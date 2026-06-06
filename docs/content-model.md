@@ -23,7 +23,7 @@ Future subjects can follow the same pattern.
 
 ## Home Subject UI State
 
-Home subject panels should support persisted collapsed/expanded state.
+Home subject panels and the app sidebar should support persisted collapsed/expanded state.
 
 ```json
 {
@@ -32,11 +32,12 @@ Home subject panels should support persisted collapsed/expanded state.
     "english": true,
     "math": false,
     "science": false
-  }
+  },
+  "sidebarCollapsed": false
 }
 ```
 
-`true` means expanded. `false` means collapsed.
+For subject panels, `true` means expanded and `false` means collapsed.
 
 First version can store this locally. Later it should live in Supabase user settings.
 
@@ -107,6 +108,8 @@ Every learned word gets one global reference card. If the same word appears in m
 ```
 
 Japanese fields are required for learning cards and charts, but they may begin as empty `needsReview` placeholders until reviewed.
+
+Cards and charts read the global Japanese ON/OFF setting from the app shell. Avoid duplicate per-card Japanese toggles.
 
 ## Reference Browse Tree
 
@@ -186,6 +189,14 @@ academic -> academic card
 glossary -> glossary/support card
 grammar -> grammar chart/card
 ```
+
+Breadcrumbs are navigation, not decoration. They should be clickable links:
+
+```text
+Home -> English -> Reference -> current item
+```
+
+Breadcrumb text remains English-only.
 
 ## Current List Context
 

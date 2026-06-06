@@ -6,6 +6,14 @@ This file tracks the decisions made before coding.
 
 LEEA is one platform with many subjects.
 
+LEEA means:
+
+```text
+Leo's Elite Education Academy
+```
+
+Use this full name in the main heading and brand copy. Do not use "Leo's Elite Academy" as a separate product name.
+
 English is the first subject. Math and science should be possible later.
 
 ```text
@@ -61,6 +69,17 @@ Home should also show useful overview numbers, such as:
 - live lessons
 - assigned lessons
 
+The first dashboard stat values are named variables:
+
+```text
+totalWords = 312
+grammarPoints = 24
+knownWords = 186
+wordsToReview = 42
+```
+
+Later these should be calculated from reference data and Leo's progress records.
+
 ## Views
 
 There are two role views plus shared Reference.
@@ -100,6 +119,16 @@ The preferred direction is:
 - Training Ground can use a Manchester City-inspired training identity
 
 Main navigation must stay consistent across every page.
+
+The sidebar may collapse, and the collapsed/open state should persist. First version can store this locally; later Supabase can store it per user.
+
+Breadcrumbs should be clickable minimalist buttons:
+
+```text
+Home / English / Reference / current item
+```
+
+Breadcrumb labels stay English-only.
 
 ## Reference Objects
 
@@ -251,6 +280,8 @@ Japanese ON = English + Japanese support
 ```
 
 Main navigation labels stay English-only.
+
+The shell has one global Japanese ON/OFF toggle. Cards and charts read that global setting. Do not add separate Japanese show/hide buttons inside individual cards unless there is a specific lesson activity reason.
 
 Japanese belongs in:
 

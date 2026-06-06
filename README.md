@@ -42,13 +42,16 @@ Our World > Level 4 > Unit 8
 
 ## Main Rules
 
+- Use the full name consistently: **Leo's Elite Education Academy**.
 - Home is subject-level. Subjects are collapsible and the app remembers whether each subject is open or closed.
 - Lessons are specific, but repeated pieces should become reusable activity blocks.
 - Vocabulary cards, academic cards, glossary/support cards, and grammar charts are reusable reference objects.
 - Main navigation stays English-only.
 - Japanese appears only in learning content such as cards, charts, instructions, and feedback.
+- The global Japanese ON/OFF toggle controls cards and charts. Do not add a second Japanese toggle inside a card.
 - Reference is a real page Leo and Neritan can browse and search.
 - A lesson goes live by registry/status data, not by hardcoding dashboard cards.
+- Dashboard stat cards should read named variables first, then later calculated/Supabase data.
 - Build slowly: scan source first, create reference data second, build lessons third.
 
 ## Reference
@@ -114,11 +117,14 @@ Implemented first:
 - global LEEA shell
 - Home dashboard
 - collapsible English subject panel
+- collapsible sidebar
+- clickable breadcrumb buttons
 - Reference source tree
 - Reference tabs for Vocabulary, Grammar, I Know, and I Don't Know
-- vocabulary card route with Previous, Next, I Know, Japanese, and lesson-link states
+- vocabulary card route with Previous, Next, I Know, global Japanese ON/OFF, and lesson-link states
 - grammar chart/card route with Japanese and lesson-link states
-- local sample data
+- Our World Level 4 Unit 8 Vocabulary 1 and 2 data
+- named starter dashboard variables
 - Supabase client placeholder
 
 Prototype:

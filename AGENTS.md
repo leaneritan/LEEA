@@ -4,6 +4,14 @@ This repo is **LEEA**, Leo's Elite Education Academy.
 
 LEEA is for a father teaching his son. English is the first subject, but the architecture must allow future subjects such as math and science.
 
+Use the full name consistently:
+
+```text
+LEEA = Leo's Elite Education Academy
+```
+
+Do not shorten the product heading to "Leo's Elite Academy".
+
 ## Golden Rules
 
 1. **Do not rush into UI.** Read source material and design the data first.
@@ -111,6 +119,17 @@ Vocabulary cards need:
 - position in current list, such as 3 / 14
 - I Know
 - related lesson button, disabled until the lesson is live
+- one global Japanese ON/OFF control from the shell, not a second card-level Japanese button
+- Japanese content hidden when Japanese is OFF and visible when Japanese is ON
+
+## Navigation Rules
+
+Navigation must stay consistent across every route.
+
+- The left sidebar can collapse.
+- Collapsed/open state can be local at first, then Supabase later.
+- Breadcrumbs should be clickable minimalist buttons.
+- Main/sidebar/breadcrumb labels stay English-only.
 
 ## Source Tags
 

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, CheckSquare, Home, Search, Settings, UserRound } from "lucide-react";
+import { BookOpen, CheckSquare, Home, PanelLeftClose, PanelLeftOpen, Search, Settings, UserRound } from "lucide-react";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 type NavKey = "home" | "english" | "assignments" | "reference" | "profile" | "settings";
 
@@ -16,6 +17,12 @@ const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNod
   { key: "settings", label: "Settings", href: "/", icon: <Settings size={20} /> }
 ];
 
+const JapanesePreferenceContext = createContext(false);
+
+export function useJapanesePreference() {
+  return useContext(JapanesePreferenceContext);
+}
+
 export function AppShell({
   active,
   crumbs,
@@ -26,10 +33,26 @@ export function AppShell({
   children: ReactNode;
 }) {
   const [japaneseOn, setJapaneseOn] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem("leea-sidebar-collapsed");
+    if (saved) setSidebarCollapsed(saved === "true");
+  }, []);
+
+  function toggleSidebar() {
+    setSidebarCollapsed((current) => {
+      const next = !current;
+      window.localStorage.setItem("leea-sidebar-collapsed", String(next));
+      return next;
+    });
+  }
 
   return (
-    <div className={japaneseOn ? "app jp-on" : "app"}>
-      <aside className="sidebar">
+    <JapanesePreferenceContext.Provider value={japaneseOn}>
+      <div className={`${japaneseOn ? "app jp-on" : "app"} ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+        <aside className="sidebar">
         <Link className="brand" href="/">
           <span className="crest">L</span>
           <span>
@@ -37,6 +60,11 @@ export function AppShell({
             <small>Leo&apos;s Elite Education Academy</small>
           </span>
         </Link>
+
+        <button className="sidebar-toggle" onClick={toggleSidebar} type="button">
+          {sidebarCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+          <span>{sidebarCollapsed ? "Open menu" : "Collapse menu"}</span>
+        </button>
 
         <nav className="side-nav" aria-label="Main navigation">
           {navItems.map((item) => (
@@ -51,16 +79,14 @@ export function AppShell({
           <strong>Leo&apos;s Progress</strong>
           <span>3 assignments left</span>
         </div>
-      </aside>
+        </aside>
 
-      <main className="main">
-        <header className="topbar">
+        <main className="main">
+          <header className="topbar">
           <div className="crumbs">
             {crumbs.map((crumb, index) => (
               <span key={`${crumb}-${index}`}>
-                {index > 0 ? " / " : ""}
-                <b>{index === crumbs.length - 1 ? crumb : null}</b>
-                {index !== crumbs.length - 1 ? crumb : null}
+                <CrumbButton crumb={crumb} current={index === crumbs.length - 1} href={getCrumbHref(crumb, pathname)} />
               </span>
             ))}
           </div>
@@ -76,19 +102,35 @@ export function AppShell({
               Home
             </Link>
           </div>
-        </header>
+          </header>
 
-        <div className="content">{children}</div>
-      </main>
+          <div className="content">{children}</div>
+        </main>
 
-      <nav className="mobile-nav" aria-label="Mobile navigation">
-        {navItems.slice(0, 4).map((item) => (
-          <Link className={active === item.key ? "active" : ""} href={item.href} key={item.key}>
-            {item.icon}
-            <span>{item.label}</span>
-          </Link>
-        ))}
-      </nav>
-    </div>
+        <nav className="mobile-nav" aria-label="Mobile navigation">
+          {navItems.slice(0, 4).map((item) => (
+            <Link className={active === item.key ? "active" : ""} href={item.href} key={item.key}>
+              {item.icon}
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </nav>
+      </div>
+    </JapanesePreferenceContext.Provider>
+  );
+}
+
+function getCrumbHref(crumb: string, pathname: string) {
+  if (crumb === "Home") return "/";
+  if (crumb === "English") return "/";
+  if (crumb === "Reference") return "/reference";
+  return pathname;
+}
+
+function CrumbButton({ crumb, current, href }: { crumb: string; current: boolean; href: string }) {
+  return (
+    <Link className={current ? "crumb-button current" : "crumb-button"} href={href}>
+      {crumb}
+    </Link>
   );
 }

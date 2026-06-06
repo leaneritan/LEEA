@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Volume2 } from "lucide-react";
+import { useJapanesePreference } from "@/components/AppShell";
 import {
   getNextVocabularyId,
   getPreviousVocabularyId,
@@ -14,7 +15,7 @@ import {
 export function VocabularyCardPage({ initialWordId }: { initialWordId: string }) {
   const [knownOverride, setKnownOverride] = useState<Record<string, boolean>>({});
   const word = getVocabularyById(initialWordId);
-  const [showJapanese, setShowJapanese] = useState(false);
+  const showJapanese = useJapanesePreference();
 
   const displayKnown = useMemo(() => {
     if (!word) return false;
@@ -77,19 +78,12 @@ export function VocabularyCardPage({ initialWordId }: { initialWordId: string })
           <p className="meaning">{word.meaning}</p>
           <div className="sample">{highlightWord(word.example, word.word)}</div>
 
-          {word.japanese ? (
-            <>
-              <button className="jp-content-button" onClick={() => setShowJapanese((current) => !current)} type="button">
-                {showJapanese ? "Hide Japanese" : "Show Japanese"}
-              </button>
-              {showJapanese ? (
-                <div className="japanese-box">
-                  <strong>{word.japanese.word}</strong>
-                  {word.japanese.reading ? <span>{word.japanese.reading}</span> : null}
-                  <p>{word.japanese.meaning}</p>
-                </div>
-              ) : null}
-            </>
+          {showJapanese && word.japanese ? (
+            <div className="japanese-box">
+              <strong>{word.japanese.word}</strong>
+              {word.japanese.reading ? <span>{word.japanese.reading}</span> : null}
+              <p>{word.japanese.meaning}</p>
+            </div>
           ) : null}
 
           <div className="card-actions">
@@ -98,7 +92,7 @@ export function VocabularyCardPage({ initialWordId }: { initialWordId: string })
               onClick={() => setKnownOverride((current) => ({ ...current, [word.id]: !displayKnown }))}
               type="button"
             >
-              {displayKnown ? "✓ I Know" : "Mark I Know"}
+              {displayKnown ? "I Know" : "Mark I Know"}
             </button>
             {liveSource ? (
               <button className="lesson-button" type="button">

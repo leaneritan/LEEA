@@ -28,7 +28,7 @@ export function HomeDashboard() {
         <div className="hero-card">
           <span className="eyebrow">Active Session</span>
           <h1>
-            Leo&apos;s <mark>Elite</mark> Academy
+            Leo&apos;s <mark>Elite</mark> Education Academy
           </h1>
           <p>Teach, practice, and look up every word and grammar point from one consistent place.</p>
 
@@ -153,4 +153,3 @@ function Stat({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
-

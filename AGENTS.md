@@ -122,6 +122,13 @@ Vocabulary cards need:
 - one global Japanese ON/OFF control from the shell, not a second card-level Japanese button
 - Japanese content hidden when Japanese is OFF and visible when Japanese is ON
 
+Grammar cards need:
+
+- source-backed chart data
+- chart tabs, currently Notice / Pattern / Examples / Practice
+- one global Japanese ON/OFF control from the shell
+- related lesson button, disabled until the lesson is live
+
 ## Navigation Rules
 
 Navigation must stay consistent across every route.
@@ -138,6 +145,7 @@ Use exact source tags so duplicate words can appear once in search but retain ev
 ```text
 OW4-U8-V1        Our World Level 4 Unit 8 Vocabulary 1
 OW4-U8-G1        Our World Level 4 Unit 8 Grammar 1
+OW4-U8-G2        Our World Level 4 Unit 8 Grammar 2
 OW4-U8-OP        Our World Level 4 Unit 8 Opener
 JF1-L1-U2-V1     Joyful Work Year 1 Lesson 1 Unit 2 Vocabulary 1
 TG-PUNCT-COMMA   Training Ground punctuation comma lesson

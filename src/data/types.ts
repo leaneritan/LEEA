@@ -50,6 +50,15 @@ export type GrammarPoint = {
   shortName: string;
   rule: string;
   pattern: string;
+  chart?: {
+    chartType: string;
+    tabs: Array<{
+      id: string;
+      label: string;
+      title: string;
+      blocks: Array<Record<string, unknown>>;
+    }>;
+  };
   japanese?: {
     title: string;
     rule: string;
@@ -60,4 +69,10 @@ export type GrammarPoint = {
     sentence: string;
     highlight: string;
   }>;
+  workbookActivities?: Array<{
+    number: number;
+    type: string;
+    instruction: string;
+  }>;
+  tags?: string[];
 };

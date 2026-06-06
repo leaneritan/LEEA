@@ -355,6 +355,22 @@ For grammar lessons, the chart appears at the top of every tab.
 
 Grammar 1 and Grammar 2 should appear as grammar-point cards in Reference, not only inside lessons.
 
+Grammar reference cards use tabbed chart data. The first tab set is:
+
+```text
+Notice
+Pattern
+Examples
+Practice
+```
+
+Our World Level 4 Unit 8 grammar source:
+
+```text
+OW4-U8-G1 - Describing people with who
+OW4-U8-G2 - Direct and indirect objects
+```
+
 ## Lessons
 
 Lessons are specific and should not be forced into one giant template.

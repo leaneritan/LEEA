@@ -267,6 +267,19 @@ Later these should be calculated from reference data plus Leo's Supabase progres
 
 Grammar points live separately from vocabulary and can be reused at the top of every grammar practice tab.
 
+Course/unit grammar source data lives beside the unit vocabulary data:
+
+```text
+content/subjects/english/courses/our-world/level-4/unit-8/grammar.json
+```
+
+Current Unit 8 grammar points:
+
+```text
+OW4-U8-G1 - Describing people with who
+OW4-U8-G2 - Direct and indirect objects
+```
+
 ```json
 {
   "id": "ow_l4_u8_g1_who_clauses",
@@ -281,6 +294,15 @@ Grammar points live separately from vocabulary and can be reused at the top of e
   "shortName": "who clauses",
   "rule": "Use who to give more information about a person.",
   "pattern": "person + who + verb phrase",
+  "chart": {
+    "chartType": "grammar-reference-card",
+    "tabs": [
+      { "id": "notice", "label": "Notice" },
+      { "id": "pattern", "label": "Pattern" },
+      { "id": "examples", "label": "Examples" },
+      { "id": "practice", "label": "Practice" }
+    ]
+  },
   "japanese": {
     "title": "",
     "rule": "",
@@ -296,7 +318,7 @@ Grammar points live separately from vocabulary and can be reused at the top of e
 }
 ```
 
-Grammar charts and cards need Japanese on/off in the learning view.
+Grammar charts and cards need Japanese on/off in the learning view. They read the global shell setting, not a duplicate card-level button.
 
 ## Lesson Assembly
 

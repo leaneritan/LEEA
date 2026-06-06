@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEEA - Main + Reference Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Noto+Sans+JP:wght@400;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f6f1e7;
+    --paper: #fffdf8;
+    --ink: #1c1815;
+    --muted: #6d645b;
+    --hair: #e7decc;
+    --gold: #be9a4e;
+    --gold-soft: #f4e5b8;
+    --ever: #1e4d45;
+    --ever-2: #2f6f63;
+    --city: #6cabdd;
+    --city-dark: #102c50;
+    --ng-yellow: #ffcc00;
+    --ng-black: #0a0a0a;
+    --red: #b64d41;
+    --shadow: 0 1px 2px rgba(28,24,21,.04), 0 12px 32px rgba(28,24,21,.08);
+    --shadow-lg: 0 8px 30px rgba(28,24,21,.16);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: "Albert Sans", system-ui, sans-serif;
+    min-height: 100vh;
+  }
+
+  button, input { font: inherit; }
+  button { cursor: pointer; }
+
+  .app {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr);
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    background: #151d1a;
+    color: #f7f1df;
+    padding: 24px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .brand {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 0 8px 18px;
+    border-bottom: 1px solid rgba(255,255,255,.14);
+  }
+
+  .crest {
+    width: 42px;
+    height: 42px;
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    background: var(--gold);
+    color: #151d1a;
+    font-family: "Fraunces", serif;
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .brand strong {
+    display: block;
+    font-family: "Fraunces", serif;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .brand span {
+    display: block;
+    margin-top: 4px;
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: #d6c99f;
+  }
+
+  .nav {
+    display: grid;
+    gap: 6px;
+  }
+
+  .nav button {
+    border: 0;
+    background: transparent;
+    color: #d6d0c0;
+    text-align: left;
+    padding: 12px 14px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+  }
+
+  .nav button.active,
+  .nav button:hover {
+    background: rgba(255,255,255,.10);
+    color: #fff;
+  }
+
+  .nav .ico {
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+  }
+
+  .sidebar-foot {
+    margin-top: auto;
+    border-top: 1px solid rgba(255,255,255,.14);
+    padding-top: 16px;
+  }
+
+  .small-progress {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .small-progress b {
+    display: block;
+    font-size: 13px;
+  }
+
+  .small-progress span {
+    color: #d6c99f;
+    font-size: 12px;
+  }
+
+  .main {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(246,241,231,.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--hair);
+    height: 68px;
+    padding: 0 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .crumbs {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .crumbs b { color: var(--ink); }
+
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .jp-toggle {
+    border: 1px solid var(--hair);
+    background: var(--paper);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .jp-toggle.on {
+    border-color: var(--ever);
+    color: var(--ever);
+    background: #eef7f3;
+  }
+
+  .home-btn {
+    border: 0;
+    background: var(--ink);
+    color: var(--cream);
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-weight: 800;
+  }
+
+  .content {
+    padding: 34px;
+    max-width: 1220px;
+    width: 100%;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; animation: fade .22s ease; }
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .eyebrow {
+    color: var(--gold);
+    font-size: 11px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-weight: 800;
+  }
+
+  h1, h2, h3 {
+    font-family: "Fraunces", serif;
+    margin: 0;
+  }
+
+  h1 {
+    font-size: clamp(36px, 5vw, 66px);
+    line-height: .96;
+    letter-spacing: -.03em;
+    font-weight: 650;
+  }
+
+  h2 {
+    font-size: 30px;
+    font-weight: 650;
+  }
+
+  h3 {
+    font-size: 22px;
+    font-weight: 650;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) 390px;
+    gap: 24px;
+    align-items: stretch;
+    margin-bottom: 26px;
+  }
+
+  .welcome {
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    border-radius: 18px;
+    padding: 32px;
+    box-shadow: var(--shadow);
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .welcome p {
+    max-width: 560px;
+    color: var(--muted);
+    font-size: 17px;
+  }
+
+  .assignment {
+    border-radius: 18px;
+    overflow: hidden;
+    background: #17211d;
+    color: #fff;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .assignment-top {
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(255,255,255,.14);
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .assignment-body {
+    padding: 22px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    flex: 1;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    padding: 6px 10px;
+    background: rgba(255,255,255,.10);
+    color: #f7f1df;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-weight: 800;
+    width: fit-content;
+  }
+
+  .assignment h2 {
+    color: #fff;
+    font-size: 28px;
+    line-height: 1.02;
+  }
+
+  .assignment p {
+    color: #d9d0bd;
+    margin: 0;
+  }
+
+  .primary {
+    border: 0;
+    background: var(--gold);
+    color: #151d1a;
+    border-radius: 12px;
+    padding: 13px 18px;
+    font-weight: 900;
+    width: fit-content;
+  }
+
+  .ghost {
+    border: 1px solid var(--hair);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 12px;
+    padding: 11px 15px;
+    font-weight: 850;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 30px 0 16px;
+  }
+
+  .section-head span {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .course-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .course-card {
+    border: 1px solid var(--hair);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--paper);
+    box-shadow: var(--shadow);
+    min-height: 228px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .course-band {
+    min-height: 78px;
+    padding: 16px;
+    color: #fff;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .course-card.ow .course-band {
+    background: linear-gradient(135deg, var(--ng-black), #174840);
+    border-top: 8px solid var(--ng-yellow);
+  }
+
+  .course-card.jf .course-band {
+    background: linear-gradient(135deg, #fbfbf5, #efe7d5);
+    color: var(--ink);
+    border-top: 8px solid var(--red);
+  }
+
+  .course-card.tg .course-band {
+    background: linear-gradient(135deg, var(--city-dark), #1f5989);
+    border-top: 8px solid var(--city);
+  }
+
+  .course-body {
+    padding: 18px;
+    flex: 1;
+    display: grid;
+    gap: 14px;
+  }
+
+  .course-body p {
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .course-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    background: var(--cream);
+    border: 1px solid var(--hair);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .stat {
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .stat span {
+    color: var(--muted);
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .stat b {
+    display: block;
+    margin-top: 8px;
+    font-family: "Fraunces", serif;
+    font-size: 30px;
+  }
+
+  .reference-layout {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .ref-side {
+    padding: 16px;
+    height: fit-content;
+    position: sticky;
+    top: 92px;
+  }
+
+  .search {
+    position: relative;
+    margin-bottom: 14px;
+  }
+
+  .search input {
+    width: 100%;
+    border: 1px solid var(--hair);
+    background: #fff;
+    border-radius: 12px;
+    padding: 13px 14px;
+    outline: none;
+    font-weight: 700;
+  }
+
+  .tab-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .tab-row button,
+  .filter-list button {
+    border: 1px solid var(--hair);
+    background: #fff;
+    color: var(--muted);
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: 850;
+    text-align: left;
+  }
+
+  .tab-row button.active,
+  .filter-list button.active {
+    border-color: var(--ever);
+    background: #edf7f3;
+    color: var(--ever);
+  }
+
+  .filter-list {
+    display: grid;
+    gap: 8px;
+  }
+
+  .ref-main {
+    padding: 22px;
+  }
+
+  .ref-toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: start;
+    margin-bottom: 18px;
+  }
+
+  .ref-toolbar p {
+    margin: 6px 0 0;
+    color: var(--muted);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .word-mini,
+  .grammar-mini {
+    border: 1px solid var(--hair);
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px;
+    text-align: left;
+    box-shadow: 0 4px 16px rgba(28,24,21,.04);
+  }
+
+  .word-mini:hover,
+  .grammar-mini:hover {
+    border-color: var(--gold);
+    transform: translateY(-1px);
+  }
+
+  .word-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: start;
+  }
+
+  .word-mini strong,
+  .grammar-mini strong {
+    font-family: "Fraunces", serif;
+    font-size: 24px;
+  }
+
+  .word-mini p,
+  .grammar-mini p {
+    color: var(--muted);
+    margin: 8px 0 12px;
+  }
+
+  .source-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .source-tags span {
+    background: var(--cream);
+    color: var(--muted);
+    border: 1px solid var(--hair);
+    border-radius: 6px;
+    padding: 4px 7px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .08em;
+  }
+
+  .card-view {
+    max-width: 850px;
+  }
+
+  .card-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .big-word-card,
+  .grammar-card {
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .visual-box {
+    border-bottom: 1px solid var(--hair);
+    background: #fbf6df;
+    padding: 34px;
+    min-height: 170px;
+    display: grid;
+    place-items: center;
+  }
+
+  .emoji {
+    font-size: 70px;
+  }
+
+  .word-content {
+    padding: 28px;
+  }
+
+  .word-title {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .word-title h1 {
+    font-size: clamp(52px, 8vw, 86px);
+    line-height: .86;
+    font-family: "Albert Sans", sans-serif;
+    letter-spacing: -.08em;
+    font-weight: 900;
+  }
+
+  .speak {
+    border: 1px solid var(--ink);
+    background: #fff;
+    width: 54px;
+    height: 54px;
+    border-radius: 9px;
+    font-size: 22px;
+  }
+
+  .meta-line {
+    margin: 12px 0 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .sample {
+    border-left: 5px solid var(--ng-yellow);
+    background: #fff9df;
+    padding: 18px 20px;
+    margin: 20px 0;
+    font-size: 19px;
+  }
+
+  mark {
+    background: var(--ng-yellow);
+    padding: 0 4px;
+  }
+
+  .jp-box {
+    display: none;
+    background: #eef7f3;
+    border: 1px solid #cde4dc;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: "Noto Sans JP", sans-serif;
+    margin-top: 14px;
+  }
+
+  .jp-box.show { display: block; }
+
+  .card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .know {
+    border: 0;
+    background: var(--ever);
+    color: #fff;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-weight: 900;
+  }
+
+  .know.known {
+    background: #2a8a55;
+  }
+
+  .lesson-link {
+    border: 1px solid var(--hair);
+    background: #fff;
+    color: var(--ink);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-weight: 900;
+  }
+
+  .lesson-link[disabled] {
+    opacity: .5;
+    cursor: not-allowed;
+  }
+
+  .grammar-top {
+    background: var(--ng-black);
+    color: #fff;
+    border-top: 10px solid var(--ng-yellow);
+    padding: 20px 24px;
+  }
+
+  .grammar-top .eyebrow { color: var(--ng-yellow); }
+
+  .grammar-body {
+    padding: 24px;
+  }
+
+  .rule {
+    background: #fff9df;
+    border-left: 5px solid var(--ng-yellow);
+    padding: 16px;
+    font-size: 19px;
+    margin: 16px 0;
+  }
+
+  .pattern {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 18px 0;
+  }
+
+  .pattern span {
+    background: var(--cream);
+    border: 1px solid var(--hair);
+    padding: 9px 12px;
+    border-radius: 9px;
+    font-weight: 900;
+  }
+
+  .examples {
+    display: grid;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .examples div {
+    background: #fff;
+    border: 1px solid var(--hair);
+    border-radius: 10px;
+    padding: 12px;
+  }
+
+  .mobile-bar {
+    display: none;
+  }
+
+  @media (max-width: 920px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .topbar { padding: 0 18px; }
+    .content { padding: 22px 18px 92px; }
+    .hero, .reference-layout { grid-template-columns: 1fr; }
+    .course-grid, .stat-row, .cards { grid-template-columns: 1fr; }
+    .ref-side { position: static; }
+    .mobile-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      background: #151d1a;
+      padding: 8px;
+      z-index: 20;
+    }
+    .mobile-bar button {
+      border: 0;
+      background: transparent;
+      color: #d6d0c0;
+      border-radius: 10px;
+      padding: 8px 4px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .mobile-bar button.active {
+      background: rgba(255,255,255,.12);
+      color: #fff;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="crest">L</div>
+      <div>
+        <strong>LEEA</strong>
+        <span>Leo's Elite Education Academy</span>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Main navigation">
+      <button class="active" data-nav="home" onclick="showScreen('home')"><span class="ico">⌂</span>Home</button>
+      <button data-nav="english" onclick="showScreen('home')"><span class="ico">Aa</span>English</button>
+      <button data-nav="assignments"><span class="ico">✓</span>Assignments</button>
+      <button data-nav="reference" onclick="showScreen('reference')"><span class="ico">⌕</span>Reference</button>
+      <button data-nav="profile"><span class="ico">●</span>Profile</button>
+      <button data-nav="settings"><span class="ico">⚙</span>Settings</button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="small-progress">
+        <b>Leo's Progress</b>
+        <span>3 assignments left</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="crumbs" id="crumbs">Home</div>
+      <div class="top-actions">
+        <button class="jp-toggle" id="jpToggle" onclick="toggleJapanese()">Japanese OFF</button>
+        <button class="home-btn" onclick="showScreen('home')">Home</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="screen active" id="homeScreen">
+        <div class="hero">
+          <div class="welcome">
+            <div>
+              <div class="eyebrow">Welcome Back</div>
+              <h1>Learn, review, and keep moving.</h1>
+              <p>English is active now. Our World, Joyful Work, Training Ground, and Reference all live under the same LEEA shell.</p>
+            </div>
+            <div class="stat-row">
+              <div class="stat"><span>Lessons Completed</span><b>28</b></div>
+              <div class="stat"><span>Words Known</span><b>186</b></div>
+              <div class="stat"><span>Words To Review</span><b>42</b></div>
+              <div class="stat"><span>Current Streak</span><b>12</b></div>
+            </div>
+          </div>
+
+          <aside class="assignment">
+            <div class="assignment-top">
+              <span class="tag">Next Assignment</span>
+              <span class="tag">Assigned</span>
+            </div>
+            <div class="assignment-body">
+              <div>
+                <p>Our World · Level 4 · Unit 8</p>
+                <h2>Vocabulary 1</h2>
+              </div>
+              <p>Practice the target words, mark what you know, and finish the review card.</p>
+              <button class="primary">Continue</button>
+            </div>
+          </aside>
+        </div>
+
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">English</div>
+            <h2>Courses and Tools</h2>
+          </div>
+          <span>One subject, shared reference memory</span>
+        </div>
+
+        <div class="course-grid">
+          <article class="course-card ow">
+            <div class="course-band">
+              <span class="tag">National Geographic</span>
+              <b>OW</b>
+            </div>
+            <div class="course-body">
+              <div>
+                <h3>Our World</h3>
+                <p>Photo-rich unit lessons, vocabulary, grammar, reading, missions, and projects.</p>
+              </div>
+              <div class="course-meta">
+                <span class="chip">Level 4 active</span>
+                <span class="chip">Unit 8</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="course-card jf">
+            <div class="course-band">
+              <span class="tag">Junior High</span>
+              <b>JW</b>
+            </div>
+            <div class="course-body">
+              <div>
+                <h3>Joyful Work</h3>
+                <p>School workbook support, grammar practice, word order, writing, and tests.</p>
+              </div>
+              <div class="course-meta">
+                <span class="chip">Year 1 planned</span>
+                <span class="chip">Workbook</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="course-card tg">
+            <div class="course-band">
+              <span class="tag">Skill Focus</span>
+              <b>TG</b>
+            </div>
+            <div class="course-body">
+              <div>
+                <h3>Training Ground</h3>
+                <p>Focused practice for weak points like punctuation, nouns, articles, and word order.</p>
+              </div>
+              <div class="course-meta">
+                <span class="chip">Manchester City inspired</span>
+                <span class="chip">Drills</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="screen" id="referenceScreen">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">English Reference</div>
+            <h1 style="font-size:48px">Leo's word and grammar library.</h1>
+          </div>
+          <button class="ghost" onclick="openWordCard('relative')">Open sample card</button>
+        </div>
+
+        <div class="reference-layout">
+          <aside class="panel ref-side">
+            <div class="search">
+              <input id="searchBox" placeholder="Search vocabulary, grammar, tags..." oninput="filterCards()">
+            </div>
+            <div class="tab-row">
+              <button class="active" onclick="setRefMode('vocab', this)">Vocabulary</button>
+              <button onclick="setRefMode('grammar', this)">Grammar</button>
+              <button onclick="setRefMode('known', this)">I Know</button>
+              <button onclick="setRefMode('unknown', this)">I Don't Know</button>
+            </div>
+            <div class="filter-list">
+              <button class="active">All Sources</button>
+              <button>Our World · Level 4</button>
+              <button>Joyful Work · Year 1</button>
+              <button>Training Ground</button>
+              <button>Academic</button>
+              <button>Glossary</button>
+            </div>
+          </aside>
+
+          <section class="panel ref-main">
+            <div class="ref-toolbar">
+              <div>
+                <h2 id="refTitle">Vocabulary</h2>
+                <p id="refHelp">All word-like reference cards: vocabulary, academic, content, related, and glossary.</p>
+              </div>
+              <span class="tag" style="background:#edf7f3;color:var(--ever)">Searchable</span>
+            </div>
+
+            <div class="cards" id="refCards">
+              <button class="word-mini" data-type="vocab" data-known="true" data-search="relatives family ow4-u8-v1 joyful work known" onclick="openWordCard('relatives')">
+                <div class="word-head"><strong>relatives</strong><span>👨‍👩‍👦</span></div>
+                <p>People in your family, such as cousins, aunts, uncles, or grandparents.</p>
+                <div class="source-tags"><span>OW4-U8-V1</span><span>JF1-L2-VOCAB</span><span>KNOWN</span></div>
+              </button>
+              <button class="word-mini" data-type="vocab" data-known="false" data-search="clause grammar academic ow4-u8-g1 unknown" onclick="openWordCard('clause')">
+                <div class="word-head"><strong>clause</strong><span>🧩</span></div>
+                <p>A group of words that has a subject and a verb.</p>
+                <div class="source-tags"><span>OW4-U8-G1</span><span>ACADEMIC</span><span>LEARNING</span></div>
+              </button>
+              <button class="word-mini" data-type="vocab" data-known="false" data-search="caption opener academic ow4-u8-op unknown" onclick="openWordCard('caption')">
+                <div class="word-head"><strong>caption</strong><span>🏷️</span></div>
+                <p>Short text that explains a picture.</p>
+                <div class="source-tags"><span>OW4-U8-OP</span><span>ACADEMIC</span></div>
+              </button>
+              <button class="word-mini" data-type="vocab" data-known="true" data-search="alone vocabulary ow4-u8-v1 known" onclick="openWordCard('alone')">
+                <div class="word-head"><strong>alone</strong><span>🧍</span></div>
+                <p>Without other people.</p>
+                <div class="source-tags"><span>OW4-U8-V1</span><span>KNOWN</span></div>
+              </button>
+              <button class="grammar-mini" data-type="grammar" data-search="who grammar relative clause ow4-u8-g1" onclick="openGrammarCard()">
+                <strong>Describing people with who</strong>
+                <p>Use who to give more information about a person.</p>
+                <div class="source-tags"><span>OW4-U8-G1</span><span>GRAMMAR 1</span></div>
+              </button>
+              <button class="grammar-mini" data-type="grammar" data-search="direct indirect objects grammar ow4-u8-g2" onclick="openGrammarCard('objects')">
+                <strong>Direct and indirect objects</strong>
+                <p>Say who gets something and what they get.</p>
+                <div class="source-tags"><span>OW4-U8-G2</span><span>GRAMMAR 2</span></div>
+              </button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="screen card-view" id="wordCardScreen">
+        <div class="card-nav">
+          <button class="ghost" onclick="showScreen('reference')">Back to Reference</button>
+          <span class="tag" id="wordPosition" style="background:#fff;color:var(--muted)">2 / 4</span>
+          <div>
+            <button class="ghost" onclick="prevWord()">Previous</button>
+            <button class="ghost" onclick="nextWord()">Next</button>
+          </div>
+        </div>
+
+        <article class="big-word-card">
+          <div class="visual-box">
+            <div class="emoji" id="wordEmoji">👨‍👩‍👦</div>
+          </div>
+          <div class="word-content">
+            <div class="source-tags" id="wordTags"><span>OW4-U8-V1</span><span>JF1-L2-VOCAB</span></div>
+            <div class="word-title">
+              <h1 id="wordTitle">relatives</h1>
+              <button class="speak" aria-label="Play pronunciation">🔊</button>
+            </div>
+            <div class="meta-line" id="wordMeta">
+              <span>IPA /ˈrelətɪvz/</span>
+              <span>Syllables rel-a-tives</span>
+              <span>Noun · Countable</span>
+            </div>
+            <p id="wordMeaning">People in your family, such as cousins, aunts, uncles, or grandparents.</p>
+            <div class="sample" id="wordExample">I have so many <mark>relatives</mark> because we are a big family.</div>
+
+            <button class="jp-toggle" onclick="toggleCardJapanese()">Show Japanese</button>
+            <div class="jp-box" id="cardJapanese">
+              <strong id="jpWord">親戚</strong>
+              <div id="jpReading">しんせき</div>
+              <p id="jpMeaning">家族や親族の人たち。</p>
+            </div>
+
+            <div class="card-actions">
+              <button class="know" id="knowButton" onclick="toggleKnown()">✓ I Know</button>
+              <button class="lesson-link">Open related lesson</button>
+              <button class="lesson-link" disabled>Teacher lesson only</button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="screen card-view" id="grammarCardScreen">
+        <div class="card-nav">
+          <button class="ghost" onclick="showScreen('reference')">Back to Reference</button>
+          <span class="tag" style="background:#fff;color:var(--muted)">Grammar Reference</span>
+        </div>
+
+        <article class="grammar-card">
+          <div class="grammar-top">
+            <div class="eyebrow">Our World · Level 4 · Unit 8 · Grammar 1</div>
+            <h2>Describing people with who</h2>
+          </div>
+          <div class="grammar-body">
+            <div class="source-tags"><span>OW4-U8-G1</span><span>GRAMMAR POINT</span><span>LIVE LESSON</span></div>
+            <div class="rule">Use <b>who</b> to give more information about a person.</div>
+            <div class="pattern">
+              <span>person</span>
+              <span>who</span>
+              <span>verb phrase</span>
+            </div>
+            <div class="examples">
+              <div>The boy <mark>who collects fossils</mark> is my friend.</div>
+              <div>A photographer is a person <mark>who takes photos</mark>.</div>
+              <div>She is the girl <mark>who likes soccer</mark>.</div>
+            </div>
+
+            <button class="jp-toggle" style="margin-top:18px" onclick="toggleGrammarJapanese()">Show Japanese</button>
+            <div class="jp-box" id="grammarJapanese">
+              <strong>who を使って人を説明する</strong>
+              <p>人について、さらに説明を加えるときに who を使います。</p>
+              <p>形: 人 + who + 動詞句</p>
+            </div>
+
+            <div class="card-actions">
+              <button class="lesson-link">Open Grammar 1 lesson</button>
+              <button class="lesson-link">Practice this grammar</button>
+            </div>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
+</div>
+
+<nav class="mobile-bar" aria-label="Mobile navigation">
+  <button class="active" onclick="showScreen('home')">Home</button>
+  <button>Assignments</button>
+  <button onclick="showScreen('reference')">Reference</button>
+  <button>Profile</button>
+</nav>
+
+<script>
+  const words = {
+    relatives: {
+      title: "relatives",
+      emoji: "👨‍👩‍👦",
+      tags: ["OW4-U8-V1", "JF1-L2-VOCAB", "KNOWN"],
+      meta: ["IPA /ˈrelətɪvz/", "Syllables rel-a-tives", "Noun · Countable"],
+      meaning: "People in your family, such as cousins, aunts, uncles, or grandparents.",
+      example: "I have so many <mark>relatives</mark> because we are a big family.",
+      jp: ["親戚", "しんせき", "家族や親族の人たち。"],
+      known: true
+    },
+    clause: {
+      title: "clause",
+      emoji: "🧩",
+      tags: ["OW4-U8-G1", "ACADEMIC", "LEARNING"],
+      meta: ["IPA /klɔːz/", "Syllables clause", "Noun"],
+      meaning: "A group of words that has a subject and a verb.",
+      example: "The clause <mark>who collects fossils</mark> tells us more about the boy.",
+      jp: ["節", "せつ", "主語と動詞を含む語のまとまり。"],
+      known: false
+    },
+    caption: {
+      title: "caption",
+      emoji: "🏷️",
+      tags: ["OW4-U8-OP", "ACADEMIC"],
+      meta: ["IPA /ˈkæpʃən/", "Syllables cap-tion", "Noun"],
+      meaning: "Short text that explains a picture.",
+      example: "Write a <mark>caption</mark> for the polar bear photo.",
+      jp: ["キャプション", "きゃぷしょん", "写真や絵を説明する短い文。"],
+      known: false
+    },
+    alone: {
+      title: "alone",
+      emoji: "🧍",
+      tags: ["OW4-U8-V1", "KNOWN"],
+      meta: ["IPA /əˈloʊn/", "Syllables a-lone", "Adjective / Adverb"],
+      meaning: "Without other people.",
+      example: "Sometimes I like to read <mark>alone</mark>.",
+      jp: ["一人で", "ひとりで", "ほかの人と一緒ではないこと。"],
+      known: true
+    }
+  };
+
+  const wordOrder = ["relatives", "clause", "caption", "alone"];
+  let currentWord = "relatives";
+  let refMode = "vocab";
+  let japaneseOn = false;
+
+  function showScreen(name) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(name + "Screen").classList.add("active");
+    document.querySelectorAll(".nav button, .mobile-bar button").forEach(b => b.classList.remove("active"));
+    if (name === "reference" || name === "wordCard" || name === "grammarCard") {
+      document.querySelectorAll('[data-nav="reference"]').forEach(b => b.classList.add("active"));
+      document.getElementById("crumbs").innerHTML = "Home / English / <b>Reference</b>";
+    } else {
+      document.querySelectorAll('[data-nav="home"]').forEach(b => b.classList.add("active"));
+      document.getElementById("crumbs").innerHTML = "<b>Home</b>";
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function toggleJapanese() {
+    japaneseOn = !japaneseOn;
+    const btn = document.getElementById("jpToggle");
+    btn.classList.toggle("on", japaneseOn);
+    btn.textContent = japaneseOn ? "Japanese ON" : "Japanese OFF";
+    document.getElementById("cardJapanese").classList.toggle("show", japaneseOn);
+    document.getElementById("grammarJapanese").classList.toggle("show", japaneseOn);
+  }
+
+  function setRefMode(mode, button) {
+    refMode = mode;
+    document.querySelectorAll(".tab-row button").forEach(b => b.classList.remove("active"));
+    button.classList.add("active");
+    const title = document.getElementById("refTitle");
+    const help = document.getElementById("refHelp");
+    if (mode === "grammar") {
+      title.textContent = "Grammar";
+      help.textContent = "All grammar points as reusable charts and reference cards.";
+    } else if (mode === "known") {
+      title.textContent = "I Know";
+      help.textContent = "Words Leo marked as known and confident.";
+    } else if (mode === "unknown") {
+      title.textContent = "I Don't Know";
+      help.textContent = "Words Leo is still learning or needs to review.";
+    } else {
+      title.textContent = "Vocabulary";
+      help.textContent = "All word-like reference cards: vocabulary, academic, content, related, and glossary.";
+    }
+    filterCards();
+  }
+
+  function filterCards() {
+    const query = document.getElementById("searchBox").value.toLowerCase().trim();
+    document.querySelectorAll("#refCards > button").forEach(card => {
+      const type = card.dataset.type;
+      const known = card.dataset.known;
+      const text = card.dataset.search || "";
+      let visible = true;
+      if (refMode === "grammar") visible = type === "grammar";
+      if (refMode === "vocab") visible = type === "vocab";
+      if (refMode === "known") visible = type === "vocab" && known === "true";
+      if (refMode === "unknown") visible = type === "vocab" && known === "false";
+      if (query && !text.includes(query)) visible = false;
+      card.style.display = visible ? "" : "none";
+    });
+  }
+
+  function openWordCard(id) {
+    currentWord = id;
+    const data = words[id];
+    document.getElementById("wordEmoji").textContent = data.emoji;
+    document.getElementById("wordTitle").textContent = data.title;
+    document.getElementById("wordTags").innerHTML = data.tags.map(t => `<span>${t}</span>`).join("");
+    document.getElementById("wordMeta").innerHTML = data.meta.map(t => `<span>${t}</span>`).join("");
+    document.getElementById("wordMeaning").textContent = data.meaning;
+    document.getElementById("wordExample").innerHTML = data.example;
+    document.getElementById("jpWord").textContent = data.jp[0];
+    document.getElementById("jpReading").textContent = data.jp[1];
+    document.getElementById("jpMeaning").textContent = data.jp[2];
+    document.getElementById("cardJapanese").classList.toggle("show", japaneseOn);
+    document.getElementById("knowButton").classList.toggle("known", data.known);
+    document.getElementById("knowButton").textContent = data.known ? "✓ I Know" : "Mark I Know";
+    updatePosition();
+    showScreen("wordCard");
+  }
+
+  function updatePosition() {
+    const index = wordOrder.indexOf(currentWord);
+    document.getElementById("wordPosition").textContent = `${index + 1} / ${wordOrder.length}`;
+  }
+
+  function nextWord() {
+    const index = wordOrder.indexOf(currentWord);
+    openWordCard(wordOrder[(index + 1) % wordOrder.length]);
+  }
+
+  function prevWord() {
+    const index = wordOrder.indexOf(currentWord);
+    openWordCard(wordOrder[(index - 1 + wordOrder.length) % wordOrder.length]);
+  }
+
+  function toggleKnown() {
+    words[currentWord].known = !words[currentWord].known;
+    openWordCard(currentWord);
+  }
+
+  function toggleCardJapanese() {
+    document.getElementById("cardJapanese").classList.toggle("show");
+  }
+
+  function openGrammarCard() {
+    document.getElementById("grammarJapanese").classList.toggle("show", japaneseOn);
+    showScreen("grammarCard");
+  }
+
+  function toggleGrammarJapanese() {
+    document.getElementById("grammarJapanese").classList.toggle("show");
+  }
+</script>
+</body>
+</html>

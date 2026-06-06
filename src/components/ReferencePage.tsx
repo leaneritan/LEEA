@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { BookOpen, Search } from "lucide-react";
-import { grammarPoints, vocabularyItems } from "@/data/reference";
+import { grammarPoints, unit8Vocab1Items, unit8Vocab2Items, vocabularyItems } from "@/data/reference";
 
 type ReferenceMode = "source" | "vocabulary" | "grammar" | "known" | "unknown";
 
@@ -115,8 +115,19 @@ function SourceTree() {
               <summary>Level {level}</summary>
               {level === 4 ? (
                 <details open>
-                  <summary>Unit 8 · That&apos;s Really Interesting!</summary>
-                  <TreeLink href="/reference" label="Vocabulary 1" />
+                  <summary>Unit 8 - That&apos;s Really Interesting!</summary>
+                  <details open>
+                    <summary>Vocabulary 1</summary>
+                    {unit8Vocab1Items.map((word) => (
+                      <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
+                    ))}
+                  </details>
+                  <details open>
+                    <summary>Vocabulary 2</summary>
+                    {unit8Vocab2Items.map((word) => (
+                      <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
+                    ))}
+                  </details>
                   <TreeLink href="/reference/grammar/ow_l4_u8_g1_who_clauses" label="Grammar 1" />
                   <TreeLink href="/reference" label="Academic" />
                   <TreeLink href="/reference" label="Glossary" />

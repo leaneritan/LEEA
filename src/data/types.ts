@@ -17,6 +17,7 @@ export type VocabularyItem = {
   word: string;
   normalizedWord: string;
   emoji: string;
+  emojiDescription?: string;
   ipa?: string;
   syllables?: string;
   partOfSpeech?: string;
@@ -27,6 +28,7 @@ export type VocabularyItem = {
     word: string;
     reading?: string;
     meaning: string;
+    needsReview?: boolean;
   };
   sources: SourceTag[];
   tags: string[];
@@ -52,10 +54,10 @@ export type GrammarPoint = {
     title: string;
     rule: string;
     pattern: string;
+    needsReview?: boolean;
   };
   examples: Array<{
     sentence: string;
     highlight: string;
   }>;
 };
-

@@ -1,167 +1,31 @@
-import type { GrammarPoint, VocabularyItem } from "./types";
+import unit8Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json";
+import type { SourceTag, GrammarPoint, VocabularyItem } from "./types";
 
-export const vocabularyItems: VocabularyItem[] = [
-  {
-    id: "global_relatives",
-    type: "vocabulary",
-    word: "relatives",
-    normalizedWord: "relative",
-    emoji: "👨‍👩‍👦",
-    ipa: "/ˈrelətɪvz/",
-    syllables: "rel-a-tives",
-    partOfSpeech: "noun",
-    countability: "countable",
-    meaning: "People in your family, such as cousins, aunts, uncles, or grandparents.",
-    example: "I have so many relatives because we are a big family.",
-    japanese: {
-      word: "親戚",
-      reading: "しんせき",
-      meaning: "家族や親族の人たち。"
-    },
-    sources: [
-      {
-        subject: "english",
-        course: "our-world",
-        level: 4,
-        unit: 8,
-        component: "vocab-1",
-        lessonId: "ow-l4-u8-vocab-1",
-        tag: "OW4-U8-V1",
-        lessonStatus: "live"
-      },
-      {
-        subject: "english",
-        course: "joyful-work",
-        year: 1,
-        component: "vocabulary",
-        tag: "JF1-VOCAB",
-        lessonStatus: "draft"
-      }
-    ],
-    tags: ["vocabulary", "family", "OW4-U8-V1", "JF1-VOCAB"],
-    knows: true
-  },
-  {
-    id: "global_clause",
-    type: "academic",
-    word: "clause",
-    normalizedWord: "clause",
-    emoji: "🧩",
-    ipa: "/klɔːz/",
-    syllables: "clause",
-    partOfSpeech: "noun",
-    meaning: "A group of words that has a subject and a verb.",
-    example: "The clause who collects fossils tells us more about the boy.",
-    japanese: {
-      word: "節",
-      reading: "せつ",
-      meaning: "主語と動詞を含む語のまとまり。"
-    },
-    sources: [
-      {
-        subject: "english",
-        course: "our-world",
-        level: 4,
-        unit: 8,
-        component: "grammar-1",
-        lessonId: "ow-l4-u8-grammar-1",
-        tag: "OW4-U8-G1",
-        lessonStatus: "live"
-      }
-    ],
-    tags: ["academic", "grammar", "OW4-U8-G1"],
+type UnitVocabularyWord = (typeof unit8Vocabulary.words)[number];
+
+function toVocabularyItem(word: UnitVocabularyWord): VocabularyItem {
+  return {
+    id: word.id,
+    type: word.type as VocabularyItem["type"],
+    word: word.word,
+    normalizedWord: word.normalizedWord,
+    emoji: word.displayEmoji,
+    emojiDescription: word.emojiDescription,
+    syllables: word.syllables,
+    partOfSpeech: word.partOfSpeech,
+    meaning: word.meaning,
+    example: word.example,
+    japanese: word.japanese,
+    sources: word.sources as SourceTag[],
+    tags: word.tags,
     knows: false
-  },
-  {
-    id: "global_caption",
-    type: "academic",
-    word: "caption",
-    normalizedWord: "caption",
-    emoji: "🏷️",
-    ipa: "/ˈkæpʃən/",
-    syllables: "cap-tion",
-    partOfSpeech: "noun",
-    meaning: "Short text that explains a picture.",
-    example: "Write a caption for the polar bear photo.",
-    japanese: {
-      word: "キャプション",
-      reading: "きゃぷしょん",
-      meaning: "写真や絵を説明する短い文。"
-    },
-    sources: [
-      {
-        subject: "english",
-        course: "our-world",
-        level: 4,
-        unit: 8,
-        component: "opener",
-        lessonId: "ow-l4-u8-opener",
-        tag: "OW4-U8-OP",
-        lessonStatus: "draft"
-      }
-    ],
-    tags: ["academic", "opener", "OW4-U8-OP"],
-    knows: false
-  },
-  {
-    id: "global_alone",
-    type: "vocabulary",
-    word: "alone",
-    normalizedWord: "alone",
-    emoji: "🧍",
-    ipa: "/əˈloʊn/",
-    syllables: "a-lone",
-    partOfSpeech: "adjective / adverb",
-    meaning: "Without other people.",
-    example: "Sometimes I like to read alone.",
-    japanese: {
-      word: "一人で",
-      reading: "ひとりで",
-      meaning: "ほかの人と一緒ではないこと。"
-    },
-    sources: [
-      {
-        subject: "english",
-        course: "our-world",
-        level: 4,
-        unit: 8,
-        component: "vocab-1",
-        lessonId: "ow-l4-u8-vocab-1",
-        tag: "OW4-U8-V1",
-        lessonStatus: "live"
-      }
-    ],
-    tags: ["vocabulary", "OW4-U8-V1"],
-    knows: true
-  },
-  {
-    id: "global_word_order",
-    type: "glossary",
-    word: "word order",
-    normalizedWord: "word order",
-    emoji: "🧱",
-    partOfSpeech: "noun",
-    meaning: "The order of words in a sentence.",
-    example: "English word order is different from Japanese word order.",
-    japanese: {
-      word: "語順",
-      reading: "ごじゅん",
-      meaning: "文の中で言葉が並ぶ順番。"
-    },
-    sources: [
-      {
-        subject: "english",
-        course: "special-training",
-        topic: "word-order",
-        component: "lesson",
-        tag: "TG-WORD-ORDER",
-        lessonStatus: "draft"
-      }
-    ],
-    tags: ["glossary", "training-ground", "word-order"],
-    knows: false
-  }
-];
+  };
+}
+
+export const vocabularyItems: VocabularyItem[] = unit8Vocabulary.words.map(toVocabularyItem);
+
+export const unit8Vocab1Items = vocabularyItems.filter((item) => item.sources.some((source) => source.tag === "OW4-U8-V1"));
+export const unit8Vocab2Items = vocabularyItems.filter((item) => item.sources.some((source) => source.tag === "OW4-U8-V2"));
 
 export const grammarPoints: GrammarPoint[] = [
   {
@@ -172,16 +36,17 @@ export const grammarPoints: GrammarPoint[] = [
     unit: 8,
     component: "grammar-1",
     lessonId: "ow-l4-u8-grammar-1",
-    lessonStatus: "live",
+    lessonStatus: "draft",
     tag: "OW4-U8-G1",
     title: "Describing people with who",
     shortName: "who clauses",
     rule: "Use who to give more information about a person.",
     pattern: "person + who + verb phrase",
     japanese: {
-      title: "who を使って人を説明する",
-      rule: "人について、さらに説明を加えるときに who を使います。",
-      pattern: "人 + who + 動詞句"
+      title: "",
+      rule: "",
+      pattern: "",
+      needsReview: true
     },
     examples: [
       {
@@ -213,9 +78,10 @@ export const grammarPoints: GrammarPoint[] = [
     rule: "Use this pattern to say who gets something and what they get.",
     pattern: "subject + verb + person + thing",
     japanese: {
-      title: "直接目的語と間接目的語",
-      rule: "だれが何を受け取るかを言うときに使います。",
-      pattern: "主語 + 動詞 + 人 + 物"
+      title: "",
+      rule: "",
+      pattern: "",
+      needsReview: true
     },
     examples: [
       {
@@ -253,4 +119,3 @@ export function getPreviousVocabularyId(id: string) {
   const index = getVocabularyIndex(id);
   return referenceWordOrder[(index - 1 + referenceWordOrder.length) % referenceWordOrder.length];
 }
-

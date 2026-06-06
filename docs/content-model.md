@@ -1,6 +1,6 @@
 # Content Model Draft
 
-This is a first draft. It is intentionally small and editable.
+This is a first draft. It is intentionally small, editable, and source-first.
 
 ## Folder Shape
 
@@ -70,22 +70,25 @@ archived
 
 ## Vocabulary Reference
 
+Every learned word gets one global reference card. If the same word appears in multiple books or lessons, it should still have one global item with multiple source tags.
+
 ```json
 {
-  "id": "global_clause",
-  "type": "academic",
-  "word": "clause",
-  "normalizedWord": "clause",
-  "emoji": "🧩",
-  "ipa": "/klɔːz/",
-  "syllables": "clause",
+  "id": "global_relative",
+  "type": "vocabulary",
+  "word": "relative",
+  "normalizedWord": "relative",
+  "displayEmoji": "family emoji",
+  "emojiDescription": "family members",
   "partOfSpeech": "noun",
-  "meaning": "A group of words that has a subject and a verb.",
-  "example": "The clause who collects fossils tells us more about the boy.",
+  "syllables": "rel-a-tive",
+  "meaning": "a person in your family",
+  "example": "I have many relatives.",
   "japanese": {
-    "word": "節",
-    "reading": "せつ",
-    "meaning": "主語と動詞を含む語のまとまり。"
+    "word": "",
+    "reading": "",
+    "meaning": "",
+    "needsReview": true
   },
   "sources": [
     {
@@ -93,14 +96,17 @@ archived
       "course": "our-world",
       "level": 4,
       "unit": 8,
-      "component": "grammar-1",
-      "lessonId": "ow-l4-u8-grammar-1",
-      "tag": "OW4-U8-G1"
+      "component": "vocab-1",
+      "lessonId": "ow-l4-u8-vocab-1",
+      "tag": "OW4-U8-V1",
+      "lessonStatus": "draft"
     }
   ],
-  "tags": ["academic", "grammar", "OW4-U8-G1"]
+  "tags": ["vocabulary", "content", "OW4-U8-V1"]
 }
 ```
+
+Japanese fields are required for learning cards and charts, but they may begin as empty `needsReview` placeholders until reviewed.
 
 ## Reference Browse Tree
 
@@ -233,6 +239,8 @@ needs-review
 
 ## Grammar Reference
 
+Grammar points live separately from vocabulary and can be reused at the top of every grammar practice tab.
+
 ```json
 {
   "id": "ow_l4_u8_g1_who_clauses",
@@ -248,9 +256,10 @@ needs-review
   "rule": "Use who to give more information about a person.",
   "pattern": "person + who + verb phrase",
   "japanese": {
-    "title": "who を使って人を説明する",
-    "rule": "人について、さらに説明を加えるときに who を使います。",
-    "pattern": "人 + who + 動詞句"
+    "title": "",
+    "rule": "",
+    "pattern": "",
+    "needsReview": true
   },
   "examples": [
     {
@@ -260,6 +269,8 @@ needs-review
   ]
 }
 ```
+
+Grammar charts and cards need Japanese on/off in the learning view.
 
 ## Lesson Assembly
 
@@ -287,6 +298,8 @@ Lessons are ordered block lists.
   ]
 }
 ```
+
+Teacher lessons are for Neritan to teach. Learner lessons and review cards are for Leo's independent homework/practice.
 
 ## Assignment
 

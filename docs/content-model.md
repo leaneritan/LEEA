@@ -237,6 +237,21 @@ known
 needs-review
 ```
 
+## Academy Stats
+
+Home dashboard stat cards should read from named variables, not inline numbers.
+
+Current starter variables:
+
+```ts
+totalWords = 312
+grammarPoints = 24
+knownWords = 186
+wordsToReview = 42
+```
+
+Later these should be calculated from reference data plus Leo's Supabase progress/confidence records.
+
 ## Grammar Reference
 
 Grammar points live separately from vocabulary and can be reused at the top of every grammar practice tab.

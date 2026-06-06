@@ -1,8 +1,13 @@
+export const totalWords = 312;
+export const grammarPoints = 24;
+export const knownWords = 186;
+export const wordsToReview = 42;
+
 export const academyStats = {
-  totalVocabulary: 312,
-  grammarPoints: 24,
-  knownWords: 186,
-  wordsToReview: 42,
+  totalVocabulary: totalWords,
+  grammarPoints,
+  knownWords,
+  wordsToReview,
   liveLessons: 3,
   assignedLessons: 2
 };
@@ -51,4 +56,3 @@ export const englishCourses = [
     theme: "ref"
   }
 ];
-

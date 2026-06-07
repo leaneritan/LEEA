@@ -221,6 +221,13 @@ Academic rich cards use the light-card base fields plus these required fields:
 
 Academic tags should include `academic`, the source tag such as `OW4-U8-G1`, and a course-level academic tag such as `OW4-AC`. Japanese fields are required, but only confirmed Japanese should be filled. Known confirmed Unit 8 Japanese: `analyze` = `分析する / ぶんせきする`; `clause` = `節 / せつ`. Everything else stays blank with review flags until confirmed.
 
+Academic card display rules:
+
+- source tags such as `OW4-U8-OP` and `OW4-U8-G1` appear beside the word title to save vertical space
+- `syllables`, `ipa`, `partOfSpeech` / `pos`, and category render as compact pill chips
+- part-of-speech chips use distinct colors for noun, verb, adverb, adjective, and mixed forms
+- academic emoji should be large in the visual panel so the card does not waste empty space
+
 Breadcrumbs are navigation, not decoration. They should be clickable links:
 
 ```text

@@ -355,14 +355,16 @@ For grammar lessons, the chart appears at the top of every tab.
 
 Grammar 1 and Grammar 2 should appear as grammar-point cards in Reference, not only inside lessons.
 
-Grammar reference cards use tabbed chart data. The first tab set is:
+Grammar reference cards use this four-tab model:
 
 ```text
-Notice
-Pattern
-Examples
-Practice
+Chart & Samples
+Level Up
+Quiz
+Master Quiz
 ```
+
+Chart & Samples shows the rule table and 6-10 source-backed sample sentences. Level Up teaches deeper rules, transforms, and mixed samples. Quiz is multiple choice and follows the global Japanese ON/OFF. Master Quiz supports multiple choice and build-order questions; Japanese appears automatically after each answer.
 
 Our World Level 4 Unit 8 grammar source:
 

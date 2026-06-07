@@ -35,6 +35,67 @@ export type VocabularyItem = {
   knows?: boolean;
 };
 
+export type GrammarSample = {
+  text: string;
+  jp?: string;
+};
+
+export type GrammarChartRow = {
+  form: string;
+  pattern: string;
+  example: string;
+  jp?: string;
+};
+
+export type GrammarChart = {
+  title: string;
+  intro_examples: GrammarSample[];
+  rows: GrammarChartRow[];
+  note_rule?: string;
+  note_exception?: string;
+  note_exception_detail?: string;
+};
+
+export type GrammarTransform = {
+  from: string;
+  to: string;
+};
+
+export type GrammarLevelUpRule = {
+  title: string;
+  jp_title?: string;
+  subtitle: string;
+  jp_subtitle?: string;
+  transforms: GrammarTransform[];
+  examples: GrammarSample[];
+};
+
+export type GrammarLevelUp = {
+  rules: GrammarLevelUpRule[];
+  mixed_samples: Array<GrammarSample & { kind: string }>;
+};
+
+export type GrammarQuizQuestion = {
+  stem: string[];
+  answers: string[];
+  correct: number;
+  explanation: {
+    title: string;
+    body: string;
+  };
+  jp: string;
+};
+
+export type GrammarMasterQuestion =
+  | (GrammarQuizQuestion & { type: "mcq" })
+  | {
+      type: "build";
+      cue: string;
+      bank: string[];
+      correct: string[];
+      jp: string;
+    };
+
 export type GrammarPoint = {
   id: string;
   subject: "english";
@@ -50,15 +111,11 @@ export type GrammarPoint = {
   shortName: string;
   rule: string;
   pattern: string;
-  chart?: {
-    chartType: string;
-    tabs: Array<{
-      id: string;
-      label: string;
-      title: string;
-      blocks: Array<Record<string, unknown>>;
-    }>;
-  };
+  chart: GrammarChart;
+  tab1_samples: GrammarSample[];
+  tab2_levelup: GrammarLevelUp;
+  tab3_quiz: GrammarQuizQuestion[];
+  tab4_master: GrammarMasterQuestion[];
   japanese?: {
     title: string;
     rule: string;

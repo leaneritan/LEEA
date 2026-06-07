@@ -122,7 +122,7 @@ Implemented first:
 - Reference source tree
 - Reference tabs for Vocabulary, Grammar, I Know, and I Don't Know
 - vocabulary card route with Previous, Next, I Know, global Japanese ON/OFF, and lesson-link states
-- grammar chart/card route with chart tabs, global Japanese ON/OFF, and lesson-link states
+- grammar chart/card route with Chart & Samples, Level Up, Quiz, and Master Quiz tabs
 - Our World Level 4 Unit 8 Vocabulary 1 and 2 data
 - Our World Level 4 Unit 8 Grammar 1 and 2 data
 - named starter dashboard variables

@@ -295,14 +295,53 @@ OW4-U8-G2 - Direct and indirect objects
   "rule": "Use who to give more information about a person.",
   "pattern": "person + who + verb phrase",
   "chart": {
-    "chartType": "grammar-reference-card",
-    "tabs": [
-      { "id": "notice", "label": "Notice" },
-      { "id": "pattern", "label": "Pattern" },
-      { "id": "examples", "label": "Examples" },
-      { "id": "practice", "label": "Practice" }
+    "title": "Use who to describe people",
+    "intro_examples": [
+      { "text": "I have a classmate who likes math.", "jp": "" }
+    ],
+    "rows": [
+      { "form": "One person", "pattern": "person + who + singular verb", "example": "The girl who sits next to me is smart.", "jp": "" }
+    ],
+    "note_rule": "Who connects a person to extra information about that person.",
+    "note_exception": "",
+    "note_exception_detail": ""
+  },
+  "tab1_samples": [
+    { "text": "I have a classmate who likes math.", "jp": "" }
+  ],
+  "tab2_levelup": {
+    "rules": [
+      {
+        "title": "Who must describe a person",
+        "jp_title": "",
+        "subtitle": "Put who right after the person you want to explain.",
+        "jp_subtitle": "",
+        "transforms": [{ "from": "I have a classmate likes math.", "to": "I have a classmate who likes math." }],
+        "examples": [{ "text": "A cousin who lives in Osaka is visiting us.", "jp": "" }]
+      }
+    ],
+    "mixed_samples": [
+      { "kind": "affirmative", "text": "I met a scientist who studies insects.", "jp": "" }
     ]
   },
+  "tab3_quiz": [
+    {
+      "stem": ["I have a cousin ", " lives in Canada."],
+      "answers": ["where", "who", "what", "when"],
+      "correct": 1,
+      "explanation": { "title": "Use who for people", "body": "A cousin is a person." },
+      "jp": ""
+    }
+  ],
+  "tab4_master": [
+    {
+      "type": "build",
+      "cue": "",
+      "bank": ["I", "have", "a", "friend", "who", "plays", "soccer"],
+      "correct": ["I", "have", "a", "friend", "who", "plays", "soccer"],
+      "jp": ""
+    }
+  ],
   "japanese": {
     "title": "",
     "rule": "",
@@ -318,7 +357,16 @@ OW4-U8-G2 - Direct and indirect objects
 }
 ```
 
-Grammar charts and cards need Japanese on/off in the learning view. They read the global shell setting, not a duplicate card-level button.
+Grammar cards always use the four-tab model:
+
+```text
+Tab 1 - Chart & Samples
+Tab 2 - Level Up
+Tab 3 - Quiz
+Tab 4 - Master Quiz
+```
+
+Tabs 1-3 read the global Japanese ON/OFF shell setting. Tab 4 reveals Japanese automatically after each answered question, regardless of toggle state. There is no duplicate card-level Japanese button.
 
 ## Lesson Assembly
 

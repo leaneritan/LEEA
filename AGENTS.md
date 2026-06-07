@@ -125,8 +125,10 @@ Vocabulary cards need:
 Grammar cards need:
 
 - source-backed chart data
-- chart tabs, currently Notice / Pattern / Examples / Practice
+- chart tabs: Chart & Samples / Level Up / Quiz / Master Quiz
 - one global Japanese ON/OFF control from the shell
+- Tabs 1-3 use the global Japanese ON/OFF
+- Tab 4 reveals Japanese automatically after each answer, regardless of toggle state
 - related lesson button, disabled until the lesson is live
 
 ## Navigation Rules

@@ -1,6 +1,14 @@
 import unit8Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json";
 import unit8Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-8/grammar.json";
-import type { SourceTag, GrammarPoint, VocabularyItem } from "./types";
+import type {
+  GrammarChart,
+  GrammarLevelUp,
+  GrammarMasterQuestion,
+  GrammarPoint,
+  GrammarQuizQuestion,
+  SourceTag,
+  VocabularyItem
+} from "./types";
 
 type UnitVocabularyWord = (typeof unit8Vocabulary.words)[number];
 type UnitGrammarPoint = (typeof unit8Grammar.grammarPoints)[number];
@@ -44,7 +52,11 @@ function toGrammarPoint(point: UnitGrammarPoint): GrammarPoint {
     shortName: point.shortName,
     rule: point.rule,
     pattern: point.pattern,
-    chart: point.chart,
+    chart: point.chart as GrammarChart,
+    tab1_samples: point.tab1_samples,
+    tab2_levelup: point.tab2_levelup as GrammarLevelUp,
+    tab3_quiz: point.tab3_quiz as GrammarQuizQuestion[],
+    tab4_master: point.tab4_master as GrammarMasterQuestion[],
     japanese: point.japanese,
     examples: point.examples,
     workbookActivities: point.workbookActivities,

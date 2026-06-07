@@ -166,6 +166,13 @@ related
 glossary/support
 ```
 
+When a unit adds word-like reference objects, the data change is not complete until:
+
+- the unit JSON includes the objects and their ID lists
+- `content/subjects/english/reference/vocabulary-index.json` includes the IDs
+- `src/data/reference.ts` exposes any needed source-tree filters
+- the Reference source tree lists the cards under real sections, not placeholder links
+
 Grammar includes all grammar-point reference objects.
 
 I Know and I Don't Know are student-specific views built from Leo's confidence/progress state.

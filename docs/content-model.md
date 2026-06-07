@@ -107,7 +107,7 @@ Every learned word gets one global reference card. If the same word appears in m
 }
 ```
 
-Japanese fields are required for learning cards and charts, but they may begin as empty `needsReview` placeholders until reviewed.
+Japanese fields are required for learning cards and charts. They should not be left blank. If Japanese has not been parent-confirmed yet, add a careful draft and mark it with `needsReview: true` / `jp_tags: ["needs-review"]`.
 
 Cards and charts read the global Japanese ON/OFF setting from the app shell. Avoid duplicate per-card Japanese toggles.
 
@@ -186,7 +186,9 @@ Search should match:
 - meaning/definition
 - tags/source labels
 
-Search results should deduplicate by global item id and show all matching source tags.
+Search also includes Junior High search-only dictionary entries from `content/subjects/english/junior-high/sanseido-index.json`. These entries use `{ "w": string, "u": string }`, where `w` is the searchable word and `u` is the link to open. They are not LEEA cards.
+
+Search results should deduplicate by global item id and show all matching source tags. Results must clearly tag their type/source, such as Vocabulary, Academic, Grammar, Junior High, Sanseido, and source tags like `OW4-U8-G1`.
 
 Search/browse result item types should route to their reference views:
 
@@ -195,6 +197,7 @@ vocabulary -> vocabulary card
 academic -> academic card
 glossary -> glossary/support card
 grammar -> grammar chart/card
+junior-high -> Sanseido link from u
 ```
 
 ## Academic Cards
@@ -221,7 +224,7 @@ Academic rich cards use the light-card base fields plus these required fields:
 
 Mini-quizzes are part of the rich academic card. They must test use, not memorized definition. Distractors should be common real learner errors. The renderer must be interactive: tap an option, color the chosen answer green if correct or red if wrong, then show the explanation. Never render the answer as a static answer key before the learner responds.
 
-Academic tags should include `academic`, the source tag such as `OW4-U8-G1`, and a course-level academic tag such as `OW4-AC`. Japanese fields are required, but only confirmed Japanese should be filled. Known confirmed Unit 8 Japanese: `analyze` = `分析する / ぶんせきする`; `clause` = `節 / せつ`. Everything else stays blank with review flags until confirmed.
+Academic tags should include `academic`, the source tag such as `OW4-U8-G1`, and a course-level academic tag such as `OW4-AC`. Japanese fields are required and should not be blank. Known confirmed Unit 8 Japanese: `analyze` = `分析（ぶんせき）する`; `clause` = `節（せつ）`. For other Japanese, Codex may draft support text, but it must stay marked for review until the parent approves it.
 
 Japanese draft rules: use junior-high school grammar terms such as 主語, 動詞（どうし）, 節（せつ）, and 関係代名詞（かんけいだいめいし）. Use furigana only for harder kanji, inline with parentheses. Put the richest Japanese support in `jp_when_to_use`, `jp_note`, and quiz explanations. Codex drafts Japanese; parent review is required before it is treated as final.
 

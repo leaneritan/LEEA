@@ -217,10 +217,13 @@ Search should work across:
 - related words
 - glossary/support words
 - grammar points
-- Japanese fields when available
+- Japanese fields
 - source tags
+- Junior High Sanseido search-only dictionary links
 
-Search results should not duplicate the same word card just because it appears in multiple sources.
+Search results should not duplicate the same word card just because it appears in multiple sources. They should show type/source tags such as Vocabulary, Academic, Grammar, Junior High, Sanseido, and source tags like `OW4-U8-G1`.
+
+Sanseido junior-high entries live in `content/subjects/english/junior-high/sanseido-index.json` and are search-only. Clicking one opens its `u` link. Do not create LEEA cards for all Sanseido entries.
 
 ## Reference Click Behavior
 
@@ -268,11 +271,11 @@ First version can use known/not-known.
 
 ## Japanese Support
 
-Every reference object should support Japanese.
+Every reference object should support Japanese, and cards should not ship with blank Japanese display fields.
 
 English is always present.
 
-Japanese is optional in learning content:
+Japanese visibility is optional in learning content:
 
 ```text
 Japanese OFF = English only
@@ -291,6 +294,8 @@ Japanese belongs in:
 - grammar charts
 - lesson instructions when helpful
 - quiz feedback when helpful
+
+If Japanese has not been parent-confirmed yet, add a careful draft and mark it as review-needed, for example `needsReview: true` or `jp_tags: ["needs-review"]`. Codex may draft Japanese, but parent review decides what is final.
 
 Japanese should not appear by default in:
 

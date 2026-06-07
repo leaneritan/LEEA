@@ -138,6 +138,9 @@ function AcademicCard({
   word: VocabularyItem;
 }) {
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
+  const hasJapaneseMeaning = Boolean(word.jp_word || word.japanese?.word || word.jp_reading || word.japanese?.reading || word.jp_meaning || word.japanese?.meaning);
+  const hasJapaneseHowToUse = Boolean(word.jp_how_to_use?.structure || word.jp_how_to_use?.patterns?.length);
+  const hasJapanesePractice = Boolean(word.jp_practice_prompt || word.jp_note);
 
   return (
     <article className="word-card academic-card">
@@ -164,7 +167,7 @@ function AcademicCard({
           <h2>Meaning</h2>
           <p className="meaning">{word.meaning}</p>
           <div className="sample">{word.sample ?? word.example}</div>
-          {showJapanese ? (
+          {showJapanese && hasJapaneseMeaning ? (
             <div className="japanese-box">
               <strong>{word.jp_word ?? word.japanese?.word}</strong>
               {word.jp_reading ?? word.japanese?.reading ? <span>{word.jp_reading ?? word.japanese?.reading}</span> : null}
@@ -181,7 +184,9 @@ function AcademicCard({
                 <div className="academic-mini" key={item.context}>
                   <strong>{item.context}</strong>
                   <p>{item.text}</p>
-                  {showJapanese ? <span>{word.jp_when_to_use?.find((jp) => jp.context === item.context)?.text}</span> : null}
+                  {showJapanese && word.jp_when_to_use?.find((jp) => jp.context === item.context)?.text ? (
+                    <span>{word.jp_when_to_use.find((jp) => jp.context === item.context)?.text}</span>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -197,9 +202,9 @@ function AcademicCard({
                 <span key={pattern}>{pattern}</span>
               ))}
             </div>
-            {showJapanese && word.jp_how_to_use ? (
+            {showJapanese && hasJapaneseHowToUse ? (
               <div className="japanese-box">
-                <p>{word.jp_how_to_use.structure}</p>
+                {word.jp_how_to_use?.structure ? <p>{word.jp_how_to_use.structure}</p> : null}
               </div>
             ) : null}
           </section>
@@ -213,7 +218,7 @@ function AcademicCard({
                 <div className="academic-row" key={`${item.context}-${item.en}`}>
                   <span>{item.context}</span>
                   <p>{item.en}</p>
-                  {showJapanese ? <small>{item.jp}</small> : null}
+                  {showJapanese && item.jp ? <small>{item.jp}</small> : null}
                 </div>
               ))}
             </div>
@@ -237,9 +242,9 @@ function AcademicCard({
             <div className="academic-list">
               {word.nonExamples.map((item) => (
                 <div className="academic-row" key={item.en}>
-                  <span>Not a clause</span>
+                  <span>Non-example</span>
                   <p>{item.en}</p>
-                  {showJapanese ? <small>{item.jp}</small> : null}
+                  {showJapanese && item.jp ? <small>{item.jp}</small> : null}
                 </div>
               ))}
             </div>
@@ -249,9 +254,9 @@ function AcademicCard({
         <section className="academic-section">
           <h2>Practice</h2>
           <div className="sample">{word.practice_prompt}</div>
-          {showJapanese ? (
+          {showJapanese && hasJapanesePractice ? (
             <div className="japanese-box">
-              <p>{word.jp_practice_prompt}</p>
+              {word.jp_practice_prompt ? <p>{word.jp_practice_prompt}</p> : null}
               {word.jp_note ? <p>{word.jp_note}</p> : null}
             </div>
           ) : null}

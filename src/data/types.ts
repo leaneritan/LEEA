@@ -233,6 +233,7 @@ export type Lesson = {
   source: {
     type: "html-slides" | "lesson-planner" | "book" | "workbook";
     file: string;
+    embedPath?: string;
     slideCount?: number;
   };
   objectives: {

@@ -60,18 +60,20 @@ export type VocabularyItem = {
   };
   examples?: Array<{
     context: string;
-    english: string;
-    japanese: string;
+    en: string;
+    jp: string;
   }>;
   collocations?: string[];
   jp_note?: string;
   practice_prompt?: string;
   jp_practice_prompt?: string;
-  nonExamples?: string[];
+  nonExamples?: Array<{
+    en: string;
+    jp: string;
+  }>;
   miniQuiz?: Array<{
-    type: "mcq";
     prompt: string;
-    answers: string[];
+    options: string[];
     correct: number;
     explanation: string;
     jp: string;

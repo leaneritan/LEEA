@@ -211,15 +211,19 @@ Academic rich cards use the light-card base fields plus these required fields:
 - `jp_when_to_use`
 - `how_to_use`: `{ "structure": string, "patterns": string[] }`
 - `jp_how_to_use`
-- `examples`: each with English, Japanese, and a context label
+- `examples`: each with `{ "en": string, "jp": string, "context": "test" | "school" | "real-world" }`
 - `collocations`: five to six common partner phrases
 - `jp_note`
 - `practice_prompt`
 - `jp_practice_prompt`
-- `nonExamples`: two to three non-examples
-- `miniQuiz`: one to two multiple-choice checks with `correct`, `explanation`, and `jp`
+- `nonExamples`: two to three non-examples, each with `{ "en": string, "jp": string }`
+- `miniQuiz`: one to two multiple-choice checks with `prompt`, English-only `options[]`, `correct`, `explanation`, and `jp`
+
+Mini-quizzes are part of the rich academic card. They must test use, not memorized definition. Distractors should be common real learner errors. The renderer must be interactive: tap an option, color the chosen answer green if correct or red if wrong, then show the explanation. Never render the answer as a static answer key before the learner responds.
 
 Academic tags should include `academic`, the source tag such as `OW4-U8-G1`, and a course-level academic tag such as `OW4-AC`. Japanese fields are required, but only confirmed Japanese should be filled. Known confirmed Unit 8 Japanese: `analyze` = `分析する / ぶんせきする`; `clause` = `節 / せつ`. Everything else stays blank with review flags until confirmed.
+
+Japanese draft rules: use junior-high school grammar terms such as 主語, 動詞（どうし）, 節（せつ）, and 関係代名詞（かんけいだいめいし）. Use furigana only for harder kanji, inline with parentheses. Put the richest Japanese support in `jp_when_to_use`, `jp_note`, and quiz explanations. Codex drafts Japanese; parent review is required before it is treated as final.
 
 Academic card display rules:
 

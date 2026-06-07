@@ -137,6 +137,8 @@ function AcademicCard({
   showJapanese: boolean;
   word: VocabularyItem;
 }) {
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
+
   return (
     <article className="word-card academic-card">
       <div className="visual-panel academic-visual">
@@ -208,10 +210,10 @@ function AcademicCard({
             <h2>Examples</h2>
             <div className="academic-list">
               {word.examples.map((item) => (
-                <div className="academic-row" key={`${item.context}-${item.english}`}>
+                <div className="academic-row" key={`${item.context}-${item.en}`}>
                   <span>{item.context}</span>
-                  <p>{item.english}</p>
-                  {showJapanese ? <small>{item.japanese}</small> : null}
+                  <p>{item.en}</p>
+                  {showJapanese ? <small>{item.jp}</small> : null}
                 </div>
               ))}
             </div>
@@ -232,11 +234,15 @@ function AcademicCard({
         {word.nonExamples?.length ? (
           <section className="academic-section">
             <h2>Non-Examples</h2>
-            <ul className="academic-bullets">
+            <div className="academic-list">
               {word.nonExamples.map((item) => (
-                <li key={item}>{item}</li>
+                <div className="academic-row" key={item.en}>
+                  <span>Not a clause</span>
+                  <p>{item.en}</p>
+                  {showJapanese ? <small>{item.jp}</small> : null}
+                </div>
               ))}
-            </ul>
+            </div>
           </section>
         ) : null}
 
@@ -249,20 +255,40 @@ function AcademicCard({
               {word.jp_note ? <p>{word.jp_note}</p> : null}
             </div>
           ) : null}
-          {word.miniQuiz?.map((quiz) => (
+          {word.miniQuiz?.map((quiz, quizIndex) => {
+            const selected = quizAnswers[quizIndex];
+            const hasAnswered = selected !== undefined;
+
+            return (
             <div className="academic-quiz" key={quiz.prompt}>
               <strong>{quiz.prompt}</strong>
-              <ol>
-                {quiz.answers.map((answer, index) => (
-                  <li className={index === quiz.correct ? "correct-answer" : ""} key={answer}>
-                    {answer}
-                  </li>
+              <div className="quiz-options">
+                {quiz.options.map((option, index) => (
+                  <button
+                    className={
+                      hasAnswered && index === selected
+                        ? index === quiz.correct
+                          ? "quiz-option correct-answer"
+                          : "quiz-option wrong-answer"
+                        : "quiz-option"
+                    }
+                    key={option}
+                    onClick={() => setQuizAnswers((current) => ({ ...current, [quizIndex]: index }))}
+                    type="button"
+                  >
+                    {option}
+                  </button>
                 ))}
-              </ol>
-              <p>{quiz.explanation}</p>
-              {showJapanese ? <small>{quiz.jp}</small> : null}
+              </div>
+              {hasAnswered ? (
+                <>
+                  <p>{quiz.explanation}</p>
+                  {showJapanese ? <small>{quiz.jp}</small> : null}
+                </>
+              ) : null}
             </div>
-          ))}
+            );
+          })}
         </section>
 
         <div className="card-actions">

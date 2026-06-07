@@ -18,11 +18,12 @@ Do not shorten the product heading to "Leo's Elite Academy".
 2. **Source scan comes before lesson generation.** For each unit/topic, scan the lesson planner, book, or workbook before building.
 3. **Reference first.** Vocabulary cards, academic cards, glossary/support cards, and grammar charts are reusable reference objects.
 4. **Japanese ON/OFF is for learning content.** Main navigation stays English-only. Japanese belongs in cards, charts, instructions, and feedback when helpful.
-5. **Lessons are assembled from blocks.** Do not hand-code repeated cards, quizzes, sorters, grammar charts, or save logic inside each lesson.
-6. **Specific lessons are still allowed.** If an activity is truly one-off, it can be custom.
-7. **Registry controls live status.** A lesson appears because registry data says it is live/assigned.
-8. **Do, not reveal.** Leo should choose, build, sort, fix, type, speak, answer, or complete.
-9. **Keep it maintainable by one parent plus AI.** Avoid architecture that becomes another job.
+5. **Reference data must be visible.** When adding vocabulary, academic, content, related, glossary/support, or grammar reference data, update the reference indexes and browse/source-tree wiring in the same change.
+6. **Lessons are assembled from blocks.** Do not hand-code repeated cards, quizzes, sorters, grammar charts, or save logic inside each lesson.
+7. **Specific lessons are still allowed.** If an activity is truly one-off, it can be custom.
+8. **Registry controls live status.** A lesson appears because registry data says it is live/assigned.
+9. **Do, not reveal.** Leo should choose, build, sort, fix, type, speak, answer, or complete.
+10. **Keep it maintainable by one parent plus AI.** Avoid architecture that becomes another job.
 
 ## Subject Structure
 
@@ -111,6 +112,8 @@ Search
 ```
 
 Clicking vocabulary opens the vocabulary card. Clicking grammar opens the grammar chart/card.
+
+If a source tree label exists, it should list real cards or clearly say the section is empty. Do not leave placeholder links such as Academic or Glossary pointing back to `/reference`.
 
 Vocabulary cards need:
 

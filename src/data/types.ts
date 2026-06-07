@@ -92,8 +92,28 @@ export type GrammarChartRow = {
   jp?: string;
 };
 
+export type GrammarWorkbookChart = {
+  label: string;
+  title: string;
+  seeHowItWorks: {
+    beforeWho: string;
+    who: string;
+    afterWho: string;
+    explanation: string;
+  };
+  columns: [string, string, string];
+  rows: Array<{
+    person: string;
+    who: string;
+    description: string;
+  }>;
+  rule: string;
+  but?: string;
+};
+
 export type GrammarChart = {
   title: string;
+  workbookChart?: GrammarWorkbookChart;
   intro_examples: GrammarSample[];
   rows: GrammarChartRow[];
   note_rule?: string;

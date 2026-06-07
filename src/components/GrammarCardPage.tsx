@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useJapanesePreference } from "@/components/AppShell";
-import type { GrammarMasterQuestion, GrammarPoint, GrammarQuizQuestion } from "@/data/types";
+import type { GrammarMasterQuestion, GrammarPoint, GrammarQuizQuestion, GrammarWorkbookChart } from "@/data/types";
 
 const tabs = [
   { id: "chart", label: "Chart & Samples" },
@@ -134,43 +134,49 @@ function ChartAndSamples({ grammar, showJapanese }: { grammar: GrammarPoint; sho
   return (
     <div className="grammar-panel-stack">
       <section className="grammar-section">
-        <h2>{grammar.chart.title}</h2>
-        <div className="grammar-intro-grid">
-          {grammar.chart.intro_examples.map((example) => (
-            <div className="grammar-example-card" key={example.text}>
-              <p>{example.text}</p>
-              {showJapanese && example.jp ? <small>{example.jp}</small> : null}
-            </div>
-          ))}
-        </div>
-        <div className="grammar-table-wrap">
-          <table className="grammar-table">
-            <thead>
-              <tr>
-                <th>Form</th>
-                <th>Pattern</th>
-                <th>Example</th>
-              </tr>
-            </thead>
-            <tbody>
-              {grammar.chart.rows.map((row) => (
-                <tr key={`${row.form}-${row.example}`}>
-                  <td>{row.form}</td>
-                  <td>{row.pattern}</td>
-                  <td>
-                    {row.example}
-                    {showJapanese && row.jp ? <small>{row.jp}</small> : null}
-                  </td>
-                </tr>
+        {grammar.chart.workbookChart ? (
+          <WorkbookGrammarChart chart={grammar.chart.workbookChart} />
+        ) : (
+          <>
+            <h2>{grammar.chart.title}</h2>
+            <div className="grammar-intro-grid">
+              {grammar.chart.intro_examples.map((example) => (
+                <div className="grammar-example-card" key={example.text}>
+                  <p>{example.text}</p>
+                  {showJapanese && example.jp ? <small>{example.jp}</small> : null}
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="grammar-notes">
-          {grammar.chart.note_rule ? <p>{grammar.chart.note_rule}</p> : null}
-          {grammar.chart.note_exception ? <p>{grammar.chart.note_exception}</p> : null}
-          {grammar.chart.note_exception_detail ? <p>{grammar.chart.note_exception_detail}</p> : null}
-        </div>
+            </div>
+            <div className="grammar-table-wrap">
+              <table className="grammar-table">
+                <thead>
+                  <tr>
+                    <th>Form</th>
+                    <th>Pattern</th>
+                    <th>Example</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {grammar.chart.rows.map((row) => (
+                    <tr key={`${row.form}-${row.example}`}>
+                      <td>{row.form}</td>
+                      <td>{row.pattern}</td>
+                      <td>
+                        {row.example}
+                        {showJapanese && row.jp ? <small>{row.jp}</small> : null}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="grammar-notes">
+              {grammar.chart.note_rule ? <p>{grammar.chart.note_rule}</p> : null}
+              {grammar.chart.note_exception ? <p>{grammar.chart.note_exception}</p> : null}
+              {grammar.chart.note_exception_detail ? <p>{grammar.chart.note_exception_detail}</p> : null}
+            </div>
+          </>
+        )}
       </section>
 
       <section className="grammar-section">
@@ -184,6 +190,60 @@ function ChartAndSamples({ grammar, showJapanese }: { grammar: GrammarPoint; sho
           ))}
         </div>
       </section>
+    </div>
+  );
+}
+
+function WorkbookGrammarChart({ chart }: { chart: GrammarWorkbookChart }) {
+  return (
+    <div className="workbook-chart">
+      <div className="workbook-chart-title-row">
+        <div className="workbook-chart-label">
+          <span aria-hidden="true" />
+          {chart.label}
+        </div>
+        <strong>{chart.title}</strong>
+      </div>
+      <div className="workbook-chart-demo">
+        <h3>See how it works</h3>
+        <p>
+          {chart.seeHowItWorks.beforeWho}
+          <mark>{chart.seeHowItWorks.who}</mark>
+          {chart.seeHowItWorks.afterWho}
+          <span aria-hidden="true"> -- </span>
+          {chart.seeHowItWorks.explanation}
+        </p>
+      </div>
+      <div className="workbook-chart-table-wrap">
+        <table className="workbook-chart-table">
+          <thead>
+            <tr>
+              {chart.columns.map((column) => (
+                <th key={column}>{column}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {chart.rows.map((row) => (
+              <tr key={`${row.person}-${row.description}`}>
+                <td>{row.person}</td>
+                <td>{row.who}</td>
+                <td>{row.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="workbook-chart-rule">
+        <p>
+          <strong>Rule</strong> -- {chart.rule}
+        </p>
+        {chart.but ? (
+          <p>
+            <strong>But</strong> -- {chart.but}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

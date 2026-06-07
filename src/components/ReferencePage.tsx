@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { BookOpen, Search } from "lucide-react";
+import { BookOpen, ExternalLink, Search } from "lucide-react";
 import {
   grammarPoints,
   unit8AcademicItems,
@@ -12,20 +12,50 @@ import {
   unit8Vocab2Items,
   vocabularyItems
 } from "@/data/reference";
+import sanseidoIndex from "../../content/subjects/english/junior-high/sanseido-index.json";
 
 type ReferenceMode = "source" | "vocabulary" | "grammar" | "known" | "unknown";
+type SanseidoEntry = {
+  w: string;
+  u: string;
+};
+type SearchResult =
+  | {
+      id: string;
+      title: string;
+      description: string;
+      href: string;
+      kind: "vocabulary";
+      tags: string[];
+    }
+  | {
+      id: string;
+      title: string;
+      description: string;
+      href: string;
+      kind: "grammar";
+      tags: string[];
+    }
+  | {
+      id: string;
+      title: string;
+      description: string;
+      href: string;
+      kind: "junior-high";
+      tags: string[];
+    };
 
 export function ReferencePage() {
   const [mode, setMode] = useState<ReferenceMode>("source");
   const [query, setQuery] = useState("");
+  const searchQuery = query.toLowerCase().trim();
 
   const filteredWords = useMemo(() => {
-    const q = query.toLowerCase().trim();
     return vocabularyItems.filter((item) => {
       if (mode === "grammar" || mode === "source") return false;
       if (mode === "known" && !item.knows) return false;
       if (mode === "unknown" && item.knows) return false;
-      if (!q) return true;
+      if (!searchQuery) return true;
       const text = [
         item.word,
         item.normalizedWord,
@@ -39,22 +69,96 @@ export function ReferencePage() {
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
-      return text.includes(q);
+      return text.includes(searchQuery);
     });
-  }, [mode, query]);
+  }, [mode, searchQuery]);
 
   const filteredGrammar = useMemo(() => {
-    const q = query.toLowerCase().trim();
     return grammarPoints.filter((item) => {
       if (mode !== "grammar") return false;
-      if (!q) return true;
+      if (!searchQuery) return true;
       const text = [item.title, item.shortName, item.rule, item.pattern, item.tag, item.japanese?.title, item.japanese?.rule]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
-      return text.includes(q);
+      return text.includes(searchQuery);
     });
-  }, [mode, query]);
+  }, [mode, searchQuery]);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery) return [];
+
+    const wordResults: SearchResult[] = vocabularyItems
+      .map((item) => {
+        const tags = [formatVocabularyKind(item.type), ...item.sources.map((source) => source.tag)];
+        const text = [
+          item.word,
+          item.normalizedWord,
+          item.meaning,
+          item.example,
+          item.partOfSpeech,
+          item.pos,
+          item.japanese?.word,
+          item.japanese?.reading,
+          item.japanese?.meaning,
+          item.jp_word,
+          item.jp_reading,
+          item.jp_meaning,
+          ...item.tags,
+          ...tags
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        if (!text.includes(searchQuery)) return null;
+
+        return {
+          id: `vocabulary-${item.id}`,
+          title: item.word,
+          description: item.meaning,
+          href: `/reference/vocabulary/${item.id}`,
+          kind: "vocabulary",
+          tags
+        };
+      })
+      .filter((item): item is SearchResult => Boolean(item));
+
+    const grammarResults: SearchResult[] = grammarPoints
+      .map((item) => {
+        const tags = ["Grammar", item.tag, item.component.toUpperCase()];
+        const text = [item.title, item.shortName, item.rule, item.pattern, item.tag, item.component, item.japanese?.title, item.japanese?.rule, ...tags]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        if (!text.includes(searchQuery)) return null;
+
+        return {
+          id: `grammar-${item.id}`,
+          title: item.title,
+          description: item.rule,
+          href: `/reference/grammar/${item.id}`,
+          kind: "grammar",
+          tags
+        };
+      })
+      .filter((item): item is SearchResult => Boolean(item));
+
+    const sanseidoResults: SearchResult[] = (sanseidoIndex as SanseidoEntry[])
+      .filter((item) => item.w.toLowerCase().includes(searchQuery))
+      .slice(0, 60)
+      .map((item) => ({
+        id: `junior-high-${item.w}-${item.u}`,
+        title: item.w,
+        description: "Sanseido junior-high dictionary link.",
+        href: item.u,
+        kind: "junior-high",
+        tags: ["Junior High", "Sanseido", "Year 1-3"]
+      }));
+
+    return [...wordResults, ...grammarResults, ...sanseidoResults].slice(0, 100);
+  }, [searchQuery]);
 
   return (
     <div className="reference-layout">
@@ -78,8 +182,9 @@ export function ReferencePage() {
       </aside>
 
       <section className="reference-main">
-        {mode === "source" ? <SourceTree /> : null}
-        {mode === "vocabulary" || mode === "known" || mode === "unknown" ? (
+        {searchQuery ? <SearchResults query={query} results={searchResults} /> : null}
+        {!searchQuery && mode === "source" ? <SourceTree /> : null}
+        {!searchQuery && (mode === "vocabulary" || mode === "known" || mode === "unknown") ? (
           <ReferenceCards
             help={
               mode === "known"
@@ -92,7 +197,7 @@ export function ReferencePage() {
             words={filteredWords}
           />
         ) : null}
-        {mode === "grammar" ? <GrammarCards grammar={filteredGrammar} /> : null}
+        {!searchQuery && mode === "grammar" ? <GrammarCards grammar={filteredGrammar} /> : null}
       </section>
     </div>
   );
@@ -170,6 +275,11 @@ function SourceTree() {
         </details>
 
         <details open>
+          <summary>Junior High</summary>
+          <TreeLine label={`${(sanseidoIndex as SanseidoEntry[]).length.toLocaleString()} Sanseido dictionary links - search only`} />
+        </details>
+
+        <details open>
           <summary>Training Ground</summary>
           <TreeLine label="Punctuation" />
           <TreeLine label="Nouns" />
@@ -191,6 +301,54 @@ function TreeLink({ href, label }: { href: string; label: string }) {
 
 function TreeLine({ label }: { label: string }) {
   return <span className="tree-line">{label}</span>;
+}
+
+function SearchResults({ query, results }: { query: string; results: SearchResult[] }) {
+  return (
+    <div className="reference-panel">
+      <div className="panel-head">
+        <span className="eyebrow">Search Everything</span>
+        <h1>Results for &ldquo;{query}&rdquo;</h1>
+        <p>Vocabulary, academic cards, content words, grammar, and junior-high dictionary links are searched together.</p>
+      </div>
+
+      {results.length ? (
+        <div className="search-results">
+          {results.map((result) =>
+            result.kind === "junior-high" ? (
+              <a className="search-result" href={result.href} key={result.id} rel="noreferrer" target="_blank">
+                <SearchResultContent result={result} />
+                <ExternalLink size={18} />
+              </a>
+            ) : (
+              <Link className="search-result" href={result.href} key={result.id}>
+                <SearchResultContent result={result} />
+              </Link>
+            )
+          )}
+        </div>
+      ) : (
+        <div className="empty-results">No matches yet.</div>
+      )}
+    </div>
+  );
+}
+
+function SearchResultContent({ result }: { result: SearchResult }) {
+  return (
+    <div className="search-result-main">
+      <div className="mini-top">
+        <strong>{result.title}</strong>
+        <span className={`result-kind result-kind-${result.kind}`}>{formatResultKind(result.kind)}</span>
+      </div>
+      <p>{result.description}</p>
+      <div className="source-tags">
+        {result.tags.map((tag) => (
+          <span key={`${result.id}-${tag}`}>{tag}</span>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function ReferenceCards({ title, help, words }: { title: string; help: string; words: typeof vocabularyItems }) {
@@ -221,6 +379,20 @@ function ReferenceCards({ title, help, words }: { title: string; help: string; w
       </div>
     </div>
   );
+}
+
+function formatVocabularyKind(type: string) {
+  if (type === "academic") return "Academic";
+  if (type === "content") return "Content";
+  if (type === "related") return "Related";
+  if (type === "glossary") return "Glossary";
+  return "Vocabulary";
+}
+
+function formatResultKind(kind: SearchResult["kind"]) {
+  if (kind === "junior-high") return "Junior High";
+  if (kind === "grammar") return "Grammar";
+  return "Vocabulary";
 }
 
 function GrammarCards({ grammar }: { grammar: typeof grammarPoints }) {

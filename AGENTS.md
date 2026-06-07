@@ -113,13 +113,23 @@ Search
 
 Clicking vocabulary opens the vocabulary card. Clicking grammar opens the grammar chart/card.
 
+Reference search must search everything together when the search box has a query:
+
+- LEEA vocabulary, academic, content, related, and glossary cards
+- LEEA grammar points
+- Junior High search-only dictionary links from `content/subjects/english/junior-high/sanseido-index.json`
+
+Search results must show clear type/source tags such as Vocabulary, Academic, Grammar, Junior High, Sanseido, and source tags like `OW4-U8-G1`. Clicking an internal vocabulary or grammar result opens the LEEA card. Clicking a Sanseido junior-high result opens its `u` link from the JSON. Sanseido entries are search-only; do not create LEEA cards for all of them.
+
 If a source tree label exists, it should list real cards or clearly say the section is empty. Do not leave placeholder links such as Academic or Glossary pointing back to `/reference`.
 
 Academic words are thinking/study terms from Lesson Planner "Academic Language" sections. They are global cards reused across units and subjects, so duplicate academic words must merge into one `type: "academic"` item with multiple `sources[]`. Academic cards always render the rich academic card by `type`, never by tags and never as light vocabulary cards.
 
-Academic rich cards require the light-card base fields plus `meaning`, `jp_meaning`, exactly three `when_to_use` contexts, `jp_when_to_use`, `how_to_use`, `jp_how_to_use`, `examples`, `collocations`, `jp_note`, `practice_prompt`, and `jp_practice_prompt`. Also include `nonExamples` and `miniQuiz` when building new academic cards. `examples[]` use `{ en, jp, context }`, with context set to `test`, `school`, or `real-world`. `miniQuiz[]` uses `{ prompt, options[], correct, explanation, jp }`; options stay English-only, and the renderer must show the explanation only after the learner taps an option. Add the source tag, such as `OW4-U8-G1`, and the course-level `OW4-AC` tag. Only fill Japanese that is confirmed; leave other Japanese fields blank and marked for review.
+Academic rich cards require the light-card base fields plus `meaning`, `jp_meaning`, exactly three `when_to_use` contexts, `jp_when_to_use`, `how_to_use`, `jp_how_to_use`, `examples`, `collocations`, `jp_note`, `practice_prompt`, and `jp_practice_prompt`. Also include `nonExamples` and `miniQuiz` when building new academic cards. `examples[]` use `{ en, jp, context }`, with context set to `test`, `school`, or `real-world`. `miniQuiz[]` uses `{ prompt, options[], correct, explanation, jp }`; options stay English-only, and the renderer must show the explanation only after the learner taps an option. Add the source tag, such as `OW4-U8-G1`, and the course-level `OW4-AC` tag.
 
-Academic Japanese uses junior-high school grammar terms: 主語, 動詞（どうし）, 節（せつ）, and 関係代名詞（かんけいだいめいし） when relevant. Use furigana only for harder kanji, inline with parentheses. Never invent Japanese; Codex drafts and the parent does the final pass.
+All cards need Japanese. Vocabulary, academic, content, related, glossary, and grammar reference items should not ship with blank Japanese display fields. If the Japanese is not parent-confirmed, add a careful draft and mark it with `needsReview: true` / `jp_tags: ["needs-review"]`. Confirmed examples: analyze = `分析（ぶんせき）する`; clause = `節（せつ）`.
+
+Academic Japanese uses junior-high school grammar terms such as 主語, 動詞（どうし）, 節（せつ）, and 関係代名詞（かんけいだいめいし） when relevant. Use furigana only for harder kanji, inline with parentheses. Codex may draft Japanese for review, but the parent does the final pass.
 
 Academic card layout should be compact and type-aware: source chips such as `OW4-U8-OP` sit beside the word title, syllables and part of speech render as pill chips, and part-of-speech chips use distinct colors by grammar role. Academic emoji should be large enough to use the visual panel space.
 

@@ -34,8 +34,20 @@ function toVocabularyItem(word: UnitVocabularyWord): VocabularyItem {
 
 export const vocabularyItems: VocabularyItem[] = unit8Vocabulary.words.map(toVocabularyItem);
 
-export const unit8Vocab1Items = vocabularyItems.filter((item) => item.sources.some((source) => source.tag === "OW4-U8-V1"));
-export const unit8Vocab2Items = vocabularyItems.filter((item) => item.sources.some((source) => source.tag === "OW4-U8-V2"));
+export const unit8Vocab1Items = vocabularyItems.filter(
+  (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U8-V1")
+);
+export const unit8Vocab2Items = vocabularyItems.filter(
+  (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U8-V2")
+);
+export const unit8AcademicItems = vocabularyItems.filter(
+  (item) => item.type === "academic" && item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 8)
+);
+export const unit8GlossaryItems = vocabularyItems.filter(
+  (item) =>
+    (item.type === "content" || item.type === "related" || item.type === "glossary") &&
+    item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 8)
+);
 
 function toGrammarPoint(point: UnitGrammarPoint): GrammarPoint {
   return {

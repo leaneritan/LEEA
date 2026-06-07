@@ -3,7 +3,15 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { BookOpen, Search } from "lucide-react";
-import { grammarPoints, unit8GrammarItems, unit8Vocab1Items, unit8Vocab2Items, vocabularyItems } from "@/data/reference";
+import {
+  grammarPoints,
+  unit8AcademicItems,
+  unit8GlossaryItems,
+  unit8GrammarItems,
+  unit8Vocab1Items,
+  unit8Vocab2Items,
+  vocabularyItems
+} from "@/data/reference";
 
 type ReferenceMode = "source" | "vocabulary" | "grammar" | "known" | "unknown";
 
@@ -134,8 +142,18 @@ function SourceTree() {
                       <TreeLink href={`/reference/grammar/${grammar.id}`} key={grammar.id} label={`${grammar.component}: ${grammar.shortName}`} />
                     ))}
                   </details>
-                  <TreeLink href="/reference" label="Academic" />
-                  <TreeLink href="/reference" label="Glossary" />
+                  <details open>
+                    <summary>Academic</summary>
+                    {unit8AcademicItems.map((word) => (
+                      <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
+                    ))}
+                  </details>
+                  <details open>
+                    <summary>Glossary</summary>
+                    {unit8GlossaryItems.map((word) => (
+                      <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
+                    ))}
+                  </details>
                 </details>
               ) : (
                 <span className="tree-placeholder">Units will appear here.</span>

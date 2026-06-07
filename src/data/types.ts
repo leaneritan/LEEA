@@ -198,3 +198,47 @@ export type GrammarPoint = {
   }>;
   tags?: string[];
 };
+
+export type LessonReferenceLink = {
+  label: string;
+  kind: "vocabulary" | "academic" | "grammar";
+  id?: string;
+  status: "linked" | "needed";
+};
+
+export type LessonSlide = {
+  id: string;
+  title: string;
+  eyebrow: string;
+  emoji: string;
+  focus: "overview" | "word" | "recap" | "activity" | "teacher-note" | "assessment" | "preview" | "close";
+  teacherScript?: string;
+  studentAction?: string;
+  bullets: string[];
+  callout?: string;
+  referenceIds?: string[];
+};
+
+export type Lesson = {
+  id: string;
+  subject: "english";
+  course: "our-world" | "joyful-work" | "special-training";
+  level?: number;
+  unit?: number;
+  component: string;
+  mode: "teacher" | "learner";
+  status: "draft" | "live" | "assigned" | "locked";
+  title: string;
+  subtitle: string;
+  source: {
+    type: "html-slides" | "lesson-planner" | "book" | "workbook";
+    file: string;
+    slideCount?: number;
+  };
+  objectives: {
+    content: string[];
+    language: string[];
+  };
+  referenceLinks: LessonReferenceLink[];
+  slides: LessonSlide[];
+};

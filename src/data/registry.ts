@@ -17,8 +17,8 @@ export const nextAssignment = {
   course: "Our World",
   level: 4,
   unit: 8,
-  component: "Vocabulary 1",
-  lessonId: "ow-l4-u8-vocab-1",
+  component: "Unit Opener",
+  lessonId: "ow-l4-u8-opener",
   status: "assigned"
 };
 

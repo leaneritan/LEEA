@@ -50,9 +50,9 @@ export function HomeDashboard() {
             </p>
             <h2>{nextAssignment.component}</h2>
           </div>
-          <button className="primary-button" type="button">
+          <Link className="primary-button" href={`/lessons/${nextAssignment.lessonId}`}>
             Continue
-          </button>
+          </Link>
         </aside>
       </section>
 

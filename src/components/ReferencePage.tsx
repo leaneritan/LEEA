@@ -26,6 +26,7 @@ type SearchResult =
       description: string;
       href: string;
       kind: "vocabulary";
+      label: string;
       tags: string[];
     }
   | {
@@ -34,6 +35,7 @@ type SearchResult =
       description: string;
       href: string;
       kind: "grammar";
+      label: string;
       tags: string[];
     }
   | {
@@ -42,6 +44,7 @@ type SearchResult =
       description: string;
       href: string;
       kind: "junior-high";
+      label: string;
       tags: string[];
     };
 
@@ -119,6 +122,7 @@ export function ReferencePage() {
           description: item.meaning,
           href: `/reference/vocabulary/${item.id}`,
           kind: "vocabulary",
+          label: formatVocabularyKind(item.type),
           tags
         };
       })
@@ -140,6 +144,7 @@ export function ReferencePage() {
           description: item.rule,
           href: `/reference/grammar/${item.id}`,
           kind: "grammar",
+          label: "Grammar",
           tags
         };
       })
@@ -154,6 +159,7 @@ export function ReferencePage() {
         description: "Sanseido junior-high dictionary link.",
         href: item.u,
         kind: "junior-high",
+        label: "Junior High",
         tags: ["Junior High", "Sanseido", "Year 1-3"]
       }));
 
@@ -167,7 +173,9 @@ export function ReferencePage() {
           <Search size={18} />
           <input
             onChange={(event) => setQuery(event.target.value)}
+            onInput={(event) => setQuery(event.currentTarget.value)}
             placeholder="Search words, grammar, tags..."
+            type="search"
             value={query}
           />
         </label>
@@ -339,7 +347,7 @@ function SearchResultContent({ result }: { result: SearchResult }) {
     <div className="search-result-main">
       <div className="mini-top">
         <strong>{result.title}</strong>
-        <span className={`result-kind result-kind-${result.kind}`}>{formatResultKind(result.kind)}</span>
+        <span className={`result-kind result-kind-${result.kind}`}>{result.label}</span>
       </div>
       <p>{result.description}</p>
       <div className="source-tags">

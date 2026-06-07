@@ -119,6 +119,8 @@ Academic words are thinking/study terms from Lesson Planner "Academic Language" 
 
 Academic rich cards require the light-card base fields plus `meaning`, `jp_meaning`, exactly three `when_to_use` contexts, `jp_when_to_use`, `how_to_use`, `jp_how_to_use`, `examples`, `collocations`, `jp_note`, `practice_prompt`, and `jp_practice_prompt`. Also include `nonExamples` and `miniQuiz` when building new academic cards. Add the source tag, such as `OW4-U8-G1`, and the course-level `OW4-AC` tag. Only fill Japanese that is confirmed; leave other Japanese fields blank and marked for review.
 
+Academic card layout should be compact and type-aware: source chips such as `OW4-U8-OP` sit beside the word title, syllables and part of speech render as pill chips, and part-of-speech chips use distinct colors by grammar role. Academic emoji should be large enough to use the visual panel space.
+
 Vocabulary cards need:
 
 - Previous

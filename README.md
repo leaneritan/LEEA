@@ -53,6 +53,7 @@ Our World > Level 4 > Unit 8
 - A lesson goes live by registry/status data, not by hardcoding dashboard cards.
 - Dashboard stat cards should read named variables first, then later calculated/Supabase data.
 - Build slowly: scan source first, create reference data second, build lessons third.
+- Run `npm run validate:content` after reference data changes.
 
 ## Reference
 
@@ -142,3 +143,13 @@ Current app routes:
 /reference/vocabulary/[wordId]
 /reference/grammar/[grammarId]
 ```
+
+## Validation
+
+Run content validation after changing vocabulary, academic cards, glossary/content/related words, grammar reference data, or Sanseido search data:
+
+```bash
+npm run validate:content
+```
+
+The validator checks indexes, Japanese display fields, academic rich-card requirements, grammar Japanese support, and Sanseido search-only link shape.

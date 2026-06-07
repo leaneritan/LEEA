@@ -200,6 +200,24 @@ grammar -> grammar chart/card
 junior-high -> Sanseido link from u
 ```
 
+## Content Validation
+
+Run this after changing reference content:
+
+```bash
+npm run validate:content
+```
+
+The validator checks:
+
+- vocabulary IDs, ID lists, and `vocabulary-index.json`
+- required Japanese display fields on vocabulary cards
+- rich academic-card fields, exactly three `when_to_use` contexts, collocation counts, non-examples, and `miniQuiz.options[]`
+- grammar-card Japanese fields
+- Sanseido junior-high `{ "w", "u" }` search-only entries
+
+If the validator fails, fix the content or update this documented model in the same change.
+
 ## Academic Cards
 
 Academic words are thinking and study terms from Lesson Planner "Academic Language" sections, such as analyze, clause, contraction, accuracy, sequence, definition, description, and details. They are reused across units and subjects, so each academic word has one global `type: "academic"` card with multiple `sources[]` as needed.

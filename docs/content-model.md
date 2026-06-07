@@ -175,6 +175,13 @@ When a unit adds word-like reference objects, the data change is not complete un
 
 Grammar includes all grammar-point reference objects.
 
+When a grammar workbook answer key is available, the unit grammar chart should be used as the source for the grammar reference chart. Exercises can be used as source-backed samples and quizzes. Each grammar reference should target:
+
+- 10 Tab 1 sample sentences for Chart & Samples
+- 10 Tab 2 mixed/level-up sample sentences
+- 10 Tab 3 quiz questions
+- 10 Master Quiz questions
+
 I Know and I Don't Know are student-specific views built from Leo's confidence/progress state.
 
 Search should match:

@@ -147,6 +147,8 @@ Grammar cards need:
 
 - source-backed chart data
 - chart tabs: Chart & Samples / Level Up / Quiz / Master Quiz
+- when a grammar workbook answer key is available, use the unit grammar chart as the chart source
+- each grammar reference should target 10 Tab 1 sample sentences, 10 Tab 2 mixed/level-up sample sentences, 10 Tab 3 quiz questions, and 10 Master Quiz questions
 - one global Japanese ON/OFF control from the shell
 - Tabs 1-3 use the global Japanese ON/OFF
 - Tab 4 reveals Japanese automatically after each answer, regardless of toggle state

@@ -74,24 +74,19 @@ export function VocabularyCardPage({ initialWordId }: { initialWordId: string })
           <span>{word.emoji}</span>
         </div>
         <div className="word-content">
-          <div className="source-tags">
-            {word.sources.map((source) => (
-              <span key={source.tag}>{source.tag}</span>
-            ))}
-          </div>
-
           <div className="word-title-row">
             <h1>{word.word}</h1>
+            <SourceTags word={word} />
             <button className="sound-button" aria-label="Play pronunciation" type="button">
               <Volume2 size={26} />
             </button>
           </div>
 
           <div className="word-meta">
-            {word.ipa ? <span>IPA {word.ipa}</span> : null}
-            {word.syllables ? <span>Syllables {word.syllables}</span> : null}
-            {word.partOfSpeech ? <span>{word.partOfSpeech}</span> : null}
-            {word.countability ? <span>{word.countability}</span> : null}
+            {word.ipa ? <MetaChip label="IPA" value={word.ipa} /> : null}
+            {word.syllables ? <MetaChip label="Syllables" value={word.syllables} /> : null}
+            {word.partOfSpeech ? <MetaChip kind={word.partOfSpeech} value={word.partOfSpeech} /> : null}
+            {word.countability ? <MetaChip value={word.countability} /> : null}
           </div>
 
           <p className="meaning">{word.meaning}</p>
@@ -148,25 +143,19 @@ function AcademicCard({
         <span>{word.emoji}</span>
       </div>
       <div className="word-content academic-content">
-        <div className="source-tags">
-          <span>ACADEMIC</span>
-          {word.sources.map((source) => (
-            <span key={source.tag}>{source.tag}</span>
-          ))}
-        </div>
-
         <div className="word-title-row">
           <h1>{word.word}</h1>
+          <SourceTags word={word} />
           <button className="sound-button" aria-label="Play pronunciation" type="button">
             <Volume2 size={26} />
           </button>
         </div>
 
         <div className="word-meta">
-          {word.ipa ? <span>IPA {word.ipa}</span> : null}
-          {word.syllables ? <span>Syllables {word.syllables}</span> : null}
-          {word.pos || word.partOfSpeech ? <span>{word.pos ?? word.partOfSpeech}</span> : null}
-          {word.category ? <span>{word.category}</span> : null}
+          {word.ipa ? <MetaChip label="IPA" value={word.ipa} /> : null}
+          {word.syllables ? <MetaChip label="Syllables" value={word.syllables} /> : null}
+          {word.pos || word.partOfSpeech ? <MetaChip kind={word.pos ?? word.partOfSpeech} value={word.pos ?? word.partOfSpeech ?? ""} /> : null}
+          {word.category ? <MetaChip value={word.category} /> : null}
         </div>
 
         <section className="academic-section">
@@ -292,6 +281,28 @@ function AcademicCard({
         </div>
       </div>
     </article>
+  );
+}
+
+function SourceTags({ word }: { word: VocabularyItem }) {
+  return (
+    <div className="source-tags title-tags" aria-label="Source tags">
+      {word.type === "academic" ? <span className="source-tag-academic">ACADEMIC</span> : null}
+      {word.sources.map((source) => (
+        <span key={source.tag}>{source.tag}</span>
+      ))}
+    </div>
+  );
+}
+
+function MetaChip({ kind, label, value }: { kind?: string; label?: string; value: string }) {
+  const chipKind = kind?.toLowerCase().replace(/[^a-z]+/g, "-").replace(/(^-|-$)/g, "");
+
+  return (
+    <span className={chipKind ? `meta-chip meta-${chipKind}` : "meta-chip"}>
+      {label ? <strong>{label}</strong> : null}
+      {value}
+    </span>
   );
 }
 

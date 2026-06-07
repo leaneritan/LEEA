@@ -24,6 +24,7 @@ Do not shorten the product heading to "Leo's Elite Academy".
 8. **Registry controls live status.** A lesson appears because registry data says it is live/assigned.
 9. **Do, not reveal.** Leo should choose, build, sort, fix, type, speak, answer, or complete.
 10. **Keep it maintainable by one parent plus AI.** Avoid architecture that becomes another job.
+11. **Validate content before delivery.** Run `npm run validate:content` after reference data changes, before typecheck/build/PR.
 
 ## Subject Structure
 
@@ -132,6 +133,16 @@ All cards need Japanese. Vocabulary, academic, content, related, glossary, and g
 Academic Japanese uses junior-high school grammar terms such as 主語, 動詞（どうし）, 節（せつ）, and 関係代名詞（かんけいだいめいし） when relevant. Use furigana only for harder kanji, inline with parentheses. Codex may draft Japanese for review, but the parent does the final pass.
 
 Academic card layout should be compact and type-aware: source chips such as `OW4-U8-OP` sit beside the word title, syllables and part of speech render as pill chips, and part-of-speech chips use distinct colors by grammar role. Academic emoji should be large enough to use the visual panel space.
+
+## Content Validation
+
+Run this whenever reference content changes:
+
+```text
+npm run validate:content
+```
+
+The validator checks that vocabulary IDs and indexes line up, every card has Japanese display fields, academic cards have the full rich schema and mini-quiz shape, grammar cards have Japanese support, and Sanseido junior-high entries are valid search-only links. Do not weaken the validator to make bad content pass; fix the content or update the documented rule in the same PR.
 
 Vocabulary cards need:
 

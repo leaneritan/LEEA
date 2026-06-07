@@ -21,6 +21,7 @@ function toVocabularyItem(word: UnitVocabularyWord): VocabularyItem {
     normalizedWord: word.normalizedWord,
     emoji: word.displayEmoji,
     emojiDescription: word.emojiDescription,
+    ipa: "ipa" in word ? word.ipa : undefined,
     syllables: word.syllables,
     partOfSpeech: word.partOfSpeech,
     meaning: word.meaning,
@@ -28,7 +29,26 @@ function toVocabularyItem(word: UnitVocabularyWord): VocabularyItem {
     japanese: word.japanese,
     sources: word.sources as SourceTag[],
     tags: word.tags,
-    knows: false
+    knows: false,
+    pos: "pos" in word ? word.pos : undefined,
+    sample: "sample" in word ? word.sample : undefined,
+    jp_word: "jp_word" in word ? word.jp_word : undefined,
+    jp_reading: "jp_reading" in word ? word.jp_reading : undefined,
+    jp_sentence: "jp_sentence" in word ? word.jp_sentence : undefined,
+    jp_tags: "jp_tags" in word ? word.jp_tags : undefined,
+    category: "category" in word ? word.category : undefined,
+    jp_meaning: "jp_meaning" in word ? word.jp_meaning : undefined,
+    when_to_use: "when_to_use" in word ? word.when_to_use : undefined,
+    jp_when_to_use: "jp_when_to_use" in word ? word.jp_when_to_use : undefined,
+    how_to_use: "how_to_use" in word ? word.how_to_use : undefined,
+    jp_how_to_use: "jp_how_to_use" in word ? word.jp_how_to_use : undefined,
+    examples: "examples" in word ? word.examples : undefined,
+    collocations: "collocations" in word ? word.collocations : undefined,
+    jp_note: "jp_note" in word ? word.jp_note : undefined,
+    practice_prompt: "practice_prompt" in word ? word.practice_prompt : undefined,
+    jp_practice_prompt: "jp_practice_prompt" in word ? word.jp_practice_prompt : undefined,
+    nonExamples: "nonExamples" in word ? word.nonExamples : undefined,
+    miniQuiz: "miniQuiz" in word ? (word.miniQuiz as VocabularyItem["miniQuiz"]) : undefined
   };
 }
 

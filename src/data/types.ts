@@ -33,6 +33,49 @@ export type VocabularyItem = {
   sources: SourceTag[];
   tags: string[];
   knows?: boolean;
+  pos?: string;
+  sample?: string;
+  jp_word?: string;
+  jp_reading?: string;
+  jp_sentence?: string;
+  jp_tags?: string[];
+  category?: string;
+  jp_meaning?: string;
+  when_to_use?: Array<{
+    context: "test" | "school" | "real-world" | string;
+    text: string;
+  }>;
+  jp_when_to_use?: Array<{
+    context: "test" | "school" | "real-world" | string;
+    text: string;
+  }>;
+  how_to_use?: {
+    structure: string;
+    patterns: string[];
+  };
+  jp_how_to_use?: {
+    structure: string;
+    patterns: string[];
+    needsReview?: boolean;
+  };
+  examples?: Array<{
+    context: string;
+    english: string;
+    japanese: string;
+  }>;
+  collocations?: string[];
+  jp_note?: string;
+  practice_prompt?: string;
+  jp_practice_prompt?: string;
+  nonExamples?: string[];
+  miniQuiz?: Array<{
+    type: "mcq";
+    prompt: string;
+    answers: string[];
+    correct: number;
+    explanation: string;
+    jp: string;
+  }>;
 };
 
 export type GrammarSample = {

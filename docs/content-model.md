@@ -197,6 +197,30 @@ glossary -> glossary/support card
 grammar -> grammar chart/card
 ```
 
+## Academic Cards
+
+Academic words are thinking and study terms from Lesson Planner "Academic Language" sections, such as analyze, clause, contraction, accuracy, sequence, definition, description, and details. They are reused across units and subjects, so each academic word has one global `type: "academic"` card with multiple `sources[]` as needed.
+
+Academic routing is by `type`, not tags. A `type: "academic"` item always renders the rich academic card, even when the word appears inside a lesson.
+
+Academic rich cards use the light-card base fields plus these required fields:
+
+- `meaning`
+- `jp_meaning`
+- `when_to_use`: exactly three contexts, one test context, one school context, and one real-world context
+- `jp_when_to_use`
+- `how_to_use`: `{ "structure": string, "patterns": string[] }`
+- `jp_how_to_use`
+- `examples`: each with English, Japanese, and a context label
+- `collocations`: five to six common partner phrases
+- `jp_note`
+- `practice_prompt`
+- `jp_practice_prompt`
+- `nonExamples`: two to three non-examples
+- `miniQuiz`: one to two multiple-choice checks with `correct`, `explanation`, and `jp`
+
+Academic tags should include `academic`, the source tag such as `OW4-U8-G1`, and a course-level academic tag such as `OW4-AC`. Japanese fields are required, but only confirmed Japanese should be filled. Known confirmed Unit 8 Japanese: `analyze` = `分析する / ぶんせきする`; `clause` = `節 / せつ`. Everything else stays blank with review flags until confirmed.
+
 Breadcrumbs are navigation, not decoration. They should be clickable links:
 
 ```text

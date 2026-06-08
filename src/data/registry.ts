@@ -19,7 +19,7 @@ export const nextAssignment = {
   unit: 8,
   component: "Unit Opener",
   lessonId: "ow-l4-u8-opener",
-  status: "assigned"
+  status: "to teach"
 };
 
 export const englishCourses = [

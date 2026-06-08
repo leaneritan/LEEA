@@ -1,21 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, CheckSquare, Home, PanelLeftClose, PanelLeftOpen, Search, Settings, UserRound } from "lucide-react";
+import { BookOpen, CheckSquare, GraduationCap, Home, PanelLeftClose, PanelLeftOpen, Search, Settings, UserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 
-type NavKey = "home" | "english" | "assignments" | "reference" | "profile" | "settings";
+type NavKey = "home" | "teacher" | "english" | "assignments" | "reference" | "profile" | "settings";
 
 const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNode }> = [
   { key: "home", label: "Home", href: "/", icon: <Home size={20} /> },
+  { key: "teacher", label: "Neritan", href: "/teacher", icon: <GraduationCap size={20} /> },
   { key: "english", label: "English", href: "/lessons", icon: <BookOpen size={20} /> },
   { key: "assignments", label: "Assignments", href: "/", icon: <CheckSquare size={20} /> },
   { key: "reference", label: "Reference", href: "/reference", icon: <Search size={20} /> },
   { key: "profile", label: "Profile", href: "/", icon: <UserRound size={20} /> },
   { key: "settings", label: "Settings", href: "/", icon: <Settings size={20} /> }
 ];
+
+const mobileNavItems = navItems.filter((item) => ["home", "teacher", "english", "reference"].includes(item.key));
 
 const JapanesePreferenceContext = createContext(false);
 
@@ -108,7 +111,7 @@ export function AppShell({
         </main>
 
         <nav className="mobile-nav" aria-label="Mobile navigation">
-          {navItems.slice(0, 4).map((item) => (
+          {mobileNavItems.map((item) => (
             <Link className={active === item.key ? "active" : ""} href={item.href} key={item.key}>
               {item.icon}
               <span>{item.label}</span>
@@ -122,6 +125,7 @@ export function AppShell({
 
 function getCrumbHref(crumb: string, pathname: string) {
   if (crumb === "Home") return "/";
+  if (crumb === "Neritan") return "/teacher";
   if (crumb === "English") return "/lessons";
   if (crumb === "Reference") return "/reference";
   return pathname;

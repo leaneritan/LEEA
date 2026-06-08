@@ -199,6 +199,8 @@ Search results should deduplicate by global item id and show all matching source
 
 Reference browse/search controls should show useful counts. Mixed search results should be visually scannable with subtle type-aware card edges and badges for Vocabulary, Academic, Content, Related, Glossary, Grammar, and Junior High.
 
+Search ranking should prefer direct word/title matches, then meaning/rule/pattern matches, then exact source/type tags. Broad lesson/topic tags should not cause unrelated cards from the same section to appear for a shorter query.
+
 Search/browse result item types should route to their reference views:
 
 ```text

@@ -26,6 +26,7 @@ type SearchResultBase = {
   description: string;
   href: string;
   label: string;
+  score: number;
   tags: string[];
   tone: ResultTone;
 };
@@ -97,27 +98,9 @@ export function ReferencePage() {
 
     const wordResults = vocabularyItems.flatMap<SearchResult>((item) => {
       const tags = [formatVocabularyKind(item.type), ...item.sources.map((source) => source.tag)];
-      const text = [
-        item.word,
-        item.normalizedWord,
-        item.meaning,
-        item.example,
-        item.partOfSpeech,
-        item.pos,
-        item.japanese?.word,
-        item.japanese?.reading,
-        item.japanese?.meaning,
-        item.jp_word,
-        item.jp_reading,
-        item.jp_meaning,
-        ...item.tags,
-        ...tags
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+      const score = getWordSearchScore(item, tags, searchQuery);
 
-      if (!text.includes(searchQuery)) return [];
+      if (score === 0) return [];
 
       return [
         {
@@ -127,6 +110,7 @@ export function ReferencePage() {
           href: `/reference/vocabulary/${item.id}`,
           kind: "vocabulary",
           label: formatVocabularyKind(item.type),
+          score,
           tone: item.type,
           tags
         }
@@ -135,12 +119,9 @@ export function ReferencePage() {
 
     const grammarResults = grammarPoints.flatMap<SearchResult>((item) => {
       const tags = ["Grammar", item.tag, item.component.toUpperCase()];
-      const text = [item.title, item.shortName, item.rule, item.pattern, item.tag, item.component, item.japanese?.title, item.japanese?.rule, ...tags]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+      const score = getGrammarSearchScore(item, tags, searchQuery);
 
-      if (!text.includes(searchQuery)) return [];
+      if (score === 0) return [];
 
       return [
         {
@@ -150,6 +131,7 @@ export function ReferencePage() {
           href: `/reference/grammar/${item.id}`,
           kind: "grammar",
           label: "Grammar",
+          score,
           tone: "grammar",
           tags
         }
@@ -166,11 +148,14 @@ export function ReferencePage() {
         href: item.u,
         kind: "junior-high",
         label: "Junior High",
+        score: item.w.toLowerCase() === searchQuery ? 95 : 45,
         tone: "junior-high",
         tags: ["Junior High", "Sanseido", "Year 1-3"]
       }));
 
-    return [...wordResults, ...grammarResults, ...sanseidoResults].slice(0, 100);
+    return [...wordResults, ...grammarResults, ...sanseidoResults]
+      .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
+      .slice(0, 100);
   }, [sanseidoItems, searchQuery]);
 
   const searchCounts = useMemo(() => {
@@ -425,6 +410,57 @@ function ReferenceCards({ title, help, words }: { title: string; help: string; w
       </div>
     </div>
   );
+}
+
+function getWordSearchScore(item: (typeof vocabularyItems)[number], displayTags: string[], query: string) {
+  return Math.max(
+    scoreExactText([item.word, item.normalizedWord], query, 120, 100, 80),
+    scoreExactText([item.meaning, item.japanese?.meaning, item.jp_meaning], query, 65, 55, 45),
+    scoreExactText([item.example, item.sample, item.japanese?.word, item.japanese?.reading, item.jp_word, item.jp_reading], query, 45, 35, 25),
+    scoreExactTag([item.partOfSpeech, item.pos, ...item.sources.map((source) => source.tag), ...displayTags, ...item.tags], query)
+  );
+}
+
+function getGrammarSearchScore(item: (typeof grammarPoints)[number], displayTags: string[], query: string) {
+  return Math.max(
+    scoreExactText([item.title, item.shortName], query, 120, 100, 85),
+    scoreExactText([item.rule, item.pattern, item.japanese?.title, item.japanese?.rule, item.japanese?.pattern], query, 75, 60, 45),
+    scoreExactTag([item.tag, item.component, ...displayTags, ...(item.tags ?? [])], query)
+  );
+}
+
+function scoreExactText(fields: Array<string | undefined>, query: string, exactScore: number, startsScore: number, containsScore: number) {
+  return fields.reduce((best, field) => {
+    const value = normalizeSearchText(field);
+    if (!value) return best;
+    if (value === query) return Math.max(best, exactScore);
+    if (value.startsWith(query)) return Math.max(best, startsScore);
+    if (containsSearchTerm(value, query)) return Math.max(best, containsScore);
+    return best;
+  }, 0);
+}
+
+function scoreExactTag(tags: Array<string | undefined>, query: string) {
+  return tags.reduce((best, tag) => {
+    const value = normalizeSearchText(tag);
+    if (!value) return best;
+    if (value === query) return Math.max(best, 70);
+    if ((query.includes("-") || query.startsWith("ow")) && value.includes(query)) return Math.max(best, 55);
+    return best;
+  }, 0);
+}
+
+function containsSearchTerm(value: string, query: string) {
+  if (query.includes(" ")) return value.includes(query);
+  return new RegExp(`(^|[^a-z0-9])${escapeRegExp(query)}([^a-z0-9]|$)`, "i").test(value);
+}
+
+function normalizeSearchText(value: string | undefined) {
+  return value?.toLowerCase().trim() ?? "";
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function formatVocabularyKind(type: string) {

@@ -9,6 +9,8 @@ export type LessonProgressRecord = {
   updatedAt: string;
 };
 
+export type LessonProgressMap = Record<string, LessonProgressRecord>;
+
 export const lessonProgressStorageKey = "leea.lessonProgress.v1";
 
 export function createLessonProgressRecord(lessonId: string, done: boolean): LessonProgressRecord {
@@ -22,4 +24,8 @@ export function createLessonProgressRecord(lessonId: string, done: boolean): Les
     completedAt: done ? now : null,
     updatedAt: now
   };
+}
+
+export function getDoneLessonCount(lessonIds: string[], progress: LessonProgressMap) {
+  return lessonIds.filter((lessonId) => progress[lessonId]?.status === "done").length;
 }

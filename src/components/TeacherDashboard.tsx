@@ -1,37 +1,54 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, Circle, ExternalLink } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronRight, Circle, ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { createLessonProgressRecord, lessonProgressStorageKey, type LessonProgressRecord } from "@/data/lessonProgress";
-import { lessons } from "@/data/lessons";
+import {
+  createLessonProgressRecord,
+  getDoneLessonCount,
+  lessonProgressStorageKey,
+  type LessonProgressMap
+} from "@/data/lessonProgress";
+import { getLessonGroups, lessons } from "@/data/lessons";
 
-type ProgressMap = Record<string, LessonProgressRecord>;
+const groupOpenStorageKey = "leea.teacher.lessonGroupsOpen.v1";
 
 export function TeacherDashboard() {
-  const [progress, setProgress] = useState<ProgressMap>({});
+  const [progress, setProgress] = useState<LessonProgressMap>({});
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  const groups = useMemo(() => getLessonGroups(), []);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(lessonProgressStorageKey);
-    if (!saved) return;
-
-    try {
-      setProgress(JSON.parse(saved) as ProgressMap);
-    } catch {
-      setProgress({});
+    const savedProgress = window.localStorage.getItem(lessonProgressStorageKey);
+    if (savedProgress) {
+      try {
+        setProgress(JSON.parse(savedProgress) as LessonProgressMap);
+      } catch {
+        setProgress({});
+      }
     }
-  }, []);
+
+    const savedGroups = window.localStorage.getItem(groupOpenStorageKey);
+    if (savedGroups) {
+      try {
+        setOpenGroups(JSON.parse(savedGroups) as Record<string, boolean>);
+        return;
+      } catch {
+        setOpenGroups({});
+      }
+    }
+
+    setOpenGroups(Object.fromEntries(groups.map((group, index) => [group.id, index === 0])));
+  }, [groups]);
 
   const doneCount = useMemo(
-    () => lessons.filter((lesson) => progress[lesson.id]?.status === "done").length,
+    () =>
+      getDoneLessonCount(
+        lessons.map((lesson) => lesson.id),
+        progress
+      ),
     [progress]
   );
-
-  const grouped = lessons.reduce<Record<string, typeof lessons>>((groups, lesson) => {
-    const key = `${lesson.course}|${lesson.level ?? "n/a"}|${lesson.unit ?? "n/a"}`;
-    groups[key] = [...(groups[key] ?? []), lesson];
-    return groups;
-  }, {});
 
   function setLessonDone(lessonId: string, done: boolean) {
     setProgress((current) => {
@@ -40,6 +57,14 @@ export function TeacherDashboard() {
         [lessonId]: createLessonProgressRecord(lessonId, done)
       };
       window.localStorage.setItem(lessonProgressStorageKey, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  function toggleGroup(groupId: string) {
+    setOpenGroups((current) => {
+      const next = { ...current, [groupId]: !(current[groupId] ?? true) };
+      window.localStorage.setItem(groupOpenStorageKey, JSON.stringify(next));
       return next;
     });
   }
@@ -68,49 +93,63 @@ export function TeacherDashboard() {
       </section>
 
       <div className="teacher-group-grid">
-        {Object.entries(grouped).map(([key, group]) => {
-          const first = group[0];
+        {groups.map((group) => {
+          const groupDone = getDoneLessonCount(
+            group.lessons.map((lesson) => lesson.id),
+            progress
+          );
+          const isOpen = openGroups[group.id] ?? true;
+
           return (
-            <section className="teacher-group" key={key}>
-              <div className="teacher-group-header">
-                <span>{first.course === "our-world" ? "Our World" : first.course}</span>
+            <section className="teacher-group" id={group.id} key={group.id}>
+              <button className="teacher-group-header" onClick={() => toggleGroup(group.id)} type="button">
+                <span>
+                  {isOpen ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                  {group.courseLabel}
+                </span>
                 <h2>
-                  Level {first.level} - Unit {first.unit}
+                  Level {group.level} - Unit {group.unit}
                 </h2>
-              </div>
-              <div className="teacher-lesson-list">
-                {group.map((lesson) => {
-                  const record = progress[lesson.id];
-                  const done = record?.status === "done";
-                  return (
-                    <article className={done ? "teacher-lesson-card done" : "teacher-lesson-card"} key={lesson.id}>
-                      <div className="teacher-lesson-main">
-                        <span>{lesson.component}</span>
-                        <h3>{lesson.title}</h3>
-                        <p>{lesson.subtitle}</p>
-                        <small>
-                          {lesson.mode} mode - {lesson.source.slideCount ?? 0} slides
-                          {record?.completedAt ? ` - done ${new Date(record.completedAt).toLocaleDateString()}` : ""}
-                        </small>
-                      </div>
-                      <div className="teacher-lesson-actions">
-                        <Link className="teacher-open-button" href={`/lessons/${lesson.id}`}>
-                          Open Lesson
-                          <ExternalLink size={16} />
-                        </Link>
-                        <button
-                          className={done ? "teacher-done-button active" : "teacher-done-button"}
-                          onClick={() => setLessonDone(lesson.id, !done)}
-                          type="button"
-                        >
-                          {done ? <CheckCircle2 size={18} /> : <Circle size={18} />}
-                          {done ? "Done" : "Mark Done"}
-                        </button>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
+                <small>
+                  {groupDone} / {group.lessons.length} done
+                </small>
+              </button>
+
+              {isOpen ? (
+                <div className="teacher-lesson-list">
+                  {group.lessons.map((lesson) => {
+                    const record = progress[lesson.id];
+                    const done = record?.status === "done";
+                    return (
+                      <article className={done ? "teacher-lesson-card done" : "teacher-lesson-card"} key={lesson.id}>
+                        <div className="teacher-lesson-main">
+                          <span>{lesson.component}</span>
+                          <h3>{lesson.title}</h3>
+                          <p>{lesson.subtitle}</p>
+                          <small>
+                            {lesson.mode} mode - {lesson.source.slideCount ?? 0} slides
+                            {record?.completedAt ? ` - done ${new Date(record.completedAt).toLocaleDateString()}` : ""}
+                          </small>
+                        </div>
+                        <div className="teacher-lesson-actions">
+                          <Link className="teacher-open-button" href={`/lessons/${lesson.id}`}>
+                            Open Lesson
+                            <ExternalLink size={16} />
+                          </Link>
+                          <button
+                            className={done ? "teacher-done-button active" : "teacher-done-button"}
+                            onClick={() => setLessonDone(lesson.id, !done)}
+                            type="button"
+                          >
+                            {done ? <CheckCircle2 size={18} /> : <Circle size={18} />}
+                            {done ? "Done" : "Mark Done"}
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              ) : null}
             </section>
           );
         })}

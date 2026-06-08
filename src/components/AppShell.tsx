@@ -127,6 +127,8 @@ function getCrumbHref(crumb: string, pathname: string) {
   if (crumb === "Home") return "/";
   if (crumb === "Neritan") return "/teacher";
   if (crumb === "English") return "/lessons";
+  if (crumb === "Our World") return "/lessons#our-world-l4-u8";
+  if (crumb === "Unit 8") return "/lessons#our-world-l4-u8";
   if (crumb === "Reference") return "/reference";
   return pathname;
 }

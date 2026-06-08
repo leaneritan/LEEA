@@ -12,6 +12,17 @@ export const academyStats = {
   assignedLessons: 2
 };
 
+export const currentFocus = {
+  subject: "English",
+  course: "Our World",
+  courseId: "our-world" as const,
+  level: 4,
+  unit: 8,
+  title: "That's Really Interesting!",
+  goalLabel: "Finish Unit 8",
+  targetDate: "Set goal"
+};
+
 export const nextAssignment = {
   subject: "English",
   course: "Our World",

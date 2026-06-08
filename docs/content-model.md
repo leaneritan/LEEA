@@ -477,6 +477,12 @@ Reusable activity blocks are still useful, but they should emerge from repeated 
 
 Teacher lessons are for Neritan to teach. Learner lessons and review cards are for Leo's independent homework/practice.
 
+Navigation ownership:
+
+- Home is the high-level launcher for all subjects and modes.
+- English owns the detailed course, level, and unit browser.
+- Neritan's Teacher Menu owns teaching controls and lesson completion tracking.
+
 Teacher lesson progress is tracked under Neritan. The first version can be local storage, but it should match a future Supabase `lesson_progress` row:
 
 ```json

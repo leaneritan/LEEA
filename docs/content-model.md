@@ -197,6 +197,8 @@ Search also includes Junior High search-only dictionary entries from `content/su
 
 Search results should deduplicate by global item id and show all matching source tags. Results must clearly tag their type/source, such as Vocabulary, Academic, Grammar, Junior High, Sanseido, and source tags like `OW4-U8-G1`.
 
+Reference browse/search controls should show useful counts. Mixed search results should be visually scannable with subtle type-aware card edges and badges for Vocabulary, Academic, Content, Related, Glossary, Grammar, and Junior High.
+
 Search/browse result item types should route to their reference views:
 
 ```text

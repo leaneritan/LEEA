@@ -399,8 +399,15 @@ Examples:
 Current teacher tracking:
 
 - Teacher Menu opens lessons grouped by course, level, and unit.
+- Level/unit groups in the Teacher Menu should be collapsible because more levels and units will be added.
 - Teacher lessons can be marked `Done`.
 - First storage can be local, but the record shape should map to Supabase later.
+
+Navigation decision:
+
+- Home is the all-subject launcher and should stay high level.
+- English contains the detailed English course/level/unit browser.
+- Neritan contains teacher lesson tracking and teaching controls.
 
 ## Chart Templates
 

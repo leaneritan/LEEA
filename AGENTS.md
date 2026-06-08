@@ -68,6 +68,8 @@ Reference
 - show I Know / I Don't Know lists
 ```
 
+Home is a high-level launcher for all subjects and modes. Keep detailed English course/level/unit browsing inside the English area, not on Home. Neritan's Teacher Menu owns teacher lesson tracking, including collapsible level/unit groups and Mark Done state.
+
 Teacher lessons are only for teaching. Learner apps are for Leo's independent homework/practice.
 
 ## Main Layers

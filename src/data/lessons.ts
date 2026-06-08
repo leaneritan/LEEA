@@ -3,6 +3,53 @@ import type { Lesson } from "./types";
 
 export const lessons: Lesson[] = [unit8Opener as Lesson];
 
+export type LessonGroup = {
+  id: string;
+  course: Lesson["course"];
+  courseLabel: string;
+  level?: number;
+  unit?: number;
+  lessons: Lesson[];
+};
+
 export function getLessonById(id: string) {
   return lessons.find((lesson) => lesson.id === id);
+}
+
+export function getLessonGroupId(lesson: Pick<Lesson, "course" | "level" | "unit">) {
+  return `${lesson.course}-l${lesson.level ?? "na"}-u${lesson.unit ?? "na"}`;
+}
+
+export function getCourseLabel(course: Lesson["course"]) {
+  if (course === "our-world") return "Our World";
+  if (course === "joyful-work") return "Joyful Work";
+  return "Training Ground";
+}
+
+export function getLessonGroups() {
+  const groups = lessons.reduce<Record<string, LessonGroup>>((current, lesson) => {
+    const id = getLessonGroupId(lesson);
+    const existing = current[id];
+
+    if (existing) {
+      existing.lessons.push(lesson);
+      return current;
+    }
+
+    current[id] = {
+      id,
+      course: lesson.course,
+      courseLabel: getCourseLabel(lesson.course),
+      level: lesson.level,
+      unit: lesson.unit,
+      lessons: [lesson]
+    };
+    return current;
+  }, {});
+
+  return Object.values(groups);
+}
+
+export function getCurrentFocusLessons(courseId: Lesson["course"], level: number, unit: number) {
+  return lessons.filter((lesson) => lesson.course === courseId && lesson.level === level && lesson.unit === unit);
 }

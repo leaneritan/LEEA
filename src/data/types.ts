@@ -206,19 +206,6 @@ export type LessonReferenceLink = {
   status: "linked" | "needed";
 };
 
-export type LessonSlide = {
-  id: string;
-  title: string;
-  eyebrow: string;
-  emoji: string;
-  focus: "overview" | "word" | "recap" | "activity" | "teacher-note" | "assessment" | "preview" | "close";
-  teacherScript?: string;
-  studentAction?: string;
-  bullets: string[];
-  callout?: string;
-  referenceIds?: string[];
-};
-
 export type Lesson = {
   id: string;
   subject: "english";
@@ -241,5 +228,4 @@ export type Lesson = {
     language: string[];
   };
   referenceLinks: LessonReferenceLink[];
-  slides: LessonSlide[];
 };

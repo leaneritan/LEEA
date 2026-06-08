@@ -19,9 +19,9 @@ Do not shorten the product heading to "Leo's Elite Academy".
 3. **Reference first.** Vocabulary cards, academic cards, glossary/support cards, and grammar charts are reusable reference objects.
 4. **Japanese ON/OFF is for learning content.** Main navigation stays English-only. Japanese belongs in cards, charts, instructions, and feedback when helpful.
 5. **Reference data must be visible.** When adding vocabulary, academic, content, related, glossary/support, or grammar reference data, update the reference indexes and browse/source-tree wiring in the same change.
-6. **Lessons are assembled from blocks.** Do not hand-code repeated cards, quizzes, sorters, grammar charts, or save logic inside each lesson.
-7. **Specific lessons are still allowed.** If an activity is truly one-off, it can be custom.
-8. **Registry controls live status.** A lesson appears because registry data says it is live/assigned.
+6. **Teacher lessons are specific.** Do not force every Neritan lesson into one generic template. Use the source lesson/deck style when that is the best teaching experience.
+7. **Reusable blocks grow from repetition.** Build shared chart, quiz, card, sorter, save, and feedback blocks only when the same pattern appears across lessons or Leo apps.
+8. **Teacher progress lives under Neritan.** Teacher lessons are opened and marked done from the teacher menu; the local progress shape should stay ready for Supabase.
 9. **Do, not reveal.** Leo should choose, build, sort, fix, type, speak, answer, or complete.
 10. **Keep it maintainable by one parent plus AI.** Avoid architecture that becomes another job.
 11. **Validate content before delivery.** Run `npm run validate:content` after reference data changes, before typecheck/build/PR.

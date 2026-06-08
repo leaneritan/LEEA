@@ -33,7 +33,7 @@ export function HomeDashboard() {
           <p>Teach, practice, and look up every word and grammar point from one consistent place.</p>
 
           <div className="mode-grid">
-            <ModeCard title="Neritan" label="Teaching mode" text="Open teacher decks, assign Leo apps, and track progress." />
+            <ModeCard title="Neritan" label="Teaching mode" text="Open teacher decks, assign Leo apps, and track progress." href="/teacher" />
             <ModeCard title="Leo" label="Learning mode" text="Do assigned practice, complete review cards, and continue homework." active />
             <ModeCard title="Look It Up" label="Reference" text="Search vocabulary, grammar, I Know, and I Don't Know." href="/reference" />
           </div>
@@ -41,7 +41,7 @@ export function HomeDashboard() {
 
         <aside className="next-card">
           <div className="next-top">
-            <span>Next Assignment</span>
+            <span>Teaching Queue</span>
             <b>{nextAssignment.status}</b>
           </div>
           <div>
@@ -51,7 +51,7 @@ export function HomeDashboard() {
             <h2>{nextAssignment.component}</h2>
           </div>
           <Link className="primary-button" href={`/lessons/${nextAssignment.lessonId}`}>
-            Continue
+            Open Lesson
           </Link>
         </aside>
       </section>
@@ -137,7 +137,7 @@ function ModeCard({
   );
 
   return href ? (
-    <Link className="mode-card reference" href={href}>
+    <Link className={`mode-card ${title === "Look It Up" ? "reference" : "teaching"}`} href={href}>
       {content}
     </Link>
   ) : (

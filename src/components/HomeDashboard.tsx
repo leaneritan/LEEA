@@ -78,7 +78,7 @@ export function HomeDashboard() {
             {englishCourses.map((course) => (
               <Link
                 className={`course-card ${course.theme}`}
-                href={course.id === "reference" ? "/reference" : "/"}
+                href={course.id === "reference" ? "/reference" : course.id === "our-world" ? "/lessons" : "/"}
                 key={course.id}
               >
                 <div className="course-band">

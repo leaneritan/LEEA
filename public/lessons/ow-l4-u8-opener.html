@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit 8 Opener — Teach · Leo's English League</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════════
+       VARIABLES
+    ═══════════════════════════════════════════ */
+    :root {
+      --green:    #16A34A;
+      --green-dk: #14532D;
+      --green-lt: #DCFCE7;
+      --green-md: #86EFAC;
+      --arctic:   #0EA5E9;
+      --arc-bg:   #F0F9FF;
+      --arc-dk:   #075985;
+      --yellow:   #FFCC00;
+      --ybg:      #FFFBE6;
+      --paper:    #FAFAF7;
+      --surface:  #FFFFFF;
+      --soft:     #F0EEE8;
+      --border:   #E5E3DC;
+      --ink:      #111111;
+      --ink2:     #5A5853;
+      --ink3:     #6B6963;
+      --ink4:     #9A9A95;
+      --red:      #DC2626;
+      --red-lt:   #FEE2E2;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: #111;
+      font-family: 'Outfit', sans-serif;
+      overflow: hidden;
+      user-select: none;
+    }
+    button { font-family: 'Outfit', sans-serif; }
+
+    /* ═══════════════════════════════════════════
+       SCALING WRAPPER
+    ═══════════════════════════════════════════ */
+    #wrap {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: calc(100vh - 52px);
+      overflow: hidden;
+    }
+    #deck {
+      position: absolute;
+      width: 1920px;
+      height: 1080px;
+      transform-origin: top left;
+      /* left / top / transform set by JS */
+    }
+
+    /* ═══════════════════════════════════════════
+       SLIDES
+    ═══════════════════════════════════════════ */
+    .slide {
+      position: absolute;
+      inset: 0;
+      background: var(--paper);
+      display: none;
+      overflow: hidden;
+    }
+    .slide.active { display: block; }
+
+    /* ═══════════════════════════════════════════
+       NAV BAR
+    ═══════════════════════════════════════════ */
+    #nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 52px;
+      background: #0D0D0D;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 10px;
+      z-index: 9000;
+    }
+    .nb { /* nav button */
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; padding: 6px 18px; border-radius: 4px;
+      cursor: pointer; font-weight: 600; font-size: 14px;
+      transition: all .15s;
+    }
+    .nb:hover { background: rgba(255,255,255,.2); }
+    .nb.green { background: var(--green); border-color: var(--green); }
+    #sc { /* slide counter */
+      color: rgba(255,255,255,.65); font-size: 13px; font-weight: 600;
+      min-width: 64px; text-align: center;
+    }
+    #pgbar { flex: 1; height: 4px; background: rgba(255,255,255,.12); border-radius: 2px; overflow: hidden; }
+    #pgfill { height: 100%; background: var(--green); transition: width .3s; }
+    #unit-lbl { color: var(--green-md); font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin-left: auto; }
+
+    /* ═══════════════════════════════════════════
+       TEACHER NOTES PANEL
+    ═══════════════════════════════════════════ */
+    #tn-panel {
+      position: fixed;
+      top: 0; right: -440px;
+      width: 440px; height: calc(100vh - 52px);
+      background: #1a2332;
+      transition: right .3s ease;
+      z-index: 8000;
+      display: flex; flex-direction: column;
+    }
+    #tn-panel.open { right: 0; }
+    .tn-head {
+      background: var(--green-dk);
+      padding: 16px 20px;
+      font-weight: 800; font-size: 12px; letter-spacing: .2em; text-transform: uppercase;
+      color: #fff;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+    }
+    .tn-close { cursor: pointer; font-size: 20px; opacity: .7; }
+    .tn-close:hover { opacity: 1; }
+    #tn-body {
+      flex: 1; overflow-y: auto;
+      padding: 20px 22px;
+      font-size: 15px; line-height: 1.75;
+      color: rgba(255,255,255,.82);
+    }
+    #tn-body strong { color: var(--yellow); }
+    #tn-body .tn-sec { margin-bottom: 16px; }
+    #tn-body .tn-lbl {
+      font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--green-md); font-weight: 700; margin-bottom: 6px; display: block;
+    }
+    #tn-body ul { padding-left: 18px; }
+    #tn-body li { margin-bottom: 5px; }
+    #tn-body .tn-qa { background: rgba(255,255,255,.06); border-left: 3px solid var(--yellow); padding: 10px 14px; border-radius: 0 6px 6px 0; margin-top: 8px; }
+
+    /* ═══════════════════════════════════════════
+       SHARED SLIDE COMPONENTS
+    ═══════════════════════════════════════════ */
+
+    /* Slide header bar */
+    .sh {
+      height: 88px;
+      display: flex; align-items: center;
+      padding: 0 72px; gap: 22px;
+      flex-shrink: 0;
+    }
+    .sh.gr  { background: var(--green); }
+    .sh.arc { background: var(--arctic); }
+    .sh.dk  { background: var(--ink); }
+    .sh.gld { background: #92400E; }
+    .sh-icon { font-size: 44px; line-height: 1; }
+    .sh-text .sh-title { font-size: 36px; font-weight: 800; color: #fff; letter-spacing: -.01em; }
+    .sh-text .sh-sub   { font-size: 18px; font-weight: 500; color: rgba(255,255,255,.68); margin-top: 1px; }
+    .sh-tag {
+      margin-left: auto;
+      background: rgba(255,255,255,.16); color: #fff;
+      padding: 6px 18px 5px; border-radius: 20px;
+      font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    }
+
+    /* Slide body — natural flow */
+    .sb { padding: 50px 72px; height: calc(1080px - 88px); overflow: hidden; }
+
+    /* Two-column game layout */
+    .gl { display: grid; grid-template-columns: 36% 64%; height: 100%; }
+    .wp { /* word panel */
+      display: flex; flex-direction: column; justify-content: center;
+      padding-right: 52px; border-right: 1px solid var(--border);
+    }
+    .gp { /* game panel */
+      display: flex; flex-direction: column; justify-content: center;
+      padding-left: 56px;
+    }
+
+    /* Word display */
+    .vtag {
+      display: inline-block; padding: 5px 14px 4px; border-radius: 4px;
+      font-size: 12px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .vtag.rel { background: #F3F4F6; color: #6B7280; border: 1.5px solid #D1D5DB; }
+    .vtag.ac  { background: var(--arctic); color: #fff; }
+    .big-em   { font-size: 76px; line-height: 1; margin-bottom: 8px; display: block; }
+    .big-w    { font-size: 76px; font-weight: 900; line-height: 1; color: var(--ink); letter-spacing: -.02em; margin-bottom: 6px; }
+    .w-pron   { font-size: 20px; color: var(--ink3); font-style: italic; margin-bottom: 22px; }
+    .dad-bbl  {
+      background: var(--ybg); border-left: 4px solid var(--yellow);
+      padding: 16px 20px; border-radius: 0 12px 12px 0;
+      font-size: 17px; line-height: 1.65; color: var(--ink2);
+    }
+    .dad-bbl strong { color: var(--ink); font-weight: 700; }
+
+    /* Definition reveal */
+    .def-box { border: 2px solid var(--green); border-radius: 12px; padding: 20px 24px; margin-top: 18px; background: var(--green-lt); }
+    .def-box.ac { background: var(--arc-bg); border-color: var(--arctic); }
+    .def-t  { font-size: 22px; line-height: 1.5; font-weight: 500; }
+    .def-t strong { color: var(--green); font-weight: 800; }
+    .def-t.ac strong { color: var(--arc-dk); }
+    .def-ex { font-size: 17px; color: var(--ink2); line-height: 1.65; margin-top: 10px; }
+
+    /* Game action button */
+    .gbtn {
+      background: var(--green); color: #fff; border: none;
+      padding: 16px 36px; border-radius: 10px;
+      font-weight: 800; font-size: 22px; cursor: pointer;
+      transition: all .2s; letter-spacing: .01em;
+    }
+    .gbtn:hover:not(:disabled) { background: var(--green-dk); transform: translateY(-2px); }
+    .gbtn:disabled { opacity: .45; cursor: default; transform: none; }
+    .gbtn.arc { background: var(--arctic); }
+    .gbtn.arc:hover:not(:disabled) { background: var(--arc-dk); }
+
+    /* ═══════════════════════════════════════════
+       GAME 1 — HOBBY SPINNER
+    ═══════════════════════════════════════════ */
+    .spin-wrap { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+    .wheel-box { position: relative; width: 380px; height: 380px; }
+    .hw { width: 100%; height: 100%; position: relative; }
+    .hw-ctr {
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%,-50%);
+      width: 68px; height: 68px; border-radius: 50%;
+      background: var(--green); border: 4px solid var(--green-dk);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; z-index: 5;
+    }
+    .hw-it {
+      position: absolute; font-size: 52px;
+      left: 50%; top: 50%;
+      transform: translate(-50%,-50%) rotate(calc(var(--i) * 45deg)) translateY(-156px);
+    }
+
+    /* ═══════════════════════════════════════════
+       GAME 2 — DARK ROOM
+    ═══════════════════════════════════════════ */
+    .dark-room {
+      position: relative;
+      background: #0D1117; border-radius: 20px;
+      padding: 38px 28px;
+      display: flex; flex-direction: column; align-items: center; gap: 20px;
+      overflow: hidden; min-height: 310px;
+    }
+    .dr-lbl { color: rgba(255,255,255,.38); font-size: 13px; letter-spacing: .22em; text-transform: uppercase; font-weight: 600; }
+    .cam-big { font-size: 96px; filter: drop-shadow(0 0 20px rgba(14,165,233,.5)); }
+    .cam-flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; transition: opacity .14s; border-radius: 20px; }
+    .polaroid {
+      background: #fff; border: 1px solid var(--border);
+      padding: 13px 13px 36px; max-width: 210px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.22);
+      animation: polaDrop .5s cubic-bezier(.34,1.56,.64,1);
+      text-align: center;
+    }
+    @keyframes polaDrop { from{transform:translateY(-38px) rotate(-5deg);opacity:0} to{transform:none;opacity:1} }
+    .pola-img { font-size: 52px; }
+    .pola-s   { font-size: 13px; color: var(--ink3); font-style: italic; margin-top: 6px; }
+    .shutter {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: #1E293B; border: 2px solid rgba(255,255,255,.25);
+      color: #fff; padding: 14px 28px; border-radius: 10px;
+      font-weight: 700; font-size: 18px; cursor: pointer; transition: all .2s;
+    }
+    .shutter:hover:not(:disabled) { background: #334155; }
+    .shutter:disabled { opacity: .45; cursor: default; }
+    .sh-dot { width: 15px; height: 15px; border-radius: 50%; background: var(--arctic); box-shadow: 0 0 10px var(--arctic); }
+
+    /* ═══════════════════════════════════════════
+       GAME 3 — MOUNTAIN TRAIL
+    ═══════════════════════════════════════════ */
+    .hike-instr { font-size: 18px; font-weight: 600; color: var(--ink2); margin-bottom: 10px; }
+    .mt-wrap {
+      position: relative; width: 100%; height: 370px;
+      background: linear-gradient(to bottom,#BFDBFE 0%,#93C5FD 34%,#DBEAFE 34%);
+      border-radius: 18px; overflow: hidden;
+    }
+    .mt-body { position: absolute; bottom:0; left:50%; transform:translateX(-50%); width:80%; height:70%; background:#166534; clip-path:polygon(50% 0%,5% 100%,95% 100%); }
+    .mt-snow { position: absolute; bottom:0; left:50%; transform:translateX(-50%); width:80%; height:70%; background:#fff; clip-path:polygon(50% 0%,38% 26%,62% 26%); }
+    .mt-trees { position:absolute; bottom:28%; left:0; right:0; display:flex; justify-content:space-around; padding:0 16%; font-size:22px; pointer-events:none; }
+    .wp-dot {
+      position: absolute; transform: translate(-50%,50%);
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--yellow); border: 3px solid var(--green-dk);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 16px; font-weight: 800; color: var(--green-dk);
+      z-index: 10; transition: all .2s;
+    }
+    .wp-dot:hover:not(.locked):not(.visited) { transform: translate(-50%,50%) scale(1.15); }
+    .wp-dot.locked  { opacity: .3; cursor: not-allowed; }
+    .wp-dot.visited { background: var(--green); color: #fff; cursor: default; }
+    .wp-dot.hint    { animation: hintP 1.2s ease infinite; }
+    @keyframes hintP { 0%,100%{box-shadow:0 0 0 6px rgba(22,163,74,.3)} 50%{box-shadow:0 0 0 12px rgba(22,163,74,.08)} }
+    .hiker-em {
+      position: absolute; font-size: 32px; transform: translate(-50%,50%);
+      transition: all .65s cubic-bezier(.34,1.56,.64,1); z-index: 11; pointer-events: none;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,.3));
+    }
+    .sum-flag { position: absolute; font-size: 34px; z-index: 12; animation: flagP .4s ease; pointer-events: none; }
+    @keyframes flagP { from{transform:scale(0) rotate(-15deg)} to{transform:scale(1)} }
+
+    /* ═══════════════════════════════════════════
+       GAME 4 — ICE TAP
+    ═══════════════════════════════════════════ */
+    .ice-stg {
+      position: relative; width: 100%; height: 350px;
+      background: linear-gradient(to bottom,#BAE6FD 0%,#E0F2FE 45%,#F0F9FF 70%,#fff 100%);
+      border-radius: 18px; overflow: hidden;
+      cursor: crosshair; user-select: none;
+    }
+    .ice-crack { position:absolute; inset:0; opacity:.12; background-image:linear-gradient(40deg,transparent 47%,#94A3B8 47%,#94A3B8 53%,transparent 53%),linear-gradient(-25deg,transparent 44%,#94A3B8 44%,#94A3B8 46%,transparent 46%); background-size:68px 68px,88px 88px; pointer-events:none; }
+    .ice-over { position:absolute; top:14px; left:50%; transform:translateX(-50%); background:rgba(255,255,255,.9); padding:8px 20px; border-radius:20px; font-size:16px; font-weight:600; white-space:nowrap; pointer-events:none; z-index:10; }
+    .ice-c    { position:absolute; bottom:14px; right:18px; font-weight:800; font-size:20px; color:var(--arc-dk); background:rgba(255,255,255,.9); padding:5px 14px; border-radius:10px; pointer-events:none; z-index:10; }
+    .ice-paw  { position:absolute; font-size:40px; pointer-events:none; transform:translate(-50%,-50%); animation:pawP .35s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes pawP { from{transform:translate(-50%,-50%) scale(0) rotate(-18deg);opacity:0} to{transform:translate(-50%,-50%) scale(1);opacity:1} }
+    .ice-bear-el { position:absolute; font-size:92px; top:50%; right:-140px; transform:translateY(-50%); transition:right .9s cubic-bezier(.34,1.56,.64,1); pointer-events:none; z-index:10; }
+    .ice-bear-el.go { right: 8%; }
+
+    /* ═══════════════════════════════════════════
+       GAME 5 — PHOTO DETECTIVE (analyze)
+    ═══════════════════════════════════════════ */
+    .det-layout { display: grid; grid-template-columns: 52% 48%; gap: 24px; height: 100%; }
+    .scene-art {
+      position: relative; width: 100%;
+      background: linear-gradient(to bottom,#BFDBFE 0%,#93C5FD 40%,#E0F2FE 40%,#F0F9FF 72%,#CBD5E1 72%,#94A3B8 100%);
+      border-radius: 16px; overflow: hidden; border: 1px solid var(--border);
+      aspect-ratio: 4/3; align-self: start;
+    }
+    .sc-sun  { position:absolute; top:7%;  right:9%;  font-size:40px; pointer-events:none; }
+    .sc-mtn  { position:absolute; bottom:27%; left:7%; font-size:46px; opacity:.65; pointer-events:none; }
+    .sc-bear { position:absolute; bottom:28%; left:38%; font-size:66px; pointer-events:none; }
+    .sc-cam  { position:absolute; bottom:26%; right:18%; font-size:50px; pointer-events:none; }
+    .sc-i1   { position:absolute; bottom:5%; left:3%;  font-size:24px; opacity:.4; pointer-events:none; }
+    .sc-i2   { position:absolute; bottom:8%; right:5%; font-size:20px; opacity:.4; pointer-events:none; }
+    .hs {
+      position: absolute; transform: translate(-50%,-50%);
+      background: none; border: none; cursor: pointer; z-index: 10; padding: 0;
+    }
+    .hs-d {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,204,0,.92); border: 2.5px solid var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px; color: var(--ink);
+      animation: dotP 1.5s ease infinite; transition: all .2s;
+    }
+    .hs.found .hs-d { background: var(--green); color: #fff; border-color: var(--green-dk); animation: none; }
+    .hs.found .hs-d::before { content: '✓'; font-size: 15px; }
+    @keyframes dotP { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+    .fi-panel { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-top: 4px; }
+    .fi-hdr   { font-weight: 700; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink3); margin-bottom: 6px; }
+    .fi-card  { display:flex; align-items:flex-start; gap:12px; background:var(--surface); border-radius:10px; padding:12px 16px; font-size:17px; line-height:1.5; border:1px solid var(--border); animation:fadeIn .3s ease; }
+    .fi-em    { font-size:24px; flex-shrink:0; }
+    .fi-ph    { color:var(--ink4); font-size:16px; font-style:italic; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
+    /* ═══════════════════════════════════════════
+       GAME 6 — NOTEBOOK FILL (describe)
+    ═══════════════════════════════════════════ */
+    .desc-gl { display: grid; grid-template-columns: auto 1fr; gap: 22px; height: 100%; align-items: start; }
+    .desc-btns { display: flex; flex-direction: column; gap: 10px; padding-top: 4px; }
+    .d-btn {
+      padding: 12px 20px; border: 2px solid var(--arctic); border-radius: 10px;
+      background: var(--surface); font-weight: 700; font-size: 17px; color: var(--arc-dk);
+      cursor: pointer; transition: all .2s; white-space: nowrap; text-align: left;
+    }
+    .d-btn:hover:not(.used) { background: var(--arctic); color: #fff; }
+    .d-btn.used { background: var(--green-lt); border-color: var(--green); color: var(--green-dk); cursor: default; }
+    .nb-paper {
+      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      padding: 18px 22px; min-height: 280px;
+      background-image: repeating-linear-gradient(transparent,transparent 34px,#DBEAFE 34px,#DBEAFE 35px);
+      background-position: 0 8px;
+    }
+    .nb-line { padding: 4px 0; font-size: 19px; line-height: 2; animation: fadeIn .3s ease; }
+    .nl-k    { font-weight: 800; color: var(--arc-dk); font-size: 17px; margin-right: 8px; }
+    .nb-ph   { color: var(--ink4); font-size: 16px; font-style: italic; }
+
+    /* ═══════════════════════════════════════════
+       GAME 7 — WHY CHAIN (explain)
+    ═══════════════════════════════════════════ */
+    .why-chain {
+      display: flex; align-items: center; gap: 14px; width: 100%;
+    }
+    .why-c {
+      flex: 1; border: 2.5px solid var(--border); border-radius: 14px;
+      padding: 28px 18px; text-align: center;
+      cursor: pointer; background: var(--soft); transition: all .25s;
+      font-size: 18px; line-height: 1.55;
+    }
+    .why-c.locked   { opacity: .3; cursor: not-allowed; }
+    .why-c.unlocked { background: var(--surface); border-color: var(--arctic); }
+    .why-c.unlocked:hover { background: var(--arc-bg); transform: translateY(-3px); }
+    .why-c.revealed { background: var(--arc-bg); border-color: var(--arctic); cursor: default; }
+    .why-em  { font-size: 48px; display: block; margin-bottom: 12px; }
+    .why-arr { font-size: 28px; color: var(--arctic); flex-shrink: 0; }
+
+    /* ═══════════════════════════════════════════
+       GAME 8 — CAPTION MATCH
+    ═══════════════════════════════════════════ */
+    .cap-gl { display: grid; grid-template-columns: 40% 60%; gap: 24px; height: 100%; }
+    .cap-ph {
+      background: linear-gradient(to bottom,#BAE6FD 0%,#E0F2FE 45%,#F0F9FF 70%,#CBD5E1 100%);
+      border-radius: 16px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-size: 80px; border: 1px solid var(--border); position: relative;
+      padding: 24px;
+    }
+    .cap-stmp {
+      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: rgba(22,163,74,.92); color: #fff; font-weight: 700;
+      font-size: 15px; padding: 7px 18px; border-radius: 6px; border: 2px solid #fff;
+      white-space: nowrap;
+    }
+    .cap-opts { display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+    .cap-o {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 20px; border: 2.5px solid var(--border); border-radius: 12px;
+      background: var(--surface); cursor: pointer; text-align: left;
+      font-size: 19px; line-height: 1.55; transition: all .18s;
+    }
+    .cap-o:hover    { border-color: var(--arctic); background: var(--arc-bg); }
+    .cap-o.correct  { border-color: var(--green); background: var(--green-lt); }
+    .cap-o.wrong    { border-color: var(--red); background: var(--red-lt); animation: shake .4s ease; }
+    .cap-l   { font-weight: 800; font-size: 22px; color: var(--ink3); flex-shrink: 0; min-width: 24px; }
+    .cap-hint { font-size: 16px; color: var(--ink2); font-style: italic; min-height: 20px; margin-top: 6px; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+    /* ═══════════════════════════════════════════
+       RECAP SLIDES
+    ═══════════════════════════════════════════ */
+    .recap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .rc-card {
+      background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px;
+      padding: 28px 28px; display: flex; align-items: flex-start; gap: 18px;
+      cursor: pointer; transition: all .2s;
+    }
+    .rc-card:hover { border-color: var(--green); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.06); }
+    .rc-card.flipped { background: var(--green-lt); border-color: var(--green); }
+    .rc-card.flipped.ac { background: var(--arc-bg); border-color: var(--arctic); }
+    .rc-em   { font-size: 52px; flex-shrink: 0; }
+    .rc-word { font-size: 36px; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+    .rc-def  { font-size: 17px; color: var(--ink2); line-height: 1.55; display: none; }
+    .rc-card.flipped .rc-def { display: block; }
+    .rc-tap  { font-size: 13px; color: var(--ink4); font-style: italic; }
+    .rc-card.flipped .rc-tap { display: none; }
+
+    /* ═══════════════════════════════════════════
+       SPECIAL SLIDES
+    ═══════════════════════════════════════════ */
+
+    /* TITLE SLIDE */
+    .title-slide {
+      background: linear-gradient(135deg, var(--green-dk) 0%, var(--green) 55%, #15803D 100%);
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 80px 100px; position: relative; overflow: hidden;
+    }
+    .ts-bg  { position: absolute; right: 60px; top: 50%; transform: translateY(-50%); font-size: 320px; opacity: .1; pointer-events: none; line-height: 1; }
+    .ts-unit  { font-size: 20px; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: 14px; }
+    .ts-title { font-size: 88px; font-weight: 900; color: #fff; line-height: 1.05; margin-bottom: 14px; letter-spacing: -.02em; }
+    .ts-sub   { font-size: 34px; font-weight: 500; color: rgba(255,255,255,.75); margin-bottom: 44px; }
+    .ts-chips { display: flex; gap: 14px; flex-wrap: wrap; }
+    .ts-chip  { background: rgba(255,255,255,.14); border: 1.5px solid rgba(255,255,255,.28); color: #fff; padding: 10px 22px; border-radius: 24px; font-size: 20px; font-weight: 600; }
+
+    /* OBJECTIVES */
+    .obj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .obj-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 28px 28px; }
+    .obj-icon { font-size: 40px; margin-bottom: 12px; }
+    .obj-head { font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--ink3); margin-bottom: 10px; }
+    .obj-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .obj-list li { font-size: 20px; line-height: 1.5; padding-left: 24px; position: relative; }
+    .obj-list li::before { content: '•'; position: absolute; left: 4px; color: var(--green); font-weight: 700; }
+
+    /* BUILD BACKGROUND — step activity */
+    .step-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 4px; }
+    .step-item {
+      background: var(--surface); border: 2.5px solid var(--border); border-radius: 14px;
+      padding: 22px 16px; text-align: center; cursor: pointer; transition: all .22s;
+    }
+    .step-item:hover { border-color: var(--green); background: var(--green-lt); transform: translateY(-3px); }
+    .step-item.on { border-color: var(--green); background: var(--green-lt); }
+    .si-em  { font-size: 42px; margin-bottom: 10px; display: block; }
+    .si-lbl { font-size: 18px; font-weight: 700; }
+    .step-instr { font-size: 24px; font-weight: 600; color: var(--ink); margin-bottom: 18px; }
+
+    /* THE PHOTO DISCUSSION */
+    .photo-disc { display: grid; grid-template-columns: 52% 48%; height: 100%; }
+    .pd-photo {
+      position: relative; margin: 8px 32px 8px 0;
+      background: linear-gradient(to bottom,#BFDBFE 0%,#93C5FD 40%,#E0F2FE 40%,#F0F9FF 72%,#CBD5E1 72%,#94A3B8 100%);
+      border-radius: 20px; overflow: hidden; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pd-bear   { font-size: 180px; }
+    .pd-cap    { position: absolute; bottom: 20px; left: 20px; right: 20px; background: rgba(0,0,0,.7); color: #fff; padding: 14px 18px; border-radius: 10px; font-size: 18px; line-height: 1.5; font-style: italic; }
+    .pd-panel  { display: flex; flex-direction: column; gap: 18px; padding-top: 16px; overflow-y: auto; }
+    .dq-card   { background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 18px 22px; cursor: pointer; transition: all .2s; }
+    .dq-card:hover { border-color: var(--green); }
+    .dq-card.open  { border-color: var(--green); background: var(--green-lt); }
+    .dq-q   { font-size: 20px; font-weight: 700; }
+    .dq-a   { font-size: 17px; color: var(--green-dk); margin-top: 8px; display: none; }
+    .dq-card.open .dq-a { display: block; }
+
+    /* BE THE EXPERT */
+    .expert-slide { display: grid; grid-template-columns: 42% 58%; height: 100%; gap: 0; }
+    .ex-left  { padding-right: 44px; display: flex; flex-direction: column; gap: 18px; justify-content: center; border-right: 1px solid var(--border); }
+    .ex-right { padding-left: 44px; display: flex; flex-direction: column; gap: 16px; justify-content: center; overflow-y: auto; }
+    .ex-tag   { display: inline-block; background: var(--green); color: #fff; padding: 5px 14px 4px; font-size: 12px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; border-radius: 4px; margin-bottom: 8px; }
+    .ex-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; }
+    .ex-bt    { font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--ink3); margin-bottom: 10px; }
+    .ex-txt   { font-size: 18px; line-height: 1.75; color: var(--ink); }
+
+    /* LOOK AND CHECK */
+    .lc-slide { display: grid; grid-template-columns: 48% 52%; height: 100%; }
+    .lc-photo { margin: 8px 32px 8px 0; background: linear-gradient(to bottom,#BAE6FD,#E0F2FE 45%,#F0F9FF 70%,#CBD5E1 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 180px; border: 1px solid var(--border); }
+    .lc-panel { display: flex; flex-direction: column; gap: 18px; padding-top: 8px; justify-content: center; }
+    .lc-q     { font-size: 28px; font-weight: 700; }
+    .lc-opts  { display: flex; flex-direction: column; gap: 14px; }
+    .lc-opt   { display: flex; align-items: center; gap: 16px; padding: 18px 22px; border: 2.5px solid var(--border); border-radius: 12px; background: var(--surface); cursor: pointer; transition: all .2s; font-size: 22px; font-weight: 600; }
+    .lc-opt:hover   { border-color: var(--green); background: var(--green-lt); }
+    .lc-opt.correct { border-color: var(--green); background: var(--green-lt); }
+    .lc-opt.wrong   { border-color: var(--red); background: var(--red-lt); animation: shake .4s; }
+    .lc-radio { width: 24px; height: 24px; border-radius: 50%; border: 2.5px solid var(--border); flex-shrink: 0; }
+    .lc-opt.correct .lc-radio { background: var(--green); border-color: var(--green); }
+
+    /* CAPTION WRITING */
+    .cw-slide { display: grid; grid-template-columns: 44% 56%; height: 100%; }
+    .cw-photo { margin: 8px 36px 8px 0; background: linear-gradient(to bottom,#BAE6FD,#E0F2FE 45%,#F0F9FF 70%,#CBD5E1 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 160px; border: 1px solid var(--border); }
+    .cw-panel { display: flex; flex-direction: column; gap: 16px; justify-content: center; }
+    .cw-title { font-size: 32px; font-weight: 900; color: var(--green); }
+    .cw-tip   { background: var(--arc-bg); border-left: 4px solid var(--arctic); padding: 12px 18px; border-radius: 0 10px 10px 0; font-size: 18px; color: var(--arc-dk); }
+    .cw-ex    { background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 18px; font-size: 18px; line-height: 1.55; }
+    .cw-ex.gd { border-color: var(--green); background: var(--green-lt); }
+    .cw-ex.bd { border-color: var(--red); background: var(--red-lt); }
+
+    /* FORMATIVE ASSESSMENT */
+    .fa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 8px; }
+    .fa-card { background: var(--surface); border: 2.5px solid var(--border); border-radius: 14px; padding: 28px 26px; cursor: pointer; transition: all .2s; }
+    .fa-card:hover { border-color: var(--green); transform: translateY(-2px); }
+    .fa-card.done  { border-color: var(--green); background: var(--green-lt); }
+    .fa-icon { font-size: 38px; margin-bottom: 12px; }
+    .fa-q    { font-size: 21px; font-weight: 700; margin-bottom: 6px; }
+    .fa-a    { font-size: 17px; color: var(--ink2); line-height: 1.55; }
+
+    /* GREAT JOB */
+    .gj-slide {
+      background: linear-gradient(135deg,var(--green-dk),var(--green));
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; text-align: center;
+    }
+    .gj-trophy { font-size: 130px; }
+    .gj-title  { font-size: 90px; font-weight: 900; color: #fff; letter-spacing: -.02em; }
+    .gj-sub    { font-size: 34px; color: rgba(255,255,255,.78); }
+    .gj-chips  { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+    .gj-chip   { background: rgba(255,255,255,.16); color: #fff; border: 1.5px solid rgba(255,255,255,.3); padding: 8px 20px; border-radius: 20px; font-size: 18px; font-weight: 600; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ SCALING WRAPPER ═══════════ -->
+<div id="wrap">
+  <div id="deck">
+
+    <!-- ══════════════════════════════════════
+         SLIDE 1 — TITLE
+    ══════════════════════════════════════ -->
+    <div class="slide active" id="s1">
+      <div class="title-slide">
+        <div class="ts-bg">🐻‍❄️</div>
+        <div class="ts-unit">Unit 8 · Our World 2E Level 4</div>
+        <div class="ts-title">That's Really<br>Interesting!</div>
+        <div class="ts-sub">Hobbies, Interests &amp; the Arctic</div>
+        <div class="ts-chips">
+          <span class="ts-chip">🎨 Hobbies</span>
+          <span class="ts-chip">📸 Photography</span>
+          <span class="ts-chip">🐻‍❄️ Polar Bears</span>
+          <span class="ts-chip">🔍 Analyze &amp; Describe</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 2 — OBJECTIVES
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s2">
+      <div class="sh gr">
+        <span class="sh-icon">🎯</span>
+        <div class="sh-text"><div class="sh-title">Unit 8 Opener</div><div class="sh-sub">What we'll learn today</div></div>
+        <span class="sh-tag">Objectives</span>
+      </div>
+      <div class="sb">
+        <div class="obj-grid">
+          <div class="obj-card">
+            <div class="obj-icon">📚</div>
+            <div class="obj-head">Content Objectives</div>
+            <ul class="obj-list">
+              <li>Identify and describe hobbies and interests</li>
+              <li>Analyze a photo for information</li>
+              <li>Write a caption for a photo</li>
+            </ul>
+          </div>
+          <div class="obj-card">
+            <div class="obj-icon">🗣️</div>
+            <div class="obj-head">Language Objectives</div>
+            <ul class="obj-list">
+              <li>Use new related vocabulary: hobby, photographer, hiker, polar bear</li>
+              <li>Use academic language: analyze, describe, explain, caption</li>
+              <li>Discuss what makes a good photo caption</li>
+            </ul>
+          </div>
+          <div class="obj-card">
+            <div class="obj-icon">🌍</div>
+            <div class="obj-head">Unit 8 — Big Picture</div>
+            <ul class="obj-list">
+              <li>Grammar 1: Describing people with <em>who</em></li>
+              <li>Grammar 2: Direct and indirect objects</li>
+              <li>Reading: <em>Hide and Seek</em></li>
+              <li>Writing: Explanation writing</li>
+            </ul>
+          </div>
+          <div class="obj-card" style="background:var(--green-lt);border-color:var(--green)">
+            <div class="obj-icon">⭐</div>
+            <div class="obj-head" style="color:var(--green)">Today's 8 Words</div>
+            <ul class="obj-list">
+              <li>🎨 hobby · 📸 photographer · 🥾 hiker · 🐻‍❄️ polar bear</li>
+              <li>🔍 analyze · 📝 describe · 💡 explain · 🗒️ caption</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 3 — hobby (SPINNER)
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s3">
+      <div class="sh gr">
+        <span class="sh-icon">🎨</span>
+        <div class="sh-text"><div class="sh-title">hobby</div><div class="sh-sub">/ˈhɒbi/ · noun</div></div>
+        <span class="sh-tag">Related Vocabulary</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag rel">Related Vocabulary</span>
+            <span class="big-em">🎨</span>
+            <div class="big-w">hobby</div>
+            <div class="w-pron">/ˈhɒbi/ · hob·by · noun</div>
+            <div class="dad-bbl">💬 Dad: "Leo, what do you love doing after school? Football? Gaming? Those are your <strong>hobbies</strong>! Spin the wheel to see all the hobbies people enjoy around the world…"</div>
+          </div>
+          <div class="gp">
+            <div class="spin-wrap">
+              <div class="wheel-box">
+                <div class="hw" id="hw">
+                  <div class="hw-ctr">🎡</div>
+                  <span class="hw-it" style="--i:0">🎨</span>
+                  <span class="hw-it" style="--i:1">⚽</span>
+                  <span class="hw-it" style="--i:2">📸</span>
+                  <span class="hw-it" style="--i:3">🎮</span>
+                  <span class="hw-it" style="--i:4">🎵</span>
+                  <span class="hw-it" style="--i:5">🏔️</span>
+                  <span class="hw-it" style="--i:6">🌱</span>
+                  <span class="hw-it" style="--i:7">🎣</span>
+                </div>
+              </div>
+              <p style="font-size:18px;color:var(--ink3)">Every emoji is a different hobby!</p>
+              <button class="gbtn" id="spin-btn" onclick="spinWheel()">🎡 Spin the Wheel!</button>
+            </div>
+            <div class="def-box hidden" id="hobby-def">
+              <div class="def-t">A <strong>hobby</strong> is something you love to do for fun in your free time.</div>
+              <div class="def-ex">🎨 "Painting is a hobby." · ⚽ "Soccer is Leo's hobby!" · 📸 "Wildlife photography is Roie's hobby."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 4 — photographer (DARK ROOM)
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s4">
+      <div class="sh gr">
+        <span class="sh-icon">📸</span>
+        <div class="sh-text"><div class="sh-title">photographer</div><div class="sh-sub">/fəˈtɒɡrəfə/ · noun</div></div>
+        <span class="sh-tag">Related Vocabulary</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag rel">Related Vocabulary</span>
+            <span class="big-em">📸</span>
+            <div class="big-w">photographer</div>
+            <div class="w-pron">/fəˈtɒɡrəfə/ · pho·tog·ra·pher</div>
+            <div class="dad-bbl">💬 Dad: "Roie Galitz is a professional wildlife <strong>photographer</strong>. He went to the Arctic to photograph animals. Click the shutter to see what happened when he left his camera on the ice…"</div>
+          </div>
+          <div class="gp">
+            <div class="dark-room" id="dark-room">
+              <div class="dr-lbl">🔵 Dark Room — waiting for a photo…</div>
+              <span class="cam-big">📷</span>
+              <div id="polaroid-wrap" style="display:none">
+                <div class="polaroid">
+                  <div class="pola-img">🐻‍❄️📷❄️</div>
+                  <div class="pola-s">Svalbard, Norway</div>
+                </div>
+              </div>
+              <div class="cam-flash" id="cam-flash"></div>
+            </div>
+            <div style="text-align:center;margin-top:14px">
+              <button class="shutter" id="shutter-btn" onclick="clickShutter()">
+                <span class="sh-dot"></span> Click the Shutter
+              </button>
+            </div>
+            <div class="def-box hidden" id="photo-def">
+              <div class="def-t">A <strong>photographer</strong> is a person who takes photos — as a hobby or as a job.</div>
+              <div class="def-ex">📸 "Roie Galitz is a professional wildlife photographer. He travels to dangerous places to photograph amazing animals!"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 5 — hiker (MOUNTAIN TRAIL)
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s5">
+      <div class="sh gr">
+        <span class="sh-icon">🥾</span>
+        <div class="sh-text"><div class="sh-title">hiker</div><div class="sh-sub">/ˈhaɪkə/ · noun</div></div>
+        <span class="sh-tag">Related Vocabulary</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag rel">Related Vocabulary</span>
+            <span class="big-em">🥾</span>
+            <div class="big-w">hiker</div>
+            <div class="w-pron">/ˈhaɪkə/ · hi·ker · noun</div>
+            <div class="dad-bbl">💬 Dad: "To reach polar bear territory, Roie hiked across Arctic mountains and ice fields. He wasn't just a photographer — he was a <strong>hiker</strong> too! Let's guide him to the summit — tap each waypoint in order!"</div>
+          </div>
+          <div class="gp">
+            <div class="hike-instr">👇 Tap each number in order to reach the summit!</div>
+            <div class="mt-wrap" id="mt-wrap">
+              <div class="mt-body"></div>
+              <div class="mt-snow"></div>
+              <div class="mt-trees"><span>🌲</span><span>🌲</span><span>🌲</span></div>
+              <button class="wp-dot hint"   id="wp-0" style="left:22%;bottom:13%" onclick="clickWP(0)">1</button>
+              <button class="wp-dot locked" id="wp-1" style="left:32%;bottom:27%" onclick="clickWP(1)">2</button>
+              <button class="wp-dot locked" id="wp-2" style="left:41%;bottom:42%" onclick="clickWP(2)">3</button>
+              <button class="wp-dot locked" id="wp-3" style="left:49%;bottom:55%" onclick="clickWP(3)">4</button>
+              <button class="wp-dot locked" id="wp-4" style="left:50%;bottom:67%" onclick="clickWP(4)">⛳</button>
+              <span class="hiker-em" id="hiker-em" style="left:22%;bottom:3%">🥾</span>
+              <span class="sum-flag hidden" id="sum-flag" style="left:51%;bottom:72%">🚩</span>
+            </div>
+            <div class="def-box hidden" id="hiker-def">
+              <div class="def-t">A <strong>hiker</strong> is someone who walks long distances through nature — in mountains, forests, or wild areas.</div>
+              <div class="def-ex">🥾 "Roie hiked across Arctic terrain to reach polar bear territory. He is an experienced hiker!"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 6 — polar bear (ICE TAP)
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s6">
+      <div class="sh gr">
+        <span class="sh-icon">🐻‍❄️</span>
+        <div class="sh-text"><div class="sh-title">polar bear</div><div class="sh-sub">/ˈpəʊlə beə/ · noun</div></div>
+        <span class="sh-tag">Related Vocabulary</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag rel">Related Vocabulary</span>
+            <span class="big-em">🐻‍❄️</span>
+            <div class="big-w">polar bear</div>
+            <div class="w-pron">/ˈpəʊlə beə/ · noun</div>
+            <div class="dad-bbl">💬 Dad: "Something enormous and white is hiding on the Arctic ice… Can you find it? Tap the ice <strong>5 times</strong> to discover what's hiding!"</div>
+          </div>
+          <div class="gp">
+            <div class="ice-stg" id="ice-stg" onclick="tapIce(event)" ontouchstart="tapIce(event)">
+              <div class="ice-crack"></div>
+              <div class="ice-over" id="ice-over">🧊 Tap the ice to find what's hiding! (0/5)</div>
+              <div class="ice-c" id="ice-c">0/5</div>
+              <span class="ice-bear-el" id="ice-bear">🐻‍❄️</span>
+            </div>
+            <div class="def-box hidden" id="bear-def">
+              <div class="def-t">A <strong>polar bear</strong> is a huge white bear that lives in the Arctic — one of the coldest, most remote places on Earth!</div>
+              <div class="def-ex">🐻‍❄️ "Polar bears can weigh up to 700 kg!" · 🐻‍❄️ "This curious polar bear found Roie's camera in Svalbard, Norway." · 🐻‍❄️ "Polar bears are excellent swimmers — up to 100 km!"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 7 — RELATED VOCAB RECAP
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s7">
+      <div class="sh gr">
+        <span class="sh-icon">🔄</span>
+        <div class="sh-text"><div class="sh-title">Related Vocabulary — Quick Recap</div><div class="sh-sub">Tap each card to reveal the definition</div></div>
+        <span class="sh-tag">Recap</span>
+      </div>
+      <div class="sb">
+        <div class="recap-grid">
+          <div class="rc-card" onclick="this.classList.toggle('flipped')">
+            <span class="rc-em">🎨</span>
+            <div><div class="rc-word">hobby</div><div class="rc-def">Something you love to do for fun in your free time.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+          <div class="rc-card" onclick="this.classList.toggle('flipped')">
+            <span class="rc-em">📸</span>
+            <div><div class="rc-word">photographer</div><div class="rc-def">A person who takes photos as a hobby or job.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+          <div class="rc-card" onclick="this.classList.toggle('flipped')">
+            <span class="rc-em">🥾</span>
+            <div><div class="rc-word">hiker</div><div class="rc-def">Someone who walks long distances through nature.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+          <div class="rc-card" onclick="this.classList.toggle('flipped')">
+            <span class="rc-em">🐻‍❄️</span>
+            <div><div class="rc-word">polar bear</div><div class="rc-def">A huge white bear that lives in the Arctic.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 8 — analyze (PHOTO DETECTIVE)
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s8">
+      <div class="sh arc">
+        <span class="sh-icon">🔍</span>
+        <div class="sh-text"><div class="sh-title">analyze</div><div class="sh-sub">/ˈænəlaɪz/ · verb</div></div>
+        <span class="sh-tag">Academic Language</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag ac">Academic Language</span>
+            <span class="big-em">🔍</span>
+            <div class="big-w">analyze</div>
+            <div class="w-pron">/ˈænəlaɪz/ · an·a·lyze · verb</div>
+            <div class="dad-bbl" style="border-color:var(--arctic)">💬 Dad: "A good reporter doesn't just look — they <strong>ANALYZE</strong>! They look carefully to find information. You're the detective now. Tap all 5 ❓ hotspots!"</div>
+          </div>
+          <div class="gp">
+            <div class="det-layout">
+              <div>
+                <div class="scene-art" id="an-scene">
+                  <span class="sc-sun">☀️</span>
+                  <span class="sc-mtn">🏔️</span>
+                  <span class="sc-bear">🐻‍❄️</span>
+                  <span class="sc-cam">📷</span>
+                  <span class="sc-i1">❄️</span>
+                  <span class="sc-i2">❄️</span>
+                  <button class="hs" id="hs-0" style="left:47%;top:47%" onclick="clickHS(0)"><div class="hs-d">?</div></button>
+                  <button class="hs" id="hs-1" style="left:70%;top:64%" onclick="clickHS(1)"><div class="hs-d">?</div></button>
+                  <button class="hs" id="hs-2" style="left:19%;top:79%" onclick="clickHS(2)"><div class="hs-d">?</div></button>
+                  <button class="hs" id="hs-3" style="left:36%;top:87%" onclick="clickHS(3)"><div class="hs-d">?</div></button>
+                  <button class="hs" id="hs-4" style="left:80%;top:18%" onclick="clickHS(4)"><div class="hs-d">?</div></button>
+                </div>
+              </div>
+              <div>
+                <div class="fi-hdr">🔍 Findings — <span id="fi-n">0</span>/5</div>
+                <div class="fi-panel" id="fi-list">
+                  <div class="fi-ph">Click the ❓ hotspots on the photo →</div>
+                </div>
+              </div>
+            </div>
+            <div class="def-box ac hidden" id="analyze-def" style="margin-top:14px">
+              <div class="def-t ac">To <strong>analyze</strong> means to look carefully at something to understand it and find information.</div>
+              <div class="def-ex">🔍 "Analyze the photo — don't just look, THINK about what you see and what it tells you!"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 9 — describe (NOTEBOOK FILL)
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s9">
+      <div class="sh arc">
+        <span class="sh-icon">📝</span>
+        <div class="sh-text"><div class="sh-title">describe</div><div class="sh-sub">/dɪˈskraɪb/ · verb</div></div>
+        <span class="sh-tag">Academic Language</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag ac">Academic Language</span>
+            <span class="big-em">📝</span>
+            <div class="big-w">describe</div>
+            <div class="w-pron">/dɪˈskraɪb/ · de·scribe · verb</div>
+            <div class="dad-bbl" style="border-color:var(--arctic)">💬 Dad: "A reporter <strong>describes</strong> everything they see. Tap each button to fill the Reporter's Notebook with a description of the polar bear scene!"</div>
+          </div>
+          <div class="gp">
+            <div class="desc-gl">
+              <div class="desc-btns">
+                <button class="d-btn" id="db-WHO"   onclick="addDesc('WHO')">👤 WHO</button>
+                <button class="d-btn" id="db-WHAT"  onclick="addDesc('WHAT')">📸 WHAT</button>
+                <button class="d-btn" id="db-WHERE" onclick="addDesc('WHERE')">📍 WHERE</button>
+                <button class="d-btn" id="db-WHEN"  onclick="addDesc('WHEN')">🕐 WHEN</button>
+                <button class="d-btn" id="db-HOW"   onclick="addDesc('HOW')">🐾 HOW</button>
+              </div>
+              <div class="nb-paper">
+                <div class="nb-ph" id="nb-ph">Tap a button to fill the notebook →</div>
+                <div id="nb-lines"></div>
+              </div>
+            </div>
+            <div class="def-box ac hidden" id="describe-def" style="margin-top:14px">
+              <div class="def-t ac">To <strong>describe</strong> means to use words to tell what something looks like, where it is, or what happened.</div>
+              <div class="def-ex">📝 Unit 8 goal: "<strong>Describe</strong> and explain a hobby." · WHO + WHAT + WHERE + WHEN + HOW = a full description!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 10 — explain (WHY CHAIN)
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s10">
+      <div class="sh arc">
+        <span class="sh-icon">💡</span>
+        <div class="sh-text"><div class="sh-title">explain</div><div class="sh-sub">/ɪkˈspleɪn/ · verb</div></div>
+        <span class="sh-tag">Academic Language</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag ac">Academic Language</span>
+            <span class="big-em">💡</span>
+            <div class="big-w">explain</div>
+            <div class="w-pron">/ɪkˈspleɪn/ · ex·plain · verb</div>
+            <div class="dad-bbl" style="border-color:var(--arctic)">💬 Dad: "Describing is <strong>WHAT</strong>. Explaining is <strong>WHY</strong>. Why did the polar bear find the camera? Tap the cards from left to right to unlock the explanation!"</div>
+          </div>
+          <div class="gp" style="justify-content:center;gap:20px">
+            <div class="why-chain">
+              <div class="why-c unlocked" id="why-0" onclick="clickWhy(0)">
+                <span class="why-em">🔒</span>
+                <p style="font-size:16px;color:var(--ink3)">Tap to unlock!</p>
+              </div>
+              <div class="why-arr">→</div>
+              <div class="why-c locked" id="why-1" onclick="clickWhy(1)">
+                <span class="why-em">🔒</span>
+                <p style="font-size:16px;color:var(--ink4)">Locked</p>
+              </div>
+              <div class="why-arr">→</div>
+              <div class="why-c locked" id="why-2" onclick="clickWhy(2)">
+                <span class="why-em">🔒</span>
+                <p style="font-size:16px;color:var(--ink4)">Locked</p>
+              </div>
+            </div>
+            <div class="def-box ac hidden" id="explain-def">
+              <div class="def-t ac">To <strong>explain</strong> means to say WHY or HOW something happened.</div>
+              <div class="def-ex">💡 "Explain WHY the polar bear found the camera." → Give the reason (WHY)!<br>💡 Unit 8 goal: "Describe AND <strong>explain</strong> a hobby."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 11 — caption (CAPTION MATCH)
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s11">
+      <div class="sh arc">
+        <span class="sh-icon">🗒️</span>
+        <div class="sh-text"><div class="sh-title">caption</div><div class="sh-sub">/ˈkæpʃən/ · noun</div></div>
+        <span class="sh-tag">Academic Language</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag ac">Academic Language</span>
+            <span class="big-em">🗒️</span>
+            <div class="big-w">caption</div>
+            <div class="w-pron">/ˈkæpʃən/ · cap·tion · noun</div>
+            <div class="dad-bbl" style="border-color:var(--arctic)">💬 Dad: "Every magazine photo has a <strong>caption</strong> — a short sentence that explains the photo. Which caption below is the BEST? Leo, you choose first!"</div>
+          </div>
+          <div class="gp">
+            <div class="cap-gl">
+              <div class="cap-ph" id="cap-photo">
+                🐻‍❄️📷❄️
+                <span class="cap-stmp hidden" id="cap-stmp">✓ Perfect caption!</span>
+              </div>
+              <div>
+                <div class="cap-opts">
+                  <button class="cap-o" id="cm-A" onclick="pickCap('A')"><span class="cap-l">A</span><span>It's a bear.</span></button>
+                  <button class="cap-o" id="cm-B" onclick="pickCap('B')"><span class="cap-l">B</span><span>A curious polar bear investigates a photographer's camera in Svalbard, Norway.</span></button>
+                  <button class="cap-o" id="cm-C" onclick="pickCap('C')"><span class="cap-l">C</span><span>Animals live in cold places.</span></button>
+                </div>
+                <p class="cap-hint" id="cm-hint"></p>
+                <div class="def-box ac hidden" id="caption-def" style="margin-top:12px">
+                  <div class="def-t ac">A <strong>caption</strong> is a short sentence under a photo that tells who or what is in the photo, and what is happening.</div>
+                  <div class="def-ex">🗒️ Great captions are: <strong>Specific</strong> (who/what/where) · <strong>Short</strong> (1–2 sentences) · <strong>Interesting</strong> (vivid adjectives!)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 12 — ACADEMIC RECAP
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s12">
+      <div class="sh arc">
+        <span class="sh-icon">🔄</span>
+        <div class="sh-text"><div class="sh-title">Academic Language — Quick Recap</div><div class="sh-sub">Tap each card to reveal</div></div>
+        <span class="sh-tag">Recap</span>
+      </div>
+      <div class="sb">
+        <div class="recap-grid">
+          <div class="rc-card" onclick="this.classList.toggle('flipped');this.classList.toggle('ac')">
+            <span class="rc-em">🔍</span>
+            <div><div class="rc-word">analyze</div><div class="rc-def">Look carefully to find information and understand something.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+          <div class="rc-card" onclick="this.classList.toggle('flipped');this.classList.toggle('ac')">
+            <span class="rc-em">📝</span>
+            <div><div class="rc-word">describe</div><div class="rc-def">Use words to tell what something looks like, where it is, or what happened.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+          <div class="rc-card" onclick="this.classList.toggle('flipped');this.classList.toggle('ac')">
+            <span class="rc-em">💡</span>
+            <div><div class="rc-word">explain</div><div class="rc-def">Say WHY or HOW something happened — give the reason or the steps.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+          <div class="rc-card" onclick="this.classList.toggle('flipped');this.classList.toggle('ac')">
+            <span class="rc-em">🗒️</span>
+            <div><div class="rc-word">caption</div><div class="rc-def">A short sentence under a photo that tells who/what/where — and makes readers curious!</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+        </div>
+        <div style="margin-top:20px;background:var(--arc-bg);border:1.5px solid var(--arctic);border-radius:12px;padding:18px 24px;font-size:20px;color:var(--arc-dk)">
+          <strong>Key difference:</strong> Describe = <em>WHAT</em> (the bear is white and curious) · Explain = <em>WHY</em> (the bear found the camera <em>because</em> it was curious about the scent)
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 13 — BUILD BACKGROUND
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s13">
+      <div class="sh gr">
+        <span class="sh-icon">🕹️</span>
+        <div class="sh-text"><div class="sh-title">Build Background — Step Forward!</div><div class="sh-sub">Stand up! Step forward when you hear something interesting.</div></div>
+        <span class="sh-tag">Introduce</span>
+      </div>
+      <div class="sb">
+        <div class="step-instr">💬 Dad reads each activity. <strong>Leo steps forward</strong> when he thinks it sounds interesting!</div>
+        <div class="step-grid">
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">⚽</span><div class="si-lbl">Playing soccer</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">🎮</span><div class="si-lbl">Playing video games</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">🏛️</span><div class="si-lbl">Going to a museum</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">🎣</span><div class="si-lbl">Fishing</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">🎸</span><div class="si-lbl">Playing an instrument</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">📸</span><div class="si-lbl">Wildlife photography</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">🏔️</span><div class="si-lbl">Hiking in the Arctic</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">🎨</span><div class="si-lbl">Drawing &amp; painting</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 14 — THE PHOTO
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s14">
+      <div class="sh dk">
+        <span class="sh-icon">📷</span>
+        <div class="sh-text"><div class="sh-title">Look at This Photo…</div><div class="sh-sub">What do you see? What's happening?</div></div>
+        <span class="sh-tag">The Anchor Photo</span>
+      </div>
+      <div class="sb">
+        <div class="photo-disc">
+          <div class="pd-photo">
+            <span class="pd-bear">🐻‍❄️</span>
+            <div class="pd-cap">"A curious polar bear investigating a photographer's camera. Svalbard, Norway." — Roie Galitz</div>
+          </div>
+          <div class="pd-panel">
+            <div style="font-size:24px;font-weight:700;margin-bottom:4px">🗣️ Discussion Questions</div>
+            <div style="font-size:17px;color:var(--ink2);margin-bottom:14px">Tap each card to reveal the model answer — but ask Leo first!</div>
+            <div class="dq-card" onclick="this.classList.toggle('open')">
+              <div class="dq-q">What do you see in the photo?</div>
+              <div class="dq-a">A polar bear, a camera, and ice/snow. The bear is very close to the camera.</div>
+            </div>
+            <div class="dq-card" onclick="this.classList.toggle('open')">
+              <div class="dq-q">What does the polar bear seem to be doing?</div>
+              <div class="dq-a">The bear is investigating the camera — sniffing it or pawing at it. It looks curious!</div>
+            </div>
+            <div class="dq-card" onclick="this.classList.toggle('open')">
+              <div class="dq-q">Where is the person who owns the camera?</div>
+              <div class="dq-a">Probably far away — it's dangerous to be close to a polar bear! Everyone backed away for safety.</div>
+            </div>
+            <div class="dq-card" onclick="this.classList.toggle('open')">
+              <div class="dq-q">How do you think the photographer felt?</div>
+              <div class="dq-a">Excited! And maybe a little scared. But happy — this is an incredible, once-in-a-lifetime photo!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 15 — ABOUT THE PHOTO (BE THE EXPERT)
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s15">
+      <div class="sh gld">
+        <span class="sh-icon">⭐</span>
+        <div class="sh-text"><div class="sh-title">BE THE EXPERT — About the Photo</div><div class="sh-sub">Background knowledge for Dad to share with Leo</div></div>
+        <span class="sh-tag">Be the Expert</span>
+      </div>
+      <div class="sb">
+        <div class="expert-slide">
+          <div class="ex-left">
+            <span class="ex-tag">About the Photo</span>
+            <div style="font-size:100px;text-align:center">🐻‍❄️📷</div>
+            <div style="background:var(--ybg);border:1.5px solid var(--yellow);border-radius:12px;padding:18px 20px;font-size:18px;color:var(--ink2);line-height:1.65">
+              <strong>Photographer:</strong> Roie Galitz<br>
+              <strong>Location:</strong> Svalbard / Greenland, Arctic<br>
+              <strong>Context:</strong> Wildlife photography workshop<br>
+              <strong>Bear weight:</strong> ~500 kg
+            </div>
+          </div>
+          <div class="ex-right">
+            <div class="ex-block">
+              <div class="ex-bt">What Happened</div>
+              <div class="ex-txt">This photo shows a male polar bear who came across a group of people at a wildlife photography workshop. As the curious bear came closer, <strong>everyone backed away for safety</strong>. The polar bear then investigated the camera equipment — apparently interested in joining the workshop!</div>
+            </div>
+            <div class="ex-block">
+              <div class="ex-bt">The Location</div>
+              <div class="ex-txt">Svalbard/Greenland — deep in the Arctic between the North Atlantic and Arctic Oceans. About <strong>80% of Greenland is covered in ice</strong>. Wildlife here includes polar bears, seals, whales, musk oxen, and sea eagles.</div>
+            </div>
+            <div class="ex-block">
+              <div class="ex-bt">Discussion Prompts</div>
+              <div class="ex-txt">🐾 "Why do you think the photographer set up his camera and stepped away?"<br>🐾 "Is wildlife photography a <em>dangerous</em> hobby? Why?"<br>🐾 "Would you like to photograph polar bears?"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 16 — TEACHING TIP
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s16">
+      <div class="sh gld">
+        <span class="sh-icon">💡</span>
+        <div class="sh-text"><div class="sh-title">BE THE EXPERT — Teaching Tip</div><div class="sh-sub">Encouraging Leo's curiosity</div></div>
+        <span class="sh-tag">Be the Expert</span>
+      </div>
+      <div class="sb" style="display:flex;flex-direction:column;gap:24px;justify-content:center">
+        <div class="ex-block">
+          <div class="ex-bt">Teaching Tip</div>
+          <div class="ex-txt" style="font-size:20px">Leo may become interested in learning more about polar bears, Greenland, or wildlife photography from this photo. <strong>Encourage it!</strong> Help him find reliable print or online resources to research the topic. Encouraging his interests will help him become an enthusiastic, active learner.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+          <div class="ex-block" style="text-align:center">
+            <div style="font-size:36px;margin-bottom:8px">📖</div>
+            <div class="ex-bt">If Leo wants more…</div>
+            <div class="ex-txt" style="font-size:16px">Offer additional readings about polar bears or Arctic wildlife</div>
+          </div>
+          <div class="ex-block" style="text-align:center">
+            <div style="font-size:36px;margin-bottom:8px">🌐</div>
+            <div class="ex-bt">Online resources</div>
+            <div class="ex-txt" style="font-size:16px">National Geographic Kids, BBC Earth, WWF polar bear pages</div>
+          </div>
+          <div class="ex-block" style="text-align:center">
+            <div style="font-size:36px;margin-bottom:8px">🎯</div>
+            <div class="ex-bt">Key vocabulary</div>
+            <div class="ex-txt" style="font-size:16px">Arctic, habitat, endangered, wildlife, photography</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 17 — LOOK AND CHECK
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s17">
+      <div class="sh gr">
+        <span class="sh-icon">✔️</span>
+        <div class="sh-text"><div class="sh-title">Look and Check</div><div class="sh-sub">Student Book p. 130 — Who is taking the photo?</div></div>
+        <span class="sh-tag">Activity</span>
+      </div>
+      <div class="sb">
+        <div class="lc-slide">
+          <div class="lc-photo">🐻‍❄️</div>
+          <div class="lc-panel">
+            <div class="lc-q">Who is taking the photo?</div>
+            <div style="font-size:17px;color:var(--ink2);margin-bottom:4px">Tap your answer — Leo chooses first!</div>
+            <div class="lc-opts">
+              <div class="lc-opt" id="lc-a" onclick="pickLC('a')">
+                <div class="lc-radio"></div>
+                a photographer
+              </div>
+              <div class="lc-opt" id="lc-b" onclick="pickLC('b')">
+                <div class="lc-radio"></div>
+                a hiker
+              </div>
+              <div class="lc-opt" id="lc-c" onclick="pickLC('c')">
+                <div class="lc-radio"></div>
+                a polar bear
+              </div>
+            </div>
+            <div id="lc-feedback" style="display:none;font-size:18px;color:var(--green-dk);font-weight:600;background:var(--green-lt);border-radius:10px;padding:14px 18px;margin-top:4px">
+              ✅ A photographer! Roie Galitz is the professional wildlife photographer who set up the camera.<br><br>
+              🐾 Fun fact: In a way, the polar bear is ALSO "taking the photo" by investigating the camera — that's what makes this photo so amazing! 😄
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 18 — WRITE A CAPTION
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s18">
+      <div class="sh gr">
+        <span class="sh-icon">✍️</span>
+        <div class="sh-text"><div class="sh-title">Write a Caption</div><div class="sh-sub">Student Book p. 130 — Reporter's Notebook Entry #1</div></div>
+        <span class="sh-tag">Activity</span>
+      </div>
+      <div class="sb">
+        <div class="cw-slide">
+          <div class="cw-photo">🐻‍❄️📷❄️</div>
+          <div class="cw-panel">
+            <div class="cw-title">📓 Write your caption!</div>
+            <div class="cw-tip">💡 A great caption is <strong>specific</strong> (who, what, where), <strong>short</strong>, and uses vivid adjectives!</div>
+            <div style="font-size:19px;font-weight:700;color:var(--ink)">Useful words:</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">curious</span>
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">polar bear</span>
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">photographer</span>
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">investigates</span>
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">Svalbard</span>
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">Arctic</span>
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">camera</span>
+            </div>
+            <div class="cw-ex gd">✅ <strong>Good:</strong> "A curious polar bear investigates a photographer's camera in Svalbard, Norway."</div>
+            <div class="cw-ex bd">❌ <strong>Too simple:</strong> "It's a bear." — <em>Too short! Not specific enough.</em></div>
+            <div style="font-size:18px;font-weight:600;color:var(--green-dk);margin-top:4px">📓 Leo writes his caption in the Student Book or notebook — this becomes Reporter's Notebook Entry #1!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 19 — FORMATIVE ASSESSMENT
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s19">
+      <div class="sh gr">
+        <span class="sh-icon">✔</span>
+        <div class="sh-text"><div class="sh-title">Formative Assessment</div><div class="sh-sub">Check Leo's understanding — tap each card when done</div></div>
+        <span class="sh-tag">Assessment</span>
+      </div>
+      <div class="sb">
+        <div style="font-size:20px;color:var(--ink2);margin-bottom:20px">Two tasks from the Lesson Planner — check both before finishing the opener.</div>
+        <div class="fa-grid">
+          <div class="fa-card" onclick="this.classList.toggle('done')">
+            <div class="fa-icon">👁️</div>
+            <div class="fa-q">Task 1 — Look and Check ✓</div>
+            <div class="fa-a">Leo correctly identified that <strong>a photographer</strong> took the photo. (Bonus: discuss how the polar bear is "taking" the photo too!)</div>
+          </div>
+          <div class="fa-card" onclick="this.classList.toggle('done')">
+            <div class="fa-icon">✍️</div>
+            <div class="fa-q">Task 2 — Write a Caption ✓</div>
+            <div class="fa-a">Leo wrote a caption for the polar bear photo. It should be specific (who/what/where) and use at least one vivid adjective. This is <strong>Reporter's Notebook Entry #1</strong>.</div>
+          </div>
+          <div class="fa-card" onclick="this.classList.toggle('done')">
+            <div class="fa-icon">🔤</div>
+            <div class="fa-q">Vocabulary Check ✓</div>
+            <div class="fa-a">Leo can define all 8 words: hobby, photographer, hiker, polar bear, analyze, describe, explain, caption. Quick oral check — point to each emoji card and ask!</div>
+          </div>
+          <div class="fa-card" onclick="this.classList.toggle('done')">
+            <div class="fa-icon">💡</div>
+            <div class="fa-q">Academic Language Check ✓</div>
+            <div class="fa-a">Leo understands the difference between <strong>describe</strong> (WHAT) and <strong>explain</strong> (WHY). Can he give an example of each using the polar bear photo?</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 20 — UNIT PREVIEW
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s20">
+      <div class="sh gr">
+        <span class="sh-icon">🗺️</span>
+        <div class="sh-text"><div class="sh-title">What's Next in Unit 8?</div><div class="sh-sub">The Reporter's Notebook continues…</div></div>
+        <span class="sh-tag">Unit Preview</span>
+      </div>
+      <div class="sb">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px">
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">📚</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Vocab 1</div>
+            <div style="font-size:15px;color:var(--ink2)">collect, creative, enjoy, compete, cooperate, score…</div>
+          </div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">📖</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Vocab 2</div>
+            <div style="font-size:15px;color:var(--ink2)">a bug, a comic book, a dinosaur, a fossil, stuffed animal</div>
+          </div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">🔧</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Grammar 1</div>
+            <div style="font-size:15px;color:var(--ink2)">Describing people with <em>who</em></div>
+          </div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">🔧</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Grammar 2</div>
+            <div style="font-size:15px;color:var(--ink2)">Direct and indirect objects</div>
+          </div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">🎵</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Song</div>
+            <div style="font-size:15px;color:var(--ink2)">Unit 8 song — hobbies and interests</div>
+          </div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">📰</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Reading</div>
+            <div style="font-size:15px;color:var(--ink2)"><em>Hide and Seek</em></div>
+          </div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">✍️</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Writing</div>
+            <div style="font-size:15px;color:var(--ink2)">Explanation writing — describe &amp; explain a hobby</div>
+          </div>
+          <div style="background:var(--green-lt);border:1.5px solid var(--green);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">🎯</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px;color:var(--green)">Mission + Project</div>
+            <div style="font-size:15px;color:var(--green-dk)">Enjoy a hobby · Present a hobby</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SLIDE 21 — GREAT JOB!
+    ══════════════════════════════════════ -->
+    <div class="slide" id="s21">
+      <div class="gj-slide">
+        <div class="gj-trophy">🏆</div>
+        <div class="gj-title">Great Job, Leo!</div>
+        <div class="gj-sub">Unit 8 Opener Complete · Reporter's Notebook Entry #1 written!</div>
+        <div class="gj-chips">
+          <span class="gj-chip">🎨 hobby</span>
+          <span class="gj-chip">📸 photographer</span>
+          <span class="gj-chip">🥾 hiker</span>
+          <span class="gj-chip">🐻‍❄️ polar bear</span>
+          <span class="gj-chip">🔍 analyze</span>
+          <span class="gj-chip">📝 describe</span>
+          <span class="gj-chip">💡 explain</span>
+          <span class="gj-chip">🗒️ caption</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /deck -->
+</div><!-- /wrap -->
+
+<!-- ═══════════ NAV BAR ═══════════ -->
+<div id="nav">
+  <button class="nb" onclick="prevSlide()">◀ Prev</button>
+  <span id="sc">1 / 21</span>
+  <button class="nb" onclick="nextSlide()">Next ▶</button>
+  <div id="pgbar"><div id="pgfill"></div></div>
+  <button class="nb" id="tn-btn" onclick="toggleNotes()">📝 Notes</button>
+  <span id="unit-lbl">Unit 8 · Opener</span>
+</div>
+
+<!-- ═══════════ TEACHER NOTES PANEL ═══════════ -->
+<div id="tn-panel">
+  <div class="tn-head">
+    📝 Teacher Notes
+    <span class="tn-close" onclick="toggleNotes()">✕</span>
+  </div>
+  <div id="tn-body"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   TEACHER NOTES DATA
+═══════════════════════════════════════════ */
+const NOTES = {
+  1: `<div class="tn-sec"><span class="tn-lbl">Slide 1 — Title</span>Show Leo the title slide and ask: <strong>"What do you think Unit 8 is about?"</strong> Wait for his answer. Then introduce the polar bear theme. Set the mood — this is a fun, creative unit about hobbies and interests.</div>`,
+
+  2: `<div class="tn-sec"><span class="tn-lbl">Slide 2 — Objectives</span>Read the objectives together. Highlight <strong>analyze</strong> and <strong>caption</strong> — these are the key academic words. Ask Leo: <strong>"What do you think 'analyze' means?"</strong> Accept any answer — this builds curiosity before the game.</div>`,
+
+  3: `<div class="tn-sec"><span class="tn-lbl">Slide 3 — hobby (Spinner)</span>Click <strong>SPIN</strong> and watch with Leo as the wheel spins. When it stops, say: <em>"That's a hobby! What's YOUR hobby, Leo?"</em> Wait for his answer before clicking Next. The definition appears after the spin.</div><div class="tn-qa">Expected: Leo mentions soccer, gaming, or drawing.</div>`,
+
+  4: `<div class="tn-sec"><span class="tn-lbl">Slide 4 — photographer (Dark Room)</span>Build suspense: <em>"The room is dark... the camera is ready..."</em> Click the shutter TOGETHER. React to the polaroid appearing. Say: <em>"This is exactly what Roie Galitz does! He's a wildlife photographer."</em></div><div class="tn-qa">Ask: "What's the difference between a hobby and a job?"</div>`,
+
+  5: `<div class="tn-sec"><span class="tn-lbl">Slide 5 — hiker (Mountain Trail)</span>Guide Leo to tap waypoints <strong>IN ORDER (1→4→⛳)</strong>. If he skips, it won't respond — that's the mechanic. At the summit: <em>"Roie hiked all the way here to photograph polar bears!"</em></div><div class="tn-qa">Ask: "Is hiking easy or hard? Would you like to hike in the Arctic?"</div>`,
+
+  6: `<div class="tn-sec"><span class="tn-lbl">Slide 6 — polar bear (Ice Tap)</span>Say: <em>"Something is hiding on this ice... Tap 5 times to find it!"</em> Let Leo do ALL the tapping. <strong>React with excitement</strong> when the bear slides in. Then ask Leo to say the word: "POLAR BEAR!"</div><div class="tn-qa">Bear fact: polar bears can weigh 700 kg and swim 100+ km!</div>`,
+
+  7: `<div class="tn-sec"><span class="tn-lbl">Slide 7 — Related Vocab Recap</span>Quick oral check. Point to each card and ask Leo to define it <strong>without tapping yet</strong>. Tap to reveal only if he forgets. Thumbs up for each correct definition. If he forgets one, revisit the game slide before moving on.</div>`,
+
+  8: `<div class="tn-sec"><span class="tn-lbl">Slide 8 — analyze (Photo Detective)</span>Click each hotspot <strong>SLOWLY</strong>. Read each finding aloud together. Emphasize: <em>"When we analyze, we don't just look — we THINK about what we see."</em></div><div class="tn-qa">All 5 must be clicked before the definition appears. Let Leo click them!</div>`,
+
+  9: `<div class="tn-sec"><span class="tn-lbl">Slide 9 — describe (Notebook Fill)</span>Tap buttons one at a time. For each one, ask Leo to contribute more. After WHO → Roie Galitz, ask: <em>"What else do you know about Roie?"</em> After WHERE, ask: <em>"Where is Svalbard?"</em></div><div class="tn-qa">All 5 buttons fill the notebook. Definition appears after all 5.</div>`,
+
+  10: `<div class="tn-sec"><span class="tn-lbl">Slide 10 — explain (Why Chain)</span>Tap cards <strong>left to right</strong>. For each, ask Leo to say it in his own words. The chain: curious bear → found camera → amazing photo! Ask: <em>"What's the KEY difference between describe and explain?"</em></div><div class="tn-qa">Describe = WHAT · Explain = WHY. This is the Unit 8 writing goal!</div>`,
+
+  11: `<div class="tn-sec"><span class="tn-lbl">Slide 11 — caption (Caption Match)</span><strong>Let Leo choose FIRST</strong> before you guide him. If he picks A or C, listen to WHY before showing the feedback. Then click B together and discuss: <em>"Why is B better than A or C?"</em></div><div class="tn-qa">A = too short. C = not specific to THIS photo. B = specific + interesting adjective + location!</div>`,
+
+  12: `<div class="tn-sec"><span class="tn-lbl">Slide 12 — Academic Recap</span>Quick oral recall. Ask: <strong>"What's the difference between describe and explain?"</strong></div><div class="tn-qa">Expected: Describe = WHAT/HOW it looks. Explain = WHY it happened.</div>`,
+
+  13: `<div class="tn-sec"><span class="tn-lbl">Slide 13 — Build Background</span><strong>DO THIS PHYSICALLY</strong> — actually stand up with Leo! You both step forward when you think an activity is interesting. Compare answers! This is the LP's "Build Background" activity.</div><div class="tn-qa">After the activity, say: "These are all hobbies! Unit 8 is about hobbies."</div>`,
+
+  14: `<div class="tn-sec"><span class="tn-lbl">Slide 14 — The Photo</span><strong>Don't describe the photo immediately.</strong> Let Leo look for 30 seconds in silence. Ask: "What do you see?" Wait. "What do you think is happening?" Let him talk first. Then click each discussion card to reveal model answers — but always ask Leo before revealing.</div>`,
+
+  15: `<div class="tn-sec"><span class="tn-lbl">Slide 15 — About the Photo (BE THE EXPERT)</span>Note: The LP says the location is <strong>Greenland</strong>, though the official caption says Svalbard — both are in the Arctic. Share the Roie Galitz story. Discuss: <em>"Why do you think Roie stood back for safety?"</em></div>`,
+
+  16: `<div class="tn-sec"><span class="tn-lbl">Slide 16 — Teaching Tip</span>If Leo asks to learn MORE about polar bears or Arctic — <strong>encourage it!</strong> Point him to National Geographic Kids or BBC Earth. This curiosity is exactly what the LP wants you to nurture.</div>`,
+
+  17: `<div class="tn-sec"><span class="tn-lbl">Slide 17 — Look and Check (SB p.130)</span>Ask Leo to point to his answer <strong>before clicking</strong>. The correct answer is "a photographer." But discuss: <em>"In a funny way, is the polar bear also taking the photo?"</em> — this sparks creative thinking!</div>`,
+
+  18: `<div class="tn-sec"><span class="tn-lbl">Slide 18 — Write a Caption</span>Give Leo at least <strong>3 minutes</strong> to write. Encourage: specific + short + interesting adjective. Remind: <em>"This is Reporter's Notebook Entry #1!"</em> He'll type it into the Leo App afterward for Supabase save.</div><div class="tn-qa">Good caption = who + what + where + vivid adjective. Minimum 10 words.</div>`,
+
+  19: `<div class="tn-sec"><span class="tn-lbl">Slide 19 — Formative Assessment</span>Tap each card when confirmed. Four checks: Look and Check ✓ · Caption written ✓ · 8 vocab words ✓ · Describe vs Explain ✓. <strong>Praise effort on the caption regardless of correctness</strong> — this is the first step of Reporter's Notebook!</div>`,
+
+  20: `<div class="tn-sec"><span class="tn-lbl">Slide 20 — Unit Preview</span>Show Leo what's coming. The writing goal: "describe and explain a hobby." Ask: <em>"Which unit component are you most excited about?"</em></div>`,
+
+  21: `<div class="tn-sec"><span class="tn-lbl">Slide 21 — Great Job!</span>Celebrate! Leo has completed the Unit 8 Opener and written his first caption. Remind him to open the <strong>Leo App</strong> to save Entry #1 and practice the 8 words independently. See you next lesson!</div>`,
+};
+
+/* ═══════════════════════════════════════════
+   SCALING
+═══════════════════════════════════════════ */
+let notesOpen = false;
+const TOTAL = 21;
+let current  = 1;
+
+function scaleSlides() {
+  const tnW = notesOpen ? 440 : 0;
+  const aw  = window.innerWidth  - tnW;
+  const ah  = window.innerHeight - 52; // nav bar
+  const s   = Math.min(aw / 1920, ah / 1080);
+  const deck = document.getElementById('deck');
+  const left = (aw  - 1920 * s) / 2;
+  const top  = (ah  - 1080 * s) / 2;
+  deck.style.transform = `scale(${s})`;
+  deck.style.left      = left + 'px';
+  deck.style.top       = top  + 'px';
+}
+window.addEventListener('resize', scaleSlides);
+scaleSlides();
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════ */
+function goTo(n) {
+  if (n < 1 || n > TOTAL) return;
+  document.getElementById('s' + current).classList.remove('active');
+  current = n;
+  document.getElementById('s' + current).classList.add('active');
+  document.getElementById('sc').textContent    = current + ' / ' + TOTAL;
+  document.getElementById('pgfill').style.width = ((current - 1) / (TOTAL - 1) * 100) + '%';
+  showNotes();
+}
+function nextSlide() { goTo(current + 1); }
+function prevSlide() { goTo(current - 1); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown'  || e.key === ' ')  { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                      { e.preventDefault(); prevSlide(); }
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+});
+
+/* ═══════════════════════════════════════════
+   TEACHER NOTES
+═══════════════════════════════════════════ */
+function showNotes() {
+  document.getElementById('tn-body').innerHTML = NOTES[current] || '<div class="tn-sec" style="color:var(--ink4);font-style:italic">No notes for this slide.</div>';
+}
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('tn-btn').classList.toggle('green', notesOpen);
+  scaleSlides();
+  showNotes();
+}
+showNotes();
+
+/* ═══════════════════════════════════════════
+   GAME 1 — HOBBY SPINNER (s3)
+═══════════════════════════════════════════ */
+let spun = false;
+function spinWheel() {
+  if (spun) return;
+  const wheel = document.getElementById('hw');
+  const btn   = document.getElementById('spin-btn');
+  btn.disabled = true; btn.textContent = '🌀 Spinning…';
+  const deg = 7 * 360 + Math.floor(Math.random() * 360);
+  wheel.style.transition = 'transform 2.6s cubic-bezier(.2,.8,.3,1)';
+  wheel.style.transform  = 'rotate(' + deg + 'deg)';
+  setTimeout(() => {
+    document.getElementById('hobby-def').classList.remove('hidden');
+    btn.textContent = '✓ Done!';
+    spun = true;
+  }, 2700);
+}
+
+/* ═══════════════════════════════════════════
+   GAME 2 — DARK ROOM (s4)
+═══════════════════════════════════════════ */
+function clickShutter() {
+  const btn   = document.getElementById('shutter-btn');
+  const flash = document.getElementById('cam-flash');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="sh-dot"></span> ✓ Photo taken!';
+  flash.style.opacity = '1';
+  setTimeout(() => {
+    flash.style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('polaroid-wrap').style.display = 'block';
+      document.getElementById('photo-def').classList.remove('hidden');
+    }, 300);
+  }, 170);
+}
+
+/* ═══════════════════════════════════════════
+   GAME 3 — MOUNTAIN TRAIL (s5)
+═══════════════════════════════════════════ */
+let wpStep = 0;
+const wpPos = [
+  {left:'22%',bottom:'13%'}, {left:'32%',bottom:'27%'},
+  {left:'41%',bottom:'42%'}, {left:'49%',bottom:'55%'},
+  {left:'50%',bottom:'67%'}
+];
+function clickWP(n) {
+  if (n !== wpStep) return;
+  const wp = document.getElementById('wp-' + n);
+  wp.classList.remove('locked','hint'); wp.classList.add('visited'); wp.textContent = '✓';
+  const hiker = document.getElementById('hiker-em');
+  hiker.style.left = wpPos[n].left; hiker.style.bottom = wpPos[n].bottom;
+  wpStep++;
+  if (n < 4) {
+    const nxt = document.getElementById('wp-' + (n + 1));
+    nxt.classList.remove('locked'); nxt.classList.add('hint');
+  } else {
+    const flag = document.getElementById('sum-flag');
+    flag.classList.remove('hidden');
+    flag.style.left = '52%'; flag.style.bottom = '73%';
+    setTimeout(() => document.getElementById('hiker-def').classList.remove('hidden'), 350);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   GAME 4 — ICE TAP (s6)
+═══════════════════════════════════════════ */
+let iceTaps = 0;
+function tapIce(e) {
+  if (iceTaps >= 5) return;
+  e.preventDefault();
+  const stg  = document.getElementById('ice-stg');
+  const rect = stg.getBoundingClientRect();
+  const src  = e.touches ? e.touches[0] : e;
+  const x    = (src.clientX - rect.left) / rect.width  * 100;
+  const y    = (src.clientY - rect.top)  / rect.height * 100;
+  const paw  = document.createElement('span');
+  paw.className   = 'ice-paw';
+  paw.textContent = '🐾';
+  paw.style.left  = Math.max(8, Math.min(88, x)) + '%';
+  paw.style.top   = Math.max(15, Math.min(78, y)) + '%';
+  stg.appendChild(paw);
+  iceTaps++;
+  document.getElementById('ice-c').textContent    = iceTaps + '/5';
+  document.getElementById('ice-over').textContent = iceTaps < 5
+    ? '🧊 Keep tapping! (' + iceTaps + '/5)' : '🐻‍❄️ Found it!';
+  if (iceTaps >= 5) {
+    setTimeout(() => {
+      const bear = document.getElementById('ice-bear');
+      bear.style.display = 'block';
+      requestAnimationFrame(() => bear.classList.add('go'));
+      setTimeout(() => document.getElementById('bear-def').classList.remove('hidden'), 950);
+    }, 200);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   GAME 5 — PHOTO DETECTIVE (s8)
+═══════════════════════════════════════════ */
+const fiData = [
+  { emoji:'🐻‍❄️', label:'Polar Bear',   text:'Large, white, and curious — the star of the photo!' },
+  { emoji:'📷',    label:"Roie's Camera", text:"Roie Galitz's camera, placed on the Arctic ice." },
+  { emoji:'❄️',    label:'Ice & Snow',   text:'The Arctic habitat — frozen, cold, and remote.' },
+  { emoji:'🐾',    label:'Pawprints',    text:'Evidence — the bear walked across the ice to the camera.' },
+  { emoji:'☀️',    label:'Arctic Light', text:'24-hour summer daylight — the "Midnight Sun"!' },
+];
+let fiFound = 0;
+function clickHS(n) {
+  const hs = document.getElementById('hs-' + n);
+  if (hs.classList.contains('found')) return;
+  hs.classList.add('found');
+  const list = document.getElementById('fi-list');
+  const ph = list.querySelector('.fi-ph');
+  if (ph) ph.remove();
+  const f = fiData[n];
+  const card = document.createElement('div');
+  card.className = 'fi-card';
+  card.innerHTML = '<span class="fi-em">' + f.emoji + '</span><div><strong>' + f.label + '</strong><br>' + f.text + '</div>';
+  list.appendChild(card);
+  fiFound++;
+  document.getElementById('fi-n').textContent = fiFound;
+  if (fiFound >= 5) document.getElementById('analyze-def').classList.remove('hidden');
+}
+
+/* ═══════════════════════════════════════════
+   GAME 6 — NOTEBOOK FILL (s9)
+═══════════════════════════════════════════ */
+const descMap = {
+  WHO:   { emoji:'👤', text:'Roie Galitz — a professional wildlife photographer' },
+  WHAT:  { emoji:'📸', text:'A polar bear investigating his camera on the Arctic ice' },
+  WHERE: { emoji:'📍', text:'Svalbard, Norway — deep in the Arctic (78°N)' },
+  WHEN:  { emoji:'🕐', text:'During a wildlife photography workshop' },
+  HOW:   { emoji:'🐾', text:'The curious bear came close; everyone stepped back for safety' },
+};
+let descCt = 0; const descDone = new Set();
+function addDesc(k) {
+  if (descDone.has(k)) return; descDone.add(k);
+  document.getElementById('nb-ph')?.remove();
+  const d = descMap[k];
+  const l = document.createElement('div');
+  l.className = 'nb-line';
+  l.innerHTML = '<span class="nl-k">' + d.emoji + ' ' + k + ':</span>' + d.text;
+  document.getElementById('nb-lines').appendChild(l);
+  document.getElementById('db-' + k).classList.add('used');
+  if (++descCt >= 5) document.getElementById('describe-def').classList.remove('hidden');
+}
+
+/* ═══════════════════════════════════════════
+   GAME 7 — WHY CHAIN (s10)
+═══════════════════════════════════════════ */
+const whyD = [
+  { emoji:'🐻‍❄️', text:'The polar bear was <strong>curious</strong>' },
+  { emoji:'📷',    text:'It found Roie\'s <strong>camera</strong> on the ice' },
+  { emoji:'🌟',    text:'Roie got an <strong>incredible, once-in-a-lifetime photo!</strong>' },
+];
+let whyStep = 0;
+function clickWhy(n) {
+  if (n !== whyStep) return;
+  const c = document.getElementById('why-' + n);
+  c.classList.remove('locked','unlocked'); c.classList.add('revealed');
+  c.innerHTML = '<span class="why-em">' + whyD[n].emoji + '</span><p>' + whyD[n].text + '</p>';
+  whyStep++;
+  if (n < 2) {
+    const nxt = document.getElementById('why-' + (n + 1));
+    nxt.classList.remove('locked'); nxt.classList.add('unlocked');
+    nxt.innerHTML = '<span class="why-em" style="font-size:36px">👆</span><p style="font-size:16px;color:var(--arc-dk)">Tap to unlock!</p>';
+  } else {
+    document.getElementById('explain-def').classList.remove('hidden');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   GAME 8 — CAPTION MATCH (s11)
+═══════════════════════════════════════════ */
+const cmFb = {
+  A: "💡 True, but too short! A caption needs who, what, AND where — with an interesting adjective.",
+  C: "💡 That's about all cold-place animals, not THIS specific photo. Be specific!",
+};
+let cmDone = false;
+function pickCap(c) {
+  if (cmDone) return;
+  if (c === 'B') {
+    cmDone = true;
+    ['A','B','C'].forEach(x => { const el = document.getElementById('cm-' + x); el.style.opacity = '.5'; el.disabled = true; });
+    document.getElementById('cm-B').classList.add('correct'); document.getElementById('cm-B').style.opacity = '1';
+    document.getElementById('cap-stmp').classList.remove('hidden');
+    document.getElementById('cm-hint').textContent = '';
+    document.getElementById('caption-def').classList.remove('hidden');
+  } else {
+    const el = document.getElementById('cm-' + c);
+    el.classList.add('wrong');
+    document.getElementById('cm-hint').textContent = cmFb[c];
+    setTimeout(() => el.classList.remove('wrong'), 1800);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   LOOK AND CHECK (s17)
+═══════════════════════════════════════════ */
+function pickLC(c) {
+  ['a','b','c'].forEach(x => document.getElementById('lc-' + x).classList.remove('correct','wrong'));
+  document.getElementById('lc-' + c).classList.add(c === 'a' ? 'correct' : 'wrong');
+  if (c === 'a') {
+    document.getElementById('lc-feedback').style.display = 'block';
+  } else {
+    setTimeout(() => document.getElementById('lc-' + c).classList.remove('wrong'), 1500);
+  }
+}
+</script>
+</body>
+</html>

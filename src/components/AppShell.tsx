@@ -10,7 +10,7 @@ type NavKey = "home" | "english" | "assignments" | "reference" | "profile" | "se
 
 const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNode }> = [
   { key: "home", label: "Home", href: "/", icon: <Home size={20} /> },
-  { key: "english", label: "English", href: "/", icon: <BookOpen size={20} /> },
+  { key: "english", label: "English", href: "/lessons", icon: <BookOpen size={20} /> },
   { key: "assignments", label: "Assignments", href: "/", icon: <CheckSquare size={20} /> },
   { key: "reference", label: "Reference", href: "/reference", icon: <Search size={20} /> },
   { key: "profile", label: "Profile", href: "/", icon: <UserRound size={20} /> },
@@ -122,7 +122,7 @@ export function AppShell({
 
 function getCrumbHref(crumb: string, pathname: string) {
   if (crumb === "Home") return "/";
-  if (crumb === "English") return "/";
+  if (crumb === "English") return "/lessons";
   if (crumb === "Reference") return "/reference";
   return pathname;
 }

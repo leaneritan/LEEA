@@ -382,7 +382,9 @@ OW4-U8-G2 - Direct and indirect objects
 
 Lessons are specific and should not be forced into one giant template.
 
-Lessons should be assembled from reusable activity blocks where possible.
+Neritan's teacher lessons live under the Teacher Menu. They are for teaching Leo directly, so the best experience can be a custom deck/page for that lesson. The lesson browser is generic, but each lesson surface can be specific.
+
+Reusable activity blocks should be created when patterns repeat across lessons or Leo apps. Do not create a block system first and then force every lesson into it.
 
 Examples:
 
@@ -393,6 +395,12 @@ Examples:
 - Reading: text, comprehension, graphic literacy
 - Junior High: word order, grammar, translation, self-expression, test practice
 - Training Ground: focused skill drills for weak points
+
+Current teacher tracking:
+
+- Teacher Menu opens lessons grouped by course, level, and unit.
+- Teacher lessons can be marked `Done`.
+- First storage can be local, but the record shape should map to Supabase later.
 
 ## Chart Templates
 

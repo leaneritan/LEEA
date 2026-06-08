@@ -440,32 +440,55 @@ Tabs 1-3 read the global Japanese ON/OFF shell setting. Tab 4 reveals Japanese a
 
 ## Lesson Assembly
 
-Lessons are ordered block lists.
+Teacher lessons are Neritan-facing teaching experiences. They are allowed to be specific: an opener can be a slide deck, a grammar lesson can be a workbook-style chart flow, and a reading lesson can be an annotation experience.
+
+Do not force every teacher lesson into one generic template. Keep the lesson registry/metadata consistent, but let the lesson surface fit the source material and Leo's needs.
 
 ```json
 {
-  "id": "ow-l4-u8-vocab-1",
+  "id": "ow-l4-u8-opener",
   "subject": "english",
   "course": "our-world",
   "level": 4,
   "unit": 8,
-  "component": "vocab-1",
-  "title": "Vocabulary 1",
+  "component": "opener",
+  "mode": "teacher",
+  "title": "Unit 8 Opener",
   "status": "draft",
-  "blocks": [
-    {
-      "type": "wordCard",
-      "wordId": "global_alone"
-    },
-    {
-      "type": "chooseWithFeedback",
-      "id": "alone-meaning-check"
-    }
-  ]
+  "source": {
+    "type": "html-slides",
+    "file": "opener (1).html",
+    "embedPath": "/lessons/ow-l4-u8-opener.html",
+    "slideCount": 21
+  }
 }
 ```
 
+Reusable activity blocks are still useful, but they should emerge from repeated patterns:
+
+- grammar chart
+- vocabulary card/reveal
+- mini quiz
+- sort/match
+- caption writing
+- teacher note
+- Leo response/check
+- progress/save
+
 Teacher lessons are for Neritan to teach. Learner lessons and review cards are for Leo's independent homework/practice.
+
+Teacher lesson progress is tracked under Neritan. The first version can be local storage, but it should match a future Supabase `lesson_progress` row:
+
+```json
+{
+  "lessonId": "ow-l4-u8-opener",
+  "teacherId": "neritan",
+  "studentId": "leo",
+  "status": "done",
+  "completedAt": "2026-06-08T00:00:00.000Z",
+  "updatedAt": "2026-06-08T00:00:00.000Z"
+}
+```
 
 ## Assignment
 

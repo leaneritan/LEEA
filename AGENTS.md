@@ -124,6 +124,8 @@ Reference search must search everything together when the search box has a query
 
 Search results must show clear type/source tags such as Vocabulary, Academic, Grammar, Junior High, Sanseido, and source tags like `OW4-U8-G1`. Clicking an internal vocabulary or grammar result opens the LEEA card. Clicking a Sanseido junior-high result opens its `u` link from the JSON. Sanseido entries are search-only; do not create LEEA cards for all of them.
 
+Reference browse/search controls should show useful counts, and mixed search results should use subtle type-aware color cues such as card edges and badges for Vocabulary, Academic, Content, Related, Glossary, Grammar, and Junior High.
+
 If a source tree label exists, it should list real cards or clearly say the section is empty. Do not leave placeholder links such as Academic or Glossary pointing back to `/reference`.
 
 Academic words are thinking/study terms from Lesson Planner "Academic Language" sections. They are global cards reused across units and subjects, so duplicate academic words must merge into one `type: "academic"` item with multiple `sources[]`. Academic cards always render the rich academic card by `type`, never by tags and never as light vocabulary cards.

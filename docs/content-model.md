@@ -483,6 +483,10 @@ Teacher lessons are for Neritan to teach. Learner lessons and review cards are f
 
 Learner apps should be registered as separate `mode: "learner"` lessons, not folded into the teacher lesson record. Uploaded standalone HTML apps can live in `public/learn/...` and keep their own local progress keys while the surrounding LEEA route provides assignment, review, and later Supabase wiring.
 
+Leo mode should stay scalable as more units and levels are added: group learner apps by course/level/unit in collapsible sections, and show component cues with emoji plus color-coded chips/edges for opener, vocabulary, grammar, reading, writing, and review.
+
+Before the assignment UI exists, a learner app is assigned by setting its lesson JSON `status` to `assigned`. Home should surface assigned learner homework first. If no learner homework is waiting, Home should show Coming Up Next from unfinished current-unit work. Later, Neritan's Assign button should write this same assignment state locally and then to Supabase.
+
 Navigation ownership:
 
 - Home is the high-level launcher for all subjects and modes.

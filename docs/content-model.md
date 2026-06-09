@@ -487,6 +487,8 @@ Leo mode should stay scalable as more units and levels are added: group learner 
 
 Before the assignment UI exists, a learner app is assigned by setting its lesson JSON `status` to `assigned`. Home should surface assigned learner homework first. If no learner homework is waiting, Home should show Coming Up Next from unfinished current-unit work. Later, Neritan's Assign button should write this same assignment state locally and then to Supabase.
 
+Home current-focus progress counts unique unit components, not raw teacher/learner routes. A teacher slide lesson and a Leo learner app for the same component should appear as one lesson/component in Home progress.
+
 Navigation ownership:
 
 - Home is the high-level launcher for all subjects and modes.

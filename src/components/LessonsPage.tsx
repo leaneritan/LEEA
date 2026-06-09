@@ -11,7 +11,7 @@ export function LessonsPage() {
       <header className="lessons-hero">
         <span className="eyebrow">English</span>
         <h1>English Lessons</h1>
-        <p>Choose the course first, then open teacher lessons by level and unit.</p>
+        <p>Choose the course first, then open teacher lessons and Leo apps by level and unit.</p>
       </header>
 
       <section className="english-course-grid" aria-label="English courses">

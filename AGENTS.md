@@ -72,6 +72,8 @@ Home is a high-level launcher for all subjects and modes. Keep detailed English 
 
 Teacher lessons are only for teaching. Learner apps are for Leo's independent homework/practice.
 
+Learner apps live as separate `mode: "learner"` lesson records from teacher lessons, even when they cover the same component. They open from Leo mode and may embed uploaded standalone HTML apps from `public/learn/...` while keeping local progress keys ready for Supabase.
+
 ## Main Layers
 
 ```text

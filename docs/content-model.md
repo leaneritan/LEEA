@@ -481,6 +481,8 @@ Reusable activity blocks are still useful, but they should emerge from repeated 
 
 Teacher lessons are for Neritan to teach. Learner lessons and review cards are for Leo's independent homework/practice.
 
+Learner apps should be registered as separate `mode: "learner"` lessons, not folded into the teacher lesson record. Uploaded standalone HTML apps can live in `public/learn/...` and keep their own local progress keys while the surrounding LEEA route provides assignment, review, and later Supabase wiring.
+
 Navigation ownership:
 
 - Home is the high-level launcher for all subjects and modes.

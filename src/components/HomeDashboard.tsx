@@ -38,7 +38,7 @@ export function HomeDashboard() {
 
           <div className="mode-grid">
             <ModeCard title="Neritan" label="Teaching mode" text="Open teacher decks, assign Leo apps, and track progress." href="/teacher" />
-            <ModeCard title="Leo" label="Learning mode" text="Do assigned practice, complete review cards, and continue homework." active />
+            <ModeCard title="Leo" label="Learning mode" text="Do assigned practice, complete review cards, and continue homework." href="/leo" learner />
             <ModeCard title="Look It Up" label="Reference" text="Search vocabulary, grammar, I Know, and I Don't Know." href="/reference" />
           </div>
         </div>
@@ -92,13 +92,15 @@ function ModeCard({
   label,
   text,
   active,
-  href
+  href,
+  learner
 }: {
   title: string;
   label: string;
   text: string;
   active?: boolean;
   href?: string;
+  learner?: boolean;
 }) {
   const content = (
     <>
@@ -110,7 +112,7 @@ function ModeCard({
   );
 
   return href ? (
-    <Link className={`mode-card ${title === "Look It Up" ? "reference" : "teaching"}`} href={href}>
+    <Link className={`mode-card ${title === "Look It Up" ? "reference" : learner ? "active" : "teaching"}`} href={href}>
       {content}
     </Link>
   ) : (

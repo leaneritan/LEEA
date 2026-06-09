@@ -4,21 +4,36 @@ import Link from "next/link";
 import { CheckCircle2, ChevronDown, ChevronRight, Circle, ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
+  assignmentStorageKey,
+  createAssignmentRecord,
+  seedAssignments,
+  type AssignmentMap,
+  type AssignmentRecord
+} from "@/data/assignments";
+import { getLearnerAppProgress } from "@/data/learnerProgress";
+import {
   createLessonProgressRecord,
   getDoneLessonCount,
   lessonProgressStorageKey,
   type LessonProgressMap
 } from "@/data/lessonProgress";
-import { getLessonGroups, teacherLessons } from "@/data/lessons";
+import { getLessonGroups, learnerLessons, teacherLessons } from "@/data/lessons";
 
 const groupOpenStorageKey = "leea.teacher.lessonGroupsOpen.v1";
 
 export function TeacherDashboard() {
   const [progress, setProgress] = useState<LessonProgressMap>({});
+  const [assignments, setAssignments] = useState<AssignmentMap>({});
+  const [progressVersion, setProgressVersion] = useState(0);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const groups = useMemo(() => getLessonGroups(teacherLessons), []);
 
   useEffect(() => {
+    function refreshAssignments() {
+      setAssignments(readAssignments());
+      setProgressVersion((current) => current + 1);
+    }
+
     const savedProgress = window.localStorage.getItem(lessonProgressStorageKey);
     if (savedProgress) {
       try {
@@ -27,19 +42,28 @@ export function TeacherDashboard() {
         setProgress({});
       }
     }
+    refreshAssignments();
 
     const savedGroups = window.localStorage.getItem(groupOpenStorageKey);
     if (savedGroups) {
       try {
         setOpenGroups(JSON.parse(savedGroups) as Record<string, boolean>);
-        return;
       } catch {
         setOpenGroups({});
       }
+    } else {
+      setOpenGroups(Object.fromEntries(groups.map((group, index) => [group.id, index === 0])));
     }
 
-    setOpenGroups(Object.fromEntries(groups.map((group, index) => [group.id, index === 0])));
+    window.addEventListener("storage", refreshAssignments);
+    window.addEventListener("focus", refreshAssignments);
+    return () => {
+      window.removeEventListener("storage", refreshAssignments);
+      window.removeEventListener("focus", refreshAssignments);
+    };
   }, [groups]);
+
+  progressVersion;
 
   const doneCount = useMemo(
     () =>
@@ -65,6 +89,17 @@ export function TeacherDashboard() {
     setOpenGroups((current) => {
       const next = { ...current, [groupId]: !(current[groupId] ?? true) };
       window.localStorage.setItem(groupOpenStorageKey, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  function assignLesson(lessonId: string) {
+    setAssignments((current) => {
+      const next = {
+        ...current,
+        [lessonId]: current[lessonId] ?? createAssignmentRecord(lessonId)
+      };
+      window.localStorage.setItem(assignmentStorageKey, JSON.stringify(next));
       return next;
     });
   }
@@ -155,6 +190,45 @@ export function TeacherDashboard() {
         })}
       </div>
 
+      <section className="teacher-homework-panel">
+        <div className="teacher-section-head">
+          <span className="eyebrow">Leo Homework</span>
+          <h2>Assign & Review</h2>
+        </div>
+        <div className="teacher-homework-list">
+          {learnerLessons.map((lesson) => {
+            const assignment = assignments[lesson.id];
+            const appProgress = getLearnerAppProgress(lesson.source);
+            return (
+              <article className="teacher-homework-card" key={lesson.id}>
+                <div className="teacher-lesson-main">
+                  <span>{lesson.component}</span>
+                  <h3>{lesson.title}</h3>
+                  <p>{lesson.subtitle}</p>
+                  <small>{formatAssignmentStatus(assignment, appProgress.done)}</small>
+                </div>
+                <div className="teacher-review-summary">
+                  <strong>
+                    {appProgress.completedModules} / {appProgress.moduleCount} modules
+                  </strong>
+                  <span>{appProgress.score !== null ? `Quiz ${appProgress.score}%` : "Quiz not finished"}</span>
+                </div>
+                <div className="teacher-lesson-actions">
+                  <button className={assignment ? "teacher-done-button active" : "teacher-done-button"} onClick={() => assignLesson(lesson.id)} type="button">
+                    {assignment ? <CheckCircle2 size={18} /> : <Circle size={18} />}
+                    {assignment ? "Assigned" : "Assign to Leo"}
+                  </button>
+                  <Link className="teacher-open-button" href={`/teacher/review/${lesson.id}`}>
+                    Review
+                    <ExternalLink size={16} />
+                  </Link>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
       <section className="supabase-note">
         <h2>Supabase Ready</h2>
         <p>
@@ -164,4 +238,26 @@ export function TeacherDashboard() {
       </section>
     </section>
   );
+}
+
+function readAssignments() {
+  try {
+    const saved = window.localStorage.getItem(assignmentStorageKey);
+    const parsed = saved ? (JSON.parse(saved) as AssignmentMap) : {};
+    const seeded = seedAssignments(learnerLessons, parsed);
+    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
+    return seeded;
+  } catch {
+    const seeded = seedAssignments(learnerLessons, {});
+    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
+    return seeded;
+  }
+}
+
+function formatAssignmentStatus(assignment: AssignmentRecord | undefined, appDone: boolean) {
+  if (!assignment) return "not assigned";
+  if (assignment.status === "reviewed") return "reviewed";
+  if (assignment.status === "needs-redo") return "needs redo";
+  if (appDone) return "ready to review";
+  return "assigned";
 }

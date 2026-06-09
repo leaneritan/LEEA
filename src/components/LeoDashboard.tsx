@@ -3,23 +3,19 @@
 import Link from "next/link";
 import { CheckCircle2, ChevronDown, ChevronRight, Circle, Play } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { assignmentStorageKey, seedAssignments, type AssignmentMap, type AssignmentRecord } from "@/data/assignments";
+import { getLearnerAppProgress, type LearnerAppProgress } from "@/data/learnerProgress";
 import { getLessonGroups, learnerLessons } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
-
-type LearnerAppProgress = {
-  completedModules: number;
-  moduleCount: number;
-  score: number | null;
-  done: boolean;
-  caption: string;
-};
 
 const groupOpenStorageKey = "leea.leo.lessonGroupsOpen.v1";
 
 export function LeoDashboard() {
   const [progressVersion, setProgressVersion] = useState(0);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
-  const groups = useMemo(() => getLessonGroups(learnerLessons), []);
+  const [assignments, setAssignments] = useState<AssignmentMap>({});
+  const assignedLessons = useMemo(() => learnerLessons.filter((lesson) => assignments[lesson.id]), [assignments]);
+  const groups = useMemo(() => getLessonGroups(assignedLessons), [assignedLessons]);
 
   useEffect(() => {
     const savedGroups = window.localStorage.getItem(groupOpenStorageKey);
@@ -33,7 +29,11 @@ export function LeoDashboard() {
       setOpenGroups(Object.fromEntries(groups.map((group, index) => [group.id, index === 0])));
     }
 
-    const refresh = () => setProgressVersion((current) => current + 1);
+    const refresh = () => {
+      setAssignments(readAssignments());
+      setProgressVersion((current) => current + 1);
+    };
+    refresh();
     window.addEventListener("storage", refresh);
     window.addEventListener("focus", refresh);
     return () => {
@@ -44,8 +44,8 @@ export function LeoDashboard() {
 
   const appProgress = useMemo(() => {
     progressVersion;
-    return Object.fromEntries(learnerLessons.map((lesson) => [lesson.id, getLearnerAppProgress(lesson.source.storagePrefix, lesson.source.moduleCount)]));
-  }, [progressVersion]);
+    return Object.fromEntries(assignedLessons.map((lesson) => [lesson.id, getLearnerAppProgress(lesson.source)]));
+  }, [assignedLessons, progressVersion]);
 
   function toggleGroup(groupId: string) {
     setOpenGroups((current) => {
@@ -63,8 +63,9 @@ export function LeoDashboard() {
         <p>Open the next app, finish the modules, and come back here to see progress.</p>
       </header>
 
-      <div className="leo-group-grid">
-        {groups.map((group) => {
+      {groups.length ? (
+        <div className="leo-group-grid">
+          {groups.map((group) => {
           const isOpen = openGroups[group.id] ?? true;
           const groupProgress = group.lessons.map((lesson) => appProgress[lesson.id]).filter(Boolean);
           const doneCount = groupProgress.filter((progress) => progress.done).length;
@@ -87,19 +88,25 @@ export function LeoDashboard() {
               {isOpen ? (
                 <div className="leo-app-grid">
                   {group.lessons.map((lesson) => (
-                    <LeoAppCard key={lesson.id} lesson={lesson} progress={appProgress[lesson.id]} />
+                    <LeoAppCard assignment={assignments[lesson.id]} key={lesson.id} lesson={lesson} progress={appProgress[lesson.id]} />
                   ))}
                 </div>
               ) : null}
             </section>
           );
-        })}
-      </div>
+          })}
+        </div>
+      ) : (
+        <section className="empty-results">
+          <h2>No homework assigned yet.</h2>
+          <p>Ask Neritan to assign the next Leo app from Teacher Menu.</p>
+        </section>
+      )}
     </section>
   );
 }
 
-function LeoAppCard({ lesson, progress }: { lesson: Lesson; progress: LearnerAppProgress }) {
+function LeoAppCard({ assignment, lesson, progress }: { assignment: AssignmentRecord | undefined; lesson: Lesson; progress: LearnerAppProgress }) {
   const percent = Math.round((progress.completedModules / progress.moduleCount) * 100);
   const component = getLearnerComponentMeta(lesson.component);
 
@@ -132,7 +139,7 @@ function LeoAppCard({ lesson, progress }: { lesson: Lesson; progress: LearnerApp
         <div className="leo-status-row">
           <span className={progress.done ? "leo-status done" : "leo-status"}>
             {progress.done ? <CheckCircle2 size={16} /> : <Circle size={16} />}
-            {progress.done ? "Done" : lesson.status}
+            {getLearnerStatusText(assignment, progress.done)}
           </span>
           {progress.score !== null ? <span className="leo-score">Quiz {progress.score}%</span> : <span className="leo-score muted">Quiz not finished</span>}
         </div>
@@ -158,40 +165,31 @@ function LeoAppCard({ lesson, progress }: { lesson: Lesson; progress: LearnerApp
 }
 
 function getLearnerComponentMeta(component: string) {
-  if (component.includes("vocab")) return { emoji: "🧺", label: "Vocabulary", tone: "vocab" };
-  if (component.includes("grammar")) return { emoji: "🧩", label: "Grammar", tone: "grammar" };
-  if (component.includes("reading")) return { emoji: "📖", label: "Reading", tone: "reading" };
-  if (component.includes("writing")) return { emoji: "✍️", label: "Writing", tone: "writing" };
-  if (component.includes("review")) return { emoji: "✅", label: "Review", tone: "review" };
-  return { emoji: "🐻‍❄️", label: "Opener", tone: "opener" };
+  if (component.includes("vocab")) return { emoji: "V", label: "Vocabulary", tone: "vocab" };
+  if (component.includes("grammar")) return { emoji: "G", label: "Grammar", tone: "grammar" };
+  if (component.includes("reading")) return { emoji: "R", label: "Reading", tone: "reading" };
+  if (component.includes("writing")) return { emoji: "W", label: "Writing", tone: "writing" };
+  if (component.includes("review")) return { emoji: "OK", label: "Review", tone: "review" };
+  return { emoji: "OP", label: "Opener", tone: "opener" };
 }
 
-function getLearnerAppProgress(storagePrefix = "", moduleCount = 0): LearnerAppProgress {
-  if (typeof window === "undefined" || !storagePrefix || !moduleCount) {
-    return { completedModules: 0, moduleCount: moduleCount || 1, score: null, done: false, caption: "" };
-  }
-
-  const completedModules = Array.from({ length: moduleCount }, (_, index) => index + 1).filter((moduleNumber) =>
-    loadLocalValue(`${storagePrefix}m${moduleNumber}-done`, false)
-  ).length;
-  const scoreData = loadLocalValue<{ score?: number; done?: boolean } | null>(`${storagePrefix}score`, null);
-  const done = Boolean(loadLocalValue(`${storagePrefix}done`, false) || scoreData?.done);
-  const caption = loadLocalValue(`${storagePrefix}m5-caption`, "");
-
-  return {
-    completedModules,
-    moduleCount,
-    score: typeof scoreData?.score === "number" ? scoreData.score : null,
-    done,
-    caption
-  };
-}
-
-function loadLocalValue<T>(key: string, fallback: T): T {
+function readAssignments() {
   try {
-    const value = window.localStorage.getItem(key);
-    return value === null ? fallback : (JSON.parse(value) as T);
+    const saved = window.localStorage.getItem(assignmentStorageKey);
+    const parsed = saved ? (JSON.parse(saved) as AssignmentMap) : {};
+    const seeded = seedAssignments(learnerLessons, parsed);
+    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
+    return seeded;
   } catch {
-    return fallback;
+    const seeded = seedAssignments(learnerLessons, {});
+    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
+    return seeded;
   }
+}
+
+function getLearnerStatusText(assignment: AssignmentRecord | undefined, done: boolean) {
+  if (assignment?.status === "reviewed") return "Reviewed";
+  if (assignment?.status === "needs-redo") return "Needs redo";
+  if (done) return "Done";
+  return "Assigned";
 }

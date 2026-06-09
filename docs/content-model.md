@@ -489,6 +489,8 @@ Before the assignment UI exists, a learner app is assigned by setting its lesson
 
 Home current-focus progress counts unique unit components, not raw teacher/learner routes. A teacher slide lesson and a Leo learner app for the same component should appear as one lesson/component in Home progress.
 
+The local assignment/review loop should exist before Supabase is wired: Neritan assigns a learner app, Leo completes it, Neritan reviews saved module/score/caption progress, and the assignment status becomes `reviewed` or `needs-redo`. The local record should stay close to the future Supabase rows.
+
 Navigation ownership:
 
 - Home is the high-level launcher for all subjects and modes.

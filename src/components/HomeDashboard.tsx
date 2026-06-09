@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { assignmentStorageKey, seedAssignments, type AssignmentMap } from "@/data/assignments";
 import { getDoneLessonCount, lessonProgressStorageKey, type LessonProgressMap } from "@/data/lessonProgress";
 import { getCurrentFocusLessons, learnerLessons, teacherLessons } from "@/data/lessons";
 import { currentFocus } from "@/data/registry";
@@ -9,6 +10,7 @@ import type { Lesson } from "@/data/types";
 
 export function HomeDashboard() {
   const [progress, setProgress] = useState<LessonProgressMap>({});
+  const [assignments, setAssignments] = useState<AssignmentMap>({});
   const [progressVersion, setProgressVersion] = useState(0);
   const focusLessons = getCurrentFocusLessons(currentFocus.courseId, currentFocus.level, currentFocus.unit);
   const focusComponents = getUniqueFocusComponents(focusLessons);
@@ -17,7 +19,7 @@ export function HomeDashboard() {
     progress
   );
   const progressPercent = focusComponents.length ? Math.round((doneCount / focusComponents.length) * 100) : 0;
-  const nextItem = getHomeNextItem(progress);
+  const nextItem = getHomeNextItem(progress, assignments);
 
   useEffect(() => {
     function refreshProgress() {
@@ -29,6 +31,7 @@ export function HomeDashboard() {
           setProgress({});
         }
       }
+      setAssignments(readAssignments());
       setProgressVersion((current) => current + 1);
     }
 
@@ -123,8 +126,11 @@ function getComponentFamily(component: string) {
   return component.replace(/-app$/, "");
 }
 
-function getHomeNextItem(progress: LessonProgressMap) {
-  const assignedLesson = learnerLessons.find((lesson) => lesson.status === "assigned" && !isLearnerLessonDone(lesson));
+function getHomeNextItem(progress: LessonProgressMap, assignments: AssignmentMap) {
+  const assignedLesson = learnerLessons.find((lesson) => {
+    const assignment = assignments[lesson.id];
+    return assignment && (assignment.status === "assigned" || assignment.status === "needs-redo") && !isLearnerLessonDone(lesson);
+  });
 
   if (assignedLesson) {
     return {
@@ -149,6 +155,20 @@ function getHomeNextItem(progress: LessonProgressMap) {
     status: "done",
     lesson: learnerLessons[0] ?? teacherLessons[0]
   };
+}
+
+function readAssignments() {
+  try {
+    const saved = window.localStorage.getItem(assignmentStorageKey);
+    const parsed = saved ? (JSON.parse(saved) as AssignmentMap) : {};
+    const seeded = seedAssignments(learnerLessons, parsed);
+    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
+    return seeded;
+  } catch {
+    const seeded = seedAssignments(learnerLessons, {});
+    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
+    return seeded;
+  }
 }
 
 function isLearnerLessonDone(lesson: Lesson) {

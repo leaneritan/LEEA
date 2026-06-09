@@ -218,10 +218,13 @@ export type Lesson = {
   title: string;
   subtitle: string;
   source: {
-    type: "html-slides" | "lesson-planner" | "book" | "workbook";
+    type: "html-slides" | "html-app" | "lesson-planner" | "book" | "workbook";
     file: string;
     embedPath?: string;
     slideCount?: number;
+    moduleCount?: number;
+    storagePrefix?: string;
+    homeworkId?: string;
   };
   objectives: {
     content: string[];

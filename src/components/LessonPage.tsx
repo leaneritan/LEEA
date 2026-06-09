@@ -5,8 +5,10 @@ import { ExternalLink } from "lucide-react";
 import type { Lesson } from "@/data/types";
 
 export function LessonPage({ lesson }: { lesson: Lesson }) {
+  const isLearnerApp = lesson.mode === "learner";
+
   return (
-    <section className="deck-lesson-page">
+    <section className={isLearnerApp ? "deck-lesson-page learner-lesson-page" : "deck-lesson-page"}>
       <header className="deck-lesson-bar">
         <div>
           <span className="eyebrow">
@@ -15,15 +17,15 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
           <h1>{lesson.title}</h1>
         </div>
         <nav aria-label="Lesson actions">
-          <Link className="ghost-button" href="/lessons">
-            All Lessons
+          <Link className="ghost-button" href={isLearnerApp ? "/leo" : "/lessons"}>
+            {isLearnerApp ? "My Assignments" : "All Lessons"}
           </Link>
           <Link className="ghost-button" href="/reference">
             Reference
           </Link>
           {lesson.source.embedPath ? (
             <a className="ghost-button" href={lesson.source.embedPath} rel="noreferrer" target="_blank">
-              Open Fullscreen
+              {isLearnerApp ? "Open App Fullscreen" : "Open Fullscreen"}
               <ExternalLink size={16} />
             </a>
           ) : null}

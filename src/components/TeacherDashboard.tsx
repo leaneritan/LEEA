@@ -9,14 +9,14 @@ import {
   lessonProgressStorageKey,
   type LessonProgressMap
 } from "@/data/lessonProgress";
-import { getLessonGroups, lessons } from "@/data/lessons";
+import { getLessonGroups, teacherLessons } from "@/data/lessons";
 
 const groupOpenStorageKey = "leea.teacher.lessonGroupsOpen.v1";
 
 export function TeacherDashboard() {
   const [progress, setProgress] = useState<LessonProgressMap>({});
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
-  const groups = useMemo(() => getLessonGroups(), []);
+  const groups = useMemo(() => getLessonGroups(teacherLessons), []);
 
   useEffect(() => {
     const savedProgress = window.localStorage.getItem(lessonProgressStorageKey);
@@ -44,7 +44,7 @@ export function TeacherDashboard() {
   const doneCount = useMemo(
     () =>
       getDoneLessonCount(
-        lessons.map((lesson) => lesson.id),
+        teacherLessons.map((lesson) => lesson.id),
         progress
       ),
     [progress]
@@ -80,7 +80,7 @@ export function TeacherDashboard() {
       <section className="teacher-stats" aria-label="Teaching stats">
         <div>
           <span>Lessons</span>
-          <strong>{lessons.length}</strong>
+          <strong>{teacherLessons.length}</strong>
         </div>
         <div>
           <span>Done</span>
@@ -88,7 +88,7 @@ export function TeacherDashboard() {
         </div>
         <div>
           <span>To Teach</span>
-          <strong>{lessons.length - doneCount}</strong>
+          <strong>{teacherLessons.length - doneCount}</strong>
         </div>
       </section>
 

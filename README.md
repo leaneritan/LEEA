@@ -124,6 +124,8 @@ Implemented first:
 - Reference tabs for Vocabulary, Grammar, I Know, and I Don't Know
 - vocabulary card route with Previous, Next, I Know, global Japanese ON/OFF, and lesson-link states
 - grammar chart/card route with Chart & Samples, Level Up, Quiz, and Master Quiz tabs
+- Leo learner dashboard for assigned apps
+- Our World Level 4 Unit 8 Opener learner app embedded from `public/learn/ow-l4-u8-opener.html`
 - Our World Level 4 Unit 8 Vocabulary 1 and 2 data
 - Our World Level 4 Unit 8 Grammar 1 and 2 data
 - named starter dashboard variables
@@ -140,6 +142,8 @@ Current app routes:
 ```text
 /
 /reference
+/leo
+/lessons/[lessonId]
 /reference/vocabulary/[wordId]
 /reference/grammar/[grammarId]
 ```

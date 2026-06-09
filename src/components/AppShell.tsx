@@ -12,7 +12,7 @@ const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNod
   { key: "home", label: "Home", href: "/", icon: <Home size={20} /> },
   { key: "teacher", label: "Neritan", href: "/teacher", icon: <GraduationCap size={20} /> },
   { key: "english", label: "English", href: "/lessons", icon: <BookOpen size={20} /> },
-  { key: "assignments", label: "Assignments", href: "/", icon: <CheckSquare size={20} /> },
+  { key: "assignments", label: "Leo", href: "/leo", icon: <CheckSquare size={20} /> },
   { key: "reference", label: "Reference", href: "/reference", icon: <Search size={20} /> },
   { key: "profile", label: "Profile", href: "/", icon: <UserRound size={20} /> },
   { key: "settings", label: "Settings", href: "/", icon: <Settings size={20} /> }
@@ -126,6 +126,7 @@ export function AppShell({
 function getCrumbHref(crumb: string, pathname: string) {
   if (crumb === "Home") return "/";
   if (crumb === "Neritan") return "/teacher";
+  if (crumb === "Leo") return "/leo";
   if (crumb === "English") return "/lessons";
   if (crumb === "Our World") return "/lessons#our-world-l4-u8";
   if (crumb === "Unit 8") return "/lessons#our-world-l4-u8";

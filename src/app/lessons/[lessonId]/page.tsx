@@ -11,8 +11,11 @@ export default async function LessonRoute({ params }: { params: Promise<{ lesson
     notFound();
   }
 
+  const active = lesson.mode === "learner" ? "assignments" : "english";
+  const crumbs = lesson.mode === "learner" ? ["Home", "Leo", "Our World", `Unit ${lesson.unit}`, lesson.title] : ["Home", "English", "Our World", `Unit ${lesson.unit}`, lesson.title];
+
   return (
-    <AppShell active="english" crumbs={["Home", "English", "Our World", `Unit ${lesson.unit}`, lesson.title]}>
+    <AppShell active={active} crumbs={crumbs}>
       <LessonPage lesson={lesson} />
     </AppShell>
   );

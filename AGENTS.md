@@ -74,6 +74,8 @@ Teacher lessons are only for teaching. Learner apps are for Leo's independent ho
 
 Learner apps live as separate `mode: "learner"` lesson records from teacher lessons, even when they cover the same component. They open from Leo mode and may embed uploaded standalone HTML apps from `public/learn/...` while keeping local progress keys ready for Supabase.
 
+Leo mode should group learner apps by course/level/unit with collapsible sections. Learner app cards should show a clear component cue, such as emoji plus color-coded chip/edge for opener, vocabulary, grammar, reading, writing, and review.
+
 ## Main Layers
 
 ```text

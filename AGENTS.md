@@ -78,6 +78,8 @@ Leo mode should group learner apps by course/level/unit with collapsible section
 
 Until the Neritan assignment UI exists, homework is assigned by setting a learner lesson's `status` to `assigned` in its lesson JSON. Home should show assigned learner homework first; when no homework is waiting, it should show Coming Up Next based on unfinished current-unit work.
 
+Home current-focus progress counts unit components, not every route. If a teacher lesson and Leo learner app cover the same component, such as `opener` and `opener-app`, they count as one lesson/component in the Home progress total.
+
 ## Main Layers
 
 ```text

@@ -11,11 +11,12 @@ export function HomeDashboard() {
   const [progress, setProgress] = useState<LessonProgressMap>({});
   const [progressVersion, setProgressVersion] = useState(0);
   const focusLessons = getCurrentFocusLessons(currentFocus.courseId, currentFocus.level, currentFocus.unit);
+  const focusComponents = getUniqueFocusComponents(focusLessons);
   const doneCount = getDoneLessonCount(
-    focusLessons.map((lesson) => lesson.id),
+    focusComponents.map((lesson) => lesson.id),
     progress
   );
-  const progressPercent = focusLessons.length ? Math.round((doneCount / focusLessons.length) * 100) : 0;
+  const progressPercent = focusComponents.length ? Math.round((doneCount / focusComponents.length) * 100) : 0;
   const nextItem = getHomeNextItem(progress);
 
   useEffect(() => {
@@ -91,7 +92,7 @@ export function HomeDashboard() {
         <div className="focus-progress">
           <div className="focus-progress-top">
             <span>{doneCount} done</span>
-            <span>{focusLessons.length} lessons</span>
+            <span>{focusComponents.length} {focusComponents.length === 1 ? "lesson" : "lessons"}</span>
           </div>
           <div className="focus-progress-bar" aria-label={`${progressPercent}% complete`}>
             <span style={{ width: `${progressPercent}%` }} />
@@ -101,6 +102,25 @@ export function HomeDashboard() {
       </section>
     </div>
   );
+}
+
+function getUniqueFocusComponents(items: Lesson[]) {
+  const components = new Map<string, Lesson>();
+
+  items.forEach((lesson) => {
+    const key = getComponentFamily(lesson.component);
+    const existing = components.get(key);
+
+    if (!existing || (existing.mode === "learner" && lesson.mode === "teacher")) {
+      components.set(key, lesson);
+    }
+  });
+
+  return Array.from(components.values());
+}
+
+function getComponentFamily(component: string) {
+  return component.replace(/-app$/, "");
 }
 
 function getHomeNextItem(progress: LessonProgressMap) {

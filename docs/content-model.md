@@ -485,6 +485,8 @@ Learner apps should be registered as separate `mode: "learner"` lessons, not fol
 
 Leo mode should stay scalable as more units and levels are added: group learner apps by course/level/unit in collapsible sections, and show component cues with emoji plus color-coded chips/edges for opener, vocabulary, grammar, reading, writing, and review.
 
+Before the assignment UI exists, a learner app is assigned by setting its lesson JSON `status` to `assigned`. Home should surface assigned learner homework first. If no learner homework is waiting, Home should show Coming Up Next from unfinished current-unit work. Later, Neritan's Assign button should write this same assignment state locally and then to Supabase.
+
 Navigation ownership:
 
 - Home is the high-level launcher for all subjects and modes.

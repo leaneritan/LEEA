@@ -76,6 +76,8 @@ Learner apps live as separate `mode: "learner"` lesson records from teacher less
 
 Leo mode should group learner apps by course/level/unit with collapsible sections. Learner app cards should show a clear component cue, such as emoji plus color-coded chip/edge for opener, vocabulary, grammar, reading, writing, and review.
 
+Until the Neritan assignment UI exists, homework is assigned by setting a learner lesson's `status` to `assigned` in its lesson JSON. Home should show assigned learner homework first; when no homework is waiting, it should show Coming Up Next based on unfinished current-unit work.
+
 ## Main Layers
 
 ```text

@@ -161,10 +161,6 @@ export function TeacherDashboard() {
                     const assignment = lesson.mode === "learner" ? assignments[lesson.id] : undefined;
                     const appProgress = lesson.mode === "learner" ? getLearnerAppProgress(lesson.source) : null;
                     const accent = componentAccent(lesson.component);
-                    const learnerCounterpart = lesson.mode === "teacher"
-                      ? group.lessons.find((l) => l.mode === "learner")
-                      : undefined;
-
                     return (
                       <article
                         className={done ? "teacher-lesson-card done" : "teacher-lesson-card"}
@@ -207,11 +203,6 @@ export function TeacherDashboard() {
                           {/* Leo app — teacher previewing or Leo opening */}
                           {lesson.mode === "learner" && (
                             <Link className="teacher-open-button" href={`/lessons/${lesson.id}`}>
-                              Open App <ExternalLink size={15} />
-                            </Link>
-                          )}
-                          {lesson.mode === "teacher" && learnerCounterpart && (
-                            <Link className="teacher-done-button" href={`/lessons/${learnerCounterpart.id}`}>
                               Open App <ExternalLink size={15} />
                             </Link>
                           )}

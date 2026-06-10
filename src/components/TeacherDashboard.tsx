@@ -200,12 +200,6 @@ export function TeacherDashboard() {
                               Open <ExternalLink size={15} />
                             </Link>
                           )}
-                          {/* Leo app — teacher previewing or Leo opening */}
-                          {lesson.mode === "learner" && (
-                            <Link className="teacher-open-button" href={`/lessons/${lesson.id}`}>
-                              Open App <ExternalLink size={15} />
-                            </Link>
-                          )}
                           {/* Assign */}
                           {lesson.mode === "learner" && !assignment && (
                             <button className="teacher-done-button" onClick={() => assignLesson(lesson.id)} type="button">

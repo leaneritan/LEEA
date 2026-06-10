@@ -104,6 +104,15 @@ export function TeacherDashboard() {
     });
   }
 
+  function unassignLesson(lessonId: string) {
+    setAssignments((current) => {
+      const next = { ...current };
+      delete next[lessonId];
+      window.localStorage.setItem(assignmentStorageKey, JSON.stringify(next));
+      return next;
+    });
+  }
+
   return (
     <section className="teacher-page">
       <header className="teacher-hero">
@@ -152,6 +161,9 @@ export function TeacherDashboard() {
                     const assignment = lesson.mode === "learner" ? assignments[lesson.id] : undefined;
                     const appProgress = lesson.mode === "learner" ? getLearnerAppProgress(lesson.source) : null;
                     const accent = componentAccent(lesson.component);
+                    const learnerCounterpart = lesson.mode === "teacher"
+                      ? group.lessons.find((l) => l.mode === "learner")
+                      : undefined;
 
                     return (
                       <article
@@ -186,26 +198,47 @@ export function TeacherDashboard() {
                         </div>
 
                         <div className="teacher-lesson-actions">
-                          <Link className="teacher-open-button" href={`/lessons/${lesson.id}`}>
-                            Open
-                            <ExternalLink size={15} />
-                          </Link>
-                          {lesson.mode === "learner" && (
-                            <button
-                              className={assignment ? "teacher-done-button active" : "teacher-done-button"}
-                              onClick={() => assignLesson(lesson.id)}
-                              type="button"
-                            >
-                              {assignment ? <CheckCircle2 size={16} /> : <Circle size={16} />}
-                              {assignment ? "Assigned" : "Assign"}
-                            </button>
-                          )}
-                          {lesson.mode === "learner" && (
-                            <Link className="teacher-done-button" href={`/teacher/review/${lesson.id}`}>
-                              Review
-                              <ExternalLink size={15} />
+                          {/* Teacher deck */}
+                          {lesson.mode === "teacher" && (
+                            <Link className="teacher-open-button" href={`/lessons/${lesson.id}`}>
+                              Open <ExternalLink size={15} />
                             </Link>
                           )}
+                          {/* Leo app — teacher previewing or Leo opening */}
+                          {lesson.mode === "learner" && (
+                            <Link className="teacher-open-button" href={`/lessons/${lesson.id}`}>
+                              Open App <ExternalLink size={15} />
+                            </Link>
+                          )}
+                          {lesson.mode === "teacher" && learnerCounterpart && (
+                            <Link className="teacher-done-button" href={`/lessons/${learnerCounterpart.id}`}>
+                              Open App <ExternalLink size={15} />
+                            </Link>
+                          )}
+                          {/* Assign */}
+                          {lesson.mode === "learner" && !assignment && (
+                            <button className="teacher-done-button" onClick={() => assignLesson(lesson.id)} type="button">
+                              <Circle size={16} /> Assign
+                            </button>
+                          )}
+                          {lesson.mode === "learner" && assignment && (
+                            <button className="teacher-done-button active" disabled type="button">
+                              <CheckCircle2 size={16} /> Assigned
+                            </button>
+                          )}
+                          {/* Unassign */}
+                          {lesson.mode === "learner" && assignment && (
+                            <button className="teacher-done-button warning" onClick={() => unassignLesson(lesson.id)} type="button">
+                              Unassign
+                            </button>
+                          )}
+                          {/* Review */}
+                          {lesson.mode === "learner" && (
+                            <Link className="teacher-done-button" href={`/teacher/review/${lesson.id}`}>
+                              Review <ExternalLink size={15} />
+                            </Link>
+                          )}
+                          {/* Mark Done */}
                           <button
                             className={done ? "teacher-done-button active" : "teacher-done-button"}
                             onClick={() => setLessonDone(lesson.id, !done)}

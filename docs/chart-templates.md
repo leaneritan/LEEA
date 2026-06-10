@@ -2,6 +2,56 @@
 
 These National Geographic graphic organizers should become reusable LEEA chart templates.
 
+## Implemented Templates
+
+### `dnd-sorter` — Drag-and-Drop Column Sorter
+
+**File:** `public/teach/components/charts.js`  
+**Template ID:** `two-column-chart` (and any N-column variant)  
+**First used in:** OW L4 U8 Vocabulary 1 teacher deck (`public/lessons/ow-l4-u8-vocab-1.html`)
+
+#### API
+
+```js
+// Load once in <head>:
+// <script src="/teach/components/charts.js"></script>
+
+el.innerHTML = buildDndSorter({
+  id:     'dnd-vocab8',          // unique string — must be unique per page
+  tiles: [
+    { text: '⚽ Playing soccer', answer: 'hobby' },
+    { text: '😴 Sleeping',       answer: 'not'   },
+    // ...
+  ],
+  zones: [
+    { key: 'hobby', label: '✅ Hobby',       color: '#16A34A' },
+    { key: 'not',   label: '❌ Not a hobby', color: '#6b7280' },
+  ],
+  onComplete: function () {
+    // called once every tile is in the correct zone
+    document.getElementById('done-msg').style.display = 'block';
+  }
+});
+```
+
+#### Behaviour
+
+- Tiles start in a shuffled word bank.
+- Mouse drag-and-drop and touch drag (iPad) both work.
+- Correct placement: tile turns green and locks in the zone.
+- Wrong placement: tile flashes red and returns to original position.
+- `onComplete` fires exactly once, when all tiles are correctly sorted.
+- Multiple instances on the same page are fully independent.
+
+#### Notes for Codex
+
+- Add the `<script src="/teach/components/charts.js"></script>` tag in `<head>` of any lesson that uses it.
+- `buildDndSorter` is the only global it exposes (`window.buildDndSorter`).
+- Zones can be any number (2, 3, 4 …) — the zones row is a flex row.
+- The `answer` string on each tile must exactly match a zone `key`.
+
+
+
 They are not just PDFs to display. They should become interactive/block templates that can render in teacher lessons and learner apps.
 
 ## Source Folder

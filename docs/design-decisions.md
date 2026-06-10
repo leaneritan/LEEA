@@ -398,10 +398,11 @@ Examples:
 
 Current teacher tracking:
 
-- Teacher Menu opens lessons grouped by course, level, and unit.
-- Level/unit groups in the Teacher Menu should be collapsible because more levels and units will be added.
-- Teacher lessons can be marked `Done`.
-- First storage can be local, but the record shape should map to Supabase later.
+- Teacher Menu opens all lessons (teacher + learner) grouped by course, level, and unit in one unified list — no separate homework section.
+- Level/unit groups are collapsible because more levels and units will be added.
+- Each lesson card shows Open and Mark Done. Learner-mode cards also show Assign and Review buttons, and inline progress pills (modules done, quiz score).
+- Teacher lessons are marked `Done` by Neritan after teaching. Learner lessons are marked Assigned and then Reviewed after Leo completes them.
+- First storage is local, but all record shapes map to Supabase later.
 
 Navigation decision:
 

@@ -15,8 +15,9 @@ export function LeoDashboard() {
   const [progressVersion, setProgressVersion] = useState(0);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const [assignments, setAssignments] = useState<AssignmentMap>({});
+  // Hero shows only what's currently assigned; the list below shows every Leo app so he can revisit anything.
   const assignedLessons = useMemo(() => learnerLessons.filter((lesson) => assignments[lesson.id]), [assignments]);
-  const groups = useMemo(() => getLessonGroups(assignedLessons), [assignedLessons]);
+  const groups = useMemo(() => getLessonGroups(learnerLessons), []);
 
   // Refresh must not depend on `groups`: every refresh creates a new
   // assignments object, which recomputes `groups`, so a [groups] dep
@@ -50,8 +51,8 @@ export function LeoDashboard() {
 
   const appProgress = useMemo(() => {
     progressVersion;
-    return Object.fromEntries(assignedLessons.map((lesson) => [lesson.id, getLearnerAppProgress(lesson.source)]));
-  }, [assignedLessons, progressVersion]);
+    return Object.fromEntries(learnerLessons.map((lesson) => [lesson.id, getLearnerAppProgress(lesson.source)]));
+  }, [progressVersion]);
 
   function toggleGroup(groupId: string) {
     setOpenGroups((current) => {
@@ -111,9 +112,15 @@ export function LeoDashboard() {
 function LeoAppCard({ assignment, lesson, progress }: { assignment: AssignmentRecord | undefined; lesson: Lesson; progress: LearnerAppProgress }) {
   const percent = Math.round((progress.completedModules / progress.moduleCount) * 100);
   const component = getLearnerComponentMeta(lesson.component);
+  const cardClass = [
+    "leo-app-card",
+    `leo-app-card-${component.tone}`,
+    assignment ? "" : "leo-app-card-available",
+    progress.done ? "leo-app-card-done" : ""
+  ].filter(Boolean).join(" ");
 
   return (
-    <article className={`leo-app-card leo-app-card-${component.tone}`}>
+    <article className={cardClass}>
       <div className="leo-app-main">
         <div className="leo-component-row">
           <span className={`component-chip component-chip-${component.tone}`}>
@@ -179,5 +186,6 @@ function getLearnerStatusText(assignment: AssignmentRecord | undefined, done: bo
   if (assignment?.status === "reviewed") return "Reviewed";
   if (assignment?.status === "needs-redo") return "Needs redo";
   if (done) return "Done";
-  return "Assigned";
+  if (assignment) return "Assigned";
+  return "Not assigned";
 }

@@ -496,7 +496,7 @@ Learner app `source` fields describe how LEEA reads the app's local progress:
 
 A learner lesson with `status: "live"` is not auto-assigned — Neritan assigns it from the teacher card. Use `status: "assigned"` only when the app should be homework immediately on load.
 
-Leo mode should stay scalable as more units and levels are added: group learner apps by course/level/unit in collapsible sections, and show component cues with emoji plus color-coded chips/edges for opener, vocabulary, grammar, reading, writing, and review.
+Leo mode should stay scalable as more units and levels are added: group learner apps by course/level/unit in collapsible sections, and show component cues with emoji plus color-coded chips/edges for opener, vocabulary, grammar, reading, writing, and review. The list shows every learner lesson, not only assigned ones — the hero handles "what to do now", the list handles "Leo's full library to revisit".
 
 A learner app can be auto-assigned by setting its lesson JSON `status` to `assigned` — `seedAssignments` picks this up on load. The Teacher Menu Assign button also writes the same assignment record to local storage. Home should surface assigned learner homework first. If no learner homework is waiting, Home should show Coming Up Next from unfinished current-unit work. Later, assignment state should also sync to Supabase.
 

@@ -155,11 +155,14 @@ export function TeacherDashboard() {
 
               {isOpen ? (
                 <div className="teacher-lesson-list">
-                  {group.lessons.map((lesson) => {
+                  {group.lessons.filter((l) => l.mode === "teacher").map((lesson) => {
                     const record = progress[lesson.id];
                     const done = record?.status === "done";
-                    const assignment = lesson.mode === "learner" ? assignments[lesson.id] : undefined;
-                    const appProgress = lesson.mode === "learner" ? getLearnerAppProgress(lesson.source) : null;
+                    const learnerCounterpart = group.lessons.find(
+                      (l) => l.mode === "learner" && l.component === `${lesson.component}-app`
+                    );
+                    const assignment = learnerCounterpart ? assignments[learnerCounterpart.id] : undefined;
+                    const appProgress = learnerCounterpart ? getLearnerAppProgress(learnerCounterpart.source) : null;
                     const accent = componentAccent(lesson.component);
                     return (
                       <article
@@ -170,9 +173,7 @@ export function TeacherDashboard() {
                         <div className="teacher-lesson-main">
                           <div className="teacher-card-top">
                             <span>{lesson.component}</span>
-                            <span className={`mode-badge ${lesson.mode === "teacher" ? "mode-badge-teacher" : "mode-badge-learner"}`}>
-                              {lesson.mode === "teacher" ? "Teacher" : "Leo"}
-                            </span>
+                            <span className="mode-badge mode-badge-teacher">Teacher</span>
                           </div>
                           <h3>{lesson.title}</h3>
                           <p>{lesson.subtitle}</p>
@@ -195,31 +196,29 @@ export function TeacherDashboard() {
 
                         <div className="teacher-lesson-actions">
                           {/* Teacher deck */}
-                          {lesson.mode === "teacher" && (
-                            <Link className="teacher-open-button" href={`/lessons/${lesson.id}`}>
-                              Open <ExternalLink size={15} />
-                            </Link>
-                          )}
-                          {/* Assign */}
-                          {lesson.mode === "learner" && !assignment && (
-                            <button className="teacher-done-button" onClick={() => assignLesson(lesson.id)} type="button">
+                          <Link className="teacher-open-button" href={`/lessons/${lesson.id}`}>
+                            Open <ExternalLink size={15} />
+                          </Link>
+                          {/* Assign Leo's app counterpart */}
+                          {learnerCounterpart && !assignment && (
+                            <button className="teacher-done-button" onClick={() => assignLesson(learnerCounterpart.id)} type="button">
                               <Circle size={16} /> Assign
                             </button>
                           )}
-                          {lesson.mode === "learner" && assignment && (
+                          {learnerCounterpart && assignment && (
                             <button className="teacher-done-button active" disabled type="button">
                               <CheckCircle2 size={16} /> Assigned
                             </button>
                           )}
                           {/* Unassign */}
-                          {lesson.mode === "learner" && assignment && (
-                            <button className="teacher-done-button warning" onClick={() => unassignLesson(lesson.id)} type="button">
+                          {learnerCounterpart && assignment && (
+                            <button className="teacher-done-button warning" onClick={() => unassignLesson(learnerCounterpart.id)} type="button">
                               Unassign
                             </button>
                           )}
                           {/* Review */}
-                          {lesson.mode === "learner" && (
-                            <Link className="teacher-done-button" href={`/teacher/review/${lesson.id}`}>
+                          {learnerCounterpart && (
+                            <Link className="teacher-done-button" href={`/teacher/review/${learnerCounterpart.id}`}>
                               Review <ExternalLink size={15} />
                             </Link>
                           )}

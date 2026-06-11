@@ -7,6 +7,7 @@ import { readAssignments, type AssignmentMap, type AssignmentRecord } from "@/da
 import { getLearnerAppProgress, type LearnerAppProgress } from "@/data/learnerProgress";
 import { getLessonGroups, learnerLessons } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
+import { LeoHomeworkHero } from "./LeoHomeworkHero";
 
 const groupOpenStorageKey = "leea.leo.lessonGroupsOpen.v1";
 
@@ -60,13 +61,14 @@ export function LeoDashboard() {
     });
   }
 
+  const heroItems = useMemo(
+    () => assignedLessons.map((lesson) => ({ lesson, progress: appProgress[lesson.id] })).filter((item) => item.progress),
+    [assignedLessons, appProgress]
+  );
+
   return (
     <section className="leo-page">
-      <header className="leo-hero">
-        <span className="eyebrow">Leo Learning Mode</span>
-        <h1>My Assignments</h1>
-        <p>Open the next app, finish the modules, and come back here to see progress.</p>
-      </header>
+      <LeoHomeworkHero items={heroItems} />
 
       {groups.length ? (
         <div className="leo-group-grid">
@@ -101,12 +103,7 @@ export function LeoDashboard() {
           );
           })}
         </div>
-      ) : (
-        <section className="empty-results">
-          <h2>No homework assigned yet.</h2>
-          <p>Ask Neritan to assign the next Leo app from Teacher Menu.</p>
-        </section>
-      )}
+      ) : null}
     </section>
   );
 }

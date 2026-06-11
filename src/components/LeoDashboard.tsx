@@ -17,18 +17,10 @@ export function LeoDashboard() {
   const assignedLessons = useMemo(() => learnerLessons.filter((lesson) => assignments[lesson.id]), [assignments]);
   const groups = useMemo(() => getLessonGroups(assignedLessons), [assignedLessons]);
 
+  // Refresh must not depend on `groups`: every refresh creates a new
+  // assignments object, which recomputes `groups`, so a [groups] dep
+  // re-runs this effect forever (frozen page).
   useEffect(() => {
-    const savedGroups = window.localStorage.getItem(groupOpenStorageKey);
-    if (savedGroups) {
-      try {
-        setOpenGroups(JSON.parse(savedGroups) as Record<string, boolean>);
-      } catch {
-        setOpenGroups({});
-      }
-    } else {
-      setOpenGroups(Object.fromEntries(groups.map((group, index) => [group.id, index === 0])));
-    }
-
     const refresh = () => {
       setAssignments(readAssignments(learnerLessons));
       setProgressVersion((current) => current + 1);
@@ -40,6 +32,19 @@ export function LeoDashboard() {
       window.removeEventListener("storage", refresh);
       window.removeEventListener("focus", refresh);
     };
+  }, []);
+
+  useEffect(() => {
+    const savedGroups = window.localStorage.getItem(groupOpenStorageKey);
+    if (savedGroups) {
+      try {
+        setOpenGroups(JSON.parse(savedGroups) as Record<string, boolean>);
+      } catch {
+        setOpenGroups({});
+      }
+    } else {
+      setOpenGroups(Object.fromEntries(groups.map((group, index) => [group.id, index === 0])));
+    }
   }, [groups]);
 
   const appProgress = useMemo(() => {

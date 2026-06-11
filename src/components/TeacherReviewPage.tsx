@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CheckCircle2, Circle, RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
+  assignLesson,
   assignmentStorageKey,
   createAssignmentRecord,
   createReviewRecord,
@@ -36,7 +37,7 @@ export function TeacherReviewPage({ lesson }: { lesson: Lesson }) {
   }, [lesson]);
 
   function assign() {
-    setAssignments((current) => saveAssignments({ ...current, [lesson.id]: current[lesson.id] ?? createAssignmentRecord(lesson.id) }));
+    setAssignments((current) => assignLesson(lesson.id, current));
   }
 
   function review(status: "reviewed" | "needs-redo") {

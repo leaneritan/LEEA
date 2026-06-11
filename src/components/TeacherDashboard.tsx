@@ -4,9 +4,9 @@ import Link from "next/link";
 import { CheckCircle2, ChevronDown, ChevronRight, Circle, ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
-  assignmentStorageKey,
-  createAssignmentRecord,
+  assignLesson as assignLessonRecord,
   readAssignments,
+  unassignLesson as unassignLessonRecord,
   type AssignmentMap,
   type AssignmentRecord
 } from "@/data/assignments";
@@ -97,20 +97,11 @@ export function TeacherDashboard() {
   }
 
   function assignLesson(lessonId: string) {
-    setAssignments((current) => {
-      const next = { ...current, [lessonId]: current[lessonId] ?? createAssignmentRecord(lessonId) };
-      window.localStorage.setItem(assignmentStorageKey, JSON.stringify(next));
-      return next;
-    });
+    setAssignments((current) => assignLessonRecord(lessonId, current));
   }
 
   function unassignLesson(lessonId: string) {
-    setAssignments((current) => {
-      const next = { ...current };
-      delete next[lessonId];
-      window.localStorage.setItem(assignmentStorageKey, JSON.stringify(next));
-      return next;
-    });
+    setAssignments((current) => unassignLessonRecord(lessonId, current));
   }
 
   return (

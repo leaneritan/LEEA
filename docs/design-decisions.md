@@ -400,8 +400,10 @@ Current teacher tracking:
 
 - Teacher Menu shows only teacher slide cards, grouped by course, level, and unit — Leo's app cards never appear as separate boxes on the Neritan page.
 - Level/unit groups are collapsible because more levels and units will be added.
-- Each teacher card carries all controls in one place: Open (slides), Assign/Assigned + Unassign (Leo's matching app), Review (Leo's work), and Mark Done.
-- A teacher lesson finds its learner counterpart by component name: teacher `opener` pairs with learner `opener-app` in the same level/unit. Cards with a counterpart also show inline progress pills (modules done, quiz score).
+- Each teacher card carries all controls in one place: Open (slides) and Mark Done are the teaching controls; Assign/Assigned, Review, and Unassign live inside a tinted "Leo's App" group box so app controls are visually separate from teaching controls.
+- A teacher lesson finds its learner counterpart by component name: teacher `opener` pairs with learner `opener-app` in the same level/unit. Cards with a counterpart show a "Leo's App" label plus inline progress pills (modules done, quiz score).
+- Button hierarchy: Open is the primary black button; Mark Done is a standard outline button; app-group buttons are compact; Unassign is a quiet underlined ghost button because it is a rare corrective action.
+- The component label on each card is colored by its component accent (opener gold-deep, vocab green, grammar blue, reading amber, writing plum, mission green) so cards are scannable; the same accent colors the card's left edge. There is no Teacher/Leo badge on this page because every card is a teacher card.
 - Teacher lessons are marked `Done` by Neritan after teaching. Learner apps are marked Assigned and then Reviewed after Leo completes them.
 - First storage is local, but all record shapes map to Supabase later.
 

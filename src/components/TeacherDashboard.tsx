@@ -172,8 +172,9 @@ export function TeacherDashboard() {
                       >
                         <div className="teacher-lesson-main">
                           <div className="teacher-card-top">
-                            <span>{lesson.component}</span>
-                            <span className="mode-badge mode-badge-teacher">Teacher</span>
+                            <span style={{ color: lesson.component === "opener" ? "var(--gold-deep)" : accent }}>
+                              {lesson.component}
+                            </span>
                           </div>
                           <h3>{lesson.title}</h3>
                           <p>{lesson.subtitle}</p>
@@ -184,6 +185,7 @@ export function TeacherDashboard() {
                           </small>
                           {appProgress && (
                             <div className="lesson-inline-progress">
+                              <span className="lesson-inline-label">Leo&apos;s App</span>
                               <span className={appProgress.completedModules > 0 ? "lesson-inline-stat stat-done" : "lesson-inline-stat"}>
                                 {appProgress.completedModules} / {appProgress.moduleCount} modules
                               </span>
@@ -195,34 +197,10 @@ export function TeacherDashboard() {
                         </div>
 
                         <div className="teacher-lesson-actions">
-                          {/* Teacher deck */}
+                          {/* Teaching controls */}
                           <Link className="teacher-open-button" href={`/lessons/${lesson.id}`}>
                             Open <ExternalLink size={15} />
                           </Link>
-                          {/* Assign Leo's app counterpart */}
-                          {learnerCounterpart && !assignment && (
-                            <button className="teacher-done-button" onClick={() => assignLesson(learnerCounterpart.id)} type="button">
-                              <Circle size={16} /> Assign
-                            </button>
-                          )}
-                          {learnerCounterpart && assignment && (
-                            <button className="teacher-done-button active" disabled type="button">
-                              <CheckCircle2 size={16} /> Assigned
-                            </button>
-                          )}
-                          {/* Unassign */}
-                          {learnerCounterpart && assignment && (
-                            <button className="teacher-done-button warning" onClick={() => unassignLesson(learnerCounterpart.id)} type="button">
-                              Unassign
-                            </button>
-                          )}
-                          {/* Review */}
-                          {learnerCounterpart && (
-                            <Link className="teacher-done-button" href={`/teacher/review/${learnerCounterpart.id}`}>
-                              Review <ExternalLink size={15} />
-                            </Link>
-                          )}
-                          {/* Mark Done */}
                           <button
                             className={done ? "teacher-done-button active" : "teacher-done-button"}
                             onClick={() => setLessonDone(lesson.id, !done)}
@@ -231,6 +209,29 @@ export function TeacherDashboard() {
                             {done ? <CheckCircle2 size={16} /> : <Circle size={16} />}
                             {done ? "Done" : "Mark Done"}
                           </button>
+                          {/* Leo's app controls, grouped and tinted */}
+                          {learnerCounterpart && (
+                            <div className="app-controls">
+                              <span className="app-controls-label">Leo&apos;s App</span>
+                              {!assignment ? (
+                                <button className="teacher-done-button" onClick={() => assignLesson(learnerCounterpart.id)} type="button">
+                                  <Circle size={16} /> Assign
+                                </button>
+                              ) : (
+                                <button className="teacher-done-button active" disabled type="button">
+                                  <CheckCircle2 size={16} /> Assigned
+                                </button>
+                              )}
+                              <Link className="teacher-done-button" href={`/teacher/review/${learnerCounterpart.id}`}>
+                                Review <ExternalLink size={15} />
+                              </Link>
+                              {assignment && (
+                                <button className="teacher-done-button ghost" onClick={() => unassignLesson(learnerCounterpart.id)} type="button">
+                                  Unassign
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </article>
                     );

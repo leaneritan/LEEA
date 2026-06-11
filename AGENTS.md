@@ -74,7 +74,7 @@ Teacher lessons are only for teaching. Learner apps are for Leo's independent ho
 
 Learner apps live as separate `mode: "learner"` lesson records from teacher lessons, even when they cover the same component. They open from Leo mode and may embed uploaded standalone HTML apps from `public/learn/...` while keeping local progress keys ready for Supabase.
 
-The Neritan Teacher Menu shows only teacher slide cards — learner apps never render as separate boxes there. Each teacher card carries the controls for Leo's matching app (Assign/Assigned, Unassign, Review) plus Open and Mark Done. The counterpart is found by component name: teacher `opener` pairs with learner `opener-app` in the same level/unit, so new learner apps must follow the `{component}-app` naming to surface their buttons on the teacher card.
+The Neritan Teacher Menu shows only teacher slide cards — learner apps never render as separate boxes there. Each teacher card carries the controls for Leo's matching app (Assign/Assigned, Review, Unassign) inside a tinted `app-controls` group labeled "Leo's App", next to the teaching controls Open and Mark Done. The counterpart is found by component name: teacher `opener` pairs with learner `opener-app` in the same level/unit, so new learner apps must follow the `{component}-app` naming to surface their buttons on the teacher card. Open stays the primary black button; Unassign renders as a quiet ghost button. Component labels and card left edges share the same accent color per component type.
 
 Leo mode should group learner apps by course/level/unit with collapsible sections. Learner app cards should show a clear component cue, such as emoji plus color-coded chip/edge for opener, vocabulary, grammar, reading, writing, and review.
 

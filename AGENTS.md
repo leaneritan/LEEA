@@ -160,7 +160,7 @@ Run this whenever reference content changes:
 npm run validate:content
 ```
 
-The validator checks that vocabulary IDs and indexes line up, every card has Japanese display fields, academic cards have the full rich schema and mini-quiz shape, grammar cards have Japanese support, and Sanseido junior-high entries are valid search-only links. Do not weaken the validator to make bad content pass; fix the content or update the documented rule in the same PR.
+The validator checks that vocabulary IDs and indexes line up, every card has Japanese display fields, academic cards have the full rich schema and mini-quiz shape, grammar cards have Japanese support, Sanseido junior-high entries are valid search-only links, every lesson JSON under the unit `lessons/` folder is imported by `src/data/lessons.ts`, and every `mode: "learner"` lesson's component ends with `-app` AND has a matching teacher-mode lesson with the base component in the same course/level/unit. Do not weaken the validator to make bad content pass; fix the content or update the documented rule in the same PR.
 
 Vocabulary cards need:
 

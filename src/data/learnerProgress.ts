@@ -21,18 +21,20 @@ export function getLearnerAppProgress(source: Lesson["source"]): LearnerAppProgr
     return { completedModules: 0, moduleCount: moduleCount || 1, modules: [], score: null, done: false, caption: "" };
   }
 
+  const keyFormat = source.moduleKeyFormat ?? "m{n}-done";
   const modules = Array.from({ length: moduleCount }, (_, index) => {
-    const moduleNumber = index + 1;
+    const doneKey = keyFormat.replace("{n}", String(index + 1)).replace("{i}", String(index));
     return {
-      id: `m${moduleNumber}`,
-      label: getModuleLabel(moduleNumber),
-      done: loadLocalValue(`${storagePrefix}m${moduleNumber}-done`, false)
+      id: `m${index + 1}`,
+      label: source.moduleLabels?.[index] ?? `Module ${index + 1}`,
+      done: loadLocalValue(`${storagePrefix}${doneKey}`, false)
     };
   });
   const completedModules = modules.filter((module) => module.done).length;
   const scoreData = loadLocalValue<{ score?: number; done?: boolean } | null>(`${storagePrefix}score`, null);
-  const done = Boolean(loadLocalValue(`${storagePrefix}done`, false) || scoreData?.done);
-  const caption = loadLocalValue(`${storagePrefix}m5-caption`, "");
+  const homeworkDone = source.homeworkId ? loadLocalValue(`leea-${source.homeworkId}-done`, false) : false;
+  const done = Boolean(loadLocalValue(`${storagePrefix}done`, false) || scoreData?.done || homeworkDone);
+  const caption = source.captionKey ? loadLocalValue(`${storagePrefix}${source.captionKey}`, "") : "";
 
   return {
     completedModules,
@@ -51,18 +53,4 @@ export function loadLocalValue<T>(key: string, fallback: T): T {
   } catch {
     return fallback;
   }
-}
-
-function getModuleLabel(moduleNumber: number) {
-  const labels = [
-    "In This Unit I Will",
-    "What Is a Hobby?",
-    "Photo Explorer",
-    "Look and Check",
-    "Write Your Caption",
-    "Hobby or Not?",
-    "Final Quiz"
-  ];
-
-  return labels[moduleNumber - 1] ?? `Module ${moduleNumber}`;
 }

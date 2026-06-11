@@ -1,9 +1,15 @@
 import unit8Opener from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.json";
 import unit8OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener-learner.json";
 import unit8Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab1.json";
+import unit8Vocab1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab1-learner.json";
 import type { Lesson } from "./types";
 
-export const lessons: Lesson[] = [unit8Opener as Lesson, unit8OpenerLearner as Lesson, unit8Vocab1 as Lesson];
+export const lessons: Lesson[] = [
+  unit8Opener as Lesson,
+  unit8OpenerLearner as Lesson,
+  unit8Vocab1 as Lesson,
+  unit8Vocab1Learner as Lesson
+];
 export const teacherLessons = lessons.filter((lesson) => lesson.mode === "teacher");
 export const learnerLessons = lessons.filter((lesson) => lesson.mode === "learner");
 

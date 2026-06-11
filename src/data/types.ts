@@ -225,6 +225,12 @@ export type Lesson = {
     moduleCount?: number;
     storagePrefix?: string;
     homeworkId?: string;
+    /** Module done-key pattern appended to storagePrefix. {n} = 1-based, {i} = 0-based. Default "m{n}-done". */
+    moduleKeyFormat?: string;
+    /** Display labels per module, in order. Falls back to "Module N". */
+    moduleLabels?: string[];
+    /** Key appended to storagePrefix that stores Leo's written caption, if the app has one. */
+    captionKey?: string;
   };
   objectives: {
     content: string[];

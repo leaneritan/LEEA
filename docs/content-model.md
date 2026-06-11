@@ -485,6 +485,17 @@ Teacher lessons are for Neritan to teach. Learner lessons and review cards are f
 
 Learner apps should be registered as separate `mode: "learner"` lessons, not folded into the teacher lesson record. Uploaded standalone HTML apps can live in `public/learn/...` and keep their own local progress keys while the surrounding LEEA route provides assignment, review, and later Supabase wiring.
 
+Learner app `source` fields describe how LEEA reads the app's local progress:
+
+- `storagePrefix` — full localStorage key prefix the app writes under, such as `leea-4-8-vocab-1-`
+- `moduleCount` — number of modules/tabs
+- `moduleKeyFormat` — done-key pattern appended to the prefix; `{n}` is 1-based, `{i}` is 0-based; default `m{n}-done` (opener style), the vocab app uses `tab-{i}-done`
+- `moduleLabels` — display labels per module, in order; falls back to `Module N`
+- `homeworkId` — the app's homework namespace; LEEA also treats `leea-{homeworkId}-done` as the done flag
+- `captionKey` — key after the prefix holding Leo's written caption, if the app has one (opener: `m5-caption`)
+
+A learner lesson with `status: "live"` is not auto-assigned — Neritan assigns it from the teacher card. Use `status: "assigned"` only when the app should be homework immediately on load.
+
 Leo mode should stay scalable as more units and levels are added: group learner apps by course/level/unit in collapsible sections, and show component cues with emoji plus color-coded chips/edges for opener, vocabulary, grammar, reading, writing, and review.
 
 A learner app can be auto-assigned by setting its lesson JSON `status` to `assigned` — `seedAssignments` picks this up on load. The Teacher Menu Assign button also writes the same assignment record to local storage. Home should surface assigned learner homework first. If no learner homework is waiting, Home should show Coming Up Next from unfinished current-unit work. Later, assignment state should also sync to Supabase.

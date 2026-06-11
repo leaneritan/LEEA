@@ -78,7 +78,9 @@ The Neritan Teacher Menu shows only teacher slide cards — learner apps never r
 
 Leo mode should group learner apps by course/level/unit with collapsible sections. Learner app cards should show a clear component cue, such as emoji plus color-coded chip/edge for opener, vocabulary, grammar, reading, writing, and review.
 
-A learner lesson can be auto-assigned by setting its `status` to `assigned` in the lesson JSON — `seedAssignments` picks this up on load. The Teacher Menu also has an Assign button that writes the same record to local storage manually. Home should show assigned learner homework first; when no homework is waiting, it should show Coming Up Next based on unfinished current-unit work.
+A learner lesson can be auto-assigned by setting its `status` to `assigned` in the lesson JSON — `seedAssignments` picks this up on load. Use `status: "live"` when Neritan should assign it manually from the teacher card instead. Home should show assigned learner homework first; when no homework is waiting, it should show Coming Up Next based on unfinished current-unit work.
+
+Learner app progress is read through `getLearnerAppProgress(source)`. The lesson JSON `source` describes the app's localStorage shape: `storagePrefix`, `moduleCount`, `moduleKeyFormat` (`{n}` 1-based / `{i}` 0-based, default `m{n}-done`), `moduleLabels`, `homeworkId`, and optional `captionKey`. Do not hardcode app-specific keys or labels in TypeScript — they belong in the lesson JSON.
 
 Home current-focus progress counts unit components, not every route. If a teacher lesson and Leo learner app cover the same component, such as `opener` and `opener-app`, they count as one lesson/component in the Home progress total.
 

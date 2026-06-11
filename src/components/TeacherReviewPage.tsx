@@ -7,7 +7,7 @@ import {
   assignmentStorageKey,
   createAssignmentRecord,
   createReviewRecord,
-  seedAssignments,
+  readAssignments,
   type AssignmentMap,
   type AssignmentRecord
 } from "@/data/assignments";
@@ -22,7 +22,7 @@ export function TeacherReviewPage({ lesson }: { lesson: Lesson }) {
 
   useEffect(() => {
     function refresh() {
-      setAssignments(readAssignments());
+      setAssignments(readAssignments(learnerLessons));
       setProgress(getLearnerAppProgress(lesson.source));
     }
 
@@ -119,16 +119,6 @@ function ReviewStat({ label, value }: { label: string; value: string }) {
       <strong>{value}</strong>
     </div>
   );
-}
-
-function readAssignments() {
-  try {
-    const saved = window.localStorage.getItem(assignmentStorageKey);
-    const parsed = saved ? (JSON.parse(saved) as AssignmentMap) : {};
-    return saveAssignments(seedAssignments(learnerLessons, parsed));
-  } catch {
-    return saveAssignments(seedAssignments(learnerLessons, {}));
-  }
 }
 
 function saveAssignments(assignments: AssignmentMap) {

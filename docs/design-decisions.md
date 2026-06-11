@@ -60,6 +60,8 @@ When a subject is expanded, its courses/modules are visible.
 
 The app should remember each user's collapsed/expanded preference. First version can store this locally; later Supabase can store it per user.
 
+Dashboard and sidebar numbers must be real data, never hardcoded placeholders. The sidebar "Leo's Progress" count reads open assignments (status `assigned` or `needs-redo`) from the shared `readAssignments`/`getOpenAssignmentCount` helpers in `src/data/assignments.ts`. All components read assignment state through those helpers — do not re-implement localStorage reads per component.
+
 Home should also show useful overview numbers, such as:
 
 - total vocabulary cards
@@ -403,6 +405,7 @@ Current teacher tracking:
 - Each teacher card carries all controls in one place: Open (slides) and Mark Done are the teaching controls; Assign/Assigned, Review, and Unassign live inside a tinted "Leo's App" group box so app controls are visually separate from teaching controls.
 - A teacher lesson finds its learner counterpart by component name: teacher `opener` pairs with learner `opener-app` in the same level/unit. Cards with a counterpart show a "Leo's App" label plus inline progress pills (modules done, quiz score).
 - Button hierarchy: Open is the primary black button; Mark Done is a standard outline button; app-group buttons are compact; Unassign is a quiet underlined ghost button because it is a rare corrective action.
+- Typography rule: at most one uppercase label per card region. The component label (card top) and the "Leo's App" group label stay uppercase; meta text, progress pills, and group-header counts use sentence case. Do not add new uppercase/letter-spaced styles without removing one.
 - The component label on each card is colored by its component accent (opener gold-deep, vocab green, grammar blue, reading amber, writing plum, mission green) so cards are scannable; the same accent colors the card's left edge. There is no Teacher/Leo badge on this page because every card is a teacher card.
 - Teacher lessons are marked `Done` by Neritan after teaching. Learner apps are marked Assigned and then Reviewed after Leo completes them.
 - First storage is local, but all record shapes map to Supabase later.

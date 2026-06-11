@@ -52,3 +52,24 @@ export function seedAssignments(items: Lesson[], current: AssignmentMap) {
     return next;
   }, { ...current });
 }
+
+// Browser-only: call from effects/handlers, not during render.
+export function readAssignments(learnerItems: Lesson[]): AssignmentMap {
+  try {
+    const saved = window.localStorage.getItem(assignmentStorageKey);
+    const parsed = saved ? (JSON.parse(saved) as AssignmentMap) : {};
+    const seeded = seedAssignments(learnerItems, parsed);
+    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
+    return seeded;
+  } catch {
+    const seeded = seedAssignments(learnerItems, {});
+    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
+    return seeded;
+  }
+}
+
+export function getOpenAssignmentCount(assignments: AssignmentMap) {
+  return Object.values(assignments).filter(
+    (assignment) => assignment.status === "assigned" || assignment.status === "needs-redo"
+  ).length;
+}

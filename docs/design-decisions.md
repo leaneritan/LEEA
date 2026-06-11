@@ -406,6 +406,14 @@ Current teacher tracking:
 - A teacher lesson finds its learner counterpart by component name: teacher `opener` pairs with learner `opener-app` in the same level/unit. Cards with a counterpart show a "Leo's App" label plus inline progress pills (modules done, quiz score).
 - Button hierarchy: Open is the primary black button; Mark Done is a standard outline button; app-group buttons are compact; Unassign is a quiet underlined ghost button because it is a rare corrective action.
 - Typography rule: at most one uppercase label per card region. The component label (card top) and the "Leo's App" group label stay uppercase; meta text, progress pills, and group-header counts use sentence case. Do not add new uppercase/letter-spaced styles without removing one.
+
+Leo's view design rules (different from Neritan):
+
+- Leo's page must feel like Leo's, not like a smaller copy of the teacher dashboard. Warmer surfaces (gold/cream gradient), bigger numbers, fewer words.
+- Top of `/leo` is a `LeoHomeworkHero` card with three states: one assignment (giant title + Start/Keep Going button), multiple assignments (same card + "and X more" link to the rest), and caught-up (celebratory empty state with reference link). The rest of the page stays the collapsible grouped browser of assigned apps below.
+- The hero greets ("Hi Leo 👋"), names the component with an emoji chip, shows a single progress meter, and offers one big action. No secondary buttons compete with Start.
+- Progress meter uses a single evergreen gradient bar — not the muted Neritan style. The Start button is pill-shaped with a soft shadow to feel tappable on a tablet.
+- Leo's page should never show "no homework" as a sad empty state. It is always either active (hero + groups) or a positive caught-up moment.
 - The component label on each card is colored by its component accent (opener gold-deep, vocab green, grammar blue, reading amber, writing plum, mission green) so cards are scannable; the same accent colors the card's left edge. There is no Teacher/Leo badge on this page because every card is a teacher card.
 - Teacher lessons are marked `Done` by Neritan after teaching. Learner apps are marked Assigned and then Reviewed after Leo completes them.
 - First storage is local, but all record shapes map to Supabase later.

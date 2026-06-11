@@ -78,6 +78,8 @@ The Neritan Teacher Menu shows only teacher slide cards — learner apps never r
 
 Leo mode should group learner apps by course/level/unit with collapsible sections. Learner app cards should show a clear component cue, such as emoji plus color-coded chip/edge for opener, vocabulary, grammar, reading, writing, and review.
 
+Leo's page must feel like Leo's, not a smaller copy of the teacher dashboard. The top of `/leo` is always a `LeoHomeworkHero` card (warm gold/cream surface, "Hi Leo 👋" greeting, single big Start/Keep Going button). It has three states: one assignment, multiple assignments ("and X more"), and a celebratory caught-up state. The grouped browser stays below. Do not add competing primary buttons to the hero or restyle Leo's view in the muted Neritan palette.
+
 A learner lesson can be auto-assigned by setting its `status` to `assigned` in the lesson JSON — `seedAssignments` picks this up on load. Use `status: "live"` when Neritan should assign it manually from the teacher card instead. Home should show assigned learner homework first; when no homework is waiting, it should show Coming Up Next based on unfinished current-unit work.
 
 Learner app progress is read through `getLearnerAppProgress(source)`. The lesson JSON `source` describes the app's localStorage shape: `storagePrefix`, `moduleCount`, `moduleKeyFormat` (`{n}` 1-based / `{i}` 0-based, default `m{n}-done`), `moduleLabels`, `homeworkId`, and optional `captionKey`. Do not hardcode app-specific keys or labels in TypeScript — they belong in the lesson JSON.

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Play, Sparkles } from "lucide-react";
 import type { LearnerAppProgress } from "@/data/learnerProgress";
 import type { Lesson } from "@/data/types";
+import { getComponentMeta } from "./componentMeta";
 
 type Item = { lesson: Lesson; progress: LearnerAppProgress };
 
@@ -74,16 +75,6 @@ export function LeoHomeworkHero({ items }: { items: Item[] }) {
       </div>
     </section>
   );
-}
-
-function getComponentMeta(component: string) {
-  if (component.includes("opener")) return { emoji: "🎯", label: "Opener", tone: "opener" };
-  if (component.includes("vocab")) return { emoji: "📚", label: "Vocabulary", tone: "vocab" };
-  if (component.includes("grammar")) return { emoji: "🧩", label: "Grammar", tone: "grammar" };
-  if (component.includes("reading")) return { emoji: "📖", label: "Reading", tone: "reading" };
-  if (component.includes("writing")) return { emoji: "✏️", label: "Writing", tone: "writing" };
-  if (component.includes("review")) return { emoji: "🔁", label: "Review", tone: "review" };
-  return { emoji: "🎯", label: "Activity", tone: "opener" };
 }
 
 function getGroupHashFor(lesson: Lesson) {

@@ -226,6 +226,8 @@ The validator checks:
 - rich academic-card fields, exactly three `when_to_use` contexts, collocation counts, non-examples, and `miniQuiz.options[]`
 - grammar-card Japanese fields
 - Sanseido junior-high `{ "w", "u" }` search-only entries
+- every lesson JSON in the unit `lessons/` folder is imported by `src/data/lessons.ts` (no orphaned lesson files)
+- every `mode: "learner"` lesson's component ends with `-app` and has a matching teacher lesson with the base component in the same course/level/unit (so the buttons surface on the teacher card)
 
 If the validator fails, fix the content or update this documented model in the same change.
 

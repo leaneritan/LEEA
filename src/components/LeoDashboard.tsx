@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { CheckCircle2, ChevronDown, ChevronRight, Circle, Play } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { assignmentStorageKey, seedAssignments, type AssignmentMap, type AssignmentRecord } from "@/data/assignments";
+import { readAssignments, type AssignmentMap, type AssignmentRecord } from "@/data/assignments";
 import { getLearnerAppProgress, type LearnerAppProgress } from "@/data/learnerProgress";
 import { getLessonGroups, learnerLessons } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
@@ -30,7 +30,7 @@ export function LeoDashboard() {
     }
 
     const refresh = () => {
-      setAssignments(readAssignments());
+      setAssignments(readAssignments(learnerLessons));
       setProgressVersion((current) => current + 1);
     };
     refresh();
@@ -171,20 +171,6 @@ function getLearnerComponentMeta(component: string) {
   if (component.includes("writing")) return { emoji: "W", label: "Writing", tone: "writing" };
   if (component.includes("review")) return { emoji: "OK", label: "Review", tone: "review" };
   return { emoji: "OP", label: "Opener", tone: "opener" };
-}
-
-function readAssignments() {
-  try {
-    const saved = window.localStorage.getItem(assignmentStorageKey);
-    const parsed = saved ? (JSON.parse(saved) as AssignmentMap) : {};
-    const seeded = seedAssignments(learnerLessons, parsed);
-    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
-    return seeded;
-  } catch {
-    const seeded = seedAssignments(learnerLessons, {});
-    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
-    return seeded;
-  }
 }
 
 function getLearnerStatusText(assignment: AssignmentRecord | undefined, done: boolean) {

@@ -5,6 +5,8 @@ import { BookOpen, CheckSquare, GraduationCap, Home, PanelLeftClose, PanelLeftOp
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
+import { getOpenAssignmentCount, readAssignments } from "@/data/assignments";
+import { learnerLessons } from "@/data/lessons";
 
 type NavKey = "home" | "teacher" | "english" | "assignments" | "reference" | "profile" | "settings";
 
@@ -37,11 +39,24 @@ export function AppShell({
 }) {
   const [japaneseOn, setJapaneseOn] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [assignmentsLeft, setAssignmentsLeft] = useState<number | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
     const saved = window.localStorage.getItem("leea-sidebar-collapsed");
     if (saved) setSidebarCollapsed(saved === "true");
+
+    function refreshAssignments() {
+      setAssignmentsLeft(getOpenAssignmentCount(readAssignments(learnerLessons)));
+    }
+
+    refreshAssignments();
+    window.addEventListener("storage", refreshAssignments);
+    window.addEventListener("focus", refreshAssignments);
+    return () => {
+      window.removeEventListener("storage", refreshAssignments);
+      window.removeEventListener("focus", refreshAssignments);
+    };
   }, []);
 
   function toggleSidebar() {
@@ -80,7 +95,13 @@ export function AppShell({
 
         <div className="sidebar-progress">
           <strong>Leo&apos;s Progress</strong>
-          <span>3 assignments left</span>
+          <span>
+            {assignmentsLeft === null
+              ? "…"
+              : assignmentsLeft === 0
+                ? "No homework waiting"
+                : `${assignmentsLeft} assignment${assignmentsLeft === 1 ? "" : "s"} left`}
+          </span>
         </div>
         </aside>
 

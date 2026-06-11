@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { assignmentStorageKey, seedAssignments, type AssignmentMap } from "@/data/assignments";
+import { readAssignments, type AssignmentMap } from "@/data/assignments";
 import { getDoneLessonCount, lessonProgressStorageKey, type LessonProgressMap } from "@/data/lessonProgress";
 import { getCurrentFocusLessons, learnerLessons, teacherLessons } from "@/data/lessons";
 import { currentFocus } from "@/data/registry";
@@ -31,7 +31,7 @@ export function HomeDashboard() {
           setProgress({});
         }
       }
-      setAssignments(readAssignments());
+      setAssignments(readAssignments(learnerLessons));
       setProgressVersion((current) => current + 1);
     }
 
@@ -155,20 +155,6 @@ function getHomeNextItem(progress: LessonProgressMap, assignments: AssignmentMap
     status: "done",
     lesson: learnerLessons[0] ?? teacherLessons[0]
   };
-}
-
-function readAssignments() {
-  try {
-    const saved = window.localStorage.getItem(assignmentStorageKey);
-    const parsed = saved ? (JSON.parse(saved) as AssignmentMap) : {};
-    const seeded = seedAssignments(learnerLessons, parsed);
-    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
-    return seeded;
-  } catch {
-    const seeded = seedAssignments(learnerLessons, {});
-    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
-    return seeded;
-  }
 }
 
 function isLearnerLessonDone(lesson: Lesson) {

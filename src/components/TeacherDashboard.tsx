@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   assignmentStorageKey,
   createAssignmentRecord,
-  seedAssignments,
+  readAssignments,
   type AssignmentMap,
   type AssignmentRecord
 } from "@/data/assignments";
@@ -40,7 +40,7 @@ export function TeacherDashboard() {
 
   useEffect(() => {
     function refreshAll() {
-      setAssignments(readAssignments());
+      setAssignments(readAssignments(learnerLessons));
       setProgressVersion((v) => v + 1);
     }
 
@@ -244,20 +244,6 @@ export function TeacherDashboard() {
       </div>
     </section>
   );
-}
-
-function readAssignments() {
-  try {
-    const saved = window.localStorage.getItem(assignmentStorageKey);
-    const parsed = saved ? (JSON.parse(saved) as AssignmentMap) : {};
-    const seeded = seedAssignments(learnerLessons, parsed);
-    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
-    return seeded;
-  } catch {
-    const seeded = seedAssignments(learnerLessons, {});
-    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
-    return seeded;
-  }
 }
 
 function formatAssignmentStatus(assignment: AssignmentRecord, appDone: boolean) {

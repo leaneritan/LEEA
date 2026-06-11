@@ -487,6 +487,8 @@ Leo mode should stay scalable as more units and levels are added: group learner 
 
 A learner app can be auto-assigned by setting its lesson JSON `status` to `assigned` — `seedAssignments` picks this up on load. The Teacher Menu Assign button also writes the same assignment record to local storage. Home should surface assigned learner homework first. If no learner homework is waiting, Home should show Coming Up Next from unfinished current-unit work. Later, assignment state should also sync to Supabase.
 
+On the Neritan Teacher Menu, learner apps do not render as their own cards. The teacher slide card for the same component carries the app controls (Assign/Assigned, Unassign, Review) next to Open and Mark Done. The pairing rule is component naming: teacher `opener` ↔ learner `opener-app` within the same course/level/unit. Register new learner apps with the `{component}-app` component name or their buttons will not appear on the teacher card.
+
 Home current-focus progress counts unique unit components, not raw teacher/learner routes. A teacher slide lesson and a Leo learner app for the same component should appear as one lesson/component in Home progress.
 
 The local assignment/review loop should exist before Supabase is wired: Neritan assigns a learner app, Leo completes it, Neritan reviews saved module/score/caption progress, and the assignment status becomes `reviewed` or `needs-redo`. The local record should stay close to the future Supabase rows.

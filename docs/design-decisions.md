@@ -398,10 +398,11 @@ Examples:
 
 Current teacher tracking:
 
-- Teacher Menu opens all lessons (teacher + learner) grouped by course, level, and unit in one unified list — no separate homework section.
+- Teacher Menu shows only teacher slide cards, grouped by course, level, and unit — Leo's app cards never appear as separate boxes on the Neritan page.
 - Level/unit groups are collapsible because more levels and units will be added.
-- Each lesson card shows Open and Mark Done. Learner-mode cards also show Assign and Review buttons, and inline progress pills (modules done, quiz score).
-- Teacher lessons are marked `Done` by Neritan after teaching. Learner lessons are marked Assigned and then Reviewed after Leo completes them.
+- Each teacher card carries all controls in one place: Open (slides), Assign/Assigned + Unassign (Leo's matching app), Review (Leo's work), and Mark Done.
+- A teacher lesson finds its learner counterpart by component name: teacher `opener` pairs with learner `opener-app` in the same level/unit. Cards with a counterpart also show inline progress pills (modules done, quiz score).
+- Teacher lessons are marked `Done` by Neritan after teaching. Learner apps are marked Assigned and then Reviewed after Leo completes them.
 - First storage is local, but all record shapes map to Supabase later.
 
 Navigation decision:

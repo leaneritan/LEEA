@@ -34,7 +34,10 @@ export function LeoHomeworkHero({ items }: { items: Item[] }) {
   const startLabel = next.progress.completedModules > 0 ? "Keep Going" : "Start";
 
   return (
-    <section className="leo-hero-card" aria-label="Today's homework">
+    <section
+      aria-label="Today's homework"
+      className={`leo-hero-card leo-hero-card-${meta.tone}`}
+    >
       <div className="leo-hero-greeting">
         <span aria-hidden="true">👋</span>
         <span>Hi Leo</span>

@@ -429,7 +429,11 @@ Leo's view design rules (different from Neritan):
 - The Start button stays pill-shaped black with a soft shadow on every tone (one consistent CTA across the whole app).
 - Progress meter uses a single accent gradient bar — not the muted Neritan style.
 - Leo's page should never show "no homework" as a sad empty state. It is always either active (hero + groups) or a positive caught-up moment.
-- Adding a new component type: add the matching `.leo-hero-card-<tone>` block in `globals.css` (sets the four `--hero-*` vars) and add an entry in `getComponentMeta` in `src/components/componentMeta.ts` (the single source of truth — do not add it inside `LeoHomeworkHero.tsx`). Do not introduce per-tone overrides anywhere else — the variable cascade handles everything.
+- Adding a new component type requires three CSS blocks in `globals.css` and one entry in `src/components/componentMeta.ts`:
+  1. `.leo-hero-card-{tone}` — sets `--hero-accent`, `--hero-accent-soft`, `--hero-edge`, `--hero-bg-1`, `--hero-bg-2` for the Leo homework hero
+  2. `.next-card-{tone}` — sets `--next-accent`, `--next-accent-ink`, `--next-accent-deep` for Home's next-up card
+  3. `.leo-app-card-{tone}` — sets `--leo-component`, `--leo-component-soft`, `--leo-component-ink` for Leo's grouped app card list
+  Do not introduce per-tone overrides anywhere else — the variable cascade handles everything.
 - The component label on each card is colored by its component accent (opener gold-deep, vocab green, grammar blue, reading amber, writing plum, mission green) so cards are scannable; the same accent colors the card's left edge. There is no Teacher/Leo badge on this page because every card is a teacher card.
 - Teacher lessons are marked `Done` by Neritan after teaching. Learner apps are marked Assigned and then Reviewed after Leo completes them.
 - First storage is local, but all record shapes map to Supabase later.

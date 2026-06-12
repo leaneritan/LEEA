@@ -1039,11 +1039,13 @@ function checkSplitApp() {
 }
 // Generic quick-check answer handler in scenes
 function qcAnswer(btn, isCorrect, sceneId, saveKey) {
-  const opts = btn.parentElement.querySelectorAll('.mcq-opt');
-  if (Array.from(opts).some(function(o){ return o.disabled; })) return;
-  opts.forEach(function(o){ o.disabled = true; });
+  // Scene already answered correctly — ignore further clicks
+  if (sceneId && document.getElementById(sceneId).classList.contains('opened')) return;
+  // Prevent re-clicking the same button while its feedback is still showing
+  if (btn.disabled) return;
   if (isCorrect) {
     btn.classList.add('ok');
+    btn.parentElement.querySelectorAll('.mcq-opt').forEach(function(o){ o.disabled = true; });
     if (sceneId) {
       document.getElementById(sceneId).classList.add('opened');
       lSave(SAVE_PREFIX + saveKey, true);
@@ -1051,9 +1053,10 @@ function qcAnswer(btn, isCorrect, sceneId, saveKey) {
     }
   } else {
     btn.classList.add('bad');
+    btn.disabled = true;
     setTimeout(function(){
       btn.classList.remove('bad');
-      opts.forEach(function(o){ o.disabled = false; });
+      btn.disabled = false;
     }, 700);
   }
 }
@@ -1140,26 +1143,30 @@ function restoreM3() {
 // M4 — LOOK AND CHECK
 // ═══════════════════════════════
 function lcPickApp(btn, isCorrect) {
-  const opts = document.querySelectorAll('#m4-opts .mcq-opt');
-  if (Array.from(opts).some(function(o){ return o.classList.contains('ok') || o.classList.contains('bad'); })) return;
+  // Already answered correctly — ignore further clicks
+  if (lLoad(SAVE_PREFIX + 'm4-correct', false)) return;
+  // Prevent re-clicking the same button while its feedback is showing
+  if (btn.disabled) return;
   if (isCorrect) {
     btn.classList.add('ok');
     document.getElementById('lc-fb').className = 'mcq-fb show ok';
     document.getElementById('lc-fb').innerHTML = '🎉 YES! The photographer is named <strong>Roie Galitz</strong>! He works in the Arctic. 📷❄️';
     lSave(SAVE_PREFIX + 'm4-answer', 'a photographer ✓');
     lSave(SAVE_PREFIX + 'm4-correct', true);
-    opts.forEach(function(o){ o.disabled = true; });
+    document.querySelectorAll('#m4-opts .mcq-opt').forEach(function(o){ o.disabled = true; });
     const cbtn = document.getElementById('cbtn-m4');
     cbtn.disabled = false;
     cbtn.textContent = 'Mark Look and Check complete ✓';
     updateBadge('m4','prog');
   } else {
     btn.classList.add('bad');
+    btn.disabled = true;
     document.getElementById('lc-fb').className = 'mcq-fb show bad';
     document.getElementById('lc-fb').innerHTML = '❌ Try again! Look carefully — who would be USING the camera? 📷';
     lSave(SAVE_PREFIX + 'm4-attempts', (lLoad(SAVE_PREFIX + 'm4-attempts', 0) || 0) + 1);
     setTimeout(function(){
       btn.classList.remove('bad');
+      btn.disabled = false;
       document.getElementById('lc-fb').classList.remove('show');
     }, 1500);
   }

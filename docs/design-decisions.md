@@ -2,6 +2,29 @@
 
 This file tracks the decisions made before coding.
 
+## Lesson Generation Workflow
+
+Lesson planner PDFs (NatGeo Our World, Joyful Work, etc.) live in `docs/lesson-plans/` and are tracked by Git LFS. Each level has a `planner.pdf` and an `index.json` mapping units and components to PDF page ranges.
+
+The `/generate-lesson` skill reads the planner PDF and generates both the Neritan teacher HTML and Leo's learner app HTML in one step. Page numbers in `index.json` are PDF-internal page numbers (1-indexed). When a unit was first measured from an excerpt PDF, `pdf_offset` is set to 0 until the full level PDF is added and page numbers are updated.
+
+Folder structure:
+
+```text
+docs/lesson-plans/
+  english/
+    our-world/
+      level-1/ … level-6/
+        planner.pdf   (Git LFS — user adds locally)
+        index.json
+        supporting/
+    joyful-work/
+      year-1/ … year-3/
+    training-ground/
+```
+
+PDFs are private (never in a public repo). The user clones locally and pushes via git to add them.
+
 ## Platform
 
 LEEA is one platform with many subjects.

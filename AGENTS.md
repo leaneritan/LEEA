@@ -278,6 +278,61 @@ Navigation must stay consistent across every route.
 - Breadcrumbs should be clickable minimalist buttons.
 - Main/sidebar/breadcrumb labels stay English-only.
 
+## Lesson Generation from Planner PDFs
+
+NatGeo lesson planner PDFs live in `docs/lesson-plans/` organised by subject → course → level (or year). Each level folder holds:
+
+```
+docs/lesson-plans/
+  english/
+    our-world/
+      level-4/
+        planner.pdf       ← added by the user (Git LFS, ~70 MB)
+        index.json        ← maps unit → component → PDF page range
+        supporting/       ← audio scripts, worksheets, etc.
+    joyful-work/
+      year-1/ ...
+    training-ground/ ...
+```
+
+PDFs are tracked with Git LFS via `.gitattributes` (`docs/lesson-plans/**/*.pdf`). The user must add PDFs locally via `git clone` + `git add` + `git push` — they cannot be uploaded through the web UI at 70 MB.
+
+`index.json` format (page numbers are PDF page numbers, 1-indexed from the start of the file):
+
+```json
+{
+  "course": "Our World",
+  "level": 4,
+  "pdf": "planner.pdf",
+  "units": {
+    "u8": {
+      "theme": "That's Really Interesting!",
+      "pdf_offset": 0,
+      "sections": {
+        "opener":    "1-2",
+        "vocab-1":   "3-6",
+        "song":      "7-8",
+        "grammar-1": "9-12",
+        "vocab-2":   "13-14",
+        "grammar-2": "15-16",
+        "reading":   "17-20",
+        "writing":   "21-23"
+      }
+    }
+  }
+}
+```
+
+`pdf_offset` is 0 when the page numbers above are already relative to the full level PDF. If the unit was measured from an excerpt, set `pdf_offset = (unit start page in full PDF) - 1`.
+
+To generate a lesson pair from the planner, run the `/generate-lesson` skill:
+
+```
+/generate-lesson english/our-world/level-4 u8 grammar-1
+```
+
+The skill reads the index, reads the correct PDF pages, extracts content, and generates both the teacher HTML and learner app HTML following all LEEA conventions. Full instructions are in `.claude/commands/generate-lesson.md`.
+
 ## Source Tags
 
 Use exact source tags so duplicate words can appear once in search but retain every source.

@@ -428,8 +428,12 @@ Examples:
 | opener | `public/lessons/ow-l4-u8-opener.html` | `public/learn/ow-l4-u8-opener.html` | `assigned` (auto-seeds) |
 | vocab-1 | `public/lessons/ow-l4-u8-vocab-1.html` | `public/learn/ow-l4-u8-vocab-1.html` | `live` |
 | song | `public/lessons/ow-l4-u8-song.html` | `public/learn/ow-l4-u8-song.html` | `live` |
+| grammar-1 | `public/lessons/ow-l4-u8-grammar-1.html` | `public/learn/ow-l4-u8-grammar-1.html` | not yet built |
+| grammar-2 | `public/lessons/ow-l4-u8-grammar-2.html` | `public/learn/ow-l4-u8-grammar-2.html` | not yet built |
+| reading | `public/lessons/ow-l4-u8-reading.html` | `public/learn/ow-l4-u8-reading.html` | not yet built |
+| writing | `public/lessons/ow-l4-u8-writing.html` | `public/learn/ow-l4-u8-writing.html` | not yet built |
 
-Still to build: grammar-1 (OW4-U8-G1), grammar-2 (OW4-U8-G2), reading, writing.
+Build priority: grammar-1 → grammar-2 → reading → writing.
 
 Current teacher tracking:
 

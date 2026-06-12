@@ -178,6 +178,7 @@ function getLearnerComponentMeta(component: string) {
   if (component.includes("grammar")) return { emoji: "G", label: "Grammar", tone: "grammar" };
   if (component.includes("reading")) return { emoji: "R", label: "Reading", tone: "reading" };
   if (component.includes("writing")) return { emoji: "W", label: "Writing", tone: "writing" };
+  if (component.includes("song")) return { emoji: "🎵", label: "Song", tone: "song" };
   if (component.includes("review")) return { emoji: "OK", label: "Review", tone: "review" };
   return { emoji: "OP", label: "Opener", tone: "opener" };
 }

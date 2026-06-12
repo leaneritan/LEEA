@@ -227,10 +227,14 @@ export type Lesson = {
     homeworkId?: string;
     /** Module done-key pattern appended to storagePrefix. {n} = 1-based, {i} = 0-based. Default "m{n}-done". */
     moduleKeyFormat?: string;
+    /** Explicit per-module done-key suffixes. Takes precedence over moduleKeyFormat. Use when module IDs are non-numeric (e.g. "ma") or the suffix is not "-done". */
+    moduleKeys?: string[];
     /** Display labels per module, in order. Falls back to "Module N". */
     moduleLabels?: string[];
     /** Key appended to storagePrefix that stores Leo's written caption, if the app has one. */
     captionKey?: string;
+    /** Key appended to storagePrefix where the app's quiz score is stored. Default "score". */
+    scoreKey?: string;
   };
   objectives: {
     content: string[];

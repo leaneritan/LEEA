@@ -806,7 +806,44 @@ function initReviewMode() {
 function openModal(id) {
   document.getElementById(id).classList.add('open');
   document.body.style.overflow = 'hidden';
-  if (id === 'm7' && !m7Started) initM7();
+  if (id === 'm7' && !m7Started) {
+    const savedScore = lLoad(SAVE_PREFIX + 'score');
+    if (savedScore && savedScore.done) {
+      // Restore result view from saved score — don't restart the quiz
+      m7Started = true;
+      m7Score = savedScore.score || 0;
+      m7Wrong = savedScore.wrongQuestions || [];
+      restoreM7Result(savedScore);
+    } else {
+      initM7();
+    }
+  }
+}
+function restoreM7Result(savedScore) {
+  const pct = savedScore.percent || Math.round((savedScore.score || 0) / m7Qs.length * 100);
+  const passed = pct >= 80;
+  document.getElementById('m7-progFill').style.width = '100%';
+  document.getElementById('m7-quizArea').style.display = 'none';
+  let html = '<div class="result-box">';
+  html += '<div class="result-score">' + (savedScore.score || 0) + '/' + m7Qs.length + '</div>';
+  html += '<div style="font-size:.95rem;font-weight:800;margin-top:6px;color:' + (passed ? 'var(--gn)' : 'var(--rd)') + '">' + pct + '% — ' + (passed ? '⚽ GOAL!' : 'Try again next time!') + '</div>';
+  html += '<div class="result-bullets">';
+  const wrong = savedScore.wrongQuestions || [];
+  m7Qs.forEach(function(q, i) {
+    const miss = wrong.find(function(w){ return w.question === 'Q' + (i + 1); });
+    if (miss) {
+      html += '<div class="result-bullet bad">❌ Q' + (i + 1) + ': ' + q.q + '<br>You chose: <em>' + miss.chosen + '</em><br>Correct: <strong>' + miss.correct + '</strong></div>';
+    } else {
+      html += '<div class="result-bullet ok">✓ Q' + (i + 1) + ' — correct!</div>';
+    }
+  });
+  html += '</div>';
+  if (passed) html += '<div style="margin-top:12px;font-size:.85rem;font-weight:700;color:var(--gn)">🎉 Brilliant work, Leo! You\'re ready for Vocabulary 1!</div>';
+  else html += '<div style="margin-top:12px;font-size:.85rem;font-weight:700;color:var(--ink2)">Don\'t worry — you can tap ↺ Redo and try again!</div>';
+  html += '</div>';
+  document.getElementById('m7-result').innerHTML = html;
+  document.getElementById('m7-result').style.display = 'block';
+  document.getElementById('m7-bottom').style.display = 'flex';
 }
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
@@ -1365,6 +1402,8 @@ function finishM7() {
   const pct = Math.round(m7Score / m7Qs.length * 100);
   const passed = pct >= 80;
   saveScore(m7Score, true, { wrongQuestions: m7Wrong });
+  // Auto-save m7-done so completedModules counts it without needing the extra button click
+  lSave(SAVE_PREFIX + 'm7-done', true);
   let html = '<div class="result-box">';
   html += '<div class="result-score">' + m7Score + '/' + m7Qs.length + '</div>';
   html += '<div style="font-size:.95rem;font-weight:800;margin-top:6px;color:' + (passed ? 'var(--gn)' : 'var(--rd)') + '">' + pct + '% — ' + (passed ? '⚽ GOAL!' : 'Try again next time!') + '</div>';

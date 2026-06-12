@@ -86,7 +86,18 @@ Reusable activity templates live under two parallel folders: `public/teach/compo
 
 A learner lesson can be auto-assigned by setting its `status` to `assigned` in the lesson JSON — `seedAssignments` picks this up on load. Use `status: "live"` when Neritan should assign it manually from the teacher card instead. Home should show assigned learner homework first; when no homework is waiting, it should show Coming Up Next based on unfinished current-unit work.
 
-Learner app progress is read through `getLearnerAppProgress(source)`. The lesson JSON `source` describes the app's localStorage shape: `storagePrefix`, `moduleCount`, `moduleKeyFormat` (`{n}` 1-based / `{i}` 0-based, default `m{n}-done`), `moduleLabels`, `homeworkId`, and optional `captionKey`. Do not hardcode app-specific keys or labels in TypeScript — they belong in the lesson JSON.
+Learner app progress is read through `getLearnerAppProgress(source)`. The lesson JSON `source` describes the app's localStorage shape:
+
+- `storagePrefix` — the full `leea-…-` prefix the app writes under.
+- `moduleCount` — how many completable activities the app has.
+- `moduleLabels` — display labels per module, in order.
+- `moduleKeyFormat` (default `m{n}-done`, `{n}` 1-based / `{i}` 0-based) — for apps with regular numeric module IDs (opener style).
+- `moduleKeys` — explicit per-module done-key suffixes. **Takes precedence over `moduleKeyFormat`.** Use when module IDs are non-numeric (`"ma"`) or the suffix is not `-done` (e.g. song uses `m1-complete`, `ma-complete`, …).
+- `scoreKey` (default `score`) — the quiz score key suffix when the app stores its score elsewhere (e.g. song stores the quiz at `m6-score`).
+- `homeworkId` — the cloud namespace; also enables the `leea-{homeworkId}-done` "homework finished" flag.
+- `captionKey` — key holding Leo's written caption, if the app has one.
+
+`getLearnerAppProgress` accepts either boolean or `{done, timestamp}` values at module keys (both are truthy when complete). It returns `score` as a **percent**: it prefers `scoreData.percent`, falls back to `Math.round(score/total * 100)` if both are present, and only treats `score` as a percent for legacy apps that store no `total`. Do not hardcode app-specific keys or labels in TypeScript — they belong in the lesson JSON.
 
 Home current-focus progress counts unit components, not every route. If a teacher lesson and Leo learner app cover the same component, such as `opener` and `opener-app`, they count as one lesson/component in the Home progress total.
 

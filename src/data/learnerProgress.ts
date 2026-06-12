@@ -22,25 +22,44 @@ export function getLearnerAppProgress(source: Lesson["source"]): LearnerAppProgr
   }
 
   const keyFormat = source.moduleKeyFormat ?? "m{n}-done";
+  const explicitKeys = source.moduleKeys;
   const modules = Array.from({ length: moduleCount }, (_, index) => {
-    const doneKey = keyFormat.replace("{n}", String(index + 1)).replace("{i}", String(index));
+    const doneKey = explicitKeys?.[index]
+      ?? keyFormat.replace("{n}", String(index + 1)).replace("{i}", String(index));
+    // Apps may store either a raw boolean or a {done, timestamp} object — both are truthy when complete.
     return {
       id: `m${index + 1}`,
       label: source.moduleLabels?.[index] ?? `Module ${index + 1}`,
-      done: loadLocalValue(`${storagePrefix}${doneKey}`, false)
+      done: Boolean(loadLocalValue<unknown>(`${storagePrefix}${doneKey}`, null))
     };
   });
   const completedModules = modules.filter((module) => module.done).length;
-  const scoreData = loadLocalValue<{ score?: number; done?: boolean } | null>(`${storagePrefix}score`, null);
+  const scoreKeyPath = source.scoreKey ?? "score";
+  const scoreData = loadLocalValue<{ score?: number; total?: number; percent?: number; done?: boolean } | null>(
+    `${storagePrefix}${scoreKeyPath}`,
+    null
+  );
   const homeworkDone = source.homeworkId ? loadLocalValue(`leea-${source.homeworkId}-done`, false) : false;
   const done = Boolean(loadLocalValue(`${storagePrefix}done`, false) || scoreData?.done || homeworkDone);
   const caption = source.captionKey ? loadLocalValue(`${storagePrefix}${source.captionKey}`, "") : "";
+
+  // Score is displayed as a percent. Apps may store it as `percent` (canonical)
+  // or as `score` (raw correct count) with `total`. Prefer percent; fall back to
+  // computing it; fall back to treating raw score as percent for legacy apps.
+  let scorePercent: number | null = null;
+  if (typeof scoreData?.percent === "number") {
+    scorePercent = scoreData.percent;
+  } else if (typeof scoreData?.score === "number" && typeof scoreData?.total === "number" && scoreData.total > 0) {
+    scorePercent = Math.round((scoreData.score / scoreData.total) * 100);
+  } else if (typeof scoreData?.score === "number") {
+    scorePercent = scoreData.score;
+  }
 
   return {
     completedModules,
     moduleCount,
     modules,
-    score: typeof scoreData?.score === "number" ? scoreData.score : null,
+    score: scorePercent,
     done,
     caption
   };

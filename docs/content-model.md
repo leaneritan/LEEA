@@ -490,9 +490,13 @@ Learner app `source` fields describe how LEEA reads the app's local progress:
 - `storagePrefix` — full localStorage key prefix the app writes under, such as `leea-4-8-vocab-1-`
 - `moduleCount` — number of modules/tabs
 - `moduleKeyFormat` — done-key pattern appended to the prefix; `{n}` is 1-based, `{i}` is 0-based; default `m{n}-done` (opener style), the vocab app uses `tab-{i}-done`
+- `moduleKeys` — explicit per-module done-key suffixes, takes precedence over `moduleKeyFormat`; use when module IDs are non-numeric (`"ma"`) or the suffix is not `-done` (the song app uses `["m1-complete", "m2-complete", "ma-complete", "m3-complete", "m4-complete", "m5-complete", "m6-complete"]`)
 - `moduleLabels` — display labels per module, in order; falls back to `Module N`
+- `scoreKey` — quiz score key after the prefix, default `score`; the song app stores the quiz at `m6-score`
 - `homeworkId` — the app's homework namespace; LEEA also treats `leea-{homeworkId}-done` as the done flag
 - `captionKey` — key after the prefix holding Leo's written caption, if the app has one (opener: `m5-caption`)
+
+Score is rendered as a percent. The reader prefers `scoreData.percent`, falls back to `Math.round(score / total * 100)` if both are present, and only treats `score` as a percent for legacy apps that omit `total`.
 
 A learner lesson with `status: "live"` is not auto-assigned — Neritan assigns it from the teacher card. Use `status: "assigned"` only when the app should be homework immediately on load.
 

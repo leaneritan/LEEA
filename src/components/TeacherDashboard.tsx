@@ -27,6 +27,7 @@ function componentAccent(component: string): string {
   if (component.startsWith("grammar")) return "#406a9f";
   if (component.startsWith("reading")) return "#a66c3f";
   if (component.startsWith("writing")) return "#6d6875";
+  if (component.startsWith("song")) return "#d94f7b";
   if (component === "mission") return "#237a3a";
   return "var(--hair)";
 }

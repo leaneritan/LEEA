@@ -4,6 +4,7 @@ export type ComponentTone =
   | "grammar"
   | "reading"
   | "writing"
+  | "song"
   | "review";
 
 export type ComponentMeta = {
@@ -22,6 +23,7 @@ export function getComponentMeta(component: string): ComponentMeta {
   if (component.includes("grammar")) return { emoji: "🧩", label: "Grammar", tone: "grammar" };
   if (component.includes("reading")) return { emoji: "📖", label: "Reading", tone: "reading" };
   if (component.includes("writing")) return { emoji: "✏️", label: "Writing", tone: "writing" };
+  if (component.includes("song")) return { emoji: "🎵", label: "Song", tone: "song" };
   if (component.includes("review")) return { emoji: "🔁", label: "Review", tone: "review" };
   return { emoji: "🎯", label: "Activity", tone: "opener" };
 }

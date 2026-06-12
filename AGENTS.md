@@ -82,7 +82,7 @@ Leo's page must feel like Leo's, not a smaller copy of the teacher dashboard. Th
 
 Use `getComponentMeta(component)` from `src/components/componentMeta.ts` as the single source of truth for emoji/label/tone. The Leo hero, Home's `NextCard`, and any future surface that names a lesson must read from it — do not duplicate the emoji/label/tone map. Home's `.next-card` carries the same per-component tone as the Leo hero through `--next-accent` and `--next-accent-deep` so the path from Home → Leo's view stays visually unbroken.
 
-Reusable activity templates live under two parallel folders: `public/teach/components/*` for teacher slide decks (e.g. `charts.js` → `buildDndSorter`) and `public/learn/components/*` for Leo learner apps (e.g. `sunshine.js` → `buildSunshine`). Same self-contained vanilla JS pattern, same `window.build*` global. When a learner app HTML references a `/learn/components/*.js` helper, the file must exist in this repo — content validation does not yet catch dangling references, but the app's init function will silently no-op if the global is undefined. The reusable templates are documented in `docs/chart-templates.md` with API, behaviour, and Codex notes; add a new section there whenever a new template is built. Do not duplicate template logic inline in a lesson HTML when a shared helper exists. The hero is color-coded by lesson component (opener gold, vocab green, grammar blue, reading amber, writing plum, review green) through a single `--hero-accent` CSS variable that drives the left edge, background tint, greeting, meter, and "more" link. Adding a new component type: add a `.leo-hero-card-<tone>` block in `globals.css` and a tone in `getComponentMeta` in `LeoHomeworkHero.tsx`. Do not add competing primary buttons to the hero or restyle Leo's view in the muted Neritan palette.
+Reusable activity templates live under two parallel folders: `public/teach/components/*` for teacher slide decks (e.g. `charts.js` → `buildDndSorter`) and `public/learn/components/*` for Leo learner apps (e.g. `sunshine.js` → `buildSunshine`). Same self-contained vanilla JS pattern, same `window.build*` global. When a learner app HTML references a `/learn/components/*.js` helper, the file must exist in this repo — content validation does not yet catch dangling references, but the app's init function will silently no-op if the global is undefined. The reusable templates are documented in `docs/chart-templates.md` with API, behaviour, and Codex notes; add a new section there whenever a new template is built. Do not duplicate template logic inline in a lesson HTML when a shared helper exists. The hero is color-coded by lesson component (opener gold, vocab green, grammar blue, reading amber, writing plum, song coral/pink `#d94f7b`, review green) through a single `--hero-accent` CSS variable that drives the left edge, background tint, greeting, meter, and "more" link. Adding a new component type: add a `.leo-hero-card-<tone>` block in `globals.css` and add an entry in `getComponentMeta` in `src/components/componentMeta.ts` (the single source of truth — not inside `LeoHomeworkHero.tsx`). Do not add competing primary buttons to the hero or restyle Leo's view in the muted Neritan palette.
 
 A learner lesson can be auto-assigned by setting its `status` to `assigned` in the lesson JSON — `seedAssignments` picks this up on load. Use `status: "live"` when Neritan should assign it manually from the teacher card instead. Home should show assigned learner homework first; when no homework is waiting, it should show Coming Up Next based on unfinished current-unit work.
 
@@ -104,6 +104,18 @@ Home current-focus progress counts unit components, not every route. If a teache
 Before Supabase is connected, Neritan assignment/review uses local storage with Supabase-shaped records. The assignment loop is: Neritan assigns a learner app, Leo completes it, Neritan reviews saved module/score/caption progress, then marks it reviewed or needs redo.
 
 Assignment state is read through the shared helpers `readAssignments(learnerLessons)` and `getOpenAssignmentCount(...)` in `src/data/assignments.ts`. Mutate state only through `assignLesson(lessonId, current)` and `unassignLesson(lessonId, current)` from the same module — they keep an `leea.assignments.unassigned.v1` set so `seedAssignments` does not resurrect an auto-assigned lesson after Neritan explicitly unassigns it. Do not duplicate localStorage read/seed logic inside components. Sidebar and dashboard numbers must come from real records, never hardcoded values. UI typography rule: at most one uppercase letter-spaced label per card region — component labels and group labels are uppercase, meta text and pills are sentence case.
+
+## Current Build Status — Unit 8 (Our World Level 4)
+
+These lesson pairs are registered in `src/data/lessons.ts` and live on the working branch:
+
+| Component | Teacher file | Learner file | Learner status |
+|---|---|---|---|
+| opener | `public/lessons/ow-l4-u8-opener.html` | `public/learn/ow-l4-u8-opener.html` | `assigned` (auto-seeds) |
+| vocab-1 | `public/lessons/ow-l4-u8-vocab-1.html` | `public/learn/ow-l4-u8-vocab-1.html` | `live` (Neritan assigns) |
+| song | `public/lessons/ow-l4-u8-song.html` | `public/learn/ow-l4-u8-song.html` | `live` (Neritan assigns) |
+
+Still to build: grammar-1 (OW4-U8-G1), grammar-2 (OW4-U8-G2), reading, writing.
 
 ## Main Layers
 

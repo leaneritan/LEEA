@@ -496,6 +496,19 @@ Learner app `source` fields describe how LEEA reads the app's local progress:
 - `homeworkId` — the app's homework namespace; LEEA also treats `leea-{homeworkId}-done` as the done flag
 - `captionKey` — key after the prefix holding Leo's written caption, if the app has one (opener: `m5-caption`)
 
+**Song app example** (non-numeric module IDs + non-default score key):
+
+```json
+{
+  "storagePrefix": "leea-4-8-song-",
+  "moduleCount": 7,
+  "moduleKeys": ["m1-complete", "m2-complete", "ma-complete", "m3-complete", "m4-complete", "m5-complete", "m6-complete"],
+  "moduleLabels": ["Listen & Sing", "Song Words", "Academic Words", "Word Review", "Use It Again", "Write a Line", "Quiz"],
+  "scoreKey": "m6-score",
+  "homeworkId": "leo-4-8-song"
+}
+```
+
 Score is rendered as a percent. The reader prefers `scoreData.percent`, falls back to `Math.round(score / total * 100)` if both are present, and only treats `score` as a percent for legacy apps that omit `total`.
 
 A learner lesson with `status: "live"` is not auto-assigned — Neritan assigns it from the teacher card. Use `status: "assigned"` only when the app should be homework immediately on load.

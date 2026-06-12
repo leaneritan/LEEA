@@ -306,7 +306,12 @@ function openModule(id){
   $('mIcon').textContent=m.icon; $('mTitle').textContent=m.title;
   $('mFtr').innerHTML=''; $('mBody').scrollTop=0;
   if(m.dash) renderDash();
-  else if(m.quiz) renderQuiz();
+  else if(m.quiz){
+    // If quiz already completed, restore result view — don't restart from zero
+    const sc=lLoad(SAVE_PREFIX+m.id+'-score');
+    if(sc && sc.done) renderQuizReview();
+    else renderQuiz();
+  }
   else { renderModule(id); renderFooter(m); }
   $('modal').classList.add('open');
 }
@@ -532,6 +537,9 @@ function renderQuizReview(){
   if(!sc||!sc.done){ body.innerHTML=`<div class="note" style="font-size:16px">Quiz not done yet.</div>`; return; }
   body.innerHTML=`<div class="quiz-result"><div class="qpct">${sc.percent}%</div><div style="font-weight:700">${sc.score} / ${sc.total} correct</div></div>
     ${wrong.length?`<div class="klabel">Words to practice</div><div class="wrongs">${wrong.map(w=>`<div class="wrong-item"><div class="wp">${w.prompt}</div>Leo chose: <span class="wc">${w.chosen}</span><br>Answer: <span class="wok">${w.correct}</span></div>`).join('')}</div>`:`<div class="note">Perfect — no wrong answers! 🏆</div>`}`;
+  if(!isReview){
+    $('mFtr').innerHTML=`<button class="btn-complete" onclick="closeModal()">Close</button><button class="btn-redo" onclick="renderQuiz()">↺ Redo quiz</button>`;
+  }
 }
 
 /* ---- Progress dashboard (m7) ---- */

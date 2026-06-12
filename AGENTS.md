@@ -99,6 +99,53 @@ Learner app progress is read through `getLearnerAppProgress(source)`. The lesson
 
 `getLearnerAppProgress` accepts either boolean or `{done, timestamp}` values at module keys (both are truthy when complete). It returns `score` as a **percent**: it prefers `scoreData.percent`, falls back to `Math.round(score/total * 100)` if both are present, and only treats `score` as a percent for legacy apps that store no `total`. Do not hardcode app-specific keys or labels in TypeScript — they belong in the lesson JSON.
 
+### Learner app save/restore contract
+
+Every module or quiz in a learner HTML app must follow this contract:
+
+**1. Auto-save the done-key when the module finishes.**
+The completion function (e.g. `finishQuiz()`, `finish()`) must save the module's done-key immediately — do not rely on the student clicking a "Mark complete" button to write that key. `getLearnerAppProgress` reads the done-key to count `completedModules`; if the key is missing, the teacher card shows the wrong count.
+
+```js
+// At the end of the quiz finish function:
+lSave(SAVE_PREFIX + 'm7-done', true);       // opener pattern
+lSave(SAVE_PREFIX + 'm6-complete', {...});   // song/vocab pattern
+```
+
+**2. Persist quiz score to localStorage when the quiz finishes.**
+Call `saveScore(score, total, true, { ...extra })` inside the quiz finish function so the result can be restored. Do not only display the result — always write it.
+
+**3. Restore result view on modal/tab reopen — never restart a completed module from zero.**
+When a modal opens or a tab switches to a completed module, check for saved state first. If `score.done === true` (or `moduleId-complete` exists), show the result view using a dedicated `restoreXResult()` function. Only call `initX()` (which resets everything) when there is no saved state or the user explicitly taps ↺ Redo.
+
+```js
+// Modal pattern (opener style):
+function openModal(id) {
+  if (id === 'm7' && !m7Started) {
+    const saved = lLoad(SAVE_PREFIX + 'score');
+    if (saved && saved.done) restoreM7Result(saved);
+    else initM7();
+  }
+  ...
+}
+
+// Tab pattern (vocab style):
+window.showTab = function(n) {
+  origShowTab(n);
+  if (n === 11) { if (!restoreQuizResult()) initQuiz(); }
+  ...
+};
+```
+
+**4. ↺ Redo clears saved state before re-initializing.**
+The redo path must remove the saved score and done-key before calling `initX()`, otherwise the restore check will immediately show the old result again.
+
+```js
+// "Try again" inline button:
+onclick="lSave('score', null); initQuiz()"
+// or doRedo / resetModule clears: localStorage.removeItem('leea-' + prefix + 'score')
+```
+
 Home current-focus progress counts unit components, not every route. If a teacher lesson and Leo learner app cover the same component, such as `opener` and `opener-app`, they count as one lesson/component in the Home progress total.
 
 Before Supabase is connected, Neritan assignment/review uses local storage with Supabase-shaped records. The assignment loop is: Neritan assigns a learner app, Leo completes it, Neritan reviews saved module/score/caption progress, then marks it reviewed or needs redo.

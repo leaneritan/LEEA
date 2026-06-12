@@ -573,7 +573,7 @@ body{display:flex;flex-direction:column}
     <div id="quiz-qwrap" style="display:flex;flex-direction:column;gap:14px"></div>
     <div id="quiz-result" style="display:none" class="card card-green">
       <div style="font-size:24px;font-weight:800;text-align:center;color:var(--green-d)" id="quiz-result-text"></div>
-      <div style="text-align:center;margin-top:8px"><button onclick="initQuiz()" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:10px 24px;font-size:15px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif">🔄 Try again</button></div>
+      <div style="text-align:center;margin-top:8px"><button onclick="lSave('score',null);initQuiz()" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:10px 24px;font-size:15px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif">🔄 Try again</button></div>
     </div>
   </div>
   <div class="tab-footer">
@@ -1482,6 +1482,20 @@ function showQuizResult() {
   document.querySelector('#quiz-result div:nth-child(2)').textContent = sub;
   document.getElementById('quiz-result').style.display = 'block';
   document.getElementById('quiz-result').scrollIntoView({behavior:'smooth'});
+  // Persist result so tab restore can show it instead of restarting the quiz
+  saveScore(quizScoreVal, 14, true, { quizTrophy: trophy, quizText: text, quizSub: sub });
+}
+function restoreQuizResult() {
+  const sc = lLoad('score');
+  if (!sc || !sc.done) return false;
+  // Restore the score display and result panel without resetting
+  document.getElementById('quiz-score-disp').textContent = sc.score + ' / 14';
+  document.getElementById('quiz-progress').style.width = '100%';
+  document.getElementById('quiz-result-text').textContent = sc.quizTrophy ? (sc.quizTrophy + ' ' + sc.quizText) : (sc.score + '/14 — ' + sc.percent + '%');
+  const sub = document.querySelector('#quiz-result div:nth-child(2)');
+  if (sub && sc.quizSub) sub.textContent = sc.quizSub;
+  document.getElementById('quiz-result').style.display = 'block';
+  return true;
 }
 
 // ── TAB 12: DRIBBLE ──────────────────────────────────────────
@@ -1554,7 +1568,7 @@ window.showTab = function(n) {
   if (n === 8) { matchRound=0; matchTotalDone=0; document.getElementById('match-tbody').innerHTML=''; startMatchRound(0); }
   if (n === 9) initSunshine();
   if (n === 10) { wuIdx=0; renderWrapUp(); }
-  if (n === 11) initQuiz();
+  if (n === 11) { if (!restoreQuizResult()) initQuiz(); }
   if (n === 12) initDribble();
 };
 

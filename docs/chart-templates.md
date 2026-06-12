@@ -2,7 +2,64 @@
 
 These National Geographic graphic organizers should become reusable LEEA chart templates.
 
+## Component Locations
+
+Reusable templates live under two parallel folders, depending on which surface they're for:
+
+- `public/teach/components/*` — used by Neritan's teacher slide decks under `public/lessons/*.html`
+- `public/learn/components/*` — used by Leo's learner apps under `public/learn/*.html`
+
+Same naming style, same self-contained vanilla JS. Each template file exposes one or two `window.build*` functions and an internal config store keyed by element id.
+
 ## Implemented Templates
+
+### `sunshine` — Sunshine Organizer (graphic organizer)
+
+**File:** `public/learn/components/sunshine.js`
+**Surface:** Leo learner apps
+**First used in:** OW L4 U8 Vocabulary 1 Leo app (`public/learn/ow-l4-u8-vocab-1.html`) Tab 9 — "Apply"
+**Based on:** the classic Cengage 6-ray WHO / WHAT / WHEN / WHERE / WHY / HOW organizer, generalized to N rays (3–8)
+
+#### API
+
+```js
+// Load once in <head>:
+// <script src="/learn/components/sunshine.js"></script>
+
+el.innerHTML = buildSunshine({
+  id:          'sunshine-svg',    // unique string per page
+  words:       [                  // one entry per ray (3–8)
+    { word: 'collect', emoji: '🗂️' },
+    { word: 'creative', emoji: '🎨' },
+    // ...
+  ],
+  centerLabel: 'My Questions',    // text inside the center sun
+  centerEmoji: '☀️',              // optional, defaults to ☀️
+  centerHint:  'Tap a ray',       // optional small caption
+  saved:       { 0: 'his answer' }, // truthy entries render the green-check filled state
+  onSelect:    (i, word) => openEditor(i)   // ray tap / Enter / Space
+  // angles:   [-90, -18, 54, 126, 198]   // optional override; defaults to evenly spaced from top
+});
+```
+
+#### Behaviour
+
+- N triangular rays around a center sun, evenly spaced by default.
+- Each ray shows a curved word label (SVG `<textPath>`) along the inner arc + a large emoji along the ray.
+- Center shows the optional emoji, label, and hint.
+- Rays cycle through a warm sun palette (gold / amber / coral / honey / peach / butter).
+- `saved[i]` truthy → ray renders with a slightly more saturated fill and a green check badge near the tip.
+- Hover or keyboard-focus on a ray: subtle scale-up + brightness pop. `prefers-reduced-motion` is respected.
+- Each ray is a button (tap + Enter + Space) with an `aria-label`.
+
+#### Notes for Codex
+
+- Single global exposed: `window.buildSunshine` (plus internal `window._sunshineSelect` click bridge).
+- Configs are stored by id inside the IIFE, so re-rendering the same id (after `saved` updates) preserves the `onSelect` callback.
+- SVG is responsive: `max-width: 560px; width: 100%; height: auto`. Embed inside a centered flex container.
+- For 6 rays use Cengage labels (`WHO?` / `WHAT?` / …). For vocabulary, themes, or any 3–8 prompt set, just pass the right words.
+
+---
 
 ### `dnd-sorter` — Drag-and-Drop Column Sorter
 

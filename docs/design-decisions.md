@@ -489,6 +489,24 @@ Details live in:
 docs/chart-templates.md
 ```
 
+## Learner App Quiz and Module Save Rules
+
+Every interactive module or quiz in a Leo learner HTML app must follow these rules. Violations cause the student to lose their result on page reload and the teacher card to show the wrong progress count.
+
+**Rule 1 — Save the done-key automatically when a module finishes.**
+The completion function must write the module's done-key. Do not wait for the student to click "Mark complete" — the key must be saved at finish time so `getLearnerAppProgress` counts it in `completedModules`.
+
+**Rule 2 — Save quiz score to localStorage when the quiz ends.**
+Call `saveScore(score, total, true, { ...extras })` inside the quiz finish function. The extras (trophy, text, sub, wrongQuestions) let the restore path regenerate the result view without re-running the quiz.
+
+**Rule 3 — Restore result view on reopen, never restart.**
+When a modal opens or tab switches to a module that has saved state, show the result view (via a dedicated `restoreXResult()` function). Only call `initX()` when there is no saved state or the user explicitly tapped ↺ Redo.
+
+**Rule 4 — ↺ Redo clears saved state before re-initializing.**
+Remove the saved score and done-key before calling `initX()` so the restore check does not immediately show the old result. The doRedo / resetModule path is the only entry point to `initX()`.
+
+These rules were added after finding the same bug independently in the opener (m7), song (m6), and vocab (tab 11) apps.
+
 ## Registry
 
 The dashboard should read a registry.

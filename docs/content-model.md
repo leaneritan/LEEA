@@ -111,6 +111,24 @@ Japanese fields are required for learning cards and charts. They should not be l
 
 Cards and charts read the global Japanese ON/OFF setting from the app shell. Avoid duplicate per-card Japanese toggles.
 
+### Vocabulary JSON structure
+
+The unit vocabulary JSON (`vocabulary.json`) uses named word-list ID arrays that the validator checks:
+
+```json
+{
+  "wordIds":         ["..."],   // all word IDs in this unit
+  "vocab1WordIds":   ["..."],   // tag OW4-U8-V1
+  "vocab2WordIds":   ["..."],   // tag OW4-U8-V2
+  "academicWordIds": ["..."],   // type: "academic"
+  "contentWordIds":  ["..."],   // type: "content"
+  "relatedWordIds":  ["..."],   // type: "related"
+  "words":           [...]      // the full card objects
+}
+```
+
+Every word ID must appear in `wordIds` AND in `content/subjects/english/reference/vocabulary-index.json`. The validator will fail if they are out of sync.
+
 ## Reference Browse Tree
 
 Reference opens in source-tree mode by default.
@@ -339,6 +357,8 @@ wordsToReview = 42
 
 Later these should be calculated from reference data plus Leo's Supabase progress/confidence records.
 
+`src/data/registry.ts` also exports `academyStats` which includes `liveLessons` and `assignedLessons`. These two fields are currently hardcoded placeholder stubs (`liveLessons: 3`, `assignedLessons: 2`) — they are not wired to real lesson or assignment data yet. Do not copy these hardcoded values into other components. When the stats UI is built, replace them with computed values from `lessons.ts` and `assignments.ts`.
+
 ## Grammar Reference
 
 Grammar points live separately from vocabulary and can be reused at the top of every grammar practice tab.
@@ -432,6 +452,8 @@ OW4-U8-G2 - Direct and indirect objects
   ]
 }
 ```
+
+The `chart` field may optionally include a `workbookChart` object (`GrammarWorkbookChart`) when the source is a workbook answer key. `workbookChart` holds the structured table (label, columns, rows, rule, and a `seeHowItWorks` block) so the renderer can display the original workbook chart layout. The plain `chart` fields (`intro_examples`, `rows`, `note_rule`) are always required alongside it.
 
 Grammar cards always use the four-tab model:
 

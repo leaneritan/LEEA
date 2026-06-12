@@ -105,6 +105,12 @@ Before Supabase is connected, Neritan assignment/review uses local storage with 
 
 Assignment state is read through the shared helpers `readAssignments(learnerLessons)` and `getOpenAssignmentCount(...)` in `src/data/assignments.ts`. Mutate state only through `assignLesson(lessonId, current)` and `unassignLesson(lessonId, current)` from the same module — they keep an `leea.assignments.unassigned.v1` set so `seedAssignments` does not resurrect an auto-assigned lesson after Neritan explicitly unassigns it. Do not duplicate localStorage read/seed logic inside components. Sidebar and dashboard numbers must come from real records, never hardcoded values. UI typography rule: at most one uppercase letter-spaced label per card region — component labels and group labels are uppercase, meta text and pills are sentence case.
 
+Teacher lesson "Mark Done" state is tracked separately in `src/data/lessonProgress.ts`. It uses `leea.lessonProgress.v1` in localStorage and stores `LessonProgressRecord` objects shaped to match a future Supabase row (`lessonId`, `teacherId`, `studentId`, `status`, `completedAt`, `updatedAt`).
+
+`src/data/registry.ts` holds named stat variables (`totalWords`, `grammarPoints`, `knownWords`, `wordsToReview`) plus `academyStats`. The `liveLessons` and `assignedLessons` fields in `academyStats` are currently hardcoded stub values — they must be replaced with real computed counts before the stats section can be trusted. Do not add new hardcoded numbers here; wire to real lesson and assignment data instead.
+
+Leo's app card list uses a third CSS variable layer: `.leo-app-card-{tone}` classes set `--leo-component`, `--leo-component-soft`, and `--leo-component-ink` on each card. The tone comes from `getComponentMeta(lesson.component).tone`. All three surfaces (Leo hero `--hero-accent`, Home next-card `--next-accent`/`--next-accent-deep`, Leo app card `--leo-component`) are driven by `getComponentMeta` — do not add per-surface hardcoded color maps.
+
 ## Current Build Status — Unit 8 (Our World Level 4)
 
 These lesson pairs are registered in `src/data/lessons.ts` and live on the working branch:

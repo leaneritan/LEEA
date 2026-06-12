@@ -157,7 +157,7 @@ Story / sequence templates:
 Compare / classify templates:
 
 - T-chart
-- two-column chart
+- two-column chart ✓ built — `public/teach/components/charts.js` (`buildDndSorter`)
 - three-column chart
 - Venn diagram 2 circles
 - Venn diagram 3 circles
@@ -365,7 +365,7 @@ Training Ground:
 Start with the chart templates that are most likely to repeat:
 
 1. T-chart
-2. two-column chart
+2. two-column chart ✓ built — `public/teach/components/charts.js` (`buildDndSorter`)
 3. three-column chart
 4. word web
 5. KWL chart

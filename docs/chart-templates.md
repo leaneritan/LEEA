@@ -147,7 +147,7 @@ Pie templates:
 Map / web templates:
 
 - spider map
-- sunshine organizer
+- sunshine organizer ✓ built — `public/learn/components/sunshine.js`
 - word web
 
 Story / sequence templates:

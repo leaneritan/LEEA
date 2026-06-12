@@ -393,10 +393,20 @@ Examples:
 - Unit Opener: photo discussion, caption writing
 - Vocabulary: word cards, games, sorting, quizzes
 - Grammar: chart, notice, build, fix, use
-- Song: lyrics, listening, vocabulary, activity
+- Song: karaoke word-tap, song-word carousel (chorus/verse/rhyme), academic-word carousel, vocab-game carousel, use-it-again swap, write-a-line, quiz
 - Reading: text, comprehension, graphic literacy
 - Junior High: word order, grammar, translation, self-expression, test practice
 - Training Ground: focused skill drills for weak points
+
+### Unit 8 current build status
+
+| Component | Teacher lesson | Leo app | Leo status |
+|---|---|---|---|
+| opener | `public/lessons/ow-l4-u8-opener.html` | `public/learn/ow-l4-u8-opener.html` | `assigned` (auto-seeds) |
+| vocab-1 | `public/lessons/ow-l4-u8-vocab-1.html` | `public/learn/ow-l4-u8-vocab-1.html` | `live` |
+| song | `public/lessons/ow-l4-u8-song.html` | `public/learn/ow-l4-u8-song.html` | `live` |
+
+Still to build: grammar-1 (OW4-U8-G1), grammar-2 (OW4-U8-G2), reading, writing.
 
 Current teacher tracking:
 
@@ -419,7 +429,7 @@ Leo's view design rules (different from Neritan):
 - The Start button stays pill-shaped black with a soft shadow on every tone (one consistent CTA across the whole app).
 - Progress meter uses a single accent gradient bar — not the muted Neritan style.
 - Leo's page should never show "no homework" as a sad empty state. It is always either active (hero + groups) or a positive caught-up moment.
-- Adding a new component type: add the matching `.leo-hero-card-<tone>` block in `globals.css` (sets the four `--hero-*` vars) and a tone in `getComponentMeta` in `LeoHomeworkHero.tsx`. Do not introduce per-tone overrides anywhere else — the variable cascade handles everything.
+- Adding a new component type: add the matching `.leo-hero-card-<tone>` block in `globals.css` (sets the four `--hero-*` vars) and add an entry in `getComponentMeta` in `src/components/componentMeta.ts` (the single source of truth — do not add it inside `LeoHomeworkHero.tsx`). Do not introduce per-tone overrides anywhere else — the variable cascade handles everything.
 - The component label on each card is colored by its component accent (opener gold-deep, vocab green, grammar blue, reading amber, writing plum, mission green) so cards are scannable; the same accent colors the card's left edge. There is no Teacher/Leo badge on this page because every card is a teacher card.
 - Teacher lessons are marked `Done` by Neritan after teaching. Learner apps are marked Assigned and then Reviewed after Leo completes them.
 - First storage is local, but all record shapes map to Supabase later.

@@ -75,7 +75,8 @@ Each word becomes one object in `words[]`. Use the clean schema only — do not 
 Notes:
 - `id` uses `global_` prefix so the same word in another unit becomes a second `sources[]` entry on the same card — never a duplicate card
 - `normalizedWord` is the word in lowercase, no punctuation, multi-word phrases joined with spaces (`take photos`)
-- `displayEmoji` is the visual; `emojiDescription` is what the emoji shows
+- `displayEmoji` is the visual; one emoji is the common case, but the field is a plain string — multi-emoji values like `"🔋⚡"` are allowed when two emojis help picture the word
+- `emojiDescription` is what the emoji shows
 - `japanese.needsReview: true` until the parent has confirmed the Japanese
 - `tags[]` should include the type, the component name, a topical tag, and the source tag
 

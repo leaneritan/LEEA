@@ -37,6 +37,35 @@ Set the component CSS tone via `getComponentMeta()` in `src/components/component
 | writing | plum | ✍️ |
 
 Three CSS variable surfaces use the tone: the Leo homework hero (`--hero-accent`), Home's next-card (`--next-accent`), and the Leo app card list (`--leo-component`). See `globals.css` for the variable cascade.
+## Canonical NatGeo lesson phases per component
+
+Every Our World unit follows the same component-phase pattern. The teacher slideshow has one slide (or small slide group) per phase; the Leo app has one module per phase. The phase names below are the canonical NatGeo names — match them in slide labels, Leo module IDs, and lesson HTML.
+
+| Component | Phases (in order) |
+|---|---|
+| **opener** | Introduce (Activate Prior Knowledge + Build Background) + Be the Expert |
+| **vocab-1** | Warm Up → Present → Practice → Apply → Extend → Wrap Up → Recap |
+| **song** | Use the Song + Use It Again (recycles Vocab 1 and previews Grammar 1 only — never Grammar 2) |
+| **grammar-1** | Warm Up → Present → Practice → Apply → Extend → Wrap Up → Recap + Grammar in Depth |
+| **grammar-2** | Warm Up → Present → Practice → Apply → Extend → Wrap Up → Recap + Grammar in Depth |
+| **vocab-2** | Warm Up → Present → Practice → Apply → Extend → Wrap Up (no Recap) |
+| **reading** | Warm Up → Present → Practice → Apply → Extend → Recap → Wrap Up (Recap is before Wrap Up here; Think Aloud sits inside Present in some units, not a separate phase) |
+| **writing** | Warm Up → Present → Read the Model → Plan → Write → Edit → Share |
+| **mission** | Think → Pair → Share + Be the Expert (About the Photo + Meet the Explorer) |
+| **project** | Prepare → Share → Modify |
+| **book-reading** | Before You Read → While You Read → After You Read |
+
+Notes:
+
+- These phases are the **truth** — they come from the NatGeo Our World lesson planner. When the planner page for a unit shows the same phase names, the slideshow and Leo app use them verbatim. Do not rename phases (e.g. don't change "Practice" to "Try It Out").
+- The Be the Expert sidebar in opener and mission becomes a final slide/module ("About the Photo" / "Meet the Explorer") — it is not a teacher-only note.
+- The vocab-2 phase list deliberately ends at Wrap Up. Vocab 2 has no Recap because the unit's review work happens in Reading and Writing.
+- Reading flips the usual order: Recap comes BEFORE Wrap Up.
+- Song only previews Grammar 1 and recycles Vocab 1. Do not include Grammar 2 content in song slides or the song Leo app.
+
+These phases drive what goes in each Leo app shell below. The shell adds vocab review / academic / content / formative assessment modules around the canonical phases when the content fits.
+
+**Verification status:** the phase list was verified against Our World Level 4, Units 1, 4, 7, and 8 (planner.pdf pages 38–39, 134–135, 230–251, 260–282). Cross-level checks (Levels 1, 2, 3, 5, 6) are pending — those planner PDFs have not been pushed yet. The Level 4 pattern is expected to hold across levels because NatGeo Our World uses one consistent lesson architecture; re-verify when each level's PDF arrives and update this section if any level deviates.
 
 ## Locked module structures
 

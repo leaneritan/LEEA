@@ -2,6 +2,29 @@
 
 This file tracks the decisions made before coding.
 
+## Lesson Generation Workflow
+
+Lesson planner PDFs (NatGeo Our World, Joyful Work, etc.) live in `docs/lesson-plans/` and are tracked by Git LFS. Each level has a `planner.pdf` and an `index.json` mapping units and components to PDF page ranges.
+
+The `/generate-lesson` skill reads the planner PDF and generates both the Neritan teacher HTML and Leo's learner app HTML in one step. Page numbers in `index.json` are PDF-internal page numbers (1-indexed). When a unit was first measured from an excerpt PDF, `pdf_offset` is set to 0 until the full level PDF is added and page numbers are updated.
+
+Folder structure:
+
+```text
+docs/lesson-plans/
+  english/
+    our-world/
+      level-1/ … level-6/
+        planner.pdf   (Git LFS — user adds locally)
+        index.json
+        supporting/
+    joyful-work/
+      year-1/ … year-3/
+    training-ground/
+```
+
+PDFs are private (never in a public repo). The user clones locally and pushes via git to add them.
+
 ## Platform
 
 LEEA is one platform with many subjects.
@@ -59,6 +82,8 @@ When a subject is collapsed, only the subject card/header is visible.
 When a subject is expanded, its courses/modules are visible.
 
 The app should remember each user's collapsed/expanded preference. First version can store this locally; later Supabase can store it per user.
+
+Dashboard and sidebar numbers must be real data, never hardcoded placeholders. The sidebar "Leo's Progress" count reads open assignments (status `assigned` or `needs-redo`) from the shared `readAssignments`/`getOpenAssignmentCount` helpers in `src/data/assignments.ts`. All components read assignment state through those helpers — do not re-implement localStorage reads per component.
 
 Home should also show useful overview numbers, such as:
 
@@ -391,17 +416,54 @@ Examples:
 - Unit Opener: photo discussion, caption writing
 - Vocabulary: word cards, games, sorting, quizzes
 - Grammar: chart, notice, build, fix, use
-- Song: lyrics, listening, vocabulary, activity
+- Song: karaoke word-tap, song-word carousel (chorus/verse/rhyme), academic-word carousel, vocab-game carousel, use-it-again swap, write-a-line, quiz
 - Reading: text, comprehension, graphic literacy
 - Junior High: word order, grammar, translation, self-expression, test practice
 - Training Ground: focused skill drills for weak points
 
+### Unit 8 current build status
+
+| Component | Teacher lesson | Leo app | Leo status |
+|---|---|---|---|
+| opener | `public/lessons/ow-l4-u8-opener.html` | `public/learn/ow-l4-u8-opener.html` | `assigned` (auto-seeds) |
+| vocab-1 | `public/lessons/ow-l4-u8-vocab-1.html` | `public/learn/ow-l4-u8-vocab-1.html` | `live` |
+| song | `public/lessons/ow-l4-u8-song.html` | `public/learn/ow-l4-u8-song.html` | `live` |
+| grammar-1 | `public/lessons/ow-l4-u8-grammar-1.html` | `public/learn/ow-l4-u8-grammar-1.html` | not yet built |
+| grammar-2 | `public/lessons/ow-l4-u8-grammar-2.html` | `public/learn/ow-l4-u8-grammar-2.html` | not yet built |
+| reading | `public/lessons/ow-l4-u8-reading.html` | `public/learn/ow-l4-u8-reading.html` | not yet built |
+| writing | `public/lessons/ow-l4-u8-writing.html` | `public/learn/ow-l4-u8-writing.html` | not yet built |
+
+Build priority: grammar-1 → grammar-2 → reading → writing.
+
 Current teacher tracking:
 
-- Teacher Menu opens lessons grouped by course, level, and unit.
-- Level/unit groups in the Teacher Menu should be collapsible because more levels and units will be added.
-- Teacher lessons can be marked `Done`.
-- First storage can be local, but the record shape should map to Supabase later.
+- Teacher Menu shows only teacher slide cards, grouped by course, level, and unit — Leo's app cards never appear as separate boxes on the Neritan page.
+- Level/unit groups are collapsible because more levels and units will be added.
+- Each teacher card carries all controls in one place: Open (slides) and Mark Done are the teaching controls; Assign/Assigned, Review, and Unassign live inside a tinted "Leo's App" group box so app controls are visually separate from teaching controls.
+- A teacher lesson finds its learner counterpart by component name: teacher `opener` pairs with learner `opener-app` in the same level/unit. Cards with a counterpart show a "Leo's App" label plus inline progress pills (modules done, quiz score).
+- Button hierarchy: Open is the primary black button; Mark Done is a standard outline button; app-group buttons are compact; Unassign is a quiet underlined ghost button because it is a rare corrective action.
+- Typography rule: at most one uppercase label per card region. The component label (card top) and the "Leo's App" group label stay uppercase; meta text, progress pills, and group-header counts use sentence case. Do not add new uppercase/letter-spaced styles without removing one.
+
+Leo's view design rules (different from Neritan):
+
+- Leo's page must feel like Leo's, not like a smaller copy of the teacher dashboard. Warm tinted surfaces, bigger numbers, fewer words.
+- Top of `/leo` is a `LeoHomeworkHero` card with three states: one assignment (giant title + Start/Keep Going button), multiple assignments (same card + "and X more" link to the rest), and caught-up (celebratory empty state with reference link).
+- The grouped browser below the hero is Leo's **full library**: it lists every learner app, not only the currently assigned ones. The hero handles "what to do now"; the list handles "everything you can revisit." Apps that are not currently assigned render with the `leo-app-card-available` modifier (softer cream background, hair-thin left edge, no shadow on the Open App button) so they do not compete with active homework. Done apps get a `leo-app-card-done` quiet green accent. Status text is honest: "Not assigned" when there is no assignment record, not a misleading "Assigned".
+- The hero greets ("Hi Leo 👋"), names the component with an emoji chip, shows a single progress meter, and offers one big action. No secondary buttons compete with Start.
+- The hero is **color-coded by lesson component** so Leo can spot what kind of work today is before reading: opener gold, vocab green, grammar blue, reading amber, writing plum, song coral/pink, review green. The caught-up state uses its own celebratory green.
+- Color is applied via a single `--hero-accent` CSS variable that drives the colored left edge (10 px), a soft radial gradient in the background, the greeting, the progress meter bar and percent number, and the "and X more" link. Background tones stay pale so the white-on-black Start button still reads as the loudest element.
+- Home's "next-up" aside (`.next-card`) carries the **same per-component tone** so the path from Home to Leo's view feels unbroken. The next-card stays dark (Home is the parent's overview, not Leo's playspace), but the colored left edge, top-label color, and primary-button color all match the lesson's tone via `--next-accent` and `--next-accent-deep`. Any future surface that names a lesson should reuse `getComponentMeta` from `src/components/componentMeta.ts` — do not duplicate the emoji/label/tone map.
+- The Start button stays pill-shaped black with a soft shadow on every tone (one consistent CTA across the whole app).
+- Progress meter uses a single accent gradient bar — not the muted Neritan style.
+- Leo's page should never show "no homework" as a sad empty state. It is always either active (hero + groups) or a positive caught-up moment.
+- Adding a new component type requires three CSS blocks in `globals.css` and one entry in `src/components/componentMeta.ts`:
+  1. `.leo-hero-card-{tone}` — sets `--hero-accent`, `--hero-accent-soft`, `--hero-edge`, `--hero-bg-1`, `--hero-bg-2` for the Leo homework hero
+  2. `.next-card-{tone}` — sets `--next-accent`, `--next-accent-ink`, `--next-accent-deep` for Home's next-up card
+  3. `.leo-app-card-{tone}` — sets `--leo-component`, `--leo-component-soft`, `--leo-component-ink` for Leo's grouped app card list
+  Do not introduce per-tone overrides anywhere else — the variable cascade handles everything.
+- The component label on each card is colored by its component accent (opener gold-deep, vocab green, grammar blue, reading amber, writing plum, mission green) so cards are scannable; the same accent colors the card's left edge. There is no Teacher/Leo badge on this page because every card is a teacher card.
+- Teacher lessons are marked `Done` by Neritan after teaching. Learner apps are marked Assigned and then Reviewed after Leo completes them.
+- First storage is local, but all record shapes map to Supabase later.
 
 Navigation decision:
 
@@ -453,6 +515,24 @@ Details live in:
 ```text
 docs/chart-templates.md
 ```
+
+## Learner App Quiz and Module Save Rules
+
+Every interactive module or quiz in a Leo learner HTML app must follow these rules. Violations cause the student to lose their result on page reload and the teacher card to show the wrong progress count.
+
+**Rule 1 — Save the done-key automatically when a module finishes.**
+The completion function must write the module's done-key. Do not wait for the student to click "Mark complete" — the key must be saved at finish time so `getLearnerAppProgress` counts it in `completedModules`.
+
+**Rule 2 — Save quiz score to localStorage when the quiz ends.**
+Call `saveScore(score, total, true, { ...extras })` inside the quiz finish function. The extras (trophy, text, sub, wrongQuestions) let the restore path regenerate the result view without re-running the quiz.
+
+**Rule 3 — Restore result view on reopen, never restart.**
+When a modal opens or tab switches to a module that has saved state, show the result view (via a dedicated `restoreXResult()` function). Only call `initX()` when there is no saved state or the user explicitly tapped ↺ Redo.
+
+**Rule 4 — ↺ Redo clears saved state before re-initializing.**
+Remove the saved score and done-key before calling `initX()` so the restore check does not immediately show the old result. The doRedo / resetModule path is the only entry point to `initX()`.
+
+These rules were added after finding the same bug independently in the opener (m7), song (m6), and vocab (tab 11) apps.
 
 ## Registry
 

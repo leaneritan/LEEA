@@ -111,6 +111,24 @@ Japanese fields are required for learning cards and charts. They should not be l
 
 Cards and charts read the global Japanese ON/OFF setting from the app shell. Avoid duplicate per-card Japanese toggles.
 
+### Vocabulary JSON structure
+
+The unit vocabulary JSON (`vocabulary.json`) uses named word-list ID arrays that the validator checks:
+
+```json
+{
+  "wordIds":         ["..."],   // all word IDs in this unit
+  "vocab1WordIds":   ["..."],   // tag OW4-U8-V1
+  "vocab2WordIds":   ["..."],   // tag OW4-U8-V2
+  "academicWordIds": ["..."],   // type: "academic"
+  "contentWordIds":  ["..."],   // type: "content"
+  "relatedWordIds":  ["..."],   // type: "related"
+  "words":           [...]      // the full card objects
+}
+```
+
+Every word ID must appear in `wordIds` AND in `content/subjects/english/reference/vocabulary-index.json`. The validator will fail if they are out of sync.
+
 ## Reference Browse Tree
 
 Reference opens in source-tree mode by default.
@@ -226,6 +244,8 @@ The validator checks:
 - rich academic-card fields, exactly three `when_to_use` contexts, collocation counts, non-examples, and `miniQuiz.options[]`
 - grammar-card Japanese fields
 - Sanseido junior-high `{ "w", "u" }` search-only entries
+- every lesson JSON in the unit `lessons/` folder is imported by `src/data/lessons.ts` (no orphaned lesson files)
+- every `mode: "learner"` lesson's component ends with `-app` and has a matching teacher lesson with the base component in the same course/level/unit (so the buttons surface on the teacher card)
 
 If the validator fails, fix the content or update this documented model in the same change.
 
@@ -337,6 +357,8 @@ wordsToReview = 42
 
 Later these should be calculated from reference data plus Leo's Supabase progress/confidence records.
 
+`src/data/registry.ts` also exports `academyStats` which includes `liveLessons` and `assignedLessons`. These two fields are currently hardcoded placeholder stubs (`liveLessons: 3`, `assignedLessons: 2`) — they are not wired to real lesson or assignment data yet. Do not copy these hardcoded values into other components. When the stats UI is built, replace them with computed values from `lessons.ts` and `assignments.ts`.
+
 ## Grammar Reference
 
 Grammar points live separately from vocabulary and can be reused at the top of every grammar practice tab.
@@ -431,6 +453,8 @@ OW4-U8-G2 - Direct and indirect objects
 }
 ```
 
+The `chart` field may optionally include a `workbookChart` object (`GrammarWorkbookChart`) when the source is a workbook answer key. `workbookChart` holds the structured table (label, columns, rows, rule, and a `seeHowItWorks` block) so the renderer can display the original workbook chart layout. The plain `chart` fields (`intro_examples`, `rows`, `note_rule`) are always required alongside it.
+
 Grammar cards always use the four-tab model:
 
 ```text
@@ -483,9 +507,39 @@ Teacher lessons are for Neritan to teach. Learner lessons and review cards are f
 
 Learner apps should be registered as separate `mode: "learner"` lessons, not folded into the teacher lesson record. Uploaded standalone HTML apps can live in `public/learn/...` and keep their own local progress keys while the surrounding LEEA route provides assignment, review, and later Supabase wiring.
 
-Leo mode should stay scalable as more units and levels are added: group learner apps by course/level/unit in collapsible sections, and show component cues with emoji plus color-coded chips/edges for opener, vocabulary, grammar, reading, writing, and review.
+Learner app `source` fields describe how LEEA reads the app's local progress:
 
-Before the assignment UI exists, a learner app is assigned by setting its lesson JSON `status` to `assigned`. Home should surface assigned learner homework first. If no learner homework is waiting, Home should show Coming Up Next from unfinished current-unit work. Later, Neritan's Assign button should write this same assignment state locally and then to Supabase.
+- `storagePrefix` — full localStorage key prefix the app writes under, such as `leea-4-8-vocab-1-`
+- `moduleCount` — number of modules/tabs
+- `moduleKeyFormat` — done-key pattern appended to the prefix; `{n}` is 1-based, `{i}` is 0-based; default `m{n}-done` (opener style), the vocab app uses `tab-{i}-done`
+- `moduleKeys` — explicit per-module done-key suffixes, takes precedence over `moduleKeyFormat`; use when module IDs are non-numeric (`"ma"`) or the suffix is not `-done` (the song app uses `["m1-complete", "m2-complete", "ma-complete", "m3-complete", "m4-complete", "m5-complete", "m6-complete"]`)
+- `moduleLabels` — display labels per module, in order; falls back to `Module N`
+- `scoreKey` — quiz score key after the prefix, default `score`; the song app stores the quiz at `m6-score`
+- `homeworkId` — the app's homework namespace; LEEA also treats `leea-{homeworkId}-done` as the done flag
+- `captionKey` — key after the prefix holding Leo's written caption, if the app has one (opener: `m5-caption`)
+
+**Song app example** (non-numeric module IDs + non-default score key):
+
+```json
+{
+  "storagePrefix": "leea-4-8-song-",
+  "moduleCount": 7,
+  "moduleKeys": ["m1-complete", "m2-complete", "ma-complete", "m3-complete", "m4-complete", "m5-complete", "m6-complete"],
+  "moduleLabels": ["Listen & Sing", "Song Words", "Academic Words", "Word Review", "Use It Again", "Write a Line", "Quiz"],
+  "scoreKey": "m6-score",
+  "homeworkId": "leo-4-8-song"
+}
+```
+
+Score is rendered as a percent. The reader prefers `scoreData.percent`, falls back to `Math.round(score / total * 100)` if both are present, and only treats `score` as a percent for legacy apps that omit `total`.
+
+A learner lesson with `status: "live"` is not auto-assigned — Neritan assigns it from the teacher card. Use `status: "assigned"` only when the app should be homework immediately on load.
+
+Leo mode should stay scalable as more units and levels are added: group learner apps by course/level/unit in collapsible sections, and show component cues with emoji plus color-coded chips/edges for opener, vocabulary, grammar, reading, writing, and review. The list shows every learner lesson, not only assigned ones — the hero handles "what to do now", the list handles "Leo's full library to revisit".
+
+A learner app can be auto-assigned by setting its lesson JSON `status` to `assigned` — `seedAssignments` picks this up on load. The Teacher Menu Assign button also writes the same assignment record to local storage. Home should surface assigned learner homework first. If no learner homework is waiting, Home should show Coming Up Next from unfinished current-unit work. Later, assignment state should also sync to Supabase.
+
+On the Neritan Teacher Menu, learner apps do not render as their own cards. The teacher slide card for the same component carries the app controls (Assign/Assigned, Review, Unassign) inside a tinted "Leo's App" group, next to the teaching controls Open and Mark Done. The pairing rule is component naming: teacher `opener` ↔ learner `opener-app` within the same course/level/unit. Register new learner apps with the `{component}-app` component name or their buttons will not appear on the teacher card.
 
 Home current-focus progress counts unique unit components, not raw teacher/learner routes. A teacher slide lesson and a Leo learner app for the same component should appear as one lesson/component in Home progress.
 

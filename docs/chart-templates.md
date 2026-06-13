@@ -2,6 +2,113 @@
 
 These National Geographic graphic organizers should become reusable LEEA chart templates.
 
+## Component Locations
+
+Reusable templates live under two parallel folders, depending on which surface they're for:
+
+- `public/teach/components/*` — used by Neritan's teacher slide decks under `public/lessons/*.html`
+- `public/learn/components/*` — used by Leo's learner apps under `public/learn/*.html`
+
+Same naming style, same self-contained vanilla JS. Each template file exposes one or two `window.build*` functions and an internal config store keyed by element id.
+
+## Implemented Templates
+
+### `sunshine` — Sunshine Organizer (graphic organizer)
+
+**File:** `public/learn/components/sunshine.js`
+**Surface:** Leo learner apps
+**First used in:** OW L4 U8 Vocabulary 1 Leo app (`public/learn/ow-l4-u8-vocab-1.html`) Tab 9 — "Apply"
+**Based on:** the classic Cengage 6-ray WHO / WHAT / WHEN / WHERE / WHY / HOW organizer, generalized to N rays (3–8)
+
+#### API
+
+```js
+// Load once in <head>:
+// <script src="/learn/components/sunshine.js"></script>
+
+el.innerHTML = buildSunshine({
+  id:          'sunshine-svg',    // unique string per page
+  words:       [                  // one entry per ray (3–8)
+    { word: 'collect', emoji: '🗂️' },
+    { word: 'creative', emoji: '🎨' },
+    // ...
+  ],
+  centerLabel: 'My Questions',    // text inside the center sun
+  centerEmoji: '☀️',              // optional, defaults to ☀️
+  centerHint:  'Tap a ray',       // optional small caption
+  saved:       { 0: 'his answer' }, // truthy entries render the green-check filled state
+  onSelect:    (i, word) => openEditor(i)   // ray tap / Enter / Space
+  // angles:   [-90, -18, 54, 126, 198]   // optional override; defaults to evenly spaced from top
+});
+```
+
+#### Behaviour
+
+- N triangular rays around a center sun, evenly spaced by default.
+- Each ray shows a curved word label (SVG `<textPath>`) along the inner arc + a large emoji along the ray.
+- Center shows the optional emoji, label, and hint.
+- Rays cycle through a warm sun palette (gold / amber / coral / honey / peach / butter).
+- `saved[i]` truthy → ray renders with a slightly more saturated fill and a green check badge near the tip.
+- Hover or keyboard-focus on a ray: subtle scale-up + brightness pop. `prefers-reduced-motion` is respected.
+- Each ray is a button (tap + Enter + Space) with an `aria-label`.
+
+#### Notes for Codex
+
+- Single global exposed: `window.buildSunshine` (plus internal `window._sunshineSelect` click bridge).
+- Configs are stored by id inside the IIFE, so re-rendering the same id (after `saved` updates) preserves the `onSelect` callback.
+- SVG is responsive: `max-width: 560px; width: 100%; height: auto`. Embed inside a centered flex container.
+- For 6 rays use Cengage labels (`WHO?` / `WHAT?` / …). For vocabulary, themes, or any 3–8 prompt set, just pass the right words.
+
+---
+
+### `dnd-sorter` — Drag-and-Drop Column Sorter
+
+**File:** `public/teach/components/charts.js`  
+**Template ID:** `two-column-chart` (and any N-column variant)  
+**First used in:** OW L4 U8 Vocabulary 1 teacher deck (`public/lessons/ow-l4-u8-vocab-1.html`)
+
+#### API
+
+```js
+// Load once in <head>:
+// <script src="/teach/components/charts.js"></script>
+
+el.innerHTML = buildDndSorter({
+  id:     'dnd-vocab8',          // unique string — must be unique per page
+  tiles: [
+    { text: '⚽ Playing soccer', answer: 'hobby' },
+    { text: '😴 Sleeping',       answer: 'not'   },
+    // ...
+  ],
+  zones: [
+    { key: 'hobby', label: '✅ Hobby',       color: '#16A34A' },
+    { key: 'not',   label: '❌ Not a hobby', color: '#6b7280' },
+  ],
+  onComplete: function () {
+    // called once every tile is in the correct zone
+    document.getElementById('done-msg').style.display = 'block';
+  }
+});
+```
+
+#### Behaviour
+
+- Tiles start in a shuffled word bank.
+- Mouse drag-and-drop and touch drag (iPad) both work.
+- Correct placement: tile turns green and locks in the zone.
+- Wrong placement: tile flashes red and returns to original position.
+- `onComplete` fires exactly once, when all tiles are correctly sorted.
+- Multiple instances on the same page are fully independent.
+
+#### Notes for Codex
+
+- Add the `<script src="/teach/components/charts.js"></script>` tag in `<head>` of any lesson that uses it.
+- `buildDndSorter` is the only global it exposes (`window.buildDndSorter`).
+- Zones can be any number (2, 3, 4 …) — the zones row is a flex row.
+- The `answer` string on each tile must exactly match a zone `key`.
+
+
+
 They are not just PDFs to display. They should become interactive/block templates that can render in teacher lessons and learner apps.
 
 ## Source Folder
@@ -40,7 +147,7 @@ Pie templates:
 Map / web templates:
 
 - spider map
-- sunshine organizer
+- sunshine organizer ✓ built — `public/learn/components/sunshine.js`
 - word web
 
 Story / sequence templates:
@@ -50,7 +157,7 @@ Story / sequence templates:
 Compare / classify templates:
 
 - T-chart
-- two-column chart
+- two-column chart ✓ built — `public/teach/components/charts.js` (`buildDndSorter`)
 - three-column chart
 - Venn diagram 2 circles
 - Venn diagram 3 circles
@@ -258,7 +365,7 @@ Training Ground:
 Start with the chart templates that are most likely to repeat:
 
 1. T-chart
-2. two-column chart
+2. two-column chart ✓ built — `public/teach/components/charts.js` (`buildDndSorter`)
 3. three-column chart
 4. word web
 5. KWL chart

@@ -378,6 +378,7 @@ git push
 After the user pushes, the next cloud session will have the real PDF available.
 
 **Updating pdf_offset for the full level PDF:** The Unit 8 page numbers in `index.json` were measured from a 30-page Unit 8 excerpt, so `pdf_offset` is currently `0`. Once the full level PDF is pushed, update `pdf_offset` for u8 to `(page number where Unit 8 starts in the full PDF) - 1`. For example, if Unit 8 starts on page 87 of the full PDF, set `"pdf_offset": 86`. The skill adds this offset to every section page number automatically.
+
 ## Source Tags
 
 Use exact source tags so duplicate words can appear once in search but retain every source.

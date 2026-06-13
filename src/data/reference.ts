@@ -1,3 +1,4 @@
+import unit7Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-7/vocabulary.json";
 import unit8Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json";
 import unit8Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-8/grammar.json";
 import type {
@@ -10,8 +11,14 @@ import type {
   VocabularyItem
 } from "./types";
 
-type UnitVocabularyWord = (typeof unit8Vocabulary.words)[number];
+type UnitVocabularyWord =
+  | (typeof unit8Vocabulary.words)[number]
+  | (typeof unit7Vocabulary.words)[number];
 type UnitGrammarPoint = (typeof unit8Grammar.grammarPoints)[number];
+
+function hasKey<T extends object, K extends string>(word: T, key: K): word is T & Record<K, unknown> {
+  return key in word;
+}
 
 function toVocabularyItem(word: UnitVocabularyWord): VocabularyItem {
   return {
@@ -21,7 +28,7 @@ function toVocabularyItem(word: UnitVocabularyWord): VocabularyItem {
     normalizedWord: word.normalizedWord,
     emoji: word.displayEmoji,
     emojiDescription: word.emojiDescription,
-    ipa: "ipa" in word ? word.ipa : undefined,
+    ipa: hasKey(word, "ipa") ? (word.ipa as string) : undefined,
     syllables: word.syllables,
     partOfSpeech: word.partOfSpeech,
     meaning: word.meaning,
@@ -30,29 +37,74 @@ function toVocabularyItem(word: UnitVocabularyWord): VocabularyItem {
     sources: word.sources as SourceTag[],
     tags: word.tags,
     knows: false,
-    pos: "pos" in word ? word.pos : undefined,
-    sample: "sample" in word ? word.sample : undefined,
-    jp_word: "jp_word" in word ? word.jp_word : undefined,
-    jp_reading: "jp_reading" in word ? word.jp_reading : undefined,
-    jp_sentence: "jp_sentence" in word ? word.jp_sentence : undefined,
-    jp_tags: "jp_tags" in word ? word.jp_tags : undefined,
-    category: "category" in word ? word.category : undefined,
-    jp_meaning: "jp_meaning" in word ? word.jp_meaning : undefined,
-    when_to_use: "when_to_use" in word ? word.when_to_use : undefined,
-    jp_when_to_use: "jp_when_to_use" in word ? word.jp_when_to_use : undefined,
-    how_to_use: "how_to_use" in word ? word.how_to_use : undefined,
-    jp_how_to_use: "jp_how_to_use" in word ? word.jp_how_to_use : undefined,
-    examples: "examples" in word ? word.examples : undefined,
-    collocations: "collocations" in word ? word.collocations : undefined,
-    jp_note: "jp_note" in word ? word.jp_note : undefined,
-    practice_prompt: "practice_prompt" in word ? word.practice_prompt : undefined,
-    jp_practice_prompt: "jp_practice_prompt" in word ? word.jp_practice_prompt : undefined,
-    nonExamples: "nonExamples" in word ? word.nonExamples : undefined,
-    miniQuiz: "miniQuiz" in word ? (word.miniQuiz as VocabularyItem["miniQuiz"]) : undefined
+    pos: hasKey(word, "pos") ? (word.pos as string) : undefined,
+    sample: hasKey(word, "sample") ? (word.sample as string) : undefined,
+    jp_word: hasKey(word, "jp_word") ? (word.jp_word as string) : undefined,
+    jp_reading: hasKey(word, "jp_reading") ? (word.jp_reading as string) : undefined,
+    jp_sentence: hasKey(word, "jp_sentence") ? (word.jp_sentence as string) : undefined,
+    jp_tags: hasKey(word, "jp_tags") ? (word.jp_tags as string[]) : undefined,
+    category: hasKey(word, "category") ? (word.category as string) : undefined,
+    jp_meaning: hasKey(word, "jp_meaning") ? (word.jp_meaning as string) : undefined,
+    when_to_use: hasKey(word, "when_to_use") ? (word.when_to_use as VocabularyItem["when_to_use"]) : undefined,
+    jp_when_to_use: hasKey(word, "jp_when_to_use") ? (word.jp_when_to_use as VocabularyItem["jp_when_to_use"]) : undefined,
+    how_to_use: hasKey(word, "how_to_use") ? (word.how_to_use as VocabularyItem["how_to_use"]) : undefined,
+    jp_how_to_use: hasKey(word, "jp_how_to_use") ? (word.jp_how_to_use as VocabularyItem["jp_how_to_use"]) : undefined,
+    examples: hasKey(word, "examples") ? (word.examples as VocabularyItem["examples"]) : undefined,
+    collocations: hasKey(word, "collocations") ? (word.collocations as string[]) : undefined,
+    jp_note: hasKey(word, "jp_note") ? (word.jp_note as string) : undefined,
+    practice_prompt: hasKey(word, "practice_prompt") ? (word.practice_prompt as string) : undefined,
+    jp_practice_prompt: hasKey(word, "jp_practice_prompt") ? (word.jp_practice_prompt as string) : undefined,
+    nonExamples: hasKey(word, "nonExamples") ? (word.nonExamples as VocabularyItem["nonExamples"]) : undefined,
+    miniQuiz: hasKey(word, "miniQuiz") ? (word.miniQuiz as VocabularyItem["miniQuiz"]) : undefined
   };
 }
 
-export const vocabularyItems: VocabularyItem[] = unit8Vocabulary.words.map(toVocabularyItem);
+function mergeWordsAcrossUnits(unitWordLists: UnitVocabularyWord[][]): VocabularyItem[] {
+  const byId = new Map<string, VocabularyItem>();
+  const order: string[] = [];
+  for (const unitWords of unitWordLists) {
+    for (const word of unitWords) {
+      const item = toVocabularyItem(word);
+      const existing = byId.get(item.id);
+      if (existing) {
+        const seenTags = new Set(existing.sources.map((s) => s.tag));
+        for (const source of item.sources) {
+          if (!seenTags.has(source.tag)) {
+            existing.sources.push(source);
+            seenTags.add(source.tag);
+          }
+        }
+        for (const tag of item.tags) {
+          if (!existing.tags.includes(tag)) existing.tags.push(tag);
+        }
+      } else {
+        byId.set(item.id, item);
+        order.push(item.id);
+      }
+    }
+  }
+  return order.map((id) => byId.get(id) as VocabularyItem);
+}
+
+export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
+  unit8Vocabulary.words as UnitVocabularyWord[],
+  unit7Vocabulary.words as UnitVocabularyWord[]
+]);
+
+export const unit7Vocab1Items = vocabularyItems.filter(
+  (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U7-V1")
+);
+export const unit7Vocab2Items = vocabularyItems.filter(
+  (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U7-V2")
+);
+export const unit7AcademicItems = vocabularyItems.filter(
+  (item) => item.type === "academic" && item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 7)
+);
+export const unit7GlossaryItems = vocabularyItems.filter(
+  (item) =>
+    (item.type === "content" || item.type === "related" || item.type === "glossary") &&
+    item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 7)
+);
 
 export const unit8Vocab1Items = vocabularyItems.filter(
   (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U8-V1")

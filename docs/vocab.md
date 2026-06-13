@@ -149,5 +149,10 @@ The component code maps:
 - `SG` song
 - `RD` reading
 - `WR` writing
+- `MI` mission (end-of-unit mission section)
+- `PJ` project (end-of-unit project section)
+- `RDR` unit reader (the bundled NatGeo reader book, distinct from `RD` reading)
+
+For mission/project/reader sources, omit `lessonId` (these sections do not have their own teacher lessons or Leo apps) and use `component: "mission" | "project" | "reader"` in `sources[]`.
 
 Always include the source tag in `sources[].tag` AND in `tags[]`. Search uses both.

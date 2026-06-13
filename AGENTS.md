@@ -255,6 +255,8 @@ Search results must show clear type/source tags such as Vocabulary, Academic, Gr
 
 Reference browse/search controls should show useful counts, and mixed search results should use subtle type-aware color cues such as card edges and badges for Vocabulary, Academic, Content, Related, Glossary, Grammar, and Junior High.
 
+Reference level colors must stay consistent everywhere levels are listed: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The source tree nests Vocabulary and Grammar inside each level/unit. For units with real data, Vocabulary nests Vocabulary 1, Vocabulary 2, Academic, and Glossary rather than flattening them beside Grammar.
+
 Reference search should rank direct word/title matches above meaning/rule matches. Broad lesson/topic tags such as `collecting` must not make every card in that section appear for a shorter query such as `collect`; source tags such as `OW4-U8-G1` can match by exact code or code prefix.
 
 If a source tree label exists, it should list real cards or clearly say the section is empty. Do not leave placeholder links such as Academic or Glossary pointing back to `/reference`.

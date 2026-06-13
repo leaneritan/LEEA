@@ -212,6 +212,8 @@ Reference
 
 The user should not have to open every top-level course manually.
 
+Levels use one stable color progression throughout Reference: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. Inside each level/unit, Vocabulary and Grammar are nested groups. When real unit data exists, Vocabulary contains Vocabulary 1, Vocabulary 2, Academic, and Glossary.
+
 Reference also has clear sections/pages:
 
 ```text

@@ -49,10 +49,7 @@ type SearchResult =
 
 export function ReferencePage() {
   const [mode, setMode] = useState<ReferenceMode>("source");
-  const [searchScope, setSearchScope] = useState<SearchScope>("all");
-  const [query, setQuery] = useState("");
   const { knownWordSet } = useKnownWordIds();
-  const searchQuery = query.toLowerCase().trim();
   const sanseidoItems = sanseidoIndex as SanseidoEntry[];
 
   const referenceCounts = useMemo(
@@ -72,35 +69,60 @@ export function ReferencePage() {
       const known = isWordKnown(item, knownWordSet);
       if (mode === "known" && !known) return false;
       if (mode === "unknown" && known) return false;
-      if (!searchQuery) return true;
-      const text = [
-        item.word,
-        item.normalizedWord,
-        item.meaning,
-        item.japanese?.word,
-        item.japanese?.reading,
-        item.japanese?.meaning,
-        ...item.tags,
-        ...item.sources.map((source) => source.tag)
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      return text.includes(searchQuery);
+      return true;
     });
-  }, [knownWordSet, mode, searchQuery]);
+  }, [knownWordSet, mode]);
 
   const filteredGrammar = useMemo(() => {
     return grammarPoints.filter((item) => {
       if (mode !== "grammar") return false;
-      if (!searchQuery) return true;
-      const text = [item.title, item.shortName, item.rule, item.pattern, item.tag, item.japanese?.title, item.japanese?.rule]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      return text.includes(searchQuery);
+      return true;
     });
-  }, [mode, searchQuery]);
+  }, [mode]);
+
+  return (
+    <div className="reference-layout">
+      <aside className="reference-side">
+        <div className="ref-tabs">
+          <ModeButton active={mode === "source"} count={referenceCounts.source} label="Source Tree" onClick={() => setMode("source")} />
+          <ModeButton active={mode === "vocabulary"} count={referenceCounts.vocabulary} label="Vocabulary" onClick={() => setMode("vocabulary")} />
+          <ModeButton active={mode === "grammar"} count={referenceCounts.grammar} label="Grammar" onClick={() => setMode("grammar")} />
+          <ModeButton active={mode === "known"} count={referenceCounts.known} label="I Know" onClick={() => setMode("known")} />
+          <ModeButton active={mode === "unknown"} count={referenceCounts.unknown} label="I Don't Know" onClick={() => setMode("unknown")} />
+          <Link className="ref-nav-link" href="/reference/search">
+            <span>Search</span>
+            <span className="ref-count">{referenceCounts.source.toLocaleString()}</span>
+          </Link>
+        </div>
+      </aside>
+
+      <section className="reference-main">
+        {mode === "source" ? <SourceTree /> : null}
+        {mode === "vocabulary" || mode === "known" || mode === "unknown" ? (
+          <ReferenceCards
+            help={
+              mode === "known"
+                ? "Words Leo marked as known."
+                : mode === "unknown"
+                  ? "Words Leo is still learning or needs to review."
+                  : "All word-like cards: vocabulary, academic, content, related, and glossary."
+            }
+            title={mode === "known" ? "I Know" : mode === "unknown" ? "I Don't Know" : "Vocabulary"}
+            words={filteredWords}
+            knownWordSet={knownWordSet}
+          />
+        ) : null}
+        {mode === "grammar" ? <GrammarCards grammar={filteredGrammar} /> : null}
+      </section>
+    </div>
+  );
+}
+
+export function ReferenceSearchPage() {
+  const [searchScope, setSearchScope] = useState<SearchScope>("all");
+  const [query, setQuery] = useState("");
+  const sanseidoItems = sanseidoIndex as SanseidoEntry[];
+  const searchQuery = query.toLowerCase().trim();
 
   const searchResults = useMemo(() => {
     if (!searchQuery) return [];
@@ -189,11 +211,13 @@ export function ReferencePage() {
   }, [searchResults]);
 
   return (
-    <div className="reference-layout">
-      <aside className="reference-side">
-        <label className="search-box">
-          <Search size={18} />
+    <div className="reference-search-page">
+      <div className="reference-search-shell">
+        <span className="eyebrow">Search Everything</span>
+        <label className="search-box search-box-large">
+          <Search size={22} />
           <input
+            autoFocus
             onChange={(event) => setQuery(event.target.value)}
             onInput={(event) => setQuery(event.currentTarget.value)}
             placeholder="Search words, grammar, tags..."
@@ -209,35 +233,18 @@ export function ReferencePage() {
           <SearchScopeButton active={searchScope === "academic"} label="Academic" onClick={() => setSearchScope("academic")} />
           <SearchScopeButton active={searchScope === "junior-high"} label="Junior High" onClick={() => setSearchScope("junior-high")} />
         </div>
+      </div>
 
-        <div className="ref-tabs">
-          <ModeButton active={mode === "source"} count={referenceCounts.source} label="Source Tree" onClick={() => setMode("source")} />
-          <ModeButton active={mode === "vocabulary"} count={referenceCounts.vocabulary} label="Vocabulary" onClick={() => setMode("vocabulary")} />
-          <ModeButton active={mode === "grammar"} count={referenceCounts.grammar} label="Grammar" onClick={() => setMode("grammar")} />
-          <ModeButton active={mode === "known"} count={referenceCounts.known} label="I Know" onClick={() => setMode("known")} />
-          <ModeButton active={mode === "unknown"} count={referenceCounts.unknown} label="I Don't Know" onClick={() => setMode("unknown")} />
+      {searchQuery ? (
+        <SearchResults counts={searchCounts} query={query} results={searchResults} scope={searchScope} />
+      ) : (
+        <div className="reference-panel">
+          <div className="panel-head">
+            <h1>Search</h1>
+            <p>Use the menu Search button to search vocabulary, grammar, glossary, academic cards, and junior-high dictionary links from one page.</p>
+          </div>
         </div>
-      </aside>
-
-      <section className="reference-main">
-        {searchQuery ? <SearchResults counts={searchCounts} query={query} results={searchResults} scope={searchScope} /> : null}
-        {!searchQuery && mode === "source" ? <SourceTree /> : null}
-        {!searchQuery && (mode === "vocabulary" || mode === "known" || mode === "unknown") ? (
-          <ReferenceCards
-            help={
-              mode === "known"
-                ? "Words Leo marked as known."
-                : mode === "unknown"
-                  ? "Words Leo is still learning or needs to review."
-                  : "All word-like cards: vocabulary, academic, content, related, and glossary."
-            }
-            title={mode === "known" ? "I Know" : mode === "unknown" ? "I Don't Know" : "Vocabulary"}
-            words={filteredWords}
-            knownWordSet={knownWordSet}
-          />
-        ) : null}
-        {!searchQuery && mode === "grammar" ? <GrammarCards grammar={filteredGrammar} /> : null}
-      </section>
+      )}
     </div>
   );
 }
@@ -278,7 +285,7 @@ function SourceTree() {
       </div>
 
       <div className="source-tree">
-        <details open>
+        <details className="tree-course" open>
           <summary>Our World</summary>
           {sourceLevels.map(({ level, caption }) => (
             <details className={`source-level source-level-${level}`} key={level} open={level === 4}>
@@ -288,76 +295,76 @@ function SourceTree() {
               </summary>
               {level === 4 ? (
                 <>
-                  <details>
+                  <details className="tree-unit">
                     <summary>Unit 7 - Good Idea!</summary>
-                    <details open>
+                    <details className="tree-category tree-category-vocabulary" open>
                       <summary>Vocabulary</summary>
-                      <details open>
+                      <details className="tree-subgroup" open>
                         <summary>Vocabulary 1</summary>
                         {unit7Vocab1Items.map((word) => (
                           <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
                         ))}
                       </details>
-                      <details>
+                      <details className="tree-subgroup">
                         <summary>Vocabulary 2</summary>
                         {unit7Vocab2Items.map((word) => (
                           <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
                         ))}
                       </details>
-                      <details>
+                      <details className="tree-subgroup">
                         <summary>Academic</summary>
                         {unit7AcademicItems.map((word) => (
                           <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
                         ))}
                       </details>
-                      <details>
+                      <details className="tree-subgroup">
                         <summary>Glossary</summary>
                         {unit7GlossaryItems.map((word) => (
                           <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
                         ))}
                       </details>
                     </details>
-                    <details>
+                    <details className="tree-category tree-category-grammar">
                       <summary>Grammar</summary>
                       <span className="tree-placeholder">Grammar charts not yet built for Unit 7.</span>
                     </details>
                   </details>
-                  <details open>
+                  <details className="tree-unit" open>
                     <summary>Unit 8 - That&apos;s Really Interesting!</summary>
-                    <details open>
+                    <details className="tree-category tree-category-vocabulary" open>
                       <summary>Vocabulary</summary>
-                      <details open>
+                      <details className="tree-subgroup" open>
                         <summary>Vocabulary 1</summary>
                         {unit8Vocab1Items.map((word) => (
                           <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
                         ))}
                       </details>
-                      <details>
+                      <details className="tree-subgroup">
                         <summary>Vocabulary 2</summary>
                         {unit8Vocab2Items.map((word) => (
                           <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
                         ))}
                       </details>
-                      <details>
+                      <details className="tree-subgroup">
                         <summary>Academic</summary>
                         {unit8AcademicItems.map((word) => (
                           <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
                         ))}
                       </details>
-                      <details>
+                      <details className="tree-subgroup">
                         <summary>Glossary</summary>
                         {unit8GlossaryItems.map((word) => (
                           <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
                         ))}
                       </details>
                     </details>
-                    <details open>
+                    <details className="tree-category tree-category-grammar" open>
                       <summary>Grammar</summary>
                       {unit8GrammarItems.map((grammar) => (
                         <TreeLink href={`/reference/grammar/${grammar.id}`} key={grammar.id} label={`${grammar.component}: ${grammar.shortName}`} />
                       ))}
                     </details>
-                    <details open>
+                    <details className="tree-category" open>
                       <summary>Search-only support</summary>
                       <TreeLine label="Junior-high dictionary links are searched from the menu above." />
                     </details>
@@ -365,13 +372,16 @@ function SourceTree() {
                 </>
               ) : (
                 <>
-                  <details>
-                    <summary>Vocabulary</summary>
-                    <span className="tree-placeholder">Units will appear here.</span>
-                  </details>
-                  <details>
-                    <summary>Grammar</summary>
-                    <span className="tree-placeholder">Grammar points will appear here.</span>
+                  <details className="tree-unit">
+                    <summary>Units</summary>
+                    <details className="tree-category tree-category-vocabulary">
+                      <summary>Vocabulary</summary>
+                      <span className="tree-placeholder">Vocabulary groups will appear here.</span>
+                    </details>
+                    <details className="tree-category tree-category-grammar">
+                      <summary>Grammar</summary>
+                      <span className="tree-placeholder">Grammar points will appear here.</span>
+                    </details>
                   </details>
                 </>
               )}
@@ -379,19 +389,19 @@ function SourceTree() {
           ))}
         </details>
 
-        <details open>
+        <details className="tree-course" open>
           <summary>Joyful Work</summary>
           <TreeLine label="Year 1" />
           <TreeLine label="Year 2" />
           <TreeLine label="Year 3" />
         </details>
 
-        <details open>
+        <details className="tree-course" open>
           <summary>Junior High</summary>
           <TreeLine label={`${(sanseidoIndex as SanseidoEntry[]).length.toLocaleString()} Sanseido dictionary links - search only`} />
         </details>
 
-        <details open>
+        <details className="tree-course" open>
           <summary>Training Ground</summary>
           <TreeLine label="Punctuation" />
           <TreeLine label="Nouns" />

@@ -77,6 +77,16 @@ Notes:
 - `normalizedWord` is the word in lowercase, no punctuation, multi-word phrases joined with spaces (`take photos`)
 - `displayEmoji` is the visual; one emoji is the common case, but the field is a plain string — multi-emoji values like `"🔋⚡"` are allowed when two emojis help picture the word
 - `emojiDescription` is what the emoji shows
+
+### Emoji consistency
+
+Emojis must be consistent across units so Leo learns one visual per concept.
+
+- **Same global word → same emoji.** Because the same `global_<id>` card serves every unit, this is automatic — never override `displayEmoji` per source.
+- **Closely related forms can share an emoji.** Noun/verb pairs from the same root (`imagine` / `imagination`, `invent` / `invention`) may use the same primary emoji, or two clearly related ones (`💡` for both).
+- **Distinct concepts should not share an emoji.** If two unrelated words would land on the same emoji, vary one. Example: `habit` (📅 recurring routine) vs `typical` (🔁 something that recurs) — keep them apart.
+- **When a new unit reuses a word that's already a global card, do not change its emoji.** Add a new entry to `sources[]` and leave everything else alone.
+- **Lesson HTML reads emojis from `vocabulary.json`, not from a hardcoded copy.** When a teacher slideshow or Leo app needs a vocab card, it pulls from the unit's `vocabulary.json` so the emoji always matches Reference.
 - `japanese.needsReview: true` until the parent has confirmed the Japanese
 - `tags[]` should include the type, the component name, a topical tag, and the source tag
 

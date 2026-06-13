@@ -139,6 +139,17 @@ Target shape:
 
 To be locked when the first writing Leo app is built.
 
+## Reading vocab and grammar from the unit JSON
+
+Every Leo app module that needs a vocab word, an academic word, or a grammar chart reads it from the unit's `vocabulary.json` / `grammar.json` — never a hardcoded copy inside the HTML.
+
+- The unit's `vocabulary.json` is the single source of truth for the word, emoji, meaning, example, and Japanese
+- A Leo app's flashcard, quiz prompt, or carousel pulls those fields by `id` from the JSON
+- The same rule applies to teacher slideshows — see `docs/teacher-slides.md`
+- This is why **emojis stay consistent**: change the emoji in one place, every surface updates
+
+If a Leo app needs words a unit's JSON does not have (e.g. an end-of-unit review using vocabulary from earlier units), pull those by `id` from the global `vocabularyItems` array in `src/data/reference.ts`.
+
 ## Source field shape
 
 The Leo lesson JSON `source` block must describe localStorage exactly so `getLearnerAppProgress` reads the right keys:

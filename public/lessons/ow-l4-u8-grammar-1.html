@@ -9,12 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --blue:#3B82F6;--blue-dk:#1E3A8A;--blue-lt:#DBEAFE;--blue-md:#93C5FD;
+      --blue:#3B82F6;--blue-dk:#1E3A8A;--blue-lt:#DBEAFE;--blue-md:#93C5FD;--blue-bg:#EFF6FF;
       --gold:#F59E0B;--gold-lt:#FEF3C7;--gold-dk:#92400E;
-      --green:#16A34A;--green-lt:#DCFCE7;--red:#DC2626;--red-lt:#FEE2E2;
+      --green:#16A34A;--green-lt:#DCFCE7;--green-dk:#14532D;
+      --red:#DC2626;--red-lt:#FEE2E2;
       --paper:#FAFAF7;--surface:#fff;--soft:#F0EEE8;--border:#E5E3DC;
       --ink:#111827;--ink2:#374151;--ink3:#6B7280;--ink4:#9CA3AF;
       --yellow:#FCD34D;--purple:#7C3AED;--purple-lt:#EDE9FE;
+      --orange:#F97316;--orange-lt:#FED7AA;
     }
     *{margin:0;padding:0;box-sizing:border-box}
     body{background:#0b1220;font-family:'Outfit',sans-serif;overflow:hidden;user-select:none;color:var(--ink)}
@@ -24,18 +26,25 @@
     .slide{position:absolute;inset:0;background:var(--paper);display:none;overflow:hidden}
     .slide.active{display:block}
 
+    /* phase background variations */
+    .slide.bg-navy{background:linear-gradient(180deg,#0B1220 0%,#1E3A8A 100%)}
+    .slide.bg-navy .sb{color:#fff}
+    .slide.bg-blue{background:linear-gradient(180deg,#EFF6FF 0%,#DBEAFE 100%)}
+    .slide.bg-yellow{background:linear-gradient(180deg,#FFFBE6 0%,#FEF3C7 100%)}
+    .slide.bg-orange{background:linear-gradient(180deg,#FFF7ED 0%,#FED7AA 100%)}
+    .slide.bg-cream{background:#FAFAF7}
+
     /* nav */
     #nav{position:fixed;bottom:0;left:0;right:0;height:52px;background:#0D0D0D;display:flex;align-items:center;padding:0 16px;gap:10px;z-index:9000}
     .nb{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 18px;border-radius:4px;cursor:pointer;font-weight:600;font-size:14px;transition:all .15s}
     .nb:hover{background:rgba(255,255,255,.2)}
     .nb.blue{background:var(--blue);border-color:var(--blue)}
-    .nb.gold{background:var(--gold);border-color:var(--gold);color:#fff}
     #sc{color:rgba(255,255,255,.65);font-size:13px;font-weight:600;min-width:64px;text-align:center}
     #pgbar{flex:1;height:4px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden}
     #pgfill{height:100%;background:var(--blue);transition:width .3s}
     #unit-lbl{color:var(--blue-md);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-left:auto}
 
-    /* notes panel */
+    /* teacher notes */
     #tn-panel{position:fixed;top:0;right:-440px;width:440px;height:calc(100vh - 52px);background:#1a2332;transition:right .3s ease;z-index:8000;display:flex;flex-direction:column}
     #tn-panel.open{right:0}
     .tn-head{background:var(--blue-dk);padding:16px 20px;font-weight:800;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#fff;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
@@ -51,13 +60,14 @@
     .sh.gold{background:var(--gold-dk)}
     .sh.purple{background:var(--purple)}
     .sh.green{background:var(--green)}
+    .sh.orange{background:var(--orange)}
     .sh-icon{font-size:44px;line-height:1}
-    .sh-text .sh-title{font-size:36px;font-weight:800;color:#fff;letter-spacing:-.01em}
+    .sh-text .sh-title{font-size:34px;font-weight:800;color:#fff;letter-spacing:-.01em}
     .sh-text .sh-sub{font-size:18px;font-weight:500;color:rgba(255,255,255,.72);margin-top:1px}
     .sh-tag{margin-left:auto;background:rgba(255,255,255,.18);color:#fff;padding:6px 18px 5px;border-radius:20px;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
-    .sb{padding:50px 72px;height:calc(1080px - 88px);overflow:hidden}
+    .sb{padding:50px 72px;height:calc(1080px - 88px);overflow:hidden;position:relative}
 
-    /* TITLE slide */
+    /* title slide */
     .title-slide{position:absolute;inset:0;background:linear-gradient(135deg,#1E3A8A 0%,#3B82F6 60%,#0B1220 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px}
     .title-slide .eyebrow{color:var(--blue-md);font-size:18px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;margin-bottom:30px}
     .title-slide h1{font-size:128px;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1;margin-bottom:24px}
@@ -66,163 +76,234 @@
     .title-slide .tag-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
     .title-slide .tg{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;padding:12px 28px;border-radius:30px;font-size:18px;font-weight:600}
 
-    /* SECTION header slide */
-    .sec-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px;background:var(--paper)}
+    /* section header */
+    .sec-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px}
     .sec-slide .num{color:var(--blue);font-size:24px;font-weight:800;letter-spacing:.3em;margin-bottom:18px}
     .sec-slide .em{font-size:140px;margin-bottom:18px}
-    .sec-slide h2{font-size:120px;font-weight:900;color:var(--ink);letter-spacing:-.03em;line-height:1;margin-bottom:24px}
-    .sec-slide p{font-size:30px;color:var(--ink3);max-width:1400px;line-height:1.5}
+    .sec-slide h2{font-size:120px;font-weight:900;letter-spacing:-.03em;line-height:1;margin-bottom:24px}
+    .sec-slide p{font-size:28px;color:var(--ink3);max-width:1400px;line-height:1.5}
+    .slide.bg-navy .sec-slide h2{color:#fff}
+    .slide.bg-navy .sec-slide p{color:rgba(255,255,255,.78)}
 
-    /* goal slide */
-    .goal-card{background:linear-gradient(135deg,#fff,#F9FAFB);border:3px solid var(--blue);border-radius:28px;padding:72px 80px;max-width:1500px;margin:60px auto 0;box-shadow:0 20px 60px rgba(59,130,246,.18)}
+    /* goal card */
+    .goal-card{background:linear-gradient(135deg,#fff,#F9FAFB);border:3px solid var(--blue);border-radius:28px;padding:60px 70px;max-width:1500px;margin:50px auto 0;box-shadow:0 20px 60px rgba(59,130,246,.18)}
     .goal-card .lbl{color:var(--blue);font-size:18px;font-weight:800;letter-spacing:.3em;text-transform:uppercase;margin-bottom:20px}
-    .goal-card h3{font-size:64px;font-weight:900;color:var(--ink);line-height:1.1;letter-spacing:-.02em}
-    .goal-card .pattern{margin-top:48px;background:var(--blue-lt);border-radius:18px;padding:36px 48px;font-size:40px;font-weight:800;color:var(--blue-dk);text-align:center}
+    .goal-card h3{font-size:60px;font-weight:900;color:var(--ink);line-height:1.1;letter-spacing:-.02em}
+    .goal-card .pattern{margin-top:40px;background:var(--blue-lt);border-radius:18px;padding:30px 40px;font-size:38px;font-weight:800;color:var(--blue-dk);text-align:center}
     .goal-card .pattern .pp{color:var(--blue)}
 
-    /* grammar box (yellow chart) */
-    .gbox{background:#FFFBE6;border:3px solid var(--gold);border-radius:18px;padding:44px 56px;box-shadow:0 14px 40px rgba(245,158,11,.16)}
-    .gbox .lbl{color:var(--gold-dk);font-size:16px;font-weight:800;letter-spacing:.28em;text-transform:uppercase;margin-bottom:14px}
-    .gbox h3{font-size:48px;font-weight:900;color:var(--ink);margin-bottom:32px;letter-spacing:-.02em}
-    .gbox .row{font-size:32px;line-height:1.55;color:var(--ink2);margin-bottom:18px;font-weight:500}
-    .gbox .row strong{color:var(--blue);font-weight:800}
+    /* grammar box */
+    .gbox{background:#FFFBE6;border:4px solid var(--gold);border-radius:18px;padding:40px 50px;box-shadow:0 14px 40px rgba(245,158,11,.18)}
+    .gbox .lbl{display:inline-block;background:var(--gold);color:#fff;font-size:13px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;margin-bottom:14px;padding:6px 14px;border-radius:6px}
+    .gbox .tr{font-size:14px;color:var(--gold-dk);font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+    .gbox h3{font-size:42px;font-weight:900;color:var(--ink);margin-bottom:24px;letter-spacing:-.02em}
+    .gbox .row{font-size:30px;line-height:1.55;color:var(--ink2);margin-bottom:14px;font-weight:500;cursor:pointer;padding:10px 14px;border-radius:8px;transition:all .15s}
+    .gbox .row:hover{background:rgba(245,158,11,.1)}
+    .gbox .row strong{color:var(--ink);font-weight:800}
     .gbox .row .hl{background:#FCD34D;padding:2px 10px;border-radius:6px;color:var(--ink);font-weight:700}
+    .gbox .row.pulsed{animation:pulse 1s}
+    @keyframes pulse{0%{background:rgba(245,158,11,.3)}100%{background:transparent}}
 
-    /* example slide */
-    .ex-wrap{display:flex;flex-direction:column;justify-content:center;height:100%;gap:36px}
-    .ex-num{color:var(--blue);font-size:18px;font-weight:800;letter-spacing:.3em}
-    .ex-sentence{font-size:72px;font-weight:800;color:var(--ink);line-height:1.2;letter-spacing:-.02em;max-width:1700px}
-    .ex-sentence .person{background:var(--blue-lt);color:var(--blue-dk);padding:6px 16px;border-radius:10px}
-    .ex-sentence .who{color:var(--blue);font-weight:900}
-    .ex-sentence .verb{background:var(--yellow);padding:6px 16px;border-radius:10px}
-    .ex-tag{display:flex;gap:14px;flex-wrap:wrap}
-    .ex-tag .ch{background:var(--blue-lt);color:var(--blue-dk);padding:10px 22px;border-radius:20px;font-size:18px;font-weight:700}
-
-    /* pattern formula */
-    .formula{display:flex;align-items:center;justify-content:center;gap:30px;flex-wrap:wrap;margin-top:40px}
-    .formula .pc{background:#fff;border:3px solid var(--blue);border-radius:20px;padding:36px 44px;text-align:center;box-shadow:0 12px 28px rgba(59,130,246,.18);min-width:240px}
-    .formula .pc .em{font-size:60px;margin-bottom:12px}
-    .formula .pc .lb{font-size:28px;font-weight:800;color:var(--blue-dk)}
-    .formula .plus{font-size:64px;color:var(--blue);font-weight:900}
-
-    /* dad bubble */
-    .dad-bbl{background:var(--gold-lt);border-left:6px solid var(--gold);padding:24px 32px;border-radius:0 16px 16px 0;font-size:24px;line-height:1.55;color:var(--ink2)}
+    /* dad / leo bubbles */
+    .dad-bbl{background:var(--gold-lt);border-left:6px solid var(--gold);padding:22px 30px;border-radius:0 16px 16px 0;font-size:22px;line-height:1.55;color:var(--ink2)}
     .dad-bbl::before{content:"👨 DAD";display:block;font-size:13px;font-weight:800;letter-spacing:.24em;color:var(--gold-dk);margin-bottom:8px}
     .dad-bbl strong{color:var(--ink)}
-
-    /* leo bubble */
-    .leo-bbl{background:var(--blue-lt);border-left:6px solid var(--blue);padding:24px 32px;border-radius:0 16px 16px 0;font-size:24px;line-height:1.55;color:var(--ink2)}
+    .leo-bbl{background:var(--blue-lt);border-left:6px solid var(--blue);padding:22px 30px;border-radius:0 16px 16px 0;font-size:22px;line-height:1.55;color:var(--ink2)}
     .leo-bbl::before{content:"⚽ LEO";display:block;font-size:13px;font-weight:800;letter-spacing:.24em;color:var(--blue-dk);margin-bottom:8px}
     .leo-bbl strong{color:var(--ink)}
 
-    /* vocab refresher mega-panel */
-    .vocab-tabs{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
-    .vocab-tab{background:#fff;border:2px solid var(--border);border-radius:14px;padding:14px 22px;cursor:pointer;font-size:22px;font-weight:700;color:var(--ink2);transition:all .15s}
-    .vocab-tab:hover{border-color:var(--blue);background:var(--blue-lt)}
-    .vocab-tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-    .vocab-panel{display:none;grid-template-columns:1fr 1fr;gap:48px;height:calc(100% - 80px);align-items:start}
-    .vocab-panel.active{display:grid}
-    .vp-left{padding-right:24px}
-    .vp-right{padding-left:24px;border-left:2px solid var(--border)}
-    .vp-em{font-size:120px;margin-bottom:14px;line-height:1}
-    .vp-word{font-size:84px;font-weight:900;color:var(--ink);letter-spacing:-.02em;line-height:1;margin-bottom:6px}
-    .vp-pos{font-size:18px;color:var(--ink3);font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin-bottom:30px}
-    .vp-def{background:#fff;border-radius:14px;padding:28px 32px;margin-bottom:24px;border:2px solid var(--border)}
-    .vp-def .lb{font-size:13px;font-weight:800;letter-spacing:.28em;color:var(--blue);margin-bottom:10px}
-    .vp-def .dx{font-size:26px;color:var(--ink);line-height:1.45;font-weight:500;margin-bottom:14px}
-    .vp-def .ex{font-size:20px;color:var(--ink3);font-style:italic}
-    .vp-mg{background:#fff;border-radius:14px;padding:24px 28px;border:2px solid var(--border);margin-bottom:18px}
-    .vp-mg h4{font-size:18px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:16px}
-    .mg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .mg-btn{background:#F3F4F6;border:2px solid var(--border);border-radius:12px;padding:18px 16px;cursor:pointer;font-size:22px;font-weight:700;color:var(--ink2);transition:all .15s;text-align:center}
-    .mg-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.06)}
-    .mg-btn.ok{background:var(--green-lt);border-color:var(--green);color:var(--green)}
-    .mg-btn.bad{background:var(--red-lt);border-color:var(--red);color:var(--red)}
-    .mg-msg{margin-top:14px;font-size:20px;font-weight:700;padding:14px 18px;border-radius:10px;display:none}
+    /* VOCAB REFRESHER - per-word slides */
+    .word-slide{display:grid;grid-template-columns:42% 58%;gap:48px;height:100%;align-items:start}
+    .ws-left{padding-right:24px;border-right:2px solid var(--border)}
+    .ws-right{padding-left:24px}
+    .ws-em{font-size:160px;line-height:1;margin-bottom:18px}
+    .ws-word{font-size:88px;font-weight:900;color:var(--ink);letter-spacing:-.02em;line-height:1;margin-bottom:10px}
+    .ws-pos{font-size:18px;color:var(--ink3);font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin-bottom:30px}
+    .ws-def{background:#fff;border-radius:14px;padding:24px 28px;margin-bottom:20px;border:2px solid var(--border)}
+    .ws-def .lb{font-size:13px;font-weight:800;letter-spacing:.28em;color:var(--blue);margin-bottom:10px}
+    .ws-def .dx{font-size:24px;color:var(--ink);line-height:1.45;font-weight:500;margin-bottom:12px}
+    .ws-def .ex{font-size:18px;color:var(--ink3);font-style:italic;line-height:1.5}
+
+    /* mini-game container */
+    .mg-box{background:#fff;border-radius:16px;padding:26px 30px;border:3px solid var(--blue);margin-bottom:18px;box-shadow:0 8px 24px rgba(59,130,246,.12)}
+    .mg-box h4{font-size:18px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:14px}
+    .mg-box .mg-inst{font-size:18px;font-weight:700;color:var(--ink2);margin-bottom:14px;line-height:1.4}
+    .mg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+    .mg-btn{background:#F3F4F6;border:2px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;font-size:20px;font-weight:700;color:var(--ink2);transition:all .15s;text-align:left}
+    .mg-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.06);border-color:var(--blue)}
+    .mg-btn.ok{background:var(--green-lt);border-color:var(--green);color:var(--green-dk)}
+    .mg-btn.bad{background:var(--red-lt);border-color:var(--red);color:#7F1D1D}
+    .mg-btn.used{opacity:.5;cursor:not-allowed}
+    .mg-msg{margin-top:12px;font-size:18px;font-weight:700;padding:14px 18px;border-radius:10px;display:none}
     .mg-msg.show{display:block}
-    .mg-msg.ok{background:var(--green-lt);color:#14532D}
-    .vp-qc{background:#fff;border-radius:14px;padding:24px 28px;border:2px solid var(--border)}
-    .vp-qc .qq{font-size:24px;font-weight:700;color:var(--ink);margin-bottom:14px}
-    .vp-qc .qopts{display:flex;flex-direction:column;gap:10px}
-    .vp-qc .qopt{background:#F3F4F6;border:2px solid var(--border);border-radius:10px;padding:16px 22px;cursor:pointer;font-size:22px;font-weight:600;color:var(--ink2);text-align:left}
-    .vp-qc .qopt:hover{border-color:var(--blue)}
-    .vp-qc .qopt.ok{background:var(--green-lt);border-color:var(--green);color:#14532D}
-    .vp-qc .qopt.bad{background:var(--red-lt);border-color:var(--red);color:#7F1D1D}
+    .mg-msg.ok{background:var(--green-lt);color:var(--green-dk)}
+
+    /* quick check */
+    .qc-box{background:#fff;border-radius:14px;padding:22px 26px;border:2px solid var(--border)}
+    .qc-box .qq{font-size:22px;font-weight:700;color:var(--ink);margin-bottom:12px}
+    .qc-box .qopts{display:flex;flex-direction:column;gap:10px}
+    .qc-box .qopt{background:#F3F4F6;border:2px solid var(--border);border-radius:10px;padding:14px 22px;cursor:pointer;font-size:20px;font-weight:600;color:var(--ink2);text-align:left;transition:all .15s}
+    .qc-box .qopt:hover{border-color:var(--blue);background:var(--blue-bg)}
+    .qc-box .qopt.ok{background:var(--green-lt);border-color:var(--green);color:var(--green-dk)}
+    .qc-box .qopt.bad{background:var(--red-lt);border-color:var(--red);color:#7F1D1D}
+
+    /* sentence interaction (clickable parts) */
+    .sentence-box{background:#fff;border:2px solid var(--border);border-radius:16px;padding:30px 36px;margin-bottom:18px}
+    .sentence{font-size:34px;font-weight:600;color:var(--ink2);line-height:1.55}
+    .sentence .word{display:inline-block;padding:2px 8px;margin:0 2px;border-radius:6px;cursor:pointer;transition:all .15s}
+    .sentence .word:hover{background:var(--blue-lt)}
+    .sentence .word.tap-target{background:var(--gold-lt);border-bottom:3px dashed var(--gold-dk);animation:wiggle 1.5s infinite}
+    .sentence .word.dissolved{display:inline-block;width:0;padding:0;margin:0;opacity:0;transition:all .5s}
+    .sentence .word.found{background:var(--green);color:#fff;font-weight:800}
+    .sentence .word.wrong{background:var(--red);color:#fff}
+    .sentence .who-chip{display:inline-block;background:var(--blue);color:#fff;padding:4px 12px;border-radius:8px;font-weight:900;opacity:0;transition:opacity .4s}
+    .sentence .who-chip.show{opacity:1}
+    @keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
+
+    .sentence-result{background:var(--green-lt);border:3px solid var(--green);border-radius:16px;padding:30px 36px;font-size:34px;font-weight:700;color:var(--green-dk);line-height:1.55;opacity:0;transform:translateY(20px);transition:all .5s}
+    .sentence-result.show{opacity:1;transform:translateY(0)}
+    .sentence-result .hl{background:var(--yellow);color:var(--ink);padding:2px 10px;border-radius:6px}
+
+    /* word builder / chip palette */
+    .chip-target{background:#fff;border:3px dashed var(--blue);border-radius:18px;padding:28px 34px;min-height:90px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:28px;font-weight:600;color:var(--ink);margin-bottom:24px}
+    .chip-target .placeholder{color:var(--ink4);font-style:italic;font-weight:500}
+    .chip-bank{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:24px;background:#F3F4F6;border-radius:18px}
+    .chip{background:var(--blue);color:#fff;border:0;padding:14px 22px;border-radius:12px;font-size:24px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Outfit',sans-serif}
+    .chip:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(59,130,246,.3)}
+    .chip.used{opacity:.3;pointer-events:none}
+    .chip.gold{background:var(--gold)}
+    .chip.green{background:var(--green)}
 
     /* T-chart */
-    .t-chart{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:30px}
-    .t-col{background:#fff;border:3px solid var(--border);border-radius:18px;padding:40px;text-align:center}
-    .t-col.who-col{border-color:var(--blue);background:#EFF6FF}
-    .t-col.that-col{border-color:var(--gold);background:#FFFBE6}
-    .t-col .head{font-size:48px;font-weight:900;margin-bottom:22px;letter-spacing:-.02em}
+    .t-chart{display:grid;grid-template-columns:1fr 1fr;gap:30px;height:100%}
+    .t-col{background:#fff;border:4px solid var(--border);border-radius:18px;padding:28px;display:flex;flex-direction:column;min-height:300px}
+    .t-col.who-col{border-color:var(--blue);background:var(--blue-bg)}
+    .t-col.that-col{border-color:var(--gold);background:var(--gold-lt)}
+    .t-col .head{font-size:38px;font-weight:900;text-align:center;margin-bottom:14px;letter-spacing:-.02em}
     .t-col.who-col .head{color:var(--blue-dk)}
     .t-col.that-col .head{color:var(--gold-dk)}
-    .t-col .sub{font-size:22px;color:var(--ink3);margin-bottom:30px;font-weight:600}
-    .t-col .ex{font-size:24px;color:var(--ink2);margin-bottom:14px;font-weight:600;line-height:1.5}
-    .t-col .ex strong{color:var(--ink)}
+    .t-col .sub{font-size:18px;color:var(--ink3);text-align:center;margin-bottom:20px;font-weight:600}
+    .t-col .drop-zone{flex:1;background:rgba(255,255,255,.5);border:2px dashed var(--ink4);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;align-items:center;min-height:120px}
+    .t-col .drop-zone.hover{background:rgba(59,130,246,.1);border-color:var(--blue);border-style:solid}
+    .t-col .dropped{padding:10px 18px;background:#fff;border:2px solid var(--border);border-radius:10px;font-size:18px;font-weight:700;color:var(--ink)}
 
-    /* error/correction */
-    .err-row{background:#fff;border:2px solid var(--border);border-radius:18px;padding:36px 44px;margin-bottom:24px;display:flex;align-items:center;gap:30px}
-    .err-row.bad{background:var(--red-lt);border-color:var(--red)}
-    .err-row.ok{background:var(--green-lt);border-color:var(--green)}
-    .err-mark{font-size:54px;flex-shrink:0}
-    .err-row .sent{font-size:32px;font-weight:600;color:var(--ink)}
+    .t-bank{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+    .t-item{background:#fff;border:3px solid var(--border);border-radius:12px;padding:12px 18px;cursor:pointer;font-size:18px;font-weight:700;color:var(--ink);transition:all .15s;user-select:none}
+    .t-item:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 6px 14px rgba(0,0,0,.08)}
+    .t-item.placed{opacity:0;pointer-events:none}
 
-    /* transform */
-    .tx-row{display:flex;align-items:center;gap:24px;margin-bottom:22px}
-    .tx-row .from{background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 30px;font-size:24px;flex:1;color:var(--ink2);font-weight:500}
-    .tx-row .arr{font-size:40px;color:var(--blue);font-weight:900}
-    .tx-row .to{background:var(--blue-lt);border:2px solid var(--blue);border-radius:14px;padding:24px 30px;font-size:24px;flex:1;color:var(--blue-dk);font-weight:700}
-    .tx-row .to .who{background:var(--gold);color:var(--ink);padding:2px 10px;border-radius:6px}
+    /* raise hand interaction */
+    .hand-q{background:#fff;border:3px solid var(--blue);border-radius:18px;padding:40px 50px;text-align:center;margin:30px auto;max-width:1300px}
+    .hand-q .q{font-size:48px;font-weight:800;color:var(--ink);margin-bottom:30px;line-height:1.3}
+    .hand-q .hand-btn{background:var(--blue);color:#fff;border:0;padding:24px 48px;border-radius:18px;font-size:32px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 8px 24px rgba(59,130,246,.32);transition:all .15s}
+    .hand-q .hand-btn:hover{transform:translateY(-3px);background:var(--blue-dk)}
+    .hand-q .hand-btn.raised{background:var(--gold)}
+    .hand-q .answer{margin-top:24px;font-size:30px;color:var(--green-dk);font-weight:700;display:none}
+    .hand-q .answer.show{display:block}
+    .hand-q .answer .hl{background:var(--yellow);padding:2px 8px;border-radius:6px}
 
-    /* practice item */
-    .pr-card{background:#fff;border:3px solid var(--border);border-radius:22px;padding:64px 80px;max-width:1500px;margin:30px auto 0;box-shadow:0 18px 50px rgba(0,0,0,.06)}
-    .pr-card .num{color:var(--blue);font-size:22px;font-weight:800;letter-spacing:.32em;margin-bottom:24px}
-    .pr-card .stem{font-size:48px;font-weight:700;color:var(--ink);line-height:1.4;margin-bottom:36px}
-    .pr-card .stem .blank{display:inline-block;min-width:200px;border-bottom:4px solid var(--blue);padding:0 14px}
-    .pr-card .stem .blank.filled{background:var(--blue-lt);color:var(--blue-dk);border-bottom:0;border-radius:8px;padding:2px 16px}
-    .pr-card .ans{display:none;background:var(--green-lt);border-left:6px solid var(--green);padding:24px 30px;border-radius:0 14px 14px 0;font-size:28px;color:#14532D;font-weight:700;margin-top:24px}
-    .pr-card.show .ans{display:block}
-    .pr-reveal{display:block;margin:32px auto 0;background:var(--blue);color:#fff;border:0;padding:18px 36px;border-radius:14px;font-size:22px;font-weight:700;cursor:pointer}
+    /* sentence morph (build from leo's name + verb) */
+    .morph-stage{background:#fff;border:3px solid var(--border);border-radius:18px;padding:50px 60px;max-width:1600px;margin:30px auto 0;min-height:340px;display:flex;flex-direction:column;justify-content:center}
+    .morph-line{font-size:42px;font-weight:700;color:var(--ink);line-height:1.5;text-align:center;padding:18px 0;transition:all .6s}
+    .morph-line .blank{display:inline-block;min-width:160px;border-bottom:4px solid var(--blue);padding:0 14px;color:var(--blue);font-weight:900}
+    .morph-line .underline-who{background:linear-gradient(transparent 60%,var(--yellow) 60%);padding:0 6px}
+    .morph-line.faded{opacity:.4}
 
-    /* survey chart */
-    .survey{background:#fff;border:3px solid var(--border);border-radius:18px;overflow:hidden;max-width:1500px;margin:24px auto 0}
-    .survey table{width:100%;border-collapse:collapse}
-    .survey th{background:var(--blue);color:#fff;padding:22px;font-size:22px;font-weight:800;text-align:left;letter-spacing:.04em}
-    .survey td{padding:22px 26px;border-top:2px solid var(--border);font-size:24px;color:var(--ink2);font-weight:500}
-    .survey td.q{font-weight:700;color:var(--ink)}
-    .survey td.name{font-weight:700;color:var(--blue-dk)}
-    .survey td.cnt{text-align:center;font-weight:800;color:var(--blue);font-size:28px}
+    .swap-bank{display:flex;justify-content:center;gap:16px;margin-top:30px;flex-wrap:wrap}
+    .swap-btn{background:var(--blue);color:#fff;border:0;padding:14px 24px;border-radius:12px;font-size:22px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+    .swap-btn:hover{transform:translateY(-2px);background:var(--blue-dk)}
+    .swap-btn.used{opacity:.4}
 
-    /* apply game */
-    .cards-row{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:30px}
-    .pcard{background:#fff;border:3px solid var(--border);border-radius:16px;padding:28px 22px;text-align:center;cursor:pointer;transition:all .15s}
-    .pcard:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:0 10px 22px rgba(0,0,0,.06)}
-    .pcard .em{font-size:60px;margin-bottom:12px}
-    .pcard .who-clue{font-size:18px;color:var(--ink3);font-weight:600;line-height:1.45}
+    /* practice item — pair joiner */
+    .joiner-card{background:#fff;border:3px solid var(--border);border-radius:22px;padding:50px 60px;max-width:1700px;margin:20px auto 0;box-shadow:0 12px 32px rgba(0,0,0,.05)}
+    .joiner-card .pn{color:var(--blue);font-size:18px;font-weight:800;letter-spacing:.3em;margin-bottom:18px}
+    .joiner-card .src{font-size:32px;color:var(--ink2);font-weight:600;line-height:1.45;margin-bottom:14px;padding:18px 24px;background:#F9FAFB;border-radius:12px}
+    .joiner-card .src .tap-pronoun{display:inline-block;background:var(--gold-lt);color:var(--gold-dk);padding:2px 12px;border-radius:8px;cursor:pointer;font-weight:900;border:3px dashed var(--gold);animation:wiggle 1.5s infinite}
+    .joiner-card .src .tap-pronoun.dissolved{display:inline-block;width:0;padding:0;margin:0;opacity:0;transition:all .5s}
+    .joiner-card .who-chip{display:inline-block;background:var(--blue);color:#fff;padding:4px 14px;border-radius:8px;font-weight:900;opacity:0;font-size:32px;transition:opacity .4s}
+    .joiner-card .who-chip.show{opacity:1}
+    .joiner-card .result{display:none;background:var(--green-lt);border:3px solid var(--green);border-radius:14px;padding:24px 30px;font-size:32px;font-weight:700;color:var(--green-dk);line-height:1.5;margin-top:14px}
+    .joiner-card .result.show{display:block}
+    .joiner-card .result .hl{background:var(--yellow);color:var(--ink);padding:2px 10px;border-radius:6px}
+    .joiner-card .hint{font-size:18px;color:var(--ink3);font-style:italic;margin-top:14px}
 
-    /* extend */
-    .lines{background:#fff;border:3px solid var(--border);border-radius:18px;padding:50px 60px}
-    .lines .line{font-size:32px;color:var(--ink2);padding:24px 0;border-bottom:2px dashed var(--border);display:flex;align-items:baseline;gap:18px}
-    .lines .line:last-child{border-bottom:0}
-    .lines .line .lb{font-size:22px;font-weight:800;color:var(--blue);letter-spacing:.2em;min-width:48px}
+    /* score badge */
+    .score-badge{position:absolute;top:20px;right:30px;background:var(--blue);color:#fff;padding:10px 22px;border-radius:30px;font-size:20px;font-weight:800;z-index:10}
 
-    /* frames */
-    .frames{display:flex;flex-direction:column;gap:24px;margin-top:30px;max-width:1500px;margin-left:auto;margin-right:auto}
-    .frame{background:#fff;border:3px solid var(--blue);border-radius:18px;padding:32px 42px;font-size:36px;color:var(--ink2);font-weight:600;line-height:1.45}
-    .frame .blank{display:inline-block;min-width:280px;border-bottom:4px solid var(--blue);margin:0 12px;padding-bottom:4px}
+    /* survey */
+    .survey-table{background:#fff;border:3px solid var(--border);border-radius:18px;overflow:hidden;max-width:1700px;margin:20px auto 0}
+    .survey-table .row{display:grid;grid-template-columns:60% 28% 12%;border-top:2px solid var(--border);font-size:20px}
+    .survey-table .row:first-child{border-top:0;background:var(--blue);color:#fff;font-weight:800}
+    .survey-table .row > div{padding:18px 22px}
+    .survey-table .row .q{font-weight:700;color:var(--ink)}
+    .survey-table .row .yn{display:flex;gap:8px}
+    .survey-table .yn-btn{background:#F3F4F6;border:2px solid var(--border);border-radius:8px;padding:8px 16px;cursor:pointer;font-size:16px;font-weight:700;flex:1}
+    .survey-table .yn-btn:hover{border-color:var(--blue)}
+    .survey-table .yn-btn.yes{background:var(--green);color:#fff;border-color:var(--green)}
+    .survey-table .yn-btn.no{background:var(--red);color:#fff;border-color:var(--red)}
+    .survey-table .cnt{text-align:center;font-weight:900;color:var(--blue);font-size:24px}
+
+    /* apply guess-who */
+    .gw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:30px}
+    .gw-card{background:#fff;border:3px solid var(--border);border-radius:16px;padding:24px;text-align:center;cursor:pointer;transition:all .15s;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+    .gw-card:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:0 10px 22px rgba(0,0,0,.08)}
+    .gw-card.revealed{background:var(--green-lt);border-color:var(--green)}
+    .gw-card.wrong{background:var(--red-lt);border-color:var(--red);animation:shake .4s}
+    .gw-card .silhouette{font-size:80px;filter:blur(0)}
+    .gw-card.hidden .silhouette{filter:blur(20px)}
+    .gw-card .name{font-size:20px;font-weight:800;color:var(--ink);margin-top:6px;opacity:0}
+    .gw-card.revealed .name{opacity:1}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+    .gw-controls{background:#fff;border:2px solid var(--border);border-radius:16px;padding:24px 30px;margin-bottom:20px}
+    .gw-controls .clue-row{font-size:24px;color:var(--ink2);font-weight:600;line-height:1.5;margin-bottom:14px}
+    .gw-controls .clue-row strong{color:var(--blue)}
+    .gw-clue-btn{background:var(--blue);color:#fff;border:0;padding:14px 28px;border-radius:12px;font-size:20px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
+    .gw-clue-btn:hover{background:var(--blue-dk)}
+    .gw-clue-btn:disabled{opacity:.4;cursor:not-allowed}
+
+    /* word web */
+    .word-web{position:relative;width:1200px;height:600px;margin:30px auto 0}
+    .ww-oval{position:absolute;background:#fff;border:3px solid var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:20px;font-weight:700;color:var(--ink);cursor:pointer;transition:all .15s}
+    .ww-oval:hover{transform:scale(1.05)}
+    .ww-oval.center{background:var(--blue);color:#fff;width:240px;height:140px;left:480px;top:230px;font-size:32px;font-weight:900;cursor:default}
+    .ww-oval.o1{width:200px;height:120px;left:140px;top:100px}
+    .ww-oval.o2{width:200px;height:120px;right:140px;top:100px}
+    .ww-oval.o3{width:200px;height:120px;left:140px;bottom:100px}
+    .ww-oval.o4{width:200px;height:120px;right:140px;bottom:100px}
+    .ww-oval.filled{background:var(--green-lt);border-color:var(--green);color:var(--green-dk)}
+    .ww-line{position:absolute;height:3px;background:var(--blue-md);transform-origin:left center}
 
     /* checklist */
-    .check-list{background:#fff;border:3px solid var(--border);border-radius:18px;padding:48px 56px;max-width:1500px;margin:30px auto 0}
-    .check-list .ck{display:flex;align-items:center;gap:24px;padding:22px 0;border-bottom:2px solid var(--border);font-size:30px;color:var(--ink2);font-weight:500}
-    .check-list .ck:last-child{border-bottom:0}
-    .check-list .ck .box{width:46px;height:46px;border:3px solid var(--blue);border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--blue);font-weight:900}
+    .checklist{background:#fff;border:3px solid var(--border);border-radius:18px;padding:36px 44px;max-width:1500px;margin:30px auto 0}
+    .checklist .ck{display:flex;align-items:center;gap:20px;padding:18px 0;border-bottom:2px solid var(--border);font-size:24px;color:var(--ink2);font-weight:500;cursor:pointer}
+    .checklist .ck:last-child{border-bottom:0}
+    .checklist .ck .box{width:42px;height:42px;border:3px solid var(--blue);border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;font-weight:900;background:#fff;transition:all .15s}
+    .checklist .ck.done .box{background:var(--green);border-color:var(--green)}
+    .checklist .ck.done{color:var(--green-dk);font-weight:700}
+
+    /* formative quiz */
+    .quiz-card{background:#fff;border:3px solid var(--border);border-radius:22px;padding:50px 60px;max-width:1500px;margin:20px auto 0}
+    .quiz-card .qn{color:var(--blue);font-size:18px;font-weight:800;letter-spacing:.3em;margin-bottom:18px}
+    .quiz-card .qq{font-size:36px;font-weight:700;color:var(--ink);line-height:1.4;margin-bottom:36px}
+    .quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .quiz-opt{background:#F3F4F6;border:3px solid var(--border);border-radius:14px;padding:24px 30px;cursor:pointer;font-size:24px;font-weight:700;color:var(--ink2);text-align:left;transition:all .15s;font-family:'Outfit',sans-serif}
+    .quiz-opt:hover{border-color:var(--blue);background:var(--blue-bg)}
+    .quiz-opt.ok{background:var(--green-lt);border-color:var(--green);color:var(--green-dk)}
+    .quiz-opt.bad{background:var(--red-lt);border-color:var(--red);color:#7F1D1D}
+    .quiz-feedback{margin-top:24px;padding:24px 30px;border-radius:14px;font-size:22px;font-weight:600;display:none;line-height:1.5}
+    .quiz-feedback.show{display:block}
+    .quiz-feedback.ok{background:var(--green-lt);color:var(--green-dk)}
+    .quiz-feedback.bad{background:var(--red-lt);color:#7F1D1D}
 
     /* celebration */
     .celebrate{position:absolute;inset:0;background:linear-gradient(135deg,#1E3A8A 0%,#3B82F6 60%,#F59E0B 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px}
     .celebrate .em{font-size:200px;margin-bottom:30px}
     .celebrate h2{font-size:128px;font-weight:900;color:#fff;letter-spacing:-.03em;margin-bottom:30px;line-height:1}
     .celebrate p{font-size:36px;color:rgba(255,255,255,.88);max-width:1300px;line-height:1.5}
+    .celebrate .score-box{margin-top:40px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);border-radius:24px;padding:30px 60px}
+    .celebrate .score-box .lb{font-size:20px;letter-spacing:.3em;color:rgba(255,255,255,.7);font-weight:700;margin-bottom:8px}
+    .celebrate .score-box .sc{font-size:84px;font-weight:900;color:var(--yellow)}
 
     /* mark done */
     .markdone-wrap{position:absolute;inset:0;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px}
@@ -235,10 +316,12 @@
     .md-msg{margin-top:24px;font-size:22px;color:var(--green);font-weight:800;display:none}
     .md-msg.show{display:block}
 
-    /* utility */
-    .row{display:flex;gap:30px;align-items:center}
-    .col{display:flex;flex-direction:column;gap:24px}
-    .center{display:flex;align-items:center;justify-content:center}
+    /* soccer carousel */
+    .soccer-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:1700px;margin:20px auto 0}
+    .soccer-card{background:#fff;border:2px solid var(--border);border-radius:14px;padding:20px 24px;font-size:22px;color:var(--ink2);font-weight:500;line-height:1.45;cursor:pointer;transition:all .15s}
+    .soccer-card:hover{border-color:var(--blue);transform:translateX(4px)}
+    .soccer-card .who-clause{background:var(--yellow);padding:2px 10px;border-radius:6px;font-weight:700;color:var(--ink)}
+    .soccer-card .league{display:inline-block;font-size:14px;color:var(--blue);font-weight:800;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
   </style>
 </head>
 <body>
@@ -246,211 +329,109 @@
 <div id="wrap">
   <div id="deck">
 
-    <!-- ─────────────────────────────────────
+    <!-- ════════════════════════════════════════════════════════════
          PHASE 1 — TITLE + GOALS (slides 1-3)
-    ───────────────────────────────────── -->
+    ════════════════════════════════════════════════════════════ -->
 
     <!-- s1: TITLE -->
-    <div class="slide active" id="s1" data-notes="<strong>Open the lesson.</strong> Read the title with Leo. Hype it up — today we learn how to describe people using one little word that does a lot of work: <em>who</em>. Tell him by the end of the lesson he'll describe his favorite footballers using this pattern.">
+    <div class="slide active" id="s1" data-notes="<strong>Open the lesson.</strong> Read the title with Leo. Hype it up — today we learn the small word that lets us describe ANY person — soccer players, family, movie heroes — in one smart sentence.">
       <div class="title-slide">
-        <div class="eyebrow">UNIT 8 · GRAMMAR 1</div>
+        <div class="eyebrow">UNIT 8 · GRAMMAR 1 · TR 8.4</div>
         <h1>Describing people with <span class="em">who</span></h1>
-        <div class="sub">Today we learn the small word that turns two sentences about a person into one smart sentence.</div>
+        <div class="sub">Today we learn the word that turns two sentences about a person into one smart sentence.</div>
         <div class="tag-row">
-          <div class="tg">📐 Grammar Box</div>
-          <div class="tg">⚽ Soccer examples</div>
-          <div class="tg">🎬 Movie examples</div>
-          <div class="tg">✏️ Practice + Apply</div>
+          <div class="tg">📐 NatGeo TR 8.4</div>
+          <div class="tg">⚽ Premier League</div>
+          <div class="tg">⚽ La Liga</div>
+          <div class="tg">⚽ Bundesliga</div>
+          <div class="tg">⚽ Ligue 1</div>
+          <div class="tg">🎬 Movies</div>
         </div>
       </div>
     </div>
 
-    <!-- s2: TODAY'S GOAL -->
-    <div class="slide" id="s2" data-notes="<strong>Read the goal.</strong> Say: 'By the end of today, you'll be able to describe ANY person using who plus what they do.' Point at the pattern. Show that <em>person + who + verb phrase</em> = one smart English sentence.">
-      <div class="sh blue"><div class="sh-icon">🎯</div><div class="sh-text"><div class="sh-title">Today's Goal</div><div class="sh-sub">What Leo can do by the end of this lesson</div></div><div class="sh-tag">Goal</div></div>
+    <!-- s2: GOAL -->
+    <div class="slide bg-blue" id="s2" data-notes="<strong>Read the goal aloud.</strong> Point at the pattern. Drill it three times: 'Person, who, verb phrase.' Tell Leo by the end he'll describe ALL his favorite players this way.">
+      <div class="sh blue"><div class="sh-icon">🎯</div><div class="sh-text"><div class="sh-title">Today's Goal</div><div class="sh-sub">What Leo can do by the end</div></div><div class="sh-tag">Goal</div></div>
       <div class="sb">
         <div class="goal-card">
           <div class="lbl">I CAN</div>
-          <h3>describe people with <em style="color:var(--blue)">who</em>.</h3>
+          <h3>give information about people using phrases with <em style="color:var(--blue)">who</em>.</h3>
           <div class="pattern">person <span class="pp">+ who +</span> verb phrase</div>
         </div>
+        <div class="dad-bbl" style="max-width:1300px;margin:30px auto 0;font-size:22px"><strong>Leo</strong> — by the end, you'll describe Haaland, Bellingham, Batman, anyone you want — with one smart sentence using <em>who</em>.</div>
       </div>
     </div>
 
-    <!-- s3: UNIT CONTEXT -->
-    <div class="slide" id="s3" data-notes="<strong>Place this lesson in the unit.</strong> We're in Unit 8 — That's Really Interesting! Vocab 1 introduced hobby words, song was 'Hobbies' — now we describe the people who do those hobbies. Grammar 2 comes next.">
+    <!-- s3: CONTEXT -->
+    <div class="slide bg-cream" id="s3" data-notes="<strong>Place this lesson.</strong> Unit 8 — That's Really Interesting! Opener / Vocab 1 / Song done. Today is Grammar 1. Soccer + movies + family vocabulary will be everywhere.">
       <div class="sh dk"><div class="sh-icon">🗺️</div><div class="sh-text"><div class="sh-title">Where We Are</div><div class="sh-sub">Our World · Level 4 · Unit 8 — That's Really Interesting!</div></div><div class="sh-tag">Context</div></div>
       <div class="sb">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:50px">
-          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:34px;text-align:center;opacity:.5"><div style="font-size:64px;margin-bottom:14px">🚀</div><div style="font-size:22px;font-weight:800;color:var(--ink)">Opener</div><div style="font-size:16px;color:var(--ink4);margin-top:6px">Done</div></div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:34px;text-align:center;opacity:.5"><div style="font-size:64px;margin-bottom:14px">📚</div><div style="font-size:22px;font-weight:800;color:var(--ink)">Vocab 1</div><div style="font-size:16px;color:var(--ink4);margin-top:6px">Done</div></div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:34px;text-align:center;opacity:.5"><div style="font-size:64px;margin-bottom:14px">🎵</div><div style="font-size:22px;font-weight:800;color:var(--ink)">Song</div><div style="font-size:16px;color:var(--ink4);margin-top:6px">Done</div></div>
-          <div style="background:var(--blue-lt);border:3px solid var(--blue);border-radius:18px;padding:34px;text-align:center"><div style="font-size:64px;margin-bottom:14px">📐</div><div style="font-size:22px;font-weight:800;color:var(--blue-dk)">Grammar 1</div><div style="font-size:16px;color:var(--blue);margin-top:6px;font-weight:800">← Today</div></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:30px">
+          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:30px;text-align:center;opacity:.5"><div style="font-size:56px;margin-bottom:10px">🚀</div><div style="font-size:20px;font-weight:800">Opener</div><div style="font-size:14px;color:var(--ink4);margin-top:4px">Done ✓</div></div>
+          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:30px;text-align:center;opacity:.5"><div style="font-size:56px;margin-bottom:10px">📚</div><div style="font-size:20px;font-weight:800">Vocab 1</div><div style="font-size:14px;color:var(--ink4);margin-top:4px">Done ✓</div></div>
+          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:30px;text-align:center;opacity:.5"><div style="font-size:56px;margin-bottom:10px">🎵</div><div style="font-size:20px;font-weight:800">Song</div><div style="font-size:14px;color:var(--ink4);margin-top:4px">Done ✓</div></div>
+          <div style="background:var(--blue-lt);border:3px solid var(--blue);border-radius:18px;padding:30px;text-align:center"><div style="font-size:56px;margin-bottom:10px">📐</div><div style="font-size:20px;font-weight:800;color:var(--blue-dk)">Grammar 1</div><div style="font-size:14px;color:var(--blue);margin-top:4px;font-weight:800">← Today</div></div>
         </div>
-        <div style="margin-top:50px;text-align:center;font-size:26px;color:var(--ink2);max-width:1400px;margin-left:auto;margin-right:auto;line-height:1.5">
-          We've learned <strong>hobby words</strong> and sung about hobbies. Now let's learn how to <strong style="color:var(--blue)">describe the people</strong> who do them.
+        <div style="margin-top:40px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;max-width:1700px;margin-left:auto;margin-right:auto">
+          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:20px"><div style="font-size:13px;font-weight:800;letter-spacing:.24em;color:var(--blue);margin-bottom:8px">📖 OBJECTIVE</div><div style="font-size:18px;font-weight:600;color:var(--ink)">Give information about people using phrases with <em>who</em>.</div></div>
+          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:20px"><div style="font-size:13px;font-weight:800;letter-spacing:.24em;color:var(--blue);margin-bottom:8px">🎓 ACADEMIC</div><div style="font-size:18px;font-weight:600;color:var(--ink)">clause · contraction</div></div>
+          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:20px"><div style="font-size:13px;font-weight:800;letter-spacing:.24em;color:var(--blue);margin-bottom:8px">📦 CONTENT</div><div style="font-size:18px;font-weight:600;color:var(--ink)">trilobite (the unit's fossil)</div></div>
         </div>
       </div>
     </div>
 
-    <!-- ─────────────────────────────────────
-         PHASE 2 — VOCAB REFRESHER (slides 4-5)
-    ───────────────────────────────────── -->
+    <!-- ════════════════════════════════════════════════════════════
+         PHASE 2 — VOCAB REFRESHER (slides 4-8)
+         Real Unit 8 words: clause · contraction · trilobite · creative
+    ════════════════════════════════════════════════════════════ -->
 
-    <!-- s4: VOCAB INTRO -->
-    <div class="slide" id="s4" data-notes="<strong>Intro the four refresher words.</strong> These four words come up in today's grammar lesson. Click each tab on the next slide and we'll do a mini-game + quick check for each one before the grammar.">
+    <!-- s4: REFRESHER INTRO -->
+    <div class="slide bg-yellow" id="s4" data-notes="<strong>Switch to Vocab Refresher.</strong> Four words from Unit 8 we need today. Two academic (clause + contraction) per PL; one content (trilobite) per PL; one bonus from vocab-1 (creative). Each word has a mini-game and a quick check.">
       <div class="sec-slide">
         <div class="num">PHASE 2 · VOCAB REFRESHER</div>
         <div class="em">📚</div>
-        <h2>4 Words You'll Need</h2>
-        <p>One academic word + three person-words. Mini-game + quick check for each. We need these to talk about people using <em style="color:var(--blue)">who</em>.</p>
+        <h2 style="color:var(--gold-dk)">4 Words We Need</h2>
+        <p>Two academic, one content, one bonus — straight from Unit 8. Each one gets a mini-game.</p>
       </div>
     </div>
 
-    <!-- s5: VOCAB MEGA-PANEL -->
-    <div class="slide" id="s5" data-notes="<strong>Vocab refresher module.</strong> Click each tab in order. For each word: read the definition together, do the click-the-X mini-game, then the quick check. Praise Leo's answers — these are warm-up words, not graded.">
-      <div class="sh blue"><div class="sh-icon">📚</div><div class="sh-text"><div class="sh-title">Vocab Refresher</div><div class="sh-sub">Tap each word — definition, mini-game, quick check</div></div><div class="sh-tag">4 Words</div></div>
+    <!-- s5: VOCAB 1 — CLAUSE -->
+    <div class="slide bg-cream" id="s5" data-notes="<strong>Word 1: clause.</strong> Define it. Show the spot-the-clause game with soccer sentences. Each correct tap = green pulse. Then quick check — what is a clause?">
+      <div class="sh blue"><div class="sh-icon">🎓</div><div class="sh-text"><div class="sh-title">Word 1 of 4 · Academic</div><div class="sh-sub">clause</div></div><div class="sh-tag">OW4-U8 Academic</div></div>
       <div class="sb">
-        <div class="vocab-tabs">
-          <button class="vocab-tab active" onclick="showVocab(0)">🎓 clause</button>
-          <button class="vocab-tab" onclick="showVocab(1)">👤 person</button>
-          <button class="vocab-tab" onclick="showVocab(2)">📸 photographer</button>
-          <button class="vocab-tab" onclick="showVocab(3)">👨‍👩‍👧 relative</button>
-        </div>
-
-        <!-- VOCAB 0: clause -->
-        <div class="vocab-panel active" id="vp-0">
-          <div class="vp-left">
-            <div class="vp-em">🎓</div>
-            <div class="vp-word">clause</div>
-            <div class="vp-pos">Noun · Academic</div>
-            <div class="vp-def">
+        <div class="word-slide">
+          <div class="ws-left">
+            <div class="ws-em">🎓</div>
+            <div class="ws-word">clause</div>
+            <div class="ws-pos">Noun · Academic</div>
+            <div class="ws-def">
               <div class="lb">DEFINITION</div>
-              <div class="dx">A part of a sentence that has a verb in it. Today's "who clause" is a small clause about a person.</div>
-              <div class="ex">"A photographer is a person <strong>who takes photos</strong>." — "who takes photos" is a who-clause.</div>
+              <div class="dx">A part of a sentence that has a <strong>verb</strong> inside it. Today's "who-clause" is a small clause about a person.</div>
+              <div class="ex">"Haaland is the striker <strong>who plays for Man City</strong>." — "who plays for Man City" is a who-clause!</div>
             </div>
-            <div class="dad-bbl"><strong>Leo</strong> — count the verbs in this sentence and you find the clauses. Today's grammar adds a clause to describe a person.</div>
+            <div class="dad-bbl"><strong>Leo</strong> — count the verbs in a sentence and you find the clauses. Today's grammar adds a who-clause.</div>
           </div>
-          <div class="vp-right">
-            <div class="vp-mg">
-              <h4>🎮 Spot the Clause</h4>
-              <div style="font-size:18px;font-weight:700;color:var(--ink3);margin-bottom:14px">Click the WHO-CLAUSE inside this sentence:</div>
-              <div style="font-size:28px;font-weight:700;color:var(--ink);line-height:1.6">Haaland is the striker <button class="mg-btn" style="display:inline-block;margin:0 4px" onclick="clauseHit(this,true)">who plays for Man City</button> in the Premier League.</div>
-              <div class="mg-msg ok" id="mg-clause">✅ Yes! "who plays for Man City" is the who-clause — it describes Haaland.</div>
+          <div class="ws-right">
+            <div class="mg-box">
+              <h4>🎮 Spot the Who-Clause</h4>
+              <div class="mg-inst">Tap the WHO-CLAUSE inside each sentence:</div>
+              <div style="background:#F9FAFB;border:2px solid var(--border);border-radius:12px;padding:18px;margin-bottom:10px;font-size:22px;line-height:1.5">
+                Bellingham is the player
+                <button class="mg-btn" style="display:inline-block;padding:6px 14px;font-size:20px" onclick="clauseHit(this,true,'mg-clause-1')">who scores for Real Madrid</button>.
+              </div>
+              <div style="background:#F9FAFB;border:2px solid var(--border);border-radius:12px;padding:18px;margin-bottom:10px;font-size:22px;line-height:1.5">
+                <button class="mg-btn" style="display:inline-block;padding:6px 14px;font-size:20px" onclick="clauseHit(this,false,'mg-clause-1')">Haaland is the striker</button>
+                <button class="mg-btn" style="display:inline-block;padding:6px 14px;font-size:20px" onclick="clauseHit(this,true,'mg-clause-1')">who plays for Manchester City</button>.
+              </div>
+              <div class="mg-msg ok" id="mg-clause-1">✅ Yes! A who-clause = WHO + verb. It describes the person.</div>
             </div>
-            <div class="vp-qc">
+            <div class="qc-box">
               <div class="qq">❓ What is a clause?</div>
               <div class="qopts">
-                <button class="qopt" onclick="qc(this,false)">A long sentence</button>
-                <button class="qopt" onclick="qc(this,true)">A part of a sentence with a verb</button>
                 <button class="qopt" onclick="qc(this,false)">A single word</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- VOCAB 1: person -->
-        <div class="vocab-panel" id="vp-1">
-          <div class="vp-left">
-            <div class="vp-em">👤</div>
-            <div class="vp-word">a person</div>
-            <div class="vp-pos">Noun · Countable</div>
-            <div class="vp-def">
-              <div class="lb">DEFINITION</div>
-              <div class="dx">A human being — anyone you can describe with <em>who</em>.</div>
-              <div class="ex">"Vinicius Jr. is a person who plays for Real Madrid in La Liga."</div>
-            </div>
-            <div class="dad-bbl"><strong>Leo</strong> — who is one person you know? Tell me about them in one sentence.</div>
-          </div>
-          <div class="vp-right">
-            <div class="vp-mg">
-              <h4>🎮 Click All the People</h4>
-              <div class="mg-grid">
-                <button class="mg-btn" onclick="pHit(this,true)">⚽ Haaland</button>
-                <button class="mg-btn" onclick="pHit(this,false)">🌧️ rain</button>
-                <button class="mg-btn" onclick="pHit(this,true)">🦇 Batman</button>
-                <button class="mg-btn" onclick="pHit(this,false)">🏔️ a mountain</button>
-                <button class="mg-btn" onclick="pHit(this,true)">📸 Roie</button>
-                <button class="mg-btn" onclick="pHit(this,false)">🚗 a car</button>
-              </div>
-              <div class="mg-msg ok" id="mg-person">✅ A person is a human — only Haaland, Batman, and Roie are people!</div>
-            </div>
-            <div class="vp-qc">
-              <div class="qq">❓ Which one is a person?</div>
-              <div class="qopts">
-                <button class="qopt" onclick="qc(this,false)">Avatar (the movie)</button>
-                <button class="qopt" onclick="qc(this,true)">Lamine Yamal</button>
-                <button class="qopt" onclick="qc(this,false)">Real Madrid (the club)</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- VOCAB 2: photographer -->
-        <div class="vocab-panel" id="vp-2">
-          <div class="vp-left">
-            <div class="vp-em">📸</div>
-            <div class="vp-word">a photographer</div>
-            <div class="vp-pos">Noun · Person</div>
-            <div class="vp-def">
-              <div class="lb">DEFINITION</div>
-              <div class="dx">A person whose job is taking photos.</div>
-              <div class="ex">"Roie Galitz is a photographer who takes pictures of polar bears."</div>
-            </div>
-            <div class="dad-bbl"><strong>Photographer</strong> = "a person <em>who takes photos</em>." Notice the who-clause already!</div>
-          </div>
-          <div class="vp-right">
-            <div class="vp-mg">
-              <h4>🎮 Photographer or Not?</h4>
-              <div class="mg-grid">
-                <button class="mg-btn" onclick="pHit(this,true)">📸 takes wedding photos</button>
-                <button class="mg-btn" onclick="pHit(this,false)">🍳 cooks dinner</button>
-                <button class="mg-btn" onclick="pHit(this,true)">🐻‍❄️ shoots wildlife</button>
-                <button class="mg-btn" onclick="pHit(this,false)">⚽ scores goals</button>
-              </div>
-              <div class="mg-msg ok" id="mg-photog">✅ Photographers take photos. Cooks cook. Strikers score!</div>
-            </div>
-            <div class="vp-qc">
-              <div class="qq">❓ A photographer is a person who...</div>
-              <div class="qopts">
-                <button class="qopt" onclick="qc(this,true)">takes photos</button>
-                <button class="qopt" onclick="qc(this,false)">scores goals</button>
-                <button class="qopt" onclick="qc(this,false)">drives a car</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- VOCAB 3: relative -->
-        <div class="vocab-panel" id="vp-3">
-          <div class="vp-left">
-            <div class="vp-em">👨‍👩‍👧</div>
-            <div class="vp-word">a relative</div>
-            <div class="vp-pos">Noun · Person</div>
-            <div class="vp-def">
-              <div class="lb">DEFINITION</div>
-              <div class="dx">A person in your family — like your cousin, aunt, uncle, grandparent.</div>
-              <div class="ex">"My cousin who lives in Tokyo is a relative I see every summer."</div>
-            </div>
-            <div class="dad-bbl"><strong>Leo</strong> — name three relatives you have. Now we can describe them using <em>who</em>!</div>
-          </div>
-          <div class="vp-right">
-            <div class="vp-mg">
-              <h4>🎮 Relative or Not?</h4>
-              <div class="mg-grid">
-                <button class="mg-btn" onclick="pHit(this,true)">👵 grandma</button>
-                <button class="mg-btn" onclick="pHit(this,false)">🐶 your dog</button>
-                <button class="mg-btn" onclick="pHit(this,true)">👨 uncle</button>
-                <button class="mg-btn" onclick="pHit(this,false)">👨‍🏫 your teacher</button>
-              </div>
-              <div class="mg-msg ok" id="mg-relative">✅ Family people are relatives. A teacher is a person but not a relative!</div>
-            </div>
-            <div class="vp-qc">
-              <div class="qq">❓ Which is a relative?</div>
-              <div class="qopts">
-                <button class="qopt" onclick="qc(this,false)">your best friend</button>
-                <button class="qopt" onclick="qc(this,true)">your cousin</button>
-                <button class="qopt" onclick="qc(this,false)">your neighbor</button>
+                <button class="qopt" onclick="qc(this,true)">A part of a sentence with a verb</button>
+                <button class="qopt" onclick="qc(this,false)">The end of a sentence</button>
               </div>
             </div>
           </div>
@@ -458,657 +439,896 @@
       </div>
     </div>
 
-    <!-- ─────────────────────────────────────
-         PHASE 3 — WARM UP (slides 6-10)
-    ───────────────────────────────────── -->
+    <!-- s6: VOCAB 2 — CONTRACTION -->
+    <div class="slide bg-cream" id="s6" data-notes="<strong>Word 2: contraction.</strong> Per PL: 'The word She's in Item 4 may be difficult... ask What two words make up she's? (she is).' Use match-pair game with contractions Leo will see today.">
+      <div class="sh blue"><div class="sh-icon">🎓</div><div class="sh-text"><div class="sh-title">Word 2 of 4 · Academic</div><div class="sh-sub">contraction</div></div><div class="sh-tag">OW4-U8 Academic</div></div>
+      <div class="sb">
+        <div class="word-slide">
+          <div class="ws-left">
+            <div class="ws-em">✂️</div>
+            <div class="ws-word">contraction</div>
+            <div class="ws-pos">Noun · Academic</div>
+            <div class="ws-def">
+              <div class="lb">DEFINITION</div>
+              <div class="dx">Two words <strong>squeezed</strong> into one with an apostrophe (').</div>
+              <div class="ex">she's = she + is · who's = who + is · they're = they + are</div>
+            </div>
+            <div class="dad-bbl"><strong>Item 4 today says:</strong> "I have an aunt <em>who's</em> very creative." That apostrophe in <em>who's</em> = "who" + "is"!</div>
+          </div>
+          <div class="ws-right">
+            <div class="mg-box">
+              <h4>🎮 Match the Contraction</h4>
+              <div class="mg-inst">Tap each contraction to see what 2 words it's made of:</div>
+              <div class="mg-grid">
+                <button class="mg-btn" onclick="contractReveal(this,'she is')">she's</button>
+                <button class="mg-btn" onclick="contractReveal(this,'who is')">who's</button>
+                <button class="mg-btn" onclick="contractReveal(this,'they are')">they're</button>
+                <button class="mg-btn" onclick="contractReveal(this,'he is')">he's</button>
+                <button class="mg-btn" onclick="contractReveal(this,'we are')">we're</button>
+                <button class="mg-btn" onclick="contractReveal(this,'it is')">it's</button>
+              </div>
+              <div class="mg-msg ok" id="mg-contract">✅ A contraction squeezes two words into one!</div>
+            </div>
+            <div class="qc-box">
+              <div class="qq">❓ What does "who's" mean?</div>
+              <div class="qopts">
+                <button class="qopt" onclick="qc(this,false)">who was</button>
+                <button class="qopt" onclick="qc(this,true)">who is</button>
+                <button class="qopt" onclick="qc(this,false)">who will</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <!-- s6: WARM UP HEADER -->
-    <div class="slide" id="s6" data-notes="<strong>Switch to Warm Up.</strong> Quick energizer before the grammar box. We'll get Leo's brain ready to describe people.">
+    <!-- s7: VOCAB 3 — TRILOBITE -->
+    <div class="slide bg-cream" id="s7" data-notes="<strong>Word 3: trilobite.</strong> Per PL: 'Trilobite fossil, Morocco' photo on grammar box page. The fossil dig game. Item 5 of Practice 1 is about people who collect fossils.">
+      <div class="sh blue"><div class="sh-icon">📦</div><div class="sh-text"><div class="sh-title">Word 3 of 4 · Content</div><div class="sh-sub">trilobite</div></div><div class="sh-tag">OW4-U8 Content</div></div>
+      <div class="sb">
+        <div class="word-slide">
+          <div class="ws-left">
+            <div class="ws-em">🦂</div>
+            <div class="ws-word">a trilobite</div>
+            <div class="ws-pos">Noun · Content</div>
+            <div class="ws-def">
+              <div class="lb">DEFINITION</div>
+              <div class="dx">An ancient sea animal that lived 500+ million years ago. We only know about them from <strong>fossils</strong>.</div>
+              <div class="ex">"A paleontologist is a scientist who studies trilobites and other fossils."</div>
+            </div>
+            <div class="dad-bbl"><strong>Item 5 today:</strong> "I know three people who collect fossils" — trilobites are some of the coolest fossils!</div>
+          </div>
+          <div class="ws-right">
+            <div class="mg-box">
+              <h4>🎮 Fossil Dig — Tap the Trilobites!</h4>
+              <div class="mg-inst">Click the trilobite fossils (not the modern things):</div>
+              <div class="mg-grid">
+                <button class="mg-btn" onclick="fossilHit(this,true)">🦂 trilobite</button>
+                <button class="mg-btn" onclick="fossilHit(this,false)">📱 smartphone</button>
+                <button class="mg-btn" onclick="fossilHit(this,true)">🦴 ancient bone</button>
+                <button class="mg-btn" onclick="fossilHit(this,false)">⚽ soccer ball</button>
+                <button class="mg-btn" onclick="fossilHit(this,true)">🐚 fossil shell</button>
+                <button class="mg-btn" onclick="fossilHit(this,false)">🚗 car</button>
+              </div>
+              <div class="mg-msg ok" id="mg-fossil">✅ Trilobites lived 500+ million years ago. Way older than soccer!</div>
+            </div>
+            <div class="qc-box">
+              <div class="qq">❓ A trilobite is...</div>
+              <div class="qopts">
+                <button class="qopt" onclick="qc(this,false)">a modern fish</button>
+                <button class="qopt" onclick="qc(this,true)">an ancient sea animal (fossil)</button>
+                <button class="qopt" onclick="qc(this,false)">a kind of stone</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- s8: VOCAB 4 — CREATIVE -->
+    <div class="slide bg-cream" id="s8" data-notes="<strong>Word 4: creative (bonus, from Vocab 1).</strong> PL Practice items 3 + 4 both use 'creative'. Quick refresher with sort game.">
+      <div class="sh blue"><div class="sh-icon">🎨</div><div class="sh-text"><div class="sh-title">Word 4 of 4 · Vocab 1</div><div class="sh-sub">creative</div></div><div class="sh-tag">OW4-U8-V1</div></div>
+      <div class="sb">
+        <div class="word-slide">
+          <div class="ws-left">
+            <div class="ws-em">🎨</div>
+            <div class="ws-word">creative</div>
+            <div class="ws-pos">Adjective · Vocab 1</div>
+            <div class="ws-def">
+              <div class="lb">DEFINITION</div>
+              <div class="dx">Good at making or thinking of <strong>new things</strong>.</div>
+              <div class="ex">"My best friend is a <em>creative</em> person who takes amazing photos."</div>
+            </div>
+            <div class="dad-bbl"><strong>Items 3 + 4 today</strong> describe creative people. Lamine Yamal is a creative player too — he tries new moves every game.</div>
+          </div>
+          <div class="ws-right">
+            <div class="mg-box">
+              <h4>🎮 Creative or Not?</h4>
+              <div class="mg-inst">Tap actions that are creative:</div>
+              <div class="mg-grid">
+                <button class="mg-btn" onclick="creativeHit(this,true)">🎨 paints a picture</button>
+                <button class="mg-btn" onclick="creativeHit(this,false)">😴 sleeps all day</button>
+                <button class="mg-btn" onclick="creativeHit(this,true)">📸 takes a unique photo</button>
+                <button class="mg-btn" onclick="creativeHit(this,false)">📺 watches the same show again</button>
+                <button class="mg-btn" onclick="creativeHit(this,true)">⚽ invents a new soccer move</button>
+                <button class="mg-btn" onclick="creativeHit(this,true)">📝 writes a story</button>
+              </div>
+              <div class="mg-msg ok" id="mg-creative">✅ Creative = making something NEW or original!</div>
+            </div>
+            <div class="qc-box">
+              <div class="qq">❓ Which player is the most creative?</div>
+              <div class="qopts">
+                <button class="qopt" onclick="qc(this,true)">Lamine Yamal — invents new moves</button>
+                <button class="qopt" onclick="qc(this,false)">A player who only kicks straight</button>
+                <button class="qopt" onclick="qc(this,false)">A player who copies others</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         PHASE 3 — WARM UP (slides 9-13) — PL Preteach
+    ════════════════════════════════════════════════════════════ -->
+
+    <!-- s9: PHASE HEADER -->
+    <div class="slide bg-navy" id="s9" data-notes="<strong>Warm Up — PL Preteach phase.</strong> We're going to translate every teacher move from the PL into Leo's clicks. Write 'who' on screen, raise hand, build sentence, swap pieces.">
       <div class="sec-slide">
-        <div class="num">PHASE 3 · 5 MIN</div>
+        <div class="num">PHASE 3 · 6 MIN</div>
         <div class="em">🔥</div>
         <h2>Warm Up</h2>
-        <p>Quick prompts to get Leo's brain warmed up. We're describing people — let's start with people he knows from football.</p>
+        <p>The PL Preteach moves — turned into clicks. Leo will raise a hand, build a sentence, and swap pieces.</p>
       </div>
     </div>
 
-    <!-- s7: SET THE STAGE -->
-    <div class="slide" id="s7" data-notes="<strong>Set the stage.</strong> Show Leo the soccer photos. Ask: 'Who do you see?' Get him naming players. Then say: 'Today we won't just NAME them — we'll DESCRIBE them in one smart sentence.'">
-      <div class="sh blue"><div class="sh-icon">🔥</div><div class="sh-text"><div class="sh-title">Set the Stage</div><div class="sh-sub">Who do you see?</div></div><div class="sh-tag">Warm Up</div></div>
+    <!-- s10: PL MOVE 1-3 — Write who, raise hand -->
+    <div class="slide bg-blue" id="s10" data-notes="<strong>PL moves 1-3.</strong> Tap 'who' to read it aloud. Then ask the raise-hand question. Leo clicks the raise-hand button. Dad reads aloud the resulting sentence about Leo.">
+      <div class="sh blue"><div class="sh-icon">✋</div><div class="sh-text"><div class="sh-title">"Who likes ___? Raise your hand!"</div><div class="sh-sub">PL Preteach · Step 1</div></div><div class="sh-tag">Step 1</div></div>
       <div class="sb">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:40px">
-          <div style="background:#fff;border:2px solid var(--border);border-radius:16px;padding:30px;text-align:center"><div style="font-size:90px;margin-bottom:8px">⚽</div><div style="font-size:24px;font-weight:800;color:var(--ink)">Haaland</div><div style="font-size:16px;color:var(--ink3)">Man City · Premier League</div></div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:16px;padding:30px;text-align:center"><div style="font-size:90px;margin-bottom:8px">🎯</div><div style="font-size:24px;font-weight:800;color:var(--ink)">Bellingham</div><div style="font-size:16px;color:var(--ink3)">Real Madrid · La Liga</div></div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:16px;padding:30px;text-align:center"><div style="font-size:90px;margin-bottom:8px">⚡</div><div style="font-size:24px;font-weight:800;color:var(--ink)">Lamine Yamal</div><div style="font-size:16px;color:var(--ink3)">Barcelona · La Liga</div></div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:16px;padding:30px;text-align:center"><div style="font-size:90px;margin-bottom:8px">🔥</div><div style="font-size:24px;font-weight:800;color:var(--ink)">Kane</div><div style="font-size:16px;color:var(--ink3)">Bayern Munich · Bundesliga</div></div>
+        <div style="text-align:center;margin-bottom:30px">
+          <button onclick="readWho(this)" id="big-who" style="background:transparent;border:0;font-size:180px;font-weight:900;color:var(--blue);font-family:'Outfit',sans-serif;cursor:pointer;letter-spacing:-.04em;line-height:.9;transition:all .2s">who</button>
+          <div id="who-said" style="font-size:24px;color:var(--green-dk);font-weight:800;margin-top:8px;display:none">✅ Said it! "Who" is for PEOPLE.</div>
         </div>
-        <div class="dad-bbl" style="margin-top:30px;font-size:28px"><strong>Leo</strong> — name one thing each of these players DOES. We'll use those facts in a second to build smart sentences.</div>
+        <div class="hand-q">
+          <div class="q">Who likes <strong>watching soccer</strong>? ✋</div>
+          <button class="hand-btn" id="hand-1" onclick="raiseHand('hand-1','ans-1')">✋ Raise your hand!</button>
+          <div class="answer" id="ans-1">Got it! <strong>Leo</strong> likes watching soccer. ⚽<br><span style="font-size:22px">→ Leo is a student <span class="hl">who likes watching soccer</span>.</span></div>
+        </div>
       </div>
     </div>
 
-    <!-- s8: BOARD SENTENCES -->
-    <div class="slide" id="s8" data-notes="<strong>Two-sentence starting point.</strong> Show Leo two sentences about the same person. They are correct but choppy. Ask: 'Can we say this faster?'">
-      <div class="sh blue"><div class="sh-icon">📝</div><div class="sh-text"><div class="sh-title">Two Sentences About One Person</div><div class="sh-sub">Can we say this faster?</div></div><div class="sh-tag">Warm Up</div></div>
+    <!-- s11: PL MOVE 4-8 — Build sentence + underline -->
+    <div class="slide bg-blue" id="s11" data-notes="<strong>PL moves 4-8.</strong> Show 'Leo likes watching soccer.' Click the morph button to transform it into 'Leo is a student who likes watching soccer.' Watch the auto-underline of the who-clause.">
+      <div class="sh blue"><div class="sh-icon">🪄</div><div class="sh-text"><div class="sh-title">Watch the Sentence Morph</div><div class="sh-sub">PL Preteach · Step 2 — "who tells more about the person"</div></div><div class="sh-tag">Step 2</div></div>
       <div class="sb">
-        <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:60px;max-width:1500px;margin:30px auto 0">
-          <div style="font-size:38px;color:var(--ink2);line-height:1.4;margin-bottom:24px;font-weight:600">1. Haaland is a striker.</div>
-          <div style="font-size:38px;color:var(--ink2);line-height:1.4;font-weight:600">2. Haaland plays for Manchester City.</div>
-          <div style="margin-top:50px;padding:30px;background:var(--blue-lt);border-left:6px solid var(--blue);border-radius:0 14px 14px 0">
-            <div style="font-size:24px;font-weight:800;color:var(--blue-dk);letter-spacing:.2em;margin-bottom:10px">💡 IDEA</div>
-            <div style="font-size:30px;font-weight:600;color:var(--ink)">Two sentences feels slow. Today we learn to <strong style="color:var(--blue)">join them with <em>who</em></strong> — one smart sentence!</div>
+        <div class="morph-stage">
+          <div class="morph-line" id="morph-1a">Leo likes watching soccer.</div>
+          <div style="text-align:center;margin:20px 0">
+            <button onclick="doMorph()" id="morph-btn" style="background:var(--blue);color:#fff;border:0;padding:18px 40px;border-radius:14px;font-size:22px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">🪄 Add the who-clause</button>
+          </div>
+          <div class="morph-line" id="morph-1b" style="opacity:0">Leo is a student <span class="underline-who">who likes watching soccer</span>.</div>
+        </div>
+        <div class="dad-bbl" style="margin-top:30px;font-size:22px;max-width:1500px;margin-left:auto;margin-right:auto"><strong>Watch</strong> — the yellow highlight is the <em>who-clause</em>. It tells more about Leo.</div>
+      </div>
+    </div>
+
+    <!-- s12: PL MOVE 9-11 — Erase and swap pieces -->
+    <div class="slide bg-blue" id="s12" data-notes="<strong>PL moves 9-11.</strong> The 'erase Lucia and video games, swap with new pieces' move. Leo swaps the name and verb to make a new sentence. Different people, same rule.">
+      <div class="sh blue"><div class="sh-icon">🔄</div><div class="sh-text"><div class="sh-title">Swap the Pieces — Same Rule</div><div class="sh-sub">PL Preteach · Step 3</div></div><div class="sh-tag">Step 3</div></div>
+      <div class="sb">
+        <div class="morph-stage">
+          <div class="morph-line" id="swap-line"><span id="swap-name">____</span> is a student <span class="underline-who">who likes <span id="swap-verb">_______</span></span>.</div>
+        </div>
+        <div style="margin-top:30px;text-align:center">
+          <div style="font-size:18px;font-weight:800;letter-spacing:.24em;color:var(--blue);margin-bottom:14px">PICK A PERSON</div>
+          <div class="swap-bank">
+            <button class="swap-btn" onclick="setSwap('name','Dad')">Dad 👨</button>
+            <button class="swap-btn" onclick="setSwap('name','Mom')">Mom 👩</button>
+            <button class="swap-btn" onclick="setSwap('name','Haaland')">Haaland ⚽</button>
+            <button class="swap-btn" onclick="setSwap('name','Batman')">Batman 🦇</button>
+          </div>
+        </div>
+        <div style="margin-top:20px;text-align:center">
+          <div style="font-size:18px;font-weight:800;letter-spacing:.24em;color:var(--blue);margin-bottom:14px">PICK A VERB PHRASE</div>
+          <div class="swap-bank">
+            <button class="swap-btn" onclick="setSwap('verb','watching Avatar')">watching Avatar 🎬</button>
+            <button class="swap-btn" onclick="setSwap('verb','scoring goals')">scoring goals ⚽</button>
+            <button class="swap-btn" onclick="setSwap('verb','collecting trilobites')">collecting trilobites 🦂</button>
+            <button class="swap-btn" onclick="setSwap('verb','reading comics')">reading comics 📖</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- s9: DAD MODELS -->
-    <div class="slide" id="s9" data-notes="<strong>Model the join.</strong> Read both versions aloud. Point at the word <em>who</em>. Show how it connects 'Haaland' (a person) to what he does.">
-      <div class="sh blue"><div class="sh-icon">👨</div><div class="sh-text"><div class="sh-title">Dad Models</div><div class="sh-sub">Watch how I join two sentences with <em>who</em></div></div><div class="sh-tag">Warm Up</div></div>
+    <!-- s13: PL MOVE 12-14 — Notice "who" doesn't change -->
+    <div class="slide bg-blue" id="s13" data-notes="<strong>PL move 14.</strong> 'Point out that who does not change. It stays the same whether the sentence is about a boy or a girl.' Spotlight on the word who while name+verb swap.">
+      <div class="sh blue"><div class="sh-icon">🔒</div><div class="sh-text"><div class="sh-title">Notice: "who" stays the same</div><div class="sh-sub">PL Preteach · Step 4 — boy or girl, who never changes</div></div><div class="sh-tag">Step 4</div></div>
       <div class="sb">
         <div style="max-width:1500px;margin:30px auto 0">
-          <div style="font-size:28px;color:var(--ink3);margin-bottom:20px;font-weight:700;letter-spacing:.18em;text-transform:uppercase">STEP 1 — Two sentences</div>
-          <div style="background:#FFF7ED;border:2px solid #FDBA74;border-radius:14px;padding:28px 36px;margin-bottom:24px;font-size:30px;color:var(--ink2);font-weight:600;line-height:1.5">Haaland is a striker. Haaland plays for Manchester City.</div>
-          <div style="font-size:28px;color:var(--ink3);margin-bottom:20px;font-weight:700;letter-spacing:.18em;text-transform:uppercase">STEP 2 — One sentence with <em style="color:var(--blue)">who</em></div>
-          <div style="background:var(--blue-lt);border:3px solid var(--blue);border-radius:14px;padding:28px 36px;font-size:38px;color:var(--ink);font-weight:700;line-height:1.4">Haaland is a striker <span style="background:var(--yellow);padding:2px 12px;border-radius:8px;color:var(--ink)">who plays for Manchester City</span>.</div>
-          <div class="dad-bbl" style="margin-top:32px;font-size:24px"><strong>Watch</strong> — I remove the second "Haaland", I drop in <em>who</em>, and the second sentence becomes a who-clause that DESCRIBES the first one.</div>
+          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:30px 40px;margin-bottom:18px;font-size:30px;color:var(--ink2);font-weight:600;line-height:1.5">⚽ Haaland is a player <span style="background:var(--yellow);padding:2px 10px;border-radius:6px;font-weight:800">who</span> scores goals.</div>
+          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:30px 40px;margin-bottom:18px;font-size:30px;color:var(--ink2);font-weight:600;line-height:1.5">🎯 Bellingham is a midfielder <span style="background:var(--yellow);padding:2px 10px;border-radius:6px;font-weight:800">who</span> scores goals.</div>
+          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:30px 40px;margin-bottom:18px;font-size:30px;color:var(--ink2);font-weight:600;line-height:1.5">📸 Mom is a person <span style="background:var(--yellow);padding:2px 10px;border-radius:6px;font-weight:800">who</span> takes photos.</div>
+          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:30px 40px;font-size:30px;color:var(--ink2);font-weight:600;line-height:1.5">🦇 Batman is a hero <span style="background:var(--yellow);padding:2px 10px;border-radius:6px;font-weight:800">who</span> protects Gotham.</div>
         </div>
+        <div class="dad-bbl" style="margin-top:30px;font-size:22px;max-width:1500px;margin-left:auto;margin-right:auto">Boy, girl, soccer player, superhero — <strong>who never changes!</strong> 🔒</div>
       </div>
     </div>
 
-    <!-- s10: LEO'S TURN -->
-    <div class="slide" id="s10" data-notes="<strong>Leo's turn — oral.</strong> Give him a famous person and one fact. Ask him to say it as ONE sentence with who. Don't write — just say. Praise any attempt.">
-      <div class="sh blue"><div class="sh-icon">⚽</div><div class="sh-text"><div class="sh-title">Leo's Turn</div><div class="sh-sub">Try it out loud — one smart sentence</div></div><div class="sh-tag">Warm Up</div></div>
-      <div class="sb">
-        <div class="leo-bbl" style="margin-bottom:36px;font-size:32px;max-width:1600px">Salah is a winger. Salah plays for Liverpool.<br><br><strong>Now join them with <em>who</em>:</strong></div>
-        <div style="text-align:center;font-size:30px;color:var(--ink3);margin:24px 0;font-weight:600">→ Say it out loud, then turn the slide.</div>
-        <div style="background:var(--green-lt);border:3px solid var(--green);border-radius:14px;padding:28px 36px;max-width:1600px;font-size:32px;color:var(--ink);font-weight:700;line-height:1.45">
-          ✅ <strong>Answer:</strong> Salah is a winger <span style="background:var(--yellow);padding:2px 12px;border-radius:8px">who plays for Liverpool</span>.
-        </div>
-      </div>
-    </div>
+    <!-- ════════════════════════════════════════════════════════════
+         PHASE 4 — PRESENT (slides 14-20) — PL Present
+    ════════════════════════════════════════════════════════════ -->
 
-    <!-- ─────────────────────────────────────
-         PHASE 4 — PRESENT (slides 11-17)
-    ───────────────────────────────────── -->
-
-    <!-- s11: PHASE HEADER -->
-    <div class="slide" id="s11" data-notes="<strong>Switch to Present.</strong> This is the heart of the lesson — the grammar box. Open it up, read it slowly, let Leo see the rule.">
+    <!-- s14: PHASE HEADER -->
+    <div class="slide bg-yellow" id="s14" data-notes="<strong>Switch to Present.</strong> The Grammar Box (NatGeo TR 8.4) is the centerpiece. Then we'll do the PL board sentence pairs — join two sentences with who.">
       <div class="sec-slide">
         <div class="num">PHASE 4 · 12 MIN</div>
         <div class="em">📐</div>
-        <h2>Present</h2>
-        <p>The Grammar Box. The rule. The pattern. Then plenty of examples — soccer + movies — until the pattern sticks.</p>
+        <h2 style="color:var(--gold-dk)">Present</h2>
+        <p>The Grammar Box (TR 8.4) + the PL "join two sentences with who" moves + 10 soccer samples.</p>
       </div>
     </div>
 
-    <!-- s12: GRAMMAR BOX -->
-    <div class="slide" id="s12" data-notes="<strong>The Grammar Box — read it together.</strong> This is the NatGeo box, verbatim. Read the rule, then each sample sentence slowly. Point at the highlighted who-clause in each one.">
-      <div class="sh gold"><div class="sh-icon">📐</div><div class="sh-text"><div class="sh-title">Grammar Box</div><div class="sh-sub">OW4-U8-G1 — Describing people with <em>who</em></div></div><div class="sh-tag">Rule</div></div>
+    <!-- s15: GRAMMAR BOX (TR 8.4) -->
+    <div class="slide bg-cream" id="s15" data-notes="<strong>Grammar Box — TR 8.4.</strong> Read each example aloud. Click each one to highlight the who-clause. Verbatim from the NatGeo planner page 269.">
+      <div class="sh gold"><div class="sh-icon">📐</div><div class="sh-text"><div class="sh-title">Grammar Box · TR 8.4</div><div class="sh-sub">Describing people with who — NatGeo verbatim</div></div><div class="sh-tag">Rule</div></div>
       <div class="sb">
         <div class="gbox" style="max-width:1700px;margin:30px auto 0">
           <div class="lbl">RULE</div>
-          <h3>Use <span style="color:var(--blue)">who</span> to give more information about a person.</h3>
-          <div class="row"><strong>I have a classmate</strong> <span class="hl">who likes math</span>.</div>
-          <div class="row"><strong>A photographer</strong> is a person <span class="hl">who takes photos</span>.</div>
-          <div class="row"><strong>My cousin</strong> <span class="hl">who lives in Osaka</span> is visiting us.</div>
-          <div style="margin-top:30px;font-size:24px;color:var(--ink3);font-style:italic">Pattern: <strong style="color:var(--ink);font-style:normal">person + who + verb phrase</strong></div>
+          <span class="tr">· TR 8.4</span>
+          <h3 style="margin-top:14px">Describing people with <em style="color:var(--blue)">who</em></h3>
+          <div class="row" id="gb-row-1" onclick="pulseRow('gb-row-1')">The person <span class="hl">who has the highest score</span> wins the game.</div>
+          <div class="row" id="gb-row-2" onclick="pulseRow('gb-row-2')">I know a boy <span class="hl">who collects movie posters</span>.</div>
+          <div class="row" id="gb-row-3" onclick="pulseRow('gb-row-3')">We have three cousins <span class="hl">who play in a musical group together</span>.</div>
+          <div style="margin-top:20px;font-size:20px;color:var(--ink3);font-style:italic">👆 <strong>Tap each example</strong> to highlight the who-clause.</div>
         </div>
       </div>
     </div>
 
-    <!-- s13: PATTERN FORMULA -->
-    <div class="slide" id="s13" data-notes="<strong>Pattern formula slide.</strong> Show the pattern visually. Three boxes: PERSON + WHO + VERB PHRASE. Drill it: 'Person, who, verb phrase. Person, who, verb phrase.'">
-      <div class="sh blue"><div class="sh-icon">🧩</div><div class="sh-text"><div class="sh-title">The Pattern</div><div class="sh-sub">Three pieces, one smart sentence</div></div><div class="sh-tag">Formula</div></div>
+    <!-- s16: PL Q-CHECK on the box -->
+    <div class="slide bg-cream" id="s16" data-notes="<strong>PL questions on the box.</strong> 'Who wins the game?' (person with highest score). 'Who knows a lot about movies?' (boy who collects movie posters). Test that Leo understood the rule.">
+      <div class="sh gold"><div class="sh-icon">❓</div><div class="sh-text"><div class="sh-title">Quick Check on the Box</div><div class="sh-sub">PL Present · "Ask Who wins the game? Who knows a lot about movies?"</div></div><div class="sh-tag">Check</div></div>
       <div class="sb">
-        <div class="formula" style="margin-top:120px">
-          <div class="pc"><div class="em">👤</div><div class="lb">PERSON</div></div>
-          <div class="plus">+</div>
-          <div class="pc" style="border-color:var(--gold);background:var(--gold-lt)"><div class="em">🔗</div><div class="lb" style="color:var(--gold-dk)">who</div></div>
-          <div class="plus">+</div>
-          <div class="pc"><div class="em">🎯</div><div class="lb">VERB PHRASE</div></div>
+        <div class="quiz-card" style="margin-bottom:16px">
+          <div class="qn">QUESTION 1</div>
+          <div class="qq">Who <strong>wins</strong> the game?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="qc2(this,false,'fb-pc1')">The person who runs the fastest</button>
+            <button class="quiz-opt" onclick="qc2(this,true,'fb-pc1')">The person who has the highest score</button>
+          </div>
+          <div class="quiz-feedback ok" id="fb-pc1">✅ Yes! Says it right in the box.</div>
         </div>
-        <div style="margin-top:80px;text-align:center;font-size:36px;color:var(--ink2);font-weight:600;max-width:1600px;margin-left:auto;margin-right:auto">
-          Haaland <span style="background:var(--gold-lt);color:var(--gold-dk);padding:2px 14px;border-radius:8px;font-weight:800">who</span> plays for Manchester City.
+        <div class="quiz-card">
+          <div class="qn">QUESTION 2</div>
+          <div class="qq">Who <strong>knows a lot about movies</strong>?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="qc2(this,true,'fb-pc2')">A boy who collects movie posters</button>
+            <button class="quiz-opt" onclick="qc2(this,false,'fb-pc2')">Three cousins in a musical group</button>
+          </div>
+          <div class="quiz-feedback ok" id="fb-pc2">✅ Yes! Movie posters → loves movies.</div>
         </div>
       </div>
     </div>
 
-    <!-- s14: EXAMPLE 1 -->
-    <div class="slide" id="s14" data-notes="<strong>Soccer example 1.</strong> Read together. Point at PERSON (Haaland), point at WHO, point at VERB PHRASE (plays for Manchester City). Premier League context.">
-      <div class="sh blue"><div class="sh-icon">⚽</div><div class="sh-text"><div class="sh-title">Example 1 · Premier League</div><div class="sh-sub">Manchester City's striker</div></div><div class="sh-tag">Present</div></div>
+    <!-- s17: PL BOARD PAIR 1 — Join with who -->
+    <div class="slide bg-cream" id="s17" data-notes="<strong>PL Board Sentence Pair 1.</strong> 'There is a boy in my class. He takes photos.' PL says: 'Ask Who takes photos? (the boy). You can join these sentences with who. Erase the period and He, replace with who.' Leo taps He → it dissolves, who appears.">
+      <div class="sh gold"><div class="sh-icon">🪄</div><div class="sh-text"><div class="sh-title">Pair 1 — Tap to Join with WHO</div><div class="sh-sub">PL Present · "Erase 'He', replace with 'who'"</div></div><div class="sh-tag">Join</div></div>
       <div class="sb">
-        <div class="ex-wrap">
-          <div class="ex-num">EXAMPLE 1</div>
-          <div class="ex-sentence"><span class="person">Haaland</span> is the striker <span class="who">who</span> <span class="verb">plays for Manchester City</span> in the Premier League.</div>
-          <div class="ex-tag"><div class="ch">⚽ Premier League</div><div class="ch">🏟️ Manchester City</div><div class="ch">🎯 Striker</div></div>
+        <div class="joiner-card">
+          <div class="pn">SOURCE</div>
+          <div class="src">There is a boy in my class<span id="p1-period">.</span> <button class="tap-pronoun" id="p1-pronoun" onclick="joinPair('p1','He','takes photos')">He</button> takes photos.</div>
+          <div class="hint">👆 Tap "<strong>He</strong>" — it'll dissolve and "who" will float in.</div>
+          <div class="result" id="p1-result">✅ There is a boy in my class <span class="hl">who takes photos</span>.</div>
         </div>
       </div>
     </div>
 
-    <!-- s15: EXAMPLE 2 -->
-    <div class="slide" id="s15" data-notes="<strong>Soccer example 2.</strong> Bellingham — La Liga. Same pattern. PERSON + WHO + VERB PHRASE.">
-      <div class="sh blue"><div class="sh-icon">🎯</div><div class="sh-text"><div class="sh-title">Example 2 · La Liga</div><div class="sh-sub">Real Madrid's midfielder</div></div><div class="sh-tag">Present</div></div>
+    <!-- s18: PL BOARD PAIR 2 -->
+    <div class="slide bg-cream" id="s18" data-notes="<strong>PL Board Sentence Pair 2.</strong> 'I have a cousin. She collects coins.' Leo taps She → dissolves, who appears. Same move, different person.">
+      <div class="sh gold"><div class="sh-icon">🪄</div><div class="sh-text"><div class="sh-title">Pair 2 — Same Move, Different Person</div><div class="sh-sub">PL Present · "Repeat with the second pair"</div></div><div class="sh-tag">Join</div></div>
       <div class="sb">
-        <div class="ex-wrap">
-          <div class="ex-num">EXAMPLE 2</div>
-          <div class="ex-sentence"><span class="person">Bellingham</span> is the midfielder <span class="who">who</span> <span class="verb">scored in the Champions League</span> for Real Madrid.</div>
-          <div class="ex-tag"><div class="ch">🇪🇸 La Liga</div><div class="ch">🏆 Champions League</div><div class="ch">🏟️ Real Madrid</div></div>
+        <div class="joiner-card">
+          <div class="pn">SOURCE</div>
+          <div class="src">I have a cousin<span id="p2-period">.</span> <button class="tap-pronoun" id="p2-pronoun" onclick="joinPair('p2','She','collects coins')">She</button> collects coins.</div>
+          <div class="hint">👆 Tap "<strong>She</strong>" — same trick!</div>
+          <div class="result" id="p2-result">✅ I have a cousin <span class="hl">who collects coins</span>.</div>
         </div>
       </div>
     </div>
 
-    <!-- s16: EXAMPLE 3 -->
-    <div class="slide" id="s16" data-notes="<strong>Movie example.</strong> Same pattern works for movie characters. Batman from Dark Knight — also a person we can describe with who.">
-      <div class="sh blue"><div class="sh-icon">🦇</div><div class="sh-text"><div class="sh-title">Example 3 · Dark Knight</div><div class="sh-sub">Movie characters are people too</div></div><div class="sh-tag">Present</div></div>
+    <!-- s19: PL TRICKY ONE — who in the middle -->
+    <div class="slide bg-cream" id="s19" data-notes="<strong>PL Tricky case.</strong> 'My friend knows a lot about actors. She collects movie posters.' If Leo replaces 'She' directly, the sentence is broken: 'My friend knows a lot about actors who collects movie posters.' (collects doesn't match actors). Show the wrong version first, then the FIX: who goes in the MIDDLE — 'My friend who collects movie posters knows a lot about actors.'">
+      <div class="sh orange"><div class="sh-icon">⚠️</div><div class="sh-text"><div class="sh-title">Tricky! WHO goes in the MIDDLE</div><div class="sh-sub">PL Present · "Does this sentence make sense?"</div></div><div class="sh-tag">Watch out</div></div>
       <div class="sb">
-        <div class="ex-wrap">
-          <div class="ex-num">EXAMPLE 3</div>
-          <div class="ex-sentence"><span class="person">Batman</span> is the hero <span class="who">who</span> <span class="verb">protects Gotham City</span> at night.</div>
-          <div class="ex-tag"><div class="ch">🎬 Dark Knight</div><div class="ch">🦇 Superhero</div><div class="ch">🌃 Gotham</div></div>
+        <div style="max-width:1700px;margin:20px auto 0">
+          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 32px;margin-bottom:14px;font-size:24px;color:var(--ink2);font-weight:600;line-height:1.5">
+            <div style="font-size:14px;font-weight:800;letter-spacing:.2em;color:var(--ink3);margin-bottom:10px">SOURCE</div>
+            My friend knows a lot about actors. She collects movie posters.
+          </div>
+          <div style="background:var(--red-lt);border:3px solid var(--red);border-radius:14px;padding:24px 32px;margin-bottom:14px;font-size:24px;color:#7F1D1D;font-weight:600;line-height:1.5">
+            ❌ <strong>If we just swap "She" with "who"</strong>:<br>
+            My friend knows a lot about actors <strong>who collects movie posters</strong>.<br>
+            <span style="font-size:18px;color:#7F1D1D;font-style:italic">→ This says the ACTORS collect movie posters. That's not right!</span>
+          </div>
+          <div class="dad-bbl" style="margin-bottom:14px"><strong>The fix:</strong> Put "who" right next to "my friend" — so the clause describes the friend, not the actors.</div>
+          <div style="background:var(--green-lt);border:3px solid var(--green);border-radius:14px;padding:24px 32px;font-size:24px;color:var(--green-dk);font-weight:700;line-height:1.5">
+            ✅ My friend <span style="background:var(--yellow);color:var(--ink);padding:2px 8px;border-radius:6px">who collects movie posters</span> knows a lot about actors.
+          </div>
+          <div style="margin-top:14px;font-size:18px;color:var(--ink3);font-style:italic;text-align:center">In this case, <strong>who comes in the middle</strong> of the sentence — right after "my friend".</div>
         </div>
       </div>
     </div>
 
-    <!-- s17: SAMPLES CAROUSEL -->
-    <div class="slide" id="s17" data-notes="<strong>More samples — read carousel.</strong> Read each one slowly. Have Leo repeat. Notice the who-clause in each. Don't rush.">
-      <div class="sh blue"><div class="sh-icon">🎢</div><div class="sh-text"><div class="sh-title">More Examples</div><div class="sh-sub">Read each one aloud — notice the who-clause</div></div><div class="sh-tag">7 Samples</div></div>
+    <!-- s20: SOCCER SAMPLES CAROUSEL — 10 who-clause sentences -->
+    <div class="slide bg-cream" id="s20" data-notes="<strong>Soccer who-clause samples.</strong> 10 examples across all 4 leagues. Tap each one to hear it aloud (mentally). Notice the who-clause in each.">
+      <div class="sh gold"><div class="sh-icon">⚽</div><div class="sh-text"><div class="sh-title">10 Soccer Examples</div><div class="sh-sub">Tap each — notice the who-clause</div></div><div class="sh-tag">10 Samples</div></div>
       <div class="sb">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1800px">
-          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 30px;font-size:24px;color:var(--ink2);font-weight:500;line-height:1.4"><strong style="color:var(--blue)">1.</strong> Lamine Yamal is the young player <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who scores</em> for Barcelona in La Liga.</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 30px;font-size:24px;color:var(--ink2);font-weight:500;line-height:1.4"><strong style="color:var(--blue)">2.</strong> Salah is the winger <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who scores goals</em> for Liverpool.</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 30px;font-size:24px;color:var(--ink2);font-weight:500;line-height:1.4"><strong style="color:var(--blue)">3.</strong> Vinicius Jr. is the player <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who is fast</em> on the left wing.</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 30px;font-size:24px;color:var(--ink2);font-weight:500;line-height:1.4"><strong style="color:var(--blue)">4.</strong> Kane is the striker <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who moved</em> from Tottenham to Bayern Munich.</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 30px;font-size:24px;color:var(--ink2);font-weight:500;line-height:1.4"><strong style="color:var(--blue)">5.</strong> Kvaratskhelia is the winger <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who joined PSG</em> from Napoli.</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 30px;font-size:24px;color:var(--ink2);font-weight:500;line-height:1.4"><strong style="color:var(--blue)">6.</strong> John Wick is the man <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who never gives up</em>.</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 30px;font-size:24px;color:var(--ink2);font-weight:500;line-height:1.4;grid-column:span 2;text-align:center"><strong style="color:var(--blue)">7.</strong> Jake Sully is the human <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who became Na'vi</em> in Avatar.</div>
+        <div class="soccer-grid">
+          <div class="soccer-card" onclick="this.style.background='var(--blue-lt)'"><span class="league">Premier League</span><br>Haaland is the striker <span class="who-clause">who scores goals</span> for Manchester City.</div>
+          <div class="soccer-card" onclick="this.style.background='var(--blue-lt)'"><span class="league">La Liga</span><br>Bellingham is the midfielder <span class="who-clause">who scored in the Champions League final</span>.</div>
+          <div class="soccer-card" onclick="this.style.background='var(--blue-lt)'"><span class="league">La Liga</span><br>Lamine Yamal is the young player <span class="who-clause">who plays</span> for Barcelona.</div>
+          <div class="soccer-card" onclick="this.style.background='var(--blue-lt)'"><span class="league">La Liga</span><br>Vinicius Jr. is the winger <span class="who-clause">who runs fast</span> for Real Madrid.</div>
+          <div class="soccer-card" onclick="this.style.background='var(--blue-lt)'"><span class="league">Premier League</span><br>Salah is the winger <span class="who-clause">who scores goals</span> for Liverpool.</div>
+          <div class="soccer-card" onclick="this.style.background='var(--blue-lt)'"><span class="league">Bundesliga</span><br>Kane is the striker <span class="who-clause">who moved</span> from Tottenham to Bayern Munich.</div>
+          <div class="soccer-card" onclick="this.style.background='var(--blue-lt)'"><span class="league">Ligue 1</span><br>Kvaratskhelia is the winger <span class="who-clause">who joined PSG</span> from Napoli.</div>
+          <div class="soccer-card" onclick="this.style.background='var(--blue-lt)'"><span class="league">Ligue 1</span><br>Cherki is the playmaker <span class="who-clause">who creates chances</span> at PSG.</div>
+          <div class="soccer-card" onclick="this.style.background='var(--blue-lt)'"><span class="league">Bundesliga</span><br>Musiala is the German player <span class="who-clause">who dribbles past defenders</span>.</div>
+          <div class="soccer-card" onclick="this.style.background='var(--blue-lt)'"><span class="league">Champions League</span><br>Real Madrid is the team <span class="who-clause">who keep winning</span> in Europe.<br><span style="font-size:13px;color:var(--ink4);font-style:italic">(team = group of people → who works here)</span></div>
         </div>
       </div>
     </div>
 
-    <!-- ─────────────────────────────────────
-         PHASE 5 — GRAMMAR IN DEPTH (slides 18-22)
-    ───────────────────────────────────── -->
+    <!-- ════════════════════════════════════════════════════════════
+         PHASE 5 — GRAMMAR IN DEPTH (slides 21-24) — PL Be the Expert
+    ════════════════════════════════════════════════════════════ -->
 
-    <!-- s18: PHASE HEADER -->
-    <div class="slide" id="s18" data-notes="<strong>Switch to Grammar in Depth.</strong> Be the Expert sidebar from the planner. We explain when to use who vs which/that. Common mistakes. Transforms.">
+    <!-- s21: PHASE HEADER -->
+    <div class="slide bg-navy" id="s21" data-notes="<strong>Grammar in Depth.</strong> PL Be the Expert. What's a clause? Who vs that/which. Position rule. Soccer drill.">
       <div class="sec-slide">
-        <div class="num">PHASE 5 · 6 MIN</div>
+        <div class="num">PHASE 5 · 5 MIN</div>
         <div class="em">🧠</div>
         <h2>Grammar in Depth</h2>
-        <p>When to use <em style="color:var(--blue)">who</em> vs <em>which/that</em>. Common mistakes. How to turn two sentences into one.</p>
+        <p>What's a clause, really? When does who go in the middle vs the end? A T-chart sort to nail it down.</p>
       </div>
     </div>
 
-    <!-- s19: WHEN TO USE -->
-    <div class="slide" id="s19" data-notes="<strong>Who vs which/that.</strong> The rule: who = people only. Which/that = things and animals. Use the T-chart to lock it in.">
-      <div class="sh purple"><div class="sh-icon">🧭</div><div class="sh-text"><div class="sh-title">When to Use <em>WHO</em></div><div class="sh-sub">Only for people — never for things</div></div><div class="sh-tag">Rule</div></div>
+    <!-- s22: WHAT IS A CLAUSE -->
+    <div class="slide bg-cream" id="s22" data-notes="<strong>What's a clause?</strong> PL Be the Expert: 'A clause is a group of words with a subject and verb.' Show by decomposing soccer sentences.">
+      <div class="sh purple"><div class="sh-icon">🧠</div><div class="sh-text"><div class="sh-title">What is a Who-Clause?</div><div class="sh-sub">A small piece with a verb that describes the person</div></div><div class="sh-tag">In Depth</div></div>
       <div class="sb">
-        <div class="t-chart" style="max-width:1700px;margin:30px auto 0">
+        <div style="max-width:1700px;margin:20px auto 0">
+          <div style="background:#fff;border:3px solid var(--purple);border-radius:18px;padding:32px 40px;margin-bottom:20px">
+            <div style="font-size:18px;font-weight:800;letter-spacing:.24em;color:var(--purple);margin-bottom:14px">A WHO-CLAUSE HAS 2 PARTS</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;text-align:center">
+              <div style="background:var(--purple-lt);border-radius:14px;padding:24px"><div style="font-size:60px;margin-bottom:10px">🔗</div><div style="font-size:24px;font-weight:800;color:var(--purple)">who</div><div style="font-size:16px;color:var(--ink3);margin-top:4px">(the link)</div></div>
+              <div style="background:var(--blue-lt);border-radius:14px;padding:24px"><div style="font-size:60px;margin-bottom:10px">🎯</div><div style="font-size:24px;font-weight:800;color:var(--blue-dk)">verb phrase</div><div style="font-size:16px;color:var(--ink3);margin-top:4px">(what the person does)</div></div>
+            </div>
+          </div>
+          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:28px 36px;font-size:28px;color:var(--ink2);font-weight:600;line-height:1.5">
+            Haaland is the striker <span style="background:var(--purple-lt);color:var(--purple);padding:2px 8px;border-radius:6px;font-weight:800">who</span> <span style="background:var(--blue-lt);color:var(--blue-dk);padding:2px 8px;border-radius:6px;font-weight:800">scores goals for Man City</span>.
+          </div>
+          <div class="dad-bbl" style="margin-top:14px"><strong>Notice</strong>: every who-clause has a verb in it ("scores", "plays", "collects"). That verb does the describing.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- s23: T-CHART DRAG -->
+    <div class="slide bg-cream" id="s23" data-notes="<strong>T-chart sort.</strong> Drag items into WHO (people) column or WHICH/THAT (things) column. Mix of soccer players + objects. Wrong = bounces back, right = locks in.">
+      <div class="sh purple"><div class="sh-icon">🗂️</div><div class="sh-text"><div class="sh-title">Sort: WHO or WHICH/THAT?</div><div class="sh-sub">Tap each chip → it goes to the right column</div></div><div class="sh-tag">Sort</div></div>
+      <div class="sb">
+        <div class="t-chart">
           <div class="t-col who-col">
-            <div class="head">WHO</div>
-            <div class="sub">for PEOPLE 👤</div>
-            <div class="ex">Haaland <strong>who</strong> plays for Man City</div>
-            <div class="ex">My cousin <strong>who</strong> lives in Osaka</div>
-            <div class="ex">Batman <strong>who</strong> fights crime</div>
+            <div class="head">WHO 👤</div>
+            <div class="sub">for PEOPLE</div>
+            <div class="drop-zone" id="who-drop"></div>
           </div>
           <div class="t-col that-col">
-            <div class="head">WHICH / THAT</div>
-            <div class="sub">for THINGS 📦 and ANIMALS 🐾</div>
-            <div class="ex">The ball <strong>that</strong> is round</div>
-            <div class="ex">The stadium <strong>which</strong> is huge</div>
-            <div class="ex">The dog <strong>that</strong> barks</div>
+            <div class="head">WHICH / THAT 📦</div>
+            <div class="sub">for THINGS &amp; ANIMALS</div>
+            <div class="drop-zone" id="that-drop"></div>
           </div>
+        </div>
+        <div class="t-bank" id="t-bank">
+          <button class="t-item" data-target="who" onclick="sortItem(this)">⚽ Haaland</button>
+          <button class="t-item" data-target="that" onclick="sortItem(this)">🥎 a ball</button>
+          <button class="t-item" data-target="who" onclick="sortItem(this)">👨‍👩‍👧 my cousin</button>
+          <button class="t-item" data-target="that" onclick="sortItem(this)">🏟️ a stadium</button>
+          <button class="t-item" data-target="who" onclick="sortItem(this)">🦇 Batman</button>
+          <button class="t-item" data-target="that" onclick="sortItem(this)">🏔️ a mountain</button>
+          <button class="t-item" data-target="who" onclick="sortItem(this)">📸 a photographer</button>
+          <button class="t-item" data-target="that" onclick="sortItem(this)">🦂 a trilobite</button>
+          <button class="t-item" data-target="who" onclick="sortItem(this)">🎯 Bellingham</button>
+          <button class="t-item" data-target="that" onclick="sortItem(this)">🏆 a trophy</button>
         </div>
       </div>
     </div>
 
-    <!-- s20: COMMON MISTAKE -->
-    <div class="slide" id="s20" data-notes="<strong>Common mistakes.</strong> Show errors in red, corrections in green. Help Leo notice the pattern: 'is this a PERSON? Yes → who. No → that.'">
-      <div class="sh purple"><div class="sh-icon">⚠️</div><div class="sh-text"><div class="sh-title">Common Mistakes</div><div class="sh-sub">Don't use <em>who</em> for things!</div></div><div class="sh-tag">Watch out</div></div>
-      <div class="sb">
-        <div style="max-width:1700px;margin:30px auto 0">
-          <div class="err-row bad">
-            <div class="err-mark">❌</div>
-            <div class="sent">I have a <strong>ball</strong> <em style="color:var(--red)">who</em> is round.</div>
-          </div>
-          <div class="err-row ok">
-            <div class="err-mark">✅</div>
-            <div class="sent">I have a <strong>ball</strong> <em style="color:var(--green)">that</em> is round.</div>
-          </div>
-          <div style="height:24px"></div>
-          <div class="err-row bad">
-            <div class="err-mark">❌</div>
-            <div class="sent">The <strong>stadium</strong> <em style="color:var(--red)">who</em> is big.</div>
-          </div>
-          <div class="err-row ok">
-            <div class="err-mark">✅</div>
-            <div class="sent">The <strong>stadium</strong> <em style="color:var(--green)">which</em> is big.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- s21: TRANSFORMS -->
-    <div class="slide" id="s21" data-notes="<strong>Transform two sentences into one.</strong> The skill — see two short sentences, join with who. Practice the move three times.">
-      <div class="sh purple"><div class="sh-icon">🔄</div><div class="sh-text"><div class="sh-title">Two Sentences → One</div><div class="sh-sub">Replace the repeated person with <em>who</em></div></div><div class="sh-tag">Transform</div></div>
+    <!-- s24: POSITION RULE -->
+    <div class="slide bg-cream" id="s24" data-notes="<strong>Position rule.</strong> 'The adjective clause goes immediately after the noun it modifies.' Use the PL example. Show in 3 soccer examples.">
+      <div class="sh purple"><div class="sh-icon">📍</div><div class="sh-text"><div class="sh-title">Where Does WHO Go?</div><div class="sh-sub">Right after the person you're describing</div></div><div class="sh-tag">Position</div></div>
       <div class="sb">
         <div style="max-width:1700px;margin:20px auto 0">
-          <div class="tx-row">
-            <div class="from">Vinicius is a player. Vinicius is fast.</div>
-            <div class="arr">→</div>
-            <div class="to">Vinicius is a player <span class="who">who</span> is fast.</div>
+          <div style="background:#fff;border:3px solid var(--purple);border-radius:14px;padding:28px 36px;margin-bottom:16px;font-size:26px;color:var(--ink2);font-weight:600;line-height:1.5">
+            <span style="background:var(--blue-lt);color:var(--blue-dk);padding:2px 10px;border-radius:6px;font-weight:800">Haaland</span> ⬅ <span style="background:var(--yellow);padding:2px 10px;border-radius:6px;font-weight:800">who scores for Man City</span> is dangerous.
           </div>
-          <div class="tx-row">
-            <div class="from">Salah scores goals. Salah plays for Liverpool.</div>
-            <div class="arr">→</div>
-            <div class="to">Salah, <span class="who">who</span> scores goals, plays for Liverpool.</div>
+          <div style="background:#fff;border:3px solid var(--purple);border-radius:14px;padding:28px 36px;margin-bottom:16px;font-size:26px;color:var(--ink2);font-weight:600;line-height:1.5">
+            I love <span style="background:var(--blue-lt);color:var(--blue-dk);padding:2px 10px;border-radius:6px;font-weight:800">the player</span> ⬅ <span style="background:var(--yellow);padding:2px 10px;border-radius:6px;font-weight:800">who wears number 9</span>.
           </div>
-          <div class="tx-row">
-            <div class="from">Batman is a hero. Batman protects Gotham.</div>
-            <div class="arr">→</div>
-            <div class="to">Batman is a hero <span class="who">who</span> protects Gotham.</div>
+          <div style="background:#fff;border:3px solid var(--purple);border-radius:14px;padding:28px 36px;margin-bottom:16px;font-size:26px;color:var(--ink2);font-weight:600;line-height:1.5">
+            <span style="background:var(--blue-lt);color:var(--blue-dk);padding:2px 10px;border-radius:6px;font-weight:800">Cousins</span> ⬅ <span style="background:var(--yellow);padding:2px 10px;border-radius:6px;font-weight:800">who play in a musical group</span> have fun.
           </div>
+          <div class="dad-bbl" style="margin-top:24px;font-size:22px"><strong>Rule:</strong> "who-clause" sticks to the person like glue. Don't put anything between them.</div>
         </div>
       </div>
     </div>
 
-    <!-- s22: MIXED SAMPLES (Level Up) -->
-    <div class="slide" id="s22" data-notes="<strong>Mixed samples.</strong> A few harder ones — questions, negatives, longer who-clauses. Just read together, no quiz yet.">
-      <div class="sh purple"><div class="sh-icon">🚀</div><div class="sh-text"><div class="sh-title">Mixed Samples</div><div class="sh-sub">Level-up examples — read together</div></div><div class="sh-tag">Level Up</div></div>
-      <div class="sb">
-        <div style="max-width:1700px;margin:20px auto 0">
-          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 32px;margin-bottom:16px;font-size:26px;color:var(--ink2);line-height:1.45">Do you know the player <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who scored</em> for Real Madrid in the final?</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 32px;margin-bottom:16px;font-size:26px;color:var(--ink2);line-height:1.45">My uncle <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who lives in Manchester</em> goes to every City game.</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 32px;margin-bottom:16px;font-size:26px;color:var(--ink2);line-height:1.45">I don't know anyone <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who hasn't seen</em> Avatar.</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:14px;padding:24px 32px;font-size:26px;color:var(--ink2);line-height:1.45">Sid, <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who is the sloth</em> in Ice Age, makes everyone laugh.</div>
-        </div>
-      </div>
-    </div>
+    <!-- ════════════════════════════════════════════════════════════
+         PHASE 6 — PRACTICE 1 (slides 25-30) — PL Activity 1 verbatim
+    ════════════════════════════════════════════════════════════ -->
 
-    <!-- ─────────────────────────────────────
-         PHASE 6 — PRACTICE 1 (slides 23-28)
-    ───────────────────────────────────── -->
-
-    <!-- s23: PHASE HEADER -->
-    <div class="slide" id="s23" data-notes="<strong>Switch to Practice 1.</strong> Five fill-in items. Leo tries each one out loud, then we reveal the answer.">
+    <!-- s25: PHASE HEADER -->
+    <div class="slide bg-orange" id="s25" data-notes="<strong>Practice 1 from the PL.</strong> Activity 1, p.136 — 5 sentence pairs to join with who. Item 1 is done as the model. Items 2-5 Leo joins by tapping the pronoun.">
       <div class="sec-slide">
         <div class="num">PHASE 6 · 8 MIN</div>
         <div class="em">✏️</div>
-        <h2>Practice 1</h2>
-        <p>Five sentences with a blank. Leo says the answer aloud, then we tap to check.</p>
+        <h2 style="color:var(--orange)">Practice 1</h2>
+        <p>The 5 PL items, page 136. Item 1 is the model. For items 2-5: tap the pronoun → it dissolves → "who" floats in.</p>
       </div>
     </div>
 
-    <!-- s24: ITEM 1 -->
-    <div class="slide" id="s24" data-notes="<strong>Item 1.</strong> Leo says: 'Bellingham is the player WHO plays for Real Madrid.' Tap reveal.">
-      <div class="sh blue"><div class="sh-icon">✏️</div><div class="sh-text"><div class="sh-title">Practice 1 — Item 1</div><div class="sh-sub">Premier League / La Liga</div></div><div class="sh-tag">1 of 5</div></div>
+    <!-- s26: ITEM 1 (MODEL) -->
+    <div class="slide bg-cream" id="s26" data-notes="<strong>Item 1 — done for Leo as a model.</strong> PL: 'Item 1 is done for you.' Show the join. Ask 'What word is gone from the new sentence?' (he). This is the demonstration.">
+      <div class="sh orange"><div class="sh-icon">✏️</div><div class="sh-text"><div class="sh-title">Item 1 — Watch the Model</div><div class="sh-sub">PL: "Item 1 is done for you"</div></div><div class="sh-tag">1 of 5</div></div>
       <div class="sb">
-        <div class="pr-card" id="p1">
-          <div class="num">ITEM 1</div>
-          <div class="stem">Bellingham is the player <span class="blank">______</span> plays for Real Madrid.</div>
-          <div class="ans">✅ <strong>who</strong> — Bellingham is the player <em>who plays for Real Madrid</em>.</div>
-          <button class="pr-reveal" onclick="prReveal('p1')">Reveal answer</button>
+        <div class="joiner-card">
+          <div class="pn">SOURCE</div>
+          <div class="src">I have a younger brother. He loves video games.</div>
+          <div style="text-align:center;font-size:40px;color:var(--blue);font-weight:900;margin:14px 0">↓</div>
+          <div class="result show" style="background:var(--blue-lt);border-color:var(--blue);color:var(--blue-dk)">✅ I have a younger brother <span class="hl">who loves video games</span>.</div>
+          <div class="dad-bbl" style="margin-top:20px"><strong>Question:</strong> What word disappeared from the new sentence? <em>(He)</em></div>
         </div>
       </div>
     </div>
 
-    <!-- s25: ITEM 2 -->
-    <div class="slide" id="s25" data-notes="<strong>Item 2.</strong> 'Cherki is the playmaker WHO joined PSG from Lyon.'">
-      <div class="sh blue"><div class="sh-icon">✏️</div><div class="sh-text"><div class="sh-title">Practice 1 — Item 2</div><div class="sh-sub">Ligue 1 transfer</div></div><div class="sh-tag">2 of 5</div></div>
+    <!-- s27: ITEM 2 -->
+    <div class="slide bg-cream" id="s27" data-notes="<strong>Item 2.</strong> 'There is a girl in my class. She collects seashells.' Tap She → who.">
+      <div class="sh orange"><div class="sh-icon">✏️</div><div class="sh-text"><div class="sh-title">Item 2 — Tap "She"</div><div class="sh-sub">PL Activity 1 · Item 2</div></div><div class="sh-tag">2 of 5</div></div>
       <div class="sb">
-        <div class="pr-card" id="p2">
-          <div class="num">ITEM 2</div>
-          <div class="stem">Cherki is the playmaker <span class="blank">______</span> joined PSG.</div>
-          <div class="ans">✅ <strong>who</strong> — Cherki is the playmaker <em>who joined PSG</em>.</div>
-          <button class="pr-reveal" onclick="prReveal('p2')">Reveal answer</button>
+        <div class="joiner-card">
+          <div class="pn">SOURCE</div>
+          <div class="src">There is a girl in my class<span id="i2-period">.</span> <button class="tap-pronoun" id="i2-pronoun" onclick="joinPair('i2','She','collects seashells')">She</button> collects seashells.</div>
+          <div class="hint">👆 Tap "<strong>She</strong>"</div>
+          <div class="result" id="i2-result">✅ There is a girl in my class <span class="hl">who collects seashells</span>.</div>
         </div>
       </div>
     </div>
 
-    <!-- s26: ITEM 3 -->
-    <div class="slide" id="s26" data-notes="<strong>Item 3.</strong> Movie example — 'Sid is the sloth WHO travels with Manny in Ice Age.'">
-      <div class="sh blue"><div class="sh-icon">✏️</div><div class="sh-text"><div class="sh-title">Practice 1 — Item 3</div><div class="sh-sub">Ice Age</div></div><div class="sh-tag">3 of 5</div></div>
+    <!-- s28: ITEM 3 -->
+    <div class="slide bg-cream" id="s28" data-notes="<strong>Item 3.</strong> 'My best friend is a creative person. She takes amazing photos.' Tap She → who.">
+      <div class="sh orange"><div class="sh-icon">✏️</div><div class="sh-text"><div class="sh-title">Item 3 — Tap "She"</div><div class="sh-sub">PL Activity 1 · Item 3</div></div><div class="sh-tag">3 of 5</div></div>
       <div class="sb">
-        <div class="pr-card" id="p3">
-          <div class="num">ITEM 3</div>
-          <div class="stem">Sid is the sloth <span class="blank">______</span> travels with Manny in Ice Age.</div>
-          <div class="ans">✅ <strong>who</strong> — Sid is the sloth <em>who travels with Manny in Ice Age</em>.<br><span style="font-size:18px;font-weight:600;color:var(--ink3)">(In cartoons, animal characters that talk get treated like people — who is fine here.)</span></div>
-          <button class="pr-reveal" onclick="prReveal('p3')">Reveal answer</button>
+        <div class="joiner-card">
+          <div class="pn">SOURCE</div>
+          <div class="src">My best friend is a creative person<span id="i3-period">.</span> <button class="tap-pronoun" id="i3-pronoun" onclick="joinPair('i3','She','takes amazing photos')">She</button> takes amazing photos.</div>
+          <div class="hint">👆 Tap "<strong>She</strong>"</div>
+          <div class="result" id="i3-result">✅ My best friend is a creative person <span class="hl">who takes amazing photos</span>.</div>
         </div>
       </div>
     </div>
 
-    <!-- s27: ITEM 4 -->
-    <div class="slide" id="s27" data-notes="<strong>Item 4.</strong> 'Kane is the striker WHO scored for Bayern Munich.'">
-      <div class="sh blue"><div class="sh-icon">✏️</div><div class="sh-text"><div class="sh-title">Practice 1 — Item 4</div><div class="sh-sub">Bundesliga</div></div><div class="sh-tag">4 of 5</div></div>
+    <!-- s29: ITEM 4 — Contraction case -->
+    <div class="slide bg-cream" id="s29" data-notes="<strong>Item 4 — contraction!</strong> 'I have an aunt. She's very creative.' PL note: 'The word She's may be difficult... explain that it's a contraction. What two words make up she's? (she is). They can use the word is to write their combined sentence.' Result: 'I have an aunt who is / who's very creative.'">
+      <div class="sh orange"><div class="sh-icon">✂️</div><div class="sh-text"><div class="sh-title">Item 4 — Contraction Time!</div><div class="sh-sub">PL: "she's = she + is"</div></div><div class="sh-tag">4 of 5</div></div>
       <div class="sb">
-        <div class="pr-card" id="p4">
-          <div class="num">ITEM 4</div>
-          <div class="stem">Kane is the striker <span class="blank">______</span> scored for Bayern Munich.</div>
-          <div class="ans">✅ <strong>who</strong> — Kane is the striker <em>who scored for Bayern Munich</em>.</div>
-          <button class="pr-reveal" onclick="prReveal('p4')">Reveal answer</button>
+        <div class="joiner-card">
+          <div class="pn">SOURCE · (heads up — She's is a contraction!)</div>
+          <div class="src">I have an aunt<span id="i4-period">.</span> <button class="tap-pronoun" id="i4-pronoun" onclick="joinPair('i4','She is','very creative')">She's</button> very creative.</div>
+          <div class="hint">👆 Tap "<strong>She's</strong>" — remember, She's = She + is</div>
+          <div class="result" id="i4-result">✅ I have an aunt <span class="hl">who is</span> very creative. <br><span style="font-size:22px;color:var(--ink3);font-style:italic">(Or contraction-style: I have an aunt <strong>who's</strong> very creative.)</span></div>
         </div>
       </div>
     </div>
 
-    <!-- s28: ITEM 5 -->
-    <div class="slide" id="s28" data-notes="<strong>Item 5 — tricky one.</strong> The blank is for a thing (the ball), so the answer is NOT 'who'. Use 'that' here. Tests whether Leo really understands the rule.">
-      <div class="sh blue"><div class="sh-icon">✏️</div><div class="sh-text"><div class="sh-title">Practice 1 — Item 5</div><div class="sh-sub">Tricky one — is it a person?</div></div><div class="sh-tag">5 of 5</div></div>
+    <!-- s30: ITEM 5 — They -->
+    <div class="slide bg-cream" id="s30" data-notes="<strong>Item 5.</strong> 'I know three people. They collect fossils.' Tap They → who. Note the verb stays 'collect' (not 'collects') because 'three people' is plural.">
+      <div class="sh orange"><div class="sh-icon">✏️</div><div class="sh-text"><div class="sh-title">Item 5 — Tap "They"</div><div class="sh-sub">PL Activity 1 · Item 5 (plural!)</div></div><div class="sh-tag">5 of 5</div></div>
       <div class="sb">
-        <div class="pr-card" id="p5">
-          <div class="num">ITEM 5</div>
-          <div class="stem">The ball <span class="blank">______</span> is yellow is the new La Liga ball.</div>
-          <div class="ans">✅ <strong>that</strong> (or <strong>which</strong>) — a ball is a thing, NOT a person, so we don't use <em>who</em>!</div>
-          <button class="pr-reveal" onclick="prReveal('p5')">Reveal answer</button>
+        <div class="joiner-card">
+          <div class="pn">SOURCE</div>
+          <div class="src">I know three people<span id="i5-period">.</span> <button class="tap-pronoun" id="i5-pronoun" onclick="joinPair('i5','They','collect fossils')">They</button> collect fossils.</div>
+          <div class="hint">👆 Tap "<strong>They</strong>"</div>
+          <div class="result" id="i5-result">✅ I know three people <span class="hl">who collect fossils</span>. 🦂<br><span style="font-size:22px;color:var(--ink3);font-style:italic">(Plural people → "collect" stays plural. who never changes!)</span></div>
         </div>
       </div>
     </div>
 
-    <!-- ─────────────────────────────────────
-         PHASE 7 — PRACTICE 2 (slides 29-33)
-    ───────────────────────────────────── -->
+    <!-- ════════════════════════════════════════════════════════════
+         PHASE 7 — PRACTICE 2 (slides 31-34) — PL Class Survey
+    ════════════════════════════════════════════════════════════ -->
 
-    <!-- s29: PHASE HEADER -->
-    <div class="slide" id="s29" data-notes="<strong>Switch to Practice 2 — Find Someone Who survey.</strong> The NatGeo activity. Leo asks Dad each row. Use real names. Build a class survey chart.">
+    <!-- s31: PHASE HEADER -->
+    <div class="slide bg-blue" id="s31" data-notes="<strong>Practice 2 — PL Class Survey.</strong> Activity 2, p.137. 6 'Who...?' questions. Leo asks Dad each one. Count answers. Then write summary sentences with who.">
       <div class="sec-slide">
         <div class="num">PHASE 7 · 7 MIN</div>
-        <div class="em">🔍</div>
-        <h2>Practice 2</h2>
-        <p>"Find Someone Who…" — Leo asks Dad each row and writes the name. We're using <em>who</em> in real questions now.</p>
+        <div class="em">📋</div>
+        <h2 style="color:var(--blue)">Practice 2</h2>
+        <p>The PL Class Survey, page 137. Leo asks Dad — Dad answers — we count and write summary sentences with who.</p>
       </div>
     </div>
 
-    <!-- s30: SURVEY CHART -->
-    <div class="slide" id="s30" data-notes="<strong>Survey chart.</strong> Six rows. Leo asks: 'Do you watch a team WHO plays in La Liga?' If yes, write the name. Count at the end.">
-      <div class="sh blue"><div class="sh-icon">📋</div><div class="sh-text"><div class="sh-title">Find Someone Who…</div><div class="sh-sub">Ask each question — write Dad's answer</div></div><div class="sh-tag">Survey</div></div>
+    <!-- s32: SURVEY CHART -->
+    <div class="slide bg-cream" id="s32" data-notes="<strong>Survey chart.</strong> The 6 PL questions verbatim. Leo clicks Yes or No for Dad. Count fills in. Sample says 'There are three students who enjoy books. They are Maria, Carlos, and Tomas.' Adapt for Dad.">
+      <div class="sh blue"><div class="sh-icon">📋</div><div class="sh-text"><div class="sh-title">Class Survey · Ask Dad Each Row</div><div class="sh-sub">PL Activity 2 — 6 questions from page 137</div></div><div class="sh-tag">Survey</div></div>
       <div class="sb">
-        <div class="survey">
-          <table>
-            <thead>
-              <tr><th style="width:55%">Find someone who…</th><th style="width:30%">Name</th><th style="width:15%;text-align:center">✓</th></tr>
-            </thead>
-            <tbody>
-              <tr><td class="q">… watches a team who plays in the Premier League</td><td class="name">_______________</td><td class="cnt">▢</td></tr>
-              <tr><td class="q">… knows a player who plays for Real Madrid</td><td class="name">_______________</td><td class="cnt">▢</td></tr>
-              <tr><td class="q">… has a relative who lives outside Japan</td><td class="name">_______________</td><td class="cnt">▢</td></tr>
-              <tr><td class="q">… likes a movie who has Batman in it</td><td class="name">_______________</td><td class="cnt">▢</td></tr>
-              <tr><td class="q">… can name a player who plays for PSG</td><td class="name">_______________</td><td class="cnt">▢</td></tr>
-              <tr><td class="q">… knows someone who plays soccer every weekend</td><td class="name">_______________</td><td class="cnt">▢</td></tr>
-            </tbody>
-          </table>
+        <div class="survey-table">
+          <div class="row"><div>Who …</div><div>Dad?</div><div style="text-align:center">✓</div></div>
+          <div class="row"><div class="q">1. enjoys books?</div><div class="yn"><button class="yn-btn" onclick="svy(this,'sv1')">Yes</button><button class="yn-btn" onclick="svy(this,'sv1')">No</button></div><div class="cnt" id="sv1">—</div></div>
+          <div class="row"><div class="q">2. likes to compete in sports?</div><div class="yn"><button class="yn-btn" onclick="svy(this,'sv2')">Yes</button><button class="yn-btn" onclick="svy(this,'sv2')">No</button></div><div class="cnt" id="sv2">—</div></div>
+          <div class="row"><div class="q">3. likes to play video games?</div><div class="yn"><button class="yn-btn" onclick="svy(this,'sv3')">Yes</button><button class="yn-btn" onclick="svy(this,'sv3')">No</button></div><div class="cnt" id="sv3">—</div></div>
+          <div class="row"><div class="q">4. often takes photos?</div><div class="yn"><button class="yn-btn" onclick="svy(this,'sv4')">Yes</button><button class="yn-btn" onclick="svy(this,'sv4')">No</button></div><div class="cnt" id="sv4">—</div></div>
+          <div class="row"><div class="q">5. has more than one hobby?</div><div class="yn"><button class="yn-btn" onclick="svy(this,'sv5')">Yes</button><button class="yn-btn" onclick="svy(this,'sv5')">No</button></div><div class="cnt" id="sv5">—</div></div>
+          <div class="row"><div class="q">6. collects something?</div><div class="yn"><button class="yn-btn" onclick="svy(this,'sv6')">Yes</button><button class="yn-btn" onclick="svy(this,'sv6')">No</button></div><div class="cnt" id="sv6">—</div></div>
         </div>
       </div>
     </div>
 
-    <!-- s31: DAD MODELS THE Q -->
-    <div class="slide" id="s31" data-notes="<strong>Dad models one question.</strong> Show how to ask using who naturally.">
-      <div class="sh blue"><div class="sh-icon">👨</div><div class="sh-text"><div class="sh-title">Dad Models</div><div class="sh-sub">Ask the question with <em>who</em></div></div><div class="sh-tag">Model</div></div>
+    <!-- s33: SUMMARY SENTENCES -->
+    <div class="slide bg-cream" id="s33" data-notes="<strong>Write summary sentences with who.</strong> Sample frame from PL: 'There is one person who enjoys books. It is Dad.' For each YES answer, build a sentence with who.">
+      <div class="sh blue"><div class="sh-icon">📝</div><div class="sh-text"><div class="sh-title">Write the Sentences with WHO</div><div class="sh-sub">For each YES, use the PL sentence frame</div></div><div class="sh-tag">Build</div></div>
       <div class="sb">
-        <div style="max-width:1500px;margin:30px auto 0">
-          <div class="dad-bbl" style="margin-bottom:30px;font-size:30px">Leo, ask me: <strong>"Do you know a player who plays for Real Madrid?"</strong></div>
-          <div class="leo-bbl" style="margin-bottom:30px;font-size:30px">Do you know a player <strong>who plays for Real Madrid</strong>?</div>
-          <div class="dad-bbl" style="font-size:30px">Yes! <strong>Bellingham</strong> — he's the midfielder <em>who scores</em> for Real Madrid.</div>
+        <div style="max-width:1700px;margin:30px auto 0">
+          <div style="background:#fff;border:3px solid var(--blue);border-radius:16px;padding:30px 40px;margin-bottom:18px;font-size:28px;color:var(--ink);font-weight:600;line-height:1.5">
+            There is one person in our house <span style="background:var(--yellow);padding:2px 10px;border-radius:6px;font-weight:800">who enjoys books</span>. He is Dad.
+          </div>
+          <div style="background:#fff;border:3px solid var(--blue);border-radius:16px;padding:30px 40px;margin-bottom:18px;font-size:28px;color:var(--ink);font-weight:600;line-height:1.5">
+            There is one person <span style="background:var(--yellow);padding:2px 10px;border-radius:6px;font-weight:800">who likes to compete in sports</span>. It's Leo. ⚽
+          </div>
+          <div style="background:#fff;border:3px solid var(--blue);border-radius:16px;padding:30px 40px;margin-bottom:18px;font-size:28px;color:var(--ink);font-weight:600;line-height:1.5">
+            There is one person <span style="background:var(--yellow);padding:2px 10px;border-radius:6px;font-weight:800">who collects soccer cards</span>. It's Leo too.
+          </div>
+          <div class="dad-bbl" style="margin-top:24px"><strong>Try one more</strong> using Mom's answers: "There is one person who ___. It's Mom."</div>
         </div>
       </div>
     </div>
 
-    <!-- s32: LEO ASKS DAD -->
-    <div class="slide" id="s32" data-notes="<strong>Leo's turn to ask.</strong> Leo asks each row from the survey. Dad answers. Mark the survey live on paper or whiteboard.">
-      <div class="sh blue"><div class="sh-icon">⚽</div><div class="sh-text"><div class="sh-title">Leo Asks Dad</div><div class="sh-sub">Ask each survey row out loud — using <em>who</em></div></div><div class="sh-tag">Leo's turn</div></div>
+    <!-- s34: BONUS — SOCCER SURVEY -->
+    <div class="slide bg-cream" id="s34" data-notes="<strong>BONUS — soccer survey.</strong> Same survey shape but soccer-themed. Practice using 'who' to describe favorite players.">
+      <div class="sh blue"><div class="sh-icon">⚽</div><div class="sh-text"><div class="sh-title">Bonus — Soccer Survey</div><div class="sh-sub">Find a player who…</div></div><div class="sh-tag">Bonus</div></div>
       <div class="sb">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;max-width:1700px;margin:30px auto 0">
-          <div style="background:#fff;border:2px solid var(--border);border-radius:16px;padding:32px"><div style="font-size:18px;font-weight:800;letter-spacing:.2em;color:var(--blue);margin-bottom:14px">QUESTION 1</div><div style="font-size:26px;color:var(--ink);font-weight:600;line-height:1.45">Do you watch a team <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who plays</em> in the Premier League?</div></div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:16px;padding:32px"><div style="font-size:18px;font-weight:800;letter-spacing:.2em;color:var(--blue);margin-bottom:14px">QUESTION 2</div><div style="font-size:26px;color:var(--ink);font-weight:600;line-height:1.45">Do you know a player <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who plays for</em> Real Madrid?</div></div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:16px;padding:32px"><div style="font-size:18px;font-weight:800;letter-spacing:.2em;color:var(--blue);margin-bottom:14px">QUESTION 3</div><div style="font-size:26px;color:var(--ink);font-weight:600;line-height:1.45">Do you have a relative <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who lives</em> outside Japan?</div></div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:16px;padding:32px"><div style="font-size:18px;font-weight:800;letter-spacing:.2em;color:var(--blue);margin-bottom:14px">QUESTION 4</div><div style="font-size:26px;color:var(--ink);font-weight:600;line-height:1.45">Do you know a hero <em style="background:var(--yellow);padding:2px 8px;border-radius:6px">who fights</em> crime in a movie?</div></div>
+        <div class="survey-table">
+          <div class="row"><div>Find a player who …</div><div>Name</div><div style="text-align:center">⚽</div></div>
+          <div class="row"><div class="q">1. plays in the Premier League</div><div class="yn"><strong style="font-size:20px;color:var(--ink2);padding:8px 14px">Haaland / Salah</strong></div><div class="cnt">⚽</div></div>
+          <div class="row"><div class="q">2. plays for Real Madrid</div><div class="yn"><strong style="font-size:20px;color:var(--ink2);padding:8px 14px">Bellingham / Vinicius</strong></div><div class="cnt">⚽</div></div>
+          <div class="row"><div class="q">3. plays in Ligue 1</div><div class="yn"><strong style="font-size:20px;color:var(--ink2);padding:8px 14px">Kvaratskhelia / Cherki</strong></div><div class="cnt">⚽</div></div>
+          <div class="row"><div class="q">4. is very young (under 20)</div><div class="yn"><strong style="font-size:20px;color:var(--ink2);padding:8px 14px">Lamine Yamal</strong></div><div class="cnt">⚽</div></div>
+          <div class="row"><div class="q">5. plays for Bayern Munich</div><div class="yn"><strong style="font-size:20px;color:var(--ink2);padding:8px 14px">Kane / Musiala</strong></div><div class="cnt">⚽</div></div>
+          <div class="row"><div class="q">6. is a striker</div><div class="yn"><strong style="font-size:20px;color:var(--ink2);padding:8px 14px">Haaland / Kane</strong></div><div class="cnt">⚽</div></div>
         </div>
+        <div class="dad-bbl" style="margin-top:24px;max-width:1500px;margin-left:auto;margin-right:auto"><strong>Build:</strong> "Lamine Yamal is the player <em>who is very young</em>." "Haaland is the striker <em>who plays for Man City</em>."</div>
       </div>
     </div>
 
-    <!-- s33: RESULTS REVIEW -->
-    <div class="slide" id="s33" data-notes="<strong>Review the survey.</strong> Look back at the chart. Talk about what we found. Celebrate the questions that worked.">
-      <div class="sh blue"><div class="sh-icon">🏁</div><div class="sh-text"><div class="sh-title">Results</div><div class="sh-sub">What did we learn?</div></div><div class="sh-tag">Review</div></div>
-      <div class="sb">
-        <div style="max-width:1500px;margin:50px auto 0;text-align:center">
-          <div style="font-size:60px;margin-bottom:30px">📊</div>
-          <div style="font-size:36px;color:var(--ink);font-weight:700;margin-bottom:30px;line-height:1.4">How many times did you say the word <em style="color:var(--blue)">who</em>?</div>
-          <div style="background:var(--blue-lt);border:3px solid var(--blue);border-radius:18px;padding:50px;font-size:120px;font-weight:900;color:var(--blue-dk)">6+</div>
-          <div style="margin-top:30px;font-size:28px;color:var(--ink3);font-weight:600">Every time you describe a person — say <em style="color:var(--blue)">who</em>.</div>
-        </div>
-      </div>
-    </div>
+    <!-- ════════════════════════════════════════════════════════════
+         PHASE 8 — APPLY (slides 35-38) — PL Guess Who
+    ════════════════════════════════════════════════════════════ -->
 
-    <!-- ─────────────────────────────────────
-         PHASE 8 — APPLY (slides 34-39)
-    ───────────────────────────────────── -->
-
-    <!-- s34: PHASE HEADER -->
-    <div class="slide" id="s34" data-notes="<strong>Switch to Apply.</strong> Guess-who game using who clauses. Leo picks a person from a card. Dad guesses. Then swap.">
+    <!-- s35: PHASE HEADER -->
+    <div class="slide bg-yellow" id="s35" data-notes="<strong>Apply — Guess Who.</strong> PL Activity 3. Group dialogue with model: 'This person is someone who enjoys books and often takes photos. Who is it?' We'll do family round first, then a soccer round.">
       <div class="sec-slide">
         <div class="num">PHASE 8 · 8 MIN</div>
         <div class="em">💬</div>
-        <h2>Apply</h2>
-        <p>Guess-who game using <em style="color:var(--blue)">who</em> clues. Leo gives clues. Dad guesses. Then we swap.</p>
+        <h2 style="color:var(--gold-dk)">Apply — Guess Who</h2>
+        <p>Dad gives who-clues. Leo guesses the person. Family round, then soccer round.</p>
       </div>
     </div>
 
-    <!-- s35: MODEL DIALOGUE -->
-    <div class="slide" id="s35" data-notes="<strong>Model the dialogue.</strong> Read both sides. Show that EVERY clue uses who-clause.">
-      <div class="sh blue"><div class="sh-icon">🎙️</div><div class="sh-text"><div class="sh-title">How to Play</div><div class="sh-sub">Each clue uses <em>who</em></div></div><div class="sh-tag">Model</div></div>
+    <!-- s36: MODEL DIALOGUE -->
+    <div class="slide bg-cream" id="s36" data-notes="<strong>Model the PL dialogue.</strong> 'This person is someone who enjoys books and often takes photos. Who is it? Is it Tomas?' Show the back-and-forth.">
+      <div class="sh gold"><div class="sh-icon">🎙️</div><div class="sh-text"><div class="sh-title">How to Play — PL Model Dialogue</div><div class="sh-sub">Each clue uses "who"</div></div><div class="sh-tag">Model</div></div>
       <div class="sb">
         <div style="max-width:1500px;margin:30px auto 0">
-          <div class="leo-bbl" style="margin-bottom:24px;font-size:28px">I'm thinking of a player <strong>who plays</strong> in La Liga.</div>
-          <div class="dad-bbl" style="margin-bottom:24px;font-size:28px">Is it Bellingham?</div>
-          <div class="leo-bbl" style="margin-bottom:24px;font-size:28px">No — he's a player <strong>who is</strong> only 18 years old.</div>
-          <div class="dad-bbl" style="font-size:28px">Lamine Yamal!</div>
+          <div class="dad-bbl" style="margin-bottom:18px;font-size:24px">This person is someone <strong>who enjoys books</strong> and <strong>who often takes photos</strong>. Who is it?</div>
+          <div class="leo-bbl" style="margin-bottom:18px;font-size:24px">Is it Mom?</div>
+          <div class="dad-bbl" style="margin-bottom:18px;font-size:24px">Yes! How did you know?</div>
+          <div class="leo-bbl" style="font-size:24px">Mom is the person <strong>who reads every night</strong>! 📚</div>
         </div>
+        <div style="margin-top:30px;text-align:center;font-size:22px;color:var(--ink3);font-style:italic">👉 Every clue starts with "<strong style="color:var(--blue)">who</strong>".</div>
       </div>
     </div>
 
-    <!-- s36: FRAMES -->
-    <div class="slide" id="s36" data-notes="<strong>Sentence frames.</strong> Leo can choose any frame to start his clue.">
-      <div class="sh blue"><div class="sh-icon">🧰</div><div class="sh-text"><div class="sh-title">Sentence Frames</div><div class="sh-sub">Start your clue with one of these</div></div><div class="sh-tag">Frames</div></div>
+    <!-- s37: FAMILY GUESS WHO -->
+    <div class="slide bg-cream" id="s37" data-notes="<strong>Family Guess Who.</strong> Dad clicks 'Give a clue' → reveals one who-clue at a time. Leo clicks the silhouette he thinks. Right = card flips, wrong = shake.">
+      <div class="sh gold"><div class="sh-icon">👨‍👩‍👧</div><div class="sh-text"><div class="sh-title">Round 1 · Family</div><div class="sh-sub">Click "Give a clue" — then guess the silhouette</div></div><div class="sh-tag">Round 1</div></div>
       <div class="sb">
-        <div class="frames">
-          <div class="frame">I'm thinking of a person <em style="color:var(--blue)">who</em> <span class="blank"></span>.</div>
-          <div class="frame">It's the player <em style="color:var(--blue)">who</em> <span class="blank"></span>.</div>
-          <div class="frame">It's the hero <em style="color:var(--blue)">who</em> <span class="blank"></span>.</div>
+        <div class="gw-controls">
+          <div class="clue-row" id="gw1-clue">Click "Give a clue" to start! Dad's thinking of one of these 4 people…</div>
+          <button class="gw-clue-btn" id="gw1-btn" onclick="giveClueFamily()">🔍 Give a clue</button>
+          <span id="gw1-clue-count" style="margin-left:18px;font-size:18px;color:var(--ink3);font-weight:600">Clue 0 of 3</span>
+        </div>
+        <div class="gw-grid">
+          <div class="gw-card hidden" onclick="guessFamily(this,'Dad')"><div class="silhouette">👨</div><div class="name">Dad</div></div>
+          <div class="gw-card hidden" onclick="guessFamily(this,'Mom')"><div class="silhouette">👩</div><div class="name">Mom</div></div>
+          <div class="gw-card hidden" onclick="guessFamily(this,'Leo')"><div class="silhouette">⚽</div><div class="name">Leo</div></div>
+          <div class="gw-card hidden" onclick="guessFamily(this,'Grandma')"><div class="silhouette">👵</div><div class="name">Grandma</div></div>
         </div>
       </div>
     </div>
 
-    <!-- s37: GAME RULES -->
-    <div class="slide" id="s37" data-notes="<strong>Game rules.</strong> 3 clues max. Each clue uses who. Then a guess.">
-      <div class="sh blue"><div class="sh-icon">📜</div><div class="sh-text"><div class="sh-title">Rules</div><div class="sh-sub">3 clues max — each with <em>who</em></div></div><div class="sh-tag">Setup</div></div>
+    <!-- s38: SOCCER GUESS WHO -->
+    <div class="slide bg-cream" id="s38" data-notes="<strong>Soccer Guess Who.</strong> Same game with 8 soccer players. Each card has its silhouette + name hidden. Dad gives 3 who-clues, Leo guesses.">
+      <div class="sh gold"><div class="sh-icon">⚽</div><div class="sh-text"><div class="sh-title">Round 2 · Soccer</div><div class="sh-sub">Same game — soccer edition</div></div><div class="sh-tag">Round 2</div></div>
       <div class="sb">
-        <div style="max-width:1500px;margin:40px auto 0;display:flex;flex-direction:column;gap:24px">
-          <div style="background:#fff;border:2px solid var(--border);border-radius:16px;padding:30px 40px;font-size:28px;color:var(--ink2);font-weight:600;display:flex;align-items:center;gap:24px"><div style="width:60px;height:60px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;flex-shrink:0">1</div>Pick a person from the cards on the next slide.</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:16px;padding:30px 40px;font-size:28px;color:var(--ink2);font-weight:600;display:flex;align-items:center;gap:24px"><div style="width:60px;height:60px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;flex-shrink:0">2</div>Give up to 3 clues — each one MUST use <em style="color:var(--blue)">who</em>.</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:16px;padding:30px 40px;font-size:28px;color:var(--ink2);font-weight:600;display:flex;align-items:center;gap:24px"><div style="width:60px;height:60px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;flex-shrink:0">3</div>Other person guesses. Swap roles. ⚽</div>
+        <div class="gw-controls">
+          <div class="clue-row" id="gw2-clue">Click "Give a clue" — Dad's thinking of one of these 8 players…</div>
+          <button class="gw-clue-btn" id="gw2-btn" onclick="giveClueSoccer()">🔍 Give a clue</button>
+          <span id="gw2-clue-count" style="margin-left:18px;font-size:18px;color:var(--ink3);font-weight:600">Clue 0 of 3</span>
+        </div>
+        <div class="gw-grid">
+          <div class="gw-card hidden" onclick="guessSoccer(this,'Haaland')"><div class="silhouette">⚽</div><div class="name">Haaland</div></div>
+          <div class="gw-card hidden" onclick="guessSoccer(this,'Bellingham')"><div class="silhouette">🎯</div><div class="name">Bellingham</div></div>
+          <div class="gw-card hidden" onclick="guessSoccer(this,'Lamine Yamal')"><div class="silhouette">⚡</div><div class="name">Lamine Yamal</div></div>
+          <div class="gw-card hidden" onclick="guessSoccer(this,'Kane')"><div class="silhouette">🔥</div><div class="name">Kane</div></div>
+          <div class="gw-card hidden" onclick="guessSoccer(this,'Salah')"><div class="silhouette">🦅</div><div class="name">Salah</div></div>
+          <div class="gw-card hidden" onclick="guessSoccer(this,'Vinicius')"><div class="silhouette">🏃</div><div class="name">Vinicius Jr.</div></div>
+          <div class="gw-card hidden" onclick="guessSoccer(this,'Kvaratskhelia')"><div class="silhouette">🇬🇪</div><div class="name">Kvaratskhelia</div></div>
+          <div class="gw-card hidden" onclick="guessSoccer(this,'Cherki')"><div class="silhouette">🎨</div><div class="name">Cherki</div></div>
         </div>
       </div>
     </div>
 
-    <!-- s38: CARDS -->
-    <div class="slide" id="s38" data-notes="<strong>Person cards.</strong> Tap any one. Use 3 who-clues. Then guess.">
-      <div class="sh blue"><div class="sh-icon">🃏</div><div class="sh-text"><div class="sh-title">Pick a Card</div><div class="sh-sub">8 people — give 3 clues using <em>who</em></div></div><div class="sh-tag">8 Cards</div></div>
-      <div class="sb">
-        <div class="cards-row">
-          <div class="pcard"><div class="em">⚽</div><div style="font-size:22px;font-weight:800;color:var(--ink);margin-bottom:6px">Haaland</div><div class="who-clue">who plays for Man City who scores goals who is Norwegian</div></div>
-          <div class="pcard"><div class="em">🎯</div><div style="font-size:22px;font-weight:800;color:var(--ink);margin-bottom:6px">Bellingham</div><div class="who-clue">who plays for Real Madrid who is English who scored a Champions League final goal</div></div>
-          <div class="pcard"><div class="em">⚡</div><div style="font-size:22px;font-weight:800;color:var(--ink);margin-bottom:6px">Lamine Yamal</div><div class="who-clue">who plays for Barcelona who is very young who is Spanish</div></div>
-          <div class="pcard"><div class="em">🔥</div><div style="font-size:22px;font-weight:800;color:var(--ink);margin-bottom:6px">Kane</div><div class="who-clue">who plays for Bayern who is English who used to play for Tottenham</div></div>
-          <div class="pcard"><div class="em">🦇</div><div style="font-size:22px;font-weight:800;color:var(--ink);margin-bottom:6px">Batman</div><div class="who-clue">who fights crime who lives in Gotham who is also Bruce Wayne</div></div>
-          <div class="pcard"><div class="em">🌊</div><div style="font-size:22px;font-weight:800;color:var(--ink);margin-bottom:6px">Jake Sully</div><div class="who-clue">who became Na'vi who is in Avatar who can ride a banshee</div></div>
-          <div class="pcard"><div class="em">🥋</div><div style="font-size:22px;font-weight:800;color:var(--ink);margin-bottom:6px">John Wick</div><div class="who-clue">who never gives up who had a dog who fights everyone</div></div>
-          <div class="pcard"><div class="em">🦥</div><div style="font-size:22px;font-weight:800;color:var(--ink);margin-bottom:6px">Sid</div><div class="who-clue">who is a sloth who is in Ice Age who is friends with Manny</div></div>
-        </div>
-      </div>
-    </div>
+    <!-- ════════════════════════════════════════════════════════════
+         PHASE 9 — EXTEND (slides 39-41) — PL Word Web
+    ════════════════════════════════════════════════════════════ -->
 
-    <!-- s39: REFLECTION -->
-    <div class="slide" id="s39" data-notes="<strong>Reflect on the game.</strong> Which clue worked best? Which was hardest?">
-      <div class="sh blue"><div class="sh-icon">💭</div><div class="sh-text"><div class="sh-title">Quick Reflection</div><div class="sh-sub">What worked?</div></div><div class="sh-tag">Reflect</div></div>
-      <div class="sb">
-        <div style="max-width:1500px;margin:60px auto 0">
-          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:50px 60px;margin-bottom:24px;font-size:32px;color:var(--ink);font-weight:600">🟢 Which clue was your <strong style="color:var(--green)">easiest</strong> to give?</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:50px 60px;margin-bottom:24px;font-size:32px;color:var(--ink);font-weight:600">🟡 Which clue was <strong style="color:var(--gold-dk)">tricky</strong>?</div>
-          <div style="background:#fff;border:2px solid var(--border);border-radius:18px;padding:50px 60px;font-size:32px;color:var(--ink);font-weight:600">🔵 Which person was <strong style="color:var(--blue)">hardest to guess</strong>?</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ─────────────────────────────────────
-         PHASE 9 — EXTEND (slides 40-42)
-    ───────────────────────────────────── -->
-
-    <!-- s40: PHASE HEADER -->
-    <div class="slide" id="s40" data-notes="<strong>Switch to Extend.</strong> Leo writes 3 sentences about people he knows — real or famous — using who.">
+    <!-- s39: PHASE HEADER -->
+    <div class="slide bg-orange" id="s39" data-notes="<strong>Extend — PL Word Web.</strong> Pair work. Center oval = partner name. Surrounding ovals = hobbies. Then write description using who.">
       <div class="sec-slide">
         <div class="num">PHASE 9 · 5 MIN</div>
         <div class="em">🚀</div>
-        <h2>Extend</h2>
-        <p>Leo writes 3 sentences about people he knows — real or famous — each using a <em style="color:var(--blue)">who</em>-clause.</p>
+        <h2 style="color:var(--orange)">Extend — Word Web</h2>
+        <p>PL Word Web graphic organizer. Dad's name in the center, his hobbies around. Then write a description using who.</p>
       </div>
     </div>
 
-    <!-- s41: WRITE -->
-    <div class="slide" id="s41" data-notes="<strong>Write 3 sentences.</strong> Topics: a player, a relative, a movie character. Each one uses who.">
-      <div class="sh blue"><div class="sh-icon">✍️</div><div class="sh-text"><div class="sh-title">Write 3 Sentences</div><div class="sh-sub">Player · Relative · Movie character</div></div><div class="sh-tag">Write</div></div>
+    <!-- s40: WORD WEB -->
+    <div class="slide bg-cream" id="s40" data-notes="<strong>Word web.</strong> Click each outer oval to fill in one of Dad's hobbies. PL example: 'Luisa' in center, 'plays board games / collects rocks' around.">
+      <div class="sh orange"><div class="sh-icon">🕸️</div><div class="sh-text"><div class="sh-title">Word Web · Dad's Hobbies</div><div class="sh-sub">Tap each oval to fill it</div></div><div class="sh-tag">Web</div></div>
       <div class="sb">
-        <div class="lines" style="max-width:1700px;margin:30px auto 0">
-          <div class="line"><span class="lb">⚽</span>__________________________________________________________________</div>
-          <div class="line"><span class="lb">👨‍👩‍👧</span>__________________________________________________________________</div>
-          <div class="line"><span class="lb">🎬</span>__________________________________________________________________</div>
+        <div class="word-web">
+          <div class="ww-oval center">Dad 👨</div>
+          <div class="ww-oval o1" onclick="fillOval(this,'collects soccer cards ⚽')">Tap to fill</div>
+          <div class="ww-oval o2" onclick="fillOval(this,'watches movies 🎬')">Tap to fill</div>
+          <div class="ww-oval o3" onclick="fillOval(this,'reads books 📖')">Tap to fill</div>
+          <div class="ww-oval o4" onclick="fillOval(this,'cooks dinner 🍳')">Tap to fill</div>
+        </div>
+        <div class="dad-bbl" style="margin-top:20px;max-width:1500px;margin-left:auto;margin-right:auto;font-size:22px"><strong>Next:</strong> Use the word web to write: "Dad is a person <em>who watches movies</em>." or "Dad is someone <em>who reads books</em>."</div>
+      </div>
+    </div>
+
+    <!-- s41: WRITE DESCRIPTION -->
+    <div class="slide bg-cream" id="s41" data-notes="<strong>Write descriptions.</strong> PL model: 'Luisa is a student who collects rocks.' Leo writes 3 about Dad from the word web.">
+      <div class="sh orange"><div class="sh-icon">✍️</div><div class="sh-text"><div class="sh-title">Write 3 About Dad</div><div class="sh-sub">Use the word web — one who-sentence each</div></div><div class="sh-tag">Write</div></div>
+      <div class="sb">
+        <div style="max-width:1700px;margin:30px auto 0">
+          <div style="background:#fff;border:3px solid var(--orange);border-radius:14px;padding:30px 40px;margin-bottom:16px;font-size:30px;color:var(--ink2);font-weight:600">1. Dad is a person <strong style="color:var(--blue)">who</strong> __________________________________________</div>
+          <div style="background:#fff;border:3px solid var(--orange);border-radius:14px;padding:30px 40px;margin-bottom:16px;font-size:30px;color:var(--ink2);font-weight:600">2. Dad is someone <strong style="color:var(--blue)">who</strong> __________________________________________</div>
+          <div style="background:#fff;border:3px solid var(--orange);border-radius:14px;padding:30px 40px;font-size:30px;color:var(--ink2);font-weight:600">3. Dad is a dad <strong style="color:var(--blue)">who</strong> __________________________________________</div>
         </div>
       </div>
     </div>
 
-    <!-- s42: SHARE -->
-    <div class="slide" id="s42" data-notes="<strong>Share aloud.</strong> Leo reads each sentence. Dad reacts — praise the use of who.">
-      <div class="sh blue"><div class="sh-icon">🎤</div><div class="sh-text"><div class="sh-title">Share Aloud</div><div class="sh-sub">Read each sentence — Dad reacts</div></div><div class="sh-tag">Share</div></div>
-      <div class="sb">
-        <div style="max-width:1500px;margin:80px auto 0;text-align:center">
-          <div style="font-size:80px;margin-bottom:30px">🎤</div>
-          <div style="font-size:42px;color:var(--ink);font-weight:800;line-height:1.4;margin-bottom:30px">Read your 3 sentences out loud!</div>
-          <div style="font-size:26px;color:var(--ink3);font-weight:600;max-width:1300px;margin:0 auto;line-height:1.5">Dad will smile every time you use <em style="color:var(--blue)">who</em> correctly. 😊</div>
-        </div>
-      </div>
-    </div>
+    <!-- ════════════════════════════════════════════════════════════
+         PHASE 10 — WRAP UP (slides 42-44)
+    ════════════════════════════════════════════════════════════ -->
 
-    <!-- ─────────────────────────────────────
-         PHASE 10 — WRAP UP (slides 43-45)
-    ───────────────────────────────────── -->
-
-    <!-- s43: PHASE HEADER -->
-    <div class="slide" id="s43" data-notes="<strong>Wrap Up.</strong> Quick last frames. Then a one-screen summary.">
+    <!-- s42: PHASE HEADER -->
+    <div class="slide bg-navy" id="s42" data-notes="<strong>Wrap Up.</strong> PL: hold up photos of people doing hobbies. Students describe using who. Plus count-and-fill sentence frame.">
       <div class="sec-slide">
         <div class="num">PHASE 10 · 3 MIN</div>
         <div class="em">🎯</div>
         <h2>Wrap Up</h2>
-        <p>Three quick sentences. Then a one-screen summary of today.</p>
+        <p>Look at photos. Build sentences. Use who in everything.</p>
       </div>
     </div>
 
-    <!-- s44: FRAMES -->
-    <div class="slide" id="s44" data-notes="<strong>Quick fill-ins.</strong> Three frames. Leo says each one fast.">
-      <div class="sh blue"><div class="sh-icon">⚡</div><div class="sh-text"><div class="sh-title">Quick Fill</div><div class="sh-sub">3 frames — say each one fast</div></div><div class="sh-tag">Rapid</div></div>
+    <!-- s43: PHOTO SENTENCES -->
+    <div class="slide bg-cream" id="s43" data-notes="<strong>Photo grid.</strong> Tap each photo to reveal a who-sentence about the person. Mix of soccer + family + movie characters.">
+      <div class="sh blue"><div class="sh-icon">📸</div><div class="sh-text"><div class="sh-title">Tap a Photo — Build a Sentence</div><div class="sh-sub">Each person gets a who-sentence</div></div><div class="sh-tag">Photos</div></div>
       <div class="sb">
-        <div class="frames">
-          <div class="frame">I have a friend <em style="color:var(--blue)">who</em> <span class="blank"></span>.</div>
-          <div class="frame">My favorite player is Haaland, <em style="color:var(--blue)">who</em> <span class="blank"></span>.</div>
-          <div class="frame">A photographer is someone <em style="color:var(--blue)">who</em> <span class="blank"></span>.</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;max-width:1700px;margin:20px auto 0">
+          <div onclick="photoReveal(this,'Haaland is the striker who plays for Man City. ⚽')" style="background:#fff;border:3px solid var(--border);border-radius:14px;padding:24px;text-align:center;cursor:pointer"><div style="font-size:70px;margin-bottom:8px">⚽</div><div style="font-size:18px;font-weight:700;color:var(--ink)">Haaland</div></div>
+          <div onclick="photoReveal(this,'Bellingham is the midfielder who scores for Real Madrid.')" style="background:#fff;border:3px solid var(--border);border-radius:14px;padding:24px;text-align:center;cursor:pointer"><div style="font-size:70px;margin-bottom:8px">🎯</div><div style="font-size:18px;font-weight:700;color:var(--ink)">Bellingham</div></div>
+          <div onclick="photoReveal(this,'Lamine Yamal is the young player who plays for Barcelona.')" style="background:#fff;border:3px solid var(--border);border-radius:14px;padding:24px;text-align:center;cursor:pointer"><div style="font-size:70px;margin-bottom:8px">⚡</div><div style="font-size:18px;font-weight:700;color:var(--ink)">Lamine Yamal</div></div>
+          <div onclick="photoReveal(this,'Batman is the hero who protects Gotham. 🦇')" style="background:#fff;border:3px solid var(--border);border-radius:14px;padding:24px;text-align:center;cursor:pointer"><div style="font-size:70px;margin-bottom:8px">🦇</div><div style="font-size:18px;font-weight:700;color:var(--ink)">Batman</div></div>
+          <div onclick="photoReveal(this,'Mom is the person who takes photos at every party.')" style="background:#fff;border:3px solid var(--border);border-radius:14px;padding:24px;text-align:center;cursor:pointer"><div style="font-size:70px;margin-bottom:8px">👩</div><div style="font-size:18px;font-weight:700;color:var(--ink)">Mom</div></div>
+          <div onclick="photoReveal(this,'Dad is the dad who watches every Champions League match.')" style="background:#fff;border:3px solid var(--border);border-radius:14px;padding:24px;text-align:center;cursor:pointer"><div style="font-size:70px;margin-bottom:8px">👨</div><div style="font-size:18px;font-weight:700;color:var(--ink)">Dad</div></div>
+          <div onclick="photoReveal(this,'Jake Sully is the human who became Na'vi in Avatar.')" style="background:#fff;border:3px solid var(--border);border-radius:14px;padding:24px;text-align:center;cursor:pointer"><div style="font-size:70px;margin-bottom:8px">🌊</div><div style="font-size:18px;font-weight:700;color:var(--ink)">Jake Sully</div></div>
+          <div onclick="photoReveal(this,'Sid is the sloth who travels with Manny in Ice Age. 🦥')" style="background:#fff;border:3px solid var(--border);border-radius:14px;padding:24px;text-align:center;cursor:pointer"><div style="font-size:70px;margin-bottom:8px">🦥</div><div style="font-size:18px;font-weight:700;color:var(--ink)">Sid</div></div>
+        </div>
+        <div id="photo-result" style="margin-top:24px;background:var(--green-lt);border:3px solid var(--green);border-radius:14px;padding:24px 30px;font-size:26px;color:var(--green-dk);font-weight:700;line-height:1.4;display:none;max-width:1700px;margin-left:auto;margin-right:auto"></div>
+      </div>
+    </div>
+
+    <!-- s44: SENTENCE FRAME -->
+    <div class="slide bg-cream" id="s44" data-notes="<strong>Sentence frame builder.</strong> PL: 'There are ___ students in class who play video games.' Adapt — 'There are ___ players who score for Real Madrid.'">
+      <div class="sh blue"><div class="sh-icon">🧰</div><div class="sh-text"><div class="sh-title">Final Frames</div><div class="sh-sub">Say each one fast</div></div><div class="sh-tag">Frames</div></div>
+      <div class="sb">
+        <div style="max-width:1700px;margin:30px auto 0;display:flex;flex-direction:column;gap:18px">
+          <div style="background:#fff;border:3px solid var(--blue);border-radius:14px;padding:30px 40px;font-size:32px;color:var(--ink2);font-weight:600">There are <strong style="color:var(--blue)">3</strong> players <em style="color:var(--blue)">who</em> play for Real Madrid — Bellingham, Vinicius, Rodrygo. ⚽</div>
+          <div style="background:#fff;border:3px solid var(--blue);border-radius:14px;padding:30px 40px;font-size:32px;color:var(--ink2);font-weight:600">There are <strong style="color:var(--blue)">2</strong> players <em style="color:var(--blue)">who</em> play for PSG — Kvaratskhelia, Cherki. ⚽</div>
+          <div style="background:#fff;border:3px solid var(--blue);border-radius:14px;padding:30px 40px;font-size:32px;color:var(--ink2);font-weight:600">I have <strong style="color:var(--blue)">1</strong> dad <em style="color:var(--blue)">who</em> ____________________________ . 👨</div>
         </div>
       </div>
     </div>
 
-    <!-- s45: SUMMARY -->
-    <div class="slide" id="s45" data-notes="<strong>Summary slide.</strong> One screen with the rule + pattern + 3 best examples. Read it together.">
-      <div class="sh blue"><div class="sh-icon">📌</div><div class="sh-text"><div class="sh-title">Today's Summary</div><div class="sh-sub">Rule · Pattern · 3 Best Examples</div></div><div class="sh-tag">Summary</div></div>
-      <div class="sb">
-        <div style="max-width:1700px;margin:20px auto 0">
-          <div class="goal-card" style="padding:36px 50px">
-            <div class="lbl">THE RULE</div>
-            <h3 style="font-size:42px">Use <em style="color:var(--blue)">who</em> to describe a person.</h3>
-            <div style="margin-top:18px;font-size:26px;color:var(--blue-dk);font-weight:800">Pattern: person + who + verb phrase</div>
-          </div>
-          <div style="margin-top:24px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px">
-            <div style="background:#fff;border:2px solid var(--blue);border-radius:14px;padding:24px;font-size:22px;color:var(--ink2);font-weight:600;line-height:1.45;text-align:center">⚽ Haaland is the striker <em style="color:var(--blue)">who plays</em> for Man City.</div>
-            <div style="background:#fff;border:2px solid var(--blue);border-radius:14px;padding:24px;font-size:22px;color:var(--ink2);font-weight:600;line-height:1.45;text-align:center">🎯 Bellingham is the player <em style="color:var(--blue)">who scores</em> for Real Madrid.</div>
-            <div style="background:#fff;border:2px solid var(--blue);border-radius:14px;padding:24px;font-size:22px;color:var(--ink2);font-weight:600;line-height:1.45;text-align:center">🦇 Batman is the hero <em style="color:var(--blue)">who protects</em> Gotham.</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- ════════════════════════════════════════════════════════════
+         PHASE 11 — RECAP + FORMATIVE (slides 45-53)
+    ════════════════════════════════════════════════════════════ -->
 
-    <!-- ─────────────────────────────────────
-         PHASE 11 — RECAP + FORMATIVE (slides 46-50)
-    ───────────────────────────────────── -->
-
-    <!-- s46: PHASE HEADER -->
-    <div class="slide" id="s46" data-notes="<strong>Recap and Formative.</strong> Final checks. Can-do checklist. Exit ticket.">
+    <!-- s45: PHASE HEADER -->
+    <div class="slide bg-orange" id="s45" data-notes="<strong>Recap + Formative.</strong> PL Recap with Emi + Tuan/Binh examples. Then a 6-question formative quiz with score tracking.">
       <div class="sec-slide">
-        <div class="num">PHASE 11 · 4 MIN</div>
+        <div class="num">PHASE 11 · 6 MIN</div>
         <div class="em">✅</div>
-        <h2>Recap + Check</h2>
-        <p>Quick rule recap, the can-do checklist, and Leo's exit ticket.</p>
+        <h2 style="color:var(--orange)">Recap + Quiz</h2>
+        <p>PL Recap pairs, then a 6-question quiz. Track Leo's score.</p>
       </div>
     </div>
 
-    <!-- s47: RULE RECAP -->
-    <div class="slide" id="s47" data-notes="<strong>Recap the rule one more time.</strong> One sentence: 'Use who for people.'">
-      <div class="sh green"><div class="sh-icon">📖</div><div class="sh-text"><div class="sh-title">Rule in One Line</div><div class="sh-sub">Say it together</div></div><div class="sh-tag">Recap</div></div>
+    <!-- s46: PL RECAP -->
+    <div class="slide bg-cream" id="s46" data-notes="<strong>PL Recap.</strong> 'Emi is a friend of mine. She plays in a musical group.' → 'Emi is a friend of mine who plays in a musical group.' Then Tuan and Binh.">
+      <div class="sh orange"><div class="sh-icon">📖</div><div class="sh-text"><div class="sh-title">PL Recap — Join These Pairs</div><div class="sh-sub">PL: Emi, then Tuan and Binh</div></div><div class="sh-tag">Recap</div></div>
       <div class="sb">
-        <div style="max-width:1500px;margin:80px auto 0;text-align:center">
-          <div style="background:linear-gradient(135deg,var(--blue-lt),#fff);border:3px solid var(--blue);border-radius:24px;padding:80px 60px;font-size:56px;font-weight:800;color:var(--blue-dk);line-height:1.3">Use <em style="color:var(--blue);background:var(--yellow);padding:0 16px;border-radius:10px">who</em> to describe a <strong style="color:var(--ink)">person</strong>.</div>
+        <div class="joiner-card" style="margin-bottom:24px">
+          <div class="pn">RECAP 1</div>
+          <div class="src">Emi is a friend of mine<span id="r1-period">.</span> <button class="tap-pronoun" id="r1-pronoun" onclick="joinPair('r1','She','plays in a musical group')">She</button> plays in a musical group.</div>
+          <div class="result" id="r1-result">✅ Emi is a friend of mine <span class="hl">who plays in a musical group</span>.</div>
+        </div>
+        <div class="joiner-card">
+          <div class="pn">RECAP 2</div>
+          <div class="src">Tuan and Binh are brothers<span id="r2-period">.</span> <button class="tap-pronoun" id="r2-pronoun" onclick="joinPair('r2','They','play basketball after school')">They</button> play basketball after school.</div>
+          <div class="result" id="r2-result">✅ Tuan and Binh are brothers <span class="hl">who play basketball after school</span>.</div>
         </div>
       </div>
     </div>
 
-    <!-- s48: CAN-DO CHECKLIST -->
-    <div class="slide" id="s48" data-notes="<strong>Formative assessment from the planner.</strong> Can Leo do each item? Talk through it.">
-      <div class="sh green"><div class="sh-icon">📋</div><div class="sh-text"><div class="sh-title">Can-Do Checklist</div><div class="sh-sub">Formative assessment</div></div><div class="sh-tag">Check</div></div>
+    <!-- s47-52: FORMATIVE QUIZ Q1-Q6 -->
+    <div class="slide bg-yellow" id="s47" data-notes="<strong>Quiz Q1.</strong> Soccer fill-in. Track score in window.quizScore.">
+      <div class="sh gold"><div class="sh-icon">✅</div><div class="sh-text"><div class="sh-title">Formative Quiz · Q1</div><div class="sh-sub">6 questions — choose the best answer</div></div><div class="sh-tag">Quiz</div></div>
+      <div class="score-badge" id="qz-score">Score: 0/6</div>
       <div class="sb">
-        <div class="check-list">
-          <div class="ck"><div class="box">✓</div>Can describe a person using <em style="color:var(--blue)">who</em> + verb phrase</div>
-          <div class="ck"><div class="box">✓</div>Knows that <em style="color:var(--blue)">who</em> is for people only — not for things</div>
-          <div class="ck"><div class="box">✓</div>Can join two short sentences into one using <em style="color:var(--blue)">who</em></div>
-          <div class="ck"><div class="box">✓</div>Used <em style="color:var(--blue)">who</em> in at least 3 spoken sentences today</div>
+        <div class="quiz-card">
+          <div class="qn">QUESTION 1 of 6</div>
+          <div class="qq">Bellingham is the player ___ scores for Real Madrid.</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">that</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,true)">who</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">which</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">whose</button>
+          </div>
+          <div class="quiz-feedback ok" id="q1-fb-ok">✅ Yes! Bellingham is a person → who.</div>
+          <div class="quiz-feedback bad" id="q1-fb-bad">❌ A person needs "who", not that/which/whose.</div>
         </div>
       </div>
     </div>
 
-    <!-- s49: EXIT TICKET -->
-    <div class="slide" id="s49" data-notes="<strong>Exit ticket.</strong> One question to confirm understanding. Leo must answer with who clause.">
-      <div class="sh green"><div class="sh-icon">🎟️</div><div class="sh-text"><div class="sh-title">Exit Ticket</div><div class="sh-sub">One last sentence — Leo's choice</div></div><div class="sh-tag">Exit</div></div>
+    <div class="slide bg-yellow" id="s48" data-notes="<strong>Quiz Q2.</strong> Person vs thing.">
+      <div class="sh gold"><div class="sh-icon">✅</div><div class="sh-text"><div class="sh-title">Formative Quiz · Q2</div><div class="sh-sub">Person or thing?</div></div><div class="sh-tag">Quiz</div></div>
+      <div class="score-badge" id="qz-score-2">Score: 0/6</div>
       <div class="sb">
-        <div style="max-width:1500px;margin:60px auto 0;text-align:center">
-          <div style="font-size:80px;margin-bottom:30px">🎟️</div>
-          <div style="font-size:42px;color:var(--ink);font-weight:800;line-height:1.4;margin-bottom:30px">Tell me about one person you know — using <em style="color:var(--blue)">who</em>.</div>
-          <div class="dad-bbl" style="font-size:24px;text-align:left;max-width:1200px;margin:30px auto 0"><strong>Dad reacts</strong> with a thumbs up the second Leo uses the pattern correctly. ✅</div>
+        <div class="quiz-card">
+          <div class="qn">QUESTION 2 of 6</div>
+          <div class="qq">The stadium ___ holds 90,000 fans is the Camp Nou.</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">who</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,true)">that</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">whose</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">whom</button>
+          </div>
+          <div class="quiz-feedback ok" id="q2-fb-ok">✅ A stadium is a THING. Use "that" or "which".</div>
+          <div class="quiz-feedback bad" id="q2-fb-bad">❌ A stadium is not a person — use "that".</div>
         </div>
       </div>
     </div>
 
-    <!-- s50: CELEBRATION -->
-    <div class="slide" id="s50" data-notes="<strong>Celebrate!</strong> Lesson done — soccer-style hype.">
+    <div class="slide bg-yellow" id="s49" data-notes="<strong>Quiz Q3.</strong> Position of the who-clause.">
+      <div class="sh gold"><div class="sh-icon">✅</div><div class="sh-text"><div class="sh-title">Formative Quiz · Q3</div><div class="sh-sub">Which sentence joins correctly?</div></div><div class="sh-tag">Quiz</div></div>
+      <div class="score-badge" id="qz-score-3">Score: 0/6</div>
+      <div class="sb">
+        <div class="quiz-card">
+          <div class="qn">QUESTION 3 of 6</div>
+          <div class="qq">SOURCE: <em>I have a cousin. She likes Avatar.</em><br>Which is correct?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quizAnswer(this,true)">I have a cousin who likes Avatar.</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">I have a cousin who she likes Avatar.</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">I who likes Avatar have a cousin.</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">I have a who Avatar cousin likes.</button>
+          </div>
+          <div class="quiz-feedback ok" id="q3-fb-ok">✅ Right — "who" replaces "She". You don't keep both.</div>
+          <div class="quiz-feedback bad" id="q3-fb-bad">❌ "who" REPLACES the pronoun (She). It doesn't add to it.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide bg-yellow" id="s50" data-notes="<strong>Quiz Q4.</strong> Soccer who-clause.">
+      <div class="sh gold"><div class="sh-icon">✅</div><div class="sh-text"><div class="sh-title">Formative Quiz · Q4</div><div class="sh-sub">Soccer time</div></div><div class="sh-tag">Quiz</div></div>
+      <div class="score-badge" id="qz-score-4">Score: 0/6</div>
+      <div class="sb">
+        <div class="quiz-card">
+          <div class="qn">QUESTION 4 of 6</div>
+          <div class="qq">SOURCE: <em>Haaland is a striker. He plays for Manchester City.</em><br>Joined version:</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">Haaland is a striker that he plays for Man City.</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,true)">Haaland is a striker who plays for Manchester City.</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">Haaland is a striker who he plays for Manchester City.</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">Haaland is a striker which plays for Manchester City.</button>
+          </div>
+          <div class="quiz-feedback ok" id="q4-fb-ok">⚽ Yes! Haaland is a person → who. And no double pronoun.</div>
+          <div class="quiz-feedback bad" id="q4-fb-bad">❌ Haaland is a PERSON (use who) and "He" disappears (don't double).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide bg-yellow" id="s51" data-notes="<strong>Quiz Q5.</strong> Verb agreement with plural.">
+      <div class="sh gold"><div class="sh-icon">✅</div><div class="sh-text"><div class="sh-title">Formative Quiz · Q5</div><div class="sh-sub">Singular or plural verb?</div></div><div class="sh-tag">Quiz</div></div>
+      <div class="score-badge" id="qz-score-5">Score: 0/6</div>
+      <div class="sb">
+        <div class="quiz-card">
+          <div class="qn">QUESTION 5 of 6</div>
+          <div class="qq">I know three people ___ trilobite fossils. 🦂</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">who collects</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,true)">who collect</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">which collects</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">that collects</button>
+          </div>
+          <div class="quiz-feedback ok" id="q5-fb-ok">✅ "Three people" is plural → "collect" (no s).</div>
+          <div class="quiz-feedback bad" id="q5-fb-bad">❌ "Three people" is plural → "collect" stays plural. And use "who" for people.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide bg-yellow" id="s52" data-notes="<strong>Quiz Q6.</strong> The contraction case (PL item 4 style).">
+      <div class="sh gold"><div class="sh-icon">✅</div><div class="sh-text"><div class="sh-title">Formative Quiz · Q6</div><div class="sh-sub">Contraction time</div></div><div class="sh-tag">Quiz</div></div>
+      <div class="score-badge" id="qz-score-6">Score: 0/6</div>
+      <div class="sb">
+        <div class="quiz-card">
+          <div class="qn">QUESTION 6 of 6</div>
+          <div class="qq">"My friend who's creative" — what does <em>who's</em> mean?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">who was</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,true)">who is</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">whose (belonging)</button>
+            <button class="quiz-opt" onclick="quizAnswer(this,false)">who will</button>
+          </div>
+          <div class="quiz-feedback ok" id="q6-fb-ok">✂️ Yes! who's = who + is. Apostrophe = "is".</div>
+          <div class="quiz-feedback bad" id="q6-fb-bad">❌ who's = who + is. Don't confuse with "whose" (no apostrophe).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- s53: SCORE + CELEBRATION -->
+    <div class="slide" id="s53" data-notes="<strong>Final score.</strong> Show Leo's score out of 6. Celebrate. Move to Mark Done.">
       <div class="celebrate">
         <div class="em">🏆</div>
         <h2>Goal! Lesson Complete!</h2>
-        <p>You can now describe ANY person — footballer, family, movie hero — using <em style="color:#FCD34D">who</em>. ⚽📐</p>
+        <p>You can now describe ANY person — Haaland, Bellingham, Batman, Dad — using <em style="color:#FCD34D">who</em>.</p>
+        <div class="score-box">
+          <div class="lb">YOUR SCORE</div>
+          <div class="sc" id="final-score">0 / 6</div>
+        </div>
       </div>
     </div>
 
-    <!-- ─────────────────────────────────────
-         PHASE 12 — MARK DONE (slide 51)
-    ───────────────────────────────────── -->
+    <!-- ════════════════════════════════════════════════════════════
+         PHASE 12 — MARK DONE (slide 54)
+    ════════════════════════════════════════════════════════════ -->
 
-    <!-- s51: MARK DONE -->
-    <div class="slide" id="s51" data-notes="<strong>Tap Mark Done.</strong> This saves the lesson to Neritan's progress so the teacher card shows complete.">
+    <div class="slide" id="s54" data-notes="<strong>Tap Mark Done.</strong> Saves to leea.lessonProgress.v1. Neritan's teacher dashboard reads this.">
       <div class="markdone-wrap">
         <div class="em">✅</div>
         <h2>Mark Lesson Done</h2>
-        <p>This saves to Neritan's teacher progress so the lesson card on your teacher dashboard shows complete.</p>
+        <p>This saves to Neritan's teacher progress so the lesson card on the dashboard shows complete.</p>
         <button class="md-btn" id="md-btn" onclick="markDone()">Mark Done</button>
         <div class="md-msg" id="md-msg">✅ Saved — Grammar 1 marked done.</div>
       </div>
@@ -1122,21 +1342,18 @@
   <button class="nb" onclick="prev()">← Prev</button>
   <button class="nb" onclick="next()">Next →</button>
   <button class="nb" onclick="toggleNotes()">📝 Notes</button>
-  <span id="sc">1 / 51</span>
+  <span id="sc">1 / 54</span>
   <div id="pgbar"><div id="pgfill"></div></div>
   <span id="unit-lbl">⚽ OW4 · U8 · Grammar 1</span>
 </nav>
 
-<!-- TEACHER NOTES PANEL -->
 <aside id="tn-panel">
   <div class="tn-head"><span>Teacher Notes</span><span class="tn-close" onclick="toggleNotes()">✕</span></div>
   <div id="tn-body"></div>
 </aside>
 
 <script>
-/* ═══════════════════════════════════════════
-   SLIDE NAV
-═══════════════════════════════════════════ */
+/* ═══════════════════════ NAV ═══════════════════════ */
 const slides = document.querySelectorAll('.slide');
 const total = slides.length;
 let cur = 0;
@@ -1150,6 +1367,8 @@ function show(i) {
   document.getElementById('pgfill').style.width = ((cur + 1) / total * 100) + '%';
   const notes = slides[cur].getAttribute('data-notes') || '';
   document.getElementById('tn-body').innerHTML = notes;
+  updateScoreBadges();
+  if (i === total - 2) document.getElementById('final-score').textContent = window.quizScore + ' / 6';
 }
 function next() { show(Math.min(cur + 1, total - 1)); }
 function prev() { show(Math.max(cur - 1, 0)); }
@@ -1161,9 +1380,7 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'n' || e.key === 'N') { toggleNotes(); }
 });
 
-/* ═══════════════════════════════════════════
-   SCALING — deck is 1920x1080
-═══════════════════════════════════════════ */
+/* ═══════════════════════ SCALING ═══════════════════════ */
 function scale() {
   const wrap = document.getElementById('wrap');
   const deck = document.getElementById('deck');
@@ -1179,36 +1396,33 @@ window.addEventListener('resize', scale);
 scale();
 show(0);
 
-/* ═══════════════════════════════════════════
-   VOCAB TABS
-═══════════════════════════════════════════ */
-function showVocab(n) {
-  document.querySelectorAll('.vocab-tab').forEach((b, i) => b.classList.toggle('active', i === n));
-  document.querySelectorAll('.vocab-panel').forEach((p, i) => p.classList.toggle('active', i === n));
-}
-
-/* ═══════════════════════════════════════════
-   VOCAB MINI-GAMES + QUICK CHECKS
-═══════════════════════════════════════════ */
-function clauseHit(btn, ok) {
+/* ═══════════════════════ VOCAB MINI-GAMES ═══════════════════════ */
+function clauseHit(btn, ok, msgId) {
   if (btn.classList.contains('used')) return;
   btn.classList.add('used');
   btn.classList.add(ok ? 'ok' : 'bad');
-  if (ok) document.getElementById('mg-clause').classList.add('show');
+  if (ok) document.getElementById(msgId).classList.add('show');
 }
-const pHits = { 'mg-person': 3, 'mg-photog': 2, 'mg-relative': 2 };
-const pState = {};
-function pHit(btn, ok) {
+const contractMap = {};
+function contractReveal(btn, expansion) {
+  if (btn.classList.contains('used')) return;
+  btn.classList.add('used','ok');
+  btn.textContent = btn.textContent + ' = ' + expansion;
+  document.getElementById('mg-contract').classList.add('show');
+}
+let fossilCount = 0;
+function fossilHit(btn, ok) {
   if (btn.classList.contains('used')) return;
   btn.classList.add('used');
   btn.classList.add(ok ? 'ok' : 'bad');
-  const panel = btn.closest('.vocab-panel');
-  const msgEl = panel.querySelector('.mg-msg');
-  if (msgEl) {
-    const key = msgEl.id;
-    pState[key] = (pState[key] || 0) + (ok ? 1 : 0);
-    if (pState[key] >= 1) msgEl.classList.add('show');
-  }
+  if (ok) { fossilCount++; if (fossilCount >= 1) document.getElementById('mg-fossil').classList.add('show'); }
+}
+let creativeCount = 0;
+function creativeHit(btn, ok) {
+  if (btn.classList.contains('used')) return;
+  btn.classList.add('used');
+  btn.classList.add(ok ? 'ok' : 'bad');
+  if (ok) { creativeCount++; if (creativeCount >= 1) document.getElementById('mg-creative').classList.add('show'); }
 }
 function qc(btn, ok) {
   const opts = btn.parentElement.querySelectorAll('.qopt');
@@ -1217,16 +1431,191 @@ function qc(btn, ok) {
   btn.classList.add(ok ? 'ok' : 'bad');
 }
 
-/* ═══════════════════════════════════════════
-   PRACTICE REVEAL
-═══════════════════════════════════════════ */
-function prReveal(id) {
-  document.getElementById(id).classList.add('show');
+/* ═══════════════════════ WARM UP ═══════════════════════ */
+function readWho(btn) {
+  btn.style.color = 'var(--green)';
+  btn.style.transform = 'scale(1.1)';
+  document.getElementById('who-said').style.display = 'block';
+}
+function raiseHand(btnId, ansId) {
+  const btn = document.getElementById(btnId);
+  btn.classList.add('raised');
+  btn.textContent = '✋ Hand raised!';
+  setTimeout(() => document.getElementById(ansId).classList.add('show'), 400);
+}
+function doMorph() {
+  document.getElementById('morph-1a').classList.add('faded');
+  document.getElementById('morph-btn').disabled = true;
+  document.getElementById('morph-btn').textContent = '✓ Morphed!';
+  setTimeout(() => { document.getElementById('morph-1b').style.opacity = '1'; }, 400);
+}
+function setSwap(part, val) {
+  if (part === 'name') document.getElementById('swap-name').textContent = val;
+  if (part === 'verb') document.getElementById('swap-verb').textContent = val;
+  event.target.classList.add('used');
 }
 
-/* ═══════════════════════════════════════════
-   MARK DONE — writes to lessonProgress.v1
-═══════════════════════════════════════════ */
+/* ═══════════════════════ GRAMMAR BOX ═══════════════════════ */
+function pulseRow(id) {
+  const el = document.getElementById(id);
+  el.classList.remove('pulsed');
+  void el.offsetWidth;
+  el.classList.add('pulsed');
+}
+
+/* ═══════════════════════ PRESENT CHECK ═══════════════════════ */
+function qc2(btn, ok, fbId) {
+  const opts = btn.parentElement.querySelectorAll('.quiz-opt');
+  if (btn.classList.contains('ok') || btn.classList.contains('bad')) return;
+  opts.forEach(o => o.disabled = true);
+  btn.classList.add(ok ? 'ok' : 'bad');
+  if (ok) document.getElementById(fbId).classList.add('show');
+}
+
+/* ═══════════════════════ JOIN PAIR (Practice 1 + Recap) ═══════════════════════ */
+function joinPair(prefix, pronounWord, verbPhrase) {
+  const period = document.getElementById(prefix + '-period');
+  const pronoun = document.getElementById(prefix + '-pronoun');
+  if (pronoun.classList.contains('dissolved')) return;
+  if (period) period.style.opacity = '0';
+  pronoun.classList.add('dissolved');
+  pronoun.style.width = '0';
+  pronoun.style.padding = '0';
+  pronoun.style.margin = '0';
+  pronoun.style.opacity = '0';
+  setTimeout(() => {
+    document.getElementById(prefix + '-result').classList.add('show');
+  }, 500);
+}
+
+/* ═══════════════════════ T-CHART SORT ═══════════════════════ */
+function sortItem(btn) {
+  const target = btn.dataset.target;
+  const dropZone = document.getElementById(target + '-drop');
+  const clone = document.createElement('div');
+  clone.className = 'dropped';
+  clone.textContent = btn.textContent;
+  dropZone.appendChild(clone);
+  btn.classList.add('placed');
+}
+
+/* ═══════════════════════ SURVEY ═══════════════════════ */
+function svy(btn, cntId) {
+  const row = btn.parentElement;
+  const buttons = row.querySelectorAll('.yn-btn');
+  buttons.forEach(b => b.classList.remove('yes','no'));
+  if (btn.textContent === 'Yes') btn.classList.add('yes');
+  else btn.classList.add('no');
+  document.getElementById(cntId).textContent = btn.textContent === 'Yes' ? '✓' : '✗';
+}
+
+/* ═══════════════════════ GUESS WHO ═══════════════════════ */
+const familyClues = [
+  ['who watches every Champions League match ⚽', 'who reads the newspaper 📰', 'who is bigger than Leo'],
+  ['who takes photos at every party 📸', 'who reads books every night 📚', 'who cooks dinner 🍳'],
+  ['who loves soccer ⚽', 'who is in 4th grade 🎒', 'who plays FIFA every weekend 🎮'],
+  ['who is the oldest in the family 👵', 'who makes the best cookies 🍪', 'who tells stories from long ago']
+];
+const familyAnswers = ['Dad','Mom','Leo','Grandma'];
+let familyTarget = 0;
+let familyClueIdx = 0;
+function giveClueFamily() {
+  if (familyClueIdx === 0) familyTarget = Math.floor(Math.random()*4);
+  if (familyClueIdx >= 3) return;
+  const clue = familyClues[familyTarget][familyClueIdx];
+  const prev = document.getElementById('gw1-clue').innerHTML;
+  document.getElementById('gw1-clue').innerHTML = (familyClueIdx === 0 ? '' : prev + '<br>') + '<strong>This person…</strong> ' + clue;
+  familyClueIdx++;
+  document.getElementById('gw1-clue-count').textContent = 'Clue ' + familyClueIdx + ' of 3';
+  if (familyClueIdx >= 3) document.getElementById('gw1-btn').disabled = true;
+}
+function guessFamily(card, name) {
+  if (card.classList.contains('revealed')) return;
+  const ans = familyAnswers[familyTarget];
+  if (name === ans) {
+    card.classList.remove('hidden');
+    card.classList.add('revealed');
+    document.getElementById('gw1-clue').innerHTML += '<br><strong style="color:var(--green-dk)">✅ YES! It was ' + name + '!</strong>';
+  } else {
+    card.classList.add('wrong');
+    setTimeout(() => card.classList.remove('wrong'), 500);
+  }
+}
+const soccerClues = [
+  ['who plays for Man City ⚽', 'who scores many goals', 'who is Norwegian'],
+  ['who plays for Real Madrid 🇪🇸', 'who is English 🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'who scored in a Champions League final'],
+  ['who plays for Barcelona', 'who is very young (17!)', 'who is Spanish 🇪🇸'],
+  ['who plays for Bayern Munich 🇩🇪', 'who used to play for Tottenham', 'who is English'],
+  ['who plays for Liverpool ⚽', 'who is Egyptian 🇪🇬', 'who scores from the right wing'],
+  ['who plays for Real Madrid', 'who is Brazilian 🇧🇷', 'who is famous for fast dribbling on the left'],
+  ['who plays for PSG ⚽', 'who is Georgian 🇬🇪', 'who joined from Napoli'],
+  ['who plays for PSG', 'who creates chances for teammates', 'who is French and a playmaker']
+];
+const soccerAnswers = ['Haaland','Bellingham','Lamine Yamal','Kane','Salah','Vinicius','Kvaratskhelia','Cherki'];
+let soccerTarget = 0, soccerClueIdx = 0;
+function giveClueSoccer() {
+  if (soccerClueIdx === 0) soccerTarget = Math.floor(Math.random()*8);
+  if (soccerClueIdx >= 3) return;
+  const clue = soccerClues[soccerTarget][soccerClueIdx];
+  const prev = document.getElementById('gw2-clue').innerHTML;
+  document.getElementById('gw2-clue').innerHTML = (soccerClueIdx === 0 ? '' : prev + '<br>') + '<strong>This player…</strong> ' + clue;
+  soccerClueIdx++;
+  document.getElementById('gw2-clue-count').textContent = 'Clue ' + soccerClueIdx + ' of 3';
+  if (soccerClueIdx >= 3) document.getElementById('gw2-btn').disabled = true;
+}
+function guessSoccer(card, name) {
+  if (card.classList.contains('revealed')) return;
+  const ans = soccerAnswers[soccerTarget];
+  if (name === ans) {
+    card.classList.remove('hidden');
+    card.classList.add('revealed');
+    document.getElementById('gw2-clue').innerHTML += '<br><strong style="color:var(--green-dk)">⚽ YES! It was ' + name + '!</strong>';
+  } else {
+    card.classList.add('wrong');
+    setTimeout(() => card.classList.remove('wrong'), 500);
+  }
+}
+
+/* ═══════════════════════ WORD WEB ═══════════════════════ */
+function fillOval(el, content) {
+  el.textContent = content;
+  el.classList.add('filled');
+}
+
+/* ═══════════════════════ PHOTO REVEAL ═══════════════════════ */
+function photoReveal(card, sentence) {
+  const r = document.getElementById('photo-result');
+  r.innerHTML = '✅ <strong>' + sentence + '</strong>';
+  r.style.display = 'block';
+  card.style.borderColor = 'var(--blue)';
+  card.style.background = 'var(--blue-lt)';
+}
+
+/* ═══════════════════════ FORMATIVE QUIZ ═══════════════════════ */
+window.quizScore = 0;
+const quizDone = {};
+function quizAnswer(btn, ok) {
+  const card = btn.closest('.quiz-card');
+  if (card.dataset.done === 'true') return;
+  card.dataset.done = 'true';
+  const opts = btn.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.disabled = true);
+  btn.classList.add(ok ? 'ok' : 'bad');
+  const slideId = btn.closest('.slide').id;
+  const qNum = slideId.replace('s4','').replace('s5','');
+  // s47..s52 map to q1..q6
+  const slideIndex = parseInt(slideId.substring(1)) - 47;
+  const qIdx = slideIndex + 1;
+  document.getElementById('q' + qIdx + '-fb-' + (ok ? 'ok' : 'bad')).classList.add('show');
+  if (ok) window.quizScore++;
+  quizDone[slideId] = true;
+  updateScoreBadges();
+}
+function updateScoreBadges() {
+  document.querySelectorAll('[id^="qz-score"]').forEach(el => el.textContent = 'Score: ' + window.quizScore + '/6');
+}
+
+/* ═══════════════════════ MARK DONE ═══════════════════════ */
 const LESSON_ID = 'ow-l4-u8-grammar-1';
 function markDone() {
   const btn = document.getElementById('md-btn');
@@ -1242,7 +1631,9 @@ function markDone() {
       studentId: 'leo',
       status: 'done',
       completedAt: now,
-      updatedAt: now
+      updatedAt: now,
+      quizScore: window.quizScore,
+      quizTotal: 6
     };
     localStorage.setItem(key, JSON.stringify(data));
     btn.classList.add('done');
@@ -1255,7 +1646,6 @@ function markDone() {
   }
 }
 
-/* Reflect any prior progress */
 try {
   const raw = localStorage.getItem('leea.lessonProgress.v1');
   if (raw) {
@@ -1265,7 +1655,7 @@ try {
       if (btn) { btn.classList.add('done'); btn.textContent = '✓ Done'; }
     }
   }
-} catch (e) { /* ignore */ }
+} catch (e) {}
 </script>
 </body>
 </html>

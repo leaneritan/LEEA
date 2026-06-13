@@ -41,6 +41,44 @@ For subject panels, `true` means expanded and `false` means collapsed.
 
 First version can store this locally. Later it should live in Supabase user settings.
 
+## Academic Progress
+
+School test tracking is parent-facing first and lives under Neritan at `/teacher/progress`.
+
+Local storage keys:
+
+```text
+leea.academicProgress.testResults.v1
+leea.academicProgress.goals.v1
+```
+
+Test result records should stay Supabase-shaped:
+
+```json
+{
+  "id": "test-leo-2026-05-17-term-1-midterm",
+  "studentId": "leo",
+  "schoolYear": "2026",
+  "term": "Term 1",
+  "testName": "Term 1 Midterm",
+  "testDate": "2026-05-17",
+  "rank": 65,
+  "studentCount": 150,
+  "subjects": [
+    { "subject": "japanese", "score": 70, "average": 74.2, "maxScore": 100 },
+    { "subject": "social", "score": 75, "average": 56.3, "maxScore": 100 },
+    { "subject": "math", "score": 75, "average": 67.2, "maxScore": 100 },
+    { "subject": "science", "score": 80, "average": 67.6, "maxScore": 100 },
+    { "subject": "english", "score": 92, "average": 82.7, "maxScore": 100 }
+  ],
+  "notes": "",
+  "createdAt": "2026-05-17T00:00:00.000Z",
+  "updatedAt": "2026-05-17T00:00:00.000Z"
+}
+```
+
+Keep school subjects flexible enough for future subjects, but the first tracker uses Japanese, Social Studies, Math, Science, and English. This is different from LEEA lesson progress: test results are real school outcomes, not lesson completion records.
+
 ## Registry
 
 The registry says what exists and what is live.
@@ -174,6 +212,8 @@ I Don't Know
 Search
 ```
 
+Search lives at `/reference/search` as its own sidebar route. Keep `/reference` as the browse-first Reference library page.
+
 Vocabulary includes all word-like reference objects:
 
 ```text
@@ -217,7 +257,9 @@ Search results should deduplicate by global item id and show all matching source
 
 Reference browse/search controls should show useful counts. Mixed search results should be visually scannable with subtle type-aware card edges and badges for Vocabulary, Academic, Content, Related, Glossary, Grammar, and Junior High.
 
-Reference level colors must stay consistent anywhere levels appear: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The source tree keeps Vocabulary and Grammar nested under each level/unit. For units with real data, Vocabulary nests Vocabulary 1, Vocabulary 2, Academic, and Glossary.
+Reference level colors must stay consistent and visually distinct anywhere levels appear: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The source tree hierarchy is `Level -> Unit -> Vocabulary/Grammar`; Vocabulary nests Vocabulary 1, Vocabulary 2, Academic, and Glossary, and Grammar nests grammar-point cards.
+
+Leo's Reference confidence state is stored locally in the same shape expected for Supabase. The browser key is `leea.referenceConfidence.v1`; its value is a map of `ReferenceConfidenceRecord` objects keyed by `wordId`. Keep the record fields aligned with the expanded confidence shape below. Older bare word-ID arrays are migration-only and should not be written by new code.
 
 Search ranking should prefer direct word/title matches, then meaning/rule/pattern matches, then exact source/type tags. Broad lesson/topic tags should not cause unrelated cards from the same section to appear for a shorter query.
 
@@ -327,11 +369,15 @@ Expanded later:
 
 ```json
 {
+  "id": "reference-confidence-leo-global_relative",
   "studentId": "leo",
   "wordId": "global_relative",
+  "knows": true,
   "confidence": "known",
   "markedKnownAt": "2026-06-06T00:00:00.000Z",
-  "sourceContext": "OW4-U8-V1"
+  "sourceContext": "OW4-U8-V1",
+  "createdAt": "2026-06-06T00:00:00.000Z",
+  "updatedAt": "2026-06-06T00:00:00.000Z"
 }
 ```
 

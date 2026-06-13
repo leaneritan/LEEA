@@ -55,6 +55,7 @@ Neritan view
 - preview Leo apps
 - assign learner apps
 - track Leo progress
+- track school test results and academic goals under `/teacher/progress`
 
 Leo view
 - see next assignment
@@ -154,6 +155,8 @@ Assignment state is read through the shared helpers `readAssignments(learnerLess
 
 Teacher lesson "Mark Done" state is tracked separately in `src/data/lessonProgress.ts`. It uses `leea.lessonProgress.v1` in localStorage and stores `LessonProgressRecord` objects shaped to match a future Supabase row (`lessonId`, `teacherId`, `studentId`, `status`, `completedAt`, `updatedAt`).
 
+Academic test tracking lives under Neritan at `/teacher/progress`. Store periodic school test results through `src/data/academicProgress.ts`, using `leea.academicProgress.testResults.v1` and `leea.academicProgress.goals.v1`. Records are local-first but Supabase-shaped: `studentId`, `schoolYear`, `term`, `testName`, `testDate`, `rank`, `studentCount`, `subjects[]` with score/average/maxScore, notes, `createdAt`, and `updatedAt`. Keep this multi-subject from the start: Japanese, Social Studies, Math, Science, and English.
+
 `src/data/registry.ts` holds named stat variables (`totalWords`, `grammarPoints`, `knownWords`, `wordsToReview`) plus `academyStats`. The `liveLessons` and `assignedLessons` fields in `academyStats` are currently hardcoded stub values — they must be replaced with real computed counts before the stats section can be trusted. Do not add new hardcoded numbers here; wire to real lesson and assignment data instead.
 
 Leo's app card list uses a third CSS variable layer: `.leo-app-card-{tone}` classes set `--leo-component`, `--leo-component-soft`, and `--leo-component-ink` on each card. The tone comes from `getComponentMeta(lesson.component).tone`. All three surfaces (Leo hero `--hero-accent`, Home next-card `--next-accent`/`--next-accent-deep`, Leo app card `--leo-component`) are driven by `getComponentMeta` — do not add per-surface hardcoded color maps.
@@ -243,6 +246,8 @@ I Don't Know
 Search
 ```
 
+Search is its own sidebar route at `/reference/search`. Keep `/reference` focused on browse/source-tree, vocabulary, grammar, I Know, and I Don't Know. Do not put the full search box back at the top of the default Reference page.
+
 Clicking vocabulary opens the vocabulary card. Clicking grammar opens the grammar chart/card.
 
 Reference search must search everything together when the search box has a query:
@@ -255,7 +260,9 @@ Search results must show clear type/source tags such as Vocabulary, Academic, Gr
 
 Reference browse/search controls should show useful counts, and mixed search results should use subtle type-aware color cues such as card edges and badges for Vocabulary, Academic, Content, Related, Glossary, Grammar, and Junior High.
 
-Reference level colors must stay consistent everywhere levels are listed: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The source tree nests Vocabulary and Grammar inside each level/unit. For units with real data, Vocabulary nests Vocabulary 1, Vocabulary 2, Academic, and Glossary rather than flattening them beside Grammar.
+Reference level colors must stay consistent and visually distinct everywhere levels are listed: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The source tree nests as `Level -> Unit -> Vocabulary/Grammar`; Vocabulary nests Vocabulary 1, Vocabulary 2, Academic, and Glossary, while Grammar nests grammar-point cards. Keep the hierarchy visually obvious with different styling for level, unit, category, and subgroup rows.
+
+Leo's Reference `I Know` / `I Don't Know` state is local-first but Supabase-shaped. Use `src/components/useKnownWordIds.ts` and its `leea.referenceConfidence.v1` records (`id`, `studentId`, `wordId`, `knows`, `confidence`, `sourceContext`, `markedKnownAt`, `createdAt`, `updatedAt`). Do not store new confidence state as a bare array of word IDs; that shape was temporary and is only supported for migration.
 
 Reference search should rank direct word/title matches above meaning/rule matches. Broad lesson/topic tags such as `collecting` must not make every card in that section appear for a shorter query such as `collect`; source tags such as `OW4-U8-G1` can match by exact code or code prefix.
 

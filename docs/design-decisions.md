@@ -128,6 +128,7 @@ Neritan view:
 - preview Leo apps
 - assign learner apps
 - track Leo progress
+- track school test results and academic goals
 
 Leo view:
 
@@ -143,6 +144,8 @@ Reference:
 - show I Know and I Don't Know lists
 
 Teacher lessons are only for teaching. Learner apps are for Leo's independent homework/practice.
+
+Academic Progress is a parent-facing Neritan page at `/teacher/progress`. It tracks Leo's real school test results across Japanese, Social Studies, Math, Science, and English, plus goals for total score, rank, and each subject. It is not a lesson and not Reference. First storage is local through `src/data/academicProgress.ts`, but the records are shaped to map directly to future Supabase tables for test results and academic goals.
 
 ## Visual Direction
 
@@ -212,7 +215,7 @@ Reference
 
 The user should not have to open every top-level course manually.
 
-Levels use one stable color progression throughout Reference: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. Inside each level/unit, Vocabulary and Grammar are nested groups. When real unit data exists, Vocabulary contains Vocabulary 1, Vocabulary 2, Academic, and Glossary.
+Levels use one stable, high-contrast color progression throughout Reference: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The source tree hierarchy is `Level -> Unit -> Vocabulary/Grammar`; Vocabulary contains Vocabulary 1, Vocabulary 2, Academic, and Glossary, while Grammar contains grammar-point cards. Level, unit, category, and subgroup rows should look different enough that the nesting is clear without reading every label.
 
 Reference also has clear sections/pages:
 
@@ -223,6 +226,8 @@ I Know
 I Don't Know
 Search
 ```
+
+Search is a separate sidebar destination at `/reference/search`, not an always-visible block on the default Reference page. The default `/reference` page opens to the browse/source-tree view.
 
 Vocabulary page:
 
@@ -297,6 +302,8 @@ Examples of current lists:
 - unknown words
 
 I Know is Leo-specific progress data, not global word data.
+
+The current implementation stores Reference confidence in `leea.referenceConfidence.v1` as Supabase-shaped records keyed by `wordId`, not as static vocabulary fields and not as a bare array. Each record carries `id`, `studentId`, `wordId`, `knows`, `confidence`, `sourceContext`, `markedKnownAt`, `createdAt`, and `updatedAt`. This local shape should map directly to a future `reference_confidence` table.
 
 Possible confidence states:
 

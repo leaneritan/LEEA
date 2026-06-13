@@ -1,26 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, CheckSquare, GraduationCap, Home, PanelLeftClose, PanelLeftOpen, Search, Settings, UserRound } from "lucide-react";
+import { BarChart3, BookOpen, CheckSquare, GraduationCap, Home, Library, PanelLeftClose, PanelLeftOpen, Search, Settings, UserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getOpenAssignmentCount, readAssignments } from "@/data/assignments";
 import { learnerLessons } from "@/data/lessons";
 
-type NavKey = "home" | "teacher" | "english" | "assignments" | "reference" | "profile" | "settings";
+type NavKey = "home" | "teacher" | "progress" | "english" | "assignments" | "reference" | "search" | "profile" | "settings";
 
 const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNode }> = [
   { key: "home", label: "Home", href: "/", icon: <Home size={20} /> },
   { key: "teacher", label: "Neritan", href: "/teacher", icon: <GraduationCap size={20} /> },
+  { key: "progress", label: "Progress", href: "/teacher/progress", icon: <BarChart3 size={20} /> },
   { key: "english", label: "English", href: "/lessons", icon: <BookOpen size={20} /> },
   { key: "assignments", label: "Leo", href: "/leo", icon: <CheckSquare size={20} /> },
-  { key: "reference", label: "Reference", href: "/reference", icon: <Search size={20} /> },
+  { key: "reference", label: "Reference", href: "/reference", icon: <Library size={20} /> },
+  { key: "search", label: "Search", href: "/reference/search", icon: <Search size={20} /> },
   { key: "profile", label: "Profile", href: "/", icon: <UserRound size={20} /> },
   { key: "settings", label: "Settings", href: "/", icon: <Settings size={20} /> }
 ];
 
-const mobileNavItems = navItems.filter((item) => ["home", "teacher", "english", "reference"].includes(item.key));
+const mobileNavItems = navItems.filter((item) => ["home", "teacher", "english", "reference", "search"].includes(item.key));
 
 const JapanesePreferenceContext = createContext(false);
 
@@ -147,11 +149,13 @@ export function AppShell({
 function getCrumbHref(crumb: string, pathname: string) {
   if (crumb === "Home") return "/";
   if (crumb === "Neritan") return "/teacher";
+  if (crumb === "Progress") return "/teacher/progress";
   if (crumb === "Leo") return "/leo";
   if (crumb === "English") return "/lessons";
   if (crumb === "Our World") return "/lessons#our-world-l4-u8";
   if (crumb === "Unit 8") return "/lessons#our-world-l4-u8";
   if (crumb === "Reference") return "/reference";
+  if (crumb === "Search") return "/reference/search";
   return pathname;
 }
 

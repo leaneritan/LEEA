@@ -168,7 +168,38 @@ These lesson pairs are registered in `src/data/lessons.ts` and live on the worki
 | vocab-1 | `public/lessons/ow-l4-u8-vocab-1.html` | `public/learn/ow-l4-u8-vocab-1.html` | `live` (Neritan assigns) |
 | song | `public/lessons/ow-l4-u8-song.html` | `public/learn/ow-l4-u8-song.html` | `live` (Neritan assigns) |
 
-Still to build: grammar-1 (OW4-U8-G1), grammar-2 (OW4-U8-G2), reading, writing.
+Still to build in priority order: grammar-1 (OW4-U8-G1), grammar-2 (OW4-U8-G2), reading, writing.
+
+Target file paths when built:
+
+| Component | Teacher file | Learner file |
+|---|---|---|
+| grammar-1 | `public/lessons/ow-l4-u8-grammar-1.html` | `public/learn/ow-l4-u8-grammar-1.html` |
+| grammar-2 | `public/lessons/ow-l4-u8-grammar-2.html` | `public/learn/ow-l4-u8-grammar-2.html` |
+| reading | `public/lessons/ow-l4-u8-reading.html` | `public/learn/ow-l4-u8-reading.html` |
+| writing | `public/lessons/ow-l4-u8-writing.html` | `public/learn/ow-l4-u8-writing.html` |
+
+### Grammar lesson HTML structure (no existing template — follow this spec)
+
+Grammar is the first component type with no existing example. Use this spec:
+
+**Teacher lesson** (`public/lessons/ow-l4-u8-grammar-1.html`):
+- Slide-based deck, same HTML/CSS shell as `public/lessons/ow-l4-u8-opener.html`
+- Slides: intro (grammar rule name + unit context) → grammar box (verbatim examples from PDF) → Notice activity → Build activity → Fix activity → Use activity → wrap-up
+- Grammar box appears on every slide as a collapsible sticky reference panel
+- Mark Done button saves to `leea.lessonProgress.v1`
+
+**Learner app** (`public/learn/ow-l4-u8-grammar-1.html`):
+- Four-tab layout: **Chart & Samples** | **Level Up** | **Quiz** | **Master Quiz**
+- `SAVE_PREFIX = 'leea-4-8-grammar-1-'`
+- `HOMEWORK_ID = 'leo-4-8-grammar-1'`
+- Tab 1 (Chart & Samples): rule table + 6–10 source-backed sample sentences. No save needed — it is reference only.
+- Tab 2 (Level Up): deeper rules, transforms, mixed samples. No save needed.
+- Tab 3 (Quiz): multiple choice, 10 questions, follows global Japanese ON/OFF. Save score with `saveScore(score, 10, true, { trophy, text, sub, wrongQuestions })`. Restore result on re-open (Rule 3). ↺ Redo clears saved state (Rule 4). Done-key: `m3-done`.
+- Tab 4 (Master Quiz): mix of multiple-choice and build-order questions, 10 items. Japanese shown automatically after each answer regardless of toggle. Save score to `m4-score`. Done-key: `m4-done`. Restore on re-open.
+- `moduleCount: 4`, `moduleKeys: ["t1-done", "t2-done", "m3-done", "m4-done"]` in the registry lesson JSON.
+
+Tabs 1 and 2 auto-save their done-key when the user opens the tab (they are reference tabs — opening counts as done). Tabs 3 and 4 save only when the quiz finishes.
 
 ## Main Layers
 
@@ -333,6 +364,20 @@ To generate a lesson pair from the planner, run the `/generate-lesson` skill:
 
 The skill reads the index, reads the correct PDF pages, extracts content, and generates both the teacher HTML and learner app HTML following all LEEA conventions. Full instructions are in `.claude/commands/generate-lesson.md`.
 
+**If the PDF is not present yet:** the `planner.pdf` file will show as a Git LFS pointer (very small file, not the real PDF). The Read tool will return an error or empty content. Do not attempt to generate the lesson — tell the user the PDF is missing and show them the exact local command to add it:
+
+```bash
+# Run this on your local machine, not in the cloud environment:
+git lfs install          # once per machine
+cp /path/to/your/NatGeo-OurWorld-Level4.pdf docs/lesson-plans/english/our-world/level-4/planner.pdf
+git add docs/lesson-plans/english/our-world/level-4/planner.pdf
+git commit -m "Add Our World Level 4 lesson planner PDF"
+git push
+```
+
+After the user pushes, the next cloud session will have the real PDF available.
+
+**Updating pdf_offset for the full level PDF:** The Unit 8 page numbers in `index.json` were measured from a 30-page Unit 8 excerpt, so `pdf_offset` is currently `0`. Once the full level PDF is pushed, update `pdf_offset` for u8 to `(page number where Unit 8 starts in the full PDF) - 1`. For example, if Unit 8 starts on page 87 of the full PDF, set `"pdf_offset": 86`. The skill adds this offset to every section page number automatically.
 ## Source Tags
 
 Use exact source tags so duplicate words can appear once in search but retain every source.

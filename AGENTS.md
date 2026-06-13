@@ -313,6 +313,15 @@ Navigation must stay consistent across every route.
 
 ## Lesson Generation from Planner PDFs
 
+The lesson-building workflow is documented in six focused docs under `docs/`:
+
+- `docs/build-order.md` — master per-unit pipeline (read this first)
+- `docs/pdf-mapping.md` — `index.json`, `pdf_offset`, page math
+- `docs/vocab.md` — scan + build + wire vocabulary
+- `docs/grammar.md` — scan + build + wire grammar
+- `docs/components.md` — locked Leo app structure per component type
+- `docs/teacher-slides.md` — teacher slideshow conventions
+
 NatGeo lesson planner PDFs live in `docs/lesson-plans/` organised by subject → course → level (or year). Each level folder holds:
 
 ```

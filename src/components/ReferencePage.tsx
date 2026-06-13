@@ -6,6 +6,10 @@ import { BookOpen, ExternalLink, Search } from "lucide-react";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
 import {
   grammarPoints,
+  unit7AcademicItems,
+  unit7GlossaryItems,
+  unit7Vocab1Items,
+  unit7Vocab2Items,
   unit8AcademicItems,
   unit8GlossaryItems,
   unit8GrammarItems,
@@ -283,46 +287,82 @@ function SourceTree() {
                 <small>{caption}</small>
               </summary>
               {level === 4 ? (
-                <details open>
-                  <summary>Unit 8 - That&apos;s Really Interesting!</summary>
-                  <details open>
-                    <summary>Vocabulary</summary>
+                <>
+                  <details>
+                    <summary>Unit 7 - Good Idea!</summary>
                     <details open>
-                      <summary>Vocabulary 1</summary>
-                      {unit8Vocab1Items.map((word) => (
-                        <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
-                      ))}
+                      <summary>Vocabulary</summary>
+                      <details open>
+                        <summary>Vocabulary 1</summary>
+                        {unit7Vocab1Items.map((word) => (
+                          <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
+                        ))}
+                      </details>
+                      <details>
+                        <summary>Vocabulary 2</summary>
+                        {unit7Vocab2Items.map((word) => (
+                          <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
+                        ))}
+                      </details>
+                      <details>
+                        <summary>Academic</summary>
+                        {unit7AcademicItems.map((word) => (
+                          <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
+                        ))}
+                      </details>
+                      <details>
+                        <summary>Glossary</summary>
+                        {unit7GlossaryItems.map((word) => (
+                          <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
+                        ))}
+                      </details>
                     </details>
                     <details>
-                      <summary>Vocabulary 2</summary>
-                      {unit8Vocab2Items.map((word) => (
-                        <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
-                      ))}
-                    </details>
-                    <details>
-                      <summary>Academic</summary>
-                      {unit8AcademicItems.map((word) => (
-                        <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
-                      ))}
-                    </details>
-                    <details>
-                      <summary>Glossary</summary>
-                      {unit8GlossaryItems.map((word) => (
-                        <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
-                      ))}
+                      <summary>Grammar</summary>
+                      <span className="tree-placeholder">Grammar charts not yet built for Unit 7.</span>
                     </details>
                   </details>
                   <details open>
-                    <summary>Grammar</summary>
-                    {unit8GrammarItems.map((grammar) => (
-                      <TreeLink href={`/reference/grammar/${grammar.id}`} key={grammar.id} label={`${grammar.component}: ${grammar.shortName}`} />
-                    ))}
+                    <summary>Unit 8 - That&apos;s Really Interesting!</summary>
+                    <details open>
+                      <summary>Vocabulary</summary>
+                      <details open>
+                        <summary>Vocabulary 1</summary>
+                        {unit8Vocab1Items.map((word) => (
+                          <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
+                        ))}
+                      </details>
+                      <details>
+                        <summary>Vocabulary 2</summary>
+                        {unit8Vocab2Items.map((word) => (
+                          <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
+                        ))}
+                      </details>
+                      <details>
+                        <summary>Academic</summary>
+                        {unit8AcademicItems.map((word) => (
+                          <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
+                        ))}
+                      </details>
+                      <details>
+                        <summary>Glossary</summary>
+                        {unit8GlossaryItems.map((word) => (
+                          <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
+                        ))}
+                      </details>
+                    </details>
+                    <details open>
+                      <summary>Grammar</summary>
+                      {unit8GrammarItems.map((grammar) => (
+                        <TreeLink href={`/reference/grammar/${grammar.id}`} key={grammar.id} label={`${grammar.component}: ${grammar.shortName}`} />
+                      ))}
+                    </details>
+                    <details open>
+                      <summary>Search-only support</summary>
+                      <TreeLine label="Junior-high dictionary links are searched from the menu above." />
+                    </details>
                   </details>
-                  <details open>
-                    <summary>Search-only support</summary>
-                    <TreeLine label="Junior-high dictionary links are searched from the menu above." />
-                  </details>
-                </details>
+                </>
               ) : (
                 <>
                   <details>

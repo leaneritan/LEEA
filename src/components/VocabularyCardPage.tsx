@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Volume2 } from "lucide-react";
 import { useJapanesePreference } from "@/components/AppShell";
+import { useKnownWordIds } from "@/components/useKnownWordIds";
 import {
   getNextVocabularyId,
   getPreviousVocabularyId,
@@ -14,14 +15,14 @@ import {
 import type { VocabularyItem } from "@/data/types";
 
 export function VocabularyCardPage({ initialWordId }: { initialWordId: string }) {
-  const [knownOverride, setKnownOverride] = useState<Record<string, boolean>>({});
+  const { knownWordSet, setWordKnown } = useKnownWordIds();
   const word = getVocabularyById(initialWordId);
   const showJapanese = useJapanesePreference();
 
   const displayKnown = useMemo(() => {
     if (!word) return false;
-    return knownOverride[word.id] ?? Boolean(word.knows);
-  }, [knownOverride, word]);
+    return knownWordSet.has(word.id) || Boolean(word.knows);
+  }, [knownWordSet, word]);
 
   if (!word) return null;
 
@@ -57,7 +58,7 @@ export function VocabularyCardPage({ initialWordId }: { initialWordId: string })
         <AcademicCard
           displayKnown={displayKnown}
           liveSource={Boolean(liveSource)}
-          onToggleKnown={() => setKnownOverride((current) => ({ ...current, [word.id]: !displayKnown }))}
+          onToggleKnown={() => setWordKnown(word.id, !displayKnown)}
           showJapanese={showJapanese}
           word={word}
         />
@@ -103,7 +104,7 @@ export function VocabularyCardPage({ initialWordId }: { initialWordId: string })
           <div className="card-actions">
             <button
               className={displayKnown ? "know-button known" : "know-button"}
-              onClick={() => setKnownOverride((current) => ({ ...current, [word.id]: !displayKnown }))}
+              onClick={() => setWordKnown(word.id, !displayKnown)}
               type="button"
             >
               {displayKnown ? "I Know" : "Mark I Know"}

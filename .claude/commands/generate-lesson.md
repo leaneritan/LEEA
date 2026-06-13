@@ -28,6 +28,21 @@ Examples:
 7. Runs `npm run validate:content` to confirm everything is clean.
 8. Updates AGENTS.md and docs/*.md if there are structural changes.
 
+## Planner availability
+
+Our World Levels 1-6 have planner PDFs and supporting files checked in through Git LFS:
+
+| Level | Planner path | Supporting path |
+|---|---|---|
+| 1 | `docs/lesson-plans/english/our-world/level-1/planner.pdf` | `docs/lesson-plans/english/our-world/level-1/supporting/` |
+| 2 | `docs/lesson-plans/english/our-world/level-2/planner.pdf` | `docs/lesson-plans/english/our-world/level-2/supporting/` |
+| 3 | `docs/lesson-plans/english/our-world/level-3/planner.pdf` | `docs/lesson-plans/english/our-world/level-3/supporting/` |
+| 4 | `docs/lesson-plans/english/our-world/level-4/planner.pdf` | `docs/lesson-plans/english/our-world/level-4/supporting/` |
+| 5 | `docs/lesson-plans/english/our-world/level-5/planner.pdf` | `docs/lesson-plans/english/our-world/level-5/supporting/` |
+| 6 | `docs/lesson-plans/english/our-world/level-6/planner.pdf` | `docs/lesson-plans/english/our-world/level-6/supporting/` |
+
+If the PDF opens as a tiny Git LFS pointer instead of the real document, run `git lfs pull` before generating.
+
 ## Lesson ID convention
 
 `ow-l{level}-u{unit}-{component}` — e.g. `ow-l4-u8-grammar-1`

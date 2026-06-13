@@ -160,10 +160,20 @@ The component code maps:
 - `SG` song
 - `RD` reading
 - `WR` writing
-- `MI` mission (end-of-unit mission section)
-- `PJ` project (end-of-unit project section)
+- `MI` mission (end-of-unit mission section — **Levels 4-6 only**)
+- `VL` value (end-of-unit value section — **Levels 1-3 only**)
+- `LT` let's talk (functional dialogue boxes — **Levels 4-6 only**)
+- `PJ` project (end-of-unit project section — all levels)
 - `RDR` unit reader (the bundled NatGeo reader book, distinct from `RD` reading)
 
-For mission/project/reader sources, omit `lessonId` (these sections do not have their own teacher lessons or Leo apps) and use `component: "mission" | "project" | "reader"` in `sources[]`.
+NatGeo Our World uses a different end-of-unit pattern by level band:
+
+| Levels 1-3 | Levels 4-6 |
+|---|---|
+| Value + Project | Mission + Let's Talk + Project |
+
+Use `MI` only when the planner page actually says **MISSION**. Use `VL` when it says **VALUE**. Do not invent a Mission tag for a Level 1-3 unit.
+
+For mission/value/project/reader/let's-talk sources, omit `lessonId` (these sections do not have their own teacher lessons or Leo apps yet) and use `component: "mission" | "value" | "project" | "reader" | "lets-talk"` in `sources[]`.
 
 Always include the source tag in `sources[].tag` AND in `tags[]`. Search uses both.

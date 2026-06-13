@@ -106,22 +106,26 @@ Take the academic word's depth seriously — the rich card is the main academic 
 
 ## Source-tag codes
 
-| Code | Section |
-|---|---|
-| `V1` | vocab-1 |
-| `V2` | vocab-2 |
-| `G1` | grammar-1 |
-| `G2` | grammar-2 |
-| `OP` | opener |
-| `SG` | song |
-| `RD` | reading |
-| `WR` | writing |
-| `MI` | mission |
-| `PJ` | project |
-| `RDR` | unit reader |
+| Code | Section | Level band |
+|---|---|---|
+| `V1` | vocab-1 | all |
+| `V2` | vocab-2 | all |
+| `G1` | grammar-1 | all |
+| `G2` | grammar-2 | all |
+| `OP` | opener | all |
+| `SG` | song | all |
+| `RD` | reading | all |
+| `WR` | writing | all |
+| `MI` | mission | **Levels 4-6 only** |
+| `VL` | value | **Levels 1-3 only** |
+| `LT` | let's talk | **Levels 4-6 only** |
+| `PJ` | project | all |
+| `RDR` | unit reader | all |
 
-Format: `<COURSE><LEVEL>-U<UNIT>-<CODE>` e.g. `OW4-U7-V1`.
+Format: `<COURSE><LEVEL>-U<UNIT>-<CODE>` e.g. `OW4-U7-V1`, `OW2-U3-VL`, `OW5-U2-LT`.
 Course-level academic tag: `<COURSE><LEVEL>-AC` e.g. `OW4-AC`.
+
+**Important:** Use `MI` only when the planner page actually labels the section **MISSION** (Levels 4-6). Use `VL` when it says **VALUE** (Levels 1-3). Never invent a Mission tag for a Level 1-3 unit.
 
 ## Step-by-step
 

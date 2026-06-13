@@ -65,7 +65,27 @@ Notes:
 
 These phases drive what goes in each Leo app shell below. The shell adds vocab review / academic / content / formative assessment modules around the canonical phases when the content fits.
 
-**Verification status:** the phase list was verified against Our World Level 4, Units 1, 4, 7, and 8 (planner.pdf pages 38–39, 134–135, 230–251, 260–282). Cross-level checks (Levels 1, 2, 3, 5, 6) are pending — those planner PDFs have not been pushed yet. The Level 4 pattern is expected to hold across levels because NatGeo Our World uses one consistent lesson architecture; re-verify when each level's PDF arrives and update this section if any level deviates.
+**Verification status:** all six Our World levels were checked. The opener / vocab / song / grammar / reading / writing phase sequences above are the same across L1-L6 (verified against Level 1 Unit 1 page 46, Level 2 + Level 3 Scope and Sequence pages, Level 4 Units 1/4/7/8, Level 5 + Level 6 Scope and Sequence pages). Two level-band variants below.
+
+### Level-band variants: Value vs Mission, Let's Talk
+
+The end-of-unit social-emotional segment and the dialogue boxes differ between lower and upper levels:
+
+| Phase | Levels 1-3 | Levels 4-6 |
+|---|---|---|
+| End-of-unit social-emotional | **Value** (e.g. "Be neat", "Take care of others", "Be a good sport") | **Mission** with National Geographic Explorer (e.g. "Connect with nature", "Be prepared") |
+| Functional dialogue | not in scope | **Let's Talk** (e.g. "It's my turn", "I love it!") |
+| Unit 0 (preparatory unit) | present | not present |
+| Project | present | present |
+
+Source-tag impact:
+
+- Levels 1-3 use `VL` (value) where Levels 4-6 use `MI` (mission). E.g. `OW2-U4-VL` vs `OW4-U7-MI`
+- Let's Talk content in Levels 4-6 uses `LT`. E.g. `OW5-U3-LT`
+- `PJ` (project) and `RDR` (unit reader) work the same across all levels
+- See `docs/vocab.md` for the full source-tag code table
+
+When scanning a Level 1-3 unit, look for the **VALUE** label on the unit opener spread and the end-of-unit Value page; when scanning Level 4-6, look for **MISSION** with a Be the Expert "About the Photo" + "Meet the Explorer" sidebar.
 
 ## Locked module structures
 

@@ -364,20 +364,24 @@ To generate a lesson pair from the planner, run the `/generate-lesson` skill:
 
 The skill reads the index, reads the correct PDF pages, extracts content, and generates both the teacher HTML and learner app HTML following all LEEA conventions. Full instructions are in `.claude/commands/generate-lesson.md`.
 
-**If the PDF is not present yet:** the `planner.pdf` file will show as a Git LFS pointer (very small file, not the real PDF). The Read tool will return an error or empty content. Do not attempt to generate the lesson — tell the user the PDF is missing and show them the exact local command to add it:
+**Planner PDF availability:** Our World Levels 1-6 have `planner.pdf` files and supporting files checked in through Git LFS:
+
+| Level | Planner path | Supporting path |
+|---|---|---|
+| 1 | `docs/lesson-plans/english/our-world/level-1/planner.pdf` | `docs/lesson-plans/english/our-world/level-1/supporting/` |
+| 2 | `docs/lesson-plans/english/our-world/level-2/planner.pdf` | `docs/lesson-plans/english/our-world/level-2/supporting/` |
+| 3 | `docs/lesson-plans/english/our-world/level-3/planner.pdf` | `docs/lesson-plans/english/our-world/level-3/supporting/` |
+| 4 | `docs/lesson-plans/english/our-world/level-4/planner.pdf` | `docs/lesson-plans/english/our-world/level-4/supporting/` |
+| 5 | `docs/lesson-plans/english/our-world/level-5/planner.pdf` | `docs/lesson-plans/english/our-world/level-5/supporting/` |
+| 6 | `docs/lesson-plans/english/our-world/level-6/planner.pdf` | `docs/lesson-plans/english/our-world/level-6/supporting/` |
+
+If a cloud session sees only a tiny pointer file instead of a real PDF, run:
 
 ```bash
-# Run this on your local machine, not in the cloud environment:
-git lfs install          # once per machine
-cp /path/to/your/NatGeo-OurWorld-Level4.pdf docs/lesson-plans/english/our-world/level-4/planner.pdf
-git add docs/lesson-plans/english/our-world/level-4/planner.pdf
-git commit -m "Add Our World Level 4 lesson planner PDF"
-git push
+git lfs pull
 ```
 
-After the user pushes, the next cloud session will have the real PDF available.
-
-**Updating pdf_offset for the full level PDF:** The Unit 8 page numbers in `index.json` were measured from a 30-page Unit 8 excerpt, so `pdf_offset` is currently `0`. Once the full level PDF is pushed, update `pdf_offset` for u8 to `(page number where Unit 8 starts in the full PDF) - 1`. For example, if Unit 8 starts on page 87 of the full PDF, set `"pdf_offset": 86`. The skill adds this offset to every section page number automatically.
+**Updating pdf_offset:** Some `index.json` files still have placeholder or excerpt-based page ranges. When building a lesson, verify the unit start page in the full `planner.pdf` and set `pdf_offset = (unit start page in full PDF) - 1` when section page numbers are unit-relative. The skill adds this offset to every section page number automatically.
 
 ## Source Tags
 

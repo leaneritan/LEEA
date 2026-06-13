@@ -4,9 +4,9 @@ This file tracks the decisions made before coding.
 
 ## Lesson Generation Workflow
 
-Lesson planner PDFs (NatGeo Our World, Joyful Work, etc.) live in `docs/lesson-plans/` and are tracked by Git LFS. Each level has a `planner.pdf` and an `index.json` mapping units and components to PDF page ranges.
+Lesson planner PDFs (NatGeo Our World, Joyful Work, etc.) live in `docs/lesson-plans/` and are tracked by Git LFS. Each level has a `planner.pdf`, an `index.json` mapping units and components to PDF page ranges, and optional support files in `supporting/`.
 
-The `/generate-lesson` skill reads the planner PDF and generates both the Neritan teacher HTML and Leo's learner app HTML in one step. Page numbers in `index.json` are PDF-internal page numbers (1-indexed). When a unit was first measured from an excerpt PDF, `pdf_offset` is set to 0 until the full level PDF is added and page numbers are updated.
+The `/generate-lesson` skill reads the planner PDF and generates both the Neritan teacher HTML and Leo's learner app HTML in one step. Page numbers in `index.json` are PDF-internal page numbers (1-indexed). When a unit was first measured from an excerpt PDF, update `pdf_offset` after verifying the unit start page in the full planner PDF.
 
 Folder structure:
 
@@ -14,16 +14,29 @@ Folder structure:
 docs/lesson-plans/
   english/
     our-world/
-      level-1/ … level-6/
-        planner.pdf   (Git LFS — user adds locally)
+      level-1/ ... level-6/
+        planner.pdf   (Git LFS)
         index.json
         supporting/
     joyful-work/
-      year-1/ … year-3/
+      year-1/ ... year-3/
     training-ground/
 ```
 
-PDFs are private (never in a public repo). The user clones locally and pushes via git to add them.
+Our World Levels 1-6 now have `planner.pdf` files and supporting files in Git LFS. Cloud/Claude environments should run `git lfs pull` after checkout if a PDF reads as a tiny pointer file instead of the real document.
+
+Current Our World planner availability:
+
+| Level | Planner | Supporting files |
+|---|---|---|
+| Level 1 | `docs/lesson-plans/english/our-world/level-1/planner.pdf` | `docs/lesson-plans/english/our-world/level-1/supporting/` |
+| Level 2 | `docs/lesson-plans/english/our-world/level-2/planner.pdf` | `docs/lesson-plans/english/our-world/level-2/supporting/` |
+| Level 3 | `docs/lesson-plans/english/our-world/level-3/planner.pdf` | `docs/lesson-plans/english/our-world/level-3/supporting/` |
+| Level 4 | `docs/lesson-plans/english/our-world/level-4/planner.pdf` | `docs/lesson-plans/english/our-world/level-4/supporting/` |
+| Level 5 | `docs/lesson-plans/english/our-world/level-5/planner.pdf` | `docs/lesson-plans/english/our-world/level-5/supporting/` |
+| Level 6 | `docs/lesson-plans/english/our-world/level-6/planner.pdf` | `docs/lesson-plans/english/our-world/level-6/supporting/` |
+
+PDFs remain private teaching assets. Keep the repo private and use Git LFS for any future PDF uploads.
 
 ## Platform
 

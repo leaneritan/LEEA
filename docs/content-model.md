@@ -217,6 +217,8 @@ Search results should deduplicate by global item id and show all matching source
 
 Reference browse/search controls should show useful counts. Mixed search results should be visually scannable with subtle type-aware card edges and badges for Vocabulary, Academic, Content, Related, Glossary, Grammar, and Junior High.
 
+Reference level colors must stay consistent anywhere levels appear: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The source tree keeps Vocabulary and Grammar nested under each level/unit. For units with real data, Vocabulary nests Vocabulary 1, Vocabulary 2, Academic, and Glossary.
+
 Search ranking should prefer direct word/title matches, then meaning/rule/pattern matches, then exact source/type tags. Broad lesson/topic tags should not cause unrelated cards from the same section to appear for a shorter query.
 
 Search/browse result item types should route to their reference views:

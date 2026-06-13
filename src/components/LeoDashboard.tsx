@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { CheckCircle2, ChevronDown, ChevronRight, Circle, Play } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { assignmentStorageKey, seedAssignments, type AssignmentMap, type AssignmentRecord } from "@/data/assignments";
+import { readAssignments, type AssignmentMap, type AssignmentRecord } from "@/data/assignments";
 import { getLearnerAppProgress, type LearnerAppProgress } from "@/data/learnerProgress";
 import { getLessonGroups, learnerLessons } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
+import { LeoHomeworkHero } from "./LeoHomeworkHero";
 
 const groupOpenStorageKey = "leea.leo.lessonGroupsOpen.v1";
 
@@ -14,8 +15,26 @@ export function LeoDashboard() {
   const [progressVersion, setProgressVersion] = useState(0);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const [assignments, setAssignments] = useState<AssignmentMap>({});
+  // Hero shows only what's currently assigned; the list below shows every Leo app so he can revisit anything.
   const assignedLessons = useMemo(() => learnerLessons.filter((lesson) => assignments[lesson.id]), [assignments]);
-  const groups = useMemo(() => getLessonGroups(assignedLessons), [assignedLessons]);
+  const groups = useMemo(() => getLessonGroups(learnerLessons), []);
+
+  // Refresh must not depend on `groups`: every refresh creates a new
+  // assignments object, which recomputes `groups`, so a [groups] dep
+  // re-runs this effect forever (frozen page).
+  useEffect(() => {
+    const refresh = () => {
+      setAssignments(readAssignments(learnerLessons));
+      setProgressVersion((current) => current + 1);
+    };
+    refresh();
+    window.addEventListener("storage", refresh);
+    window.addEventListener("focus", refresh);
+    return () => {
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("focus", refresh);
+    };
+  }, []);
 
   useEffect(() => {
     const savedGroups = window.localStorage.getItem(groupOpenStorageKey);
@@ -28,24 +47,12 @@ export function LeoDashboard() {
     } else {
       setOpenGroups(Object.fromEntries(groups.map((group, index) => [group.id, index === 0])));
     }
-
-    const refresh = () => {
-      setAssignments(readAssignments());
-      setProgressVersion((current) => current + 1);
-    };
-    refresh();
-    window.addEventListener("storage", refresh);
-    window.addEventListener("focus", refresh);
-    return () => {
-      window.removeEventListener("storage", refresh);
-      window.removeEventListener("focus", refresh);
-    };
   }, [groups]);
 
   const appProgress = useMemo(() => {
     progressVersion;
-    return Object.fromEntries(assignedLessons.map((lesson) => [lesson.id, getLearnerAppProgress(lesson.source)]));
-  }, [assignedLessons, progressVersion]);
+    return Object.fromEntries(learnerLessons.map((lesson) => [lesson.id, getLearnerAppProgress(lesson.source)]));
+  }, [progressVersion]);
 
   function toggleGroup(groupId: string) {
     setOpenGroups((current) => {
@@ -55,13 +62,14 @@ export function LeoDashboard() {
     });
   }
 
+  const heroItems = useMemo(
+    () => assignedLessons.map((lesson) => ({ lesson, progress: appProgress[lesson.id] })).filter((item) => item.progress),
+    [assignedLessons, appProgress]
+  );
+
   return (
     <section className="leo-page">
-      <header className="leo-hero">
-        <span className="eyebrow">Leo Learning Mode</span>
-        <h1>My Assignments</h1>
-        <p>Open the next app, finish the modules, and come back here to see progress.</p>
-      </header>
+      <LeoHomeworkHero items={heroItems} />
 
       {groups.length ? (
         <div className="leo-group-grid">
@@ -96,12 +104,7 @@ export function LeoDashboard() {
           );
           })}
         </div>
-      ) : (
-        <section className="empty-results">
-          <h2>No homework assigned yet.</h2>
-          <p>Ask Neritan to assign the next Leo app from Teacher Menu.</p>
-        </section>
-      )}
+      ) : null}
     </section>
   );
 }
@@ -109,9 +112,15 @@ export function LeoDashboard() {
 function LeoAppCard({ assignment, lesson, progress }: { assignment: AssignmentRecord | undefined; lesson: Lesson; progress: LearnerAppProgress }) {
   const percent = Math.round((progress.completedModules / progress.moduleCount) * 100);
   const component = getLearnerComponentMeta(lesson.component);
+  const cardClass = [
+    "leo-app-card",
+    `leo-app-card-${component.tone}`,
+    assignment ? "" : "leo-app-card-available",
+    progress.done ? "leo-app-card-done" : ""
+  ].filter(Boolean).join(" ");
 
   return (
-    <article className={`leo-app-card leo-app-card-${component.tone}`}>
+    <article className={cardClass}>
       <div className="leo-app-main">
         <div className="leo-component-row">
           <span className={`component-chip component-chip-${component.tone}`}>
@@ -169,27 +178,15 @@ function getLearnerComponentMeta(component: string) {
   if (component.includes("grammar")) return { emoji: "G", label: "Grammar", tone: "grammar" };
   if (component.includes("reading")) return { emoji: "R", label: "Reading", tone: "reading" };
   if (component.includes("writing")) return { emoji: "W", label: "Writing", tone: "writing" };
+  if (component.includes("song")) return { emoji: "🎵", label: "Song", tone: "song" };
   if (component.includes("review")) return { emoji: "OK", label: "Review", tone: "review" };
   return { emoji: "OP", label: "Opener", tone: "opener" };
-}
-
-function readAssignments() {
-  try {
-    const saved = window.localStorage.getItem(assignmentStorageKey);
-    const parsed = saved ? (JSON.parse(saved) as AssignmentMap) : {};
-    const seeded = seedAssignments(learnerLessons, parsed);
-    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
-    return seeded;
-  } catch {
-    const seeded = seedAssignments(learnerLessons, {});
-    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
-    return seeded;
-  }
 }
 
 function getLearnerStatusText(assignment: AssignmentRecord | undefined, done: boolean) {
   if (assignment?.status === "reviewed") return "Reviewed";
   if (assignment?.status === "needs-redo") return "Needs redo";
   if (done) return "Done";
-  return "Assigned";
+  if (assignment) return "Assigned";
+  return "Not assigned";
 }

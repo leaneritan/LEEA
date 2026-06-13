@@ -143,7 +143,7 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
 
 /* Scene quick check */
 .scene-qc{padding:10px 12px;background:var(--paper);border-top:1px solid var(--bdr);display:none}
-.scene-card.opened .scene-qc{display:block}
+.scene-card.opened .scene-qc,.scene-card.revealed .scene-qc{display:block}
 .scene-qc-q{font-size:.78rem;font-weight:800;color:var(--ink);margin-bottom:6px}
 .scene-qc-opts{display:flex;flex-direction:column;gap:5px}
 
@@ -806,7 +806,44 @@ function initReviewMode() {
 function openModal(id) {
   document.getElementById(id).classList.add('open');
   document.body.style.overflow = 'hidden';
-  if (id === 'm7' && !m7Started) initM7();
+  if (id === 'm7' && !m7Started) {
+    const savedScore = lLoad(SAVE_PREFIX + 'score');
+    if (savedScore && savedScore.done) {
+      // Restore result view from saved score — don't restart the quiz
+      m7Started = true;
+      m7Score = savedScore.score || 0;
+      m7Wrong = savedScore.wrongQuestions || [];
+      restoreM7Result(savedScore);
+    } else {
+      initM7();
+    }
+  }
+}
+function restoreM7Result(savedScore) {
+  const pct = savedScore.percent || Math.round((savedScore.score || 0) / m7Qs.length * 100);
+  const passed = pct >= 80;
+  document.getElementById('m7-progFill').style.width = '100%';
+  document.getElementById('m7-quizArea').style.display = 'none';
+  let html = '<div class="result-box">';
+  html += '<div class="result-score">' + (savedScore.score || 0) + '/' + m7Qs.length + '</div>';
+  html += '<div style="font-size:.95rem;font-weight:800;margin-top:6px;color:' + (passed ? 'var(--gn)' : 'var(--rd)') + '">' + pct + '% — ' + (passed ? '⚽ GOAL!' : 'Try again next time!') + '</div>';
+  html += '<div class="result-bullets">';
+  const wrong = savedScore.wrongQuestions || [];
+  m7Qs.forEach(function(q, i) {
+    const miss = wrong.find(function(w){ return w.question === 'Q' + (i + 1); });
+    if (miss) {
+      html += '<div class="result-bullet bad">❌ Q' + (i + 1) + ': ' + q.q + '<br>You chose: <em>' + miss.chosen + '</em><br>Correct: <strong>' + miss.correct + '</strong></div>';
+    } else {
+      html += '<div class="result-bullet ok">✓ Q' + (i + 1) + ' — correct!</div>';
+    }
+  });
+  html += '</div>';
+  if (passed) html += '<div style="margin-top:12px;font-size:.85rem;font-weight:700;color:var(--gn)">🎉 Brilliant work, Leo! You\'re ready for Vocabulary 1!</div>';
+  else html += '<div style="margin-top:12px;font-size:.85rem;font-weight:700;color:var(--ink2)">Don\'t worry — you can tap ↺ Redo and try again!</div>';
+  html += '</div>';
+  document.getElementById('m7-result').innerHTML = html;
+  document.getElementById('m7-result').style.display = 'block';
+  document.getElementById('m7-bottom').style.display = 'flex';
 }
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
@@ -967,6 +1004,8 @@ function playScene1() {
   setTimeout(function(){ flash.classList.remove('fire'); }, 1000);
   setTimeout(function(){ bear.classList.add('come'); }, 900);
   setTimeout(function(){ msg.classList.add('show'); }, 1800);
+  // Reveal the quick-check after the animation plays
+  setTimeout(function(){ document.getElementById('sc-1').classList.add('revealed'); }, 2000);
 }
 function playScene2() {
   if (document.getElementById('sc-2').classList.contains('scene-played')) return;
@@ -978,12 +1017,18 @@ function playScene2() {
   setTimeout(function(){ flash.classList.remove('fire'); }, 900);
   setTimeout(function(){ pol.classList.add('show'); }, 700);
   setTimeout(function(){ msg.classList.add('show'); }, 1500);
+  // Reveal the quick-check after the animation plays
+  setTimeout(function(){ document.getElementById('sc-2').classList.add('revealed'); }, 1800);
 }
 function litHobbyApp(tile) {
   if (tile.classList.contains('lit')) return;
   tile.classList.add('lit');
   const lit = document.querySelectorAll('#sc-3 .s-htile.lit').length;
-  if (lit >= 6) document.getElementById('s3-msg').classList.add('show');
+  if (lit >= 6) {
+    document.getElementById('s3-msg').classList.add('show');
+    // Reveal the quick-check once all tiles are lit
+    setTimeout(function(){ document.getElementById('sc-3').classList.add('revealed'); }, 400);
+  }
 }
 function pickBoringApp() {
   const box = document.getElementById('s4-boring');
@@ -998,15 +1043,22 @@ function pickFunApp() {
   checkSplitApp();
 }
 function checkSplitApp() {
-  // scene 4 visual reveal — quick check still required for module credit
+  const both = document.getElementById('s4-boring').classList.contains('shown') &&
+                document.getElementById('s4-fun').classList.contains('shown');
+  if (both) {
+    // Reveal the quick-check once both boxes are tapped
+    setTimeout(function(){ document.getElementById('sc-4').classList.add('revealed'); }, 400);
+  }
 }
 // Generic quick-check answer handler in scenes
 function qcAnswer(btn, isCorrect, sceneId, saveKey) {
-  const opts = btn.parentElement.querySelectorAll('.mcq-opt');
-  if (Array.from(opts).some(function(o){ return o.disabled; })) return;
-  opts.forEach(function(o){ o.disabled = true; });
+  // Scene already answered correctly — ignore further clicks
+  if (sceneId && document.getElementById(sceneId).classList.contains('opened')) return;
+  // Prevent re-clicking the same button while its feedback is still showing
+  if (btn.disabled) return;
   if (isCorrect) {
     btn.classList.add('ok');
+    btn.parentElement.querySelectorAll('.mcq-opt').forEach(function(o){ o.disabled = true; });
     if (sceneId) {
       document.getElementById(sceneId).classList.add('opened');
       lSave(SAVE_PREFIX + saveKey, true);
@@ -1014,9 +1066,10 @@ function qcAnswer(btn, isCorrect, sceneId, saveKey) {
     }
   } else {
     btn.classList.add('bad');
+    btn.disabled = true;
     setTimeout(function(){
       btn.classList.remove('bad');
-      opts.forEach(function(o){ o.disabled = false; });
+      btn.disabled = false;
     }, 700);
   }
 }
@@ -1034,7 +1087,7 @@ function updateM2Progress() {
 }
 function resetM2UI() {
   for (let i = 1; i <= 4; i++) localStorage.removeItem('leea-' + SAVE_PREFIX + 'm2-scene-' + i);
-  document.querySelectorAll('#m2 .scene-card').forEach(function(c){ c.classList.remove('opened','scene-played'); });
+  document.querySelectorAll('#m2 .scene-card').forEach(function(c){ c.classList.remove('opened','revealed','scene-played'); });
   document.querySelectorAll('#m2 .mcq-opt').forEach(function(o){ o.classList.remove('ok','bad'); o.disabled = false; });
   // Reset scene animations
   document.querySelectorAll('#m2 .s-cam-pop, #m2 .s-bear, #m2 .s-pol').forEach(function(el){
@@ -1103,26 +1156,30 @@ function restoreM3() {
 // M4 — LOOK AND CHECK
 // ═══════════════════════════════
 function lcPickApp(btn, isCorrect) {
-  const opts = document.querySelectorAll('#m4-opts .mcq-opt');
-  if (Array.from(opts).some(function(o){ return o.classList.contains('ok') || o.classList.contains('bad'); })) return;
+  // Already answered correctly — ignore further clicks
+  if (lLoad(SAVE_PREFIX + 'm4-correct', false)) return;
+  // Prevent re-clicking the same button while its feedback is showing
+  if (btn.disabled) return;
   if (isCorrect) {
     btn.classList.add('ok');
     document.getElementById('lc-fb').className = 'mcq-fb show ok';
     document.getElementById('lc-fb').innerHTML = '🎉 YES! The photographer is named <strong>Roie Galitz</strong>! He works in the Arctic. 📷❄️';
     lSave(SAVE_PREFIX + 'm4-answer', 'a photographer ✓');
     lSave(SAVE_PREFIX + 'm4-correct', true);
-    opts.forEach(function(o){ o.disabled = true; });
+    document.querySelectorAll('#m4-opts .mcq-opt').forEach(function(o){ o.disabled = true; });
     const cbtn = document.getElementById('cbtn-m4');
     cbtn.disabled = false;
     cbtn.textContent = 'Mark Look and Check complete ✓';
     updateBadge('m4','prog');
   } else {
     btn.classList.add('bad');
+    btn.disabled = true;
     document.getElementById('lc-fb').className = 'mcq-fb show bad';
     document.getElementById('lc-fb').innerHTML = '❌ Try again! Look carefully — who would be USING the camera? 📷';
     lSave(SAVE_PREFIX + 'm4-attempts', (lLoad(SAVE_PREFIX + 'm4-attempts', 0) || 0) + 1);
     setTimeout(function(){
       btn.classList.remove('bad');
+      btn.disabled = false;
       document.getElementById('lc-fb').classList.remove('show');
     }, 1500);
   }
@@ -1365,6 +1422,8 @@ function finishM7() {
   const pct = Math.round(m7Score / m7Qs.length * 100);
   const passed = pct >= 80;
   saveScore(m7Score, true, { wrongQuestions: m7Wrong });
+  // Auto-save m7-done so completedModules counts it without needing the extra button click
+  lSave(SAVE_PREFIX + 'm7-done', true);
   let html = '<div class="result-box">';
   html += '<div class="result-score">' + m7Score + '/' + m7Qs.length + '</div>';
   html += '<div style="font-size:.95rem;font-weight:800;margin-top:6px;color:' + (passed ? 'var(--gn)' : 'var(--rd)') + '">' + pct + '% — ' + (passed ? '⚽ GOAL!' : 'Try again next time!') + '</div>';

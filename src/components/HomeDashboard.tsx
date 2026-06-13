@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { assignmentStorageKey, seedAssignments, type AssignmentMap } from "@/data/assignments";
+import { readAssignments, type AssignmentMap } from "@/data/assignments";
 import { getDoneLessonCount, lessonProgressStorageKey, type LessonProgressMap } from "@/data/lessonProgress";
 import { getCurrentFocusLessons, learnerLessons, teacherLessons } from "@/data/lessons";
 import { currentFocus } from "@/data/registry";
 import type { Lesson } from "@/data/types";
+import { getComponentMeta } from "./componentMeta";
 
 export function HomeDashboard() {
   const [progress, setProgress] = useState<LessonProgressMap>({});
@@ -31,7 +32,7 @@ export function HomeDashboard() {
           setProgress({});
         }
       }
-      setAssignments(readAssignments());
+      setAssignments(readAssignments(learnerLessons));
       setProgressVersion((current) => current + 1);
     }
 
@@ -63,21 +64,7 @@ export function HomeDashboard() {
           </div>
         </div>
 
-        <aside className="next-card">
-          <div className="next-top">
-            <span>{nextItem.label}</span>
-            <b>{nextItem.status}</b>
-          </div>
-          <div>
-            <p>
-              {getCourseDisplay(nextItem.lesson.course)} - Level {nextItem.lesson.level} - Unit {nextItem.lesson.unit}
-            </p>
-            <h2>{nextItem.lesson.title}</h2>
-          </div>
-          <Link className="primary-button" href={`/lessons/${nextItem.lesson.id}`}>
-            {nextItem.lesson.mode === "learner" ? "Open Homework" : "Open Lesson"}
-          </Link>
-        </aside>
+        <NextCard nextItem={nextItem} />
       </section>
 
       <section className="focus-banner" aria-label="Current unit focus">
@@ -157,20 +144,6 @@ function getHomeNextItem(progress: LessonProgressMap, assignments: AssignmentMap
   };
 }
 
-function readAssignments() {
-  try {
-    const saved = window.localStorage.getItem(assignmentStorageKey);
-    const parsed = saved ? (JSON.parse(saved) as AssignmentMap) : {};
-    const seeded = seedAssignments(learnerLessons, parsed);
-    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
-    return seeded;
-  } catch {
-    const seeded = seedAssignments(learnerLessons, {});
-    window.localStorage.setItem(assignmentStorageKey, JSON.stringify(seeded));
-    return seeded;
-  }
-}
-
 function isLearnerLessonDone(lesson: Lesson) {
   if (typeof window === "undefined") return false;
   const storagePrefix = lesson.source.storagePrefix;
@@ -192,6 +165,30 @@ function getCourseDisplay(course: Lesson["course"]) {
   if (course === "our-world") return "Our World";
   if (course === "joyful-work") return "Joyful Work";
   return "Training Ground";
+}
+
+function NextCard({ nextItem }: { nextItem: { label: string; status: string; lesson: Lesson } }) {
+  const meta = getComponentMeta(nextItem.lesson.component);
+  return (
+    <aside className={`next-card next-card-${meta.tone}`}>
+      <div className="next-top">
+        <span>
+          <span aria-hidden="true" className="next-emoji">{meta.emoji}</span>
+          {nextItem.label}
+        </span>
+        <b>{nextItem.status}</b>
+      </div>
+      <div>
+        <p>
+          {getCourseDisplay(nextItem.lesson.course)} - Level {nextItem.lesson.level} - Unit {nextItem.lesson.unit}
+        </p>
+        <h2>{nextItem.lesson.title}</h2>
+      </div>
+      <Link className="primary-button" href={`/lessons/${nextItem.lesson.id}`}>
+        {nextItem.lesson.mode === "learner" ? "Open Homework" : "Open Lesson"}
+      </Link>
+    </aside>
+  );
 }
 
 function ModeCard({

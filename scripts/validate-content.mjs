@@ -185,6 +185,43 @@ for (const [index, entry] of (sanseido ?? []).entries()) {
   if (present(entry.u) && !/^https?:\/\//.test(entry.u)) fail(`sanseido[${index}].u must be an http(s) URL`);
 }
 
+// Lesson registration + teacher/learner pairing check
+const lessonsDir = "content/subjects/english/courses/our-world/level-4/unit-8/lessons";
+const lessons = [];
+for (const file of fs.readdirSync(path.join(root, lessonsDir))) {
+  if (!file.endsWith(".json")) continue;
+  const lesson = readJson(path.join(lessonsDir, file));
+  lessons.push({ ...lesson, file });
+}
+
+const lessonsTsPath = "src/data/lessons.ts";
+const lessonsTsSource = fs.readFileSync(path.join(root, lessonsTsPath), "utf8");
+
+for (const lesson of lessons) {
+  if (!lessonsTsSource.includes(`/${lesson.file}`)) {
+    fail(`${lesson.file} (${lesson.id}) is not imported by ${lessonsTsPath}`);
+  }
+}
+
+const byComponent = new Map();
+for (const lesson of lessons) {
+  const key = `${lesson.course}|l${lesson.level}|u${lesson.unit}|${lesson.component}`;
+  byComponent.set(key, lesson);
+}
+
+for (const lesson of lessons) {
+  if (lesson.mode !== "learner") continue;
+  if (!lesson.component.endsWith("-app")) {
+    fail(`${lesson.id}: learner lesson component "${lesson.component}" must end with "-app" so its buttons surface on the matching teacher card`);
+    continue;
+  }
+  const teacherComponent = lesson.component.slice(0, -"-app".length);
+  const teacherKey = `${lesson.course}|l${lesson.level}|u${lesson.unit}|${teacherComponent}`;
+  if (!byComponent.has(teacherKey)) {
+    fail(`${lesson.id}: learner lesson has no teacher counterpart with component "${teacherComponent}" in the same level/unit`);
+  }
+}
+
 if (errors.length) {
   console.error(`Content validation failed with ${errors.length} issue(s):`);
   for (const error of errors) console.error(`- ${error}`);
@@ -192,4 +229,4 @@ if (errors.length) {
 }
 
 console.log("Content validation passed.");
-console.log(`Checked ${vocabulary.words.length} vocabulary cards, ${grammar.grammarPoints.length} grammar cards, and ${sanseido.length} Sanseido links.`);
+console.log(`Checked ${vocabulary.words.length} vocabulary cards, ${grammar.grammarPoints.length} grammar cards, ${lessons.length} lessons, and ${sanseido.length} Sanseido links.`);

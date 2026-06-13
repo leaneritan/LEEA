@@ -4,10 +4,11 @@ import Link from "next/link";
 import { CheckCircle2, Circle, RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
+  assignLesson,
   assignmentStorageKey,
   createAssignmentRecord,
   createReviewRecord,
-  seedAssignments,
+  readAssignments,
   type AssignmentMap,
   type AssignmentRecord
 } from "@/data/assignments";
@@ -22,7 +23,7 @@ export function TeacherReviewPage({ lesson }: { lesson: Lesson }) {
 
   useEffect(() => {
     function refresh() {
-      setAssignments(readAssignments());
+      setAssignments(readAssignments(learnerLessons));
       setProgress(getLearnerAppProgress(lesson.source));
     }
 
@@ -36,7 +37,7 @@ export function TeacherReviewPage({ lesson }: { lesson: Lesson }) {
   }, [lesson]);
 
   function assign() {
-    setAssignments((current) => saveAssignments({ ...current, [lesson.id]: current[lesson.id] ?? createAssignmentRecord(lesson.id) }));
+    setAssignments((current) => assignLesson(lesson.id, current));
   }
 
   function review(status: "reviewed" | "needs-redo") {
@@ -119,16 +120,6 @@ function ReviewStat({ label, value }: { label: string; value: string }) {
       <strong>{value}</strong>
     </div>
   );
-}
-
-function readAssignments() {
-  try {
-    const saved = window.localStorage.getItem(assignmentStorageKey);
-    const parsed = saved ? (JSON.parse(saved) as AssignmentMap) : {};
-    return saveAssignments(seedAssignments(learnerLessons, parsed));
-  } catch {
-    return saveAssignments(seedAssignments(learnerLessons, {}));
-  }
 }
 
 function saveAssignments(assignments: AssignmentMap) {

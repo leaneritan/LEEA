@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Song · What's Your Hobby? — Leo's App 🎵</title>
+
+<!-- Supabase + LEEA Cloud (repo paths; degrade gracefully if absent) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../../../lib/leea-cloud-config.js"></script>
+<script src="../../../../lib/leea-cloud.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#16A34A;--green-d:#14532D;--green-m:#22C55E;--green-l:#DCFCE7;
+  --blue:#0EA5E9;--blue-l:#E0F2FE;--amber:#F59E0B;--amber-l:#FEF3C7;--purple:#7C3AED;
+  --red:#DC2626;--ink:#14241D;--ink-2:#475a50;--ink-3:#7b8a82;--bg:#F0FDF4;--border:#dfe7e1;
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;color:var(--ink);padding-bottom:40px}
+.ja{font-family:'Noto Sans JP','Outfit',sans-serif}
+
+/* header */
+.hdr{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;padding:20px 18px 22px;position:sticky;top:0;z-index:40;box-shadow:0 3px 14px rgba(0,0,0,.18)}
+.hdr h1{font-size:21px;font-weight:800;display:flex;align-items:center;gap:9px}
+.hdr p{font-size:13px;opacity:.9;margin-top:3px}
+.review-banner{background:var(--amber);color:#5a3d00;font-weight:700;text-align:center;padding:9px;font-size:14px}
+
+/* module grid */
+.wrap{max-width:680px;margin:0 auto;padding:18px 14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.card{background:#fff;border:2px solid var(--border);border-radius:18px;padding:18px 16px;cursor:pointer;position:relative;transition:transform .12s,box-shadow .12s;min-height:128px;display:flex;flex-direction:column}
+.card:active{transform:scale(.97)}
+.card:hover{box-shadow:0 8px 22px rgba(20,80,40,.12);border-color:var(--green-m)}
+.card .ci{font-size:40px;line-height:1}
+.card .ct{font-size:18px;font-weight:800;margin-top:10px}
+.card .cs{font-size:13px;color:var(--ink-3);margin-top:3px;line-height:1.3;flex:1}
+.card.wide{grid-column:1/-1;min-height:auto;flex-direction:row;align-items:center;gap:14px}
+.card.wide .ci{font-size:34px}
+.card.wide .ct{margin-top:0}
+.badge{position:absolute;top:12px;right:12px;font-size:12px;font-weight:800;padding:4px 9px;border-radius:999px;background:var(--border);color:var(--ink-3)}
+.badge.done{background:var(--green);color:#fff}
+.badge.score{background:var(--blue);color:#fff}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(15,30,22,.55);z-index:60;display:none;align-items:flex-end;justify-content:center}
+.modal.open{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:680px;max-height:94vh;border-radius:22px 22px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:up .25s ease}
+@keyframes up{from{transform:translateY(40px);opacity:.6}to{transform:translateY(0);opacity:1}}
+.sheet-hdr{background:#fff;padding:16px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sheet-hdr .si{font-size:26px}
+.sheet-hdr h2{font-size:18px;font-weight:800;flex:1}
+.x{background:var(--border);border:none;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;color:var(--ink-2);flex-shrink:0}
+.sheet-body{padding:18px;overflow-y:auto;flex:1}
+.sheet-ftr{padding:13px 16px;background:#fff;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:13px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit}
+.btn-complete.confirmed{background:var(--green-d);pointer-events:none}
+.btn-redo{width:110px;background:#fff;color:var(--red);border:2px solid var(--red);border-radius:13px;padding:15px 0;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
+.btn-redo.armed{background:var(--red);color:#fff}
+
+/* flashcard header inside game */
+.fcard{background:#fff;border:2px solid var(--border);border-radius:16px;padding:16px;text-align:center;margin-bottom:14px;position:relative}
+.fcard .fe{font-size:54px;line-height:1}
+.fcard .fw{font-size:28px;font-weight:800;margin-top:4px}
+.fcard .fi{font-size:14px;color:var(--ink-3);margin-top:2px}
+.fcard .ja-btn{margin-top:10px;background:var(--green-l);color:var(--green-d);border:none;border-radius:10px;padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.fcard .ja-reveal{display:none;margin-top:10px;font-size:17px;color:var(--ink);line-height:1.4}
+.fcard .ja-reveal.show{display:block}
+.fcard .ja-reveal .jp{font-weight:700}
+.fcard .ja-reveal .en{color:var(--ink-2);font-size:15px;margin-top:3px}
+
+/* games */
+.q{font-size:19px;font-weight:600;text-align:center;line-height:1.4;margin-bottom:14px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{background:#fff;border:2.5px solid var(--border);border-radius:13px;padding:15px;font-size:17px;font-weight:600;cursor:pointer;text-align:center;font-family:inherit}
+.opt:active{transform:scale(.98)}
+.opt.correct{background:var(--green);border-color:var(--green);color:#fff}
+.opt.wrong{background:#fee2e2;border-color:var(--red);color:var(--red)}
+.opt.dim{opacity:.5}
+.lines{display:flex;flex-direction:column;gap:10px}
+.line{background:#fff;border:2.5px solid var(--border);border-radius:13px;padding:14px;font-size:16px;cursor:pointer;line-height:1.35;font-weight:500}
+.line.correct{background:var(--green);border-color:var(--green);color:#fff}
+.line.wrong{background:#fee2e2;border-color:var(--red)}
+.chips{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:6px}
+.chip{background:var(--blue-l);border:2px solid var(--blue);color:#075985;border-radius:11px;padding:11px 16px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
+.chip.used{opacity:.35;pointer-events:none}
+.slotline{font-size:20px;font-weight:600;text-align:center;line-height:1.6;margin:8px 0}
+.slot{display:inline-block;min-width:120px;border-bottom:3px dashed var(--green);color:var(--green-d);font-weight:800;padding:0 8px}
+.fb{text-align:center;font-size:16px;font-weight:700;min-height:24px;margin-top:12px}
+.fb.ok{color:var(--green-d)}.fb.no{color:var(--red)}
+.def{background:var(--green-l);border:2px solid var(--green);border-radius:13px;padding:0 16px;max-height:0;overflow:hidden;opacity:0;transition:all .4s;margin-top:14px}
+.def.show{max-height:200px;opacity:1;padding:14px 16px}
+.def .dt{font-size:16px;color:var(--ink);line-height:1.4}
+.next-btn{display:none;width:100%;background:var(--blue);color:#fff;border:none;border-radius:13px;padding:14px;font-size:16px;font-weight:800;margin-top:16px;cursor:pointer;font-family:inherit}
+.next-btn.show{display:block}
+.dots{display:flex;gap:6px;justify-content:center;margin-bottom:14px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.dot.on{background:var(--green)}
+.dot.cur{background:var(--green);transform:scale(1.5)}
+
+/* karaoke */
+.kw{display:inline-block;font-weight:700;color:var(--green-d);background:var(--green-l);border-radius:7px;padding:1px 7px;cursor:pointer;border:2px solid transparent}
+.kw.tapped{background:var(--green);color:#fff}
+.kl{font-size:17px;line-height:1.9;padding:1px 0}
+.klabel{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin:14px 0 4px}
+.klabel.cho{color:var(--amber)}
+.kcount{background:var(--green-l);border:2px solid var(--green);border-radius:14px;padding:12px;text-align:center;font-size:15px;font-weight:700;color:var(--green-d);margin-bottom:14px;position:sticky;top:0;z-index:2}
+.kcount b{font-size:24px;display:block}
+
+/* progress dashboard */
+.prog-row{display:flex;align-items:center;gap:12px;background:#fff;border:2px solid var(--border);border-radius:13px;padding:13px 15px;margin-bottom:9px}
+.prog-row .pi{font-size:24px}
+.prog-row .pn{flex:1;font-weight:700;font-size:15px}
+.prog-row .ps{font-weight:800;font-size:14px;padding:4px 10px;border-radius:999px;background:var(--border);color:var(--ink-3)}
+.prog-row .ps.done{background:var(--green);color:#fff}
+.prog-row .ps.score{background:var(--blue);color:#fff}
+.wrongs{margin-top:14px}
+.wrong-item{background:#fff;border:2px solid var(--border);border-left:6px solid var(--red);border-radius:11px;padding:12px 14px;margin-bottom:8px;font-size:14px;line-height:1.4}
+.wrong-item .wp{font-weight:700}
+.wrong-item .wc{color:var(--red)}.wrong-item .wok{color:var(--green-d);font-weight:700}
+.quiz-result{text-align:center;padding:10px}
+.quiz-result .qbig{font-size:60px}
+.quiz-result .qpct{font-size:46px;font-weight:900;color:var(--green)}
+.note{font-size:13px;color:var(--ink-3);text-align:center;margin-top:14px;line-height:1.4}
+</style>
+</head>
+<body>
+<div id="reviewBanner"></div>
+<div class="hdr">
+  <h1>🎵 What's Your Hobby?</h1>
+  <p>Unit 8 · Song · Leo's practice</p>
+</div>
+
+<div class="wrap">
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="sheet-hdr"><span class="si" id="mIcon">🎵</span><h2 id="mTitle">Module</h2><button class="x" onclick="closeModal()">✕</button></div>
+    <div class="sheet-body" id="mBody"></div>
+    <div class="sheet-ftr" id="mFtr"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== SAVE LAYER (LEEA standard) ===================== */
+const SAVE_PREFIX = '4-8-song-';
+const HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-8-song';
+const isReview = new URLSearchParams(location.search).get('review') === '1';
+
+function lSave(key, val){
+  try{ localStorage.setItem('leea-'+key, JSON.stringify(val)); }catch(e){}
+  try{ if(window.LEEA_CLOUD && window.LEEA_CLOUD.enabled) window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val); }catch(e){}
+}
+function lLoad(key){
+  try{ const v=localStorage.getItem('leea-'+key); return v?JSON.parse(v):null; }catch(e){ return null; }
+}
+async function restoreProgressFromCloud(){
+  try{
+    if(!window.LEEA_CLOUD || !window.LEEA_CLOUD.enabled) return;
+    const rows = await window.LEEA_CLOUD.fetchProgress(HOMEWORK_ID);
+    if(!rows) return;
+    rows.forEach(r=>{ try{ localStorage.setItem('leea-'+r.storage_key, JSON.stringify(r.value)); }catch(e){} });
+  }catch(e){}
+}
+function saveScore(id, score, total){
+  const percent = total? Math.round(score/total*100):0;
+  lSave(SAVE_PREFIX+id+'-score', {score,total,percent,done:true,timestamp:Date.now()});
+}
+
+/* ===================== CONTENT ===================== */
+function kw(w,word){ return `<span class="kw" data-w="${word||w}">${w}</span>`; }
+const SONG = {
+  chorus:[`What's your hobby?`,`What do you like to do?`,`What's your hobby?`,`I have a hobby, too!`],
+  verse1:[
+    `The boy who has the highest ${kw("score")} wins the video game.`,
+    `The girl who ${kw("collects","collect")} a ${kw("fossil")} wants to learn its name.`,
+    `Who ${kw("enjoys","enjoy")} a ${kw("comic book","comic book")}?`,
+    `Who likes to ${kw("compete")}?`,
+    `I ${kw("collect")} ${kw("stuffed animals","stuffed animal")} because I think they're sweet.`
+  ],
+  verse2:[
+    `The boy who ${kw("takes a photo","take photos")} sees it on the ${kw("screen")}.`,
+    `The girl who reads about ${kw("dinosaurs","dinosaur")} can see them in her dreams.`,
+    `Do you like to ${kw("cooperate")}?`,
+    `Do you like to work ${kw("alone")}?`,
+    `I like to talk about my hobby on my new cell phone.`
+  ],
+  bridge:[
+    `It's fun to be ${kw("creative")} and show what you can do.`,
+    `${kw("Collect","collect")}, ${kw("compete")}, ${kw("cooperate")}.`,
+    `I have a hobby. Do you?`
+  ]
+};
+
+const NEWWORDS = [
+  { word:"chorus", emoji:"🔁", ipa:"/ˈkɔːrəs/", ja:"サビ", jaen:"the part of a song that repeats",
+    def:"A chorus = the part of a song that repeats. We sing it again and again.",
+    game:{type:"pick", q:"Which part do we sing <b>again and again</b>?", opts:["The Chorus","Verse 1","The Bridge"], correct:0} },
+  { word:"verse", emoji:"📜", ipa:"/vɜːrs/", ja:"バース", jaen:"the story part of a song",
+    def:"A verse = a part of a song that tells the story. Each verse is different.",
+    game:{type:"pick", q:"Which part <b>tells the story</b> and changes each time?", opts:["The Chorus","A Verse"], correct:1} },
+  { word:"rhyme", emoji:"🎶", ipa:"/raɪm/", ja:"韻（いん）", jaen:"words that end with the same sound",
+    def:"Rhyme = words that end with the same sound, like do and too.",
+    game:{type:"pick", q:"Which word <b>rhymes</b> with <b>do</b>?", opts:["too","book","game"], correct:0} }
+];
+
+const VOCAB = [
+  { word:"score", emoji:"📊🏅", ipa:"/skɔːr/", ja:"得点（とくてん）", jaen:"the points you have in a game", def:"Your score = the number of points you have in a game.",
+    game:{type:"lyric", q:"Tap the line where you hear <b>score</b>.", lines:["The boy who has the highest score wins the video game.","Who enjoys a comic book?","I have a hobby, too!"], correct:0} },
+  { word:"collect", emoji:"🗂️🪙", ipa:"/kəˈlɛkt/", ja:"集める（あつめる）", jaen:"to keep things you like together", def:"Collect = to bring together things you like and keep them.",
+    game:{type:"tf", s:"In the song, the singer says \u201CI collect stuffed animals.\u201D", a:true} },
+  { word:"enjoy", emoji:"😄🎉", ipa:"/ɪnˈdʒɔɪ/", ja:"楽しむ（たのしむ）", jaen:"to like doing something", def:"Enjoy = to like doing something and feel happy.",
+    game:{type:"gap", before:"Who", after:"a comic book?", chips:["enjoys","collects","takes"], a:"enjoys"} },
+  { word:"compete", emoji:"🏆⚔️", ipa:"/kəmˈpiːt/", ja:"競争する（きょうそうする）", jaen:"to try to win", def:"Compete = to try to win against other people.",
+    game:{type:"pick", q:"What does <b>compete</b> mean?", opts:["to try to win","to fall asleep","to draw"], correct:0} },
+  { word:"take photos", emoji:"📸🌿", ipa:"/teɪk ˈfoʊtoʊz/", ja:"写真をとる（しゃしんをとる）", jaen:"to make pictures with a camera", def:"Take photos = to use a camera to make pictures.",
+    game:{type:"scramble", q:"Put the words in order.", pieces:["photos","take"], a:"take photos"} },
+  { word:"a screen", emoji:"📺🖥️", ipa:"/skriːn/", ja:"画面（がめん）", jaen:"the flat part of a phone or TV", def:"A screen = the flat glass part where you see pictures.",
+    game:{type:"tf", s:"A screen is the flat part of a phone or TV where you see pictures.", a:true} },
+  { word:"cooperate", emoji:"🤜🤛", ipa:"/koʊˈɒpəreɪt/", ja:"協力する（きょうりょくする）", jaen:"to work together", def:"Cooperate = to work together with other people.",
+    game:{type:"gap", before:"Do you like to", after:"with your team?", chips:["cooperate","compete","collect"], a:"cooperate"} },
+  { word:"alone", emoji:"🧍🔇", ipa:"/əˈloʊn/", ja:"ひとりで", jaen:"by yourself", def:"Alone = by yourself, with no other people.",
+    game:{type:"pick", q:"Which one means <b>alone</b>?", opts:["by yourself","with friends","very fast"], correct:0} },
+  { word:"creative", emoji:"🎨💡", ipa:"/kriˈeɪtɪv/", ja:"創造的な（そうぞうてきな）", jaen:"good at making new things", def:"Creative = good at making new and interesting things.",
+    game:{type:"lyric", q:"Tap the line where you hear <b>creative</b>.", lines:["Who likes to compete?","It's fun to be creative and show what you can do.","I have a hobby, too!"], correct:1} },
+  { word:"a fossil", emoji:"🦴🪨", ipa:"/ˈfɒsəl/", ja:"化石（かせき）", jaen:"the old shape of an animal in rock", def:"A fossil = the old shape of an animal or plant, kept in rock for a long time.",
+    game:{type:"tf", s:"A fossil is a very old shape of a plant or animal in rock.", a:true} },
+  { word:"a comic book", emoji:"📖💥", ipa:"/ˈkɒmɪk bʊk/", ja:"漫画（まんが）", jaen:"a book that tells a story with pictures", def:"A comic book = a book that tells a story with pictures.",
+    game:{type:"gap", before:"I like to read a", after:"about superheroes.", chips:["comic book","fossil","screen"], a:"comic book"} },
+  { word:"a stuffed animal", emoji:"🧸❤️", ipa:"/stʌft ˈænɪməl/", ja:"ぬいぐるみ", jaen:"a soft toy animal", def:"A stuffed animal = a soft toy animal you can hug.",
+    game:{type:"pick", q:"Which one is a <b>stuffed animal</b>?", opts:["a soft toy bear","a real fish","a fast car"], correct:0} },
+  { word:"a dinosaur", emoji:"🦕🦖", ipa:"/ˈdaɪnəsɔːr/", ja:"恐竜（きょうりゅう）", jaen:"a big animal from long ago", def:"A dinosaur = a very big animal that lived a long, long time ago.",
+    game:{type:"scramble", q:"Build the word.", pieces:["no","di","saur"], a:"dinosaur", join:""} }
+];
+
+const QUIZ = [
+  {p:"What do we call the part of a song that <b>repeats</b>?", opts:["chorus","verse","rhyme"], c:0},
+  {p:"Which part of a song <b>tells the story</b> and changes each time?", opts:["verse","chorus","score"], c:0},
+  {p:"Words that end with the <b>same sound</b>, like do and too, are a...", opts:["rhyme","fossil","screen"], c:0},
+  {p:"What is our song called?", opts:["What's Your Hobby?","What's Your Name?","What Time Is It?"], c:0},
+  {p:"Harry Kane had the highest ___ in the Bundesliga \u2014 33 goals.", opts:["score","screen","dinosaur"], c:0},
+  {p:"To <b>work together</b> with other people is to ___.", opts:["cooperate","compete","collect"], c:0},
+  {p:"A soft toy animal you can hug is a ___.", opts:["stuffed animal","fossil","comic book"], c:0},
+  {p:"The old shape of an animal kept in rock is a ___.", opts:["fossil","dinosaur","screen"], c:0}
+];
+
+/* Academic words — Tier B proper games (recycled but full weight) */
+const ACADEMIC = [
+  { word:"analyze", emoji:"🔬🔎", ipa:"/ˈænəlaɪz/", ja:"分析する（ぶんせきする）", jaen:"look closely to understand", def:"Analyze = to look at something carefully to understand it.",
+    game:{type:"pick", q:"What do you do when you <b>analyze</b> a song?", opts:["look at it carefully to understand it","throw it away","sing it very fast"], correct:0} },
+  { word:"describe", emoji:"👀🗣️", ipa:"/dɪˈskraɪb/", ja:"描写する（びょうしゃする）", jaen:"say what something is like", def:"Describe = to say what something is like.",
+    game:{type:"tf", s:"If you <b>describe</b> your hobby, you say what it is like.", a:true} },
+  { word:"explain", emoji:"💡🗯️", ipa:"/ɪkˈspleɪn/", ja:"説明する（せつめいする）", jaen:"tell how or why", def:"Explain = to tell how or why something happens.",
+    game:{type:"gap", before:"Please", after:"how to play the game.", chips:["explain","analyze","collect"], a:"explain"} },
+  { word:"caption", emoji:"🏷️📸", ipa:"/ˈkæpʃən/", ja:"キャプション（写真の説明）", jaen:"the words under a photo", def:"A caption = the words under a photo that tell about it.",
+    game:{type:"pick", q:"What is a <b>caption</b>?", opts:["the words under a photo","a kind of ball","a loud song"], correct:0} }
+];
+
+/* ===================== MODULES ===================== */
+const MODULES = [
+  {id:"m1", icon:"🎵", title:"Listen & Sing", sub:"Tap the hobby words as you sing", complete:true},
+  {id:"m2", icon:"🆕", title:"Song Words", sub:"chorus · verse · rhyme", complete:true},
+  {id:"ma", icon:"🎓", title:"Academic Words", sub:"Tricky words we keep strong", complete:true},
+  {id:"m3", icon:"🔤", title:"Word Review", sub:"13 quick word games", complete:true},
+  {id:"m4", icon:"🔁", title:"Use It Again", sub:"Swap words + a peek at who", complete:true},
+  {id:"m5", icon:"✍️", title:"Write a Line", sub:"Make your own song line", complete:true},
+  {id:"m6", icon:"🧠", title:"Quiz", sub:"Show what you know", complete:false, quiz:true},
+  {id:"m7", icon:"📊", title:"My Progress", sub:"See everything you finished", wide:true, dash:true}
+];
+</script>
+<script>
+/* ===================== UI BUILD ===================== */
+const $ = id=>document.getElementById(id);
+function buildGrid(){
+  $('grid').innerHTML = MODULES.map(m=>`
+    <div class="card ${m.wide?'wide':''}" onclick="openModule('${m.id}')">
+      <span class="badge" id="badge-${m.id}"></span>
+      <div class="ci">${m.icon}</div>
+      <div><div class="ct">${m.title}</div><div class="cs">${m.sub}</div></div>
+    </div>`).join('');
+  MODULES.forEach(m=>updateBadge(m.id));
+}
+function updateBadge(id){
+  try{
+    const b=$('badge-'+id); if(!b) return;
+    const m=MODULES.find(x=>x.id===id);
+    if(m && m.quiz){
+      const sc=lLoad(SAVE_PREFIX+id+'-score');
+      if(sc && sc.done){ b.className='badge score'; b.textContent=sc.percent+'%'; return; }
+      b.className='badge'; b.textContent=''; return;
+    }
+    if(m && m.dash){ b.className='badge'; b.textContent=''; return; }
+    const c=lLoad(SAVE_PREFIX+id+'-complete');
+    if(c && c.timestamp){ b.className='badge done'; b.textContent='✓ Done'; }
+    else { b.className='badge'; b.textContent=''; }
+  }catch(e){}
+}
+
+/* ===================== MODAL ===================== */
+let CUR=null;
+function openModule(id){
+  const m=MODULES.find(x=>x.id===id); if(!m) return; CUR=m;
+  $('mIcon').textContent=m.icon; $('mTitle').textContent=m.title;
+  $('mFtr').innerHTML=''; $('mBody').scrollTop=0;
+  if(m.dash) renderDash();
+  else if(m.quiz){
+    // If quiz already completed, restore result view — don't restart from zero
+    const sc=lLoad(SAVE_PREFIX+m.id+'-score');
+    if(sc && sc.done) renderQuizReview();
+    else renderQuiz();
+  }
+  else { renderModule(id); renderFooter(m); }
+  $('modal').classList.add('open');
+}
+function closeModal(){ $('modal').classList.remove('open'); CUR=null; }
+function renderFooter(m){
+  const done = (lLoad(SAVE_PREFIX+m.id+'-complete')||{}).timestamp;
+  $('mFtr').innerHTML=`
+    <button class="btn-complete ${done?'confirmed':''}" id="cbtn-${m.id}" onclick="markComplete('${m.id}','Leo')">${done?'Leo complete ✓':'Mark Leo complete ✓'}</button>
+    <button class="btn-redo" id="rbtn-${m.id}" onclick="armRedo('${m.id}',this)">↺ Redo</button>`;
+}
+function markComplete(id,name){
+  lSave(SAVE_PREFIX+id+'-complete', {done:true, timestamp:Date.now()});
+  updateBadge(id);
+  const btn=$('cbtn-'+id);
+  if(btn){ btn.classList.add('confirmed'); btn.textContent=name+' complete ✓'; }
+  setTimeout(closeModal,400);
+}
+function armRedo(id,btn){
+  if(btn.dataset.armed==='1'){ doRedo(id); return; }
+  btn.dataset.armed='1'; btn.classList.add('armed'); btn.textContent='Tap again ↺';
+  setTimeout(()=>{ if(btn){btn.dataset.armed='';btn.classList.remove('armed');btn.textContent='↺ Redo';} },2500);
+}
+function doRedo(id){
+  try{ localStorage.removeItem('leea-'+SAVE_PREFIX+id+'-complete'); }catch(e){}
+  try{ if(window.LEEA_CLOUD && window.LEEA_CLOUD.enabled) window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, SAVE_PREFIX+id+'-complete', null); }catch(e){}
+  updateBadge(id);
+  openModule(id);
+}
+
+/* ===================== MODULE RENDERERS ===================== */
+function renderModule(id){
+  const body=$('mBody');
+  if(id==='m1') body.innerHTML=renderKaraoke();
+  else if(id==='m2') body.innerHTML=`<div id="carousel"></div>`, startCarousel(NEWWORDS,'new');
+  else if(id==='ma') body.innerHTML=`<div id="carousel"></div>`, startCarousel(ACADEMIC,'acad');
+  else if(id==='m3') body.innerHTML=`<div id="carousel"></div>`, startCarousel(VOCAB,'vocab');
+  else if(id==='m4') body.innerHTML=renderUseAgain(), wireUseAgain();
+  else if(id==='m5') body.innerHTML=renderWrite(), wireWrite();
+  if(id==='m1') wireKaraoke();
+}
+
+/* ---- Karaoke (m1) ---- */
+function renderKaraoke(){
+  const block=(label,cls,arr)=>`<div class="klabel ${cls}">${label}</div>`+arr.map(l=>`<div class="kl">${l}</div>`).join('');
+  return `<div class="kcount">Words found <b id="kc">0</b>Tap the green words while you sing! 🎤</div>
+    ${block('Chorus 🔁','cho',SONG.chorus)}
+    ${block('Verse 1 📜','',SONG.verse1)}
+    ${block('Chorus 🔁','cho',SONG.chorus)}
+    ${block('Verse 2 📜','',SONG.verse2)}
+    ${block('Bridge 🎶','',SONG.bridge)}
+    ${block('Chorus 🔁','cho',SONG.chorus)}`;
+}
+function wireKaraoke(){
+  let c=0; const seen=new Set();
+  $('mBody').querySelectorAll('.kw').forEach(w=>w.onclick=()=>{
+    if(isReview) return;
+    if(w.classList.contains('tapped')) return;
+    w.classList.add('tapped'); seen.add(w.dataset.w); c++; $('kc').textContent=c;
+  });
+  if(isReview) $('mBody').querySelectorAll('.kw').forEach(w=>w.classList.add('tapped'));
+}
+
+/* ---- Carousel for new words + vocab (m2,m3) ---- */
+function startCarousel(list, kind){
+  let i=0;
+  function show(){
+    const v=list[i]; const c=$('carousel');
+    c.innerHTML=`
+      <div class="dots">${list.map((_,k)=>`<span class="dot ${k<i?'on':''} ${k===i?'cur':''}"></span>`).join('')}</div>
+      <div class="fcard">
+        <div class="fe">${v.emoji}</div><div class="fw">${v.word}</div><div class="fi">${v.ipa}</div>
+        <button class="ja-btn" id="jab">意味を見る (tap)</button>
+        <div class="ja-reveal" id="jar"><span class="jp ja">${v.ja}</span><div class="en">${v.jaen}</div></div>
+      </div>
+      <div id="gwrap"></div>
+      <div class="def" id="gdef"><div class="dt">${v.def}</div></div>
+      <button class="next-btn" id="nextb">${i<list.length-1?'Next word →':'Finish ✓'}</button>`;
+    $('jab').onclick=()=>$('jar').classList.add('show');
+    const onSolve=()=>{ $('gdef').classList.add('show'); $('nextb').classList.add('show'); };
+    renderGame($('gwrap'), v.game, onSolve);
+    if(isReview){ onSolve(); }
+    $('nextb').onclick=()=>{ if(i<list.length-1){ i++; show(); } else { const f=$('cbtn-'+CUR.id); if(f){ f.scrollIntoView(); } $('carousel').insertAdjacentHTML('beforeend',`<div class="note">🎉 All done! Tap "Mark Leo complete" below.</div>`);} };
+  }
+  show();
+}
+
+/* ---- Generic game engine ---- */
+function renderGame(wrap, g, onSolve){
+  if(g.type==='pick'){
+    wrap.innerHTML=`<div class="q">${g.q}</div><div class="opts">${g.opts.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div>`;
+    wrap.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{
+      if(+o.dataset.i===g.correct){ o.classList.add('correct'); wrap.querySelectorAll('.opt').forEach(x=>x.style.pointerEvents='none'); onSolve(); }
+      else{ o.classList.add('wrong'); setTimeout(()=>o.classList.remove('wrong'),500); }
+    });
+    if(isReview) wrap.querySelector(`.opt[data-i="${g.correct}"]`).classList.add('correct');
+  }
+  else if(g.type==='lyric'){
+    wrap.innerHTML=`<div class="q">${g.q}</div><div class="lines">${g.lines.map((l,i)=>`<div class="line" data-i="${i}">${l}</div>`).join('')}</div>`;
+    wrap.querySelectorAll('.line').forEach(l=>l.onclick=()=>{
+      if(+l.dataset.i===g.correct){ l.classList.add('correct'); wrap.querySelectorAll('.line').forEach(x=>x.style.pointerEvents='none'); onSolve(); }
+      else{ l.classList.add('wrong'); setTimeout(()=>l.classList.remove('wrong'),500); }
+    });
+    if(isReview) wrap.querySelector(`.line[data-i="${g.correct}"]`).classList.add('correct');
+  }
+  else if(g.type==='tf'){
+    wrap.innerHTML=`<div class="q">${g.s}</div><div class="opts"><button class="opt" data-v="1">✓ True</button><button class="opt" data-v="0">✗ False</button></div><div class="fb" id="tffb"></div>`;
+    wrap.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{
+      const v=o.dataset.v==='1'; const fb=wrap.querySelector('#tffb');
+      if(v===g.a){ o.classList.add('correct'); fb.className='fb ok'; fb.textContent='Yes! 🎉'; wrap.querySelectorAll('.opt').forEach(x=>x.style.pointerEvents='none'); onSolve(); }
+      else{ o.classList.add('wrong'); fb.className='fb no'; fb.textContent='Try again!'; setTimeout(()=>o.classList.remove('wrong'),500); }
+    });
+    if(isReview){ wrap.querySelector(`.opt[data-v="${g.a?1:0}"]`).classList.add('correct'); }
+  }
+  else if(g.type==='gap'){
+    wrap.innerHTML=`<div class="slotline">${g.before} <span class="slot" id="gs">______</span> ${g.after}</div><div class="chips">${g.chips.map(c=>`<button class="chip" data-c="${c}">${c}</button>`).join('')}</div><div class="fb" id="gpfb"></div>`;
+    wrap.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
+      const fb=wrap.querySelector('#gpfb');
+      if(c.dataset.c===g.a){ wrap.querySelector('#gs').textContent=g.a; c.classList.add('used'); fb.className='fb ok'; fb.textContent='Perfect! 🎉'; onSolve(); }
+      else{ c.style.background='#fee2e2'; fb.className='fb no'; fb.textContent='Not that one!'; setTimeout(()=>c.style.background='',500); }
+    });
+    if(isReview) wrap.querySelector('#gs').textContent=g.a;
+  }
+  else if(g.type==='scramble'){
+    const jc=g.join===undefined?' ':g.join; let order=[];
+    const pieces=[...g.pieces].sort(()=>Math.random()-.5);
+    wrap.innerHTML=`<div class="q">${g.q}</div><div class="slotline"><span class="slot" id="ss" style="min-width:200px">______</span></div><div class="chips">${pieces.map(p=>`<button class="chip" data-p="${p}">${p}</button>`).join('')}</div><div class="fb" id="scfb"></div>`;
+    wrap.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
+      if(c.classList.contains('used')) return;
+      c.classList.add('used'); order.push(c.dataset.p); wrap.querySelector('#ss').textContent=order.join(jc);
+      const fb=wrap.querySelector('#scfb');
+      if(order.length===g.pieces.length){
+        if(order.join(jc).toLowerCase()===g.a.toLowerCase()){ fb.className='fb ok'; fb.textContent='You got it! 🎉'; onSolve(); }
+        else{ fb.className='fb no'; fb.textContent='Try again!'; order=[]; wrap.querySelectorAll('.chip').forEach(x=>x.classList.remove('used')); setTimeout(()=>{wrap.querySelector('#ss').textContent='______';fb.textContent='';},900); }
+      }
+    });
+    if(isReview) wrap.querySelector('#ss').textContent=g.a;
+  }
+}
+
+/* ---- Use It Again (m4) ---- */
+function renderUseAgain(){
+  return `<div class="note" style="margin:0 0 14px;font-size:14px">Swap the song words for their opposites, then peek at the little word <b>who</b>.</div>
+  <div class="fcard"><div class="slotline">Do you like to <span class="slot" id="sw1">cooperate</span>?</div>
+    <div class="chips"><button class="chip" data-sw="1" data-ok="1">compete</button><button class="chip" data-sw="1" data-ok="0">enjoy</button><button class="chip" data-sw="1" data-ok="0">collect</button></div></div>
+  <div class="fcard"><div class="slotline">Do you like to work <span class="slot" id="sw2">alone</span>?</div>
+    <div class="chips"><button class="chip" data-sw="2" data-ok="1">together</button><button class="chip" data-sw="2" data-ok="0">creative</button><button class="chip" data-sw="2" data-ok="0">score</button></div></div>
+  <div class="fb ok" id="swfb"></div>
+  <div class="klabel">A peek at \u201Cwho\u201D 👀 — tap to see</div>
+  ${[
+    {q:"Who wins the video game?",a:"the boy <b>who</b> has the highest score"},
+    {q:"Who can see dinosaurs in dreams?",a:"the girl <b>who</b> reads about dinosaurs"},
+    {q:"⚽ Who won the Bundesliga Golden Boot?",a:"Harry Kane, <b>who</b> scored 33 goals"}
+  ].map((w,i)=>`<div class="prog-row" id="who${i}" style="cursor:pointer"><div class="pn">${w.q}</div><div class="pn" style="text-align:right;color:var(--green-d);opacity:0" id="wa${i}">${w.a}</div></div>`).join('')}`;
+}
+function wireUseAgain(){
+  $('mBody').querySelectorAll('[data-sw]').forEach(c=>c.onclick=()=>{
+    const g=c.dataset.sw, fb=$('swfb');
+    if(c.dataset.ok==='1'){ $('sw'+g).textContent=c.textContent; $('mBody').querySelectorAll(`[data-sw="${g}"]`).forEach(x=>x.classList.add('used')); c.classList.remove('used'); c.style.background='var(--green)'; c.style.color='#fff'; fb.textContent='Nice swap! Sing the new line. 🎶'; }
+    else{ c.style.background='#fee2e2'; setTimeout(()=>c.style.background='',500); }
+  });
+  for(let i=0;i<3;i++){ const r=$('who'+i); if(r) r.onclick=()=>{ const a=$('wa'+i); if(a)a.style.opacity=1; }; }
+  if(isReview){ $('sw1').textContent='compete'; $('sw2').textContent='together'; for(let i=0;i<3;i++){const a=$('wa'+i); if(a)a.style.opacity=1;} }
+}
+
+/* ---- Write a line (m5) ---- */
+function renderWrite(){
+  return `<div class="fcard" style="background:var(--amber-l);border-color:var(--amber)"><div style="font-size:16px;color:#7c5b06;font-weight:600;line-height:1.5">🎵 Model:<br>"I <b>collect stuffed animals</b><br>because I think they're <b>sweet</b>."</div></div>
+  <div class="slotline">I <span class="slot" id="b1">______</span></div>
+  <div class="chips" id="r1"><button class="chip" data-row="1" data-t="collect soccer cards">collect soccer cards</button><button class="chip" data-row="1" data-t="take photos">take photos</button><button class="chip" data-row="1" data-t="read comic books">read comic books</button></div>
+  <div class="slotline" style="margin-top:14px">because <span class="slot" id="b2">______</span>.</div>
+  <div class="chips" id="r2"><button class="chip" data-row="2" data-t="they are cool">they are cool</button><button class="chip" data-row="2" data-t="it is fun">it is fun</button><button class="chip" data-row="2" data-t="I love them">I love them</button></div>
+  <div class="fb ok" id="wfb" style="margin-top:18px;font-size:18px"></div>`;
+}
+function wireWrite(){
+  let r1=null,r2=null;
+  $('mBody').querySelectorAll('[data-row]').forEach(c=>c.onclick=()=>{
+    const row=c.dataset.row;
+    $('mBody').querySelectorAll(`[data-row="${row}"]`).forEach(x=>{x.style.background='';x.style.color='';});
+    c.style.background='var(--green)'; c.style.color='#fff';
+    if(row==='1'){ r1=c.dataset.t; $('b1').textContent=r1; } else { r2=c.dataset.t; $('b2').textContent=r2; }
+    if(r1&&r2){ $('wfb').textContent='🎵 "I '+r1+' because '+r2+'." Sing it!'; }
+  });
+}
+
+/* ---- Quiz (m6) ---- */
+function renderQuiz(){
+  let i=0, score=0, wrong=[];
+  const body=$('mBody');
+  function show(){
+    if(i>=QUIZ.length){ finish(); return; }
+    const q=QUIZ[i];
+    body.innerHTML=`<div class="dots">${QUIZ.map((_,k)=>`<span class="dot ${k<i?'on':''} ${k===i?'cur':''}"></span>`).join('')}</div>
+      <div class="q" style="margin-top:6px">${i+1}. ${q.p}</div>
+      <div class="opts">${q.opts.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join('')}</div>
+      <div class="fb" id="qfb"></div>`;
+    body.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{
+      body.querySelectorAll('.opt').forEach(x=>x.style.pointerEvents='none');
+      const k=+o.dataset.k, fb=$('qfb');
+      if(k===q.c){ o.classList.add('correct'); score++; fb.className='fb ok'; fb.textContent='Correct! 🎉'; }
+      else{ o.classList.add('wrong'); body.querySelector(`.opt[data-k="${q.c}"]`).classList.add('correct'); fb.className='fb no'; fb.textContent='The answer is highlighted in green.';
+        wrong.push({question:'Q'+(i+1), prompt:q.p.replace(/<[^>]+>/g,''), chosen:q.opts[k], correct:q.opts[q.c]}); }
+      setTimeout(()=>{ i++; show(); }, 950);
+    });
+  }
+  function finish(){
+    const pct=Math.round(score/QUIZ.length*100);
+    saveScore('m6', score, QUIZ.length);
+    lSave(SAVE_PREFIX+'m6-wrong', wrong);
+    lSave(SAVE_PREFIX+'m6-complete', {done:true, timestamp:Date.now()});
+    updateBadge('m6');
+    body.innerHTML=`<div class="quiz-result"><div class="qbig">${pct>=80?'🏆':pct>=50?'🎉':'💪'}</div>
+      <div class="qpct">${pct}%</div><div style="font-size:18px;font-weight:700;margin-top:4px">${score} / ${QUIZ.length} correct</div>
+      <div class="note">${pct>=80?'Amazing singing brain, Leo!':pct>=50?'Good job — sing it again to get even better!':'Let\u2019s sing the song again together. You\u2019ve got this!'}</div></div>`;
+    $('mFtr').innerHTML=`<button class="btn-complete" onclick="closeModal()">Done ✓</button><button class="btn-redo" onclick="renderQuiz()">↺ Redo</button>`;
+  }
+  $('mFtr').innerHTML='';
+  if(isReview){ renderQuizReview(); return; }
+  show();
+}
+function renderQuizReview(){
+  const sc=lLoad(SAVE_PREFIX+'m6-score'); const wrong=lLoad(SAVE_PREFIX+'m6-wrong')||[];
+  const body=$('mBody');
+  if(!sc||!sc.done){ body.innerHTML=`<div class="note" style="font-size:16px">Quiz not done yet.</div>`; return; }
+  body.innerHTML=`<div class="quiz-result"><div class="qpct">${sc.percent}%</div><div style="font-weight:700">${sc.score} / ${sc.total} correct</div></div>
+    ${wrong.length?`<div class="klabel">Words to practice</div><div class="wrongs">${wrong.map(w=>`<div class="wrong-item"><div class="wp">${w.prompt}</div>Leo chose: <span class="wc">${w.chosen}</span><br>Answer: <span class="wok">${w.correct}</span></div>`).join('')}</div>`:`<div class="note">Perfect — no wrong answers! 🏆</div>`}`;
+  if(!isReview){
+    $('mFtr').innerHTML=`<button class="btn-complete" onclick="closeModal()">Close</button><button class="btn-redo" onclick="renderQuiz()">↺ Redo quiz</button>`;
+  }
+}
+
+/* ---- Progress dashboard (m7) ---- */
+function renderDash(){
+  const body=$('mBody'); $('mFtr').innerHTML=`<button class="btn-complete" onclick="closeModal()">Close</button>`;
+  const rows=MODULES.filter(m=>!m.dash).map(m=>{
+    if(m.quiz){ const sc=lLoad(SAVE_PREFIX+m.id+'-score'); return `<div class="prog-row"><span class="pi">${m.icon}</span><span class="pn">${m.title}</span><span class="ps ${sc&&sc.done?'score':''}">${sc&&sc.done?sc.percent+'%':'—'}</span></div>`; }
+    const c=lLoad(SAVE_PREFIX+m.id+'-complete');
+    return `<div class="prog-row"><span class="pi">${m.icon}</span><span class="pn">${m.title}</span><span class="ps ${c&&c.timestamp?'done':''}">${c&&c.timestamp?'✓ Done':'—'}</span></div>`;
+  }).join('');
+  const wrong=lLoad(SAVE_PREFIX+'m6-wrong')||[];
+  body.innerHTML=rows + (wrong.length?`<div class="klabel">Quiz words to practice</div><div class="wrongs">${wrong.map(w=>`<div class="wrong-item"><div class="wp">${w.prompt}</div>You chose: <span class="wc">${w.chosen}</span> · Answer: <span class="wok">${w.correct}</span></div>`).join('')}</div>`:'')
+    + `<div class="note">Keep singing "What's Your Hobby?" 🎶</div>`;
+}
+
+/* ===================== INIT ===================== */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  await restoreProgressFromCloud();
+  if(isReview){ $('reviewBanner').innerHTML=`<div class="review-banner">👀 Review mode — Leo's results & answers</div>`; }
+  buildGrid();
+});
+</script>
+</body>
+</html>

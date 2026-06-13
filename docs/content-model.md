@@ -219,6 +219,8 @@ Reference browse/search controls should show useful counts. Mixed search results
 
 Reference level colors must stay consistent anywhere levels appear: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The source tree keeps Vocabulary and Grammar nested under each level/unit. For units with real data, Vocabulary nests Vocabulary 1, Vocabulary 2, Academic, and Glossary.
 
+Leo's Reference confidence state is stored locally in the same shape expected for Supabase. The browser key is `leea.referenceConfidence.v1`; its value is a map of `ReferenceConfidenceRecord` objects keyed by `wordId`. Keep the record fields aligned with the expanded confidence shape below. Older bare word-ID arrays are migration-only and should not be written by new code.
+
 Search ranking should prefer direct word/title matches, then meaning/rule/pattern matches, then exact source/type tags. Broad lesson/topic tags should not cause unrelated cards from the same section to appear for a shorter query.
 
 Search/browse result item types should route to their reference views:
@@ -327,11 +329,15 @@ Expanded later:
 
 ```json
 {
+  "id": "reference-confidence-leo-global_relative",
   "studentId": "leo",
   "wordId": "global_relative",
+  "knows": true,
   "confidence": "known",
   "markedKnownAt": "2026-06-06T00:00:00.000Z",
-  "sourceContext": "OW4-U8-V1"
+  "sourceContext": "OW4-U8-V1",
+  "createdAt": "2026-06-06T00:00:00.000Z",
+  "updatedAt": "2026-06-06T00:00:00.000Z"
 }
 ```
 

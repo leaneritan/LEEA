@@ -298,6 +298,8 @@ Examples of current lists:
 
 I Know is Leo-specific progress data, not global word data.
 
+The current implementation stores Reference confidence in `leea.referenceConfidence.v1` as Supabase-shaped records keyed by `wordId`, not as static vocabulary fields and not as a bare array. Each record carries `id`, `studentId`, `wordId`, `knows`, `confidence`, `sourceContext`, `markedKnownAt`, `createdAt`, and `updatedAt`. This local shape should map directly to a future `reference_confidence` table.
+
 Possible confidence states:
 
 ```text

@@ -37,6 +37,55 @@ Set the component CSS tone via `getComponentMeta()` in `src/components/component
 | writing | plum | ✍️ |
 
 Three CSS variable surfaces use the tone: the Leo homework hero (`--hero-accent`), Home's next-card (`--next-accent`), and the Leo app card list (`--leo-component`). See `globals.css` for the variable cascade.
+## Canonical NatGeo lesson phases per component
+
+Every Our World unit follows the same component-phase pattern. The teacher slideshow has one slide (or small slide group) per phase; the Leo app has one module per phase. The phase names below are the canonical NatGeo names — match them in slide labels, Leo module IDs, and lesson HTML.
+
+| Component | Phases (in order) |
+|---|---|
+| **opener** | Introduce (Activate Prior Knowledge + Build Background) + Be the Expert |
+| **vocab-1** | Warm Up → Present → Practice → Apply → Extend → Wrap Up → Recap |
+| **song** | Use the Song + Use It Again (recycles Vocab 1 and previews Grammar 1 only — never Grammar 2) |
+| **grammar-1** | Warm Up → Present → Practice → Apply → Extend → Wrap Up → Recap + Grammar in Depth |
+| **grammar-2** | Warm Up → Present → Practice → Apply → Extend → Wrap Up → Recap + Grammar in Depth |
+| **vocab-2** | Warm Up → Present → Practice → Apply → Extend → Wrap Up (no Recap) |
+| **reading** | Warm Up → Present → Practice → Apply → Extend → Recap → Wrap Up (Recap is before Wrap Up here; Think Aloud sits inside Present in some units, not a separate phase) |
+| **writing** | Warm Up → Present → Read the Model → Plan → Write → Edit → Share |
+| **mission** | Think → Pair → Share + Be the Expert (About the Photo + Meet the Explorer) |
+| **project** | Prepare → Share → Modify |
+| **book-reading** | Before You Read → While You Read → After You Read |
+
+Notes:
+
+- These phases are the **truth** — they come from the NatGeo Our World lesson planner. When the planner page for a unit shows the same phase names, the slideshow and Leo app use them verbatim. Do not rename phases (e.g. don't change "Practice" to "Try It Out").
+- The Be the Expert sidebar in opener and mission becomes a final slide/module ("About the Photo" / "Meet the Explorer") — it is not a teacher-only note.
+- The vocab-2 phase list deliberately ends at Wrap Up. Vocab 2 has no Recap because the unit's review work happens in Reading and Writing.
+- Reading flips the usual order: Recap comes BEFORE Wrap Up.
+- Song only previews Grammar 1 and recycles Vocab 1. Do not include Grammar 2 content in song slides or the song Leo app.
+
+These phases drive what goes in each Leo app shell below. The shell adds vocab review / academic / content / formative assessment modules around the canonical phases when the content fits.
+
+**Verification status:** all six Our World levels were checked. The opener / vocab / song / grammar / reading / writing phase sequences above are the same across L1-L6 (verified against Level 1 Unit 1 page 46, Level 2 + Level 3 Scope and Sequence pages, Level 4 Units 1/4/7/8, Level 5 + Level 6 Scope and Sequence pages). Two level-band variants below.
+
+### Level-band variants: Value vs Mission, Let's Talk
+
+The end-of-unit social-emotional segment and the dialogue boxes differ between lower and upper levels:
+
+| Phase | Levels 1-3 | Levels 4-6 |
+|---|---|---|
+| End-of-unit social-emotional | **Value** (e.g. "Be neat", "Take care of others", "Be a good sport") | **Mission** with National Geographic Explorer (e.g. "Connect with nature", "Be prepared") |
+| Functional dialogue | not in scope | **Let's Talk** (e.g. "It's my turn", "I love it!") |
+| Unit 0 (preparatory unit) | present | not present |
+| Project | present | present |
+
+Source-tag impact:
+
+- Levels 1-3 use `VL` (value) where Levels 4-6 use `MI` (mission). E.g. `OW2-U4-VL` vs `OW4-U7-MI`
+- Let's Talk content in Levels 4-6 uses `LT`. E.g. `OW5-U3-LT`
+- `PJ` (project) and `RDR` (unit reader) work the same across all levels
+- See `docs/vocab.md` for the full source-tag code table
+
+When scanning a Level 1-3 unit, look for the **VALUE** label on the unit opener spread and the end-of-unit Value page; when scanning Level 4-6, look for **MISSION** with a Be the Expert "About the Photo" + "Meet the Explorer" sidebar.
 
 ## Locked module structures
 
@@ -138,6 +187,17 @@ Target shape:
 - Share / Peer Feedback frames
 
 To be locked when the first writing Leo app is built.
+
+## Reading vocab and grammar from the unit JSON
+
+Every Leo app module that needs a vocab word, an academic word, or a grammar chart reads it from the unit's `vocabulary.json` / `grammar.json` — never a hardcoded copy inside the HTML.
+
+- The unit's `vocabulary.json` is the single source of truth for the word, emoji, meaning, example, and Japanese
+- A Leo app's flashcard, quiz prompt, or carousel pulls those fields by `id` from the JSON
+- The same rule applies to teacher slideshows — see `docs/teacher-slides.md`
+- This is why **emojis stay consistent**: change the emoji in one place, every surface updates
+
+If a Leo app needs words a unit's JSON does not have (e.g. an end-of-unit review using vocabulary from earlier units), pull those by `id` from the global `vocabularyItems` array in `src/data/reference.ts`.
 
 ## Source field shape
 

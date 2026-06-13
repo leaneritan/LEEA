@@ -77,6 +77,16 @@ Notes:
 - `normalizedWord` is the word in lowercase, no punctuation, multi-word phrases joined with spaces (`take photos`)
 - `displayEmoji` is the visual; one emoji is the common case, but the field is a plain string — multi-emoji values like `"🔋⚡"` are allowed when two emojis help picture the word
 - `emojiDescription` is what the emoji shows
+
+### Emoji consistency
+
+Emojis must be consistent across units so Leo learns one visual per concept.
+
+- **Same global word → same emoji.** Because the same `global_<id>` card serves every unit, this is automatic — never override `displayEmoji` per source.
+- **Closely related forms can share an emoji.** Noun/verb pairs from the same root (`imagine` / `imagination`, `invent` / `invention`) may use the same primary emoji, or two clearly related ones (`💡` for both).
+- **Distinct concepts should not share an emoji.** If two unrelated words would land on the same emoji, vary one. Example: `habit` (📅 recurring routine) vs `typical` (🔁 something that recurs) — keep them apart.
+- **When a new unit reuses a word that's already a global card, do not change its emoji.** Add a new entry to `sources[]` and leave everything else alone.
+- **Lesson HTML reads emojis from `vocabulary.json`, not from a hardcoded copy.** When a teacher slideshow or Leo app needs a vocab card, it pulls from the unit's `vocabulary.json` so the emoji always matches Reference.
 - `japanese.needsReview: true` until the parent has confirmed the Japanese
 - `tags[]` should include the type, the component name, a topical tag, and the source tag
 
@@ -150,10 +160,20 @@ The component code maps:
 - `SG` song
 - `RD` reading
 - `WR` writing
-- `MI` mission (end-of-unit mission section)
-- `PJ` project (end-of-unit project section)
+- `MI` mission (end-of-unit mission section — **Levels 4-6 only**)
+- `VL` value (end-of-unit value section — **Levels 1-3 only**)
+- `LT` let's talk (functional dialogue boxes — **Levels 4-6 only**)
+- `PJ` project (end-of-unit project section — all levels)
 - `RDR` unit reader (the bundled NatGeo reader book, distinct from `RD` reading)
 
-For mission/project/reader sources, omit `lessonId` (these sections do not have their own teacher lessons or Leo apps) and use `component: "mission" | "project" | "reader"` in `sources[]`.
+NatGeo Our World uses a different end-of-unit pattern by level band:
+
+| Levels 1-3 | Levels 4-6 |
+|---|---|
+| Value + Project | Mission + Let's Talk + Project |
+
+Use `MI` only when the planner page actually says **MISSION**. Use `VL` when it says **VALUE**. Do not invent a Mission tag for a Level 1-3 unit.
+
+For mission/value/project/reader/let's-talk sources, omit `lessonId` (these sections do not have their own teacher lessons or Leo apps yet) and use `component: "mission" | "value" | "project" | "reader" | "lets-talk"` in `sources[]`.
 
 Always include the source tag in `sources[].tag` AND in `tags[]`. Search uses both.

@@ -89,14 +89,16 @@ Where each part of a slide comes from:
 
 | Slide part | Source |
 |---|---|
-| Vocab word display | `vocabulary.json` for the unit |
-| Grammar box | `grammar.json` chart |
+| Vocab word display | `vocabulary.json` for the unit (single source of truth — same emoji, meaning, Japanese as Reference) |
+| Grammar box | `grammar.json` chart for the unit |
 | Reading text | the planner PDF (verbatim) and/or supporting student book PDF |
 | Song lyrics | the planner PDF (verbatim) |
 | Writing model | the planner PDF (verbatim) |
 | Photo / video references | the planner PDF, with TR codes preserved |
 
-Do not duplicate vocab or grammar content inside a teacher HTML when it lives in `vocabulary.json` or `grammar.json`. Slides should read from data or, if static-baked for performance, the source of truth is still the JSON.
+Do not duplicate vocab or grammar content inside a teacher HTML when it lives in `vocabulary.json` or `grammar.json`. Slides should read from data or, if static-baked for performance, the source of truth is still the JSON — change the JSON and the slide updates next render.
+
+This is why emojis stay consistent across Reference, Leo apps, and teacher slides — every surface reads the same `displayEmoji` from `vocabulary.json`.
 
 ## What stays consistent across all teacher slideshows
 

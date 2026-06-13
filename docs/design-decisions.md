@@ -128,6 +128,7 @@ Neritan view:
 - preview Leo apps
 - assign learner apps
 - track Leo progress
+- track school test results and academic goals
 
 Leo view:
 
@@ -143,6 +144,8 @@ Reference:
 - show I Know and I Don't Know lists
 
 Teacher lessons are only for teaching. Learner apps are for Leo's independent homework/practice.
+
+Academic Progress is a parent-facing Neritan page at `/teacher/progress`. It tracks Leo's real school test results across Japanese, Social Studies, Math, Science, and English, plus goals for total score, rank, and each subject. It is not a lesson and not Reference. First storage is local through `src/data/academicProgress.ts`, but the records are shaped to map directly to future Supabase tables for test results and academic goals.
 
 ## Visual Direction
 

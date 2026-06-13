@@ -41,6 +41,44 @@ For subject panels, `true` means expanded and `false` means collapsed.
 
 First version can store this locally. Later it should live in Supabase user settings.
 
+## Academic Progress
+
+School test tracking is parent-facing first and lives under Neritan at `/teacher/progress`.
+
+Local storage keys:
+
+```text
+leea.academicProgress.testResults.v1
+leea.academicProgress.goals.v1
+```
+
+Test result records should stay Supabase-shaped:
+
+```json
+{
+  "id": "test-leo-2026-05-17-term-1-midterm",
+  "studentId": "leo",
+  "schoolYear": "2026",
+  "term": "Term 1",
+  "testName": "Term 1 Midterm",
+  "testDate": "2026-05-17",
+  "rank": 65,
+  "studentCount": 150,
+  "subjects": [
+    { "subject": "japanese", "score": 70, "average": 74.2, "maxScore": 100 },
+    { "subject": "social", "score": 75, "average": 56.3, "maxScore": 100 },
+    { "subject": "math", "score": 75, "average": 67.2, "maxScore": 100 },
+    { "subject": "science", "score": 80, "average": 67.6, "maxScore": 100 },
+    { "subject": "english", "score": 92, "average": 82.7, "maxScore": 100 }
+  ],
+  "notes": "",
+  "createdAt": "2026-05-17T00:00:00.000Z",
+  "updatedAt": "2026-05-17T00:00:00.000Z"
+}
+```
+
+Keep school subjects flexible enough for future subjects, but the first tracker uses Japanese, Social Studies, Math, Science, and English. This is different from LEEA lesson progress: test results are real school outcomes, not lesson completion records.
+
 ## Registry
 
 The registry says what exists and what is live.

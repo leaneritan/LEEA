@@ -339,19 +339,19 @@ function SourceTree() {
                           <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
                         ))}
                       </details>
-                      <details className="tree-subgroup">
+                      <details className="tree-subgroup" open>
                         <summary>Vocabulary 2</summary>
                         {unit8Vocab2Items.map((word) => (
                           <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
                         ))}
                       </details>
-                      <details className="tree-subgroup">
+                      <details className="tree-subgroup" open>
                         <summary>Academic</summary>
                         {unit8AcademicItems.map((word) => (
                           <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />
                         ))}
                       </details>
-                      <details className="tree-subgroup">
+                      <details className="tree-subgroup" open>
                         <summary>Glossary</summary>
                         {unit8GlossaryItems.map((word) => (
                           <TreeLink href={`/reference/vocabulary/${word.id}`} key={word.id} label={`${word.emoji} ${word.word}`} />

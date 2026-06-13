@@ -55,6 +55,7 @@ Neritan view
 - preview Leo apps
 - assign learner apps
 - track Leo progress
+- track school test results and academic goals under `/teacher/progress`
 
 Leo view
 - see next assignment
@@ -153,6 +154,8 @@ Before Supabase is connected, Neritan assignment/review uses local storage with 
 Assignment state is read through the shared helpers `readAssignments(learnerLessons)` and `getOpenAssignmentCount(...)` in `src/data/assignments.ts`. Mutate state only through `assignLesson(lessonId, current)` and `unassignLesson(lessonId, current)` from the same module — they keep an `leea.assignments.unassigned.v1` set so `seedAssignments` does not resurrect an auto-assigned lesson after Neritan explicitly unassigns it. Do not duplicate localStorage read/seed logic inside components. Sidebar and dashboard numbers must come from real records, never hardcoded values. UI typography rule: at most one uppercase letter-spaced label per card region — component labels and group labels are uppercase, meta text and pills are sentence case.
 
 Teacher lesson "Mark Done" state is tracked separately in `src/data/lessonProgress.ts`. It uses `leea.lessonProgress.v1` in localStorage and stores `LessonProgressRecord` objects shaped to match a future Supabase row (`lessonId`, `teacherId`, `studentId`, `status`, `completedAt`, `updatedAt`).
+
+Academic test tracking lives under Neritan at `/teacher/progress`. Store periodic school test results through `src/data/academicProgress.ts`, using `leea.academicProgress.testResults.v1` and `leea.academicProgress.goals.v1`. Records are local-first but Supabase-shaped: `studentId`, `schoolYear`, `term`, `testName`, `testDate`, `rank`, `studentCount`, `subjects[]` with score/average/maxScore, notes, `createdAt`, and `updatedAt`. Keep this multi-subject from the start: Japanese, Social Studies, Math, Science, and English.
 
 `src/data/registry.ts` holds named stat variables (`totalWords`, `grammarPoints`, `knownWords`, `wordsToReview`) plus `academyStats`. The `liveLessons` and `assignedLessons` fields in `academyStats` are currently hardcoded stub values — they must be replaced with real computed counts before the stats section can be trusted. Do not add new hardcoded numbers here; wire to real lesson and assignment data instead.
 

@@ -24,35 +24,66 @@ function sourceLabel(word, suffix) {
   return `${word.id} (${word.word}) ${suffix}`;
 }
 
-const unit8VocabularyPath = "content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json";
+const unitVocabularyPaths = [
+  "content/subjects/english/courses/our-world/level-4/unit-7/vocabulary.json",
+  "content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json"
+];
 const vocabularyIndexPath = "content/subjects/english/reference/vocabulary-index.json";
 const unit8GrammarPath = "content/subjects/english/courses/our-world/level-4/unit-8/grammar.json";
 const sanseidoPath = "content/subjects/english/junior-high/sanseido-index.json";
 
-const vocabulary = readJson(unit8VocabularyPath);
 const vocabularyIndex = readJson(vocabularyIndexPath);
 const grammar = readJson(unit8GrammarPath);
 const sanseido = readJson(sanseidoPath);
 
-const wordIds = new Set(vocabulary.wordIds ?? []);
 const wordsById = new Map();
+const allWordIds = new Set();
 
-for (const word of vocabulary.words ?? []) {
-  if (wordsById.has(word.id)) fail(`duplicate vocabulary id: ${word.id}`);
-  wordsById.set(word.id, word);
-}
+for (const unitPath of unitVocabularyPaths) {
+  const unitVocabulary = readJson(unitPath);
+  const unitWordIds = new Set(unitVocabulary.wordIds ?? []);
+  const unitWordsSeen = new Set();
 
-for (const id of wordIds) {
-  if (!wordsById.has(id)) fail(`wordIds references missing word: ${id}`);
-}
+  for (const word of unitVocabulary.words ?? []) {
+    if (unitWordsSeen.has(word.id)) fail(`${unitPath}: duplicate vocabulary id within unit: ${word.id}`);
+    unitWordsSeen.add(word.id);
+    allWordIds.add(word.id);
 
-for (const word of vocabulary.words ?? []) {
-  if (!wordIds.has(word.id)) fail(`${word.id} exists in words[] but not wordIds`);
-}
+    if (wordsById.has(word.id)) {
+      // Same global word appears in multiple units. Merge sources, dedup by tag.
+      const existing = wordsById.get(word.id);
+      const seenTags = new Set((existing.sources ?? []).map((s) => s.tag));
+      for (const source of word.sources ?? []) {
+        if (!seenTags.has(source.tag)) {
+          existing.sources.push(source);
+          seenTags.add(source.tag);
+        }
+      }
+      for (const tag of word.tags ?? []) {
+        if (!existing.tags.includes(tag)) existing.tags.push(tag);
+      }
+    } else {
+      // First time seeing this word — clone so we can safely merge later.
+      wordsById.set(word.id, {
+        ...word,
+        sources: [...(word.sources ?? [])],
+        tags: [...(word.tags ?? [])]
+      });
+    }
+  }
 
-for (const listName of ["vocab1WordIds", "vocab2WordIds", "academicWordIds", "contentWordIds", "relatedWordIds"]) {
-  for (const id of vocabulary[listName] ?? []) {
-    if (!wordsById.has(id)) fail(`${listName} references missing word: ${id}`);
+  for (const id of unitWordIds) {
+    if (!unitWordsSeen.has(id)) fail(`${unitPath}: wordIds references missing word: ${id}`);
+  }
+
+  for (const word of unitVocabulary.words ?? []) {
+    if (!unitWordIds.has(word.id)) fail(`${unitPath}: ${word.id} exists in words[] but not wordIds`);
+  }
+
+  for (const listName of ["vocab1WordIds", "vocab2WordIds", "academicWordIds", "contentWordIds", "relatedWordIds"]) {
+    for (const id of unitVocabulary[listName] ?? []) {
+      if (!unitWordsSeen.has(id)) fail(`${unitPath}: ${listName} references missing word: ${id}`);
+    }
   }
 }
 
@@ -60,11 +91,11 @@ for (const id of vocabularyIndex.words ?? []) {
   if (!wordsById.has(id)) fail(`vocabulary-index references missing word: ${id}`);
 }
 
-for (const id of wordIds) {
+for (const id of allWordIds) {
   if (!(vocabularyIndex.words ?? []).includes(id)) fail(`vocabulary-index is missing ${id}`);
 }
 
-for (const word of vocabulary.words ?? []) {
+for (const word of wordsById.values()) {
   assertPresent(word.id, sourceLabel(word, "id"));
   assertPresent(word.type, sourceLabel(word, "type"));
   assertPresent(word.word, sourceLabel(word, "word"));
@@ -229,4 +260,4 @@ if (errors.length) {
 }
 
 console.log("Content validation passed.");
-console.log(`Checked ${vocabulary.words.length} vocabulary cards, ${grammar.grammarPoints.length} grammar cards, ${lessons.length} lessons, and ${sanseido.length} Sanseido links.`);
+console.log(`Checked ${wordsById.size} vocabulary cards across ${unitVocabularyPaths.length} unit files, ${grammar.grammarPoints.length} grammar cards, ${lessons.length} lessons, and ${sanseido.length} Sanseido links.`);

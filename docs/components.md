@@ -225,3 +225,19 @@ When a new component Leo app is built for the first time:
 2. List its modules in this doc under that component's section, mark "LOCKED"
 3. Note any special storage fields (non-numeric module IDs, non-default `scoreKey`, `captionKey`)
 4. Future units of the same component copy that structure exactly
+
+## Grammar slide patterns (locked in v4 of Unit 8 Grammar 1)
+
+These reusable patterns came out of iterating the Unit 8 Grammar 1 teacher deck and now apply to every future grammar lesson:
+
+1. **Grammar Box + Workbook Transform Pairs** — the chart slide pairs the rule box (left) with 3–4 source→joined transform exercises from the Grammar Workbook (right). Each pair has a `buildTxPair(n, resultHTML)` button that animates the duplicate pronoun dissolving and reveals the joined sentence. Source pill cites Student Book TR page AND Grammar Workbook page.
+
+2. **Word Web + Live Sentence Builder** — Extend (Word Web) slides never use `buildWordWeb` alone. Always pair it with a live sentence builder (uses the `onChange(nodes)` callback to render the target-grammar sentence for every filled oval). Include a person-picker row above the web so the same component works for Dad / Mom / Leo / a player / a friend — each person gets its own `storageKey` so prior work persists per person. See `docs/chart-templates.md` for the API.
+
+3. **Soccer carousel size + grouping** — grammar sample carousels hold 15+ tagged samples grouped by source category (Premier League / La Liga / Bundesliga / Ligue 1 / Serie A / Champions League / World Cup / Movies). Use `<span class="league">` tag inside each card. End with a count summary line.
+
+4. **Grammar Detective — workbook-cited cases** — Detective cases pull from the Grammar Workbook's "who or X" rule AND the transform pairs (page 34 for Unit 8). Cite the workbook page in each case explanation. Aim for 7+ cases per Detective slide.
+
+5. **Source pills on every chart slide** — every chart / rule / sample slide includes a `<span class="source-pill">` at the bottom citing both sources: `Student Book p. X / TR Y.Y · Grammar Workbook p. Z`.
+
+When iterating an existing deck (per user feedback "don't add or delete slides"), improve interactivity and pack more content into existing slides — keep the slide count constant.

@@ -160,6 +160,25 @@ el.innerHTML = buildWordWeb({
 - Text > 22 chars is truncated with an ellipsis in the SVG; the full text stays in state.
 - Defaults: 0 min, 8 max nodes. Pass `addable:false, removable:false` for a fixed-size web that's only editable in place.
 
+#### Live sentence-builder pairing (Grammar lessons)
+
+When a `buildWordWeb` lives on a **grammar** slide, pair it with a **live sentence builder** that uses the `onChange(nodes)` callback to render one full grammar-pattern sentence per filled oval. Example for who-clauses (`public/lessons/ow-l4-u8-grammar-1.html` s42):
+
+```js
+host.innerHTML = window.buildWordWeb({
+  id: 'web-dad',
+  center: window._wwCenter,       // mutable via picker chips
+  nodes:  window._wwNodes,
+  storageKey: 'leea-4-8-grammar-1-web-' + slug(window._wwCenter.text),
+  onChange: function (nodes) {
+    window._wwNodes = nodes;
+    wwRenderSentences();          // renders: "<name> is a person who <oval text>."
+  }
+});
+```
+
+The sentence builder is the bridge that turns "tap and type" into "Leo says a full target-grammar sentence aloud." Without it the web is just decoration; with it, every oval becomes a who-sentence Leo can speak. Add a person-picker row above the web so the same web works for Dad / Mom / Leo / a player / a friend — each person gets its own `storageKey` so prior work is preserved.
+
 
 
 They are not just PDFs to display. They should become interactive/block templates that can render in teacher lessons and learner apps.

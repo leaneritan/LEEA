@@ -1,19 +1,21 @@
-# vocab
+# vocab-unit-scanner
 
 Scan one unit's vocabulary from the planner PDF, build `vocabulary.json`, wire it to Reference search, source tree, and indexes, then validate.
+
+> **Naming note:** this skill is the **unit-level vocab scanner**. Future related skills (e.g. `/vocab-1-app`, `/song-app`, `/grammar-1-app`) build the per-lesson teacher slides + Leo apps that consume the `vocabulary.json` this skill produces.
 
 ## Usage
 
 ```
-/vocab <course-path> <unit-number>
+/vocab-unit-scanner <course-path> <unit-number>
 ```
 
 Examples:
 
 ```
-/vocab english/our-world/level-4 7
-/vocab english/our-world/level-5 3
-/vocab english/joyful-work/year-2 4
+/vocab-unit-scanner english/our-world/level-4 7
+/vocab-unit-scanner english/our-world/level-5 3
+/vocab-unit-scanner english/joyful-work/year-2 4
 ```
 
 The first arg is the path under `docs/lesson-plans/` (so the planner PDF is at `docs/lesson-plans/<course-path>/planner.pdf`). The second is the unit number.

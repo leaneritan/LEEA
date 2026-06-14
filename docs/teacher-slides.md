@@ -57,6 +57,8 @@ Use the NatGeo planner activity sections as the slide flow:
 - Apply activity (often a class survey or pair work)
 - Wrap Up sentence frames
 - Reads chart data from `grammar.json`, not a hardcoded copy
+- When a Grammar Box is source-verbatim from a book/audio track, show the source on the slide (for example, `Student Book p. 136 / TR 8.4`) so Neritan can trace the teaching point back to the lesson planner/supporting files.
+- If the grammar lesson uses a word web, the slide should make the sentence-building move explicit: center oval = person/noun being described, outer ovals = details, final sentence = `person + who + verb phrase`. The who-clause must describe the person directly.
 
 ### reading
 - Pre-read (introduce strategy)

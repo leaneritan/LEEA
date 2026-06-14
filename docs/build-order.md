@@ -59,10 +59,9 @@ Each step becomes its own skill so a unit can be built one chunk at a time. The 
 /vocab-unit-scanner    steps 1-4   ← BUILT (.claude/commands/vocab-unit-scanner.md)
 /grammar-unit-scanner  steps 5-8   ← planned (scans + builds unit grammar.json)
 /opener-app            step 9      ← planned (teacher slides + Leo opener app)
-/vocab-1-app           step 10     ← planned (vocab-1 teacher + Leo app)
+/vocab-app             steps 10,13 ← BUILT (.claude/commands/vocab-app.md — handles both vocab-1 and vocab-2)
 /song-app              step 11     ← planned
 /grammar-1-app         step 12     ← planned
-/vocab-2-app           step 13     ← planned
 /grammar-2-app         step 14     ← planned
 /reading-app           step 15     ← planned
 /writing-app           step 16     ← planned

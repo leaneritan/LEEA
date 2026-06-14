@@ -108,6 +108,59 @@ el.innerHTML = buildDndSorter({
 - The `answer` string on each tile must exactly match a zone `key`.
 
 
+### `word-web` — Editable Word Web (graphic organizer)
+
+**File:** `public/teach/components/wordweb.js`
+**Surface:** Teacher slide decks (works inside the 1920×1080 scaled deck)
+**First used in:** OW L4 U8 Grammar 1 teacher deck (`public/lessons/ow-l4-u8-grammar-1.html`) — Extend phase
+
+#### API
+
+```js
+// Load once in <head>:
+// <script src="/teach/components/wordweb.js"></script>
+
+el.innerHTML = buildWordWeb({
+  id:         'web-dad',                       // unique per page
+  center:     { text: 'Dad', emoji: '👨' },
+  nodes: [                                     // initial outer ovals (optional)
+    { text: 'watches movies', emoji: '🎬' },
+    { text: 'plays soccer',  emoji: '⚽' }
+  ],
+  addable:    true,                            // show "+ Add oval" button
+  removable:  true,                            // show "×" on filled ovals
+  editable:   true,                            // click oval → prompt to edit text
+  maxNodes:   8,
+  minNodes:   0,
+  storageKey: 'leea-4-8-grammar-1-web1',       // optional — persists to localStorage
+  onChange:   (nodes) => { ... }               // optional callback after every change
+  // optional colors:
+  // accent:       '#3B82F6', accentDark:   '#1E3A8A',
+  // filledFill:   '#DCFCE7', filledStroke: '#16A34A', filledInk: '#14532D'
+});
+```
+
+#### Behaviour
+
+- SVG layout, viewBox 900×540, scales responsively (max-width 900).
+- Center oval + N outer ovals around it (1 to `maxNodes`), connector lines beneath.
+- Tap an oval → `prompt()` for text (pre-filled if it already has text).
+- Tap "**+ Add oval**" → adds an empty oval. Outer ovals auto-redistribute.
+- Tap the red "×" on a filled oval → removes it (respects `minNodes`).
+- Tap "↺ Reset" → confirms then clears all nodes.
+- `storageKey` persists `nodes[]` to localStorage and reloads on next render.
+- `onChange(nodes)` fires after every save (edit/add/remove/reset).
+
+#### Notes for Codex
+
+- Single global exposed: `window.buildWordWeb` (plus `window._leeaWeb*` click bridges).
+- Re-rendering replaces the parent element's innerHTML, so wrap the call in its own container.
+- The `prompt()` UX is intentionally simple — swap for a custom modal when needed.
+- Custom `accent` / `filledFill` colors let any component-toned deck use the web.
+- Text > 22 chars is truncated with an ellipsis in the SVG; the full text stays in state.
+- Defaults: 0 min, 8 max nodes. Pass `addable:false, removable:false` for a fixed-size web that's only editable in place.
+
+
 
 They are not just PDFs to display. They should become interactive/block templates that can render in teacher lessons and learner apps.
 
@@ -148,7 +201,7 @@ Map / web templates:
 
 - spider map
 - sunshine organizer ✓ built — `public/learn/components/sunshine.js`
-- word web
+- word web ✓ built — `public/teach/components/wordweb.js` (`buildWordWeb`)
 
 Story / sequence templates:
 

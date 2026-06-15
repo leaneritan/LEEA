@@ -53,22 +53,21 @@ For each component in this order:
 
 ## Skill plan (to build later)
 
-Each step becomes its own skill so a unit can be built one chunk at a time:
+Each step becomes its own skill so a unit can be built one chunk at a time. The vocab scanner is the only one built so far; the rest are planned and named for clarity (the per-component skills will each generate the teacher slideshow + paired Leo app for that component):
 
 ```text
-/scan-vocab        steps 1
-/build-vocab-json  steps 2-4
-/scan-grammar      step 5
-/build-grammar     steps 6-8
-/generate-opener   step 9
-/generate-vocab    steps 10, 13
-/generate-song     step 11
-/generate-grammar  steps 12, 14
-/generate-reading  step 15
-/generate-writing  step 16
+/vocab-unit-scanner    steps 1-4   ← BUILT (.claude/commands/vocab-unit-scanner.md)
+/grammar-unit-scanner  steps 5-8   ← planned (scans + builds unit grammar.json)
+/opener-app            step 9      ← planned (teacher slides + Leo opener app)
+/vocab-app             steps 10,13 ← BUILT (.claude/commands/vocab-app.md — handles both vocab-1 and vocab-2)
+/song-app              step 11     ← planned
+/grammar-1-app         step 12     ← planned
+/grammar-2-app         step 14     ← planned
+/reading-app           step 15     ← planned
+/writing-app           step 16     ← planned
 ```
 
-Skills are added after the corresponding template/Leo app is built and locked.
+Naming rule going forward: the **`-unit-scanner`** suffix means "scans the unit PDF and produces unit-level JSON (vocabulary or grammar)"; the **`-app`** suffix means "builds the teacher slideshow + paired Leo learner app for that component." Skills are added after the corresponding template/Leo app is built and locked.
 
 ## Stop conditions
 

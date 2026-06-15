@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leo · Unit 8 · Vocabulary 2 — Collecting</title>
+<script src="/teach/components/charts.js"></script>
+<script src="/learn/components/sunshine.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --blue:#3B82F6;--blue-d:#1E3A8A;--blue-l:#EFF6FF;
+  --red:#EF4444;--red-l:#FEF2F2;
+  --gold:#F59E0B;--gold-l:#FEF3C7;--gold-d:#92400E;
+  --amber:#F59E0B;--purple:#7C3AED;--purple-l:#F5F3FF;
+  --ink:#111;--ink-2:#374151;--ink-3:#6B7280;--ink-4:#9CA3AF;--border:#E5E7EB;
+  --surface:#fff;--paper:#FAFAF7;--yellow:#FCD34D;
+}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink)}
+body{display:flex;flex-direction:column}
+.app-header{background:var(--green);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-header .logo{font-size:24px}
+.app-header .title{font-size:20px;font-weight:800;line-height:1.1}
+.app-header .subtitle{font-size:13px;opacity:.85;margin-top:2px}
+.app-header .badge-row{margin-left:auto;display:flex;gap:8px;align-items:center}
+.prog-pill{background:rgba(255,255,255,.22);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700}
+.tab-nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:12px 14px;font-size:13px;font-weight:700;font-family:'Outfit',sans-serif;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;min-width:70px}
+.tab-btn .tab-icon{font-size:18px}
+.tab-btn .tab-name{font-size:11px;letter-spacing:.3px}
+.tab-btn.active{color:var(--green);border-bottom-color:var(--green)}
+.tab-btn .tab-check{position:absolute;top:6px;right:6px;font-size:11px;display:none}
+.tab-btn.done .tab-check{display:block}
+.tab-content{flex:1;overflow-y:auto;display:none;flex-direction:column}
+.tab-content.active{display:flex}
+.tab-body{flex:1;padding:20px;display:flex;flex-direction:column;gap:16px;max-width:800px;width:100%;margin:0 auto;align-self:center}
+.tab-footer{background:#fff;border-top:2px solid var(--border);padding:12px 16px;display:flex;gap:10px;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-complete:hover{background:var(--green-d)}
+.btn-complete.confirmed{background:#9CA3AF;pointer-events:none}
+.btn-redo{width:110px;background:#fff;color:var(--red);border:2px solid var(--red);border-radius:12px;padding:14px;font-size:15px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s;flex-shrink:0}
+.btn-redo.armed{background:var(--red);color:#fff}
+.card{background:#fff;border-radius:16px;padding:20px;border:2px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.section-title{font-size:18px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px}
+.section-sub{font-size:14px;color:var(--ink-3);margin-top:2px}
+.dad-hint{background:#FFFBEB;border-left:4px solid var(--amber);padding:12px 16px;border-radius:0 12px 12px 0;font-size:15px;color:var(--ink-2);line-height:1.5}
+.dad-hint b{color:var(--gold-d);font-weight:800}
+
+/* FLASHCARD (vocab1 style — green theme) */
+.fc-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mode-btn{padding:8px 18px;border-radius:20px;border:2px solid var(--green);font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;background:#fff;color:var(--green);transition:all .2s}
+.mode-btn.active{background:var(--green);color:#fff}
+.fc-nav{display:flex;gap:14px;align-items:center;justify-content:center;margin-top:12px}
+.fc-nav button{background:#fff;border:2px solid var(--border);border-radius:12px;padding:10px 28px;font-size:20px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;color:var(--ink)}
+.fc-nav button:hover{border-color:var(--green);color:var(--green);background:var(--green-l)}
+.fc-counter{font-size:14px;font-weight:700;color:var(--ink-3);min-width:40px;text-align:center}
+.flashcard-wrap{perspective:1000px;min-height:260px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:260px;position:relative;transform-style:preserve-3d;transition:transform .5s ease}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:10px}
+.fc-front{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff}
+.fc-back{background:#fff;border:2px solid var(--green);transform:rotateY(180deg)}
+.fc-emoji{font-size:64px;line-height:1}
+.fc-word{font-size:32px;font-weight:800;text-align:center}
+.fc-pos{font-size:14px;opacity:.75;font-weight:600;letter-spacing:.2em;text-transform:uppercase}
+.fc-def{font-size:18px;font-weight:600;color:var(--ink);text-align:center;line-height:1.4}
+.fc-jp{font-size:15px;color:var(--ink-3);text-align:center;display:none}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:none;border:1px dashed #D1D5DB;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:600;color:var(--ink-3);cursor:pointer;font-family:'Outfit',sans-serif;margin-top:4px;transition:all .2s}
+.fc-jp-btn:hover{border-color:var(--green);color:var(--green)}
+.fc-sample{font-size:15px;color:var(--ink-2);text-align:center;line-height:1.5;font-style:italic;margin-top:4px}
+.fc-sample b{color:var(--green);font-style:normal;font-weight:700}
+.fc-tap{font-size:12px;opacity:.6;margin-top:8px}
+
+/* Quiz mode (type the word) */
+.quiz-wrap{background:#fff;border:2px solid var(--border);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;align-items:center}
+.quiz-sentence{font-size:18px;font-weight:600;color:var(--ink);text-align:center;line-height:1.5}
+.quiz-input-row{display:flex;gap:10px;align-items:center;width:100%;max-width:360px}
+.quiz-input{flex:1;border:2px solid var(--border);border-radius:10px;padding:12px 16px;font-size:17px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
+.quiz-input:focus{border-color:var(--green)}
+.quiz-input.correct{border-color:var(--green);background:var(--green-l);color:var(--green-d)}
+.quiz-input.wrong{border-color:var(--red);background:var(--red-l)}
+.quiz-check{background:var(--green);color:#fff;border:none;border-radius:10px;padding:12px 18px;font-size:16px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.quiz-fb{font-size:15px;font-weight:700;text-align:center;min-height:22px}
+.quiz-emoji{font-size:48px}
+
+.done-banner{background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:14px 20px;font-size:16px;font-weight:700;color:var(--green-d);text-align:center;display:none}
+.done-banner.show{display:block}
+
+/* HOBBY/COLLECTING CHIPS (Tab 1) */
+.chip-grid{display:flex;flex-wrap:wrap;gap:10px}
+.hobby-chip{padding:10px 18px;border-radius:20px;border:2px solid var(--border);background:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;transition:all .2s}
+.hobby-chip:hover{border-color:var(--green)}
+.hobby-chip.selected{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* MCQ */
+.opt{padding:12px 16px;border:2px solid var(--border);border-radius:10px;cursor:pointer;font-size:15px;font-weight:600;background:#fff;font-family:Outfit,sans-serif;transition:all .2s;text-align:left;line-height:1.4}
+.opt:hover{border-color:var(--green)}
+.opt.correct{background:var(--green-l);border-color:var(--green);color:var(--green-d);pointer-events:none}
+.opt.wrong{background:var(--red-l);border-color:var(--red);color:#7F1D1D;pointer-events:none}
+.opt-row{display:flex;flex-direction:column;gap:8px}
+.q-card{background:#fff;border-radius:14px;border:2px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:10px}
+.q-card.answered{background:var(--green-l);border-color:var(--green)}
+.q-card.answered-bad{background:var(--red-l);border-color:var(--red)}
+.q-prompt{font-size:16px;font-weight:700;color:var(--ink);line-height:1.5}
+.q-prompt em{background:var(--yellow);padding:1px 6px;border-radius:4px;font-style:normal}
+.q-explain{font-size:13px;color:var(--green-d);font-weight:600;display:none;padding-top:6px;border-top:1px dashed var(--border)}
+.q-card.answered .q-explain,.q-card.answered-bad .q-explain{display:block}
+.q-card.answered-bad .q-explain{color:#7F1D1D}
+
+/* READING gap fill */
+.read-text{background:#fff;border:2px solid var(--border);border-radius:14px;padding:18px 20px;font-size:16px;color:var(--ink);line-height:1.7}
+.read-blank{display:inline-block;min-width:90px;border-bottom:3px solid var(--green);text-align:center;color:var(--green);font-weight:800;padding:0 6px;cursor:pointer;border-radius:4px;margin:0 2px}
+.read-blank:hover{background:var(--green-l)}
+.read-blank.filled{background:var(--green-l);border:2px solid var(--green);border-bottom:2px solid var(--green);color:var(--green-d)}
+.read-blank.wrong{background:var(--red-l);border-color:var(--red);color:var(--red)}
+.word-bank{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding:14px;background:#F3F4F6;border-radius:12px}
+.word-bank .bank-word{padding:8px 16px;background:#fff;border:2px solid var(--border);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;color:var(--ink-2)}
+.word-bank .bank-word.used{opacity:.3;pointer-events:none}
+
+/* UNSCRAMBLE */
+.uns-item{background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.uns-item.correct{border-color:var(--green);background:var(--green-l)}
+.uns-em{font-size:32px}
+.uns-scrambled{font-size:20px;font-weight:800;color:var(--green-d);letter-spacing:3px;flex:1;text-align:center;background:#F3F4F6;padding:8px 14px;border-radius:8px}
+.uns-input{border:2px solid var(--border);border-radius:8px;padding:10px;font-size:15px;font-family:Outfit,sans-serif;outline:none;width:140px}
+.uns-input:focus{border-color:var(--green)}
+.uns-input.correct{background:var(--green-l);border-color:var(--green);color:var(--green-d);font-weight:700}
+.uns-input.wrong{background:var(--red-l);border-color:var(--red);color:var(--red)}
+.uns-hint{font-size:12px;color:var(--ink-3);margin-top:2px;font-style:italic;width:100%;padding-left:42px}
+
+/* MATCH */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.match-chip{padding:12px 14px;border:2px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;background:#fff;transition:all .2s;font-family:Outfit,sans-serif;text-align:left;line-height:1.3}
+.match-chip:hover{border-color:var(--green)}
+.match-chip.selected{border-color:var(--green);background:var(--green-l)}
+.match-chip.matched{background:#F0FDF4;border-color:var(--green);opacity:.6;pointer-events:none}
+.match-chip.wrong-flash{background:var(--red-l);border-color:var(--red)}
+.match-em{font-size:22px;margin-right:8px}
+
+/* APPLY (sunshine) */
+.apply-host{margin-top:14px;display:flex;justify-content:center}
+.apply-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.apply-modal.open{display:flex}
+.apply-modal-card{background:#fff;border-radius:16px;padding:20px;max-width:480px;width:100%;display:flex;flex-direction:column;gap:12px}
+.apply-modal-card h4{font-size:18px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px}
+.apply-modal-card textarea{border:2px solid var(--border);border-radius:10px;padding:12px;font-size:15px;font-family:Outfit,sans-serif;min-height:80px;resize:vertical}
+.apply-modal-card textarea:focus{border-color:var(--green);outline:none}
+.apply-modal-card .row{display:flex;gap:10px;justify-content:flex-end}
+.apply-modal-card .b{padding:10px 20px;border:0;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif}
+.apply-modal-card .b.save{background:var(--green);color:#fff}
+.apply-modal-card .b.cancel{background:#F3F4F6;color:var(--ink-2)}
+
+/* WRAP UP */
+.wrap-card{background:#fff;border:2px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.wrap-q{font-size:15px;font-weight:700;color:var(--ink)}
+.wrap-opts{display:flex;gap:8px;flex-wrap:wrap}
+.wu-opt{padding:10px 16px;border:2px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;background:#fff;font-family:Outfit,sans-serif}
+.wu-opt:hover{border-color:var(--green)}
+.wu-opt.correct{background:var(--green-l);border-color:var(--green);pointer-events:none}
+.wu-opt.wrong{background:var(--red-l);border-color:var(--red);pointer-events:none}
+
+/* QUIZ (scored) */
+.quiz-score-pill{background:var(--green);color:#fff;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:800;display:inline-block;margin-bottom:10px}
+.quiz-prog{display:flex;gap:4px;margin-bottom:14px}
+.qp-dot{flex:1;height:6px;background:var(--border);border-radius:3px}
+.qp-dot.ok{background:var(--green)}
+.qp-dot.bad{background:var(--red)}
+.qfinal{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;border-radius:16px;padding:24px;text-align:center;display:none}
+.qfinal.show{display:block}
+.qfinal .em{font-size:56px}
+.qfinal .sc{font-size:42px;font-weight:900;margin:6px 0}
+.qfinal .lb{font-size:13px;opacity:.85;letter-spacing:.3em;font-weight:700;text-transform:uppercase}
+.qfinal .msg{font-size:14px;margin-top:6px;opacity:.95}
+
+/* DRIBBLE */
+.drib-pitch{background:linear-gradient(180deg,#86EFAC 0%,#16A34A 100%);border-radius:16px;padding:18px;color:#fff;text-align:center;position:relative}
+.drib-goal{font-size:12px;font-weight:800;letter-spacing:.3em;margin-bottom:6px;text-transform:uppercase}
+.drib-score{font-size:42px;font-weight:900;line-height:1;text-shadow:0 2px 8px rgba(0,0,0,.25)}
+.drib-defenders{display:flex;gap:10px;justify-content:center;margin-top:10px}
+.drib-defender{font-size:26px;transition:all .4s}
+.drib-defender.beaten{filter:grayscale(1);opacity:.35}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo">🦖</div>
+  <div>
+    <div class="title">Unit 8 · Vocabulary 2 — Collecting</div>
+    <div class="subtitle">5 collecting words · Leo's Test App</div>
+  </div>
+  <div class="badge-row">
+    <div class="prog-pill" id="prog-pill">0 / 13 done</div>
+  </div>
+</div>
+
+<div class="tab-nav" id="tab-nav">
+  <button class="tab-btn active" onclick="showTab(0)" id="tb0"><span class="tab-icon">📚</span><span class="tab-name">Academic</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(1)" id="tb1"><span class="tab-icon">🔥</span><span class="tab-name">Warm Up</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(2)" id="tb2"><span class="tab-icon">🎯</span><span class="tab-name">Present</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(3)" id="tb3"><span class="tab-icon">🃏</span><span class="tab-name">Flashcards</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(4)" id="tb4"><span class="tab-icon">🧠</span><span class="tab-name">Sort</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(5)" id="tb5"><span class="tab-icon">📖</span><span class="tab-name">Reading</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(6)" id="tb6"><span class="tab-icon">📝</span><span class="tab-name">Practice</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(7)" id="tb7"><span class="tab-icon">🔤</span><span class="tab-name">Unscramble</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(8)" id="tb8"><span class="tab-icon">🔗</span><span class="tab-name">Match</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(9)" id="tb9"><span class="tab-icon">☀️</span><span class="tab-name">Apply</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(10)" id="tb10"><span class="tab-icon">🎭</span><span class="tab-name">Wrap Up</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(11)" id="tb11"><span class="tab-icon">✅</span><span class="tab-name">Quiz</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(12)" id="tb12"><span class="tab-icon">⚽</span><span class="tab-name">Dribble!</span><span class="tab-check">✅</span></button>
+</div>
+
+<!-- TAB 0 — ACADEMIC (flashcards practice + quiz) -->
+<div class="tab-content active" id="tc0">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📚 Academic &amp; Target Vocabulary</div>
+      <div class="section-sub">1 academic word (accuracy) + 5 target words · Practice mode: tap to flip · Quiz mode: type the word</div>
+    </div>
+    <div class="fc-controls">
+      <button class="mode-btn active" id="fc0-prac" onclick="setFcMode('practice')">📖 Practice</button>
+      <button class="mode-btn" id="fc0-quiz" onclick="setFcMode('quiz')">🧠 Quiz</button>
+    </div>
+    <div id="fc0-practice">
+      <div class="flashcard-wrap" onclick="flipCard()">
+        <div class="flashcard" id="fc0-card">
+          <div class="fc-face fc-front">
+            <div class="fc-emoji" id="fc0-emoji">🎯</div>
+            <div class="fc-word" id="fc0-word">accuracy</div>
+            <div class="fc-pos" id="fc0-pos">Noun · Academic</div>
+            <div class="fc-tap">tap to flip 👆</div>
+          </div>
+          <div class="fc-face fc-back">
+            <div class="fc-emoji" id="fc0-emoji-b">🎯</div>
+            <div class="fc-def" id="fc0-def">how correct or exact something is</div>
+            <div class="fc-jp" id="fc0-jp">正確さ（せいかくさ）</div>
+            <button class="fc-jp-btn" id="fc0-jp-btn" onclick="toggleJp(event)">🇯🇵 日本語</button>
+            <div class="fc-sample" id="fc0-sample">Check the <b>accuracy</b> of your answer before turning the page.</div>
+          </div>
+        </div>
+      </div>
+      <div class="fc-nav">
+        <button onclick="fcPrev()">◀ Prev</button>
+        <span class="fc-counter" id="fc0-counter">1 / 6</span>
+        <button onclick="fcNext()">Next ▶</button>
+      </div>
+    </div>
+    <div id="fc0-quizmode" style="display:none">
+      <div class="quiz-wrap">
+        <div class="quiz-emoji" id="fcq-emoji">🎯</div>
+        <div class="quiz-sentence" id="fcq-sentence">Type the word that means: how correct something is</div>
+        <div id="fcq-clue" style="font-size:13px;color:var(--ink-3);text-align:center;font-style:italic"></div>
+        <div class="quiz-input-row">
+          <input class="quiz-input" id="fcq-input" placeholder="Type the word…" onkeydown="if(event.key==='Enter')checkFcQuiz()">
+          <button class="quiz-check" onclick="checkFcQuiz()">✓</button>
+        </div>
+        <div class="quiz-fb" id="fcq-fb"></div>
+        <div style="font-size:13px;color:var(--ink-3);font-weight:600">Quiz: <span id="fcq-progress">0 / 6 done</span></div>
+      </div>
+    </div>
+    <div class="done-banner" id="fc0-done">🎉 All 6 reviewed! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-0" onclick="doRedo(0)">↺ Redo</button>
+    <button class="btn-complete" id="complete-0" onclick="markComplete(0)">Mark Academic complete ✓</button>
+  </div>
+</div>
+
+<!-- TAB 1 — WARM UP (collecting chips) -->
+<div class="tab-content" id="tc1">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🔥 What Do You Collect?</div>
+      <div class="section-sub">Tap the things YOU like to collect. Then answer Dad's questions!</div>
+    </div>
+    <div class="dad-hint">The Lesson Planner asks: <b>"What do you want to collect?"</b> Some people collect bugs, fossils, stuffed animals, comic books, soccer cards… anything is a hobby!</div>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:15px;font-weight:700;color:var(--ink-2)">Pick ALL the collecting hobbies you do or want to do:</div>
+      <div class="chip-grid" id="wu-chips">
+        <button class="hobby-chip" onclick="warmToggle(this,'cards')">⚽ Soccer cards</button>
+        <button class="hobby-chip" onclick="warmToggle(this,'comics')">📚 Comic books (Marvel!)</button>
+        <button class="hobby-chip" onclick="warmToggle(this,'dinos')">🦖 Dinosaur toys</button>
+        <button class="hobby-chip" onclick="warmToggle(this,'bugs')">🐞 Real bugs</button>
+        <button class="hobby-chip" onclick="warmToggle(this,'fossils')">🪨 Fossils</button>
+        <button class="hobby-chip" onclick="warmToggle(this,'plushies')">🧸 Stuffed animals</button>
+        <button class="hobby-chip" onclick="warmToggle(this,'lego')">🧱 LEGO</button>
+        <button class="hobby-chip" onclick="warmToggle(this,'coins')">🪙 Coins</button>
+        <button class="hobby-chip" onclick="warmToggle(this,'stamps')">📮 Stamps</button>
+      </div>
+    </div>
+    <div id="wu-q-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="done-banner" id="wu-done">🎉 Warm Up done! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-1" onclick="doRedo(1)">↺ Redo</button>
+    <button class="btn-complete" id="complete-1" onclick="markComplete(1)">Mark Warm Up complete ✓</button>
+  </div>
+</div>
+
+<!-- TAB 2 — PRESENT (per-word Yes/No check) -->
+<div class="tab-content" id="tc2">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🎯 Present — Meet Each Word</div>
+      <div class="section-sub">5 mini cards. Tap YES or NO to each Dad question.</div>
+    </div>
+    <div class="dad-hint">Read each word and meaning. Dad asks a quick yes-or-no. You can do it!</div>
+    <div id="pr-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="pr-done">🎉 All 5 done! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-2" onclick="doRedo(2)">↺ Redo</button>
+    <button class="btn-complete" id="complete-2" onclick="markComplete(2)">Mark Present complete ✓</button>
+  </div>
+</div>
+
+<!-- TAB 3 — FLASHCARDS (5 target words) -->
+<div class="tab-content" id="tc3">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🃏 5 Target Words — Flip Each One</div>
+      <div class="section-sub">Tap to flip · Use Prev / Next to cycle through.</div>
+    </div>
+    <div class="flashcard-wrap" onclick="flipCard3()">
+      <div class="flashcard" id="fc3-card">
+        <div class="fc-face fc-front">
+          <div class="fc-emoji" id="fc3-emoji">🐞</div>
+          <div class="fc-word" id="fc3-word">a bug</div>
+          <div class="fc-pos" id="fc3-pos">Noun</div>
+          <div class="fc-tap">tap to flip 👆</div>
+        </div>
+        <div class="fc-face fc-back">
+          <div class="fc-emoji" id="fc3-emoji-b">🐞</div>
+          <div class="fc-def" id="fc3-def">a small insect</div>
+          <div class="fc-jp" id="fc3-jp">虫（むし）</div>
+          <button class="fc-jp-btn" id="fc3-jp-btn" onclick="toggleJp3(event)">🇯🇵 日本語</button>
+          <div class="fc-sample" id="fc3-sample">The <b>bug</b> is on the leaf.</div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button onclick="fc3Prev()">◀ Prev</button>
+      <span class="fc-counter" id="fc3-counter">1 / 5</span>
+      <button onclick="fc3Next()">Next ▶</button>
+    </div>
+    <div class="done-banner" id="fc3-done">🎉 All 5 reviewed! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-3" onclick="doRedo(3)">↺ Redo</button>
+    <button class="btn-complete" id="complete-3" onclick="markComplete(3)">Mark Flashcards complete ✓</button>
+  </div>
+</div>
+
+<!-- TAB 4 — SORT (uses buildDndSorter) -->
+<div class="tab-content" id="tc4">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🧠 Sort: Alive or Not Alive?</div>
+      <div class="section-sub">Drag each item into the right column. 12 items.</div>
+    </div>
+    <div class="dad-hint">The Lesson Planner asks: <b>"Which one is something that is alive?"</b> (a bug) <b>"Which one is an animal that is not alive anymore?"</b> (a dinosaur). Sort them all here.</div>
+    <div id="sort-host"></div>
+    <div class="done-banner" id="sort-done">🎉 All 12 sorted! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-4" onclick="doRedo(4)">↺ Redo</button>
+    <button class="btn-complete" id="complete-4" onclick="markComplete(4)">Mark Sort complete ✓</button>
+  </div>
+</div>
+
+<!-- TAB 5 — READING (fill blanks with word bank) -->
+<div class="tab-content" id="tc5">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📖 Reading — At the Science Museum Store</div>
+      <div class="section-sub">Adapted from Workbook p. 98. Fill in each blank from the word bank.</div>
+    </div>
+    <div class="dad-hint">Read carefully. Click a blank, then click the right word from the bank below.</div>
+    <div class="read-text" id="read-text">
+      Irma is at the science museum store with her older brother, Leo. They look at toys.<br><br>
+      "Look at this!" she says. The <span class="read-blank" data-correct="stuffed animal" onclick="rdBlankClick(this)">_____</span> is soft and cute. "But it's for little kids."<br><br>
+      Next she sees a giant <span class="read-blank" data-correct="dinosaur" onclick="rdBlankClick(this)">_____</span> with bright colors. "This is old-fashioned," she thinks.<br><br>
+      Then a small box. "Wow!" Leo holds up a <span class="read-blank" data-correct="bug" onclick="rdBlankClick(this)">_____</span> — it moves when you put batteries in! Cool — but a little scary.<br><br>
+      On the next shelf — a beautiful <span class="read-blank" data-correct="fossil" onclick="rdBlankClick(this)">_____</span> shaped like a tiny shell from millions of years ago.<br><br>
+      Finally Irma picks a <span class="read-blank" data-correct="comic book" onclick="rdBlankClick(this)">_____</span> — Spider-Man! "Easiest gift," she smiles. "My brother loves Marvel!"
+    </div>
+    <div class="word-bank" id="word-bank">
+      <button class="bank-word" data-word="stuffed animal" onclick="rdBankPick(this)">stuffed animal</button>
+      <button class="bank-word" data-word="dinosaur" onclick="rdBankPick(this)">dinosaur</button>
+      <button class="bank-word" data-word="bug" onclick="rdBankPick(this)">bug</button>
+      <button class="bank-word" data-word="fossil" onclick="rdBankPick(this)">fossil</button>
+      <button class="bank-word" data-word="comic book" onclick="rdBankPick(this)">comic book</button>
+    </div>
+    <div class="done-banner" id="read-done">🎉 All blanks filled! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-5" onclick="doRedo(5)">↺ Redo</button>
+    <button class="btn-complete" id="complete-5" onclick="markComplete(5)">Mark Reading complete ✓</button>
+  </div>
+</div>
+
+<!-- TAB 6 — PRACTICE (8 MCQ items, mixing planner T/F + workbook content) -->
+<div class="tab-content" id="tc6">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📝 Practice — 8 Items</div>
+      <div class="section-sub">Mix of Lesson Planner True/False + Workbook items.</div>
+    </div>
+    <div class="dad-hint">Tap the best answer. Green = right. Try every one — explanations show after each answer.</div>
+    <div id="prac-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="prac-done">🎉 All 8 answered! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-6" onclick="doRedo(6)">↺ Redo</button>
+    <button class="btn-complete" id="complete-6" onclick="markComplete(6)">Mark Practice complete ✓</button>
+  </div>
+</div>
+
+<!-- TAB 7 — UNSCRAMBLE -->
+<div class="tab-content" id="tc7">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🔤 Unscramble — All 5 Target Words</div>
+      <div class="section-sub">Look at the emoji, unscramble the letters, type the word.</div>
+    </div>
+    <div class="dad-hint">Look at the emoji. The letters are mixed up. Type the right word!</div>
+    <div id="uns-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="done-banner" id="uns-done">🎉 All 5 unscrambled! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-7" onclick="doRedo(7)">↺ Redo</button>
+    <button class="btn-complete" id="complete-7" onclick="markComplete(7)">Mark Unscramble complete ✓</button>
+  </div>
+</div>
+
+<!-- TAB 8 — MATCH (word → meaning) -->
+<div class="tab-content" id="tc8">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🔗 Match — Word ↔ Meaning</div>
+      <div class="section-sub">Tap a word on the left, then its meaning on the right. Wrong matches flash red.</div>
+    </div>
+    <div class="dad-hint">All 5 target words on the left. Match each to its meaning on the right.</div>
+    <div class="match-grid" id="match-grid"></div>
+    <div class="done-banner" id="match-done">🎉 All matched! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-8" onclick="doRedo(8)">↺ Redo</button>
+    <button class="btn-complete" id="complete-8" onclick="markComplete(8)">Mark Match complete ✓</button>
+  </div>
+</div>
+
+<!-- TAB 9 — APPLY (sunshine organizer) -->
+<div class="tab-content" id="tc9">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">☀️ Apply — Sunshine Organizer</div>
+      <div class="section-sub">Tap each ray. Write one sentence using that word.</div>
+    </div>
+    <div class="dad-hint">The Lesson Planner says: <b>"Write two sentences with your word."</b> Here you write ONE per ray — 5 total. Tap a ray, type, save.</div>
+    <div class="apply-host" id="apply-host"></div>
+    <div class="done-banner" id="apply-done">🎉 5 rays filled! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-9" onclick="doRedo(9)">↺ Redo</button>
+    <button class="btn-complete" id="complete-9" onclick="markComplete(9)">Mark Apply complete ✓</button>
+  </div>
+</div>
+
+<!-- Apply Modal (typing UI) -->
+<div class="apply-modal" id="apply-modal">
+  <div class="apply-modal-card">
+    <h4 id="apply-modal-title">Write a sentence</h4>
+    <div style="font-size:13px;color:var(--ink-3)" id="apply-modal-hint"></div>
+    <textarea id="apply-modal-text" placeholder="Write a sentence using the word…"></textarea>
+    <div class="row">
+      <button class="b cancel" onclick="applyClose()">Cancel</button>
+      <button class="b save" onclick="applySave()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 10 — WRAP UP (flip-and-answer review) -->
+<div class="tab-content" id="tc10">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🎭 Wrap Up — Quick Review</div>
+      <div class="section-sub">6 quick questions — choose the best collecting word.</div>
+    </div>
+    <div class="dad-hint">The Lesson Planner asks: <b>"What do you like to collect?"</b> Now mix recall + recognition.</div>
+    <div id="wrap-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="wrap-done">🎉 All 6 done! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-10" onclick="doRedo(10)">↺ Redo</button>
+    <button class="btn-complete" id="complete-10" onclick="markComplete(10)">Mark Wrap Up complete ✓</button>
+  </div>
+</div>
+
+<!-- TAB 11 — QUIZ (10 scored) -->
+<div class="tab-content" id="tc11">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">✅ Quiz — Show What You Know</div>
+      <div class="section-sub">10 multiple-choice questions. Score is saved.</div>
+    </div>
+    <div><span class="quiz-score-pill" id="quiz-score">Score: 0 / 10</span></div>
+    <div class="quiz-prog" id="quiz-prog"></div>
+    <div id="quiz-list" style="display:flex;flex-direction:column;gap:14px"></div>
+    <div class="qfinal" id="qfinal">
+      <div class="em">🏆</div>
+      <div class="lb">YOUR SCORE</div>
+      <div class="sc" id="qfinal-sc">0 / 10</div>
+      <div class="msg" id="qfinal-msg"></div>
+    </div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-11" onclick="doRedo(11)">↺ Redo Quiz</button>
+    <button class="btn-complete" id="complete-11" onclick="markComplete(11)">Mark Quiz complete ✓</button>
+  </div>
+</div>
+
+<!-- TAB 12 — DRIBBLE! (8 soccer + collecting items) -->
+<div class="tab-content" id="tc12">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">⚽ Can Leo Score?</div>
+      <div class="section-sub">8 shots. Right answer = goal!</div>
+    </div>
+    <div class="drib-pitch">
+      <div class="drib-goal">Goal counter</div>
+      <div class="drib-score" id="drib-score">0 / 8</div>
+      <div class="drib-defenders" id="drib-defenders">
+        <span class="drib-defender">🥅</span>
+        <span class="drib-defender">🛡️</span>
+        <span class="drib-defender">🛡️</span>
+        <span class="drib-defender">🛡️</span>
+        <span class="drib-defender">🛡️</span>
+        <span class="drib-defender">🛡️</span>
+        <span class="drib-defender">🛡️</span>
+        <span class="drib-defender">🛡️</span>
+      </div>
+    </div>
+    <div id="drib-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="drib-done">⚽ Match complete! Mark below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-12" onclick="doRedo(12)">↺ Redo</button>
+    <button class="btn-complete" id="complete-12" onclick="markComplete(12)">Mark Dribble complete ✓</button>
+  </div>
+</div>
+
+<script>
+/* ═════════════════════════════════════════════════════════════════════
+   UNIT 8 VOCAB 2 — LEO APP
+   SAVE_PREFIX: leea-4-8-vocab-2-   HOMEWORK_ID: leo-4-8-vocab-2
+   moduleCount 13 · moduleKeyFormat tab-{i}-done · scoreKey score
+═════════════════════════════════════════════════════════════════════ */
+const SAVE_PREFIX = 'leea-4-8-vocab-2-';
+const HOMEWORK_ID = 'leo-4-8-vocab-2';
+const TAB_COUNT = 13;
+const TAB_NAMES = ['Academic','Warm Up','Present','Flashcards','Sort','Reading','Practice','Unscramble','Match','Apply','Wrap Up','Quiz','Dribble!'];
+const TAB_INIT = {};
+const TAB_RESET = {};
+const TAB_RESTORE = {};
+
+function lSave(s,v){try{localStorage.setItem(SAVE_PREFIX+s,JSON.stringify(v));}catch(e){}}
+function lLoad(s){try{const r=localStorage.getItem(SAVE_PREFIX+s);return r?JSON.parse(r):null;}catch(e){return null;}}
+function lDel(s){try{localStorage.removeItem(SAVE_PREFIX+s);}catch(e){}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+
+function refreshProgress(){
+  let done=0;
+  for(let i=0;i<TAB_COUNT;i++){
+    if(lLoad('tab-'+i+'-done')){done++;document.getElementById('tb'+i).classList.add('done');}
+  }
+  document.getElementById('prog-pill').textContent=done+' / '+TAB_COUNT+' done';
+  if(done>=TAB_COUNT)lSave(HOMEWORK_ID+'-done',{complete:true,completedAt:new Date().toISOString()});
+}
+
+function markComplete(tab){
+  lSave('tab-'+tab+'-done',{done:true,completedAt:new Date().toISOString()});
+  const btn=document.getElementById('complete-'+tab);
+  btn.textContent='✓ '+TAB_NAMES[tab]+' done';
+  btn.classList.add('confirmed');
+  refreshProgress();
+}
+
+function doRedo(tab){
+  const btn=document.getElementById('redo-'+tab);
+  if(!btn.classList.contains('armed')){
+    btn.classList.add('armed');btn.textContent='Tap again to confirm ↺';
+    setTimeout(()=>{btn.classList.remove('armed');btn.textContent='↺ Redo';},3000);
+    return;
+  }
+  btn.classList.remove('armed');btn.textContent='↺ Redo';
+  lDel('tab-'+tab+'-done');
+  if(tab===11)lDel('score');
+  Object.keys(localStorage).filter(k=>k.startsWith(SAVE_PREFIX+'tab-'+tab+'-')).forEach(k=>localStorage.removeItem(k));
+  if(TAB_RESET[tab])TAB_RESET[tab]();
+  const cb=document.getElementById('complete-'+tab);
+  cb.classList.remove('confirmed');
+  cb.textContent='Mark '+TAB_NAMES[tab]+' complete ✓';
+  document.getElementById('tb'+tab).classList.remove('done');
+  refreshProgress();
+}
+
+function showTab(n){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===n));
+  document.querySelectorAll('.tab-content').forEach((c,i)=>c.classList.toggle('active',i===n));
+  const cb=document.getElementById('complete-'+n);
+  if(lLoad('tab-'+n+'-done')){cb.classList.add('confirmed');cb.textContent='✓ '+TAB_NAMES[n]+' done';}
+  else{cb.classList.remove('confirmed');cb.textContent='Mark '+TAB_NAMES[n]+' complete ✓';}
+  if(TAB_INIT[n]&&!TAB_INIT[n]._init){TAB_INIT[n]();TAB_INIT[n]._init=true;}
+  if(TAB_RESTORE[n])TAB_RESTORE[n]();
+}
+
+/* ── TAB 0 — ACADEMIC + 5 target flashcards ── */
+const FC_WORDS=[
+  {word:'accuracy',emoji:'🎯',pos:'Noun · Academic',def:'how correct or exact something is',jp:'正確さ（せいかくさ）',sample:"Check the <b>accuracy</b> of your answer before turning the page."},
+  {word:'a bug',emoji:'🐞',pos:'Noun · Target',def:'a small insect',jp:'虫（むし）',sample:"The <b>bug</b> is on the leaf."},
+  {word:'a comic book',emoji:'📚',pos:'Noun · Target',def:'a book that tells a story with pictures and words',jp:'漫画本（まんがぼん）',sample:"He collects <b>comic books</b>."},
+  {word:'a dinosaur',emoji:'🦖',pos:'Noun · Target',def:'a large animal that lived long ago',jp:'恐竜（きょうりゅう）',sample:"The museum has a <b>dinosaur</b> model."},
+  {word:'a fossil',emoji:'🪨',pos:'Noun · Target',def:'the hard remains or mark of a plant or animal from long ago',jp:'化石（かせき）',sample:"I found a <b>fossil</b> in the rock."},
+  {word:'a stuffed animal',emoji:'🧸',pos:'Noun · Target',def:'a soft toy animal filled with material',jp:'ぬいぐるみ',sample:"My little brother has a <b>stuffed animal</b>."}
+];
+let fcIdx=0,fcVisited=new Set(),fcQuizSolved=new Set(),fcQuizIdx=0;
+TAB_INIT[0]=function(){};
+TAB_RESET[0]=function(){fcIdx=0;fcVisited=new Set();fcQuizSolved=new Set();fcQuizIdx=0;
+  document.getElementById('fc0-prac').classList.add('active');document.getElementById('fc0-quiz').classList.remove('active');
+  document.getElementById('fc0-practice').style.display='block';document.getElementById('fc0-quizmode').style.display='none';
+  document.getElementById('fc0-card').classList.remove('flipped');document.getElementById('fc0-done').classList.remove('show');fcRender();};
+TAB_RESTORE[0]=function(){const s=lLoad('tab-0-state');if(s){fcVisited=new Set(s.visited||[]);fcQuizSolved=new Set(s.quizSolved||[]);if(fcVisited.size>=FC_WORDS.length&&fcQuizSolved.size>=FC_WORDS.length)document.getElementById('fc0-done').classList.add('show');}fcRender();};
+function fcSaveState(){lSave('tab-0-state',{visited:Array.from(fcVisited),quizSolved:Array.from(fcQuizSolved)});}
+function fcRender(){const w=FC_WORDS[fcIdx];document.getElementById('fc0-emoji').textContent=w.emoji;document.getElementById('fc0-word').textContent=w.word;document.getElementById('fc0-pos').textContent=w.pos;document.getElementById('fc0-emoji-b').textContent=w.emoji;document.getElementById('fc0-def').textContent=w.def;document.getElementById('fc0-jp').textContent=w.jp;document.getElementById('fc0-jp').classList.remove('revealed');document.getElementById('fc0-sample').innerHTML=w.sample;document.getElementById('fc0-counter').textContent=(fcIdx+1)+' / '+FC_WORDS.length;document.getElementById('fc0-card').classList.remove('flipped');}
+function flipCard(){document.getElementById('fc0-card').classList.toggle('flipped');fcVisited.add(fcIdx);fcSaveState();if(fcVisited.size>=FC_WORDS.length&&fcQuizSolved.size>=FC_WORDS.length)document.getElementById('fc0-done').classList.add('show');}
+function fcNext(){fcIdx=(fcIdx+1)%FC_WORDS.length;fcRender();}
+function fcPrev(){fcIdx=(fcIdx-1+FC_WORDS.length)%FC_WORDS.length;fcRender();}
+function toggleJp(e){e.stopPropagation();document.getElementById('fc0-jp').classList.toggle('revealed');}
+function setFcMode(m){document.getElementById('fc0-prac').classList.toggle('active',m==='practice');document.getElementById('fc0-quiz').classList.toggle('active',m==='quiz');document.getElementById('fc0-practice').style.display=m==='practice'?'block':'none';document.getElementById('fc0-quizmode').style.display=m==='quiz'?'block':'none';if(m==='quiz')fcQuizRender();}
+function fcQuizRender(){let next=-1;for(let i=0;i<FC_WORDS.length;i++){const ix=(fcQuizIdx+i)%FC_WORDS.length;if(!fcQuizSolved.has(ix)){next=ix;break;}}if(next===-1){document.getElementById('fcq-emoji').textContent='🏆';document.getElementById('fcq-sentence').innerHTML='All 6 quizzed!';document.getElementById('fcq-clue').textContent='';document.getElementById('fcq-input').style.display='none';document.querySelector('.quiz-check').style.display='none';document.getElementById('fcq-progress').textContent=FC_WORDS.length+' / '+FC_WORDS.length+' done';return;}fcQuizIdx=next;const w=FC_WORDS[next];document.getElementById('fcq-emoji').textContent=w.emoji;document.getElementById('fcq-sentence').innerHTML=esc(w.def)+'. What word is it?';document.getElementById('fcq-clue').textContent='Starts with "'+w.word.replace(/^(a|an)\s+/,'').charAt(0)+'"';document.getElementById('fcq-input').value='';document.getElementById('fcq-input').className='quiz-input';document.getElementById('fcq-fb').textContent='';document.getElementById('fcq-progress').textContent=fcQuizSolved.size+' / '+FC_WORDS.length+' done';}
+function checkFcQuiz(){const w=FC_WORDS[fcQuizIdx];const v=document.getElementById('fcq-input').value.trim().toLowerCase();const inp=document.getElementById('fcq-input');const fb=document.getElementById('fcq-fb');const target=w.word.toLowerCase().replace(/^(a|an)\s+/,'');if(v===target||v===w.word.toLowerCase()){inp.classList.add('correct');inp.classList.remove('wrong');fb.textContent='✅ Right! '+w.word+' — '+w.def;fb.style.color='var(--green-d)';fcQuizSolved.add(fcQuizIdx);fcSaveState();setTimeout(fcQuizRender,1400);if(fcQuizSolved.size>=FC_WORDS.length&&fcVisited.size>=FC_WORDS.length)document.getElementById('fc0-done').classList.add('show');}else{inp.classList.add('wrong');inp.classList.remove('correct');fb.textContent='❌ Try again. It starts with "'+target.charAt(0)+'".';fb.style.color='var(--red)';}}
+
+/* ── TAB 1 — WARM UP ── */
+const WU_SELECTED=new Set();
+const WU_QS=[
+  {q:'Which collecting hobby do many kids enjoy?',opts:['watching paint dry','collecting soccer cards or comic books','sleeping all day'],correct:1,exp:'Soccer cards + comic books are popular hobbies!'},
+  {q:'A bug, a dinosaur, a fossil, a comic book, a stuffed animal — all of these can be…',opts:['food','things people collect as a hobby','school subjects'],correct:1,exp:'All 5 vocab-2 words are things people COLLECT.'},
+  {q:'A teddy bear is a kind of…',opts:['a fossil','a stuffed animal','a comic book'],correct:1,exp:'Lesson Planner: "A teddy bear is a kind of stuffed animal." Same family!'}
+];
+TAB_INIT[1]=function(){
+  const host=document.getElementById('wu-q-list');host.innerHTML='';
+  WU_QS.forEach((q,i)=>{
+    const card=document.createElement('div');card.className='q-card';card.id='wu-q-'+i;
+    let opts='<div class="opt-row">';q.opts.forEach((o,j)=>{opts+='<button class="opt" onclick="warmPick('+i+','+j+')">'+esc(o)+'</button>';});opts+='</div>';
+    card.innerHTML='<div class="q-prompt"><strong>Q'+(i+1)+'.</strong> '+esc(q.q)+'</div>'+opts+'<div class="q-explain">'+esc(q.exp)+'</div>';
+    host.appendChild(card);
+  });
+};
+TAB_RESET[1]=function(){WU_SELECTED.clear();document.querySelectorAll('#wu-chips .hobby-chip').forEach(c=>c.classList.remove('selected'));document.getElementById('wu-done').classList.remove('show');TAB_INIT[1]._init=false;TAB_INIT[1]();TAB_INIT[1]._init=true;};
+TAB_RESTORE[1]=function(){const s=lLoad('tab-1-state');if(!s)return;(s.chips||[]).forEach(k=>{const b=document.querySelector('#wu-chips .hobby-chip[onclick*="'+k+'"]');if(b)b.classList.add('selected');WU_SELECTED.add(k);});(s.ans||[]).forEach((a,i)=>{if(a==null)return;const card=document.getElementById('wu-q-'+i);if(!card)return;const opts=card.querySelectorAll('.opt');const c=a===WU_QS[i].correct;opts[a].classList.add(c?'correct':'wrong');opts.forEach(o=>o.disabled=true);card.classList.add(c?'answered':'answered-bad');});if(s.allDone)document.getElementById('wu-done').classList.add('show');};
+function warmToggle(btn,key){btn.classList.toggle('selected');if(WU_SELECTED.has(key))WU_SELECTED.delete(key);else WU_SELECTED.add(key);warmSave();}
+window._warmAns=[];
+function warmPick(qi,oi){const q=WU_QS[qi];const card=document.getElementById('wu-q-'+qi);if(card.classList.contains('answered')||card.classList.contains('answered-bad'))return;const opts=card.querySelectorAll('.opt');opts.forEach(o=>o.disabled=true);const c=oi===q.correct;opts[oi].classList.add(c?'correct':'wrong');card.classList.add(c?'answered':'answered-bad');window._warmAns[qi]=oi;warmSave();}
+function warmSave(){const correctCount=WU_QS.filter((_,i)=>window._warmAns[i]===WU_QS[i].correct).length;const allDone=correctCount>=WU_QS.length;lSave('tab-1-state',{chips:Array.from(WU_SELECTED),ans:window._warmAns,allDone});if(allDone)document.getElementById('wu-done').classList.add('show');}
+
+/* ── TAB 2 — PRESENT (per-word yes/no) ── */
+const PR_CARDS=[
+  {w:'a bug 🐞',q:"Have you ever seen a bug in your garden?",emoji:'🐞',exp:"Bugs are everywhere — gardens, leaves, even inside your house sometimes!"},
+  {w:'a comic book 📚',q:"Do you read comic books with superheroes like Spider-Man?",emoji:'📚',exp:"Marvel comics are awesome — Spider-Man, Iron Man, Captain America!"},
+  {w:'a dinosaur 🦖',q:"Were dinosaurs alive at the same time as people?",emoji:'🦖',exp:"NO! Dinosaurs lived MILLIONS of years before people. We only know them from fossils!"},
+  {w:'a fossil 🪨',q:"Can a fossil show us what animals lived long ago?",emoji:'🪨',exp:"YES! Fossils are the marks or bones of animals from millions of years ago."},
+  {w:'a stuffed animal 🧸',q:"Is a teddy bear a stuffed animal?",emoji:'🧸',exp:"YES! A teddy bear is one kind of stuffed animal. Soft toy = stuffed animal."}
+];
+const PR_ANS=['yes','yes','no','yes','yes'];
+TAB_INIT[2]=function(){const host=document.getElementById('pr-list');host.innerHTML='';PR_CARDS.forEach((c,i)=>{const card=document.createElement('div');card.className='q-card';card.id='pr-c-'+i;card.innerHTML='<div style="display:flex;align-items:center;gap:14px"><div style="font-size:48px">'+c.emoji+'</div><div style="flex:1"><div style="font-size:13px;font-weight:800;letter-spacing:.2em;color:var(--green-d)">WORD '+(i+1)+'</div><div class="q-prompt">'+esc(c.w)+'</div><div style="font-size:13px;color:var(--ink-3);font-style:italic;margin-top:4px">'+esc(c.q)+'</div></div></div><div style="display:flex;gap:8px;margin-top:8px"><button class="opt" style="flex:1;text-align:center" onclick="prPick('+i+',\'yes\')">✅ YES</button><button class="opt" style="flex:1;text-align:center" onclick="prPick('+i+',\'no\')">❌ NO</button></div><div class="q-explain">'+esc(c.exp)+'</div>';host.appendChild(card);});};
+TAB_RESET[2]=function(){document.getElementById('pr-done').classList.remove('show');TAB_INIT[2]._init=false;TAB_INIT[2]();TAB_INIT[2]._init=true;};
+TAB_RESTORE[2]=function(){const s=lLoad('tab-2-state');if(!s)return;(s.ans||[]).forEach((a,i)=>{if(a==null)return;const card=document.getElementById('pr-c-'+i);if(!card)return;const opts=card.querySelectorAll('.opt');const c=a===PR_ANS[i];opts[a==='yes'?0:1].classList.add(c?'correct':'wrong');opts.forEach(o=>o.disabled=true);card.classList.add(c?'answered':'answered-bad');});if(s.allDone)document.getElementById('pr-done').classList.add('show');};
+window._prAns=[];
+function prPick(i,ans){const card=document.getElementById('pr-c-'+i);if(card.classList.contains('answered')||card.classList.contains('answered-bad'))return;const opts=card.querySelectorAll('.opt');opts.forEach(o=>o.disabled=true);const c=ans===PR_ANS[i];opts[ans==='yes'?0:1].classList.add(c?'correct':'wrong');card.classList.add(c?'answered':'answered-bad');window._prAns[i]=ans;const allDone=window._prAns.filter(a=>a!=null).length>=PR_CARDS.length;lSave('tab-2-state',{ans:window._prAns,allDone});if(allDone)document.getElementById('pr-done').classList.add('show');}
+
+/* ── TAB 3 — FLASHCARDS (5 target words) ── */
+const FC3_WORDS=FC_WORDS.slice(1);
+let fc3Idx=0,fc3Visited=new Set();
+TAB_INIT[3]=function(){};
+TAB_RESET[3]=function(){fc3Idx=0;fc3Visited=new Set();document.getElementById('fc3-card').classList.remove('flipped');document.getElementById('fc3-done').classList.remove('show');fc3Render();};
+TAB_RESTORE[3]=function(){const s=lLoad('tab-3-state');if(s){fc3Visited=new Set(s.visited||[]);if(fc3Visited.size>=FC3_WORDS.length)document.getElementById('fc3-done').classList.add('show');}fc3Render();};
+function fc3Render(){const w=FC3_WORDS[fc3Idx];document.getElementById('fc3-emoji').textContent=w.emoji;document.getElementById('fc3-word').textContent=w.word;document.getElementById('fc3-pos').textContent=w.pos;document.getElementById('fc3-emoji-b').textContent=w.emoji;document.getElementById('fc3-def').textContent=w.def;document.getElementById('fc3-jp').textContent=w.jp;document.getElementById('fc3-jp').classList.remove('revealed');document.getElementById('fc3-sample').innerHTML=w.sample;document.getElementById('fc3-counter').textContent=(fc3Idx+1)+' / '+FC3_WORDS.length;document.getElementById('fc3-card').classList.remove('flipped');}
+function flipCard3(){document.getElementById('fc3-card').classList.toggle('flipped');fc3Visited.add(fc3Idx);lSave('tab-3-state',{visited:Array.from(fc3Visited)});if(fc3Visited.size>=FC3_WORDS.length)document.getElementById('fc3-done').classList.add('show');}
+function fc3Next(){fc3Idx=(fc3Idx+1)%FC3_WORDS.length;fc3Render();}
+function fc3Prev(){fc3Idx=(fc3Idx-1+FC3_WORDS.length)%FC3_WORDS.length;fc3Render();}
+function toggleJp3(e){e.stopPropagation();document.getElementById('fc3-jp').classList.toggle('revealed');}
+
+/* ── TAB 4 — SORT (buildDndSorter) ── */
+TAB_INIT[4]=function(){const host=document.getElementById('sort-host');if(typeof window.buildDndSorter!=='function'){host.innerHTML='<div style="background:var(--red-l);border:2px solid var(--red);border-radius:12px;padding:14px;color:#7F1D1D;font-weight:700">⚠️ Sorter component not loaded.</div>';return;}host.innerHTML=window.buildDndSorter({id:'leo-v2-sort',tiles:[{text:'🐞 a real bug',answer:'alive'},{text:'🦖 a real dinosaur',answer:'not'},{text:'🧸 a stuffed animal',answer:'not'},{text:'🪨 a fossil',answer:'not'},{text:'📚 a comic book',answer:'not'},{text:'🐢 a turtle',answer:'alive'},{text:'🦋 a butterfly',answer:'alive'},{text:'🪦 dinosaur bones',answer:'not'},{text:'🐝 a bee',answer:'alive'},{text:'🤖 a toy robot',answer:'not'},{text:'🐠 a fish',answer:'alive'},{text:'🪨 a rock',answer:'not'}],zones:[{key:'alive',label:'🌱 ALIVE',color:'#16A34A'},{key:'not',label:'⏳ NOT ALIVE',color:'#6B7280'}],onComplete:function(){lSave('tab-4-state',{complete:true});document.getElementById('sort-done').classList.add('show');}});};
+TAB_RESET[4]=function(){TAB_INIT[4]._init=false;document.getElementById('sort-done').classList.remove('show');TAB_INIT[4]();TAB_INIT[4]._init=true;};
+TAB_RESTORE[4]=function(){const s=lLoad('tab-4-state');if(s&&s.complete)document.getElementById('sort-done').classList.add('show');};
+
+/* ── TAB 5 — READING (gap fill, word bank) ── */
+let _rdActive=null;
+TAB_INIT[5]=function(){};
+TAB_RESET[5]=function(){document.querySelectorAll('.read-blank').forEach(b=>{b.textContent='_____';b.classList.remove('filled','wrong');});document.querySelectorAll('.bank-word').forEach(b=>b.classList.remove('used'));document.getElementById('read-done').classList.remove('show');_rdActive=null;};
+TAB_RESTORE[5]=function(){const s=lLoad('tab-5-state');if(!s)return;(s.filled||[]).forEach(pair=>{const b=document.querySelectorAll('.read-blank')[pair.i];if(b){b.textContent=pair.w;b.classList.add('filled');}const bw=document.querySelector('.bank-word[data-word="'+pair.w+'"]');if(bw)bw.classList.add('used');});if((s.filled||[]).length>=document.querySelectorAll('.read-blank').length)document.getElementById('read-done').classList.add('show');};
+function rdBlankClick(b){document.querySelectorAll('.read-blank').forEach(x=>x.style.outline='');b.style.outline='3px solid var(--green)';_rdActive=b;}
+function rdBankPick(btn){if(!_rdActive){if(window.alert)alert('Tap a blank first.');return;}const word=btn.dataset.word;const correct=_rdActive.dataset.correct;if(word===correct){_rdActive.textContent=word;_rdActive.classList.add('filled');_rdActive.classList.remove('wrong');_rdActive.style.outline='';btn.classList.add('used');_rdActive=null;const filled=[];document.querySelectorAll('.read-blank').forEach((b,i)=>{if(b.classList.contains('filled'))filled.push({i,w:b.textContent});});lSave('tab-5-state',{filled});if(filled.length>=document.querySelectorAll('.read-blank').length)document.getElementById('read-done').classList.add('show');}else{_rdActive.classList.add('wrong');setTimeout(()=>_rdActive&&_rdActive.classList.remove('wrong'),700);}}
+
+/* ── TAB 6 — PRACTICE (8 MCQ items) ── */
+const PRAC_QS=[
+  {q:'LP: "She thinks dinosaurs are boring." TRUE or FALSE?',opts:['TRUE','FALSE'],correct:1,exp:'Lesson Planner: Maria DOES like dinosaurs — she replays TR 8.5 to check. FALSE.'},
+  {q:"LP: \"She's scared of bugs.\" TRUE or FALSE?",opts:['TRUE','FALSE'],correct:1,exp:'Lesson Planner: Maria LOVES bugs! FALSE.'},
+  {q:'LP: "Her brother collects fossils." TRUE or FALSE?',opts:['TRUE','FALSE'],correct:0,exp:'YES — TRUE per LP TR 8.5.'},
+  {q:'Workbook p. 98: "Bugs are old-fashioned." Right or wrong?',opts:['Right','Wrong — dinosaurs are old-fashioned'],correct:1,exp:"Irma says DINOSAURS are old-fashioned, not bugs. (Workbook p. 98 item 2)"},
+  {q:'Workbook p. 98: Which one MOVES when you put batteries in?',opts:['stuffed animal','bug','fossil'],correct:1,exp:'Workbook says BUGS move with batteries — toy bugs!'},
+  {q:"Workbook p. 98: Irma buys ___ for her brother because they are the easiest.",opts:['fossils','comic books','stuffed animals'],correct:1,exp:'Comic books — they are easy gifts. Spider-Man comics are popular!'},
+  {q:'Which one is a soft toy?',opts:['a fossil','a stuffed animal','a dinosaur'],correct:1,exp:'LP: "A teddy bear is a kind of stuffed animal." Stuffed animals are SOFT toys.'},
+  {q:'⚽ Leo collects soccer cards. Which target word is most LIKE soccer cards?',opts:['a fossil — old + collected','a comic book — paper + collected','a bug — alive'],correct:1,exp:'Both soccer cards and comic books are paper things people collect. Both are great hobbies!'}
+];
+TAB_INIT[6]=function(){const host=document.getElementById('prac-list');host.innerHTML='';PRAC_QS.forEach((q,i)=>{const card=document.createElement('div');card.className='q-card';card.id='prc-'+i;let opts='<div class="opt-row">';q.opts.forEach((o,j)=>{opts+='<button class="opt" onclick="pracPick('+i+','+j+')">'+esc(o)+'</button>';});opts+='</div>';card.innerHTML='<div class="q-prompt"><strong>Q'+(i+1)+' of 8.</strong> '+q.q+'</div>'+opts+'<div class="q-explain">'+esc(q.exp)+'</div>';host.appendChild(card);});};
+TAB_RESET[6]=function(){window._pracAns=[];TAB_INIT[6]._init=false;document.getElementById('prac-done').classList.remove('show');TAB_INIT[6]();TAB_INIT[6]._init=true;};
+TAB_RESTORE[6]=function(){const s=lLoad('tab-6-state');if(!s)return;window._pracAns=s.ans||[];(s.ans||[]).forEach((a,i)=>{if(a==null)return;const card=document.getElementById('prc-'+i);if(!card)return;const opts=card.querySelectorAll('.opt');const c=a===PRAC_QS[i].correct;opts[a].classList.add(c?'correct':'wrong');opts.forEach(o=>o.disabled=true);card.classList.add(c?'answered':'answered-bad');});if(s.allDone)document.getElementById('prac-done').classList.add('show');};
+window._pracAns=[];
+function pracPick(qi,oi){if(window._pracAns[qi]!=null)return;const card=document.getElementById('prc-'+qi);const opts=card.querySelectorAll('.opt');opts.forEach(o=>o.disabled=true);const c=oi===PRAC_QS[qi].correct;opts[oi].classList.add(c?'correct':'wrong');card.classList.add(c?'answered':'answered-bad');window._pracAns[qi]=oi;const allDone=window._pracAns.filter(a=>a!=null).length>=PRAC_QS.length;lSave('tab-6-state',{ans:window._pracAns,allDone});if(allDone)document.getElementById('prac-done').classList.add('show');}
+
+/* ── TAB 7 — UNSCRAMBLE ── */
+const UNS_ITEMS=[
+  {emoji:'🐞',word:'bug',scrambled:'GUB',hint:'a small insect'},
+  {emoji:'📚',word:'comic',scrambled:'CMIOC',hint:'a ___ book has pictures and words'},
+  {emoji:'🦖',word:'dinosaur',scrambled:'IDSNUOAR',hint:'lived long ago'},
+  {emoji:'🪨',word:'fossil',scrambled:'OFLISS',hint:'a mark left in rock'},
+  {emoji:'🧸',word:'stuffed',scrambled:'DTUSFFE',hint:'a ___ animal is a soft toy'}
+];
+TAB_INIT[7]=function(){const host=document.getElementById('uns-list');host.innerHTML='';UNS_ITEMS.forEach((u,i)=>{const item=document.createElement('div');item.className='uns-item';item.id='un-'+i;item.innerHTML='<div class="uns-em">'+u.emoji+'</div><div class="uns-scrambled">'+u.scrambled+'</div><input class="uns-input" id="un-in-'+i+'" placeholder="type word" onkeydown="if(event.key===\'Enter\')unsCheck('+i+')"><button class="quiz-check" onclick="unsCheck('+i+')">✓</button><div class="uns-hint">'+esc(u.hint)+'</div>';host.appendChild(item);});};
+TAB_RESET[7]=function(){window._unsSolved=[];TAB_INIT[7]._init=false;document.getElementById('uns-done').classList.remove('show');TAB_INIT[7]();TAB_INIT[7]._init=true;};
+TAB_RESTORE[7]=function(){const s=lLoad('tab-7-state');if(!s)return;window._unsSolved=s.solved||[];(s.solved||[]).forEach(i=>{const item=document.getElementById('un-'+i);if(!item)return;const inp=document.getElementById('un-in-'+i);if(inp){inp.value=UNS_ITEMS[i].word;inp.classList.add('correct');inp.disabled=true;}item.classList.add('correct');});if(s.allDone)document.getElementById('uns-done').classList.add('show');};
+window._unsSolved=[];
+function unsCheck(i){const inp=document.getElementById('un-in-'+i);const v=inp.value.trim().toLowerCase();const item=document.getElementById('un-'+i);if(item.classList.contains('correct'))return;if(v===UNS_ITEMS[i].word){inp.classList.add('correct');inp.disabled=true;item.classList.add('correct');if(!window._unsSolved.includes(i))window._unsSolved.push(i);const allDone=window._unsSolved.length>=UNS_ITEMS.length;lSave('tab-7-state',{solved:window._unsSolved,allDone});if(allDone)document.getElementById('uns-done').classList.add('show');}else{inp.classList.add('wrong');setTimeout(()=>inp.classList.remove('wrong'),700);}}
+
+/* ── TAB 8 — MATCH (word ↔ meaning) ── */
+const MATCH_PAIRS=[
+  {key:'bug',l:'🐞 a bug',r:'a small insect'},
+  {key:'comic',l:'📚 a comic book',r:'a book with pictures + words'},
+  {key:'dino',l:'🦖 a dinosaur',r:'a large animal from long ago'},
+  {key:'fossil',l:'🪨 a fossil',r:'a mark of a plant/animal in rock'},
+  {key:'plush',l:'🧸 a stuffed animal',r:'a soft toy animal'}
+];
+let _matchLeft=null,_matchPaired=new Set();
+TAB_INIT[8]=function(){const grid=document.getElementById('match-grid');grid.innerHTML='';const leftOrder=MATCH_PAIRS.slice();const rightOrder=MATCH_PAIRS.slice().sort(()=>Math.random()-.5);MATCH_PAIRS.forEach((_,i)=>{const lb=document.createElement('button');lb.className='match-chip';lb.dataset.side='l';lb.dataset.key=leftOrder[i].key;lb.textContent=leftOrder[i].l;lb.onclick=()=>matchPick(lb);const rb=document.createElement('button');rb.className='match-chip';rb.dataset.side='r';rb.dataset.key=rightOrder[i].key;rb.textContent=rightOrder[i].r;rb.onclick=()=>matchPick(rb);grid.appendChild(lb);grid.appendChild(rb);});};
+TAB_RESET[8]=function(){_matchLeft=null;_matchPaired.clear();TAB_INIT[8]._init=false;document.getElementById('match-done').classList.remove('show');TAB_INIT[8]();TAB_INIT[8]._init=true;};
+TAB_RESTORE[8]=function(){const s=lLoad('tab-8-state');if(!s)return;(s.paired||[]).forEach(k=>{document.querySelectorAll('.match-chip[data-key="'+k+'"]').forEach(c=>c.classList.add('matched'));_matchPaired.add(k);});if(s.allDone)document.getElementById('match-done').classList.add('show');};
+function matchPick(chip){if(chip.classList.contains('matched'))return;if(chip.dataset.side==='l'){document.querySelectorAll('.match-chip[data-side="l"]').forEach(c=>c.classList.remove('selected'));chip.classList.add('selected');_matchLeft=chip;return;}if(!_matchLeft)return;if(chip.dataset.key===_matchLeft.dataset.key){chip.classList.add('matched');_matchLeft.classList.add('matched');_matchLeft.classList.remove('selected');_matchPaired.add(chip.dataset.key);_matchLeft=null;const allDone=_matchPaired.size>=MATCH_PAIRS.length;lSave('tab-8-state',{paired:Array.from(_matchPaired),allDone});if(allDone)document.getElementById('match-done').classList.add('show');}else{chip.classList.add('wrong-flash');setTimeout(()=>chip.classList.remove('wrong-flash'),700);}}
+
+/* ── TAB 9 — APPLY (sunshine organizer) ── */
+const APPLY_WORDS=[
+  {word:'a bug',emoji:'🐞'},
+  {word:'a comic book',emoji:'📚'},
+  {word:'a dinosaur',emoji:'🦖'},
+  {word:'a fossil',emoji:'🪨'},
+  {word:'a stuffed animal',emoji:'🧸'}
+];
+let _applyIdx=0;
+TAB_INIT[9]=function(){const host=document.getElementById('apply-host');const saved=lLoad('tab-9-apply')||{};if(typeof window.buildSunshine!=='function'){host.innerHTML='<div style="background:var(--red-l);border:2px solid var(--red);border-radius:12px;padding:14px;color:#7F1D1D;font-weight:700">⚠️ Sunshine component not loaded.</div>';return;}window.__sunCB=function(i){_applyIdx=i;document.getElementById('apply-modal-title').textContent=APPLY_WORDS[i].emoji+' Write a sentence with "'+APPLY_WORDS[i].word+'"';document.getElementById('apply-modal-hint').textContent='Tip: include a person + the word + something they do. E.g. "Leo has a stuffed animal that looks like Sid."';document.getElementById('apply-modal-text').value=saved[i]||'';document.getElementById('apply-modal').classList.add('open');document.getElementById('apply-modal-text').focus();};host.innerHTML=window.buildSunshine({id:'sun-v2',words:APPLY_WORDS,saved,onSelect:window.__sunCB,centerLabel:'5 Words',centerEmoji:'☀️',centerHint:'Tap a ray'});};
+TAB_RESET[9]=function(){lDel('tab-9-apply');TAB_INIT[9]._init=false;document.getElementById('apply-done').classList.remove('show');TAB_INIT[9]();TAB_INIT[9]._init=true;};
+TAB_RESTORE[9]=function(){const s=lLoad('tab-9-apply');if(!s)return;if(Object.keys(s).length>=APPLY_WORDS.length)document.getElementById('apply-done').classList.add('show');};
+function applyClose(){document.getElementById('apply-modal').classList.remove('open');}
+function applySave(){const v=document.getElementById('apply-modal-text').value.trim();const cur=lLoad('tab-9-apply')||{};if(v){cur[_applyIdx]=v;lSave('tab-9-apply',cur);}applyClose();TAB_INIT[9]._init=false;TAB_INIT[9]();TAB_INIT[9]._init=true;if(Object.keys(cur).length>=APPLY_WORDS.length)document.getElementById('apply-done').classList.add('show');}
+
+/* ── TAB 10 — WRAP UP ── */
+const WRAP_QS=[
+  {q:"⚽ Leo collects soccer cards. They are like…",opts:['stuffed animals','comic books — paper + collected','fossils'],correct:1,exp:'Both are paper collectibles!'},
+  {q:"🦇 Batman lives in a ___.",opts:['fossil','comic book','dinosaur'],correct:1,exp:'Comic books — Batman is a DC comics hero!'},
+  {q:"🤖 Iron Man and Spider-Man are heroes in…",opts:['Marvel comic books','dinosaur movies','stuffed animals'],correct:0,exp:'Marvel comics + movies. Perfect tie to the unit!'},
+  {q:"🦥 In Ice Age, Sid is a kind of stuffed animal toy version of which animal?",opts:['a sloth','a bug','a fossil'],correct:0,exp:'Sid is a SLOTH! There are real sloths today, plus toy stuffed-animal versions of Sid.'},
+  {q:"🪨 What can we learn about dinosaurs from?",opts:['stuffed animals','fossils','comic books'],correct:1,exp:'FOSSILS! That\'s how we know dinosaurs existed.'},
+  {q:"Which collecting hobby do you like MOST?",opts:['comic books / cards','dinosaur toys','fossils / bugs'],correct:0,exp:'There\'s no wrong answer — but most kids love comic books and cards!'}
+];
+TAB_INIT[10]=function(){const host=document.getElementById('wrap-list');host.innerHTML='';WRAP_QS.forEach((q,i)=>{const card=document.createElement('div');card.className='wrap-card';card.id='wr-'+i;let opts='<div class="wrap-opts">';q.opts.forEach((o,j)=>{opts+='<button class="wu-opt" onclick="wrapPick('+i+','+j+')">'+esc(o)+'</button>';});opts+='</div>';card.innerHTML='<div class="wrap-q"><strong>Q'+(i+1)+'.</strong> '+esc(q.q)+'</div>'+opts+'<div style="font-size:13px;color:var(--green-d);font-weight:600;display:none;padding-top:6px" class="wrap-exp">'+esc(q.exp)+'</div>';host.appendChild(card);});};
+TAB_RESET[10]=function(){window._wrapAns=[];TAB_INIT[10]._init=false;document.getElementById('wrap-done').classList.remove('show');TAB_INIT[10]();TAB_INIT[10]._init=true;};
+TAB_RESTORE[10]=function(){const s=lLoad('tab-10-state');if(!s)return;window._wrapAns=s.ans||[];(s.ans||[]).forEach((a,i)=>{if(a==null)return;const card=document.getElementById('wr-'+i);if(!card)return;const opts=card.querySelectorAll('.wu-opt');const c=a===WRAP_QS[i].correct;opts[a].classList.add(c?'correct':'wrong');opts.forEach(o=>o.disabled=true);card.querySelector('.wrap-exp').style.display='block';});if(s.allDone)document.getElementById('wrap-done').classList.add('show');};
+window._wrapAns=[];
+function wrapPick(qi,oi){if(window._wrapAns[qi]!=null)return;const card=document.getElementById('wr-'+qi);const opts=card.querySelectorAll('.wu-opt');opts.forEach(o=>o.disabled=true);const c=oi===WRAP_QS[qi].correct;opts[oi].classList.add(c?'correct':'wrong');card.querySelector('.wrap-exp').style.display='block';window._wrapAns[qi]=oi;const allDone=window._wrapAns.filter(a=>a!=null).length>=WRAP_QS.length;lSave('tab-10-state',{ans:window._wrapAns,allDone});if(allDone)document.getElementById('wrap-done').classList.add('show');}
+
+/* ── TAB 11 — QUIZ (10 scored) ── */
+const QUIZ_QS=[
+  {q:'A small insect is a ___.',opts:['fossil','bug','comic book','stuffed animal'],correct:1,exp:'Bug = small insect.'},
+  {q:'Spider-Man, Iron Man and Batman appear in ___.',opts:['fossils','comic books','dinosaur models','stuffed animals'],correct:1,exp:'Comic books — Marvel and DC heroes!'},
+  {q:'An animal that lived millions of years ago is a ___.',opts:['stuffed animal','dinosaur','bug','comic book'],correct:1,exp:'Dinosaur!'},
+  {q:'A teddy bear is a ___.',opts:['fossil','stuffed animal','dinosaur'],correct:1,exp:'A teddy bear is a stuffed animal (LP).'},
+  {q:'A mark or bone of an animal from long ago — found in rock — is a ___.',opts:['fossil','bug','comic book'],correct:0,exp:'Fossil!'},
+  {q:'Workbook p. 98: Which one moves with batteries?',opts:['bug','dinosaur','fossil'],correct:0,exp:'BUGS — toy bugs with batteries.'},
+  {q:'⚽ "Leo collects ___ from the Premier League." Which fits BEST?',opts:['fossils','soccer cards (like comic books)','bugs'],correct:1,exp:'Soccer cards work just like comic books — paper, collected, traded.'},
+  {q:'How CORRECT something is — that\'s ___.',opts:['accuracy','collecting','flexibility'],correct:0,exp:'Accuracy = how correct (Academic Language).'},
+  {q:'🦥 Sid from Ice Age would be sold in a store as a ___.',opts:['fossil','stuffed animal','dinosaur model'],correct:1,exp:'A stuffed animal — soft toy!'},
+  {q:'🪨 We know dinosaurs existed because of ___.',opts:['comic books','fossils','stuffed animals'],correct:1,exp:'Fossils show us the past.'}
+];
+window._quizAns=[];window._quizScore=0;
+TAB_INIT[11]=function(){const host=document.getElementById('quiz-list');host.innerHTML='';QUIZ_QS.forEach((q,i)=>{const card=document.createElement('div');card.className='q-card';card.id='qz-'+i;let opts='<div class="opt-row">';q.opts.forEach((o,j)=>{opts+='<button class="opt" onclick="quizPick('+i+','+j+')">'+esc(o)+'</button>';});opts+='</div>';card.innerHTML='<div style="font-size:12px;font-weight:800;letter-spacing:.2em;color:var(--green-d)">Q'+(i+1)+' of 10</div><div class="q-prompt">'+esc(q.q)+'</div>'+opts+'<div class="q-explain">'+esc(q.exp)+'</div>';host.appendChild(card);});const prog=document.getElementById('quiz-prog');prog.innerHTML='';for(let i=0;i<QUIZ_QS.length;i++){const dot=document.createElement('div');dot.className='qp-dot';dot.id='qp-'+i;prog.appendChild(dot);}};
+TAB_RESET[11]=function(){window._quizAns=[];window._quizScore=0;lDel('score');document.getElementById('qfinal').classList.remove('show');document.getElementById('quiz-score').textContent='Score: 0 / 10';TAB_INIT[11]._init=false;TAB_INIT[11]();TAB_INIT[11]._init=true;};
+TAB_RESTORE[11]=function(){const s=lLoad('score');if(!s)return;(s.answers||[]).forEach((a,i)=>{if(a==null)return;const card=document.getElementById('qz-'+i);if(!card)return;const opts=card.querySelectorAll('.opt');const c=a===QUIZ_QS[i].correct;opts[a].classList.add(c?'correct':'wrong');opts.forEach(o=>o.disabled=true);card.classList.add(c?'answered':'answered-bad');document.getElementById('qp-'+i).classList.add(c?'ok':'bad');});window._quizAns=s.answers||[];window._quizScore=s.score||0;document.getElementById('quiz-score').textContent='Score: '+window._quizScore+' / 10';if(s.done){document.getElementById('qfinal').classList.add('show');document.getElementById('qfinal-sc').textContent=window._quizScore+' / 10';document.getElementById('qfinal-msg').textContent=quizMsg(window._quizScore);}};
+function quizMsg(s){if(s===10)return '🏆 PERFECT! All 10 right!';if(s>=8)return '⚽ Great score!';if(s>=6)return '👍 Solid — keep practicing.';return '💪 Good try — read again and Redo!';}
+function quizPick(qi,oi){if(window._quizAns[qi]!=null)return;const q=QUIZ_QS[qi];const card=document.getElementById('qz-'+qi);const opts=card.querySelectorAll('.opt');opts.forEach(o=>o.disabled=true);const c=oi===q.correct;opts[oi].classList.add(c?'correct':'wrong');card.classList.add(c?'answered':'answered-bad');document.getElementById('qp-'+qi).classList.add(c?'ok':'bad');window._quizAns[qi]=oi;if(c)window._quizScore++;document.getElementById('quiz-score').textContent='Score: '+window._quizScore+' / 10';const done=window._quizAns.filter(a=>a!=null).length>=QUIZ_QS.length;lSave('score',{score:window._quizScore,total:10,percent:Math.round(window._quizScore/10*100),answers:window._quizAns,done});if(done){document.getElementById('qfinal').classList.add('show');document.getElementById('qfinal-sc').textContent=window._quizScore+' / 10';document.getElementById('qfinal-msg').textContent=quizMsg(window._quizScore);}}
+
+/* ── TAB 12 — DRIBBLE (8 shots, goal counter) ── */
+const DRIB_QS=[
+  {q:'⚽ "Haaland collects ___ of every match he scores in." Best fit:',opts:['bugs','comic books — like memorabilia','soccer cards / posters'],correct:2,exp:'Posters/cards! Soccer mementos.'},
+  {q:'🦇 Batman appears in ___.',opts:['fossils','comic books','dinosaurs'],correct:1,exp:'Batman = comic book hero!'},
+  {q:'🦖 A T-Rex is a kind of ___.',opts:['stuffed animal','dinosaur','fossil'],correct:1,exp:'T-Rex = dinosaur!'},
+  {q:'🐞 In your garden you might see a ___ on a leaf.',opts:['bug','fossil','comic book'],correct:0,exp:'Bug on a leaf — classic!'},
+  {q:'🪨 Paleontologists are scientists who find and study ___.',opts:['fossils','comic books','stuffed animals'],correct:0,exp:'Paleontologists dig for fossils.'},
+  {q:'🧸 A soft toy in the shape of an animal is a ___.',opts:['fossil','stuffed animal','bug'],correct:1,exp:'Stuffed animal!'},
+  {q:'🤖 Iron Man started in ___ and now is in movies.',opts:['fossils','comic books','stuffed animals'],correct:1,exp:'Marvel comic books!'},
+  {q:'⚽ When Leo trades a soccer card with a friend, that\'s the same kind of hobby as trading ___.',opts:['fossils','stuffed animals','comic books'],correct:2,exp:'Comic book trading is exactly like soccer card trading. Both are collecting hobbies!'}
+];
+window._dribScore=0;window._dribAns=[];
+TAB_INIT[12]=function(){const host=document.getElementById('drib-list');host.innerHTML='';DRIB_QS.forEach((q,i)=>{const card=document.createElement('div');card.className='q-card';card.id='dr-'+i;let opts='<div class="opt-row">';q.opts.forEach((o,j)=>{opts+='<button class="opt" onclick="dribPick('+i+','+j+')">'+esc(o)+'</button>';});opts+='</div>';card.innerHTML='<div style="font-size:12px;font-weight:800;letter-spacing:.2em;color:var(--green-d)">SHOT '+(i+1)+' of 8</div><div class="q-prompt">'+esc(q.q)+'</div>'+opts+'<div class="q-explain">'+esc(q.exp)+'</div>';host.appendChild(card);});};
+TAB_RESET[12]=function(){window._dribScore=0;window._dribAns=[];document.getElementById('drib-score').textContent='0 / 8';document.querySelectorAll('.drib-defender').forEach(d=>d.classList.remove('beaten'));document.getElementById('drib-done').classList.remove('show');TAB_INIT[12]._init=false;TAB_INIT[12]();TAB_INIT[12]._init=true;};
+TAB_RESTORE[12]=function(){const s=lLoad('tab-12-state');if(!s)return;window._dribAns=s.ans||[];window._dribScore=s.score||0;document.getElementById('drib-score').textContent=window._dribScore+' / 8';const defs=document.querySelectorAll('.drib-defender');for(let i=0;i<window._dribScore&&i+1<defs.length;i++)defs[i+1].classList.add('beaten');(s.ans||[]).forEach((a,i)=>{if(a==null)return;const card=document.getElementById('dr-'+i);if(!card)return;const opts=card.querySelectorAll('.opt');const c=a===DRIB_QS[i].correct;opts[a].classList.add(c?'correct':'wrong');opts.forEach(o=>o.disabled=true);card.classList.add(c?'answered':'answered-bad');});if(s.done)document.getElementById('drib-done').classList.add('show');};
+function dribPick(qi,oi){if(window._dribAns[qi]!=null)return;const q=DRIB_QS[qi];const card=document.getElementById('dr-'+qi);const opts=card.querySelectorAll('.opt');opts.forEach(o=>o.disabled=true);const c=oi===q.correct;opts[oi].classList.add(c?'correct':'wrong');card.classList.add(c?'answered':'answered-bad');window._dribAns[qi]=oi;if(c){window._dribScore++;const defs=document.querySelectorAll('.drib-defender');if(window._dribScore+1<=defs.length)defs[window._dribScore].classList.add('beaten');document.getElementById('drib-score').textContent=window._dribScore+' / 8';}const done=window._dribAns.filter(a=>a!=null).length>=DRIB_QS.length;lSave('tab-12-state',{ans:window._dribAns,score:window._dribScore,done});if(done)document.getElementById('drib-done').classList.add('show');}
+
+/* ── BOOT ── */
+(function(){showTab(0);refreshProgress();})();
+</script>
+</body>
+</html>

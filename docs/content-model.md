@@ -202,6 +202,32 @@ level: 4
 unit: 8
 ```
 
+Our World checkpoint material appears after every three-unit band:
+
+```text
+Level 4
+- Units 1-3
+  - Unit 1
+  - Unit 2
+  - Unit 3
+  - Review 1-3
+  - Extra Reading 1-3
+- Units 4-6
+  - Unit 4
+  - Unit 5
+  - Unit 6
+  - Review 4-6
+  - Extra Reading 4-6
+- Units 7-9
+  - Unit 7
+  - Unit 8
+  - Unit 9
+  - Review 7-9
+  - Extra Reading 7-9
+```
+
+Treat these as checkpoint lessons, not as sub-lessons of Unit 3, 6, or 9. They use normal teacher/learner lesson records so assignment, review, and future Supabase sync work the same way as unit lessons. Components are `review` / `review-app` and `extra-reading` / `extra-reading-app`. Source tags use band notation such as `OW4-R7-9` and `OW4-ER7-9`.
+
 Reference also exposes:
 
 ```text
@@ -592,6 +618,8 @@ On the Neritan Teacher Menu, learner apps do not render as their own cards. The 
 Home current-focus progress counts unique unit components, not raw teacher/learner routes. A teacher slide lesson and a Leo learner app for the same component should appear as one lesson/component in Home progress.
 
 The local assignment/review loop should exist before Supabase is wired: Neritan assigns a learner app, Leo completes it, Neritan reviews saved module/score/caption progress, and the assignment status becomes `reviewed` or `needs-redo`. The local record should stay close to the future Supabase rows.
+
+Checkpoint lessons follow the same assignment/review loop, but they sit at the end of their three-unit band in Neritan's Teacher Menu. If a checkpoint deck/app has not been generated yet, show a planned checkpoint card instead of creating a fake lesson link.
 
 Navigation ownership:
 

@@ -51,6 +51,8 @@ Every Our World unit follows the same component-phase pattern. The teacher slide
 | **vocab-2** | Warm Up → Present → Practice → Apply → Extend → Wrap Up (no Recap) |
 | **reading** | Warm Up → Present → Practice → Apply → Extend → Recap → Wrap Up (Recap is before Wrap Up here; Think Aloud sits inside Present in some units, not a separate phase) |
 | **writing** | Warm Up → Present → Read the Model → Plan → Write → Edit → Share |
+| **review** | Mixed checkpoint review after Units 1-3, 4-6, or 7-9 |
+| **extra-reading** | Extended checkpoint reading after Units 1-3, 4-6, or 7-9 |
 | **mission** | Think → Pair → Share + Be the Expert (About the Photo + Meet the Explorer) |
 | **project** | Prepare → Share → Modify |
 | **book-reading** | Before You Read → While You Read → After You Read |
@@ -187,6 +189,14 @@ Target shape:
 - Share / Peer Feedback frames
 
 To be locked when the first writing Leo app is built.
+
+### review (TO LOCK)
+
+Checkpoint review apps appear after three-unit bands (`1-3`, `4-6`, `7-9`). They should mix vocabulary, grammar, listening/reading comprehension, and a final quiz from the previous three units. Use teacher component `review` and learner component `review-app`. Suggested IDs: `ow-l4-r7-9-review` and `ow-l4-r7-9-review-app`.
+
+### extra-reading (TO LOCK)
+
+Extra Reading apps appear beside checkpoint reviews after the same three-unit bands. They should focus on extended reading, comprehension checks, new glossary/support words, and a short response. Use teacher component `extra-reading` and learner component `extra-reading-app`. Suggested IDs: `ow-l4-er7-9-extra-reading` and `ow-l4-er7-9-extra-reading-app`.
 
 ## Reading vocab and grammar from the unit JSON
 

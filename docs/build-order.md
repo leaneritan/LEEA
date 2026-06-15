@@ -1,17 +1,17 @@
-# Build Order — Per-Unit Lesson Pipeline
+# Build Order - Per-Unit Lesson Pipeline
 
 How to build one unit of an English course from PDF to live lessons.
 
 ## Principle
 
-Reference data first, lessons second. Lessons link to vocab and grammar cards by ID — if the reference data is not in place, lessons reference nothing.
+Reference data first, lessons second. Lessons link to vocab and grammar cards by ID. If the reference data is not in place, lessons reference nothing.
 
-Teacher slideshows are custom-crafted per lesson. Leo learner apps are templated per component type (every grammar-2 app has roughly the same modules; only the data varies).
+Teacher slideshows are custom-crafted per lesson. Leo learner apps are templated per component type.
 
 ## Per-unit steps
 
 ```text
-─── REFERENCE ──────────────────────────────────────
+REFERENCE
 1. Scan vocab from the planner PDF
 2. Build vocabulary.json (clean schema)
 3. Wire vocab to indexes + reference.ts
@@ -22,7 +22,7 @@ Teacher slideshows are custom-crafted per lesson. Leo learner apps are templated
 7. Wire grammar to grammar-index.json + reference.ts
 8. Run npm run validate:content
 
-─── COMPONENT PAIRS (slideshow + Leo app) ──────────
+COMPONENT PAIRS (slideshow + Leo app)
 For each component in this order:
    9.  opener     (slideshow + Leo opener app)
    10. vocab-1    (slideshow + Leo vocab-1 app)
@@ -33,7 +33,13 @@ For each component in this order:
    15. reading    (slideshow + Leo reading app)
    16. writing    (slideshow + Leo writing app)
 
-─── REGISTER ───────────────────────────────────────
+After every three-unit band, build checkpoint components from the planner:
+   16a. review        (mixed review slideshow + Leo review app)
+   16b. extra-reading (extended reading slideshow + Leo extra-reading app)
+
+Checkpoint lessons belong to the band, not to the last unit in the band. Use bands `1-3`, `4-6`, and `7-9`.
+
+REGISTER
 17. Add teacher + learner JSON entries under
     content/subjects/english/courses/<course>/level-<n>/unit-<n>/lessons/
 18. Verify src/data/lessons.ts auto-imports them
@@ -44,27 +50,29 @@ For each component in this order:
 
 | Step | Doc |
 |---|---|
-| 1–4 | `docs/vocab.md` |
-| 5–8 | `docs/grammar.md` |
-| 9–16 teacher slideshows | `docs/teacher-slides.md` |
-| 9–16 Leo apps | `docs/components.md` |
+| 1-4 | `docs/vocab.md` |
+| 5-8 | `docs/grammar.md` |
+| 9-16 teacher slideshows | `docs/teacher-slides.md` |
+| 9-16 Leo apps | `docs/components.md` |
 | PDF page math | `docs/pdf-mapping.md` |
 | Schema details | `docs/content-model.md` |
 
-## Skill plan (to build later)
+## Skill plan
 
-Each step becomes its own skill so a unit can be built one chunk at a time. The vocab scanner is the only one built so far; the rest are planned and named for clarity (the per-component skills will each generate the teacher slideshow + paired Leo app for that component):
+Each step becomes its own skill so a unit can be built one chunk at a time. The vocab scanner is built; the rest are planned and named for clarity.
 
 ```text
-/vocab-unit-scanner    steps 1-4   ← BUILT (.claude/commands/vocab-unit-scanner.md)
-/grammar-unit-scanner  steps 5-8   ← planned (scans + builds unit grammar.json)
-/opener-app            step 9      ← planned (teacher slides + Leo opener app)
-/vocab-app             steps 10,13 ← BUILT (.claude/commands/vocab-app.md — handles both vocab-1 and vocab-2)
-/song-app              step 11     ← planned
-/grammar-1-app         step 12     ← planned
-/grammar-2-app         step 14     ← planned
-/reading-app           step 15     ← planned
-/writing-app           step 16     ← planned
+/vocab-unit-scanner    steps 1-4   BUILT (.claude/commands/vocab-unit-scanner.md)
+/grammar-unit-scanner  steps 5-8   planned (scans + builds unit grammar.json)
+/opener-app            step 9      planned (teacher slides + Leo opener app)
+/vocab-app             steps 10,13 BUILT (.claude/commands/vocab-app.md; handles vocab-1 and vocab-2)
+/song-app              step 11     planned
+/grammar-1-app         step 12     planned
+/grammar-2-app         step 14     planned
+/reading-app           step 15     planned
+/writing-app           step 16     planned
+/review-app            checkpoint  planned (teacher review + Leo review app)
+/extra-reading-app     checkpoint  planned (teacher extra reading + Leo extra-reading app)
 ```
 
 Naming rule going forward: the **`-unit-scanner`** suffix means "scans the unit PDF and produces unit-level JSON (vocabulary or grammar)"; the **`-app`** suffix means "builds the teacher slideshow + paired Leo learner app for that component." Skills are added after the corresponding template/Leo app is built and locked.

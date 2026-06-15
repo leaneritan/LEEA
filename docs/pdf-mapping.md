@@ -41,9 +41,21 @@ PDFs are tracked with Git LFS (`.gitattributes`). To add a PDF, clone locally, d
         "writing":   "21-23"
       }
     }
+  },
+  "checkpoints": {
+    "r7-9": {
+      "title": "Review 7-9",
+      "pdf_offset": 0,
+      "sections": {
+        "review": "",
+        "extra-reading": ""
+      }
+    }
   }
 }
 ```
+
+Use `checkpoints` for Review and Extra Reading pages that come after Units 1-3, 4-6, and 7-9. Do not store those ranges inside Unit 3, Unit 6, or Unit 9; they cover the whole band.
 
 ## Page math
 

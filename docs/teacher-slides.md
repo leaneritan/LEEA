@@ -73,6 +73,18 @@ Use the NatGeo planner activity sections as the slide flow:
 - Edit checklist
 - Share
 
+### review
+- Mixed checkpoint review after Units 1-3, 4-6, or 7-9
+- Recycle vocabulary, academic language, grammar, reading/listening skills, and common errors from the full band
+- Include quick teacher checks before Leo gets the paired review app
+
+### extra-reading
+- Extended checkpoint reading after Units 1-3, 4-6, or 7-9
+- Pre-read vocabulary/glossary support
+- Read or listen to the text
+- Comprehension checks and a short response
+- Add new word-like items to Reference with `OW<level>-ER<start>-<end>` source tags when needed
+
 ## Mark Done storage
 
 Every teacher slideshow ends with a Mark Done button:

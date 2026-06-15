@@ -71,6 +71,8 @@ Reference
 
 Home is a high-level launcher for all subjects and modes. Keep detailed English course/level/unit browsing inside the English area, not on Home. Neritan's Teacher Menu owns teacher lesson tracking, including collapsible level/unit groups and Mark Done state.
 
+Our World also has checkpoint material after each three-unit band. Treat Review and Extra Reading after Units 1-3, 4-6, and 7-9 as first-class checkpoint lessons, not as part of Unit 3, 6, or 9. In the Neritan Teacher Menu they appear at the end of the matching band (`Units 1-3`, `Units 4-6`, `Units 7-9`) after the unit cards. Until their deck/app files are generated, show them as planned checkpoint cards rather than broken lesson links.
+
 Teacher lessons are only for teaching. Learner apps are for Leo's independent homework/practice.
 
 Learner apps live as separate `mode: "learner"` lesson records from teacher lessons, even when they cover the same component. They open from Leo mode and may embed uploaded standalone HTML apps from `public/learn/...` while keeping local progress keys ready for Supabase.
@@ -78,6 +80,8 @@ Learner apps live as separate `mode: "learner"` lesson records from teacher less
 The Neritan Teacher Menu shows only teacher slide cards — learner apps never render as separate boxes there. Each teacher card carries the controls for Leo's matching app (Assign/Assigned, Review, Unassign) inside a tinted `app-controls` group labeled "Leo's App", next to the teaching controls Open and Mark Done. The counterpart is found by component name: teacher `opener` pairs with learner `opener-app` in the same level/unit, so new learner apps must follow the `{component}-app` naming to surface their buttons on the teacher card. Open stays the primary black button; Unassign renders as a quiet ghost button. Component labels and card left edges share the same accent color per component type.
 
 Leo mode should group learner apps by course/level/unit with collapsible sections. Learner app cards should show a clear component cue, such as emoji plus color-coded chip/edge for opener, vocabulary, grammar, reading, writing, and review.
+
+Checkpoint learner apps use the same assignment/review loop as unit apps. Use teacher components `review` and `extra-reading`, with learner counterparts `review-app` and `extra-reading-app`. Source tags use band notation such as `OW4-R7-9` and `OW4-ER7-9`.
 
 Leo's page must feel like Leo's, not a smaller copy of the teacher dashboard. The top of `/leo` is always a `LeoHomeworkHero` card with "Hi Leo 👋" greeting, a single big Start/Keep Going button, and three states: one assignment, multiple assignments ("and X more"), and a celebratory caught-up state. The grouped browser below the hero is the **full Leo library** — it shows every `mode: "learner"` lesson grouped by course/level/unit, not only the currently assigned ones. Cards without an active assignment get the `leo-app-card-available` modifier (softer styling) and a "Not assigned" status. Cards Leo has finished get a `leo-app-card-done` quiet green accent.
 
@@ -261,6 +265,8 @@ Search results must show clear type/source tags such as Vocabulary, Academic, Gr
 Reference browse/search controls should show useful counts, and mixed search results should use subtle type-aware color cues such as card edges and badges for Vocabulary, Academic, Content, Related, Glossary, Grammar, and Junior High.
 
 Reference level colors must stay consistent and visually distinct everywhere levels are listed: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The source tree nests as `Level -> Unit -> Vocabulary/Grammar`; Vocabulary nests Vocabulary 1, Vocabulary 2, Academic, and Glossary, while Grammar nests grammar-point cards. Keep the hierarchy visually obvious with different styling for level, unit, category, and subgroup rows.
+
+For checkpoint content, the Reference source tree nests it under the level band after the unit entries, for example `Level 4 -> Units 7-9 -> Review 7-9` and `Extra Reading 7-9`. New checkpoint vocabulary, glossary, academic, reading, and grammar-support items should keep their `OW<level>-R<start>-<end>` or `OW<level>-ER<start>-<end>` source tags.
 
 Leo's Reference `I Know` / `I Don't Know` state is local-first but Supabase-shaped. Use `src/components/useKnownWordIds.ts` and its `leea.referenceConfidence.v1` records (`id`, `studentId`, `wordId`, `knows`, `confidence`, `sourceContext`, `markedKnownAt`, `createdAt`, `updatedAt`). Do not store new confidence state as a bare array of word IDs; that shape was temporary and is only supported for migration.
 

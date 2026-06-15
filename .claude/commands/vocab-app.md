@@ -54,7 +54,7 @@ Examples: `ow-l4-u8-vocab-1`, `ow-l4-u8-vocab-2`, `ow-l5-u3-vocab-1`.
 
 ### Teacher slideshow shell (custom per word — DO NOT REVEAL)
 
-Reference: `public/lessons/ow-l4-u8-vocab-1.html` (103 slides, ~250 onclick handlers).
+Reference: `public/lessons/ow-l4-u8-vocab-1.html` (103 slides, ~250 onclick handlers) and `public/lessons/ow-l4-u8-vocab-2.html` (34 slides — same density adapted for 5 words).
 
 - 1920×1080 deck with scaling wrapper. Nav bar with prev/next/notes/progress. Right-side teacher notes panel (press **N**).
 - Per-unit theme colors at the top of `<style>`. For Our World use the level color from `docs/design-decisions.md` ("Levels use one stable color progression: L1 green · L2 teal · L3 blue · L4 purple · L5 orange · L6 red").
@@ -69,6 +69,35 @@ Reference: `public/lessons/ow-l4-u8-vocab-1.html` (103 slides, ~250 onclick hand
 - Slide flow follows the Lesson Planner phases verbatim per `docs/components.md` vocab-1: Warm Up → Present → Practice → Apply → Extend → Wrap Up → Recap. The Present section is the heavy lift — bespoke mini-game per word.
 - Final slide is **Mark Done** that writes to `leea.lessonProgress.v1` (same record shape as `lessonProgress.ts`). No save/restore on the teacher deck — Neritan marks done from the teacher dashboard.
 - Source pill at the bottom of every chart / rule / sample slide citing both: `Student Book p. X / TR Y.Y · Workbook p. Z` (per the v4 grammar-1 rule in `docs/components.md`).
+
+### Per-word Present slides — MANDATORY right-panel mini-game (one per target word)
+
+This is the single most important rule for vocab decks. Every target word gets its own dedicated Present slide with a two-column layout:
+
+- **Left column** (40% width): the word card (with a small click-feedback animation), the click-to-reveal button, and the revealed content (definition + example + Dad/Leo dialogue).
+- **Right column** (60% width): a **bespoke mini-game with a clear goal, a running score counter, and a win message**. NOT a click-feedback. NOT a reveal. NOT a static info box. A real interactive challenge the learner plays.
+
+A mini-game is anything with:
+1. A goal stated up front ("Tap all 6 bugs", "Stack the bones in order", "Match 4 mascots to 4 years")
+2. Live score / progress feedback (`X / N` counter)
+3. A win state with a celebration message
+4. Wrong-answer feedback (shake + miss counter, or reset)
+
+Reference mini-game patterns (from `ow-l4-u8-vocab-2.html` s6-s10):
+- **Catch-the-X grid** — N right answers + M distractors in a tile grid, tap the right ones (e.g. bug → 🐞🐝🦋 vs ⚽📚🪨)
+- **Hero Hunt / Pick-the-set** — same grid but each correct tap reveals a name (e.g. comic book → 🕷️ Spider-Man, 🦇 Batman, 🛡️ Captain America)
+- **Sequence builder** — 5 ordered slots + a bank of choices; correct order locks, wrong shakes (e.g. dinosaur → stack the T-Rex bones)
+- **Multi-round classification** — emoji shown, 3 MCQ options, advance through 3 rounds (e.g. fossil → name what you dug up: ammonite / dinosaur bone / trilobite)
+- **Pair match** — two rows, tap one from each, correct pair locks (e.g. stuffed animal → 4 World Cup mascots ↔ 4 years)
+- **Embodied / "do the word"** — the mechanic acts out the word's meaning (dig 5 times to reveal a fossil; click to make the dino ROAR; hug the stuffed animal)
+
+A click-to-reveal animation on the word card (spin, flip, shake) is fine as flavour, but it is NOT the mini-game. The mini-game lives in the right column and the learner must actually play it.
+
+Each per-word slide must include — below the mini-game — a compact "How do we use" box (2 bullets max) and a source pill citing Book p.X · TR Y.Y. No oversized emoji decoration cards, no standalone soccer banners (fold the soccer reference into Dad/Leo dialogue or the "How do we use" bullets).
+
+Add a CSS block `.mg-wrap / .mg-head / .mg-grid / .mg-btn / .mg-score / .mg-win / .mg-source` (see vocab-2 reference) — keep classes named the same across decks so future skills can reuse the patterns.
+
+Verify before commit: open the deck, click through s_present_1 … s_present_N. Each must have a working game with a score going up and a win message firing. If any per-word slide is just a reveal + info box → it is not done.
 
 ### Leo learner app — 13 tabs (LOCKED via vocab-1)
 
@@ -235,6 +264,7 @@ Push to the current working branch. Do NOT create a PR — Leaneritan reviews + 
 ## Output checklist
 
 - [ ] Teacher slideshow at `public/lessons/<lesson-id>.html` (~100 slides, bespoke per-word games)
+- [ ] EVERY target word has a Present slide with a right-panel mini-game (goal + score + win) — not just a click-to-reveal
 - [ ] Leo app at `public/learn/<lesson-id>.html` (13 tabs, all 4 save/restore rules)
 - [ ] Teacher JSON registered with `component: "<vocab-1|vocab-2>"`, `mode: "teacher"`, `slideCount`
 - [ ] Learner JSON registered with `component: "<vocab-1|vocab-2>-app"`, `mode: "learner"`, full `source` block

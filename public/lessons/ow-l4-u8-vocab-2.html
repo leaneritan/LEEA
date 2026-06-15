@@ -172,6 +172,43 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
 .done-card p{font-size:22px;color:#374151;margin-bottom:30px;line-height:1.6}
 .done-card .donebtn{font-size:28px;padding:20px 60px;border-radius:16px}
 .done-card .donebtn.done{background:#9ca3af;cursor:not-allowed}
+
+/* PER-WORD MINI-GAMES (right panel) */
+.mg-wrap{background:#fff;border-radius:16px;padding:18px 22px;box-shadow:0 4px 14px rgba(0,0,0,.08);display:flex;flex-direction:column;gap:12px;flex:1}
+.mg-head{font-size:22px;font-weight:900;color:#fff;background:var(--green);padding:10px 18px;border-radius:10px;text-align:center}
+.mg-head.red{background:var(--red)} .mg-head.blue{background:var(--blue)} .mg-head.amber{background:var(--amber)} .mg-head.orange{background:var(--orange)}
+.mg-inst{font-size:18px;font-weight:700;color:var(--navy);text-align:center}
+.mg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.mg-btn{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 6px;font-size:34px;cursor:pointer;transition:all .15s;font-family:'Outfit',sans-serif}
+.mg-btn:hover{transform:translateY(-2px);border-color:var(--green)}
+.mg-btn.hit{background:var(--green-bg);border-color:var(--green);opacity:.55;cursor:default}
+.mg-btn.miss{background:var(--red-bg);border-color:var(--red);animation:shake .3s ease}
+.mg-score{background:var(--navy);color:#fff;border-radius:10px;padding:10px 18px;font-size:18px;font-weight:800;text-align:center}
+.mg-win{background:var(--green);color:#fff;border-radius:10px;padding:10px 18px;font-size:18px;font-weight:800;text-align:center}
+.mg-source{background:var(--orange-bg);border-left:5px solid var(--orange);border-radius:10px;padding:10px 16px;font-size:16px;color:var(--navy);font-weight:600}
+.mg-source b{color:var(--orange)}
+
+/* Skeleton stacker (dinosaur) */
+.mg-skel{position:relative;height:300px;background:linear-gradient(180deg,#f3f4f6 0%,#d1d5db 100%);border-radius:14px;display:flex;align-items:flex-end;justify-content:center;padding:14px;overflow:hidden}
+.mg-stack{display:flex;flex-direction:column-reverse;gap:4px;align-items:center}
+.mg-bone-slot{width:120px;height:36px;border:2px dashed #9ca3af;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#9ca3af;background:rgba(255,255,255,.5)}
+.mg-bone-slot.placed{background:var(--green);color:#fff;border-style:solid;border-color:var(--green-d)}
+.mg-bones-bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.mg-bone-btn{background:#fff;border:2px solid #a16207;border-radius:10px;padding:8px 14px;font-size:18px;font-weight:700;color:#78350f;cursor:pointer}
+.mg-bone-btn.placed{opacity:.3;cursor:default}
+
+/* Fossil ID (multi-round) */
+.mg-fossil-stage{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:14px;padding:18px;text-align:center}
+.mg-fossil-stage .em{font-size:70px;line-height:1}
+.mg-fossil-stage .lab{font-size:18px;font-weight:700;color:var(--amber);margin-top:6px}
+
+/* Mascot match */
+.mg-mascot-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.mg-mascot{background:#fff;border:3px solid #e5e7eb;border-radius:12px;padding:12px 14px;font-size:18px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:140px;color:var(--navy);font-family:'Outfit',sans-serif}
+.mg-mascot:hover{border-color:var(--orange);transform:translateY(-2px)}
+.mg-mascot.sel{border-color:var(--orange);background:var(--orange-bg)}
+.mg-mascot.matched{background:var(--green-bg);border-color:var(--green);opacity:.55;cursor:default}
+.mg-mascot .em{font-size:34px}
 </style>
 </head>
 <body>
@@ -398,27 +435,35 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
         </div>
       </div>
     </div>
-    <div class="col" style="gap:18px">
-      <div class="how-box">
-        <div class="lbl">💡 HOW DO WE USE &quot;BUG&quot;?</div>
-        <ul>
-          <li>A bug is a small <strong>insect</strong> (ladybug, bee, ant, butterfly)</li>
-          <li>Pattern: <strong>a bug · bugs · the bug</strong></li>
-          <li>Collocations: <em>collect bugs · catch a bug · a bug in a jar</em></li>
+    <div class="col" style="gap:14px">
+      <div class="mg-wrap">
+        <div class="mg-head red">🎮 Catch the Bugs in a Jar!</div>
+        <div class="mg-inst">Tap ONLY the bugs 🐞 — skip the non-bugs! Find all <strong>6 bugs</strong>.</div>
+        <div class="mg-grid" id="mg-bug-grid">
+          <button class="mg-btn" onclick="mgBug(this,1)">🐞</button>
+          <button class="mg-btn" onclick="mgBug(this,0)">⚽</button>
+          <button class="mg-btn" onclick="mgBug(this,1)">🐝</button>
+          <button class="mg-btn" onclick="mgBug(this,0)">📚</button>
+          <button class="mg-btn" onclick="mgBug(this,1)">🦋</button>
+          <button class="mg-btn" onclick="mgBug(this,0)">🦖</button>
+          <button class="mg-btn" onclick="mgBug(this,1)">🐜</button>
+          <button class="mg-btn" onclick="mgBug(this,0)">🧸</button>
+          <button class="mg-btn" onclick="mgBug(this,1)">🦗</button>
+          <button class="mg-btn" onclick="mgBug(this,0)">🪨</button>
+          <button class="mg-btn" onclick="mgBug(this,1)">🕷️</button>
+          <button class="mg-btn" onclick="mgBug(this,0)">🎮</button>
+        </div>
+        <div class="mg-score">Caught: <span id="mg-bug-c">0</span> / 6 bugs · Misses: <span id="mg-bug-m">0</span></div>
+        <div id="mg-bug-win" class="mg-win hidden">🌟 PERFECT! You caught every bug!</div>
+      </div>
+      <div class="how-box" style="padding:14px 20px">
+        <div class="lbl" style="font-size:18px;margin-bottom:6px">💡 How do we use &quot;BUG&quot;?</div>
+        <ul style="font-size:18px;line-height:1.6">
+          <li>a bug · bugs · catch a bug · in a jar</li>
           <li>Idiom: <strong>a flu bug</strong> = a tiny illness 🤒</li>
         </ul>
       </div>
-      <div style="background:var(--red);border-radius:14px;padding:20px;text-align:center;color:#fff">
-        <div style="font-size:80px">🐞🐝🦋🐜</div>
-        <div style="font-size:24px;font-weight:800;margin-top:6px">Tiny crawly &amp; flying things!</div>
-      </div>
-      <div class="source-pill">
-        <div class="lbl">📖 BOOK p.138 · TR 8.5</div>
-        <div class="quote">"Look at the bug on the leaf!"</div>
-      </div>
-      <div style="background:var(--green);border-radius:14px;padding:14px 22px;color:#fff;font-size:20px;font-weight:700">
-        ⚽ Soccer note: Bellingham, Saka and Foden all missed games this season because of <em>flu bugs</em>! 🤒
-      </div>
+      <div class="mg-source"><b>📖 Book p.138 · TR 8.5</b> · "Look at the bug on the leaf!"</div>
     </div>
   </div>
 </div>
@@ -451,27 +496,32 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
         </div>
       </div>
     </div>
-    <div class="col" style="gap:18px">
-      <div class="how-box" style="background:#1e3a8a">
-        <div class="lbl">💡 HOW DO WE USE &quot;COMIC BOOK&quot;?</div>
-        <ul>
-          <li>A comic book tells a story with <strong>pictures + words</strong></li>
-          <li>Pattern: <strong>a comic book · comic books</strong></li>
-          <li>Collocations: <em>read a comic book · collect comic books · a Marvel comic book</em></li>
-          <li>Famous: Spider-Man · Batman · Iron Man · One Piece · Doraemon</li>
+    <div class="col" style="gap:14px">
+      <div class="mg-wrap">
+        <div class="mg-head blue">🎮 Hero Hunt — Tap the Comic Books!</div>
+        <div class="mg-inst">Tap each <strong>comic book hero</strong> 📚🦸 — skip everything else!</div>
+        <div class="mg-grid" id="mg-comic-grid" style="grid-template-columns:repeat(3,1fr)">
+          <button class="mg-btn" onclick="mgComic(this,1,'Spider-Man')">🕷️</button>
+          <button class="mg-btn" onclick="mgComic(this,0)">⚽</button>
+          <button class="mg-btn" onclick="mgComic(this,1,'Iron Man')">🤖</button>
+          <button class="mg-btn" onclick="mgComic(this,0)">🪨</button>
+          <button class="mg-btn" onclick="mgComic(this,1,'Batman')">🦇</button>
+          <button class="mg-btn" onclick="mgComic(this,0)">🧸</button>
+          <button class="mg-btn" onclick="mgComic(this,1,'Thor')">⚡</button>
+          <button class="mg-btn" onclick="mgComic(this,0)">🐞</button>
+          <button class="mg-btn" onclick="mgComic(this,1,'Captain America')">🛡️</button>
+        </div>
+        <div class="mg-score">Heroes found: <span id="mg-comic-c">0</span> / 5 · <span id="mg-comic-name" style="color:var(--yellow)">—</span></div>
+        <div id="mg-comic-win" class="mg-win hidden">🌟 ALL 5 HEROES FOUND! You read comic books like Bellingham! 🕷️📚</div>
+      </div>
+      <div class="how-box" style="background:#1e3a8a;padding:14px 20px">
+        <div class="lbl" style="font-size:18px;margin-bottom:6px">💡 How do we use &quot;COMIC BOOK&quot;?</div>
+        <ul style="font-size:18px;line-height:1.6">
+          <li>a comic book · read · collect · Marvel comic book</li>
+          <li>⚽ <strong>Bellingham</strong> → Marvel · <strong>Foden</strong> → Pokémon</li>
         </ul>
       </div>
-      <div style="background:var(--blue);border-radius:14px;padding:20px;text-align:center;color:#fff">
-        <div style="font-size:80px">📚🦸🕷️</div>
-        <div style="font-size:24px;font-weight:800;margin-top:6px">Stories in pictures!</div>
-      </div>
-      <div class="source-pill" style="border-color:var(--blue)">
-        <div class="lbl" style="color:var(--blue)">📖 BOOK p.138 · TR 8.5</div>
-        <div class="quote">"He reads a comic book."</div>
-      </div>
-      <div style="background:var(--green);border-radius:14px;padding:14px 22px;color:#fff;font-size:20px;font-weight:700">
-        ⚽ <strong>Bellingham</strong> → Marvel · <strong>Foden</strong> → Pokémon · <strong>Haaland</strong> → Funko Pop! figures!
-      </div>
+      <div class="mg-source" style="border-left-color:var(--blue);background:var(--blue-bg)"><b style="color:var(--blue)">📖 Book p.138 · TR 8.5</b> · "He reads a comic book."</div>
     </div>
   </div>
 </div>
@@ -497,27 +547,37 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
         </div>
       </div>
     </div>
-    <div class="col" style="gap:18px">
-      <div class="how-box">
-        <div class="lbl">💡 HOW DO WE USE &quot;DINOSAUR&quot;?</div>
-        <ul>
-          <li>A dinosaur lived <strong>millions of years ago</strong></li>
-          <li>Pattern: <strong>a dinosaur · dinosaurs · the dinosaur</strong></li>
-          <li>Collocations: <em>a dinosaur model · a toy dinosaur · a dinosaur skeleton</em></li>
-          <li>Famous: T-Rex · Triceratops · Brachiosaurus · Velociraptor</li>
+    <div class="col" style="gap:14px">
+      <div class="mg-wrap">
+        <div class="mg-head">🎮 Build the T-Rex Skeleton!</div>
+        <div class="mg-inst">Stack the bones from <strong>bottom up</strong>: legs → body → ribs → neck → skull!</div>
+        <div class="mg-skel">
+          <div class="mg-stack">
+            <div class="mg-bone-slot" id="bone-1" data-need="legs">1️⃣ legs</div>
+            <div class="mg-bone-slot" id="bone-2" data-need="body">2️⃣ body</div>
+            <div class="mg-bone-slot" id="bone-3" data-need="ribs">3️⃣ ribs</div>
+            <div class="mg-bone-slot" id="bone-4" data-need="neck">4️⃣ neck</div>
+            <div class="mg-bone-slot" id="bone-5" data-need="skull">5️⃣ skull 🦖</div>
+          </div>
+        </div>
+        <div class="mg-bones-bank" id="bones-bank">
+          <button class="mg-bone-btn" data-bone="skull" onclick="mgDino(this)">🦴 skull</button>
+          <button class="mg-bone-btn" data-bone="legs" onclick="mgDino(this)">🦴 legs</button>
+          <button class="mg-bone-btn" data-bone="ribs" onclick="mgDino(this)">🦴 ribs</button>
+          <button class="mg-bone-btn" data-bone="neck" onclick="mgDino(this)">🦴 neck</button>
+          <button class="mg-bone-btn" data-bone="body" onclick="mgDino(this)">🦴 body</button>
+        </div>
+        <div class="mg-score">Stacked: <span id="mg-dino-c">0</span> / 5 bones</div>
+        <div id="mg-dino-win" class="mg-win hidden">🦖 ROAR! You built the T-Rex skeleton!</div>
+      </div>
+      <div class="how-box" style="padding:14px 20px">
+        <div class="lbl" style="font-size:18px;margin-bottom:6px">💡 How do we use &quot;DINOSAUR&quot;?</div>
+        <ul style="font-size:18px;line-height:1.6">
+          <li>a dinosaur · dinosaur model · dinosaur skeleton</li>
+          <li>⚽ Football dinosaurs: <strong>Modrić</strong> 40 · <strong>Ronaldo</strong> 40 · <strong>Messi</strong> 38</li>
         </ul>
       </div>
-      <div style="background:var(--green);border-radius:14px;padding:20px;text-align:center;color:#fff">
-        <div style="font-size:80px">🦖🦕🦴</div>
-        <div style="font-size:24px;font-weight:800;margin-top:6px">Giants from long ago!</div>
-      </div>
-      <div class="source-pill" style="border-color:var(--green)">
-        <div class="lbl" style="color:var(--green-d)">📖 BOOK p.138 · TR 8.5</div>
-        <div class="quote">"It is a dinosaur."</div>
-      </div>
-      <div style="background:var(--green);border-radius:14px;padding:14px 22px;color:#fff;font-size:20px;font-weight:700">
-        ⚽ Football dinosaurs (2025-26): <strong>Modrić</strong> (40) · <strong>Ronaldo</strong> (40) · <strong>Pepe</strong> (42) · <strong>Messi</strong> (38).
-      </div>
+      <div class="mg-source" style="border-left-color:var(--green);background:var(--green-bg)"><b style="color:var(--green-d)">📖 Book p.138 · TR 8.5</b> · "It is a dinosaur."</div>
     </div>
   </div>
 </div>
@@ -546,27 +606,30 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
         </div>
       </div>
     </div>
-    <div class="col" style="gap:18px">
-      <div class="how-box" style="background:#78350f">
-        <div class="lbl">💡 HOW DO WE USE &quot;FOSSIL&quot;?</div>
-        <ul>
-          <li>A fossil is from a plant or animal from <strong>long ago</strong></li>
-          <li>Pattern: <strong>a fossil · fossils · the fossil</strong></li>
-          <li>Collocations: <em>find a fossil · a fossil of a fish · dig for fossils</em></li>
-          <li>Where: <strong>in a rock · in the ground · at the beach · in a museum</strong></li>
+    <div class="col" style="gap:14px">
+      <div class="mg-wrap">
+        <div class="mg-head amber">🎮 Fossil ID — Name What You Found!</div>
+        <div class="mg-inst">Dig at the rock 🪨 then identify each <strong>fossil</strong> you uncover!</div>
+        <div class="mg-fossil-stage" id="mg-fossil-stage">
+          <div class="em" id="mg-fossil-em">🪨</div>
+          <div class="lab" id="mg-fossil-lab">Round <span id="mg-fossil-r">1</span> / 3 — Tap an answer below!</div>
+        </div>
+        <div class="quiz-opts" id="mg-fossil-opts">
+          <button class="quiz-opt" onclick="mgFossil(this,true)">🐚 ammonite (sea shell fossil)</button>
+          <button class="quiz-opt" onclick="mgFossil(this,false)">🐶 puppy</button>
+          <button class="quiz-opt" onclick="mgFossil(this,false)">⚽ soccer ball</button>
+        </div>
+        <div class="mg-score">Identified: <span id="mg-fossil-c">0</span> / 3 fossils</div>
+        <div id="mg-fossil-win" class="mg-win hidden">🪨 Brilliant! You&apos;re a real paleontologist!</div>
+      </div>
+      <div class="how-box" style="background:#78350f;padding:14px 20px">
+        <div class="lbl" style="font-size:18px;margin-bottom:6px">💡 How do we use &quot;FOSSIL&quot;?</div>
+        <ul style="font-size:18px;line-height:1.6">
+          <li>a fossil · find · dig for · a fossil of a fish</li>
+          <li>🇦🇷 Argentinosaurus = biggest fossil ever — Messi&apos;s country!</li>
         </ul>
       </div>
-      <div style="background:var(--amber);border-radius:14px;padding:20px;text-align:center;color:#fff">
-        <div style="font-size:80px">🪨🦴🐚</div>
-        <div style="font-size:24px;font-weight:800;margin-top:6px">Old life in rock!</div>
-      </div>
-      <div class="source-pill" style="border-color:var(--amber)">
-        <div class="lbl" style="color:var(--amber)">📖 BOOK p.138 · TR 8.5</div>
-        <div class="quote">"That&apos;s a fossil!"</div>
-      </div>
-      <div style="background:var(--green);border-radius:14px;padding:14px 22px;color:#fff;font-size:20px;font-weight:700">
-        🇦🇷 Argentina has Argentinosaurus — 35m long, 100 tonnes — the BIGGEST fossil ever found! 🦖🪨
-      </div>
+      <div class="mg-source" style="border-left-color:var(--amber);background:var(--amber-bg)"><b style="color:var(--amber)">📖 Book p.138 · TR 8.5</b> · "That&apos;s a fossil!"</div>
     </div>
   </div>
 </div>
@@ -592,27 +655,35 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
         </div>
       </div>
     </div>
-    <div class="col" style="gap:18px">
-      <div class="how-box" style="background:#9a3412">
-        <div class="lbl">💡 HOW DO WE USE &quot;STUFFED ANIMAL&quot;?</div>
-        <ul>
-          <li>A stuffed animal is a <strong>soft toy</strong> shaped like an animal</li>
-          <li>Pattern: <strong>a stuffed animal · stuffed animals</strong></li>
-          <li>Collocations: <em>hug a stuffed animal · a teddy bear · a soft toy</em></li>
-          <li>Where: <strong>on the bed · in the toy box · in the World Cup shop!</strong></li>
+    <div class="col" style="gap:14px">
+      <div class="mg-wrap">
+        <div class="mg-head orange">🎮 Mascot Match — World Cup Stuffed Animals!</div>
+        <div class="mg-inst">Tap a <strong>mascot</strong> 🧸, then tap the right <strong>World Cup year</strong>. Match all 4!</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="mg-mascot-row" id="mg-masc-top">
+            <button class="mg-mascot" onclick="mgMascot(this,'qatar','m')"><span class="em">👻</span><span>La&apos;eeb</span></button>
+            <button class="mg-mascot" onclick="mgMascot(this,'russia','m')"><span class="em">🐺</span><span>Zabivaka</span></button>
+            <button class="mg-mascot" onclick="mgMascot(this,'brazil','m')"><span class="em">🦔</span><span>Fuleco</span></button>
+            <button class="mg-mascot" onclick="mgMascot(this,'usa','m')"><span class="em">🦅</span><span>Clutch</span></button>
+          </div>
+          <div class="mg-mascot-row" id="mg-masc-bot">
+            <button class="mg-mascot" onclick="mgMascot(this,'brazil','y')"><span class="em">🇧🇷</span><span>2014 Brazil</span></button>
+            <button class="mg-mascot" onclick="mgMascot(this,'russia','y')"><span class="em">🇷🇺</span><span>2018 Russia</span></button>
+            <button class="mg-mascot" onclick="mgMascot(this,'qatar','y')"><span class="em">🇶🇦</span><span>2022 Qatar</span></button>
+            <button class="mg-mascot" onclick="mgMascot(this,'usa','y')"><span class="em">🇺🇸</span><span>2026 USA</span></button>
+          </div>
+        </div>
+        <div class="mg-score">Matched: <span id="mg-masc-c">0</span> / 4 mascots</div>
+        <div id="mg-masc-win" class="mg-win hidden">🧸 ALL 4 MATCHED! You know your World Cup stuffed animals!</div>
+      </div>
+      <div class="how-box" style="background:#9a3412;padding:14px 20px">
+        <div class="lbl" style="font-size:18px;margin-bottom:6px">💡 How do we use &quot;STUFFED ANIMAL&quot;?</div>
+        <ul style="font-size:18px;line-height:1.6">
+          <li>a stuffed animal · soft toy · hug · teddy bear</li>
+          <li>🏆 2026 mascots: Maple 🦫 · Zayu 🐆 · Clutch 🦅</li>
         </ul>
       </div>
-      <div style="background:var(--orange);border-radius:14px;padding:20px;text-align:center;color:#fff">
-        <div style="font-size:80px">🧸🐻🦁🐰</div>
-        <div style="font-size:24px;font-weight:800;margin-top:6px">Soft &amp; cuddly!</div>
-      </div>
-      <div class="source-pill">
-        <div class="lbl">📖 BOOK p.138 · TR 8.5</div>
-        <div class="quote">"My little brother has a stuffed animal."</div>
-      </div>
-      <div style="background:var(--green);border-radius:14px;padding:14px 22px;color:#fff;font-size:20px;font-weight:700">
-        🏆 World Cup 2026: <strong>Maple 🦫</strong> (Canada), <strong>Zayu 🐆</strong> (Mexico), <strong>Clutch 🦅</strong> (USA). Collect all 3! 🧸⚽
-      </div>
+      <div class="mg-source"><b>📖 Book p.138 · TR 8.5</b> · "My little brother has a stuffed animal."</div>
     </div>
   </div>
 </div>
@@ -1990,6 +2061,143 @@ function markDone(){
     document.getElementById("markStatus").textContent = "Saved to local progress · " + new Date().toLocaleString();
   } catch (e){
     document.getElementById("markStatus").textContent = "Could not save: " + e.message;
+  }
+}
+
+// ── PER-WORD MINI-GAMES ─────────────────────────────────
+
+// 🐞 Catch the Bugs
+var mgBugC = 0, mgBugM = 0;
+function mgBug(el, isBug){
+  if (el.classList.contains("hit") || el.classList.contains("miss")) return;
+  if (isBug){
+    el.classList.add("hit");
+    mgBugC++;
+    document.getElementById("mg-bug-c").textContent = mgBugC;
+    if (mgBugC >= 6){
+      document.getElementById("mg-bug-win").classList.remove("hidden");
+    }
+  } else {
+    el.classList.add("miss");
+    mgBugM++;
+    document.getElementById("mg-bug-m").textContent = mgBugM;
+    setTimeout(function(){ el.classList.remove("miss"); }, 600);
+  }
+}
+
+// 📚 Hero Hunt
+var mgComicC = 0;
+function mgComic(el, isHero, name){
+  if (el.classList.contains("hit") || el.classList.contains("miss")) return;
+  if (isHero){
+    el.classList.add("hit");
+    mgComicC++;
+    document.getElementById("mg-comic-c").textContent = mgComicC;
+    document.getElementById("mg-comic-name").textContent = "Found: " + name + "!";
+    if (mgComicC >= 5){
+      document.getElementById("mg-comic-win").classList.remove("hidden");
+    }
+  } else {
+    el.classList.add("miss");
+    setTimeout(function(){ el.classList.remove("miss"); }, 600);
+  }
+}
+
+// 🦖 Build the T-Rex (sequential)
+var dinoOrder = ["legs","body","ribs","neck","skull"];
+var dinoStep = 0;
+function mgDino(btn){
+  if (btn.classList.contains("placed")) return;
+  var bone = btn.dataset.bone;
+  if (bone === dinoOrder[dinoStep]){
+    btn.classList.add("placed");
+    var slot = document.getElementById("bone-" + (dinoStep+1));
+    slot.classList.add("placed");
+    slot.textContent = "✓ " + bone;
+    dinoStep++;
+    document.getElementById("mg-dino-c").textContent = dinoStep;
+    if (dinoStep >= 5){
+      var win = document.getElementById("mg-dino-win");
+      win.classList.remove("hidden");
+      roarDino();
+    }
+  } else {
+    btn.classList.add("shake");
+    setTimeout(function(){ btn.classList.remove("shake"); }, 400);
+  }
+}
+
+// 🪨 Fossil ID (3 rounds)
+var fossilRounds = [
+  {em:"🐚", correct:"🐚 ammonite (sea shell fossil)", opts:["🐚 ammonite (sea shell fossil)","🐶 puppy","⚽ soccer ball"]},
+  {em:"🦴", correct:"🦴 dinosaur bone (T-Rex leg!)", opts:["🐞 living bug","🦴 dinosaur bone (T-Rex leg!)","🧸 stuffed animal"]},
+  {em:"🦗", correct:"🦗 trilobite (a 500-million-year-old sea bug)", opts:["📚 comic book","🪨 ordinary rock","🦗 trilobite (a 500-million-year-old sea bug)"]}
+];
+var fossilStep = 0;
+var fossilC = 0;
+function mgFossil(btn, isCorrect){
+  if (btn.dataset.locked) return;
+  var round = fossilRounds[fossilStep];
+  var correct = btn.textContent.trim() === round.correct;
+  btn.dataset.locked = "1";
+  btn.classList.add(correct ? "correct" : "wrong");
+  if (correct){
+    fossilC++;
+    document.getElementById("mg-fossil-c").textContent = fossilC;
+  }
+  setTimeout(function(){
+    fossilStep++;
+    if (fossilStep >= fossilRounds.length){
+      document.getElementById("mg-fossil-em").textContent = "🏆";
+      document.getElementById("mg-fossil-lab").textContent = "All 3 fossils identified!";
+      document.getElementById("mg-fossil-opts").style.display = "none";
+      if (fossilC >= 2) document.getElementById("mg-fossil-win").classList.remove("hidden");
+    } else {
+      var next = fossilRounds[fossilStep];
+      document.getElementById("mg-fossil-em").textContent = next.em;
+      document.getElementById("mg-fossil-r").textContent = (fossilStep + 1);
+      document.getElementById("mg-fossil-lab").innerHTML = "Round <span id=\"mg-fossil-r\">" + (fossilStep+1) + "</span> / 3 — Tap an answer below!";
+      var opts = document.getElementById("mg-fossil-opts");
+      opts.innerHTML = "";
+      for (var i = 0; i < next.opts.length; i++){
+        var b = document.createElement("button");
+        b.className = "quiz-opt";
+        b.textContent = next.opts[i];
+        b.onclick = (function(btnEl){ return function(){ mgFossil(btnEl); }; })(b);
+        opts.appendChild(b);
+      }
+    }
+  }, 900);
+}
+
+// 🧸 Mascot Match
+var mascP = null, mascY = null, mascC = 0;
+function mgMascot(el, key, kind){
+  if (el.classList.contains("matched")) return;
+  if (kind === "m"){
+    if (mascP) mascP.classList.remove("sel");
+    el.classList.add("sel"); mascP = el; mascP.dataset.key = key;
+  } else {
+    if (mascY) mascY.classList.remove("sel");
+    el.classList.add("sel"); mascY = el; mascY.dataset.key = key;
+  }
+  if (mascP && mascY){
+    if (mascP.dataset.key === mascY.dataset.key){
+      mascP.classList.add("matched"); mascP.classList.remove("sel");
+      mascY.classList.add("matched"); mascY.classList.remove("sel");
+      mascC++;
+      document.getElementById("mg-masc-c").textContent = mascC;
+      mascP = null; mascY = null;
+      if (mascC >= 4) document.getElementById("mg-masc-win").classList.remove("hidden");
+    } else {
+      var p = mascP, y = mascY;
+      p.classList.add("shake"); y.classList.add("shake");
+      setTimeout(function(){
+        p.classList.remove("shake","sel");
+        y.classList.remove("shake","sel");
+      }, 400);
+      mascP = null; mascY = null;
+    }
   }
 }
 

@@ -417,14 +417,14 @@ body{display:flex;flex-direction:column}
   </div>
 </div>
 
-<!-- ─────────────── TAB 5 — SORT (T-chart) ─────────────── -->
+<!-- ─────────────── TAB 5 — SORT: correct vs wrong who-sentence ─────────────── -->
 <div class="tab-content" id="tc5">
   <div class="tab-body">
     <div>
-      <div class="section-title">🗂️ Sort: WHO vs WHICH/THAT</div>
-      <div class="section-sub">Drag each chip into the right column. 12 chips total.</div>
+      <div class="section-title">🗂️ Sort: ✅ Correct who-sentence vs ❌ Wrong</div>
+      <div class="section-sub">Drag each sentence chip into the right column. 12 chips total — 6 correct, 6 broken.</div>
     </div>
-    <div class="dad-hint"><b>People</b> get <b>who</b>. <b>Things and animals</b> get <b>that</b> or <b>which</b>.</div>
+    <div class="dad-hint">A correct <b>who</b>-sentence: <em>person + who + verb phrase</em>. Common breaks: double pronoun (<em>who he</em>), wrong verb match, missing <em>who</em>.</div>
     <div class="sort-host" id="sort-host"></div>
     <div class="done-banner" id="sort-done">🎉 All 12 sorted! Mark complete below.</div>
   </div>
@@ -926,14 +926,15 @@ function rulePick(qi, oi){
 /* ═════════════════════════════════════════════════════════════════════
    TAB 3 — DETECTIVE (find the mistake)
 ═════════════════════════════════════════════════════════════════════ */
+// People-only DET cases (all errors are about describing PEOPLE with who — no which/that contrasts)
 const DET_CASES = [
-  { words: ['I','have','a','ball'], wrong: 'who', after: ['is','round.'], exp: 'A ball is a thing → use that or which.' },
-  { words: ['Haaland','is','the','striker'], wrong: 'which', after: ['plays','for','Man','City.'], exp: 'Haaland is a person → use who.' },
-  { words: ['I','have','a','cousin','who'], wrong: 'she', after: ['likes','Avatar.'], exp: 'Who already REPLACES "she" — don\'t keep both.' },
-  { words: ['The','stadium'], wrong: 'who', after: ['holds','90,000','fans','is','Camp','Nou.'], exp: 'A stadium is a thing → use that or which.' },
-  { words: ['I','know','three','people'], wrong: 'who collects', after: ['fossils.'], exp: 'Three people is plural → "who collect" (no s).' },
-  { words: ['Bellingham','is','the','player','that'], wrong: 'plays', after: ['for','Real','Madrid.'], exp: 'For a person use "who plays", not "that plays".', note: '(replace "that")' },
-  { words: ['My','friend'], wrong: 'whose', after: ['loves','soccer','is','Leo.'], exp: 'Use "who" to describe — "whose" means belonging.' }
+  { words: ['I','have','a','cousin','who'], wrong: 'she', after: ['likes','Avatar.'], exp: 'Double pronoun! "who" already replaces "she" — pick one, not both.' },
+  { words: ['I','know','three','people','who'], wrong: 'collects', after: ['fossils.'], exp: 'Plural subject (three people) → who COLLECT (no -s).' },
+  { words: ['Bellingham','is','a','player','who'], wrong: 'play', after: ['for','Real','Madrid.'], exp: 'Singular subject (Bellingham) → who PLAYS (add -s).' },
+  { words: ['I','have','a','brother'], wrong: 'he', after: ['loves','video','games.'], exp: 'Join the two sentences with WHO, not "he". → ...brother who loves video games.' },
+  { words: ['I','have','an','aunt','who'], wrong: 'are', after: ['very','creative.'], exp: 'One aunt → who IS very creative (or "who\\u2019s"). "Are" is for plural.' },
+  { words: ['There','is','a','girl','in','my','class','who'], wrong: 'she', after: ['collects','seashells.'], exp: 'Double pronoun again! "who" already replaces "she".' },
+  { words: ['Haaland','is','a','striker','who'], wrong: 'scoring', after: ['30','goals','this','season.'], exp: 'After "who" use a regular verb (scores), not -ing.' }
 ];
 TAB_INIT[3] = function(){
   const list = document.getElementById('det-list');
@@ -947,6 +948,7 @@ TAB_INIT[3] = function(){
     html += '<span class="det-word" data-wrong="1" onclick="detTap(' + i + ',\'bad\',this)">' + escapeHTML(c.wrong) + '</span> ';
     c.after.forEach(w => { html += '<span class="det-word" onclick="detTap(' + i + ',\'good\',this)">' + escapeHTML(w) + '</span> '; });
     html += '</div><div class="det-fb ok" id="det-fb-ok-' + i + '">✅ Right! ' + c.exp + '</div><div class="det-fb bad" id="det-fb-bad-' + i + '">❌ Look again — that word is fine. Find the one that breaks the who-rule.</div>';
+    card.innerHTML = html;
     list.appendChild(card);
   });
 };
@@ -1072,22 +1074,22 @@ TAB_INIT[5] = function(){
   host.innerHTML = window.buildDndSorter({
     id: 'leo-g1-sort',
     tiles: [
-      { text: '⚽ Haaland', answer: 'who' },
-      { text: '🥎 a ball', answer: 'thing' },
-      { text: '👨‍👩‍👧 my cousin', answer: 'who' },
-      { text: '🏟️ a stadium', answer: 'thing' },
-      { text: '🦇 Batman', answer: 'who' },
-      { text: '🏔️ a mountain', answer: 'thing' },
-      { text: '📸 a photographer', answer: 'who' },
-      { text: '🦂 a trilobite', answer: 'thing' },
-      { text: '🎯 Bellingham', answer: 'who' },
-      { text: '🏆 a trophy', answer: 'thing' },
-      { text: '🦥 Sid (sloth)', answer: 'thing' },
-      { text: '👨 Dad', answer: 'who' }
+      { text: '✓ I have a brother who loves video games.', answer: 'ok' },
+      { text: '✗ I have a brother who he loves video games.', answer: 'wrong' },
+      { text: '✓ Bellingham is a player who plays for Real Madrid.', answer: 'ok' },
+      { text: '✗ Bellingham is a player who play for Real Madrid.', answer: 'wrong' },
+      { text: '✓ I know three people who collect fossils.', answer: 'ok' },
+      { text: '✗ I know three people who collects fossils.', answer: 'wrong' },
+      { text: '✓ Maria is a friend who takes amazing photos.', answer: 'ok' },
+      { text: '✗ Maria is a friend she takes amazing photos.', answer: 'wrong' },
+      { text: '✓ Haaland is a striker who scores 30 goals.', answer: 'ok' },
+      { text: '✗ Haaland scores 30 goals who is a striker.', answer: 'wrong' },
+      { text: "✓ I have an aunt who's very creative.", answer: 'ok' },
+      { text: '✗ I have an aunt who are very creative.', answer: 'wrong' }
     ],
     zones: [
-      { key: 'who', label: '👤 WHO (people)', color: '#3B82F6' },
-      { key: 'thing', label: '📦 WHICH/THAT (things & animals)', color: '#F59E0B' }
+      { key: 'ok', label: '✅ CORRECT who-sentence', color: '#16A34A' },
+      { key: 'wrong', label: '❌ WRONG — fix it!', color: '#EF4444' }
     ],
     onComplete: function(){
       lSave('tab-5-state', { complete: true });

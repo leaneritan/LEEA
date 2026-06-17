@@ -134,6 +134,13 @@ body{display:flex;flex-direction:column}
 
 /* MATCH */
 .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.match-recap{margin-top:14px;background:#fff;border:2px solid var(--green-b);border-radius:12px;padding:14px 18px}
+.match-recap .recap-title{font-size:16px;font-weight:800;color:var(--green-d);margin-bottom:4px}
+.match-recap .recap-sub{font-size:13px;color:var(--ink-3);font-style:italic;margin-bottom:10px}
+.recap-table{width:100%;border-collapse:collapse;font-size:13px}
+.recap-table th{background:var(--green-l);color:var(--green-d);text-align:left;padding:8px 10px;font-weight:800;border-bottom:2px solid var(--green-b);font-size:12px;letter-spacing:.5px;text-transform:uppercase}
+.recap-table td{padding:10px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--ink);line-height:1.5}
+.recap-table tr:last-child td{border-bottom:none}
 .match-chip{padding:12px 14px;border:2px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;background:#fff;transition:all .2s;font-family:Outfit,sans-serif;text-align:left;line-height:1.3}
 .match-chip:hover{border-color:var(--green)}
 .match-chip.selected{border-color:var(--green);background:var(--green-l)}
@@ -318,36 +325,55 @@ body{display:flex;flex-direction:column}
   </div>
 </div>
 
-<!-- TAB 3 — FLASHCARDS (5 target words) -->
+<!-- TAB 3 — FLASHCARDS (5 target words · practice + quiz) -->
 <div class="tab-content" id="tc3">
   <div class="tab-body">
     <div>
-      <div class="section-title">🃏 5 Target Words — Flip Each One</div>
-      <div class="section-sub">Tap to flip · Use Prev / Next to cycle through.</div>
+      <div class="section-title">🃏 5 Target Words — Practice &amp; Quiz</div>
+      <div class="section-sub">Practice mode: tap to flip · Quiz mode: type the word</div>
     </div>
-    <div class="flashcard-wrap" onclick="flipCard3()">
-      <div class="flashcard" id="fc3-card">
-        <div class="fc-face fc-front">
-          <div class="fc-emoji" id="fc3-emoji">🐞</div>
-          <div class="fc-word" id="fc3-word">a bug</div>
-          <div class="fc-pos" id="fc3-pos">Noun</div>
-          <div class="fc-tap">tap to flip 👆</div>
-        </div>
-        <div class="fc-face fc-back">
-          <div class="fc-emoji" id="fc3-emoji-b">🐞</div>
-          <div class="fc-def" id="fc3-def">a small insect</div>
-          <div class="fc-jp" id="fc3-jp">虫（むし）</div>
-          <button class="fc-jp-btn" id="fc3-jp-btn" onclick="toggleJp3(event)">🇯🇵 日本語</button>
-          <div class="fc-sample" id="fc3-sample">The <b>bug</b> is on the leaf.</div>
+    <div class="fc-controls">
+      <button class="mode-btn active" id="fc3-prac" onclick="setFc3Mode('practice')">📖 Practice</button>
+      <button class="mode-btn" id="fc3-quiz" onclick="setFc3Mode('quiz')">🧠 Quiz</button>
+    </div>
+    <div id="fc3-practice">
+      <div class="flashcard-wrap" onclick="flipCard3()">
+        <div class="flashcard" id="fc3-card">
+          <div class="fc-face fc-front">
+            <div class="fc-emoji" id="fc3-emoji">🐞</div>
+            <div class="fc-word" id="fc3-word">a bug</div>
+            <div class="fc-pos" id="fc3-pos">Noun</div>
+            <div class="fc-tap">tap to flip 👆</div>
+          </div>
+          <div class="fc-face fc-back">
+            <div class="fc-emoji" id="fc3-emoji-b">🐞</div>
+            <div class="fc-def" id="fc3-def">a small insect</div>
+            <div class="fc-jp" id="fc3-jp">虫（むし）</div>
+            <button class="fc-jp-btn" id="fc3-jp-btn" onclick="toggleJp3(event)">🇯🇵 日本語</button>
+            <div class="fc-sample" id="fc3-sample">The <b>bug</b> is on the leaf.</div>
+          </div>
         </div>
       </div>
+      <div class="fc-nav">
+        <button onclick="fc3Prev()">◀ Prev</button>
+        <span class="fc-counter" id="fc3-counter">1 / 5</span>
+        <button onclick="fc3Next()">Next ▶</button>
+      </div>
     </div>
-    <div class="fc-nav">
-      <button onclick="fc3Prev()">◀ Prev</button>
-      <span class="fc-counter" id="fc3-counter">1 / 5</span>
-      <button onclick="fc3Next()">Next ▶</button>
+    <div id="fc3-quizmode" style="display:none">
+      <div class="quiz-wrap">
+        <div class="quiz-emoji" id="fc3q-emoji">🐞</div>
+        <div class="quiz-sentence" id="fc3q-sentence">A small insect. What word is it?</div>
+        <div id="fc3q-clue" style="font-size:13px;color:var(--ink-3);text-align:center;font-style:italic"></div>
+        <div class="quiz-input-row">
+          <input class="quiz-input" id="fc3q-input" placeholder="Type the word…" onkeydown="if(event.key==='Enter')checkFc3Quiz()">
+          <button class="quiz-check" onclick="checkFc3Quiz()">✓</button>
+        </div>
+        <div class="quiz-fb" id="fc3q-fb"></div>
+        <div style="font-size:13px;color:var(--ink-3);font-weight:600">Quiz: <span id="fc3q-progress">0 / 5 done</span></div>
+      </div>
     </div>
-    <div class="done-banner" id="fc3-done">🎉 All 5 reviewed! Mark complete below.</div>
+    <div class="done-banner" id="fc3-done">🎉 All 5 done! Mark complete below.</div>
   </div>
   <div class="tab-footer">
     <button class="btn-redo" id="redo-3" onclick="doRedo(3)">↺ Redo</button>
@@ -437,16 +463,26 @@ body{display:flex;flex-direction:column}
   </div>
 </div>
 
-<!-- TAB 8 — MATCH (word → meaning) -->
+<!-- TAB 8 — MATCH (word ↔ TR 8.5 sentence) -->
 <div class="tab-content" id="tc8">
   <div class="tab-body">
     <div>
-      <div class="section-title">🔗 Match — Word ↔ Meaning</div>
-      <div class="section-sub">Tap a word on the left, then its meaning on the right. Wrong matches flash red.</div>
+      <div class="section-title">🔗 Match — Word ↔ TR 8.5 Sentence</div>
+      <div class="section-sub">Tap a word, then tap its matching audio sentence from Track 8.5. Wrong matches flash red.</div>
     </div>
-    <div class="dad-hint">All 5 target words on the left. Match each to its meaning on the right.</div>
+    <div class="dad-hint">🎧 These are the SAME sentences Leo heard in TR 8.5 (Vocabulary 2, Activity 1: Listen and repeat). Matching them now helps you remember how each word sounds in context.</div>
     <div class="match-grid" id="match-grid"></div>
-    <div class="done-banner" id="match-done">🎉 All matched! Mark complete below.</div>
+    <div class="done-banner" id="match-done">🎉 All matched! Here&apos;s your pronunciation recap below 👇</div>
+    <div id="match-recap" class="match-recap" style="display:none">
+      <div class="recap-title">📋 TR 8.5 Pronunciation Recap</div>
+      <div class="recap-sub">Practice saying each sentence aloud — match the audio!</div>
+      <table class="recap-table">
+        <thead>
+          <tr><th>Word</th><th>TR 8.5 sentence</th><th>Pronunciation</th></tr>
+        </thead>
+        <tbody id="recap-tbody"></tbody>
+      </table>
+    </div>
   </div>
   <div class="tab-footer">
     <button class="btn-redo" id="redo-8" onclick="doRedo(8)">↺ Redo</button>
@@ -685,12 +721,16 @@ function prPick(i,ans){const card=document.getElementById('pr-c-'+i);if(card.cla
 
 /* ── TAB 3 — FLASHCARDS (5 target words) ── */
 const FC3_WORDS=FC_WORDS.slice(1);
+let fc3Mode='practice',fc3QuizIdx=0,fc3QuizSolved=new Set();
+function setFc3Mode(m){fc3Mode=m;document.getElementById('fc3-prac').classList.toggle('active',m==='practice');document.getElementById('fc3-quiz').classList.toggle('active',m==='quiz');document.getElementById('fc3-practice').style.display=m==='practice'?'block':'none';document.getElementById('fc3-quizmode').style.display=m==='quiz'?'block':'none';if(m==='quiz')fc3QuizRender();lSave('tab-3-state',{visited:Array.from(fc3Visited),solved:Array.from(fc3QuizSolved),mode:fc3Mode});}
+function fc3QuizRender(){let next=-1;for(let i=0;i<FC3_WORDS.length;i++){const ix=(fc3QuizIdx+i)%FC3_WORDS.length;if(!fc3QuizSolved.has(ix)){next=ix;break;}}if(next===-1){document.getElementById('fc3q-emoji').textContent='🏆';document.getElementById('fc3q-sentence').innerHTML='All 5 quizzed!';document.getElementById('fc3q-clue').textContent='';document.getElementById('fc3q-input').style.display='none';document.querySelector('#fc3-quizmode .quiz-check').style.display='none';document.getElementById('fc3q-progress').textContent=FC3_WORDS.length+' / '+FC3_WORDS.length+' done';return;}fc3QuizIdx=next;const w=FC3_WORDS[next];document.getElementById('fc3q-emoji').textContent=w.emoji;document.getElementById('fc3q-sentence').innerHTML=esc(w.def)+'. What word is it?';const stripped=w.word.replace(/^(a|an)\s+/,'');document.getElementById('fc3q-clue').textContent='Starts with "'+stripped.charAt(0)+'"';document.getElementById('fc3q-input').value='';document.getElementById('fc3q-input').className='quiz-input';document.getElementById('fc3q-input').style.display='';document.querySelector('#fc3-quizmode .quiz-check').style.display='';document.getElementById('fc3q-fb').textContent='';document.getElementById('fc3q-progress').textContent=fc3QuizSolved.size+' / '+FC3_WORDS.length+' done';}
+function checkFc3Quiz(){const w=FC3_WORDS[fc3QuizIdx];const v=document.getElementById('fc3q-input').value.trim().toLowerCase();const inp=document.getElementById('fc3q-input');const fb=document.getElementById('fc3q-fb');const target=w.word.toLowerCase().replace(/^(a|an)\s+/,'');if(v===target||v===w.word.toLowerCase()){inp.classList.add('correct');inp.classList.remove('wrong');fb.textContent='✅ Right! '+w.word+' — '+w.def;fb.style.color='var(--green-d)';fc3QuizSolved.add(fc3QuizIdx);lSave('tab-3-state',{visited:Array.from(fc3Visited),solved:Array.from(fc3QuizSolved),mode:fc3Mode});setTimeout(fc3QuizRender,1400);if(fc3QuizSolved.size>=FC3_WORDS.length&&fc3Visited.size>=FC3_WORDS.length)document.getElementById('fc3-done').classList.add('show');}else{inp.classList.add('wrong');inp.classList.remove('correct');fb.textContent='❌ Try again. It starts with "'+target.charAt(0)+'".';fb.style.color='var(--red)';}}
 let fc3Idx=0,fc3Visited=new Set();
 TAB_INIT[3]=function(){};
-TAB_RESET[3]=function(){fc3Idx=0;fc3Visited=new Set();document.getElementById('fc3-card').classList.remove('flipped');document.getElementById('fc3-done').classList.remove('show');fc3Render();};
-TAB_RESTORE[3]=function(){const s=lLoad('tab-3-state');if(s){fc3Visited=new Set(s.visited||[]);if(fc3Visited.size>=FC3_WORDS.length)document.getElementById('fc3-done').classList.add('show');}fc3Render();};
+TAB_RESET[3]=function(){fc3Idx=0;fc3Visited=new Set();fc3QuizIdx=0;fc3QuizSolved=new Set();fc3Mode='practice';document.getElementById('fc3-card').classList.remove('flipped');document.getElementById('fc3-done').classList.remove('show');setFc3Mode('practice');fc3Render();};
+TAB_RESTORE[3]=function(){const s=lLoad('tab-3-state');if(s){fc3Visited=new Set(s.visited||[]);fc3QuizSolved=new Set(s.solved||[]);if(s.mode)fc3Mode=s.mode;if(fc3Visited.size>=FC3_WORDS.length&&fc3QuizSolved.size>=FC3_WORDS.length)document.getElementById('fc3-done').classList.add('show');}setFc3Mode(fc3Mode);fc3Render();};
 function fc3Render(){const w=FC3_WORDS[fc3Idx];document.getElementById('fc3-emoji').textContent=w.emoji;document.getElementById('fc3-word').textContent=w.word;document.getElementById('fc3-pos').textContent=w.pos;document.getElementById('fc3-emoji-b').textContent=w.emoji;document.getElementById('fc3-def').textContent=w.def;document.getElementById('fc3-jp').textContent=w.jp;document.getElementById('fc3-jp').classList.remove('revealed');document.getElementById('fc3-sample').innerHTML=w.sample;document.getElementById('fc3-counter').textContent=(fc3Idx+1)+' / '+FC3_WORDS.length;document.getElementById('fc3-card').classList.remove('flipped');}
-function flipCard3(){document.getElementById('fc3-card').classList.toggle('flipped');fc3Visited.add(fc3Idx);lSave('tab-3-state',{visited:Array.from(fc3Visited)});if(fc3Visited.size>=FC3_WORDS.length)document.getElementById('fc3-done').classList.add('show');}
+function flipCard3(){document.getElementById('fc3-card').classList.toggle('flipped');fc3Visited.add(fc3Idx);lSave('tab-3-state',{visited:Array.from(fc3Visited),solved:Array.from(fc3QuizSolved),mode:fc3Mode});if(fc3Visited.size>=FC3_WORDS.length&&fc3QuizSolved.size>=FC3_WORDS.length)document.getElementById('fc3-done').classList.add('show');}
 function fc3Next(){fc3Idx=(fc3Idx+1)%FC3_WORDS.length;fc3Render();}
 function fc3Prev(){fc3Idx=(fc3Idx-1+FC3_WORDS.length)%FC3_WORDS.length;fc3Render();}
 function toggleJp3(e){e.stopPropagation();document.getElementById('fc3-jp').classList.toggle('revealed');}
@@ -740,18 +780,21 @@ window._unsSolved=[];
 function unsCheck(i){const inp=document.getElementById('un-in-'+i);const v=inp.value.trim().toLowerCase();const item=document.getElementById('un-'+i);if(item.classList.contains('correct'))return;if(v===UNS_ITEMS[i].word){inp.classList.add('correct');inp.disabled=true;item.classList.add('correct');if(!window._unsSolved.includes(i))window._unsSolved.push(i);const allDone=window._unsSolved.length>=UNS_ITEMS.length;lSave('tab-7-state',{solved:window._unsSolved,allDone});if(allDone)document.getElementById('uns-done').classList.add('show');}else{inp.classList.add('wrong');setTimeout(()=>inp.classList.remove('wrong'),700);}}
 
 /* ── TAB 8 — MATCH (word ↔ meaning) ── */
+// Pairs come straight from TR 8.5 (Vocabulary 2, Activity 1: Listen and repeat).
+// Matches the audioscript so Leo practices the SAME sentences he heard.
 const MATCH_PAIRS=[
-  {key:'bug',l:'🐞 a bug',r:'a small insect'},
-  {key:'comic',l:'📚 a comic book',r:'a book with pictures + words'},
-  {key:'dino',l:'🦖 a dinosaur',r:'a large animal from long ago'},
-  {key:'fossil',l:'🪨 a fossil',r:'a mark of a plant/animal in rock'},
-  {key:'plush',l:'🧸 a stuffed animal',r:'a soft toy animal'}
+  {key:'bug',   l:'🐞 a bug',            r:'Some people are scared of bugs, but I love them.', ipa:'/bʌɡ/'},
+  {key:'comic', l:'📚 a comic book',     r:'A boy in my class collects comic books.',          ipa:'/ˈkɑː.mɪk bʊk/'},
+  {key:'dino',  l:'🦖 a dinosaur',       r:'I think that dinosaurs are really interesting.',   ipa:'/ˈdaɪ.nə.sɔːr/'},
+  {key:'fossil',l:'🪨 a fossil',         r:'My brother collects old fossils.',                 ipa:'/ˈfɒs.əl/'},
+  {key:'plush', l:'🧸 a stuffed animal', r:'My mom gave me a stuffed animal for my birthday.', ipa:'/stʌft ˈæn.ɪ.məl/'}
 ];
+function renderMatchRecap(){const tbody=document.getElementById('recap-tbody');if(!tbody)return;tbody.innerHTML='';MATCH_PAIRS.forEach(p=>{const tr=document.createElement('tr');tr.innerHTML='<td><strong>'+esc(p.l)+'</strong></td><td><em>"'+esc(p.r)+'"</em></td><td style="font-family:Georgia,serif;color:#6b7280">'+esc(p.ipa)+'</td>';tbody.appendChild(tr);});document.getElementById('match-recap').style.display='block';}
 let _matchLeft=null,_matchPaired=new Set();
 TAB_INIT[8]=function(){const grid=document.getElementById('match-grid');grid.innerHTML='';const leftOrder=MATCH_PAIRS.slice();const rightOrder=MATCH_PAIRS.slice().sort(()=>Math.random()-.5);MATCH_PAIRS.forEach((_,i)=>{const lb=document.createElement('button');lb.className='match-chip';lb.dataset.side='l';lb.dataset.key=leftOrder[i].key;lb.textContent=leftOrder[i].l;lb.onclick=()=>matchPick(lb);const rb=document.createElement('button');rb.className='match-chip';rb.dataset.side='r';rb.dataset.key=rightOrder[i].key;rb.textContent=rightOrder[i].r;rb.onclick=()=>matchPick(rb);grid.appendChild(lb);grid.appendChild(rb);});};
-TAB_RESET[8]=function(){_matchLeft=null;_matchPaired.clear();TAB_INIT[8]._init=false;document.getElementById('match-done').classList.remove('show');TAB_INIT[8]();TAB_INIT[8]._init=true;};
-TAB_RESTORE[8]=function(){const s=lLoad('tab-8-state');if(!s)return;(s.paired||[]).forEach(k=>{document.querySelectorAll('.match-chip[data-key="'+k+'"]').forEach(c=>c.classList.add('matched'));_matchPaired.add(k);});if(s.allDone)document.getElementById('match-done').classList.add('show');};
-function matchPick(chip){if(chip.classList.contains('matched'))return;if(chip.dataset.side==='l'){document.querySelectorAll('.match-chip[data-side="l"]').forEach(c=>c.classList.remove('selected'));chip.classList.add('selected');_matchLeft=chip;return;}if(!_matchLeft)return;if(chip.dataset.key===_matchLeft.dataset.key){chip.classList.add('matched');_matchLeft.classList.add('matched');_matchLeft.classList.remove('selected');_matchPaired.add(chip.dataset.key);_matchLeft=null;const allDone=_matchPaired.size>=MATCH_PAIRS.length;lSave('tab-8-state',{paired:Array.from(_matchPaired),allDone});if(allDone)document.getElementById('match-done').classList.add('show');}else{chip.classList.add('wrong-flash');setTimeout(()=>chip.classList.remove('wrong-flash'),700);}}
+TAB_RESET[8]=function(){_matchLeft=null;_matchPaired.clear();TAB_INIT[8]._init=false;document.getElementById('match-done').classList.remove('show');document.getElementById('match-recap').style.display='none';TAB_INIT[8]();TAB_INIT[8]._init=true;};
+TAB_RESTORE[8]=function(){const s=lLoad('tab-8-state');if(!s)return;(s.paired||[]).forEach(k=>{document.querySelectorAll('.match-chip[data-key="'+k+'"]').forEach(c=>c.classList.add('matched'));_matchPaired.add(k);});if(s.allDone){document.getElementById('match-done').classList.add('show');renderMatchRecap();}};
+function matchPick(chip){if(chip.classList.contains('matched'))return;if(chip.dataset.side==='l'){document.querySelectorAll('.match-chip[data-side="l"]').forEach(c=>c.classList.remove('selected'));chip.classList.add('selected');_matchLeft=chip;return;}if(!_matchLeft)return;if(chip.dataset.key===_matchLeft.dataset.key){chip.classList.add('matched');_matchLeft.classList.add('matched');_matchLeft.classList.remove('selected');_matchPaired.add(chip.dataset.key);_matchLeft=null;const allDone=_matchPaired.size>=MATCH_PAIRS.length;lSave('tab-8-state',{paired:Array.from(_matchPaired),allDone});if(allDone){document.getElementById('match-done').classList.add('show');renderMatchRecap();}}else{chip.classList.add('wrong-flash');setTimeout(()=>chip.classList.remove('wrong-flash'),700);}}
 
 /* ── TAB 9 — APPLY (sunshine organizer) ── */
 const APPLY_WORDS=[

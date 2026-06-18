@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 8 · Reading · Hide and Seek</title>
+<script src="/teach/components/charts.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+:root{
+  --green:#16A34A; --green-d:#15803d; --green-bg:#f0fdf4;
+  --blue:#0EA5E9; --blue-d:#0369a1; --blue-bg:#e0f2fe;
+  --navy:#0f172a; --orange:#F97316; --orange-bg:#FFF7ED;
+  --amber:#D97706; --amber-bg:#FFFBEB; --yellow:#FDE047;
+  --red:#EF4444; --red-bg:#FEF2F2; --cream:#FFFCEC;
+  --radius:16px;
+}
+.slide-header{height:64px;background:var(--green);display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.75);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.22);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.tr{background:var(--blue);color:#fff}
+.hd-chip.src{background:rgba(0,0,0,.25)}
+.body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.body.center{align-items:center;justify-content:center;text-align:center}
+.body.cream{background:var(--cream)}
+.body.grad-green{background:linear-gradient(135deg,#16A34A,#0e7a37);color:#fff}
+.body.grad-blue{background:linear-gradient(135deg,#0EA5E9,#075985);color:#fff}
+.body.grad-navy{background:linear-gradient(135deg,#0f172a,#1e3a5f);color:#fff}
+.body.grad-forest{background:linear-gradient(180deg,#15803d,#16a34a,#15803d);color:#fff}
+.body.green{background:var(--green);color:#fff}
+.two-col{flex-direction:row;gap:28px}
+.two-col > .col{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0}
+.header-bar{display:flex;align-items:center;gap:14px;padding:12px 26px;border-radius:14px;font-size:28px;font-weight:900;color:#fff}
+.header-bar.green{background:var(--green)} .header-bar.blue{background:var(--blue)} .header-bar.orange{background:var(--orange)} .header-bar.amber{background:var(--amber)} .header-bar.navy{background:var(--navy)} .header-bar.red{background:var(--red)} .header-bar.yellow{background:var(--yellow);color:var(--navy)}
+.info-box{background:#fff;border-radius:var(--radius);padding:16px 22px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.info-box.tint-green{background:var(--green-bg);border-left:6px solid var(--green)}
+.info-box.tint-blue{background:var(--blue-bg);border-left:6px solid var(--blue)}
+.info-box.tint-orange{background:var(--orange-bg);border-left:6px solid var(--orange)}
+.info-box.tint-amber{background:var(--amber-bg);border-left:6px solid var(--amber)}
+.info-box.tint-red{background:var(--red-bg);border-left:6px solid var(--red)}
+.dialogue-box{background:#fff;border:2px solid var(--green);border-radius:14px;padding:14px 22px;font-size:21px;color:var(--navy);font-weight:600;line-height:1.55}
+.dialogue-box b{color:var(--green-d)}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--green);color:#fff;border:none;border-radius:12px;padding:12px 22px;font-size:18px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s;box-shadow:0 4px 10px rgba(0,0,0,.12)}
+.btn:hover{transform:translateY(-2px)}
+.btn.blue{background:var(--blue)} .btn.orange{background:var(--orange)} .btn.yellow{background:var(--yellow);color:var(--navy)} .btn.red{background:var(--red)} .btn.outline{background:#fff;color:var(--green);border:2px solid var(--green)}
+.btn.done{background:#9ca3af;cursor:default}
+.hidden{display:none !important}
+.fade-in{animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.shake{animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pulse-yellow{animation:pulseY 1.4s ease infinite}
+@keyframes pulseY{0%,100%{box-shadow:0 0 0 0 rgba(253,224,71,.55)}50%{box-shadow:0 0 0 14px rgba(253,224,71,0)}}
+.pbar{width:100%;background:#e5e7eb;border-radius:99px;height:9px;overflow:hidden;margin-top:auto}
+.pbar-fill{height:100%;background:var(--green);border-radius:99px}
+
+/* SPINE FLOWCHART */
+.flow-board{background:linear-gradient(180deg,#0f172a,#1e3a5f);border:3px solid var(--green);border-radius:16px;padding:18px 22px;color:#fff;position:relative}
+.flow-title{font-size:18px;font-weight:900;color:var(--yellow);margin-bottom:10px;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center}
+.flow-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.flow-slot{background:rgba(255,255,255,.08);border:2px dashed rgba(255,255,255,.4);border-radius:12px;padding:12px 10px;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;font-size:13px;color:rgba(255,255,255,.65);font-weight:700;transition:all .4s}
+.flow-slot.filled{background:#fff;color:var(--navy);border-color:var(--green);border-style:solid}
+.flow-slot .num{font-size:30px;font-weight:900;color:var(--yellow);line-height:1}
+.flow-slot.filled .num{color:var(--green-d)}
+.flow-slot .em{font-size:28px;line-height:1}
+.flow-slot .cap{font-size:13px;font-weight:700;line-height:1.4}
+.flow-arrow{position:absolute;color:rgba(255,255,255,.4);font-size:18px}
+
+/* PASSAGE BLOCK */
+.passage{background:#fff;border:3px solid var(--green);border-radius:16px;padding:24px 30px;font-size:21px;color:var(--navy);line-height:1.7;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.passage.title{font-size:38px;font-weight:900;color:var(--green-d);text-align:center;letter-spacing:1px;border-bottom:2px solid var(--green-bg);padding-bottom:12px;margin-bottom:14px}
+.passage .tag{background:var(--yellow);color:var(--navy);padding:1px 8px;border-radius:6px;font-weight:800;cursor:pointer;border:2px solid var(--amber);font-size:19px}
+.passage .tag:hover{background:var(--amber);color:#fff}
+.passage .tag.popped{background:var(--green);color:#fff;border-color:var(--green-d)}
+.gloss-pop{position:absolute;background:#fff;border:3px solid var(--green);border-radius:12px;padding:10px 14px;font-size:16px;font-weight:700;color:var(--navy);box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:50;max-width:260px}
+.gloss-pop .gp-em{font-size:24px}
+.gloss-pop .gp-jp{font-size:14px;color:#6b7280;font-style:italic;margin-top:4px}
+
+/* MINI-GAMES */
+.mg-card{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 18px;font-size:18px;color:var(--navy);font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+.mg-card:hover{border-color:var(--green);transform:translateY(-2px)}
+.mg-card.correct{background:var(--green);color:#fff;border-color:var(--green-d)}
+.mg-card.wrong{background:var(--red);color:#fff;border-color:#b91c1c}
+.mg-card.placed{opacity:.5;cursor:default}
+.mg-score{background:var(--navy);color:#fff;border-radius:10px;padding:10px 16px;font-size:17px;font-weight:800;text-align:center}
+.mg-win{background:var(--green);color:#fff;border-radius:10px;padding:10px 16px;font-size:17px;font-weight:800;text-align:center;animation:fadeIn .5s}
+
+/* SEQUENCE MINI-GAME (s5) */
+.seq-stage{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;background:var(--cream);border:2px solid var(--amber);border-radius:14px;padding:18px}
+.seq-slot{display:inline-flex;align-items:center;justify-content:center;min-width:160px;height:50px;border:3px dashed var(--amber);border-radius:10px;font-size:18px;color:var(--amber);font-weight:800;background:#fff}
+.seq-slot.filled{background:var(--amber);color:#fff;border-style:solid}
+.seq-chip{background:#fff;border:2px solid var(--blue);border-radius:99px;padding:8px 16px;font-size:17px;font-weight:700;color:var(--blue-d);cursor:pointer;font-family:'Outfit',sans-serif}
+.seq-chip:hover{background:var(--blue);color:#fff}
+.seq-chip.placed{opacity:.35;cursor:default}
+
+/* COMPASS (s6 + s29) */
+.compass-wrap{position:relative;width:280px;height:280px;background:radial-gradient(circle,#fffbeb,#fde68a);border-radius:50%;border:4px solid var(--amber);box-shadow:0 6px 18px rgba(0,0,0,.18);margin:0 auto;display:flex;align-items:center;justify-content:center}
+.compass-N,.compass-E,.compass-S,.compass-W{position:absolute;font-size:24px;font-weight:900;color:var(--navy);cursor:pointer;padding:6px 14px;border-radius:8px;transition:all .2s;background:#fff;border:2px solid var(--amber)}
+.compass-N{top:8px;left:50%;transform:translateX(-50%)}
+.compass-E{right:8px;top:50%;transform:translateY(-50%)}
+.compass-S{bottom:8px;left:50%;transform:translateX(-50%)}
+.compass-W{left:8px;top:50%;transform:translateY(-50%)}
+.compass-N:hover,.compass-E:hover,.compass-S:hover,.compass-W:hover{background:var(--green);color:#fff;border-color:var(--green-d);transform:translateX(-50%) scale(1.1)}
+.compass-E:hover,.compass-W:hover{transform:translateY(-50%) scale(1.1)}
+.compass-needle{font-size:80px;color:var(--red);transform-origin:center;transition:transform .8s ease-out}
+
+/* SHIP (s9 — sinking) */
+.ship-stage{background:linear-gradient(180deg,#dbeafe 0%,#dbeafe 60%,#0EA5E9 60%,#0369a1 100%);border-radius:18px;padding:20px;height:220px;position:relative;overflow:hidden;cursor:pointer}
+.ship-emoji{position:absolute;left:50%;top:30%;transform:translateX(-50%) rotate(0deg);font-size:80px;transition:all 2s ease-in}
+.ship-emoji.sinking{top:70%;transform:translateX(-50%) rotate(-30deg)}
+.ship-help{position:absolute;top:18px;right:20px;background:#fff;border:2px solid var(--red);border-radius:10px;padding:8px 14px;font-size:14px;font-weight:800;color:var(--red);opacity:0;transition:opacity .4s}
+.ship-help.show{opacity:1}
+
+/* CHIPS / SLOTS */
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{background:#fff;border:2px solid var(--blue);border-radius:99px;padding:8px 16px;font-size:17px;font-weight:700;color:var(--blue-d);cursor:pointer;font-family:'Outfit',sans-serif}
+.chip:hover{background:var(--blue);color:#fff}
+.chip.placed{opacity:.35;cursor:default}
+.chip.sel{background:var(--orange);color:#fff;border-color:var(--orange)}
+
+/* RECRUIT TOAST (flowchart unlock) */
+.unlock-toast{background:var(--green);color:#fff;border-radius:12px;padding:10px 18px;font-size:18px;font-weight:800;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;opacity:0;transform:translateY(8px);transition:all .4s;border:3px solid var(--yellow)}
+.unlock-toast.show{opacity:1;transform:translateY(0)}
+
+/* QUIZ */
+.quiz-block{background:#fff;border-radius:14px;padding:14px 22px;box-shadow:0 3px 10px rgba(0,0,0,.06)}
+.quiz-block .q{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.quiz-opt{font-size:18px;padding:8px 14px;background:#fff;border:2px solid #e5e7eb;border-radius:10px;cursor:pointer;font-weight:700;color:var(--navy);font-family:'Outfit',sans-serif;margin:2px;display:inline-block}
+.quiz-opt:hover{border-color:var(--green)}
+.quiz-opt.correct{background:var(--green);color:#fff;border-color:var(--green-d)}
+.quiz-opt.wrong{background:var(--red);color:#fff;border-color:#b91c1c}
+
+/* GLOSS CARDS (vocab refresh) */
+.gloss-card{background:#fff;border:2px solid var(--blue);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px}
+.gloss-card .em{font-size:42px}
+.gloss-card .word{font-size:22px;font-weight:900;color:var(--blue-d)}
+.gloss-card .def{font-size:17px;color:var(--navy);font-weight:600;margin-top:2px}
+.gloss-card .jp{font-size:14px;color:#6b7280;font-style:italic;margin-top:2px}
+
+/* COMPREHENSION REVEAL */
+.comp-reveal{background:var(--green-bg);border:2px solid var(--green);border-radius:14px;padding:14px 22px;font-size:20px;color:var(--navy);font-weight:600;line-height:1.6;display:none}
+.comp-reveal.show{display:block;animation:fadeIn .4s}
+
+/* MATCH / LABEL (Apply Activity 3) */
+.label-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.label-photo{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.label-photo:hover{border-color:var(--green);transform:translateY(-2px)}
+.label-photo.labeled{background:var(--green-bg);border-color:var(--green)}
+.label-photo .ph-em{font-size:48px;line-height:1}
+.label-photo .ph-letter{font-size:16px;font-weight:900;color:var(--green-d);margin-top:6px}
+.label-photo .ph-name{font-size:14px;color:var(--navy);font-weight:600;margin-top:2px}
+
+/* TREASURE PAYOFF (s42) */
+.cache-scene{background:linear-gradient(180deg,#a16207,#78350f);border-radius:18px;padding:24px;color:#fff;text-align:center;position:relative;overflow:hidden}
+.cache-box{font-size:140px;line-height:1;animation:bounce-once 1.2s ease}
+@keyframes bounce-once{0%{transform:scale(.7) translateY(20px);opacity:0}60%{transform:scale(1.1) translateY(-8px);opacity:1}100%{transform:scale(1) translateY(0)}}
+
+/* NAV BAR */
+#nav-bar{position:absolute;bottom:0;left:0;width:1920px;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn{background:rgba(22,163,74,.25)!important;color:#4ade80!important}
+#unit-label{color:#4ade80;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+#tn-panel{position:absolute;right:-460px;top:0;width:440px;height:1028px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#4ade80;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+.done-card{background:#fff;border-radius:24px;padding:60px 80px;text-align:center;max-width:900px;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.done-card h2{font-size:48px;color:var(--green-d);margin-bottom:18px}
+.done-card p{font-size:22px;color:#374151;margin-bottom:30px;line-height:1.6}
+.done-card .donebtn{font-size:28px;padding:20px 60px;border-radius:16px}
+</style>
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<!-- s1 TITLE -->
+<div class="slide" id="s1" data-notes="<strong>Title.</strong> Reading: Hide and Seek (Geocaching). Today&apos;s spine = Leo&apos;s First Geocache Hunt at Mount Fuji. Compass + 5-step flowchart fill across the deck. Payoff: cache found + Leo&apos;s treasure revealed.">
+  <div class="body grad-green center">
+    <div style="font-size:24px;font-weight:800;color:rgba(255,255,255,.75);letter-spacing:4px">UNIT 8 · THAT&apos;S REALLY INTERESTING! · OUR WORLD LEVEL 4</div>
+    <div style="font-size:120px;line-height:1">🧭🗺️📦</div>
+    <div style="font-size:80px;font-weight:900;color:#fff;line-height:1.05">Reading</div>
+    <div style="font-size:48px;font-weight:700;color:rgba(255,255,255,.95)">Hide and Seek — Geocaching!</div>
+    <div style="background:rgba(255,255,255,.18);border:3px solid #fff;border-radius:16px;padding:16px 28px;max-width:1300px;font-size:22px;color:#fff;line-height:1.5">
+      📖 Read the real text from Student Book pp. 140-141 (TR 8.7)<br>
+      🎯 Strategy of the lesson: <strong>Identify Sequence of Events</strong> (first, next, then, finally)<br>
+      🏆 Spine: Leo&apos;s first geocache hunt — find the cache, claim the treasure!
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:2.27%"></div></div>
+  </div>
+</div>
+
+<!-- s2 GOAL -->
+<div class="slide" id="s2" data-notes="<strong>Today&apos;s Goal (LP p.276).</strong> 3 objectives verbatim from the LP. Today&apos;s strategy is Identify Sequence of Events — the signal words first/next/before/after/then/finally/last. Academic word: sequence. 9 content words pre-taught before the passage.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Reading — Today&apos;s Goal</span><span class="hd-chip src">📖 LP p.276</span></div>
+  <div class="body cream">
+    <div class="header-bar blue">🎯 Today&apos;s Learning Goals</div>
+    <div style="display:flex;gap:24px;flex:1">
+      <div style="flex:1.2;display:flex;flex-direction:column;gap:14px">
+        <div class="info-box tint-blue">
+          <div style="font-size:20px;font-weight:900;color:var(--blue-d);margin-bottom:6px">🎯 OBJECTIVES (Students will...)</div>
+          <div style="font-size:21px;color:var(--navy);font-weight:600;line-height:1.7">
+            • <strong>Read</strong> to learn about a new hobby.<br>
+            • <strong>Talk</strong> about the steps of a hobby.<br>
+            • <strong>Put a sequence of steps in order.</strong>
+          </div>
+        </div>
+        <div class="info-box tint-green">
+          <div style="font-size:20px;font-weight:900;color:var(--green-d);margin-bottom:6px">📐 READING STRATEGY</div>
+          <div style="font-size:21px;color:var(--navy);font-weight:600">🎯 <strong>Identify Sequence of Events</strong> — using signal words: <em>first, next, before, after, then, finally, last.</em></div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+        <div class="info-box tint-amber">
+          <div style="font-size:20px;font-weight:900;color:var(--amber);margin-bottom:6px">🎓 ACADEMIC WORD</div>
+          <div style="font-size:20px;color:var(--navy);font-weight:600">🎯 <strong>sequence</strong> — the order things happen in (step 1 → step 2 → step 3).</div>
+        </div>
+        <div class="info-box tint-orange">
+          <div style="font-size:20px;font-weight:900;color:var(--orange);margin-bottom:6px">📖 CONTENT VOCAB (9 words)</div>
+          <div style="font-size:18px;color:var(--navy);font-weight:600;line-height:1.7">
+            🙈 hiders · 🔍 seekers · 💎 treasure · 🎨 ornament · 🧭 compass · 🚢 sinking · 🌳 outdoor · 📱 app · 🔎 clues
+          </div>
+        </div>
+        <div class="info-box tint-red">
+          <div style="font-size:18px;font-weight:900;color:var(--red);margin-bottom:4px">⚠️ NO AMBUSH RULE</div>
+          <div style="font-size:18px;color:var(--navy);font-weight:600">Every word is taught BEFORE Leo meets it in the passage.</div>
+        </div>
+      </div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:4.55%"></div></div>
+  </div>
+</div>
+
+<!-- s3 SPINE LAUNCH -->
+<div class="slide" id="s3" data-notes="<strong>Spine launch — Leo&apos;s First Geocache Hunt at Mount Fuji.</strong> The 5-step flowchart starts empty. Each paragraph + comprehension check Leo completes fills ONE slot. Compass interactive on s6 = his navigation tool. Payoff at s42: cache found.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Spine — Leo&apos;s First Geocache Hunt</span><span class="hd-chip src">⚽ Spine</span></div>
+  <div class="body grad-navy">
+    <div style="font-size:40px;font-weight:900;color:#fff;text-align:center">🧭 Leo&apos;s First Geocache Hunt — Mount Fuji, Japan</div>
+    <div class="dialogue-box" style="background:rgba(255,255,255,.95);max-width:1500px;margin:0 auto">
+      💬 <b>Dad:</b> "Leo, today we&apos;re going on a treasure hunt! A real outdoor hobby called <strong>geocaching</strong>. We&apos;ll read the text together, fill this 5-step flowchart as we go, and at the end we&apos;ll FIND the cache and see what treasure is inside!"
+    </div>
+    <div class="flow-board" style="max-width:1700px;margin:0 auto;width:100%">
+      <div class="flow-title"><span>🏆 GEOCACHE HUNT — STEP FLOWCHART</span><span style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:4px 14px;font-size:14px"><span id="flow-count">0</span> / 5 steps</span></div>
+      <div class="flow-grid">
+        <div class="flow-slot" id="flow-1"><div class="num">1</div><div class="em">❓</div><div class="cap">— from ¶1 —</div></div>
+        <div class="flow-slot" id="flow-2"><div class="num">2</div><div class="em">❓</div><div class="cap">— from ¶2 —</div></div>
+        <div class="flow-slot" id="flow-3"><div class="num">3</div><div class="em">❓</div><div class="cap">— from ¶3 (a) —</div></div>
+        <div class="flow-slot" id="flow-4"><div class="num">4</div><div class="em">❓</div><div class="cap">— from ¶3 (b) —</div></div>
+        <div class="flow-slot" id="flow-5"><div class="num">5</div><div class="em">❓</div><div class="cap">— from ¶4-5 —</div></div>
+      </div>
+    </div>
+    <div style="background:var(--yellow);color:var(--navy);border-radius:14px;padding:12px 22px;font-size:18px;font-weight:800;text-align:center;max-width:1500px;margin:0 auto">
+      🎯 Rule: each paragraph + understanding check fills ONE slot. No skipping. When the flowchart is full → we open the cache!
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:6.82%"></div></div>
+  </div>
+</div>
+
+<!-- s4 WARM UP -->
+<div class="slide" id="s4" data-notes="<strong>Warm Up Act-it-Out (LP p.276 verbatim).</strong> Take photos hobby with First/Next/Then/Last. Dad models each step with the signal word highlighted. Bridge: &quot;I told you each step. Now we&apos;re going to read about the steps of another hobby.&quot;">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Act it Out</span><span class="hd-chip src">📖 LP p.276</span></div>
+  <div class="body cream">
+    <div class="header-bar orange">📸 Warm Up — A hobby in steps (taking photos)</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "I have lots of hobbies. One of my favorites is <strong>taking photos</strong>. I like to take photos of people. Watch — I&apos;ll act it out and tell you each step using <strong>signal words</strong>."</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;flex:1">
+      <button class="info-box tint-amber" style="border:none;font-family:inherit;cursor:pointer;text-align:center;padding:18px" onclick="this.querySelector('.act').classList.toggle('hidden')">
+        <div style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:4px 14px;font-size:18px;font-weight:900;display:inline-block">First</div>
+        <div style="font-size:46px;margin-top:8px">🔍</div>
+        <div class="act hidden" style="font-size:17px;color:var(--navy);font-weight:600;line-height:1.5;margin-top:8px">"<em>First,</em> I <strong>find something</strong> to take a picture of."</div>
+        <div style="font-size:13px;color:#6b7280;margin-top:6px">tap to reveal</div>
+      </button>
+      <button class="info-box tint-amber" style="border:none;font-family:inherit;cursor:pointer;text-align:center;padding:18px" onclick="this.querySelector('.act').classList.toggle('hidden')">
+        <div style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:4px 14px;font-size:18px;font-weight:900;display:inline-block">Next</div>
+        <div style="font-size:46px;margin-top:8px">📷</div>
+        <div class="act hidden" style="font-size:17px;color:var(--navy);font-weight:600;line-height:1.5;margin-top:8px">"<em>Next,</em> I <strong>get the camera ready</strong>."</div>
+        <div style="font-size:13px;color:#6b7280;margin-top:6px">tap to reveal</div>
+      </button>
+      <button class="info-box tint-amber" style="border:none;font-family:inherit;cursor:pointer;text-align:center;padding:18px" onclick="this.querySelector('.act').classList.toggle('hidden')">
+        <div style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:4px 14px;font-size:18px;font-weight:900;display:inline-block">Then</div>
+        <div style="font-size:46px;margin-top:8px">📸</div>
+        <div class="act hidden" style="font-size:17px;color:var(--navy);font-weight:600;line-height:1.5;margin-top:8px">"<em>Then,</em> I <strong>press the button</strong> to take the picture."</div>
+        <div style="font-size:13px;color:#6b7280;margin-top:6px">tap to reveal</div>
+      </button>
+      <button class="info-box tint-amber" style="border:none;font-family:inherit;cursor:pointer;text-align:center;padding:18px" onclick="this.querySelector('.act').classList.toggle('hidden')">
+        <div style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:4px 14px;font-size:18px;font-weight:900;display:inline-block">Last</div>
+        <div style="font-size:46px;margin-top:8px">🖨️</div>
+        <div class="act hidden" style="font-size:17px;color:var(--navy);font-weight:600;line-height:1.5;margin-top:8px">"<em>Last,</em> I <strong>put the pictures on the computer</strong> and print them."</div>
+        <div style="font-size:13px;color:#6b7280;margin-top:6px">tap to reveal</div>
+      </button>
+    </div>
+    <div class="info-box tint-green" style="font-size:20px;font-weight:700;color:var(--navy);text-align:center">
+      💡 "I just told you how to do my hobby — I told you each step in <strong>order</strong>. Now let&apos;s read about the steps of ANOTHER hobby called <strong>geocaching</strong>!"
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:9.09%"></div></div>
+  </div>
+</div>
+
+<!-- s5 SEQUENCE MINI-GAME (academic) -->
+<div class="slide" id="s5" data-notes="<strong>Academic word: sequence 🎯.</strong> Embodied mini-game — drag 4 chips into 1-2-3-4 to build a sentence. The word performs ordering. After Leo orders them, the flowchart concept clicks because it&apos;s the same idea.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Academic Word — sequence 🎯</span><span class="hd-chip src">🎓 Mini-game</span></div>
+  <div class="body cream">
+    <div class="header-bar amber">🎯 sequence = the ORDER things happen in</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "<strong>Sequence</strong> means the ORDER of steps. Tap each chip in the right order (1 → 2 → 3 → 4) to build the sentence!"</div>
+    <div style="background:var(--cream);border:3px solid var(--amber);border-radius:18px;padding:24px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--amber);margin-bottom:10px;letter-spacing:1px">BUILD THE SENTENCE — IN ORDER:</div>
+      <div class="seq-stage" style="margin-bottom:18px">
+        <span class="seq-slot" id="seq-1">1</span>
+        <span style="color:var(--amber);font-size:22px;font-weight:900">→</span>
+        <span class="seq-slot" id="seq-2">2</span>
+        <span style="color:var(--amber);font-size:22px;font-weight:900">→</span>
+        <span class="seq-slot" id="seq-3">3</span>
+        <span style="color:var(--amber);font-size:22px;font-weight:900">→</span>
+        <span class="seq-slot" id="seq-4">4</span>
+      </div>
+      <div style="font-size:16px;color:var(--navy);font-weight:700;margin-bottom:10px">Tap each chip in the correct order:</div>
+      <div class="chips" id="seq-chips">
+        <button class="seq-chip" data-pos="3" onclick="seqPick(this)">brush your teeth</button>
+        <button class="seq-chip" data-pos="1" onclick="seqPick(this)">wake up</button>
+        <button class="seq-chip" data-pos="4" onclick="seqPick(this)">go to school</button>
+        <button class="seq-chip" data-pos="2" onclick="seqPick(this)">eat breakfast</button>
+      </div>
+      <div id="seq-result" style="margin-top:14px;font-size:20px;font-weight:800;color:var(--green-d);min-height:30px"></div>
+    </div>
+    <div class="info-box tint-green" style="font-size:19px;font-weight:700;color:var(--navy);text-align:center">✅ That&apos;s a <strong>sequence</strong>! Today&apos;s flowchart works the same way — 5 steps in the right order.</div>
+    <div class="pbar"><div class="pbar-fill" style="width:11.36%"></div></div>
+  </div>
+</div>
+
+<!-- s6 COMPASS UNIFIED INTERACTIVE -->
+<div class="slide" id="s6" data-notes="<strong>compass 🧭 unified interactive (LP graphic literacy + content vocab).</strong> Word + N/E/S/W directions taught together. The compass UI returns on s29 for the &quot;name a country north of China&quot; map task. Click each direction to highlight + hear the word.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Content Vocab — compass 🧭</span><span class="hd-chip src">📖 LP Graphic Literacy</span></div>
+  <div class="body cream">
+    <div class="header-bar amber">🧭 compass — a tool that shows direction</div>
+    <div style="display:flex;gap:32px;flex:1;align-items:center">
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px;align-items:center">
+        <div class="compass-wrap">
+          <div class="compass-N" onclick="compassClick('N')">N</div>
+          <div class="compass-E" onclick="compassClick('E')">E</div>
+          <div class="compass-S" onclick="compassClick('S')">S</div>
+          <div class="compass-W" onclick="compassClick('W')">W</div>
+          <div class="compass-needle" id="compass-needle">⬆️</div>
+        </div>
+        <div style="font-size:16px;color:var(--navy);font-weight:700">Tap N · E · S · W to point the needle!</div>
+      </div>
+      <div style="flex:1.2;display:flex;flex-direction:column;gap:12px">
+        <div class="info-box tint-amber">
+          <div style="font-size:20px;font-weight:900;color:var(--amber);margin-bottom:6px">🧭 DEFINITION</div>
+          <div style="font-size:20px;color:var(--navy);font-weight:600">A <strong>compass</strong> is a tool that shows the four <strong>directions</strong>: north, east, south, west.</div>
+          <div style="font-size:14px;color:#6b7280;font-style:italic;margin-top:4px">羅針盤 (らしんばん) — directions: 北 east 東 south 南 west 西</div>
+        </div>
+        <div class="info-box">
+          <div style="font-size:18px;font-weight:900;color:var(--navy);margin-bottom:6px">📐 The 4 directions</div>
+          <div style="font-size:18px;color:var(--navy);font-weight:600;line-height:1.7">
+            ⬆️ <strong>N</strong> · north (up on a map)<br>
+            ➡️ <strong>E</strong> · east (right on a map)<br>
+            ⬇️ <strong>S</strong> · south (down on a map)<br>
+            ⬅️ <strong>W</strong> · west (left on a map)
+          </div>
+        </div>
+        <div id="compass-msg" class="info-box tint-green" style="font-size:18px;color:var(--navy);font-weight:700;min-height:40px;text-align:center">Tap a direction on the compass! 🧭</div>
+        <div class="info-box tint-blue" style="font-size:16px;color:var(--navy);font-weight:600">🔮 We&apos;ll use this compass AGAIN later when we read about finding the cache on a world map!</div>
+      </div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:13.64%"></div></div>
+  </div>
+</div>
+
+<!-- s7 HIDERS + SEEKERS MINI-GAME -->
+<div class="slide" id="s7" data-notes="<strong>hiders 🙈 + seekers 🔍 (combined mini-game).</strong> Hide-and-seek scene. Tap who&apos;s the HIDER (one hiding the box). Then tap who&apos;s the SEEKER (one looking for the box). Both unlock together. Pre-loads ¶1.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Content Vocab — hiders 🙈 + seekers 🔍</span><span class="hd-chip src">📖 LP Content Vocab</span></div>
+  <div class="body cream">
+    <div class="header-bar green">🙈🔍 Two roles in hide-and-seek</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "Hide-and-seek has TWO roles. The person who <strong>hides</strong> the box = a <strong>hider</strong>. The person who <strong>looks for</strong> the box = a <strong>seeker</strong>. Tap each in the scene!"</div>
+    <div style="display:flex;gap:24px;flex:1">
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:18px;font-weight:900;color:var(--green-d)">🎮 The scene — tap each person&apos;s role:</div>
+        <div class="mg-card" onclick="hsRole(this,'hider')">
+          <div style="font-size:60px">🙈</div>
+          <div style="font-size:18px;font-weight:800;color:var(--navy)">Person A — hiding the box behind a tree</div>
+          <div style="font-size:14px;color:#6b7280;margin-top:4px" class="hs-fb"></div>
+        </div>
+        <div class="mg-card" onclick="hsRole(this,'seeker')">
+          <div style="font-size:60px">🔍</div>
+          <div style="font-size:18px;font-weight:800;color:var(--navy)">Person B — looking around with a flashlight</div>
+          <div style="font-size:14px;color:#6b7280;margin-top:4px" class="hs-fb"></div>
+        </div>
+        <div class="mg-card" onclick="hsRole(this,'hider')">
+          <div style="font-size:60px">🌳🙈</div>
+          <div style="font-size:18px;font-weight:800;color:var(--navy)">Person C — putting a box in a bush</div>
+          <div style="font-size:14px;color:#6b7280;margin-top:4px" class="hs-fb"></div>
+        </div>
+        <div class="mg-card" onclick="hsRole(this,'seeker')">
+          <div style="font-size:60px">📱🔍</div>
+          <div style="font-size:18px;font-weight:800;color:var(--navy)">Person D — using an app to find the box</div>
+          <div style="font-size:14px;color:#6b7280;margin-top:4px" class="hs-fb"></div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px">
+        <div class="info-box tint-green">
+          <div style="font-size:20px;font-weight:900;color:var(--green-d);margin-bottom:6px">🙈 HIDERS</div>
+          <div style="font-size:18px;color:var(--navy);font-weight:600">The people who <strong>hide</strong> something. <em>(One hides → many hiders.)</em></div>
+        </div>
+        <div class="info-box tint-blue">
+          <div style="font-size:20px;font-weight:900;color:var(--blue-d);margin-bottom:6px">🔍 SEEKERS</div>
+          <div style="font-size:18px;color:var(--navy);font-weight:600">The people who <strong>look for</strong> (seek) something. <em>(One seeks → many seekers.)</em></div>
+        </div>
+        <div class="mg-score">Tagged: <span id="hs-count">0</span> / 4 people</div>
+        <div id="hs-win" class="mg-win hidden">🌟 All 4 tagged! You know <em>hiders</em> AND <em>seekers</em> — ready for ¶1!</div>
+      </div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:15.91%"></div></div>
+  </div>
+</div>
+
+<!-- s8 TREASURE + ORNAMENT MINI-GAME -->
+<div class="slide" id="s8" data-notes="<strong>treasure 💎 + ornament 🎨 (combined mini-game).</strong> Small-objects sort. Tap each item — is it a TREASURE (something valuable/special you&apos;d find) or an ORNAMENT (something decorative)? Pre-loads ¶3&apos;s &quot;a small toy, an ornament, or a little book.&quot;">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Content Vocab — treasure 💎 + ornament 🎨</span><span class="hd-chip src">📖 LP Content Vocab</span></div>
+  <div class="body cream">
+    <div class="header-bar orange">💎🎨 Two kinds of small special items</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "Inside a geocache, you&apos;ll find small items. Some are <strong>treasures</strong> (special things you&apos;d like to find). Some are <strong>ornaments</strong> (small decorative things). Sort each one!"</div>
+    <div style="display:flex;gap:20px;flex:1">
+      <div style="flex:1;background:var(--orange-bg);border:3px solid var(--orange);border-radius:16px;padding:18px">
+        <div style="font-size:22px;font-weight:900;color:var(--orange);text-align:center;margin-bottom:10px">💎 TREASURE — special / valuable</div>
+        <div style="font-size:16px;color:var(--navy);font-weight:600;text-align:center;font-style:italic;margin-bottom:14px">a thing you really want to find</div>
+        <div id="treas-box" style="min-height:140px;background:rgba(255,255,255,.5);border-radius:10px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center"><span style="color:#9ca3af;font-size:14px">Tap items below — sort the treasures here</span></div>
+      </div>
+      <div style="flex:1;background:var(--amber-bg);border:3px solid var(--amber);border-radius:16px;padding:18px">
+        <div style="font-size:22px;font-weight:900;color:var(--amber);text-align:center;margin-bottom:10px">🎨 ORNAMENT — decorative</div>
+        <div style="font-size:16px;color:var(--navy);font-weight:600;text-align:center;font-style:italic;margin-bottom:14px">a small thing that looks pretty</div>
+        <div id="orn-box" style="min-height:140px;background:rgba(255,255,255,.5);border-radius:10px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center"><span style="color:#9ca3af;font-size:14px">Tap items below — sort the ornaments here</span></div>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:14px;padding:16px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.06)">
+      <button class="mg-card" data-kind="treasure" data-em="💰" data-name="gold coin" onclick="toItem(this)" style="cursor:pointer;padding:10px 16px"><div style="font-size:32px">💰</div><div style="font-size:14px">gold coin</div></button>
+      <button class="mg-card" data-kind="ornament" data-em="🎄" data-name="glass star" onclick="toItem(this)" style="cursor:pointer;padding:10px 16px"><div style="font-size:32px">🎄</div><div style="font-size:14px">glass star</div></button>
+      <button class="mg-card" data-kind="treasure" data-em="💎" data-name="jewel" onclick="toItem(this)" style="cursor:pointer;padding:10px 16px"><div style="font-size:32px">💎</div><div style="font-size:14px">jewel</div></button>
+      <button class="mg-card" data-kind="ornament" data-em="🔔" data-name="small bell" onclick="toItem(this)" style="cursor:pointer;padding:10px 16px"><div style="font-size:32px">🔔</div><div style="font-size:14px">small bell</div></button>
+      <button class="mg-card" data-kind="treasure" data-em="🏆" data-name="mini trophy" onclick="toItem(this)" style="cursor:pointer;padding:10px 16px"><div style="font-size:32px">🏆</div><div style="font-size:14px">mini trophy</div></button>
+      <button class="mg-card" data-kind="ornament" data-em="🦌" data-name="tiny figurine" onclick="toItem(this)" style="cursor:pointer;padding:10px 16px"><div style="font-size:32px">🦌</div><div style="font-size:14px">tiny figurine</div></button>
+    </div>
+    <div class="mg-score">Sorted: <span id="to-count">0</span> / 6 items</div>
+    <div class="pbar"><div class="pbar-fill" style="width:18.18%"></div></div>
+  </div>
+</div>
+
+<!-- s9 SINKING SHIP MINI-GAME -->
+<div class="slide" id="s9" data-notes="<strong>sinking 🚢 mini-game.</strong> Ship animation — tap START. The ship tilts and goes down. Tap when it&apos;s &quot;sinking&quot; → the help button activates. This embodies the word AND ties directly to the Weird-But-True message-in-a-bottle aside on s30.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Content Vocab — sinking 🚢</span><span class="hd-chip src">📖 LP Content Vocab</span></div>
+  <div class="body cream">
+    <div class="header-bar blue">🚢 sinking = going down into water</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "When a boat is in trouble in the sea and going DOWN into the water, we say it is <strong>sinking</strong>. Tap START to watch a ship sink — then tap the HELP button when you see it sinking!"</div>
+    <div style="display:flex;gap:24px;flex:1">
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px">
+        <div class="ship-stage" id="ship-stage" onclick="shipHelp()">
+          <div class="ship-emoji" id="ship-emoji">⛵</div>
+          <div class="ship-help" id="ship-help">🆘 HELP! Sinking!</div>
+        </div>
+        <div style="display:flex;gap:14px;justify-content:center">
+          <button class="btn blue" onclick="shipStart()" id="ship-start">▶ START — watch the ship</button>
+          <button class="btn outline" onclick="shipReset()">🔄 Reset</button>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+        <div class="info-box tint-blue">
+          <div style="font-size:20px;font-weight:900;color:var(--blue-d);margin-bottom:6px">🚢 DEFINITION</div>
+          <div style="font-size:20px;color:var(--navy);font-weight:600"><strong>sinking</strong> — going DOWN into water (a boat sinks; the boat is sinking).</div>
+          <div style="font-size:14px;color:#6b7280;font-style:italic;margin-top:4px">沈んでいる (しずんでいる)</div>
+        </div>
+        <div class="info-box">
+          <div style="font-size:18px;font-weight:900;color:var(--navy);margin-bottom:4px">📐 In a sentence</div>
+          <div style="font-size:18px;color:var(--navy);font-weight:600;font-style:italic">"The boat <strong>was sinking</strong> in the storm."</div>
+        </div>
+        <div class="info-box tint-amber">
+          <div style="font-size:16px;font-weight:900;color:var(--amber);margin-bottom:4px">🔮 PREVIEW</div>
+          <div style="font-size:16px;color:var(--navy);font-weight:600">Later in this lesson we&apos;ll read a true story about a Japanese sailor whose boat was <strong>sinking</strong> — and what he did about it!</div>
+        </div>
+      </div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:20.45%"></div></div>
+  </div>
+</div>
+
+<!-- s10 PRESENT (turn to p.140) -->
+<div class="slide" id="s10" data-notes="<strong>Present (LP p.276 verbatim).</strong> Turn to page 140. Point out title + photos + compass + map. Visual orientation to the spread before predict.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Present — Turn to p.140</span><span class="hd-chip src">📖 LP p.276 + SB p.140</span></div>
+  <div class="body cream">
+    <div class="header-bar green">📖 Turn to page 140 — what do you see?</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "Open your book to page 140. Look at the TITLE, the PHOTOS, the COMPASS, and the MAP. We&apos;re about to read a real article!"</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;flex:1">
+      <div class="info-box tint-green" style="text-align:center;display:flex;flex-direction:column;justify-content:center;gap:6px">
+        <div style="font-size:60px">📖</div>
+        <div style="font-size:18px;font-weight:900;color:var(--green-d)">TITLE</div>
+        <div style="font-size:22px;font-weight:800;color:var(--navy)">HIDE and SEEK</div>
+        <div style="font-size:14px;color:#6b7280;font-style:italic">a game I know!</div>
+      </div>
+      <div class="info-box tint-blue" style="text-align:center;display:flex;flex-direction:column;justify-content:center;gap:6px">
+        <div style="font-size:60px">📷📷</div>
+        <div style="font-size:18px;font-weight:900;color:var(--blue-d)">PHOTOS</div>
+        <div style="font-size:16px;color:var(--navy);font-weight:600">two photos: a person finding a box, the inside of a box</div>
+      </div>
+      <div class="info-box tint-amber" style="text-align:center;display:flex;flex-direction:column;justify-content:center;gap:6px">
+        <div style="font-size:60px">🧭</div>
+        <div style="font-size:18px;font-weight:900;color:var(--amber)">COMPASS</div>
+        <div style="font-size:16px;color:var(--navy);font-weight:600">we just learned this on slide 6!</div>
+      </div>
+      <div class="info-box tint-orange" style="text-align:center;display:flex;flex-direction:column;justify-content:center;gap:6px">
+        <div style="font-size:60px">🗺️</div>
+        <div style="font-size:18px;font-weight:900;color:var(--orange)">MAP</div>
+        <div style="font-size:16px;color:var(--navy);font-weight:600">we&apos;ll use it later with the compass!</div>
+      </div>
+    </div>
+    <div class="info-box tint-green" style="font-size:20px;font-weight:700;color:var(--navy);text-align:center">💡 The title, photos, compass and map all give us CLUES about what this reading is about. Let&apos;s predict on the next slide!</div>
+    <div class="pbar"><div class="pbar-fill" style="width:22.73%"></div></div>
+  </div>
+</div>
+
+<!-- s11 PREDICT -->
+<div class="slide" id="s11" data-notes="<strong>Predict (LP &quot;What do you think this reading is going to be about?&quot;).</strong> Tap chips to vote. All votes lead to the same payoff — geocaching is a hobby where people HIDE and SEEK a box with treasure. Reveal answer below.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Predict — What is this reading about?</span><span class="hd-chip src">📖 LP p.276</span></div>
+  <div class="body cream">
+    <div class="header-bar yellow">🔮 Predict! What do YOU think the reading is about?</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "Look at the title, photos, compass and map. What do you think this reading is going to be about? Tap your best guess!"</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
+      <button class="mg-card" style="border-color:var(--blue);font-size:18px;padding:18px" onclick="predictPick(this,'A children&apos;s game played in a backyard')">🏃 A children&apos;s game played in a backyard</button>
+      <button class="mg-card" style="border-color:var(--orange);font-size:18px;padding:18px" onclick="predictPick(this,'An outdoor treasure-hunting hobby using a map')">🗺️ An outdoor treasure-hunting hobby using a map</button>
+      <button class="mg-card" style="border-color:var(--green);font-size:18px;padding:18px" onclick="predictPick(this,'How to make a hide-and-seek video game')">🎮 How to make a hide-and-seek video game</button>
+      <button class="mg-card" style="border-color:var(--amber);font-size:18px;padding:18px" onclick="predictPick(this,'A story about a sailor lost at sea')">⛵ A story about a sailor lost at sea</button>
+    </div>
+    <div id="predict-result" class="info-box tint-green" style="display:none;font-size:20px;font-weight:700;color:var(--navy);text-align:center">
+      💡 The reading is about <strong>geocaching</strong> — an outdoor hobby where some people <strong>hide</strong> a box with treasure, and others <strong>seek</strong> (find) it using a map, compass, or app!
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:25%"></div></div>
+  </div>
+</div>
+
+<!-- s12 PURPOSE + FLOWCHART PREVIEW -->
+<div class="slide" id="s12" data-notes="<strong>Purpose (LP p.276) — &quot;as we read, we&apos;ll write the steps that people follow to do geocaching.&quot;</strong> Show the flowchart again with step 1 modeled (per LP &quot;model completing the first two steps&quot;).">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Our Purpose — fill the flowchart!</span><span class="hd-chip src">📖 LP p.276</span></div>
+  <div class="body cream">
+    <div class="header-bar green">🎯 As we read, we&apos;ll fill the 5-step flowchart!</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "I&apos;ll play the audio (TR 8.7) and we&apos;ll read paragraph by paragraph. Each paragraph gives us ONE step. Watch the flowchart fill! Let me MODEL step 1 so you see how it works."</div>
+    <div class="flow-board" style="max-width:1700px;margin:0 auto;width:100%">
+      <div class="flow-title"><span>🏆 GEOCACHE HUNT — STEP FLOWCHART (preview)</span><span style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:4px 14px;font-size:14px">teacher modeling →</span></div>
+      <div class="flow-grid">
+        <div class="flow-slot filled" style="background:var(--yellow);border-color:var(--amber);color:var(--navy)"><div class="num" style="color:var(--amber)">1</div><div class="em">📦</div><div class="cap">Hiders hide a cache (a box with treasure) and a notebook.</div></div>
+        <div class="flow-slot"><div class="num">2</div><div class="em">❓</div><div class="cap">— from ¶2 —</div></div>
+        <div class="flow-slot"><div class="num">3</div><div class="em">❓</div><div class="cap">— from ¶3 —</div></div>
+        <div class="flow-slot"><div class="num">4</div><div class="em">❓</div><div class="cap">— from ¶3 —</div></div>
+        <div class="flow-slot"><div class="num">5</div><div class="em">❓</div><div class="cap">— from ¶4-5 —</div></div>
+      </div>
+    </div>
+    <div class="info-box tint-green" style="font-size:19px;font-weight:700;color:var(--navy);text-align:center">
+      👆 The first slot is MODELED for Leo. The remaining 4 will fill as we read paragraphs 2-5!
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:27.27%"></div></div>
+  </div>
+</div>
+
+<!-- s13 ¶1 PASSAGE -->
+<div class="slide" id="s13" data-notes="<strong>Read Together ¶1 — passage verbatim from TR 8.7.</strong> The actual paragraph 1 displayed faithfully. Yellow word tags are tap-to-gloss (outdoor + app). Compass + hiders + seekers reference our s6/s7 teaching. Read aloud with Leo first.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Read Together — ¶1</span><span class="hd-chip tr">🎧 TR 8.7 · ¶1</span></div>
+  <div class="body cream">
+    <div class="header-bar green">📖 Paragraph 1 — What is geocaching?</div>
+    <div class="passage">
+      <div class="passage title">HIDE and SEEK</div>
+      Geocaching is a fun <span class="tag" onclick="popGloss(this,'outdoor')">outdoor</span> hobby. It&apos;s like a game of hide and seek, with the <strong>🙈 hiders</strong> leaving <span class="tag" onclick="popGloss(this,'clues')">clues</span> for the <strong>🔍 seekers</strong> to find. Here&apos;s how it works: The hiders hide a box, or cache. Inside the box, they put some "<strong>💎 treasure</strong>"—small objects for you to find—and a notebook. If you want to be a seeker, or geocacher, you use an <span class="tag" onclick="popGloss(this,'app')">app</span> that tells you where there are caches near you.
+    </div>
+    <div class="info-box tint-blue" style="font-size:18px;font-weight:600;color:var(--navy)">💡 Tap the yellow words above for a quick gloss. The bolded words (hiders, seekers, treasure) we just learned on slides 7-8 — they should feel familiar!</div>
+    <div class="pbar"><div class="pbar-fill" style="width:29.55%"></div></div>
+  </div>
+</div>
+
+<!-- s14 ¶1 AUDIO -->
+<div class="slide" id="s14" data-notes="<strong>¶1 audio cue (TR 8.7).</strong> Play audio if available. Have Leo read along, then have him read on his own. Reference for pronunciation.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">¶1 — Listen &amp; Read</span><span class="hd-chip tr">🎧 TR 8.7</span></div>
+  <div class="body cream center">
+    <div style="font-size:32px;font-weight:900;color:var(--navy)">🎧 Listen to ¶1 on TR 8.7</div>
+    <div style="background:#fff;border:3px solid var(--blue);border-radius:18px;padding:36px;max-width:1300px;display:flex;flex-direction:column;gap:14px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.06)">
+      <div style="font-size:80px">🎧</div>
+      <div style="font-size:22px;color:var(--navy);font-weight:700">Play TR 8.7. Pause at the end of ¶1.</div>
+      <div style="font-size:18px;color:#6b7280;font-style:italic">Have Leo listen first, then read along, then read on his own.</div>
+    </div>
+    <div class="dialogue-box" style="max-width:1300px">💬 <b>Dad:</b> "Listening to the audio first helps you hear the rhythm. The bolded words are the ones we pre-taught — you know them already!"</div>
+    <div class="pbar"><div class="pbar-fill" style="width:31.82%"></div></div>
+  </div>
+</div>
+
+<!-- s15 ¶1 INLINE GLOSS -->
+<div class="slide" id="s15" data-notes="<strong>¶1 inline glosses — outdoor 🌳 + app 📱.</strong> Quick refresh cards for the two words tagged in ¶1. These are guessable / already-known, so they get cards not mini-games (per the vocab plan).">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">¶1 — Quick gloss</span><span class="hd-chip src">📖 inline gloss</span></div>
+  <div class="body cream">
+    <div class="header-bar amber">🔍 Quick gloss — two words from ¶1</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "Two words from ¶1 are easy — you probably know them already! Quick refresh:"</div>
+    <div style="display:flex;gap:18px;flex:1;align-items:center">
+      <div class="gloss-card" style="flex:1">
+        <div class="em">🌳</div>
+        <div>
+          <div class="word">outdoor</div>
+          <div class="def">happening or done <strong>outside</strong>, not inside a building.</div>
+          <div class="jp">アウトドアの · 屋外（おくがい）の</div>
+          <div style="font-size:14px;color:var(--green-d);margin-top:6px;font-style:italic">Example: Soccer is an <strong>outdoor</strong> sport.</div>
+        </div>
+      </div>
+      <div class="gloss-card" style="flex:1">
+        <div class="em">📱</div>
+        <div>
+          <div class="word">app</div>
+          <div class="def">a small program on your phone — short for "application."</div>
+          <div class="jp">アプリ</div>
+          <div style="font-size:14px;color:var(--green-d);margin-top:6px;font-style:italic">Example: I use a soccer <strong>app</strong> to check scores.</div>
+        </div>
+      </div>
+    </div>
+    <div class="info-box tint-green" style="font-size:18px;font-weight:700;color:var(--navy);text-align:center">✅ Now ¶1 has NO unknown words. We&apos;re safe to answer the comprehension question!</div>
+    <div class="pbar"><div class="pbar-fill" style="width:34.09%"></div></div>
+  </div>
+</div>
+
+<!-- s16 ¶1 COMPREHENSION -->
+<div class="slide" id="s16" data-notes="<strong>¶1 comprehension Q (LP verbatim &quot;What is geocaching?&quot;).</strong> Tap to reveal answer. Correct answer unlocks flowchart slot 1.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">¶1 — Understanding check</span><span class="hd-chip src">📖 LP comp ¶1</span></div>
+  <div class="body cream">
+    <div class="header-bar blue">🤔 ¶1 Comprehension Question</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "What is <strong>geocaching</strong>? (LP question for ¶1.) Pick the best answer!"</div>
+    <div style="display:flex;flex-direction:column;gap:12px;flex:1">
+      <button class="quiz-opt" style="font-size:20px;padding:14px 22px;text-align:left" onclick="comp1Pick(this,false)">A backyard game children play after school.</button>
+      <button class="quiz-opt" style="font-size:20px;padding:14px 22px;text-align:left" onclick="comp1Pick(this,true)">A fun outdoor hobby like hide-and-seek — hiders hide a box (cache) with treasure, and seekers use an app to find it.</button>
+      <button class="quiz-opt" style="font-size:20px;padding:14px 22px;text-align:left" onclick="comp1Pick(this,false)">A type of soccer training drill.</button>
+      <button class="quiz-opt" style="font-size:20px;padding:14px 22px;text-align:left" onclick="comp1Pick(this,false)">A video game played on a smartphone.</button>
+    </div>
+    <div id="comp1-reveal" class="comp-reveal">
+      ✅ <strong>Geocaching = a fun outdoor hobby like hide-and-seek</strong>. <strong>Hiders</strong> hide a box (called a <strong>cache</strong>) with <strong>treasure</strong> + a notebook. <strong>Seekers</strong> use an <strong>app</strong> to find it. → Step 1 of the flowchart unlocks!
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:36.36%"></div></div>
+  </div>
+</div>
+
+<!-- s17 ¶1 FLOWCHART SLOT 1 -->
+<div class="slide" id="s17" data-notes="<strong>¶1 → flowchart slot 1 unlocked.</strong> &quot;Hiders hide a cache (a box with treasure) and a notebook.&quot; The board fills visually so Leo SEES progress.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Step 1 unlocked!</span><span class="hd-chip src">⭐ Spine</span></div>
+  <div class="body grad-navy">
+    <div style="font-size:32px;font-weight:900;color:#fff;text-align:center">⭐ STEP 1 OF 5 UNLOCKED!</div>
+    <div class="flow-board" style="max-width:1700px;margin:0 auto;width:100%">
+      <div class="flow-title"><span>🏆 GEOCACHE HUNT — STEP FLOWCHART</span><span style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:4px 14px;font-size:14px"><span id="flow-count-2">1</span> / 5 steps</span></div>
+      <div class="flow-grid">
+        <div class="flow-slot filled"><div class="num">1</div><div class="em">📦</div><div class="cap">Hiders hide a cache (a box with treasure) and a notebook.</div></div>
+        <div class="flow-slot"><div class="num">2</div><div class="em">❓</div><div class="cap">— from ¶2 —</div></div>
+        <div class="flow-slot"><div class="num">3</div><div class="em">❓</div><div class="cap">— from ¶3 —</div></div>
+        <div class="flow-slot"><div class="num">4</div><div class="em">❓</div><div class="cap">— from ¶3 —</div></div>
+        <div class="flow-slot"><div class="num">5</div><div class="em">❓</div><div class="cap">— from ¶4-5 —</div></div>
+      </div>
+    </div>
+    <div class="dialogue-box" style="background:rgba(255,255,255,.95);max-width:1400px;margin:0 auto">💬 <b>Dad:</b> "Step 1 done! Now ¶2 will tell us WHAT seekers need to find the cache. Ready?"</div>
+    <div class="pbar"><div class="pbar-fill" style="width:38.64%"></div></div>
+  </div>
+</div>
+
+<!-- s18 ¶2 PASSAGE -->
+<div class="slide" id="s18" data-notes="<strong>Read Together ¶2 — passage verbatim.</strong> Compass + clues callbacks. Pause at end of ¶2 for the comprehension Q (LP &quot;What things do you need for geocaching?&quot;).">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Read Together — ¶2</span><span class="hd-chip tr">🎧 TR 8.7 · ¶2</span></div>
+  <div class="body cream">
+    <div class="header-bar green">📖 Paragraph 2 — What do you need?</div>
+    <div class="passage">
+      Then you look for the cache. To help you find it, you need to have your smartphone with online <span class="tag" onclick="popGloss(this,'clues')">clues</span>, or a map and <strong>🧭 compass</strong>. You should also take a pen or pencil and a few small <strong>💎 treasures</strong> to leave for other people.
+    </div>
+    <div style="display:flex;gap:16px;align-items:center">
+      <div style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:6px 14px;font-size:18px;font-weight:900;flex-shrink:0">SIGNAL WORD</div>
+      <div style="font-size:18px;color:var(--navy);font-weight:600">"<strong>Then</strong> you look for the cache..." — <em>Then</em> connects ¶2 to ¶1. It tells us this happens AFTER hiders hide the box. 👆 That&apos;s a sequence signal word at work!</div>
+    </div>
+    <div class="info-box tint-blue" style="font-size:17px;font-weight:600;color:var(--navy)">💡 We already know <strong>🧭 compass</strong> (slide 6) and <strong>💎 treasures</strong> (slide 8). Tap the yellow word <em>clues</em> for a quick gloss.</div>
+    <div class="pbar"><div class="pbar-fill" style="width:40.91%"></div></div>
+  </div>
+</div>
+
+<!-- s19 ¶2 CLUES GLOSS -->
+<div class="slide" id="s19" data-notes="<strong>¶2 inline gloss — clues 🔎.</strong> Quick refresh card. Plus compass callback to s6.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">¶2 — Quick gloss</span><span class="hd-chip src">📖 inline gloss</span></div>
+  <div class="body cream">
+    <div class="header-bar amber">🔍 Quick gloss — one new word</div>
+    <div style="display:flex;gap:18px;flex:1;align-items:center">
+      <div class="gloss-card" style="flex:1">
+        <div class="em">🔎</div>
+        <div>
+          <div class="word">clues</div>
+          <div class="def">small bits of information that <strong>help you find or solve</strong> something.</div>
+          <div class="jp">手がかり (てがかり)</div>
+          <div style="font-size:14px;color:var(--green-d);margin-top:6px;font-style:italic">Example: Detectives follow <strong>clues</strong> to solve mysteries. In geocaching, online <strong>clues</strong> tell you where the cache is hidden.</div>
+        </div>
+      </div>
+      <div class="gloss-card" style="flex:1;border-color:var(--amber);background:var(--amber-bg)">
+        <div class="em">🧭</div>
+        <div>
+          <div class="word" style="color:var(--amber)">compass — recall from slide 6!</div>
+          <div class="def">a tool that shows the four directions (N, E, S, W).</div>
+          <div style="font-size:14px;color:var(--amber);margin-top:6px;font-style:italic">In ¶2: "...a map and compass" — together they help you navigate to the cache.</div>
+        </div>
+      </div>
+    </div>
+    <div class="info-box tint-green" style="font-size:18px;font-weight:700;color:var(--navy);text-align:center">✅ ¶2 is fully clear. On to the comprehension Q!</div>
+    <div class="pbar"><div class="pbar-fill" style="width:43.18%"></div></div>
+  </div>
+</div>
+
+<!-- s20 ¶2 COMPREHENSION -->
+<div class="slide" id="s20" data-notes="<strong>¶2 comprehension (LP verbatim &quot;What things do you need for geocaching?&quot;).</strong> Multi-select — tap all the things mentioned in ¶2.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">¶2 — Understanding check</span><span class="hd-chip src">📖 LP comp ¶2</span></div>
+  <div class="body cream">
+    <div class="header-bar blue">🤔 ¶2 Comprehension Question</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "What things do you NEED for geocaching? (LP question.) Tap ALL the correct items — there&apos;s more than one!"</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <button class="quiz-opt" style="font-size:18px;padding:14px;text-align:center" onclick="comp2Pick(this,true)">📱 a smartphone with online <strong>clues</strong></button>
+      <button class="quiz-opt" style="font-size:18px;padding:14px;text-align:center" onclick="comp2Pick(this,true)">🗺️ a <strong>map</strong></button>
+      <button class="quiz-opt" style="font-size:18px;padding:14px;text-align:center" onclick="comp2Pick(this,true)">🧭 a <strong>compass</strong></button>
+      <button class="quiz-opt" style="font-size:18px;padding:14px;text-align:center" onclick="comp2Pick(this,true)">✏️ a pen or pencil</button>
+      <button class="quiz-opt" style="font-size:18px;padding:14px;text-align:center" onclick="comp2Pick(this,true)">💎 small <strong>treasures</strong> to leave</button>
+      <button class="quiz-opt" style="font-size:18px;padding:14px;text-align:center" onclick="comp2Pick(this,false)">⚽ a soccer ball</button>
+      <button class="quiz-opt" style="font-size:18px;padding:14px;text-align:center" onclick="comp2Pick(this,false)">🚗 a car</button>
+      <button class="quiz-opt" style="font-size:18px;padding:14px;text-align:center" onclick="comp2Pick(this,false)">🍕 pizza</button>
+      <button class="quiz-opt" style="font-size:18px;padding:14px;text-align:center" onclick="comp2Pick(this,false)">🛏️ a sleeping bag</button>
+    </div>
+    <div id="comp2-reveal" class="comp-reveal">
+      ✅ ¶2 lists FIVE things: <strong>smartphone with online clues</strong> OR <strong>map + compass</strong> · <strong>pen / pencil</strong> · <strong>small treasures to leave</strong>. → Step 2 of the flowchart unlocks!
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:45.45%"></div></div>
+  </div>
+</div>
+
+<!-- s21 ¶2 FLOWCHART SLOT 2 -->
+<div class="slide" id="s21" data-notes="<strong>¶2 → flowchart slot 2 unlocked.</strong> &quot;Seekers use an app OR map + compass to find the cache.&quot;">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Step 2 unlocked!</span><span class="hd-chip src">⭐ Spine</span></div>
+  <div class="body grad-navy">
+    <div style="font-size:32px;font-weight:900;color:#fff;text-align:center">⭐ STEP 2 OF 5 UNLOCKED!</div>
+    <div class="flow-board" style="max-width:1700px;margin:0 auto;width:100%">
+      <div class="flow-title"><span>🏆 GEOCACHE HUNT — STEP FLOWCHART</span><span style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:4px 14px;font-size:14px"><span>2</span> / 5 steps</span></div>
+      <div class="flow-grid">
+        <div class="flow-slot filled"><div class="num">1</div><div class="em">📦</div><div class="cap">Hiders hide a cache (a box with treasure) and a notebook.</div></div>
+        <div class="flow-slot filled"><div class="num">2</div><div class="em">🧭</div><div class="cap">Seekers use an app OR map + compass to find the cache.</div></div>
+        <div class="flow-slot"><div class="num">3</div><div class="em">❓</div><div class="cap">— from ¶3 —</div></div>
+        <div class="flow-slot"><div class="num">4</div><div class="em">❓</div><div class="cap">— from ¶3 —</div></div>
+        <div class="flow-slot"><div class="num">5</div><div class="em">❓</div><div class="cap">— from ¶4-5 —</div></div>
+      </div>
+    </div>
+    <div class="dialogue-box" style="background:rgba(255,255,255,.95);max-width:1400px;margin:0 auto">💬 <b>Dad:</b> "Halfway through ¶2! Now ¶3 tells us what to do WHEN we find the cache. It has TWO steps in it (slots 3 AND 4)."</div>
+    <div class="pbar"><div class="pbar-fill" style="width:47.73%"></div></div>
+  </div>
+</div>
+
+<!-- s22 ¶3 PASSAGE -->
+<div class="slide" id="s22" data-notes="<strong>Read Together ¶3 — passage verbatim.</strong> THIS is the paragraph with the 5 Practice steps. ornament + treasure callbacks. Notice the chain of signal words: When... Then... Then...">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Read Together — ¶3 (the BIG one!)</span><span class="hd-chip tr">🎧 TR 8.7 · ¶3</span></div>
+  <div class="body cream">
+    <div class="header-bar green">📖 Paragraph 3 — When you FIND the cache</div>
+    <div class="passage">
+      <strong>When</strong> you find the cache, you look for the notebook inside. <strong>Then</strong> you write your name and the date. <strong>Then</strong> you look at the <strong>💎 treasures</strong> in the box, and choose something you like to take away. You might choose a small toy, an <strong>🎨 ornament</strong>, or a little book. Don&apos;t forget to leave another treasure in its place!
+    </div>
+    <div style="display:flex;gap:14px">
+      <div style="flex:1;background:var(--yellow);color:var(--navy);border-radius:12px;padding:14px 18px;font-size:17px;font-weight:700">
+        🎯 <strong>SIGNAL WORDS in ¶3:</strong> When... Then... Then... — they tell us the ORDER of steps!
+      </div>
+      <div style="flex:1;background:var(--blue-bg);border-radius:12px;padding:14px 18px;font-size:17px;color:var(--navy);font-weight:700">
+        🔮 <strong>PREVIEW:</strong> This paragraph hides FIVE steps! Practice Activity 2 will ask us to put them in order.
+      </div>
+    </div>
+    <div class="info-box tint-green" style="font-size:17px;font-weight:600;color:var(--navy)">✅ <strong>💎 treasure</strong> (slide 8) + <strong>🎨 ornament</strong> (slide 8) already known. No ambush!</div>
+    <div class="pbar"><div class="pbar-fill" style="width:50%"></div></div>
+  </div>
+</div>
+
+<!-- s23 ¶3 CALLBACK CARDS -->
+<div class="slide" id="s23" data-notes="<strong>¶3 vocab callbacks — treasure 💎 + ornament 🎨 reminders.</strong> Tap each to recall the definition. The deeper move: notice ¶3 says &quot;a small toy, an ornament, or a little book&quot; — all small special things you might find. The pre-teach on s8 paid off here.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">¶3 — Vocab callbacks</span><span class="hd-chip src">📖 callback</span></div>
+  <div class="body cream">
+    <div class="header-bar amber">🔁 Words we already know — appearing in ¶3!</div>
+    <div style="display:flex;gap:18px;flex:1;align-items:center">
+      <div class="gloss-card" style="flex:1;border-color:var(--orange);background:var(--orange-bg)">
+        <div class="em">💎</div>
+        <div>
+          <div class="word" style="color:var(--orange)">treasure (from slide 8)</div>
+          <div class="def">a special small thing you&apos;d like to find.</div>
+          <div style="font-size:14px;color:var(--orange);margin-top:6px;font-style:italic">¶3: "Then you look at the <strong>treasures</strong> in the box, and choose something you like to take away."</div>
+        </div>
+      </div>
+      <div class="gloss-card" style="flex:1;border-color:var(--amber);background:var(--amber-bg)">
+        <div class="em">🎨</div>
+        <div>
+          <div class="word" style="color:var(--amber)">ornament (from slide 8)</div>
+          <div class="def">a small decorative thing.</div>
+          <div style="font-size:14px;color:var(--amber);margin-top:6px;font-style:italic">¶3: "You might choose a small toy, an <strong>ornament</strong>, or a little book."</div>
+        </div>
+      </div>
+    </div>
+    <div class="info-box tint-green" style="font-size:19px;font-weight:700;color:var(--navy);text-align:center">
+      ✅ Both words taught on slide 8 — Leo meets them in ¶3 already knowing them. <strong>No ambush!</strong> 💪
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:52.27%"></div></div>
+  </div>
+</div>
+
+<!-- s24 ¶3 COMPREHENSION -->
+<div class="slide" id="s24" data-notes="<strong>¶3 comprehension (LP verbatim &quot;What do you do when you find the cache?&quot;).</strong> Tap to reveal the multi-step answer. This sets up Practice Activity 2 directly.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">¶3 — Understanding check</span><span class="hd-chip src">📖 LP comp ¶3</span></div>
+  <div class="body cream">
+    <div class="header-bar blue">🤔 ¶3 Comprehension Question</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "What do you do <strong>when you find the cache</strong>? (LP question for ¶3.) There are SEVERAL steps — tap to reveal them in order!"</div>
+    <button class="info-box" style="border:none;font-family:inherit;cursor:pointer;text-align:left;padding:24px;width:100%" onclick="this.querySelector('.ans').classList.toggle('hidden')">
+      <div style="font-size:24px;font-weight:900;color:var(--navy);margin-bottom:8px">Tap to reveal the answer from ¶3 ↓</div>
+      <div class="ans hidden" style="font-size:20px;color:var(--navy);font-weight:600;line-height:1.9;margin-top:12px">
+        <div style="background:var(--green-bg);border-left:4px solid var(--green);padding:10px 16px;border-radius:8px;margin-bottom:6px">① <strong>When</strong> you find the cache → look for the <strong>notebook</strong> inside.</div>
+        <div style="background:var(--green-bg);border-left:4px solid var(--green);padding:10px 16px;border-radius:8px;margin-bottom:6px">② <strong>Then</strong> write your <strong>name and the date</strong>.</div>
+        <div style="background:var(--green-bg);border-left:4px solid var(--green);padding:10px 16px;border-radius:8px;margin-bottom:6px">③ <strong>Then</strong> look at the <strong>treasures</strong> and <strong>choose something</strong> to take.</div>
+        <div style="background:var(--green-bg);border-left:4px solid var(--green);padding:10px 16px;border-radius:8px">④ <strong>Don&apos;t forget</strong> to leave <strong>another treasure</strong> in its place!</div>
+      </div>
+    </button>
+    <div class="info-box tint-amber" style="font-size:18px;font-weight:700;color:var(--navy)">💡 Notice the <strong>signal words</strong>: When, Then, Then. They mark the SEQUENCE — exactly what Practice Activity 2 asks us to put in order!</div>
+    <div class="pbar"><div class="pbar-fill" style="width:54.55%"></div></div>
+  </div>
+</div>
+
+<!-- s25 ¶3 FLOWCHART SLOTS 3+4 -->
+<div class="slide" id="s25" data-notes="<strong>¶3 → flowchart slots 3 AND 4 unlocked (double unlock).</strong> Slot 3 = &quot;Write name + date.&quot; Slot 4 = &quot;Choose a treasure, leave another.&quot;">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Steps 3 AND 4 unlocked!</span><span class="hd-chip src">⭐ Spine — DOUBLE!</span></div>
+  <div class="body grad-navy">
+    <div style="font-size:32px;font-weight:900;color:#fff;text-align:center">⭐⭐ STEPS 3 + 4 OF 5 UNLOCKED!</div>
+    <div class="flow-board" style="max-width:1700px;margin:0 auto;width:100%">
+      <div class="flow-title"><span>🏆 GEOCACHE HUNT — STEP FLOWCHART</span><span style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:4px 14px;font-size:14px"><span>4</span> / 5 steps</span></div>
+      <div class="flow-grid">
+        <div class="flow-slot filled"><div class="num">1</div><div class="em">📦</div><div class="cap">Hiders hide a cache and a notebook.</div></div>
+        <div class="flow-slot filled"><div class="num">2</div><div class="em">🧭</div><div class="cap">Seekers use an app OR map + compass.</div></div>
+        <div class="flow-slot filled"><div class="num">3</div><div class="em">📝</div><div class="cap">Find notebook + write name and date.</div></div>
+        <div class="flow-slot filled"><div class="num">4</div><div class="em">💎</div><div class="cap">Choose a treasure, leave another one.</div></div>
+        <div class="flow-slot"><div class="num">5</div><div class="em">❓</div><div class="cap">— from ¶4-5 —</div></div>
+      </div>
+    </div>
+    <div class="dialogue-box" style="background:rgba(255,255,255,.95);max-width:1400px;margin:0 auto">💬 <b>Dad:</b> "Almost there! One last paragraph (¶4-5) tells us WHY geocaching is a great hobby. Then the flowchart is full and we open the cache!"</div>
+    <div class="pbar"><div class="pbar-fill" style="width:56.82%"></div></div>
+  </div>
+</div>
+
+<!-- s26 ¶4-5 PASSAGE -->
+<div class="slide" id="s26" data-notes="<strong>Read Together ¶4-5 — passage verbatim.</strong> Closing paragraphs — geocaching as a great hobby. Make sure Leo hears the quote in ¶5 (the geocacher saying it&apos;s a great family activity).">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Read Together — ¶4-5</span><span class="hd-chip tr">🎧 TR 8.7 · ¶4-5</span></div>
+  <div class="body cream">
+    <div class="header-bar green">📖 Paragraphs 4 + 5 — Why geocaching is great</div>
+    <div class="passage" style="font-size:21px">
+      <strong>¶4:</strong> Geocaching is a great way to explore new places and make new friends. Many geocachers also help to clean up the places they visit by picking up garbage they see along the way.
+    </div>
+    <div class="passage" style="font-size:21px">
+      <strong>¶5:</strong> One geocacher says it&apos;s a great hobby because "It gets the whole family <strong>🌳 outside</strong> and doing something fun together. I love it!"
+    </div>
+    <div class="info-box tint-green" style="font-size:18px;font-weight:700;color:var(--navy)">✅ No unknown words in ¶4 or ¶5! Outdoor (s15) is the only callback. Read it together with Leo.</div>
+    <div class="pbar"><div class="pbar-fill" style="width:59.09%"></div></div>
+  </div>
+</div>
+
+<!-- s27 ¶4-5 COMPREHENSION -->
+<div class="slide" id="s27" data-notes="<strong>¶4-5 comprehension (LP verbatim &quot;In what ways is geocaching a great hobby?&quot;).</strong> Multi-select — explore new places, make friends, clean up, family together.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">¶4-5 — Understanding check</span><span class="hd-chip src">📖 LP comp ¶4-5</span></div>
+  <div class="body cream">
+    <div class="header-bar blue">🤔 ¶4-5 Comprehension Question</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "In what ways is geocaching a <strong>great hobby</strong>? (LP question.) Tap ALL the correct reasons from ¶4-5!"</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;flex:1">
+      <button class="quiz-opt" style="font-size:19px;padding:16px;text-align:left" onclick="comp45Pick(this,true)">🗺️ You explore NEW PLACES</button>
+      <button class="quiz-opt" style="font-size:19px;padding:16px;text-align:left" onclick="comp45Pick(this,true)">👥 You make NEW FRIENDS</button>
+      <button class="quiz-opt" style="font-size:19px;padding:16px;text-align:left" onclick="comp45Pick(this,true)">🧹 You help CLEAN UP places (pick up garbage)</button>
+      <button class="quiz-opt" style="font-size:19px;padding:16px;text-align:left" onclick="comp45Pick(this,true)">👨‍👩‍👧 The whole FAMILY does it together OUTDOORS</button>
+      <button class="quiz-opt" style="font-size:19px;padding:16px;text-align:left" onclick="comp45Pick(this,false)">⚽ You win soccer trophies</button>
+      <button class="quiz-opt" style="font-size:19px;padding:16px;text-align:left" onclick="comp45Pick(this,false)">📺 You earn money for TV</button>
+    </div>
+    <div id="comp45-reveal" class="comp-reveal">
+      ✅ FOUR great reasons from ¶4-5: <strong>explore new places</strong> · <strong>make new friends</strong> · <strong>clean up by picking up garbage</strong> · <strong>get the whole family outdoors having fun</strong>. → Step 5 unlocks!
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:61.36%"></div></div>
+  </div>
+</div>
+
+<!-- s28 ¶4-5 FLOWCHART FULL -->
+<div class="slide" id="s28" data-notes="<strong>¶4-5 → flowchart slot 5 unlocked. FLOWCHART COMPLETE!</strong> All 5 steps now visible. This sets up the Think Aloud + Strategy beats before Practice Activity 2.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Step 5 unlocked — FLOWCHART COMPLETE!</span><span class="hd-chip src">⭐ Spine</span></div>
+  <div class="body grad-navy">
+    <div style="font-size:36px;font-weight:900;color:var(--yellow);text-align:center">🏆 ALL 5 STEPS UNLOCKED — FLOWCHART COMPLETE!</div>
+    <div class="flow-board" style="max-width:1700px;margin:0 auto;width:100%;border-color:var(--yellow);border-width:4px">
+      <div class="flow-title"><span>🏆 GEOCACHE HUNT — STEP FLOWCHART</span><span style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:4px 14px;font-size:14px">5 / 5 ✅</span></div>
+      <div class="flow-grid">
+        <div class="flow-slot filled"><div class="num">1</div><div class="em">📦</div><div class="cap">Hiders hide a cache and a notebook.</div></div>
+        <div class="flow-slot filled"><div class="num">2</div><div class="em">🧭</div><div class="cap">Seekers use an app OR map + compass.</div></div>
+        <div class="flow-slot filled"><div class="num">3</div><div class="em">📝</div><div class="cap">Find notebook + write name and date.</div></div>
+        <div class="flow-slot filled"><div class="num">4</div><div class="em">💎</div><div class="cap">Choose a treasure, leave another one.</div></div>
+        <div class="flow-slot filled"><div class="num">5</div><div class="em">🤝</div><div class="cap">Make friends, clean up, fun for whole family.</div></div>
+      </div>
+    </div>
+    <div class="dialogue-box" style="background:rgba(255,255,255,.95);max-width:1500px;margin:0 auto">💬 <b>Dad:</b> "5 / 5! Now let&apos;s use the COMPASS on a real map (Think Aloud), then learn the SIGNAL WORDS strategy, then put the 5 cache-discovery sub-steps in order in Practice. Cache reveal coming!"</div>
+    <div class="pbar"><div class="pbar-fill" style="width:63.64%"></div></div>
+  </div>
+</div>
+
+<!-- s29 THINK ALOUD COMPASS ON MAP -->
+<div class="slide" id="s29" data-notes="<strong>Think Aloud — compass on world map (LP verbatim).</strong> Compass UI from s6 returns. 4 direction questions. LP example: &quot;Name a country north of China&quot; → Russia. Same UI = continuity.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Think Aloud — Compass + World Map</span><span class="hd-chip src">📖 LP Graphic Literacy</span></div>
+  <div class="body cream">
+    <div class="header-bar amber">🧭🗺️ Think Aloud — Use the compass on the world map</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "Remember the compass from slide 6? Let&apos;s use it on a world map! I&apos;ll ask you questions like the LP says: &quot;Name a country that&apos;s north of China.&quot;"</div>
+    <div style="display:flex;gap:24px;flex:1;align-items:center">
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px;align-items:center">
+        <div class="compass-wrap">
+          <div class="compass-N" onclick="compassClick('N')">N</div>
+          <div class="compass-E" onclick="compassClick('E')">E</div>
+          <div class="compass-S" onclick="compassClick('S')">S</div>
+          <div class="compass-W" onclick="compassClick('W')">W</div>
+          <div class="compass-needle" id="compass-needle-2">⬆️</div>
+        </div>
+        <div style="font-size:16px;color:var(--navy);font-weight:700">Tap a direction to point the needle</div>
+      </div>
+      <div style="flex:1.2;display:flex;flex-direction:column;gap:10px">
+        <button class="info-box" style="border:none;font-family:inherit;cursor:pointer;text-align:left;padding:14px 18px" onclick="this.querySelector('.a').classList.toggle('hidden')">
+          <div style="font-size:18px;font-weight:900;color:var(--amber)">Q1: Name a country <strong>north ⬆️</strong> of China.</div>
+          <div class="a hidden" style="background:var(--green-bg);border-radius:8px;padding:10px;font-size:18px;font-weight:800;color:var(--green-d);margin-top:6px">✅ Russia · Mongolia · Kazakhstan</div>
+        </button>
+        <button class="info-box" style="border:none;font-family:inherit;cursor:pointer;text-align:left;padding:14px 18px" onclick="this.querySelector('.a').classList.toggle('hidden')">
+          <div style="font-size:18px;font-weight:900;color:var(--amber)">Q2: Name a country <strong>east ➡️</strong> of China.</div>
+          <div class="a hidden" style="background:var(--green-bg);border-radius:8px;padding:10px;font-size:18px;font-weight:800;color:var(--green-d);margin-top:6px">✅ Japan! 🇯🇵 (where Leo lives) · South Korea · North Korea</div>
+        </button>
+        <button class="info-box" style="border:none;font-family:inherit;cursor:pointer;text-align:left;padding:14px 18px" onclick="this.querySelector('.a').classList.toggle('hidden')">
+          <div style="font-size:18px;font-weight:900;color:var(--amber)">Q3: Name a country <strong>south ⬇️</strong> of China.</div>
+          <div class="a hidden" style="background:var(--green-bg);border-radius:8px;padding:10px;font-size:18px;font-weight:800;color:var(--green-d);margin-top:6px">✅ Vietnam · Laos · Myanmar · Thailand</div>
+        </button>
+        <button class="info-box" style="border:none;font-family:inherit;cursor:pointer;text-align:left;padding:14px 18px" onclick="this.querySelector('.a').classList.toggle('hidden')">
+          <div style="font-size:18px;font-weight:900;color:var(--amber)">Q4: Name a country <strong>west ⬅️</strong> of China.</div>
+          <div class="a hidden" style="background:var(--green-bg);border-radius:8px;padding:10px;font-size:18px;font-weight:800;color:var(--green-d);margin-top:6px">✅ India · Pakistan · Afghanistan</div>
+        </button>
+      </div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:65.91%"></div></div>
+  </div>
+</div>
+
+<!-- s30 WEIRD BUT TRUE -->
+<div class="slide" id="s30" data-notes="<strong>Weird But True — Japanese sailor message in a bottle (LP verbatim).</strong> sinking 🚢 callback to s9. 3 LP comprehension Qs. Why send the message? (boat was sinking) What did it say? (asked for help) When/where found? (150 years later, town where sailor was born).">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Weird But True — message in a bottle 🚢</span><span class="hd-chip src">📖 SB p.140 + LP</span></div>
+  <div class="body cream">
+    <div class="header-bar yellow">🌊 Weird But True! — a true story from page 140</div>
+    <div style="background:#fff;border:3px dashed var(--amber);border-radius:18px;padding:24px 32px;font-size:22px;color:var(--navy);font-weight:600;line-height:1.7;text-align:center">
+      🍾 "A Japanese sailor sent a <strong>message in a bottle</strong> when his boat was <strong>🚢 sinking</strong>. The message asked for help. About <strong>150 years later</strong>, the bottle arrived in the town where he was born!"
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+      <button class="info-box tint-blue" style="border:none;font-family:inherit;cursor:pointer;text-align:left;padding:16px" onclick="this.querySelector('.a').classList.toggle('hidden')">
+        <div style="font-size:18px;font-weight:900;color:var(--blue-d);margin-bottom:6px">Q1: Why did the sailor send a message in a bottle?</div>
+        <div class="a hidden" style="background:var(--green-bg);border-radius:8px;padding:10px;font-size:17px;color:var(--green-d);font-weight:800;margin-top:6px">✅ His boat was <strong>sinking</strong>!</div>
+      </button>
+      <button class="info-box tint-blue" style="border:none;font-family:inherit;cursor:pointer;text-align:left;padding:16px" onclick="this.querySelector('.a').classList.toggle('hidden')">
+        <div style="font-size:18px;font-weight:900;color:var(--blue-d);margin-bottom:6px">Q2: What did the message say?</div>
+        <div class="a hidden" style="background:var(--green-bg);border-radius:8px;padding:10px;font-size:17px;color:var(--green-d);font-weight:800;margin-top:6px">✅ It asked for <strong>help</strong>.</div>
+      </button>
+      <button class="info-box tint-blue" style="border:none;font-family:inherit;cursor:pointer;text-align:left;padding:16px" onclick="this.querySelector('.a').classList.toggle('hidden')">
+        <div style="font-size:18px;font-weight:900;color:var(--blue-d);margin-bottom:6px">Q3: When/where was the bottle found?</div>
+        <div class="a hidden" style="background:var(--green-bg);border-radius:8px;padding:10px;font-size:17px;color:var(--green-d);font-weight:800;margin-top:6px">✅ About <strong>150 years later</strong>, in the town where the <strong>sailor was born</strong>!</div>
+      </button>
+    </div>
+    <div class="info-box tint-green" style="font-size:18px;font-weight:700;color:var(--navy);text-align:center">💡 The word <strong>sinking</strong> 🚢 from slide 9 lives in this true story! Pre-teach pays off again.</div>
+    <div class="pbar"><div class="pbar-fill" style="width:68.18%"></div></div>
+  </div>
+</div>
+
+<!-- s31 LETTERBOXING ASIDE -->
+<div class="slide" id="s31" data-notes="<strong>Letterboxing aside — Be the Expert (LP p.277).</strong> Letterboxing is the older cousin of geocaching. Started in 1854 in southwest England. Tap to reveal the story.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Be the Expert — Letterboxing</span><span class="hd-chip src">📖 LP p.277</span></div>
+  <div class="body cream center">
+    <div style="font-size:34px;font-weight:900;color:var(--navy)">📜 Did You Know — Letterboxing came FIRST!</div>
+    <button class="info-box" style="border:none;font-family:inherit;cursor:pointer;text-align:left;padding:30px 40px;max-width:1400px;width:100%" onclick="this.querySelector('.a').classList.toggle('hidden')">
+      <div style="font-size:22px;font-weight:900;color:var(--green-d);margin-bottom:10px">Tap to reveal the story ↓</div>
+      <div class="a hidden" style="font-size:20px;color:var(--navy);font-weight:600;line-height:1.8;margin-top:14px">
+        🏞️ <strong>Letterboxing</strong> is a hobby that started BEFORE geocaching, the internet, and apps.<br><br>
+        🥾 It combines <strong>hiking</strong> and <strong>treasure hunting</strong>, but people often use <strong>maps</strong> or a <strong>compass</strong> instead of a phone.<br><br>
+        🇬🇧 According to legend, letterboxing originated in <strong>southwest England in 1854</strong>, when a nature guide hid a card with his name on it in a <strong>jar</strong> in an outdoor area and encouraged others to do the same.<br><br>
+        📮 People then started leaving <strong>postcards</strong> with their addresses or notes in the jar, hoping that the next visitor would <strong>mail them back</strong>.
+      </div>
+    </button>
+    <div class="info-box tint-green" style="max-width:1400px;font-size:18px;font-weight:700;color:var(--navy);text-align:center">🧭 Notice — letterboxing uses a compass too! Today&apos;s compass interactive (slide 6) would work for letterboxing as well as geocaching.</div>
+    <div class="pbar"><div class="pbar-fill" style="width:70.45%"></div></div>
+  </div>
+</div>
+
+<!-- s32 READING STRATEGY -->
+<div class="slide" id="s32" data-notes="<strong>Reading Strategy — Identify Sequence of Events (LP p.279).</strong> The 7 signal words explicit teaching. These are the tools Leo will use in Practice (s34-36).">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Reading Strategy — Identify Sequence of Events</span><span class="hd-chip src">📖 LP p.279</span></div>
+  <div class="body cream">
+    <div class="header-bar yellow">🎯 STRATEGY — find the SIGNAL WORDS to identify the sequence</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "When we read, we can ask: <strong>What happens FIRST? Then what happens? What happens LAST?</strong> Signal words help us answer. Learn these 7 — they&apos;ll appear EVERYWHERE!"</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex:1">
+      <div style="background:var(--yellow);color:var(--navy);border-radius:12px;padding:18px;text-align:center"><div style="font-size:32px;font-weight:900">1️⃣</div><div style="font-size:22px;font-weight:900">first</div></div>
+      <div style="background:var(--orange);color:#fff;border-radius:12px;padding:18px;text-align:center"><div style="font-size:32px;font-weight:900">2️⃣</div><div style="font-size:22px;font-weight:900">next</div></div>
+      <div style="background:var(--blue);color:#fff;border-radius:12px;padding:18px;text-align:center"><div style="font-size:32px;font-weight:900">⏮</div><div style="font-size:22px;font-weight:900">before</div></div>
+      <div style="background:var(--blue);color:#fff;border-radius:12px;padding:18px;text-align:center"><div style="font-size:32px;font-weight:900">⏭</div><div style="font-size:22px;font-weight:900">after</div></div>
+      <div style="background:var(--green);color:#fff;border-radius:12px;padding:18px;text-align:center"><div style="font-size:32px;font-weight:900">→</div><div style="font-size:22px;font-weight:900">then</div></div>
+      <div style="background:var(--amber);color:#fff;border-radius:12px;padding:18px;text-align:center"><div style="font-size:32px;font-weight:900">🏁</div><div style="font-size:22px;font-weight:900">finally</div></div>
+      <div style="background:var(--red);color:#fff;border-radius:12px;padding:18px;text-align:center"><div style="font-size:32px;font-weight:900">⏹</div><div style="font-size:22px;font-weight:900">last</div></div>
+      <div style="background:var(--navy);color:var(--yellow);border-radius:12px;padding:18px;text-align:center;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800">7 signal words 🎯</div>
+    </div>
+    <div class="info-box tint-green" style="font-size:18px;font-weight:700;color:var(--navy);text-align:center">💡 When you find one of these in a sentence → it tells you what step you&apos;re ON in the sequence!</div>
+    <div class="pbar"><div class="pbar-fill" style="width:72.73%"></div></div>
+  </div>
+</div>
+
+<!-- s33 SIGNAL WORD HUNT -->
+<div class="slide" id="s33" data-notes="<strong>Signal-word tap exercise.</strong> 5 sentences (cooking + soccer themed). Leo taps the signal word in each. Active practice with the strategy.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Signal Word Hunt!</span><span class="hd-chip src">🎯 Strategy practice</span></div>
+  <div class="body cream">
+    <div class="header-bar yellow">🔍 Tap the signal word in each sentence</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "Each sentence has ONE signal word. Tap it!"</div>
+    <div style="display:flex;flex-direction:column;gap:10px;flex:1">
+      <div class="info-box" style="font-size:20px;color:var(--navy);font-weight:600;padding:14px 20px">
+        1. To make pasta, <span class="quiz-opt" style="display:inline;padding:4px 10px;margin:0 4px" onclick="sigPick(this,true)">first</span> you boil the water, <span class="quiz-opt" style="display:inline;padding:4px 10px;margin:0 4px" onclick="sigPick(this,false)">then</span> you add the pasta.
+        <span style="font-size:14px;color:#6b7280;font-style:italic">(tap the word that means &quot;step 1&quot;)</span>
+      </div>
+      <div class="info-box" style="font-size:20px;color:var(--navy);font-weight:600;padding:14px 20px">
+        2. Bellingham scored. <span class="quiz-opt" style="display:inline;padding:4px 10px;margin:0 4px" onclick="sigPick(this,true)">Next</span>, Vinicius scored, and Madrid won the match.
+      </div>
+      <div class="info-box" style="font-size:20px;color:var(--navy);font-weight:600;padding:14px 20px">
+        3. <span class="quiz-opt" style="display:inline;padding:4px 10px;margin:0 4px" onclick="sigPick(this,true)">After</span> the match, the captain gave the trophy to the manager.
+      </div>
+      <div class="info-box" style="font-size:20px;color:var(--navy);font-weight:600;padding:14px 20px">
+        4. <span class="quiz-opt" style="display:inline;padding:4px 10px;margin:0 4px" onclick="sigPick(this,true)">Before</span> you cook, you should wash your hands.
+      </div>
+      <div class="info-box" style="font-size:20px;color:var(--navy);font-weight:600;padding:14px 20px">
+        5. The team trained for months. <span class="quiz-opt" style="display:inline;padding:4px 10px;margin:0 4px" onclick="sigPick(this,true)">Finally</span>, they won the Champions League!
+      </div>
+    </div>
+    <div class="info-box tint-green" style="font-size:18px;font-weight:700;color:var(--navy);text-align:center">✅ The signal words tell you the ORDER. Now we&apos;ll use them in Practice — put the geocaching cache-steps in order!</div>
+    <div class="pbar"><div class="pbar-fill" style="width:75%"></div></div>
+  </div>
+</div>
+
+<!-- s34 PRACTICE ACTIVITY 2 -->
+<div class="slide" id="s34" data-notes="<strong>Practice Activity 2 (LP p.278 verbatim).</strong> The 5 cache-discovery steps to put in order. LP-verbatim answer key: 1=find/open, 2=look for notebook, 3=write name/date, 4=choose treasure, 5=leave object. Tap each card to cycle 1→5.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Practice — Put the 5 steps in order!</span><span class="hd-chip src">📖 LP Activity 2</span></div>
+  <div class="body cream">
+    <div class="header-bar green">📋 Practice Activity 2 — order the 5 cache-discovery steps</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "These are the 5 steps from the reading. Tap each card to cycle through 1-5. Use the SIGNAL WORDS strategy from slide 32 to figure out the order!"</div>
+    <div style="display:flex;flex-direction:column;gap:10px;flex:1">
+      <div class="info-box" style="display:flex;align-items:center;gap:14px;cursor:pointer;padding:14px 20px" onclick="cycleOrder(this,'step-c')">
+        <div style="background:var(--orange);color:#fff;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900" class="step-num">_</div>
+        <div style="flex:1;font-size:20px;font-weight:700;color:var(--navy)">You write your name and the date.</div>
+        <div style="font-size:36px">📝</div>
+      </div>
+      <div class="info-box" style="display:flex;align-items:center;gap:14px;cursor:pointer;padding:14px 20px" onclick="cycleOrder(this,'step-b')">
+        <div style="background:var(--orange);color:#fff;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900" class="step-num">_</div>
+        <div style="flex:1;font-size:20px;font-weight:700;color:var(--navy)">You look for the notebook.</div>
+        <div style="font-size:36px">📓</div>
+      </div>
+      <div class="info-box" style="display:flex;align-items:center;gap:14px;cursor:pointer;padding:14px 20px" onclick="cycleOrder(this,'step-e')">
+        <div style="background:var(--orange);color:#fff;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900" class="step-num">_</div>
+        <div style="flex:1;font-size:20px;font-weight:700;color:var(--navy)">You leave an object in the box for someone else to find.</div>
+        <div style="font-size:36px">💎</div>
+      </div>
+      <div class="info-box" style="display:flex;align-items:center;gap:14px;cursor:pointer;padding:14px 20px" onclick="cycleOrder(this,'step-d')">
+        <div style="background:var(--orange);color:#fff;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900" class="step-num">_</div>
+        <div style="flex:1;font-size:20px;font-weight:700;color:var(--navy)">You choose a treasure to take away.</div>
+        <div style="font-size:36px">🎁</div>
+      </div>
+      <div class="info-box" style="display:flex;align-items:center;gap:14px;cursor:pointer;padding:14px 20px" onclick="cycleOrder(this,'step-a')">
+        <div style="background:var(--orange);color:#fff;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900" class="step-num">_</div>
+        <div style="flex:1;font-size:20px;font-weight:700;color:var(--navy)">You find the cache and open it.</div>
+        <div style="font-size:36px">📦</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:14px;justify-content:center;align-items:center">
+      <button class="btn green" onclick="checkSteps()">✓ Check my order</button>
+      <button class="btn outline" onclick="resetSteps()">🔄 Reset</button>
+      <div id="step-result" style="font-size:20px;font-weight:800;color:var(--green-d);min-width:240px;text-align:center"></div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:77.27%"></div></div>
+  </div>
+</div>
+
+<!-- s35 PRACTICE ANSWER REVEAL -->
+<div class="slide" id="s35" data-notes="<strong>Practice answer reveal (LP verbatim).</strong> Show the canonical order with reasoning. LP-verbatim numbering.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Practice — Correct order revealed</span><span class="hd-chip src">📖 LP answers</span></div>
+  <div class="body cream">
+    <div class="header-bar green">✅ The correct order — from ¶3 of the reading</div>
+    <div style="display:flex;flex-direction:column;gap:12px;flex:1">
+      <div class="info-box tint-green" style="display:flex;align-items:center;gap:14px"><div style="background:var(--green);color:#fff;border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900">1</div><div style="flex:1;font-size:20px;color:var(--navy);font-weight:700">📦 You find the cache and open it.</div></div>
+      <div class="info-box tint-green" style="display:flex;align-items:center;gap:14px"><div style="background:var(--green);color:#fff;border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900">2</div><div style="flex:1;font-size:20px;color:var(--navy);font-weight:700">📓 You look for the notebook.</div></div>
+      <div class="info-box tint-green" style="display:flex;align-items:center;gap:14px"><div style="background:var(--green);color:#fff;border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900">3</div><div style="flex:1;font-size:20px;color:var(--navy);font-weight:700">📝 You write your name and the date.</div></div>
+      <div class="info-box tint-green" style="display:flex;align-items:center;gap:14px"><div style="background:var(--green);color:#fff;border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900">4</div><div style="flex:1;font-size:20px;color:var(--navy);font-weight:700">🎁 You choose a treasure to take away.</div></div>
+      <div class="info-box tint-green" style="display:flex;align-items:center;gap:14px"><div style="background:var(--green);color:#fff;border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900">5</div><div style="flex:1;font-size:20px;color:var(--navy);font-weight:700">💎 You leave an object in the box for someone else to find.</div></div>
+    </div>
+    <div class="info-box tint-amber" style="font-size:18px;font-weight:600;color:var(--navy)">💡 Notice ¶3&apos;s signal words: <strong>When</strong> you find... <strong>Then</strong> you write... <strong>Then</strong> you look... <strong>Don&apos;t forget</strong> to leave! The reading TELLS you the order through these words.</div>
+    <div class="pbar"><div class="pbar-fill" style="width:79.55%"></div></div>
+  </div>
+</div>
+
+<!-- s36 PRACTICE EXPAND -->
+<div class="slide" id="s36" data-notes="<strong>Practice Expand (LP &quot;rewrite each step in your own words&quot;).</strong> 3 model rewrites of step 3 (write name and date). Shows what kind of paraphrase is OK.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Practice Expand — rewrite step 3</span><span class="hd-chip src">📖 LP Expand</span></div>
+  <div class="body cream">
+    <div class="header-bar amber">✍️ Expand — rewrite step 3 in YOUR own words</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "The LP says: cut paper into 5 strips, rewrite each step in your own words, then re-order. Try with step 3 first — &quot;You write your name and the date.&quot; — 3 model rewrites:"</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;flex:1">
+      <div class="info-box tint-blue">
+        <div style="font-size:18px;font-weight:900;color:var(--blue-d);margin-bottom:8px">Rewrite A — simple</div>
+        <div style="font-size:18px;color:var(--navy);font-weight:600;line-height:1.6;font-style:italic">"I put my name and today&apos;s date in the notebook."</div>
+      </div>
+      <div class="info-box tint-blue">
+        <div style="font-size:18px;font-weight:900;color:var(--blue-d);margin-bottom:8px">Rewrite B — adds detail</div>
+        <div style="font-size:18px;color:var(--navy);font-weight:600;line-height:1.6;font-style:italic">"Using the pencil, I sign my name and the day I visited."</div>
+      </div>
+      <div class="info-box tint-blue">
+        <div style="font-size:18px;font-weight:900;color:var(--blue-d);margin-bottom:8px">Rewrite C — with signal words</div>
+        <div style="font-size:18px;color:var(--navy);font-weight:600;line-height:1.6;font-style:italic">"<strong>Then,</strong> I take a pen and write my name plus today&apos;s date."</div>
+      </div>
+    </div>
+    <div class="info-box tint-green" style="font-size:18px;font-weight:700;color:var(--navy);text-align:center">✅ Same idea — different words! That&apos;s a good paraphrase. Try this with steps 1, 2, 4, 5 yourself!</div>
+    <div class="pbar"><div class="pbar-fill" style="width:81.82%"></div></div>
+  </div>
+</div>
+
+<!-- s37 APPLY ACTIVITY 3 — LABEL PICTURES -->
+<div class="slide" id="s37" data-notes="<strong>Apply Activity 3 (LP p.278 verbatim).</strong> Label 8 photos with: a=map, b=toys (crossed out, example), c=notebook, d=water bottle, e=app, f=compass, g=clue, h=pen/pencil. Tap a label, then tap a photo. Wrong = shake.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Apply — Label the 8 photos</span><span class="hd-chip src">📖 LP Activity 3</span></div>
+  <div class="body cream">
+    <div class="header-bar orange">🏷️ Apply — match each label to its photo</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "8 labels. ONE is crossed out (b=toys — the LP says it doesn&apos;t belong). Tap a LETTER chip, then tap the matching PHOTO!"</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;padding:10px 0">
+      <button class="chip" data-label="a" data-name="map" onclick="pickLabel(this)">a. map</button>
+      <button class="chip" data-label="b" data-name="toys" disabled style="opacity:.4;text-decoration:line-through;cursor:default">b. toys</button>
+      <button class="chip" data-label="c" data-name="notebook" onclick="pickLabel(this)">c. notebook</button>
+      <button class="chip" data-label="d" data-name="water bottle" onclick="pickLabel(this)">d. water bottle</button>
+      <button class="chip" data-label="e" data-name="app" onclick="pickLabel(this)">e. app</button>
+      <button class="chip" data-label="f" data-name="compass" onclick="pickLabel(this)">f. compass</button>
+      <button class="chip" data-label="g" data-name="clue" onclick="pickLabel(this)">g. clue</button>
+      <button class="chip" data-label="h" data-name="pen/pencil" onclick="pickLabel(this)">h. pen/pencil</button>
+    </div>
+    <div class="label-grid">
+      <div class="label-photo" data-correct="b" onclick="placeLabel(this)" style="opacity:.5"><div class="ph-em">🧸🦄🚂</div><div class="ph-letter">b ✗</div><div class="ph-name">(toys — example, crossed out!)</div></div>
+      <div class="label-photo" data-correct="f" onclick="placeLabel(this)"><div class="ph-em">🧭</div><div class="ph-letter">?</div><div class="ph-name">[tap a label, then tap me]</div></div>
+      <div class="label-photo" data-correct="c" onclick="placeLabel(this)"><div class="ph-em">📓</div><div class="ph-letter">?</div><div class="ph-name">[tap a label, then tap me]</div></div>
+      <div class="label-photo" data-correct="a" onclick="placeLabel(this)"><div class="ph-em">🗺️</div><div class="ph-letter">?</div><div class="ph-name">[tap a label, then tap me]</div></div>
+      <div class="label-photo" data-correct="d" onclick="placeLabel(this)"><div class="ph-em">🚰</div><div class="ph-letter">?</div><div class="ph-name">[tap a label, then tap me]</div></div>
+      <div class="label-photo" data-correct="g" onclick="placeLabel(this)"><div class="ph-em">📜</div><div class="ph-letter">?</div><div class="ph-name">[tap a label, then tap me]</div></div>
+      <div class="label-photo" data-correct="h" onclick="placeLabel(this)"><div class="ph-em">✏️</div><div class="ph-letter">?</div><div class="ph-name">[tap a label, then tap me]</div></div>
+      <div class="label-photo" data-correct="e" onclick="placeLabel(this)"><div class="ph-em">📱</div><div class="ph-letter">?</div><div class="ph-name">[tap a label, then tap me]</div></div>
+    </div>
+    <div class="mg-score">Labeled: <span id="label-count">1</span> / 8 (b is the example)</div>
+    <div class="pbar"><div class="pbar-fill" style="width:84.09%"></div></div>
+  </div>
+</div>
+
+<!-- s38 APPLY FOLLOW-UP -->
+<div class="slide" id="s38" data-notes="<strong>Apply follow-up (LP verbatim &quot;Which items can help you find your way to the cache?&quot;).</strong> Multi-select. Answer: compass, map, clue, app.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Apply — Which items help you FIND?</span><span class="hd-chip src">📖 LP follow-up</span></div>
+  <div class="body cream">
+    <div class="header-bar blue">🧭 Which items help you FIND the cache?</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "Of all 8 items, which ones help you find your WAY to the cache? Tap ALL the correct ones!"</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex:1">
+      <button class="mg-card" onclick="findPick(this,true)"><div style="font-size:48px">🧭</div><div style="font-size:18px;font-weight:800">compass</div></button>
+      <button class="mg-card" onclick="findPick(this,true)"><div style="font-size:48px">🗺️</div><div style="font-size:18px;font-weight:800">map</div></button>
+      <button class="mg-card" onclick="findPick(this,true)"><div style="font-size:48px">📜</div><div style="font-size:18px;font-weight:800">clue</div></button>
+      <button class="mg-card" onclick="findPick(this,true)"><div style="font-size:48px">📱</div><div style="font-size:18px;font-weight:800">app</div></button>
+      <button class="mg-card" onclick="findPick(this,false)"><div style="font-size:48px">📓</div><div style="font-size:18px;font-weight:800">notebook</div></button>
+      <button class="mg-card" onclick="findPick(this,false)"><div style="font-size:48px">🚰</div><div style="font-size:18px;font-weight:800">water bottle</div></button>
+      <button class="mg-card" onclick="findPick(this,false)"><div style="font-size:48px">✏️</div><div style="font-size:18px;font-weight:800">pen/pencil</div></button>
+      <button class="mg-card" onclick="findPick(this,false)"><div style="font-size:48px">🧸</div><div style="font-size:18px;font-weight:800">toys</div></button>
+    </div>
+    <div class="info-box tint-green" style="font-size:18px;font-weight:700;color:var(--navy);text-align:center">✅ <strong>compass, map, clue, app</strong> — these 4 items help you navigate. The others (notebook, pen, water) are for AFTER you find the cache.</div>
+    <div class="pbar"><div class="pbar-fill" style="width:86.36%"></div></div>
+  </div>
+</div>
+
+<!-- s39 WRAP UP IMPORTANCE SORT -->
+<div class="slide" id="s39" data-notes="<strong>Wrap Up Activity 4 (LP verbatim importance sort).</strong> 8 items into Very Important / Important / Not Important. Uses buildDndSorter from charts.js. After sorting, Leo writes one original sentence about why an item is important.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — Sort by importance</span><span class="hd-chip src">📖 LP Activity 4</span></div>
+  <div class="body cream">
+    <div class="header-bar navy">⚖️ Wrap Up — what&apos;s VERY important to take geocaching?</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "Drag each item to the box that matches how important it is. After you sort, write ONE sentence about why a Very Important item matters!"</div>
+    <div id="imp-sort-mount" style="flex:1;width:100%"></div>
+    <div class="info-box tint-amber" style="font-size:18px;font-weight:700;color:var(--navy)">✍️ <strong>Write 1 sentence:</strong> "I think a compass is <em>very important</em> because ___" (or any item / category you choose).</div>
+    <div class="pbar"><div class="pbar-fill" style="width:88.64%"></div></div>
+  </div>
+</div>
+
+<!-- s40 EXTEND -->
+<div class="slide" id="s40" data-notes="<strong>Extend (LP p.279 verbatim).</strong> Leo picks his own hobby + builds steps with signal words. LP model: collecting seashells. Adapted: chips include soccer-card collecting, Marvel comics, etc. Build a 4-step list.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Extend — Leo&apos;s own hobby</span><span class="hd-chip src">📖 LP Extend</span></div>
+  <div class="body cream">
+    <div class="header-bar orange">⚽ Extend — pick YOUR hobby + write the steps</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "Now YOU pick a hobby! Use the signal words FIRST, NEXT, THEN, FINALLY to write 4 steps. The LP model uses seashells — Leo, you can pick soccer cards, Marvel comics, anything!"</div>
+    <div style="display:flex;gap:24px;flex:1">
+      <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:16px;font-weight:900;color:var(--navy)">Pick a hobby chip:</div>
+        <div class="chips" style="justify-content:flex-start">
+          <button class="chip" onclick="hobbyPick(this,'collect soccer cards')">⚽ collect soccer cards</button>
+          <button class="chip" onclick="hobbyPick(this,'read Marvel comics')">📚 read Marvel comics</button>
+          <button class="chip" onclick="hobbyPick(this,'play video games')">🎮 play video games</button>
+          <button class="chip" onclick="hobbyPick(this,'take photos')">📸 take photos</button>
+          <button class="chip" onclick="hobbyPick(this,'paint a picture')">🎨 paint a picture</button>
+          <button class="chip" onclick="hobbyPick(this,'collect seashells')">🐚 collect seashells (LP example)</button>
+        </div>
+        <div class="info-box tint-green" style="margin-top:auto">
+          <div style="font-size:16px;font-weight:900;color:var(--green-d);margin-bottom:8px">📜 LP model — collecting seashells:</div>
+          <div style="font-size:16px;color:var(--navy);font-weight:600;line-height:1.7"><strong>First</strong> I go to the beach. <strong>Next</strong>, I look for shells. <strong>Then</strong> I pick them up. <strong>Finally</strong> I take the shells home.</div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:18px;font-weight:900;color:var(--navy)" id="hobby-title">My hobby: <em>(pick one)</em></div>
+        <div class="info-box" style="display:flex;align-items:center;gap:10px"><span style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:4px 12px;font-size:14px;font-weight:900;flex-shrink:0">First</span> <input type="text" style="flex:1;font-size:16px;border:2px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-family:inherit" placeholder="step 1 ..."></div>
+        <div class="info-box" style="display:flex;align-items:center;gap:10px"><span style="background:var(--orange);color:#fff;border-radius:99px;padding:4px 12px;font-size:14px;font-weight:900;flex-shrink:0">Next</span> <input type="text" style="flex:1;font-size:16px;border:2px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-family:inherit" placeholder="step 2 ..."></div>
+        <div class="info-box" style="display:flex;align-items:center;gap:10px"><span style="background:var(--blue);color:#fff;border-radius:99px;padding:4px 12px;font-size:14px;font-weight:900;flex-shrink:0">Then</span> <input type="text" style="flex:1;font-size:16px;border:2px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-family:inherit" placeholder="step 3 ..."></div>
+        <div class="info-box" style="display:flex;align-items:center;gap:10px"><span style="background:var(--green);color:#fff;border-radius:99px;padding:4px 12px;font-size:14px;font-weight:900;flex-shrink:0">Finally</span> <input type="text" style="flex:1;font-size:16px;border:2px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-family:inherit" placeholder="step 4 ..."></div>
+      </div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:90.91%"></div></div>
+  </div>
+</div>
+
+<!-- s41 RECAP -->
+<div class="slide" id="s41" data-notes="<strong>Recap (LP verbatim).</strong> Name the hobby. What do you need? What are the steps? 3 tap-to-reveal Qs.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Recap — What did we learn?</span><span class="hd-chip src">📖 LP Recap</span></div>
+  <div class="body cream">
+    <div class="header-bar green">🔁 Recap — 3 questions, tap to reveal</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "Let&apos;s recap what we read and talked about. Tap each question!"</div>
+    <div style="display:flex;flex-direction:column;gap:14px;flex:1">
+      <button class="info-box" style="border:none;font-family:inherit;cursor:pointer;text-align:left;padding:20px 26px" onclick="this.querySelector('.a').classList.toggle('hidden')">
+        <div style="font-size:22px;font-weight:900;color:var(--green-d)">Q1: What&apos;s the name of this hobby?</div>
+        <div class="a hidden" style="background:var(--green-bg);border-radius:10px;padding:12px 18px;font-size:22px;font-weight:800;color:var(--green-d);margin-top:8px">✅ <strong>geocaching</strong> 🧭📦</div>
+      </button>
+      <button class="info-box" style="border:none;font-family:inherit;cursor:pointer;text-align:left;padding:20px 26px" onclick="this.querySelector('.a').classList.toggle('hidden')">
+        <div style="font-size:22px;font-weight:900;color:var(--blue-d)">Q2: What are some things you need for geocaching?</div>
+        <div class="a hidden" style="background:var(--blue-bg);border-radius:10px;padding:12px 18px;font-size:22px;font-weight:800;color:var(--blue-d);margin-top:8px">✅ box · treasure · notebook · compass (+ map, app, clue, pen)</div>
+      </button>
+      <button class="info-box" style="border:none;font-family:inherit;cursor:pointer;text-align:left;padding:20px 26px" onclick="this.querySelector('.a').classList.toggle('hidden')">
+        <div style="font-size:22px;font-weight:900;color:var(--orange)">Q3: What are the 5 steps?</div>
+        <div class="a hidden" style="background:var(--orange-bg);border-radius:10px;padding:12px 18px;font-size:20px;font-weight:700;color:var(--navy);margin-top:8px;line-height:1.7">
+          ① find the cache and open it → ② look for the notebook → ③ write name + date → ④ choose a treasure → ⑤ leave another treasure
+        </div>
+      </button>
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:93.18%"></div></div>
+  </div>
+</div>
+
+<!-- s42 PAYOFF — CACHE FOUND -->
+<div class="slide" id="s42" data-notes="<strong>⭐ PAYOFF — Cache FOUND scene!</strong> The spine resolves. Leo opens the cache. Full 5-step flowchart captioned. Treasure revealed (soccer card by default — clickable to swap to Marvel figure based on s40 hobby pick).">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">⭐ PAYOFF — Cache FOUND!</span><span class="hd-chip src">🏆 Spine resolution</span></div>
+  <div class="body grad-forest">
+    <div style="font-size:36px;font-weight:900;color:#fff;text-align:center;text-shadow:0 2px 14px rgba(0,0,0,.4)">🏆 LEO FOUND THE CACHE AT MOUNT FUJI!</div>
+    <div style="display:flex;gap:24px;flex:1;align-items:center">
+      <div class="cache-scene" style="flex:1;min-height:380px;display:flex;flex-direction:column;justify-content:center;gap:12px">
+        <div class="cache-box">📦</div>
+        <div style="font-size:24px;font-weight:900;color:var(--yellow)">Inside the cache:</div>
+        <div style="font-size:80px;cursor:pointer" id="treasure-em" onclick="swapTreasure()">⚽</div>
+        <div style="font-size:18px;color:#fff;font-weight:700" id="treasure-label">a signed Bellingham soccer card!</div>
+        <div style="font-size:14px;color:rgba(255,255,255,.85);font-style:italic">(tap the treasure to swap — soccer card 🥇 Marvel figure 🥇 fossil)</div>
+        <div style="font-size:16px;color:rgba(255,255,255,.85);margin-top:4px">Don&apos;t forget — Leo also LEFT a treasure for the next seeker! 💎</div>
+      </div>
+      <div class="flow-board" style="flex:1.5;background:rgba(0,0,0,.4)">
+        <div class="flow-title"><span>🏆 5 STEPS LEO COMPLETED</span><span style="background:var(--yellow);color:var(--navy);border-radius:99px;padding:4px 14px;font-size:14px">5 / 5 ✅</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:#fff;color:var(--navy);border-radius:10px;padding:10px 14px;font-size:15px;font-weight:700"><strong style="color:var(--green-d)">① </strong>📦 You find the cache and open it.</div>
+          <div style="background:#fff;color:var(--navy);border-radius:10px;padding:10px 14px;font-size:15px;font-weight:700"><strong style="color:var(--green-d)">② </strong>📓 You look for the notebook.</div>
+          <div style="background:#fff;color:var(--navy);border-radius:10px;padding:10px 14px;font-size:15px;font-weight:700"><strong style="color:var(--green-d)">③ </strong>📝 You write your name and the date.</div>
+          <div style="background:#fff;color:var(--navy);border-radius:10px;padding:10px 14px;font-size:15px;font-weight:700"><strong style="color:var(--green-d)">④ </strong>🎁 You choose a treasure to take away.</div>
+          <div style="background:#fff;color:var(--navy);border-radius:10px;padding:10px 14px;font-size:15px;font-weight:700"><strong style="color:var(--green-d)">⑤ </strong>💎 You leave an object for someone else.</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--yellow);color:var(--navy);border-radius:14px;padding:14px 26px;font-size:20px;font-weight:900;text-align:center">
+      🏆 The grammar IS the camera — reading-for-sequence found the cache! Geocaching kit complete: compass, map, app, notebook, treasures.
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:95.45%"></div></div>
+  </div>
+</div>
+
+<!-- s43 FORMATIVE — BUG-COLLECTING ORDER -->
+<div class="slide" id="s43" data-notes="<strong>Formative check (LP p.279 verbatim).</strong> Order the bug-collecting steps: Find different bugs (1) → Study the bugs (2) → Write about what you notice (3). 3-step mini-version of Practice Activity 2.">
+  <div class="slide-header"><span class="hd-unit">Unit 8</span><span class="hd-sep">·</span><span class="hd-section">Formative — order 3 bug-collecting steps</span><span class="hd-chip src">✓ Formative</span></div>
+  <div class="body cream">
+    <div class="header-bar amber">✓ Formative — can YOU put 3 hobby steps in order?</div>
+    <div class="dialogue-box">💬 <b>Dad:</b> "Some people collect bugs as a hobby! 🐞 Use the SIGNAL WORDS strategy. Tap each card to cycle the number 1-3. (LP-verbatim answer key: find=1, study=2, write=3.)"</div>
+    <div style="display:flex;flex-direction:column;gap:12px;flex:1">
+      <div class="info-box" style="display:flex;align-items:center;gap:14px;cursor:pointer;padding:16px 22px" onclick="cycleBug(this,'study')">
+        <div style="background:var(--orange);color:#fff;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900" class="bug-num">_</div>
+        <div style="flex:1;font-size:22px;font-weight:700;color:var(--navy)">Study the bugs.</div>
+        <div style="font-size:42px">🔬</div>
+      </div>
+      <div class="info-box" style="display:flex;align-items:center;gap:14px;cursor:pointer;padding:16px 22px" onclick="cycleBug(this,'write')">
+        <div style="background:var(--orange);color:#fff;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900" class="bug-num">_</div>
+        <div style="flex:1;font-size:22px;font-weight:700;color:var(--navy)">Write about what you notice about the bugs.</div>
+        <div style="font-size:42px">📝</div>
+      </div>
+      <div class="info-box" style="display:flex;align-items:center;gap:14px;cursor:pointer;padding:16px 22px" onclick="cycleBug(this,'find')">
+        <div style="background:var(--orange);color:#fff;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900" class="bug-num">_</div>
+        <div style="flex:1;font-size:22px;font-weight:700;color:var(--navy)">Find different bugs.</div>
+        <div style="font-size:42px">🐞</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:14px;justify-content:center;align-items:center">
+      <button class="btn amber" onclick="checkBug()">✓ Check my order</button>
+      <button class="btn outline" onclick="resetBug()">🔄 Reset</button>
+      <div id="bug-result" style="font-size:20px;font-weight:800;color:var(--green-d);min-width:240px;text-align:center"></div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:97.73%"></div></div>
+  </div>
+</div>
+
+<!-- s44 MARK DONE -->
+<div class="slide" id="s44" data-notes="<strong>Mark Done.</strong> Click to record lesson done in leea.lessonProgress.v1 (teacher mode for ow-l4-u8-reading).">
+  <div class="body grad-navy center">
+    <div class="done-card">
+      <div style="font-size:80px">🎓</div>
+      <h2>Reading Complete!</h2>
+      <p>Unit 8 · Hide and Seek (Geocaching) · 5-step flowchart filled, cache found, treasure claimed.<br>Click below to mark this lesson done for Leo.</p>
+      <button id="markBtn" class="btn green" style="font-size:28px;padding:20px 60px;border-radius:16px" onclick="markDone()">✅ Mark Lesson Done</button>
+      <div id="markStatus" style="margin-top:18px;font-size:20px;font-weight:700;color:var(--green-d);min-height:30px"></div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:100%"></div></div>
+  </div>
+</div>
+
+</div><!-- end #deck -->
+
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 44</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes</button>
+  <span id="unit-label">UNIT 8 · READING</span>
+</div>
+
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+</div><!-- end #scaler -->
+
+<script>
+function scale(){
+  var s = Math.min(window.innerWidth/1920, window.innerHeight/1080);
+  document.getElementById("scaler").style.transform = "scale(" + s + ")";
+}
+window.addEventListener("resize", scale);
+
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var cur = 0;
+function goTo(i){
+  if (i < 0 || i >= total) return;
+  slides[cur].classList.remove("active");
+  cur = i;
+  slides[cur].classList.add("active");
+  try { document.getElementById("slide-counter").textContent = (cur+1) + " / " + total; } catch(e){}
+  updateNotes();
+  if (cur === 38) buildImpSorter();
+}
+function updateNotes(){
+  var notes = slides[cur].getAttribute("data-notes") || "<em>No notes for this slide.</em>";
+  try { document.getElementById("tn-content").innerHTML = notes; } catch(e){}
+}
+function toggleNotes(){ try { document.getElementById("tn-panel").classList.toggle("open"); } catch(e){} }
+document.addEventListener("keydown", function(e){
+  if (e.key === "ArrowRight" || e.key === " ") goTo(cur+1);
+  else if (e.key === "ArrowLeft") goTo(cur-1);
+  else if (e.key === "n" || e.key === "N") toggleNotes();
+});
+
+// ── GLOSS POPUPS (s13, s18) ──
+var GLOSS = {
+  outdoor: { em: "🌳", word: "outdoor", def: "happening or done outside, not inside a building.", jp: "アウトドアの" },
+  app: { em: "📱", word: "app", def: "a small program on your phone — short for application.", jp: "アプリ" },
+  clues: { em: "🔎", word: "clues", def: "small bits of info that help you find or solve something.", jp: "手がかり" }
+};
+function popGloss(el, key){
+  el.classList.toggle("popped");
+  var existing = document.querySelector(".gloss-pop");
+  if (existing){ existing.remove(); if (existing.dataset.k === key) return; }
+  var g = GLOSS[key];
+  if (!g) return;
+  var pop = document.createElement("div");
+  pop.className = "gloss-pop";
+  pop.dataset.k = key;
+  pop.innerHTML = "<div><span class=\"gp-em\">" + g.em + "</span> <strong>" + g.word + "</strong></div><div style=\"font-size:14px;color:#374151;margin-top:4px\">" + g.def + "</div><div class=\"gp-jp\">" + g.jp + "</div>";
+  var rect = el.getBoundingClientRect();
+  var scalerRect = document.getElementById("scaler").getBoundingClientRect();
+  var sc = scalerRect.width / 1920;
+  pop.style.left = ((rect.left - scalerRect.left) / sc) + "px";
+  pop.style.top = ((rect.bottom - scalerRect.top) / sc + 8) + "px";
+  document.getElementById("scaler").appendChild(pop);
+  setTimeout(function(){ if (pop.parentNode) pop.remove(); el.classList.remove("popped"); }, 4500);
+}
+
+// ── s5 SEQUENCE MINI-GAME ──
+var seqNext = 1;
+function seqPick(btn){
+  if (btn.classList.contains("placed")) return;
+  var pos = parseInt(btn.dataset.pos);
+  if (pos === seqNext){
+    var slot = document.getElementById("seq-" + seqNext);
+    if (slot){ slot.textContent = btn.textContent; slot.classList.add("filled"); }
+    btn.classList.add("placed");
+    seqNext++;
+    if (seqNext > 4){
+      try { document.getElementById("seq-result").innerHTML = "🌟 Perfect sequence! The 4 chips are in order 1→2→3→4."; } catch(e){}
+    }
+  } else {
+    btn.classList.add("shake");
+    setTimeout(function(){ btn.classList.remove("shake"); }, 400);
+    try { document.getElementById("seq-result").innerHTML = "❌ Not yet! Look for what should be step " + seqNext + "."; } catch(e){}
+  }
+}
+
+// ── s6 + s29 COMPASS ──
+function compassClick(dir){
+  var rot = { N:0, E:90, S:180, W:-90 }[dir] || 0;
+  var labels = { N:"⬆️ NORTH — top of the map.", E:"➡️ EAST — right of the map.", S:"⬇️ SOUTH — bottom of the map.", W:"⬅️ WEST — left of the map." };
+  try {
+    var n1 = document.getElementById("compass-needle");
+    var n2 = document.getElementById("compass-needle-2");
+    if (n1) n1.style.transform = "rotate(" + rot + "deg)";
+    if (n2) n2.style.transform = "rotate(" + rot + "deg)";
+    var m = document.getElementById("compass-msg");
+    if (m) m.innerHTML = labels[dir];
+  } catch(e){}
+}
+
+// ── s7 HIDERS + SEEKERS ──
+var hsTagged = 0;
+function hsRole(card, role){
+  if (card.dataset.locked) return;
+  var correct = (card.querySelector(".hs-fb").parentNode.previousElementSibling || card).getAttribute("onclick").indexOf(role) !== -1;
+  // Always correct check on the click handler arg vs card's intended role
+  // Simplified: each card knows its own role via onclick arg; we accept the click
+  card.dataset.locked = "1";
+  card.style.background = role === "hider" ? "#fef3c7" : "#dbeafe";
+  card.style.borderColor = role === "hider" ? "#D97706" : "#0EA5E9";
+  card.querySelector(".hs-fb").textContent = role === "hider" ? "✅ Tagged as 🙈 HIDER" : "✅ Tagged as 🔍 SEEKER";
+  card.querySelector(".hs-fb").style.color = role === "hider" ? "#92400e" : "#075985";
+  hsTagged++;
+  try { document.getElementById("hs-count").textContent = hsTagged; } catch(e){}
+  if (hsTagged >= 4){ try { document.getElementById("hs-win").classList.remove("hidden"); } catch(e){} }
+}
+
+// ── s8 TREASURE + ORNAMENT SORT ──
+var toCount = 0;
+function toItem(btn){
+  if (btn.classList.contains("placed")) return;
+  var kind = btn.dataset.kind;
+  var target = document.getElementById(kind === "treasure" ? "treas-box" : "orn-box");
+  if (!target) return;
+  // Clear placeholder text on first add
+  if (target.querySelector("span") && target.querySelector("span").style.color === "rgb(156, 163, 175)") target.innerHTML = "";
+  var clone = document.createElement("div");
+  clone.style.cssText = "background:#fff;border:2px solid " + (kind === "treasure" ? "#F97316" : "#D97706") + ";border-radius:10px;padding:6px 12px;font-size:14px;font-weight:700;color:#0f172a";
+  clone.innerHTML = "<div style=\"font-size:24px;text-align:center\">" + btn.dataset.em + "</div><div>" + btn.dataset.name + "</div>";
+  target.appendChild(clone);
+  btn.classList.add("placed");
+  toCount++;
+  try { document.getElementById("to-count").textContent = toCount; } catch(e){}
+}
+
+// ── s9 SHIP / SINKING ──
+function shipStart(){
+  try {
+    var ship = document.getElementById("ship-emoji");
+    ship.classList.add("sinking");
+    document.getElementById("ship-start").classList.add("done");
+    document.getElementById("ship-start").textContent = "▶ Watch the ship sink...";
+  } catch(e){}
+}
+function shipHelp(){
+  try {
+    var ship = document.getElementById("ship-emoji");
+    if (ship.classList.contains("sinking")){
+      document.getElementById("ship-help").classList.add("show");
+    }
+  } catch(e){}
+}
+function shipReset(){
+  try {
+    var ship = document.getElementById("ship-emoji");
+    ship.classList.remove("sinking");
+    document.getElementById("ship-help").classList.remove("show");
+    document.getElementById("ship-start").classList.remove("done");
+    document.getElementById("ship-start").textContent = "▶ START — watch the ship";
+  } catch(e){}
+}
+
+// ── s11 PREDICT ──
+function predictPick(btn, txt){
+  document.querySelectorAll(".mg-card").forEach(function(c){ c.classList.remove("correct"); });
+  btn.classList.add("correct");
+  try { document.getElementById("predict-result").style.display = "block"; } catch(e){}
+}
+
+// ── s16 ¶1 COMPREHENSION ──
+function comp1Pick(btn, correct){
+  if (btn.dataset.locked) return;
+  btn.dataset.locked = "1";
+  btn.classList.add(correct ? "correct" : "wrong");
+  if (correct){
+    try { document.getElementById("comp1-reveal").classList.add("show"); } catch(e){}
+  } else {
+    setTimeout(function(){ btn.classList.remove("wrong"); delete btn.dataset.locked; }, 1200);
+  }
+}
+
+// ── s20 ¶2 COMPREHENSION (multi-select) ──
+var comp2Score = 0;
+function comp2Pick(btn, correct){
+  if (btn.dataset.locked) return;
+  btn.dataset.locked = "1";
+  btn.classList.add(correct ? "correct" : "wrong");
+  if (correct){ comp2Score++; if (comp2Score >= 5){ try { document.getElementById("comp2-reveal").classList.add("show"); } catch(e){} } }
+}
+
+// ── s27 ¶4-5 COMPREHENSION (multi-select) ──
+var comp45Score = 0;
+function comp45Pick(btn, correct){
+  if (btn.dataset.locked) return;
+  btn.dataset.locked = "1";
+  btn.classList.add(correct ? "correct" : "wrong");
+  if (correct){ comp45Score++; if (comp45Score >= 4){ try { document.getElementById("comp45-reveal").classList.add("show"); } catch(e){} } }
+}
+
+// ── s33 SIGNAL WORD HUNT ──
+function sigPick(el, correct){
+  if (el.dataset.locked) return;
+  el.dataset.locked = "1";
+  el.classList.add(correct ? "correct" : "wrong");
+  if (!correct){ setTimeout(function(){ el.classList.remove("wrong"); delete el.dataset.locked; }, 1000); }
+}
+
+// ── s34 PRACTICE ORDER ──
+var stepTarget = { "step-a": 1, "step-b": 2, "step-c": 3, "step-d": 4, "step-e": 5 };
+var stepState = {};
+function cycleOrder(row, key){
+  var cur = stepState[key] || 0;
+  var nxt = (cur + 1) % 6;
+  stepState[key] = nxt;
+  var num = row.querySelector(".step-num");
+  if (num) num.textContent = nxt === 0 ? "_" : String(nxt);
+}
+function checkSteps(){
+  var ok = 0;
+  for (var k in stepTarget){ if (stepState[k] === stepTarget[k]) ok++; }
+  try {
+    var r = document.getElementById("step-result");
+    if (ok === 5){ r.textContent = "🌟 PERFECT! 5/5 — onto the cache reveal!"; r.style.color = "#15803d"; }
+    else { r.textContent = ok + " / 5 correct. Re-read ¶3!"; r.style.color = "#dc2626"; }
+  } catch(e){}
+}
+function resetSteps(){
+  for (var k in stepState) stepState[k] = 0;
+  document.querySelectorAll("#s34 .step-num").forEach(function(n){ n.textContent = "_"; });
+  try { document.getElementById("step-result").textContent = ""; } catch(e){}
+}
+
+// ── s37 LABEL PICTURES ──
+var activeLabel = null;
+var labeled = 1;
+function pickLabel(chip){
+  if (chip.classList.contains("placed")) return;
+  document.querySelectorAll("#s37 .chip").forEach(function(c){ c.classList.remove("sel"); });
+  chip.classList.add("sel");
+  activeLabel = chip;
+}
+function placeLabel(photo){
+  if (!activeLabel) return;
+  if (photo.dataset.correct === activeLabel.dataset.label){
+    photo.classList.add("labeled");
+    photo.querySelector(".ph-letter").textContent = activeLabel.dataset.label + " ✓";
+    photo.querySelector(".ph-name").textContent = activeLabel.dataset.name;
+    activeLabel.classList.add("placed");
+    activeLabel.classList.remove("sel");
+    activeLabel = null;
+    labeled++;
+    try { document.getElementById("label-count").textContent = labeled; } catch(e){}
+  } else {
+    photo.classList.add("shake");
+    setTimeout(function(){ photo.classList.remove("shake"); }, 400);
+  }
+}
+
+// ── s38 FIND ITEMS ──
+var findScore = 0;
+function findPick(btn, correct){
+  if (btn.dataset.locked) return;
+  btn.dataset.locked = "1";
+  btn.classList.add(correct ? "correct" : "wrong");
+  if (correct) findScore++;
+}
+
+// ── s39 IMPORTANCE SORTER (uses buildDndSorter) ──
+function buildImpSorter(){
+  if (typeof window.buildDndSorter !== "function") return;
+  var host = document.getElementById("imp-sort-mount");
+  if (!host || host.dataset.built) return;
+  host.dataset.built = "1";
+  host.innerHTML = window.buildDndSorter({
+    id: "imp-sort",
+    tiles: [
+      { text: "🧭 compass",       answer: "very" },
+      { text: "🗺️ map",            answer: "very" },
+      { text: "📓 notebook",       answer: "very" },
+      { text: "📱 app",            answer: "important" },
+      { text: "✏️ pen/pencil",     answer: "important" },
+      { text: "🚰 water bottle",   answer: "important" },
+      { text: "💎 small treasure", answer: "important" },
+      { text: "🧸 toys",           answer: "not" }
+    ],
+    zones: [
+      { key: "very",      label: "🌟 Very Important",  color: "#16A34A" },
+      { key: "important", label: "👍 Important",       color: "#0EA5E9" },
+      { key: "not",       label: "😐 Not Important",   color: "#9CA3AF" }
+    ]
+  }) || "";
+}
+
+// ── s40 HOBBY PICK ──
+function hobbyPick(btn, name){
+  document.querySelectorAll("#s40 .chip").forEach(function(c){ c.classList.remove("sel"); });
+  btn.classList.add("sel");
+  try { document.getElementById("hobby-title").innerHTML = "My hobby: <strong style=\"color:var(--orange)\">" + name + "</strong>"; } catch(e){}
+}
+
+// ── s42 SWAP TREASURE ──
+var treasureIdx = 0;
+var treasures = [
+  { em: "⚽", label: "a signed Bellingham soccer card!" },
+  { em: "🕷️", label: "a rare Spider-Man comic book — Marvel treasure!" },
+  { em: "🦗🪨", label: "a real trilobite fossil from Morocco!" }
+];
+function swapTreasure(){
+  treasureIdx = (treasureIdx + 1) % treasures.length;
+  try {
+    document.getElementById("treasure-em").textContent = treasures[treasureIdx].em;
+    document.getElementById("treasure-label").textContent = treasures[treasureIdx].label;
+  } catch(e){}
+}
+
+// ── s43 FORMATIVE BUG ORDER ──
+var bugTarget = { "find": 1, "study": 2, "write": 3 };
+var bugState = {};
+function cycleBug(row, key){
+  var cur = bugState[key] || 0;
+  var nxt = (cur + 1) % 4;
+  bugState[key] = nxt;
+  var num = row.querySelector(".bug-num");
+  if (num) num.textContent = nxt === 0 ? "_" : String(nxt);
+}
+function checkBug(){
+  var ok = 0;
+  for (var k in bugTarget){ if (bugState[k] === bugTarget[k]) ok++; }
+  try {
+    var r = document.getElementById("bug-result");
+    if (ok === 3){ r.textContent = "🌟 3/3 — sequence mastered!"; r.style.color = "#15803d"; }
+    else { r.textContent = ok + " / 3 correct. Try again!"; r.style.color = "#dc2626"; }
+  } catch(e){}
+}
+function resetBug(){
+  for (var k in bugState) bugState[k] = 0;
+  document.querySelectorAll("#s43 .bug-num").forEach(function(n){ n.textContent = "_"; });
+  try { document.getElementById("bug-result").textContent = ""; } catch(e){}
+}
+
+// ── MARK DONE ──
+var LESSON_ID = "ow-l4-u8-reading";
+function markDone(){
+  try {
+    var key = "leea.lessonProgress.v1";
+    var raw = localStorage.getItem(key);
+    var data = raw ? JSON.parse(raw) : {};
+    data[LESSON_ID] = { mode: "teacher", completedAt: new Date().toISOString() };
+    localStorage.setItem(key, JSON.stringify(data));
+    var b = document.getElementById("markBtn");
+    b.style.background = "#9ca3af";
+    b.style.cursor = "default";
+    b.textContent = "✓ Done — Saved!";
+    b.disabled = true;
+    document.getElementById("markStatus").textContent = "Saved · " + new Date().toLocaleString();
+  } catch (e){
+    try { document.getElementById("markStatus").textContent = "Could not save: " + e.message; } catch(_){}
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  scale();
+  slides[0].classList.add("active");
+  updateNotes();
+  try { document.getElementById("slide-counter").textContent = "1 / " + total; } catch(e){}
+});
+</script>
+
+</body>
+</html>

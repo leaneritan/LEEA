@@ -549,22 +549,198 @@ body{display:flex;flex-direction:column;height:100vh}
   </div><!-- end tab-wrap -->
 </div><!-- end #sb-mode -->
 
-<!-- ─────────── WB MODE — Workbook (stub, Block 2) ─────────── -->
+<!-- ─────────── WB MODE — Workbook Reading: Video Games Then and Now ─────────── -->
 <div class="mode-pane" id="wb-mode" style="display:none">
   <div class="mode-back-bar">
     <button onclick="backToLanding()">◀ Back to menu</button>
-    <span class="mode-label">📒 Workbook — coming in Block 2</span>
+    <span class="mode-label">📒 Workbook — Video Games: Then and Now</span>
   </div>
-  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;gap:14px;background:linear-gradient(135deg,#E0F2FE,#FAFAF7)">
-    <div style="font-size:80px">📒</div>
-    <div style="font-size:22px;font-weight:900;color:var(--blue-d)">Workbook — Block 2</div>
-    <div style="font-size:15px;color:var(--ink-2);line-height:1.6;max-width:500px">
-      Next session, Block 2 will:<br>
-      1. Pull the actual workbook reading exercises from <code>l4_34286_ak-wb.pdf</code> (the Reading pages, around p. 100-101).<br>
-      2. Identify any workbook-only words Leo hasn&apos;t learned yet and add them to <code>vocabulary.json</code> first.<br>
-      3. Build the workbook tabs here (same shell, same save/restore pattern).
+
+  <div class="tab-nav">
+    <button class="tab-btn" onclick="wbShowTab(0)" id="wtb0"><span class="tab-icon">📚</span><span class="tab-name">Vocab</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="wbShowTab(1)" id="wtb1"><span class="tab-icon">📖</span><span class="tab-name">Read</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="wbShowTab(2)" id="wtb2"><span class="tab-icon">✅</span><span class="tab-name">T / F</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="wbShowTab(3)" id="wtb3"><span class="tab-icon">🗓️</span><span class="tab-name">Timeline</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="wbShowTab(4)" id="wtb4"><span class="tab-icon">🏆</span><span class="tab-name">Quiz</span><span class="tab-check">✓</span></button>
+  </div>
+
+  <div class="tab-wrap">
+
+    <!-- WB TAB 0 — Vocab (5 NEW words + recycled) -->
+    <div class="tab-content active" id="wtc0">
+      <div class="tab-body">
+        <div class="section-title">📚 Vocab — 5 new words for the workbook reading</div>
+        <div class="section-sub">Learn these 5 before reading "Video Games: Then and Now." <strong>Practice</strong> = tap to flip. <strong>Quiz</strong> = type the word.</div>
+        <div class="dad-hint">💡 You ALREADY know <em>controller, screen, compete, cooperate</em> from Vocabulary 1 — they show up in this reading too!</div>
+
+        <div class="fc-controls">
+          <button class="mode-btn active" id="wfc-prac" onclick="setWfcMode('practice')">📖 Practice</button>
+          <button class="mode-btn" id="wfc-quiz" onclick="setWfcMode('quiz')">🧠 Quiz</button>
+        </div>
+
+        <div id="wfc-practice">
+          <div class="flashcard-wrap" onclick="flipWfcCard()">
+            <div class="flashcard" id="wfc-card">
+              <div class="fc-face">
+                <div class="fc-emoji" id="wfc-em">🕹️</div>
+                <div class="fc-word" id="wfc-word">arcade</div>
+                <div class="fc-pos" id="wfc-pos">Noun · WB-new</div>
+                <div class="fc-tap">tap to flip 👆</div>
+              </div>
+              <div class="fc-face fc-back">
+                <div class="fc-emoji" id="wfc-em-b">🕹️</div>
+                <div class="fc-def" id="wfc-def">a place with many video game machines that you pay to play</div>
+                <div class="fc-jp" id="wfc-jp">ゲームセンター</div>
+                <button class="fc-jp-btn" id="wfc-jp-btn" onclick="toggleWfcJp(event)">🇯🇵 日本語</button>
+                <div class="fc-sample" id="wfc-sample">Arcades were like shopping malls full of game <b>machines</b>.</div>
+              </div>
+            </div>
+          </div>
+          <div class="fc-nav">
+            <button onclick="wfcPrev()">◀ Prev</button>
+            <span class="fc-counter" id="wfc-counter">1 / 5</span>
+            <button onclick="wfcNext()">Next ▶</button>
+          </div>
+        </div>
+
+        <div id="wfc-quizmode" style="display:none">
+          <div class="quiz-wrap">
+            <div class="quiz-emoji" id="wfcq-em">🕹️</div>
+            <div class="quiz-sentence" id="wfcq-sent">A place with video game machines. What word is it?</div>
+            <div id="wfcq-clue" style="font-size:13px;color:var(--ink-3);font-style:italic"></div>
+            <div class="quiz-input-row">
+              <input class="quiz-input" id="wfcq-input" placeholder="Type the word…" onkeydown="if(event.key==='Enter')checkWfcQuiz()">
+              <button class="quiz-check" onclick="checkWfcQuiz()">✓</button>
+            </div>
+            <div class="quiz-fb" id="wfcq-fb"></div>
+            <div style="font-size:13px;color:var(--ink-3);font-weight:600">Quiz: <span id="wfcq-prog">0 / 5 done</span></div>
+          </div>
+        </div>
+
+        <div class="done-banner" id="wfc-done">🎉 Vocab mastered! Now go to <strong>Read</strong> tab 👉</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="w-redo-0" onclick="wbDoRedo(0)">↺ Redo</button>
+        <button class="btn-complete" id="w-complete-0" onclick="wbMarkComplete(0)">Mark Vocab complete ✓</button>
+      </div>
     </div>
-    <button class="btn-redo" onclick="backToLanding()" style="margin-top:14px">◀ Back to menu</button>
+
+    <!-- WB TAB 1 — Read passage (verbatim from WB p.100 TR 8.6) -->
+    <div class="tab-content" id="wtc1">
+      <div class="tab-body">
+        <div class="section-title">📖 Read — Video Games: Then and Now</div>
+        <div class="section-sub">Read the passage from Workbook p.100 (audio TR 8.6).</div>
+        <div class="read-meta">🎧 Source: Workbook p.100 · Listen and read TR 8.6</div>
+
+        <div class="passage-block">
+          <div class="ptitle">Video Games: Then and Now</div>
+          <div class="pheader">5 paragraphs · about 200 words</div>
+          Today video games are played by boys, girls, women, and men of all ages around the world. But how did video games start?<br><br>
+          <strong>1.</strong> One of the first video games ever invented, in 1958, was a tennis game. Players used a controller to hit a ball over a net on a small screen. It was slow and simple compared with today&apos;s video games.<br><br>
+          <strong>2.</strong> Video games first became popular in the 1970s. To play, the gamers — mostly young men — went to video <strong>🕹️ arcades</strong>. Arcades were like shopping malls full of machines. This changed in 1972, with the invention of the first home video game. Gamers could plug a game <strong>🎮 console</strong> into their home TV. Soon people wanted small <strong>🤲 portable</strong> games, too. The first successful handheld game came out in 1989. After that, people could play games almost anywhere.<br><br>
+          <strong>3.</strong> In the 1990s, two inventions changed gaming forever: cell phones and the internet. In 1994, the first very popular multiplayer game was released. Gamers could play online with more than one person at the same time, cooperating and competing. The game attracted millions of players.<br><br>
+          <strong>4.</strong> Game consoles developed fast in the 2000s, with faster games and better pictures and sound. In 2006, a new console was aimed at more active users. The controller detected movement in all directions, and users had to get up and move around. Sports such as virtual tennis, baseball, and golf became popular.<br><br>
+          <strong>5.</strong> In the 2010s, <strong>🥽 virtual reality</strong> headsets were developed. Players wear these <strong>🎧 headsets</strong> on their heads. What the player sees and hears is controlled by the headset. Gamers need a fast and powerful computer.
+        </div>
+
+        <div class="dad-hint" style="margin-top:14px">✅ All 5 bolded words (arcade, console, portable, virtual reality, headset) are on the Vocab tab. <em>Controller, screen, compete, cooperate</em> are recycled from V1.</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="w-redo-1" onclick="wbDoRedo(1)">↺ Redo</button>
+        <button class="btn-complete" id="w-complete-1" onclick="wbMarkComplete(1)">Mark Read complete ✓</button>
+      </div>
+    </div>
+
+    <!-- WB TAB 2 — T/F (WB Activity 2) -->
+    <div class="tab-content" id="wtc2">
+      <div class="tab-body">
+        <div class="section-title">✅ T / F — Workbook Activity 2</div>
+        <div class="section-sub">Check T for True or F for False. Answers from Workbook p.101.</div>
+
+        <div class="comp-q" id="wbtf-1">
+          <div class="ql">1.</div>
+          <div class="qt">In the 1970s, mostly young men went to video arcades.</div>
+          <button class="comp-opt" onclick="wbTf(this,1,true)">✅ True</button>
+          <button class="comp-opt" onclick="wbTf(this,1,false)">❌ False</button>
+        </div>
+        <div class="comp-q" id="wbtf-2">
+          <div class="ql">2.</div>
+          <div class="qt">Arcades were in shopping malls.</div>
+          <button class="comp-opt" onclick="wbTf(this,2,true)">✅ True</button>
+          <button class="comp-opt" onclick="wbTf(this,2,false)">❌ False</button>
+        </div>
+        <div class="comp-q" id="wbtf-3">
+          <div class="ql">3.</div>
+          <div class="qt">People wanted to be able to play video games everywhere.</div>
+          <button class="comp-opt" onclick="wbTf(this,3,true)">✅ True</button>
+          <button class="comp-opt" onclick="wbTf(this,3,false)">❌ False</button>
+        </div>
+        <div class="comp-q" id="wbtf-4">
+          <div class="ql">4.</div>
+          <div class="qt">You don&apos;t need a computer to play virtual reality games.</div>
+          <button class="comp-opt" onclick="wbTf(this,4,true)">✅ True</button>
+          <button class="comp-opt" onclick="wbTf(this,4,false)">❌ False</button>
+          <div style="font-size:12px;color:var(--ink-3);margin-top:4px;font-style:italic">💡 Re-read ¶5 — what do VR gamers need?</div>
+        </div>
+
+        <div class="done-banner" id="wbtf-done">🎉 All 4 T/F answered correctly!</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="w-redo-2" onclick="wbDoRedo(2)">↺ Redo</button>
+        <button class="btn-complete" id="w-complete-2" onclick="wbMarkComplete(2)">Mark T/F complete ✓</button>
+      </div>
+    </div>
+
+    <!-- WB TAB 3 — Timeline (WB Activity 4) -->
+    <div class="tab-content" id="wtc3">
+      <div class="tab-body">
+        <div class="section-title">🗓️ Timeline — Workbook Activity 4</div>
+        <div class="section-sub">Match each year to what happened. Tap a year, then tap the matching event.</div>
+        <div class="dad-hint">💡 Use the reading to find the answers. The timeline runs 1958 → 2010s.</div>
+
+        <div class="match-wrap" style="display:flex;gap:20px;margin-top:14px">
+          <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:900;color:var(--ink-3);letter-spacing:1.5px;text-transform:uppercase">When?</div>
+            <button class="match-chip" onclick="wbMatch(this,'a','y')" data-key="a">1958</button>
+            <button class="match-chip" onclick="wbMatch(this,'b','y')" data-key="b">1972</button>
+            <button class="match-chip" onclick="wbMatch(this,'c','y')" data-key="c">1994</button>
+            <button class="match-chip" onclick="wbMatch(this,'d','y')" data-key="d">2006</button>
+            <button class="match-chip" onclick="wbMatch(this,'e','y')" data-key="e">2010s</button>
+          </div>
+          <div style="flex:2;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:900;color:var(--ink-3);letter-spacing:1.5px;text-transform:uppercase">What happened?</div>
+            <button class="match-chip" onclick="wbMatch(this,'c','w')" data-key="c">Online multiplayer game released</button>
+            <button class="match-chip" onclick="wbMatch(this,'a','w')" data-key="a">First video game (tennis) invented — slow &amp; simple</button>
+            <button class="match-chip" onclick="wbMatch(this,'e','w')" data-key="e">Virtual reality headsets developed</button>
+            <button class="match-chip" onclick="wbMatch(this,'b','w')" data-key="b">First home video game — plug into your TV</button>
+            <button class="match-chip" onclick="wbMatch(this,'d','w')" data-key="d">Controller detected movement — players got active</button>
+          </div>
+        </div>
+
+        <div class="done-banner" id="wbtl-done">🎉 5 / 5 timeline matched!</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="w-redo-3" onclick="wbDoRedo(3)">↺ Redo</button>
+        <button class="btn-complete" id="w-complete-3" onclick="wbMarkComplete(3)">Mark Timeline complete ✓</button>
+      </div>
+    </div>
+
+    <!-- WB TAB 4 — QUIZ (6 scored) -->
+    <div class="tab-content" id="wtc4">
+      <div class="tab-body">
+        <div class="section-title">🏆 Quiz — show what you read</div>
+        <div class="section-sub">6 mixed questions: vocab + comprehension + sequence.</div>
+        <div class="quiz-score-pill" id="wq-pill">0 / 6 · 0%</div>
+        <div class="quiz-prog" id="wq-prog"></div>
+        <div id="wq-list"></div>
+        <div id="wq-final" class="qfinal"><div class="em">🏆</div><div class="lb">Final Score</div><div class="sc" id="wq-sc">0 / 6</div><div id="wq-msg" style="margin-top:6px;font-size:14px;opacity:.95"></div></div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="w-redo-4" onclick="wbDoRedo(4)">↺ Redo</button>
+        <button class="btn-complete" id="w-complete-4" onclick="wbMarkComplete(4)">Mark Quiz complete ✓</button>
+      </div>
+    </div>
+
   </div>
 </div><!-- end #wb-mode -->
 
@@ -626,13 +802,22 @@ function markComplete(i){
   if (c){ c.classList.add("done"); c.textContent = "✓ Done — keep going!"; }
   refreshProg();
 }
+var WB_TABS = 5;
 function refreshProg(){
   var n = 0;
   for (var i = 0; i < TOTAL_TABS; i++){ if (lLoad("tab-" + i + "-done")) n++; }
-  try { document.getElementById("prog-pill").textContent = n + " / " + TOTAL_TABS + " done"; } catch(e){}
+  var w = 0;
+  for (var j = 0; j < WB_TABS; j++){ if (lLoad("wb-tab-" + j + "-done")) w++; }
+  var totalDone = n + w;
+  var totalAll = TOTAL_TABS + WB_TABS;
+  try { document.getElementById("prog-pill").textContent = totalDone + " / " + totalAll + " done"; } catch(e){}
   try {
     var pillSb = document.getElementById("mc-prog-sb");
     if (pillSb){ pillSb.textContent = n + " / " + TOTAL_TABS + " done"; if (n > 0) pillSb.classList.add("has-prog"); else pillSb.classList.remove("has-prog"); }
+  } catch(e){}
+  try {
+    var pillWb = document.getElementById("mc-prog-wb");
+    if (pillWb){ pillWb.textContent = w + " / " + WB_TABS + " done"; if (w > 0) pillWb.classList.add("has-prog"); else pillWb.classList.remove("has-prog"); }
   } catch(e){}
 }
 
@@ -1173,8 +1358,349 @@ function showQuizFinal(){
 }
 
 // ─── INIT ───
+// ═══════════════════════════════════════════════════════════════════
+//   WB MODE — Workbook tabs + state machines
+// ═══════════════════════════════════════════════════════════════════
+var wbCur = 0;
+var WB_INIT = {}, WB_RESET = {}, WB_RESTORE = {};
+function wbShowTab(i){
+  if (i < 0 || i >= WB_TABS) return;
+  var prev = document.getElementById("wtc" + wbCur); if (prev) prev.classList.remove("active");
+  var pb = document.getElementById("wtb" + wbCur); if (pb) pb.classList.remove("active");
+  wbCur = i;
+  var nc = document.getElementById("wtc" + i); if (nc) nc.classList.add("active");
+  var nb = document.getElementById("wtb" + i); if (nb) nb.classList.add("active");
+  lSave("wb-last-tab", i);
+  if (WB_INIT[i] && !WB_INIT[i]._init){ WB_INIT[i](); WB_INIT[i]._init = true; if (WB_RESTORE[i]) WB_RESTORE[i](); }
+}
+function wbMarkComplete(i){
+  lSave("wb-tab-" + i + "-done", true);
+  var btn = document.getElementById("wtb" + i); if (btn) btn.classList.add("done");
+  var c = document.getElementById("w-complete-" + i);
+  if (c){ c.classList.add("done"); c.textContent = "✓ Done — keep going!"; }
+  refreshProg();
+}
+var wbRedoArmed = {};
+function wbDoRedo(i){
+  var btn = document.getElementById("w-redo-" + i); if (!btn) return;
+  if (!wbRedoArmed[i]){
+    wbRedoArmed[i] = true;
+    btn.classList.add("armed"); btn.textContent = "↺ Tap again";
+    setTimeout(function(){ wbRedoArmed[i] = false; if (btn){ btn.classList.remove("armed"); btn.textContent = "↺ Redo"; } }, 3000);
+    return;
+  }
+  wbRedoArmed[i] = false;
+  btn.classList.remove("armed"); btn.textContent = "↺ Redo";
+  var keys = ["wb-tab-" + i + "-done", "wb-tab-" + i + "-state"];
+  if (i === 4){ keys.push("wb-tab-4-score"); }
+  keys.forEach(lDel);
+  var bb = document.getElementById("w-complete-" + i);
+  if (bb){ bb.classList.remove("done"); bb.textContent = "Mark complete ✓"; }
+  var tb = document.getElementById("wtb" + i); if (tb) tb.classList.remove("done");
+  if (WB_RESET[i]) WB_RESET[i]();
+  refreshProg();
+}
+
+// ─── WB TAB 0 — Vocab flashcards (5 WB-new words, practice + quiz) ───
+var WFC_WORDS = [
+  { emoji: "🕹️", word: "arcade",          pos: "Noun · WB",           def: "a place with many video game machines that you pay to play",                   jp: "ゲームセンター",              sample: "Arcades were like shopping malls full of game <b>machines</b>." },
+  { emoji: "🎮", word: "console",         pos: "Noun · WB",           def: "a small machine you plug into a TV to play video games",                       jp: "ゲーム機（ゲームき）",       sample: "Game <b>consoles</b> got faster and better in the 2000s." },
+  { emoji: "🤲", word: "portable",        pos: "Adjective · WB",      def: "small and light enough to carry around easily",                                jp: "持ち運びできる（もちはこびできる）",  sample: "People wanted small <b>portable</b> games to take anywhere." },
+  { emoji: "🥽", word: "virtual reality", pos: "Noun phrase · WB",    def: "a fake (computer-made) world you see and hear with a headset",                 jp: "バーチャル・リアリティ",     sample: "In <b>virtual reality</b>, the headset controls what you see and hear." },
+  { emoji: "🎧", word: "headset",         pos: "Noun · WB",           def: "a thing you wear on your head with screens or speakers near your ears or eyes", jp: "ヘッドセット",                sample: "Players wear a VR <b>headset</b> on their heads." }
+];
+var wfcIdx = 0, wfcVisited = new Set();
+var wfcMode = "practice", wfcQuizIdx = 0, wfcQuizSolved = new Set();
+WB_INIT[0] = function(){};
+WB_RESET[0] = function(){
+  wfcIdx = 0; wfcVisited = new Set(); wfcQuizIdx = 0; wfcQuizSolved = new Set(); wfcMode = "practice";
+  var card = document.getElementById("wfc-card"); if (card) card.classList.remove("flipped");
+  var d = document.getElementById("wfc-done"); if (d) d.classList.remove("show");
+  setWfcMode("practice"); wfcRender();
+};
+WB_RESTORE[0] = function(){
+  var s = lLoad("wb-tab-0-state");
+  if (s){
+    wfcVisited = new Set(s.visited || []);
+    wfcQuizSolved = new Set(s.solved || []);
+    if (s.mode) wfcMode = s.mode;
+    if (wfcVisited.size >= WFC_WORDS.length && wfcQuizSolved.size >= WFC_WORDS.length){
+      var d = document.getElementById("wfc-done"); if (d) d.classList.add("show");
+    }
+  }
+  setWfcMode(wfcMode); wfcRender();
+};
+function wfcRender(){
+  var w = WFC_WORDS[wfcIdx]; if (!w) return;
+  try {
+    document.getElementById("wfc-em").textContent = w.emoji;
+    document.getElementById("wfc-word").textContent = w.word;
+    document.getElementById("wfc-pos").textContent = w.pos;
+    document.getElementById("wfc-em-b").textContent = w.emoji;
+    document.getElementById("wfc-def").textContent = w.def;
+    document.getElementById("wfc-jp").textContent = w.jp;
+    document.getElementById("wfc-jp").classList.remove("revealed");
+    document.getElementById("wfc-sample").innerHTML = w.sample;
+    document.getElementById("wfc-counter").textContent = (wfcIdx + 1) + " / " + WFC_WORDS.length;
+    document.getElementById("wfc-card").classList.remove("flipped");
+  } catch(e){}
+}
+function flipWfcCard(){
+  try {
+    document.getElementById("wfc-card").classList.toggle("flipped");
+    wfcVisited.add(wfcIdx);
+    saveWfcState(); checkWfcComplete();
+  } catch(e){}
+}
+function wfcNext(){ wfcIdx = (wfcIdx + 1) % WFC_WORDS.length; wfcRender(); }
+function wfcPrev(){ wfcIdx = (wfcIdx - 1 + WFC_WORDS.length) % WFC_WORDS.length; wfcRender(); }
+function toggleWfcJp(e){ e.stopPropagation(); try { document.getElementById("wfc-jp").classList.toggle("revealed"); } catch(ex){} }
+function setWfcMode(m){
+  wfcMode = m;
+  try {
+    document.getElementById("wfc-prac").classList.toggle("active", m === "practice");
+    document.getElementById("wfc-quiz").classList.toggle("active", m === "quiz");
+    document.getElementById("wfc-practice").style.display = m === "practice" ? "block" : "none";
+    document.getElementById("wfc-quizmode").style.display = m === "quiz" ? "block" : "none";
+  } catch(e){}
+  if (m === "quiz") wfcQuizRender();
+  saveWfcState();
+}
+function wfcQuizRender(){
+  var next = -1;
+  for (var i = 0; i < WFC_WORDS.length; i++){
+    var ix = (wfcQuizIdx + i) % WFC_WORDS.length;
+    if (!wfcQuizSolved.has(ix)){ next = ix; break; }
+  }
+  if (next === -1){
+    try {
+      document.getElementById("wfcq-em").textContent = "🏆";
+      document.getElementById("wfcq-sent").innerHTML = "All 5 quizzed!";
+      document.getElementById("wfcq-clue").textContent = "";
+      document.getElementById("wfcq-input").style.display = "none";
+      document.querySelector("#wfc-quizmode .quiz-check").style.display = "none";
+      document.getElementById("wfcq-prog").textContent = WFC_WORDS.length + " / " + WFC_WORDS.length + " done";
+    } catch(e){}
+    return;
+  }
+  wfcQuizIdx = next;
+  var w = WFC_WORDS[next];
+  try {
+    document.getElementById("wfcq-em").textContent = w.emoji;
+    document.getElementById("wfcq-sent").innerHTML = esc(w.def) + ". What word is it?";
+    document.getElementById("wfcq-clue").textContent = "Starts with \"" + w.word.charAt(0) + "\"";
+    document.getElementById("wfcq-input").value = "";
+    document.getElementById("wfcq-input").className = "quiz-input";
+    document.getElementById("wfcq-input").style.display = "";
+    document.querySelector("#wfc-quizmode .quiz-check").style.display = "";
+    document.getElementById("wfcq-fb").textContent = "";
+    document.getElementById("wfcq-prog").textContent = wfcQuizSolved.size + " / " + WFC_WORDS.length + " done";
+  } catch(e){}
+}
+function checkWfcQuiz(){
+  var w = WFC_WORDS[wfcQuizIdx];
+  var v = document.getElementById("wfcq-input").value.trim().toLowerCase();
+  var inp = document.getElementById("wfcq-input"); var fb = document.getElementById("wfcq-fb");
+  if (v === w.word.toLowerCase()){
+    inp.classList.add("correct"); inp.classList.remove("wrong");
+    fb.textContent = "✅ Right! " + w.word + " — " + w.def;
+    fb.style.color = "var(--green-d)";
+    wfcQuizSolved.add(wfcQuizIdx);
+    saveWfcState();
+    setTimeout(wfcQuizRender, 1200);
+    checkWfcComplete();
+  } else {
+    inp.classList.add("wrong"); inp.classList.remove("correct");
+    fb.textContent = "❌ Try again. It starts with \"" + w.word.charAt(0) + "\".";
+    fb.style.color = "var(--red)";
+  }
+}
+function saveWfcState(){ lSave("wb-tab-0-state", { visited: Array.from(wfcVisited), solved: Array.from(wfcQuizSolved), mode: wfcMode }); }
+function checkWfcComplete(){
+  if (wfcVisited.size >= WFC_WORDS.length && wfcQuizSolved.size >= WFC_WORDS.length){
+    var d = document.getElementById("wfc-done"); if (d) d.classList.add("show");
+  }
+}
+
+// ─── WB TAB 1 — Read passage (no state — just reading) ───
+WB_INIT[1] = function(){};
+
+// ─── WB TAB 2 — T/F (4 items; answers T,T,T,F) ───
+var WBTF_ANS = { 1: true, 2: true, 3: true, 4: false };
+var wbtfSolved = new Set();
+WB_INIT[2] = function(){};
+WB_RESET[2] = function(){
+  wbtfSolved.clear();
+  document.querySelectorAll("[id^='wbtf-'] .comp-opt").forEach(function(b){ b.classList.remove("correct","wrong"); delete b.dataset.locked; });
+  var d = document.getElementById("wbtf-done"); if (d) d.classList.remove("show");
+};
+WB_RESTORE[2] = function(){
+  var s = lLoad("wb-tab-2-state");
+  if (s && s.solved){
+    s.solved.forEach(function(n){
+      var card = document.getElementById("wbtf-" + n);
+      if (card){
+        var opts = card.querySelectorAll(".comp-opt");
+        opts.forEach(function(o){ o.dataset.locked = "1"; });
+        var correctIdx = WBTF_ANS[n] ? 0 : 1;
+        if (opts[correctIdx]) opts[correctIdx].classList.add("correct");
+      }
+      wbtfSolved.add(n);
+    });
+    if (s.allDone){ var d = document.getElementById("wbtf-done"); if (d) d.classList.add("show"); }
+  }
+};
+function wbTf(btn, n, pickedTrue){
+  if (btn.dataset.locked) return;
+  var correct = pickedTrue === WBTF_ANS[n];
+  if (!correct){ btn.classList.add("wrong"); setTimeout(function(){ btn.classList.remove("wrong"); }, 700); return; }
+  // lock and mark
+  var parent = btn.parentNode;
+  parent.querySelectorAll(".comp-opt").forEach(function(o){ o.dataset.locked = "1"; });
+  btn.classList.add("correct");
+  wbtfSolved.add(n);
+  var allDone = wbtfSolved.size >= 4;
+  lSave("wb-tab-2-state", { solved: Array.from(wbtfSolved), allDone: allDone });
+  if (allDone){ var d = document.getElementById("wbtf-done"); if (d) d.classList.add("show"); }
+}
+
+// ─── WB TAB 3 — Timeline match game ───
+var wbtlPickedY = null, wbtlPickedW = null, wbtlMatched = new Set();
+WB_INIT[3] = function(){};
+WB_RESET[3] = function(){
+  wbtlPickedY = null; wbtlPickedW = null; wbtlMatched.clear();
+  document.querySelectorAll("#wtc3 .match-chip").forEach(function(c){ c.classList.remove("matched","selected"); });
+  var d = document.getElementById("wbtl-done"); if (d) d.classList.remove("show");
+};
+WB_RESTORE[3] = function(){
+  var s = lLoad("wb-tab-3-state");
+  if (s && s.matched){
+    s.matched.forEach(function(k){
+      document.querySelectorAll("#wtc3 .match-chip[data-key=\"" + k + "\"]").forEach(function(c){ c.classList.add("matched"); });
+      wbtlMatched.add(k);
+    });
+    if (s.allDone){ var d = document.getElementById("wbtl-done"); if (d) d.classList.add("show"); }
+  }
+};
+function wbMatch(chip, key, kind){
+  if (chip.classList.contains("matched")) return;
+  if (kind === "y"){
+    if (wbtlPickedY) wbtlPickedY.classList.remove("selected");
+    chip.classList.add("selected"); wbtlPickedY = chip; wbtlPickedY.dataset.k = key;
+  } else {
+    if (wbtlPickedW) wbtlPickedW.classList.remove("selected");
+    chip.classList.add("selected"); wbtlPickedW = chip; wbtlPickedW.dataset.k = key;
+  }
+  if (wbtlPickedY && wbtlPickedW){
+    if (wbtlPickedY.dataset.k === wbtlPickedW.dataset.k){
+      wbtlPickedY.classList.add("matched"); wbtlPickedY.classList.remove("selected");
+      wbtlPickedW.classList.add("matched"); wbtlPickedW.classList.remove("selected");
+      wbtlMatched.add(wbtlPickedY.dataset.k);
+      wbtlPickedY = null; wbtlPickedW = null;
+      var allDone = wbtlMatched.size >= 5;
+      lSave("wb-tab-3-state", { matched: Array.from(wbtlMatched), allDone: allDone });
+      if (allDone){ var d = document.getElementById("wbtl-done"); if (d) d.classList.add("show"); }
+    } else {
+      var y = wbtlPickedY, w = wbtlPickedW;
+      y.classList.add("wrong-flash"); w.classList.add("wrong-flash");
+      setTimeout(function(){
+        y.classList.remove("wrong-flash","selected"); w.classList.remove("wrong-flash","selected");
+      }, 600);
+      wbtlPickedY = null; wbtlPickedW = null;
+    }
+  }
+}
+
+// ─── WB TAB 4 — Quiz (6 items, scored) ───
+var WB_QUIZ = [
+  { q: "What is an arcade?", opts: ["A place with many video game machines you pay to play", "A small game console", "A virtual reality headset", "A computer mouse"], correct: 0 },
+  { q: "What is a console?", opts: ["A type of joystick", "A small machine you plug into a TV to play games", "A virtual reality program", "An online multiplayer game"], correct: 1 },
+  { q: "What does portable mean?", opts: ["Big and heavy", "Small and light enough to carry around", "Old and slow", "Online only"], correct: 1 },
+  { q: "In what year did the first VERY POPULAR multiplayer game come out?", opts: ["1958", "1972", "1994", "2010"], correct: 2 },
+  { q: "In a VR game, what controls what the player sees and hears?", opts: ["A controller", "A TV", "The headset", "A keyboard"], correct: 2 },
+  { q: "Put these in the right SEQUENCE (1 = earliest): arcades / VR headsets / home consoles", opts: ["VR → home → arcades", "Arcades → home consoles → VR headsets", "Home → arcades → VR", "VR → arcades → home"], correct: 1 }
+];
+WB_INIT[4] = function(){
+  var host = document.getElementById("wq-list"); if (!host) return;
+  host.innerHTML = "";
+  WB_QUIZ.forEach(function(q, i){
+    var card = document.createElement("div");
+    card.className = "q-card"; card.id = "wqc-" + i;
+    var html = "<div class=\"q-prompt\">" + (i+1) + ". " + esc(q.q) + "</div>";
+    q.opts.forEach(function(o, oi){
+      html += "<button class=\"opt\" onclick=\"wbQuizPick(" + i + "," + oi + ")\">" + esc(o) + "</button>";
+    });
+    card.innerHTML = html; host.appendChild(card);
+  });
+  var prog = document.getElementById("wq-prog"); if (prog){
+    prog.innerHTML = "";
+    for (var i = 0; i < WB_QUIZ.length; i++){ var d = document.createElement("div"); d.className = "qp-dot"; d.id = "wqp-" + i; prog.appendChild(d); }
+  }
+};
+WB_RESET[4] = function(){
+  window._wbqAns = []; window._wbqScore = 0;
+  document.querySelectorAll("#wtc4 .q-card .opt").forEach(function(o){ o.classList.remove("correct","wrong"); delete o.dataset.locked; });
+  document.querySelectorAll("#wtc4 .qp-dot").forEach(function(d){ d.classList.remove("ok","bad"); });
+  var pill = document.getElementById("wq-pill"); if (pill) pill.textContent = "0 / 6 · 0%";
+  var qf = document.getElementById("wq-final"); if (qf) qf.classList.remove("show");
+};
+WB_RESTORE[4] = function(){
+  var s = lLoad("wb-tab-4-state"); if (!s) return;
+  window._wbqAns = s.answers || []; window._wbqScore = s.score || 0;
+  window._wbqAns.forEach(function(oi, i){
+    if (oi == null) return;
+    var card = document.getElementById("wqc-" + i); if (!card) return;
+    var opts = card.querySelectorAll(".opt");
+    var correct = oi === WB_QUIZ[i].correct;
+    if (opts[oi]) opts[oi].classList.add(correct ? "correct" : "wrong");
+    opts.forEach(function(o){ o.dataset.locked = "1"; });
+    var dot = document.getElementById("wqp-" + i); if (dot) dot.classList.add(correct ? "ok" : "bad");
+  });
+  updateWbQuizPill();
+  if (s.done) showWbQuizFinal();
+};
+window._wbqAns = []; window._wbqScore = 0;
+function wbQuizPick(qi, oi){
+  var card = document.getElementById("wqc-" + qi); if (!card) return;
+  var opts = card.querySelectorAll(".opt");
+  if (opts[0].dataset.locked) return;
+  opts.forEach(function(o){ o.dataset.locked = "1"; });
+  var correct = oi === WB_QUIZ[qi].correct;
+  opts[oi].classList.add(correct ? "correct" : "wrong");
+  window._wbqAns[qi] = oi;
+  if (correct) window._wbqScore++;
+  var dot = document.getElementById("wqp-" + qi); if (dot) dot.classList.add(correct ? "ok" : "bad");
+  updateWbQuizPill();
+  var allDone = window._wbqAns.filter(function(x){ return x != null; }).length >= WB_QUIZ.length;
+  lSave("wb-tab-4-state", { answers: window._wbqAns, score: window._wbqScore, done: allDone });
+  if (allDone){
+    var pct = Math.round((window._wbqScore / WB_QUIZ.length) * 100);
+    lSave("wb-score", { score: window._wbqScore, total: WB_QUIZ.length, percent: pct, answers: window._wbqAns, done: true });
+    showWbQuizFinal();
+  }
+}
+function updateWbQuizPill(){
+  var ans = (window._wbqAns || []).filter(function(x){ return x != null; }).length;
+  var pct = ans > 0 ? Math.round((window._wbqScore / ans) * 100) : 0;
+  var pill = document.getElementById("wq-pill");
+  if (pill) pill.textContent = window._wbqScore + " / " + ans + " · " + pct + "%";
+}
+function showWbQuizFinal(){
+  var qf = document.getElementById("wq-final"); if (!qf) return;
+  qf.classList.add("show");
+  var pct = Math.round((window._wbqScore / WB_QUIZ.length) * 100);
+  var sc = document.getElementById("wq-sc"); if (sc) sc.textContent = window._wbqScore + " / " + WB_QUIZ.length + " · " + pct + "%";
+  var msg = document.getElementById("wq-msg");
+  if (msg){
+    if (pct >= 80) msg.textContent = "🏆 You read it, you learned it!";
+    else if (pct >= 60) msg.textContent = "👍 Good — go back to the Read tab and re-read ¶3-5.";
+    else msg.textContent = "📖 Re-read the passage in the Read tab and try again.";
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", function(){
-  // restore "done" status badges
+  // SB "done" badges
   for (var i = 0; i < TOTAL_TABS; i++){
     if (lLoad("tab-" + i + "-done")){
       var tb = document.getElementById("tb" + i); if (tb) tb.classList.add("done");
@@ -1182,13 +1708,31 @@ document.addEventListener("DOMContentLoaded", function(){
       if (cb){ cb.classList.add("done"); cb.textContent = "✓ Done — keep going!"; }
     }
   }
+  // WB "done" badges
+  for (var j = 0; j < WB_TABS; j++){
+    if (lLoad("wb-tab-" + j + "-done")){
+      var wtb = document.getElementById("wtb" + j); if (wtb) wtb.classList.add("done");
+      var wcb = document.getElementById("w-complete-" + j);
+      if (wcb){ wcb.classList.add("done"); wcb.textContent = "✓ Done — keep going!"; }
+    }
+  }
   refreshProg();
-  // Restore last-mode: landing (default) / sb / wb
+  // Init WB tab 0 immediately so it renders when WB opens
+  if (WB_INIT[0]){ WB_INIT[0](); WB_INIT[0]._init = true; if (WB_RESTORE[0]) WB_RESTORE[0](); }
+  // If user comes back to WB mode, restore the last WB tab too
+  var wbLast = lLoad("wb-last-tab");
+  if (wbLast != null && wbLast !== 0){
+    // pre-init the requested tab so restore runs
+    if (WB_INIT[wbLast] && !WB_INIT[wbLast]._init){ WB_INIT[wbLast](); WB_INIT[wbLast]._init = true; if (WB_RESTORE[wbLast]) WB_RESTORE[wbLast](); }
+    // visually switch only happens once enterMode('wb') is called below
+  }
+  // Restore last-mode
   var lastMode = lLoad("last-mode");
   if (lastMode === "sb"){ enterMode("sb"); }
-  else if (lastMode === "wb"){ enterMode("wb"); }
-  else {
-    // stay on landing
+  else if (lastMode === "wb"){
+    enterMode("wb");
+    if (wbLast != null && wbLast !== 0) wbShowTab(wbLast);
+  } else {
     try {
       document.getElementById("landing").style.display = "flex";
       document.getElementById("sb-mode").style.display = "none";

@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leo · Unit 8 Reading — Hide and Seek</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --blue:#0EA5E9;--blue-d:#0369A1;--blue-l:#E0F2FE;
+  --amber:#D97706;--amber-l:#FFFBEB;
+  --orange:#F97316;--orange-l:#FFF7ED;
+  --yellow:#FDE047;--red:#EF4444;--red-l:#FEF2F2;
+  --paper:#FAFAF7;--ink:#0f172a;--ink-2:#374151;--ink-3:#6B7280;--ink-4:#9CA3AF;--border:#E5E7EB;
+}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);overflow:hidden}
+body{display:flex;flex-direction:column;height:100vh}
+
+/* HEADER */
+.app-header{background:var(--green);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.logo{font-size:32px}
+.title{font-size:17px;font-weight:800}
+.subtitle{font-size:13px;opacity:.9;margin-top:2px}
+.badge-row{margin-left:auto;display:flex;gap:8px;align-items:center}
+.prog-pill{background:rgba(255,255,255,.2);color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:800}
+
+/* TABS */
+.tab-nav{display:flex;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex:1;min-width:120px;padding:14px 10px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tab-btn.active{color:var(--green);border-bottom-color:var(--green)}
+.tab-btn .tab-icon{font-size:22px;line-height:1}
+.tab-btn .tab-name{font-size:13px}
+.tab-btn .tab-check{font-size:11px;color:var(--green);opacity:0;height:11px;line-height:1}
+.tab-btn.done .tab-check{opacity:1}
+
+/* TAB CONTENT */
+.tab-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tab-content{display:none;flex:1;flex-direction:column;overflow:hidden}
+.tab-content.active{display:flex}
+.tab-body{flex:1;overflow-y:auto;padding:18px;max-width:840px;width:100%;margin:0 auto}
+.tab-footer{background:#fff;border-top:2px solid var(--border);padding:12px 16px;display:flex;gap:10px;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.btn-redo{flex:0 0 110px;background:#F3F4F6;color:var(--ink-2);border:2px solid var(--border);border-radius:10px;padding:12px;font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-redo:hover{background:#E5E7EB}
+.btn-redo.armed{background:var(--amber);color:#fff;border-color:var(--amber)}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-complete:hover{background:var(--green-d)}
+.btn-complete.done{background:#9CA3AF;cursor:default}
+
+/* SHARED PIECES */
+.section-title{font-size:18px;font-weight:900;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.section-sub{font-size:14px;color:var(--ink-3);margin-bottom:14px;line-height:1.5}
+.dad-hint{background:var(--green-l);border-left:4px solid var(--green);border-radius:0 12px 12px 0;padding:12px 16px;font-size:14px;color:var(--ink);line-height:1.5;margin-bottom:14px}
+.dad-hint b{color:var(--green-d)}
+.card{background:#fff;border:2px solid var(--border);border-radius:14px;padding:16px}
+.done-banner{background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:14px 18px;font-size:15px;font-weight:700;color:var(--green-d);text-align:center;display:none;margin-top:14px}
+.done-banner.show{display:block}
+
+/* READ TAB — passage display */
+.read-meta{background:var(--blue-l);border:2px solid var(--blue);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--blue-d);font-weight:700;margin-bottom:14px}
+.passage-block{background:#fff;border:2px solid var(--green);border-radius:14px;padding:18px 22px;font-size:17px;color:var(--ink);line-height:1.75;margin-bottom:12px}
+.passage-block.locked{opacity:.4;pointer-events:none;border-color:var(--border)}
+.passage-block .ptitle{font-size:30px;font-weight:900;color:var(--green-d);text-align:center;margin-bottom:12px;letter-spacing:1px;border-bottom:2px solid var(--green-l);padding-bottom:10px}
+.passage-block .pheader{font-size:13px;font-weight:900;color:var(--ink-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.passage-block .tag{background:var(--yellow);color:var(--ink);padding:1px 7px;border-radius:5px;font-weight:800;cursor:pointer;border:2px solid var(--amber)}
+.passage-block .tag:hover{background:var(--amber);color:#fff}
+.passage-block .tag.popped{background:var(--green);color:#fff;border-color:var(--green-d)}
+.gloss-pop{position:fixed;background:#fff;border:3px solid var(--green);border-radius:12px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--ink);box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:50;max-width:260px}
+.gloss-pop .gp-em{font-size:24px}
+.gloss-pop .gp-jp{font-size:12px;color:var(--ink-3);font-style:italic;margin-top:4px}
+
+.comp-q{background:var(--green-l);border:2px dashed var(--green);border-radius:12px;padding:14px 18px;margin-bottom:18px}
+.comp-q .ql{font-size:12px;font-weight:900;color:var(--green-d);letter-spacing:1.5px;margin-bottom:6px}
+.comp-q .qt{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px}
+.comp-opt{display:block;background:#fff;border:2px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;text-align:left;width:100%;margin-bottom:6px;font-family:'Outfit',sans-serif;transition:all .15s}
+.comp-opt:hover{border-color:var(--green)}
+.comp-opt.correct{background:var(--green);color:#fff;border-color:var(--green-d)}
+.comp-opt.wrong{background:var(--red);color:#fff;border-color:var(--red)}
+.unlock-msg{background:var(--amber);color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:800;text-align:center;display:inline-block}
+
+/* STRATEGY TAB */
+.signal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.signal-card{padding:14px 10px;border-radius:12px;text-align:center;font-weight:900;color:#fff;font-size:16px}
+.signal-card.s1{background:var(--yellow);color:var(--ink)}
+.signal-card.s2{background:var(--orange)}
+.signal-card.s3{background:var(--blue)}
+.signal-card.s4{background:var(--blue)}
+.signal-card.s5{background:var(--green)}
+.signal-card.s6{background:var(--amber)}
+.signal-card.s7{background:var(--red)}
+.signal-card .em{font-size:24px;margin-bottom:4px;line-height:1}
+.sig-sentence{background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--ink);line-height:1.6;margin-bottom:8px}
+.sig-pick{display:inline;background:#fff;border:2px dashed var(--green);border-radius:6px;padding:2px 8px;cursor:pointer;font-weight:700;color:var(--green-d);margin:0 2px}
+.sig-pick:hover{background:var(--green-l)}
+.sig-pick.correct{background:var(--green);color:#fff;border-style:solid}
+.sig-pick.wrong{background:var(--red);color:#fff;border-style:solid}
+
+/* ORDER TAB */
+.order-row{background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:10px;cursor:pointer;transition:all .15s}
+.order-row:hover{border-color:var(--green)}
+.order-row .order-num{background:var(--orange);color:#fff;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;flex-shrink:0}
+.order-row .order-num.empty{background:#E5E7EB;color:var(--ink-3)}
+.order-row .order-text{flex:1;font-size:15px;font-weight:700;color:var(--ink)}
+.order-row .order-em{font-size:32px}
+.order-row.correct{border-color:var(--green);background:var(--green-l)}
+.order-actions{display:flex;gap:10px;margin-top:14px;justify-content:center}
+.order-actions .b{padding:10px 22px;border-radius:10px;font-size:14px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;border:none}
+.order-actions .b.check{background:var(--green);color:#fff}
+.order-actions .b.reset{background:#F3F4F6;color:var(--ink-2);border:2px solid var(--border)}
+.order-result{text-align:center;font-size:16px;font-weight:800;color:var(--green-d);margin-top:10px;min-height:24px}
+
+/* LABEL TAB */
+.label-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;justify-content:center;background:#F3F4F6;border-radius:12px;padding:12px}
+.label-chip{background:#fff;border:2px solid var(--blue);border-radius:99px;padding:8px 14px;font-size:14px;font-weight:700;color:var(--blue-d);cursor:pointer;font-family:'Outfit',sans-serif}
+.label-chip:hover{background:var(--blue);color:#fff}
+.label-chip.placed{opacity:.35;cursor:default}
+.label-chip.sel{background:var(--orange);color:#fff;border-color:var(--orange)}
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.photo-cell{background:#fff;border:3px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s}
+.photo-cell:hover{border-color:var(--green)}
+.photo-cell.labeled{background:var(--green-l);border-color:var(--green)}
+.photo-cell.shake{animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.photo-cell .ph-em{font-size:38px;line-height:1}
+.photo-cell .ph-let{font-size:14px;font-weight:900;color:var(--green-d);margin-top:6px}
+.photo-cell .ph-nm{font-size:11px;color:var(--ink-2);font-weight:600;margin-top:2px}
+.find-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.find-opt{background:#fff;border:2px solid var(--border);border-radius:10px;padding:10px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink);font-family:'Outfit',sans-serif}
+.find-opt:hover{border-color:var(--green)}
+.find-opt.correct{background:var(--green);color:#fff;border-color:var(--green-d)}
+.find-opt.wrong{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* QUIZ TAB */
+.quiz-score-pill{background:var(--green);color:#fff;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;display:inline-block;margin-bottom:10px}
+.quiz-prog{display:flex;gap:4px;margin-bottom:14px}
+.qp-dot{flex:1;height:6px;background:var(--border);border-radius:3px}
+.qp-dot.ok{background:var(--green)}
+.qp-dot.bad{background:var(--red)}
+.q-card{background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.q-card .q-prompt{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.q-card .opt{display:block;background:#fff;border:2px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;width:100%;text-align:left;color:var(--ink);margin-bottom:6px;font-family:'Outfit',sans-serif}
+.q-card .opt:hover{border-color:var(--green)}
+.q-card .opt.correct{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.q-card .opt.wrong{background:var(--red-l);border-color:var(--red);color:var(--red)}
+.qfinal{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;border-radius:14px;padding:22px;text-align:center;display:none;margin-top:12px}
+.qfinal.show{display:block}
+.qfinal .em{font-size:48px}
+.qfinal .sc{font-size:38px;font-weight:900;margin:4px 0}
+.qfinal .lb{font-size:12px;opacity:.85;letter-spacing:.3em;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo">🧭</div>
+  <div>
+    <div class="title">Unit 8 · Reading — Hide and Seek</div>
+    <div class="subtitle">Geocaching · Leo&apos;s independent reading app</div>
+  </div>
+  <div class="badge-row">
+    <div class="prog-pill" id="prog-pill">0 / 5 done</div>
+  </div>
+</div>
+
+<div class="tab-nav" id="tab-nav">
+  <button class="tab-btn active" onclick="showTab(0)" id="tb0"><span class="tab-icon">📖</span><span class="tab-name">Read</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" onclick="showTab(1)" id="tb1"><span class="tab-icon">🎯</span><span class="tab-name">Strategy</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" onclick="showTab(2)" id="tb2"><span class="tab-icon">📋</span><span class="tab-name">Order</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" onclick="showTab(3)" id="tb3"><span class="tab-icon">🏷️</span><span class="tab-name">Label</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" onclick="showTab(4)" id="tb4"><span class="tab-icon">✅</span><span class="tab-name">Quiz</span><span class="tab-check">✓</span></button>
+</div>
+
+<div class="tab-wrap">
+
+<!-- ─────────── TAB 0 — READ ─────────── -->
+<div class="tab-content active" id="tc0">
+  <div class="tab-body">
+    <div class="section-title">📖 Read — Hide and Seek</div>
+    <div class="section-sub">Read each paragraph carefully. Answer the question. The next paragraph unlocks when you get it right.</div>
+    <div class="dad-hint">💡 Tap any <strong>yellow word</strong> in the passage for a quick gloss (definition pop-up).</div>
+    <div class="read-meta">🎧 Source: TR 8.7 · Student Book pp. 140-141 (verbatim)</div>
+
+    <!-- ¶1 -->
+    <div class="passage-block" id="pb-1">
+      <div class="ptitle">HIDE and SEEK</div>
+      <div class="pheader">Paragraph 1 of 4</div>
+      Geocaching is a fun <span class="tag" onclick="popGloss(this,'outdoor')">outdoor</span> hobby. It&apos;s like a game of hide and seek, with the hiders leaving clues for the seekers to find. Here&apos;s how it works: The hiders hide a box, or cache. Inside the box, they put some "treasure" — small objects for you to find — and a notebook. If you want to be a seeker, or geocacher, you use an <span class="tag" onclick="popGloss(this,'app')">app</span> that tells you where there are caches near you.
+    </div>
+    <div class="comp-q" id="cq-1">
+      <div class="ql">¶1 — UNDERSTANDING CHECK</div>
+      <div class="qt">What is geocaching?</div>
+      <button class="comp-opt" onclick="compPick(this,1,false)">A backyard game children play after school.</button>
+      <button class="comp-opt" onclick="compPick(this,1,true)">A fun outdoor hobby — hiders hide a box (cache) with treasure, and seekers use an app or map to find it.</button>
+      <button class="comp-opt" onclick="compPick(this,1,false)">A video game played on a smartphone.</button>
+    </div>
+
+    <!-- ¶2 (locked initially) -->
+    <div class="passage-block locked" id="pb-2">
+      <div class="pheader">Paragraph 2 of 4 — 🔒 answer ¶1 first</div>
+      Then you look for the cache. To help you find it, you need to have your smartphone with online <span class="tag" onclick="popGloss(this,'clues')">clues</span>, or a map and compass. You should also take a pen or pencil and a few small treasures to leave for other people.
+    </div>
+    <div class="comp-q" id="cq-2" style="display:none">
+      <div class="ql">¶2 — UNDERSTANDING CHECK</div>
+      <div class="qt">What do you need for geocaching?</div>
+      <button class="comp-opt" onclick="compPick(this,2,false)">Only a soccer ball.</button>
+      <button class="comp-opt" onclick="compPick(this,2,true)">A smartphone with clues OR a map and compass, plus a pen/pencil and small treasures to leave.</button>
+      <button class="comp-opt" onclick="compPick(this,2,false)">A car and a sleeping bag.</button>
+    </div>
+
+    <!-- ¶3 -->
+    <div class="passage-block locked" id="pb-3">
+      <div class="pheader">Paragraph 3 of 4 — 🔒 answer ¶2 first</div>
+      When you find the cache, you look for the notebook inside. Then you write your name and the date. Then you look at the treasures in the box, and choose something you like to take away. You might choose a small toy, an ornament, or a little book. Don&apos;t forget to leave another treasure in its place!
+    </div>
+    <div class="comp-q" id="cq-3" style="display:none">
+      <div class="ql">¶3 — UNDERSTANDING CHECK</div>
+      <div class="qt">When you FIND the cache, what do you do FIRST?</div>
+      <button class="comp-opt" onclick="compPick(this,3,false)">Take a treasure and run home.</button>
+      <button class="comp-opt" onclick="compPick(this,3,true)">Look for the notebook inside (then write your name and date, choose a treasure, leave another).</button>
+      <button class="comp-opt" onclick="compPick(this,3,false)">Close the box without opening it.</button>
+    </div>
+
+    <!-- ¶4-5 -->
+    <div class="passage-block locked" id="pb-4">
+      <div class="pheader">Paragraphs 4 + 5 of 4 — 🔒 answer ¶3 first</div>
+      <strong>¶4:</strong> Geocaching is a great way to explore new places and make new friends. Many geocachers also help to clean up the places they visit by picking up garbage they see along the way.<br><br>
+      <strong>¶5:</strong> One geocacher says it&apos;s a great hobby because "It gets the whole family outside and doing something fun together. I love it!"
+    </div>
+    <div class="comp-q" id="cq-4" style="display:none">
+      <div class="ql">¶4-5 — UNDERSTANDING CHECK</div>
+      <div class="qt">In what ways is geocaching a great hobby?</div>
+      <button class="comp-opt" onclick="compPick(this,4,false)">It pays a lot of money.</button>
+      <button class="comp-opt" onclick="compPick(this,4,true)">You explore new places, make friends, clean up garbage, and the whole family does it outdoors together.</button>
+      <button class="comp-opt" onclick="compPick(this,4,false)">It only works on rainy days.</button>
+    </div>
+
+    <div class="done-banner" id="read-done">🎉 All 4 paragraphs read &amp; answered! Mark complete below 👇</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-0" onclick="doRedo(0)">↺ Redo</button>
+    <button class="btn-complete" id="complete-0" onclick="markComplete(0)">Mark Read complete ✓</button>
+  </div>
+</div>
+
+<!-- ─────────── TAB 1 — STRATEGY ─────────── -->
+<div class="tab-content" id="tc1">
+  <div class="tab-body">
+    <div class="section-title">🎯 Strategy — Identify Sequence of Events</div>
+    <div class="section-sub">When you read, look for SIGNAL WORDS — they tell you the ORDER of events.</div>
+    <div class="dad-hint">💡 The 7 signal words below mark where each step starts. Tap the signal word in each sentence to identify it.</div>
+
+    <div class="signal-grid">
+      <div class="signal-card s1"><div class="em">1️⃣</div>first</div>
+      <div class="signal-card s2"><div class="em">2️⃣</div>next</div>
+      <div class="signal-card s3"><div class="em">⏮</div>before</div>
+      <div class="signal-card s4"><div class="em">⏭</div>after</div>
+      <div class="signal-card s5"><div class="em">→</div>then</div>
+      <div class="signal-card s6"><div class="em">🏁</div>finally</div>
+      <div class="signal-card s7"><div class="em">⏹</div>last</div>
+    </div>
+
+    <div class="section-title" style="font-size:15px;margin-top:18px">🔍 Find the signal word in each sentence:</div>
+    <div class="sig-sentence" id="sig-1">
+      1. To make pasta, <span class="sig-pick" onclick="sigPick(this,1,true)">first</span> you boil the water, <span class="sig-pick" onclick="sigPick(this,1,false)">then</span> you add the pasta.
+      <div style="font-size:12px;color:var(--ink-3);font-style:italic;margin-top:4px">tap the word that means &quot;step 1&quot;</div>
+    </div>
+    <div class="sig-sentence" id="sig-2">
+      2. Bellingham scored. <span class="sig-pick" onclick="sigPick(this,2,true)">Next</span>, Vinicius scored, and Madrid won.
+    </div>
+    <div class="sig-sentence" id="sig-3">
+      3. <span class="sig-pick" onclick="sigPick(this,3,true)">After</span> the match, the captain gave the trophy to the manager.
+    </div>
+    <div class="sig-sentence" id="sig-4">
+      4. <span class="sig-pick" onclick="sigPick(this,4,true)">Before</span> you cook, you should wash your hands.
+    </div>
+    <div class="sig-sentence" id="sig-5">
+      5. The team trained for months. <span class="sig-pick" onclick="sigPick(this,5,true)">Finally</span>, they won the Champions League!
+    </div>
+
+    <div class="done-banner" id="sig-done">🎯 Strategy locked in! Mark complete below 👇</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-1" onclick="doRedo(1)">↺ Redo</button>
+    <button class="btn-complete" id="complete-1" onclick="markComplete(1)">Mark Strategy complete ✓</button>
+  </div>
+</div>
+
+<!-- ─────────── TAB 2 — ORDER (LP Activity 2) ─────────── -->
+<div class="tab-content" id="tc2">
+  <div class="tab-body">
+    <div class="section-title">📋 Order — Put the 5 cache-discovery steps in sequence</div>
+    <div class="section-sub">Use the signal words from paragraph 3 of the reading to figure out the order.</div>
+    <div class="dad-hint">💡 Tap each step to cycle through numbers 1-5. ¶3 starts: <em>"When you find the cache, you look for the notebook inside. <strong>Then</strong> you write..."</em></div>
+
+    <div class="order-row" onclick="cycleOrd(this,'c')">
+      <div class="order-num empty">_</div>
+      <div class="order-text">You write your name and the date.</div>
+      <div class="order-em">📝</div>
+    </div>
+    <div class="order-row" onclick="cycleOrd(this,'b')">
+      <div class="order-num empty">_</div>
+      <div class="order-text">You look for the notebook.</div>
+      <div class="order-em">📓</div>
+    </div>
+    <div class="order-row" onclick="cycleOrd(this,'e')">
+      <div class="order-num empty">_</div>
+      <div class="order-text">You leave an object in the box for someone else to find.</div>
+      <div class="order-em">💎</div>
+    </div>
+    <div class="order-row" onclick="cycleOrd(this,'d')">
+      <div class="order-num empty">_</div>
+      <div class="order-text">You choose a treasure to take away.</div>
+      <div class="order-em">🎁</div>
+    </div>
+    <div class="order-row" onclick="cycleOrd(this,'a')">
+      <div class="order-num empty">_</div>
+      <div class="order-text">You find the cache and open it.</div>
+      <div class="order-em">📦</div>
+    </div>
+
+    <div class="order-actions">
+      <button class="b check" onclick="checkOrd()">✓ Check my order</button>
+      <button class="b reset" onclick="resetOrd()">↺ Reset</button>
+    </div>
+    <div class="order-result" id="ord-result"></div>
+
+    <div class="done-banner" id="ord-done">🎉 5 / 5 in correct order! Mark complete below 👇</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-2" onclick="doRedo(2)">↺ Redo</button>
+    <button class="btn-complete" id="complete-2" onclick="markComplete(2)">Mark Order complete ✓</button>
+  </div>
+</div>
+
+<!-- ─────────── TAB 3 — LABEL (LP Activity 3 + follow-up) ─────────── -->
+<div class="tab-content" id="tc3">
+  <div class="tab-body">
+    <div class="section-title">🏷️ Label — Match labels to photos</div>
+    <div class="section-sub">Tap a letter chip first, then tap the photo it labels. Label <em>b. toys</em> is crossed out (the example — toys don&apos;t belong in geocaching gear).</div>
+    <div class="dad-hint">💡 Once you label all 7 photos, you&apos;ll answer: which items help you FIND the cache?</div>
+
+    <div class="label-chips">
+      <button class="label-chip" data-label="a" data-name="map" onclick="pickLab(this)">a. map</button>
+      <button class="label-chip placed" disabled style="opacity:.4;text-decoration:line-through;cursor:default">b. toys</button>
+      <button class="label-chip" data-label="c" data-name="notebook" onclick="pickLab(this)">c. notebook</button>
+      <button class="label-chip" data-label="d" data-name="water bottle" onclick="pickLab(this)">d. water bottle</button>
+      <button class="label-chip" data-label="e" data-name="app" onclick="pickLab(this)">e. app</button>
+      <button class="label-chip" data-label="f" data-name="compass" onclick="pickLab(this)">f. compass</button>
+      <button class="label-chip" data-label="g" data-name="clue" onclick="pickLab(this)">g. clue</button>
+      <button class="label-chip" data-label="h" data-name="pen/pencil" onclick="pickLab(this)">h. pen/pencil</button>
+    </div>
+
+    <div class="photo-grid">
+      <div class="photo-cell labeled" style="opacity:.45"><div class="ph-em">🧸🦄🚂</div><div class="ph-let">b ✗</div><div class="ph-nm">(toys — example)</div></div>
+      <div class="photo-cell" data-correct="f" onclick="placeLab(this)"><div class="ph-em">🧭</div><div class="ph-let">?</div><div class="ph-nm">tap me</div></div>
+      <div class="photo-cell" data-correct="c" onclick="placeLab(this)"><div class="ph-em">📓</div><div class="ph-let">?</div><div class="ph-nm">tap me</div></div>
+      <div class="photo-cell" data-correct="a" onclick="placeLab(this)"><div class="ph-em">🗺️</div><div class="ph-let">?</div><div class="ph-nm">tap me</div></div>
+      <div class="photo-cell" data-correct="d" onclick="placeLab(this)"><div class="ph-em">🚰</div><div class="ph-let">?</div><div class="ph-nm">tap me</div></div>
+      <div class="photo-cell" data-correct="g" onclick="placeLab(this)"><div class="ph-em">📜</div><div class="ph-let">?</div><div class="ph-nm">tap me</div></div>
+      <div class="photo-cell" data-correct="h" onclick="placeLab(this)"><div class="ph-em">✏️</div><div class="ph-let">?</div><div class="ph-nm">tap me</div></div>
+      <div class="photo-cell" data-correct="e" onclick="placeLab(this)"><div class="ph-em">📱</div><div class="ph-let">?</div><div class="ph-nm">tap me</div></div>
+    </div>
+
+    <div id="find-section" style="display:none;margin-top:18px">
+      <div class="section-title" style="font-size:15px">🧭 Which items help you FIND the cache?</div>
+      <div class="section-sub">Tap ALL 4 correct items.</div>
+      <div class="find-grid">
+        <button class="find-opt" onclick="findOpt(this,true)">🧭 compass</button>
+        <button class="find-opt" onclick="findOpt(this,true)">🗺️ map</button>
+        <button class="find-opt" onclick="findOpt(this,true)">📜 clue</button>
+        <button class="find-opt" onclick="findOpt(this,true)">📱 app</button>
+        <button class="find-opt" onclick="findOpt(this,false)">📓 notebook</button>
+        <button class="find-opt" onclick="findOpt(this,false)">🚰 water</button>
+        <button class="find-opt" onclick="findOpt(this,false)">✏️ pen</button>
+        <button class="find-opt" onclick="findOpt(this,false)">🧸 toys</button>
+      </div>
+    </div>
+
+    <div class="done-banner" id="lab-done">🎉 All labels placed + 4 finders found! Mark complete below 👇</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-3" onclick="doRedo(3)">↺ Redo</button>
+    <button class="btn-complete" id="complete-3" onclick="markComplete(3)">Mark Label complete ✓</button>
+  </div>
+</div>
+
+<!-- ─────────── TAB 4 — QUIZ (10 scored) ─────────── -->
+<div class="tab-content" id="tc4">
+  <div class="tab-body">
+    <div class="section-title">✅ Quiz — Show what you know</div>
+    <div class="section-sub">10 questions mixing reading comprehension, sequence, and vocabulary in context.</div>
+    <div class="quiz-score-pill" id="quiz-pill">0 / 10 · 0%</div>
+    <div class="quiz-prog" id="quiz-prog"></div>
+
+    <div id="quiz-list"></div>
+    <div id="qfinal" class="qfinal"><div class="em">🏆</div><div class="lb">Final Score</div><div class="sc" id="qfinal-sc">0 / 10</div><div id="qfinal-msg" style="margin-top:6px;font-size:14px;opacity:.95"></div></div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-4" onclick="doRedo(4)">↺ Redo</button>
+    <button class="btn-complete" id="complete-4" onclick="markComplete(4)">Mark Quiz complete ✓</button>
+  </div>
+</div>
+
+</div><!-- end tab-wrap -->
+
+<script>
+// ─── STORAGE ───
+var PREFIX = "leea-4-8-reading-";
+var TOTAL_TABS = 5;
+function lSave(k, v){ try { localStorage.setItem(PREFIX + k, JSON.stringify(v)); } catch(e){} }
+function lLoad(k){ try { var raw = localStorage.getItem(PREFIX + k); return raw ? JSON.parse(raw) : null; } catch(e){ return null; } }
+function lDel(k){ try { localStorage.removeItem(PREFIX + k); } catch(e){} }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+// ─── TABS ───
+var cur = 0;
+var TAB_INIT = {}, TAB_RESET = {}, TAB_RESTORE = {};
+function showTab(i){
+  if (i < 0 || i >= TOTAL_TABS) return;
+  var prev = document.getElementById("tc" + cur);
+  if (prev) prev.classList.remove("active");
+  var prevBtn = document.getElementById("tb" + cur);
+  if (prevBtn) prevBtn.classList.remove("active");
+  cur = i;
+  var n = document.getElementById("tc" + i);
+  if (n) n.classList.add("active");
+  var nb = document.getElementById("tb" + i);
+  if (nb) nb.classList.add("active");
+  lSave("last-tab", i);
+  if (TAB_INIT[i] && !TAB_INIT[i]._init){ TAB_INIT[i](); TAB_INIT[i]._init = true; if (TAB_RESTORE[i]) TAB_RESTORE[i](); }
+}
+function markComplete(i){
+  lSave("tab-" + i + "-done", true);
+  var btn = document.getElementById("tb" + i);
+  if (btn) btn.classList.add("done");
+  var c = document.getElementById("complete-" + i);
+  if (c){ c.classList.add("done"); c.textContent = "✓ Done — keep going!"; }
+  refreshProg();
+}
+function refreshProg(){
+  var n = 0;
+  for (var i = 0; i < TOTAL_TABS; i++){ if (lLoad("tab-" + i + "-done")) n++; }
+  try { document.getElementById("prog-pill").textContent = n + " / " + TOTAL_TABS + " done"; } catch(e){}
+}
+
+// ─── REDO (two-tap armed) ───
+var redoArmed = {};
+function doRedo(i){
+  var btn = document.getElementById("redo-" + i);
+  if (!btn) return;
+  if (!redoArmed[i]){
+    redoArmed[i] = true;
+    btn.classList.add("armed");
+    btn.textContent = "↺ Tap again";
+    setTimeout(function(){ redoArmed[i] = false; if (btn){ btn.classList.remove("armed"); btn.textContent = "↺ Redo"; } }, 3000);
+    return;
+  }
+  redoArmed[i] = false;
+  btn.classList.remove("armed");
+  btn.textContent = "↺ Redo";
+  // wipe tab state
+  var keys = ["tab-" + i + "-done", "tab-" + i + "-state"];
+  if (i === 4){ keys.push("tab-4-score"); }
+  keys.forEach(lDel);
+  var bb = document.getElementById("complete-" + i);
+  if (bb){ bb.classList.remove("done"); bb.textContent = "Mark complete ✓"; }
+  var tb = document.getElementById("tb" + i);
+  if (tb) tb.classList.remove("done");
+  if (TAB_RESET[i]) TAB_RESET[i]();
+  refreshProg();
+}
+
+// ─── GLOSS POPUPS (Tab 0) ───
+var GLOSS = {
+  outdoor: { em: "🌳", word: "outdoor", def: "happening or done outside, not inside a building", jp: "アウトドアの · 屋外" },
+  app: { em: "📱", word: "app", def: "a small program on your phone — short for application", jp: "アプリ" },
+  clues: { em: "🔎", word: "clues", def: "small bits of info that help you find or solve something", jp: "手がかり" }
+};
+function popGloss(el, key){
+  el.classList.toggle("popped");
+  var existing = document.querySelector(".gloss-pop");
+  if (existing){ var was = existing.dataset.k; existing.remove(); if (was === key) return; }
+  var g = GLOSS[key]; if (!g) return;
+  var pop = document.createElement("div");
+  pop.className = "gloss-pop"; pop.dataset.k = key;
+  pop.innerHTML = "<div><span class=\"gp-em\">" + g.em + "</span> <strong>" + esc(g.word) + "</strong></div><div style=\"font-size:13px;color:#374151;margin-top:3px\">" + esc(g.def) + "</div><div class=\"gp-jp\">" + esc(g.jp) + "</div>";
+  var rect = el.getBoundingClientRect();
+  pop.style.left = Math.max(8, rect.left) + "px";
+  pop.style.top = (rect.bottom + 6) + "px";
+  document.body.appendChild(pop);
+  setTimeout(function(){ if (pop.parentNode) pop.remove(); el.classList.remove("popped"); }, 4500);
+}
+
+// ─── TAB 0 — READ ───
+TAB_INIT[0] = function(){};
+TAB_RESET[0] = function(){
+  for (var i = 1; i <= 4; i++){
+    var pb = document.getElementById("pb-" + i);
+    if (pb){ pb.classList.toggle("locked", i !== 1); }
+    var cq = document.getElementById("cq-" + i);
+    if (cq){ cq.style.display = i === 1 ? "block" : "none"; cq.querySelectorAll(".comp-opt").forEach(function(b){ b.classList.remove("correct","wrong"); delete b.dataset.locked; }); }
+  }
+  var rd = document.getElementById("read-done"); if (rd) rd.classList.remove("show");
+};
+TAB_RESTORE[0] = function(){
+  var s = lLoad("tab-0-state");
+  if (!s) return;
+  (s.solved || []).forEach(function(n){
+    var cq = document.getElementById("cq-" + n);
+    if (cq){
+      var opts = cq.querySelectorAll(".comp-opt");
+      opts.forEach(function(o){ o.dataset.locked = "1"; });
+      var correctIdx = n === 1 ? 1 : (n === 2 ? 1 : (n === 3 ? 1 : 1));
+      if (opts[correctIdx]) opts[correctIdx].classList.add("correct");
+    }
+    if (n < 4){
+      var nb = document.getElementById("pb-" + (n + 1)); if (nb) nb.classList.remove("locked");
+      var ncq = document.getElementById("cq-" + (n + 1)); if (ncq) ncq.style.display = "block";
+      // strip "locked" header
+      var lockHdr = nb && nb.querySelector(".pheader"); if (lockHdr) lockHdr.textContent = lockHdr.textContent.replace(/ — 🔒.*$/, "");
+    }
+  });
+  if (s.allDone){ var rd = document.getElementById("read-done"); if (rd) rd.classList.add("show"); }
+};
+var readSolved = new Set();
+function compPick(btn, n, correct){
+  if (btn.dataset.locked) return;
+  if (!correct){
+    btn.classList.add("wrong");
+    setTimeout(function(){ btn.classList.remove("wrong"); }, 700);
+    return;
+  }
+  // mark all options for this ¶ as locked
+  var parent = btn.parentNode;
+  parent.querySelectorAll(".comp-opt").forEach(function(o){ o.dataset.locked = "1"; });
+  btn.classList.add("correct");
+  readSolved.add(n);
+  // unlock next paragraph
+  if (n < 4){
+    var nb = document.getElementById("pb-" + (n + 1));
+    if (nb){
+      nb.classList.remove("locked");
+      var hdr = nb.querySelector(".pheader");
+      if (hdr) hdr.textContent = hdr.textContent.replace(/ — 🔒.*$/, "");
+    }
+    var ncq = document.getElementById("cq-" + (n + 1));
+    if (ncq) ncq.style.display = "block";
+  }
+  var allDone = readSolved.size >= 4;
+  lSave("tab-0-state", { solved: Array.from(readSolved), allDone: allDone });
+  if (allDone){ var rd = document.getElementById("read-done"); if (rd) rd.classList.add("show"); }
+}
+
+// ─── TAB 1 — STRATEGY ───
+TAB_INIT[1] = function(){};
+TAB_RESET[1] = function(){
+  for (var i = 1; i <= 5; i++){
+    var s = document.getElementById("sig-" + i);
+    if (s) s.querySelectorAll(".sig-pick").forEach(function(b){ b.classList.remove("correct","wrong"); delete b.dataset.locked; });
+  }
+  var d = document.getElementById("sig-done"); if (d) d.classList.remove("show");
+};
+TAB_RESTORE[1] = function(){
+  var s = lLoad("tab-1-state");
+  if (s && s.solved){
+    s.solved.forEach(function(n){
+      var sent = document.getElementById("sig-" + n);
+      if (sent){
+        sent.querySelectorAll(".sig-pick").forEach(function(b){
+          if (b.getAttribute("onclick").indexOf(",true)") !== -1) b.classList.add("correct");
+          b.dataset.locked = "1";
+        });
+      }
+    });
+    if (s.allDone){ var d = document.getElementById("sig-done"); if (d) d.classList.add("show"); }
+  }
+};
+var sigSolved = new Set();
+function sigPick(el, n, correct){
+  if (el.dataset.locked) return;
+  if (!correct){
+    el.classList.add("wrong");
+    setTimeout(function(){ el.classList.remove("wrong"); }, 600);
+    return;
+  }
+  // lock the sentence
+  var sent = document.getElementById("sig-" + n);
+  if (sent) sent.querySelectorAll(".sig-pick").forEach(function(b){ b.dataset.locked = "1"; });
+  el.classList.add("correct");
+  sigSolved.add(n);
+  var allDone = sigSolved.size >= 5;
+  lSave("tab-1-state", { solved: Array.from(sigSolved), allDone: allDone });
+  if (allDone){ var d = document.getElementById("sig-done"); if (d) d.classList.add("show"); }
+}
+
+// ─── TAB 2 — ORDER ───
+var ordState = {};
+var ordTarget = { a: 1, b: 2, c: 3, d: 4, e: 5 };
+TAB_INIT[2] = function(){};
+TAB_RESET[2] = function(){
+  ordState = {};
+  document.querySelectorAll("#tc2 .order-row").forEach(function(r){
+    r.classList.remove("correct");
+    var n = r.querySelector(".order-num");
+    if (n){ n.classList.add("empty"); n.textContent = "_"; }
+  });
+  var d = document.getElementById("ord-done"); if (d) d.classList.remove("show");
+  var r2 = document.getElementById("ord-result"); if (r2) r2.textContent = "";
+};
+TAB_RESTORE[2] = function(){
+  var s = lLoad("tab-2-state");
+  if (s && s.state){
+    ordState = s.state;
+    document.querySelectorAll("#tc2 .order-row").forEach(function(r){
+      var oc = r.getAttribute("onclick") || "";
+      var m = oc.match(/'([a-e])'/);
+      if (m){
+        var k = m[1];
+        var v = ordState[k];
+        if (v){
+          var n = r.querySelector(".order-num");
+          if (n){ n.classList.remove("empty"); n.textContent = String(v); }
+        }
+      }
+    });
+    if (s.allDone){
+      document.querySelectorAll("#tc2 .order-row").forEach(function(r){ r.classList.add("correct"); });
+      var d = document.getElementById("ord-done"); if (d) d.classList.add("show");
+    }
+  }
+};
+function cycleOrd(row, key){
+  var cur = ordState[key] || 0;
+  var nxt = (cur + 1) % 6;
+  ordState[key] = nxt;
+  var n = row.querySelector(".order-num");
+  if (n){
+    if (nxt === 0){ n.classList.add("empty"); n.textContent = "_"; }
+    else { n.classList.remove("empty"); n.textContent = String(nxt); }
+  }
+}
+function checkOrd(){
+  var ok = 0;
+  for (var k in ordTarget){ if (ordState[k] === ordTarget[k]) ok++; }
+  var r = document.getElementById("ord-result");
+  if (ok === 5){
+    if (r){ r.textContent = "🌟 5 / 5 — perfect sequence!"; r.style.color = "var(--green-d)"; }
+    document.querySelectorAll("#tc2 .order-row").forEach(function(row){ row.classList.add("correct"); });
+    var d = document.getElementById("ord-done"); if (d) d.classList.add("show");
+    lSave("tab-2-state", { state: ordState, allDone: true });
+  } else {
+    if (r){ r.textContent = ok + " / 5 right. Check ¶3 for the signal words!"; r.style.color = "var(--red)"; }
+    lSave("tab-2-state", { state: ordState, allDone: false });
+  }
+}
+function resetOrd(){ if (TAB_RESET[2]) TAB_RESET[2](); }
+
+// ─── TAB 3 — LABEL ───
+var activeLab = null;
+var labPlaced = 0;
+var findScore = 0;
+TAB_INIT[3] = function(){};
+TAB_RESET[3] = function(){
+  activeLab = null; labPlaced = 0; findScore = 0;
+  document.querySelectorAll("#tc3 .label-chip").forEach(function(c){
+    if (c.dataset.label) c.classList.remove("placed", "sel");
+  });
+  document.querySelectorAll("#tc3 .photo-cell").forEach(function(p){
+    if (p.dataset.correct){
+      p.classList.remove("labeled");
+      var let_ = p.querySelector(".ph-let"); if (let_) let_.textContent = "?";
+      var nm = p.querySelector(".ph-nm"); if (nm) nm.textContent = "tap me";
+    }
+  });
+  document.querySelectorAll("#tc3 .find-opt").forEach(function(o){ o.classList.remove("correct","wrong"); delete o.dataset.locked; });
+  var fs = document.getElementById("find-section"); if (fs) fs.style.display = "none";
+  var d = document.getElementById("lab-done"); if (d) d.classList.remove("show");
+};
+TAB_RESTORE[3] = function(){
+  var s = lLoad("tab-3-state");
+  if (!s) return;
+  if (s.placed){
+    Object.keys(s.placed).forEach(function(let_){
+      var chip = document.querySelector("#tc3 .label-chip[data-label=\"" + let_ + "\"]");
+      var name = chip ? chip.dataset.name : let_;
+      var photo = document.querySelector("#tc3 .photo-cell[data-correct=\"" + let_ + "\"]");
+      if (chip) chip.classList.add("placed");
+      if (photo){
+        photo.classList.add("labeled");
+        var l = photo.querySelector(".ph-let"); if (l) l.textContent = let_ + " ✓";
+        var n = photo.querySelector(".ph-nm"); if (n) n.textContent = name;
+      }
+      labPlaced++;
+    });
+  }
+  if (labPlaced >= 7){ var fs = document.getElementById("find-section"); if (fs) fs.style.display = "block"; }
+  (s.find || []).forEach(function(label){
+    document.querySelectorAll("#tc3 .find-opt").forEach(function(o){
+      if (o.textContent.trim().toLowerCase().indexOf(label) !== -1){
+        o.classList.add("correct"); o.dataset.locked = "1";
+      }
+    });
+  });
+  findScore = (s.find || []).length;
+  if (s.allDone){ var d = document.getElementById("lab-done"); if (d) d.classList.add("show"); }
+};
+function pickLab(chip){
+  if (chip.classList.contains("placed")) return;
+  document.querySelectorAll("#tc3 .label-chip").forEach(function(c){ c.classList.remove("sel"); });
+  chip.classList.add("sel");
+  activeLab = chip;
+}
+function placeLab(photo){
+  if (!activeLab || photo.classList.contains("labeled")) return;
+  if (photo.dataset.correct === activeLab.dataset.label){
+    photo.classList.add("labeled");
+    var l = photo.querySelector(".ph-let"); if (l) l.textContent = activeLab.dataset.label + " ✓";
+    var n = photo.querySelector(".ph-nm"); if (n) n.textContent = activeLab.dataset.name;
+    activeLab.classList.add("placed"); activeLab.classList.remove("sel");
+    activeLab = null;
+    labPlaced++;
+    saveLabState();
+    if (labPlaced >= 7){ var fs = document.getElementById("find-section"); if (fs) fs.style.display = "block"; }
+  } else {
+    photo.classList.add("shake");
+    setTimeout(function(){ photo.classList.remove("shake"); }, 400);
+  }
+}
+function findOpt(btn, correct){
+  if (btn.dataset.locked) return;
+  btn.dataset.locked = "1";
+  btn.classList.add(correct ? "correct" : "wrong");
+  if (correct){
+    findScore++;
+    saveLabState();
+    if (findScore >= 4 && labPlaced >= 7){
+      var d = document.getElementById("lab-done"); if (d) d.classList.add("show");
+      var s = lLoad("tab-3-state") || {}; s.allDone = true; lSave("tab-3-state", s);
+    }
+  } else {
+    setTimeout(function(){ btn.classList.remove("wrong"); delete btn.dataset.locked; }, 800);
+  }
+}
+function saveLabState(){
+  var placed = {};
+  document.querySelectorAll("#tc3 .photo-cell.labeled").forEach(function(p){
+    if (p.dataset.correct) placed[p.dataset.correct] = true;
+  });
+  var find = [];
+  document.querySelectorAll("#tc3 .find-opt.correct").forEach(function(o){
+    var t = o.textContent.toLowerCase().replace(/[^a-z ]/g, "").trim();
+    find.push(t.split(" ").pop());
+  });
+  lSave("tab-3-state", { placed: placed, find: find, allDone: (labPlaced >= 7 && findScore >= 4) });
+}
+
+// ─── TAB 4 — QUIZ ───
+var QUIZ = [
+  { q: "What is geocaching?", opts: ["A backyard children's game", "A fun outdoor hobby where hiders hide a box with treasure and seekers find it", "A new soccer position", "A type of fishing"], correct: 1 },
+  { q: "Where do hiders put the cache?", opts: ["In a tree, a bush, or somewhere outdoors", "On the kitchen table", "In a swimming pool", "At a soccer stadium"], correct: 0 },
+  { q: "Which two things help you find the cache?", opts: ["A pillow and a blanket", "A bicycle and skates", "An app with online clues — or a map and compass", "A TV remote"], correct: 2 },
+  { q: "What do you do FIRST when you find the cache?", opts: ["Eat lunch", "Look for the notebook inside", "Take the whole box home", "Throw it in the river"], correct: 1 },
+  { q: "What do you write in the notebook?", opts: ["A song", "Your name and the date", "A story", "Your phone number"], correct: 1 },
+  { q: "What should you do with a treasure you take from the cache?", opts: ["Sell it online", "Eat it", "Leave another treasure in its place", "Hide it forever"], correct: 2 },
+  { q: "An ornament is...", opts: ["A small decorative thing", "A type of food", "A loud noise", "A computer program"], correct: 0 },
+  { q: "In the Weird-But-True story, the sailor's boat was...", opts: ["flying", "sinking", "racing", "sleeping"], correct: 1 },
+  { q: "Which signal word means 'step 1'?", opts: ["finally", "after", "first", "before"], correct: 2 },
+  { q: "Why is geocaching a great hobby? (best answer)", opts: ["It earns money", "It is only for adults", "You explore new places, make friends, and help clean up outdoors", "It is dangerous"], correct: 2 }
+];
+TAB_INIT[4] = function(){
+  var host = document.getElementById("quiz-list"); if (!host) return;
+  host.innerHTML = "";
+  QUIZ.forEach(function(q, i){
+    var card = document.createElement("div");
+    card.className = "q-card"; card.id = "qc-" + i;
+    var html = "<div class=\"q-prompt\">" + (i+1) + ". " + esc(q.q) + "</div>";
+    q.opts.forEach(function(o, oi){
+      html += "<button class=\"opt\" onclick=\"quizPick(" + i + "," + oi + ")\">" + esc(o) + "</button>";
+    });
+    card.innerHTML = html;
+    host.appendChild(card);
+  });
+  // progress dots
+  var prog = document.getElementById("quiz-prog"); if (prog){
+    prog.innerHTML = "";
+    for (var i = 0; i < QUIZ.length; i++){ var d = document.createElement("div"); d.className = "qp-dot"; d.id = "qp-" + i; prog.appendChild(d); }
+  }
+};
+TAB_RESET[4] = function(){
+  window._quizAns = []; window._quizScore = 0;
+  document.querySelectorAll("#tc4 .q-card .opt").forEach(function(o){ o.classList.remove("correct","wrong"); delete o.dataset.locked; });
+  document.querySelectorAll("#tc4 .qp-dot").forEach(function(d){ d.classList.remove("ok","bad"); });
+  var pill = document.getElementById("quiz-pill"); if (pill) pill.textContent = "0 / 10 · 0%";
+  var qf = document.getElementById("qfinal"); if (qf) qf.classList.remove("show");
+};
+TAB_RESTORE[4] = function(){
+  var s = lLoad("tab-4-state"); if (!s) return;
+  window._quizAns = s.answers || []; window._quizScore = s.score || 0;
+  window._quizAns.forEach(function(oi, i){
+    if (oi == null) return;
+    var card = document.getElementById("qc-" + i); if (!card) return;
+    var opts = card.querySelectorAll(".opt");
+    var correct = oi === QUIZ[i].correct;
+    if (opts[oi]) opts[oi].classList.add(correct ? "correct" : "wrong");
+    opts.forEach(function(o){ o.dataset.locked = "1"; });
+    var dot = document.getElementById("qp-" + i); if (dot) dot.classList.add(correct ? "ok" : "bad");
+  });
+  updateQuizPill();
+  if (s.done){ showQuizFinal(); }
+};
+window._quizAns = []; window._quizScore = 0;
+function quizPick(qi, oi){
+  var card = document.getElementById("qc-" + qi); if (!card) return;
+  var opts = card.querySelectorAll(".opt");
+  if (opts[0].dataset.locked) return;
+  opts.forEach(function(o){ o.dataset.locked = "1"; });
+  var correct = oi === QUIZ[qi].correct;
+  opts[oi].classList.add(correct ? "correct" : "wrong");
+  window._quizAns[qi] = oi;
+  if (correct) window._quizScore++;
+  var dot = document.getElementById("qp-" + qi); if (dot) dot.classList.add(correct ? "ok" : "bad");
+  updateQuizPill();
+  var allDone = window._quizAns.filter(function(x){ return x != null; }).length >= QUIZ.length;
+  lSave("tab-4-state", { answers: window._quizAns, score: window._quizScore, done: allDone });
+  if (allDone){
+    var pct = Math.round((window._quizScore / QUIZ.length) * 100);
+    lSave("score", { score: window._quizScore, total: QUIZ.length, percent: pct, answers: window._quizAns, done: true });
+    showQuizFinal();
+  }
+}
+function updateQuizPill(){
+  var ans = (window._quizAns || []).filter(function(x){ return x != null; }).length;
+  var pct = ans > 0 ? Math.round((window._quizScore / ans) * 100) : 0;
+  var pill = document.getElementById("quiz-pill");
+  if (pill) pill.textContent = window._quizScore + " / " + ans + " · " + pct + "%";
+}
+function showQuizFinal(){
+  var qf = document.getElementById("qfinal"); if (!qf) return;
+  qf.classList.add("show");
+  var pct = Math.round((window._quizScore / QUIZ.length) * 100);
+  var sc = document.getElementById("qfinal-sc"); if (sc) sc.textContent = window._quizScore + " / " + QUIZ.length + " · " + pct + "%";
+  var msg = document.getElementById("qfinal-msg");
+  if (msg){
+    if (pct >= 80) msg.textContent = "🏆 Great work! You read the article and got it!";
+    else if (pct >= 60) msg.textContent = "👍 Good — re-read ¶3 and try the quiz again!";
+    else msg.textContent = "📖 Re-read the passage in the Read tab and try again.";
+  }
+}
+
+// ─── INIT ───
+document.addEventListener("DOMContentLoaded", function(){
+  // restore "done" status badges
+  for (var i = 0; i < TOTAL_TABS; i++){
+    if (lLoad("tab-" + i + "-done")){
+      var tb = document.getElementById("tb" + i); if (tb) tb.classList.add("done");
+      var cb = document.getElementById("complete-" + i);
+      if (cb){ cb.classList.add("done"); cb.textContent = "✓ Done — keep going!"; }
+    }
+  }
+  refreshProg();
+  // init current tab and restore
+  if (TAB_INIT[0]){ TAB_INIT[0](); TAB_INIT[0]._init = true; if (TAB_RESTORE[0]) TAB_RESTORE[0](); }
+  // jump to last-saved tab if any
+  var last = lLoad("last-tab");
+  if (last != null && last !== 0) showTab(last);
+});
+</script>
+
+</body>
+</html>

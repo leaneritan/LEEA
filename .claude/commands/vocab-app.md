@@ -154,6 +154,28 @@ Match `public/learn/ow-l4-u8-vocab-1.html` shell:
 
 Load each via `<script src="…">` in `<head>`. Don't inline-duplicate logic that already lives in these components.
 
+### Flashcards Tab + Academic Tab — MANDATORY Practice + Quiz dual mode (PR #77 lock)
+
+Tab 0 (Academic) AND Tab 3 (Flashcards) must implement the `flashcard-shell` pattern from `docs/chart-templates.md`. Per Leaneritan: "Flash card just like academy needs quiz."
+
+**Required pieces (inline in the Leo app — no external helper yet, extraction pending):**
+- `.fc-controls` strip with two `.mode-btn` buttons: 📖 Practice + 🧠 Quiz
+- Practice mode: tap-to-flip flashcard (front: emoji + word + part of speech; back: definition + 🇯🇵 Japanese toggle + sample sentence with the target word bolded)
+- Quiz mode: emoji + definition shown, Leo types the word, ✓ check, "Starts with X" clue, live progress
+- **Tab completes only when BOTH modes are done** (`visited >= N` AND `quizSolved >= N`)
+- `tab-N-state` stores `{ visited, solved, mode }` so Leo returns to the same mode with progress intact
+
+### Match Tab — MANDATORY transcript-driven sentences + recap table (PR #79 lock)
+
+Tab 8 (Match) pairs each word with its **verbatim transcript sentence** from the TR audio (not generic word ↔ meaning). Per Leaneritan: "I need to match the transcript so Leo knows how to pronounce in practice."
+
+**Required pieces:**
+- `MATCH_PAIRS` data pulled from the transcript file (`supporting/ow2e_ame_sb_level<N>_audioscript_website.docx`), section TR `<unit>.5` for vocab-2 (TR 8.5 = Vocab 2 Activity 1)
+- Each pair carries `{key, l: "emoji + word", r: "verbatim sentence", ipa: "/IPA/"}`
+- Section title + dad-hint call out the TR source explicitly so Leo sees the audio link
+- On match completion AND on RESTORE if already done: render a `recap-table` (see `docs/chart-templates.md`) with columns **Word · TR sentence · Pronunciation (IPA)**
+- Same recap-table shape across every vocab component — consistent for Leo
+
 ## Leo personalization (mandatory in samples)
 
 Per the working rule from the Grammar 1 build:
@@ -266,6 +288,9 @@ Push to the current working branch. Do NOT create a PR — Leaneritan reviews + 
 - [ ] Teacher slideshow at `public/lessons/<lesson-id>.html` (~100 slides, bespoke per-word games)
 - [ ] EVERY target word has a Present slide with a right-panel mini-game (goal + score + win) — not just a click-to-reveal
 - [ ] Leo app at `public/learn/<lesson-id>.html` (13 tabs, all 4 save/restore rules)
+- [ ] **Academic Tab 0 AND Flashcards Tab 3 have Practice + Quiz dual mode** — tab completes only when BOTH modes done (PR #77)
+- [ ] **Match Tab 8 uses verbatim TR transcript sentences** (`MATCH_PAIRS` pulled from `supporting/...audioscript_website.docx`)
+- [ ] **Match completion + RESTORE both render the `recap-table`** with Word · TR sentence · Pronunciation columns (PR #79)
 - [ ] Teacher JSON registered with `component: "<vocab-1|vocab-2>"`, `mode: "teacher"`, `slideCount`
 - [ ] Learner JSON registered with `component: "<vocab-1|vocab-2>-app"`, `mode: "learner"`, full `source` block
 - [ ] `src/data/lessons.ts` updated with both imports

@@ -10,6 +10,7 @@ import unit8Vocab2 from "../../content/subjects/english/courses/our-world/level-
 import unit8Vocab2Learner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab2-learner.json";
 import unit8Grammar2 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/grammar2.json";
 import unit8Reading from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/reading.json";
+import unit8ReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/reading-learner.json";
 import type { Lesson } from "./types";
 
 export const lessons: Lesson[] = [
@@ -24,7 +25,8 @@ export const lessons: Lesson[] = [
   unit8Vocab2 as Lesson,
   unit8Vocab2Learner as Lesson,
   unit8Grammar2 as Lesson,
-  unit8Reading as Lesson
+  unit8Reading as Lesson,
+  unit8ReadingLearner as Lesson
 ];
 export const teacherLessons = lessons.filter((lesson) => lesson.mode === "teacher");
 export const learnerLessons = lessons.filter((lesson) => lesson.mode === "learner");

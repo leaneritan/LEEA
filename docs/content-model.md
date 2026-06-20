@@ -283,7 +283,7 @@ Search results should deduplicate by global item id and show all matching source
 
 Reference browse/search controls should show useful counts. Mixed search results should be visually scannable with subtle type-aware card edges and badges for Vocabulary, Academic, Content, Related, Glossary, Grammar, and Junior High.
 
-Reference level colors must stay consistent and visually distinct anywhere levels appear: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The source tree hierarchy is `Level -> Unit -> Vocabulary/Grammar`; Vocabulary nests Vocabulary 1, Vocabulary 2, Academic, and Glossary, and Grammar nests grammar-point cards.
+Reference level colors must stay consistent and visually distinct anywhere levels appear: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The Source Tree, Vocabulary, Grammar, I Know, and I Don't Know views all use the same nested hierarchy: `Course -> Level -> Unit -> Vocabulary/Grammar`. Vocabulary nests Vocabulary 1, Vocabulary 2, Academic, and Glossary, and Grammar nests grammar-point cards.
 
 Leo's Reference confidence state is stored locally in the same shape expected for Supabase. The browser key is `leea.referenceConfidence.v1`; its value is a map of `ReferenceConfidenceRecord` objects keyed by `wordId`. Keep the record fields aligned with the expanded confidence shape below. Older bare word-ID arrays are migration-only and should not be written by new code.
 

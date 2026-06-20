@@ -55,7 +55,7 @@ export function HomeDashboard() {
         <div className="hero-card">
           <span className="eyebrow">Active Session</span>
           <div className="home-brand-mark" aria-hidden="true">
-            <Image alt="" height={118} src="/brand/leea_brand_logo.png" width={118} />
+            <Image alt="" height={118} src="/brand/leea_brand_mark.png" width={118} />
           </div>
           <h1>
             Leo&apos;s <mark>Elite</mark> Education Academy

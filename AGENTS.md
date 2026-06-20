@@ -91,7 +91,7 @@ Reusable activity templates live under two parallel folders: `public/teach/compo
 
 A learner lesson can be auto-assigned by setting its `status` to `assigned` in the lesson JSON — `seedAssignments` picks this up on load. Use `status: "live"` when Neritan should assign it manually from the teacher card instead. Home should show assigned learner homework first; when multiple homework records are open, show the most recently updated `assigned` or `needs-redo` record first. When no homework is waiting, it should show Coming Up Next based on unfinished current-unit work. Home must use `getLearnerAppProgress(source)` to decide whether a learner app is done so apps with custom `moduleKeys` or `scoreKey` stay accurate.
 
-Use `public/brand/leea_brand_logo.png` for LEEA branding in the app shell and Home hero; do not recreate the mark in CSS or inline SVG.
+Use `public/brand/leea_brand_mark.png` for small square LEEA brand marks in the app shell and Home hero. Keep `public/brand/leea_brand_logo.png` as the full transparent logo asset. Do not recreate the mark in CSS or inline SVG.
 
 Learner app progress is read through `getLearnerAppProgress(source)`. The lesson JSON `source` describes the app's localStorage shape:
 

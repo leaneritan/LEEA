@@ -140,17 +140,17 @@ body{display:flex;flex-direction:column;height:100vh}
 .hobby-chip{background:#fff;border:2px solid var(--green);border-radius:99px;padding:8px 16px;font-size:14px;font-weight:700;color:var(--green-d);cursor:pointer;font-family:'Outfit',sans-serif}
 .hobby-chip:hover{background:var(--green);color:#fff}
 
-/* WRITE tab */
-.write-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:start}
-@media (max-width:700px){.write-grid{grid-template-columns:1fr}}
+/* WRITE tab — chart on TOP (always visible), textarea below */
+.write-grid{display:flex;flex-direction:column;gap:14px}
 .draft-area{display:flex;flex-direction:column;gap:8px}
-.draft-textarea{width:100%;min-height:340px;border:3px solid var(--green);border-radius:14px;padding:14px 16px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--ink);line-height:1.7;background:#fff;resize:vertical;outline:none}
+.draft-textarea{width:100%;min-height:280px;border:3px solid var(--green);border-radius:14px;padding:14px 16px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--ink);line-height:1.7;background:#fff;resize:vertical;outline:none}
 .draft-textarea:focus{border-color:var(--green-d)}
 .draft-meta{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-3);font-weight:700}
 .draft-meta .saved{color:var(--green-d)}
 .ref-chart-wrap{background:var(--blue-l);border:2px solid var(--blue);border-radius:14px;padding:12px 14px}
-.ref-chart-wrap .lb{font-size:12px;font-weight:900;color:var(--blue-d);letter-spacing:1px;margin-bottom:8px}
-.ref-empty{font-size:13px;color:var(--ink-3);font-style:italic;text-align:center;padding:16px 8px}
+.ref-chart-wrap .lb{font-size:13px;font-weight:900;color:var(--blue-d);letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.ref-chart-wrap .lb .hint{font-size:11px;font-weight:600;color:var(--ink-3);font-style:italic;letter-spacing:0}
+.ref-empty{font-size:14px;color:var(--ink-3);font-style:italic;text-align:center;padding:24px 12px;background:#fff;border-radius:10px;border:2px dashed var(--border)}
 
 /* QUIZ TAB shared */
 .quiz-score-pill{background:var(--green);color:#fff;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;display:inline-block;margin-bottom:10px}
@@ -187,7 +187,9 @@ body{display:flex;flex-direction:column;height:100vh}
 .wmap{background:#fff;border:3px dashed var(--blue);border-radius:18px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:14px;position:relative}
 .wmap .center{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--blue);color:#fff;border-radius:14px;padding:14px 12px;text-align:center}
 .wmap .center .lb{font-size:11px;font-weight:900;letter-spacing:1.5px;opacity:.85}
-.wmap .center .hobby{font-size:22px;font-weight:900}
+.wmap .center input{font-size:20px;font-weight:900;border:none;background:rgba(255,255,255,.18);border-bottom:2px dashed rgba(255,255,255,.5);color:#fff;padding:6px 12px;border-radius:8px;outline:none;text-align:center;font-family:'Outfit',sans-serif;width:80%;max-width:280px}
+.wmap .center input::placeholder{color:rgba(255,255,255,.7);font-weight:600}
+.wmap .center input:focus{background:rgba(255,255,255,.3);border-bottom-style:solid}
 .wmap .arm{display:flex;flex-direction:column;gap:6px}
 .wmap .arm .q{font-size:13px;font-weight:800;color:var(--blue-d);text-align:center}
 .wmap .arm textarea{width:100%;min-height:64px;border:2px dashed var(--blue);background:var(--blue-l);border-radius:10px;padding:10px 12px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);font-weight:600;resize:vertical;outline:none;line-height:1.5}
@@ -409,13 +411,13 @@ body{display:flex;flex-direction:column;height:100vh}
         <div class="section-sub">Turn each cell of your chart into 1-2 sentences. Use <em>for example</em> or <em>such as</em> at least once.</div>
         <div class="dad-hint">💬 <b>Dad:</b> Auto-saves as you type. Reference your chart on the right. Don&apos;t worry about perfect — write a first draft.</div>
         <div class="write-grid">
+          <div class="ref-chart-wrap">
+            <div class="lb"><span>📋 YOUR PLAN (from Plan tab)</span><span class="hint">live — updates from the Plan tab</span></div>
+            <div id="ref-chart-sb"><div class="ref-empty">Fill the Plan tab first — your chart will show here.</div></div>
+          </div>
           <div class="draft-area">
             <textarea class="draft-textarea" id="leo-draft-sb" placeholder="My hobby is..."></textarea>
             <div class="draft-meta"><span id="wc-sb">0 words · 0 sentences</span><span class="saved">💾 Auto-saved</span></div>
-          </div>
-          <div class="ref-chart-wrap">
-            <div class="lb">📋 YOUR PLAN (from Plan tab)</div>
-            <div id="ref-chart-sb"><div class="ref-empty">Fill the Plan tab first — your chart will show here.</div></div>
           </div>
         </div>
         <div class="done-banner" id="done-3">✅ Draft saved. Read it aloud to Dad and edit one more time.</div>
@@ -495,7 +497,7 @@ body{display:flex;flex-direction:column;height:100vh}
         <div class="wmap">
           <div class="center">
             <div class="lb">MY HOBBY</div>
-            <div class="hobby" id="wm-hobby">(pick on SB Plan tab)</div>
+            <input type="text" id="wm-hobby" placeholder="type a hobby for THIS map…" autocomplete="off">
           </div>
           <div class="arm"><div class="q">❓ What IS it?</div><textarea id="wm-q1" data-key="q1" placeholder="A sport / a game / a collection..."></textarea></div>
           <div class="arm"><div class="q">🌍 Where is it FROM?</div><textarea id="wm-q2" data-key="q2" placeholder="Country / who started it..."></textarea></div>
@@ -723,7 +725,6 @@ function wbShowTab(i){
   if (nb) nb.classList.add("active");
   lSave("wb-last-tab", i);
   if (WB_INIT[i] && !WB_INIT[i]._init){ WB_INIT[i](); WB_INIT[i]._init = true; if (WB_RESTORE[i]) WB_RESTORE[i](); }
-  if (i === 1) refreshWmapHobby();
 }
 function wbMarkComplete(i){
   lSave("wb-tab-" + i + "-done", true);
@@ -969,7 +970,6 @@ function leoHobby(hobby){
     saved[0][0] = hobby;
     rawSave(KEY_FCC, saved);
     mountSbChart();
-    refreshWmapHobby();
   } catch(e){}
 }
 
@@ -1157,6 +1157,16 @@ function wbStepTap(card){
 /* ─── WB TAB 1 — WORD MAP ─── */
 WB_INIT[1] = function(){
   var saved = lLoad("wb-tab-1-state") || {};
+  /* hobby input — independent from the SB chart */
+  var hobbyEl = document.getElementById("wm-hobby");
+  if (hobbyEl){
+    if (saved.hobby) hobbyEl.value = saved.hobby;
+    hobbyEl.addEventListener("input", function(){
+      var s = lLoad("wb-tab-1-state") || {};
+      s.hobby = hobbyEl.value;
+      lSave("wb-tab-1-state", s);
+    });
+  }
   ["q1","q2","q3","q4"].forEach(function(k){
     var ta = document.getElementById("wm-" + k);
     if (!ta) return;
@@ -1167,28 +1177,16 @@ WB_INIT[1] = function(){
       lSave("wb-tab-1-state", state);
     });
   });
-  refreshWmapHobby();
 };
 WB_RESET[1] = function(){
   lDel("wb-tab-1-state");
+  var hobbyEl = document.getElementById("wm-hobby");
+  if (hobbyEl) hobbyEl.value = "";
   ["q1","q2","q3","q4"].forEach(function(k){
     var ta = document.getElementById("wm-" + k);
     if (ta) ta.value = "";
   });
-  refreshWmapHobby();
 };
-function refreshWmapHobby(){
-  try {
-    var el = document.getElementById("wm-hobby");
-    if (!el) return;
-    var saved = rawLoad(KEY_FCC);
-    if (saved && saved[0] && saved[0][0]){
-      el.textContent = saved[0][0];
-    } else {
-      el.textContent = "(pick on SB Plan tab)";
-    }
-  } catch(e){}
-}
 
 /* ─── WB TAB 2 + 3 — DEF / EXAMPLES / COMPARE pick chips ─── */
 WB_INIT[2] = function(){};

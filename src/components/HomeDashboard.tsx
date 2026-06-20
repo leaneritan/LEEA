@@ -3,11 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { readAssignments, type AssignmentMap } from "@/data/assignments";
+import { getOpenAssignmentCount, readAssignments, type AssignmentMap } from "@/data/assignments";
 import { getLearnerAppProgress } from "@/data/learnerProgress";
 import { getDoneLessonCount, lessonProgressStorageKey, type LessonProgressMap } from "@/data/lessonProgress";
 import { getCurrentFocusLessons, learnerLessons, teacherLessons } from "@/data/lessons";
-import { currentFocus } from "@/data/registry";
+import { currentFocus, grammarPoints, totalWords } from "@/data/registry";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
 
@@ -22,6 +22,7 @@ export function HomeDashboard() {
     progress
   );
   const progressPercent = focusComponents.length ? Math.round((doneCount / focusComponents.length) * 100) : 0;
+  const openAssignmentCount = getOpenAssignmentCount(assignments);
   const nextItem = getHomeNextItem(progress, assignments);
 
   useEffect(() => {
@@ -53,14 +54,24 @@ export function HomeDashboard() {
     <div className="stack">
       <section className="home-hero">
         <div className="hero-card">
-          <span className="eyebrow">Active Session</span>
-          <div className="home-brand-mark" aria-hidden="true">
-            <Image alt="" height={118} src="/brand/leea_brand_mark.png" width={118} />
+          <div className="home-hero-head">
+            <div className="home-brand-mark" aria-hidden="true">
+              <Image alt="" height={118} src="/brand/leea_brand_mark.png" width={118} />
+            </div>
+            <div>
+              <span className="eyebrow">Active Session</span>
+              <h1>
+                Leo&apos;s <mark>Elite</mark> Education Academy
+              </h1>
+              <p>Teach, practice, and look up every word and grammar point from one consistent place.</p>
+            </div>
           </div>
-          <h1>
-            Leo&apos;s <mark>Elite</mark> Education Academy
-          </h1>
-          <p>Teach, practice, and look up every word and grammar point from one consistent place.</p>
+
+          <div className="home-snapshot" aria-label="Academy overview">
+            <SnapshotItem label="Homework" value={String(openAssignmentCount)} detail={openAssignmentCount === 1 ? "open assignment" : "open assignments"} />
+            <SnapshotItem label="Unit Progress" value={`${progressPercent}%`} detail={`${doneCount}/${focusComponents.length} components`} />
+            <SnapshotItem label="Reference" value={String(totalWords + grammarPoints)} detail="cards ready" />
+          </div>
 
           <div className="mode-grid">
             <ModeCard title="Neritan" label="Teaching mode" text="Open teacher decks, assign Leo apps, and track progress." href="/teacher" />
@@ -69,7 +80,7 @@ export function HomeDashboard() {
           </div>
         </div>
 
-        <NextCard nextItem={nextItem} />
+        <NextCard nextItem={nextItem} progress={progress} />
       </section>
 
       <section className="focus-banner" aria-label="Current unit focus">
@@ -173,8 +184,29 @@ function getCourseDisplay(course: Lesson["course"]) {
   return "Training Ground";
 }
 
-function NextCard({ nextItem }: { nextItem: { label: string; status: string; lesson: Lesson } }) {
+function getModeDisplay(mode: Lesson["mode"]) {
+  return mode === "learner" ? "Leo" : "Neritan";
+}
+
+function getNextProgress(lesson: Lesson, progress: LessonProgressMap) {
+  if (lesson.mode === "learner") {
+    const appProgress = getLearnerAppProgress(lesson.source);
+    return {
+      label: `${appProgress.completedModules}/${appProgress.moduleCount} modules`,
+      percent: appProgress.moduleCount ? Math.round((appProgress.completedModules / appProgress.moduleCount) * 100) : 0
+    };
+  }
+
+  const done = progress[lesson.id]?.status === "done";
+  return {
+    label: done ? "Marked done" : "Ready to teach",
+    percent: done ? 100 : 0
+  };
+}
+
+function NextCard({ nextItem, progress }: { nextItem: { label: string; status: string; lesson: Lesson }; progress: LessonProgressMap }) {
   const meta = getComponentMeta(nextItem.lesson.component);
+  const nextProgress = getNextProgress(nextItem.lesson, progress);
   return (
     <aside className={`next-card next-card-${meta.tone}`}>
       <div className="next-top">
@@ -189,11 +221,38 @@ function NextCard({ nextItem }: { nextItem: { label: string; status: string; les
           {getCourseDisplay(nextItem.lesson.course)} - Level {nextItem.lesson.level} - Unit {nextItem.lesson.unit}
         </p>
         <h2>{nextItem.lesson.title}</h2>
+        <div className="next-meta-grid">
+          <span>
+            Mode
+            <strong>{getModeDisplay(nextItem.lesson.mode)}</strong>
+          </span>
+          <span>
+            Focus
+            <strong>{meta.label}</strong>
+          </span>
+          <span>
+            Progress
+            <strong>{nextProgress.label}</strong>
+          </span>
+        </div>
+        <div className="next-progress" aria-label={`${nextProgress.percent}% progress`}>
+          <span style={{ width: `${nextProgress.percent}%` }} />
+        </div>
       </div>
       <Link className="primary-button" href={`/lessons/${nextItem.lesson.id}`}>
         {nextItem.lesson.mode === "learner" ? "Open Homework" : "Open Lesson"}
       </Link>
     </aside>
+  );
+}
+
+function SnapshotItem({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return (
+    <div className="snapshot-item">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <small>{detail}</small>
+    </div>
   );
 }
 

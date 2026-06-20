@@ -109,6 +109,8 @@ Home should also show useful overview numbers, such as:
 
 The first dashboard stat values are named variables:
 
+Home's first viewport should balance brand identity with immediate action. Keep the LEEA mark and academy headline visible, but pair them with a compact real-data snapshot strip and an informative next-up card. The next-up card should show mode, component focus, and progress using existing lesson/assignment/progress helpers; do not fill the dark panel with decorative copy or hardcoded numbers.
+
 ```text
 totalWords = 312
 grammarPoints = 24

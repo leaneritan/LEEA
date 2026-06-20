@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { readAssignments, type AssignmentMap } from "@/data/assignments";
+import { getLearnerAppProgress } from "@/data/learnerProgress";
 import { getDoneLessonCount, lessonProgressStorageKey, type LessonProgressMap } from "@/data/lessonProgress";
 import { getCurrentFocusLessons, learnerLessons, teacherLessons } from "@/data/lessons";
 import { currentFocus } from "@/data/registry";
@@ -52,6 +54,9 @@ export function HomeDashboard() {
       <section className="home-hero">
         <div className="hero-card">
           <span className="eyebrow">Active Session</span>
+          <div className="home-brand-mark" aria-hidden="true">
+            <Image alt="" height={118} src="/brand/leea_brand_logo.png" width={118} />
+          </div>
           <h1>
             Leo&apos;s <mark>Elite</mark> Education Academy
           </h1>
@@ -114,10 +119,14 @@ function getComponentFamily(component: string) {
 }
 
 function getHomeNextItem(progress: LessonProgressMap, assignments: AssignmentMap) {
-  const assignedLesson = learnerLessons.find((lesson) => {
-    const assignment = assignments[lesson.id];
-    return assignment && (assignment.status === "assigned" || assignment.status === "needs-redo") && !isLearnerLessonDone(lesson);
-  });
+  const assignedLesson = learnerLessons
+    .reduce<{ lesson: Lesson; updatedAt: number }[]>((current, lesson) => {
+      const assignment = assignments[lesson.id];
+      if (!assignment || !isOpenAssignment(assignment.status) || isLearnerLessonDone(lesson)) return current;
+      current.push({ lesson, updatedAt: getAssignmentTimestamp(assignment) });
+      return current;
+    }, [])
+    .sort((a, b) => b.updatedAt - a.updatedAt)[0]?.lesson;
 
   if (assignedLesson) {
     return {
@@ -144,21 +153,18 @@ function getHomeNextItem(progress: LessonProgressMap, assignments: AssignmentMap
   };
 }
 
-function isLearnerLessonDone(lesson: Lesson) {
-  if (typeof window === "undefined") return false;
-  const storagePrefix = lesson.source.storagePrefix;
-  if (!storagePrefix) return false;
-
-  return Boolean(loadLocalValue(`${storagePrefix}done`, false) || loadLocalValue<{ done?: boolean } | null>(`${storagePrefix}score`, null)?.done);
+function isOpenAssignment(status: string) {
+  return status === "assigned" || status === "needs-redo";
 }
 
-function loadLocalValue<T>(key: string, fallback: T): T {
-  try {
-    const value = window.localStorage.getItem(key);
-    return value === null ? fallback : (JSON.parse(value) as T);
-  } catch {
-    return fallback;
-  }
+function getAssignmentTimestamp(assignment: NonNullable<AssignmentMap[string]>) {
+  const timestamp = Date.parse(assignment.updatedAt || assignment.assignedAt);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function isLearnerLessonDone(lesson: Lesson) {
+  if (typeof window === "undefined") return false;
+  return getLearnerAppProgress(lesson.source).done;
 }
 
 function getCourseDisplay(course: Lesson["course"]) {

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { BarChart3, BookOpen, CheckSquare, GraduationCap, Home, Library, PanelLeftClose, PanelLeftOpen, Search, Settings, UserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -74,7 +75,9 @@ export function AppShell({
       <div className={`${japaneseOn ? "app jp-on" : "app"} ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
         <aside className="sidebar">
         <Link className="brand" href="/">
-          <span className="crest">L</span>
+          <span className="brand-logo-wrap">
+            <Image alt="" className="brand-logo" height={48} src="/brand/leea_brand_logo.png" width={48} />
+          </span>
           <span>
             <strong>LEEA</strong>
             <small>Leo&apos;s Elite Education Academy</small>

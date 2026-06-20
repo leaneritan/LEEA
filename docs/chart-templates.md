@@ -108,6 +108,43 @@ el.innerHTML = buildDndSorter({
 - The `answer` string on each tile must exactly match a zone `key`.
 
 
+### `four-col-chart` — 4-column writing planner chart
+
+**File:** `public/teach/components/charts.js`
+**Surface:** Teacher slide decks (Writing component primarily — Explanation / Comparison / Cause-Effect writing all use a 4-column planner)
+**First used in:** OW L4 U8 Writing teacher deck (planned) — Warm Up demo + Plan phase + Write phase reference.
+**Re-use:** any LP that calls for a 4-column planner chart. Column labels are configurable.
+
+#### API
+
+```js
+window.buildFourColChart({
+  id:         'fcc-leo',                              // unique per page
+  mode:       'display' | 'fill' | 'reveal',          // default 'display'
+  title:      'Hobby Planner',                        // optional header
+  columns:    ['Hobby','What it is','How you do it','Examples'],
+  rows:       [['video games','games that...','You choose...','...']],   // display & reveal
+  rowCount:   1,                                      // fill mode only
+  storageKey: 'leea-4-8-writing-fcc-leo',             // fill mode: auto-persists
+  onCellEdit: function(rowIx, colIx, value) { ... },  // fill mode callback
+  onCellFill: function(rowIx, colIx, value) { ... }   // reveal mode callback
+});
+```
+
+#### Three modes
+
+- **`display`** — read-only chart (model on the wall). Used for the LP's example planner before Leo fills his own.
+- **`fill`** — Leo types into each cell (his own chart). `<textarea>` per cell, auto-saves to `storageKey` on every input event. Restored on page reload.
+- **`reveal`** — cells start as "tap a chip below" slots; chips below the chart fill the matching slot when tapped. Used to teacher-reveal the model row-by-row in a presentation.
+
+#### Notes
+
+- Self-contained scoped CSS (no global pollution).
+- Returns an HTML string; the wrapper passes it to `innerHTML`.
+- Restore (fill mode) happens in `setTimeout(0)` after the DOM lands, same pattern as `buildDndSorter`.
+
+---
+
 ### `word-web` — Editable Word Web (graphic organizer)
 
 **File:** `public/teach/components/wordweb.js`

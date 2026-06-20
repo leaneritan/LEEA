@@ -108,6 +108,43 @@ el.innerHTML = buildDndSorter({
 - The `answer` string on each tile must exactly match a zone `key`.
 
 
+### `four-col-chart` — 4-column writing planner chart
+
+**File:** `public/teach/components/charts.js`
+**Surface:** Teacher slide decks (Writing component primarily — Explanation / Comparison / Cause-Effect writing all use a 4-column planner)
+**First used in:** OW L4 U8 Writing teacher deck (planned) — Warm Up demo + Plan phase + Write phase reference.
+**Re-use:** any LP that calls for a 4-column planner chart. Column labels are configurable.
+
+#### API
+
+```js
+window.buildFourColChart({
+  id:         'fcc-leo',                              // unique per page
+  mode:       'display' | 'fill' | 'reveal',          // default 'display'
+  title:      'Hobby Planner',                        // optional header
+  columns:    ['Hobby','What it is','How you do it','Examples'],
+  rows:       [['video games','games that...','You choose...','...']],   // display & reveal
+  rowCount:   1,                                      // fill mode only
+  storageKey: 'leea-4-8-writing-fcc-leo',             // fill mode: auto-persists
+  onCellEdit: function(rowIx, colIx, value) { ... },  // fill mode callback
+  onCellFill: function(rowIx, colIx, value) { ... }   // reveal mode callback
+});
+```
+
+#### Three modes
+
+- **`display`** — read-only chart (model on the wall). Used for the LP's example planner before Leo fills his own.
+- **`fill`** — Leo types into each cell (his own chart). `<textarea>` per cell, auto-saves to `storageKey` on every input event. Restored on page reload.
+- **`reveal`** — cells start as "tap a chip below" slots; chips below the chart fill the matching slot when tapped. Used to teacher-reveal the model row-by-row in a presentation.
+
+#### Notes
+
+- Self-contained scoped CSS (no global pollution).
+- Returns an HTML string; the wrapper passes it to `innerHTML`.
+- Restore (fill mode) happens in `setTimeout(0)` after the DOM lands, same pattern as `buildDndSorter`.
+
+---
+
 ### `word-web` — Editable Word Web (graphic organizer)
 
 **File:** `public/teach/components/wordweb.js`
@@ -179,7 +216,74 @@ host.innerHTML = window.buildWordWeb({
 
 The sentence builder is the bridge that turns "tap and type" into "Leo says a full target-grammar sentence aloud." Without it the web is just decoration; with it, every oval becomes a who-sentence Leo can speak. Add a person-picker row above the web so the same web works for Dad / Mom / Leo / a player / a friend — each person gets its own `storageKey` so prior work is preserved.
 
+### `flashcard-shell` — Flashcards with Practice + Quiz modes (Leo-app pattern)
 
+**Locked in:** Vocab 2 Academic tab (Tab 0), Vocab 2 Flashcards tab (Tab 3, PR #77), Reading SB Vocab tab (Tab 5), Reading WB Vocab tab (Tab 0). **Currently inline in each app — extractable into `flashcard-shell.js` once a third Leo app needs it.**
+
+**Required pieces:**
+- `.fc-controls` strip with two `.mode-btn` buttons: 📖 **Practice** + 🧠 **Quiz**
+- `#fcN-practice` div: tap-to-flip flashcard with front (emoji + word + part of speech + "tap to flip 👆") and back (emoji + definition + Japanese toggle + sample sentence with target word **bold-highlighted in the matching sample colour**)
+- `#fcN-quizmode` div: emoji + definition shown, Leo types the word into `<input>`, ✓ check button validates; "Starts with X" clue; live progress "N / N done"
+- **Tab completes only when BOTH modes are done** (`visited >= N` AND `quizSolved >= N`)
+- Save/restore extended: state stores `{ visited, solved, mode }` so Leo returns to the same mode with progress intact
+
+**Sample sentences rule:** match the source's transcript (TR audio) so practice mirrors what Leo heard. The Reading SB Vocab tab pulls samples from how the words appear in the passage. The Reading WB Vocab tab pulls from the workbook reading. The Vocab 2 app pulls from TR 8.5.
+
+**Storage shape:**
+```js
+{ visited: [0,1,2,...], solved: [0,1,2,...], mode: "practice"|"quiz" }
+// saved under tab-N-state, or wb-tab-N-state in multi-mode apps
+```
+
+### `recap-table` — Pronunciation / sequence recap table (after Match completion)
+
+**Locked in:** Vocab 2 Match tab (PR #79) on completion → shows a 3-column table (Word · TR sentence · Pronunciation). **Currently inline; extractable into a helper once a second component needs it.**
+
+**Shape:**
+```text
+┌─────────────┬──────────────────────────────────┬───────────────┐
+│ Word        │ TR sentence (verbatim transcript) │ Pronunciation │
+├─────────────┼──────────────────────────────────┼───────────────┤
+│ 🐞 a bug    │ "Look at the bug on the leaf!"   │ /bʌɡ/         │
+│ 📚 a comic  │ "He reads a comic book."          │ /ˈkɑː.mɪk/   │
+│ ... etc.    │                                  │               │
+└─────────────┴──────────────────────────────────┴───────────────┘
+```
+
+**Required pieces:**
+- `.match-recap` outer card (green border, white background)
+- `.recap-title` + `.recap-sub` (recap-title is e.g. "📋 TR 8.5 Pronunciation Recap"; sub is e.g. "Practice saying each sentence aloud — match the audio!")
+- `.recap-table` with `<thead>` (green-tinted header row) + `<tbody>` rows
+- Appears on match-completion AND on RESTORE if the tab was already completed
+- IPA snippets live in the `MATCH_PAIRS` data alongside the word + sentence so the table can render from the same source
+
+**Reuse target:** every vocab + reading + grammar Leo app should drop this in after any match-the-words activity. Same shape, consistent for Leo across components.
+
+### `landing-screen-modes` — Multi-mode landing for Leo apps with more than one source
+
+**Locked in:** Reading Leo app (PR #82) — landing screen with 📘 Student Book + 📒 Workbook cards. Each card opens its own mode pane with its own tabs.
+
+**Required pieces:**
+- `.landing-screen` outer container shown on first load (and on `backToLanding()` calls)
+- One `.mode-card` per source — minimum 2, room for more (e.g. Extra-Reading as a future 3rd card)
+- Each card has: `.mc-icon` (📘 / 📒) · `.mc-title` (Student Book / Workbook) · `.mc-sub` (one-line content description) · `.mc-prog` pill (live progress count from `lLoad("tab-N-done")` + `lLoad("wb-tab-N-done")`)
+- Each mode pane has a `.mode-back-bar` at the top with a "◀ Back to menu" pill + a `.mode-label` (📘 / 📒 + source title)
+- `enterMode(m)` and `backToLanding()` functions swap visibility + save `last-mode` to localStorage so the app restores Leo's last view on reload
+
+**Storage namespacing (per mode):**
+```text
+SAVE_PREFIX:   leea-<l>-<u>-<component>-
+SB tabs:       tab-{i}-done           (mode 1)
+WB tabs:       wb-tab-{i}-done        (mode 2)
+SB quiz score: score                  (mode 1)
+WB quiz score: wb-score               (mode 2)
+Mode tracker:  last-mode              (landing | sb | wb | ...)
+Tab trackers:  last-tab, wb-last-tab
+```
+
+**Code structure:** keep parallel function sets (`showTab` + `markComplete` + `doRedo` for SB; `wbShowTab` + `wbMarkComplete` + `wbDoRedo` for WB) instead of one parameterized function. Each mode gets its own `TAB_INIT` / `TAB_RESET` / `TAB_RESTORE` registry (`TAB_INIT` + `WB_INIT`). Simpler to read; keeps the locked mode's code untouched when a new mode is added.
+
+**When to use this template:** any Leo app where the LP has more than one reading/practice source (Student Book + Workbook is the most common). Don't use for single-source apps like vocab — they stay flat.
 
 They are not just PDFs to display. They should become interactive/block templates that can render in teacher lessons and learner apps.
 

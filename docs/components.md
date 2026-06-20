@@ -166,17 +166,40 @@ Module count and exact module IDs to be locked when the first grammar-1 Leo app 
 
 Same shape as grammar-1. Different chart data and different theme. To be locked after grammar-1 is locked.
 
-### reading (TO LOCK)
+### reading (LOCKED — Unit 8 Reading)
 
-Target shape (informed by NatGeo reading components):
+**Locked patterns:** `public/lessons/ow-l4-u8-reading.html` (teacher · 44 slides) + `public/learn/ow-l4-u8-reading.html` (Leo app · landing → SB + WB modes · 11 modules). Skill: `.claude/commands/reading-app.md`.
 
-- Listen and Read (full text with paragraph reveals)
-- Comprehension (sequence-order OR fill-chart, depending on the reading strategy)
-- Graphic Organizer (flow chart / interview grid / three-column chart — type from `grammar.json`-style reading data)
-- Vocabulary check from content words
-- Quiz
+**Teacher slideshow shape:**
+- 1920×1080 LEEA shell (#scaler + .slide.active + nav + teacher notes). Single inline `<script>` block.
+- ~44 slides. The passage from the source (Student Book TR pages) appears **verbatim** — never paraphrased.
+- One throughline spine (e.g. "Leo's First Geocache Hunt") with a step-flowchart that fills as each paragraph + comprehension check completes.
+- Academic Language + comprehension-blocking new words get mini-games BEFORE Leo meets them in the passage; guessable words get inline first-encounter gloss tags.
+- Graphic-literacy element (compass / map / etc.) and Content Vocab unified into one interactive when applicable.
+- LP beats: Warm Up → Vocab mini-games → Present/Predict → Read Together (¶-by-¶ with comp Qs and flowchart unlocks) → Think Aloud → Reading Strategy (signal words explicit) → Practice (LP Activity 2 verbatim) → Apply (label pictures) → Wrap Up (importance sort using `buildDndSorter`) → Extend (Leo's own hobby) → Recap → Payoff → Formative → Mark Done.
 
-To be locked when the first reading Leo app is built.
+**Leo app shape — landing-screen mode pattern:**
+- App opens to a **landing screen** with one card per source (📘 SB, 📒 WB, future 📕 Extra-Reading). Each card shows live progress for that mode.
+- Each mode has a `◀ Back to menu` pill — switchable any time, progress persists per mode.
+- Each mode's tab strip starts with a **Vocab tab** (flashcards Practice + Quiz modes, mirrors the Vocab 2 Academic tab pattern) covering every word in that source: academic + content + any source-only words that were pre-added to `vocabulary.json`.
+- Then a **Read tab** (passage verbatim, paragraph-by-paragraph unlock — ¶2 unlocks only after Leo answers ¶1's comprehension Q).
+- Then activity tabs that mirror the source's exercise types (e.g. Strategy + Order + Label for SB Hide-and-Seek; T/F + Timeline for WB Video-Games).
+- Each mode has its own scored **Quiz tab** writing to `score` (SB) and `wb-score` (WB).
+- All four LEEA save/restore rules apply per mode.
+
+**Storage namespacing (locked):**
+```text
+SAVE_PREFIX:     leea-<l>-<u>-reading-
+SB tabs:         tab-{i}-done           (i = 0..N-1)
+WB tabs:         wb-tab-{i}-done
+SB quiz score:   score
+WB quiz score:   wb-score
+Mode tracker:    last-mode              (landing | sb | wb)
+Tab trackers:    last-tab, wb-last-tab
+homeworkId:      leo-<l>-<u>-reading
+```
+
+**Reference rule:** if the workbook reading uses words Leo hasn't met yet, they get added to `vocabulary.json` + the global `vocabulary-index.json` BEFORE the WB tabs are built — tagged with source `OW<level>-U<unit>-RD-WB`. (See Unit 8 Reading where arcade / console / portable / virtual reality / headset were added for the Video Games WB reading.)
 
 ### writing (TO LOCK)
 

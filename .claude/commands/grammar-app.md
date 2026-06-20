@@ -134,9 +134,24 @@ Buttons stay visible and disabled after firing. The final form lands in a `.join
 
 When the LP flags a tricky case (e.g. middle-*who*, plural-vs-singular agreement), the deck shows the natural wrong attempt FIRST with a red shake, THEN reorders / corrects. The error is the teacher — the learner watches the fix. Reference: Grammar 1 s15.
 
-### LP items verbatim → spine slots
+### LP items verbatim → spine slots (DEFAULT)
 
 The LP's Practice items, Recap joins, Apply survey items, and Wrap Up photos must appear **verbatim** in the deck, each mapped to ONE spine slot. Do not rewrite the LP — only personalize SAMPLES (extra sentences, swap chips, Apply scenarios). Reference: Grammar 1 mapped all 5 Practice items + both Recap joins + the 6 survey questions to FC Leo United slots.
+
+### Soccer-overlay variant — when Leaneritan explicitly approves it
+
+For specific decks, Leaneritan may direct: *"copy the activities and make them about soccer — same structure, soccer-led content."* This OVERRIDES the verbatim rule above for that build. Locked in for Unit 8 Grammar 2 (`docs/lesson-plans/english/our-world/level-4/grammar-2.design.md` "Soccer-overlay note").
+
+**When the soccer-overlay variant is approved:**
+- LP activity *types* preserved exactly (rewrite-the-sentence keeps that mechanic; game-board with coin token keeps that; list-3-gifts keeps the frame).
+- LP sentence *content* gets rewritten into a soccer scenario that maps 1-to-1 onto the LP item:
+  - LP *"My cousin sent a dinosaur book to him"* → *"A fan sent a Real Madrid scarf to Bellingham"* (same grammar, soccer surface).
+  - LP toy-dinosaur-to-Aziz Preteach → toy-ball-to-Salah Preteach.
+  - LP classroom-pencils Wrap Up → dressing-room boots/playbook/towels exchange.
+- Density mandate stays in effect — every concept slide carries 3-5 sample sentences, Practice has 4 LP items + 4 bonus soccer items, Apply has 8 rolls, etc.
+- The design.md MUST include a "Soccer-overlay note" section explicitly calling out the override and showing the LP-item → soccer-rewrite mapping table so reviewers can verify the LP shape was preserved.
+
+**Default unless told otherwise: verbatim.** Soccer-overlay needs explicit user approval per build.
 
 ### Soccer freshness (web-search at build time)
 

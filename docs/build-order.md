@@ -68,13 +68,15 @@ Each step becomes its own skill so a unit can be built one chunk at a time. The 
 /vocab-app             steps 10,13 BUILT (.claude/commands/vocab-app.md; handles vocab-1 and vocab-2)
 /song-app              step 11     planned
 /grammar-app           steps 12,14 BUILT (.claude/commands/grammar-app.md; teacher slideshow only — handles grammar-1 and grammar-2; Leo app pattern locked later)
-/reading-app           step 15     planned
+/reading-app           step 15     BUILT (.claude/commands/reading-app.md; teacher slideshow + Leo app with SB/WB landing-screen mode pattern)
 /writing-app           step 16     planned
 /review-app            checkpoint  planned (teacher review + Leo review app)
 /extra-reading-app     checkpoint  planned (teacher extra reading + Leo extra-reading app)
 ```
 
 Naming rule going forward: the **`-unit-scanner`** suffix means "scans the unit PDF and produces unit-level JSON (vocabulary or grammar)"; the **`-app`** suffix means "builds the teacher slideshow + paired Leo learner app for that component" (except `/grammar-app`, which currently builds the teacher slideshow only — the Leo grammar app pattern is locked after grammar-2's Leo app ships, same way `/vocab-app` waited for vocab-2). Skills are added after the corresponding template/Leo app is built and locked.
+
+`/reading-app` includes a **landing-screen mode pattern**: one card per source (📘 SB, 📒 WB, future 📕 Extra-Reading). Each mode has its own tab strip starting with a Vocab tab (flashcards + quiz of every word in that source — including any WB-only words pre-added to `vocabulary.json`). Storage is namespaced per mode (`tab-N-done` for SB, `wb-tab-N-done` for WB). See `.claude/commands/reading-app.md` for the locked pattern.
 
 ## Stop conditions
 

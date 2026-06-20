@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leo · Unit 8 Writing — Fun with Paper</title>
+<script src="/teach/components/charts.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --blue:#0EA5E9;--blue-d:#0369A1;--blue-l:#E0F2FE;
+  --amber:#D97706;--amber-l:#FFFBEB;
+  --orange:#F97316;--orange-l:#FFF7ED;
+  --yellow:#FDE047;--red:#EF4444;--red-l:#FEF2F2;
+  --paper:#FAFAF7;--ink:#0f172a;--ink-2:#374151;--ink-3:#6B7280;--ink-4:#9CA3AF;--border:#E5E7EB;
+}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);overflow:hidden}
+body{display:flex;flex-direction:column;height:100vh}
+
+/* HEADER */
+.app-header{background:var(--green);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.logo{font-size:32px}
+.title{font-size:17px;font-weight:800}
+.subtitle{font-size:13px;opacity:.9;margin-top:2px}
+.badge-row{margin-left:auto;display:flex;gap:8px;align-items:center}
+.prog-pill{background:rgba(255,255,255,.2);color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:800}
+
+/* TABS */
+.tab-nav{display:flex;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex:1;min-width:110px;padding:14px 8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tab-btn.active{color:var(--green);border-bottom-color:var(--green)}
+.tab-btn .tab-icon{font-size:22px;line-height:1}
+.tab-btn .tab-name{font-size:13px}
+.tab-btn .tab-check{font-size:11px;color:var(--green);opacity:0;height:11px;line-height:1}
+.tab-btn.done .tab-check{opacity:1}
+
+/* TAB CONTENT */
+.tab-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tab-content{display:none;flex:1;flex-direction:column;overflow:hidden}
+.tab-content.active{display:flex}
+.tab-body{flex:1;overflow-y:auto;padding:18px;max-width:860px;width:100%;margin:0 auto}
+.tab-footer{background:#fff;border-top:2px solid var(--border);padding:12px 16px;display:flex;gap:10px;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.btn-redo{flex:0 0 110px;background:#F3F4F6;color:var(--ink-2);border:2px solid var(--border);border-radius:10px;padding:12px;font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-redo:hover{background:#E5E7EB}
+.btn-redo.armed{background:var(--amber);color:#fff;border-color:var(--amber)}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-complete:hover{background:var(--green-d)}
+.btn-complete.done{background:#9CA3AF;cursor:default}
+
+/* SHARED */
+.section-title{font-size:18px;font-weight:900;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.section-sub{font-size:14px;color:var(--ink-3);margin-bottom:14px;line-height:1.5}
+.dad-hint{background:var(--green-l);border-left:4px solid var(--green);border-radius:0 12px 12px 0;padding:12px 16px;font-size:14px;color:var(--ink);line-height:1.5;margin-bottom:14px}
+.dad-hint b{color:var(--green-d)}
+.card{background:#fff;border:2px solid var(--border);border-radius:14px;padding:16px}
+.done-banner{background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:14px 18px;font-size:15px;font-weight:700;color:var(--green-d);text-align:center;display:none;margin-top:14px}
+.done-banner.show{display:block}
+
+/* LANDING SCREEN */
+.landing-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:30px;gap:20px;background:linear-gradient(135deg,#F0FDF4,#E0F2FE);overflow-y:auto;flex-wrap:wrap}
+.mode-card{background:#fff;border:3px solid var(--border);border-radius:18px;padding:32px 28px;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s;min-width:280px;max-width:360px;flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.mode-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(0,0,0,.14)}
+.mode-card.sb{border-color:var(--green)}
+.mode-card.sb:hover{background:var(--green-l)}
+.mode-card.wb{border-color:var(--blue)}
+.mode-card.wb:hover{background:var(--blue-l)}
+.mc-icon{font-size:72px;line-height:1}
+.mc-title{font-size:24px;font-weight:900;color:var(--ink)}
+.mode-card.sb .mc-title{color:var(--green-d)}
+.mode-card.wb .mc-title{color:var(--blue-d)}
+.mc-sub{font-size:14px;color:var(--ink-3);line-height:1.5}
+.mc-prog{background:#F3F4F6;color:var(--ink-2);padding:6px 14px;border-radius:99px;font-size:12px;font-weight:800;margin-top:6px}
+.mode-card.sb .mc-prog.has-prog{background:var(--green);color:#fff}
+.mode-card.wb .mc-prog.has-prog{background:var(--blue);color:#fff}
+
+/* MODE BACK BAR */
+.mode-back-bar{background:#fff;border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.mode-back-bar button{background:none;border:2px solid var(--border);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;color:var(--ink-2);cursor:pointer;font-family:'Outfit',sans-serif}
+.mode-back-bar button:hover{background:#F3F4F6;border-color:var(--ink-3)}
+.mode-back-bar .mode-label{font-size:14px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:6px}
+.mode-pane{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* FLASHCARDS (SB Vocab — Practice + Quiz dual mode) */
+.fc-controls{display:flex;gap:8px;background:#F3F4F6;border-radius:12px;padding:4px;margin-bottom:14px}
+.mode-btn{flex:1;background:none;border:none;padding:10px;font-size:14px;font-weight:700;color:var(--ink-3);cursor:pointer;border-radius:8px;font-family:'Outfit',sans-serif;transition:all .15s}
+.mode-btn.active{background:#fff;color:var(--green-d);box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.flashcard-wrap{perspective:1000px;margin-bottom:12px;cursor:pointer}
+.flashcard{position:relative;height:320px;transition:transform .6s;transform-style:preserve-3d}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;background:#fff;border:3px solid var(--green);border-radius:18px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.fc-back{transform:rotateY(180deg);background:linear-gradient(135deg,#F0FDF4,#fff);border-color:var(--green)}
+.fc-emoji{font-size:56px;line-height:1}
+.fc-word{font-size:30px;font-weight:900;color:var(--ink);line-height:1.1}
+.fc-pos{font-size:13px;color:var(--ink-3);font-weight:600;font-style:italic}
+.fc-tap{font-size:12px;color:var(--ink-4);font-weight:600;margin-top:6px}
+.fc-def{font-size:18px;color:var(--ink);font-weight:700;line-height:1.4;max-width:340px}
+.fc-jp{font-size:14px;color:var(--ink-3);font-style:italic;display:none}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:var(--green-l);border:2px solid var(--green-b);color:var(--green-d);padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
+.fc-sample{font-size:14px;color:var(--ink-2);font-style:italic;line-height:1.5;background:var(--green-l);border-radius:10px;padding:10px 14px;max-width:340px}
+.fc-sample b{color:var(--green-d);background:rgba(255,255,255,.6);padding:1px 5px;border-radius:4px}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;padding:0 4px}
+.fc-nav button{background:#fff;border:2px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif}
+.fc-nav button:hover{border-color:var(--green)}
+.fc-counter{font-size:13px;font-weight:800;color:var(--ink-3)}
+
+/* QUIZ mode within Vocab tab */
+.quiz-wrap{background:#fff;border:3px solid var(--blue);border-radius:18px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.quiz-emoji{font-size:64px;line-height:1}
+.quiz-sentence{font-size:18px;font-weight:700;color:var(--ink);line-height:1.5;max-width:380px}
+.quiz-input-row{display:flex;gap:8px;width:100%;max-width:360px}
+.quiz-input{flex:1;border:2px solid var(--border);border-radius:10px;padding:12px 14px;font-size:16px;font-family:'Outfit',sans-serif;color:var(--ink);outline:none}
+.quiz-input:focus{border-color:var(--green)}
+.quiz-input.correct{border-color:var(--green);background:var(--green-l);color:var(--green-d);font-weight:700}
+.quiz-input.wrong{border-color:var(--red);background:var(--red-l);color:var(--red)}
+.quiz-check{background:var(--green);color:#fff;border:none;border-radius:10px;padding:0 20px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif}
+.quiz-fb{font-size:14px;font-weight:700;min-height:18px}
+
+/* MODEL / passage display */
+.passage-block{background:#fff;border:2px solid var(--amber);border-radius:14px;padding:18px 22px;font-size:17px;color:var(--ink);line-height:1.75;margin-bottom:12px}
+.passage-block .ptitle{font-size:28px;font-weight:900;color:var(--amber);text-align:center;margin-bottom:12px;letter-spacing:1px;border-bottom:2px solid var(--amber-l);padding-bottom:10px}
+.hl-def{background:var(--blue-l);padding:2px 6px;border-radius:5px;border-bottom:3px solid var(--blue);font-weight:700}
+.hl-ex{background:var(--green-l);padding:2px 6px;border-radius:5px;border-bottom:3px solid var(--green);font-weight:700}
+.hl-vocab{background:var(--orange-l);font-weight:800;padding:2px 6px;border-radius:5px}
+.find-task{background:var(--amber-l);border:2px dashed var(--amber);border-radius:12px;padding:12px 16px;margin-bottom:10px}
+.find-task .qt{font-size:14px;font-weight:800;color:var(--amber);margin-bottom:6px}
+.find-task .ans{display:flex;flex-wrap:wrap;gap:6px}
+.find-task .ans button{background:#fff;border:2px solid var(--border);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink);font-family:'Outfit',sans-serif}
+.find-task .ans button:hover{border-color:var(--green)}
+.find-task .ans button.correct{background:var(--green);color:#fff;border-color:var(--green-d)}
+.find-task .ans button.wrong{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* PLAN — chart-host */
+.chart-host{background:#fff;border:3px solid var(--green);border-radius:14px;padding:14px 18px;margin-top:10px}
+.hobby-bank{background:var(--green-l);border:2px dashed var(--green);border-radius:12px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.hobby-bank .lb{font-size:12px;font-weight:900;color:var(--green-d);letter-spacing:1px;margin-right:6px}
+.hobby-chip{background:#fff;border:2px solid var(--green);border-radius:99px;padding:8px 16px;font-size:14px;font-weight:700;color:var(--green-d);cursor:pointer;font-family:'Outfit',sans-serif}
+.hobby-chip:hover{background:var(--green);color:#fff}
+
+/* WRITE tab */
+.write-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:start}
+@media (max-width:700px){.write-grid{grid-template-columns:1fr}}
+.draft-area{display:flex;flex-direction:column;gap:8px}
+.draft-textarea{width:100%;min-height:340px;border:3px solid var(--green);border-radius:14px;padding:14px 16px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--ink);line-height:1.7;background:#fff;resize:vertical;outline:none}
+.draft-textarea:focus{border-color:var(--green-d)}
+.draft-meta{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-3);font-weight:700}
+.draft-meta .saved{color:var(--green-d)}
+.ref-chart-wrap{background:var(--blue-l);border:2px solid var(--blue);border-radius:14px;padding:12px 14px}
+.ref-chart-wrap .lb{font-size:12px;font-weight:900;color:var(--blue-d);letter-spacing:1px;margin-bottom:8px}
+.ref-empty{font-size:13px;color:var(--ink-3);font-style:italic;text-align:center;padding:16px 8px}
+
+/* QUIZ TAB shared */
+.quiz-score-pill{background:var(--green);color:#fff;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;display:inline-block;margin-bottom:10px}
+.quiz-prog{display:flex;gap:4px;margin-bottom:14px}
+.qp-dot{flex:1;height:6px;background:var(--border);border-radius:3px}
+.qp-dot.ok{background:var(--green)}
+.qp-dot.bad{background:var(--red)}
+.q-card{background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.q-card .q-prompt{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.q-card .opt{display:block;background:#fff;border:2px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;width:100%;text-align:left;color:var(--ink);margin-bottom:6px;font-family:'Outfit',sans-serif}
+.q-card .opt:hover{border-color:var(--green)}
+.q-card .opt.correct{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.q-card .opt.wrong{background:var(--red-l);border-color:var(--red);color:var(--red)}
+.q-card .opt.disabled{opacity:.6;pointer-events:none}
+.qfinal{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;border-radius:14px;padding:22px;text-align:center;display:none;margin-top:12px}
+.qfinal.show{display:block}
+.qfinal .em{font-size:48px}
+.qfinal .sc{font-size:38px;font-weight:900;margin:4px 0}
+.qfinal .lb{font-size:12px;opacity:.85;letter-spacing:.3em;font-weight:700}
+
+/* WB · 6 STEPS */
+.steps-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.step-card{background:#fff;border:2px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:all .2s}
+.step-card:hover{border-color:var(--blue)}
+.step-card.unlocked{border-color:var(--blue);background:var(--blue-l)}
+.step-card .num{background:var(--ink-3);color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;flex-shrink:0}
+.step-card.unlocked .num{background:var(--blue)}
+.step-card .body{flex:1}
+.step-card .ttl{font-size:15px;font-weight:900;color:var(--ink);margin-bottom:4px}
+.step-card .body .body-text{font-size:13px;color:var(--ink-2);font-weight:600;line-height:1.5;display:none}
+.step-card.unlocked .body .body-text{display:block}
+
+/* WB · WORD MAP */
+.wmap{background:#fff;border:3px dashed var(--blue);border-radius:18px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:14px;position:relative}
+.wmap .center{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--blue);color:#fff;border-radius:14px;padding:14px 12px;text-align:center}
+.wmap .center .lb{font-size:11px;font-weight:900;letter-spacing:1.5px;opacity:.85}
+.wmap .center .hobby{font-size:22px;font-weight:900}
+.wmap .arm{display:flex;flex-direction:column;gap:6px}
+.wmap .arm .q{font-size:13px;font-weight:800;color:var(--blue-d);text-align:center}
+.wmap .arm textarea{width:100%;min-height:64px;border:2px dashed var(--blue);background:var(--blue-l);border-radius:10px;padding:10px 12px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);font-weight:600;resize:vertical;outline:none;line-height:1.5}
+.wmap .arm textarea:focus{border-color:var(--blue-d);background:#fff}
+
+/* WB · DEFINE+EXAMPLES — pick chips */
+.def-task{background:var(--blue-l);border:2px solid var(--blue);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.def-task .qt{font-size:14px;font-weight:800;color:var(--blue-d);margin-bottom:8px}
+.def-task .opts{display:flex;flex-wrap:wrap;gap:8px}
+.def-task .opts button{background:#fff;border:2px solid var(--border);border-radius:99px;padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--ink)}
+.def-task .opts button:hover{border-color:var(--blue)}
+.def-task .opts button.correct{background:var(--green);color:#fff;border-color:var(--green-d)}
+.def-task .opts button.wrong{background:var(--red);color:#fff;border-color:var(--red)}
+.def-task .opts button.locked{pointer-events:none;opacity:.65}
+
+/* WB · COMPARE INTROS */
+.compare-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media (max-width:700px){.compare-row{grid-template-columns:1fr}}
+.intro-card{background:#fff;border:3px solid var(--amber);border-radius:14px;padding:14px 16px;font-size:14px;color:var(--ink);line-height:1.7;font-weight:600}
+.intro-card .badge{display:inline-block;background:var(--amber);color:#fff;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:800;margin-bottom:6px;letter-spacing:.5px}
+.intro-card.blue{border-color:var(--blue)}
+.intro-card.blue .badge{background:var(--blue)}
+
+/* WB · DRAFT topic chips + planner */
+.topic-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.topic-chip{background:#fff;border:2px solid var(--orange);border-radius:99px;padding:8px 14px;font-size:14px;font-weight:700;color:var(--orange);cursor:pointer;font-family:'Outfit',sans-serif}
+.topic-chip:hover{background:var(--orange);color:#fff}
+.topic-chip.sel{background:var(--orange);color:#fff}
+.draft-plan{background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.draft-plan .lb{font-size:12px;font-weight:900;color:var(--ink-3);letter-spacing:1px}
+.draft-plan input{width:100%;border:2px dashed var(--orange);background:var(--orange-l);border-radius:10px;padding:9px 12px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);font-weight:600;outline:none}
+.draft-plan input:focus{border-color:#EA580C;background:#fff}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo">✍️</div>
+  <div>
+    <div class="title">Unit 8 · Writing — Fun with Paper</div>
+    <div class="subtitle">Origami + Hobby explanation · Leo&apos;s independent writing app</div>
+  </div>
+  <div class="badge-row">
+    <div class="prog-pill" id="prog-pill">0 / 10 done</div>
+  </div>
+</div>
+
+<!-- ─────────── LANDING SCREEN (pick SB or WB) ─────────── -->
+<div class="landing-screen" id="landing">
+  <button class="mode-card sb" onclick="enterMode('sb')">
+    <div class="mc-icon">📘</div>
+    <div class="mc-title">Student Book</div>
+    <div class="mc-sub">Read &quot;Fun with Paper&quot;<br>Plan + write YOUR own hobby</div>
+    <div class="mc-prog" id="mc-prog-sb">0 / 5 done</div>
+  </button>
+  <button class="mode-card wb" onclick="enterMode('wb')">
+    <div class="mc-icon">📒</div>
+    <div class="mc-title">Workbook</div>
+    <div class="mc-sub">6 planning steps + word map<br>+ definition / examples / draft</div>
+    <div class="mc-prog" id="mc-prog-wb">0 / 5 done</div>
+  </button>
+</div>
+
+<!-- ─────────── SB MODE ─────────── -->
+<div class="mode-pane" id="sb-mode" style="display:none">
+  <div class="mode-back-bar">
+    <button onclick="backToLanding()">← Back</button>
+    <div class="mode-label">📘 Student Book — Fun with Paper</div>
+  </div>
+  <div class="tab-nav">
+    <button class="tab-btn" onclick="showTab(0)" id="tb0"><span class="tab-icon">📚</span><span class="tab-name">Vocab</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="showTab(1)" id="tb1"><span class="tab-icon">📖</span><span class="tab-name">Model</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="showTab(2)" id="tb2"><span class="tab-icon">🗂️</span><span class="tab-name">Plan</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="showTab(3)" id="tb3"><span class="tab-icon">✍️</span><span class="tab-name">Write</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="showTab(4)" id="tb4"><span class="tab-icon">✅</span><span class="tab-name">Quiz</span><span class="tab-check">✓</span></button>
+  </div>
+  <div class="tab-wrap">
+
+    <!-- SB TAB 0 — VOCAB (Practice + Quiz flashcards) -->
+    <div class="tab-content" id="tc0">
+      <div class="tab-body">
+        <div class="section-title">📚 Vocab — 8 words from this lesson</div>
+        <div class="section-sub">3 Academic words + 5 Content words. Practice them as flashcards, then Quiz yourself.</div>
+        <div class="dad-hint">💬 <b>Dad:</b> Tap the card to flip. Read the meaning, the soccer/origami example, then peek at the Japanese if you need it.</div>
+        <div class="fc-controls">
+          <button class="mode-btn active" id="fc-mode-practice" onclick="fcSetMode('practice')">🎴 Practice</button>
+          <button class="mode-btn" id="fc-mode-quiz" onclick="fcSetMode('quiz')">📝 Quiz</button>
+        </div>
+        <div id="fc-practice">
+          <div class="flashcard-wrap" id="fc-wrap" onclick="fcFlip()">
+            <div class="flashcard" id="fc-card">
+              <div class="fc-face fc-front">
+                <div class="fc-emoji" id="fc-emoji">📜</div>
+                <div class="fc-word" id="fc-word">origami</div>
+                <div class="fc-pos" id="fc-pos">noun · content</div>
+                <div class="fc-tap">tap to flip</div>
+              </div>
+              <div class="fc-face fc-back">
+                <div class="fc-def" id="fc-def">The Japanese art of folding paper into shapes.</div>
+                <div class="fc-sample" id="fc-sample"><b>I made a paper crane out of one square sheet.</b></div>
+                <button class="fc-jp-btn" onclick="event.stopPropagation();fcShowJp()">🇯🇵 Show Japanese</button>
+                <div class="fc-jp" id="fc-jp">折り紙</div>
+              </div>
+            </div>
+          </div>
+          <div class="fc-nav">
+            <button onclick="fcPrev()">◀ Prev</button>
+            <div class="fc-counter" id="fc-counter">1 / 8</div>
+            <button onclick="fcNext()">Next ▶</button>
+          </div>
+        </div>
+        <div id="fc-quiz" style="display:none">
+          <div class="quiz-wrap">
+            <div class="quiz-emoji" id="qz-emoji">📜</div>
+            <div class="quiz-sentence" id="qz-sentence">Type the word that means: <b>The Japanese art of folding paper.</b></div>
+            <div class="quiz-input-row">
+              <input class="quiz-input" id="qz-input" placeholder="type the word…" autocomplete="off">
+              <button class="quiz-check" onclick="fcQzCheck()">Check</button>
+            </div>
+            <div class="quiz-fb" id="qz-fb"></div>
+            <div class="fc-nav" style="width:100%">
+              <button onclick="fcQzSkip()">Skip</button>
+              <div class="fc-counter" id="qz-counter">1 / 8</div>
+              <button onclick="fcQzNext()">Next ▶</button>
+            </div>
+          </div>
+        </div>
+        <div class="done-banner" id="done-0">✅ All 8 words practiced. You know your writing vocab!</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="redo-0" onclick="doRedo(0)">↺ Redo</button>
+        <button class="btn-complete" id="complete-0" onclick="markComplete(0)">Mark Vocab complete ✓</button>
+      </div>
+    </div>
+
+    <!-- SB TAB 1 — MODEL (Fun with Paper passage + find tasks) -->
+    <div class="tab-content" id="tc1">
+      <div class="tab-body">
+        <div class="section-title">📖 Read the model — Fun with Paper</div>
+        <div class="section-sub">An <b>Explanation</b> paragraph about origami. As you read, notice the <span class="hl-def">definitions</span>, the <span class="hl-ex">examples</span>, and the <span class="hl-vocab">vocab words</span>.</div>
+        <div class="dad-hint">💬 <b>Dad:</b> Read the whole thing twice. First for sense, then to find the definition + 2 examples.</div>
+        <div class="passage-block">
+          <div class="ptitle">Fun with Paper</div>
+          The Japanese invented <span class="hl-vocab">📜 origami</span> in the 17th century, and now it is popular everywhere in the world.<br><br>
+          The word &quot;origami&quot; comes from two Japanese words: <span class="hl-def">&quot;ori,&quot; which means &quot;🌀 folding&quot;</span>, and <span class="hl-def">&quot;Kami,&quot; which means &quot;paper.&quot;</span> In origami, you always begin with one square sheet of paper. Then you fold the paper many times to make a shape.<br><br>
+          Origami is very creative. You can make simple shapes, <span class="hl-ex">for example, a little bug</span>. Or you can make a difficult <span class="hl-vocab">🎨 design</span>. To make a difficult shape, <span class="hl-ex">such as a <span class="hl-vocab">🐲 dragon</span></span>, you have to fold the paper many times in different ways. The most famous origami design is the Japanese paper <span class="hl-vocab">🕊️ crane</span>. Origami isn&apos;t always easy, but it&apos;s fun!
+        </div>
+        <div class="find-task">
+          <div class="qt">🏷️ Find the definition — what does &quot;origami&quot; mean?</div>
+          <div class="ans">
+            <button onclick="findCheck(this,false,'m1')">paper that is square</button>
+            <button onclick="findCheck(this,true,'m1')">folding paper (ori) + paper (kami)</button>
+            <button onclick="findCheck(this,false,'m1')">a 17th-century festival</button>
+          </div>
+        </div>
+        <div class="find-task">
+          <div class="qt">🔍 Find a SIMPLE shape example</div>
+          <div class="ans">
+            <button onclick="findCheck(this,false,'m2')">a dragon</button>
+            <button onclick="findCheck(this,true,'m2')">a little bug</button>
+            <button onclick="findCheck(this,false,'m2')">a paper crane</button>
+          </div>
+        </div>
+        <div class="find-task">
+          <div class="qt">🔍 Find a DIFFICULT shape example</div>
+          <div class="ans">
+            <button onclick="findCheck(this,true,'m3')">a dragon</button>
+            <button onclick="findCheck(this,false,'m3')">a square</button>
+            <button onclick="findCheck(this,false,'m3')">an envelope</button>
+          </div>
+        </div>
+        <div class="find-task">
+          <div class="qt">📝 Which TWO phrases introduce an example? (tap both)</div>
+          <div class="ans" id="find-m4">
+            <button onclick="findMulti(this,true,'m4',['such as','for example'])">such as</button>
+            <button onclick="findMulti(this,false,'m4',['such as','for example'])">like</button>
+            <button onclick="findMulti(this,true,'m4',['such as','for example'])">for example</button>
+            <button onclick="findMulti(this,false,'m4',['such as','for example'])">and then</button>
+          </div>
+        </div>
+        <div class="done-banner" id="done-1">✅ Model read + analyzed. You know what an Explanation paragraph looks like.</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="redo-1" onclick="doRedo(1)">↺ Redo</button>
+        <button class="btn-complete" id="complete-1" onclick="markComplete(1)">Mark Model complete ✓</button>
+      </div>
+    </div>
+
+    <!-- SB TAB 2 — PLAN (4-col chart, fill mode) -->
+    <div class="tab-content" id="tc2">
+      <div class="tab-body">
+        <div class="section-title">🗂️ Plan — fill YOUR hobby chart</div>
+        <div class="section-sub">Pick a hobby chip below to fill column 1, then type a short phrase into each of the other 3 columns. Your work saves automatically.</div>
+        <div class="dad-hint">💬 <b>Dad:</b> Phrases, NOT full sentences. The sentences come when you Write the paragraph on the next tab. This chart is your plan.</div>
+        <div class="hobby-bank">
+          <span class="lb">HOBBY:</span>
+          <button class="hobby-chip" onclick="leoHobby('collect soccer cards')">⚽ collect soccer cards</button>
+          <button class="hobby-chip" onclick="leoHobby('play soccer')">⚽ play soccer</button>
+          <button class="hobby-chip" onclick="leoHobby('read Marvel comics')">📚 read Marvel comics</button>
+          <button class="hobby-chip" onclick="leoHobby('draw pictures')">🎨 draw pictures</button>
+          <button class="hobby-chip" onclick="leoHobby('collect fossils')">🪨 collect fossils</button>
+          <button class="hobby-chip" onclick="leoHobby('play video games')">🎮 play video games</button>
+        </div>
+        <div class="chart-host">
+          <div id="leo-chart-sb"></div>
+        </div>
+        <div class="done-banner" id="done-2">✅ Plan saved. Head to the Write tab next.</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="redo-2" onclick="doRedo(2)">↺ Redo</button>
+        <button class="btn-complete" id="complete-2" onclick="markComplete(2)">Mark Plan complete ✓</button>
+      </div>
+    </div>
+
+    <!-- SB TAB 3 — WRITE -->
+    <div class="tab-content" id="tc3">
+      <div class="tab-body">
+        <div class="section-title">✍️ Write — your hobby paragraph</div>
+        <div class="section-sub">Turn each cell of your chart into 1-2 sentences. Use <em>for example</em> or <em>such as</em> at least once.</div>
+        <div class="dad-hint">💬 <b>Dad:</b> Auto-saves as you type. Reference your chart on the right. Don&apos;t worry about perfect — write a first draft.</div>
+        <div class="write-grid">
+          <div class="draft-area">
+            <textarea class="draft-textarea" id="leo-draft-sb" placeholder="My hobby is..."></textarea>
+            <div class="draft-meta"><span id="wc-sb">0 words · 0 sentences</span><span class="saved">💾 Auto-saved</span></div>
+          </div>
+          <div class="ref-chart-wrap">
+            <div class="lb">📋 YOUR PLAN (from Plan tab)</div>
+            <div id="ref-chart-sb"><div class="ref-empty">Fill the Plan tab first — your chart will show here.</div></div>
+          </div>
+        </div>
+        <div class="done-banner" id="done-3">✅ Draft saved. Read it aloud to Dad and edit one more time.</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="redo-3" onclick="doRedo(3)">↺ Redo</button>
+        <button class="btn-complete" id="complete-3" onclick="markComplete(3)">Mark Write complete ✓</button>
+      </div>
+    </div>
+
+    <!-- SB TAB 4 — QUIZ -->
+    <div class="tab-content" id="tc4">
+      <div class="tab-body">
+        <div class="section-title">✅ Quiz — show what you know</div>
+        <div class="quiz-score-pill" id="qz4-pill">0 / 6 correct</div>
+        <div class="quiz-prog" id="qz4-dots"></div>
+        <div class="dad-hint">💬 <b>Dad:</b> 6 quick questions about today&apos;s writing words and rules. Tap your answer.</div>
+        <div id="qz4-list"></div>
+        <div class="qfinal" id="qz4-final">
+          <div class="em">🏆</div>
+          <div class="sc" id="qz4-final-sc">0 / 6</div>
+          <div class="lb">QUIZ COMPLETE</div>
+        </div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="redo-4" onclick="doRedo(4)">↺ Redo</button>
+        <button class="btn-complete" id="complete-4" onclick="markComplete(4)">Mark Quiz complete ✓</button>
+      </div>
+    </div>
+
+  </div>
+</div><!-- end #sb-mode -->
+
+<!-- ─────────── WB MODE ─────────── -->
+<div class="mode-pane" id="wb-mode" style="display:none">
+  <div class="mode-back-bar">
+    <button onclick="backToLanding()">← Back</button>
+    <div class="mode-label">📒 Workbook — Writing pp. 102-103</div>
+  </div>
+  <div class="tab-nav">
+    <button class="tab-btn" onclick="wbShowTab(0)" id="wtb0"><span class="tab-icon">📋</span><span class="tab-name">6 Steps</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="wbShowTab(1)" id="wtb1"><span class="tab-icon">🕸️</span><span class="tab-name">Word Map</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="wbShowTab(2)" id="wtb2"><span class="tab-icon">🔍</span><span class="tab-name">Define</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="wbShowTab(3)" id="wtb3"><span class="tab-icon">🔬</span><span class="tab-name">Compare</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="wbShowTab(4)" id="wtb4"><span class="tab-icon">📝</span><span class="tab-name">Draft</span><span class="tab-check">✓</span></button>
+  </div>
+  <div class="tab-wrap">
+
+    <!-- WB TAB 0 — 6 STEPS -->
+    <div class="tab-content" id="wtc0">
+      <div class="tab-body">
+        <div class="section-title">📋 How the writer planned &quot;Fun with Paper&quot;</div>
+        <div class="section-sub">The writer used 6 steps BEFORE writing. Tap each step to unlock it.</div>
+        <div class="dad-hint">💬 <b>Dad:</b> Every good writer plans before drafting. These are the same steps YOU will use on the Draft tab.</div>
+        <div class="steps-list" id="wb-steps-list">
+          <div class="step-card" data-step="1" onclick="wbStepTap(this)"><div class="num">1</div><div class="body"><div class="ttl">Chose a hobby to write about</div><div class="body-text">She picked <b>origami</b> — something she knew well and could explain.</div></div></div>
+          <div class="step-card" data-step="2" onclick="wbStepTap(this)"><div class="num">2</div><div class="body"><div class="ttl">Made a word map</div><div class="body-text">She wrote 4 questions about the hobby: <i>What is it? · Where is it from? · What can you make? · How do you do it?</i></div></div></div>
+          <div class="step-card" data-step="3" onclick="wbStepTap(this)"><div class="num">3</div><div class="body"><div class="ttl">Decided what readers need</div><div class="body-text">She chose <b>1 definition</b> + <b>2 examples</b>: define <i>origami</i> · simple example <i>a little bug</i> · difficult example <i>a dragon</i>.</div></div></div>
+          <div class="step-card" data-step="4" onclick="wbStepTap(this)"><div class="num">4</div><div class="body"><div class="ttl">Underlined example phrases</div><div class="body-text">She picked <b>such as</b> and <b>for example</b> (not <i>like</i> — that&apos;s too informal).</div></div></div>
+          <div class="step-card" data-step="5" onclick="wbStepTap(this)"><div class="num">5</div><div class="body"><div class="ttl">Planned the introduction</div><div class="body-text">She compared with another intro (<i>Hide and Seek</i>): both NAME the hobby + give a fact about it.</div></div></div>
+          <div class="step-card" data-step="6" onclick="wbStepTap(this)"><div class="num">6</div><div class="body"><div class="ttl">Wrote the first draft</div><div class="body-text">A <b>draft</b> = the first version. You always edit it before sharing.</div></div></div>
+        </div>
+        <div class="done-banner" id="wb-done-0">✅ You unlocked all 6 steps. Now you know the writer&apos;s process.</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="w-redo-0" onclick="wbDoRedo(0)">↺ Redo</button>
+        <button class="btn-complete" id="w-complete-0" onclick="wbMarkComplete(0)">Mark Steps complete ✓</button>
+      </div>
+    </div>
+
+    <!-- WB TAB 1 — WORD MAP -->
+    <div class="tab-content" id="wtc1">
+      <div class="tab-body">
+        <div class="section-title">🕸️ Word map — answer 4 questions about YOUR hobby</div>
+        <div class="section-sub">In the middle is YOUR hobby. Answer each question around it. Short phrases are fine.</div>
+        <div class="dad-hint">💬 <b>Dad:</b> If you already picked a hobby in the SB Plan tab, it shows up in the middle here too. Otherwise type one.</div>
+        <div class="wmap">
+          <div class="center">
+            <div class="lb">MY HOBBY</div>
+            <div class="hobby" id="wm-hobby">(pick on SB Plan tab)</div>
+          </div>
+          <div class="arm"><div class="q">❓ What IS it?</div><textarea id="wm-q1" data-key="q1" placeholder="A sport / a game / a collection..."></textarea></div>
+          <div class="arm"><div class="q">🌍 Where is it FROM?</div><textarea id="wm-q2" data-key="q2" placeholder="Country / who started it..."></textarea></div>
+          <div class="arm"><div class="q">🛠️ What can you MAKE / DO?</div><textarea id="wm-q3" data-key="q3" placeholder="Specific things..."></textarea></div>
+          <div class="arm"><div class="q">📐 HOW do you do it?</div><textarea id="wm-q4" data-key="q4" placeholder="Steps / tools..."></textarea></div>
+        </div>
+        <div class="done-banner" id="wb-done-1">✅ Word map saved. Now you can decide what to define + give examples for.</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="w-redo-1" onclick="wbDoRedo(1)">↺ Redo</button>
+        <button class="btn-complete" id="w-complete-1" onclick="wbMarkComplete(1)">Mark Word Map complete ✓</button>
+      </div>
+    </div>
+
+    <!-- WB TAB 2 — DEFINE + EXAMPLES -->
+    <div class="tab-content" id="wtc2">
+      <div class="tab-body">
+        <div class="section-title">🔍 Definition + examples (WB Activity 1, parts 3 + 4)</div>
+        <div class="section-sub">The writer decided readers needed ONE definition and TWO examples. Pick the right ones from the passage.</div>
+        <div class="dad-hint">💬 <b>Dad:</b> Look back at the model on the SB Model tab if you forget.</div>
+        <div class="def-task" data-tk="t0">
+          <div class="qt">a. Which word did she DEFINE for us?</div>
+          <div class="opts">
+            <button onclick="defPick(this,'t0',true)">origami</button>
+            <button onclick="defPick(this,'t0',false)">crane</button>
+            <button onclick="defPick(this,'t0',false)">paper</button>
+          </div>
+        </div>
+        <div class="def-task" data-tk="t1">
+          <div class="qt">b. What is an example of a SIMPLE shape?</div>
+          <div class="opts">
+            <button onclick="defPick(this,'t1',false)">a dragon</button>
+            <button onclick="defPick(this,'t1',true)">a little bug</button>
+            <button onclick="defPick(this,'t1',false)">a paper crane</button>
+          </div>
+        </div>
+        <div class="def-task" data-tk="t2">
+          <div class="qt">c. What is an example of a DIFFICULT shape?</div>
+          <div class="opts">
+            <button onclick="defPick(this,'t2',true)">a dragon</button>
+            <button onclick="defPick(this,'t2',false)">a square</button>
+            <button onclick="defPick(this,'t2',false)">an envelope</button>
+          </div>
+        </div>
+        <div class="def-task" data-tk="t3">
+          <div class="qt">d. Tap the TWO phrases the writer used to introduce examples</div>
+          <div class="opts" id="ex-phrases">
+            <button onclick="defMulti(this,'t3',true)">such as</button>
+            <button onclick="defMulti(this,'t3',false)">like</button>
+            <button onclick="defMulti(this,'t3',true)">for example</button>
+          </div>
+        </div>
+        <div class="done-banner" id="wb-done-2">✅ Definition + examples + phrase markers — all set.</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="w-redo-2" onclick="wbDoRedo(2)">↺ Redo</button>
+        <button class="btn-complete" id="w-complete-2" onclick="wbMarkComplete(2)">Mark Define complete ✓</button>
+      </div>
+    </div>
+
+    <!-- WB TAB 3 — COMPARE INTROS -->
+    <div class="tab-content" id="wtc3">
+      <div class="tab-body">
+        <div class="section-title">🔬 Compare two introductions (WB Activity 1, part 5)</div>
+        <div class="section-sub">Read both. What do they have in common?</div>
+        <div class="dad-hint">💬 <b>Dad:</b> Both passages start with an introduction that does the SAME thing. What is it?</div>
+        <div class="compare-row">
+          <div class="intro-card">
+            <div class="badge">(a) ORIGAMI — Fun with Paper</div>
+            The Japanese invented origami in the 17th century, and now it is popular everywhere in the world.
+          </div>
+          <div class="intro-card blue">
+            <div class="badge">(b) GEOCACHING — Hide and Seek (SB p.140)</div>
+            Geocaching is a fun outdoor hobby. It&apos;s like a game of hide and seek, with the hiders leaving clues for the seekers to find.
+          </div>
+        </div>
+        <div class="def-task" data-tk="c0">
+          <div class="qt">What do the two intros have in COMMON?</div>
+          <div class="opts">
+            <button onclick="defPick(this,'c0',true)">They both NAME the hobby + tell something about it</button>
+            <button onclick="defPick(this,'c0',false)">They both give a date and a country</button>
+            <button onclick="defPick(this,'c0',false)">They both use the word &quot;fun&quot;</button>
+            <button onclick="defPick(this,'c0',false)">They both describe Japan</button>
+          </div>
+        </div>
+        <div class="def-task" data-tk="c1">
+          <div class="qt">Which intro tells WHEN the hobby started?</div>
+          <div class="opts">
+            <button onclick="defPick(this,'c1',true)">(a) origami — 17th century</button>
+            <button onclick="defPick(this,'c1',false)">(b) geocaching</button>
+            <button onclick="defPick(this,'c1',false)">neither</button>
+          </div>
+        </div>
+        <div class="def-task" data-tk="c2">
+          <div class="qt">Which intro uses a COMPARISON (it&apos;s LIKE another game)?</div>
+          <div class="opts">
+            <button onclick="defPick(this,'c2',false)">(a) origami</button>
+            <button onclick="defPick(this,'c2',true)">(b) geocaching — like hide and seek</button>
+            <button onclick="defPick(this,'c2',false)">both</button>
+          </div>
+        </div>
+        <div class="done-banner" id="wb-done-3">✅ You spotted the pattern: every good intro NAMES the hobby + gives a hook.</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="w-redo-3" onclick="wbDoRedo(3)">↺ Redo</button>
+        <button class="btn-complete" id="w-complete-3" onclick="wbMarkComplete(3)">Mark Compare complete ✓</button>
+      </div>
+    </div>
+
+    <!-- WB TAB 4 — DRAFT (WB Activity 3) -->
+    <div class="tab-content" id="wtc4">
+      <div class="tab-body">
+        <div class="section-title">📝 Write a NEW draft — pick a topic</div>
+        <div class="section-sub">The Workbook gives you 3 topics. Pick one. Plan it. Then write a short paragraph.</div>
+        <div class="dad-hint">💬 <b>Dad:</b> This is a NEW draft — different from your SB hobby. Pick a topic you can describe with 1 definition + 2 examples.</div>
+        <div class="topic-chips">
+          <button class="topic-chip" data-topic="A toy you like" onclick="wbTopic(this)">🧸 A toy you like</button>
+          <button class="topic-chip" data-topic="One of your video games" onclick="wbTopic(this)">🎮 One of your video games</button>
+          <button class="topic-chip" data-topic="A sport you enjoy" onclick="wbTopic(this)">⚽ A sport you enjoy</button>
+        </div>
+        <div class="draft-plan">
+          <div class="lb">📋 MINI PLAN — fill in BEFORE you write</div>
+          <input type="text" id="wb-pl-name" placeholder="Topic name (e.g. soccer · my Lego set · Mario Kart)…">
+          <input type="text" id="wb-pl-def" placeholder="What IS it? (definition: ___ is a ___)…">
+          <input type="text" id="wb-pl-ex1" placeholder="Example 1 (use such as OR for example)…">
+          <input type="text" id="wb-pl-ex2" placeholder="Example 2…">
+        </div>
+        <textarea class="draft-textarea" id="wb-draft" placeholder="Use your mini plan above. Write 4-6 sentences."></textarea>
+        <div class="draft-meta" style="margin-top:8px"><span id="wc-wb">0 words · 0 sentences</span><span class="saved">💾 Auto-saved</span></div>
+        <div class="done-banner" id="wb-done-4">✅ Second draft saved. Now you have TWO pieces of writing!</div>
+      </div>
+      <div class="tab-footer">
+        <button class="btn-redo" id="w-redo-4" onclick="wbDoRedo(4)">↺ Redo</button>
+        <button class="btn-complete" id="w-complete-4" onclick="wbMarkComplete(4)">Mark Draft complete ✓</button>
+      </div>
+    </div>
+
+  </div>
+</div><!-- end #wb-mode -->
+
+<script>
+/* ─── STORAGE ─── */
+var PREFIX = "leea-4-8-writing-";
+var TOTAL_TABS = 5;
+var WB_TABS = 5;
+function lSave(k, v){ try { localStorage.setItem(PREFIX + k, JSON.stringify(v)); } catch(e){} }
+function lLoad(k){ try { var raw = localStorage.getItem(PREFIX + k); return raw ? JSON.parse(raw) : null; } catch(e){ return null; } }
+function lDel(k){ try { localStorage.removeItem(PREFIX + k); } catch(e){} }
+/* Cross-deck shared keys (also used by teacher deck — kept WITHOUT prefix-stripping) */
+function rawSave(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+function rawLoad(k){ try { var raw = localStorage.getItem(k); return raw ? JSON.parse(raw) : null; } catch(e){ return null; } }
+function rawDel(k){ try { localStorage.removeItem(k); } catch(e){} }
+var KEY_FCC = "leea-4-8-writing-fcc-leo";
+var KEY_DRAFT_SB = "leea-4-8-writing-draft-leo";
+function esc(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* ─── MODE SWITCHING (landing ↔ SB ↔ WB) ─── */
+function enterMode(m){
+  lSave("last-mode", m);
+  try {
+    document.getElementById("landing").style.display = "none";
+    document.getElementById("sb-mode").style.display = m === "sb" ? "flex" : "none";
+    document.getElementById("wb-mode").style.display = m === "wb" ? "flex" : "none";
+  } catch(e){}
+  if (m === "sb"){
+    var last = lLoad("last-tab");
+    showTab(last != null ? last : 0);
+  } else if (m === "wb"){
+    var last2 = lLoad("wb-last-tab");
+    wbShowTab(last2 != null ? last2 : 0);
+  }
+}
+function backToLanding(){
+  lSave("last-mode", "landing");
+  try {
+    document.getElementById("landing").style.display = "flex";
+    document.getElementById("sb-mode").style.display = "none";
+    document.getElementById("wb-mode").style.display = "none";
+  } catch(e){}
+  refreshProg();
+}
+
+/* ─── SB TABS ─── */
+var cur = 0;
+var TAB_INIT = {}, TAB_RESET = {}, TAB_RESTORE = {};
+function showTab(i){
+  if (i < 0 || i >= TOTAL_TABS) return;
+  var prev = document.getElementById("tc" + cur);
+  if (prev) prev.classList.remove("active");
+  var prevBtn = document.getElementById("tb" + cur);
+  if (prevBtn) prevBtn.classList.remove("active");
+  cur = i;
+  var n = document.getElementById("tc" + i);
+  if (n) n.classList.add("active");
+  var nb = document.getElementById("tb" + i);
+  if (nb) nb.classList.add("active");
+  lSave("last-tab", i);
+  if (TAB_INIT[i] && !TAB_INIT[i]._init){ TAB_INIT[i](); TAB_INIT[i]._init = true; if (TAB_RESTORE[i]) TAB_RESTORE[i](); }
+  if (i === 3) refreshRefChart();
+}
+function markComplete(i){
+  lSave("tab-" + i + "-done", true);
+  var btn = document.getElementById("tb" + i);
+  if (btn) btn.classList.add("done");
+  var c = document.getElementById("complete-" + i);
+  if (c){ c.classList.add("done"); c.textContent = "✓ Done — keep going!"; }
+  var b = document.getElementById("done-" + i);
+  if (b) b.classList.add("show");
+  refreshProg();
+}
+
+/* ─── WB TABS ─── */
+var wbCur = 0;
+var WB_INIT = {}, WB_RESET = {}, WB_RESTORE = {};
+function wbShowTab(i){
+  if (i < 0 || i >= WB_TABS) return;
+  var prev = document.getElementById("wtc" + wbCur);
+  if (prev) prev.classList.remove("active");
+  var prevBtn = document.getElementById("wtb" + wbCur);
+  if (prevBtn) prevBtn.classList.remove("active");
+  wbCur = i;
+  var n = document.getElementById("wtc" + i);
+  if (n) n.classList.add("active");
+  var nb = document.getElementById("wtb" + i);
+  if (nb) nb.classList.add("active");
+  lSave("wb-last-tab", i);
+  if (WB_INIT[i] && !WB_INIT[i]._init){ WB_INIT[i](); WB_INIT[i]._init = true; if (WB_RESTORE[i]) WB_RESTORE[i](); }
+  if (i === 1) refreshWmapHobby();
+}
+function wbMarkComplete(i){
+  lSave("wb-tab-" + i + "-done", true);
+  var btn = document.getElementById("wtb" + i);
+  if (btn) btn.classList.add("done");
+  var c = document.getElementById("w-complete-" + i);
+  if (c){ c.classList.add("done"); c.textContent = "✓ Done — keep going!"; }
+  var b = document.getElementById("wb-done-" + i);
+  if (b) b.classList.add("show");
+  refreshProg();
+}
+
+/* ─── PROGRESS ─── */
+function refreshProg(){
+  var n = 0;
+  for (var i = 0; i < TOTAL_TABS; i++){ if (lLoad("tab-" + i + "-done")) n++; }
+  var w = 0;
+  for (var j = 0; j < WB_TABS; j++){ if (lLoad("wb-tab-" + j + "-done")) w++; }
+  var totalDone = n + w;
+  var totalAll = TOTAL_TABS + WB_TABS;
+  try { document.getElementById("prog-pill").textContent = totalDone + " / " + totalAll + " done"; } catch(e){}
+  try {
+    var pillSb = document.getElementById("mc-prog-sb");
+    if (pillSb){ pillSb.textContent = n + " / " + TOTAL_TABS + " done"; if (n > 0) pillSb.classList.add("has-prog"); else pillSb.classList.remove("has-prog"); }
+  } catch(e){}
+  try {
+    var pillWb = document.getElementById("mc-prog-wb");
+    if (pillWb){ pillWb.textContent = w + " / " + WB_TABS + " done"; if (w > 0) pillWb.classList.add("has-prog"); else pillWb.classList.remove("has-prog"); }
+  } catch(e){}
+  /* mark done tabs */
+  for (var k = 0; k < TOTAL_TABS; k++){
+    if (lLoad("tab-" + k + "-done")){
+      var tb = document.getElementById("tb" + k); if (tb) tb.classList.add("done");
+      var cb = document.getElementById("complete-" + k); if (cb){ cb.classList.add("done"); cb.textContent = "✓ Done — keep going!"; }
+      var db = document.getElementById("done-" + k); if (db) db.classList.add("show");
+    }
+  }
+  for (var k2 = 0; k2 < WB_TABS; k2++){
+    if (lLoad("wb-tab-" + k2 + "-done")){
+      var wtb = document.getElementById("wtb" + k2); if (wtb) wtb.classList.add("done");
+      var wcb = document.getElementById("w-complete-" + k2); if (wcb){ wcb.classList.add("done"); wcb.textContent = "✓ Done — keep going!"; }
+      var wdb = document.getElementById("wb-done-" + k2); if (wdb) wdb.classList.add("show");
+    }
+  }
+}
+
+/* ─── REDO (two-tap armed) ─── */
+var redoArmed = {};
+function _redoFlow(i, kind){
+  var btnId = (kind === "wb" ? "w-redo-" : "redo-") + i;
+  var btn = document.getElementById(btnId);
+  if (!btn) return false;
+  var key = kind + ":" + i;
+  if (!redoArmed[key]){
+    redoArmed[key] = true;
+    btn.classList.add("armed");
+    btn.textContent = "↺ Tap again";
+    setTimeout(function(){ redoArmed[key] = false; if (btn){ btn.classList.remove("armed"); btn.textContent = "↺ Redo"; } }, 3000);
+    return false;
+  }
+  redoArmed[key] = false;
+  btn.classList.remove("armed");
+  btn.textContent = "↺ Redo";
+  return true;
+}
+function doRedo(i){
+  if (!_redoFlow(i, "sb")) return;
+  var keys = ["tab-" + i + "-done", "tab-" + i + "-state"];
+  if (i === 4) keys.push("tab-4-score");
+  keys.forEach(lDel);
+  var bb = document.getElementById("complete-" + i);
+  if (bb){ bb.classList.remove("done"); bb.textContent = "Mark complete ✓"; }
+  var tb = document.getElementById("tb" + i);
+  if (tb) tb.classList.remove("done");
+  var db = document.getElementById("done-" + i);
+  if (db) db.classList.remove("show");
+  if (TAB_RESET[i]) TAB_RESET[i]();
+  TAB_INIT[i]._init = false;
+  refreshProg();
+}
+function wbDoRedo(i){
+  if (!_redoFlow(i, "wb")) return;
+  var keys = ["wb-tab-" + i + "-done", "wb-tab-" + i + "-state"];
+  keys.forEach(lDel);
+  var bb = document.getElementById("w-complete-" + i);
+  if (bb){ bb.classList.remove("done"); bb.textContent = "Mark complete ✓"; }
+  var tb = document.getElementById("wtb" + i);
+  if (tb) tb.classList.remove("done");
+  var db = document.getElementById("wb-done-" + i);
+  if (db) db.classList.remove("show");
+  if (WB_RESET[i]) WB_RESET[i]();
+  WB_INIT[i]._init = false;
+  refreshProg();
+}
+
+/* ─── SB TAB 0 — FLASHCARDS ─── */
+var FC = [
+  { em: "🏷️", word: "definition", pos: "noun · academic", def: "Telling what a word means — usually with WORD + means + MEANING.", sample: "A <b>goal</b> means kicking the ball into the other team&apos;s net.", jp: "定義" },
+  { em: "📝", word: "description", pos: "noun · academic", def: "A picture made out of words — many details about ONE thing.", sample: "<b>Messi is small, fast, and left-footed.</b>", jp: "描写・記述" },
+  { em: "🔍", word: "details", pos: "noun · academic", def: "Small important things others might miss.", sample: "The <b>details</b> matter: red laces, boot #10, name on the back.", jp: "細部" },
+  { em: "📜", word: "origami", pos: "noun · content", def: "The Japanese art of folding paper into shapes.", sample: "I made a crane out of one square sheet — that&apos;s <b>origami</b>.", jp: "折り紙" },
+  { em: "🌀", word: "folding", pos: "noun · content", def: "Making creases in paper to change its shape.", sample: "Start by <b>folding</b> the paper in half diagonally.", jp: "折りたたみ" },
+  { em: "🎨", word: "design", pos: "noun · content", def: "The pattern or shape you choose to make.", sample: "The crane <b>design</b> needs a lot of folds.", jp: "デザイン・型" },
+  { em: "🐲", word: "dragon", pos: "noun · content", def: "A mythical creature — and a very difficult origami design.", sample: "Folding a paper <b>dragon</b> takes many steps.", jp: "ドラゴン・竜" },
+  { em: "🕊️", word: "crane", pos: "noun · content", def: "A long-legged bird — the most famous origami design in Japan.", sample: "Folding 1000 paper <b>cranes</b> is a Japanese wish for peace.", jp: "鶴" }
+];
+var fcIdx = 0;
+var fcMode = "practice";
+var fcJpRevealed = false;
+TAB_INIT[0] = function(){ fcRender(); fcQzRender(); };
+TAB_RESET[0] = function(){ fcIdx = 0; fcMode = "practice"; fcJpRevealed = false; lDel("fc-quiz-state"); var p = document.getElementById("fc-practice"); var q = document.getElementById("fc-quiz"); if (p) p.style.display = "block"; if (q) q.style.display = "none"; var mp = document.getElementById("fc-mode-practice"); var mq = document.getElementById("fc-mode-quiz"); if (mp) mp.classList.add("active"); if (mq) mq.classList.remove("active"); fcRender(); fcQzRender(); };
+function fcSetMode(m){
+  fcMode = m;
+  var p = document.getElementById("fc-practice");
+  var q = document.getElementById("fc-quiz");
+  if (p) p.style.display = m === "practice" ? "block" : "none";
+  if (q) q.style.display = m === "quiz" ? "block" : "none";
+  var mp = document.getElementById("fc-mode-practice");
+  var mq = document.getElementById("fc-mode-quiz");
+  if (mp) mp.classList.toggle("active", m === "practice");
+  if (mq) mq.classList.toggle("active", m === "quiz");
+  if (m === "quiz") fcQzRender();
+}
+function fcRender(){
+  var c = FC[fcIdx];
+  fcJpRevealed = false;
+  try {
+    document.getElementById("fc-emoji").textContent = c.em;
+    document.getElementById("fc-word").textContent = c.word;
+    document.getElementById("fc-pos").textContent = c.pos;
+    document.getElementById("fc-def").textContent = c.def;
+    document.getElementById("fc-sample").innerHTML = c.sample;
+    document.getElementById("fc-jp").textContent = c.jp;
+    document.getElementById("fc-jp").classList.remove("revealed");
+    document.getElementById("fc-counter").textContent = (fcIdx + 1) + " / " + FC.length;
+    document.getElementById("fc-card").classList.remove("flipped");
+  } catch(e){}
+}
+function fcFlip(){ try { document.getElementById("fc-card").classList.toggle("flipped"); } catch(e){} }
+function fcShowJp(){ try { document.getElementById("fc-jp").classList.add("revealed"); } catch(e){} fcJpRevealed = true; }
+function fcPrev(){ fcIdx = (fcIdx - 1 + FC.length) % FC.length; fcRender(); }
+function fcNext(){ fcIdx = (fcIdx + 1) % FC.length; fcRender(); }
+
+/* ─── SB TAB 0 — QUIZ part ─── */
+var qzIdx = 0, qzCorrect = 0, qzAnswered = false;
+function fcQzRender(){
+  var c = FC[qzIdx];
+  try {
+    document.getElementById("qz-emoji").textContent = c.em;
+    document.getElementById("qz-sentence").innerHTML = "Type the word that means: <b>" + esc(c.def) + "</b>";
+    var inp = document.getElementById("qz-input");
+    inp.value = ""; inp.classList.remove("correct", "wrong"); inp.disabled = false;
+    document.getElementById("qz-fb").textContent = "";
+    document.getElementById("qz-counter").textContent = (qzIdx + 1) + " / " + FC.length;
+  } catch(e){}
+  qzAnswered = false;
+}
+function fcQzCheck(){
+  if (qzAnswered) return;
+  var inp = document.getElementById("qz-input");
+  var v = (inp.value || "").trim().toLowerCase();
+  var ans = FC[qzIdx].word.toLowerCase();
+  var fb = document.getElementById("qz-fb");
+  if (v === ans){
+    inp.classList.add("correct"); inp.disabled = true;
+    fb.textContent = "✅ Correct!"; fb.style.color = "var(--green-d)";
+    qzCorrect++;
+  } else {
+    inp.classList.add("wrong");
+    fb.textContent = "❌ Try again — or tap Next to see the word.";
+    fb.style.color = "var(--red)";
+  }
+  qzAnswered = true;
+}
+function fcQzSkip(){ fcQzNext(); }
+function fcQzNext(){
+  if (qzIdx >= FC.length - 1){
+    qzIdx = 0;
+    var fb = document.getElementById("qz-fb");
+    if (fb){ fb.textContent = "🏆 You scored " + qzCorrect + " / " + FC.length + ". Round again!"; }
+    qzCorrect = 0;
+    return;
+  }
+  qzIdx++;
+  fcQzRender();
+}
+
+/* ─── SB TAB 1 — MODEL find tasks ─── */
+TAB_INIT[1] = function(){ /* nothing dynamic */ };
+TAB_RESET[1] = function(){
+  /* clear button states */
+  ["m1","m2","m3","m4"].forEach(function(key){
+    document.querySelectorAll(".find-task .ans button").forEach(function(b){
+      b.classList.remove("correct","wrong");
+    });
+  });
+  findState = {};
+};
+var findState = {};
+function findCheck(btn, ok, key){
+  if (findState[key]) return;
+  if (ok){
+    btn.classList.add("correct");
+    findState[key] = true;
+  } else {
+    btn.classList.add("wrong");
+    setTimeout(function(){ btn.classList.remove("wrong"); }, 500);
+  }
+}
+var findMultiState = {};
+function findMulti(btn, ok, key, targets){
+  if (!findMultiState[key]) findMultiState[key] = { picked: [], targets: targets };
+  if (btn.classList.contains("correct") || btn.classList.contains("wrong")) return;
+  if (ok){
+    btn.classList.add("correct");
+    findMultiState[key].picked.push(btn.textContent.trim());
+  } else {
+    btn.classList.add("wrong");
+    setTimeout(function(){ btn.classList.remove("wrong"); }, 500);
+  }
+}
+
+/* ─── SB TAB 2 — PLAN (buildFourColChart) ─── */
+TAB_INIT[2] = function(){ mountSbChart(); };
+TAB_RESET[2] = function(){ rawDel(KEY_FCC); mountSbChart(); refreshWmapHobby(); refreshRefChart(); };
+function mountSbChart(){
+  try {
+    var host = document.getElementById("leo-chart-sb");
+    if (!host || typeof window.buildFourColChart !== "function") return;
+    host.innerHTML = window.buildFourColChart({
+      id: "fcc-leo-sb",
+      mode: "fill",
+      columns: ["Hobby","What it is","How you do it","Examples"],
+      rowCount: 1,
+      storageKey: KEY_FCC
+    });
+  } catch(e){}
+}
+function leoHobby(hobby){
+  try {
+    var saved = rawLoad(KEY_FCC) || [];
+    if (!saved[0]) saved[0] = ["","","",""];
+    saved[0][0] = hobby;
+    rawSave(KEY_FCC, saved);
+    mountSbChart();
+    refreshWmapHobby();
+  } catch(e){}
+}
+
+/* ─── SB TAB 3 — WRITE (draft + ref chart) ─── */
+TAB_INIT[3] = function(){
+  var ta = document.getElementById("leo-draft-sb");
+  if (!ta) return;
+  ta.value = (rawLoad(KEY_DRAFT_SB) || "") + "";
+  if (ta.value === "null") ta.value = "";
+  updateWcSb();
+  ta.addEventListener("input", function(){
+    try { localStorage.setItem(KEY_DRAFT_SB, ta.value); } catch(e){}
+    updateWcSb();
+  });
+  refreshRefChart();
+};
+TAB_RESET[3] = function(){
+  rawDel(KEY_DRAFT_SB);
+  try { document.getElementById("leo-draft-sb").value = ""; } catch(e){}
+  updateWcSb();
+};
+function updateWcSb(){
+  try {
+    var ta = document.getElementById("leo-draft-sb");
+    var wc = document.getElementById("wc-sb");
+    if (!ta || !wc) return;
+    var v = ta.value || "";
+    var words = v.trim() ? v.trim().split(/\s+/).length : 0;
+    var sentences = v.trim() ? (v.match(/[.!?]+\s|[.!?]+$/g) || []).length : 0;
+    wc.textContent = words + " words · " + sentences + " sentences";
+  } catch(e){}
+}
+function refreshRefChart(){
+  try {
+    var host = document.getElementById("ref-chart-sb");
+    if (!host || typeof window.buildFourColChart !== "function") return;
+    var saved = rawLoad(KEY_FCC);
+    if (!saved || !saved[0] || !saved[0][0]){
+      host.innerHTML = '<div class="ref-empty">Fill the Plan tab first — your chart will show here.</div>';
+      return;
+    }
+    var rows = [[
+      saved[0][0] || "—",
+      saved[0][1] || "—",
+      saved[0][2] || "—",
+      saved[0][3] || "—"
+    ]];
+    host.innerHTML = window.buildFourColChart({
+      id: "fcc-leo-ref",
+      mode: "display",
+      columns: ["Hobby","What it is","How you do it","Examples"],
+      rows: rows
+    });
+  } catch(e){}
+}
+
+/* ─── SB TAB 4 — QUIZ ─── */
+var QZ = [
+  {
+    q: "What is a DEFINITION?",
+    opts: [
+      { t: "A list of many describing words.", ok: false },
+      { t: "Telling WHAT a word means (word + means + meaning).", ok: true },
+      { t: "A sample sentence with a vocab word.", ok: false }
+    ]
+  },
+  {
+    q: "Which phrase INTRODUCES an example?",
+    opts: [
+      { t: "and then", ok: false },
+      { t: "such as", ok: true },
+      { t: "very much", ok: false }
+    ]
+  },
+  {
+    q: "Pick the correct word: The cat is licking ___ paw.",
+    opts: [
+      { t: "its (no apostrophe — belongs to the cat)", ok: true },
+      { t: "it&apos;s (= it is)", ok: false }
+    ]
+  },
+  {
+    q: "After picking a hobby, the writer made a word ___ to gather ideas.",
+    opts: [
+      { t: "map", ok: true },
+      { t: "list", ok: false },
+      { t: "song", ok: false }
+    ]
+  },
+  {
+    q: "The most famous origami design is the Japanese paper ___.",
+    opts: [
+      { t: "dragon", ok: false },
+      { t: "crane", ok: true },
+      { t: "bug", ok: false }
+    ]
+  },
+  {
+    q: "Which is NOT a good example marker for FORMAL writing?",
+    opts: [
+      { t: "for example", ok: false },
+      { t: "such as", ok: false },
+      { t: "like", ok: true }
+    ]
+  }
+];
+var qz4Idx = 0, qz4Score = 0, qz4Answers = [];
+TAB_INIT[4] = function(){ qz4Render(); };
+TAB_RESET[4] = function(){ qz4Idx = 0; qz4Score = 0; qz4Answers = []; lDel("tab-4-score"); qz4Render(); };
+function qz4Render(){
+  var list = document.getElementById("qz4-list");
+  if (!list) return;
+  var html = "";
+  for (var i = 0; i < QZ.length; i++){
+    var q = QZ[i];
+    var answered = qz4Answers[i] != null;
+    html += '<div class="q-card">';
+    html += '<div class="q-prompt">' + (i+1) + '. ' + q.q + '</div>';
+    for (var j = 0; j < q.opts.length; j++){
+      var o = q.opts[j];
+      var cls = "opt";
+      if (answered){
+        cls += " disabled";
+        if (j === qz4Answers[i]) cls += o.ok ? " correct" : " wrong";
+        else if (o.ok) cls += " correct";
+      }
+      html += '<button class="' + cls + '" onclick="qz4Pick(' + i + ',' + j + ')">' + o.t + '</button>';
+    }
+    html += '</div>';
+  }
+  list.innerHTML = html;
+  /* dots */
+  var dots = document.getElementById("qz4-dots");
+  if (dots){
+    var d = "";
+    for (var k = 0; k < QZ.length; k++){
+      var a = qz4Answers[k];
+      var ok = a != null && QZ[k].opts[a].ok;
+      var bad = a != null && !QZ[k].opts[a].ok;
+      d += '<div class="qp-dot ' + (ok ? "ok" : bad ? "bad" : "") + '"></div>';
+    }
+    dots.innerHTML = d;
+  }
+  var pill = document.getElementById("qz4-pill");
+  if (pill) pill.textContent = qz4Score + " / " + QZ.length + " correct";
+  var done = qz4Answers.filter(function(a){ return a != null; }).length === QZ.length;
+  var final = document.getElementById("qz4-final");
+  var finalSc = document.getElementById("qz4-final-sc");
+  if (final && finalSc){
+    if (done){ final.classList.add("show"); finalSc.textContent = qz4Score + " / " + QZ.length; }
+    else final.classList.remove("show");
+  }
+}
+function qz4Pick(qIdx, oIdx){
+  if (qz4Answers[qIdx] != null) return;
+  qz4Answers[qIdx] = oIdx;
+  if (QZ[qIdx].opts[oIdx].ok) qz4Score++;
+  lSave("tab-4-score", qz4Score);
+  qz4Render();
+}
+
+/* ─── WB TAB 0 — 6 STEPS ─── */
+WB_INIT[0] = function(){
+  var saved = lLoad("wb-tab-0-state") || {};
+  document.querySelectorAll("#wb-steps-list .step-card").forEach(function(card){
+    var n = card.getAttribute("data-step");
+    if (saved[n]) card.classList.add("unlocked");
+  });
+};
+WB_RESET[0] = function(){
+  lDel("wb-tab-0-state");
+  document.querySelectorAll("#wb-steps-list .step-card").forEach(function(card){
+    card.classList.remove("unlocked");
+  });
+};
+function wbStepTap(card){
+  if (card.classList.contains("unlocked")) return;
+  card.classList.add("unlocked");
+  var n = card.getAttribute("data-step");
+  var saved = lLoad("wb-tab-0-state") || {};
+  saved[n] = true;
+  lSave("wb-tab-0-state", saved);
+}
+
+/* ─── WB TAB 1 — WORD MAP ─── */
+WB_INIT[1] = function(){
+  var saved = lLoad("wb-tab-1-state") || {};
+  ["q1","q2","q3","q4"].forEach(function(k){
+    var ta = document.getElementById("wm-" + k);
+    if (!ta) return;
+    if (saved[k]) ta.value = saved[k];
+    ta.addEventListener("input", function(){
+      var state = lLoad("wb-tab-1-state") || {};
+      state[k] = ta.value;
+      lSave("wb-tab-1-state", state);
+    });
+  });
+  refreshWmapHobby();
+};
+WB_RESET[1] = function(){
+  lDel("wb-tab-1-state");
+  ["q1","q2","q3","q4"].forEach(function(k){
+    var ta = document.getElementById("wm-" + k);
+    if (ta) ta.value = "";
+  });
+  refreshWmapHobby();
+};
+function refreshWmapHobby(){
+  try {
+    var el = document.getElementById("wm-hobby");
+    if (!el) return;
+    var saved = rawLoad(KEY_FCC);
+    if (saved && saved[0] && saved[0][0]){
+      el.textContent = saved[0][0];
+    } else {
+      el.textContent = "(pick on SB Plan tab)";
+    }
+  } catch(e){}
+}
+
+/* ─── WB TAB 2 + 3 — DEF / EXAMPLES / COMPARE pick chips ─── */
+WB_INIT[2] = function(){};
+WB_RESET[2] = function(){ document.querySelectorAll("#wtc2 .def-task .opts button").forEach(function(b){ b.classList.remove("correct","wrong","locked"); }); };
+WB_INIT[3] = function(){};
+WB_RESET[3] = function(){ document.querySelectorAll("#wtc3 .def-task .opts button").forEach(function(b){ b.classList.remove("correct","wrong","locked"); }); };
+function defPick(btn, tk, ok){
+  var task = btn.closest(".def-task");
+  if (!task) return;
+  if (task.querySelector(".opts button.correct")) return;
+  if (ok){
+    btn.classList.add("correct");
+    task.querySelectorAll(".opts button").forEach(function(b){ b.classList.add("locked"); });
+  } else {
+    btn.classList.add("wrong");
+    setTimeout(function(){ btn.classList.remove("wrong"); }, 500);
+  }
+}
+function defMulti(btn, tk, ok){
+  if (btn.classList.contains("correct") || btn.classList.contains("wrong")) return;
+  if (ok){
+    btn.classList.add("correct");
+  } else {
+    btn.classList.add("wrong");
+    setTimeout(function(){ btn.classList.remove("wrong"); }, 500);
+  }
+}
+
+/* ─── WB TAB 4 — DRAFT ─── */
+WB_INIT[4] = function(){
+  var saved = lLoad("wb-tab-4-state") || {};
+  if (saved.topic){
+    document.querySelectorAll(".topic-chip").forEach(function(c){
+      if (c.getAttribute("data-topic") === saved.topic) c.classList.add("sel");
+    });
+  }
+  ["name","def","ex1","ex2"].forEach(function(k){
+    var el = document.getElementById("wb-pl-" + k);
+    if (!el) return;
+    if (saved[k] != null) el.value = saved[k];
+    el.addEventListener("input", function(){
+      var s = lLoad("wb-tab-4-state") || {};
+      s[k] = el.value;
+      lSave("wb-tab-4-state", s);
+    });
+  });
+  var ta = document.getElementById("wb-draft");
+  if (ta){
+    ta.value = saved.draft || "";
+    updateWcWb();
+    ta.addEventListener("input", function(){
+      var s = lLoad("wb-tab-4-state") || {};
+      s.draft = ta.value;
+      lSave("wb-tab-4-state", s);
+      updateWcWb();
+    });
+  }
+};
+WB_RESET[4] = function(){
+  lDel("wb-tab-4-state");
+  document.querySelectorAll(".topic-chip").forEach(function(c){ c.classList.remove("sel"); });
+  ["name","def","ex1","ex2"].forEach(function(k){
+    var el = document.getElementById("wb-pl-" + k);
+    if (el) el.value = "";
+  });
+  var ta = document.getElementById("wb-draft"); if (ta) ta.value = "";
+  updateWcWb();
+};
+function wbTopic(btn){
+  document.querySelectorAll(".topic-chip").forEach(function(c){ c.classList.remove("sel"); });
+  btn.classList.add("sel");
+  var t = btn.getAttribute("data-topic") || "";
+  var s = lLoad("wb-tab-4-state") || {};
+  s.topic = t;
+  lSave("wb-tab-4-state", s);
+}
+function updateWcWb(){
+  try {
+    var ta = document.getElementById("wb-draft");
+    var wc = document.getElementById("wc-wb");
+    if (!ta || !wc) return;
+    var v = ta.value || "";
+    var words = v.trim() ? v.trim().split(/\s+/).length : 0;
+    var sentences = v.trim() ? (v.match(/[.!?]+\s|[.!?]+$/g) || []).length : 0;
+    wc.textContent = words + " words · " + sentences + " sentences";
+  } catch(e){}
+}
+
+/* ─── BOOT ─── */
+document.addEventListener("DOMContentLoaded", function(){
+  try {
+    refreshProg();
+    var last = lLoad("last-mode");
+    if (last === "sb") enterMode("sb");
+    else if (last === "wb") enterMode("wb");
+    /* else: stay on landing */
+  } catch(e){ console.warn("boot", e); }
+});
+</script>
+
+</body>
+</html>

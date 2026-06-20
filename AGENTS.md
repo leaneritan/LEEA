@@ -266,7 +266,7 @@ Search results must show clear type/source tags such as Vocabulary, Academic, Gr
 
 Reference browse/search controls should show useful counts, and mixed search results should use subtle type-aware color cues such as card edges and badges for Vocabulary, Academic, Content, Related, Glossary, Grammar, and Junior High.
 
-Reference level colors must stay consistent and visually distinct everywhere levels are listed: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The source tree nests as `Level -> Unit -> Vocabulary/Grammar`; Vocabulary nests Vocabulary 1, Vocabulary 2, Academic, and Glossary, while Grammar nests grammar-point cards. Keep the hierarchy visually obvious with different styling for level, unit, category, and subgroup rows.
+Reference level colors must stay consistent and visually distinct everywhere levels are listed: Level 1 green, Level 2 teal, Level 3 blue, Level 4 purple, Level 5 orange, Level 6 red. The source tree, Vocabulary, Grammar, I Know, and I Don't Know views all nest as `Course -> Level -> Unit -> Vocabulary/Grammar`; Vocabulary nests Vocabulary 1, Vocabulary 2, Academic, and Glossary, while Grammar nests grammar-point cards. Keep the hierarchy visually obvious with different styling for level, unit, category, and subgroup rows.
 
 For checkpoint content, the Reference source tree nests it under the level band after the unit entries, for example `Level 4 -> Units 7-9 -> Review 7-9` and `Extra Reading 7-9`. New checkpoint vocabulary, glossary, academic, reading, and grammar-support items should keep their `OW<level>-R<start>-<end>` or `OW<level>-ER<start>-<end>` source tags.
 

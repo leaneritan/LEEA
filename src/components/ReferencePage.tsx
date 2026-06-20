@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { BookOpen, ExternalLink, Search } from "lucide-react";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
 import {
@@ -46,6 +47,15 @@ type SearchResult =
   | {
       kind: "junior-high";
     } & SearchResultBase;
+type ReferenceNode<T> = {
+  id: string;
+  label: string;
+  caption?: string;
+  count: number;
+  items: T[];
+  children: ReferenceNode<T>[];
+};
+type ReferenceSourceItem = (typeof vocabularyItems)[number] | (typeof grammarPoints)[number];
 
 export function ReferencePage() {
   const [mode, setMode] = useState<ReferenceMode>("source");
@@ -514,9 +524,11 @@ function ReferenceCards({
         <p>{help}</p>
       </div>
 
-      <div className="card-grid">
-        {words.map((word) => (
-          <Link className={`mini-card mini-card-${word.type}`} href={`/reference/vocabulary/${word.id}`} key={word.id}>
+      <NestedReferenceTree
+        emptyLabel="No vocabulary cards in this view yet."
+        items={words}
+        renderItem={(word) => (
+          <Link className={`nested-card nested-card-${word.type}`} href={`/reference/vocabulary/${word.id}`} key={word.id}>
             <div className="mini-top">
               <strong>{word.word}</strong>
               <span>{word.emoji}</span>
@@ -529,8 +541,9 @@ function ReferenceCards({
               {isWordKnown(word, knownWordSet) ? <span className="known-tag">KNOWN</span> : <span>LEARNING</span>}
             </div>
           </Link>
-        ))}
-      </div>
+        )}
+        type="vocabulary"
+      />
     </div>
   );
 }
@@ -626,9 +639,11 @@ function GrammarCards({ grammar }: { grammar: typeof grammarPoints }) {
         <p>All grammar points as reusable charts and cards.</p>
       </div>
 
-      <div className="card-grid">
-        {grammar.map((item) => (
-          <Link className="mini-card grammar" href={`/reference/grammar/${item.id}`} key={item.id}>
+      <NestedReferenceTree
+        emptyLabel="No grammar cards in this view yet."
+        items={grammar}
+        renderItem={(item) => (
+          <Link className="nested-card nested-card-grammar" href={`/reference/grammar/${item.id}`} key={item.id}>
             <div className="mini-top">
               <strong>{item.title}</strong>
               <BookOpen size={24} />
@@ -640,8 +655,196 @@ function GrammarCards({ grammar }: { grammar: typeof grammarPoints }) {
               {item.lessonStatus === "live" ? <span className="known-tag">LIVE</span> : <span>DRAFT</span>}
             </div>
           </Link>
-        ))}
-      </div>
+        )}
+        type="grammar"
+      />
     </div>
   );
+}
+
+function NestedReferenceTree<T extends ReferenceSourceItem>({
+  emptyLabel,
+  items,
+  renderItem,
+  type
+}: {
+  emptyLabel: string;
+  items: T[];
+  renderItem: (item: T) => ReactNode;
+  type: "vocabulary" | "grammar";
+}) {
+  const tree = useMemo<ReferenceNode<T>[]>(() => buildReferenceTree(items, type), [items, type]);
+
+  if (!items.length) return <div className="tree-placeholder nested-empty">{emptyLabel}</div>;
+
+  return (
+    <div className="nested-reference-tree">
+      {tree.map((course) => (
+        <details className="tree-course nested-course" key={course.id} open>
+          <summary>
+            <span>{course.label}</span>
+            <span className="nested-count">{course.count.toLocaleString()}</span>
+          </summary>
+          {course.children.map((level) => (
+            <details className={`source-level source-level-${level.id}`} key={level.id} open>
+              <summary className="level-summary">
+                <span>{level.label}</span>
+                <small>{level.caption}</small>
+                <span className="nested-count">{level.count.toLocaleString()}</span>
+              </summary>
+              {level.children.map((unit) => (
+                <details className="tree-unit nested-unit" key={unit.id} open>
+                  <summary>
+                    <span>{unit.label}</span>
+                    <span className="nested-count">{unit.count.toLocaleString()}</span>
+                  </summary>
+                  {unit.children.map((category) => (
+                    <details className={`tree-category nested-category nested-category-${category.id}`} key={category.id} open>
+                      <summary>
+                        <span>{category.label}</span>
+                        <span className="nested-count">{category.count.toLocaleString()}</span>
+                      </summary>
+                      {category.children.map((subgroup) => (
+                        <details className="tree-subgroup nested-subgroup" key={subgroup.id} open>
+                          <summary>
+                            <span>{subgroup.label}</span>
+                            <span className="nested-count">{subgroup.count.toLocaleString()}</span>
+                          </summary>
+                          <div className="nested-card-list">
+                            {subgroup.items.map((item) => renderItem(item))}
+                          </div>
+                        </details>
+                      ))}
+                    </details>
+                  ))}
+                </details>
+              ))}
+            </details>
+          ))}
+        </details>
+      ))}
+    </div>
+  );
+}
+
+function buildReferenceTree<T extends ReferenceSourceItem>(items: T[], type: "vocabulary" | "grammar"): ReferenceNode<T>[] {
+  const courses = new Map<string, ReferenceNode<T>>();
+
+  items.forEach((item) => {
+    const source = getPrimaryReferenceSource(item);
+    const courseId = source.course;
+    const level = source.level ?? getItemLevel(item) ?? 0;
+    const unit = source.unit ?? getItemUnit(item) ?? 0;
+    const categoryKey = type === "grammar" ? "grammar" : "vocabulary";
+    const subgroupKey = type === "grammar" ? getGrammarSubgroup(item as (typeof grammarPoints)[number]) : getVocabularySubgroup(item as (typeof vocabularyItems)[number]);
+    const course = getOrCreateNode(courses, courseId, formatCourseLabel(courseId));
+    const levelNode = getOrCreateNode(course.children, String(level), `Level ${level || "Unassigned"}`, getLevelCaption(level));
+    const unitNode = getOrCreateNode(levelNode.children, String(unit), formatUnitLabel(unit, level));
+    const category = getOrCreateNode(unitNode.children, categoryKey, type === "grammar" ? "Grammar" : "Vocabulary");
+    const subgroup = getOrCreateNode(category.children, subgroupKey.id, subgroupKey.label);
+
+    subgroup.items.push(item);
+    [course, levelNode, unitNode, category, subgroup].forEach((node) => {
+      node.count += 1;
+    });
+  });
+
+  return sortNodes(Array.from(courses.values()));
+}
+
+function getOrCreateNode<T>(mapOrList: Map<string, ReferenceNode<T>> | ReferenceNode<T>[], id: string, label: string, caption?: string) {
+  if (mapOrList instanceof Map) {
+    const existing = mapOrList.get(id);
+    if (existing) return existing;
+    const node: ReferenceNode<T> = { id, label, caption, count: 0, items: [], children: [] };
+    mapOrList.set(id, node);
+    return node;
+  }
+
+  const existing = mapOrList.find((node) => node.id === id);
+  if (existing) return existing;
+  const node: ReferenceNode<T> = { id, label, caption, count: 0, items: [], children: [] };
+  mapOrList.push(node);
+  return node;
+}
+
+function getPrimaryReferenceSource(item: ReferenceSourceItem) {
+  if ("sources" in item) {
+    return item.sources.find((source) => source.course === "our-world") ?? item.sources[0];
+  }
+
+  return {
+    course: item.course,
+    level: item.level,
+    unit: item.unit,
+    component: item.component,
+    tag: item.tag
+  };
+}
+
+function getItemLevel(item: ReferenceSourceItem) {
+  return "level" in item ? item.level : undefined;
+}
+
+function getItemUnit(item: ReferenceSourceItem) {
+  return "unit" in item ? item.unit : undefined;
+}
+
+function getVocabularySubgroup(item: (typeof vocabularyItems)[number]) {
+  if (item.type === "academic") return { id: "academic", label: "Academic" };
+  if (item.type === "content" || item.type === "related" || item.type === "glossary") return { id: "glossary", label: "Glossary" };
+  if (item.sources.some((source) => source.tag.includes("-V2"))) return { id: "vocabulary-2", label: "Vocabulary 2" };
+  if (item.sources.some((source) => source.tag.includes("-V1"))) return { id: "vocabulary-1", label: "Vocabulary 1" };
+  return { id: "vocabulary", label: "Vocabulary" };
+}
+
+function getGrammarSubgroup(item: (typeof grammarPoints)[number]) {
+  return { id: item.component, label: formatGrammarComponent(item.component) };
+}
+
+function sortNodes<T>(nodes: ReferenceNode<T>[]): ReferenceNode<T>[] {
+  return nodes
+    .sort((a, b) => sortReferenceId(a.id) - sortReferenceId(b.id) || a.label.localeCompare(b.label))
+    .map((node) => ({ ...node, children: sortNodes(node.children) }));
+}
+
+function sortReferenceId(id: string) {
+  if (id === "our-world") return 1;
+  if (id === "joyful-work") return 2;
+  if (id === "special-training") return 3;
+  if (id === "vocabulary") return 1;
+  if (id === "grammar") return 2;
+  if (id === "vocabulary-1") return 1;
+  if (id === "vocabulary-2") return 2;
+  if (id === "academic") return 3;
+  if (id === "glossary") return 4;
+  const numeric = Number(id);
+  return Number.isFinite(numeric) ? numeric : 99;
+}
+
+function formatCourseLabel(course: string | undefined) {
+  if (course === "our-world") return "Our World";
+  if (course === "joyful-work") return "Joyful Work";
+  if (course === "special-training") return "Training Ground";
+  return "Unknown Course";
+}
+
+function formatUnitLabel(unit: number | undefined, level: number | undefined) {
+  if (!unit) return "Unassigned Unit";
+  if (level === 4 && unit === 7) return "Unit 7 - Good Idea!";
+  if (level === 4 && unit === 8) return "Unit 8 - That's Really Interesting!";
+  return `Unit ${unit}`;
+}
+
+function getLevelCaption(level: number | undefined) {
+  return sourceLevels.find((item) => item.level === level)?.caption ?? "Reference";
+}
+
+function formatGrammarComponent(component: string) {
+  if (component === "grammar-1") return "Grammar 1";
+  if (component === "grammar-2") return "Grammar 2";
+  return component
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }

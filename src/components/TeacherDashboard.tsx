@@ -34,12 +34,10 @@ function componentAccent(component: string): string {
   return "var(--hair)";
 }
 
-type TeacherBand = {
+type TeacherLevel = {
   id: string;
   courseLabel: string;
   level?: number;
-  bandStart?: number;
-  bandEnd?: number;
   unitGroups: ReturnType<typeof getLessonGroups>;
 };
 
@@ -62,11 +60,10 @@ function getUnitBand(unit?: number) {
   return { start, end: start + 2 };
 }
 
-function getTeacherBands(): TeacherBand[] {
+function getTeacherLevels(): TeacherLevel[] {
   const unitGroups = getLessonGroups(lessons);
-  const bands = unitGroups.reduce<Record<string, TeacherBand>>((current, group) => {
-    const band = getUnitBand(group.unit);
-    const id = `${group.course}-l${group.level ?? "na"}-u${band.start ?? "na"}-${band.end ?? "na"}`;
+  const levels = unitGroups.reduce<Record<string, TeacherLevel>>((current, group) => {
+    const id = `${group.course}-l${group.level ?? "na"}`;
     const existing = current[id];
 
     if (existing) {
@@ -78,29 +75,29 @@ function getTeacherBands(): TeacherBand[] {
       id,
       courseLabel: group.courseLabel,
       level: group.level,
-      bandStart: band.start,
-      bandEnd: band.end,
       unitGroups: [group]
     };
     return current;
   }, {});
 
-  return Object.values(bands).map((band) => ({
-    ...band,
-    unitGroups: band.unitGroups.sort((a, b) => (a.unit ?? 0) - (b.unit ?? 0))
+  return Object.values(levels).map((level) => ({
+    ...level,
+    unitGroups: level.unitGroups.sort((a, b) => (a.unit ?? 0) - (b.unit ?? 0))
   }));
 }
 
 export function TeacherDashboard() {
   const [progress, setProgress] = useState<LessonProgressMap>({});
   const [assignments, setAssignments] = useState<AssignmentMap>({});
+  const [assignmentsReady, setAssignmentsReady] = useState(false);
   const [progressVersion, setProgressVersion] = useState(0);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
-  const groups = useMemo(() => getTeacherBands(), []);
+  const groups = useMemo(() => getTeacherLevels(), []);
 
   useEffect(() => {
     function refreshAll() {
       setAssignments(readAssignments(learnerLessons));
+      setAssignmentsReady(true);
       setProgressVersion((v) => v + 1);
     }
 
@@ -138,6 +135,14 @@ export function TeacherDashboard() {
   const doneCount = useMemo(
     () => getDoneLessonCount(teacherLessons.map((l) => l.id), progress),
     [progress]
+  );
+
+  const nextLearnerToAssign = useMemo(
+    () =>
+      learnerLessons.find(
+        (lesson) => !assignments[lesson.id] && !getLearnerAppProgress(lesson.source).done
+      ),
+    [assignments, progressVersion]
   );
 
   function setLessonDone(lessonId: string, done: boolean) {
@@ -187,6 +192,35 @@ export function TeacherDashboard() {
         </div>
       </section>
 
+      {assignmentsReady && (
+        <section className="teacher-next-assignment" aria-label="Next Leo app to assign">
+          {nextLearnerToAssign ? (
+            <>
+              <div>
+                <span className="teacher-next-label">Next to assign</span>
+                <h2>{nextLearnerToAssign.title}</h2>
+                <p>
+                  {nextLearnerToAssign.course === "our-world" ? "Our World" : nextLearnerToAssign.course} · Level {nextLearnerToAssign.level} · Unit {nextLearnerToAssign.unit}
+                </p>
+              </div>
+              <div className="teacher-next-actions">
+                <Link className="teacher-done-button" href={`/lessons/${nextLearnerToAssign.id}`}>
+                  Open Leo App <ExternalLink size={15} />
+                </Link>
+                <button className="teacher-open-button" onClick={() => assignLesson(nextLearnerToAssign.id)} type="button">
+                  <Circle size={16} /> Assign
+                </button>
+              </div>
+            </>
+          ) : (
+            <div>
+              <span className="teacher-next-label">Assignments ready</span>
+              <h2>No Leo apps are waiting to be assigned.</h2>
+            </div>
+          )}
+        </section>
+      )}
+
       <div className="teacher-group-grid">
         {groups.map((group) => {
           const teacherInGroup = group.unitGroups.flatMap((unitGroup) => unitGroup.lessons.filter((l) => l.mode === "teacher"));
@@ -201,15 +235,22 @@ export function TeacherDashboard() {
                   {group.courseLabel}
                 </span>
                 <h2>
-                  Level {group.level} - Units {group.bandStart}-{group.bandEnd}
+                  Level {group.level}
                 </h2>
                 <small>{groupDone} / {teacherInGroup.length} taught</small>
               </button>
 
               {isOpen ? (
                 <div className="teacher-lesson-list">
-                  {group.unitGroups.map((unitGroup) => (
-                    <div className="teacher-unit-section" key={unitGroup.id}>
+                  {group.unitGroups.map((unitGroup, unitIndex) => {
+                    const band = getUnitBand(unitGroup.unit);
+                    const nextUnit = group.unitGroups[unitIndex + 1]?.unit;
+                    const nextBand = getUnitBand(nextUnit);
+                    const isLastUnitInVisibleBand = nextBand.start !== band.start;
+
+                    return (
+                      <div className="teacher-level-sequence" key={unitGroup.id}>
+                        <div className="teacher-unit-section">
                       <div className="teacher-unit-label">
                         <span>Unit {unitGroup.unit}</span>
                       </div>
@@ -269,6 +310,9 @@ export function TeacherDashboard() {
                               {learnerCounterpart && (
                                 <div className="app-controls">
                                   <span className="app-controls-label">Leo&apos;s App</span>
+                                  <Link className="teacher-done-button" href={`/lessons/${learnerCounterpart.id}`}>
+                                    Open Leo App <ExternalLink size={15} />
+                                  </Link>
                                   {!assignment ? (
                                     <button className="teacher-done-button" onClick={() => assignLesson(learnerCounterpart.id)} type="button">
                                       <Circle size={16} /> Assign
@@ -292,40 +336,43 @@ export function TeacherDashboard() {
                           </article>
                         );
                       })}
-                    </div>
-                  ))}
-
-                  <div className="teacher-checkpoint-section">
-                    <div className="teacher-unit-label checkpoint">
-                      <span>Checkpoint after Units {group.bandStart}-{group.bandEnd}</span>
-                    </div>
-                    {checkpointComponents.map((checkpoint) => {
-                      const accent = componentAccent(checkpoint.component);
-                      return (
-                        <article
-                          className="teacher-lesson-card planned"
-                          key={checkpoint.component}
-                          style={{ borderLeft: `6px solid ${accent}` }}
-                        >
-                          <div className="teacher-lesson-main">
-                            <div className="teacher-card-top">
-                              <span style={{ color: accent }}>{checkpoint.component}</span>
+                        </div>
+                        {isLastUnitInVisibleBand && (
+                          <div className="teacher-checkpoint-section">
+                            <div className="teacher-unit-label checkpoint">
+                              <span>Checkpoint after Units {band.start}-{band.end}</span>
                             </div>
-                            <h3>
-                              {checkpoint.title} {group.bandStart}-{group.bandEnd}
-                            </h3>
-                            <p>{checkpoint.subtitle}</p>
-                            <small>Planned checkpoint - teacher deck and Leo app will appear here when generated</small>
+                            {checkpointComponents.map((checkpoint) => {
+                              const accent = componentAccent(checkpoint.component);
+                              return (
+                                <article
+                                  className="teacher-lesson-card planned"
+                                  key={checkpoint.component}
+                                  style={{ borderLeft: `6px solid ${accent}` }}
+                                >
+                                  <div className="teacher-lesson-main">
+                                    <div className="teacher-card-top">
+                                      <span style={{ color: accent }}>{checkpoint.component}</span>
+                                    </div>
+                                    <h3>
+                                      {checkpoint.title} {band.start}-{band.end}
+                                    </h3>
+                                    <p>{checkpoint.subtitle}</p>
+                                    <small>Planned checkpoint - teacher deck and Leo app will appear here when generated</small>
+                                  </div>
+                                  <div className="teacher-lesson-actions">
+                                    <button className="teacher-done-button" disabled type="button">
+                                      Planned
+                                    </button>
+                                  </div>
+                                </article>
+                              );
+                            })}
                           </div>
-                          <div className="teacher-lesson-actions">
-                            <button className="teacher-done-button" disabled type="button">
-                              Planned
-                            </button>
-                          </div>
-                        </article>
-                      );
-                    })}
-                  </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : null}
             </section>

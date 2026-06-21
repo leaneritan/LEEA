@@ -42,8 +42,9 @@ Checkpoint lessons belong to the band, not to the last unit in the band. Use ban
 REGISTER
 17. Add teacher + learner JSON entries under
     content/subjects/english/courses/<course>/level-<n>/unit-<n>/lessons/
-18. Verify src/data/lessons.ts auto-imports them
-19. Run npm run validate:content (final)
+18. Name them `<component>.teacher.json` and `<component>.learner.json`
+19. Import them in `src/data/lessons.ts`
+20. Run npm run validate:content (final)
 ```
 
 ## Which doc covers which step

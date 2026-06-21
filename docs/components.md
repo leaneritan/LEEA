@@ -8,6 +8,8 @@ When a new component type is built for the first time, lock its module list here
 
 - Teacher file: `public/lessons/<lesson-id>.html`
 - Leo file:    `public/learn/<lesson-id>.html`
+- Teacher lesson record: `content/.../lessons/<component>.teacher.json`
+- Leo lesson record: `content/.../lessons/<component>.learner.json`
 - Lesson IDs:  `ow-l<level>-u<unit>-<component>` e.g. `ow-l4-u8-grammar-1`
 - Pairing rule: teacher `<component>` pairs with learner `<component>-app` in the same level/unit. The validator enforces this.
 
@@ -107,7 +109,7 @@ Reference: `public/learn/ow-l4-u8-opener.html`
 | m6 | Hobby or Not? / Theme Sorter | Sort items into two buckets |
 | m7 | Final Quiz | Multiple-choice quiz, score saved |
 
-Source JSON shape — see `content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener-learner.json`. `moduleCount: 7`, `moduleKeyFormat: m{n}-done`, `captionKey: m5-caption`.
+Source JSON shape — see `content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.learner.json`. `moduleCount: 7`, `moduleKeyFormat: m{n}-done`, `captionKey: m5-caption`.
 
 ### vocab-1 (LOCKED)
 

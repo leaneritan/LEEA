@@ -1,18 +1,18 @@
-import unit8Opener from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.json";
-import unit8OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener-learner.json";
-import unit8Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab1.json";
-import unit8Vocab1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab1-learner.json";
-import unit8Song from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/song.json";
-import unit8SongLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/song-learner.json";
-import unit8Grammar1 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/grammar1.json";
-import unit8Grammar1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/grammar1-learner.json";
-import unit8Vocab2 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab2.json";
-import unit8Vocab2Learner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab2-learner.json";
-import unit8Grammar2 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/grammar2.json";
-import unit8Reading from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/reading.json";
-import unit8ReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/reading-learner.json";
-import unit8Writing from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/writing.json";
-import unit8WritingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/writing-learner.json";
+import unit8Opener from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.teacher.json";
+import unit8OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.learner.json";
+import unit8Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab1.teacher.json";
+import unit8Vocab1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab1.learner.json";
+import unit8Song from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/song.teacher.json";
+import unit8SongLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/song.learner.json";
+import unit8Grammar1 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/grammar1.teacher.json";
+import unit8Grammar1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/grammar1.learner.json";
+import unit8Vocab2 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab2.teacher.json";
+import unit8Vocab2Learner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab2.learner.json";
+import unit8Grammar2 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/grammar2.teacher.json";
+import unit8Reading from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/reading.teacher.json";
+import unit8ReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/reading.learner.json";
+import unit8Writing from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/writing.teacher.json";
+import unit8WritingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/writing.learner.json";
 import type { Lesson } from "./types";
 
 export const lessons: Lesson[] = [

@@ -229,6 +229,14 @@ const lessonsTsPath = "src/data/lessons.ts";
 const lessonsTsSource = fs.readFileSync(path.join(root, lessonsTsPath), "utf8");
 
 for (const lesson of lessons) {
+  if (lesson.mode === "teacher" && !lesson.file.endsWith(".teacher.json")) {
+    fail(`${lesson.file} (${lesson.id}) is a teacher lesson and must use the .teacher.json filename suffix`);
+  }
+
+  if (lesson.mode === "learner" && !lesson.file.endsWith(".learner.json")) {
+    fail(`${lesson.file} (${lesson.id}) is a learner lesson and must use the .learner.json filename suffix`);
+  }
+
   if (!lessonsTsSource.includes(`/${lesson.file}`)) {
     fail(`${lesson.file} (${lesson.id}) is not imported by ${lessonsTsPath}`);
   }

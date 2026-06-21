@@ -1,0 +1,182 @@
+/**
+ * ref-data.ts — UI-ready selectors for the new Reference surfaces.
+ *
+ * Transforms the existing VocabularyItem / GrammarPoint exports into the
+ * design-time shapes (WordEntry / AcademicEntry / GrammarEntry) via the
+ * adapters in src/data/reference-shapes.ts. Per-unit filtered exports are
+ * derived here so each surface (Browse, Search, cards) imports only what
+ * it needs.
+ */
+
+import { grammarPoints, vocabularyItems } from "@/data/reference";
+import {
+  toAcademicEntry,
+  toGrammarEntry,
+  toWordEntry,
+  type AcademicEntry,
+  type GrammarEntry,
+  type WordEntry
+} from "@/data/reference-shapes";
+
+/* ─── all words (vocab + academic + content + glossary + related) ─── */
+export const allWords: WordEntry[] = vocabularyItems.map(toWordEntry);
+
+export function getWordById(id: string): WordEntry | undefined {
+  return allWords.find((entry) => entry.id === id);
+}
+
+/* ─── academic-only (richer card) ─── */
+export const academicWords: AcademicEntry[] = vocabularyItems
+  .map(toAcademicEntry)
+  .filter((entry): entry is AcademicEntry => entry !== null);
+
+export function getAcademicById(id: string): AcademicEntry | undefined {
+  return academicWords.find((entry) => entry.id === id);
+}
+
+/* ─── grammar points ─── */
+export const allGrammar: GrammarEntry[] = grammarPoints.map(toGrammarEntry);
+
+export function getGrammarEntryById(id: string): GrammarEntry | undefined {
+  return allGrammar.find((entry) => entry.grammarId === id);
+}
+
+/* ─── source-tree shape: course → level → unit → groups ─── */
+export type TreeUnit = {
+  unit: number;
+  unitTitle: string;
+  vocabGroups: Array<{ label: string; words: WordEntry[] }>;
+  grammar: GrammarEntry[];
+};
+export type TreeLevel = {
+  level: number;
+  units: TreeUnit[];
+  active: boolean;
+};
+export type TreeCourse = {
+  course: "our-world" | "joyful-work" | "junior-high";
+  label: string;
+  color: string;
+  levels: TreeLevel[];
+};
+
+/* Build the source tree dynamically from what's in the data. We only show
+   units that actually have words/grammar — no empty placeholders. */
+export const sourceTree: TreeCourse[] = buildSourceTree();
+
+function buildSourceTree(): TreeCourse[] {
+  /* Our World — group by level, then unit */
+  const byUnit = new Map<string, { level: number; unit: number; unitTitle: string; words: WordEntry[]; grammar: GrammarEntry[] }>();
+
+  for (const word of allWords) {
+    for (const source of word.sources) {
+      if (source.course !== "our-world" || source.level == null || source.unit == null) continue;
+      const key = `${source.level}-${source.unit}`;
+      const bucket =
+        byUnit.get(key) ?? {
+          level: source.level,
+          unit: source.unit,
+          unitTitle: "",
+          words: [],
+          grammar: []
+        };
+      if (!bucket.words.includes(word)) bucket.words.push(word);
+      byUnit.set(key, bucket);
+    }
+  }
+
+  for (const grammar of allGrammar) {
+    if (grammar.course !== "our-world") continue;
+    const key = `${grammar.level}-${grammar.unit}`;
+    const bucket =
+      byUnit.get(key) ?? {
+        level: grammar.level,
+        unit: grammar.unit,
+        unitTitle: "",
+        words: [],
+        grammar: []
+      };
+    if (!bucket.grammar.includes(grammar)) bucket.grammar.push(grammar);
+    byUnit.set(key, bucket);
+  }
+
+  /* Look up unit titles from the source JSON */
+  const unitTitleHints: Record<string, string> = {
+    "4-7": "Let's Explore!",
+    "4-8": "That's Really Interesting!"
+  };
+
+  const levels = new Map<number, TreeLevel>();
+  for (const bucket of byUnit.values()) {
+    bucket.unitTitle = unitTitleHints[`${bucket.level}-${bucket.unit}`] ?? `Unit ${bucket.unit}`;
+    const level =
+      levels.get(bucket.level) ?? { level: bucket.level, units: [], active: bucket.level === 4 };
+    level.units.push({
+      unit: bucket.unit,
+      unitTitle: bucket.unitTitle,
+      vocabGroups: groupWordsByComponent(bucket.words),
+      grammar: bucket.grammar
+    });
+    levels.set(bucket.level, level);
+  }
+  for (const level of levels.values()) level.units.sort((a, b) => a.unit - b.unit);
+
+  const ow: TreeCourse = {
+    course: "our-world",
+    label: "Our World",
+    color: "var(--ref-course-ow)",
+    levels: Array.from(levels.values()).sort((a, b) => a.level - b.level)
+  };
+
+  return [ow];
+}
+
+function groupWordsByComponent(words: WordEntry[]): TreeUnit["vocabGroups"] {
+  const groups: Record<string, WordEntry[]> = {
+    "Vocabulary 1": [],
+    "Vocabulary 2": [],
+    Academic: [],
+    Glossary: []
+  };
+  for (const word of words) {
+    const hasV1 = word.sources.some((s) => s.tag.endsWith("-V1"));
+    const hasV2 = word.sources.some((s) => s.tag.endsWith("-V2"));
+    const isAcademic = word.type === "academic";
+    if (isAcademic) groups.Academic.push(word);
+    else if (hasV1) groups["Vocabulary 1"].push(word);
+    else if (hasV2) groups["Vocabulary 2"].push(word);
+    else groups.Glossary.push(word);
+  }
+  return Object.entries(groups)
+    .filter(([, list]) => list.length > 0)
+    .map(([label, list]) => ({ label, words: list }));
+}
+
+/* ─── known split — for I Know / I Don't Know cuts ─── */
+export function splitKnown(words: WordEntry[], knownSet: Set<string>) {
+  const known: WordEntry[] = [];
+  const unknown: WordEntry[] = [];
+  for (const word of words) {
+    if (knownSet.has(word.id)) known.push(word);
+    else unknown.push(word);
+  }
+  return { known, unknown };
+}
+
+/* ─── group words by source course (for I Know chips) ─── */
+export function groupByCourse(words: WordEntry[]) {
+  const groups: Record<string, WordEntry[]> = {
+    "our-world": [],
+    "joyful-work": [],
+    "junior-high": []
+  };
+  for (const word of words) {
+    const primary = word.sources[0]?.course ?? "our-world";
+    groups[primary]?.push(word);
+  }
+  return [
+    { key: "our-world", label: "Our World", color: "var(--ref-course-ow)", words: groups["our-world"] },
+    { key: "joyful-work", label: "Joyful Work", color: "var(--ref-course-jw)", words: groups["joyful-work"] },
+    { key: "junior-high", label: "Junior High", color: "var(--ref-course-jh)", words: groups["junior-high"] }
+  ].filter((group) => group.words.length > 0);
+}

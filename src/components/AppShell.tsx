@@ -8,6 +8,7 @@ import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getOpenAssignmentCount, readAssignments } from "@/data/assignments";
 import { learnerLessons } from "@/data/lessons";
+import { useJapaneseSetting } from "@/components/useJapaneseSetting";
 
 type NavKey = "home" | "teacher" | "progress" | "english" | "assignments" | "reference" | "search" | "profile" | "settings";
 
@@ -40,7 +41,7 @@ export function AppShell({
   crumbs: string[];
   children: ReactNode;
 }) {
-  const [japaneseOn, setJapaneseOn] = useState(false);
+  const [japaneseOn, setJapaneseOn] = useJapaneseSetting();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [assignmentsLeft, setAssignmentsLeft] = useState<number | null>(null);
   const pathname = usePathname();

@@ -1,11 +1,10 @@
 import { AppShell } from "@/components/AppShell";
-import { ReferencePage } from "@/components/ReferencePage";
+import { ReferenceBrowse } from "@/components/reference/ReferenceBrowse";
 
 export default function ReferenceRoute() {
   return (
-    <AppShell active="reference" crumbs={["Home", "English", "Reference"]}>
-      <ReferencePage />
+    <AppShell active="reference" crumbs={["Reference", "Browse"]}>
+      <ReferenceBrowse />
     </AppShell>
   );
 }
-

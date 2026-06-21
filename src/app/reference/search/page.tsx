@@ -1,10 +1,10 @@
 import { AppShell } from "@/components/AppShell";
-import { ReferenceSearchPage } from "@/components/ReferencePage";
+import { ReferenceSearch } from "@/components/reference/ReferenceSearch";
 
 export default function ReferenceSearchRoute() {
   return (
-    <AppShell active="search" crumbs={["Home", "English", "Reference", "Search"]}>
-      <ReferenceSearchPage />
+    <AppShell active="search" crumbs={["Reference", "Search"]}>
+      <ReferenceSearch />
     </AppShell>
   );
 }

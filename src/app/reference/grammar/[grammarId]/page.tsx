@@ -1,20 +1,19 @@
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
-import { GrammarCardPage } from "@/components/GrammarCardPage";
-import { getGrammarById } from "@/data/reference";
+import { GrammarCard } from "@/components/reference/GrammarCard";
+import { getGrammarEntryById } from "@/components/reference/ref-data";
 
 export default async function GrammarRoute({ params }: { params: Promise<{ grammarId: string }> }) {
   const { grammarId } = await params;
-  const grammar = getGrammarById(grammarId);
+  const entry = getGrammarEntryById(grammarId);
 
-  if (!grammar) {
+  if (!entry) {
     notFound();
   }
 
   return (
-    <AppShell active="reference" crumbs={["Home", "English", "Reference", grammar.shortName]}>
-      <GrammarCardPage grammar={grammar} />
+    <AppShell active="reference" crumbs={["Reference", "Grammar", entry.title]}>
+      <GrammarCard entry={entry} />
     </AppShell>
   );
 }
-

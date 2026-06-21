@@ -1,20 +1,15 @@
-import { notFound } from "next/navigation";
-import { AppShell } from "@/components/AppShell";
-import { VocabularyCardPage } from "@/components/VocabularyCardPage";
-import { getVocabularyById } from "@/data/reference";
+import { notFound, redirect } from "next/navigation";
+import { getAcademicById, getWordById } from "@/components/reference/ref-data";
 
-export default async function VocabularyRoute({ params }: { params: Promise<{ wordId: string }> }) {
+/**
+ * Legacy `/reference/vocabulary/[wordId]` route — redirects to the new
+ * unified `/reference/word/[wordId]` or `/reference/academic/[wordId]`
+ * routes introduced with the PR 99 redesign. Kept so external links and
+ * existing bookmarks don't 404.
+ */
+export default async function LegacyVocabularyRoute({ params }: { params: Promise<{ wordId: string }> }) {
   const { wordId } = await params;
-  const word = getVocabularyById(wordId);
-
-  if (!word) {
-    notFound();
-  }
-
-  return (
-    <AppShell active="reference" crumbs={["Home", "English", "Reference", word.word]}>
-      <VocabularyCardPage initialWordId={word.id} />
-    </AppShell>
-  );
+  if (getAcademicById(wordId)) redirect(`/reference/academic/${wordId}`);
+  if (getWordById(wordId)) redirect(`/reference/word/${wordId}`);
+  notFound();
 }
-

@@ -15,6 +15,8 @@ import { useMemo, useState } from "react";
 import { useJapanesePreference } from "@/components/AppShell";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
 import type { AcademicEntry } from "@/data/reference-shapes";
+import { posPillClass } from "./pos-pill";
+import { getAcademicNav } from "./ref-data";
 
 const POS_LABEL: Record<string, string> = {
   verb: "verb",
@@ -33,6 +35,7 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
   const { knownWordSet, setWordKnown } = useKnownWordIds();
   const known = knownWordSet.has(entry.id);
   const [picks, setPicks] = useState<QuizState>({});
+  const nav = useMemo(() => getAcademicNav(entry.id), [entry.id]);
 
   const quizScoreLine = useMemo(() => {
     if (entry.academic.quiz.length === 0) return "";
@@ -60,7 +63,7 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
               <span className="rcardv2-academic-flag">★ Academic word</span>
               <div className="rcardv2-hero-title">
                 <h1>{entry.word}</h1>
-                <span className="rcardv2-pos-tag rcardv2-pos-tag--blue">{POS_LABEL[entry.pos] ?? entry.pos}</span>
+                <span className={`refv2-pos-pill ${posPillClass(entry.pos)}`}>{POS_LABEL[entry.pos] ?? entry.pos}</span>
                 {entry.syllables && <span className="rcardv2-syllables">{entry.syllables}</span>}
                 {entry.pronUS && <span className="rcardv2-ipa-soft">/{entry.pronUS.replace(/^\/|\/$/g, "")}/</span>}
               </div>
@@ -102,7 +105,10 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
             <p>{entry.academic.meaningEN || entry.definition}</p>
           </div>
           <div className="rcardv2-meaning-cell rcardv2-meaning-cell--jp">
-            <div className="rcardv2-eyebrow rcardv2-eyebrow--blue">意味 · Japanese</div>
+            <div className="rcardv2-eyebrow rcardv2-eyebrow--blue">
+              意味 · Japanese
+              {jp && entry.jp.needsReview && <span className="rcardv2-needs-badge">needs review</span>}
+            </div>
             {jp && entry.academic.meaningJP ? (
               <p lang="ja">{entry.academic.meaningJP}</p>
             ) : (
@@ -111,6 +117,33 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
           </div>
         </div>
       </section>
+
+      <nav className="rcardv2-prevnext" aria-label="Academic word navigation">
+        {nav.prev ? (
+          <Link href={`/reference/academic/${nav.prev.id}`} className="rcardv2-prevnext-btn">
+            <span className="rcardv2-prevnext-arrow">←</span>
+            {nav.prev.word}
+          </Link>
+        ) : (
+          <button type="button" className="rcardv2-prevnext-btn is-disabled" disabled>
+            <span className="rcardv2-prevnext-arrow">←</span>Start
+          </button>
+        )}
+        <div className="rcardv2-prevnext-pos">
+          <div className="rcardv2-prevnext-count">Academic word {nav.index} of {nav.total}</div>
+          <div className="rcardv2-prevnext-sub">Academic Language</div>
+        </div>
+        {nav.next ? (
+          <Link href={`/reference/academic/${nav.next.id}`} className="rcardv2-prevnext-btn">
+            {nav.next.word}
+            <span className="rcardv2-prevnext-arrow">→</span>
+          </Link>
+        ) : (
+          <button type="button" className="rcardv2-prevnext-btn is-disabled" disabled>
+            End<span className="rcardv2-prevnext-arrow">→</span>
+          </button>
+        )}
+      </nav>
 
       <div className="rcardv2-grid">
         <div className="rcardv2-col-left">

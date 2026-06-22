@@ -83,6 +83,7 @@ export function WordCard({ entry }: { entry: WordEntry }) {
             {jp && entry.jp.gloss && (
               <p className="rcardv2-hero-jp" lang="ja">
                 {entry.jp.gloss}
+                {entry.jp.needsReview && <span className="rcardv2-needs-badge">needs review</span>}
               </p>
             )}
           </div>

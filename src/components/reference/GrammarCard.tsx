@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useJapanesePreference } from "@/components/AppShell";
 import type { GrammarEntry, GrammarMasterDisplay, GrammarQuizDisplay, GrammarSampleDisplay } from "@/data/reference-shapes";
+import { getGrammarNav } from "./ref-data";
 
 type TabKey = "chart" | "levelup" | "quiz" | "master";
 
@@ -26,6 +27,7 @@ export function GrammarCard({ entry }: { entry: GrammarEntry }) {
   const jp = useJapanesePreference();
   const [tab, setTab] = useState<TabKey>("chart");
   const [quizAnswers, setQuizAnswers] = useState<Record<string, QuizAnswer>>({});
+  const nav = useMemo(() => getGrammarNav(entry.grammarId), [entry.grammarId]);
 
   const tabs: Array<{ key: TabKey; label: string; badge?: number }> = [
     { key: "chart", label: "Chart & Samples" },
@@ -99,6 +101,40 @@ export function GrammarCard({ entry }: { entry: GrammarEntry }) {
           </span>
         </button>
       </section>
+
+      <nav className="rcardv2-prevnext" aria-label="Grammar navigation">
+        {nav.prev ? (
+          <Link href={`/reference/grammar/${nav.prev.grammarId}`} className="rcardv2-prevnext-btn">
+            <span className="rcardv2-prevnext-arrow">←</span>
+            {nav.prev.title}
+          </Link>
+        ) : (
+          <button type="button" className="rcardv2-prevnext-btn is-disabled" disabled>
+            <span className="rcardv2-prevnext-arrow">←</span>Start
+          </button>
+        )}
+        <div className="rcardv2-prevnext-pos">
+          <div className="rcardv2-prevnext-count">Grammar {nav.index} of {nav.total} · Unit {entry.unit}</div>
+          <div className="rcardv2-prevnext-dots" aria-hidden>
+            {Array.from({ length: nav.total }, (_, i) => (
+              <span
+                key={i}
+                className={`rcardv2-prevnext-dot${i + 1 === nav.index ? " is-active" : ""}`}
+              />
+            ))}
+          </div>
+        </div>
+        {nav.next ? (
+          <Link href={`/reference/grammar/${nav.next.grammarId}`} className="rcardv2-prevnext-btn">
+            {nav.next.title}
+            <span className="rcardv2-prevnext-arrow">→</span>
+          </Link>
+        ) : (
+          <button type="button" className="rcardv2-prevnext-btn is-disabled" disabled>
+            End<span className="rcardv2-prevnext-arrow">→</span>
+          </button>
+        )}
+      </nav>
 
       <PatternChart entry={entry} jp={jp} />
 

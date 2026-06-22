@@ -20,7 +20,7 @@ import type { GrammarEntry, WordEntry } from "@/data/reference-shapes";
 
 type SanseidoEntry = { w: string; u: string };
 
-type ResultFilter = "all" | "vocabulary" | "academic" | "junior-high" | "grammar";
+type ResultFilter = "all" | "our-world" | "joyful-work" | "junior-high" | "grammar";
 
 type ResultWord = {
   kind: "word";
@@ -41,12 +41,12 @@ type ResultGrammar = {
 };
 type SearchResult = ResultWord | ResultJh | ResultGrammar;
 
-const FILTERS: Array<{ key: ResultFilter; label: string; hasDot?: boolean }> = [
+const FILTERS: Array<{ key: ResultFilter; label: string; hasDot?: boolean; dotColor?: string }> = [
   { key: "all", label: "All" },
-  { key: "vocabulary", label: "Vocabulary" },
-  { key: "academic", label: "Academic" },
-  { key: "junior-high", label: "Junior High" },
-  { key: "grammar", label: "Grammar", hasDot: true }
+  { key: "our-world", label: "Our World", hasDot: true, dotColor: "var(--ref-course-ow)" },
+  { key: "joyful-work", label: "Joyful Work", hasDot: true, dotColor: "var(--ref-course-jw)" },
+  { key: "junior-high", label: "Junior High", hasDot: true, dotColor: "var(--ref-course-jh)" },
+  { key: "grammar", label: "Grammar", hasDot: true, dotColor: "var(--ref-accent)" }
 ];
 
 const SANSEIDO_LIMIT_PER_QUERY = 20;
@@ -113,17 +113,29 @@ export function ReferenceSearch() {
   const counts = useMemo(() => {
     const totals: Record<ResultFilter, number> = {
       all: results.length,
-      vocabulary: 0,
-      academic: 0,
+      "our-world": 0,
+      "joyful-work": 0,
       "junior-high": 0,
       grammar: 0
     };
     for (const r of results) {
       if (r.kind === "word") {
-        if (r.entry.type === "academic") totals.academic++;
-        else totals.vocabulary++;
-      } else if (r.kind === "junior-high") totals["junior-high"]++;
-      else if (r.kind === "grammar") totals.grammar++;
+        /* A word entry can appear in multiple courses via its
+           sources[] — we count it once per filter it lights up,
+           so the same word can show under both Our World and
+           Joyful Work counts. */
+        const courses = new Set(r.entry.sources.map((s) => s.course));
+        if (courses.has("our-world")) totals["our-world"]++;
+        if (courses.has("joyful-work")) totals["joyful-work"]++;
+      } else if (r.kind === "junior-high") {
+        totals["junior-high"]++;
+      } else if (r.kind === "grammar") {
+        totals.grammar++;
+        /* Grammar points also have a source course — count them under
+           the matching course chip in addition to Grammar. */
+        if (r.entry.course === "our-world") totals["our-world"]++;
+        else if (r.entry.course === "joyful-work") totals["joyful-work"]++;
+      }
     }
     return totals;
   }, [results]);
@@ -131,10 +143,21 @@ export function ReferenceSearch() {
   const filteredResults = useMemo(() => {
     if (filter === "all") return results;
     return results.filter((r) => {
-      if (filter === "vocabulary") return r.kind === "word" && r.entry.type !== "academic";
-      if (filter === "academic") return r.kind === "word" && r.entry.type === "academic";
-      if (filter === "junior-high") return r.kind === "junior-high";
       if (filter === "grammar") return r.kind === "grammar";
+      if (filter === "junior-high") return r.kind === "junior-high";
+      /* Course filters: keep words whose sources include this course,
+         OR grammar points whose course matches. Junior-High Sanseido
+         entries do NOT appear under Our World / Joyful Work. */
+      if (filter === "our-world") {
+        if (r.kind === "word") return r.entry.sources.some((s) => s.course === "our-world");
+        if (r.kind === "grammar") return r.entry.course === "our-world";
+        return false;
+      }
+      if (filter === "joyful-work") {
+        if (r.kind === "word") return r.entry.sources.some((s) => s.course === "joyful-work");
+        if (r.kind === "grammar") return r.entry.course === "joyful-work";
+        return false;
+      }
       return true;
     });
   }, [results, filter]);
@@ -163,7 +186,7 @@ export function ReferenceSearch() {
               className={`refv2-filter${filter === f.key ? " is-active" : ""}`}
               onClick={() => setFilter(f.key)}
             >
-              {f.hasDot && <span className="refv2-filter-dot" />}
+              {f.hasDot && f.dotColor && <span className="refv2-filter-dot" style={{ background: f.dotColor }} />}
               <span>{f.label}</span>
               <span className="refv2-filter-count">{counts[f.key]}</span>
             </button>

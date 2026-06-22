@@ -584,3 +584,24 @@ Examples:
 - writing correction
 
 Training Ground can reuse English reference data and can also add new reference items when Leo learns them there.
+
+## Learner App Rule — Vocab Foundations are ALWAYS first
+
+Every learner app (vocab, writing, reading, grammar — every component, every unit, going forward) MUST open with two modules:
+
+1. **Academic Language** — flashcards for ALL academic words in the unit + a quiz that covers every word.
+2. **Related Vocab** — flashcards for the unit's related/content words + a quiz (≥ 2 questions per word so the quiz is substantial, not 30 seconds).
+
+These are non-negotiable:
+
+- Both modules appear in a dedicated "🎴 VOCAB FOUNDATIONS" section AT THE TOP of the home grid, **above** Student Book and Workbook.
+- Card style is the canonical LEEA 3D-flip flashcard (`.flashcard-wrap` / `.flashcard` / `.fc-jp`) with the JP reveal button.
+- Quiz style is the canonical MCQ quiz with progress bar + per-question feedback + final scoreboard.
+- They carry the purple `ALWAYS` tag in the corner of the home-grid card so the rule is visible to the student.
+
+Pass thresholds:
+
+- Academic quiz: ≥ 70% to mark module done.
+- Related quiz: ≥ 75% to mark module done (smaller word set, so the bar is slightly higher).
+
+Implemented for: Unit 8 Writing (`/public/learn/ow-l4-u8-writing.html`). Retrofit any older learner app that doesn't follow this rule before adding new units.

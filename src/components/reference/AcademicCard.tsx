@@ -123,32 +123,44 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
                 {entry.academic.whenToUse.map((context, idx) => (
                   <div key={idx} className="rcardv2-context">
                     <span className="rcardv2-context-num">{idx + 1}</span>
-                    <p>{context}</p>
+                    <div className="rcardv2-context-body">
+                      <p>{context.en}</p>
+                      {jp && context.jp && (
+                        <p className="rcardv2-context-jp" lang="ja">
+                          {context.jp}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
             </section>
           )}
 
-          {entry.academic.howToUse && (
+          {entry.academic.howToUse.structure && (
             <section className="rcardv2-section">
               <div className="rcardv2-eyebrow">How to use it</div>
-              <PatternChips structure={entry.academic.howToUse} word={entry.word} />
+              <PatternChips structure={entry.academic.howToUse.structure} word={entry.word} />
+              {jp && entry.academic.howToUse.jpStructure && (
+                <p className="rcardv2-howto-jp" lang="ja">
+                  {entry.academic.howToUse.jpStructure}
+                </p>
+              )}
             </section>
           )}
 
-          {(entry.academic.examples.test || entry.academic.examples.school || entry.academic.examples.real) && (
+          {(entry.academic.examples.test.en || entry.academic.examples.school.en || entry.academic.examples.real.en) && (
             <section className="rcardv2-section">
               <div className="rcardv2-eyebrow">Examples</div>
               <div className="rcardv2-ex-cards">
-                {entry.academic.examples.test && (
-                  <ExampleCard label="Test" icon="📝" tone="test" sentence={entry.academic.examples.test} word={entry.word} />
+                {entry.academic.examples.test.en && (
+                  <ExampleCard label="Test" icon="📝" tone="test" example={entry.academic.examples.test} word={entry.word} jp={jp} />
                 )}
-                {entry.academic.examples.school && (
-                  <ExampleCard label="School" icon="🏫" tone="school" sentence={entry.academic.examples.school} word={entry.word} />
+                {entry.academic.examples.school.en && (
+                  <ExampleCard label="School" icon="🏫" tone="school" example={entry.academic.examples.school} word={entry.word} jp={jp} />
                 )}
-                {entry.academic.examples.real && (
-                  <ExampleCard label="Real world" icon="🌍" tone="real" sentence={entry.academic.examples.real} word={entry.word} />
+                {entry.academic.examples.real.en && (
+                  <ExampleCard label="Real world" icon="🌍" tone="real" example={entry.academic.examples.real} word={entry.word} jp={jp} />
                 )}
               </div>
             </section>
@@ -161,7 +173,14 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
                 {entry.academic.nonExamples.map((wrong, idx) => (
                   <div key={idx} className="rcardv2-nonex">
                     <span className="rcardv2-nonex-x" aria-hidden>✕</span>
-                    <p>{wrong}</p>
+                    <div className="rcardv2-nonex-body">
+                      <p>{wrong.en}</p>
+                      {jp && wrong.jp && (
+                        <p className="rcardv2-nonex-jp" lang="ja">
+                          {wrong.jp}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -254,10 +273,15 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
             )}
           </section>
 
-          {entry.academic.practicePrompt && (
+          {entry.academic.practicePrompt.en && (
             <section className="rcardv2-section rcardv2-section--practice">
               <div className="rcardv2-eyebrow rcardv2-eyebrow--amber">✎ Practice prompt</div>
-              <p className="rcardv2-practice">{entry.academic.practicePrompt}</p>
+              <p className="rcardv2-practice">{entry.academic.practicePrompt.en}</p>
+              {jp && entry.academic.practicePrompt.jp && (
+                <p className="rcardv2-practice-jp" lang="ja">
+                  {entry.academic.practicePrompt.jp}
+                </p>
+              )}
             </section>
           )}
 
@@ -328,21 +352,28 @@ function ExampleCard({
   label,
   icon,
   tone,
-  sentence,
-  word
+  example,
+  word,
+  jp
 }: {
   label: string;
   icon: string;
   tone: "test" | "school" | "real";
-  sentence: string;
+  example: { en: string; jp: string };
   word: string;
+  jp: boolean;
 }) {
   return (
     <div className="rcardv2-ex-card">
       <span className={`rcardv2-ex-tag rcardv2-ex-tag--${tone}`}>
         {icon} {label}
       </span>
-      <p className="rcardv2-ex-text">{highlightWord(sentence, word)}</p>
+      <p className="rcardv2-ex-text">{highlightWord(example.en, word)}</p>
+      {jp && example.jp && (
+        <p className="rcardv2-ex-jp" lang="ja">
+          {example.jp}
+        </p>
+      )}
     </div>
   );
 }

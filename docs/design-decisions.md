@@ -605,3 +605,17 @@ Pass thresholds:
 - Related quiz: ≥ 75% to mark module done (smaller word set, so the bar is slightly higher).
 
 Implemented for: Unit 8 Writing (`/public/learn/ow-l4-u8-writing.html`). Retrofit any older learner app that doesn't follow this rule before adding new units.
+
+## No doc unless something reads it
+
+Per-lesson design docs (`grammar-1.design.md`, `writing.design.md`, etc.) were originally written as seed material to extract reusable skills (`/grammar-app`, `/reading-app`, etc.). Once the skill exists, the design doc has no active reader and becomes documentation rot.
+
+**Rule going forward:**
+
+- Do NOT create a new design doc per unit per component just because the existing Unit 8 docs have that shape.
+- The four existing Unit 8 docs (`grammar-1` / `grammar-2` / `reading` / `writing`.design.md) stay as historical reference for the skills that were extracted from them — do not delete, but do not multiply.
+- When a lesson needs to be generated for a new unit, invoke the matching skill (`/grammar-app`, `/reading-app`, `/vocab-app`) with the unit number + an optional creative theme. The skill reads `index.json` + the unit's `vocabulary.json` and produces the lesson. No bespoke design doc needed.
+- If a lesson has truly one-off content that doesn't fit the skill, just build it and capture any standing decisions in this file — not in a per-lesson markdown that no one reads.
+- `writing-app` skill is still missing (PR #103 hand-built Unit 8 Writing). When extracted from that PR's pattern, the same rule applies: no per-unit `writing.design.md` going forward.
+
+**Litmus test for any new doc:** "What program reads this?" If the answer is "none / a future human maybe", do not write it. Put the standing decision in this file instead.

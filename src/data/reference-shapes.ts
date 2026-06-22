@@ -110,13 +110,17 @@ export type AcademicEntry = WordEntry & {
   academic: {
     meaningEN: string;
     meaningJP: string;
-    whenToUse: string[];                // up to 3
-    howToUse: string;                   // pattern, single line
-    examples: { test: string; school: string; real: string };
+    whenToUse: Array<{ en: string; jp: string }>;            // up to 3, EN required, JP best-effort
+    howToUse: { structure: string; jpStructure: string };
+    examples: {
+      test: { en: string; jp: string };
+      school: { en: string; jp: string };
+      real: { en: string; jp: string };
+    };
     collocations: string[];
     jpNote: string;
-    practicePrompt: string;
-    nonExamples: string[];
+    practicePrompt: { en: string; jp: string };
+    nonExamples: Array<{ en: string; jp: string }>;
     quiz: Array<{
       prompt: string;
       options: string[];
@@ -131,25 +135,50 @@ export type AcademicEntry = WordEntry & {
 export function toAcademicEntry(item: VocabularyItem): AcademicEntry | null {
   if (item.type !== "academic") return null;
   const base = toWordEntry(item);
-  const whenEN = (item.when_to_use ?? []).map((entry) => entry.text);
+
+  /* Pair each EN when_to_use with its JP counterpart by index — the JSON
+     stores them as two parallel arrays keyed by context, not as a single
+     bilingual array, so we zip them here. */
+  const whenEN = item.when_to_use ?? [];
+  const whenJP = item.jp_when_to_use ?? [];
+  const whenToUse = whenEN.slice(0, 3).map((entry, idx) => ({
+    en: entry.text,
+    jp: whenJP[idx]?.text ?? ""
+  }));
+
   const examples = item.examples ?? [];
-  const exTest = examples.find((entry) => entry.context === "test")?.en ?? "";
-  const exSchool = examples.find((entry) => entry.context === "school")?.en ?? "";
-  const exReal = examples.find((entry) => entry.context === "real-world")?.en ?? "";
-  const howToUse = item.how_to_use?.structure ?? item.how_to_use?.patterns?.[0] ?? "";
+  const pickExample = (ctx: string) => {
+    const found = examples.find((entry) => entry.context === ctx);
+    return { en: found?.en ?? "", jp: found?.jp ?? "" };
+  };
+
+  const howToUse = {
+    structure: item.how_to_use?.structure ?? item.how_to_use?.patterns?.[0] ?? "",
+    jpStructure: item.jp_how_to_use?.structure ?? item.jp_how_to_use?.patterns?.[0] ?? ""
+  };
   return {
     ...base,
     type: "academic",
     academic: {
       meaningEN: item.meaning,
       meaningJP: item.jp_meaning ?? item.japanese?.meaning ?? "",
-      whenToUse: whenEN.slice(0, 3),
+      whenToUse,
       howToUse,
-      examples: { test: exTest, school: exSchool, real: exReal },
+      examples: {
+        test: pickExample("test"),
+        school: pickExample("school"),
+        real: pickExample("real-world")
+      },
       collocations: item.collocations ?? [],
       jpNote: item.jp_note ?? "",
-      practicePrompt: item.practice_prompt ?? "",
-      nonExamples: (item.nonExamples ?? []).map((entry) => entry.en),
+      practicePrompt: {
+        en: item.practice_prompt ?? "",
+        jp: item.jp_practice_prompt ?? ""
+      },
+      nonExamples: (item.nonExamples ?? []).map((entry) => ({
+        en: entry.en,
+        jp: entry.jp
+      })),
       quiz: (item.miniQuiz ?? []).map((entry) => ({
         prompt: entry.prompt,
         options: entry.options,
@@ -157,7 +186,7 @@ export function toAcademicEntry(item: VocabularyItem): AcademicEntry | null {
         explanationEN: entry.explanation,
         explanationJP: entry.jp
       })),
-      relatedLessonId: null     // wired when the linked lesson goes live
+      relatedLessonId: null
     }
   };
 }

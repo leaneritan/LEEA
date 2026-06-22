@@ -163,6 +163,43 @@ export function splitKnown(words: WordEntry[], knownSet: Set<string>) {
   return { known, unknown };
 }
 
+/* ─── prev/next helpers for card navigation ─── */
+export type PrevNext<T> = {
+  prev: T | null;
+  next: T | null;
+  index: number;       // 1-based position
+  total: number;
+};
+
+/* Academic prev/next within the full academic list (order = content order). */
+export function getAcademicNav(currentId: string): PrevNext<AcademicEntry> {
+  const list = academicWords;
+  const i = list.findIndex((entry) => entry.id === currentId);
+  if (i < 0) return { prev: null, next: null, index: 0, total: list.length };
+  return {
+    prev: i > 0 ? list[i - 1] : null,
+    next: i < list.length - 1 ? list[i + 1] : null,
+    index: i + 1,
+    total: list.length
+  };
+}
+
+/* Grammar prev/next within the SAME unit only (matches design: "Grammar 3 of 3 · Unit 8"). */
+export function getGrammarNav(currentId: string): PrevNext<GrammarEntry> {
+  const current = getGrammarEntryById(currentId);
+  if (!current) return { prev: null, next: null, index: 0, total: 0 };
+  const peers = allGrammar.filter(
+    (entry) => entry.course === current.course && entry.level === current.level && entry.unit === current.unit
+  );
+  const i = peers.findIndex((entry) => entry.grammarId === currentId);
+  return {
+    prev: i > 0 ? peers[i - 1] : null,
+    next: i < peers.length - 1 ? peers[i + 1] : null,
+    index: i + 1,
+    total: peers.length
+  };
+}
+
 /* ─── group words by source course (for I Know chips) ─── */
 export function groupByCourse(words: WordEntry[]) {
   const groups: Record<string, WordEntry[]> = {

@@ -6,8 +6,8 @@ These National Geographic graphic organizers should become reusable LEEA chart t
 
 Reusable templates live under two parallel folders, depending on which surface they're for:
 
-- `public/teach/components/*` — used by Neritan's teacher slide decks under `public/lessons/*.html`
-- `public/learn/components/*` — used by Leo's learner apps under `public/learn/*.html`
+- `public/components/*` — used by Neritan's teacher slide decks under `public/lessons/*.html`
+- `public/components/*` — used by Leo's learner apps under `public/learn/*.html`
 
 Same naming style, same self-contained vanilla JS. Each template file exposes one or two `window.build*` functions and an internal config store keyed by element id.
 
@@ -15,7 +15,7 @@ Same naming style, same self-contained vanilla JS. Each template file exposes on
 
 ### `sunshine` — Sunshine Organizer (graphic organizer)
 
-**File:** `public/learn/components/sunshine.js`
+**File:** `public/components/sunshine.js`
 **Surface:** Leo learner apps
 **First used in:** OW L4 U8 Vocabulary 1 Leo app (`public/learn/ow-l4-u8-vocab-1.html`) Tab 9 — "Apply"
 **Based on:** the classic Cengage 6-ray WHO / WHAT / WHEN / WHERE / WHY / HOW organizer, generalized to N rays (3–8)
@@ -24,7 +24,7 @@ Same naming style, same self-contained vanilla JS. Each template file exposes on
 
 ```js
 // Load once in <head>:
-// <script src="/learn/components/sunshine.js"></script>
+// <script src="/components/sunshine.js"></script>
 
 el.innerHTML = buildSunshine({
   id:          'sunshine-svg',    // unique string per page
@@ -63,7 +63,7 @@ el.innerHTML = buildSunshine({
 
 ### `dnd-sorter` — Drag-and-Drop Column Sorter
 
-**File:** `public/teach/components/charts.js`  
+**File:** `public/components/charts.js`  
 **Template ID:** `two-column-chart` (and any N-column variant)  
 **First used in:** OW L4 U8 Vocabulary 1 teacher deck (`public/lessons/ow-l4-u8-vocab-1.html`)
 
@@ -71,7 +71,7 @@ el.innerHTML = buildSunshine({
 
 ```js
 // Load once in <head>:
-// <script src="/teach/components/charts.js"></script>
+// <script src="/components/charts.js"></script>
 
 el.innerHTML = buildDndSorter({
   id:     'dnd-vocab8',          // unique string — must be unique per page
@@ -102,7 +102,7 @@ el.innerHTML = buildDndSorter({
 
 #### Notes for Codex
 
-- Add the `<script src="/teach/components/charts.js"></script>` tag in `<head>` of any lesson that uses it.
+- Add the `<script src="/components/charts.js"></script>` tag in `<head>` of any lesson that uses it.
 - `buildDndSorter` is the only global it exposes (`window.buildDndSorter`).
 - Zones can be any number (2, 3, 4 …) — the zones row is a flex row.
 - The `answer` string on each tile must exactly match a zone `key`.
@@ -110,7 +110,7 @@ el.innerHTML = buildDndSorter({
 
 ### `four-col-chart` — 4-column writing planner chart
 
-**File:** `public/teach/components/charts.js`
+**File:** `public/components/charts.js`
 **Surface:** Teacher slide decks (Writing component primarily — Explanation / Comparison / Cause-Effect writing all use a 4-column planner)
 **First used in:** OW L4 U8 Writing teacher deck (planned) — Warm Up demo + Plan phase + Write phase reference.
 **Re-use:** any LP that calls for a 4-column planner chart. Column labels are configurable.
@@ -147,7 +147,7 @@ window.buildFourColChart({
 
 ### `word-web` — Editable Word Web (graphic organizer)
 
-**File:** `public/teach/components/wordweb.js`
+**File:** `public/components/wordweb.js`
 **Surface:** Teacher slide decks (works inside the 1920×1080 scaled deck)
 **First used in:** OW L4 U8 Grammar 1 teacher deck (`public/lessons/ow-l4-u8-grammar-1.html`) — Extend phase
 
@@ -155,7 +155,7 @@ window.buildFourColChart({
 
 ```js
 // Load once in <head>:
-// <script src="/teach/components/wordweb.js"></script>
+// <script src="/components/wordweb.js"></script>
 
 el.innerHTML = buildWordWeb({
   id:         'web-dad',                       // unique per page
@@ -323,8 +323,8 @@ Pie templates:
 Map / web templates:
 
 - spider map
-- sunshine organizer ✓ built — `public/learn/components/sunshine.js`
-- word web ✓ built — `public/teach/components/wordweb.js` (`buildWordWeb`)
+- sunshine organizer ✓ built — `public/components/sunshine.js`
+- word web ✓ built — `public/components/wordweb.js` (`buildWordWeb`)
 
 Story / sequence templates:
 
@@ -333,7 +333,7 @@ Story / sequence templates:
 Compare / classify templates:
 
 - T-chart
-- two-column chart ✓ built — `public/teach/components/charts.js` (`buildDndSorter`)
+- two-column chart ✓ built — `public/components/charts.js` (`buildDndSorter`)
 - three-column chart
 - Venn diagram 2 circles
 - Venn diagram 3 circles
@@ -541,7 +541,7 @@ Training Ground:
 Start with the chart templates that are most likely to repeat:
 
 1. T-chart
-2. two-column chart ✓ built — `public/teach/components/charts.js` (`buildDndSorter`)
+2. two-column chart ✓ built — `public/components/charts.js` (`buildDndSorter`)
 3. three-column chart
 4. word web
 5. KWL chart

@@ -62,7 +62,7 @@ Reference: `public/lessons/ow-l4-u8-vocab-1.html` (103 slides, ~250 onclick hand
   - tap-to-choose with green/red feedback
   - drag-to-build / tap-to-build a sentence (use chip → slot UI)
   - tap-to-fix (find and correct the mistake)
-  - sort into zones (`buildDndSorter` from `public/teach/components/charts.js`)
+  - sort into zones (`buildDndSorter` from `public/components/charts.js`)
   - embodied vocab game per word (the word *does* its meaning)
   - tap-to-label parts (subject / verb / target word)
 - **One allowed reveal**: the Grammar Box / "Listen and Read" audio slide. Mark it with the TR code from the planner.
@@ -116,7 +116,7 @@ Vocab1 tab strip — exact names and order:
 | 6 | 📝 Practice | MCQ practice items with right/wrong feedback |
 | 7 | 🔤 Unscramble | Scrambled-letter word puzzles, type the word |
 | 8 | 🔗 Match | Match cards (word → meaning, or word → image) |
-| 9 | ☀️ Apply | Sunshine organizer using `buildSunshine` from `public/learn/components/sunshine.js` — Leo writes a sentence per ray using one target word each |
+| 9 | ☀️ Apply | Sunshine organizer using `buildSunshine` from `public/components/sunshine.js` — Leo writes a sentence per ray using one target word each |
 | 10 | 🎭 Wrap Up | Flip-and-answer review or self-eval |
 | 11 | ✅ Quiz | Scored MCQ formative quiz (10+ items) — score saved to `score` key per Rule 2 |
 | 12 | ⚽ Dribble! | Soccer MCQ with goal counter + dribbling defenders (8 shots) |
@@ -148,9 +148,9 @@ Match `public/learn/ow-l4-u8-vocab-1.html` shell:
 
 | Helper | Where | Tab |
 |---|---|---|
-| `buildDndSorter` | `public/teach/components/charts.js` | Tab 4 Sort |
-| `buildSunshine`  | `public/learn/components/sunshine.js` | Tab 9 Apply |
-| `buildWordWeb`   | `public/teach/components/wordweb.js` | Optional in Wrap Up or Extend if the vocab list themes it |
+| `buildDndSorter` | `public/components/charts.js` | Tab 4 Sort |
+| `buildSunshine`  | `public/components/sunshine.js` | Tab 9 Apply |
+| `buildWordWeb`   | `public/components/wordweb.js` | Optional in Wrap Up or Extend if the vocab list themes it |
 
 Load each via `<script src="…">` in `<head>`. Don't inline-duplicate logic that already lives in these components.
 

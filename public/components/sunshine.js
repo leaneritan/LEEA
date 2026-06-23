@@ -5,7 +5,7 @@
  * (center circle + N triangular rays, curved label per ray). Designed to be
  * dropped into any Leo learner app via:
  *
- *   <script src="/learn/components/sunshine.js"></script>
+ *   <script src="/components/sunshine.js"></script>
  *   …
  *   el.innerHTML = buildSunshine({ id, words, saved, onSelect, centerLabel });
  *

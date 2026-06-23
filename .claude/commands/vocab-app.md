@@ -62,7 +62,7 @@ Reference: `public/lessons/ow-l4-u8-vocab-1.html` (103 slides, ~250 onclick hand
   - tap-to-choose with green/red feedback
   - drag-to-build / tap-to-build a sentence (use chip → slot UI)
   - tap-to-fix (find and correct the mistake)
-  - sort into zones (`buildDndSorter` from `public/components/charts.js`)
+  - sort into zones (`pickChart('classification sort', { tiles, zones })` — picker resolves to `buildDndSorter`)
   - embodied vocab game per word (the word *does* its meaning)
   - tap-to-label parts (subject / verb / target word)
 - **One allowed reveal**: the Grammar Box / "Listen and Read" audio slide. Mark it with the TR code from the planner.
@@ -111,12 +111,12 @@ Vocab1 tab strip — exact names and order:
 | 1 | 🔥 Warm Up | Hobby/topic chips + a yes-no question or two |
 | 2 | 🎯 Present | Per-word dialogue card with Dad bubble + yes-no check |
 | 3 | 🃏 Flashcards | Tap-to-flip flashcards for the target vocab list |
-| 4 | 🧠 Sort | Drag-to-sort using `buildDndSorter` (e.g. hobby/not, alive/not) |
+| 4 | 🧠 Sort | Drag-to-sort via `pickChart('classification sort', { tiles, zones })` (e.g. hobby/not, alive/not) |
 | 5 | 📖 Reading | Short reading with blanks Leo fills from a word bank |
 | 6 | 📝 Practice | MCQ practice items with right/wrong feedback |
 | 7 | 🔤 Unscramble | Scrambled-letter word puzzles, type the word |
 | 8 | 🔗 Match | Match cards (word → meaning, or word → image) |
-| 9 | ☀️ Apply | Sunshine organizer using `buildSunshine` from `public/components/sunshine.js` — Leo writes a sentence per ray using one target word each |
+| 9 | ☀️ Apply | Sunshine organizer via `pickChart('sunshine organizer', { words, … })` — Leo writes a sentence per ray using one target word each |
 | 10 | 🎭 Wrap Up | Flip-and-answer review or self-eval |
 | 11 | ✅ Quiz | Scored MCQ formative quiz (10+ items) — score saved to `score` key per Rule 2 |
 | 12 | ⚽ Dribble! | Soccer MCQ with goal counter + dribbling defenders (8 shots) |
@@ -146,13 +146,20 @@ Match `public/learn/ow-l4-u8-vocab-1.html` shell:
 
 ### Reusable components to use
 
-| Helper | Where | Tab |
-|---|---|---|
-| `buildDndSorter` | `public/components/charts.js` | Tab 4 Sort |
-| `buildSunshine`  | `public/components/sunshine.js` | Tab 9 Apply |
-| `buildWordWeb`   | `public/components/wordweb.js` | Optional in Wrap Up or Extend if the vocab list themes it |
+| Picker cue | Resolves to | Component file | Used in |
+|---|---|---|---|
+| `'classification sort'` | `buildDndSorter` | `public/components/charts.js` | Tab 4 Sort |
+| `'sunshine organizer'` | `buildSunshine` | `public/components/sunshine.js` | Tab 9 Apply |
+| `'word web'` | `buildWordWeb` | `public/components/wordweb.js` | Optional in Wrap Up or Extend if the vocab list themes it |
 
-Load each via `<script src="…">` in `<head>`. Don't inline-duplicate logic that already lives in these components.
+**Call sites must use `pickChart('<cue>', config)`** — not the raw `buildXxx` global. The picker is the single source of truth for LP-cue → builder mapping (see `docs/chart-templates.md` "How skills pick a chart"). Load components in `<head>`:
+
+```html
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+```
 
 ### Flashcards Tab + Academic Tab — MANDATORY Practice + Quiz dual mode (PR #77 lock)
 

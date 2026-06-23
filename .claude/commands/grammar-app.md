@@ -64,7 +64,7 @@ Reference: `public/lessons/ow-l4-u8-grammar-1.html` (42 slides, FC Leo United sp
   - tap-to-choose with green/red feedback
   - chip → slot sentence builders
   - tap-to-fix (error spotter — find and tap the wrong word)
-  - sort into zones (`buildDndSorter` from `public/components/charts.js`)
+  - sort into zones (`pickChart('classification sort', { tiles, zones })` — picker resolves to `buildDndSorter`)
   - embodied vocab mini-game per academic/content word (the word *does* its meaning)
   - tap-to-label parts (PERSON / who / verb phrase) with color-coded chips
 - **One allowed reveal**: the Grammar Box / TR audio slide. Mark it with the TR code from the planner (e.g. `TR 8.4`)

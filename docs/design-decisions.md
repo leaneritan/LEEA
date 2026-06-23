@@ -619,3 +619,31 @@ Per-lesson design docs (`grammar-1.design.md`, `writing.design.md`, etc.) were o
 - All four core component skills now exist (`/vocab-app`, `/grammar-app`, `/reading-app`, `/writing-app`). The writing skill was extracted from PR #103's Unit 8 Writing rebuild — same rule applies: no per-unit `writing.design.md` going forward.
 
 **Litmus test for any new doc:** "What program reads this?" If the answer is "none / a future human maybe", do not write it. Put the standing decision in this file instead.
+
+## Any level, any order — readiness audit
+
+Levels get authored in any sequence. Leaneritan may go forward (Level 4 → 5) or backwards (Level 4 → 3) or non-sequentially (Level 4 unit 8 → Level 1 unit 1). The skills must handle all of these without modification.
+
+**Before invoking any skill for a new `(level, unit, component)` tuple, run:**
+
+```bash
+npm run readiness
+npm run readiness -- --level 3       # focus on one level
+npm run readiness -- --json          # machine-readable output
+```
+
+The audit walks every level's `index.json` + every unit's `vocabulary.json` and reports per-component status:
+
+- ✅ **ready** — skill can be invoked
+- ❌ **blocked** — lists the specific missing prerequisite (no `pdf_offset`, empty `sections.<component>`, missing `vocabulary.json`, empty `vocab1WordIds[]`, etc.)
+
+What unblocks a tuple, in order:
+
+1. The unit needs `pdf_offset` set on its entry in `docs/lesson-plans/.../level-N/index.json`
+2. The unit needs a non-empty page range for the section in `sections.<component>` (e.g. `"vocab-1": "3-6"`)
+3. For vocab/reading/writing components, `content/.../level-N/unit-M/vocabulary.json` must exist with the right wordId arrays populated (`vocab1WordIds`, `vocab2WordIds`, `wordIds`, `academicWordIds`)
+4. For reading + writing, the level's `supporting/` folder needs the Student Book PDF + Workbook AK PDF + audioscript (if applicable)
+
+`/vocab-unit-scanner` is the skill that generates `vocabulary.json` from the SB + AK PDFs — run it before invoking `/vocab-app`. The readiness audit will tell you when you need to.
+
+**Why this matters:** the skills can be re-run on the same `(level, unit, component)` to refresh content as the planner is corrected — they're not one-shot. The readiness audit also catches the case where someone manually edits an `index.json` and forgets one section; the missing field shows up immediately.

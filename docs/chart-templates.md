@@ -11,6 +11,62 @@ Reusable templates live under two parallel folders, depending on which surface t
 
 Same naming style, same self-contained vanilla JS. Each template file exposes one or two `window.build*` functions and an internal config store keyed by element id.
 
+## How skills pick a chart — `chartPicker` (the single source of truth)
+
+Before listing the individual chart builders below, the **right** way to call any of them from a skill / generator is via `chartPicker` — a thin lookup layer that maps Lesson Planner cue words to the matching builder. Lessons should rarely hardcode `buildFourColChart` etc. directly. Use the picker so:
+
+- Skills can generate lessons without hardcoded builder calls
+- New chart templates plug into the cue table once, not per-lesson
+- Typos in LP cue words fail loud with a list of accepted aliases
+
+**File:** `public/components/chart-picker.js`
+
+```html
+<!-- Load the components THEN the picker -->
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/flowchart.js"></script>
+<script src="/components/chart-picker.js"></script>
+```
+
+```js
+// Convenience: lookup + invoke + return HTML in one call
+el.innerHTML = pickChart('3-column chart', {
+  id: 'plan-1', mode: 'fill',
+  columns: ['First', 'Then', 'Finally'],
+  storageKey: 'leea-4-7-writing-tcc'
+});
+
+// Or: get the builder by cue and call it yourself
+const builder = chartPicker('sunshine');
+el.innerHTML = builder({ id: 'sun-1', words: [...] });
+
+// Introspect
+listAvailableCharts();
+// → [{ id: 'three-col', cues: [...], builder: 'buildThreeColChart', available: true }, ...]
+```
+
+Matching is **case-insensitive** and tolerant — hyphens, underscores, and multiple spaces all normalize to a single space. The picker also matches `{n}` wildcards (`"5-step flowchart"` matches the `{n}-step flowchart` cue) and falls back to substring matching when the LP cue is wrapped in extra text (`"complete a sunshine organizer on p.91"` still resolves to `buildSunshine`).
+
+If no cue matches, `chartPicker` throws with the full list of accepted aliases — so a typo surfaces immediately, with the fix in the error message.
+
+### Cue → builder table (canonical)
+
+| Cue family (examples) | Builder | Component file |
+|---|---|---|
+| 4-column chart · four col · 4-col | `buildFourColChart` | `charts.js` |
+| 3-column chart · three column · 3-col | `buildThreeColChart` | `charts.js` |
+| N-column chart · multi-column chart · `{n}`-col | `buildNColChart` | `charts.js` |
+| 2-column chart · dnd sorter · sort into zones · classification sort | `buildDndSorter` | `charts.js` |
+| Sunshine · sunshine organizer · 5W1H | `buildSunshine` | `sunshine.js` |
+| Word web · word map · spider map · concept web | `buildWordWeb` | `wordweb.js` |
+| Step flowchart · `{n}`-step flowchart · sequence flowchart | `buildStepFlowchart` | `flowchart.js` |
+
+Add a new chart template? Append one entry to `CHART_CUES` in `chart-picker.js` and document it below.
+
+---
+
 ## Implemented Templates
 
 ### `sunshine` — Sunshine Organizer (graphic organizer)

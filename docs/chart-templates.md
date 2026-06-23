@@ -285,6 +285,70 @@ Tab trackers:  last-tab, wb-last-tab
 
 **When to use this template:** any Leo app where the LP has more than one reading/practice source (Student Book + Workbook is the most common). Don't use for single-source apps like vocab — they stay flat.
 
+### `buildThreeColChart` / `buildNColChart` — N-column writing planner
+
+**File:** `public/components/charts.js`
+**Surface:** both teacher decks and Leo learner apps
+**Based on:** `buildFourColChart` — same code path, accepts any column count.
+
+When the Lesson Planner cues a 3-column or N-column chart instead of the canonical 4-column Explanation Writing planner, use the matching wrapper. All three (`buildThreeColChart`, `buildFourColChart`, `buildNColChart`) share the `display` / `fill` / `reveal` mode set and the `storageKey` auto-persist contract documented under `buildFourColChart` above. Only the default columns differ.
+
+```js
+// 3-column chart, fill mode, auto-save to localStorage
+el.innerHTML = buildThreeColChart({
+  id:         'tcc-leo',
+  mode:       'fill',
+  columns:    ['First', 'Then', 'Finally'],
+  storageKey: 'leea-4-X-writing-tcc-leo'
+});
+
+// N-column chart — pass any number of column headers
+el.innerHTML = buildNColChart({
+  id:      'ncc-1',
+  columns: ['Who', 'What', 'When', 'Where', 'Why'],
+  mode:    'display',
+  rows:    [['Leo', 'reads', 'evenings', 'at home', 'for fun']]
+});
+```
+
+### `buildStepFlowchart` — N-step sequence flowchart
+
+**File:** `public/components/flowchart.js`
+**Surface:** both teacher decks and Leo learner apps
+**First used in:** OW L4 U8 Reading (`public/lessons/ow-l4-u8-reading.html`) — Geocache 5-step flow that fills as Leo reads each paragraph and answers its check.
+**Lesson Planner cue:** "step flowchart", "sequence flowchart", "X-step flowchart"
+
+The chart starts with all slots empty (`❓` + placeholder caption). Each correct comprehension answer calls `unlockFlowStep(id, idx, { emoji, caption })` to fill ONE slot. The slot animates in, the `X / N steps` counter ticks up, and state auto-persists to `storageKey` if provided.
+
+```js
+// Build
+el.innerHTML = buildStepFlowchart({
+  id:    'flow-geocache',
+  title: '🏆 GEOCACHE HUNT — 5 STEPS',
+  steps: [
+    { emoji: '❓', placeholder: '— from ¶1 —' },
+    { emoji: '❓', placeholder: '— from ¶2 —' },
+    { emoji: '❓', placeholder: '— from ¶3 (a) —' },
+    { emoji: '❓', placeholder: '— from ¶3 (b) —' },
+    { emoji: '❓', placeholder: '— from ¶4-5 —' }
+  ],
+  storageKey: 'leea-4-8-reading-flow',
+  onUnlock:   function (idx, slot) { /* play sound, update score */ }
+});
+
+// Unlock a slot from a comprehension-check handler
+unlockFlowStep('flow-geocache', 0, {
+  emoji:   '📦',
+  caption: 'Hiders hide a cache (a box with treasure) and a notebook.'
+});
+
+// Read or reset
+getFlowStepState('flow-geocache');   // → [{filled, emoji, caption}, …]
+resetFlowchart('flow-geocache');     // clears state + storage
+```
+
+The grid is responsive — desktop renders all N steps in a single row; mobile (≤ 680px) falls back to 2 columns automatically.
+
 They are not just PDFs to display. They should become interactive/block templates that can render in teacher lessons and learner apps.
 
 ## Source Folder
@@ -303,6 +367,7 @@ Matrix templates:
 
 Flow templates:
 
+- step flowchart ✓ built — `public/components/flowchart.js` (`buildStepFlowchart`) — N-step sequence that fills slot-by-slot as Leo earns each step
 - flow chart left to right
 - flow chart up and down
 - timeline
@@ -334,7 +399,9 @@ Compare / classify templates:
 
 - T-chart
 - two-column chart ✓ built — `public/components/charts.js` (`buildDndSorter`)
-- three-column chart
+- three-column chart ✓ built — `public/components/charts.js` (`buildThreeColChart`)
+- four-column chart ✓ built — `public/components/charts.js` (`buildFourColChart`)
+- N-column chart ✓ built — `public/components/charts.js` (`buildNColChart` — any column count)
 - Venn diagram 2 circles
 - Venn diagram 3 circles
 

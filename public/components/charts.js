@@ -465,8 +465,37 @@
     return _escHTML(s);
   }
 
+  /* ──────────────────────────────────────────────────────────────
+   * buildNColChart / buildThreeColChart
+   * ──────────────────────────────────────────────────────────────
+   * Thin wrappers over buildFourColChart, which has been N-column
+   * agnostic all along. Same config shape, same modes (display /
+   * fill / reveal), same storageKey behavior.
+   *
+   *   buildThreeColChart({ id, columns: ['A','B','C'], rows: [...] })
+   *   buildNColChart    ({ id, columns: [...N strings], rows: [...] })
+   *
+   * Skills can pick the right wrapper based on the LP cue word —
+   * "3-column chart" → buildThreeColChart, "4-column chart" →
+   * buildFourColChart, "N-column chart" → buildNColChart.
+   * ────────────────────────────────────────────────────────────── */
+  function buildThreeColChart(config) {
+    var cfg = Object.assign({}, config);
+    if (!cfg.columns || cfg.columns.length !== 3) {
+      cfg.columns = cfg.columns && cfg.columns.length
+        ? cfg.columns.slice(0, 3).concat(['', '', '']).slice(0, 3)
+        : ['Column 1', 'Column 2', 'Column 3'];
+    }
+    return buildFourColChart(cfg);
+  }
+  function buildNColChart(config) {
+    return buildFourColChart(config);   // same code, any column count
+  }
+
   /* ── expose on window ─────────────────────────────────────── */
   window.buildDndSorter = buildDndSorter;
   window.buildFourColChart = buildFourColChart;
+  window.buildThreeColChart = buildThreeColChart;
+  window.buildNColChart = buildNColChart;
 
 }());

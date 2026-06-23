@@ -1,6 +1,6 @@
 # Unit 8 · Writing — Design Doc (Leo's Hobby Planner Chart spine)
 
-> Companion to `public/lessons/ow-l4-u8-writing.html`. Built via the future `/writing-app` skill (planned — will be extracted from this deck once shipped, same pattern as `/reading-app` extracted from Unit 8 Reading).
+> Companion to `public/lessons/ow-l4-u8-writing.html`. **The `/writing-app` skill is now live** at `.claude/commands/writing-app.md` — extracted from the Unit 8 Writing rebuild (PR #103) following the same pattern `/reading-app` was extracted from Unit 8 Reading. New units use the skill; this doc stays as historical reference.
 
 ## The lesson
 

@@ -2,7 +2,7 @@
    wordweb.js — reusable editable word web for LEEA teacher decks
    ───────────────────────────────────────────────────────────────────────
    Load once per page:
-     <script src="/teach/components/wordweb.js"></script>
+     <script src="/components/wordweb.js"></script>
 
    Render into an element:
      el.innerHTML = buildWordWeb({

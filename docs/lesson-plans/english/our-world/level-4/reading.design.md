@@ -147,7 +147,7 @@ This is the order Leo must produce in Practice (s34-35). Each step is also the c
 
 ## Reusable component callouts
 
-- **`buildDndSorter`** (from `public/teach/components/charts.js`) — used on s39 (Wrap Up Activity 4 importance sort).
+- **`buildDndSorter`** (from `public/components/charts.js`) — used on s39 (Wrap Up Activity 4 importance sort).
 - **Step flowchart** (new pattern) — currently inline in this deck. Mark as extractable: future PR adds `buildStepFlowchart(target, steps)` to charts.js so reading + writing decks reuse. (Same status as the recap-table pattern from Vocab 2 app — extract once we have 2 working examples.)
 - **Compass interactive** (new pattern) — currently inline. Used at s6 + s29 within this deck; mark as extractable if used in a future Reading deck.
 

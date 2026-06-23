@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Unit 8 · Vocabulary 2 · That&apos;s Really Interesting!</title>
 <script src="/components/charts.js"></script>
+<script src="/components/chart-picker.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1980,7 +1981,7 @@ function resetTimer(){
 }
 
 function buildSorterMount(){
-  if (typeof window.buildDndSorter !== "function") return;
+  if (typeof window.pickChart !== "function") return;
   var items = [
     {id:"bug",      label:"🐞 a bug",            target:"alive"},
     {id:"bee",      label:"🐝 a bee",             target:"alive"},
@@ -1996,10 +1997,21 @@ function buildSorterMount(){
     {id:"ladybug",  label:"🐞 a ladybug",         target:"alive"}
   ];
   var bins = [
-    {id:"alive", label:"✅ ALIVE", color:"#16A34A"},
-    {id:"not",   label:"❌ NOT ALIVE", color:"#9CA3AF"}
+    {key:"alive", label:"✅ ALIVE", color:"#16A34A"},
+    {key:"not",   label:"❌ NOT ALIVE", color:"#9CA3AF"}
   ];
-  window.buildDndSorter("sorter-mount", { items: items, bins: bins });
+  /* Map the local items/bins shape to buildDndSorter's tiles/zones contract.
+     Pre-PR-110 this call was buggy (passed element id as first arg, used
+     wrong key names) so the slide silently no-rendered. Fix landed
+     alongside the pickChart migration. */
+  var mount = document.getElementById('sorter-mount');
+  if (mount) {
+    mount.innerHTML = window.pickChart('classification sort', {
+      id: 'vocab2-sorter',
+      tiles: items.map(function (it) { return { text: it.label, answer: it.target }; }),
+      zones: bins
+    });
+  }
 }
 
 var mb = { who:"", verb:"", what:"", when:"" };

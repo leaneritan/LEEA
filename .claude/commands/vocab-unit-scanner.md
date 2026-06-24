@@ -139,12 +139,27 @@ If `planner.pdf` is a Git LFS pointer (very small file), tell the user the PDF i
 
 ### Step 2 — Read unit pages
 
-Compute absolute pages from `pdf_offset + section pages`. Read all pages from opener through writing (max 20 per Read call). Also read mission / project / reader / extra pages at the end of the unit if they exist — that is where extra Content Vocabulary lives.
+Compute absolute pages from `pdf_offset + section pages`. Read EVERY page of the unit, not just the eight named teaching sections.
+
+A National Geographic *Our World* Level 4-6 unit is 30 pages. The teaching sections (opener through writing, pages 1-23) only cover the first 23 pages. The remaining 7 pages contain the **end-of-unit content sections**:
+
+| Unit page | Section | Has Content Vocabulary? | Index key |
+|---|---|---|---|
+| 24 | Mission (L4-6) / Value (L1-3) | usually yes | `mission` / `value` |
+| 25-26 | Project | usually yes | `project` |
+| 27 | Video | resource only — skip | — |
+| 28 | Unit Reader | sometimes | `reader` |
+| 29-30 | Audio Script | resource only — skip | — |
+
+The vocab scanner MUST read pages 24, 25-26, and 28 in addition to pages 1-23. The Mission/Project/Reader pages often introduce Content Vocabulary that doesn't appear anywhere else in the unit (Unit 7 had `curiosity, typical, simple, materials, recycle, ghost, vacuum, dessert` — 8 of its 19 content words came from these sections). Skipping them produces an incomplete vocabulary.json.
+
+After reading, update `index.json` for this unit to include `mission` (or `value`), `project`, and `reader` keys with the verified page ranges. Video and Audio Script are intentionally NOT indexed (they're resource pages with no extractable content vocab).
 
 ### Step 3 — Extract word lists
 
 For each spread:
-- Left column: Vocabulary 1 / Vocabulary 2 list (when on a vocab page), Academic Language list, Content Vocabulary list, Related Vocabulary
+- Left column of any teaching page: Vocabulary 1 / Vocabulary 2 list (when on a vocab page), Academic Language list, Content Vocabulary list, Related Vocabulary list
+- **Mission/Project/Reader pages: explicitly look for the labeled `Content Vocabulary:` line in the left column.** Some units have it populated, others leave it empty. Empty is normal — record zero new words and move on.
 - Confirm against the Scope and Sequence chart at the front of the PDF if accessible
 
 ### Step 4 — Present scratch list

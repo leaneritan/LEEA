@@ -1,3 +1,4 @@
+import unit6Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-6/vocabulary.json";
 import unit7Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-7/vocabulary.json";
 import unit8Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json";
 import unit8Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-8/grammar.json";
@@ -13,7 +14,8 @@ import type {
 
 type UnitVocabularyWord =
   | (typeof unit8Vocabulary.words)[number]
-  | (typeof unit7Vocabulary.words)[number];
+  | (typeof unit7Vocabulary.words)[number]
+  | (typeof unit6Vocabulary.words)[number];
 type UnitGrammarPoint = (typeof unit8Grammar.grammarPoints)[number];
 
 function hasKey<T extends object, K extends string>(word: T, key: K): word is T & Record<K, unknown> {
@@ -88,8 +90,24 @@ function mergeWordsAcrossUnits(unitWordLists: UnitVocabularyWord[][]): Vocabular
 
 export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
   unit8Vocabulary.words as UnitVocabularyWord[],
-  unit7Vocabulary.words as UnitVocabularyWord[]
+  unit7Vocabulary.words as UnitVocabularyWord[],
+  unit6Vocabulary.words as UnitVocabularyWord[]
 ]);
+
+export const unit6Vocab1Items = vocabularyItems.filter(
+  (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U6-V1")
+);
+export const unit6Vocab2Items = vocabularyItems.filter(
+  (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U6-V2")
+);
+export const unit6AcademicItems = vocabularyItems.filter(
+  (item) => item.type === "academic" && item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 6)
+);
+export const unit6GlossaryItems = vocabularyItems.filter(
+  (item) =>
+    (item.type === "content" || item.type === "related" || item.type === "glossary") &&
+    item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 6)
+);
 
 export const unit7Vocab1Items = vocabularyItems.filter(
   (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U7-V1")

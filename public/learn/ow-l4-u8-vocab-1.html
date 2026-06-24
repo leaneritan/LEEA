@@ -1265,17 +1265,39 @@ function handleMatch(el, type, val) {
     }
   }
 }
+/* Pre-render all 14 recap rows in TR 8.2 audio-script order (= the
+   order of matchAllPairs, which is derived from vocabWords). Each row
+   starts hidden; addMatchRow reveals the row matching the pair Leo
+   just matched. The recap table ALWAYS appears in audio-script order
+   regardless of which pair Leo matched first — per the locked rule. */
+function initMatchRecapTable() {
+  const tbody = document.getElementById('match-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  matchAllPairs.forEach((pair) => {
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-recap-key', pair.word);
+    tr.style.cssText = 'border-bottom:1px solid var(--border);display:none';
+    tr.innerHTML = `<td style="padding:8px 10px;font-weight:700;font-size:13px">${pair.word}</td>
+      <td style="padding:8px;text-align:center;font-size:22px;white-space:nowrap">${pair.emoji}</td>
+      <td style="padding:8px 10px;font-size:13px;color:var(--ink-2)">${pair.sent}</td>`;
+    tbody.appendChild(tr);
+  });
+}
 function addMatchRow(wordVal) {
   const pair = matchAllPairs.find(p => p.word === wordVal);
   if (!pair) return;
-  const tbody = document.getElementById('match-tbody');
   document.getElementById('match-table-wrap').style.display = 'block';
-  const tr = document.createElement('tr');
-  tr.style.borderBottom = '1px solid var(--border)';
-  tr.innerHTML = `<td style="padding:8px 10px;font-weight:700;font-size:13px">${pair.word}</td>
-    <td style="padding:8px;text-align:center;font-size:22px">${pair.emoji}</td>
-    <td style="padding:8px 10px;font-size:13px;color:var(--ink-2)">${pair.sent}</td>`;
-  tbody.appendChild(tr);
+  /* Reveal the existing pre-rendered row at its TR 8.2 position;
+     do NOT append a new row in match order. */
+  let tr = document.querySelector(`[data-recap-key="${pair.word.replace(/"/g,'&quot;')}"]`);
+  if (!tr) {
+    /* Defensive: if init didn't run (e.g. legacy save state restore),
+       pre-render the table now and find the row. */
+    initMatchRecapTable();
+    tr = document.querySelector(`[data-recap-key="${pair.word.replace(/"/g,'&quot;')}"]`);
+  }
+  if (tr) tr.style.display = '';
 }
 
 // ── TAB 9: SUNSHINE ORGANIZER ────────────────────────────────
@@ -1566,7 +1588,7 @@ window.showTab = function(n) {
   if (n === 4) initSort();
   if (n === 6) initPractice();
   if (n === 7) { unsScoreVal=0; initUnscramble(); }
-  if (n === 8) { matchRound=0; matchTotalDone=0; document.getElementById('match-tbody').innerHTML=''; startMatchRound(0); }
+  if (n === 8) { matchRound=0; matchTotalDone=0; initMatchRecapTable(); startMatchRound(0); }
   if (n === 9) initSunshine();
   if (n === 10) { wuIdx=0; renderWrapUp(); }
   if (n === 11) { if (!restoreQuizResult()) initQuiz(); }

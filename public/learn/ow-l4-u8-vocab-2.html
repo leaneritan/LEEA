@@ -475,11 +475,11 @@ body{display:flex;flex-direction:column}
     <div class="match-grid" id="match-grid"></div>
     <div class="done-banner" id="match-done">🎉 All matched! Here&apos;s your pronunciation recap below 👇</div>
     <div id="match-recap" class="match-recap" style="display:none">
-      <div class="recap-title">📋 TR 8.5 Pronunciation Recap</div>
-      <div class="recap-sub">Practice saying each sentence aloud — match the audio!</div>
+      <div class="recap-title">✅ Matched pairs:</div>
+      <div class="recap-sub">Always in TR 8.5 audio script order — practice each one aloud.</div>
       <table class="recap-table">
         <thead>
-          <tr><th>Word</th><th>TR 8.5 sentence</th><th>Pronunciation</th></tr>
+          <tr><th>Word</th><th style="text-align:center">Emoji</th><th>Sentence</th></tr>
         </thead>
         <tbody id="recap-tbody"></tbody>
       </table>
@@ -784,15 +784,21 @@ function unsCheck(i){const inp=document.getElementById('un-in-'+i);const v=inp.v
 // Pairs come straight from TR 8.5 (Vocabulary 2, Activity 1: Listen and repeat).
 // Matches the audioscript so Leo practices the SAME sentences he heard.
 const MATCH_PAIRS=[
-  {key:'bug',   l:'🐞 a bug',            r:'Some people are scared of bugs, but I love them.', ipa:'/bʌɡ/'},
-  {key:'comic', l:'📚 a comic book',     r:'A boy in my class collects comic books.',          ipa:'/ˈkɑː.mɪk bʊk/'},
-  {key:'dino',  l:'🦖 a dinosaur',       r:'I think that dinosaurs are really interesting.',   ipa:'/ˈdaɪ.nə.sɔːr/'},
-  {key:'fossil',l:'🪨 a fossil',         r:'My brother collects old fossils.',                 ipa:'/ˈfɒs.əl/'},
-  {key:'plush', l:'🧸 a stuffed animal', r:'My mom gave me a stuffed animal for my birthday.', ipa:'/stʌft ˈæn.ɪ.məl/'}
+  {key:'comic', word:'a comic book',     emoji:'📚🦸', sent:'A boy in my class collects comic books.'},
+  {key:'bug',   word:'a bug',            emoji:'🐞🦋', sent:'Some people are scared of bugs, but I love them.'},
+  {key:'dino',  word:'a dinosaur',       emoji:'🦖🦕', sent:'I think that dinosaurs are really interesting.'},
+  {key:'fossil',word:'a fossil',         emoji:'🪨🦴', sent:'My brother collects old fossils.'},
+  {key:'plush', word:'a stuffed animal', emoji:'🧸🎁', sent:'My mom gave me a stuffed animal for my birthday.'}
 ];
-function renderMatchRecap(){const tbody=document.getElementById('recap-tbody');if(!tbody)return;tbody.innerHTML='';MATCH_PAIRS.forEach(p=>{const tr=document.createElement('tr');tr.innerHTML='<td><strong>'+esc(p.l)+'</strong></td><td><em>"'+esc(p.r)+'"</em></td><td style="font-family:Georgia,serif;color:#6b7280">'+esc(p.ipa)+'</td>';tbody.appendChild(tr);});document.getElementById('match-recap').style.display='block';}
+/* renderMatchRecap iterates MATCH_PAIRS in its ARRAY order (= TR 8.5
+   audio script order), NEVER in match-completion order. Per the
+   locked rule from chat: the recap table ALWAYS shows rows in audio
+   script order regardless of which pair Leo matched first. The
+   match-chip grid below uses the same pairs but with the right
+   column shuffled, so the matching gameplay still has randomness. */
+function renderMatchRecap(){const tbody=document.getElementById('recap-tbody');if(!tbody)return;tbody.innerHTML='';MATCH_PAIRS.forEach(p=>{const tr=document.createElement('tr');tr.innerHTML='<td style="font-weight:700">'+esc(p.word)+'</td><td style="text-align:center;font-size:22px;white-space:nowrap">'+p.emoji+'</td><td style="color:var(--ink-2)">'+esc(p.sent)+'</td>';tbody.appendChild(tr);});document.getElementById('match-recap').style.display='block';}
 let _matchLeft=null,_matchPaired=new Set();
-TAB_INIT[8]=function(){const grid=document.getElementById('match-grid');grid.innerHTML='';const leftOrder=MATCH_PAIRS.slice();const rightOrder=MATCH_PAIRS.slice().sort(()=>Math.random()-.5);MATCH_PAIRS.forEach((_,i)=>{const lb=document.createElement('button');lb.className='match-chip';lb.dataset.side='l';lb.dataset.key=leftOrder[i].key;lb.textContent=leftOrder[i].l;lb.onclick=()=>matchPick(lb);const rb=document.createElement('button');rb.className='match-chip';rb.dataset.side='r';rb.dataset.key=rightOrder[i].key;rb.textContent=rightOrder[i].r;rb.onclick=()=>matchPick(rb);grid.appendChild(lb);grid.appendChild(rb);});};
+TAB_INIT[8]=function(){const grid=document.getElementById('match-grid');grid.innerHTML='';const leftOrder=MATCH_PAIRS.slice();const rightOrder=MATCH_PAIRS.slice().sort(()=>Math.random()-.5);MATCH_PAIRS.forEach((_,i)=>{const lb=document.createElement('button');lb.className='match-chip';lb.dataset.side='l';lb.dataset.key=leftOrder[i].key;lb.textContent=leftOrder[i].emoji+' '+leftOrder[i].word;lb.onclick=()=>matchPick(lb);const rb=document.createElement('button');rb.className='match-chip';rb.dataset.side='r';rb.dataset.key=rightOrder[i].key;rb.textContent=rightOrder[i].sent;rb.onclick=()=>matchPick(rb);grid.appendChild(lb);grid.appendChild(rb);});};
 TAB_RESET[8]=function(){_matchLeft=null;_matchPaired.clear();TAB_INIT[8]._init=false;document.getElementById('match-done').classList.remove('show');document.getElementById('match-recap').style.display='none';TAB_INIT[8]();TAB_INIT[8]._init=true;};
 TAB_RESTORE[8]=function(){const s=lLoad('tab-8-state');if(!s)return;(s.paired||[]).forEach(k=>{document.querySelectorAll('.match-chip[data-key="'+k+'"]').forEach(c=>c.classList.add('matched'));_matchPaired.add(k);});if(s.allDone){document.getElementById('match-done').classList.add('show');renderMatchRecap();}};
 function matchPick(chip){if(chip.classList.contains('matched'))return;if(chip.dataset.side==='l'){document.querySelectorAll('.match-chip[data-side="l"]').forEach(c=>c.classList.remove('selected'));chip.classList.add('selected');_matchLeft=chip;return;}if(!_matchLeft)return;if(chip.dataset.key===_matchLeft.dataset.key){chip.classList.add('matched');_matchLeft.classList.add('matched');_matchLeft.classList.remove('selected');_matchPaired.add(chip.dataset.key);_matchLeft=null;const allDone=_matchPaired.size>=MATCH_PAIRS.length;lSave('tab-8-state',{paired:Array.from(_matchPaired),allDone});if(allDone){document.getElementById('match-done').classList.add('show');renderMatchRecap();}}else{chip.classList.add('wrong-flash');setTimeout(()=>chip.classList.remove('wrong-flash'),700);}}

@@ -139,9 +139,20 @@ function groupWordsByComponent(words: WordEntry[]): TreeUnit["vocabGroups"] {
     Glossary: []
   };
   for (const word of words) {
-    const hasV1 = word.sources.some((s) => s.tag.endsWith("-V1"));
-    const hasV2 = word.sources.some((s) => s.tag.endsWith("-V2"));
+    /* A word's source tag tells you WHERE in the planner it appeared
+       (vocab-1 page, vocab-2 page, reading section, etc.). It does NOT
+       tell you what KIND of word it is. The planner often introduces
+       Content Vocabulary on the same spread as Vocabulary 1 / 2 — those
+       content words get the -V1 / -V2 tag too. The Vocabulary 1 / 2
+       buckets in the source tree must only show the actual target
+       vocabulary (type "vocabulary"), not the content words from those
+       spreads. Otherwise the counts inflate (e.g. U6 V2 shows 9 instead
+       of 5, U7 V2 shows 8 instead of 5). Content + related go to
+       Glossary regardless of which section they appeared in. */
     const isAcademic = word.type === "academic";
+    const isVocab = word.type === "vocabulary";
+    const hasV1 = isVocab && word.sources.some((s) => s.tag.endsWith("-V1"));
+    const hasV2 = isVocab && word.sources.some((s) => s.tag.endsWith("-V2"));
     if (isAcademic) groups.Academic.push(word);
     else if (hasV1) groups["Vocabulary 1"].push(word);
     else if (hasV2) groups["Vocabulary 2"].push(word);

@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Unit 8 · That's Really Interesting! · Mission</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#1E0A3C; --p:#7C3AED; --a:#C4B5FD; --lt:#EDE9FE;
+  --wh:#fff; --gn:#22C55E; --rd:#EF4444; --gd:#F59E0B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#000;font-family:'Outfit',sans-serif}
+
+section{background:var(--bg);color:var(--wh);display:flex;flex-direction:column;padding:64px 96px;position:relative;overflow:hidden}
+.grad{background:linear-gradient(135deg,#1E0A3C 0%,#4C1D95 60%,#7C3AED 100%)}
+
+.t1{font-size:64px;font-weight:900;color:var(--a);line-height:1.1;margin-bottom:28px}
+.t2{font-size:44px;font-weight:800;color:var(--a);margin-bottom:20px}
+.tb{font-size:34px;line-height:1.55}
+.tsm{font-size:28px;line-height:1.5}
+.txs{font-size:24px}
+
+.btn{display:inline-flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;border:none;cursor:pointer;font-size:28px;font-weight:700;font-family:'Outfit',sans-serif;transition:all .2s}
+.bp{background:var(--p);color:var(--wh)}.bp:hover{background:#6D28D9;transform:translateY(-2px)}
+.ba{background:var(--a);color:var(--bg)}.ba:hover{opacity:.9;transform:translateY(-2px)}
+.bg{background:transparent;border:2px solid var(--a);color:var(--a)}.bg:hover{background:rgba(196,181,253,.12)}
+.bgn{background:var(--gn);color:var(--wh)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(196,181,253,.5)}50%{box-shadow:0 0 0 22px rgba(196,181,253,0);transform:scale(1.04)}}
+.bpulse{animation:pulse 2s infinite}
+
+.tn-btn{position:absolute;top:20px;right:20px;background:rgba(196,181,253,.15);border:1px solid rgba(196,181,253,.5);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:22px;color:var(--a);font-family:'Outfit',sans-serif;z-index:60}
+.tn-panel{display:none;position:absolute;top:64px;right:20px;width:480px;background:#2D1458;border:2px solid var(--a);border-radius:14px;padding:22px 26px;font-size:24px;color:var(--lt);line-height:1.55;z-index:60;box-shadow:0 8px 40px rgba(0,0,0,.6);max-height:380px;overflow-y:auto}
+.tn-panel.open{display:block}
+
+.fc{perspective:1200px;width:620px;height:400px;cursor:pointer;flex-shrink:0}
+.fc-inner{position:relative;width:100%;height:100%;transition:transform .65s;transform-style:preserve-3d}
+.fc.flipped .fc-inner{transform:rotateY(180deg)}
+.fc-f,.fc-b{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px}
+.fc-f{background:var(--p);font-size:72px;font-weight:900;color:var(--wh);text-align:center;gap:10px}
+.fc-b{background:#2D1458;border:2px solid var(--a);transform:rotateY(180deg);align-items:flex-start;justify-content:flex-start;gap:14px}
+
+.vr-item{font-size:34px;line-height:1.55;padding:12px 0;opacity:0;transform:translateY(8px);transition:all .4s ease;pointer-events:none}
+.vr-item.show{opacity:1;transform:translateY(0);pointer-events:auto}
+
+.blur-card{filter:blur(7px);transition:filter .4s;cursor:pointer;user-select:none}
+.blur-card.rev{filter:none;border:2px solid var(--a)!important;box-shadow:0 0 24px rgba(196,181,253,.35)}
+
+.step-box{display:none;background:rgba(124,58,237,.25);border-left:5px solid var(--a);border-radius:0 12px 12px 0;padding:16px 22px;font-size:34px;margin:8px 0}
+.step-box.show{display:block;animation:fdIn .4s}
+.tip-box{display:none;background:rgba(34,197,94,.15);border:2px solid var(--gn);border-radius:14px;padding:18px 24px;font-size:34px;margin-top:12px}
+.tip-box.show{display:block;animation:fdIn .5s}
+
+.ans-area{background:rgba(255,255,255,.1);border:2px solid var(--p);border-radius:10px;padding:14px 20px;font-size:32px;color:var(--wh);width:100%;outline:none;font-family:'Outfit',sans-serif;resize:none;min-height:100px;transition:border-color .2s}
+.ans-area:focus{border-color:var(--a)}
+.model-ans{display:none;background:rgba(34,197,94,.15);border:2px solid var(--gn);border-radius:12px;padding:20px 24px;font-size:30px;margin-top:14px;line-height:1.55}
+.model-ans.show{display:block;animation:fdIn .4s}
+
+.opt{background:rgba(124,58,237,.2);border:2px solid var(--p);border-radius:14px;padding:24px 28px;cursor:pointer;transition:all .2s;font-size:30px;text-align:center}
+.opt:hover{border-color:var(--a);transform:translateY(-3px)}
+.opt.sel{border-color:var(--a);background:rgba(196,181,253,.15)}
+
+.cb-row{display:flex;align-items:center;gap:20px;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.1);cursor:pointer;font-size:34px;transition:color .2s}
+.cb-box{width:44px;height:44px;border:3px solid var(--p);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:26px;transition:all .2s;flex-shrink:0}
+.cb-row.ticked .cb-box{background:var(--gn);border-color:var(--gn);color:var(--wh)}
+
+.star{font-size:56px;cursor:pointer;background:none;border:none;transition:transform .15s;filter:grayscale(1) opacity(.45);padding:0 6px}
+.star:hover,.star.lit{filter:none;transform:scale(1.18)}
+
+.quote-box{background:rgba(124,58,237,.25);border:2px solid var(--a);border-left:6px solid var(--a);border-radius:0 20px 20px 0;padding:36px 48px;font-size:36px;font-style:italic;line-height:1.7;color:var(--lt)}
+.quote-attr{font-size:26px;font-style:normal;color:rgba(196,181,253,.7);margin-top:16px;font-weight:700}
+
+.cp{position:fixed;width:12px;height:12px;border-radius:2px;pointer-events:none;z-index:9999;animation:cf 1.6s ease forwards}
+
+@keyframes flyL{from{transform:translateX(-200px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fdIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes bounce{0%,100%{transform:scale(1)}40%{transform:scale(1.3) rotate(-8deg)}70%{transform:scale(.9) rotate(4deg)}}
+@keyframes cf{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(500px) rotate(720deg);opacity:0}}
+
+.fly-l{animation:flyL .8s ease forwards}
+.fd1{animation:fdIn 1s .5s forwards;opacity:0}
+.fd2{animation:fdIn 1s 1.2s forwards;opacity:0}
+.fd3{animation:fdIn 1s 2s forwards;opacity:0}
+</style>
+</head>
+<body>
+<script>
+(() => {
+  const DESIGN_W_DEFAULT = 1920;
+  const DESIGN_H_DEFAULT = 1080;
+  const OVERLAY_HIDE_MS = 1800;
+  const VALIDATE_ATTR = 'no_overflowing_text,no_overlapping_text,slide_sized_text';
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const stylesheet = `
+    :host { position:fixed; inset:0; display:block; background:#000; overflow:hidden; }
+    .stage { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+    .canvas { position:relative; transform-origin:center center; flex-shrink:0; background:#fff; will-change:transform; }
+    ::slotted(*) { position:absolute!important; inset:0!important; width:100%!important; height:100%!important;
+      box-sizing:border-box!important; overflow:hidden; opacity:0; pointer-events:none; visibility:hidden; }
+    ::slotted([data-deck-active]) { opacity:1; pointer-events:auto; visibility:visible; }
+    .tapzones { position:fixed; inset:0; display:flex; z-index:2147482000; pointer-events:none; }
+    .tapzone { flex:1; pointer-events:auto; -webkit-tap-highlight-color:transparent; }
+    @media (hover:hover) and (pointer:fine) { .tapzones { display:none; } }
+    .overlay { position:fixed; left:50%; bottom:22px; transform:translate(-50%,6px) scale(0.92);
+      filter:blur(6px); display:flex; align-items:center; gap:4px; padding:4px; background:#000; color:#fff;
+      border-radius:999px; font-size:12px; opacity:0; pointer-events:none;
+      transition:opacity 260ms ease, transform 260ms cubic-bezier(.2,.8,.2,1), filter 260ms ease;
+      transform-origin:center bottom; z-index:2147483000; user-select:none; }
+    .overlay[data-visible] { opacity:1; pointer-events:auto; transform:translate(-50%,0) scale(1); filter:blur(0); }
+    .btn { appearance:none; -webkit-appearance:none; background:transparent; border:0; margin:0; padding:0;
+      color:inherit; font:inherit; cursor:default; display:inline-flex; align-items:center; justify-content:center;
+      height:28px; min-width:28px; border-radius:999px; color:rgba(255,255,255,0.72);
+      transition:background 140ms ease, color 140ms ease; -webkit-tap-highlight-color:transparent; }
+    .btn:hover { background:rgba(255,255,255,0.12); color:#fff; }
+    .btn svg { width:14px; height:14px; display:block; }
+    .btn.reset { font-size:11px; font-weight:500; padding:0 10px 0 12px; gap:6px; }
+    .btn.reset .kbd { display:inline-flex; align-items:center; justify-content:center; min-width:16px; height:16px;
+      padding:0 4px; font-family:ui-monospace,monospace; font-size:10px; color:rgba(255,255,255,.88);
+      background:rgba(255,255,255,.12); border-radius:4px; }
+    .count { font-variant-numeric:tabular-nums; color:#fff; font-weight:500; padding:0 8px; min-width:42px;
+      text-align:center; font-size:12px; }
+    .count .sep { color:rgba(255,255,255,.45); margin:0 3px; }
+    .count .total { color:rgba(255,255,255,.55); }
+    .divider { width:1px; height:14px; background:rgba(255,255,255,.18); margin:0 2px; }
+    @media print {
+      :host { position:static; inset:auto; background:none; overflow:visible; }
+      .stage { position:static; display:block; }
+      .canvas { transform:none!important; width:auto!important; height:auto!important; background:none; }
+      ::slotted(*) { position:relative!important; inset:auto!important;
+        width:var(--deck-design-w)!important; height:var(--deck-design-h)!important;
+        opacity:1!important; visibility:visible!important; break-after:page; }
+      .overlay,.tapzones { display:none!important; }
+    }
+  `;
+  class DeckStage extends HTMLElement {
+    static get observedAttributes() { return ['width','height','noscale']; }
+    constructor() {
+      super();
+      this._root = this.attachShadow({mode:'open'});
+      this._index = 0; this._slides = []; this._hideTimer = null;
+      this._onKey = this._onKey.bind(this);
+      this._onResize = this._onResize.bind(this);
+      this._onSlotChange = this._onSlotChange.bind(this);
+      this._onMouseMove = this._onMouseMove.bind(this);
+      this._onTapBack = this._onTapBack.bind(this);
+      this._onTapForward = this._onTapForward.bind(this);
+    }
+    get designWidth() { return parseInt(this.getAttribute('width'),10)||DESIGN_W_DEFAULT; }
+    get designHeight() { return parseInt(this.getAttribute('height'),10)||DESIGN_H_DEFAULT; }
+    connectedCallback() {
+      this._render(); this._syncPrintPageRule();
+      window.addEventListener('keydown',this._onKey);
+      window.addEventListener('resize',this._onResize);
+      window.addEventListener('mousemove',this._onMouseMove,{passive:true});
+    }
+    disconnectedCallback() {
+      window.removeEventListener('keydown',this._onKey);
+      window.removeEventListener('resize',this._onResize);
+      window.removeEventListener('mousemove',this._onMouseMove);
+      if(this._hideTimer) clearTimeout(this._hideTimer);
+    }
+    attributeChangedCallback() {
+      if(this._canvas) {
+        this._canvas.style.width = this.designWidth+'px';
+        this._canvas.style.height = this.designHeight+'px';
+        this._canvas.style.setProperty('--deck-design-w',this.designWidth+'px');
+        this._canvas.style.setProperty('--deck-design-h',this.designHeight+'px');
+        this._fit(); this._syncPrintPageRule();
+      }
+    }
+    _render() {
+      const style = document.createElement('style'); style.textContent = stylesheet;
+      const stage = document.createElement('div'); stage.className = 'stage';
+      const canvas = document.createElement('div'); canvas.className = 'canvas';
+      canvas.style.width = this.designWidth+'px'; canvas.style.height = this.designHeight+'px';
+      canvas.style.setProperty('--deck-design-w',this.designWidth+'px');
+      canvas.style.setProperty('--deck-design-h',this.designHeight+'px');
+      const slot = document.createElement('slot');
+      slot.addEventListener('slotchange',this._onSlotChange);
+      canvas.appendChild(slot); stage.appendChild(canvas);
+      const tapzones = document.createElement('div'); tapzones.className = 'tapzones';
+      tapzones.setAttribute('aria-hidden','true');
+      const tzBack = document.createElement('div'); tzBack.className = 'tapzone tapzone--back';
+      const tzMid = document.createElement('div'); tzMid.className = 'tapzone tapzone--mid'; tzMid.style.pointerEvents='none';
+      const tzFwd = document.createElement('div'); tzFwd.className = 'tapzone tapzone--fwd';
+      tzBack.addEventListener('click',this._onTapBack); tzFwd.addEventListener('click',this._onTapForward);
+      tapzones.append(tzBack,tzMid,tzFwd);
+      const overlay = document.createElement('div'); overlay.className = 'overlay';
+      overlay.setAttribute('role','toolbar'); overlay.setAttribute('aria-label','Deck controls');
+      overlay.innerHTML = `
+        <button class="btn prev" type="button" title="Previous (←)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>
+        </button>
+        <span class="count"><span class="current">1</span><span class="sep">/</span><span class="total">1</span></span>
+        <button class="btn next" type="button" title="Next (→)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg>
+        </button>
+        <span class="divider"></span>
+        <button class="btn reset" type="button" title="Reset (R)">Reset<span class="kbd">R</span></button>
+      `;
+      overlay.querySelector('.prev').addEventListener('click',()=>this._go(this._index-1,'click'));
+      overlay.querySelector('.next').addEventListener('click',()=>this._go(this._index+1,'click'));
+      overlay.querySelector('.reset').addEventListener('click',()=>this._go(0,'click'));
+      this._root.append(style,stage,tapzones,overlay);
+      this._canvas = canvas; this._slot = slot; this._overlay = overlay;
+      this._countEl = overlay.querySelector('.current');
+      this._totalEl = overlay.querySelector('.total');
+    }
+    _syncPrintPageRule() {
+      const id = 'deck-stage-print-page';
+      let tag = document.getElementById(id);
+      if(!tag){ tag=document.createElement('style'); tag.id=id; document.head.appendChild(tag); }
+      tag.textContent = '@page{size:'+this.designWidth+'px '+this.designHeight+'px;margin:0}'+
+        '@media print{html,body{margin:0!important;padding:0!important;background:none!important;overflow:visible!important;height:auto!important}'+
+        '*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+    }
+    _onSlotChange() {
+      const assigned = this._slot.assignedElements({flatten:true});
+      this._slides = assigned.filter(el=>!['TEMPLATE','SCRIPT','STYLE'].includes(el.tagName));
+      this._slides.forEach((slide,i)=>{
+        const n=i+1;
+        let label=slide.getAttribute('data-label')||'Slide';
+        slide.setAttribute('data-screen-label',pad2(n)+' '+label);
+        if(!slide.hasAttribute('data-om-validate')) slide.setAttribute('data-om-validate',VALIDATE_ATTR);
+        slide.setAttribute('data-deck-slide',String(i));
+      });
+      if(this._totalEl) this._totalEl.textContent=String(this._slides.length||1);
+      if(this._index>=this._slides.length) this._index=Math.max(0,this._slides.length-1);
+      const h=(location.hash||'').match(/^#(\d+)$/);
+      if(h){const n=parseInt(h[1],10)-1; if(n>=0&&n<this._slides.length) this._index=n;}
+      this._applyIndex({showOverlay:false,reason:'init'});
+      this._fit();
+    }
+    _applyIndex({showOverlay=true,reason='init'}={}) {
+      if(!this._slides.length) return;
+      const curr=this._index;
+      try{history.replaceState(null,'','#'+(curr+1));}catch(e){}
+      this._slides.forEach((s,i)=>{
+        if(i===curr) s.setAttribute('data-deck-active','');
+        else s.removeAttribute('data-deck-active');
+      });
+      if(this._countEl) this._countEl.textContent=String(curr+1);
+      try{window.postMessage({slideIndexChanged:curr},'*');}catch(e){}
+      this.dispatchEvent(new CustomEvent('slidechange',{detail:{index:curr,total:this._slides.length,slide:this._slides[curr]||null,reason},bubbles:true,composed:true}));
+      if(showOverlay) this._flashOverlay();
+    }
+    _flashOverlay() {
+      if(!this._overlay) return;
+      this._overlay.setAttribute('data-visible','');
+      if(this._hideTimer) clearTimeout(this._hideTimer);
+      this._hideTimer=setTimeout(()=>this._overlay.removeAttribute('data-visible'),OVERLAY_HIDE_MS);
+    }
+    _fit() {
+      if(!this._canvas) return;
+      if(this.hasAttribute('noscale')){this._canvas.style.transform='none';return;}
+      const s=Math.min(window.innerWidth/this.designWidth,window.innerHeight/this.designHeight);
+      this._canvas.style.transform=`scale(${s})`;
+    }
+    _onResize(){this._fit();}
+    _onMouseMove(){this._flashOverlay();}
+    _onTapBack(e){e.preventDefault();this._go(this._index-1,'tap');}
+    _onTapForward(e){e.preventDefault();this._go(this._index+1,'tap');}
+    _onKey(e){
+      const t=e.target;
+      if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if(e.metaKey||e.ctrlKey||e.altKey) return;
+      const key=e.key; let handled=true;
+      if(key==='ArrowRight'||key==='PageDown'||key===' '||key==='Spacebar') this._go(this._index+1,'keyboard');
+      else if(key==='ArrowLeft'||key==='PageUp') this._go(this._index-1,'keyboard');
+      else if(key==='Home') this._go(0,'keyboard');
+      else if(key==='End') this._go(this._slides.length-1,'keyboard');
+      else if(key==='r'||key==='R') this._go(0,'keyboard');
+      else if(/^[0-9]$/.test(key)){const n=key==='0'?9:parseInt(key,10)-1;if(n<this._slides.length)this._go(n,'keyboard');}
+      else handled=false;
+      if(handled){e.preventDefault();this._flashOverlay();}
+    }
+    _go(i,reason='api'){
+      if(!this._slides.length) return;
+      const clamped=Math.max(0,Math.min(this._slides.length-1,i));
+      if(clamped===this._index){this._flashOverlay();return;}
+      this._index=clamped;
+      this._applyIndex({showOverlay:true,reason});
+    }
+    get index(){return this._index;}
+    get length(){return this._slides.length;}
+    goTo(i){this._go(i,'api');}
+    next(){this._go(this._index+1,'api');}
+    prev(){this._go(this._index-1,'api');}
+    reset(){this._go(0,'api');}
+  }
+  if(!customElements.get('deck-stage')) customElements.define('deck-stage',DeckStage);
+})();
+</script>
+<deck-stage width="1920" height="1080">
+
+<!-- ══════════════════════════════════════════
+     01 TITLE
+══════════════════════════════════════════ -->
+<section class="grad" data-label="01 Title" style="align-items:center;justify-content:center;text-align:center;gap:28px">
+<div class="fly-l" style="font-size:110px">🦴🐚</div>
+<div class="fly-l" style="font-size:100px;font-weight:900">MISSION</div>
+<div class="fd1" style="font-size:52px;font-weight:700;color:var(--a)">Enjoy a hobby</div>
+<div class="fd2" style="font-size:30px;color:rgba(255,255,255,.65)">Unit 8 · That's Really Interesting! · Our World Level 4</div>
+<button class="btn ba bpulse fd3" onclick="DS.next()" style="margin-top:16px;font-size:36px;padding:20px 56px">Start ▶</button>
+</section>
+
+<!-- ══════════════════════════════════════════
+     02 OBJECTIVES
+══════════════════════════════════════════ -->
+<section data-label="02 Objectives">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">Read each objective aloud. Ask Leo: "What's a hobby? Do you have one? What does it mean to <em>enjoy</em> something?" Don't explain yet — activate curiosity. Hobbies are the spine of this whole unit (Vocabulary 1 is hobby-related: collect, take photos, play in a musical group, etc.).</div>
+<h1 class="t1">In This Lesson, Leo Will… 🎯</h1>
+<div style="display:flex;gap:36px;flex:1;align-items:center">
+  <div class="blur-card" onclick="this.classList.add('rev')" style="flex:1;background:rgba(124,58,237,.3);border:2px solid var(--p);border-radius:20px;padding:44px 32px;text-align:center;cursor:pointer">
+    <div style="font-size:72px;margin-bottom:16px">🎯</div>
+    <div class="tb" style="font-weight:700">Share ideas about hobbies you like and want to try.</div>
+  </div>
+  <div class="blur-card" onclick="this.classList.add('rev')" style="flex:1;background:rgba(124,58,237,.3);border:2px solid var(--p);border-radius:20px;padding:44px 32px;text-align:center;cursor:pointer">
+    <div style="font-size:72px;margin-bottom:16px">⚖️</div>
+    <div class="tb" style="font-weight:700">Evaluate hobbies and decide which one fits you best.</div>
+  </div>
+  <div class="blur-card" onclick="this.classList.add('rev');document.getElementById('obj-next').style.display='inline-flex'" style="flex:1;background:rgba(124,58,237,.3);border:2px solid var(--p);border-radius:20px;padding:44px 32px;text-align:center;cursor:pointer">
+    <div style="font-size:72px;margin-bottom:16px">🗣️</div>
+    <div class="tb" style="font-weight:700">Use Unit 8 vocabulary: <em>collect, alone, enjoy, hobby</em>.</div>
+  </div>
+</div>
+<div style="margin-top:28px">
+  <span class="tsm" style="color:rgba(196,181,253,.6)">Click each card to reveal ↑</span>
+  <button class="btn ba" id="obj-next" onclick="DS.next()" style="display:none;margin-left:24px">Vocabulary ▶</button>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     03 VOCAB: collect (V1, connects to Hurum's fossil hobby)
+══════════════════════════════════════════ -->
+<section data-label="03 Vocab: collect">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">"Collect" is the spine word for U8. The whole unit opens with "collect" — and our explorer Jørn Hurum collects fossils. Ask Leo: "Do YOU collect anything? Soccer cards? Marvel figures?" Connect it to his world.</div>
+<h1 class="t1">Mission Vocabulary 📖</h1>
+<div style="display:flex;gap:56px;flex:1;align-items:center">
+  <div class="fc" id="fc3" onclick="flipCard('fc3')">
+    <div class="fc-inner">
+      <div class="fc-f">collect 🗂️🪙<div style="font-size:26px;margin-top:10px;opacity:.65">Click to flip!</div></div>
+      <div class="fc-b">
+        <div style="font-size:30px;color:var(--a);font-weight:700">collect 🗂️🪙</div>
+        <div class="tsm">To <strong>get many of the same kind of thing</strong> as a hobby.</div>
+        <div class="tsm">Dad 💬 <em>"Jørn Hurum collects fossils — and now it's his job!"</em></div>
+        <div class="tsm">Leo 💬 <em>"I collect Marvel figures and Premier League stickers!"</em></div>
+        <div style="display:flex;gap:14px;margin-top:auto">
+          <button class="btn bgn" onclick="event.stopPropagation();flipOk('fc3','fc3-next')" style="font-size:22px;padding:10px 22px">Got it ✅</button>
+          <button class="btn bg" onclick="event.stopPropagation();flipCard('fc3')" style="font-size:22px;padding:10px 22px">Again 🔄</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;gap:20px">
+    <div class="tb" style="color:rgba(255,255,255,.8);line-height:1.6">Some kids collect <strong style="color:var(--a)">cards, coins, stamps, or fossils</strong>. A collection is a group of the same kind of thing you gather over time.</div>
+    <div style="background:rgba(124,58,237,.25);border-radius:14px;padding:22px 28px">
+      <div class="tsm" style="color:var(--a);margin-bottom:8px">⚽ Soccer connection:</div>
+      <div class="tsm"><em>"Leo collects Champions League trophy cards — every team, every year."</em></div>
+    </div>
+    <button class="btn ba" id="fc3-next" onclick="DS.next()" style="display:none;width:fit-content">Next word ▶</button>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     04 VOCAB: alone (V1, connects to Hurum's quote)
+══════════════════════════════════════════ -->
+<section data-label="04 Vocab: alone">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">"Alone" is the bridge into Hurum's quote on slide 8 — he says he felt "very alone" with his hobby as a child. Ask Leo: "Have you ever felt alone because you love something nobody else cared about?" That's relatable.</div>
+<h1 class="t1">Mission Vocabulary 📖</h1>
+<div style="display:flex;gap:56px;flex:1;align-items:center">
+  <div class="fc" id="fc4" onclick="flipCard('fc4')">
+    <div class="fc-inner">
+      <div class="fc-f">alone 🧍🔇<div style="font-size:26px;margin-top:10px;opacity:.65">Click to flip!</div></div>
+      <div class="fc-b">
+        <div style="font-size:30px;color:var(--a);font-weight:700">alone 🧍🔇</div>
+        <div class="tsm"><strong>Without other people</strong>; by yourself.</div>
+        <div class="tsm">Dad 💬 <em>"Hurum felt alone as a kid because nobody else liked fossils."</em></div>
+        <div class="tsm">Leo 💬 <em>"Sometimes I play video games alone, and sometimes I play with friends!"</em></div>
+        <div style="display:flex;gap:14px;margin-top:auto">
+          <button class="btn bgn" onclick="event.stopPropagation();flipOk('fc4','fc4-next')" style="font-size:22px;padding:10px 22px">Got it ✅</button>
+          <button class="btn bg" onclick="event.stopPropagation();flipCard('fc4')" style="font-size:22px;padding:10px 22px">Again 🔄</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;gap:20px">
+    <div class="tb" style="color:rgba(255,255,255,.8);line-height:1.6">Sometimes it feels good to enjoy a hobby <strong style="color:var(--a)">alone</strong>. Other times it's more fun with friends or in a group. Both are OK!</div>
+    <div style="background:rgba(124,58,237,.25);border-radius:14px;padding:22px 28px">
+      <div class="tsm" style="color:var(--a);margin-bottom:8px">⚽ Soccer connection:</div>
+      <div class="tsm"><em>"Even Haaland trains alone in the gym — but plays as part of a team on match day."</em></div>
+    </div>
+    <button class="btn ba" id="fc4-next" onclick="DS.next()" style="display:none;width:fit-content">Be the Expert ▶</button>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     05 SECTION: BE THE EXPERT
+══════════════════════════════════════════ -->
+<section class="grad" data-label="05 Be the Expert Header" style="align-items:center;justify-content:center;text-align:center;gap:28px">
+<div style="font-size:110px">🧠</div>
+<div style="font-size:90px;font-weight:900;color:var(--wh)">Be the Expert</div>
+<div style="font-size:42px;color:var(--a)">About the Photo · Meet the Explorer</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     06 ABOUT THE PHOTO
+══════════════════════════════════════════ -->
+<section data-label="06 About the Photo">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">The photo on p. 143 shows ammonite fossils. Ammonites looked like squids inside ring-shaped shells, lived in groups called "schools," and went extinct with the dinosaurs about 65 million years ago. Scientists use ammonite shells to tell how old OTHER fossils are. Ask Leo: "Have you ever found a rock that looked like an animal?"</div>
+<h1 class="t1">About the Photo 📸</h1>
+<div style="display:flex;gap:48px;flex:1">
+  <div style="flex:1;display:flex;flex-direction:column;gap:18px">
+    <div style="background:rgba(124,58,237,.2);border:2px dashed var(--p);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:320px;padding:40px">
+      <div style="font-size:100px">🐚🦴</div>
+      <div class="tsm" style="color:rgba(255,255,255,.65);text-align:center">Ammonite fossils — ring-shaped<br/>shells of an extinct sea creature</div>
+    </div>
+    <div style="background:rgba(124,58,237,.25);border-radius:12px;padding:18px 24px">
+      <div class="txs" style="color:var(--a);font-weight:700;margin-bottom:6px">⏳ WHEN: 240 million years ago</div>
+      <div class="txs">Ammonites went extinct with the dinosaurs ~65 million years ago 🦖</div>
+    </div>
+  </div>
+  <div data-step="-1" id="photo-reveal" style="flex:1;display:flex;flex-direction:column;gap:14px">
+    <div class="vr-item" data-idx="0" style="font-size:32px"><strong style="color:var(--a)">What they were:</strong> Ammonites looked like <em>squids</em> 🦑 living inside hard, ring-shaped shells. They lived in big groups called <em>"schools."</em></div>
+    <div class="vr-item" data-idx="1" style="font-size:32px"><strong style="color:var(--a)">Where you find them:</strong> Ammonite fossils are some of the most <em>common</em> fossils on Earth. Anywhere with old sea rocks — beaches, mountains that used to be ocean.</div>
+    <div class="vr-item" data-idx="2" style="font-size:32px"><strong style="color:var(--a)">Why scientists love them:</strong> Different shaped shells appeared at different times. So if you find an ammonite, you can tell how <em>OLD the rocks around it are</em>! 🗓️🪨</div>
+    <div class="vr-item" data-idx="3" style="font-size:30px">Dad 💬 <em>"This is why Hurum hunts for fossils every August — they tell a 240-million-year story!"</em><br/>Leo 💬 <em>"Like collecting Pokémon — but the cards are 240 million years old!"</em></div>
+    <div style="display:flex;gap:14px;margin-top:8px">
+      <button class="btn bp" id="photo-rev" onclick="vcReveal('photo-reveal','photo-next','photo-rev')">▶ Reveal</button>
+      <button class="btn ba" id="photo-next" onclick="DS.next()" style="display:none">Meet the Explorer ▶</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     07 MEET THE EXPLORER
+══════════════════════════════════════════ -->
+<section data-label="07 Meet the Explorer">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">Jørn Hurum is Norwegian. He turned his childhood hobby of collecting fossils into a full career. Every August he leads a team near the Arctic Circle. His most famous find is Predator X — a 50-foot sea reptile that hunted dinosaurs underwater. Connect to Leo: "Imagine your favourite hobby becoming your job!"</div>
+<h1 class="t1">Meet the Explorer 🔬</h1>
+<div style="display:flex;gap:48px;flex:1">
+  <div style="background:var(--p);border-radius:24px;padding:48px;text-align:center;min-width:320px;display:flex;flex-direction:column;align-items:center;gap:16px">
+    <div style="font-size:100px">👨‍🔬</div>
+    <div style="font-size:40px;font-weight:900;color:var(--a)">Jørn Hurum</div>
+    <div style="font-size:28px;color:rgba(255,255,255,.8)">Paleontologist<br/>National Geographic Explorer</div>
+    <div style="background:rgba(0,0,0,.3);border-radius:10px;padding:12px 20px;font-size:24px;color:var(--a)">🇳🇴 Norway, Arctic Circle</div>
+  </div>
+  <div data-step="-1" id="exp-reveal" style="flex:1;display:flex;flex-direction:column;gap:16px">
+    <div class="vr-item" data-idx="0" style="font-size:32px">🦴 <strong style="color:var(--a)">His hobby → his job:</strong> Hurum has collected fossils since he was a kid. He studies <strong>fossilized bones</strong> buried for millions of years.</div>
+    <div class="vr-item" data-idx="1" style="font-size:32px">❄️ <strong style="color:var(--a)">Where he digs:</strong> Every August his team works near the <strong>Arctic Circle</strong> in Norway. Cold, almost no plants — perfect for finding bones.</div>
+    <div class="vr-item" data-idx="2" style="font-size:32px">🐉 <strong style="color:var(--a)">Famous find:</strong> He's found about <strong>60 sea-reptile skeletons</strong> in one small area — including <em>Predator X</em>, a 50-foot pliosaur that hunted in cold oceans during the dinosaur age!</div>
+    <div class="vr-item" data-idx="3" style="font-size:30px">Dad 💬 <em>"His CHILDHOOD HOBBY became his career. Same word: collect."</em><br/>Leo 💬 <em>"So my Marvel collection could become my job?? 🦸"</em></div>
+    <div style="display:flex;gap:14px;margin-top:8px">
+      <button class="btn bp" id="exp-rev" onclick="vcReveal('exp-reveal','exp-next','exp-rev')">▶ Reveal</button>
+      <button class="btn ba" id="exp-next" onclick="DS.next()" style="display:none">Explorer's Quote ▶</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     08 EXPLORER QUOTE
+══════════════════════════════════════════ -->
+<section data-label="08 Explorer Quote">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">Read the quote twice — once normally, once asking Leo to listen for the two key vocabulary words: "alone" and "study fossils". Ask Leo: "Why did Hurum feel alone? What changed when he was 13?" The point: it's OK to like things nobody else likes — you'll find your people eventually.</div>
+<h1 class="t1">The Explorer's Quote 💬</h1>
+<div style="display:flex;flex-direction:column;justify-content:center;flex:1;gap:32px">
+  <div class="quote-box" id="qbox" style="opacity:0;transition:opacity .8s">
+    <em>"As a child, I felt very <strong style="color:var(--a)">alone</strong> with my interest in fossils. Finally, at age 13, I discovered there was a <strong style="color:var(--a)">museum</strong> in Norway that actually <strong style="color:var(--a)">employed</strong> people to study fossils."</em>
+    <div class="quote-attr">— Jørn Hurum, Paleontologist &amp; National Geographic Explorer</div>
+  </div>
+  <div id="q-steps" style="display:none;display:flex;flex-direction:column;gap:14px">
+    <div class="step-box" id="qs1">🔑 <strong style="color:var(--a)">alone</strong> = without other people — a feeling many kids have about their unique hobby 🧍</div>
+    <div class="step-box" id="qs2">🔑 <strong style="color:var(--a)">museum</strong> = a building where you can see real fossils and historic objects 🏛️</div>
+    <div class="step-box" id="qs3">🔑 <strong style="color:var(--a)">employed</strong> = paid to do a job — Hurum's hobby BECAME his job! 💼</div>
+    <div class="tip-box" id="qtip">⚽ Leo 💬 <em>"That's like discovering soccer academies exist! A whole place full of people who LOVE the same thing!"</em></div>
+  </div>
+  <div style="display:flex;gap:16px">
+    <button class="btn bp" onclick="showQuote()">Show Quote ✨</button>
+    <button class="btn bg" id="q-words-btn" onclick="showKeyWords()" style="display:none">Key Words 🔑</button>
+    <button class="btn ba" id="q-next-btn" onclick="DS.next()" style="display:none">Think Activity ▶</button>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     09 SECTION: THINK
+══════════════════════════════════════════ -->
+<section class="grad" data-label="09 Think Header" style="align-items:center;justify-content:center;text-align:center;gap:28px">
+<div style="font-size:110px">🧠</div>
+<div style="font-size:90px;font-weight:900;color:var(--wh)">Think</div>
+<div style="font-size:40px;color:var(--a)">Why have a hobby? Which one fits you?</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     10 THINK Q1 — WHY HAVE A HOBBY?
+══════════════════════════════════════════ -->
+<section data-label="10 Think Q1: Why have a hobby">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">This is the LP Think.Pair.Share Q1 verbatim: "Why is it good to have a hobby?" Help Leo see multiple reasons (fun, friends, learning, future job). Connect to Hurum — his hobby became his career.</div>
+<h1 class="t1">Think — Question 1 🤔</h1>
+<div style="display:flex;gap:40px;flex:1">
+  <div style="flex:1;display:flex;flex-direction:column;gap:20px">
+    <div style="background:rgba(124,58,237,.25);border-radius:16px;padding:28px 36px;font-size:40px;font-weight:700">Why is it good to <strong style="color:var(--a)">have a hobby</strong>?</div>
+    <textarea class="ans-area" id="q10" placeholder="Write your reasons here... (e.g. It's fun. I learn new things. I meet friends...)" style="min-height:120px"></textarea>
+    <div style="display:flex;gap:14px">
+      <button class="btn bp" onclick="document.getElementById('q10-sample').style.display='flex'">Show sample 💬</button>
+      <button class="btn ba" onclick="DS.next()">Question 2 ▶</button>
+    </div>
+    <div id="q10-sample" style="display:none;flex-direction:column;gap:10px">
+      <div style="background:rgba(124,58,237,.2);border-radius:12px;padding:16px 20px;font-size:28px">Dad 💬 <em>"A hobby gives me time to relax after work — playing music with friends."</em></div>
+      <div style="background:rgba(124,58,237,.2);border-radius:12px;padding:16px 20px;font-size:28px">Leo 💬 <em>"Hobbies are fun! And like Hurum, your hobby can become your job someday!"</em></div>
+    </div>
+  </div>
+  <div style="width:400px;display:flex;flex-direction:column;gap:14px">
+    <div class="tsm" style="color:var(--a);font-weight:700">Reason starters:</div>
+    <div class="opt" onclick="insertText('q10', 'A hobby is good because...')">💡 "A hobby is good because..."</div>
+    <div class="opt" onclick="insertText('q10', 'It helps me...')">🎯 "It helps me..."</div>
+    <div class="opt" onclick="insertText('q10', 'I meet friends who...')">👥 "I meet friends who..."</div>
+    <div class="opt" onclick="insertText('q10', 'It might become my job, like...')">💼 "It might become my job, like..."</div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     11 THINK Q2 — WHAT HOBBY TO TRY?
+══════════════════════════════════════════ -->
+<section data-label="11 Think Q2: Hobby to try">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">LP Q2: "What hobby would you like to try, and why?" If Leo names something he ALREADY does (soccer cards, Marvel comics), nudge him toward something NEW. The goal is curiosity to explore — like Hurum at age 13 finding the museum.</div>
+<h1 class="t1">Think — Question 2 💡</h1>
+<div style="display:flex;gap:40px;flex:1">
+  <div style="flex:1;display:flex;flex-direction:column;gap:20px">
+    <div style="background:rgba(124,58,237,.25);border-radius:16px;padding:28px 36px;font-size:40px;font-weight:700">What hobby would you like to <strong style="color:var(--a)">try</strong>, and <strong style="color:var(--a)">why</strong>? 🎨</div>
+    <div class="tsm" style="color:rgba(255,255,255,.7)">Think of something <em>new</em> — a hobby you've always been curious about but never tried.</div>
+    <textarea class="ans-area" id="q11" placeholder="The hobby I'd like to try: ... / Why: ..." style="min-height:130px"></textarea>
+    <div style="display:flex;gap:14px">
+      <button class="btn bp" onclick="document.getElementById('q11-sample').style.display='flex'">Show sample 💬</button>
+      <button class="btn ba" onclick="DS.next()">Question 3 ▶</button>
+    </div>
+    <div id="q11-sample" style="display:none;flex-direction:column;gap:10px">
+      <div style="background:rgba(124,58,237,.2);border-radius:12px;padding:14px 20px;font-size:27px">Dad 💬 <em>"I'd like to try learning to play the guitar — I've always loved music but never picked up an instrument."</em></div>
+      <div style="background:rgba(124,58,237,.2);border-radius:12px;padding:14px 20px;font-size:27px">Leo 💬 <em>"I'd like to try fossil hunting like Hurum — or skateboarding, because Yamal does it!"</em></div>
+    </div>
+  </div>
+  <div style="width:380px;display:flex;flex-direction:column;gap:14px">
+    <div class="tsm" style="color:var(--a);font-weight:700">Hobby ideas:</div>
+    <div class="opt" onclick="insertText('q11','I would like to try fossil hunting because...')">🦴 Fossil hunting</div>
+    <div class="opt" onclick="insertText('q11','I would like to try playing a musical instrument because...')">🎸 Musical instrument</div>
+    <div class="opt" onclick="insertText('q11','I would like to try photography because...')">📸 Photography</div>
+    <div class="opt" onclick="insertText('q11','I would like to try drawing because...')">🎨 Drawing</div>
+    <div style="background:rgba(124,58,237,.25);border-radius:12px;padding:16px 20px;margin-top:8px">
+      <div class="txs" style="color:var(--a);font-weight:700;margin-bottom:6px">💡 Tip:</div>
+      <div class="txs">Hurum tried fossils as a kid. Yamal tried skateboarding. Try ONE new thing this month — you might love it!</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     12 THINK Q3 — HOW DO YOU DO IT? WHAT DO YOU NEED?
+══════════════════════════════════════════ -->
+<section data-label="12 Think Q3: How / What you need">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">LP Q3: "How do you do the hobby you chose? What do you need?" Push Leo to think practically. For fossil hunting: shovel, brush, hat, somewhere with old rocks. For guitar: a guitar, lessons or YouTube, a quiet room. The "what do you need" question prepares him to actually try the hobby.</div>
+<h1 class="t1">Think — Question 3 🛠️</h1>
+<div style="display:flex;gap:40px;flex:1">
+  <div style="flex:1;display:flex;flex-direction:column;gap:24px;justify-content:center">
+    <div style="background:rgba(124,58,237,.25);border-radius:16px;padding:28px 36px;font-size:36px;font-weight:700">How do you <strong style="color:var(--a)">do</strong> that hobby? What do you <strong style="color:var(--a)">need</strong>?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <textarea class="ans-area" id="q12a" placeholder="HOW: First, you... Then, you... Finally, you..." style="min-height:140px"></textarea>
+      <textarea class="ans-area" id="q12b" placeholder="WHAT YOU NEED: 1. ... 2. ... 3. ..." style="min-height:140px"></textarea>
+    </div>
+    <div class="tip-box" id="q12tip">💡 Remember Hurum: his hobby needed <em>boots, a shovel, a notebook, and a cold August in Norway!</em> ⚽ For soccer, you need a ball, friends, and a field.</div>
+    <div style="display:flex;gap:14px">
+      <button class="btn bp" onclick="document.getElementById('q12tip').classList.add('show')">Show tip 💡</button>
+      <button class="btn ba" onclick="DS.next()">Pair Activity ▶</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     13 SECTION: PAIR
+══════════════════════════════════════════ -->
+<section class="grad" data-label="13 Pair Header" style="align-items:center;justify-content:center;text-align:center;gap:28px">
+<div style="font-size:110px">👥</div>
+<div style="font-size:90px;font-weight:900;color:var(--wh)">Pair</div>
+<div style="font-size:40px;color:var(--a)">Tell Dad about a hobby you'd like to try</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     14 PAIR — DAD/LEO DIALOGUE EXAMPLE
+══════════════════════════════════════════ -->
+<section data-label="14 Pair: Example Dialogue">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">First read the example dialogue together, taking turns as Dad and Leo. Then Leo describes a real hobby HE wants to try and what he'd need. Use the discussion guide on slide 15. Time: ~5 minutes.</div>
+<h1 class="t1">Pair — Listen to This Example 💬</h1>
+<div data-step="-1" id="sr14" style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px">
+  <div class="step-box" id="p14s1">❓ Dad 💬 <em>"Leo, what hobby would you like to try?"</em></div>
+  <div class="step-box" id="p14s2">Leo 💬 <em>"I'd like to try fossil hunting — like Jørn Hurum! It looks really fun to find something from millions of years ago!"</em></div>
+  <div class="step-box" id="p14s3">❓ Dad 💬 <em>"Cool! How do you do it? What do you need?"</em></div>
+  <div class="step-box" id="p14s4">Leo 💬 <em>"You need a shovel, a brush, a notebook, and somewhere with old sea rocks. First, you dig carefully. Then, you brush off the dirt. Finally, you write down where you found it!"</em></div>
+  <div class="step-box" id="p14s5">❓ Dad 💬 <em>"Would you do it alone or with someone?"</em></div>
+  <div class="step-box" id="p14s6">Leo 💬 <em>"With YOU, Dad! Hurum was alone at first too — but it's more fun with someone."</em></div>
+  <div class="tip-box" id="p14tip">✅ Now it's YOUR turn on the next slide! Use this structure to tell Dad about a hobby YOU want to try.</div>
+  <div style="display:flex;gap:14px;margin-top:16px">
+    <button class="btn bp" id="p14-btn" onclick="pairNext()">▶ Next line</button>
+    <button class="btn ba" id="p14-next" onclick="DS.next()" style="display:none">Your Turn ▶</button>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     15 PAIR — LEO'S TURN
+══════════════════════════════════════════ -->
+<section data-label="15 Pair: Leo's Turn">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">Leo talks, you listen and take notes. Use the guide questions to help. If Leo gets stuck: "Think about something you've always wanted to try — a sport, an art form, collecting something new." After discussing verbally, Leo types a short summary.</div>
+<h1 class="t1">Pair — Your Turn, Leo! 🗣️</h1>
+<div style="display:flex;gap:40px;flex:1">
+  <div style="flex:1;display:flex;flex-direction:column;gap:16px">
+    <div style="background:rgba(124,58,237,.25);border-radius:14px;padding:22px 28px;font-size:30px;line-height:1.7">
+      Talk to Dad about <strong style="color:var(--a)">a hobby you'd like to try</strong>. Tell him what you need and how you'd do it.
+    </div>
+    <textarea class="ans-area" id="q15" placeholder="Write your hobby idea here after discussing with Dad..." style="min-height:150px"></textarea>
+    <div style="display:flex;gap:14px;align-items:center">
+      <button class="btn bp" onclick="startTimer('t15',60,function(){document.getElementById('t15-done').style.display='block'})">🎤 Start discussion (60s)</button>
+      <span id="t15" style="font-size:64px;font-weight:900;color:var(--a);display:none"></span>
+    </div>
+    <div id="t15-done" style="display:none;background:rgba(34,197,94,.15);border:2px solid var(--gn);border-radius:12px;padding:14px 20px;font-size:28px">
+      🎤 Great discussion! Now write your summary above, then move to Share ▶
+    </div>
+    <button class="btn ba" onclick="DS.next()" style="margin-top:4px;width:fit-content">Share ▶</button>
+  </div>
+  <div style="width:380px;display:flex;flex-direction:column;gap:12px">
+    <div class="tsm" style="color:var(--a);font-weight:700;margin-bottom:4px">Dad asks these questions:</div>
+    <div style="background:rgba(124,58,237,.2);border-radius:12px;padding:16px 20px;font-size:26px">❓ What hobby would you like to try?</div>
+    <div style="background:rgba(124,58,237,.2);border-radius:12px;padding:16px 20px;font-size:26px">❓ Why that one?</div>
+    <div style="background:rgba(124,58,237,.2);border-radius:12px;padding:16px 20px;font-size:26px">❓ How do you do it? What do you need?</div>
+    <div style="background:rgba(124,58,237,.2);border-radius:12px;padding:16px 20px;font-size:26px">❓ Would you do it alone or with friends?</div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     16 SECTION: SHARE
+══════════════════════════════════════════ -->
+<section class="grad" data-label="16 Share Header" style="align-items:center;justify-content:center;text-align:center;gap:28px">
+<div style="font-size:110px">🗣️</div>
+<div style="font-size:90px;font-weight:900;color:var(--wh)">Share</div>
+<div style="font-size:40px;color:var(--a)">Which hobby is the most interesting?</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     17 SHARE — PRESENT HOBBY IDEAS
+══════════════════════════════════════════ -->
+<section data-label="17 Share: Present Ideas">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">Leo presents his hobby idea as if pitching it. You play "the listener" and ask one follow-up question. Then discuss which hobby out of all the ones you've talked about today is the most interesting — Hurum's fossils, Leo's idea, music, or anything else.</div>
+<h1 class="t1">Share — Present Your Hobby Idea 🎤</h1>
+<div style="display:flex;gap:40px;flex:1">
+  <div style="flex:1;display:flex;flex-direction:column;gap:20px">
+    <div style="background:rgba(124,58,237,.25);border-radius:16px;padding:24px 32px;font-size:32px;line-height:1.7">
+      Present your hobby idea. Use this structure:
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="step-box show" style="font-size:30px">1️⃣ <strong style="color:var(--a)">My hobby:</strong> <em>"The hobby I want to try is..."</em></div>
+      <div class="step-box show" style="font-size:30px">2️⃣ <strong style="color:var(--a)">Why:</strong> <em>"I want to try it because..."</em></div>
+      <div class="step-box show" style="font-size:30px">3️⃣ <strong style="color:var(--a)">How:</strong> <em>"First you... Then you... Finally you..."</em></div>
+      <div class="step-box show" style="font-size:30px">4️⃣ <strong style="color:var(--a)">What you need:</strong> <em>"You need a..."</em></div>
+    </div>
+    <div style="display:flex;gap:14px;align-items:center;margin-top:8px">
+      <button class="btn bp bpulse" onclick="startTimer('t17',30,function(){document.getElementById('t17-done').style.display='inline-flex'})" style="font-size:32px;padding:16px 40px">🎤 Present! (30s)</button>
+      <span id="t17" style="font-size:64px;font-weight:900;color:var(--a);display:none"></span>
+    </div>
+    <button class="btn ba" id="t17-done" onclick="DS.next()" style="display:none">Vote for Best Hobby ▶</button>
+  </div>
+  <div style="width:360px;background:rgba(124,58,237,.2);border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:14px">
+    <div class="tsm" style="color:var(--a);font-weight:700">Dad's follow-up questions:</div>
+    <div style="font-size:28px;line-height:1.7">❓ "How long would it take to learn?"</div>
+    <div style="font-size:28px;line-height:1.7">❓ "Where would you do it?"</div>
+    <div style="font-size:28px;line-height:1.7">❓ "Would you teach others, like Hurum does?"</div>
+    <div style="font-size:28px;line-height:1.7">❓ "What's the FIRST step to start?"</div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     18 SHARE — VOTE FOR THE MOST INTERESTING HOBBY
+══════════════════════════════════════════ -->
+<section data-label="18 Share: Vote">
+<button class="tn-btn" onclick="toggleNote(this)">📝 Teacher</button>
+<div class="tn-panel">Both Dad and Leo vote for the hobby they think is most interesting. After voting, ask: "Why did you choose it? Would you actually try it?" If Leo picks his own, that's great — encourage him to make a concrete plan to start it this month.</div>
+<h1 class="t1">Vote — Which Hobby Is Most Interesting? 🏆</h1>
+<div style="display:flex;gap:28px;flex:1;align-items:center">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1">
+    <div class="opt" id="v1" onclick="selectVote('v1')">🦴<br/>Fossil Hunting<br/><span class="txs">(like Jørn Hurum)</span></div>
+    <div class="opt" id="v2" onclick="selectVote('v2')">🎸<br/>Playing in a Musical Group<br/><span class="txs">(make music together)</span></div>
+    <div class="opt" id="v3" onclick="selectVote('v3')">📸<br/>Taking Photos<br/><span class="txs">(capture moments)</span></div>
+    <div class="opt" id="v4" onclick="selectVote('v4')">🎨<br/>Drawing or Origami<br/><span class="txs">(creative making)</span></div>
+    <div class="opt" id="v5" onclick="selectVote('v5')">💡<br/>Leo's Own Hobby Idea<br/><span class="txs">(from your idea!)</span></div>
+    <div class="opt" id="v6" onclick="selectVote('v6')">⚽<br/>Collecting Soccer Cards<br/><span class="txs">(every team, every year)</span></div>
+  </div>
+  <div style="width:380px;display:flex;flex-direction:column;gap:16px">
+    <textarea class="ans-area" id="vote-text" placeholder="Why did you choose it? Write your reason..." style="min-height:140px"></textarea>
+    <button class="btn bgn" onclick="submitVote()" style="font-size:30px">Submit Vote 🗳️</button>
+    <div id="vote-result" style="display:none;background:rgba(34,197,94,.15);border:2px solid var(--gn);border-radius:12px;padding:14px 20px;font-size:28px">🎉 Great choice! Now make a plan to actually try it this month ▶</div>
+    <button class="btn ba" id="vote-next" onclick="DS.next()" style="display:none;width:fit-content">Closing ▶</button>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     19 CLOSING
+══════════════════════════════════════════ -->
+<section class="grad" data-label="19 Closing" style="align-items:center;justify-content:center;text-align:center;gap:24px">
+<div style="font-size:100px">🎉🦴🌟</div>
+<div style="font-size:80px;font-weight:900;color:var(--wh)">Amazing work, Leo!</div>
+<div style="font-size:40px;color:var(--a);max-width:1200px;line-height:1.6">
+  You thought about <strong>hobbies</strong>, shared ideas with Dad,<br/>and picked one to try — just like young Hurum did!
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;max-width:900px">
+  <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:16px 28px;font-size:30px">✅ You used: <strong style="color:var(--a)">collect</strong> and <strong style="color:var(--a)">alone</strong></div>
+  <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:16px 28px;font-size:30px">✅ You met Jørn Hurum and saw how a childhood hobby becomes a career</div>
+  <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:16px 28px;font-size:30px">✅ You picked a hobby YOU want to try — now go do it! 🚀</div>
+</div>
+<div style="margin-top:16px">
+  <div style="font-size:32px;color:var(--a);margin-bottom:12px">How confident do you feel? Click to rate!</div>
+  <div style="display:flex;gap:4px;justify-content:center">
+    <button class="star" id="st1" onclick="rateStar(1)">⭐</button>
+    <button class="star" id="st2" onclick="rateStar(2)">⭐</button>
+    <button class="star" id="st3" onclick="rateStar(3)">⭐</button>
+    <button class="star" id="st4" onclick="rateStar(4)">⭐</button>
+    <button class="star" id="st5" onclick="rateStar(5)">⭐</button>
+  </div>
+  <div id="star-msg" style="font-size:36px;margin-top:14px;min-height:44px;color:var(--a)"></div>
+</div>
+</section>
+
+</deck-stage>
+
+<script>
+const DS = document.querySelector('deck-stage');
+
+// ── Teacher notes toggle ──
+function toggleNote(btn) {
+  btn.nextElementSibling.classList.toggle('open');
+}
+
+// ── Flip cards ──
+function flipCard(id) { document.getElementById(id).classList.toggle('flipped'); }
+function flipOk(cardId, nextId) {
+  document.getElementById(cardId).classList.add('flipped');
+  document.getElementById(nextId).style.display = 'inline-flex';
+}
+
+// ── Vocab step reveal ──
+function vcReveal(containerId, nextId, btnId) {
+  const cont = document.getElementById(containerId);
+  const step = parseInt(cont.dataset.step||'-1') + 1;
+  const items = cont.querySelectorAll('.vr-item[data-idx]');
+  if (step < items.length) {
+    items[step].classList.add('show');
+    cont.dataset.step = step;
+    if (step === items.length - 1) {
+      setTimeout(() => {
+        document.getElementById(nextId).style.display = 'inline-flex';
+        document.getElementById(btnId).style.display = 'none';
+      }, 600);
+    }
+  }
+}
+
+// ── Quote reveal ──
+let qStep = 0;
+function showQuote() {
+  document.getElementById('qbox').style.opacity = '1';
+  document.getElementById('q-words-btn').style.display = 'inline-flex';
+}
+function showKeyWords() {
+  document.getElementById('q-steps').style.display = 'flex';
+  qStep = 0;
+  showNextKeyWord();
+}
+function showNextKeyWord() {
+  const steps = ['qs1','qs2','qs3'];
+  if (qStep < steps.length) {
+    document.getElementById(steps[qStep]).classList.add('show');
+    qStep++;
+    if (qStep < steps.length) {
+      setTimeout(showNextKeyWord, 600);
+    } else {
+      setTimeout(() => {
+        document.getElementById('qtip').classList.add('show');
+        document.getElementById('q-next-btn').style.display = 'inline-flex';
+        document.getElementById('q-words-btn').style.display = 'none';
+      }, 600);
+    }
+  }
+}
+
+// ── Pair step dialogue ──
+let pairStep = 0;
+const pairSteps = ['p14s1','p14s2','p14s3','p14s4','p14s5','p14s6'];
+function pairNext() {
+  if (pairStep < pairSteps.length) {
+    document.getElementById(pairSteps[pairStep]).classList.add('show');
+    pairStep++;
+    if (pairStep >= pairSteps.length) {
+      document.getElementById('p14tip').classList.add('show');
+      document.getElementById('p14-next').style.display = 'inline-flex';
+      document.getElementById('p14-btn').style.display = 'none';
+    }
+  }
+}
+
+// ── Vote ──
+let selectedVote = null;
+function selectVote(id) {
+  ['v1','v2','v3','v4','v5','v6'].forEach(v => document.getElementById(v).classList.remove('sel'));
+  document.getElementById(id).classList.add('sel');
+  selectedVote = id;
+}
+function submitVote() {
+  if (!selectedVote) { alert('Please click one of the hobby cards first!'); return; }
+  document.getElementById('vote-result').style.display = 'block';
+  document.getElementById('vote-next').style.display = 'inline-flex';
+  confetti();
+}
+
+// ── Insert text into textarea ──
+function insertText(id, text) {
+  const ta = document.getElementById(id);
+  if (!ta) return;
+  ta.value = (ta.value ? ta.value + '\n' : '') + text + ' ';
+  ta.focus();
+}
+
+// ── Stars ──
+function rateStar(n) {
+  for (let i = 1; i <= 5; i++) {
+    const s = document.getElementById('st' + i);
+    s.classList.toggle('lit', i <= n);
+  }
+  const msgs = ['','Keep trying! 💪','Getting there! 👍','Good work! 😊','Really good! 🌟','Incredible! You are a star! 🏆'];
+  document.getElementById('star-msg').textContent = msgs[n];
+  if (n >= 4) confetti();
+}
+
+// ── Timer ──
+function startTimer(id, secs, cb) {
+  const el = document.getElementById(id);
+  el.style.display = 'inline-block';
+  let t = secs;
+  el.textContent = t;
+  const iv = setInterval(() => {
+    t--;
+    el.textContent = t;
+    if (t <= 0) { clearInterval(iv); el.style.display = 'none'; if (cb) cb(); }
+  }, 1000);
+}
+
+// ── Confetti ──
+function confetti() {
+  const colors = ['#C4B5FD','#7C3AED','#F59E0B','#22C55E','#EF4444','#ffffff'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const d = document.createElement('div');
+      d.className = 'cp';
+      d.style.left = Math.random() * 100 + 'vw';
+      d.style.top = '-20px';
+      d.style.background = colors[Math.floor(Math.random() * colors.length)];
+      d.style.width = d.style.height = (8 + Math.random() * 12) + 'px';
+      d.style.animationDuration = (1.2 + Math.random() * .8) + 's';
+      document.body.appendChild(d);
+      setTimeout(() => d.remove(), 2000);
+    }, i * 30);
+  }
+}
+
+// ── Closing confetti ──
+document.addEventListener('DOMContentLoaded', () => {
+  DS.addEventListener('slidechange', (e) => {
+    if (e.detail.slide && e.detail.slide.dataset.label === '19 Closing') {
+      setTimeout(confetti, 400);
+    }
+  });
+});
+</script>
+</body>
+</html>

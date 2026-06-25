@@ -172,16 +172,22 @@ Tab 0 (Academic) AND Tab 3 (Flashcards) must implement the `flashcard-shell` pat
 - **Tab completes only when BOTH modes are done** (`visited >= N` AND `quizSolved >= N`)
 - `tab-N-state` stores `{ visited, solved, mode }` so Leo returns to the same mode with progress intact
 
-### Match Tab — MANDATORY transcript-driven sentences + recap table (PR #79 lock)
+### Match Tab — MANDATORY transcript-driven sentences + recap table (PR #79 lock, PR #113 update)
 
 Tab 8 (Match) pairs each word with its **verbatim transcript sentence** from the TR audio (not generic word ↔ meaning). Per Leaneritan: "I need to match the transcript so Leo knows how to pronounce in practice."
 
 **Required pieces:**
-- `MATCH_PAIRS` data pulled from the transcript file (`supporting/ow2e_ame_sb_level<N>_audioscript_website.docx`), section TR `<unit>.5` for vocab-2 (TR 8.5 = Vocab 2 Activity 1)
-- Each pair carries `{key, l: "emoji + word", r: "verbatim sentence", ipa: "/IPA/"}`
+- `MATCH_PAIRS` data pulled from the transcript file (`supporting/ow2e_ame_sb_level<N>_audioscript_website.docx`), section TR `<unit>.5` for vocab-2 (TR 8.5 = Vocab 2 Activity 1) and section TR `<unit>.2` for vocab-1 (TR 8.2 = Vocab 1 Activity 2 "Listen and say")
+- **`MATCH_PAIRS` array order = TR audio script order.** Never alphabetical, never key-sorted, never arbitrary. The first row in TR = the first entry in the array.
+- Each pair carries `{key, word, emoji, sent}` — separate `word` (just the word, e.g. `"a bug"`) and `emoji` (1-2 emojis, e.g. `"🐞🦋"`) fields. Do NOT mash emoji + word into one string.
 - Section title + dad-hint call out the TR source explicitly so Leo sees the audio link
-- On match completion AND on RESTORE if already done: render a `recap-table` (see `docs/chart-templates.md`) with columns **Word · TR sentence · Pronunciation (IPA)**
-- Same recap-table shape across every vocab component — consistent for Leo
+
+**Recap table — LOCKED via PR #113:**
+- Render on match completion AND on RESTORE if already done
+- **Exactly 3 columns: Word · Emoji · Sentence.** No IPA/Pronunciation column. Emoji column centered, 1-2 emojis per row matching the V1 visual density.
+- **Always in TR audio-script order — never in match-completion order.** Pre-render every row (hidden) in TR order at tab init time, then REVEAL each row at its fixed position when Leo matches its pair. Do NOT `appendChild` a new `<tr>` per match.
+- Match gameplay randomness stays: shuffle the right-column chips when building the match grid so the matching exercise still has to be a real challenge. Only the after-completion recap is fixed-order.
+- Same recap-table shape across every vocab component — consistent for Leo. Reference implementations: `public/learn/ow-l4-u8-vocab-1.html` (14 words, 2 rounds of 7) and `public/learn/ow-l4-u8-vocab-2.html` (5 words, 1 round).
 
 ## Leo personalization (mandatory in samples)
 
@@ -296,8 +302,9 @@ Push to the current working branch. Do NOT create a PR — Leaneritan reviews + 
 - [ ] EVERY target word has a Present slide with a right-panel mini-game (goal + score + win) — not just a click-to-reveal
 - [ ] Leo app at `public/learn/<lesson-id>.html` (13 tabs, all 4 save/restore rules)
 - [ ] **Academic Tab 0 AND Flashcards Tab 3 have Practice + Quiz dual mode** — tab completes only when BOTH modes done (PR #77)
-- [ ] **Match Tab 8 uses verbatim TR transcript sentences** (`MATCH_PAIRS` pulled from `supporting/...audioscript_website.docx`)
-- [ ] **Match completion + RESTORE both render the `recap-table`** with Word · TR sentence · Pronunciation columns (PR #79)
+- [ ] **Match Tab 8 uses verbatim TR transcript sentences** (`MATCH_PAIRS` pulled from `supporting/...audioscript_website.docx`); array order = TR audio script order, never alphabetical
+- [ ] **Match completion + RESTORE both render the `recap-table`** with exactly 3 columns **Word · Emoji · Sentence** (PR #113 — no IPA column)
+- [ ] **Recap rows pre-rendered hidden in TR order, revealed on match** — never `appendChild` per match (PR #113)
 - [ ] Teacher JSON registered with `component: "<vocab-1|vocab-2>"`, `mode: "teacher"`, `slideCount`
 - [ ] Learner JSON registered with `component: "<vocab-1|vocab-2>-app"`, `mode: "learner"`, full `source` block
 - [ ] `src/data/lessons.ts` updated with both imports

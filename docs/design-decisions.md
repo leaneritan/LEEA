@@ -647,3 +647,16 @@ What unblocks a tuple, in order:
 `/vocab-unit-scanner` is the skill that generates `vocabulary.json` from the SB + AK PDFs — run it before invoking `/vocab-app`. The readiness audit will tell you when you need to.
 
 **Why this matters:** the skills can be re-run on the same `(level, unit, component)` to refresh content as the planner is corrected — they're not one-shot. The readiness audit also catches the case where someone manually edits an `index.json` and forgets one section; the missing field shows up immediately.
+
+## Match Tab — Recap table is ALWAYS in audio-script order
+
+Every vocab app's **Match tab** (vocab-1 and vocab-2 alike) shows a post-match recap table. The locked rule:
+
+- **Columns: Word · Emoji · Sentence** — three columns, exactly. No IPA/pronunciation column, no two-emoji-mash in the Word column. The Emoji column is centered and holds 1–2 emojis per row (matching V1's visual density).
+- **Order: TR audio-script order, ALWAYS.** Never sort by match-completion order, never alphabetical by word/key. The order Leo matched in must NOT change what the recap looks like.
+- **Implementation:** pre-render every row in audio-script order (hidden), then reveal each row at its fixed position when its pair is matched. Do NOT `appendChild` a new `<tr>` per match.
+- **Match-gameplay randomness stays.** Shuffle the right column when building the chip grid — the matching exercise still has to be a real challenge. Only the after-completion recap is fixed-order.
+
+Implemented for: OW L4 U8 Vocab 1 (`public/learn/ow-l4-u8-vocab-1.html`) + Vocab 2 (`public/learn/ow-l4-u8-vocab-2.html`) via PR #113.
+
+The rule extends the existing "Vocab Foundations always-first" rule (Academic + Related modules at the top of every learner app): every vocab app's Match tab also gets the locked recap shape. Retrofit any older vocab app before adding new units.

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit 8 Project — Present a Hobby · Leo's English League</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --green:    #16A34A;
+      --green-dk: #14532D;
+      --green-lt: #DCFCE7;
+      --green-md: #86EFAC;
+      --blue:     #0EA5E9;
+      --blue-bg:  #F0F9FF;
+      --blue-dk:  #075985;
+      --yellow:   #FFCC00;
+      --ybg:      #FFFBE6;
+      --paper:    #FAFAF7;
+      --surface:  #FFFFFF;
+      --soft:     #F0EEE8;
+      --border:   #E5E3DC;
+      --ink:      #111111;
+      --ink2:     #5A5853;
+      --ink3:     #6B6963;
+      --red:      #DC2626;
+      --red-lt:   #FEE2E2;
+      --project:  #0369A1;
+      --proj-lt:  #E0F2FE;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background: #111; font-family: 'Outfit', sans-serif; overflow: hidden; user-select: none; }
+    button { font-family: 'Outfit', sans-serif; }
+
+    #wrap { position: fixed; top: 0; left: 0; width: 100vw; height: calc(100vh - 52px); overflow: hidden; }
+    #deck { position: absolute; width: 1920px; height: 1080px; transform-origin: top left; }
+
+    .slide { position: absolute; inset: 0; background: var(--paper); display: none; overflow: hidden; }
+    .slide.active { display: block; }
+
+    #nav {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 52px;
+      background: #0D0D0D; display: flex; align-items: center; padding: 0 16px; gap: 10px; z-index: 9000;
+    }
+    .nb {
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; padding: 6px 18px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all .15s;
+    }
+    .nb:hover { background: rgba(255,255,255,.2); }
+    .nb.green { background: var(--green); border-color: var(--green); }
+    #sc { color: rgba(255,255,255,.65); font-size: 13px; font-weight: 600; min-width: 64px; text-align: center; }
+    #pgbar { flex: 1; height: 4px; background: rgba(255,255,255,.12); border-radius: 2px; overflow: hidden; }
+    #pgfill { height: 100%; background: var(--project); transition: width .3s; }
+    #unit-lbl { color: var(--blue); font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin-left: auto; }
+
+    #tn-panel {
+      position: fixed; top: 0; right: -440px; width: 440px; height: calc(100vh - 52px);
+      background: #1a2332; transition: right .3s ease; z-index: 8000; display: flex; flex-direction: column;
+    }
+    #tn-panel.open { right: 0; }
+    .tn-head {
+      background: var(--project); padding: 16px 20px;
+      font-weight: 800; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: #fff;
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+    .tn-close { cursor: pointer; font-size: 20px; opacity: .7; }
+    .tn-close:hover { opacity: 1; }
+    #tn-body {
+      flex: 1; overflow-y: auto; padding: 20px 22px;
+      font-size: 15px; line-height: 1.75; color: rgba(255,255,255,.82);
+    }
+    #tn-body strong { color: var(--yellow); }
+    #tn-body .tn-sec { margin-bottom: 16px; }
+    #tn-body .tn-lbl { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--blue); font-weight: 700; margin-bottom: 6px; display: block; }
+    #tn-body ul { padding-left: 18px; }
+    #tn-body li { margin-bottom: 5px; }
+    #tn-body .tn-qa { background: rgba(255,255,255,.06); border-left: 3px solid var(--yellow); padding: 10px 14px; border-radius: 0 6px 6px 0; margin-top: 8px; }
+
+    .sh { height: 88px; display: flex; align-items: center; padding: 0 72px; gap: 22px; flex-shrink: 0; }
+    .sh.pj  { background: var(--project); }
+    .sh.bl  { background: var(--blue); }
+    .sh.gn  { background: var(--green); }
+    .sh.dk  { background: var(--ink); }
+    .sh-icon { font-size: 44px; line-height: 1; }
+    .sh-text .sh-title { font-size: 36px; font-weight: 800; color: #fff; letter-spacing: -.01em; }
+    .sh-text .sh-sub   { font-size: 18px; font-weight: 500; color: rgba(255,255,255,.68); margin-top: 1px; }
+    .sh-tag { margin-left: auto; background: rgba(255,255,255,.16); color: #fff; padding: 6px 18px 5px; border-radius: 20px; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+
+    .sb { padding: 50px 72px; height: calc(1080px - 88px); overflow: hidden; }
+
+    /* Title slide */
+    .title-slide {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--project) 0%, #0C4A6E 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #fff;
+    }
+    .ts-bg { font-size: 120px; opacity: .15; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); white-space: nowrap; pointer-events: none; }
+    .ts-unit { font-size: 20px; font-weight: 600; letter-spacing: .25em; text-transform: uppercase; opacity: .6; margin-bottom: 14px; }
+    .ts-title { font-size: 84px; font-weight: 900; letter-spacing: -.02em; line-height: 1; }
+    .ts-sub { font-size: 32px; font-weight: 500; opacity: .75; margin-top: 14px; }
+
+    /* Objective rows */
+    .obj-row { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 28px; }
+    .obj-icon { font-size: 42px; line-height: 1; flex-shrink: 0; }
+    .obj-text { font-size: 28px; font-weight: 500; line-height: 1.55; color: var(--ink); padding-top: 6px; }
+    .obj-text strong { color: var(--project); }
+
+    /* Fact cards */
+    .fact-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 24px 28px; display: flex; gap: 18px; align-items: flex-start; }
+    .fact-em { font-size: 36px; line-height: 1; flex-shrink: 0; }
+    .fact-txt { font-size: 24px; font-weight: 500; line-height: 1.6; color: var(--ink2); }
+    .fact-txt strong { color: var(--ink); }
+
+    /* Step cards */
+    .step-card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 28px 32px; display: flex; gap: 22px; align-items: flex-start; }
+    .step-num { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; color: #fff; flex-shrink: 0; }
+    .step-num.bl { background: var(--blue); }
+    .step-num.pj { background: var(--project); }
+    .step-num.gn { background: var(--green); }
+    .step-txt { font-size: 26px; font-weight: 600; line-height: 1.55; color: var(--ink); }
+    .step-txt .sub { font-size: 22px; font-weight: 400; color: var(--ink2); margin-top: 4px; }
+
+    /* Chip row */
+    .chip-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; }
+    .chip { background: var(--surface); border: 2px solid var(--border); border-radius: 28px; padding: 12px 28px; font-size: 24px; font-weight: 700; color: var(--ink2); cursor: pointer; transition: all .15s; }
+    .chip:hover, .chip.sel { background: var(--proj-lt); border-color: var(--project); color: var(--project); }
+
+    /* Rubric */
+    .rubric-row { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
+    .rubric-check { font-size: 32px; flex-shrink: 0; }
+    .rubric-txt { font-size: 26px; font-weight: 500; line-height: 1.55; color: var(--ink); }
+
+    /* Now I Can */
+    .nic-row { display: flex; gap: 16px; align-items: center; margin-bottom: 18px; }
+    .nic-circle { width: 28px; height: 28px; border: 3px solid var(--border); border-radius: 50%; flex-shrink: 0; cursor: pointer; transition: all .15s; }
+    .nic-circle.checked { background: var(--green); border-color: var(--green); }
+    .nic-txt { font-size: 26px; font-weight: 500; color: var(--ink); }
+
+    /* Frame box */
+    .frame-box { background: var(--proj-lt); border: 2px dashed var(--blue); border-radius: 12px; padding: 20px 28px; font-size: 26px; font-weight: 600; color: var(--project); line-height: 1.55; font-style: italic; margin-top: 16px; }
+
+    /* Pair card */
+    .pair-card { background: var(--proj-lt); border: 2px solid var(--blue); border-radius: 14px; padding: 24px 28px; font-size: 26px; font-weight: 500; line-height: 1.6; color: var(--ink); }
+
+    /* Photo caption */
+    .photo-card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 32px; text-align: center; }
+    .photo-em { font-size: 100px; margin-bottom: 16px; }
+    .photo-cap { font-size: 22px; font-weight: 600; color: var(--ink2); line-height: 1.5; }
+
+    /* Done card */
+    .done-card { background: var(--surface); border-radius: 24px; padding: 56px 72px; text-align: center; max-width: 680px; }
+    .done-card h2 { font-size: 44px; font-weight: 900; color: var(--ink); margin: 16px 0 12px; }
+    .done-card p { font-size: 22px; color: var(--ink2); font-weight: 500; line-height: 1.6; }
+    .btn-done { background: var(--green); color: #fff; border: none; padding: 18px 48px; border-radius: 12px; font-size: 22px; font-weight: 800; cursor: pointer; margin-top: 24px; transition: all .15s; }
+    .btn-done:hover { transform: scale(1.05); }
+    .btn-done:disabled { opacity: .5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+<div id="wrap">
+  <div id="deck">
+
+    <!-- SLIDE 1 — TITLE -->
+    <div class="slide active" id="s1">
+      <div class="title-slide">
+        <div class="ts-bg">🎨📋🗣️</div>
+        <div class="ts-unit">Unit 8 · Our World 2E Level 4</div>
+        <div class="ts-title">Project</div>
+        <div class="ts-sub">Present a Hobby</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2 — OBJECTIVES -->
+    <div class="slide" id="s2">
+      <div class="sh pj">
+        <span class="sh-icon">🎯</span>
+        <div class="sh-text"><div class="sh-title">Project: Present a Hobby</div><div class="sh-sub">What we will do today</div></div>
+        <span class="sh-tag">Objectives</span>
+      </div>
+      <div class="sb">
+        <div class="obj-row">
+          <div class="obj-icon">🔍</div>
+          <div class="obj-text"><strong>Find information</strong> about hobbies and interests.</div>
+        </div>
+        <div class="obj-row">
+          <div class="obj-icon">📋</div>
+          <div class="obj-text"><strong>Give a report</strong> on a hobby or interest.</div>
+        </div>
+        <div class="obj-row">
+          <div class="obj-icon">🗣️</div>
+          <div class="obj-text"><strong>Present</strong> your report — explain details, how you do it, and show drawings or photos.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3 — BE THE EXPERT: GEODES -->
+    <div class="slide" id="s3">
+      <div class="sh dk">
+        <span class="sh-icon">💎</span>
+        <div class="sh-text"><div class="sh-title">Be the Expert</div><div class="sh-sub">About the Photo · SB p. 145</div></div>
+        <span class="sh-tag">Geodes</span>
+      </div>
+      <div class="sb" style="display:flex;gap:40px">
+        <div style="flex:1;display:flex;flex-direction:column;gap:20px">
+          <div class="fact-card"><div class="fact-em">💎</div><div class="fact-txt">This photo shows a student's report about <strong>geodes</strong> — beautiful round rocks with crystals inside.</div></div>
+          <div class="fact-card"><div class="fact-em">🏞️</div><div class="fact-txt">You can find geodes <strong>near rivers</strong>. They look like ordinary rocks on the outside.</div></div>
+          <div class="fact-card"><div class="fact-em">📅</div><div class="fact-txt">Geodes take about <strong>240 million years</strong> to form. The crystals grow very slowly inside the rock.</div></div>
+          <div class="fact-card"><div class="fact-em">🗣️</div><div class="fact-txt">The student says: <em>"This is the coolest rock I have! I bought it on vacation."</em></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4 — PREPARE: INTRO -->
+    <div class="slide" id="s4">
+      <div class="sh pj">
+        <span class="sh-icon">📋</span>
+        <div class="sh-text"><div class="sh-title">Prepare</div><div class="sh-sub">Choose your hobby · SB p. 144</div></div>
+        <span class="sh-tag">Step 1</span>
+      </div>
+      <div class="sb">
+        <div style="font-size:32px;font-weight:700;color:var(--ink);margin-bottom:24px">In this unit, we learned about different kinds of hobbies. What kinds of things do people collect? What are some other hobbies?</div>
+        <div style="font-size:26px;font-weight:500;color:var(--ink2);margin-bottom:28px">Choose one of your favorite hobbies or interests:</div>
+        <div class="chip-row">
+          <div class="chip" onclick="this.classList.toggle('sel')">🪨 Collecting something</div>
+          <div class="chip" onclick="this.classList.toggle('sel')">⚽ Playing a sport</div>
+          <div class="chip" onclick="this.classList.toggle('sel')">🎮 Playing games</div>
+          <div class="chip" onclick="this.classList.toggle('sel')">🎭 Acting, singing, or dancing</div>
+          <div class="chip" onclick="this.classList.toggle('sel')">🎨 Painting, writing, or making things</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5 — PREPARE: RESEARCH -->
+    <div class="slide" id="s5">
+      <div class="sh bl">
+        <span class="sh-icon">🔍</span>
+        <div class="sh-text"><div class="sh-title">Prepare</div><div class="sh-sub">Research your hobby</div></div>
+        <span class="sh-tag">Research</span>
+      </div>
+      <div class="sb">
+        <div class="pair-card" style="margin-bottom:28px">
+          <strong>Find information about your hobby.</strong> Use the name of the hobby or interest as a key word. You can also use words like <em>how to</em>. Use the text and photos from the unit, too.
+        </div>
+        <div style="font-size:28px;font-weight:700;color:var(--ink);margin-bottom:20px">Take notes as you research:</div>
+        <div class="step-card" style="margin-bottom:16px">
+          <div class="step-num bl">📝</div>
+          <div class="step-txt">What is it? What are the details?<div class="sub">Write short notes — not full sentences yet.</div></div>
+        </div>
+        <div class="step-card" style="margin-bottom:16px">
+          <div class="step-num bl">📝</div>
+          <div class="step-txt">How do you do it? What are the steps?<div class="sub">Think: First… Then… Finally…</div></div>
+        </div>
+        <div class="step-card">
+          <div class="step-num bl">📝</div>
+          <div class="step-txt">What drawings, photos, or objects can you show?<div class="sub">You can also bring objects to show.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6 — PREPARE: REPORT PLAN -->
+    <div class="slide" id="s6">
+      <div class="sh pj">
+        <span class="sh-icon">📋</span>
+        <div class="sh-text"><div class="sh-title">Prepare Your Report</div><div class="sh-sub">SB p. 144 · 3 parts</div></div>
+        <span class="sh-tag">Plan</span>
+      </div>
+      <div class="sb" style="display:flex;flex-direction:column;gap:24px">
+        <div class="step-card">
+          <div class="step-num pj">1</div>
+          <div class="step-txt"><strong>Choose</strong> one of your favorite hobbies or interests.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num pj">2</div>
+          <div class="step-txt"><strong>Prepare a report</strong> for the class:
+            <div class="sub">a. Explain details about it.</div>
+            <div class="sub">b. Explain how you do it.</div>
+            <div class="sub">c. Use drawings or photos. You can also bring objects to show.</div>
+          </div>
+        </div>
+        <div style="font-size:24px;color:var(--ink3);margin-top:8px">Solo adaptation: Leo prepares the report. Dad helps with research and gives feedback.</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7 — REPORT TEMPLATE -->
+    <div class="slide" id="s7">
+      <div class="sh bl">
+        <span class="sh-icon">📝</span>
+        <div class="sh-text"><div class="sh-title">Report Template</div><div class="sh-sub">What to include</div></div>
+        <span class="sh-tag">Template</span>
+      </div>
+      <div class="sb" style="display:flex;flex-direction:column;gap:20px">
+        <div style="font-size:30px;font-weight:700;color:var(--ink);margin-bottom:8px">Your report should have 3 parts:</div>
+        <div class="step-card">
+          <div class="step-num pj">A</div>
+          <div class="step-txt"><strong>Details</strong> — What is the hobby? Where does it come from? Why is it interesting?</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num bl">B</div>
+          <div class="step-txt"><strong>How</strong> — How do you do it? What steps do you follow? What do you need?</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num gn">C</div>
+          <div class="step-txt"><strong>Visuals</strong> — Show drawings, photos, or objects. Explain what they show.</div>
+        </div>
+        <div class="frame-box">"My hobby is ___. It is interesting because ___. To do it, you need ___. First, you ___. Here is a picture of ___."</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8 — SHARE: PRESENT -->
+    <div class="slide" id="s8">
+      <div class="sh gn">
+        <span class="sh-icon">🗣️</span>
+        <div class="sh-text"><div class="sh-title">Share</div><div class="sh-sub">Present your report</div></div>
+        <span class="sh-tag">Present</span>
+      </div>
+      <div class="sb">
+        <div class="pair-card" style="margin-bottom:28px">
+          <strong>Leo:</strong> Present your hobby report to Dad. Remember to speak slowly and clearly. Look at Dad when you speak!
+        </div>
+        <div style="font-size:28px;font-weight:700;color:var(--ink);margin-bottom:20px">Your presentation:</div>
+        <div class="step-card" style="margin-bottom:16px">
+          <div class="step-num pj">1</div>
+          <div class="step-txt"><strong>Name</strong> the hobby and give <strong>details</strong> about what it is.</div>
+        </div>
+        <div class="step-card" style="margin-bottom:16px">
+          <div class="step-num bl">2</div>
+          <div class="step-txt"><strong>Explain how</strong> you do it.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num gn">3</div>
+          <div class="step-txt"><strong>Show</strong> and talk about your drawings, photos, or objects.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9 — SHARE: Q&A + FEEDBACK -->
+    <div class="slide" id="s9">
+      <div class="sh gn">
+        <span class="sh-icon">❓</span>
+        <div class="sh-text"><div class="sh-title">Share</div><div class="sh-sub">Questions &amp; feedback</div></div>
+        <span class="sh-tag">Q&amp;A</span>
+      </div>
+      <div class="sb">
+        <div class="pair-card" style="margin-bottom:28px">
+          <strong>Dad:</strong> Ask Leo questions about his report. Use these sentence frames:
+        </div>
+        <div class="frame-box" style="margin-top:0">"What things does a person need to ___ ?"</div>
+        <div class="frame-box">"How did you learn about this hobby?"</div>
+        <div class="frame-box">"What do you like most about it?"</div>
+        <div style="font-size:28px;font-weight:700;color:var(--ink);margin-top:32px;margin-bottom:16px">Teaching Tip</div>
+        <div class="fact-card"><div class="fact-em">💡</div><div class="fact-txt">Help Leo improve his <strong>oral presentation skills</strong>. Tell him to look at you when speaking, to speak slowly and clearly, and to speak loudly enough.</div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10 — PROJECT RUBRIC -->
+    <div class="slide" id="s10">
+      <div class="sh pj">
+        <span class="sh-icon">✅</span>
+        <div class="sh-text"><div class="sh-title">Project Rubric</div><div class="sh-sub">Self-check</div></div>
+        <span class="sh-tag">Rubric</span>
+      </div>
+      <div class="sb" style="display:flex;flex-direction:column;gap:24px;justify-content:center">
+        <div style="font-size:30px;font-weight:700;color:var(--ink);margin-bottom:8px">Did Leo…</div>
+        <div class="rubric-row"><div class="rubric-check">✅</div><div class="rubric-txt">Choose a <strong>specific</strong> hobby or interest to present in a report?</div></div>
+        <div class="rubric-row"><div class="rubric-check">✅</div><div class="rubric-txt">Give <strong>details</strong> about the hobby or interest?</div></div>
+        <div class="rubric-row"><div class="rubric-check">✅</div><div class="rubric-txt">Explain in his report <strong>how to do</strong> the hobby or interest?</div></div>
+        <div class="rubric-row"><div class="rubric-check">✅</div><div class="rubric-txt">Include <strong>drawings or photos</strong> about the hobby or interest?</div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11 — NOW I CAN -->
+    <div class="slide" id="s11">
+      <div class="sh bl">
+        <span class="sh-icon">🏆</span>
+        <div class="sh-text"><div class="sh-title">Now I Can…</div><div class="sh-sub">Unit 8 review · SB p. 145</div></div>
+        <span class="sh-tag">Review</span>
+      </div>
+      <div class="sb" style="display:flex;flex-direction:column;gap:20px;justify-content:center">
+        <div style="font-size:30px;font-weight:700;color:var(--ink);margin-bottom:12px">Check what you can do now:</div>
+        <div class="nic-row"><div class="nic-circle" onclick="this.classList.toggle('checked')"></div><div class="nic-txt">talk about my hobbies and interests.</div></div>
+        <div class="nic-row"><div class="nic-circle" onclick="this.classList.toggle('checked')"></div><div class="nic-txt">give information about people I know.</div></div>
+        <div class="nic-row"><div class="nic-circle" onclick="this.classList.toggle('checked')"></div><div class="nic-txt">talk about gifts I've received.</div></div>
+        <div class="nic-row"><div class="nic-circle" onclick="this.classList.toggle('checked')"></div><div class="nic-txt">describe and explain a hobby.</div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12 — WRAP UP -->
+    <div class="slide" id="s12">
+      <div class="sh pj">
+        <span class="sh-icon">🎉</span>
+        <div class="sh-text"><div class="sh-title">Project Complete!</div><div class="sh-sub">Great work, Leo!</div></div>
+      </div>
+      <div class="sb" style="display:flex;flex-direction:column;gap:20px">
+        <div style="font-size:30px;font-weight:700;color:var(--ink);margin-bottom:8px">Today you:</div>
+        <div class="fact-card"><div class="fact-em">💎</div><div class="fact-txt">Learned about <strong>geodes</strong> — beautiful rocks with crystals inside</div></div>
+        <div class="fact-card"><div class="fact-em">🔍</div><div class="fact-txt"><strong>Researched</strong> a hobby and found information about it</div></div>
+        <div class="fact-card"><div class="fact-em">📋</div><div class="fact-txt"><strong>Prepared a report</strong> with details, steps, and visuals</div></div>
+        <div class="fact-card"><div class="fact-em">🗣️</div><div class="fact-txt"><strong>Presented</strong> your report to Dad and answered questions</div></div>
+        <div style="font-size:24px;color:var(--ink3);margin-top:8px">Unit 8 is almost finished! Complete the Workbook review on pp. 104–105 and the Unit 8 Quiz next.</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 13 — MARK DONE -->
+    <div class="slide" id="s13">
+      <div style="position:absolute;inset:0;background:linear-gradient(135deg,var(--project) 0%,#0C4A6E 100%);display:flex;align-items:center;justify-content:center">
+        <div class="done-card">
+          <div style="font-size:80px">🎓</div>
+          <h2>Project Complete!</h2>
+          <p>Unit 8 · Present a Hobby · Geodes &amp; hobby reports.<br>Click below to mark this lesson done for Leo.</p>
+          <button class="btn-done" id="markBtn" onclick="markDone()">✅ Mark Lesson Done</button>
+          <div id="markStatus" style="margin-top:18px;font-size:20px;font-weight:700;color:var(--project);min-height:30px"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- NAV BAR -->
+<div id="nav">
+  <button class="nb" onclick="prevSlide()">◀ Prev</button>
+  <span id="sc">1 / 13</span>
+  <button class="nb" onclick="nextSlide()">Next ▶</button>
+  <div id="pgbar"><div id="pgfill"></div></div>
+  <button class="nb" id="tn-btn" onclick="toggleNotes()">📝 Notes</button>
+  <span id="unit-lbl">Unit 8 · Project</span>
+</div>
+
+<!-- TEACHER NOTES PANEL -->
+<div id="tn-panel">
+  <div class="tn-head">
+    📝 Teacher Notes
+    <span class="tn-close" onclick="toggleNotes()">✕</span>
+  </div>
+  <div id="tn-body"></div>
+</div>
+
+<script>
+var LESSON_ID = 'ow-l4-u8-project';
+
+var NOTES = {
+  1: `<div class="tn-sec"><span class="tn-lbl">Slide 1 — Title</span>Show the title. Say: <em>"Today is a Project lesson. You are going to present a hobby!"</em></div>`,
+
+  2: `<div class="tn-sec"><span class="tn-lbl">Slide 2 — Objectives</span>Read the objectives. Explain that Leo will research a hobby, prepare a report, and present it.</div>`,
+
+  3: `<div class="tn-sec"><span class="tn-lbl">Slide 3 — Be the Expert: Geodes</span>Point to the photo on SB p. 145. Say: <em>"Look at this student's report. It's about geodes — beautiful round rocks. You can find them near rivers. They take 240 million years to form!"</em> Ask: <em>"Would you like to collect rocks?"</em></div>`,
+
+  4: `<div class="tn-sec"><span class="tn-lbl">Slide 4 — Prepare: Choose</span>LP: Say <em>"In this unit, we learned about different kinds of hobbies. Some people collect things as a hobby. What kinds of things do people collect? What are some other hobbies?"</em> Write these categories on the board: collecting something · playing a sport · playing games · acting, singing, or dancing · painting, writing, or making things with your hands. Let Leo choose.</div>`,
+
+  5: `<div class="tn-sec"><span class="tn-lbl">Slide 5 — Prepare: Research</span>LP: Say <em>"Look on the Internet. Use the name of a hobby or interest as a key word. You can also use words like how to draw animals. Use the text and photos from the unit, too."</em> Say <em>"Take notes as you research. Use your notes to choose a hobby or interest for your report."</em></div>`,
+
+  6: `<div class="tn-sec"><span class="tn-lbl">Slide 6 — Prepare: Report Plan</span>LP: Point to the photo of a hobby report on p. 145. Say <em>"Look at the photos and sentences. Get ideas for your report."</em> Help Leo plan: who will explain details? How? What drawings/photos? Allow time to prepare.</div>`,
+
+  7: `<div class="tn-sec"><span class="tn-lbl">Slide 7 — Report Template</span>Walk through the 3 parts: Details (A), How (B), Visuals (C). Read the sentence frame aloud. Let Leo practice saying it with his own hobby filled in.</div>`,
+
+  8: `<div class="tn-sec"><span class="tn-lbl">Slide 8 — Share: Present</span>LP: <em>"Have each group come to the front of the room to give its report."</em> Solo: Leo presents to Dad. First: name the hobby and give details. Then: explain how. Finally: show drawings/photos. Remind Leo to speak slowly, clearly, and look at Dad.</div>`,
+
+  9: `<div class="tn-sec"><span class="tn-lbl">Slide 9 — Q&A</span>LP: <em>"Encourage students to ask questions about each group's report."</em> Use the model question: <em>"What things does a person need to (be a part of a musical group)?"</em> Give Leo positive feedback on his presentation.</div><div class="tn-qa">Teaching tip: Help Leo improve oral presentation skills. Tell him to look at the audience, speak slowly and clearly, and speak loudly enough for all members of the audience to hear.</div>`,
+
+  10: `<div class="tn-sec"><span class="tn-lbl">Slide 10 — Project Rubric</span>Go through each rubric item with Leo. Check off what he did well. Discuss any areas to improve.</div>`,
+
+  11: `<div class="tn-sec"><span class="tn-lbl">Slide 11 — Now I Can</span>LP "Now I Can" questions: <em>"What are some hobbies and interests that people you know enjoy?"</em> · <em>"What hobbies do some of your family members have?"</em> · <em>"What is one of your hobbies? What do you need for this hobby? What are the steps for doing this hobby?"</em> · <em>"What information do you include in a paragraph of explanation?"</em></div>`,
+
+  12: `<div class="tn-sec"><span class="tn-lbl">Slide 12 — Wrap Up</span>Recap what Leo did. Remind him about the Workbook review (pp. 104–105) and the Unit 8 Quiz. LP: <em>"For additional practice, direct students to Activity Worksheet 8.4."</em></div>`,
+
+  13: `<div class="tn-sec"><span class="tn-lbl">Slide 13 — Mark Done</span>Click to record project lesson done in leea.lessonProgress.v1.</div>`
+};
+
+var notesOpen = false;
+var TOTAL = 13;
+var current = 1;
+
+function scaleSlides() {
+  var tnW = notesOpen ? 440 : 0;
+  var aw  = window.innerWidth  - tnW;
+  var ah  = window.innerHeight - 52;
+  var s   = Math.min(aw / 1920, ah / 1080);
+  var deck = document.getElementById('deck');
+  var left = (aw  - 1920 * s) / 2;
+  var top  = (ah  - 1080 * s) / 2;
+  deck.style.transform = 'scale(' + s + ')';
+  deck.style.left      = left + 'px';
+  deck.style.top       = top  + 'px';
+}
+window.addEventListener('resize', scaleSlides);
+scaleSlides();
+
+function goTo(n) {
+  if (n < 1 || n > TOTAL) return;
+  document.getElementById('s' + current).classList.remove('active');
+  current = n;
+  document.getElementById('s' + current).classList.add('active');
+  document.getElementById('sc').textContent    = current + ' / ' + TOTAL;
+  document.getElementById('pgfill').style.width = ((current - 1) / (TOTAL - 1) * 100) + '%';
+  document.getElementById('tn-body').innerHTML  = NOTES[current] || '';
+}
+function nextSlide() { goTo(current + 1); }
+function prevSlide() { goTo(current - 1); }
+
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('tn-body').innerHTML = NOTES[current] || '';
+  scaleSlides();
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+  if (e.key === 'ArrowLeft')  prevSlide();
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+});
+
+function markDone() {
+  var btn = document.getElementById('markBtn');
+  var st  = document.getElementById('markStatus');
+  try {
+    var key = 'leea.lessonProgress.v1';
+    var prog = JSON.parse(localStorage.getItem(key) || '{}');
+    prog[LESSON_ID] = { done: true, ts: new Date().toISOString() };
+    localStorage.setItem(key, JSON.stringify(prog));
+    btn.disabled = true;
+    btn.textContent = '✅ Done!';
+    st.textContent = 'Saved to Leo\'s progress.';
+  } catch(e) {
+    st.textContent = 'Error saving progress.';
+  }
+}
+
+(function() {
+  try {
+    var key = 'leea.lessonProgress.v1';
+    var prog = JSON.parse(localStorage.getItem(key) || '{}');
+    if (prog[LESSON_ID] && prog[LESSON_ID].done) {
+      document.getElementById('markBtn').disabled = true;
+      document.getElementById('markBtn').textContent = '✅ Done!';
+      document.getElementById('markStatus').textContent = 'Already marked done.';
+    }
+  } catch(e) {}
+  document.getElementById('tn-body').innerHTML = NOTES[1] || '';
+})();
+</script>
+</body>
+</html>

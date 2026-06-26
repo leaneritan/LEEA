@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 8 · Mission — Enjoy a Hobby</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gn:#16A34A;--gnl:#DCFCE7;--gnd:#15803D;
+  --mi:#237a3a;--mid:#14532D;
+  --bl:#0EA5E9;--bll:#E0F2FE;--bld:#075985;
+  --or:#F97316;--ord:#EA580C;--orl:#FFF7ED;
+  --ye:#FDE047;--yed:#EAB308;
+  --rd:#DC2626;--rdl:#FEE2E2;
+  --pu:#7C3AED;--pul:#F5F3FF;
+  --ink:#111111;--ink2:#374151;--ink3:#6B7280;
+  --paper:#FAFAF7;--surf:#FFFFFF;--bdr:#E5E7EB;
+  --fn:'Nunito',sans-serif;--fnh:'Oswald',sans-serif;
+}
+body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+.app-hdr{background:var(--ink);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.hdr-badge{background:var(--ye);color:var(--ink);font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;padding:2px 7px;border-radius:2px}
+.hdr-title{font-family:var(--fnh);font-size:.85rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hdr-unit{font-size:.7rem;font-weight:700;color:#86EFAC}
+.mbk{background:rgba(255,255,255,.15);border:none;color:#fff;font-family:var(--fn);font-size:.72rem;font-weight:800;padding:5px 11px;border-radius:20px;cursor:pointer;flex-shrink:0}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--mid),var(--mi));padding:20px 16px 16px;text-align:center}
+.hero-kick{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.7);margin-bottom:6px}
+.hero-title{font-family:var(--fnh);font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hero-title span{color:#86EFAC}
+.hero-sub{font-size:.78rem;color:rgba(255,255,255,.85);font-weight:600;margin-top:4px}
+.hero-em{font-size:1.3rem;margin-top:8px}
+.prog-wrap{background:rgba(0,0,0,.15);height:4px}
+.prog-fill{height:100%;background:#86EFAC;transition:width .5s;width:0%}
+
+/* HOME */
+.home{max-width:680px;margin:0 auto;padding:16px 14px 80px}
+.sec-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--ink3);margin-bottom:10px;margin-top:20px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mod-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px 13px 11px;cursor:pointer;transition:all .2s;position:relative}
+.mod-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.1)}
+.mod-card.mi:hover{border-color:var(--mi)}
+.mod-card.bl:hover{border-color:var(--bl)}
+.mod-card.gn:hover{border-color:var(--gn)}
+.mod-card.quiz:hover{border-color:var(--yed)}
+.mod-icon{font-size:1.5rem;margin-bottom:5px}
+.mod-name{font-weight:800;font-size:.82rem;color:var(--ink);margin-bottom:2px}
+.mod-desc{font-size:.7rem;color:var(--ink3);font-weight:600;line-height:1.4}
+.mod-badge{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;margin-top:7px;display:inline-block}
+.badge-new{background:var(--paper);color:var(--ink3);border:1px solid var(--bdr)}
+.badge-done{background:#D1FAE5;color:var(--gn)}
+.badge-prog{background:var(--orl);color:var(--ord)}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;overflow-y:auto}
+.modal.open{display:block}
+.mbox{background:var(--surf);min-height:100vh;display:flex;flex-direction:column;max-width:680px;margin:0 auto}
+.mhd{padding:13px 14px;display:flex;align-items:center;gap:10px;color:#fff;position:sticky;top:0;z-index:10;flex-shrink:0}
+.mhd.mi{background:var(--mi)}.mhd.bl{background:var(--bl)}.mhd.gn{background:var(--gn)}.mhd.dk{background:var(--ink)}.mhd.ye{background:var(--yed)}
+.mhd-title{font-weight:900;font-size:1rem;flex:1;letter-spacing:.3px;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.mhd-num{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:1px;opacity:.7}
+.mhd-close{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mbody{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
+
+/* SHARED COMPONENTS */
+.dad-card{background:#D1FAE5;border:2px solid #A7F3D0;border-radius:4px;padding:11px 13px;font-size:.82rem;font-weight:700;color:#065F46;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.dad-icon{font-size:1.1rem;flex-shrink:0}
+.info-card{background:var(--bll);border:2px solid #BFDBFE;border-radius:4px;padding:10px 12px;font-size:.78rem;font-weight:600;color:var(--bld);line-height:1.5}
+.success-card{background:#D1FAE5;border:2px solid #6EE7B7;border-radius:4px;padding:11px 13px;font-size:.85rem;font-weight:700;color:#065F46;line-height:1.5}
+.section-h{font-family:var(--fnh);font-size:.75rem;font-weight:700;letter-spacing:2px;color:var(--ink);margin-top:6px;display:flex;align-items:center;gap:6px}
+.section-h::after{content:'';flex:1;height:1px;background:var(--bdr)}
+
+/* FACT CARDS */
+.fact-row{display:flex;gap:8px;align-items:flex-start;background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:10px 12px}
+.fact-em{font-size:1.3rem;flex-shrink:0}
+.fact-txt{font-size:.8rem;font-weight:600;color:var(--ink2);line-height:1.5}
+.fact-txt b{color:var(--ink)}
+
+/* QUOTE */
+.quote-box{background:var(--gnl);border:2px solid #A7F3D0;border-left:4px solid var(--mi);border-radius:0 4px 4px 0;padding:14px 16px;font-size:.88rem;font-weight:600;color:var(--ink);line-height:1.65;font-style:italic}
+.quote-attr{font-style:normal;font-size:.72rem;font-weight:700;color:var(--mi);margin-top:8px}
+
+/* MCQ */
+.qz-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px}
+.qz-q{font-size:.88rem;font-weight:800;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.mcq-opts{display:flex;flex-direction:column;gap:7px}
+.mcq-opt{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.82rem;font-weight:700;cursor:pointer;text-align:left;transition:all .2s}
+.mcq-opt:hover:not(:disabled){background:var(--paper);border-color:var(--mi)}
+.mcq-opt.ok{background:#D1FAE5;border-color:var(--gn);color:var(--gn)}
+.mcq-opt.bad{background:var(--rdl);border-color:var(--rd);color:var(--rd);animation:shake .3s}
+.mcq-opt:disabled{cursor:not-allowed}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* INPUTS */
+.text-ta{width:100%;border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--ink);background:var(--surf);outline:none;resize:vertical;min-height:90px;line-height:1.55}
+.text-ta:focus{border-color:var(--mi)}
+
+/* SENTENCE FRAMES */
+.frame-box{background:var(--gnl);border:2px dashed #A7F3D0;border-radius:4px;padding:10px 12px;font-size:.82rem;font-weight:700;color:#065F46;line-height:1.5;font-style:italic}
+
+/* HOBBY CHIPS */
+.hobby-chips{display:flex;flex-wrap:wrap;gap:6px}
+.hobby-chip{background:var(--surf);border:2px solid var(--bdr);border-radius:20px;padding:6px 12px;font-family:var(--fn);font-size:.76rem;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .2s}
+.hobby-chip:hover{border-color:var(--mi);color:var(--mi)}
+.hobby-chip.selected{background:var(--gnl);border-color:var(--gn);color:#065F46}
+
+/* NOTE LINES */
+.note-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:12px 14px}
+.note-line{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+.note-label{font-family:var(--fnh);font-size:.7rem;font-weight:700;color:var(--mi);letter-spacing:1px;flex-shrink:0;min-width:70px}
+.note-input{flex:1;border:none;border-bottom:1.5px dashed var(--bdr);font-family:var(--fn);font-size:.82rem;font-weight:600;color:var(--ink);padding:4px 0;background:transparent;outline:none}
+.note-input:focus{border-color:var(--mi)}
+
+/* SHARE GRID */
+.share-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.share-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px 11px;font-size:.76rem;font-weight:700;color:var(--ink2);line-height:1.5;text-align:center}
+
+/* QUIZ */
+.qz-prog{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.qz-num{font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--ink3)}
+.qz-sc{font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--mi)}
+.qz-bar{background:var(--bdr);height:4px;border-radius:2px;margin-bottom:12px;overflow:hidden}
+.qz-bar-fill{background:var(--mi);height:4px;border-radius:2px;width:0;transition:width .4s}
+.qz-res{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:18px;text-align:center}
+.qz-trophy{font-size:3rem;line-height:1;margin-bottom:6px}
+.qz-score-big{font-family:var(--fnh);font-size:1.8rem;font-weight:700;color:var(--ink);letter-spacing:1px}
+.qz-msg{font-size:.85rem;font-weight:700;color:var(--ink2);margin-top:6px;line-height:1.5}
+.qz-retry{background:var(--bl);color:#fff;border:none;border-radius:4px;padding:9px 18px;font-family:var(--fn);font-size:.82rem;font-weight:800;cursor:pointer;margin-top:12px}
+.qz-pass{background:var(--gn) !important}
+
+.save-ind{display:none;background:var(--gn);color:#fff;font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:20px;align-self:flex-start;font-family:var(--fnh);letter-spacing:1px}
+.save-ind.show{display:inline-block;animation:popOut 2s ease-in}
+@keyframes popOut{0%{opacity:0;transform:translateY(-4px)}15%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0}}
+
+@media(max-width:480px){
+  .mod-grid{grid-template-columns:1fr}
+  .share-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- APP CHROME -->
+<header class="app-hdr">
+  <div class="hdr-left">
+    <span class="hdr-badge">LEEA</span>
+    <span class="hdr-title">LEO</span>
+    <span class="hdr-unit">· U8 MISSION</span>
+  </div>
+  <button class="mbk" onclick="location.href='/'" title="Back to home">← Home</button>
+</header>
+
+<div class="hero">
+  <div class="hero-kick">OUR WORLD · LEVEL 4 · UNIT 8</div>
+  <div class="hero-title">🐚 Mission: <span>Enjoy a Hobby</span></div>
+  <div class="hero-sub">Think · Pair · Share — Jørn Hurum &amp; ammonites</div>
+  <div class="hero-em">🔬 🦴 🤔 👥</div>
+</div>
+<div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
+
+<!-- HOME GRID -->
+<div id="appRoot">
+<div class="home">
+
+  <div class="sec-lbl">🔬 EXPLORE</div>
+  <div class="mod-grid">
+    <div class="mod-card mi" onclick="openModal('m1')" style="grid-column:1/-1">
+      <div class="mod-icon">🐚</div>
+      <div class="mod-name">Be the Expert</div>
+      <div class="mod-desc">Ammonites + Jørn Hurum + explorer quote</div>
+      <div class="mod-badge badge-new" id="badge-m1">START HERE</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">🤔 THINK · PAIR · SHARE</div>
+  <div class="mod-grid">
+    <div class="mod-card bl" onclick="openModal('m2')">
+      <div class="mod-icon">🤔</div>
+      <div class="mod-name">Think</div>
+      <div class="mod-desc">4 questions about your hobbies</div>
+      <div class="mod-badge badge-new" id="badge-m2">NOT STARTED</div>
+    </div>
+    <div class="mod-card mi" onclick="openModal('m3')">
+      <div class="mod-icon">👥</div>
+      <div class="mod-name">Pair &amp; Share</div>
+      <div class="mod-desc">Talk · take notes · present</div>
+      <div class="mod-badge badge-new" id="badge-m3">NOT STARTED</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">⚽ FINAL</div>
+  <div class="mod-grid">
+    <div class="mod-card quiz" onclick="openModal('m4')" style="grid-column:1/-1">
+      <div class="mod-icon">⚽</div>
+      <div class="mod-name">Can Leo Score?</div>
+      <div class="mod-desc">8 questions — need 6/8 (75%) to score!</div>
+      <div class="mod-badge badge-new" id="badge-m4">FINAL QUIZ</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     MODAL M1 — 🐚 BE THE EXPERT
+════════════════════════════════════════════════════════════════ -->
+<div class="modal" id="m1"><div class="mbox">
+<div class="mhd mi"><div class="mhd-title">🐚 Be the Expert</div><div class="mhd-num">1 / 4</div><button class="mhd-close" onclick="closeModal('m1')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Before we talk about YOUR hobbies, let's meet an explorer whose childhood hobby became his career!</div></div>
+
+  <div class="section-h">🐚 ABOUT THE PHOTO — Ammonite Fossils</div>
+  <div class="fact-row"><div class="fact-em">🐚</div><div class="fact-txt">This photo shows <b>ammonite fossils</b>. Ammonites looked like squids and lived inside ring-shaped shells.</div></div>
+  <div class="fact-row"><div class="fact-em">📅</div><div class="fact-txt">These creatures first appeared about <b>240 million years ago</b>. They lived in large groups called <b>schools</b>.</div></div>
+  <div class="fact-row"><div class="fact-em">🦖</div><div class="fact-txt">They became <b>extinct</b> with the dinosaurs, about <b>65 million years ago</b>.</div></div>
+  <div class="fact-row"><div class="fact-em">🔬</div><div class="fact-txt">Ammonite fossils are some of the <b>most common fossils</b> found today. Scientists use their shapes and sizes to tell how old other fossils are.</div></div>
+
+  <div class="section-h">🔬 MEET THE EXPLORER — Jørn Hurum</div>
+  <div class="fact-row"><div class="fact-em">👨‍🔬</div><div class="fact-txt"><b>Jørn Hurum</b> — Paleontologist &amp; National Geographic Explorer. He <b>collects and studies fossils</b> buried for millions of years.</div></div>
+  <div class="fact-row"><div class="fact-em">🏔️</div><div class="fact-txt">Each August, he leads a team to <b>Norway</b>, north of the Arctic Circle. For ~3 weeks, there is little snow and lots of <b>exposed rock</b> — perfect for finding fossils.</div></div>
+  <div class="fact-row"><div class="fact-em">🦕</div><div class="fact-txt">Hurum's team found about <b>60 sea-reptile skeletons</b>. One famous discovery, <b>Predator X</b>, is a 50-foot pliosaur that hunted in the cold ocean.</div></div>
+
+  <div class="section-h">💬 THE EXPLORER'S WORDS</div>
+  <div class="quote-box">
+    "As a child, I felt very <b>alone</b> with my interest in fossils. Finally, at age <b>13</b>, I discovered there was a museum in Norway that actually <b>employed</b> people to study fossils."
+    <div class="quote-attr">— Jørn Hurum, Paleontologist, National Geographic Explorer</div>
+  </div>
+  <div class="info-card">💡 Jørn was <b>your age</b> when he found out his hobby could be a real job. Your hobbies matter too!</div>
+
+  <div class="section-h">🎯 QUICK CHECK — 5 questions</div>
+  <div class="qz-card">
+    <div class="qz-q">Q1. What did ammonites look like?</div>
+    <div class="mcq-opts" id="m1-q1">
+      <button class="mcq-opt" onclick="m1Ans('q1',this,false)">tiny fish</button>
+      <button class="mcq-opt" onclick="m1Ans('q1',this,true)">squids with ring-shaped shells</button>
+      <button class="mcq-opt" onclick="m1Ans('q1',this,false)">large birds</button>
+    </div>
+  </div>
+  <div class="qz-card">
+    <div class="qz-q">Q2. When did ammonites become extinct?</div>
+    <div class="mcq-opts" id="m1-q2">
+      <button class="mcq-opt" onclick="m1Ans('q2',this,false)">240 million years ago</button>
+      <button class="mcq-opt" onclick="m1Ans('q2',this,true)">about 65 million years ago</button>
+      <button class="mcq-opt" onclick="m1Ans('q2',this,false)">last century</button>
+    </div>
+  </div>
+  <div class="qz-card">
+    <div class="qz-q">Q3. WHERE does Jørn Hurum look for fossils?</div>
+    <div class="mcq-opts" id="m1-q3">
+      <button class="mcq-opt" onclick="m1Ans('q3',this,false)">the Amazon jungle</button>
+      <button class="mcq-opt" onclick="m1Ans('q3',this,false)">the Sahara desert</button>
+      <button class="mcq-opt" onclick="m1Ans('q3',this,true)">Norway, north of the Arctic Circle</button>
+    </div>
+  </div>
+  <div class="qz-card">
+    <div class="qz-q">Q4. What is Predator X?</div>
+    <div class="mcq-opts" id="m1-q4">
+      <button class="mcq-opt" onclick="m1Ans('q4',this,false)">a dinosaur fossil</button>
+      <button class="mcq-opt" onclick="m1Ans('q4',this,true)">a 50-foot pliosaur (sea reptile)</button>
+      <button class="mcq-opt" onclick="m1Ans('q4',this,false)">a type of ammonite</button>
+    </div>
+  </div>
+  <div class="qz-card">
+    <div class="qz-q">Q5. How old was Jørn when he discovered fossils could be a real job?</div>
+    <div class="mcq-opts" id="m1-q5">
+      <button class="mcq-opt" onclick="m1Ans('q5',this,false)">5 years old</button>
+      <button class="mcq-opt" onclick="m1Ans('q5',this,true)">13 years old</button>
+      <button class="mcq-opt" onclick="m1Ans('q5',this,false)">25 years old</button>
+    </div>
+  </div>
+</div>
+</div></div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     MODAL M2 — 🤔 THINK
+════════════════════════════════════════════════════════════════ -->
+<div class="modal" id="m2"><div class="mbox">
+<div class="mhd bl"><div class="mhd-title">🤔 Think</div><div class="mhd-num">2 / 4</div><button class="mhd-close" onclick="closeModal('m2')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: To <b>enjoy</b> doing an activity means you really like doing it; it makes you feel happy. Let's think about what YOU enjoy!</div></div>
+
+  <div class="section-h">🏷️ WHAT DO YOU ENJOY?</div>
+  <div class="info-card">Tap the hobbies you enjoy. Then answer the 4 questions below.</div>
+  <div class="hobby-chips" id="m2-chips">
+    <button class="hobby-chip" onclick="m2Chip(this)">⚽ Soccer</button>
+    <button class="hobby-chip" onclick="m2Chip(this)">🦸 Marvel</button>
+    <button class="hobby-chip" onclick="m2Chip(this)">🎮 Video Games</button>
+    <button class="hobby-chip" onclick="m2Chip(this)">📖 Reading</button>
+    <button class="hobby-chip" onclick="m2Chip(this)">🎨 Drawing</button>
+    <button class="hobby-chip" onclick="m2Chip(this)">📸 Photography</button>
+    <button class="hobby-chip" onclick="m2Chip(this)">🪨 Fossils</button>
+    <button class="hobby-chip" onclick="m2Chip(this)">🎵 Music</button>
+  </div>
+
+  <div class="section-h">❓ QUESTION 1</div>
+  <div class="frame-box">"I enjoy ___ because it makes me feel ___."</div>
+  <div class="qz-q" style="margin-top:8px">What are some hobbies you enjoy, and how do they make you feel?</div>
+  <textarea class="text-ta" id="m2-q1" placeholder="I enjoy ... because it makes me feel ..." oninput="m2Save()"></textarea>
+
+  <div class="section-h">❓ QUESTION 2</div>
+  <div class="frame-box">"I like ___ because ___."</div>
+  <div class="qz-q" style="margin-top:8px">What do you like about each hobby?</div>
+  <textarea class="text-ta" id="m2-q2" placeholder="I like ... because ..." oninput="m2Save()"></textarea>
+
+  <div class="section-h">❓ QUESTION 3</div>
+  <div class="frame-box">"The hobby I enjoy the most is ___ because ___."</div>
+  <div class="qz-q" style="margin-top:8px">Which hobby do you enjoy the most? Why?</div>
+  <textarea class="text-ta" id="m2-q3" placeholder="The hobby I enjoy the most is ..." oninput="m2Save()"></textarea>
+
+  <div class="section-h">❓ QUESTION 4</div>
+  <div class="frame-box">"If you want to try ___, you should ___."</div>
+  <div class="qz-q" style="margin-top:8px">What would you tell someone who wants to try this hobby?</div>
+  <textarea class="text-ta" id="m2-q4" placeholder="If you want to try ... you should ..." oninput="m2Save()"></textarea>
+
+  <span class="save-ind" id="m2-saved">SAVED</span>
+</div>
+</div></div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     MODAL M3 — 👥 PAIR & SHARE
+════════════════════════════════════════════════════════════════ -->
+<div class="modal" id="m3"><div class="mbox">
+<div class="mhd mi"><div class="mhd-title">👥 Pair &amp; Share</div><div class="mhd-num">3 / 4</div><button class="mhd-close" onclick="closeModal('m3')">✕</button></div>
+<div class="mbody">
+
+  <div class="section-h">👥 PAIR — Leo talks, Dad takes notes</div>
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Talk about a hobby you would like to try. Tell me what you know about it and what you need. I'll take notes!</div></div>
+
+  <div class="info-card">📋 Use these sentence frames when you talk:</div>
+  <div class="frame-box">"I would like to try ___ because ___."</div>
+  <div class="frame-box">"To do this hobby, you need ___."</div>
+  <div class="frame-box">"First, you ___. Then, you ___. Finally, you ___."</div>
+
+  <div class="section-h">📓 DAD'S NOTES</div>
+  <div class="note-card">
+    <div class="note-line"><span class="note-label">HOBBY:</span><input class="note-input" id="m3-hobby" placeholder="What hobby?" oninput="m3Save()"></div>
+    <div class="note-line"><span class="note-label">WHY:</span><input class="note-input" id="m3-why" placeholder="Why do you want to try it?" oninput="m3Save()"></div>
+    <div class="note-line"><span class="note-label">NEED:</span><input class="note-input" id="m3-need" placeholder="What do you need?" oninput="m3Save()"></div>
+    <div class="note-line"><span class="note-label">STEPS:</span><input class="note-input" id="m3-steps" placeholder="First... then... finally..." oninput="m3Save()"></div>
+  </div>
+
+  <div class="section-h">📢 SHARE — Dad presents Leo's ideas</div>
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Now I'll present YOUR ideas back to you. Listen — did I get everything right?</div></div>
+  <div class="frame-box">"Leo would like to try ___. He needs ___. He thinks it would be fun because ___."</div>
+
+  <div class="section-h">⚖️ EVALUATE — Decide together</div>
+  <div class="qz-q">Which hobby would you enjoy doing, and why?</div>
+  <div class="hobby-chips" id="m3-eval-chips">
+    <button class="hobby-chip" onclick="m3EvalChip(this)">⚽ Leo's hobby</button>
+    <button class="hobby-chip" onclick="m3EvalChip(this)">🦴 Jørn's hobby</button>
+    <button class="hobby-chip" onclick="m3EvalChip(this)">💡 A new idea!</button>
+  </div>
+  <div class="frame-box">"I think we would enjoy ___ because ___."</div>
+  <textarea class="text-ta" id="m3-eval" placeholder="I think we would enjoy ... because ..." oninput="m3Save()" style="min-height:70px"></textarea>
+
+  <div class="section-h">🤝 SHARE FRAMES — Dad gives feedback</div>
+  <div class="share-grid">
+    <div class="share-card">✅ One thing I LIKE…</div>
+    <div class="share-card">❓ A QUESTION I have…</div>
+    <div class="share-card">⭐ An INTERESTING idea…</div>
+    <div class="share-card">🤔 Something to think about…</div>
+  </div>
+
+  <span class="save-ind" id="m3-saved">SAVED</span>
+</div>
+</div></div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     MODAL M4 — ⚽ CAN LEO SCORE? (8Q QUIZ)
+════════════════════════════════════════════════════════════════ -->
+<div class="modal" id="m4"><div class="mbox">
+<div class="mhd dk"><div class="mhd-title">⚽ Can Leo Score?</div><div class="mhd-num">4 / 4 · FINAL QUIZ</div><button class="mhd-close" onclick="closeModal('m4')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: 8 questions about the mission! You need 6/8 (75%) to score the goal. ⚽</div></div>
+  <div id="m4-quiz"></div>
+  <div id="m4-result" style="display:none"></div>
+</div>
+</div></div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     SCRIPT
+════════════════════════════════════════════════════════════════ -->
+<script>
+var SP = 'leea-4-8-mission-';
+var HW_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-8-mission';
+var MC = 4;
+
+function ls(k,v){try{localStorage.setItem(SP+k,JSON.stringify(v))}catch(e){}}
+function ll(k,fb){try{var v=localStorage.getItem(SP+k);return v!==null?JSON.parse(v):fb}catch(e){return fb}}
+
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow='hidden';
+  var fn=window['restore_'+id];
+  if(typeof fn==='function')fn();
+  if(id==='m4'&&!m4Started)initM4();
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow='';
+  updateProgress();
+}
+
+function updateBadge(id,state){
+  var el=document.getElementById('badge-'+id);
+  if(!el)return;
+  var lbl={m1:'START HERE',m2:'NOT STARTED',m3:'NOT STARTED',m4:'FINAL QUIZ'};
+  el.className='mod-badge '+(state==='done'?'badge-done':state==='prog'?'badge-prog':'badge-new');
+  el.textContent=state==='done'?'✅ DONE':state==='prog'?'▶ IN PROGRESS':(lbl[id]||'NOT STARTED');
+  ls(id+'-state',state);
+}
+function getBadge(id){return ll(id+'-state','new')}
+function setDone(id){updateBadge(id,'done');ls(id+'-done',true);updateProgress()}
+function setProg(id){if(getBadge(id)!=='done')updateBadge(id,'prog')}
+
+function updateProgress(){
+  var pf=document.getElementById('progFill');if(!pf)return;
+  var done=0;
+  for(var i=1;i<=MC;i++){if(getBadge('m'+i)==='done')done++}
+  pf.style.width=(done/MC*100)+'%';
+}
+
+function showSave(id){
+  var el=document.getElementById(id+'-saved');if(!el)return;
+  el.classList.add('show');
+  setTimeout(function(){el.classList.remove('show')},2000);
+}
+
+// ═══════════════════════════════════════════════
+// M1 — BE THE EXPERT (5 comprehension Qs)
+// ═══════════════════════════════════════════════
+var m1Score=0, m1Total=5, m1Answered=0;
+
+function m1Ans(qid,btn,correct){
+  var wrap=document.getElementById('m1-'+qid);
+  var btns=wrap.querySelectorAll('.mcq-opt');
+  for(var i=0;i<btns.length;i++)btns[i].disabled=true;
+  btn.classList.add(correct?'ok':'bad');
+  if(correct){m1Score++;if(!correct)return}
+  if(!correct){for(var i=0;i<btns.length;i++){if(btns[i]!==btn){btns[i].onclick=null}}}
+  m1Answered++;
+  setProg('m1');
+  if(m1Answered>=m1Total){
+    ls('m1-score',{score:m1Score,total:m1Total});
+    setDone('m1');
+  }
+}
+
+window.restore_m1=function(){
+  var saved=ll('m1-score');
+  if(!saved)return;
+  m1Score=saved.score;m1Answered=m1Total;
+};
+
+// ═══════════════════════════════════════════════
+// M2 — THINK (4 text areas + hobby chips)
+// ═══════════════════════════════════════════════
+function m2Chip(btn){btn.classList.toggle('selected');m2Save()}
+
+function m2Save(){
+  var data={
+    q1:document.getElementById('m2-q1').value,
+    q2:document.getElementById('m2-q2').value,
+    q3:document.getElementById('m2-q3').value,
+    q4:document.getElementById('m2-q4').value,
+    chips:[]
+  };
+  var chips=document.querySelectorAll('#m2-chips .hobby-chip.selected');
+  for(var i=0;i<chips.length;i++)data.chips.push(chips[i].textContent.trim());
+  ls('m2-data',data);
+  showSave('m2');
+
+  var filled=0;
+  if(data.q1.trim())filled++;
+  if(data.q2.trim())filled++;
+  if(data.q3.trim())filled++;
+  if(data.q4.trim())filled++;
+  if(filled>=4)setDone('m2');
+  else if(filled>0)setProg('m2');
+}
+
+window.restore_m2=function(){
+  var d=ll('m2-data');if(!d)return;
+  document.getElementById('m2-q1').value=d.q1||'';
+  document.getElementById('m2-q2').value=d.q2||'';
+  document.getElementById('m2-q3').value=d.q3||'';
+  document.getElementById('m2-q4').value=d.q4||'';
+  if(d.chips&&d.chips.length){
+    var all=document.querySelectorAll('#m2-chips .hobby-chip');
+    for(var i=0;i<all.length;i++){
+      if(d.chips.indexOf(all[i].textContent.trim())!==-1)all[i].classList.add('selected');
+    }
+  }
+};
+
+// ═══════════════════════════════════════════════
+// M3 — PAIR & SHARE (notes + eval)
+// ═══════════════════════════════════════════════
+function m3EvalChip(btn){
+  var all=document.querySelectorAll('#m3-eval-chips .hobby-chip');
+  for(var i=0;i<all.length;i++)all[i].classList.remove('selected');
+  btn.classList.add('selected');
+  m3Save();
+}
+
+function m3Save(){
+  var data={
+    hobby:document.getElementById('m3-hobby').value,
+    why:document.getElementById('m3-why').value,
+    need:document.getElementById('m3-need').value,
+    steps:document.getElementById('m3-steps').value,
+    eval:document.getElementById('m3-eval').value,
+    evalChoice:''
+  };
+  var sel=document.querySelector('#m3-eval-chips .hobby-chip.selected');
+  if(sel)data.evalChoice=sel.textContent.trim();
+  ls('m3-data',data);
+  showSave('m3');
+
+  var filled=0;
+  if(data.hobby.trim())filled++;
+  if(data.why.trim())filled++;
+  if(data.eval.trim())filled++;
+  if(filled>=3)setDone('m3');
+  else if(filled>0)setProg('m3');
+}
+
+window.restore_m3=function(){
+  var d=ll('m3-data');if(!d)return;
+  document.getElementById('m3-hobby').value=d.hobby||'';
+  document.getElementById('m3-why').value=d.why||'';
+  document.getElementById('m3-need').value=d.need||'';
+  document.getElementById('m3-steps').value=d.steps||'';
+  document.getElementById('m3-eval').value=d.eval||'';
+  if(d.evalChoice){
+    var all=document.querySelectorAll('#m3-eval-chips .hobby-chip');
+    for(var i=0;i<all.length;i++){
+      if(all[i].textContent.trim()===d.evalChoice)all[i].classList.add('selected');
+    }
+  }
+};
+
+// ═══════════════════════════════════════════════
+// M4 — FINAL QUIZ (8Q, 75% gate)
+// ═══════════════════════════════════════════════
+var m4Started=false;
+var M4_QUESTIONS=[
+  {q:'What are ammonite fossils?',opts:['ancient plants','squid-like creatures with ring-shaped shells','tiny fish bones'],ans:1},
+  {q:'When did ammonites become extinct?',opts:['240 million years ago','about 65 million years ago','1000 years ago'],ans:1},
+  {q:'What is Jørn Hurum\'s job?',opts:['teacher','paleontologist','doctor'],ans:1},
+  {q:'Where does Hurum look for fossils?',opts:['Japan','Norway, north of the Arctic Circle','Australia'],ans:1},
+  {q:'What was Predator X?',opts:['a dinosaur','a 50-foot pliosaur (sea reptile)','an ammonite'],ans:1},
+  {q:'How old was Jørn when he found out fossil study was a real job?',opts:['5','13','30'],ans:1},
+  {q:'What does "enjoy" mean?',opts:['to do something fast','to really like doing something; it makes you feel happy','to study something difficult'],ans:1},
+  {q:'In Think.Pair.Share, what does the partner do during "Pair"?',opts:['nothing','take notes on your ideas','read a book'],ans:1}
+];
+
+function initM4(){
+  m4Started=true;
+  var saved=ll('m4-score');
+  if(saved){showM4Result(saved.score,saved.total);return}
+  renderM4Quiz();
+}
+
+var m4Idx=0,m4Score=0;
+function renderM4Quiz(){
+  var host=document.getElementById('m4-quiz');
+  if(m4Idx>=M4_QUESTIONS.length){finishM4();return}
+  var q=M4_QUESTIONS[m4Idx];
+  var html='<div class="qz-prog"><span class="qz-num">Question '+(m4Idx+1)+' of '+M4_QUESTIONS.length+'</span><span class="qz-sc">Score: '+m4Score+'</span></div>';
+  html+='<div class="qz-bar"><div class="qz-bar-fill" style="width:'+(m4Idx/M4_QUESTIONS.length*100)+'%"></div></div>';
+  html+='<div class="qz-card"><div class="qz-q">'+q.q+'</div><div class="mcq-opts">';
+  for(var i=0;i<q.opts.length;i++){
+    html+='<button class="mcq-opt" onclick="m4Pick('+i+','+q.ans+',this)">'+q.opts[i]+'</button>';
+  }
+  html+='</div></div>';
+  host.innerHTML=html;
+}
+
+function m4Pick(idx,ans,btn){
+  var opts=btn.parentNode.querySelectorAll('.mcq-opt');
+  for(var i=0;i<opts.length;i++)opts[i].disabled=true;
+  var correct=idx===ans;
+  btn.classList.add(correct?'ok':'bad');
+  if(correct)m4Score++;
+  setTimeout(function(){m4Idx++;renderM4Quiz()},800);
+}
+
+function finishM4(){
+  var total=M4_QUESTIONS.length;
+  ls('m4-score',{score:m4Score,total:total});
+  try{
+    localStorage.setItem(SP+'score',JSON.stringify({score:m4Score,total:total,pct:Math.round(m4Score/total*100),done:true,timestamp:new Date().toISOString()}));
+    localStorage.setItem(HW_ID+'-score',JSON.stringify({score:m4Score,total:total,pct:Math.round(m4Score/total*100),done:true,timestamp:new Date().toISOString()}));
+    if(m4Score>=6){
+      localStorage.setItem(SP+'done',JSON.stringify(true));
+      localStorage.setItem(HW_ID+'-done',JSON.stringify(true));
+    }
+  }catch(e){}
+  showM4Result(m4Score,total);
+  if(m4Score>=6)setDone('m4');
+}
+
+function showM4Result(score,total){
+  document.getElementById('m4-quiz').style.display='none';
+  var res=document.getElementById('m4-result');res.style.display='block';
+  var pct=Math.round(score/total*100);
+  var pass=score>=6;
+  res.innerHTML='<div class="qz-res"><div class="qz-trophy">'+(pass?'⚽🎉':'😤')+'</div><div class="qz-score-big">'+score+' / '+total+' ('+pct+'%)</div><div class="qz-msg">'+(pass?'GOAL! 🥅 Leo scores! Great work on the mission!':'Not quite — you need 6/8 to score. Try again!')+'</div>'+(pass?'':'<button class="qz-retry" onclick="retryM4()">🔄 Try Again</button>')+'</div>';
+}
+
+function retryM4(){
+  m4Idx=0;m4Score=0;
+  document.getElementById('m4-result').style.display='none';
+  document.getElementById('m4-quiz').style.display='block';
+  renderM4Quiz();
+}
+
+// ═══════════════════════════════════════════════
+// INIT — restore badges
+// ═══════════════════════════════════════════════
+(function(){
+  for(var i=1;i<=MC;i++){
+    var s=getBadge('m'+i);
+    if(s!=='new')updateBadge('m'+i,s);
+  }
+  updateProgress();
+})();
+</script>
+</body>
+</html>

@@ -14,6 +14,7 @@ import unit8ReadingLearner from "../../content/subjects/english/courses/our-worl
 import unit8Writing from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/writing.teacher.json";
 import unit8WritingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/writing.learner.json";
 import unit8Mission from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/mission.teacher.json";
+import unit8MissionLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/mission-app.learner.json";
 import type { Lesson } from "./types";
 
 export const lessons: Lesson[] = [
@@ -32,7 +33,8 @@ export const lessons: Lesson[] = [
   unit8ReadingLearner as Lesson,
   unit8Writing as Lesson,
   unit8WritingLearner as Lesson,
-  unit8Mission as Lesson
+  unit8Mission as Lesson,
+  unit8MissionLearner as Lesson
 ];
 export const teacherLessons = lessons.filter((lesson) => lesson.mode === "teacher");
 export const learnerLessons = lessons.filter((lesson) => lesson.mode === "learner");

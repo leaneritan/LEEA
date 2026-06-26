@@ -262,6 +262,19 @@ for (const lesson of lessons) {
   }
 }
 
+// Orphan deck check: every ow-l*-u*-*.html in public/lessons/ must have a .teacher.json
+const lessonsHtmlDir = path.join(root, "public/lessons");
+if (fs.existsSync(lessonsHtmlDir)) {
+  const registeredEmbedPaths = new Set(lessons.map((l) => l.source?.embedPath).filter(Boolean));
+  for (const file of fs.readdirSync(lessonsHtmlDir)) {
+    if (!file.endsWith(".html")) continue;
+    const embedPath = `/lessons/${file}`;
+    if (!registeredEmbedPaths.has(embedPath)) {
+      fail(`${file} exists in public/lessons/ but has no .teacher.json with embedPath "${embedPath}" — it won't appear on the teacher dashboard`);
+    }
+  }
+}
+
 if (errors.length) {
   console.error(`Content validation failed with ${errors.length} issue(s):`);
   for (const error of errors) console.error(`- ${error}`);

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 8 · Project — Present a Hobby</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pj:#0369A1;--pjl:#E0F2FE;--pjd:#0C4A6E;
+  --bl:#0EA5E9;--bll:#E0F2FE;--bld:#075985;
+  --gn:#16A34A;--gnl:#DCFCE7;
+  --or:#F97316;--ord:#EA580C;--orl:#FFF7ED;
+  --ye:#FDE047;--yed:#EAB308;
+  --rd:#DC2626;--rdl:#FEE2E2;
+  --pu:#7C3AED;--pul:#F5F3FF;
+  --ink:#111111;--ink2:#374151;--ink3:#6B7280;
+  --paper:#FAFAF7;--surf:#FFFFFF;--bdr:#E5E7EB;
+  --fn:'Nunito',sans-serif;--fnh:'Oswald',sans-serif;
+}
+body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+.app-hdr{background:var(--ink);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.hdr-badge{background:var(--ye);color:var(--ink);font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;padding:2px 7px;border-radius:2px}
+.hdr-title{font-family:var(--fnh);font-size:.85rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hdr-unit{font-size:.7rem;font-weight:700;color:var(--bl)}
+.mbk{background:rgba(255,255,255,.15);border:none;color:#fff;font-family:var(--fn);font-size:.72rem;font-weight:800;padding:5px 11px;border-radius:20px;cursor:pointer;flex-shrink:0}
+
+.hero{background:linear-gradient(135deg,var(--pjd),var(--pj));padding:20px 16px 16px;text-align:center}
+.hero-kick{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.7);margin-bottom:6px}
+.hero-title{font-family:var(--fnh);font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hero-title span{color:#7DD3FC}
+.hero-sub{font-size:.78rem;color:rgba(255,255,255,.85);font-weight:600;margin-top:4px}
+.hero-em{font-size:1.3rem;margin-top:8px}
+.prog-wrap{background:rgba(0,0,0,.15);height:4px}
+.prog-fill{height:100%;background:#7DD3FC;transition:width .5s;width:0%}
+
+.home{max-width:680px;margin:0 auto;padding:16px 14px 80px}
+.sec-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--ink3);margin-bottom:10px;margin-top:20px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mod-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px 13px 11px;cursor:pointer;transition:all .2s;position:relative}
+.mod-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.1)}
+.mod-card.pj:hover{border-color:var(--pj)}
+.mod-card.bl:hover{border-color:var(--bl)}
+.mod-card.gn:hover{border-color:var(--gn)}
+.mod-card.quiz:hover{border-color:var(--yed)}
+.mod-icon{font-size:1.5rem;margin-bottom:5px}
+.mod-name{font-weight:800;font-size:.82rem;color:var(--ink);margin-bottom:2px}
+.mod-desc{font-size:.7rem;color:var(--ink3);font-weight:600;line-height:1.4}
+.mod-badge{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;margin-top:7px;display:inline-block}
+.badge-new{background:var(--paper);color:var(--ink3);border:1px solid var(--bdr)}
+.badge-done{background:#D1FAE5;color:var(--gn)}
+.badge-prog{background:var(--orl);color:var(--ord)}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;overflow-y:auto}
+.modal.open{display:block}
+.mbox{background:var(--surf);min-height:100vh;display:flex;flex-direction:column;max-width:680px;margin:0 auto}
+.mhd{padding:13px 14px;display:flex;align-items:center;gap:10px;color:#fff;position:sticky;top:0;z-index:10;flex-shrink:0}
+.mhd.pj{background:var(--pj)}.mhd.bl{background:var(--bl)}.mhd.gn{background:var(--gn)}.mhd.dk{background:var(--ink)}
+.mhd-title{font-weight:900;font-size:1rem;flex:1;letter-spacing:.3px;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.mhd-num{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:1px;opacity:.7}
+.mhd-close{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mbody{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
+
+.dad-card{background:#D1FAE5;border:2px solid #A7F3D0;border-radius:4px;padding:11px 13px;font-size:.82rem;font-weight:700;color:#065F46;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.dad-icon{font-size:1.1rem;flex-shrink:0}
+.info-card{background:var(--bll);border:2px solid #BFDBFE;border-radius:4px;padding:10px 12px;font-size:.78rem;font-weight:600;color:var(--bld);line-height:1.5}
+.success-card{background:#D1FAE5;border:2px solid #6EE7B7;border-radius:4px;padding:11px 13px;font-size:.85rem;font-weight:700;color:#065F46;line-height:1.5}
+.section-h{font-family:var(--fnh);font-size:.75rem;font-weight:700;letter-spacing:2px;color:var(--ink);margin-top:6px;display:flex;align-items:center;gap:6px}
+.section-h::after{content:'';flex:1;height:1px;background:var(--bdr)}
+
+.fact-row{display:flex;gap:8px;align-items:flex-start;background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:10px 12px}
+.fact-em{font-size:1.3rem;flex-shrink:0}
+.fact-txt{font-size:.8rem;font-weight:600;color:var(--ink2);line-height:1.5}
+.fact-txt b{color:var(--ink)}
+
+.qz-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px}
+.qz-q{font-size:.88rem;font-weight:800;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.mcq-opts{display:flex;flex-direction:column;gap:7px}
+.mcq-opt{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.82rem;font-weight:700;cursor:pointer;text-align:left;transition:all .2s}
+.mcq-opt:hover:not(:disabled){background:var(--paper);border-color:var(--pj)}
+.mcq-opt.ok{background:#D1FAE5;border-color:var(--gn);color:var(--gn)}
+.mcq-opt.bad{background:var(--rdl);border-color:var(--rd);color:var(--rd);animation:shake .3s}
+.mcq-opt:disabled{cursor:not-allowed}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.text-inp{width:100%;border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--ink);background:var(--surf);outline:none;transition:border-color .2s}
+.text-inp:focus{border-color:var(--pj)}
+.text-ta{width:100%;border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--ink);background:var(--surf);outline:none;resize:vertical;min-height:90px;line-height:1.55}
+.text-ta:focus{border-color:var(--pj)}
+
+.frame-box{background:var(--pjl);border:2px dashed var(--bl);border-radius:4px;padding:10px 12px;font-size:.82rem;font-weight:700;color:var(--pj);line-height:1.5;font-style:italic}
+
+.hobby-chips{display:flex;flex-wrap:wrap;gap:6px}
+.hobby-chip{background:var(--surf);border:2px solid var(--bdr);border-radius:20px;padding:6px 12px;font-family:var(--fn);font-size:.76rem;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .2s}
+.hobby-chip:hover{border-color:var(--pj);color:var(--pj)}
+.hobby-chip.selected{background:var(--pjl);border-color:var(--pj);color:var(--pj)}
+
+.chk-list{display:flex;flex-direction:column;gap:7px}
+.chk-item{display:flex;align-items:center;gap:9px;background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px 11px;cursor:pointer;font-size:.82rem;font-weight:700;color:var(--ink2);transition:all .2s}
+.chk-item:hover{background:var(--paper)}
+.chk-item.checked{background:#D1FAE5;border-color:var(--gn);color:#065F46}
+.chk-box{width:20px;height:20px;border:2px solid var(--bdr);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.85rem;background:#fff}
+.chk-item.checked .chk-box{background:var(--gn);border-color:var(--gn);color:#fff}
+
+.qz-prog{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.qz-num{font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--ink3)}
+.qz-sc{font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--pj)}
+.qz-bar{background:var(--bdr);height:4px;border-radius:2px;margin-bottom:12px;overflow:hidden}
+.qz-bar-fill{background:var(--pj);height:4px;border-radius:2px;width:0;transition:width .4s}
+.qz-res{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:18px;text-align:center}
+.qz-trophy{font-size:3rem;line-height:1;margin-bottom:6px}
+.qz-score-big{font-family:var(--fnh);font-size:1.8rem;font-weight:700;color:var(--ink);letter-spacing:1px}
+.qz-msg{font-size:.85rem;font-weight:700;color:var(--ink2);margin-top:6px;line-height:1.5}
+.qz-retry{background:var(--bl);color:#fff;border:none;border-radius:4px;padding:9px 18px;font-family:var(--fn);font-size:.82rem;font-weight:800;cursor:pointer;margin-top:12px}
+.qz-pass{background:var(--gn) !important}
+
+.save-ind{display:none;background:var(--gn);color:#fff;font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:20px;align-self:flex-start;font-family:var(--fnh);letter-spacing:1px}
+.save-ind.show{display:inline-block;animation:popOut 2s ease-in}
+@keyframes popOut{0%{opacity:0;transform:translateY(-4px)}15%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0}}
+
+@media(max-width:480px){
+  .mod-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="app-hdr">
+  <div class="hdr-left">
+    <span class="hdr-badge">LEEA</span>
+    <span class="hdr-title">LEO</span>
+    <span class="hdr-unit">· U8 PROJECT</span>
+  </div>
+  <button class="mbk" onclick="location.href='/'" title="Back to home">← Home</button>
+</header>
+
+<div class="hero">
+  <div class="hero-kick">OUR WORLD · LEVEL 4 · UNIT 8</div>
+  <div class="hero-title">📋 Project: <span>Present a Hobby</span></div>
+  <div class="hero-sub">Research · prepare · present your hobby report</div>
+  <div class="hero-em">💎 🔍 📋 🗣️</div>
+</div>
+<div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
+
+<div id="appRoot">
+<div class="home">
+
+  <div class="sec-lbl">💎 EXPLORE</div>
+  <div class="mod-grid">
+    <div class="mod-card pj" onclick="openModal('m1')" style="grid-column:1/-1">
+      <div class="mod-icon">💎</div>
+      <div class="mod-name">Be the Expert: Geodes</div>
+      <div class="mod-desc">Beautiful rocks with crystals + quiz</div>
+      <div class="mod-badge badge-new" id="badge-m1">START HERE</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">📋 PREPARE YOUR REPORT</div>
+  <div class="mod-grid">
+    <div class="mod-card bl" onclick="openModal('m2')">
+      <div class="mod-icon">🔍</div>
+      <div class="mod-name">Choose &amp; Research</div>
+      <div class="mod-desc">Pick a hobby · take notes</div>
+      <div class="mod-badge badge-new" id="badge-m2">NOT STARTED</div>
+    </div>
+    <div class="mod-card pj" onclick="openModal('m3')">
+      <div class="mod-icon">📝</div>
+      <div class="mod-name">Write Your Report</div>
+      <div class="mod-desc">Details · how · visuals</div>
+      <div class="mod-badge badge-new" id="badge-m3">NOT STARTED</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">🗣️ PRESENT &amp; REVIEW</div>
+  <div class="mod-grid">
+    <div class="mod-card gn" onclick="openModal('m4')">
+      <div class="mod-icon">🗣️</div>
+      <div class="mod-name">Present &amp; Rubric</div>
+      <div class="mod-desc">Share report · self-check</div>
+      <div class="mod-badge badge-new" id="badge-m4">NOT STARTED</div>
+    </div>
+    <div class="mod-card pj" onclick="openModal('m5')">
+      <div class="mod-icon">🏆</div>
+      <div class="mod-name">Now I Can</div>
+      <div class="mod-desc">Unit 8 review checklist</div>
+      <div class="mod-badge badge-new" id="badge-m5">NOT STARTED</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">⚽ FINAL</div>
+  <div class="mod-grid">
+    <div class="mod-card quiz" onclick="openModal('m6')" style="grid-column:1/-1">
+      <div class="mod-icon">⚽</div>
+      <div class="mod-name">Can Leo Score?</div>
+      <div class="mod-desc">8 questions — need 6/8 (75%) to score!</div>
+      <div class="mod-badge badge-new" id="badge-m6">FINAL QUIZ</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- M1 — BE THE EXPERT: GEODES -->
+<div class="modal" id="m1"><div class="mbox">
+<div class="mhd dk"><div class="mhd-title">💎 Be the Expert: Geodes</div><div class="mhd-num">1 / 6</div><button class="mhd-close" onclick="closeModal('m1')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Look at this student's report on SB p. 145. It's about geodes — let's learn about them!</div></div>
+
+  <div class="section-h">💎 WHAT ARE GEODES?</div>
+  <div class="fact-row"><div class="fact-em">💎</div><div class="fact-txt"><b>Geodes</b> are beautiful round rocks with <b>crystals</b> inside. They look ordinary on the outside!</div></div>
+  <div class="fact-row"><div class="fact-em">🏞️</div><div class="fact-txt">You can find geodes <b>near rivers</b>. People collect them as a hobby.</div></div>
+  <div class="fact-row"><div class="fact-em">📅</div><div class="fact-txt">Geodes take about <b>240 million years</b> to form. The crystals grow very slowly inside.</div></div>
+  <div class="fact-row"><div class="fact-em">🗣️</div><div class="fact-txt">The student in the photo says: <em>"This is the coolest rock I have! I bought it on vacation."</em></div></div>
+
+  <div class="section-h">🎯 QUICK CHECK — 4 questions</div>
+  <div class="qz-card">
+    <div class="qz-q">Q1. What is special about geodes?</div>
+    <div class="mcq-opts" id="m1-q1">
+      <button class="mcq-opt" onclick="m1Ans('q1',this,false)">They are very light</button>
+      <button class="mcq-opt" onclick="m1Ans('q1',this,true)">They have crystals inside</button>
+      <button class="mcq-opt" onclick="m1Ans('q1',this,false)">They are square-shaped</button>
+    </div>
+  </div>
+  <div class="qz-card">
+    <div class="qz-q">Q2. Where can you find geodes?</div>
+    <div class="mcq-opts" id="m1-q2">
+      <button class="mcq-opt" onclick="m1Ans('q2',this,true)">near rivers</button>
+      <button class="mcq-opt" onclick="m1Ans('q2',this,false)">in the sky</button>
+      <button class="mcq-opt" onclick="m1Ans('q2',this,false)">in the ocean</button>
+    </div>
+  </div>
+  <div class="qz-card">
+    <div class="qz-q">Q3. How long do geodes take to form?</div>
+    <div class="mcq-opts" id="m1-q3">
+      <button class="mcq-opt" onclick="m1Ans('q3',this,false)">about 1 year</button>
+      <button class="mcq-opt" onclick="m1Ans('q3',this,false)">about 1000 years</button>
+      <button class="mcq-opt" onclick="m1Ans('q3',this,true)">about 240 million years</button>
+    </div>
+  </div>
+  <div class="qz-card">
+    <div class="qz-q">Q4. What do geodes look like on the outside?</div>
+    <div class="mcq-opts" id="m1-q4">
+      <button class="mcq-opt" onclick="m1Ans('q4',this,true)">ordinary / normal rocks</button>
+      <button class="mcq-opt" onclick="m1Ans('q4',this,false)">shiny diamonds</button>
+      <button class="mcq-opt" onclick="m1Ans('q4',this,false)">blue crystals</button>
+    </div>
+  </div>
+</div>
+</div></div>
+
+<!-- M2 — CHOOSE & RESEARCH -->
+<div class="modal" id="m2"><div class="mbox">
+<div class="mhd bl"><div class="mhd-title">🔍 Choose &amp; Research</div><div class="mhd-num">2 / 6</div><button class="mhd-close" onclick="closeModal('m2')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Choose a hobby you love, then research it. Take notes — you'll use them to write your report!</div></div>
+
+  <div class="section-h">🎯 CHOOSE YOUR HOBBY</div>
+  <div class="hobby-chips" id="m2-chips">
+    <button class="hobby-chip" onclick="m2Chip(this)">🪨 Collecting something</button>
+    <button class="hobby-chip" onclick="m2Chip(this)">⚽ Playing a sport</button>
+    <button class="hobby-chip" onclick="m2Chip(this)">🎮 Playing games</button>
+    <button class="hobby-chip" onclick="m2Chip(this)">🎭 Acting / singing / dancing</button>
+    <button class="hobby-chip" onclick="m2Chip(this)">🎨 Painting / writing / making</button>
+  </div>
+  <input class="text-inp" id="m2-hobby" placeholder="My hobby is..." oninput="m2Save()" style="margin-top:8px">
+
+  <div class="section-h">📝 RESEARCH NOTES</div>
+  <div class="info-card">Answer these 3 questions about your hobby. Use short notes.</div>
+  <textarea class="text-ta" id="m2-details" placeholder="What IS it? What are the details? Where does it come from?" oninput="m2Save()"></textarea>
+  <textarea class="text-ta" id="m2-how" placeholder="HOW do you do it? What steps? What do you need?" oninput="m2Save()"></textarea>
+  <textarea class="text-ta" id="m2-visuals" placeholder="What drawings, photos, or objects can you show?" oninput="m2Save()" style="min-height:60px"></textarea>
+
+  <span class="save-ind" id="m2-saved">SAVED</span>
+</div>
+</div></div>
+
+<!-- M3 — WRITE YOUR REPORT -->
+<div class="modal" id="m3"><div class="mbox">
+<div class="mhd pj"><div class="mhd-title">📝 Write Your Report</div><div class="mhd-num">3 / 6</div><button class="mhd-close" onclick="closeModal('m3')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Use your research notes from module 2 to write your report. It should have 3 parts!</div></div>
+
+  <div class="section-h">📋 YOUR NOTES (from Research)</div>
+  <div id="m3-ref" class="info-card">Complete module 2 first to see your notes here.</div>
+
+  <div class="section-h">📐 REPORT TEMPLATE</div>
+  <div class="frame-box" style="margin-top:0">"My hobby is ___. It is interesting because ___. To do it, you need ___. First, you ___. Here is a picture of ___."</div>
+
+  <div class="section-h">✍️ PART A — Details</div>
+  <textarea class="text-ta" id="m3-partA" placeholder="What is the hobby? Where does it come from? Why is it interesting?" oninput="m3Save()"></textarea>
+
+  <div class="section-h">✍️ PART B — How</div>
+  <textarea class="text-ta" id="m3-partB" placeholder="How do you do it? What steps? First... Then... Finally..." oninput="m3Save()"></textarea>
+
+  <div class="section-h">✍️ PART C — Visuals</div>
+  <textarea class="text-ta" id="m3-partC" placeholder="Describe your drawings, photos, or objects. What do they show?" oninput="m3Save()" style="min-height:60px"></textarea>
+
+  <span class="save-ind" id="m3-saved">SAVED</span>
+</div>
+</div></div>
+
+<!-- M4 — PRESENT & RUBRIC -->
+<div class="modal" id="m4"><div class="mbox">
+<div class="mhd gn"><div class="mhd-title">🗣️ Present &amp; Rubric</div><div class="mhd-num">4 / 6</div><button class="mhd-close" onclick="closeModal('m4')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Present your report to me! Speak slowly and clearly. Look at me when you speak. Then we'll check the rubric together.</div></div>
+
+  <div class="section-h">🗣️ PRESENTATION STEPS</div>
+  <div class="info-card">1. <b>Name</b> the hobby and give <b>details</b>.<br>2. <b>Explain how</b> you do it.<br>3. <b>Show</b> drawings, photos, or objects.</div>
+
+  <div class="section-h">❓ DAD'S QUESTIONS</div>
+  <div class="frame-box" style="margin-top:0">"What things does a person need to do this hobby?"</div>
+  <div class="frame-box">"How did you learn about this hobby?"</div>
+  <div class="frame-box">"What do you like most about it?"</div>
+
+  <div class="section-h">✅ PROJECT RUBRIC</div>
+  <div class="chk-list" id="m4-chklist">
+    <div class="chk-item" onclick="m4Chk(0)"><div class="chk-box" id="m4-cb-0">✓</div>Did I choose a specific hobby to present?</div>
+    <div class="chk-item" onclick="m4Chk(1)"><div class="chk-box" id="m4-cb-1">✓</div>Did I give details about the hobby?</div>
+    <div class="chk-item" onclick="m4Chk(2)"><div class="chk-box" id="m4-cb-2">✓</div>Did I explain how to do the hobby?</div>
+    <div class="chk-item" onclick="m4Chk(3)"><div class="chk-box" id="m4-cb-3">✓</div>Did I include drawings or photos?</div>
+  </div>
+
+  <span class="save-ind" id="m4-saved">SAVED</span>
+</div>
+</div></div>
+
+<!-- M5 — NOW I CAN -->
+<div class="modal" id="m5"><div class="mbox">
+<div class="mhd pj"><div class="mhd-title">🏆 Now I Can</div><div class="mhd-num">5 / 6</div><button class="mhd-close" onclick="closeModal('m5')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Let's review what you learned in Unit 8! Check off everything you can do now.</div></div>
+
+  <div class="section-h">🏆 UNIT 8 — NOW I CAN…</div>
+  <div class="chk-list" id="m5-chklist">
+    <div class="chk-item" onclick="m5Chk(0)"><div class="chk-box" id="m5-cb-0">✓</div>talk about my hobbies and interests.</div>
+    <div class="chk-item" onclick="m5Chk(1)"><div class="chk-box" id="m5-cb-1">✓</div>give information about people I know.</div>
+    <div class="chk-item" onclick="m5Chk(2)"><div class="chk-box" id="m5-cb-2">✓</div>talk about gifts I've received.</div>
+    <div class="chk-item" onclick="m5Chk(3)"><div class="chk-box" id="m5-cb-3">✓</div>describe and explain a hobby.</div>
+  </div>
+
+  <div class="section-h">💬 REVIEW QUESTIONS</div>
+  <div class="qz-q">What are some hobbies and interests that people you know enjoy?</div>
+  <textarea class="text-ta" id="m5-q1" placeholder="People I know enjoy..." oninput="m5Save()" style="min-height:60px"></textarea>
+  <div class="qz-q" style="margin-top:8px">What is one of your hobbies? What do you need? What are the steps?</div>
+  <textarea class="text-ta" id="m5-q2" placeholder="One of my hobbies is... I need... The steps are..." oninput="m5Save()" style="min-height:60px"></textarea>
+
+  <span class="save-ind" id="m5-saved">SAVED</span>
+</div>
+</div></div>
+
+<!-- M6 — FINAL QUIZ -->
+<div class="modal" id="m6"><div class="mbox">
+<div class="mhd dk"><div class="mhd-title">⚽ Can Leo Score?</div><div class="mhd-num">6 / 6 · FINAL QUIZ</div><button class="mhd-close" onclick="closeModal('m6')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: 8 questions about the project! You need 6/8 (75%) to score. ⚽</div></div>
+  <div id="m6-quiz"></div>
+  <div id="m6-result" style="display:none"></div>
+</div>
+</div></div>
+
+<script>
+var SP='leea-4-8-project-';
+var HW_ID=new URLSearchParams(location.search).get('hw')||'leo-4-8-project';
+var MC=6;
+
+function ls(k,v){try{localStorage.setItem(SP+k,JSON.stringify(v))}catch(e){}}
+function ll(k,fb){try{var v=localStorage.getItem(SP+k);return v!==null?JSON.parse(v):fb}catch(e){return fb}}
+
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow='hidden';
+  var fn=window['restore_'+id];
+  if(typeof fn==='function')fn();
+  if(id==='m6'&&!m6Started)initM6();
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow='';
+  updateProgress();
+}
+
+function updateBadge(id,state){
+  var el=document.getElementById('badge-'+id);if(!el)return;
+  var lbl={m1:'START HERE',m2:'NOT STARTED',m3:'NOT STARTED',m4:'NOT STARTED',m5:'NOT STARTED',m6:'FINAL QUIZ'};
+  el.className='mod-badge '+(state==='done'?'badge-done':state==='prog'?'badge-prog':'badge-new');
+  el.textContent=state==='done'?'✅ DONE':state==='prog'?'▶ IN PROGRESS':(lbl[id]||'NOT STARTED');
+  ls(id+'-state',state);
+}
+function getBadge(id){return ll(id+'-state','new')}
+function setDone(id){updateBadge(id,'done');ls(id+'-done',true);updateProgress()}
+function setProg(id){if(getBadge(id)!=='done')updateBadge(id,'prog')}
+
+function updateProgress(){
+  var pf=document.getElementById('progFill');if(!pf)return;
+  var done=0;
+  for(var i=1;i<=MC;i++){if(getBadge('m'+i)==='done')done++}
+  pf.style.width=(done/MC*100)+'%';
+}
+
+function showSave(id){
+  var el=document.getElementById(id+'-saved');if(!el)return;
+  el.classList.add('show');setTimeout(function(){el.classList.remove('show')},2000);
+}
+
+// M1 — GEODES QUIZ
+var m1Score=0,m1Total=4,m1Answered=0;
+function m1Ans(qid,btn,correct){
+  var wrap=document.getElementById('m1-'+qid);
+  var btns=wrap.querySelectorAll('.mcq-opt');
+  for(var i=0;i<btns.length;i++)btns[i].disabled=true;
+  btn.classList.add(correct?'ok':'bad');
+  if(correct)m1Score++;
+  m1Answered++;setProg('m1');
+  if(m1Answered>=m1Total){ls('m1-score',{score:m1Score,total:m1Total});setDone('m1')}
+}
+window.restore_m1=function(){var s=ll('m1-score');if(s){m1Score=s.score;m1Answered=m1Total}};
+
+// M2 — CHOOSE & RESEARCH
+function m2Chip(btn){
+  var all=document.querySelectorAll('#m2-chips .hobby-chip');
+  for(var i=0;i<all.length;i++)all[i].classList.remove('selected');
+  btn.classList.add('selected');
+  document.getElementById('m2-hobby').value=btn.textContent.trim().replace(/^[^\s]+\s/,'');
+  m2Save();
+}
+function m2Save(){
+  var d={hobby:document.getElementById('m2-hobby').value,details:document.getElementById('m2-details').value,how:document.getElementById('m2-how').value,visuals:document.getElementById('m2-visuals').value};
+  ls('m2-data',d);showSave('m2');
+  var filled=0;
+  if(d.hobby.trim())filled++;if(d.details.trim())filled++;if(d.how.trim())filled++;
+  if(filled>=3)setDone('m2');else if(filled>0)setProg('m2');
+}
+window.restore_m2=function(){
+  var d=ll('m2-data');if(!d)return;
+  document.getElementById('m2-hobby').value=d.hobby||'';
+  document.getElementById('m2-details').value=d.details||'';
+  document.getElementById('m2-how').value=d.how||'';
+  document.getElementById('m2-visuals').value=d.visuals||'';
+};
+
+// M3 — WRITE REPORT
+window.restore_m3=function(){
+  var d=ll('m3-data');
+  if(d){document.getElementById('m3-partA').value=d.partA||'';document.getElementById('m3-partB').value=d.partB||'';document.getElementById('m3-partC').value=d.partC||''}
+  var r=ll('m2-data');
+  var ref=document.getElementById('m3-ref');
+  if(r&&r.hobby){ref.innerHTML='<b>Hobby:</b> '+r.hobby+'<br><b>Details:</b> '+(r.details||'—')+'<br><b>How:</b> '+(r.how||'—')+'<br><b>Visuals:</b> '+(r.visuals||'—')}
+};
+function m3Save(){
+  var d={partA:document.getElementById('m3-partA').value,partB:document.getElementById('m3-partB').value,partC:document.getElementById('m3-partC').value};
+  ls('m3-data',d);showSave('m3');
+  var filled=0;
+  if(d.partA.trim())filled++;if(d.partB.trim())filled++;if(d.partC.trim())filled++;
+  if(filled>=3)setDone('m3');else if(filled>0)setProg('m3');
+}
+
+// M4 — PRESENT & RUBRIC
+var m4Checks=[false,false,false,false];
+function m4Chk(i){
+  m4Checks[i]=!m4Checks[i];
+  var item=document.querySelectorAll('#m4-chklist .chk-item')[i];
+  item.classList.toggle('checked',m4Checks[i]);
+  ls('m4-checks',m4Checks);showSave('m4');
+  var all=m4Checks.every(function(c){return c});
+  if(all)setDone('m4');else setProg('m4');
+}
+window.restore_m4=function(){
+  var c=ll('m4-checks',[false,false,false,false]);m4Checks=c;
+  var items=document.querySelectorAll('#m4-chklist .chk-item');
+  for(var i=0;i<items.length;i++){items[i].classList.toggle('checked',c[i]||false)}
+};
+
+// M5 — NOW I CAN
+var m5Checks=[false,false,false,false];
+function m5Chk(i){
+  m5Checks[i]=!m5Checks[i];
+  var item=document.querySelectorAll('#m5-chklist .chk-item')[i];
+  item.classList.toggle('checked',m5Checks[i]);
+  m5Save();
+}
+function m5Save(){
+  var d={checks:m5Checks,q1:document.getElementById('m5-q1').value,q2:document.getElementById('m5-q2').value};
+  ls('m5-data',d);showSave('m5');
+  var allChecked=m5Checks.every(function(c){return c});
+  if(allChecked)setDone('m5');else if(m5Checks.some(function(c){return c})||d.q1.trim()||d.q2.trim())setProg('m5');
+}
+window.restore_m5=function(){
+  var d=ll('m5-data');if(!d)return;
+  m5Checks=d.checks||[false,false,false,false];
+  var items=document.querySelectorAll('#m5-chklist .chk-item');
+  for(var i=0;i<items.length;i++){items[i].classList.toggle('checked',m5Checks[i]||false)}
+  document.getElementById('m5-q1').value=d.q1||'';
+  document.getElementById('m5-q2').value=d.q2||'';
+};
+
+// M6 — FINAL QUIZ
+var m6Started=false;
+var M6_QS=[
+  {q:'What is special about geodes?',opts:['They are very heavy','They have crystals inside','They glow in the dark'],ans:1},
+  {q:'Where can you find geodes?',opts:['in the desert','near rivers','in the sky'],ans:1},
+  {q:'How long do geodes take to form?',opts:['about 240 million years','about 100 years','about 1 day'],ans:0},
+  {q:'What are the 3 parts of a hobby report?',opts:['title, picture, quiz','details, how, visuals','name, date, address'],ans:1},
+  {q:'What should you do when presenting?',opts:['look at the floor and whisper','speak slowly, clearly, and look at your audience','read as fast as possible'],ans:1},
+  {q:'Which is NOT one of the hobby categories from the LP?',opts:['collecting something','flying airplanes','playing games'],ans:1},
+  {q:'What does the "Now I Can" checklist include?',opts:['talk about hobbies and describe a hobby','cook dinner and clean the house','solve math problems'],ans:0},
+  {q:'What is the first step of the project?',opts:['write the report','choose a hobby','present to the class'],ans:1}
+];
+
+function initM6(){
+  m6Started=true;
+  var saved=ll('m6-score');
+  if(saved){showM6Result(saved.score,saved.total);return}
+  renderM6();
+}
+var m6Idx=0,m6Score=0;
+function renderM6(){
+  var host=document.getElementById('m6-quiz');
+  if(m6Idx>=M6_QS.length){finishM6();return}
+  var q=M6_QS[m6Idx];
+  var h='<div class="qz-prog"><span class="qz-num">Question '+(m6Idx+1)+' of '+M6_QS.length+'</span><span class="qz-sc">Score: '+m6Score+'</span></div>';
+  h+='<div class="qz-bar"><div class="qz-bar-fill" style="width:'+(m6Idx/M6_QS.length*100)+'%"></div></div>';
+  h+='<div class="qz-card"><div class="qz-q">'+q.q+'</div><div class="mcq-opts">';
+  for(var i=0;i<q.opts.length;i++){h+='<button class="mcq-opt" onclick="m6Pick('+i+','+q.ans+',this)">'+q.opts[i]+'</button>'}
+  h+='</div></div>';host.innerHTML=h;
+}
+function m6Pick(idx,ans,btn){
+  var opts=btn.parentNode.querySelectorAll('.mcq-opt');
+  for(var i=0;i<opts.length;i++)opts[i].disabled=true;
+  btn.classList.add(idx===ans?'ok':'bad');
+  if(idx===ans)m6Score++;
+  setTimeout(function(){m6Idx++;renderM6()},800);
+}
+function finishM6(){
+  var t=M6_QS.length;
+  ls('m6-score',{score:m6Score,total:t});
+  try{
+    var sd={score:m6Score,total:t,pct:Math.round(m6Score/t*100),done:true,timestamp:new Date().toISOString()};
+    localStorage.setItem(SP+'score',JSON.stringify(sd));
+    localStorage.setItem(HW_ID+'-score',JSON.stringify(sd));
+    if(m6Score>=6){localStorage.setItem(SP+'done',JSON.stringify(true));localStorage.setItem(HW_ID+'-done',JSON.stringify(true))}
+  }catch(e){}
+  showM6Result(m6Score,t);
+  if(m6Score>=6)setDone('m6');
+}
+function showM6Result(score,total){
+  document.getElementById('m6-quiz').style.display='none';
+  var res=document.getElementById('m6-result');res.style.display='block';
+  var pct=Math.round(score/total*100),pass=score>=6;
+  res.innerHTML='<div class="qz-res"><div class="qz-trophy">'+(pass?'⚽🎉':'😤')+'</div><div class="qz-score-big">'+score+' / '+total+' ('+pct+'%)</div><div class="qz-msg">'+(pass?'GOAL! 🥅 Leo scores! Great project work!':'Not quite — you need 6/8. Try again!')+'</div>'+(pass?'':'<button class="qz-retry" onclick="retryM6()">🔄 Try Again</button>')+'</div>';
+}
+function retryM6(){
+  m6Idx=0;m6Score=0;
+  document.getElementById('m6-result').style.display='none';
+  document.getElementById('m6-quiz').style.display='block';
+  renderM6();
+}
+
+// INIT
+(function(){
+  for(var i=1;i<=MC;i++){var s=getBadge('m'+i);if(s!=='new')updateBadge('m'+i,s)}
+  updateProgress();
+})();
+</script>
+</body>
+</html>

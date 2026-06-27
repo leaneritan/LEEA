@@ -1,755 +1,852 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unit 8 Reader — Hurum's Hobby · Leo's English League</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Unit 8 · Book Reading — Hurum's Hobby</title>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="/components/charts.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --or:#7C3AED;--amb:#6D28D9;--ye:#FDE047;--choc:#4C1D95;
+  --crm:#F5F3FF;--card:#FAFAF7;--bg:#1C1917;
+  --gn:#16A34A;--gnl:#DCFCE7;--rd:#DC2626;--rdl:#FEE2E2;
+  --bl:#1D4ED8;--ice:#BAE6FD;
+  --text:#1C1917;--muted:#78716C;
+  --fnh:"Luckiest Guy",cursive;--fn:"Nunito",sans-serif;
+  --r:14px;
+}
+body{font-family:var(--fn);background:var(--bg);display:flex;flex-direction:column;align-items:center;min-height:100vh}
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+.topbar{width:100%;max-width:1400px;display:flex;align-items:center;padding:10px 16px;gap:12px}
+.unit-chip{background:var(--or);color:#fff;font-family:var(--fnh);font-size:.82rem;letter-spacing:1px;padding:5px 14px;border-radius:20px;white-space:nowrap}
+.prog-wrap{flex:1;background:rgba(255,255,255,.1);border-radius:20px;height:8px;overflow:hidden}
+.prog-fill{background:linear-gradient(90deg,var(--or),var(--ye));height:100%;border-radius:20px;transition:width .4s}
+.slide-counter{color:#D6D3D1;font-size:.82rem;font-weight:800;white-space:nowrap}
+.icon-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:1rem;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0}
+.icon-btn:hover{background:rgba(255,255,255,.2)}
 
-  <script src="/components/charts.js"></script>
+.slide-wrap{width:100%;max-width:1400px;position:relative}
+.notes-panel{display:none;background:#292524;border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:14px 18px;margin:0 0 10px;color:#D6D3D1;font-size:.84rem;line-height:1.6}
+.notes-panel.open{display:block}
+.notes-panel strong{color:var(--ye)}
 
-  <style>
-    :root {
-      --green:    #16A34A;
-      --green-dk: #14532D;
-      --green-lt: #DCFCE7;
-      --green-md: #86EFAC;
-      --blue:     #0EA5E9;
-      --blue-bg:  #F0F9FF;
-      --blue-dk:  #075985;
-      --yellow:   #FFCC00;
-      --ybg:      #FFFBE6;
-      --paper:    #FAFAF7;
-      --surface:  #FFFFFF;
-      --soft:     #F0EEE8;
-      --border:   #E5E3DC;
-      --ink:      #111111;
-      --ink2:     #5A5853;
-      --ink3:     #6B6963;
-      --red:      #DC2626;
-      --red-lt:   #FEE2E2;
-      --reader:   #7C3AED;
-      --reader-dk:#4C1D95;
-      --reader-lt:#EDE9FE;
-      --reader-md:#C4B5FD;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background: #111; font-family: 'Outfit', sans-serif; overflow: hidden; user-select: none; }
-    button { font-family: 'Outfit', sans-serif; }
+.slide{display:none;background:var(--card);border-radius:20px;overflow:hidden;min-height:calc(100vh - 130px);animation:fadeIn .3s ease}
+.slide.active{display:flex;flex-direction:column}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-    #wrap { position: fixed; top: 0; left: 0; width: 100vw; height: calc(100vh - 52px); overflow: hidden; }
-    #deck { position: absolute; width: 1920px; height: 1080px; transform-origin: top left; }
+.slide-header{padding:12px 28px;display:flex;align-items:center;gap:10px;font-family:var(--fnh);font-size:.82rem;letter-spacing:1.5px}
+.sh-or{background:var(--or);color:#fff}.sh-amb{background:var(--amb);color:#fff}
+.sh-choc{background:var(--choc);color:#fff}.sh-gn{background:#16A34A;color:#fff}
+.sh-bl{background:var(--bl);color:#fff}.sh-dk{background:#1C1917;color:#fff}
 
-    .slide { position: absolute; inset: 0; background: var(--paper); display: none; overflow: hidden; }
-    .slide.active { display: block; }
+.slide-body{flex:1;padding:24px 32px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
 
-    #nav {
-      position: fixed; bottom: 0; left: 0; right: 0; height: 52px;
-      background: #0D0D0D; display: flex; align-items: center; padding: 0 16px; gap: 10px; z-index: 9000;
-    }
-    .nb {
-      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
-      color: #fff; padding: 6px 18px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all .15s;
-    }
-    .nb:hover { background: rgba(255,255,255,.2); }
-    .nb.green { background: var(--reader); border-color: var(--reader); }
-    #sc { color: rgba(255,255,255,.65); font-size: 13px; font-weight: 600; min-width: 64px; text-align: center; }
-    #pgbar { flex: 1; height: 4px; background: rgba(255,255,255,.12); border-radius: 2px; overflow: hidden; }
-    #pgfill { height: 100%; background: var(--reader); transition: width .3s; }
-    #unit-lbl { color: var(--reader-md); font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin-left: auto; }
+.title-slide{background:linear-gradient(135deg,#4C1D95,#6D28D9,#7C3AED);min-height:calc(100vh - 130px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;gap:16px}
+.title-slide .unit-lbl{background:rgba(255,255,255,.15);color:var(--ye);font-family:var(--fnh);font-size:.9rem;letter-spacing:3px;padding:6px 20px;border-radius:20px}
+.title-slide h1{font-family:var(--fnh);font-size:3.2rem;color:#fff;letter-spacing:2px;line-height:1.1}
+.title-slide h1 span{color:var(--ye)}
+.title-slide .sub{color:rgba(255,255,255,.75);font-size:.95rem;font-weight:700}
 
-    #tn-panel {
-      position: fixed; top: 0; right: -440px; width: 440px; height: calc(100vh - 52px);
-      background: #1a2332; transition: right .3s ease; z-index: 8000; display: flex; flex-direction: column;
-    }
-    #tn-panel.open { right: 0; }
-    .tn-head {
-      background: var(--reader-dk); padding: 16px 20px;
-      font-weight: 800; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: #fff;
-      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
-    }
-    .tn-close { cursor: pointer; font-size: 20px; opacity: .7; }
-    .tn-close:hover { opacity: 1; }
-    #tn-body {
-      flex: 1; overflow-y: auto; padding: 20px 22px;
-      font-size: 15px; line-height: 1.75; color: rgba(255,255,255,.82);
-    }
-    #tn-body strong { color: var(--yellow); }
-    #tn-body .tn-sec { margin-bottom: 16px; }
-    #tn-body .tn-lbl { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--reader-md); font-weight: 700; margin-bottom: 6px; display: block; }
-    #tn-body ul { padding-left: 18px; }
-    #tn-body li { margin-bottom: 5px; }
-    #tn-body .tn-qa { background: rgba(255,255,255,.06); border-left: 3px solid var(--yellow); padding: 10px 14px; border-radius: 0 6px 6px 0; margin-top: 8px; }
+.section-slide{min-height:calc(100vh - 130px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;gap:14px}
+.section-slide .sec-emoji{font-size:4rem}
+.section-slide h2{font-family:var(--fnh);font-size:2.4rem;letter-spacing:2px}
+.section-slide p{font-size:1rem;font-weight:700;max-width:560px}
+.sec-before{background:linear-gradient(135deg,#312E81,#4C1D95);color:#E0E7FF}.sec-before h2{color:#C4B5FD}
+.sec-during{background:linear-gradient(135deg,#4C1D95,#6D28D9);color:var(--crm)}.sec-during h2{color:var(--ye)}
+.sec-after{background:linear-gradient(135deg,#14532D,#166534);color:#DCFCE7}.sec-after h2{color:#86EFAC}
 
-    /* Slide header bar */
-    .sh { height: 88px; display: flex; align-items: center; padding: 0 72px; gap: 22px; flex-shrink: 0; }
-    .sh.rd  { background: var(--reader); }
-    .sh.rdk { background: var(--reader-dk); }
-    .sh.bl  { background: var(--blue); }
-    .sh.dk  { background: var(--ink); }
-    .sh-icon { font-size: 44px; line-height: 1; }
-    .sh-text .sh-title { font-size: 36px; font-weight: 800; color: #fff; letter-spacing: -.01em; }
-    .sh-text .sh-sub   { font-size: 18px; font-weight: 500; color: rgba(255,255,255,.68); margin-top: 1px; }
-    .sh-tag { margin-left: auto; background: rgba(255,255,255,.16); color: #fff; padding: 6px 18px 5px; border-radius: 20px; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.dialogue{display:flex;gap:12px;align-items:flex-start}
+.dialogue.leo{flex-direction:row-reverse}
+.avi{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.avi-dad{background:var(--bl)}.avi-leo{background:var(--gn)}
+.bubble{max-width:80%;padding:11px 15px;border-radius:16px;font-size:.86rem;font-weight:700;line-height:1.5}
+.bubble-dad{background:var(--bl);color:#fff;border-radius:4px 16px 16px 16px}
+.bubble-leo{background:var(--gn);color:#fff;border-radius:16px 4px 16px 16px}
+.bubble-label{font-size:.6rem;opacity:.7;margin-bottom:2px;letter-spacing:.5px}
 
-    .sb { padding: 50px 72px; height: calc(1080px - 88px); overflow: hidden; }
+/* VOCAB TABS */
+.present-module{flex:1;display:flex;flex-direction:column;min-height:0}
+.pp-bar-row{background:rgba(124,58,237,.1);border-radius:8px;padding:7px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.pp-bar-wrap{flex:1;background:rgba(124,58,237,.2);border-radius:20px;height:6px;overflow:hidden}
+.pp-bar-fill{background:var(--or);height:100%;border-radius:20px;transition:width .5s}
+.pp-text{font-size:.72rem;font-weight:800;color:var(--amb);white-space:nowrap}
+.word-tabs-bar{display:flex;gap:4px;overflow-x:auto;padding:0 0 6px;scrollbar-width:thin;scrollbar-color:var(--or) transparent;flex-shrink:0;flex-wrap:wrap}
+.word-tabs-bar::-webkit-scrollbar{height:4px}
+.word-tabs-bar::-webkit-scrollbar-thumb{background:var(--or);border-radius:4px}
+.word-tab{background:rgba(124,58,237,.12);border:2px solid rgba(124,58,237,.3);color:var(--amb);font-family:var(--fn);font-weight:800;font-size:.72rem;padding:6px 12px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.word-tab:hover{background:rgba(124,58,237,.25)}
+.word-tab.active{background:var(--or);border-color:var(--or);color:#fff}
+.word-tab.done{background:rgba(22,163,74,.15);border-color:#16A34A;color:#16A34A}
+.word-tab.done.active{background:#16A34A;color:#fff}
+.word-panel{display:none;flex:1;overflow-y:auto}
+.word-panel.active{display:block}
+.word-panel-inner{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:4px}
+.word-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:linear-gradient(135deg,#4C1D95,var(--amb));border-radius:var(--r);color:#fff;margin-bottom:10px}
+.word-big-emoji{font-size:2.6rem}
+.word-title{font-family:var(--fnh);font-size:1.6rem;letter-spacing:1px;color:#fff}
+.word-pos{font-size:.7rem;font-weight:700;opacity:.7;margin-top:2px;letter-spacing:1px}
+.def-box{background:var(--crm);border-radius:var(--r);padding:12px 16px;border-left:5px solid var(--or)}
+.def-label{font-size:.6rem;font-weight:800;letter-spacing:1px;color:var(--muted);margin-bottom:4px}
+.def-text{font-size:.9rem;font-weight:800;color:var(--text);margin-bottom:6px}
+.def-example{font-size:.8rem;color:var(--muted);font-weight:600;font-style:italic}
+.mini-game{background:#fff;border:2px solid var(--or);border-radius:var(--r);padding:14px 16px}
+.mini-game h4{font-family:var(--fnh);font-size:.82rem;letter-spacing:1px;color:var(--or);margin-bottom:8px}
+.game-area{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;min-height:70px}
+.game-btn{background:var(--crm);border:2px solid var(--or);border-radius:10px;padding:9px 14px;font-family:var(--fn);font-weight:800;font-size:.84rem;cursor:pointer;transition:all .2s;text-align:center}
+.game-btn:hover:not(:disabled){background:var(--or);color:#fff}
+.game-btn.correct{background:var(--gnl);border-color:var(--gn);color:var(--gn)}
+.game-btn.wrong{background:var(--rdl);border-color:var(--rd);color:var(--rd)}
+.game-btn:disabled{cursor:default;opacity:.7}
+.game-msg{font-size:.8rem;font-weight:800;color:var(--gn);width:100%;text-align:center;display:none;margin-top:4px}
+.game-msg.show{display:block}
+.game-msg.err{color:var(--rd)}
+.qc-box{background:#fff;border:1px solid #E7E5E4;border-radius:var(--r);padding:12px 16px;margin-top:8px}
+.qc-q{font-size:.86rem;font-weight:800;color:var(--text);margin-bottom:8px}
+.qc-opts{display:flex;flex-direction:column;gap:5px}
+.qc-opt{background:var(--crm);border:2px solid transparent;border-radius:10px;padding:8px 12px;font-family:var(--fn);font-weight:700;font-size:.8rem;cursor:pointer;text-align:left;transition:all .2s}
+.qc-opt:hover{border-color:var(--or)}
+.qc-opt.correct{background:var(--gnl);border-color:var(--gn);color:var(--gn)}
+.qc-opt.wrong{background:var(--rdl);border-color:var(--rd);color:var(--rd)}
+.word-nav{display:flex;justify-content:space-between;align-items:center;padding:8px 0 0;flex-shrink:0}
+.wnav-btn{background:var(--or);color:#fff;border:none;font-family:var(--fn);font-weight:800;font-size:.8rem;padding:8px 18px;border-radius:20px;cursor:pointer;transition:background .2s}
+.wnav-btn:hover{background:var(--amb)}
+.wnav-btn:disabled{opacity:.3;cursor:not-allowed}
+.wnav-btn.sec{background:var(--crm);color:var(--amb);border:2px solid var(--or)}
+.wnav-btn.sec:hover{background:var(--or);color:#fff}
+.word-prog-text{font-size:.72rem;font-weight:800;color:var(--muted)}
 
-    /* Title slide */
-    .title-slide {
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, #4C1D95, #7C3AED);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #fff;
-    }
-    .ts-bg { font-size: 120px; margin-bottom: 10px; }
-    .ts-unit { font-size: 18px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; opacity: .7; margin-bottom: 16px; }
-    .ts-title { font-size: 80px; font-weight: 900; line-height: 1.05; margin-bottom: 10px; }
-    .ts-sub { font-size: 32px; font-weight: 500; opacity: .85; }
-    .ts-badge { margin-top: 24px; background: rgba(255,255,255,.18); padding: 10px 28px; border-radius: 30px; font-size: 20px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.info-card{background:var(--crm);border-radius:var(--r);padding:14px 18px;border-left:5px solid var(--or)}
+.info-card h3{font-family:var(--fnh);font-size:.92rem;letter-spacing:1px;color:var(--amb);margin-bottom:6px}
+.info-card p,.info-card li{font-size:.84rem;font-weight:600;color:var(--text);line-height:1.6}
+.info-card ul{padding-left:16px}
+.highlight{background:var(--ye);border-radius:12px;padding:12px 16px;color:var(--choc);font-weight:800;font-size:.88rem;line-height:1.5}
+.slide-title{font-family:var(--fnh);font-size:1.7rem;color:var(--amb);letter-spacing:1px}
+.reveal-btn{background:var(--or);color:#fff;border:none;font-family:var(--fn);font-weight:800;font-size:.78rem;padding:6px 14px;border-radius:20px;cursor:pointer}
+.reveal-btn:hover{background:var(--amb)}
+.answer-reveal{background:var(--crm);border-radius:8px;padding:8px 14px;font-size:.86rem;font-weight:700;color:var(--gn);display:none;border-left:4px solid var(--gn);margin-top:6px}
 
-    /* Content cards */
-    .obj-row { display: flex; gap: 28px; align-items: flex-start; margin-bottom: 32px; }
-    .obj-icon { font-size: 64px; line-height: 1; flex-shrink: 0; }
-    .obj-text { font-size: 30px; line-height: 1.55; }
-    .obj-text strong { color: var(--reader); }
+.step-card{background:#fff;border:2px solid var(--or);border-radius:var(--r);padding:16px 20px;margin-bottom:10px;display:none}
+.step-card.show{display:block;animation:fadeIn .4s}
+.step-card .step-hd{font-family:var(--fnh);font-size:.9rem;letter-spacing:1px;color:var(--or);margin-bottom:6px}
+.step-card p{font-size:.88rem;font-weight:700;color:var(--text);line-height:1.6}
+.next-step-btn{background:var(--or);color:#fff;border:none;font-family:var(--fn);font-weight:800;font-size:.82rem;padding:9px 22px;border-radius:20px;cursor:pointer;margin-top:8px}
+.next-step-btn:hover{background:var(--amb)}
 
-    .fact-card {
-      background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px;
-      padding: 28px 32px; display: flex; gap: 24px; align-items: center;
-    }
-    .fact-em { font-size: 52px; line-height: 1; flex-shrink: 0; }
-    .fact-txt { font-size: 26px; line-height: 1.55; color: var(--ink); }
-    .fact-txt strong { color: var(--reader); }
+.qa-item{background:var(--crm);border-radius:var(--r);overflow:hidden;margin-bottom:8px}
+.qa-q{padding:14px 20px;font-size:.9rem;font-weight:800;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .2s;color:var(--choc)}
+.qa-q:hover{background:#EDE9FE}
+.qa-a{display:none;padding:12px 20px;font-size:.86rem;border-top:1px solid rgba(124,58,237,.3);color:var(--text);font-weight:700;line-height:1.6}
+.qa-a.open{display:block}
 
-    .source-pill {
-      position: absolute; bottom: 24px; right: 32px;
-      background: var(--reader-lt); color: var(--reader-dk); padding: 6px 16px; border-radius: 20px;
-      font-size: 13px; font-weight: 700;
-    }
+.assess-item{background:var(--crm);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;border:2px solid transparent;transition:all .2s;margin-bottom:6px}
+.assess-item:hover{border-color:var(--or)}
+.assess-item.checked{background:var(--gnl);border-color:var(--gn)}
+.assess-check{width:22px;height:22px;border:2px solid var(--or);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;transition:all .2s}
+.assess-item.checked .assess-check{background:var(--gn);border-color:var(--gn);color:#fff}
+.assess-item p{font-size:.86rem;font-weight:700;color:var(--text)}
 
-    .vocab-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .vocab-card {
-      background: var(--surface); border: 2px solid var(--border); border-radius: 16px;
-      padding: 28px 24px; text-align: center; transition: border-color .2s;
-    }
-    .vocab-card:hover { border-color: var(--reader); }
-    .vocab-em { font-size: 56px; margin-bottom: 10px; }
-    .vocab-word { font-size: 28px; font-weight: 800; color: var(--reader-dk); margin-bottom: 6px; }
-    .vocab-def { font-size: 18px; color: var(--ink2); line-height: 1.5; }
+.chart-wrap{background:#fff;border:2px solid var(--or);border-radius:var(--r);padding:12px;margin:8px 0}
+.fill-inp{border:none;border-bottom:2px solid var(--or);background:transparent;font-family:var(--fn);font-size:.88rem;font-weight:700;color:var(--text);outline:none;padding:2px 6px;width:140px;text-align:center;transition:border-color .2s}
+.fill-inp.ok{border-bottom-color:var(--gn);color:var(--gn)}
+.fill-inp.bad{border-bottom-color:var(--rd);animation:shake .3s}
 
-    .glossary-grid { display: flex; flex-wrap: wrap; gap: 12px; }
-    .glossary-chip {
-      padding: 10px 22px; background: var(--surface); border: 2px solid var(--border); border-radius: 30px;
-      font-size: 22px; font-weight: 600; color: var(--ink); transition: all .2s;
-    }
-    .glossary-chip:hover { border-color: var(--reader); background: var(--reader-lt); }
+.nav-bar{width:100%;max-width:1400px;display:flex;align-items:center;justify-content:space-between;padding:10px 0 16px;gap:12px}
+.nav-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;font-family:var(--fn);font-weight:800;font-size:.85rem;padding:10px 22px;border-radius:12px;cursor:pointer;transition:all .2s}
+.nav-btn:hover:not(:disabled){background:var(--or);border-color:var(--or)}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed}
+.nav-btn-primary{background:var(--or);border-color:var(--or);color:#fff}
+.nav-btn-primary:hover{background:var(--amb) !important}
+.home-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#D6D3D1;font-size:.8rem;font-weight:700;padding:8px 14px;border-radius:10px;cursor:pointer;transition:all .2s;font-family:var(--fn)}
+.home-btn:hover{background:rgba(255,255,255,.15)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 
-    .read-card {
-      background: var(--surface); border: 2px solid var(--border); border-radius: 16px;
-      padding: 32px 36px; margin-bottom: 20px;
-    }
-    .read-card .placeholder {
-      background: var(--reader-lt); border-left: 6px solid var(--reader); border-radius: 0 12px 12px 0;
-      padding: 20px 24px; font-size: 22px; color: var(--reader-dk); font-style: italic; margin-bottom: 16px;
-    }
-    .q-prompt {
-      background: var(--ybg); border-left: 6px solid var(--yellow); border-radius: 0 12px 12px 0;
-      padding: 18px 24px; font-size: 24px; color: var(--ink); margin-top: 12px;
-    }
-    .q-prompt strong { color: var(--reader); }
-
-    .frame-box {
-      background: var(--blue-bg); border-left: 8px solid var(--blue); border-radius: 0 16px 16px 0;
-      padding: 22px 30px; font-size: 28px; font-style: italic; color: var(--blue-dk); margin-top: 20px;
-    }
-
-    .pair-card {
-      background: var(--ybg); border-left: 6px solid var(--yellow); border-radius: 0 16px 16px 0;
-      padding: 28px 32px; font-size: 26px; line-height: 1.6; color: var(--ink2);
-    }
-
-    /* Done card */
-    .done-card {
-      background: var(--surface); border-radius: 24px; padding: 60px 80px; text-align: center;
-      max-width: 720px; margin: auto; box-shadow: 0 12px 40px rgba(0,0,0,.06);
-    }
-    .done-card h2 { font-size: 44px; font-weight: 900; margin: 16px 0 12px; color: var(--ink); }
-    .done-card p { font-size: 22px; color: var(--ink2); line-height: 1.6; margin-bottom: 28px; }
-    .btn-done {
-      background: var(--reader); color: #fff; border: none; padding: 20px 56px; border-radius: 16px;
-      font-size: 28px; font-weight: 700; cursor: pointer; transition: all .2s; font-family: 'Outfit', sans-serif;
-    }
-    .btn-done:hover { background: var(--reader-dk); transform: translateY(-2px); }
-
-    .reveal-btn {
-      background: var(--reader); color: #fff; border: none; padding: 14px 32px; border-radius: 12px;
-      font-size: 22px; font-weight: 700; cursor: pointer; transition: all .2s; font-family: 'Outfit', sans-serif;
-    }
-    .reveal-btn:hover { background: var(--reader-dk); }
-    .hidden { display: none; }
-    .model-box {
-      background: var(--reader-lt); border: 2px dashed var(--reader); border-radius: 14px;
-      padding: 22px 28px; font-size: 26px; color: var(--reader-dk); margin-top: 16px; line-height: 1.55;
-    }
-
-    #chart-host { height: 100%; }
-  </style>
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+</style>
 </head>
 <body>
 
-<div id="wrap">
-  <div id="deck">
-
-    <!-- ==================================================
-         SLIDE 1 — TITLE
-    ================================================== -->
-    <div class="slide active" id="s1">
-      <div class="title-slide">
-        <div class="ts-bg">🦴🦕📖</div>
-        <div class="ts-unit">Unit 8 · Our World 2E Level 4</div>
-        <div class="ts-title">Hurum&rsquo;s Hobby</div>
-        <div class="ts-sub">A biography of Jørn Hurum</div>
-        <div class="ts-badge">Reading Strategy: Ask Questions</div>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 2 — OBJECTIVES
-    ================================================== -->
-    <div class="slide" id="s2"
-      data-notes="Read the objectives aloud. Emphasize that the reading strategy today is Ask Questions — students will practice asking who/what/when/where/why/how questions as they read.">
-      <div class="sh rd">
-        <span class="sh-icon">🎯</span>
-        <div class="sh-text"><div class="sh-title">Objectives</div><div class="sh-sub">What we will learn today</div></div>
-        <span class="sh-tag">Objectives</span>
-      </div>
-      <div class="sb">
-        <div class="obj-row">
-          <div class="obj-icon">📖</div>
-          <div class="obj-text"><strong>Content:</strong> Learn about Jørn Hurum&rsquo;s life and how he turned a childhood hobby into a career.</div>
-        </div>
-        <div class="obj-row">
-          <div class="obj-icon">❓</div>
-          <div class="obj-text"><strong>Language:</strong> Ask questions using <strong>who, what, when, where, why,</strong> and <strong>how</strong>.</div>
-        </div>
-        <div class="obj-row">
-          <div class="obj-icon">🗣️</div>
-          <div class="obj-text"><strong>Grammar:</strong> Describe people with <strong>who</strong>. <em>&ldquo;Jørn Hurum is a man who studies fossils.&rdquo;</em></div>
-        </div>
-        <span class="source-pill">📖 LP p.287</span>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 3 — BEFORE YOU READ: ACTIVATE
-    ================================================== -->
-    <div class="slide" id="s3"
-      data-notes="Activate Prior Knowledge: Tell students about hobbies that you had as a child. Say whether or not you still do them. Then ask: What's your favorite hobby? Do you think you could do this hobby as a job when you grow up? Why, or why not?">
-      <div class="sh rdk">
-        <span class="sh-icon">💬</span>
-        <div class="sh-text"><div class="sh-title">Before You Read</div><div class="sh-sub">Activate Prior Knowledge</div></div>
-        <span class="sh-tag">Activate</span>
-      </div>
-      <div class="sb" style="display:flex;flex-direction:column;gap:28px">
-        <div class="pair-card">
-          <strong>Teacher:</strong> Tell students about hobbies that you had as a child. Say whether or not you still do them.
-        </div>
-        <div style="font-size:32px;font-weight:700;color:var(--ink);margin-top:8px">Ask the class:</div>
-        <div class="fact-card"><div class="fact-em">🎨</div><div class="fact-txt"><strong>What&rsquo;s your favorite hobby?</strong></div></div>
-        <div class="fact-card"><div class="fact-em">💼</div><div class="fact-txt"><strong>Do you think you could do this hobby as a job when you grow up? Why, or why not?</strong></div></div>
-        <div style="font-size:22px;color:var(--ink3);margin-top:8px">Let several students share before moving on.</div>
-        <span class="source-pill">📖 LP p.287</span>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 4 — BEFORE YOU READ: STRATEGY
-    ================================================== -->
-    <div class="slide" id="s4"
-      data-notes="Introduce the Strategy: Say 'Asking questions can help you understand what you read.' Read aloud the summary on the back cover: 'The text mentions Jørn Hurum's hobby. What is his hobby? I'll read the text to find out.' Say: 'As we read, let's use a chart to write questions about the text.' Draw a two-column chart: Question | Answer. Write 'What is Jørn Hurum's hobby?' under Question. Say: 'As we read, we'll stop to ask questions about what we read. Then we'll look for answers to our questions as we continue reading. We'll write these answers in the chart.'">
-      <div class="sh rd">
-        <span class="sh-icon">❓</span>
-        <div class="sh-text"><div class="sh-title">Reading Strategy</div><div class="sh-sub">Ask Questions</div></div>
-        <span class="sh-tag">Strategy</span>
-      </div>
-      <div class="sb" style="display:flex;gap:48px">
-        <div style="flex:1;display:flex;flex-direction:column;gap:20px">
-          <div class="fact-card"><div class="fact-em">🧠</div><div class="fact-txt"><strong>Asking questions</strong> can help you understand what you read.</div></div>
-          <div class="fact-card"><div class="fact-em">📕</div><div class="fact-txt">Read the back cover summary: <em>&ldquo;Many kids have a hobby. Some kids leave their hobby behind as they grow up, but others turn their hobby into the work they do as an adult. Jørn Hurum turned his hobby of collecting fossils into a career that he loves.&rdquo;</em></div></div>
-          <div class="fact-card"><div class="fact-em">✏️</div><div class="fact-txt">As we read, we&rsquo;ll stop to <strong>ask questions</strong> and then look for <strong>answers</strong> as we continue reading.</div></div>
-        </div>
-        <div style="flex:1">
-          <div style="font-size:24px;font-weight:700;color:var(--reader);margin-bottom:16px">Two-Column Chart</div>
-          <div style="background:var(--surface);border:2px solid var(--reader);border-radius:16px;overflow:hidden">
-            <div style="display:flex;background:var(--reader);color:#fff;font-weight:700;font-size:22px">
-              <div style="flex:1;padding:14px 20px;border-right:1px solid rgba(255,255,255,.3)">Question</div>
-              <div style="flex:1;padding:14px 20px">Answer</div>
-            </div>
-            <div style="display:flex;border-bottom:1px solid var(--border)">
-              <div style="flex:1;padding:16px 20px;font-size:20px;border-right:1px solid var(--border)">What is Jørn Hurum&rsquo;s hobby?</div>
-              <div style="flex:1;padding:16px 20px;font-size:20px;color:var(--ink3);font-style:italic">We&rsquo;ll find out!</div>
-            </div>
-            <div style="display:flex;border-bottom:1px solid var(--border)">
-              <div style="flex:1;padding:16px 20px;font-size:20px;color:var(--ink3);border-right:1px solid var(--border)">...</div>
-              <div style="flex:1;padding:16px 20px;font-size:20px;color:var(--ink3)">...</div>
-            </div>
-            <div style="display:flex">
-              <div style="flex:1;padding:16px 20px;font-size:20px;color:var(--ink3);border-right:1px solid var(--border)">...</div>
-              <div style="flex:1;padding:16px 20px;font-size:20px;color:var(--ink3)">...</div>
-            </div>
-          </div>
-          <div style="font-size:18px;color:var(--ink3);margin-top:12px">Questions can begin with: <strong style="color:var(--reader)">who, what, when, where, why, how</strong></div>
-        </div>
-        <span class="source-pill">📖 LP p.287</span>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 5 — VOCABULARY PREVIEW
-    ================================================== -->
-    <div class="slide" id="s5"
-      data-notes="Preview the 6 target vocabulary words before reading. Say each word, have students repeat. Give a simple definition and an example sentence for each. These words will appear in the reader text.">
-      <div class="sh rd">
-        <span class="sh-icon">📝</span>
-        <div class="sh-text"><div class="sh-title">Vocabulary Preview</div><div class="sh-sub">6 target words</div></div>
-        <span class="sh-tag">Vocabulary</span>
-      </div>
-      <div class="sb">
-        <div class="vocab-grid">
-          <div class="vocab-card">
-            <div class="vocab-em">😊</div>
-            <div class="vocab-word">enjoy</div>
-            <div class="vocab-def">to like doing something; it makes you happy</div>
-          </div>
-          <div class="vocab-card">
-            <div class="vocab-em">🧺</div>
-            <div class="vocab-word">collect</div>
-            <div class="vocab-def">to gather things and keep them together</div>
-          </div>
-          <div class="vocab-card">
-            <div class="vocab-em">🐞</div>
-            <div class="vocab-word">a bug</div>
-            <div class="vocab-def">a small insect or creature</div>
-          </div>
-          <div class="vocab-card">
-            <div class="vocab-em">🪨</div>
-            <div class="vocab-word">a fossil</div>
-            <div class="vocab-def">the remains of an animal or plant from long ago, preserved in rock</div>
-          </div>
-          <div class="vocab-card">
-            <div class="vocab-em">🧍</div>
-            <div class="vocab-word">alone</div>
-            <div class="vocab-def">by yourself, with no one else</div>
-          </div>
-          <div class="vocab-card">
-            <div class="vocab-em">🦖</div>
-            <div class="vocab-word">a dinosaur</div>
-            <div class="vocab-def">a very large animal that lived millions of years ago</div>
-          </div>
-        </div>
-        <span class="source-pill">📖 LP p.287</span>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 6 — GLOSSARY PREVIEW
-    ================================================== -->
-    <div class="slide" id="s6"
-      data-notes="These glossary words appear in the reader booklet. Preview them before reading. You don't need to teach all of them — just point out that students will see these words and can use context clues or the glossary to understand them.">
-      <div class="sh rdk">
-        <span class="sh-icon">📚</span>
-        <div class="sh-text"><div class="sh-title">Glossary Preview</div><div class="sh-sub">Words you will see in the text</div></div>
-        <span class="sh-tag">Glossary</span>
-      </div>
-      <div class="sb" style="display:flex;flex-direction:column;gap:24px">
-        <div style="font-size:26px;color:var(--ink2);margin-bottom:8px">These words appear in <strong style="color:var(--reader)">Hurum&rsquo;s Hobby</strong>. Look for them as you read!</div>
-        <div class="glossary-grid">
-          <div class="glossary-chip">paleontologist</div>
-          <div class="glossary-chip">fossil</div>
-          <div class="glossary-chip">preserved</div>
-          <div class="glossary-chip">passion</div>
-          <div class="glossary-chip">professor</div>
-          <div class="glossary-chip">primate</div>
-          <div class="glossary-chip">decades</div>
-          <div class="glossary-chip">carer</div>
-          <div class="glossary-chip">exhibits</div>
-          <div class="glossary-chip">lectures</div>
-          <div class="glossary-chip">tours</div>
-          <div class="glossary-chip">escorted</div>
-          <div class="glossary-chip">proper</div>
-          <div class="glossary-chip">related</div>
-          <div class="glossary-chip">showing</div>
-          <div class="glossary-chip">woods</div>
-        </div>
-        <div class="pair-card" style="margin-top:8px">
-          <strong>Tip:</strong> You don&rsquo;t need to know every word before reading. Use <strong>context clues</strong> and the <strong>glossary</strong> to help you understand new words as you read.
-        </div>
-        <span class="source-pill">📖 LP p.287</span>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 7 — WHILE YOU READ: PAGES 2-3
-    ================================================== -->
-    <div class="slide" id="s7"
-      data-notes="Read pages 2-3 together. Stop after every few pages to ask students what questions they have about the text. Remind students that a question can begin with who, what, when, where, why, and how. Model asking a question with 'who': 'Who read a book about fossils?'">
-      <div class="sh rd">
-        <span class="sh-icon">📖</span>
-        <div class="sh-text"><div class="sh-title">While You Read</div><div class="sh-sub">Pages 2&ndash;3</div></div>
-        <span class="sh-tag">Read Together</span>
-      </div>
-      <div class="sb" style="display:flex;gap:40px">
-        <div style="flex:1;display:flex;flex-direction:column;gap:20px">
-          <div class="read-card">
-            <div class="placeholder">[Story text from reader booklet &mdash; pages 2&ndash;3]</div>
-            <div style="font-size:22px;color:var(--ink2)">Read these pages aloud with students. Pause to check understanding.</div>
-          </div>
-          <div class="q-prompt">
-            <strong>Model question with &ldquo;who&rdquo;:</strong><br>
-            &ldquo;Who read a book about fossils?&rdquo;
-          </div>
-        </div>
-        <div style="width:420px">
-          <div style="font-size:22px;font-weight:700;color:var(--reader);margin-bottom:12px">Question Starters</div>
-          <div class="fact-card" style="margin-bottom:12px"><div class="fact-em">👤</div><div class="fact-txt"><strong>Who</strong> ...?</div></div>
-          <div class="fact-card" style="margin-bottom:12px"><div class="fact-em">❓</div><div class="fact-txt"><strong>What</strong> ...?</div></div>
-          <div class="fact-card" style="margin-bottom:12px"><div class="fact-em">🕐</div><div class="fact-txt"><strong>When</strong> ...?</div></div>
-          <div class="fact-card" style="margin-bottom:12px"><div class="fact-em">📍</div><div class="fact-txt"><strong>Where</strong> ...?</div></div>
-          <div class="fact-card" style="margin-bottom:12px"><div class="fact-em">🤔</div><div class="fact-txt"><strong>Why</strong> ...?</div></div>
-          <div class="fact-card"><div class="fact-em">⚙️</div><div class="fact-txt"><strong>How</strong> ...?</div></div>
-        </div>
-        <span class="source-pill">📖 LP p.287</span>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 8 — WHILE YOU READ: PAGES 4-5
-    ================================================== -->
-    <div class="slide" id="s8"
-      data-notes="Read pages 4-5 together. Pause after p.4 and say: 'Let's ask a question with who. Who read a book about fossils?' Write the question in the chart. Call on students to ask questions with what, such as 'What's a fossil?'">
-      <div class="sh rd">
-        <span class="sh-icon">📖</span>
-        <div class="sh-text"><div class="sh-title">While You Read</div><div class="sh-sub">Pages 4&ndash;5</div></div>
-        <span class="sh-tag">Read Together</span>
-      </div>
-      <div class="sb" style="display:flex;gap:40px">
-        <div style="flex:1;display:flex;flex-direction:column;gap:20px">
-          <div class="read-card">
-            <div class="placeholder">[Story text from reader booklet &mdash; pages 4&ndash;5]</div>
-            <div style="font-size:22px;color:var(--ink2)">Read these pages aloud with students.</div>
-          </div>
-          <div class="q-prompt">
-            <strong>Ask a question with &ldquo;who&rdquo;:</strong><br>
-            &ldquo;Who read a book about fossils?&rdquo;<br>
-            <em>Write this question in the chart.</em>
-          </div>
-          <div class="q-prompt">
-            <strong>Ask a question with &ldquo;what&rdquo;:</strong><br>
-            &ldquo;What&rsquo;s a fossil?&rdquo;
-          </div>
-        </div>
-        <div style="width:400px">
-          <div style="font-size:22px;font-weight:700;color:var(--reader);margin-bottom:12px">Add to Chart ✏️</div>
-          <div style="background:var(--surface);border:2px solid var(--reader);border-radius:16px;overflow:hidden">
-            <div style="display:flex;background:var(--reader);color:#fff;font-weight:700;font-size:20px">
-              <div style="flex:1;padding:12px 16px;border-right:1px solid rgba(255,255,255,.3)">Question</div>
-              <div style="flex:1;padding:12px 16px">Answer</div>
-            </div>
-            <div style="display:flex;border-bottom:1px solid var(--border)">
-              <div style="flex:1;padding:14px 16px;font-size:18px;border-right:1px solid var(--border)">What is Jørn Hurum&rsquo;s hobby?</div>
-              <div style="flex:1;padding:14px 16px;font-size:18px;color:var(--ink3)">...</div>
-            </div>
-            <div style="display:flex;border-bottom:1px solid var(--border)">
-              <div style="flex:1;padding:14px 16px;font-size:18px;border-right:1px solid var(--border)">Who read a book about fossils?</div>
-              <div style="flex:1;padding:14px 16px;font-size:18px;color:var(--ink3)">...</div>
-            </div>
-            <div style="display:flex;border-bottom:1px solid var(--border)">
-              <div style="flex:1;padding:14px 16px;font-size:18px;border-right:1px solid var(--border)">What&rsquo;s a fossil?</div>
-              <div style="flex:1;padding:14px 16px;font-size:18px;color:var(--ink3)">...</div>
-            </div>
-            <div style="display:flex">
-              <div style="flex:1;padding:14px 16px;font-size:18px;color:var(--ink3);border-right:1px solid var(--border)">...</div>
-              <div style="flex:1;padding:14px 16px;font-size:18px;color:var(--ink3)">...</div>
-            </div>
-          </div>
-        </div>
-        <span class="source-pill">📖 LP p.287</span>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 9 — WHILE YOU READ: PAGES 6-7
-    ================================================== -->
-    <div class="slide" id="s9"
-      data-notes="Read pages 6-7 together. Stop and ask students what questions they have. Encourage questions with different question words (where, when, why). Remind students: 'A question can begin with who, what, when, where, why, and how.' Add new questions to the chart.">
-      <div class="sh rd">
-        <span class="sh-icon">📖</span>
-        <div class="sh-text"><div class="sh-title">While You Read</div><div class="sh-sub">Pages 6&ndash;7</div></div>
-        <span class="sh-tag">Read Together</span>
-      </div>
-      <div class="sb" style="display:flex;flex-direction:column;gap:24px">
-        <div class="read-card">
-          <div class="placeholder">[Story text from reader booklet &mdash; pages 6&ndash;7]</div>
-          <div style="font-size:22px;color:var(--ink2)">Read these pages aloud with students. Pause to ask and collect questions.</div>
-        </div>
-        <div style="font-size:30px;font-weight:700;color:var(--ink)">What questions do you have?</div>
-        <div style="display:flex;gap:16px;flex-wrap:wrap">
-          <div class="fact-card" style="flex:1;min-width:300px"><div class="fact-em">📍</div><div class="fact-txt">Try a <strong>where</strong> question:<br><em>&ldquo;Where did he find fossils?&rdquo;</em></div></div>
-          <div class="fact-card" style="flex:1;min-width:300px"><div class="fact-em">🤔</div><div class="fact-txt">Try a <strong>why</strong> question:<br><em>&ldquo;Why does he like fossils?&rdquo;</em></div></div>
-          <div class="fact-card" style="flex:1;min-width:300px"><div class="fact-em">⚙️</div><div class="fact-txt">Try a <strong>how</strong> question:<br><em>&ldquo;How did he become a paleontologist?&rdquo;</em></div></div>
-        </div>
-        <div style="font-size:20px;color:var(--ink3)">Add new questions to the two-column chart. We&rsquo;ll look for answers as we continue reading.</div>
-        <span class="source-pill">📖 LP p.287</span>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 10 — WHILE YOU READ: PAGES 8-9
-    ================================================== -->
-    <div class="slide" id="s10"
-      data-notes="Read pages 8-9 together. Continue asking questions. Encourage 'where' and 'when' questions: 'Where did he go to school? When did he start studying fossils?' Add questions and any answers found so far to the chart.">
-      <div class="sh rd">
-        <span class="sh-icon">📖</span>
-        <div class="sh-text"><div class="sh-title">While You Read</div><div class="sh-sub">Pages 8&ndash;9</div></div>
-        <span class="sh-tag">Read Together</span>
-      </div>
-      <div class="sb" style="display:flex;flex-direction:column;gap:24px">
-        <div class="read-card">
-          <div class="placeholder">[Story text from reader booklet &mdash; pages 8&ndash;9]</div>
-          <div style="font-size:22px;color:var(--ink2)">Read these pages aloud with students. Keep adding to the chart.</div>
-        </div>
-        <div style="font-size:30px;font-weight:700;color:var(--ink)">Keep asking questions!</div>
-        <div style="display:flex;gap:16px;flex-wrap:wrap">
-          <div class="fact-card" style="flex:1;min-width:400px"><div class="fact-em">🕐</div><div class="fact-txt">Try a <strong>when</strong> question:<br><em>&ldquo;When did he start studying fossils?&rdquo;</em></div></div>
-          <div class="fact-card" style="flex:1;min-width:400px"><div class="fact-em">🏫</div><div class="fact-txt">Try a <strong>where</strong> question:<br><em>&ldquo;Where did he go to school?&rdquo;</em></div></div>
-        </div>
-        <div class="pair-card" style="margin-top:8px">
-          <strong>Tip:</strong> As you find answers in the text, write them in the <strong>Answer</strong> column of your chart!
-        </div>
-        <span class="source-pill">📖 LP p.287</span>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 11 — AFTER YOU READ
-    ================================================== -->
-    <div class="slide" id="s11"
-      data-notes="After finishing the biography, have students look at questions in the first column. For each question, ask 'Was that question answered in the text? What was the answer?' Have students write responses in the right-hand column.">
-      <div class="sh rdk">
-        <span class="sh-icon">✅</span>
-        <div class="sh-text"><div class="sh-title">After You Read</div><div class="sh-sub">Review your questions and answers</div></div>
-        <span class="sh-tag">Review</span>
-      </div>
-      <div class="sb" style="display:flex;flex-direction:column;gap:24px">
-        <div class="pair-card">
-          <strong>Instructions:</strong> Look at the questions in the first column of your chart. For each question, ask: <strong>&ldquo;Was that question answered in the text? What was the answer?&rdquo;</strong> Have students write responses in the right-hand column.
-        </div>
-        <div style="display:flex;gap:24px">
-          <div class="fact-card" style="flex:1"><div class="fact-em">1️⃣</div><div class="fact-txt">Read each <strong>question</strong> from the left column.</div></div>
-          <div class="fact-card" style="flex:1"><div class="fact-em">2️⃣</div><div class="fact-txt">Ask: <strong>&ldquo;Was this answered in the text?&rdquo;</strong></div></div>
-          <div class="fact-card" style="flex:1"><div class="fact-em">3️⃣</div><div class="fact-txt">Write the <strong>answer</strong> in the right column.</div></div>
-        </div>
-        <div style="font-size:26px;color:var(--ink);margin-top:12px;font-weight:700">Be the Expert — Reading Strategy: Ask Questions</div>
-        <div style="display:flex;gap:20px">
-          <div class="fact-card" style="flex:1"><div class="fact-txt" style="font-size:22px"><strong>During reading:</strong> Asking questions is a way of engaging with the text. When students are interested, their questions show they want to know more.</div></div>
-          <div class="fact-card" style="flex:1"><div class="fact-txt" style="font-size:22px"><strong>About unfamiliar words:</strong> Asking questions about unfamiliar words or difficult paragraphs can help students check their understanding.</div></div>
-          <div class="fact-card" style="flex:1"><div class="fact-txt" style="font-size:22px"><strong>After reading:</strong> Asking questions after reading can help students confirm their understanding.</div></div>
-        </div>
-        <span class="source-pill">📖 LP p.287</span>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 12 — TWO-COLUMN CHART ACTIVITY
-    ================================================== -->
-    <div class="slide" id="s12"
-      data-notes="Interactive two-column chart activity. Students fill in their questions and answers from the reading. Use this to consolidate what was discussed during reading. Sample questions: What is Jørn Hurum's hobby? Who read a book about fossils? What's a fossil? Where did he go to school? What did he have to study to become a paleontologist?">
-      <div class="sh rd">
-        <span class="sh-icon">📊</span>
-        <div class="sh-text"><div class="sh-title">Question &amp; Answer Chart</div><div class="sh-sub">Hurum&rsquo;s Hobby</div></div>
-        <span class="sh-tag">Chart</span>
-      </div>
-      <div class="sb">
-        <div id="chart-host"></div>
-        <span class="source-pill">📖 LP p.287</span>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 13 — WRAP UP
-    ================================================== -->
-    <div class="slide" id="s13"
-      data-notes="Wrap up the reader lesson. Connect back to the unit theme 'That's Really Interesting!' Remind students that Jørn Hurum turned a childhood hobby — collecting fossils — into a career as a paleontologist. Ask: 'Could your hobby become your job one day?'">
-      <div class="sh rd">
-        <span class="sh-icon">🏆</span>
-        <div class="sh-text"><div class="sh-title">Wrap Up</div><div class="sh-sub">That&rsquo;s Really Interesting!</div></div>
-      </div>
-      <div class="sb" style="display:flex;flex-direction:column;gap:20px">
-        <div style="font-size:30px;font-weight:700;color:var(--ink);margin-bottom:8px">Today we learned:</div>
-        <div class="fact-card"><div class="fact-em">📖</div><div class="fact-txt">We read a <strong>biography</strong> about <strong>Jørn Hurum</strong> &mdash; a real person who turned his childhood hobby into a career.</div></div>
-        <div class="fact-card"><div class="fact-em">❓</div><div class="fact-txt">We practiced <strong>asking questions</strong> using who, what, when, where, why, and how to understand the text.</div></div>
-        <div class="fact-card"><div class="fact-em">📊</div><div class="fact-txt">We used a <strong>two-column chart</strong> to track our questions and find answers in the text.</div></div>
-        <div class="fact-card"><div class="fact-em">🦕</div><div class="fact-txt">We learned new vocabulary: <strong>enjoy, collect, a bug, a fossil, alone, a dinosaur</strong>.</div></div>
-        <div style="background:var(--reader-lt);border:2px solid var(--reader);border-radius:16px;padding:28px 32px;margin-top:8px;text-align:center">
-          <div style="font-size:32px;font-weight:800;color:var(--reader-dk);margin-bottom:8px">That&rsquo;s Really Interesting!</div>
-          <div style="font-size:24px;color:var(--ink2)">Jørn Hurum was a kid who loved fossils &mdash; and now it&rsquo;s his job! <strong style="color:var(--reader)">Could your hobby become your career?</strong></div>
-        </div>
-        <span class="source-pill">📖 LP p.287</span>
-      </div>
-    </div>
-
-    <!-- ==================================================
-         SLIDE 14 — MARK DONE
-    ================================================== -->
-    <div class="slide" id="s14">
-      <div style="position:absolute;inset:0;background:linear-gradient(135deg,#4C1D95,#7C3AED);display:flex;align-items:center;justify-content:center">
-        <div class="done-card">
-          <div style="font-size:80px">📖</div>
-          <h2>Reader Complete!</h2>
-          <p>Unit 8 &middot; Hurum&rsquo;s Hobby &middot; Ask Questions strategy.<br>Click below to mark this lesson done.</p>
-          <button class="btn-done" id="markBtn" onclick="markDone()">✅ Mark Lesson Done</button>
-          <div id="markStatus" style="margin-top:18px;font-size:20px;font-weight:700;color:var(--reader);min-height:30px"></div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /deck -->
-</div><!-- /wrap -->
-
-<!-- NAV BAR -->
-<div id="nav">
-  <button class="nb" onclick="prevSlide()">◀ Prev</button>
-  <span id="sc">1 / 14</span>
-  <button class="nb" onclick="nextSlide()">Next ▶</button>
-  <div id="pgbar"><div id="pgfill"></div></div>
-  <button class="nb" id="tn-btn" onclick="toggleNotes()">📝 Notes</button>
-  <span id="unit-lbl">Unit 8 · Reader</span>
+<div class="topbar">
+  <div class="unit-chip">🦴 UNIT 8 · BOOK READING</div>
+  <div class="prog-wrap"><div class="prog-fill" id="prog-fill"></div></div>
+  <div class="slide-counter" id="slide-counter">1 / 16</div>
+  <button class="icon-btn" onclick="toggleNotes()" title="Notes">📋</button>
+  <button class="icon-btn" onclick="toggleFS()" id="fs-btn">⛶</button>
 </div>
 
-<!-- TEACHER NOTES PANEL -->
-<div id="tn-panel">
-  <div class="tn-head">
-    📝 Teacher Notes
-    <span class="tn-close" onclick="toggleNotes()">✕</span>
+<div class="slide-wrap">
+<div class="notes-panel" id="notes-panel"></div>
+
+<!-- ══ 1: TITLE ══ -->
+<div class="slide active" id="s1" data-notes="<strong>Say:</strong> 'Leo, today we read a nonfiction book — a biography about a real person! Before we read, we will learn 21 vocabulary words. Then we read together and find out how Jørn Hurum turned his childhood hobby into an amazing career!' 🦴🦕">
+  <div class="title-slide">
+    <div class="unit-lbl">UNIT 8 · LEVEL 4 · BOOK READING</div>
+    <div style="font-size:3.5rem">🦴🦕📖</div>
+    <h1>Hurum's <span>Hobby!</span></h1>
+    <div class="sub">A Biography of Jørn Hurum — Fossil Collector to Paleontologist</div>
+    <div style="background:rgba(255,255,255,.15);color:var(--ye);font-family:var(--fnh);font-size:.85rem;letter-spacing:2px;padding:7px 22px;border-radius:20px;margin-top:4px">📖 21 Vocabulary Words · 3-Step Reading Routine</div>
+    <div style="margin-top:8px;font-size:.9rem;color:rgba(255,255,255,.7);font-weight:700">Reading Strategy: <strong style="color:var(--ye)">Ask Questions ❓📝</strong></div>
   </div>
-  <div id="tn-body"></div>
+</div>
+
+<!-- ══ 2: VOCABULARY MODULE (21 words tabbed) ══ -->
+<div class="slide" id="s2" data-notes="<strong>VOCABULARY MODULE:</strong> Click each word tab. For each word: read the definition together, do the mini-game, then the quick check. Mark each word done before moving on. The first 6 are unit vocabulary, the remaining 15 are glossary words from the reader booklet.">
+  <div class="slide-header sh-or">📖 VOCABULARY — 21 Words from the Reader</div>
+  <div class="slide-body" style="padding-bottom:8px">
+
+    <div class="pp-bar-row">
+      <div class="pp-bar-wrap"><div class="pp-bar-fill" id="pp-bar" style="width:0%"></div></div>
+      <div class="pp-text" id="pp-text">0 / 21 words</div>
+    </div>
+
+    <div class="word-tabs-bar" id="word-tabs-bar"></div>
+    <div id="word-panels-host"></div>
+
+  </div>
+</div>
+
+<!-- ══ 3: BEFORE READING HEADER ══ -->
+<div class="slide" id="s3" data-notes="<strong>Step 1 — Before Reading:</strong> Tell Leo to open his reader to the beginning. Ask him to scan quickly — look at the title, cover photo, and any pictures he can see. Do NOT read yet.">
+  <div class="section-slide sec-before">
+    <div class="sec-emoji">🔍</div>
+    <h2>Step 1: Before Reading</h2>
+    <p>Scan · Predict · Ask Questions</p>
+    <div style="font-size:1.4rem;margin-top:8px">🦴 🦕 ❓ 📝</div>
+  </div>
+</div>
+
+<!-- ══ 4: BEFORE READING — SCAN & PREDICT ══ -->
+<div class="slide" id="s4" data-notes="<strong>Activate Prior Knowledge:</strong> Tell students about hobbies that you had as a child. Say whether or not you still do them. Then ask: What is your favorite hobby? Do you think you could do this hobby as a job when you grow up? Why, or why not? Get responses from several students.">
+  <div class="slide-header sh-bl">🔍 STEP 1 — Before Reading: Scan &amp; Predict</div>
+  <div class="slide-body">
+    <div class="two-col">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="slide-title">Before You Read 🧠</div>
+        <div class="info-card">
+          <h3>SCAN THE BOOK COVER — What do you see?</h3>
+          <ul>
+            <li>🦴 Title: <strong>Hurum's Hobby</strong></li>
+            <li>📸 Cover photo: a man with fossils?</li>
+            <li>💡 Key word: <strong>Hobby</strong> — what is a hobby?</li>
+          </ul>
+        </div>
+        <div class="dialogue"><div class="avi avi-dad">👨</div><div class="bubble bubble-dad"><div class="bubble-label">DAD 💬</div>Leo — look at the cover. What do you think this book is about? What hobbies do you have?</div></div>
+        <div class="dialogue leo"><div class="avi avi-leo">🦁</div><div class="bubble bubble-leo"><div class="bubble-label">LEO 💬</div><em>Leo looks, scans, and makes predictions…</em></div></div>
+        <div class="highlight">🎧 Play audio track. Leo reads along in his book while listening.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="info-card">
+          <h3>ACTIVATE PRIOR KNOWLEDGE 💭</h3>
+          <p>Before reading — discuss:</p>
+          <ul>
+            <li>🎨 What's your favorite hobby?</li>
+            <li>💼 Do you think you could do this hobby as a job when you grow up?</li>
+            <li>❓ Why or why not?</li>
+          </ul>
+        </div>
+        <div class="info-card" style="border-left-color:var(--gn)">
+          <h3>⚽ CONNECT TO SOCCER</h3>
+          <p>Playing football is a <strong>hobby</strong> for many kids. Some kids turn their hobby into a <strong>career</strong>! Mohamed Salah started playing football as a hobby in Egypt — now he is one of the best players in the world! 🏆</p>
+        </div>
+        <div class="info-card" style="border-left-color:var(--choc)">
+          <h3>📖 READING STRATEGY TODAY</h3>
+          <p><strong style="color:var(--amb)">Ask Questions ❓</strong> while you read.<br/>Use <strong>who, what, when, where, why, how</strong> to ask questions about the text.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 5: READING STRATEGY — ASK QUESTIONS ══ -->
+<div class="slide" id="s5" data-notes="<strong>Introduce the Strategy:</strong> Say: 'Asking questions can help you understand what you read.' Read aloud the summary on the back cover. Say: 'The text mentions Jørn Hurum's hobby. What is his hobby? I'll read the text to find out.' Draw a two-column chart: Question | Answer. Write: 'What is Jørn Hurum's hobby?' under Question. Say: 'As we read, we'll stop to ask questions about what we read. Then we'll look for answers to our questions. We'll write these answers in the chart.'">
+  <div class="slide-header sh-or">❓ Reading Strategy — Ask Questions</div>
+  <div class="slide-body">
+    <div class="slide-title">Ask Questions ❓ → Find Answers 📝</div>
+    <div class="two-col" style="margin-bottom:10px">
+      <div style="background:#EDE9FE;border:3px solid var(--or);border-radius:14px;padding:20px 24px;text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:8px">❓</div>
+        <div style="font-family:var(--fnh);font-size:1.3rem;color:var(--or);letter-spacing:1px;margin-bottom:8px">QUESTION</div>
+        <div style="font-size:.9rem;font-weight:800;color:var(--text)">Ask a question WHILE you read.<br/>Use who, what, when, where, why, how.</div>
+        <div style="font-size:.82rem;font-weight:700;color:var(--muted);margin-top:8px;font-style:italic">Examples:<br/><strong style="color:var(--or)">Who? What? Where? When? Why? How?</strong></div>
+      </div>
+      <div style="background:#DCFCE7;border:3px solid #16A34A;border-radius:14px;padding:20px 24px;text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:8px">📝</div>
+        <div style="font-family:var(--fnh);font-size:1.3rem;color:#16A34A;letter-spacing:1px;margin-bottom:8px">ANSWER</div>
+        <div style="font-size:.9rem;font-weight:800;color:var(--text)">Find the answer in the text.<br/>Write it in your chart AFTER reading.</div>
+        <div style="font-size:.82rem;font-weight:700;color:var(--muted);margin-top:8px;font-style:italic">Look for answers as you read.<br/><strong style="color:#16A34A">The text tells you!</strong></div>
+      </div>
+    </div>
+    <div class="dialogue"><div class="avi avi-dad">👨</div><div class="bubble bubble-dad"><div class="bubble-label">DAD 💬</div>Leo — the back cover says Jørn Hurum turned his hobby of collecting fossils into a career. My QUESTION is: "What is Jørn Hurum's hobby?" Let's read and find out!</div></div>
+    <div id="qa-strategy" class="chart-wrap" style="margin-top:4px"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="next-step-btn" onclick="buildStrategyChart()">📝 Show Q&amp;A Chart!</button>
+      <button class="wnav-btn" onclick="changeSlide(1)" style="background:var(--choc)">Now Read! →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 6: DURING READING HEADER ══ -->
+<div class="slide" id="s6" data-notes="<strong>Step 2 — During Reading:</strong> Leo now reads the book. Stop after every few pages to ask students what questions they have about the text. Remind them that questions can begin with who, what, when, where, why, and how.">
+  <div class="section-slide sec-during">
+    <div class="sec-emoji">📖</div>
+    <h2>Step 2: During Reading</h2>
+    <p>Read · Ask Questions · Write in Chart</p>
+    <div style="font-size:1.4rem;margin-top:8px">❓ → 📝</div>
+  </div>
+</div>
+
+<!-- ══ 7: PAGES 2-3 ══ -->
+<div class="slide" id="s7" data-notes="<strong>Pages 2-3:</strong> Read together. This is the introduction — Jørn Hurum's hobby of collecting fossils became his career. Ask: What is the book about? What is a biography? Key vocab: hobby, fossils, career.">
+  <div class="slide-header sh-choc">🦴 Pages 2–3 — Introduction</div>
+  <div class="slide-body">
+    <div class="dialogue" style="margin-bottom:8px"><div class="avi avi-dad">👨</div><div class="bubble bubble-dad"><div class="bubble-label">DAD 💬</div>Leo — read together! I read one sentence, you read the next. Ask QUESTIONS as we go! ❓</div></div>
+    <div class="two-col" style="flex:1">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="step-card show">
+          <div class="step-hd">📖 The Introduction</div>
+          <p>Many kids have a <strong>hobby</strong>. Some kids leave their hobby behind as they grow up, but others turn their hobby into the work they do as an adult.</p>
+        </div>
+        <div class="step-card" id="r1s2">
+          <div class="step-hd">🦴 Jørn Hurum</div>
+          <p>Jørn Hurum turned his hobby of <strong>collecting</strong> <strong>fossils</strong> into a career that he loves.</p>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="next-step-btn" id="r1-btn" onclick="storyStep('r1')">▶ Next</button>
+          <button class="wnav-btn" id="r1-next" onclick="changeSlide(1)" style="display:none;background:#16A34A">Q&amp;A Chart →</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="info-card">
+          <h3>❓ ASK QUESTIONS!</h3>
+          <ul>
+            <li><strong>What</strong> is this book about?</li>
+            <li><strong>What</strong> is a hobby?</li>
+            <li><strong>What</strong> are fossils?</li>
+            <li><strong>Who</strong> is Jørn Hurum?</li>
+          </ul>
+        </div>
+        <div class="info-card" style="border-left-color:var(--gn)">
+          <h3>🔍 FIND THE VOCABULARY!</h3>
+          <p>As you read, find these words:</p>
+          <p>hobby · collecting · fossils · career</p>
+        </div>
+        <div class="highlight">💡 <strong>Biography:</strong> A true story about a real person's life — when they were born, what they did, why they are important.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 8: Q&A CHART — PAGES 2-3 ══ -->
+<div class="slide" id="s8" data-notes="Ask Leo to answer the questions IN HIS OWN WORDS before revealing. Write questions and answers in the two-column chart. Use buildTwoColChart from charts.js.">
+  <div class="slide-header sh-choc">❓ Question &amp; Answer — Pages 2–3</div>
+  <div class="slide-body" style="justify-content:center">
+    <div class="dialogue"><div class="avi avi-dad">👨</div><div class="bubble bubble-dad"><div class="bubble-label">DAD 💬</div>Leo — what questions did you ask? What answers did you find? Tell me first — then we check!</div></div>
+    <div id="qa-p23" class="chart-wrap"></div>
+    <div class="highlight" style="margin-top:8px">⚽ Football Q&amp;A: <strong>Q:</strong> Who is Mohamed Salah? <strong>A:</strong> A footballer who turned his hobby into a career — just like Jørn Hurum! 🏆</div>
+    <button class="wnav-btn" onclick="changeSlide(1)" style="background:var(--choc);margin-top:12px;width:fit-content">Pages 4–5 →</button>
+  </div>
+</div>
+
+<!-- ══ 9: PAGES 4-5 ══ -->
+<div class="slide" id="s9" data-notes="<strong>Pages 4-5:</strong> Jørn's childhood. He found a book about fossils and it changed his life. Pause after reading and say: 'Let us ask a question with who. Who read a book about fossils?' Write the question in the chart. Say: 'Let us ask another question using what. What is a fossil?' Write students' questions in the question column.">
+  <div class="slide-header sh-bl">🦴 Pages 4–5 — Childhood in Norway</div>
+  <div class="slide-body">
+    <div class="dialogue" style="margin-bottom:8px"><div class="avi avi-leo">🦁</div><div class="bubble bubble-leo"><div class="bubble-label">LEO 💬</div>Jørn was a kid just like me! He found something he loved and never stopped! 🦴</div></div>
+    <div class="two-col" style="flex:1">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="step-card show">
+          <div class="step-hd">🏠 Growing up in Oslo</div>
+          <p>When Jørn was a little boy, he lived in Oslo, Norway. He loved to explore the <strong>woods</strong> near his home.</p>
+        </div>
+        <div class="step-card" id="r2s2">
+          <div class="step-hd">📚 The book that changed everything</div>
+          <p>One day, he found a book about <strong>fossils</strong>. He read it <strong>alone</strong> in his room. That book changed his life! He started looking for fossils everywhere — under rocks, near rivers, and in the forest.</p>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="next-step-btn" id="r2-btn" onclick="storyStep('r2')">▶ Next</button>
+          <button class="wnav-btn" id="r2-next" onclick="changeSlide(1)" style="display:none;background:#1D4ED8">Q&amp;A Chart →</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="info-card">
+          <h3>❓ ASK QUESTIONS! (LP p.287)</h3>
+          <ul>
+            <li><strong>Who</strong> read a book about fossils?</li>
+            <li><strong>What</strong> is a fossil?</li>
+            <li><strong>Where</strong> did Jørn grow up?</li>
+            <li><strong>What</strong> did he find in the woods?</li>
+          </ul>
+        </div>
+        <div class="info-card" style="border-left-color:#0EA5E9">
+          <h3>🔍 FIND THE VOCABULARY!</h3>
+          <p>woods · fossils · alone · collect</p>
+        </div>
+        <div class="highlight" style="background:var(--ice);color:#0C4A6E">📖 <strong>From the LP:</strong> "Let's ask a question with <em>who</em>. Who read a book about fossils?" Write it in the chart!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 10: Q&A CHART — PAGES 4-5 ══ -->
+<div class="slide" id="s10" data-notes="Leo answers his questions from pages 4-5. Compare to the first chart. 'Who read a book about fossils?' → Jørn Hurum. 'What is a fossil?' → The hard remains of an ancient plant or animal preserved in rock.">
+  <div class="slide-header sh-bl">❓ Question &amp; Answer — Pages 4–5</div>
+  <div class="slide-body" style="justify-content:center">
+    <div class="dialogue"><div class="avi avi-leo">🦁</div><div class="bubble bubble-leo"><div class="bubble-label">LEO 💬</div>I can answer! Jørn read the book about fossils. A fossil is the hard remains of something very old! 🦴</div></div>
+    <div id="qa-p45" class="chart-wrap"></div>
+    <div class="highlight" style="background:var(--ice);color:#0C4A6E;margin-top:8px">⚽ Leo found football through TV — Jørn found fossils through a book. Both were life-changing moments! 📖⚽</div>
+    <button class="wnav-btn" onclick="changeSlide(1)" style="background:#1D4ED8;margin-top:12px;width:fit-content">Pages 6–7 →</button>
+  </div>
+</div>
+
+<!-- ══ 11: PAGES 6-7 ══ -->
+<div class="slide" id="s11" data-notes="<strong>Pages 6-7:</strong> Jørn as a teenager — he collected many fossils. His passion grew. He decided to study at university. Ask questions: What did he collect? Why did he go to university?">
+  <div class="slide-header sh-choc">🦴 Pages 6–7 — Growing Passion</div>
+  <div class="slide-body">
+    <div class="two-col" style="flex:1">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="step-card show">
+          <div class="step-hd">🔍 The teenage collector</div>
+          <p>As a teenager, Jørn <strong>collected</strong> many fossils. He found <strong>bugs</strong> <strong>preserved</strong> in rock, ancient shells, and even parts of <strong>dinosaur</strong> bones.</p>
+        </div>
+        <div class="step-card" id="r3s2">
+          <div class="step-hd">❤️ A passion grows</div>
+          <p>His <strong>passion</strong> for fossils grew stronger every year. He decided to study at a university to learn the <strong>proper</strong> way to find and study fossils.</p>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="next-step-btn" id="r3-btn" onclick="storyStep('r3')">▶ Next</button>
+          <button class="wnav-btn" id="r3-next" onclick="changeSlide(1)" style="display:none;background:#16A34A">Q&amp;A Chart →</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="info-card">
+          <h3>❓ ASK QUESTIONS!</h3>
+          <ul>
+            <li><strong>What</strong> did Jørn collect as a teenager?</li>
+            <li><strong>What</strong> were the fossils preserved in?</li>
+            <li><strong>Why</strong> did he go to university?</li>
+            <li><strong>What</strong> does "passion" mean?</li>
+          </ul>
+        </div>
+        <div class="info-card" style="border-left-color:var(--gn)">
+          <h3>🔍 FIND THE VOCABULARY!</h3>
+          <p>collected · bugs · preserved · dinosaur · passion · proper</p>
+        </div>
+        <div class="highlight">💡 <strong>Key idea:</strong> Jørn's childhood hobby of collecting became a lifelong passion — just like how some kids who play football become professional players!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 12: Q&A CHART — PAGES 6-7 ══ -->
+<div class="slide" id="s12" data-notes="Leo answers questions about pages 6-7. What did he collect? Bugs, shells, dinosaur bones. Why university? To learn the proper way to study fossils.">
+  <div class="slide-header sh-choc">❓ Question &amp; Answer — Pages 6–7</div>
+  <div class="slide-body" style="justify-content:center">
+    <div class="dialogue"><div class="avi avi-dad">👨</div><div class="bubble bubble-dad"><div class="bubble-label">DAD 💬</div>Leo — what did Jørn collect? Why did he decide to go to university? Tell me first!</div></div>
+    <div id="qa-p67" class="chart-wrap"></div>
+    <button class="wnav-btn" onclick="changeSlide(1)" style="background:var(--choc);margin-top:12px;width:fit-content">Pages 8–9 →</button>
+  </div>
+</div>
+
+<!-- ══ 13: PAGES 8-9 ══ -->
+<div class="slide" id="s13" data-notes="<strong>Pages 8-9:</strong> Jørn becomes a paleontologist and professor. His biggest discovery — the primate fossil 'Ida.' He gives lectures, leads tours, shows exhibits. Ask: What did he have to study to become a paleontologist? Where did he go to school?">
+  <div class="slide-header sh-bl">🦴 Pages 8–9 — Career &amp; Discovery</div>
+  <div class="slide-body">
+    <div class="dialogue" style="margin-bottom:8px"><div class="avi avi-dad">👨</div><div class="bubble bubble-dad"><div class="bubble-label">DAD 💬</div>Leo — this is where we learn how Jørn's hobby became his JOB! Read carefully and ask questions!</div></div>
+    <div class="two-col" style="flex:1">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="step-card show">
+          <div class="step-hd">🎓 The Paleontologist</div>
+          <p>Jørn became a <strong>paleontologist</strong> — a scientist who studies fossils and ancient life. He became a <strong>professor</strong> at the Natural History Museum in Oslo.</p>
+        </div>
+        <div class="step-card" id="r4s2">
+          <div class="step-hd">🏛️ His work today</div>
+          <p>For <strong>decades</strong>, he has <strong>enjoyed</strong> his work. He gives <strong>lectures</strong>, leads <strong>tours</strong>, and has <strong>escorted</strong> thousands of visitors through the museum <strong>exhibits</strong>, <strong>showing</strong> them fossils that are millions of years old.</p>
+        </div>
+        <div class="step-card" id="r4s3">
+          <div class="step-hd">🐒 The big discovery!</div>
+          <p>His biggest discovery was a <strong>primate</strong> fossil called "Ida" that is 47 million years old! He is a man <strong>who</strong> turned a childhood hobby into a career <strong>related</strong> to what he has always loved.</p>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="next-step-btn" id="r4-btn" onclick="storyStep('r4')">▶ Next</button>
+          <button class="wnav-btn" id="r4-next" onclick="changeSlide(1)" style="display:none;background:#1D4ED8">After Reading →</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="info-card">
+          <h3>❓ ASK QUESTIONS! (BE THE EXPERT)</h3>
+          <ul>
+            <li><strong>Where</strong> did he go to school?</li>
+            <li><strong>What</strong> did he have to study to become a paleontologist?</li>
+            <li><strong>What</strong> is a paleontologist?</li>
+            <li><strong>What</strong> was his biggest discovery?</li>
+          </ul>
+        </div>
+        <div class="info-card" style="border-left-color:#0EA5E9">
+          <h3>🔍 FIND THE VOCABULARY!</h3>
+          <p>paleontologist · professor · decades · enjoyed · lectures · tours · escorted · exhibits · showing · primate · related</p>
+        </div>
+        <div class="highlight" style="background:var(--ice);color:#0C4A6E">🗣️ <strong>Grammar with <em>who</em>:</strong> "Jørn Hurum is a man <strong>who</strong> studies fossils." "He is a scientist <strong>who</strong> discovered Ida."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 14: AFTER READING HEADER ══ -->
+<div class="slide" id="s14" data-notes="<strong>Step 3 — After Reading:</strong> Now Leo reviews all the questions and answers. He works with the information from the entire biography.">
+  <div class="section-slide sec-after">
+    <div class="sec-emoji">✅</div>
+    <h2>Step 3: After Reading</h2>
+    <p>Review Questions · Find Answers · Summarise</p>
+    <div style="font-size:1.4rem;margin-top:8px">❓ 📝 💡</div>
+  </div>
+</div>
+
+<!-- ══ 15: COMPLETE THE CHART ══ -->
+<div class="slide" id="s15" data-notes="<strong>After Reading:</strong> Have students look at the questions in the first column of the chart. For each question, ask: Was that question answered in the text? What was the answer? Call on students to say the answers. Have students write the responses in the right-hand column of their charts.">
+  <div class="slide-header sh-gn">📊 After Reading — Complete the Q&amp;A Chart</div>
+  <div class="slide-body" style="justify-content:center">
+    <div class="dialogue"><div class="avi avi-dad">👨</div><div class="bubble bubble-dad"><div class="bubble-label">DAD 💬</div>Leo — look at all your questions. Was each question answered in the text? What was the answer? Write it in the chart!</div></div>
+    <div id="after-chart" class="chart-wrap"></div>
+    <button class="wnav-btn" onclick="changeSlide(1)" style="background:#16A34A;margin-top:10px;width:fit-content">Comprehension Questions →</button>
+  </div>
+</div>
+
+<!-- ══ 16: COMPREHENSION Q&A ══ -->
+<div class="slide" id="s16" data-notes="Ask Leo each question verbally FIRST. Let him answer before clicking to reveal. If he cannot answer, ask: What does the book say about this? Guide him back to the text.">
+  <div class="slide-header sh-gn">❓ Comprehension Questions — After Reading</div>
+  <div class="slide-body">
+    <div class="dialogue" style="margin-bottom:4px"><div class="avi avi-dad">👨</div><div class="bubble bubble-dad"><div class="bubble-label">DAD 💬</div>Leo answers first — then we check! No looking at the book yet.</div></div>
+    <div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">Q1: What was Jørn Hurum's hobby as a child? <span>▼</span></div><div class="qa-a">Jørn Hurum's hobby was collecting fossils. He found them in the woods near his home in Oslo, Norway.</div></div>
+    <div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">Q2: What book changed his life? Why? <span>▼</span></div><div class="qa-a">He found a book about fossils. After reading it alone in his room, he started looking for fossils everywhere — under rocks, near rivers, and in the forest. It sparked his lifelong passion.</div></div>
+    <div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">Q3: What is a paleontologist? <span>▼</span></div><div class="qa-a">A paleontologist is a scientist who studies fossils and ancient life. Jørn became a paleontologist and professor at the Natural History Museum in Oslo.</div></div>
+    <div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">Q4: What was Jørn's biggest discovery? <span>▼</span></div><div class="qa-a">His biggest discovery was a primate fossil called "Ida" that is 47 million years old!</div></div>
+    <div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">Q5: How did Jørn turn his hobby into a career? <span>▼</span></div><div class="qa-a">He studied at university to learn the proper way to find and study fossils. He became a professor who gives lectures, leads tours, and shows fossil exhibits to thousands of visitors.</div></div>
+    <button class="wnav-btn" onclick="changeSlide(1)" style="background:#16A34A;margin-top:10px;width:fit-content">Grammar + Assessment →</button>
+  </div>
+</div>
+
+<!-- ══ 17: GRAMMAR + ASSESSMENT ══ -->
+<div class="slide" id="s17" data-notes="Grammar in Context: Describing people with 'who.' Find examples in the text: 'Jørn is a man who studies fossils.' Ask Leo to make his own sentences. Then formative assessment — go through each item, ask Leo the question out loud.">
+  <div class="slide-header sh-amb">🔍 Grammar + Assessment</div>
+  <div class="slide-body">
+    <div class="two-col">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="slide-title" style="font-size:1.3rem">Grammar — Describing with <em>who</em></div>
+        <div class="info-card" style="border-left-color:var(--bl)">
+          <h3>FIND "WHO" IN THE TEXT</h3>
+          <p>"Jørn Hurum is a man <strong>who</strong> studies fossils."</p>
+          <p>"He is a scientist <strong>who</strong> discovered the primate fossil Ida."</p>
+          <p>"He is a professor <strong>who</strong> gives lectures at the museum."</p>
+        </div>
+        <div class="info-card" style="border-left-color:var(--gn)">
+          <h3>LEO'S TURN — Make your own sentence!</h3>
+          <p>Use <strong>who</strong> to describe a person:</p>
+          <p>⚽ "Mohamed Salah is a player <strong>who</strong> scores amazing goals."</p>
+          <p>🦴 "A carer is a person <strong>who</strong> looks after someone."</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="slide-title" style="font-size:1.3rem">Can Leo do this? 🦁</div>
+        <div class="assess-item" onclick="toggleAssess(this)"><div class="assess-check">✓</div><p>📖 Use all 21 vocabulary words correctly.</p></div>
+        <div class="assess-item" onclick="toggleAssess(this)"><div class="assess-check">✓</div><p>❓ Ask questions using who, what, when, where, why, how.</p></div>
+        <div class="assess-item" onclick="toggleAssess(this)"><div class="assess-check">✓</div><p>🦴 Retell Jørn Hurum's story from childhood to career.</p></div>
+        <div class="assess-item" onclick="toggleAssess(this)"><div class="assess-check">✓</div><p>📝 Complete a Q&amp;A chart with questions and answers.</p></div>
+        <div class="assess-item" onclick="toggleAssess(this)"><div class="assess-check">✓</div><p>🗣️ Use "who" to describe people.</p></div>
+        <div class="assess-item" onclick="toggleAssess(this)"><div class="assess-check">✓</div><p>🐒 Name Jørn's biggest discovery (Ida).</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 18: CLOSING ══ -->
+<div class="slide" id="s18" data-notes="<strong>Say:</strong> 'Leo — amazing work! You read a full biography AND learned 21 new vocabulary words! You used Ask Questions to understand Jørn Hurum's story. Now you know how a boy who loved fossils became a famous paleontologist!'">
+  <div class="title-slide" style="background:linear-gradient(135deg,#4C1D95,#6D28D9,#16A34A)">
+    <div style="font-size:3.5rem">🦴🦕🏆</div>
+    <h1>Amazing Work, <span>Leo!</span></h1>
+    <div class="sub">You read Hurum's Hobby and understood every part!</div>
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:700px;margin-top:12px">
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 20px;font-size:.88rem;font-weight:700;color:#fff">✅ You learned 21 new vocabulary words from the reader</div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 20px;font-size:.88rem;font-weight:700;color:#fff">✅ You used the Three-Step Reading Routine</div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 20px;font-size:.88rem;font-weight:700;color:#fff">✅ You asked questions and found answers in the text</div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 20px;font-size:.88rem;font-weight:700;color:#fff">✅ You used "who" to describe people</div>
+    </div>
+    <div style="margin-top:16px;font-size:.9rem;color:rgba(255,255,255,.7);font-weight:700">Next: Leo does the Book Reading App homework! 📱</div>
+  </div>
+</div>
+
+</div><!-- end slide-wrap -->
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)" disabled>← Previous</button>
+  <button class="home-btn" onclick="goHome()">🏠 Home</button>
+  <button class="nav-btn nav-btn-primary" id="next-btn" onclick="changeSlide(1)">Next →</button>
 </div>
 
 <script>
-var LESSON_ID = 'ow-l4-u8-reader';
-
-var NOTES = {
-  1: '<div class="tn-sec"><span class="tn-lbl">Slide 1 — Title</span>Show the title. Say: <em>"Today we are going to read a biography called Hurum\'s Hobby. A biography is a true story about a real person\'s life."</em></div><div class="tn-sec"><span class="tn-lbl">Text Background</span>In a biography, an author tells the true story of another person\'s life. Tell students that when they read a biography, they will learn such things as when and where the person was born, what his childhood was like, what kind of schools he went to, what he was interested in as he was growing up, what work he did as an adult, and why he is important.</div>',
-
-  2: '<div class="tn-sec"><span class="tn-lbl">Slide 2 — Objectives</span>Read the objectives aloud. Emphasize that the reading strategy today is <strong>Ask Questions</strong> — students will practice asking who/what/when/where/why/how questions as they read. Grammar focus: describing people with <strong>who</strong>.</div>',
-
-  3: '<div class="tn-sec"><span class="tn-lbl">Slide 3 — Activate Prior Knowledge</span>Tell students about hobbies that you had as a child. Say whether or not you still do them. Then ask:<ul><li><strong>What\'s your favorite hobby?</strong></li><li><strong>Do you think you could do this hobby as a job when you grow up? Why, or why not?</strong></li></ul></div>',
-
-  4: '<div class="tn-sec"><span class="tn-lbl">Slide 4 — Introduce the Strategy</span>Say: <em>"Asking questions can help you understand what you read."</em> Read aloud the summary on the back cover. <em>"The text mentions Jørn Hurum\'s hobby. What is his hobby? I\'ll read the text to find out."</em><br><br>Say: <em>"As we read, let\'s use a chart to write questions about the text."</em> Draw a two-column chart: Question | Answer. Write "What is Jørn Hurum\'s hobby?" under Question.<br><br>Say: <em>"As we read, we\'ll stop to ask questions about what we read. Then we\'ll look for answers to our questions as we continue reading. We\'ll write these answers in the chart."</em></div>',
-
-  5: '<div class="tn-sec"><span class="tn-lbl">Slide 5 — Vocabulary Preview</span>Preview the 6 target vocabulary words before reading. Say each word, have students repeat. Give a simple definition and an example sentence for each:<ul><li><strong>enjoy</strong> — to like doing something</li><li><strong>collect</strong> — to gather things and keep them</li><li><strong>a bug</strong> — a small insect</li><li><strong>a fossil</strong> — remains of an ancient animal or plant in rock</li><li><strong>alone</strong> — by yourself</li><li><strong>a dinosaur</strong> — a very large animal from millions of years ago</li></ul></div>',
-
-  6: '<div class="tn-sec"><span class="tn-lbl">Slide 6 — Glossary Preview</span>These glossary words appear in the reader booklet. Preview them before reading. You don\'t need to teach all of them — just point out that students will see these words and can use context clues or the glossary to understand them.</div>',
-
-  7: '<div class="tn-sec"><span class="tn-lbl">Slide 7 — Pages 2–3</span>Read pages 2–3 together. Stop after every few pages to ask students what questions they have about the text. Remind students that a question can begin with <strong>who, what, when, where, why,</strong> and <strong>how</strong>. Model asking a question with "who": <em>"Who read a book about fossils?"</em></div>',
-
-  8: '<div class="tn-sec"><span class="tn-lbl">Slide 8 — Pages 4–5</span>Read pages 4–5 together. Pause after p.4 and say: <em>"Let\'s ask a question with who. Who read a book about fossils?"</em> Write the question in the chart.<br><br>Call on students to ask questions with <strong>what</strong>, such as <em>"What\'s a fossil?"</em></div>',
-
-  9: '<div class="tn-sec"><span class="tn-lbl">Slide 9 — Pages 6–7</span>Continue reading pages 6–7. Stop and ask students what questions they have. Encourage questions with different question words (where, when, why). Add new questions to the chart. Look for answers to earlier questions as you read.</div>',
-
-  10: '<div class="tn-sec"><span class="tn-lbl">Slide 10 — Pages 8–9</span>Read pages 8–9 together. Continue asking questions with <strong>where</strong> and <strong>when</strong>: <em>"Where did he go to school? When did he start studying fossils?"</em> Add questions and any answers found so far to the chart.</div>',
-
-  11: '<div class="tn-sec"><span class="tn-lbl">Slide 11 — After You Read</span>After finishing the biography, have students look at questions in the first column. For each question, ask: <em>"Was that question answered in the text? What was the answer?"</em> Have students write responses in the right-hand column.<br><br><strong>Be the Expert — Reading Strategy: Ask Questions</strong><ul><li>Asking questions during reading is a way of engaging with the text. When students are interested, their questions show that they want to know more. (Where did he go to school? What did he have to study to become a paleontologist?)</li><li>Asking questions about unfamiliar words or difficult paragraphs can help students check their understanding. (What is a paleontologist?)</li><li>Asking questions after reading can help students confirm their understanding.</li></ul></div>',
-
-  12: '<div class="tn-sec"><span class="tn-lbl">Slide 12 — Chart Activity</span>Use the interactive two-column chart to consolidate questions and answers from the reading. Sample questions to discuss:<ul><li>What is Jørn Hurum\'s hobby?</li><li>Who read a book about fossils?</li><li>What\'s a fossil?</li><li>Where did he go to school?</li><li>What did he have to study to become a paleontologist?</li></ul></div>',
-
-  13: '<div class="tn-sec"><span class="tn-lbl">Slide 13 — Wrap Up</span>Connect back to the unit theme <strong>"That\'s Really Interesting!"</strong> Remind students that Jørn Hurum turned a childhood hobby — collecting fossils — into a career as a paleontologist. Ask: <em>"Could your hobby become your job one day?"</em></div>',
-
-  14: '<div class="tn-sec"><span class="tn-lbl">Slide 14 — Mark Done</span>Click to record reader lesson done in leea.lessonProgress.v1.</div>'
-};
-
-var notesOpen = false;
-var TOTAL = 14;
+var TOTAL = 18;
 var current = 1;
-
-function scaleSlides() {
-  var tnW = notesOpen ? 440 : 0;
-  var aw  = window.innerWidth  - tnW;
-  var ah  = window.innerHeight - 52;
-  var s   = Math.min(aw / 1920, ah / 1080);
-  var deck = document.getElementById('deck');
-  var left = (aw  - 1920 * s) / 2;
-  var top  = (ah  - 1080 * s) / 2;
-  deck.style.transform = 'scale(' + s + ')';
-  deck.style.left      = left + 'px';
-  deck.style.top       = top  + 'px';
-}
-window.addEventListener('resize', scaleSlides);
-scaleSlides();
-
-function goTo(n) {
-  if (n < 1 || n > TOTAL) return;
-  document.getElementById('s' + current).classList.remove('active');
-  current = n;
-  document.getElementById('s' + current).classList.add('active');
-  document.getElementById('sc').textContent    = current + ' / ' + TOTAL;
-  document.getElementById('pgfill').style.width = ((current - 1) / (TOTAL - 1) * 100) + '%';
-  showNotes();
-}
-function nextSlide() { goTo(current + 1); }
-function prevSlide() { goTo(current - 1); }
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ')  { e.preventDefault(); nextSlide(); }
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                     { e.preventDefault(); prevSlide(); }
-  if (e.key === 'n' || e.key === 'N') toggleNotes();
+var notesOpen = false;
+var notes = {};
+document.querySelectorAll('.slide').forEach(function(s) {
+  notes[parseInt(s.id.replace('s',''))] = s.dataset.notes || '';
 });
 
-function showNotes() {
-  document.getElementById('tn-body').innerHTML = NOTES[current] || '<div class="tn-sec" style="color:rgba(255,255,255,.4);font-style:italic">No notes for this slide.</div>';
+function updateUI() {
+  document.querySelectorAll('.slide').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('s'+current).classList.add('active');
+  document.getElementById('slide-counter').textContent = current + ' / ' + TOTAL;
+  document.getElementById('prog-fill').style.width = (current/TOTAL*100) + '%';
+  document.getElementById('prev-btn').disabled = current === 1;
+  document.getElementById('next-btn').disabled = current === TOTAL;
+  document.getElementById('next-btn').textContent = current === TOTAL ? 'End ✅' : 'Next →';
+  if (notesOpen) document.getElementById('notes-panel').innerHTML = notes[current] || '<em>No notes.</em>';
+  buildAllCharts();
 }
+
+function changeSlide(d) {
+  var n = current + d;
+  if (n >= 1 && n <= TOTAL) { current = n; updateUI(); window.scrollTo(0,0); }
+}
+function goHome() { window.location.href = '/'; }
 function toggleNotes() {
   notesOpen = !notesOpen;
-  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
-  document.getElementById('tn-btn').classList.toggle('green', notesOpen);
-  scaleSlides();
-  showNotes();
+  var p = document.getElementById('notes-panel');
+  p.classList.toggle('open', notesOpen);
+  if (notesOpen) p.innerHTML = notes[current] || '<em>No notes.</em>';
 }
-showNotes();
-
-/* ── Build two-column chart on slide 12 ── */
-document.getElementById('chart-host').innerHTML = buildNColChart({
-  id: 'qa-chart',
-  columns: ['Question', 'Answer'],
-  rows: [
-    ['What is Jørn Hurum\'s hobby?', 'Collecting fossils'],
-    ['Who read a book about fossils?', ''],
-    ['What\'s a fossil?', ''],
-    ['Where did he find fossils?', ''],
-    ['When did he start studying fossils?', ''],
-    ['What did he have to study to become a paleontologist?', '']
-  ]
-});
-
-function markDone() {
-  try {
-    var KEY = 'leea.lessonProgress.v1';
-    var rec = JSON.parse(localStorage.getItem(KEY) || '{}');
-    rec['ow-l4-u8-reader'] = { lessonId: 'ow-l4-u8-reader', status: 'done', completedAt: new Date().toISOString() };
-    localStorage.setItem(KEY, JSON.stringify(rec));
-    var b = document.getElementById('markBtn');
-    b.style.background = '#9ca3af';
-    b.style.cursor = 'default';
-    b.textContent = '✓ Done — Saved!';
-    b.disabled = true;
-    document.getElementById('markStatus').textContent = 'Saved · ' + new Date().toLocaleString();
-  } catch (e) {
-    try { document.getElementById('markStatus').textContent = 'Could not save: ' + e.message; } catch(_){}
+function toggleFS() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+    document.getElementById('fs-btn').textContent = 'x';
+  } else {
+    document.exitFullscreen();
+    document.getElementById('fs-btn').textContent = '⛶';
   }
 }
-</script>
+document.addEventListener('fullscreenchange', function() {
+  if (!document.fullscreenElement) document.getElementById('fs-btn').textContent = '⛶';
+});
+document.addEventListener('keydown', function(e) {
+  if (current !== 2) {
+    if (e.key==='ArrowRight'||e.key==='ArrowDown') changeSlide(1);
+    if (e.key==='ArrowLeft'||e.key==='ArrowUp') changeSlide(-1);
+  }
+});
 
+// ═══ VOCABULARY DATA ═══
+var WORDS = [
+  {emoji:'😊',word:'enjoy',pos:'VERB',def:'To like doing something — to get pleasure from it.',sample:'Jørn has <b>enjoyed</b> studying fossils for decades.',dad:'Leo — do you enjoy playing football? When you enjoy something, you feel happy doing it! 😊⚽',game:{type:'pick',prompt:'WHICH DO YOU ENJOY?',items:[{t:'⚽ Playing football',ok:true},{t:'🦷 Going to the dentist',ok:false},{t:'🎮 Playing video games',ok:true},{t:'📝 Homework on a sunny day',ok:false}],msg:'✅ You enjoy things that make you HAPPY!'}},
+  {emoji:'🧺',word:'collect',pos:'VERB',def:'To get and keep things of the same kind — to gather as a hobby.',sample:'Jørn started to <b>collect</b> fossils as a child.',dad:'Leo — collecting fossils is like collecting football cards! Do you collect anything? 🧺⚽',game:{type:'pick',prompt:'WHAT CAN YOU COLLECT?',items:[{t:'⚽ Football cards',ok:true},{t:'☁️ Clouds',ok:false},{t:'🪨 Fossils',ok:true},{t:'🌊 Ocean waves',ok:false}],msg:'✅ You collect THINGS you can keep!'}},
+  {emoji:'🐛',word:'a bug',pos:'NOUN',def:'A small insect.',sample:'He found a <b>bug</b> under a rock in the woods.',dad:'Leo — bugs are tiny insects! Some are preserved in fossils millions of years old. Have you ever caught a bug? 🐛',game:{type:'pick',prompt:'WHICH IS A BUG?',items:[{t:'🐜 An ant',ok:true},{t:'🐕 A dog',ok:false},{t:'🪲 A beetle',ok:true},{t:'🐋 A whale',ok:false}],msg:'✅ Bugs are small INSECTS — ants, beetles, flies!'}},
+  {emoji:'🪨',word:'a fossil',pos:'NOUN',def:'The hard remains or mark of a plant or animal from long ago, preserved in rock.',sample:'This <b>fossil</b> is millions of years old.',dad:'Leo — a fossil is like a photograph in stone! An ancient animal got trapped in mud, the mud turned to rock, and the shape stayed forever. 🪨',game:{type:'pick',prompt:'WHICH COULD BE A FOSSIL?',items:[{t:'🦴 Ancient bone in rock',ok:true},{t:'🍎 Fresh apple',ok:false},{t:'🐚 Shell from millions of years ago',ok:true},{t:'📱 A phone',ok:false}],msg:'✅ Fossils are ANCIENT remains preserved in rock!'}},
+  {emoji:'🧍',word:'alone',pos:'ADJECTIVE / ADVERB',def:'Without other people — by yourself.',sample:'He read the book <b>alone</b> in his room.',dad:'Leo — sometimes Salah practises alone at the training ground. Alone = by yourself, no one else. When do you like being alone? 🧍',game:{type:'pick',prompt:'WHO IS ALONE?',items:[{t:'👤 A boy reading by himself',ok:true},{t:'👨‍👩‍👦 A family at dinner',ok:false},{t:'🧍 A girl walking by herself',ok:true},{t:'⚽ A team playing together',ok:false}],msg:'✅ Alone means by YOURSELF — no one else is there!'}},
+  {emoji:'🦕',word:'a dinosaur',pos:'NOUN',def:'A very large reptile that lived millions of years ago.',sample:'They found parts of a <b>dinosaur</b> bone in the ground.',dad:'Leo — dinosaurs lived millions of years ago! T-Rex was bigger than a football pitch goalpost. Jørn found dinosaur fossils! 🦕',game:{type:'pick',prompt:'TRUE ABOUT DINOSAURS?',items:[{t:'🦴 Lived millions of years ago',ok:true},{t:'🏠 Live in houses today',ok:false},{t:'🪨 We find their fossils',ok:true},{t:'⚽ They play football',ok:false}],msg:'✅ Dinosaurs lived long ago — we know about them from fossils!'}},
+  {emoji:'🤝',word:'carer',pos:'NOUN',def:'A person who looks after someone.',sample:'A <b>carer</b> helped the children at the museum.',dad:'Leo — a carer is someone who looks after people. Nurses are carers. Your mum and dad are your carers too! 🤝',game:{type:'pick',prompt:'WHO IS A CARER?',items:[{t:'👩‍⚕️ A nurse',ok:true},{t:'🪨 A rock',ok:false},{t:'👨‍🏫 A teacher looking after students',ok:true},{t:'🦕 A dinosaur',ok:false}],msg:'✅ Carers LOOK AFTER other people!'}},
+  {emoji:'📅',word:'decades',pos:'NOUN',def:'Periods of ten years.',sample:'He has studied fossils for <b>decades</b>.',dad:'Leo — Liverpool have been winning trophies for decades! One decade = 10 years. Two decades = 20 years! 📅⚽',game:{type:'pick',prompt:'HOW LONG IS A DECADE?',items:[{t:'📅 10 years',ok:true},{t:'📅 1 year',ok:false},{t:'📅 100 years',ok:false}],msg:'✅ A decade = 10 years! Decades = many groups of 10 years!'}},
+  {emoji:'🚶',word:'escorted',pos:'VERB (PAST)',def:'Went with someone to show them the way or protect them.',sample:'He <b>escorted</b> thousands of visitors through the museum.',dad:'Leo — when you go on a school trip, the teacher escorts you. It means going WITH someone to guide them safely. 🚶',game:{type:'pick',prompt:'WHO ESCORTS?',items:[{t:'👮 A guide leading tourists',ok:true},{t:'🪨 A fossil sitting in rock',ok:false},{t:'👨‍🏫 A teacher walking students to the bus',ok:true},{t:'☁️ A cloud floating alone',ok:false}],msg:'✅ Escorted = went WITH someone to guide or protect them!'}},
+  {emoji:'🏛️',word:'exhibits',pos:'NOUN',def:'Objects or collections displayed for people to look at.',sample:'The museum has many fossil <b>exhibits</b>.',dad:'Leo — when Liverpool win a trophy, they put it on display. That is an exhibit! Museums have exhibits of fossils, art, and more. 🏛️',game:{type:'pick',prompt:'WHAT IS AN EXHIBIT?',items:[{t:'🦴 Fossils in a glass case at a museum',ok:true},{t:'🍕 Pizza in your fridge',ok:false},{t:'🖼️ Paintings on a gallery wall',ok:true},{t:'🧦 Socks in a drawer',ok:false}],msg:'✅ Exhibits are things displayed for people to SEE and LEARN from!'}},
+  {emoji:'🎤',word:'lectures',pos:'NOUN',def:'Talks given to teach people about a subject.',sample:'Professor Hurum gives <b>lectures</b> about fossils.',dad:'Leo — a lecture is like when your coach talks to the team about tactics! A professor gives lectures at a university to teach students. 🎤',game:{type:'pick',prompt:'WHICH IS A LECTURE?',items:[{t:'🎤 A professor teaching 200 students',ok:true},{t:'🤫 Whispering to a friend',ok:false},{t:'📢 A scientist presenting discoveries',ok:true},{t:'😴 Sleeping in bed',ok:false}],msg:'✅ Lectures are TALKS that teach people about a topic!'}},
+  {emoji:'🦴',word:'paleontologist',pos:'NOUN',def:'A scientist who studies fossils and ancient life.',sample:'A <b>paleontologist</b> digs up fossils to learn about the past.',dad:'Leo — a paleontologist is like a detective of the past! They dig up fossils and figure out what lived millions of years ago. Jørn Hurum is a famous paleontologist! 🦴🔍',game:{type:'pick',prompt:'WHAT DOES A PALEONTOLOGIST DO?',items:[{t:'🦴 Studies fossils',ok:true},{t:'⚽ Plays football',ok:false},{t:'🔍 Digs up ancient bones',ok:true},{t:'🍕 Makes pizza',ok:false}],msg:'✅ A paleontologist studies fossils and ancient life!'}},
+  {emoji:'❤️',word:'passion',pos:'NOUN',def:'A very strong feeling of love or interest in something.',sample:'Collecting fossils is his <b>passion</b>.',dad:'Leo — Salah has a passion for football. It means he loves it SO much he cannot stop! Jørn has a passion for fossils. What is your passion? ❤️',game:{type:'pick',prompt:'WHICH SHOWS PASSION?',items:[{t:'❤️ Practising every day because you love it',ok:true},{t:'😒 Doing something because you have to',ok:false},{t:'🔥 Being so excited you cannot wait',ok:true},{t:'😴 Feeling bored and tired',ok:false}],msg:'✅ Passion = you love something SO much you cannot stop!'}},
+  {emoji:'🧊',word:'preserved',pos:'ADJECTIVE',def:'Kept in good condition over a long time.',sample:'The fossil was perfectly <b>preserved</b> in stone.',dad:'Leo — when something is preserved, it stays in good condition for a very long time. Fossils are preserved in rock for millions of years! 🧊',game:{type:'pick',prompt:'WHICH IS PRESERVED?',items:[{t:'🦴 A fossil in rock for 47 million years',ok:true},{t:'🍌 A banana turning brown',ok:false},{t:'🏛️ An ancient statue still standing',ok:true},{t:'💧 Ice cream melting in the sun',ok:false}],msg:'✅ Preserved = kept in GOOD CONDITION over time!'}},
+  {emoji:'🐒',word:'primate',pos:'NOUN',def:'A mammal like a monkey, ape, or human.',sample:'Ida is a <b>primate</b> fossil that is 47 million years old.',dad:'Leo — you are a primate! Monkeys, apes, and humans are all primates. Jørn found a primate fossil called Ida that is 47 million years old! 🐒',game:{type:'pick',prompt:'WHICH IS A PRIMATE?',items:[{t:'🐒 A monkey',ok:true},{t:'🐍 A snake',ok:false},{t:'🧑 A human',ok:true},{t:'🐟 A fish',ok:false}],msg:'✅ Primates = monkeys, apes, and humans!'}},
+  {emoji:'🎓',word:'professor',pos:'NOUN',def:'A senior teacher at a university.',sample:'He became a <b>professor</b> at the Natural History Museum.',dad:'Leo — a professor is the top teacher at a university! They are experts. Professor Hurum is an expert on fossils. 🎓',game:{type:'pick',prompt:'WHAT DOES A PROFESSOR DO?',items:[{t:'🎓 Teaches at a university',ok:true},{t:'🍳 Cooks breakfast',ok:false},{t:'📚 Researches and publishes papers',ok:true},{t:'⚽ Scores goals',ok:false}],msg:'✅ A professor teaches and researches at a university!'}},
+  {emoji:'✅',word:'proper',pos:'ADJECTIVE',def:'Correct — the right way.',sample:'He learned the <b>proper</b> way to dig up fossils.',dad:'Leo — in football, you need the proper technique to kick the ball. Proper = the CORRECT way. Jørn learned the proper way to find fossils. ✅⚽',game:{type:'pick',prompt:'WHICH IS PROPER?',items:[{t:'✅ Following the rules carefully',ok:true},{t:'❌ Doing it any way you like',ok:false},{t:'📋 Using the correct technique',ok:true},{t:'🤷 Guessing randomly',ok:false}],msg:'✅ Proper = the CORRECT, RIGHT way to do something!'}},
+  {emoji:'🔗',word:'related',pos:'ADJECTIVE',def:'Connected to something.',sample:'His career is <b>related</b> to what he always loved.',dad:'Leo — fossils and dinosaurs are related — they are connected! Football and exercise are related too. Related = connected. 🔗',game:{type:'pick',prompt:'WHICH ARE RELATED?',items:[{t:'🦴 Fossils and paleontology',ok:true},{t:'🍕 Pizza and maths homework',ok:false},{t:'⚽ Football and exercise',ok:true},{t:'🐟 Fish and aeroplanes',ok:false}],msg:'✅ Related = CONNECTED to each other!'}},
+  {emoji:'👀',word:'showing',pos:'VERB',def:'Letting someone see something — displaying or presenting.',sample:'He spent time <b>showing</b> the fossils to visitors.',dad:'Leo — when Salah scores, he shows the ball to the crowd! Showing = letting people see. Jørn shows fossils to museum visitors. 👀',game:{type:'pick',prompt:'WHO IS SHOWING SOMETHING?',items:[{t:'🏛️ A guide presenting fossils',ok:true},{t:'😴 A person sleeping',ok:false},{t:'👨‍🏫 A teacher displaying a chart',ok:true},{t:'📦 A box sitting in a cupboard',ok:false}],msg:'✅ Showing = letting people SEE something!'}},
+  {emoji:'🗺️',word:'tours',pos:'NOUN',def:'Journeys visiting different places.',sample:'He leads <b>tours</b> of the museum.',dad:'Leo — Liverpool go on pre-season tours to other countries! A museum tour = walking around and seeing everything with a guide. 🗺️',game:{type:'pick',prompt:'WHICH IS A TOUR?',items:[{t:'🏛️ Walking through a museum with a guide',ok:true},{t:'🛋️ Sitting on your sofa',ok:false},{t:'🗺️ Visiting 5 countries in summer',ok:true},{t:'😴 Staying in bed all day',ok:false}],msg:'✅ Tours = journeys visiting different places!'}},
+  {emoji:'🌲',word:'woods',pos:'NOUN',def:'A small area of forest — trees growing together.',sample:'He searched for fossils in the <b>woods</b> near his home.',dad:'Leo — the woods is a small forest near your home. Jørn explored the woods looking for fossils. Have you ever walked in the woods? 🌲',game:{type:'pick',prompt:'WHICH DESCRIBES WOODS?',items:[{t:'🌲 An area full of trees',ok:true},{t:'🏖️ A sandy beach',ok:false},{t:'🌳 A small forest near a village',ok:true},{t:'🏙️ A big city centre',ok:false}],msg:'✅ Woods = a small area of TREES — like a mini forest!'}}
+];
+
+// BUILD VOCAB TABS + PANELS
+var wordDone = new Array(WORDS.length).fill(false);
+(function buildVocabUI(){
+  var tabsBar = document.getElementById('word-tabs-bar');
+  var host = document.getElementById('word-panels-host');
+  var tabsH = '', panelsH = '';
+  WORDS.forEach(function(w, i){
+    tabsH += '<button class="word-tab' + (i===0?' active':'') + '" onclick="showWord('+i+')">' + w.emoji + ' ' + w.word + '</button>';
+    panelsH += '<div class="word-panel' + (i===0?' active':'') + '" id="wp-'+i+'"><div class="word-panel-inner"><div>';
+    panelsH += '<div class="word-header"><div class="word-big-emoji">' + w.emoji + '</div><div><div class="word-title">' + w.word + '</div><div class="word-pos">' + w.pos + '</div></div></div>';
+    panelsH += '<div class="def-box"><div class="def-label">DEFINITION</div><div class="def-text">' + w.def + '</div><div class="def-example">From the book: "' + w.sample + '"</div></div>';
+    panelsH += '<div style="height:8px"></div>';
+    panelsH += '<div class="dialogue"><div class="avi avi-dad">👨</div><div class="bubble bubble-dad"><div class="bubble-label">DAD 💬</div>' + w.dad + '</div></div>';
+    panelsH += '</div><div>';
+    panelsH += '<div class="mini-game"><h4>🎮 ' + w.game.prompt + '</h4><div class="game-area">';
+    w.game.items.forEach(function(it, j){
+      panelsH += '<button class="game-btn" onclick="pickGame('+i+',this,'+(it.ok?'true':'false')+')">' + it.t + '</button>';
+    });
+    panelsH += '</div><div class="game-msg" id="gm-'+i+'">' + w.game.msg + '</div></div>';
+    panelsH += '<div class="qc-box"><div class="qc-q">❓ What does "' + w.word + '" mean?</div><div class="qc-opts">';
+    panelsH += '<button class="qc-opt" onclick="qc(this,true,\'w'+i+'\')">' + w.def.split('.')[0] + '</button>';
+    panelsH += '<button class="qc-opt" onclick="qc(this,false,\'w'+i+'\')">A type of food you eat</button>';
+    panelsH += '<button class="qc-opt" onclick="qc(this,false,\'w'+i+'\')">A game you play outside</button>';
+    panelsH += '</div></div>';
+    panelsH += '</div></div>';
+    var prevLabel = i > 0 ? WORDS[i-1].word : 'First word';
+    var nextLabel = i < WORDS.length-1 ? WORDS[i+1].word : '';
+    panelsH += '<div class="word-nav">';
+    panelsH += '<button class="wnav-btn sec" ' + (i===0?'disabled':'') + ' onclick="showWord('+(i-1)+')">← ' + prevLabel + '</button>';
+    panelsH += '<span class="word-prog-text">Word ' + (i+1) + ' of ' + WORDS.length + (i===WORDS.length-1?' ✅':'') + '</span>';
+    if (i < WORDS.length-1) {
+      panelsH += '<button class="wnav-btn" onclick="nextWord('+i+')">Next: ' + nextLabel + ' →</button>';
+    } else {
+      panelsH += '<button class="wnav-btn" onclick="nextWord('+i+')" style="background:#16A34A;border-color:#16A34A">All done! Before Reading →</button>';
+    }
+    panelsH += '</div></div>';
+  });
+  tabsBar.innerHTML = tabsH;
+  host.innerHTML = panelsH;
+})();
+
+function showWord(idx) {
+  document.querySelectorAll('.word-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('wp-'+idx).classList.add('active');
+  document.querySelectorAll('.word-tab').forEach(function(t, i) {
+    t.classList.remove('active');
+    if (wordDone[i]) t.classList.add('done'); else t.classList.remove('done');
+  });
+  document.querySelectorAll('.word-tab')[idx].classList.add('active');
+}
+function nextWord(idx) {
+  wordDone[idx] = true;
+  var done = wordDone.filter(Boolean).length;
+  document.getElementById('pp-bar').style.width = (done/WORDS.length*100) + '%';
+  document.getElementById('pp-text').textContent = done + ' / ' + WORDS.length + ' words';
+  document.querySelectorAll('.word-tab').forEach(function(t, i) { if (wordDone[i]) t.classList.add('done'); });
+  if (idx < WORDS.length-1) showWord(idx + 1);
+  else changeSlide(1);
+}
+
+function qc(btn, correct, wid) {
+  var box = btn.closest('.qc-opts');
+  box.querySelectorAll('.qc-opt').forEach(function(b) { b.disabled = true; });
+  btn.classList.add(correct ? 'correct' : 'wrong');
+}
+
+var pickCounts = {};
+function pickGame(wordIdx, btn, isCorrect) {
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (isCorrect) {
+    if (!pickCounts[wordIdx]) pickCounts[wordIdx] = 0;
+    pickCounts[wordIdx]++;
+    var needed = WORDS[wordIdx].game.items.filter(function(it){return it.ok}).length;
+    if (pickCounts[wordIdx] >= needed) document.getElementById('gm-'+wordIdx).classList.add('show');
+  }
+}
+
+// STORY STEPS
+var storySteps = {r1:{els:['r1s2'],step:0},r2:{els:['r2s2'],step:0},r3:{els:['r3s2'],step:0},r4:{els:['r4s2','r4s3'],step:0}};
+function storyStep(prefix) {
+  var s = storySteps[prefix];
+  if (s.step < s.els.length) {
+    document.getElementById(s.els[s.step]).classList.add('show');
+    s.step++;
+  }
+  if (s.step >= s.els.length) {
+    document.getElementById(prefix+'-btn').style.display = 'none';
+    document.getElementById(prefix+'-next').style.display = 'inline-flex';
+  }
+}
+
+// Q&A
+function toggleQA(hd) {
+  var a = hd.nextElementSibling;
+  a.classList.toggle('open');
+  var sp = hd.querySelector('span');
+  if (sp) sp.textContent = a.classList.contains('open') ? '▲' : '▼';
+}
+
+// ASSESS
+function toggleAssess(item) { item.classList.toggle('checked'); }
+
+// REVEAL
+function showAns(id, btn) {
+  document.getElementById(id).style.display = 'block';
+  btn.style.display = 'none';
+}
+
+// STRATEGY CHART
+var strategyBuilt = false;
+function buildStrategyChart() {
+  if (strategyBuilt) return;
+  if (!window.LEEA_CHARTS) { setTimeout(buildStrategyChart, 200); return; }
+  var el = document.getElementById('qa-strategy');
+  if (!el) return;
+  el.innerHTML = window.LEEA_CHARTS.buildTwoColChart({
+    id: 'strategy-qa',
+    colA: { label: '❓ Question', color: '#7C3AED' },
+    colB: { label: '\u{1F4DD} Answer', color: '#16A34A' },
+    rows: [
+      { a: 'What is Jørn Hurum’s hobby?', b: 'We’ll find out as we read! \u{1F4D6}' },
+      { a: 'What is a fossil?', b: '...' },
+      { a: 'How did his hobby become a career?', b: '...' }
+    ],
+    revealMode: true
+  });
+  strategyBuilt = true;
+}
+
+// ALL CHARTS
+function buildAllCharts() {
+  if (!window.LEEA_CHARTS) { setTimeout(buildAllCharts, 200); return; }
+  var qa23 = document.getElementById('qa-p23');
+  if (qa23 && !qa23.dataset.built) {
+    qa23.innerHTML = window.LEEA_CHARTS.buildTwoColChart({
+      id: 'qa-23', colA: { label: '❓ Question', color: '#7C3AED' }, colB: { label: '\u{1F4DD} Answer', color: '#16A34A' },
+      rows: [
+        { a: 'What is this book about?', b: 'A biography of Jørn Hurum — a man who turned his hobby of collecting fossils into a career.' },
+        { a: 'What is a biography?', b: 'A true story about a real person’s life.' }
+      ], revealMode: true
+    });
+    qa23.dataset.built = '1';
+  }
+  var qa45 = document.getElementById('qa-p45');
+  if (qa45 && !qa45.dataset.built) {
+    qa45.innerHTML = window.LEEA_CHARTS.buildTwoColChart({
+      id: 'qa-45', colA: { label: '❓ Question', color: '#7C3AED' }, colB: { label: '\u{1F4DD} Answer', color: '#16A34A' },
+      rows: [
+        { a: 'Who read a book about fossils?', b: 'Jørn Hurum — when he was a little boy in Oslo, Norway.' },
+        { a: 'What is a fossil?', b: 'The hard remains of an ancient plant or animal preserved in rock.' },
+        { a: 'Where did Jørn grow up?', b: 'In Oslo, Norway. He explored the woods near his home.' }
+      ], revealMode: true
+    });
+    qa45.dataset.built = '1';
+  }
+  var qa67 = document.getElementById('qa-p67');
+  if (qa67 && !qa67.dataset.built) {
+    qa67.innerHTML = window.LEEA_CHARTS.buildTwoColChart({
+      id: 'qa-67', colA: { label: '❓ Question', color: '#7C3AED' }, colB: { label: '\u{1F4DD} Answer', color: '#16A34A' },
+      rows: [
+        { a: 'What did Jørn collect as a teenager?', b: 'Bugs preserved in rock, ancient shells, and dinosaur bones.' },
+        { a: 'Why did he go to university?', b: 'To learn the proper way to find and study fossils.' }
+      ], revealMode: true
+    });
+    qa67.dataset.built = '1';
+  }
+  var aft = document.getElementById('after-chart');
+  if (aft && !aft.dataset.built) {
+    aft.innerHTML = window.LEEA_CHARTS.buildFillTable({
+      id: 'after-tbl',
+      columns: ['Pages \u{1F4D6}', 'Question ❓', 'Answer \u{1F4DD}'],
+      rows: [
+        { fixed: 'Pages 2–3', inputs: [{ id: 'q1', answer: ['hobby','fossil','career','collecting'] }, { id: 'a1', answer: ['fossil','collect','career','hobby'] }] },
+        { fixed: 'Pages 4–5', inputs: [{ id: 'q2', answer: ['who','book','read','fossil'] }, { id: 'a2', answer: ['jorn','hurum','oslo','norway','woods','alone'] }] },
+        { fixed: 'Pages 6–7', inputs: [{ id: 'q3', answer: ['collect','teenager','passion','dinosaur','bug'] }, { id: 'a3', answer: ['bug','shell','dinosaur','passion','proper','university'] }] },
+        { fixed: 'Pages 8–9', inputs: [{ id: 'q4', answer: ['paleontologist','professor','discovery','ida','primate'] }, { id: 'a4', answer: ['paleontologist','professor','ida','primate','museum','lecture','tour'] }] }
+      ],
+      checkLabel: 'Check ✅',
+      showAnswersLabel: 'Show Answers \u{1F50D}'
+    });
+    aft.dataset.built = '1';
+  }
+}
+
+updateUI();
+setTimeout(buildAllCharts, 300);
+</script>
 </body>
 </html>

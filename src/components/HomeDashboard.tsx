@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getOpenAssignmentCount, readAssignments, type AssignmentMap } from "@/data/assignments";
+import { getOpenAssignmentCount, readAssignments, readAssignmentsFromCloud, type AssignmentMap } from "@/data/assignments";
 import { getLearnerAppProgress } from "@/data/learnerProgress";
 import { getDoneLessonCount, lessonProgressStorageKey, type LessonProgressMap } from "@/data/lessonProgress";
 import { learnerLessons, teacherLessons } from "@/data/lessons";
@@ -35,6 +35,7 @@ export function HomeDashboard() {
         }
       }
       setAssignments(readAssignments(learnerLessons));
+      void readAssignmentsFromCloud(learnerLessons).then(setAssignments);
       setProgressVersion((current) => current + 1);
     }
 

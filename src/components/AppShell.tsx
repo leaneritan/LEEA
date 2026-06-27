@@ -6,7 +6,7 @@ import { BarChart3, BookOpen, CheckSquare, GraduationCap, Home, Library, PanelLe
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { getOpenAssignmentCount, readAssignments } from "@/data/assignments";
+import { getOpenAssignmentCount, readAssignments, readAssignmentsFromCloud } from "@/data/assignments";
 import { learnerLessons } from "@/data/lessons";
 import { useJapaneseSetting } from "@/components/useJapaneseSetting";
 
@@ -48,6 +48,9 @@ export function AppShell({
 
     function refreshAssignments() {
       setAssignmentsLeft(getOpenAssignmentCount(readAssignments(learnerLessons)));
+      void readAssignmentsFromCloud(learnerLessons).then((assignments) => {
+        setAssignmentsLeft(getOpenAssignmentCount(assignments));
+      });
     }
 
     refreshAssignments();

@@ -96,7 +96,22 @@ The teacher lesson is a slide deck for Neritan to use while teaching Leo. It sho
 
 File: `public/learn/ow-l{level}-u{unit}-{component}.html`
 
-The learner app is Leo's independent homework. It must follow ALL four save/restore rules:
+The learner app is Leo's independent homework. It must follow ALL save/restore rules AND the four universal LEEA app rules below.
+
+#### ⚠️ FOUR UNIVERSAL LEEA APP RULES (non-negotiable for every learner app)
+
+**Rule A — Vocab Foundations at the top of every app.** EVERY learner app opens with vocabulary modules:
+1. 🎓 Academic Language — flashcards (3D-flip, Practice + Quiz dual mode), 70% pass
+2. 🌟 Lesson Words — flashcards + quiz for the words in THIS lesson, ≥2 Q per word, 75% pass
+Both sit in a 🎴 VOCAB FOUNDATIONS section with the purple ALWAYS corner tag. Words from `vocabulary.json`.
+
+**Rule B — Save + Redo buttons on every module.** Every module footer has: ↺ Redo (two-tap armed) on the left, ✅ Mark Complete on the right. No exceptions.
+
+**Rule C — Lesson words as flashcard + quiz set (always).** The mechanism for Rule A. Every lesson has words; those words get flashcards + quiz.
+
+**Rule D — Every module must be interactive.** This is why we build in HTML instead of PDF. Every module requires Leo to DO something — drag, sort, match, tap-to-choose, build sentences from chips, play a mini-game, solve a puzzle. A text area alone is NOT interactive. A checklist alone is NOT interactive. Reading facts is NOT interactive. If Leo could complete the module by just reading and tapping "Mark Complete", it's not interactive enough.
+
+#### Save/restore rules
 
 **Rule 1** — Auto-save the done-key when a module finishes (do not wait for "Mark complete").
 **Rule 2** — Save quiz score to localStorage when the quiz ends: `saveScore(score, total, true, { ...extras })`.
@@ -110,6 +125,9 @@ Component-specific learner app patterns:
 - **grammar**: Chart & Samples tab → Level Up tab → Quiz tab → Master Quiz tab (four-tab model from design-decisions.md)
 - **reading**: Read tab (full text with paragraph reveals) → Comprehension tab (sequence/ordering activities) → Graphic Organizer tab
 - **writing**: Read Model tab → Plan tab (editable four-column chart) → Write tab (textarea with word count) → Edit Checklist tab
+- **mission**: Vocab Foundations → Be the Expert (interactive facts + quiz) → Think (sentence builders + opinion scales) → Pair & Share (dialogue builder + agree/disagree) → Final Quiz
+- **project**: Vocab Foundations → Be the Expert (interactive facts + quiz) → Choose & Research (interactive matching + notes) → Write Report (chip builders + word bank + text) → Present & Rubric (star-rating) → Now I Can (confidence scales + MCQ) → Final Quiz
+- **reader**: Vocab Foundations → Read Along (tap-to-gloss + comprehension gates) → Comprehension (sequence drag + T/F + MCQ) → Retell & Discuss (sentence ordering + matching + text) → Final Quiz
 
 ### Step 6 — Register the lesson
 
@@ -142,6 +160,9 @@ Update `docs/design-decisions.md` build status table.
 Report what was generated:
 - [ ] Teacher lesson HTML created at: `public/lessons/<id>.html`
 - [ ] Learner app HTML created at: `public/learn/<id>.html`
+- [ ] **Vocab Foundations modules** at top of learner app (Academic + Lesson Words flashcards + quiz)
+- [ ] **Every module has Save + Redo footer buttons** (Rule B)
+- [ ] **Every module is interactive** — no passive text-only modules (Rule D)
 - [ ] Registry entry added / already existed
 - [ ] Vocabulary words added (list them) / none needed
 - [ ] Grammar card added / none needed
@@ -152,6 +173,7 @@ Report what was generated:
 
 - Never modify `src/lib/supabase.ts`
 - All save/restore rules must be implemented — do not skip Rule 2 or Rule 3
+- All four universal LEEA app rules (A-D) must be implemented — do not skip Vocab Foundations, Save+Redo, or interactivity
 - Component tone must use the correct CSS variable block from `src/components/componentMeta.ts`
 - Teacher lesson and learner app must be paired by the component naming convention (teacher `grammar-1` ↔ learner `grammar-1-app`)
 - SAVE_PREFIX must be unique per lesson — never reuse another lesson's prefix

@@ -109,7 +109,7 @@ Reference: `public/lessons/ow-l4-u8-project.html` (~13 slides, single inline `<s
 - Final slide is **Mark Done** that writes to `leea.lessonProgress.v1`
 - Source pill on content slides citing LP page: `📖 LP pp.X-Y`
 
-### Leo learner app — 8 modules (UPDATED — was 6, now includes Vocab Foundations + interactive modules)
+### Leo learner app — 8 modules
 
 ```
 🎴 VOCAB FOUNDATIONS (always-on, purple ALWAYS tag)

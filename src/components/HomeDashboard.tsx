@@ -1,28 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getOpenAssignmentCount, readAssignments, type AssignmentMap } from "@/data/assignments";
 import { getLearnerAppProgress } from "@/data/learnerProgress";
 import { getDoneLessonCount, lessonProgressStorageKey, type LessonProgressMap } from "@/data/lessonProgress";
-import { getCurrentFocusLessons, learnerLessons, teacherLessons } from "@/data/lessons";
-import { currentFocus, grammarPoints, totalWords } from "@/data/registry";
+import { learnerLessons, teacherLessons } from "@/data/lessons";
+import { allGrammar, allWords } from "@/components/reference/ref-data";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
+import { useKnownWordIds } from "./useKnownWordIds";
 
 export function HomeDashboard() {
   const [progress, setProgress] = useState<LessonProgressMap>({});
   const [assignments, setAssignments] = useState<AssignmentMap>({});
   const [progressVersion, setProgressVersion] = useState(0);
-  const focusLessons = getCurrentFocusLessons(currentFocus.courseId, currentFocus.level, currentFocus.unit);
-  const focusComponents = getUniqueFocusComponents(focusLessons);
-  const doneCount = getDoneLessonCount(
-    focusComponents.map((lesson) => lesson.id),
-    progress
-  );
-  const progressPercent = focusComponents.length ? Math.round((doneCount / focusComponents.length) * 100) : 0;
   const openAssignmentCount = getOpenAssignmentCount(assignments);
+  const totalWords = allWords.length;
+  const grammarPoints = allGrammar.length;
+  const { knownWordSet } = useKnownWordIds();
+  const knownCount = knownWordSet.size;
+  const reviewCount = Math.max(0, totalWords - knownCount);
+  const totalLessonsDone = getDoneLessonCount(teacherLessons.map((lesson) => lesson.id), progress);
   const nextItem = getHomeNextItem(progress, assignments);
 
   useEffect(() => {
@@ -51,82 +50,40 @@ export function HomeDashboard() {
   progressVersion;
 
   return (
-    <div className="stack">
-      <section className="home-hero">
-        <div className="hero-card">
-          <div className="home-hero-head">
-            <div className="home-brand-mark" aria-hidden="true">
-              <Image alt="" height={118} src="/brand/leea_brand_mark.png" width={118} />
-            </div>
-            <div>
-              <span className="eyebrow">Active Session</span>
-              <h1>
-                Leo&apos;s <mark>Elite</mark> Education Academy
-              </h1>
-              <p>Teach, practice, and look up every word and grammar point from one consistent place.</p>
-            </div>
-          </div>
-
-          <div className="home-snapshot" aria-label="Academy overview">
-            <SnapshotItem label="Homework" value={String(openAssignmentCount)} detail={openAssignmentCount === 1 ? "open assignment" : "open assignments"} />
-            <SnapshotItem label="Unit Progress" value={`${progressPercent}%`} detail={`${doneCount}/${focusComponents.length} components`} />
-            <SnapshotItem label="Reference" value={String(totalWords + grammarPoints)} detail="cards ready" />
-          </div>
-
-          <div className="mode-grid">
-            <ModeCard title="Neritan" label="Teaching mode" text="Open teacher decks, assign Leo apps, and track progress." href="/teacher" />
-            <ModeCard title="Leo" label="Learning mode" text="Do assigned practice, complete review cards, and continue homework." href="/leo" learner />
-            <ModeCard title="Look It Up" label="Reference" text="Search vocabulary, grammar, I Know, and I Don't Know." href="/reference" />
-          </div>
+    <div className="design-home">
+      <section className="design-home-hero">
+        <div className="design-home-copy">
+          <span>{new Intl.DateTimeFormat("en", { weekday: "long", month: "long", day: "numeric" }).format(new Date())}</span>
+          <h1>Hey Leo —<br />ready to grow<br />today?</h1>
+          <p>You&apos;re {openAssignmentCount} {openAssignmentCount === 1 ? "assignment" : "assignments"} from a clean week. Pick up where you left off in Our World, Unit 8.</p>
+          <div className="design-home-pills"><b>{knownCount} words known</b><b>{reviewCount} to review</b></div>
         </div>
-
         <NextCard nextItem={nextItem} progress={progress} />
       </section>
 
-      <section className="focus-banner" aria-label="Current unit focus">
-        <div>
-          <span className="eyebrow">Current Focus</span>
-          <h2>
-            {currentFocus.course} - Level {currentFocus.level} - Unit {currentFocus.unit}
-          </h2>
-          <p>{currentFocus.title}</p>
-        </div>
-        <div className="focus-goal">
-          <span>{currentFocus.goalLabel}</span>
-          <strong>{currentFocus.targetDate}</strong>
-        </div>
-        <div className="focus-progress">
-          <div className="focus-progress-top">
-            <span>{doneCount} done</span>
-            <span>{focusComponents.length} {focusComponents.length === 1 ? "lesson" : "lessons"}</span>
-          </div>
-          <div className="focus-progress-bar" aria-label={`${progressPercent}% complete`}>
-            <span style={{ width: `${progressPercent}%` }} />
-          </div>
-          <small>{progressPercent}% complete</small>
+      <section className="design-home-role-links">
+        <Link href="/leo"><span className="role-link-icon">♙</span><div><small>Learner</small><h2>Leo&apos;s homework</h2><p>{openAssignmentCount} waiting · practice &amp; review</p></div><b>→</b></Link>
+        <Link href="/teacher"><span className="role-link-icon teacher">▣</span><div><small>Teacher</small><h2>Neritan&apos;s menu</h2><p>Assign, review &amp; track progress</p></div><b>→</b></Link>
+      </section>
+
+      <section className="design-home-stats" aria-label="Academy statistics">
+        <SnapshotItem label="Lessons done" value={String(totalLessonsDone)} detail="teacher lessons" />
+        <SnapshotItem label="Words known" value={String(knownCount)} detail="reference memory" />
+        <SnapshotItem label="To review" value={String(reviewCount)} detail="words still learning" />
+        <SnapshotItem label="Grammar points" value={String(grammarPoints)} detail="reference cards" />
+      </section>
+
+      <section className="design-subjects">
+        <header><h2>Subjects</h2><span>Pick a subject to jump into its courses</span></header>
+        <div className="design-subject-grid">
+          <Link className="subject-card active" href="/english"><div><span>Active</span><b>📖</b></div><h3>English</h3><p>Our World, Joyful Work &amp; Training Ground.</p><footer><span>3 courses</span><span>L4 · U8</span></footer></Link>
+          <article className="subject-card planned"><div><span>Soon</span><b>🔢</b></div><h3>Math</h3><p>Number sense, problem solving &amp; drills.</p><footer><span>Planned</span></footer></article>
+          <article className="subject-card planned"><div><span>Soon</span><b>🔬</b></div><h3>Science</h3><p>Inquiry, experiments &amp; the natural world.</p><footer><span>Planned</span></footer></article>
+          <article className="subject-card planned"><div><span>Soon</span><b>🏛️</b></div><h3>History</h3><p>People, places &amp; the story of the world.</p><footer><span>Planned</span></footer></article>
         </div>
       </section>
     </div>
   );
-}
-
-function getUniqueFocusComponents(items: Lesson[]) {
-  const components = new Map<string, Lesson>();
-
-  items.forEach((lesson) => {
-    const key = getComponentFamily(lesson.component);
-    const existing = components.get(key);
-
-    if (!existing || (existing.mode === "learner" && lesson.mode === "teacher")) {
-      components.set(key, lesson);
-    }
-  });
-
-  return Array.from(components.values());
-}
-
-function getComponentFamily(component: string) {
-  return component.replace(/-app$/, "");
 }
 
 function getHomeNextItem(progress: LessonProgressMap, assignments: AssignmentMap) {
@@ -184,10 +141,6 @@ function getCourseDisplay(course: Lesson["course"]) {
   return "Training Ground";
 }
 
-function getModeDisplay(mode: Lesson["mode"]) {
-  return mode === "learner" ? "Leo" : "Neritan";
-}
-
 function getNextProgress(lesson: Lesson, progress: LessonProgressMap) {
   if (lesson.mode === "learner") {
     const appProgress = getLearnerAppProgress(lesson.source);
@@ -210,37 +163,22 @@ function NextCard({ nextItem, progress }: { nextItem: { label: string; status: s
   return (
     <aside className={`next-card next-card-${meta.tone}`}>
       <div className="next-top">
-        <span>
-          <span aria-hidden="true" className="next-emoji">{meta.emoji}</span>
-          {nextItem.label}
-        </span>
-        <b>{nextItem.status}</b>
+        <span>Next up</span>
       </div>
       <div>
         <p>
-          {getCourseDisplay(nextItem.lesson.course)} - Level {nextItem.lesson.level} - Unit {nextItem.lesson.unit}
+          English · {getCourseDisplay(nextItem.lesson.course)} · L{nextItem.lesson.level} · Unit {nextItem.lesson.unit}
         </p>
         <h2>{nextItem.lesson.title}</h2>
-        <div className="next-meta-grid">
-          <span>
-            Mode
-            <strong>{getModeDisplay(nextItem.lesson.mode)}</strong>
-          </span>
-          <span>
-            Focus
-            <strong>{meta.label}</strong>
-          </span>
-          <span>
-            Progress
-            <strong>{nextProgress.label}</strong>
-          </span>
+        <div className="home-next-progress-label">
+          <span>Progress</span><strong>{nextProgress.label}</strong>
         </div>
         <div className="next-progress" aria-label={`${nextProgress.percent}% progress`}>
           <span style={{ width: `${nextProgress.percent}%` }} />
         </div>
       </div>
       <Link className="primary-button" href={`/lessons/${nextItem.lesson.id}`}>
-        {nextItem.lesson.mode === "learner" ? "Open Homework" : "Open Lesson"}
+        {nextProgress.percent > 0 ? "Keep going" : "Start now"}
       </Link>
     </aside>
   );

@@ -1,65 +1,43 @@
 "use client";
 
-/**
- * ReferenceSearch — the redesigned `/reference/search` surface.
- *
- * One query → words AND grammar mixed. Filter chips: All · Vocabulary ·
- * Academic · Junior High · Grammar. Per
- * design_handoff_leea_reference/Reference Search.dc.html.
- */
-
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Search as SearchIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useJapanesePreference } from "@/components/AppShell";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
+import type { GrammarEntry, WordEntry } from "@/data/reference-shapes";
+import sanseidoIndex from "../../../content/subjects/english/junior-high/sanseido-index.json";
 import { allGrammar, allWords } from "./ref-data";
 import { posPillClass } from "./pos-pill";
-import sanseidoIndex from "../../../content/subjects/english/junior-high/sanseido-index.json";
-import type { GrammarEntry, WordEntry } from "@/data/reference-shapes";
 
 type SanseidoEntry = { w: string; u: string };
+type ResultFilter = "all" | "vocabulary" | "academic" | "junior-high" | "grammar";
 
-type ResultFilter = "all" | "our-world" | "joyful-work" | "junior-high" | "grammar";
-
-type ResultWord = {
-  kind: "word";
-  entry: WordEntry;
-  score: number;
-};
-type ResultJh = {
-  kind: "junior-high";
-  word: string;
-  url: string;
-  score: number;
-};
-type ResultGrammar = {
-  kind: "grammar";
-  entry: GrammarEntry;
-  score: number;
-  matchedExample?: { en: string; jp: string };
-};
+type ResultWord = { kind: "word"; entry: WordEntry; score: number };
+type ResultJh = { kind: "junior-high"; word: string; url: string; score: number };
+type ResultGrammar = { kind: "grammar"; entry: GrammarEntry; score: number; matchedExample?: { en: string; jp: string } };
 type SearchResult = ResultWord | ResultJh | ResultGrammar;
 
-const FILTERS: Array<{ key: ResultFilter; label: string; hasDot?: boolean; dotColor?: string }> = [
+const FILTERS: Array<{ key: ResultFilter; label: string; dotColor?: string }> = [
   { key: "all", label: "All" },
-  { key: "our-world", label: "Our World", hasDot: true, dotColor: "var(--ref-course-ow)" },
-  { key: "joyful-work", label: "Joyful Work", hasDot: true, dotColor: "var(--ref-course-jw)" },
-  { key: "junior-high", label: "Junior High", hasDot: true, dotColor: "var(--ref-course-jh)" },
-  { key: "grammar", label: "Grammar", hasDot: true, dotColor: "var(--ref-accent)" }
+  { key: "vocabulary", label: "Vocabulary" },
+  { key: "academic", label: "Academic" },
+  { key: "junior-high", label: "Junior High" },
+  { key: "grammar", label: "Grammar", dotColor: "var(--ref-accent)" }
 ];
 
 const SANSEIDO_LIMIT_PER_QUERY = 20;
 
 export function ReferenceSearch() {
   const sanseidoItems = sanseidoIndex as SanseidoEntry[];
+  const searchParams = useSearchParams();
   const jp = useJapanesePreference();
   const { knownWordSet, setWordKnown } = useKnownWordIds();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [filter, setFilter] = useState<ResultFilter>("all");
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  /* ⌘K focus shortcut */
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -75,22 +53,19 @@ export function ReferenceSearch() {
   const trimmed = query.trim().toLowerCase();
 
   const results = useMemo<SearchResult[]>(() => {
-    if (trimmed.length === 0) return [];
+    if (!trimmed) return [];
     const out: SearchResult[] = [];
 
-    /* WORDS — vocabulary + academic + content/glossary */
     for (const entry of allWords) {
       const score = scoreWord(entry, trimmed);
       if (score > 0) out.push({ kind: "word", entry, score });
     }
 
-    /* GRAMMAR — title / rule / sample text */
     for (const entry of allGrammar) {
       const { score, matchedExample } = scoreGrammar(entry, trimmed);
       if (score > 0) out.push({ kind: "grammar", entry, score, matchedExample });
     }
 
-    /* SANSEIDO — limited to top N to avoid drowning results */
     let jhCount = 0;
     for (const item of sanseidoItems) {
       if (jhCount >= SANSEIDO_LIMIT_PER_QUERY) break;
@@ -111,30 +86,15 @@ export function ReferenceSearch() {
   }, [trimmed, sanseidoItems]);
 
   const counts = useMemo(() => {
-    const totals: Record<ResultFilter, number> = {
-      all: results.length,
-      "our-world": 0,
-      "joyful-work": 0,
-      "junior-high": 0,
-      grammar: 0
-    };
-    for (const r of results) {
-      if (r.kind === "word") {
-        /* A word entry can appear in multiple courses via its
-           sources[] — we count it once per filter it lights up,
-           so the same word can show under both Our World and
-           Joyful Work counts. */
-        const courses = new Set(r.entry.sources.map((s) => s.course));
-        if (courses.has("our-world")) totals["our-world"]++;
-        if (courses.has("joyful-work")) totals["joyful-work"]++;
-      } else if (r.kind === "junior-high") {
+    const totals: Record<ResultFilter, number> = { all: results.length, vocabulary: 0, academic: 0, "junior-high": 0, grammar: 0 };
+    for (const result of results) {
+      if (result.kind === "word") {
+        if (result.entry.type === "academic") totals.academic++;
+        else totals.vocabulary++;
+      } else if (result.kind === "junior-high") {
         totals["junior-high"]++;
-      } else if (r.kind === "grammar") {
+      } else {
         totals.grammar++;
-        /* Grammar points also have a source course — count them under
-           the matching course chip in addition to Grammar. */
-        if (r.entry.course === "our-world") totals["our-world"]++;
-        else if (r.entry.course === "joyful-work") totals["joyful-work"]++;
       }
     }
     return totals;
@@ -142,83 +102,112 @@ export function ReferenceSearch() {
 
   const filteredResults = useMemo(() => {
     if (filter === "all") return results;
-    return results.filter((r) => {
-      if (filter === "grammar") return r.kind === "grammar";
-      if (filter === "junior-high") return r.kind === "junior-high";
-      /* Course filters: keep words whose sources include this course,
-         OR grammar points whose course matches. Junior-High Sanseido
-         entries do NOT appear under Our World / Joyful Work. */
-      if (filter === "our-world") {
-        if (r.kind === "word") return r.entry.sources.some((s) => s.course === "our-world");
-        if (r.kind === "grammar") return r.entry.course === "our-world";
-        return false;
-      }
-      if (filter === "joyful-work") {
-        if (r.kind === "word") return r.entry.sources.some((s) => s.course === "joyful-work");
-        if (r.kind === "grammar") return r.entry.course === "joyful-work";
-        return false;
-      }
-      return true;
+    return results.filter((result) => {
+      if (filter === "vocabulary") return result.kind === "word" && result.entry.type !== "academic";
+      if (filter === "academic") return result.kind === "word" && result.entry.type === "academic";
+      if (filter === "junior-high") return result.kind === "junior-high";
+      return result.kind === "grammar";
     });
-  }, [results, filter]);
+  }, [filter, results]);
+
+  const bestMatches = filteredResults.filter((result) => result.score >= 60);
+  const alsoFound = filteredResults.filter((result) => result.score < 60);
 
   return (
-    <div className="refv2-shell">
-      <div className="refv2-search-field">
-        <SearchIcon size={18} className="refv2-search-icon" />
+    <div className="refv2-shell ref-search-design">
+      <div className="refv2-search-field ref-search-design-field">
+        <SearchIcon size={20} className="refv2-search-icon" />
         <input
           ref={inputRef}
           type="text"
-          placeholder="Search every word and grammar point…"
+          placeholder="Search words & grammar"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(event) => setQuery(event.target.value)}
           className="refv2-search-input"
           autoFocus
         />
       </div>
 
-      <div className="refv2-search-controls">
+      <div className="refv2-search-controls ref-search-design-controls">
         <div className="refv2-search-filters">
-          {FILTERS.map((f) => (
+          {FILTERS.map((item) => (
             <button
-              key={f.key}
+              key={item.key}
               type="button"
-              className={`refv2-filter${filter === f.key ? " is-active" : ""}`}
-              onClick={() => setFilter(f.key)}
+              className={`refv2-filter${filter === item.key ? " is-active" : ""}`}
+              onClick={() => setFilter(item.key)}
             >
-              {f.hasDot && f.dotColor && <span className="refv2-filter-dot" style={{ background: f.dotColor }} />}
-              <span>{f.label}</span>
-              <span className="refv2-filter-count">{counts[f.key]}</span>
+              {item.dotColor ? <span className="refv2-filter-dot" style={{ background: item.dotColor }} /> : null}
+              <span>{item.label}</span>
+              <span className="refv2-filter-count">{counts[item.key]}</span>
             </button>
           ))}
         </div>
-        {trimmed && (
+        {trimmed ? (
           <span className="refv2-search-meta">
             {filteredResults.length} result{filteredResults.length === 1 ? "" : "s"} · words &amp; grammar
           </span>
-        )}
+        ) : null}
       </div>
 
-      {trimmed.length === 0 ? (
-        <div className="refv2-search-empty">Type to search words, grammar, and the Junior-High Sanseido index.</div>
+      {!trimmed ? (
+        <div className="refv2-search-empty">Type to search LEEA vocabulary, academic words, grammar, and Sanseido junior-high links.</div>
       ) : filteredResults.length === 0 ? (
-        <div className="refv2-search-empty">No matches for &ldquo;{query}&rdquo;.</div>
+        <div className="refv2-search-empty">No matches for “{query}”.</div>
       ) : (
-        <div className="refv2-search-results">
-          <div className="refv2-eyebrow-mini">Best matches</div>
-          {filteredResults.map((r) => (
-            <ResultCard key={resultKey(r)} result={r} query={trimmed} jp={jp} knownSet={knownWordSet} setWordKnown={setWordKnown} />
-          ))}
+        <div className="ref-search-sections">
+          <ResultSection
+            title="Best matches"
+            results={bestMatches.length ? bestMatches : filteredResults}
+            query={trimmed}
+            jp={jp}
+            knownSet={knownWordSet}
+            setWordKnown={setWordKnown}
+          />
+          {alsoFound.length ? (
+            <ResultSection
+              title="Also found"
+              subtitle="matched in meanings & examples"
+              results={alsoFound}
+              query={trimmed}
+              jp={jp}
+              knownSet={knownWordSet}
+              setWordKnown={setWordKnown}
+            />
+          ) : null}
         </div>
       )}
     </div>
   );
 }
 
-function resultKey(r: SearchResult) {
-  if (r.kind === "word") return `w:${r.entry.id}`;
-  if (r.kind === "junior-high") return `jh:${r.word}:${r.url}`;
-  return `g:${r.entry.grammarId}`;
+function ResultSection({
+  title,
+  subtitle,
+  results,
+  query,
+  jp,
+  knownSet,
+  setWordKnown
+}: {
+  title: string;
+  subtitle?: string;
+  results: SearchResult[];
+  query: string;
+  jp: boolean;
+  knownSet: Set<string>;
+  setWordKnown: (id: string, known: boolean) => void;
+}) {
+  return (
+    <section className="ref-search-section">
+      <div className="refv2-eyebrow-mini">{title}{subtitle ? <span> · {subtitle}</span> : null}</div>
+      <div className="refv2-search-results">
+        {results.map((result) => (
+          <ResultCard key={resultKey(result)} result={result} query={query} jp={jp} knownSet={knownSet} setWordKnown={setWordKnown} />
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function ResultCard({
@@ -254,46 +243,43 @@ function WordResultCard({
 }) {
   const route = word.type === "academic" ? `/reference/academic/${word.id}` : `/reference/word/${word.id}`;
   const known = knownSet.has(word.id);
-  const isAcademic = word.type === "academic";
+
   return (
-    <article className="refv2-result">
+    <article className="refv2-result ref-search-card">
       <div className="refv2-result-head">
         <div className="refv2-result-titlebar">
-          <h3 className="refv2-result-title">
-            <Link href={route}>{highlightMatch(word.word, query)}</Link>
-          </h3>
+          <h3 className="refv2-result-title"><Link href={route}>{highlightMatch(word.word, query)}</Link></h3>
           <span className={`refv2-pos-pill ${posPillClass(word.pos)}`}>{word.pos}</span>
-          {isAcademic ? (
-            <span className="refv2-type-pill refv2-type-pill--academic">★ Academic</span>
-          ) : (
-            <span className="refv2-type-pill refv2-type-pill--vocab">Vocabulary</span>
-          )}
+          <span className={`refv2-type-pill refv2-type-pill--${word.type === "academic" ? "academic" : word.type}`}>
+            {word.type === "academic" ? "★ Academic" : typeLabel(word.type)}
+          </span>
         </div>
         <p className="refv2-result-def">{highlightMatchInText(word.definition, query)}</p>
-        {jp && word.jp.gloss && (
-          <p className="refv2-result-jp" lang="ja">
-            {word.jp.gloss}
-          </p>
-        )}
+        {jp && word.jp.gloss ? <p className="refv2-result-jp" lang="ja">{word.jp.gloss}</p> : null}
       </div>
-      <button
-        type="button"
-        className={`refv2-iknow${known ? " is-known" : ""}`}
-        onClick={() => setWordKnown(word.id, !known)}
-      >
+
+      <button type="button" className={`refv2-iknow${known ? " is-known" : ""}`} onClick={() => setWordKnown(word.id, !known)}>
         <span className="refv2-iknow-dot" />
         {known ? "Known" : "I know"}
       </button>
+
       <div className="refv2-open-in">
         <span className="refv2-open-in-label">Open in</span>
-        {word.sources.map((source, idx) => (
-          <Link key={`${source.tag}-${idx}`} href={route} className="refv2-source-chip">
+        {word.sources.map((source, index) => (
+          <Link key={`${source.tag}-${index}`} href={route} className="refv2-source-chip">
             <span className="refv2-course-dot" style={{ background: courseColor(source.course) }} />
             <span>{courseLabel(source.course)}</span>
             <span className="refv2-source-chip-tag">{source.tag}</span>
             <span className="refv2-source-chip-arrow">→</span>
           </Link>
         ))}
+        {hasSanseidoLikeSource(word) ? (
+          <span className="refv2-source-chip">
+            <span className="refv2-course-dot" style={{ background: courseColor("junior-high") }} />
+            <span>Sanseido</span>
+            <span className="refv2-source-chip-tag">linked</span>
+          </span>
+        ) : null}
       </div>
     </article>
   );
@@ -301,24 +287,21 @@ function WordResultCard({
 
 function JhResultCard({ entry, query, jp }: { entry: ResultJh; query: string; jp: boolean }) {
   return (
-    <article className="refv2-result refv2-result--jh">
+    <article className="refv2-result refv2-result--jh ref-search-card">
       <div className="refv2-result-head">
         <div className="refv2-result-titlebar">
           <h3 className="refv2-result-title">{highlightMatch(entry.word, query)}</h3>
           <span className="refv2-type-pill refv2-type-pill--jh">Junior High</span>
         </div>
-        <p className="refv2-result-def refv2-result-def--muted">Sanseido entry · meaning not yet imported. Opens the external Sanseido lookup.</p>
-        {jp && (
-          <p className="refv2-result-jp refv2-result-jp--muted" lang="ja">
-            三省堂で意味を確認
-          </p>
-        )}
+        <p className="refv2-result-def refv2-result-def--muted">A Sanseido junior-high dictionary link. Search-only; no LEEA card yet.</p>
+        {jp ? <p className="refv2-result-jp refv2-result-jp--muted" lang="ja">三省堂の外部辞書で意味を確認します。</p> : null}
       </div>
       <div className="refv2-open-in">
         <span className="refv2-open-in-label">Open in</span>
         <a className="refv2-source-chip" href={entry.url} target="_blank" rel="noreferrer">
           <span className="refv2-course-dot" style={{ background: courseColor("junior-high") }} />
           <span>Sanseido</span>
+          <span className="refv2-source-chip-tag">search-only</span>
           <span className="refv2-source-chip-arrow">↗</span>
         </a>
       </div>
@@ -326,20 +309,10 @@ function JhResultCard({ entry, query, jp }: { entry: ResultJh; query: string; jp
   );
 }
 
-function GrammarResultCard({
-  entry,
-  matched,
-  query,
-  jp
-}: {
-  entry: GrammarEntry;
-  matched?: { en: string; jp: string };
-  query: string;
-  jp: boolean;
-}) {
+function GrammarResultCard({ entry, matched, query, jp }: { entry: GrammarEntry; matched?: { en: string; jp: string }; query: string; jp: boolean }) {
   const route = `/reference/grammar/${entry.grammarId}`;
   return (
-    <Link href={route} className="refv2-result refv2-result--grammar">
+    <Link href={route} className="refv2-result refv2-result--grammar ref-search-card">
       <div className="refv2-result-head">
         <div className="refv2-result-titlebar">
           <h3 className="refv2-result-title">{highlightMatch(entry.title, query)}</h3>
@@ -347,24 +320,18 @@ function GrammarResultCard({
           <span className="refv2-tag-chip">{entry.tag}</span>
         </div>
         {matched ? (
-          <p className="refv2-result-def">
-            Matched in an example — &ldquo;{highlightMatchInText(matched.en, query)}&rdquo;
-          </p>
+          <p className="refv2-result-def">Matched in an example — “{highlightMatchInText(matched.en, query)}”</p>
         ) : (
           <p className="refv2-result-def">{entry.subtitle}</p>
         )}
-        {jp && matched?.jp && (
-          <p className="refv2-result-jp" lang="ja">
-            {matched.jp}
-          </p>
-        )}
+        {jp && matched?.jp ? <p className="refv2-result-jp" lang="ja">{matched.jp}</p> : null}
       </div>
       <span className="refv2-result-arrow">→</span>
       <div className="refv2-open-in">
         <span className="refv2-open-in-label">Open in</span>
         <span className="refv2-source-chip">
-          <span className="refv2-course-dot" style={{ background: courseColor("our-world") }} />
-          <span>Our World</span>
+          <span className="refv2-course-dot" style={{ background: courseColor(entry.course === "joyful-work" ? "joyful-work" : "our-world") }} />
+          <span>{courseLabel(entry.course === "joyful-work" ? "joyful-work" : "our-world")}</span>
           <span className="refv2-source-chip-tag">Grammar card</span>
         </span>
       </div>
@@ -372,14 +339,19 @@ function GrammarResultCard({
   );
 }
 
-/* ─── helpers ─── */
+function resultKey(result: SearchResult) {
+  if (result.kind === "word") return `w:${result.entry.id}`;
+  if (result.kind === "junior-high") return `jh:${result.word}:${result.url}`;
+  return `g:${result.entry.grammarId}`;
+}
+
 function scoreWord(entry: WordEntry, q: string): number {
-  const w = entry.word.toLowerCase();
-  if (w === q) return 100;
-  if (w.startsWith(q)) return 85;
-  if (w.includes(q)) return 60;
+  const word = entry.word.toLowerCase();
+  if (word === q) return 100;
+  if (word.startsWith(q)) return 85;
+  if (word.includes(q)) return 60;
   if (entry.definition.toLowerCase().includes(q)) return 35;
-  if (entry.examples.some((ex) => ex.toLowerCase().includes(q))) return 25;
+  if (entry.examples.some((example) => example.toLowerCase().includes(q))) return 25;
   return 0;
 }
 
@@ -389,42 +361,49 @@ function scoreGrammar(entry: GrammarEntry, q: string): { score: number; matchedE
   if (title.startsWith(q)) return { score: 80 };
   if (title.includes(q)) return { score: 65 };
   if (entry.subtitle.toLowerCase().includes(q)) return { score: 40 };
-  const sample = entry.chartAndSamples.samples.find((s) => s.en.toLowerCase().includes(q));
+  const sample = entry.chartAndSamples.samples.find((item) => item.en.toLowerCase().includes(q));
   if (sample) return { score: 30, matchedExample: sample };
   return { score: 0 };
 }
 
-function courseColor(course: "our-world" | "joyful-work" | "junior-high"): string {
+function courseColor(course: "our-world" | "joyful-work" | "junior-high") {
   if (course === "joyful-work") return "var(--ref-course-jw)";
   if (course === "junior-high") return "var(--ref-course-jh)";
   return "var(--ref-course-ow)";
 }
 
-function courseLabel(course: "our-world" | "joyful-work" | "junior-high"): string {
+function courseLabel(course: "our-world" | "joyful-work" | "junior-high") {
   if (course === "joyful-work") return "Joyful Work";
   if (course === "junior-high") return "Junior High";
   return "Our World";
 }
 
-/* Highlight a substring within a heading without rendering raw HTML. */
+function typeLabel(type: WordEntry["type"]) {
+  if (type === "content") return "Content";
+  if (type === "related") return "Related";
+  if (type === "glossary") return "Glossary";
+  if (type === "academic") return "Academic";
+  return "Vocabulary";
+}
+
+function hasSanseidoLikeSource(word: WordEntry) {
+  return word.sources.some((source) => source.course === "junior-high");
+}
+
 function highlightMatch(text: string, q: string) {
   if (!q) return text;
   const lower = text.toLowerCase();
-  const idx = lower.indexOf(q);
-  if (idx < 0) return text;
-  const before = text.slice(0, idx);
-  const hit = text.slice(idx, idx + q.length);
-  const after = text.slice(idx + q.length);
+  const index = lower.indexOf(q);
+  if (index < 0) return text;
   return (
     <>
-      {before}
-      <mark>{hit}</mark>
-      {after}
+      {text.slice(0, index)}
+      <mark>{text.slice(index, index + q.length)}</mark>
+      {text.slice(index + q.length)}
     </>
   );
 }
 
 function highlightMatchInText(text: string, q: string) {
-  if (!q) return text;
   return highlightMatch(text, q);
 }

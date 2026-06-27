@@ -1,5 +1,6 @@
+"use client";
+
 import Link from "next/link";
-import { Play, Sparkles } from "lucide-react";
 import type { LearnerAppProgress } from "@/data/learnerProgress";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
@@ -7,76 +8,68 @@ import { getComponentMeta } from "./componentMeta";
 type Item = { lesson: Lesson; progress: LearnerAppProgress };
 
 export function LeoHomeworkHero({ items }: { items: Item[] }) {
-  if (items.length === 0) {
+  const openItems = items.filter((item) => !item.progress.done);
+  const sorted = [...openItems].sort((a, b) => b.progress.completedModules - a.progress.completedModules);
+  const next = sorted[0];
+  const completedToday = items.filter((item) => item.progress.done).length;
+  const dateText = new Intl.DateTimeFormat("en", { weekday: "long", month: "long", day: "numeric" }).format(new Date());
+
+  if (!next) {
     return (
-      <section className="leo-hero-card leo-hero-empty" aria-label="Today's homework">
-        <div className="leo-hero-bubbles" aria-hidden="true">
-          <span>🎉</span><span>🌟</span><span>✨</span>
+      <section className="leo-design-hero leo-design-hero-empty" aria-label="Today's homework">
+        <div className="leo-design-copy">
+          <span>{dateText}</span>
+          <h1>Hi Leo —<br />all caught up!</h1>
+          <p>Nothing is waiting from Dad. Pick a world below for free play, or visit Reference.</p>
+          <div className="leo-today-meter"><b>Today</b><i className="done" /><i className="done" /><i className="done" /><strong>clean streak</strong></div>
         </div>
-        <h1>All caught up, Leo!</h1>
-        <p>No homework waiting. Pick anything below to practice, or visit Reference.</p>
-        <div className="leo-hero-actions">
-          <Link className="leo-hero-primary" href="/reference">
-            <Sparkles size={18} />
-            Open Reference
-          </Link>
-        </div>
+        <aside className="leo-pick-card">
+          <span>Free play</span>
+          <strong>Reference</strong>
+          <small>Words, grammar & review</small>
+          <Link href="/reference">Open Reference →</Link>
+        </aside>
       </section>
     );
   }
 
-  const sorted = [...items].sort((a, b) => Number(a.progress.done) - Number(b.progress.done));
-  const next = sorted[0];
-  const rest = sorted.slice(1);
   const meta = getComponentMeta(next.lesson.component);
-  const percent = next.progress.moduleCount
-    ? Math.round((next.progress.completedModules / next.progress.moduleCount) * 100)
-    : 0;
-  const startLabel = next.progress.completedModules > 0 ? "Keep Going" : "Start";
+  const percent = next.progress.moduleCount ? Math.round((next.progress.completedModules / next.progress.moduleCount) * 100) : 0;
+  const countText = openItems.length === 1 ? "1 thing" : `${openItems.length} things`;
 
   return (
-    <section
-      aria-label="Today's homework"
-      className={`leo-hero-card leo-hero-card-${meta.tone}`}
-    >
-      <div className="leo-hero-greeting">
-        <span aria-hidden="true">👋</span>
-        <span>Hi Leo</span>
-      </div>
-      <span className="leo-hero-eyebrow">
-        Today&apos;s homework
-        <span aria-hidden="true" className={`leo-hero-chip leo-hero-chip-${meta.tone}`}>
-          {meta.emoji} {meta.label}
-        </span>
-      </span>
-      <h1>{next.lesson.title}</h1>
-      <p>{next.lesson.subtitle}</p>
-
-      <div className="leo-hero-meter" aria-label={`${percent}% complete`}>
-        <div className="leo-hero-bar">
-          <span style={{ width: `${percent}%` }} />
-        </div>
-        <div className="leo-hero-meter-text">
-          <strong>{percent}%</strong>
-          <span>{next.progress.completedModules} / {next.progress.moduleCount} modules done</span>
+    <section className="leo-design-hero" aria-label="Today's homework">
+      <div className="leo-design-copy">
+        <span>{dateText}</span>
+        <h1>Hi Leo —<br />ready to play?</h1>
+        <p>Dad set you <b>{countText}</b> today. Let&apos;s pick up where you left off!</p>
+        <div className="leo-today-meter">
+          <b>Today</b>
+          {items.slice(0, 3).map((item) => <i className={item.progress.done ? "done" : ""} key={item.lesson.id} />)}
+          {Array.from({ length: Math.max(0, 3 - items.length) }).map((_, index) => <i key={`empty-${index}`} />)}
+          <strong>{completedToday} of {items.length} done</strong>
         </div>
       </div>
 
-      <div className="leo-hero-actions">
-        <Link className="leo-hero-primary" href={`/lessons/${next.lesson.id}`}>
-          <Play size={20} />
-          {startLabel}
-        </Link>
-        {rest.length > 0 && (
-          <a className="leo-hero-secondary" href={`#${getGroupHashFor(rest[0].lesson)}`}>
-            and {rest.length} more {rest.length === 1 ? "assignment" : "assignments"} →
-          </a>
-        )}
-      </div>
+      <aside className="leo-pick-card">
+        <span>Pick up where you left off</span>
+        <div className="leo-pick-title">
+          <i aria-hidden="true">{meta.emoji}</i>
+          <div>
+            <strong>{cleanLeoTitle(next.lesson.title)}</strong>
+            <small>Our World · {next.progress.moduleCount - next.progress.completedModules} modules left</small>
+          </div>
+        </div>
+        <div className="leo-pick-progress" aria-label={`${percent}% complete`}>
+          <i style={{ width: `${percent}%` }} />
+          <b>{next.progress.completedModules}/{next.progress.moduleCount}</b>
+        </div>
+        <Link href={`/lessons/${next.lesson.id}`}>{next.progress.completedModules > 0 ? "Keep going" : "Start"} →</Link>
+      </aside>
     </section>
   );
 }
 
-function getGroupHashFor(lesson: Lesson) {
-  return `${lesson.course}-l${lesson.level ?? "na"}-u${lesson.unit ?? "na"}`;
+function cleanLeoTitle(title: string) {
+  return title.replace(/^Unit 8 /, "").replace(/ App$/, "").replace(/ Leo's Test App$/, "");
 }

@@ -186,7 +186,7 @@ export function toAcademicEntry(item: VocabularyItem): AcademicEntry | null {
         explanationEN: entry.explanation,
         explanationJP: entry.jp
       })),
-      relatedLessonId: null
+      relatedLessonId: base.sources.find((source) => source.lessonId)?.lessonId ?? null
     }
   };
 }
@@ -223,6 +223,8 @@ export type GrammarEntry = {
   tag: string;
   title: string;
   subtitle: string;
+  jpTitle: string;
+  jpRule: string;
   course: "our-world" | "joyful-work" | "junior-high";
   level: number;
   unit: number;
@@ -241,7 +243,7 @@ export type GrammarEntry = {
 
   /* Tab 2: Level Up */
   levelUp: {
-    rules: Array<{ heading: string; body: string }>;
+    rules: Array<{ heading: string; body: string; jpHeading?: string; jpBody?: string }>;
     samples: GrammarSampleDisplay[];
   };
 
@@ -270,6 +272,8 @@ export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
     tag: point.tag,
     title: point.title,
     subtitle: point.rule,
+    jpTitle: point.japanese?.title ?? "",
+    jpRule: point.japanese?.rule ?? "",
     course:
       point.course === "joyful-work"
         ? "joyful-work"
@@ -281,7 +285,7 @@ export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
 
     chart: {
       legend: CHART_LEGEND,
-      patterns: []     // populated in PR97 from chart.intro_examples + workbookChart per grammar point
+      patterns: buildGrammarPatterns(point)
     },
 
     chartAndSamples: {
@@ -295,7 +299,9 @@ export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
     levelUp: {
       rules: (point.tab2_levelup?.rules ?? []).map((rule) => ({
         heading: rule.title,
-        body: rule.subtitle
+        body: rule.subtitle,
+        jpHeading: rule.jp_title,
+        jpBody: rule.jp_subtitle
       })),
       samples: (point.tab2_levelup?.mixed_samples ?? []).map((sample) => ({
         en: sample.text,
@@ -332,7 +338,41 @@ export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
       };
     }),
 
-    relatedLessonId: null,
+    relatedLessonId: point.lessonId ?? null,
     lessonStatus: point.lessonStatus === "live" ? "live" : "draft"
   };
+}
+
+function buildGrammarPatterns(point: GrammarPoint): GrammarEntry["chart"]["patterns"] {
+  const workbookRows = point.chart.workbookChart?.rows ?? [];
+  if (workbookRows.length) {
+    return workbookRows.map((row) => ({
+      title: point.chart.workbookChart?.title ?? point.chart.title,
+      chips: [
+        { key: "subject", text: row.person },
+        { key: "clause", text: row.who },
+        { key: "verb", text: row.description }
+      ]
+    }));
+  }
+
+  return point.chart.rows.slice(0, 4).map((row) => ({
+    title: row.form,
+    chips: row.pattern.split("+").map((part) => {
+      const text = part.trim();
+      const lower = text.toLowerCase();
+      const key = lower === "subject"
+        ? "subject"
+        : lower === "verb"
+          ? "verb"
+          : lower === "to" || lower === "for"
+            ? "prep"
+            : lower === "person"
+              ? "indirectObject"
+              : lower === "thing"
+                ? "directObject"
+                : "clause";
+      return { key, text };
+    })
+  }));
 }

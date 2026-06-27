@@ -13,16 +13,15 @@ export type ComponentMeta = {
   tone: ComponentTone;
 };
 
-// Single source of truth for component cue/label/tone. The cue is intentionally
-// text-safe because this repo is edited across Windows terminals and cloud tools.
+// Single source of truth for component cue/label/tone across Home, Leo, teacher, and course maps.
 export function getComponentMeta(component: string): ComponentMeta {
-  if (component.includes("opener")) return { emoji: "OP", label: "Opener", tone: "opener" };
-  if (component.includes("vocab")) return { emoji: "V", label: "Vocabulary", tone: "vocab" };
-  if (component.includes("grammar")) return { emoji: "G", label: "Grammar", tone: "grammar" };
-  if (component.includes("extra-reading")) return { emoji: "ER", label: "Extra Reading", tone: "reading" };
-  if (component.includes("reading")) return { emoji: "R", label: "Reading", tone: "reading" };
-  if (component.includes("writing")) return { emoji: "W", label: "Writing", tone: "writing" };
-  if (component.includes("song")) return { emoji: "S", label: "Song", tone: "song" };
-  if (component.includes("review")) return { emoji: "OK", label: "Review", tone: "review" };
-  return { emoji: "OP", label: "Activity", tone: "opener" };
+  if (component.includes("opener")) return { emoji: "💡", label: "Opener", tone: "opener" };
+  if (component.includes("vocab")) return { emoji: "🔤", label: "Vocabulary", tone: "vocab" };
+  if (component.includes("grammar")) return { emoji: "🧩", label: "Grammar", tone: "grammar" };
+  if (component.includes("extra-reading")) return { emoji: "📖", label: "Extra Reading", tone: "reading" };
+  if (component.includes("reading")) return { emoji: "📖", label: "Reading", tone: "reading" };
+  if (component.includes("writing")) return { emoji: "✍️", label: "Writing", tone: "writing" };
+  if (component.includes("song")) return { emoji: "🎵", label: "Song", tone: "song" };
+  if (component.includes("review")) return { emoji: "🏁", label: "Review", tone: "review" };
+  return { emoji: "💡", label: "Activity", tone: "opener" };
 }

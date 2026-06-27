@@ -46,6 +46,50 @@ Component keys: `project` (teacher) ↔ `project-app` (learner).
 
 ---
 
+## ⚠️ FOUR UNIVERSAL LEEA APP RULES (apply to EVERY learner app)
+
+These four rules are non-negotiable across every LEEA learner app — mission, project, reader, writing, vocab, grammar, song, opener. They exist because the whole point of building in HTML is interactivity.
+
+### Rule A — Vocab Foundations at the top of every app
+
+EVERY learner app opens with vocabulary modules before any content modules:
+
+1. **🎓 Academic Language** — flashcards (3D-flip, Practice + Quiz dual mode) for the unit's academic words. Quiz covers every word, 70% pass.
+2. **🌟 Lesson Words** — flashcards + quiz for the content/related words that appear in THIS lesson. ≥2 questions per word, 75% pass.
+
+Both sit in a **🎴 VOCAB FOUNDATIONS** section at the top of the home grid with the purple `ALWAYS` corner tag. Words come from `vocabulary.json`.
+
+### Rule B — Save + Redo buttons on every module
+
+Every module footer has two buttons:
+- **↺ Redo** (left) — two-tap armed pattern (first tap arms 3s, second tap clears saved state + re-inits)
+- **✅ Mark Complete** (right) — writes `m{N}-done` to localStorage
+
+No module is exempt.
+
+### Rule C — Lesson words as flashcard + quiz set (always)
+
+Every lesson introduces words. Those words get their own flashcard practice + quiz module using the canonical LEEA 3D-flip + `.qz-prog` / `.qz-card` / `.mcq-opts` pattern.
+
+### Rule D — Every module must be interactive
+
+**This is why we build in HTML instead of PDF.** Every module must have something Leo *does* — drag, sort, match, tap-to-choose, build sentences from chips, play a mini-game, solve a puzzle.
+
+- A text area alone is NOT interactive
+- A checklist alone is NOT interactive
+- Reading facts is NOT interactive
+
+Examples for project modules:
+- **Choose a topic** → After choosing, interactive matching (match hobby → what you need, sort hobbies by category), THEN note-taking
+- **Research notes** → Guided research with fill-in structured fields, drag facts into categories, sentence builders with word chips, THEN free text
+- **Write a report** → Sentence starters as chip builders (drag words into slots), word bank visible, THEN free text area
+- **Present & Rubric** → Self-evaluation as tap-to-rate (1-3 stars per criterion) with feedback per rating, NOT just a checklist
+- **Now I Can** → Tap-to-rate confidence scales + interactive review MCQs, NOT just checkboxes
+
+**The test:** if Leo could complete the module by just reading and tapping "Mark Complete", it's not interactive enough.
+
+---
+
 ## Locked patterns the skill must follow
 
 ### Teacher slideshow shell
@@ -65,24 +109,26 @@ Reference: `public/lessons/ow-l4-u8-project.html` (~13 slides, single inline `<s
 - Final slide is **Mark Done** that writes to `leea.lessonProgress.v1`
 - Source pill on content slides citing LP page: `📖 LP pp.X-Y`
 
-### Leo learner app — 6 modules (LOCKED via Unit 8 Project)
-
-Reference: `public/learn/ow-l4-u8-project.html` (~570 lines, 6 modules).
+### Leo learner app — 8 modules (UPDATED — was 6, now includes Vocab Foundations + interactive modules)
 
 ```
+🎴 VOCAB FOUNDATIONS (always-on, purple ALWAYS tag)
+  m1 — 🎓 Academic Language     (flashcards + quiz, 70% pass)
+  m2 — 🌟 Project Words         (flashcards + quiz on lesson content words, 75% pass)
+
 💎 EXPLORE
-  m1 — 💎 Be the Expert       (facts about the topic + 4Q quiz)
+  m3 — 💎 Be the Expert         (interactive facts + 4Q quiz on the Be the Expert topic)
 
 📋 PREPARE YOUR REPORT
-  m2 — 🔍 Choose & Research   (hobby/topic chips + text areas for notes)
-  m3 — 📝 Write Your Report   (3-part report: details, how, visuals — pulls notes from m2)
+  m4 — 🔍 Choose & Research     (interactive matching/sorting + guided note-taking)
+  m5 — 📝 Write Your Report     (sentence chip builders + word bank + free text)
 
 🗣️ PRESENT & REVIEW
-  m4 — 🗣️ Present & Rubric    (presentation steps + 4-item self-check rubric)
-  m5 — 🏆 Now I Can           (4-item unit checklist + 2 review questions)
+  m6 — 🗣️ Present & Rubric      (interactive star-rating per criterion + feedback)
+  m7 — 🏆 Now I Can             (confidence scales + interactive review MCQs)
 
 ⚽ FINAL
-  m6 — ⚽ Can Leo Score?      (8Q mixed quiz, 75% gate = need 6/8)
+  m8 — ⚽ Can Leo Score?        (8Q mixed quiz, 75% gate = need 6/8)
 ```
 
 ### App shell
@@ -99,14 +145,14 @@ Reference: `public/learn/ow-l4-u8-project.html` (~570 lines, 6 modules).
 ```text
 SAVE_PREFIX:     leea-<level>-<unit>-project-
 HOMEWORK_ID:     leo-<level>-<unit>-project
-MODULE_COUNT:    6
+MODULE_COUNT:    8
 Per-module done: m{N}-done                 (boolean)
 Per-module badge: badge state via badge-m{N}
-Quiz score:      m6-quiz-score
-m2 state:        m2-hobby, m2-details, m2-how, m2-visuals
-m3 state:        m3-details, m3-how, m3-visuals
-m4 state:        m4-chk (checklist items checked)
-m5 state:        m5-chk, m5-q1, m5-q2 (checklist + review answers)
+Quiz scores:     m1-quiz-score, m2-quiz-score, m8-quiz-score
+m4 state:        m4-hobby, m4-details, m4-how, m4-visuals
+m5 state:        m5-details, m5-how, m5-visuals
+m6 state:        m6-ratings (star ratings per criterion)
+m7 state:        m7-confidence, m7-q1, m7-q2
 ```
 
 ### All four LEEA save/restore rules
@@ -118,33 +164,46 @@ m5 state:        m5-chk, m5-q1, m5-q2 (checklist + review answers)
 
 ### Module details
 
-#### M1 — Be the Expert
+#### M1 — Academic Language (Vocab Foundations)
+- 3D-flip flashcards for all unit academic words (Practice + Quiz dual mode)
+- Quiz: ≥1 question per word, 70% pass
+- Tab completes when BOTH Practice visited + Quiz passed
+
+#### M2 — Project Words (Vocab Foundations)
+- 3D-flip flashcards for content words in this lesson (Practice + Quiz dual mode)
+- Quiz: ≥2 questions per word, 75% pass
+- Tab completes when BOTH Practice visited + Quiz passed
+
+#### M3 — Be the Expert
 - 4-6 fact cards about the topic (verbatim from LP Be the Expert sidebar)
+- **Interactive**: fact-matching game (match fact → topic), true/false with shake feedback, tap-to-reveal with scoring
 - 4-question MCQ quiz on the facts (75% pass)
 - Dad card with encouraging intro
 
-#### M2 — Choose & Research
+#### M4 — Choose & Research
 - Hobby/topic chips for selection (8-12 options from unit theme)
-- Text areas for: details about the topic, how to do it, what visuals to use
+- **Interactive BEFORE text areas**: after choosing, match hobby → what you need (drag/tap), sort research questions into categories, sentence builders with word chips
+- THEN structured text areas for: details, how to do it, visuals
 - Sentence frames from LP as prompts
 - Auto-saves all text on input
 
-#### M3 — Write Your Report
+#### M5 — Write Your Report
 - Three sections: Details, How, Visuals
-- Pulls saved notes from M2 as reference (read-only info card)
-- Text areas for each section with sentence starters from LP
+- Pulls saved notes from M4 as reference (read-only info card)
+- **Interactive**: sentence starters as chip builders (drag words into slots), word bank visible alongside text areas
 - Word count display
 
-#### M4 — Present & Rubric
+#### M6 — Present & Rubric
 - Presentation tips (step-by-step from LP)
-- 4-item self-check rubric matching LP Project Rubric criteria
-- Checklist with tap-to-check
+- **Interactive**: tap-to-rate 1-3 stars per criterion (Content, Language, Presentation, Collaboration) with feedback message per rating level
+- NOT just a checklist — star rating requires engagement
 
-#### M5 — Now I Can
-- 4-item unit goals checklist from LP Now I Can
-- 2 review questions (MCQ or open-ended)
+#### M7 — Now I Can
+- **Interactive**: tap-to-rate confidence scales (😕 → 🙂 → 😎) per unit goal
+- 2 review MCQ questions with green/red feedback
+- NOT just checkboxes
 
-#### M6 — Final Quiz
+#### M8 — Final Quiz
 - 8 mixed questions (MCQ) covering Be the Expert facts + unit content + project process
 - 75% gate (need 6/8 to pass)
 - Score saved to localStorage
@@ -217,12 +276,16 @@ Push to the current working branch. Do NOT create a PR.
 ## Output checklist
 
 - [ ] Teacher slideshow at `public/lessons/<lesson-id>.html` (~13 slides, project-blue accent)
-- [ ] Leo app at `public/learn/<lesson-id>.html` (6 modules, modal home-grid)
-- [ ] Be the Expert facts verbatim from LP
-- [ ] Prepare/Share prompts and sentence frames verbatim from LP
-- [ ] Project Rubric criteria from LP
-- [ ] Now I Can checklist from LP
-- [ ] All four save/restore rules (text areas, checklists, quiz)
+- [ ] Leo app at `public/learn/<lesson-id>.html` (8 modules, modal home-grid)
+- [ ] **Vocab Foundations** — m1 Academic + m2 Project Words (flashcards + quiz each)
+- [ ] Be the Expert with interactive fact games — NOT just reading cards
+- [ ] Choose & Research with interactive matching/sorting BEFORE text areas
+- [ ] Write Your Report with sentence chip builders + word bank
+- [ ] Present & Rubric with star-rating interaction — NOT just checklist
+- [ ] Now I Can with confidence scales + review MCQs — NOT just checkboxes
+- [ ] **Every module has Save + Redo footer buttons**
+- [ ] **Every module is interactive** (Rule D test passes)
+- [ ] All four save/restore rules
 - [ ] Teacher JSON + learner JSON registered
 - [ ] `src/data/lessons.ts` updated
 - [ ] `npm run validate:content` ✅

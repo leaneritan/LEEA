@@ -48,6 +48,44 @@ Component keys: `reader` (teacher) ↔ `reader-app` (learner).
 
 ---
 
+## ⚠️ FOUR UNIVERSAL LEEA APP RULES (apply to EVERY learner app)
+
+These four rules are non-negotiable across every LEEA learner app — mission, project, reader, writing, vocab, grammar, song, opener. They exist because the whole point of building in HTML is interactivity.
+
+### Rule A — Vocab Foundations at the top of every app
+
+EVERY learner app opens with vocabulary modules before any content modules:
+
+1. **🎓 Academic Language** — flashcards (3D-flip, Practice + Quiz dual mode) for the unit's academic words. Quiz covers every word, 70% pass.
+2. **🌟 Lesson Words** — flashcards + quiz for the content/related words that appear in THIS lesson (recycled from unit + reader-specific). ≥2 questions per word, 75% pass.
+
+Both sit in a **🎴 VOCAB FOUNDATIONS** section at the top of the home grid with the purple `ALWAYS` corner tag. Words come from `vocabulary.json`.
+
+### Rule B — Save + Redo buttons on every module
+
+Every module footer has two buttons:
+- **↺ Redo** (left) — two-tap armed pattern (first tap arms 3s, second tap clears saved state + re-inits)
+- **✅ Mark Complete** (right) — writes `m{N}-done` to localStorage
+
+No module is exempt.
+
+### Rule C — Lesson words as flashcard + quiz set (always)
+
+Every lesson introduces words. Those words get their own flashcard practice + quiz module using the canonical LEEA 3D-flip + `.qz-prog` / `.qz-card` / `.mcq-opts` pattern.
+
+### Rule D — Every module must be interactive
+
+**This is why we build in HTML instead of PDF.** Every module must have something Leo *does* — drag, sort, match, tap-to-choose, build sentences from chips, play a mini-game, solve a puzzle.
+
+Examples for reader modules:
+- **Read Along** → NOT just displaying text. Tap-to-gloss highlighted words, comprehension Qs gate next page unlock, signal-word highlighting
+- **Comprehension** → Sequence ordering with drag/tap-cycle, T/F with shake feedback, MCQ with green/red — all interactive
+- **Retell** → NOT just a text area. Sentence-ordering drag activity, story-event matching, THEN free retelling text area
+
+**The test:** if Leo could complete the module by just reading and tapping "Mark Complete", it's not interactive enough.
+
+---
+
 ## Locked patterns the skill must follow
 
 ### Teacher slideshow shell
@@ -67,21 +105,22 @@ Component keys: `reader` (teacher) ↔ `reader-app` (learner).
 - Teacher notes panel uses verbatim LP instructions
 - Source pill on content slides citing LP page: `📖 LP p.X`
 
-### Leo learner app — 5 modules (target shape)
+### Leo learner app — 7 modules (UPDATED — includes Vocab Foundations + interactive modules)
 
 ```
-📖 BEFORE YOU READ
-  m1 — 📖 Vocabulary Preview    (recycled unit words + reader-specific words, flashcards + quiz)
+🎴 VOCAB FOUNDATIONS (always-on, purple ALWAYS tag)
+  m1 — 🎓 Academic Language     (flashcards + quiz, 70% pass)
+  m2 — 🌟 Reader Words          (flashcards + quiz on reader vocabulary, 75% pass)
 
 📗 READ THE STORY
-  m2 — 📗 Read Along            (page-by-page story text with comprehension Qs between pages)
+  m3 — 📗 Read Along            (page-by-page with tap-to-gloss + comprehension Qs gating next page)
 
 📝 AFTER YOU READ
-  m3 — 📝 Comprehension         (sequence ordering, T/F, MCQ based on LP After You Read activities)
-  m4 — 💬 Retell & Discuss      (retelling frames + discussion prompts from LP)
+  m4 — 📝 Comprehension         (sequence ordering drag/tap-cycle, T/F with shake, MCQ)
+  m5 — 💬 Retell & Discuss      (sentence-ordering drag + story-event matching + free retelling)
 
 ⚽ FINAL
-  m5 — ⚽ Can Leo Score?        (6-8Q mixed quiz, 75% gate)
+  m6 — ⚽ Can Leo Score?        (8Q mixed quiz, 75% gate = need 6/8)
 ```
 
 ### App shell
@@ -98,13 +137,13 @@ Component keys: `reader` (teacher) ↔ `reader-app` (learner).
 ```text
 SAVE_PREFIX:     leea-<level>-<unit>-reader-
 HOMEWORK_ID:     leo-<level>-<unit>-reader
-MODULE_COUNT:    5
+MODULE_COUNT:    6
 Per-module done: m{N}-done                 (boolean)
 Per-module badge: badge state via badge-m{N}
-Quiz score:      m5-quiz-score
-m2 state:        m2-page (current page), m2-answers (comprehension answers)
-m3 state:        m3-answers (comprehension answers)
-m4 state:        m4-retell (text), m4-discuss (text)
+Quiz scores:     m1-quiz-score, m2-quiz-score, m6-quiz-score
+m3 state:        m3-page (current page), m3-answers (comprehension answers)
+m4 state:        m4-answers (comprehension answers)
+m5 state:        m5-order (sentence ordering), m5-retell (text)
 ```
 
 ### All four LEEA save/restore rules
@@ -116,33 +155,39 @@ m4 state:        m4-retell (text), m4-discuss (text)
 
 ### Module details
 
-#### M1 — Vocabulary Preview
-- Flashcards for key words that appear in the reader (recycled from unit vocab + any reader-specific words)
-- 4-question quiz on the vocabulary
+#### M1 — Academic Language (Vocab Foundations)
+- 3D-flip flashcards for all unit academic words (Practice + Quiz dual mode)
+- Quiz: ≥1 question per word, 70% pass
+- Tab completes when BOTH Practice visited + Quiz passed
+
+#### M2 — Reader Words (Vocab Foundations)
+- 3D-flip flashcards for words that appear in the reader (recycled from unit vocab + reader-specific)
+- Quiz: ≥2 questions per word, 75% pass
 - Words cross-referenced against `vocabulary.json` — use existing word data, don't create duplicates
 
-#### M2 — Read Along
+#### M3 — Read Along
 - Page-by-page story display (verbatim from the reader booklet)
-- Each page has a "Read" card with the text
-- Between pages: 1-2 comprehension check questions from LP "While You Read" prompts
-- Next page unlocks only after answering current page's question
+- **Interactive**: tap-to-gloss highlighted content words (yellow `.tag` highlights), comprehension Qs gate next page unlock
+- Between pages: 1-2 MCQ/T-F comprehension check questions from LP "While You Read" with green/red shake feedback
+- Next page stays locked (faded) until current page's question answered correctly
 - Tracks current page for restore
 
-#### M3 — Comprehension
+#### M4 — Comprehension
 - LP "After You Read" activities converted to interactive exercises:
-  - Sequence ordering (drag or tap-cycle to reorder story events)
-  - True/False questions about the story
-  - MCQ comprehension questions
+  - **Sequence ordering**: drag or tap-cycle to reorder story events (not just MCQ)
+  - **True/False**: with shake feedback on wrong answer
+  - **MCQ**: with green/red feedback
 - Mix of activity types based on what the LP provides
 
-#### M4 — Retell & Discuss
-- Retelling sentence frames from LP (fill-in-the-blank or free text)
-- Discussion prompts (open-ended text areas)
+#### M5 — Retell & Discuss
+- **Interactive first**: sentence-ordering drag activity (put retelling sentences in order), story-event → character matching game
+- THEN retelling sentence frames from LP (fill-in-the-blank with word bank)
+- THEN free text area for Leo's own retelling
 - Connection to unit theme ("How does this story connect to [unit theme]?")
 
-#### M5 — Final Quiz
-- 6-8 mixed questions (MCQ + T/F) covering story comprehension + vocabulary
-- 75% gate to pass
+#### M6 — Final Quiz
+- 8 mixed questions (MCQ + T/F) covering story comprehension + vocabulary
+- 75% gate (need 6/8 to pass)
 - Score saved to localStorage
 
 ### JavaScript safety contract
@@ -221,10 +266,14 @@ Push to the current working branch. Do NOT create a PR.
 ## Output checklist
 
 - [ ] Teacher slideshow at `public/lessons/<lesson-id>.html` (~12-16 slides, reader-purple accent)
-- [ ] Leo app at `public/learn/<lesson-id>.html` (5 modules, modal home-grid)
+- [ ] Leo app at `public/learn/<lesson-id>.html` (6 modules, modal home-grid)
+- [ ] **Vocab Foundations** — m1 Academic + m2 Reader Words (flashcards + quiz each)
 - [ ] Story text verbatim from reader booklet (if available)
-- [ ] Before/While/After reading activities from LP
-- [ ] Vocabulary recycled from unit `vocabulary.json`
+- [ ] Read Along with tap-to-gloss + comprehension Qs gating pages — interactive
+- [ ] Comprehension with drag/tap-cycle sequence ordering — NOT just MCQ
+- [ ] Retell with sentence-ordering drag + matching BEFORE free text
+- [ ] **Every module has Save + Redo footer buttons**
+- [ ] **Every module is interactive** (Rule D test passes)
 - [ ] All four save/restore rules (page tracking, text areas, quiz)
 - [ ] Teacher JSON + learner JSON registered
 - [ ] `src/data/lessons.ts` updated

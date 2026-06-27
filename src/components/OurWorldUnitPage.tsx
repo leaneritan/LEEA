@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { getLearnerAppProgress } from "@/data/learnerProgress";
+import { useEffect, useState } from "react";
+import { getLearnerAppProgress, hydrateLearnerProgressFromCloud } from "@/data/learnerProgress";
 import { getLessonGroups } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
@@ -73,7 +74,20 @@ function getLessonState(teacher: Lesson, learner: Lesson | undefined) {
 }
 
 export function OurWorldUnitPage() {
+  const [progressVersion, setProgressVersion] = useState(0);
   const group = getLessonGroups().find((item) => item.course === "our-world" && item.level === 4 && item.unit === 8);
+
+  useEffect(() => {
+    const currentGroup = getLessonGroups().find((item) => item.course === "our-world" && item.level === 4 && item.unit === 8);
+    if (!currentGroup) return;
+    const learners = currentGroup.lessons.filter((lesson) => lesson.mode === "learner");
+    void hydrateLearnerProgressFromCloud(learners).then((changed) => {
+      if (changed) setProgressVersion((value) => value + 1);
+    });
+  }, []);
+
+  progressVersion;
+
   const teacherLessons = group?.lessons.filter((lesson) => lesson.mode === "teacher") ?? [];
   const lessonRows = teacherLessons.map((teacher) => {
     const learner = group ? getLearnerForTeacher(teacher, group.lessons) : undefined;

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getOpenAssignmentCount, readAssignments, readAssignmentsFromCloud, type AssignmentMap } from "@/data/assignments";
-import { getLearnerAppProgress } from "@/data/learnerProgress";
+import { getLearnerAppProgress, hydrateLearnerProgressFromCloud } from "@/data/learnerProgress";
 import { getDoneLessonCount, lessonProgressStorageKey, type LessonProgressMap } from "@/data/lessonProgress";
 import { learnerLessons, teacherLessons } from "@/data/lessons";
 import { allGrammar, allWords } from "@/components/reference/ref-data";
@@ -36,6 +36,9 @@ export function HomeDashboard() {
       }
       setAssignments(readAssignments(learnerLessons));
       void readAssignmentsFromCloud(learnerLessons).then(setAssignments);
+      void hydrateLearnerProgressFromCloud(learnerLessons).then((changed) => {
+        if (changed) setProgressVersion((current) => current + 1);
+      });
       setProgressVersion((current) => current + 1);
     }
 

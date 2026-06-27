@@ -11,7 +11,7 @@ import {
   type AssignmentMap,
   type AssignmentRecord
 } from "@/data/assignments";
-import { getLearnerAppProgress, type LearnerAppProgress } from "@/data/learnerProgress";
+import { getLearnerAppProgress, hydrateLearnerProgressFromCloud, type LearnerAppProgress } from "@/data/learnerProgress";
 import {
   createLessonProgressRecord,
   getDoneLessonCount,
@@ -99,6 +99,9 @@ export function TeacherDashboard() {
     function refreshAll() {
       setAssignments(readAssignments(learnerLessons));
       void readAssignmentsFromCloud(learnerLessons).then(setAssignments);
+      void hydrateLearnerProgressFromCloud(learnerLessons).then((changed) => {
+        if (changed) setProgressVersion((value) => value + 1);
+      });
       setAssignmentsReady(true);
       setProgressVersion((value) => value + 1);
     }

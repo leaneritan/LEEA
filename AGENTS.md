@@ -14,6 +14,7 @@ Do not shorten the product heading to "Leo's Elite Academy".
 
 ## Golden Rules
 
+0. **Always create a PR after pushing.** Every `git push` must be followed by creating a pull request via the GitHub MCP tools. Do not skip this step. Do not update a merged/closed PR — create a new one.
 1. **Do not rush into UI.** Read source material and design the data first.
 2. **Source scan comes before lesson generation.** For each unit/topic, scan the lesson planner, book, or workbook before building.
 3. **Reference first.** Vocabulary cards, academic cards, glossary/support cards, and grammar charts are reusable reference objects.

@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   assignLesson as assignLessonRecord,
   readAssignments,
+  readAssignmentsFromCloud,
   unassignLesson as unassignLessonRecord,
   type AssignmentMap,
   type AssignmentRecord
@@ -97,6 +98,7 @@ export function TeacherDashboard() {
   useEffect(() => {
     function refreshAll() {
       setAssignments(readAssignments(learnerLessons));
+      void readAssignmentsFromCloud(learnerLessons).then(setAssignments);
       setAssignmentsReady(true);
       setProgressVersion((value) => value + 1);
     }

@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 8 · Reader — Hurum's Hobby</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+<script src="/components/charts.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rd:#7C3AED;--rdl:#F5F3FF;--rdd:#4C1D95;
+  --bl:#3B82F6;--bld:#1D4ED8;--bll:#EFF6FF;
+  --ye:#FDE047;--yed:#EAB308;
+  --gn:#16A34A;--gnl:#F0FDF4;
+  --red:#DC2626;--redl:#FEE2E2;
+  --am:#D97706;--aml:#FFFBEB;
+  --pu:#7C3AED;--pul:#F5F3FF;
+  --ink:#111111;--ink2:#374151;--ink3:#6B7280;
+  --paper:#FAFAF7;--surf:#FFFFFF;--bdr:#E5E7EB;
+  --fn:'Nunito',sans-serif;--fnh:'Oswald',sans-serif;
+}
+body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+.app-hdr{background:var(--ink);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.hdr-badge{background:var(--ye);color:var(--ink);font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;padding:2px 7px;border-radius:2px}
+.hdr-title{font-family:var(--fnh);font-size:.85rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hdr-unit{font-size:.7rem;font-weight:700;color:var(--rd)}
+
+.hero{background:linear-gradient(135deg,#4C1D95,#7C3AED);padding:20px 16px 16px;text-align:center}
+.hero-kick{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.7);margin-bottom:6px}
+.hero-title{font-family:var(--fnh);font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hero-title span{color:var(--ye)}
+.hero-sub{font-size:.78rem;color:rgba(255,255,255,.85);font-weight:600;margin-top:4px}
+.hero-em{font-size:1.3rem;margin-top:8px}
+.prog-wrap{background:rgba(0,0,0,.15);height:4px}
+.prog-fill{height:100%;background:var(--ye);transition:width .5s;width:0%}
+
+.hw-banner{background:var(--bll);border-bottom:2px solid var(--bl);padding:8px 16px;font-size:.8rem;font-weight:700;color:var(--bld);display:none;align-items:center;gap:8px}
+
+.home{max-width:680px;margin:0 auto;padding:16px 14px 80px}
+.sec-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--ink3);margin-bottom:10px;margin-top:20px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mod-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px 13px 11px;cursor:pointer;transition:all .2s;position:relative}
+.mod-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.1)}
+.mod-card.rd:hover{border-color:var(--rd)}
+.mod-card.quiz:hover{border-color:var(--yed)}
+.mod-card.always{border-color:#D8B4FE;background:linear-gradient(180deg,#fff,#FAF5FF)}
+.mod-card.always:hover{border-color:var(--pu)}
+.mod-icon{font-size:1.5rem;margin-bottom:5px}
+.mod-name{font-weight:800;font-size:.82rem;color:var(--ink);margin-bottom:2px}
+.mod-desc{font-size:.7rem;color:var(--ink3);font-weight:600;line-height:1.4}
+.mod-badge{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;margin-top:7px;display:inline-block}
+.badge-new{background:var(--paper);color:var(--ink3);border:1px solid var(--bdr)}
+.badge-done{background:#D1FAE5;color:var(--gn)}
+.badge-prog{background:var(--rdl);color:var(--rd)}
+.mod-tag{position:absolute;top:6px;right:6px;font-family:var(--fnh);font-size:.5rem;font-weight:700;letter-spacing:1px;color:var(--pu);background:var(--pul);padding:2px 6px;border-radius:2px}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;overflow-y:auto}
+.modal.open{display:block}
+.mbox{background:var(--surf);min-height:100vh;display:flex;flex-direction:column;max-width:680px;margin:0 auto}
+.mhd{padding:13px 14px;display:flex;align-items:center;gap:10px;color:#fff;position:sticky;top:0;z-index:10;flex-shrink:0}
+.mhd.pu{background:var(--pu)}.mhd.bl{background:var(--bl)}.mhd.gn{background:var(--gn)}.mhd.dk{background:var(--ink)}.mhd.ye{background:var(--yed)}.mhd.am{background:var(--am)}.mhd.rd{background:var(--rd)}
+.mbk{background:rgba(255,255,255,.15);border:none;color:#fff;font-family:var(--fn);font-size:.72rem;font-weight:800;padding:5px 11px;border-radius:20px;cursor:pointer;flex-shrink:0}
+.mhd-title{font-weight:900;font-size:1rem;flex:1;letter-spacing:.3px;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.mhd-num{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:1px;opacity:.7}
+.mhd-close{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mbody{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
+
+.dad-card{background:#EDE9FE;border:2px solid #C4B5FD;border-radius:4px;padding:11px 13px;font-size:.82rem;font-weight:700;color:#4C1D95;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.dad-icon{font-size:1.1rem;flex-shrink:0}
+.info-card{background:var(--bll);border:2px solid #BFDBFE;border-radius:4px;padding:10px 12px;font-size:.78rem;font-weight:600;color:var(--bld);line-height:1.5}
+.success-card{background:#D1FAE5;border:2px solid #6EE7B7;border-radius:4px;padding:11px 13px;font-size:.85rem;font-weight:700;color:#065F46;line-height:1.5}
+.section-h{font-family:var(--fnh);font-size:.75rem;font-weight:700;letter-spacing:2px;color:var(--ink);margin-top:6px;display:flex;align-items:center;gap:6px}
+.section-h::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.section-sub{font-size:.78rem;color:var(--ink3);font-weight:600;line-height:1.5;margin-top:-4px}
+
+/* FLASHCARD */
+.flashcard-wrap{perspective:1000px;min-height:240px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:240px;position:relative;transform-style:preserve-3d;transition:transform .5s ease}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;width:100%;min-height:240px;backface-visibility:hidden;border-radius:6px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;border:2px solid var(--bdr);background:var(--surf)}
+.fc-back{transform:rotateY(180deg);border-color:var(--pu);background:var(--pul)}
+.fc-emoji{font-size:2.5rem;line-height:1}
+.fc-word{font-family:var(--fnh);font-size:1.4rem;font-weight:700;color:var(--ink);letter-spacing:.5px}
+.fc-pos{font-size:.7rem;font-weight:700;color:var(--ink3);letter-spacing:1px;text-transform:uppercase}
+.fc-tap{font-size:.65rem;color:var(--ink3);font-weight:600;font-style:italic;margin-top:4px}
+.fc-def{font-size:.95rem;font-weight:700;color:var(--ink);line-height:1.4}
+.fc-sample{font-size:.82rem;font-weight:600;color:var(--ink2);line-height:1.55;font-style:italic}
+.fc-sample b{color:var(--pu);font-style:normal}
+.fc-jp{font-size:.85rem;color:var(--ink3);font-weight:600;display:none;font-family:'Hiragino Sans','Yu Gothic',sans-serif}
+.fc-jp.revealed{display:block;color:var(--pu)}
+.fc-jp-btn{background:none;border:1px dashed #d1d5db;border-radius:20px;padding:3px 12px;font-size:.68rem;font-weight:700;color:var(--ink3);cursor:pointer;font-family:var(--fn);margin-top:4px;transition:all .2s}
+.fc-jp-btn:hover{border-color:var(--pu);color:var(--pu)}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px}
+.fc-nav button{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:7px 14px;font-family:var(--fn);font-size:.78rem;font-weight:700;color:var(--ink2);cursor:pointer}
+.fc-nav button:hover{border-color:var(--pu);color:var(--pu)}
+.fc-counter{font-family:var(--fnh);font-size:.7rem;font-weight:700;color:var(--ink3);letter-spacing:1px}
+.mode-row{display:flex;gap:6px;margin-bottom:10px}
+.mode-btn{flex:1;background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:7px 8px;font-family:var(--fn);font-size:.74rem;font-weight:800;color:var(--ink3);cursor:pointer;transition:all .2s}
+.mode-btn.active{background:var(--pu);color:#fff;border-color:var(--pu)}
+
+/* QUIZ */
+.qz-prog{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.qz-num{font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--ink3)}
+.qz-sc{font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--rd)}
+.qz-bar{background:var(--bdr);height:4px;border-radius:2px;margin-bottom:12px;overflow:hidden}
+.qz-bar-fill{background:var(--rd);height:4px;border-radius:2px;width:0;transition:width .4s}
+.qz-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px}
+.qz-q{font-size:.88rem;font-weight:800;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.qz-tag{display:inline-block;font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1.5px;padding:2px 7px;border-radius:2px;margin-bottom:7px}
+.qz-tag.pu{background:var(--pul);color:var(--pu)}
+.qz-tag.rd{background:var(--rdl);color:var(--rd)}
+.qz-tag.gn{background:#D1FAE5;color:#065F46}
+.qz-res{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:18px;text-align:center}
+.qz-trophy{font-size:3rem;line-height:1;margin-bottom:6px}
+.qz-score-big{font-family:var(--fnh);font-size:1.8rem;font-weight:700;color:var(--ink);letter-spacing:1px}
+.qz-msg{font-size:.85rem;font-weight:700;color:var(--ink2);margin-top:6px;line-height:1.5}
+.qz-retry{background:var(--bl);color:#fff;border:none;border-radius:4px;padding:9px 18px;font-family:var(--fn);font-size:.82rem;font-weight:800;cursor:pointer;margin-top:12px}
+.qz-pass{background:var(--gn) !important}
+
+.mcq-opts{display:flex;flex-direction:column;gap:7px}
+.mcq-opt{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.82rem;font-weight:700;cursor:pointer;text-align:left;transition:all .2s}
+.mcq-opt:hover:not(:disabled){background:var(--paper);border-color:var(--rd)}
+.mcq-opt.ok{background:#D1FAE5;border-color:var(--gn);color:var(--gn)}
+.mcq-opt.bad{background:var(--redl);border-color:var(--red);color:var(--red);animation:shake .3s}
+.mcq-opt:disabled{cursor:not-allowed}
+.mcq-fb{font-size:.75rem;font-weight:700;padding:7px 11px;border-radius:4px;margin-top:7px;display:none;line-height:1.45}
+.mcq-fb.show{display:block}
+.mcq-fb.ok{background:#D1FAE5;color:#065F46}
+.mcq-fb.bad{background:var(--redl);color:var(--red)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* TRUE/FALSE */
+.fo-btns{display:flex;gap:8px}
+.fo-btn{flex:1;padding:9px 6px;border:2px solid var(--bdr);border-radius:4px;font-family:var(--fn);font-size:.82rem;font-weight:800;cursor:pointer;transition:all .2s;text-align:center;background:#fff}
+.fo-btn:hover:not(:disabled){background:var(--paper)}
+.fo-btn:disabled{opacity:.5;cursor:not-allowed}
+.fo-btn.ans-ok{background:#D1FAE5;border-color:var(--gn);color:var(--gn)}
+.fo-btn.ans-bad{background:var(--redl);border-color:var(--red);color:var(--red);animation:shake .3s}
+.fo-fb{font-size:.75rem;font-weight:700;margin-top:7px;padding:5px 9px;border-radius:4px;display:none}
+.fo-fb.show{display:block}
+.fo-fb.ok{background:#D1FAE5;color:#065F46}
+.fo-fb.bad{background:var(--redl);color:var(--red)}
+
+/* STORY */
+.story-page{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:16px;margin-bottom:10px;display:none}
+.story-page.show{display:block;animation:fadeIn .4s}
+.story-page.locked{opacity:.4;pointer-events:none}
+.story-page .page-num{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;color:var(--ink3);margin-bottom:6px}
+.story-page p{font-size:.88rem;font-weight:600;color:var(--ink);line-height:1.65}
+.story-page .gloss{background:var(--ye);padding:1px 5px;border-radius:3px;cursor:pointer;font-weight:800;position:relative}
+.gloss-tip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:.72rem;font-weight:700;padding:5px 10px;border-radius:6px;white-space:nowrap;z-index:5;margin-bottom:4px}
+.gloss-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--ink)}
+.gloss.tapped .gloss-tip{display:block}
+.page-gate{margin-top:10px;background:var(--rdl);border:2px solid #C4B5FD;border-radius:4px;padding:10px 12px}
+.page-gate.answered{background:#D1FAE5;border-color:#6EE7B7}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* SEQUENCE DRAG */
+.seq-item{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:10px 12px;margin-bottom:6px;cursor:grab;font-size:.82rem;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;transition:all .2s;user-select:none}
+.seq-item:active{cursor:grabbing}
+.seq-item .seq-num{background:var(--rd);color:#fff;font-family:var(--fnh);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+.seq-item.correct{background:#D1FAE5;border-color:var(--gn)}
+.seq-item.correct .seq-num{background:var(--gn)}
+
+/* INPUTS */
+.text-ta{width:100%;border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--ink);background:var(--surf);outline:none;resize:vertical;min-height:120px;line-height:1.55}
+.text-ta:focus{border-color:var(--rd)}
+
+/* SENTENCE ORDER DRAG */
+.sent-bank{display:flex;flex-direction:column;gap:6px}
+.sent-slot{background:var(--rdl);border:2px dashed #C4B5FD;border-radius:4px;padding:10px 12px;min-height:42px;font-size:.82rem;font-weight:700;color:var(--ink3);text-align:center;transition:all .2s}
+.sent-slot.filled{background:#D1FAE5;border:2px solid #6EE7B7;color:#065F46;text-align:left}
+.sent-chip{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:8px 12px;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s}
+.sent-chip:hover{border-color:var(--rd);color:var(--rd)}
+.sent-chip.used{opacity:.3;cursor:not-allowed}
+
+/* CHART HOST */
+.chart-host{margin:8px 0}
+
+/* MOD FOOT */
+.mod-foot{display:flex;gap:8px;padding:12px 14px;border-top:2px solid var(--bdr);background:var(--surf);margin-top:auto}
+.redo-btn{flex:1;background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px;font-family:var(--fn);font-size:.8rem;font-weight:800;color:var(--ink3);cursor:pointer;transition:all .15s}
+.redo-btn:hover{border-color:var(--red);color:var(--red)}
+.redo-btn.armed{background:var(--redl);border-color:var(--red);color:var(--red)}
+.done-btn{flex:1;background:var(--rd);border:2px solid var(--rd);border-radius:4px;padding:9px;font-family:var(--fn);font-size:.8rem;font-weight:800;color:#fff;cursor:pointer}
+.done-btn:hover{background:var(--rdd)}
+
+/* REVIEW */
+.rv-screen{display:none;max-width:680px;margin:0 auto;padding:18px 14px 80px}
+.rv-screen.show{display:block}
+.rv-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px;margin-bottom:11px}
+.rv-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:2px;color:var(--ink3);margin-bottom:4px}
+.rv-val{font-size:.95rem;font-weight:800;color:var(--ink);line-height:1.45}
+.rv-text{font-size:.82rem;font-weight:600;color:var(--ink2);line-height:1.55;white-space:pre-wrap}
+.rv-not-started{background:var(--paper);border:2px dashed var(--bdr);border-radius:4px;padding:24px;text-align:center;font-weight:700;color:var(--ink3);font-size:.85rem}
+
+.save-ind{display:none;background:var(--gn);color:#fff;font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:20px;align-self:flex-start;font-family:var(--fnh);letter-spacing:1px}
+.save-ind.show{display:inline-block;animation:popOut 2s ease-in}
+@keyframes popOut{0%{opacity:0;transform:translateY(-4px)}15%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0}}
+
+@media (max-width:480px){
+  .mod-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="app-hdr">
+  <div class="hdr-left">
+    <span class="hdr-badge">LEEA</span>
+    <span class="hdr-title">LEO</span>
+    <span class="hdr-unit">· U8 READER</span>
+  </div>
+  <button class="mbk" onclick="location.href='/'" title="Back to home">← Home</button>
+</header>
+
+<div class="hero">
+  <div class="hero-kick">OUR WORLD · LEVEL 4 · UNIT 8</div>
+  <div class="hero-title">📖 Reader: <span>Hurum's Hobby</span></div>
+  <div class="hero-sub">A biography · Reading Strategy: Ask Questions</div>
+  <div class="hero-em">🎴 📗 📝 💬 ⚽</div>
+</div>
+<div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
+<div id="hwBanner" class="hw-banner"></div>
+
+<!-- HOME GRID -->
+<div id="appRoot">
+<div class="home">
+
+  <div class="sec-lbl">🎴 VOCAB FOUNDATIONS</div>
+  <div class="mod-grid">
+    <div class="mod-card always" onclick="openModal('m1')">
+      <div class="mod-tag">ALWAYS</div>
+      <div class="mod-icon">🎓</div>
+      <div class="mod-name">Academic Language</div>
+      <div class="mod-desc">10 flashcards + quiz</div>
+      <div class="mod-badge badge-new" id="badge-m1">START HERE</div>
+    </div>
+    <div class="mod-card always" onclick="openModal('m2')">
+      <div class="mod-tag">ALWAYS</div>
+      <div class="mod-icon">🌟</div>
+      <div class="mod-name">Reader Words</div>
+      <div class="mod-desc">6 words + glossary quiz</div>
+      <div class="mod-badge badge-new" id="badge-m2">START HERE</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">📗 READ THE STORY</div>
+  <div class="mod-grid">
+    <div class="mod-card rd" onclick="openModal('m3')" style="grid-column:1/-1">
+      <div class="mod-icon">📗</div>
+      <div class="mod-name">Read Along</div>
+      <div class="mod-desc">Page-by-page with tap-to-gloss + comprehension gates</div>
+      <div class="mod-badge badge-new" id="badge-m3">NOT STARTED</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">📝 AFTER YOU READ</div>
+  <div class="mod-grid">
+    <div class="mod-card rd" onclick="openModal('m4')">
+      <div class="mod-icon">📝</div>
+      <div class="mod-name">Comprehension</div>
+      <div class="mod-desc">Sequence + T/F + MCQ</div>
+      <div class="mod-badge badge-new" id="badge-m4">NOT STARTED</div>
+    </div>
+    <div class="mod-card rd" onclick="openModal('m5')">
+      <div class="mod-icon">💬</div>
+      <div class="mod-name">Ask Questions Chart</div>
+      <div class="mod-desc">Two-column Q&A chart + retell</div>
+      <div class="mod-badge badge-new" id="badge-m5">NOT STARTED</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">⚽ FINAL</div>
+  <div class="mod-grid">
+    <div class="mod-card quiz" onclick="openModal('m6')" style="grid-column:1/-1">
+      <div class="mod-icon">⚽</div>
+      <div class="mod-name">Can Leo Score?</div>
+      <div class="mod-desc">8 questions — need 6/8 (75%)</div>
+      <div class="mod-badge badge-new" id="badge-m6">FINAL QUIZ</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- REVIEW MODE -->
+<div id="reviewScreen" class="rv-screen">
+  <header class="app-hdr" style="position:static;margin:-18px -14px 14px"><div class="hdr-left"><span class="hdr-badge">LEEA</span><span class="hdr-title">REVIEW · NERITAN</span></div></header>
+  <div id="reviewBody"></div>
+</div>
+
+<!-- MODAL M1 — Academic Language -->
+<div class="modal" id="m1"><div class="mbox">
+<div class="mhd pu"><div class="mhd-title">🎓 Academic Language</div><div class="mhd-num">1 / 6</div><button class="mhd-close" onclick="closeModal('m1')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: These 10 words help you talk about reading and texts. Flip each card, then take the quiz! Need 7/10 to pass.</div></div>
+  <div class="mode-row">
+    <button class="mode-btn active" id="m1-mode-fc" onclick="m1Mode('fc')">🎴 Flashcards</button>
+    <button class="mode-btn" id="m1-mode-qz" onclick="m1Mode('qz')">📝 Quiz</button>
+  </div>
+  <div id="m1-fc">
+    <div class="flashcard-wrap" onclick="m1Flip()">
+      <div class="flashcard" id="m1-card">
+        <div class="fc-face fc-front">
+          <div class="fc-emoji" id="m1-fc-em"></div>
+          <div class="fc-word" id="m1-fc-w"></div>
+          <div class="fc-pos">academic</div>
+          <div class="fc-tap">tap to flip</div>
+        </div>
+        <div class="fc-face fc-back">
+          <div class="fc-def" id="m1-fc-d"></div>
+          <div class="fc-sample" id="m1-fc-s"></div>
+          <button class="fc-jp-btn" onclick="event.stopPropagation();m1ShowJp()">🇯🇵 日本語</button>
+          <div class="fc-jp" id="m1-fc-jp"></div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav"><button onclick="m1Prev()">◀ Prev</button><div class="fc-counter" id="m1-fc-c">1 / 10</div><button onclick="m1Next()">Next ▶</button></div>
+  </div>
+  <div id="m1-qz" style="display:none">
+    <div class="qz-prog"><span class="qz-num" id="m1-qz-num">Question 1 of 10</span><span class="qz-sc" id="m1-qz-sc">Score: 0</span></div>
+    <div class="qz-bar"><div class="qz-bar-fill" id="m1-qz-bar"></div></div>
+    <div id="m1-qz-host"></div>
+    <div id="m1-qz-result" style="display:none"></div>
+  </div>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(1)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(1)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- MODAL M2 — Reader Words -->
+<div class="modal" id="m2"><div class="mbox">
+<div class="mhd pu"><div class="mhd-title">🌟 Reader Words</div><div class="mhd-num">2 / 6</div><button class="mhd-close" onclick="closeModal('m2')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: 6 vocabulary words + 15 glossary words from the biography. Flip the cards, then take the 18-question quiz. Need 14/18 to pass.</div></div>
+  <div class="mode-row">
+    <button class="mode-btn active" id="m2-mode-fc" onclick="m2Mode('fc')">🎴 Flashcards</button>
+    <button class="mode-btn" id="m2-mode-qz" onclick="m2Mode('qz')">📝 Quiz</button>
+  </div>
+  <div id="m2-fc">
+    <div class="flashcard-wrap" onclick="m2Flip()">
+      <div class="flashcard" id="m2-card">
+        <div class="fc-face fc-front">
+          <div class="fc-emoji" id="m2-fc-em"></div>
+          <div class="fc-word" id="m2-fc-w"></div>
+          <div class="fc-pos" id="m2-fc-pos">reader word</div>
+          <div class="fc-tap">tap to flip</div>
+        </div>
+        <div class="fc-face fc-back">
+          <div class="fc-def" id="m2-fc-d"></div>
+          <div class="fc-sample" id="m2-fc-s"></div>
+          <button class="fc-jp-btn" onclick="event.stopPropagation();m2ShowJp()">🇯🇵 日本語</button>
+          <div class="fc-jp" id="m2-fc-jp"></div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav"><button onclick="m2Prev()">◀ Prev</button><div class="fc-counter" id="m2-fc-c">1 / 21</div><button onclick="m2Next()">Next ▶</button></div>
+  </div>
+  <div id="m2-qz" style="display:none">
+    <div class="qz-prog"><span class="qz-num" id="m2-qz-num">Question 1 of 18</span><span class="qz-sc" id="m2-qz-sc">Score: 0</span></div>
+    <div class="qz-bar"><div class="qz-bar-fill" id="m2-qz-bar"></div></div>
+    <div id="m2-qz-host"></div>
+    <div id="m2-qz-result" style="display:none"></div>
+  </div>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(2)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(2)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- MODAL M3 — Read Along -->
+<div class="modal" id="m3"><div class="mbox">
+<div class="mhd rd"><div class="mhd-title">📗 Read Along</div><div class="mhd-num">3 / 6</div><button class="mhd-close" onclick="closeModal('m3')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Read the biography page by page. Tap highlighted words to see their meaning. Answer each comprehension question to unlock the next page!</div></div>
+  <div id="m3-pages"></div>
+  <div id="m3-complete" style="display:none">
+    <div class="success-card">📗 You finished reading the biography! Great job asking questions as you read.</div>
+  </div>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(3)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(3)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- MODAL M4 — Comprehension -->
+<div class="modal" id="m4"><div class="mbox">
+<div class="mhd am"><div class="mhd-title">📝 Comprehension</div><div class="mhd-num">4 / 6</div><button class="mhd-close" onclick="closeModal('m4')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Put events in order, answer True/False, then MCQ. Show what you understood!</div></div>
+
+  <div class="section-h">🔢 Story Events — Tap to put in order</div>
+  <div class="section-sub">Tap events in the correct order (1st → last)</div>
+  <div id="m4-seq-host"></div>
+  <div id="m4-seq-msg" style="display:none" class="success-card"></div>
+
+  <div class="section-h" style="margin-top:14px">✅ True or False?</div>
+  <div id="m4-tf-host"></div>
+
+  <div class="section-h" style="margin-top:14px">🎯 Comprehension Questions</div>
+  <div id="m4-mcq-host"></div>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(4)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(4)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- MODAL M5 — Ask Questions Chart + Retell -->
+<div class="modal" id="m5"><div class="mbox">
+<div class="mhd bl"><div class="mhd-title">💬 Ask Questions Chart</div><div class="mhd-num">5 / 6</div><button class="mhd-close" onclick="closeModal('m5')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: The reading strategy is Ask Questions. Fill in the two-column chart with questions and answers about the text. Then retell the story!</div></div>
+
+  <div class="section-h">❓ Question & Answer Chart</div>
+  <div class="section-sub">Write questions you asked while reading, then the answers you found.</div>
+  <div class="chart-host" id="m5-chart-host"></div>
+
+  <div class="section-h" style="margin-top:14px">🔤 Retell — Put sentences in order</div>
+  <div class="section-sub">Tap sentences in the correct order to retell the story.</div>
+  <div id="m5-retell-host"></div>
+  <div id="m5-retell-msg" style="display:none" class="success-card"></div>
+
+  <div class="section-h" style="margin-top:14px">✍️ Your Retelling</div>
+  <div class="section-sub">Retell the story in your own words. How did Hurum turn his hobby into a career?</div>
+  <textarea class="text-ta" id="m5-retell" placeholder="Write your retelling here..." oninput="m5SaveAll()"></textarea>
+
+  <div class="section-h" style="margin-top:14px">🌟 Connection</div>
+  <div class="section-sub">How does this story connect to the unit theme "That's Really Interesting!"?</div>
+  <textarea class="text-ta" id="m5-connect" placeholder="Write your connection here..." oninput="m5SaveAll()" style="min-height:80px"></textarea>
+  <span class="save-ind" id="m5-saved">SAVED</span>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(5)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(5)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- MODAL M6 — Can Leo Score? -->
+<div class="modal" id="m6"><div class="mbox">
+<div class="mhd dk"><div class="mhd-title">⚽ Can Leo Score?</div><div class="mhd-num">6 / 6 · FINAL QUIZ</div><button class="mhd-close" onclick="closeModal('m6')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: 8 questions! You need 6/8 (75%) to score the goal. Good luck!</div></div>
+  <div id="m6-quiz"></div>
+  <div id="m6-result" style="display:none"></div>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(6)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(6)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- SCRIPT -->
+<script>
+var SP = 'leea-4-8-reader-';
+var HW_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-8-reader';
+var REVIEW = new URLSearchParams(location.search).get('review') === '1';
+var MC = 6;
+
+function lSave(k, v) { try { localStorage.setItem(SP + k, JSON.stringify(v)); } catch(e) {} }
+function lLoad(k, fb) { try { var v = localStorage.getItem(SP + k); return v !== null ? JSON.parse(v) : (fb === undefined ? null : fb); } catch(e) { return fb === undefined ? null : fb; } }
+
+function saveScore(score, total, done, extra) {
+  var data = { score:score, total:total, pct:Math.round(score/total*100), done:done, timestamp:new Date().toISOString() };
+  if (extra) for (var x in extra) data[x] = extra[x];
+  lSave('score', data);
+  try { localStorage.setItem(HW_ID + '-score', JSON.stringify(data)); if (done) localStorage.setItem(HW_ID + '-done', JSON.stringify(true)); } catch(e) {}
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+  var fn = window['restore_' + id];
+  if (typeof fn === 'function') fn();
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+  updateProgress();
+}
+function updateBadge(id, state) {
+  var el = document.getElementById('badge-' + id);
+  if (!el) return;
+  var labels = {m1:'START HERE',m2:'START HERE',m3:'NOT STARTED',m4:'NOT STARTED',m5:'NOT STARTED',m6:'FINAL QUIZ'};
+  el.className = 'mod-badge ' + (state === 'done' ? 'badge-done' : state === 'prog' ? 'badge-prog' : 'badge-new');
+  el.textContent = state === 'done' ? '✅ DONE' : state === 'prog' ? '▶ IN PROGRESS' : (labels[id] || 'NOT STARTED');
+  lSave(id + '-state', state);
+}
+function getBadge(id) { return lLoad(id + '-state', 'new'); }
+function setDone(id) { updateBadge(id, 'done'); lSave(id + '-done', true); updateProgress(); }
+function setProg(id) { if (getBadge(id) !== 'done') updateBadge(id, 'prog'); }
+function updateProgress() {
+  var pf = document.getElementById('progFill');
+  if (!pf) return;
+  var done = 0;
+  for (var i = 1; i <= MC; i++) if (getBadge('m' + i) === 'done') done++;
+  pf.style.width = (done / MC * 100) + '%';
+}
+function showSaveInd(id) {
+  var el = document.getElementById(id + '-saved');
+  if (!el) return;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2000);
+}
+
+var redoTimers = {};
+function redoM(n) {
+  var btn = document.querySelector('#m' + n + ' .redo-btn');
+  if (btn.classList.contains('armed')) {
+    clearTimeout(redoTimers[n]);
+    btn.classList.remove('armed');
+    btn.textContent = '↺ Redo';
+    clearModuleState(n);
+    var fn = window['init_m' + n];
+    if (typeof fn === 'function') fn();
+    var rfn = window['restore_m' + n];
+    if (typeof rfn === 'function') rfn();
+    updateBadge('m' + n, 'new');
+  } else {
+    btn.classList.add('armed');
+    btn.textContent = 'Tap again to reset';
+    redoTimers[n] = setTimeout(function() { btn.classList.remove('armed'); btn.textContent = '↺ Redo'; }, 3000);
+  }
+}
+function clearModuleState(n) {
+  var keys = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k && k.indexOf(SP + 'm' + n) === 0) keys.push(k);
+  }
+  keys.forEach(function(k) { localStorage.removeItem(k); });
+  lSave('m' + n + '-done', false);
+  lSave('m' + n + '-state', 'new');
+}
+function doneM(n) { setDone('m' + n); closeModal('m' + n); }
+
+function esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ═══ M1 — ACADEMIC LANGUAGE ═══
+var ACAD = [
+  {emoji:'🔍',word:'analyze',def:'to look at something carefully to understand it',sample:'Analyze the photo and explain what you notice.',jp:'分析する'},
+  {emoji:'📝🔖',word:'clause',def:'a group of words with a subject and verb that is part of a sentence',sample:'who likes math is a clause.',jp:'節（せつ）'},
+  {emoji:'🔀',word:'contraction',def:'a shortened form of a word or words',sample:"She's is a contraction of she is.",jp:'短縮形'},
+  {emoji:'🎯',word:'accuracy',def:'being correct and without mistakes',sample:'Check your spelling for accuracy.',jp:'正確さ'},
+  {emoji:'➡️',word:'direct object',def:'the noun that receives the action of the verb',sample:'In "Show James the comic book," the comic book is the direct object.',jp:'直接目的語'},
+  {emoji:'↔️',word:'indirect object',def:'the noun that tells who or what receives the direct object',sample:'In "Show James the comic book," James is the indirect object.',jp:'間接目的語'},
+  {emoji:'🔢',word:'sequence',def:'the order in which things happen',sample:'Put the sequence of steps in order.',jp:'順序'},
+  {emoji:'🏷️',word:'definition',def:'the meaning of a word',sample:'The paragraph gives a definition of origami.',jp:'定義'},
+  {emoji:'📋',word:'description',def:'words that tell what something is like',sample:'Write a description of your hobby.',jp:'説明'},
+  {emoji:'🔎',word:'details',def:'small pieces of information',sample:'Add details about what you need for the hobby.',jp:'詳しい情報'}
+];
+
+var M1_QUIZ = [
+  {q:'To look at something carefully to understand it:',a:'analyze',d:['clause','accuracy']},
+  {q:'A group of words with a subject and verb, part of a sentence:',a:'clause',d:['contraction','sequence']},
+  {q:'A shortened form of a word or words:',a:'contraction',d:['clause','definition']},
+  {q:'Being correct and without mistakes:',a:'accuracy',d:['details','sequence']},
+  {q:'The noun that receives the action of the verb:',a:'direct object',d:['indirect object','clause']},
+  {q:'The noun that tells who or what receives the direct object:',a:'indirect object',d:['direct object','contraction']},
+  {q:'The order in which things happen:',a:'sequence',d:['definition','description']},
+  {q:'The meaning of a word:',a:'definition',d:['description','details']},
+  {q:'Words that tell what something is like:',a:'description',d:['definition','sequence']},
+  {q:'Small pieces of information:',a:'details',d:['accuracy','analyze']}
+];
+
+var m1Idx = 0, m1Flipped = false;
+function m1Mode(m) {
+  document.getElementById('m1-mode-fc').classList.toggle('active', m === 'fc');
+  document.getElementById('m1-mode-qz').classList.toggle('active', m === 'qz');
+  document.getElementById('m1-fc').style.display = m === 'fc' ? 'block' : 'none';
+  document.getElementById('m1-qz').style.display = m === 'qz' ? 'block' : 'none';
+  if (m === 'qz') m1QuizInit();
+  setProg('m1');
+}
+function m1Render() {
+  var c = ACAD[m1Idx];
+  document.getElementById('m1-fc-em').textContent = c.emoji;
+  document.getElementById('m1-fc-w').textContent = c.word;
+  document.getElementById('m1-fc-d').textContent = c.def;
+  document.getElementById('m1-fc-s').innerHTML = '<i>' + esc(c.sample) + '</i>';
+  document.getElementById('m1-fc-jp').textContent = c.jp;
+  document.getElementById('m1-fc-jp').classList.remove('revealed');
+  document.getElementById('m1-fc-c').textContent = (m1Idx+1) + ' / ' + ACAD.length;
+  document.getElementById('m1-card').classList.remove('flipped');
+  m1Flipped = false;
+}
+function m1Flip() { m1Flipped = !m1Flipped; document.getElementById('m1-card').classList.toggle('flipped', m1Flipped); }
+function m1ShowJp() { document.getElementById('m1-fc-jp').classList.add('revealed'); }
+function m1Prev() { m1Idx = (m1Idx - 1 + ACAD.length) % ACAD.length; m1Render(); }
+function m1Next() { m1Idx = (m1Idx + 1) % ACAD.length; m1Render(); }
+
+var m1QIdx = 0, m1QScore = 0;
+function m1QuizInit() {
+  if (lLoad('m1-quiz-done')) { m1QShowResult(lLoad('m1-quiz-score', 0)); return; }
+  m1QIdx = 0; m1QScore = 0;
+  document.getElementById('m1-qz-result').style.display = 'none';
+  m1QRender();
+}
+function m1QRender() {
+  var q = M1_QUIZ[m1QIdx];
+  var opts = [q.a].concat(q.d).sort(function() { return Math.random() - 0.5; });
+  document.getElementById('m1-qz-num').textContent = 'Question ' + (m1QIdx+1) + ' of ' + M1_QUIZ.length;
+  document.getElementById('m1-qz-sc').textContent = 'Score: ' + m1QScore;
+  document.getElementById('m1-qz-bar').style.width = (m1QIdx / M1_QUIZ.length * 100) + '%';
+  var h = '<div class="qz-card"><div class="qz-tag pu">ACADEMIC</div><div class="qz-q">' + q.q + '</div><div class="mcq-opts">';
+  opts.forEach(function(o) { h += '<button class="mcq-opt" data-opt="' + esc(o) + '" onclick="m1QAns(this)">' + esc(o) + '</button>'; });
+  h += '</div><div class="mcq-fb" id="m1-qfb"></div></div>';
+  document.getElementById('m1-qz-host').innerHTML = h;
+}
+function m1QAns(btn) {
+  var q = M1_QUIZ[m1QIdx];
+  var ok = btn.dataset.opt === q.a;
+  document.querySelectorAll('#m1-qz-host .mcq-opt').forEach(function(b) { b.disabled = true; });
+  if (ok) { btn.classList.add('ok'); m1QScore++; document.getElementById('m1-qfb').className = 'mcq-fb show ok'; document.getElementById('m1-qfb').textContent = '✓ Correct!'; }
+  else { btn.classList.add('bad'); document.querySelectorAll('#m1-qz-host .mcq-opt').forEach(function(b) { if (b.dataset.opt === q.a) b.classList.add('ok'); }); document.getElementById('m1-qfb').className = 'mcq-fb show bad'; document.getElementById('m1-qfb').textContent = '✕ Correct: ' + q.a; }
+  document.getElementById('m1-qz-sc').textContent = 'Score: ' + m1QScore;
+  setTimeout(function() { m1QIdx++; if (m1QIdx >= M1_QUIZ.length) m1QShowResult(m1QScore); else m1QRender(); }, 1300);
+}
+function m1QShowResult(score) {
+  var pass = score >= 7;
+  document.getElementById('m1-qz-host').innerHTML = '';
+  document.getElementById('m1-qz-bar').style.width = '100%';
+  document.getElementById('m1-qz-num').textContent = 'Quiz complete';
+  document.getElementById('m1-qz-sc').textContent = 'Final: ' + score + ' / 10';
+  document.getElementById('m1-qz-result').style.display = 'block';
+  document.getElementById('m1-qz-result').innerHTML = '<div class="qz-res"><div class="qz-trophy">' + (pass ? '🏆' : '📚') + '</div><div class="qz-score-big">' + score + ' / 10</div><div class="qz-msg">' + (pass ? 'Academic language mastered!' : 'Flip the cards again, then retry.') + '</div><button class="qz-retry' + (pass ? ' qz-pass' : '') + '" onclick="m1QRetry()">' + (pass ? 'Retry' : 'Try Again') + '</button></div>';
+  lSave('m1-quiz-score', score);
+  lSave('m1-quiz-done', true);
+  if (pass) setDone('m1');
+}
+function m1QRetry() { lSave('m1-quiz-done', false); m1QuizInit(); }
+function restore_m1() { m1Render(); }
+function init_m1() { m1Idx = 0; m1QIdx = 0; m1QScore = 0; }
+
+// ═══ M2 — READER WORDS (6 vocab + 15 glossary) ═══
+var RWORDS = [
+  {emoji:'😊',word:'enjoy',pos:'verb',def:'to like doing something',sample:'I <b>enjoy</b> playing soccer after school.',jp:'楽しむ',tag:'VOCAB'},
+  {emoji:'🧺',word:'collect',pos:'verb',def:'to get and keep things of the same kind',sample:'Hurum started to <b>collect</b> fossils as a child.',jp:'集める',tag:'VOCAB'},
+  {emoji:'🐞',word:'a bug',pos:'noun',def:'a small insect',sample:'He found a <b>bug</b> under a rock in the woods.',jp:'虫',tag:'VOCAB'},
+  {emoji:'🪨',word:'a fossil',pos:'noun',def:'the hard remains or mark of a plant or animal from long ago',sample:'This <b>fossil</b> is millions of years old.',jp:'化石',tag:'VOCAB'},
+  {emoji:'🧍',word:'alone',pos:'adjective',def:'without other people',sample:'He went to the forest <b>alone</b> to look for fossils.',jp:'ひとりで',tag:'VOCAB'},
+  {emoji:'🦖',word:'a dinosaur',pos:'noun',def:'a large animal that lived long ago',sample:'The <b>dinosaur</b> bones were found in Norway.',jp:'恐竜',tag:'VOCAB'},
+  {emoji:'👩‍⚕️',word:'carer',pos:'noun',def:'a person who looks after someone',sample:'His grandmother was his <b>carer</b> when he was young.',jp:'世話をする人',tag:'GLOSSARY'},
+  {emoji:'📅',word:'decades',pos:'noun',def:'periods of ten years',sample:'He has studied fossils for <b>decades</b>.',jp:'数十年',tag:'GLOSSARY'},
+  {emoji:'🚶',word:'escorted',pos:'verb',def:'went with someone to show them around',sample:'He <b>escorted</b> visitors through the museum.',jp:'案内した',tag:'GLOSSARY'},
+  {emoji:'🏛️',word:'exhibits',pos:'noun',def:'objects or collections shown to the public',sample:'The museum has many fossil <b>exhibits</b>.',jp:'展示品',tag:'GLOSSARY'},
+  {emoji:'🎤',word:'lectures',pos:'noun',def:'talks given to teach people about a topic',sample:'Professor Hurum gives <b>lectures</b> about fossils.',jp:'講演',tag:'GLOSSARY'},
+  {emoji:'🦴',word:'paleontologist',pos:'noun',def:'a scientist who studies fossils and ancient life',sample:'A <b>paleontologist</b> digs up fossils to learn about the past.',jp:'古生物学者',tag:'GLOSSARY'},
+  {emoji:'❤️',word:'passion',pos:'noun',def:'a very strong feeling of interest or love for something',sample:'Collecting fossils is his <b>passion</b>.',jp:'情熱',tag:'GLOSSARY'},
+  {emoji:'🧊',word:'preserved',pos:'adjective',def:'kept in good condition over time',sample:'The fossil was perfectly <b>preserved</b> in stone.',jp:'保存された',tag:'GLOSSARY'},
+  {emoji:'🐒',word:'primate',pos:'noun',def:'a type of mammal — monkeys, apes, and humans',sample:'Humans are a type of <b>primate</b>.',jp:'霊長類',tag:'GLOSSARY'},
+  {emoji:'🎓',word:'professor',pos:'noun',def:'a teacher at a university',sample:'He became a <b>professor</b> at the university in Oslo.',jp:'教授',tag:'GLOSSARY'},
+  {emoji:'✅',word:'proper',pos:'adjective',def:'correct or right',sample:'He learned the <b>proper</b> way to dig up fossils.',jp:'適切な',tag:'GLOSSARY'},
+  {emoji:'🔗',word:'related',pos:'adjective',def:'connected to something',sample:'Dinosaurs and birds are <b>related</b> animals.',jp:'関連した',tag:'GLOSSARY'},
+  {emoji:'👀',word:'showing',pos:'verb',def:'letting someone see something',sample:'He spent time <b>showing</b> the fossils to visitors.',jp:'見せる',tag:'GLOSSARY'},
+  {emoji:'🎭',word:'tours',pos:'noun',def:'trips around a place to see interesting things',sample:'He gave <b>tours</b> of the museum.',jp:'ツアー',tag:'GLOSSARY'},
+  {emoji:'🌲',word:'woods',pos:'noun',def:'an area of land covered with trees',sample:'He searched for fossils in the <b>woods</b> near his home.',jp:'森',tag:'GLOSSARY'}
+];
+
+var M2_QUIZ = [
+  {q:'Which word means "to like doing something"?',a:'enjoy',d:['collect','alone'],tag:'VOCAB'},
+  {q:'Which word means "to get and keep things of the same kind"?',a:'collect',d:['enjoy','preserved'],tag:'VOCAB'},
+  {q:'A small insect is called a:',a:'a bug',d:['a fossil','a dinosaur'],tag:'VOCAB'},
+  {q:'The hard remains of an ancient animal:',a:'a fossil',d:['a bug','a primate'],tag:'VOCAB'},
+  {q:'Without other people:',a:'alone',d:['related','proper'],tag:'VOCAB'},
+  {q:'A large animal that lived long ago:',a:'a dinosaur',d:['a primate','a bug'],tag:'VOCAB'},
+  {q:'A scientist who studies fossils:',a:'paleontologist',d:['professor','carer'],tag:'GLOSSARY'},
+  {q:'A very strong interest in something:',a:'passion',d:['lectures','tours'],tag:'GLOSSARY'},
+  {q:'Kept in good condition over time:',a:'preserved',d:['escorted','related'],tag:'GLOSSARY'},
+  {q:'A type of mammal — monkeys, apes, humans:',a:'primate',d:['dinosaur','fossil'],tag:'GLOSSARY'},
+  {q:'A teacher at a university:',a:'professor',d:['paleontologist','carer'],tag:'GLOSSARY'},
+  {q:'Objects shown to the public in a museum:',a:'exhibits',d:['lectures','tours'],tag:'GLOSSARY'},
+  {q:'Periods of ten years:',a:'decades',d:['tours','woods'],tag:'GLOSSARY'},
+  {q:'Talks given to teach people:',a:'lectures',d:['exhibits','decades'],tag:'GLOSSARY'},
+  {q:'Went with someone to show them around:',a:'escorted',d:['showing','preserved'],tag:'GLOSSARY'},
+  {q:'Correct or right:',a:'proper',d:['related','alone'],tag:'GLOSSARY'},
+  {q:'Connected to something:',a:'related',d:['proper','preserved'],tag:'GLOSSARY'},
+  {q:'An area of land covered with trees:',a:'woods',d:['tours','exhibits'],tag:'GLOSSARY'}
+];
+
+var m2Idx = 0, m2Flipped = false;
+function m2Mode(m) {
+  document.getElementById('m2-mode-fc').classList.toggle('active', m === 'fc');
+  document.getElementById('m2-mode-qz').classList.toggle('active', m === 'qz');
+  document.getElementById('m2-fc').style.display = m === 'fc' ? 'block' : 'none';
+  document.getElementById('m2-qz').style.display = m === 'qz' ? 'block' : 'none';
+  if (m === 'qz') m2QuizInit();
+  setProg('m2');
+}
+function m2Render() {
+  var c = RWORDS[m2Idx];
+  document.getElementById('m2-fc-em').textContent = c.emoji;
+  document.getElementById('m2-fc-w').textContent = c.word;
+  document.getElementById('m2-fc-pos').textContent = c.pos + ' · ' + c.tag;
+  document.getElementById('m2-fc-d').textContent = c.def;
+  document.getElementById('m2-fc-s').innerHTML = c.sample;
+  document.getElementById('m2-fc-jp').textContent = c.jp;
+  document.getElementById('m2-fc-jp').classList.remove('revealed');
+  document.getElementById('m2-fc-c').textContent = (m2Idx+1) + ' / ' + RWORDS.length;
+  document.getElementById('m2-card').classList.remove('flipped');
+  m2Flipped = false;
+}
+function m2Flip() { m2Flipped = !m2Flipped; document.getElementById('m2-card').classList.toggle('flipped', m2Flipped); }
+function m2ShowJp() { document.getElementById('m2-fc-jp').classList.add('revealed'); }
+function m2Prev() { m2Idx = (m2Idx - 1 + RWORDS.length) % RWORDS.length; m2Render(); }
+function m2Next() { m2Idx = (m2Idx + 1) % RWORDS.length; m2Render(); }
+
+var m2QIdx = 0, m2QScore = 0;
+function m2QuizInit() {
+  if (lLoad('m2-quiz-done')) { m2QShowResult(lLoad('m2-quiz-score', 0)); return; }
+  m2QIdx = 0; m2QScore = 0;
+  document.getElementById('m2-qz-result').style.display = 'none';
+  m2QRender();
+}
+function m2QRender() {
+  var q = M2_QUIZ[m2QIdx];
+  var opts = [q.a].concat(q.d).sort(function() { return Math.random() - 0.5; });
+  document.getElementById('m2-qz-num').textContent = 'Question ' + (m2QIdx+1) + ' of ' + M2_QUIZ.length;
+  document.getElementById('m2-qz-sc').textContent = 'Score: ' + m2QScore;
+  document.getElementById('m2-qz-bar').style.width = (m2QIdx / M2_QUIZ.length * 100) + '%';
+  var h = '<div class="qz-card"><div class="qz-tag ' + (q.tag === 'VOCAB' ? 'pu' : 'rd') + '">' + q.tag + '</div><div class="qz-q">' + q.q + '</div><div class="mcq-opts">';
+  opts.forEach(function(o) { h += '<button class="mcq-opt" data-opt="' + esc(o) + '" onclick="m2QAns(this)">' + esc(o) + '</button>'; });
+  h += '</div><div class="mcq-fb" id="m2-qfb"></div></div>';
+  document.getElementById('m2-qz-host').innerHTML = h;
+}
+function m2QAns(btn) {
+  var q = M2_QUIZ[m2QIdx];
+  var ok = btn.dataset.opt === q.a;
+  document.querySelectorAll('#m2-qz-host .mcq-opt').forEach(function(b) { b.disabled = true; });
+  if (ok) { btn.classList.add('ok'); m2QScore++; document.getElementById('m2-qfb').className = 'mcq-fb show ok'; document.getElementById('m2-qfb').textContent = '✓ Correct!'; }
+  else { btn.classList.add('bad'); document.querySelectorAll('#m2-qz-host .mcq-opt').forEach(function(b) { if (b.dataset.opt === q.a) b.classList.add('ok'); }); document.getElementById('m2-qfb').className = 'mcq-fb show bad'; document.getElementById('m2-qfb').textContent = '✕ Correct: ' + q.a; }
+  document.getElementById('m2-qz-sc').textContent = 'Score: ' + m2QScore;
+  setTimeout(function() { m2QIdx++; if (m2QIdx >= M2_QUIZ.length) m2QShowResult(m2QScore); else m2QRender(); }, 1300);
+}
+function m2QShowResult(score) {
+  var pass = score >= 14;
+  document.getElementById('m2-qz-host').innerHTML = '';
+  document.getElementById('m2-qz-bar').style.width = '100%';
+  document.getElementById('m2-qz-num').textContent = 'Quiz complete';
+  document.getElementById('m2-qz-sc').textContent = 'Final: ' + score + ' / ' + M2_QUIZ.length;
+  document.getElementById('m2-qz-result').style.display = 'block';
+  document.getElementById('m2-qz-result').innerHTML = '<div class="qz-res"><div class="qz-trophy">' + (pass ? '🏆' : '📚') + '</div><div class="qz-score-big">' + score + ' / ' + M2_QUIZ.length + '</div><div class="qz-msg">' + (pass ? 'Reader vocabulary mastered!' : 'Review the flashcards, then retry.') + '</div><button class="qz-retry' + (pass ? ' qz-pass' : '') + '" onclick="m2QRetry()">' + (pass ? 'Retry' : 'Try Again') + '</button></div>';
+  lSave('m2-quiz-score', score);
+  lSave('m2-quiz-done', true);
+  if (pass) setDone('m2');
+}
+function m2QRetry() { lSave('m2-quiz-done', false); m2QuizInit(); }
+function restore_m2() { m2Render(); }
+function init_m2() { m2Idx = 0; m2QIdx = 0; m2QScore = 0; }
+
+// ═══ M3 — READ ALONG ═══
+var PAGES = [
+  {num:'Pages 2-3',text:'Many kids have a hobby. Some kids leave their hobby behind as they grow up, but others turn their hobby into the work they do as an adult. <span class="gloss" onclick="tapGloss(this)">Jørn Hurum<span class="gloss-tip">The paleontologist this biography is about</span></span> turned his hobby of <span class="gloss" onclick="tapGloss(this)">collecting<span class="gloss-tip">🧺 to get and keep things of the same kind</span></span> <span class="gloss" onclick="tapGloss(this)">fossils<span class="gloss-tip">🪨 hard remains of ancient plants or animals</span></span> into a career that he loves.',
+   gate:{q:'What is the biography about?',opts:['A boy who collects fossils and becomes a paleontologist','A boy who plays soccer','A girl who likes dinosaurs'],ans:0}},
+  {num:'Pages 4-5',text:'When Jørn was a little boy, he lived in Oslo, Norway. He loved to explore the <span class="gloss" onclick="tapGloss(this)">woods<span class="gloss-tip">🌲 an area of land covered with trees</span></span> near his home. One day, he found a book about fossils. He read it <span class="gloss" onclick="tapGloss(this)">alone<span class="gloss-tip">🧍 without other people</span></span> in his room. That book changed his life! He started looking for fossils everywhere — under rocks, near rivers, and in the forest.',
+   gate:{q:'Who read a book about fossils?',opts:['Jørn Hurum','His teacher','His grandmother'],ans:0}},
+  {num:'Pages 6-7',text:'As a teenager, Jørn <span class="gloss" onclick="tapGloss(this)">collected<span class="gloss-tip">🧺 got and kept things of the same kind</span></span> many fossils. He found <span class="gloss" onclick="tapGloss(this)">bugs<span class="gloss-tip">🐞 small insects</span></span> <span class="gloss" onclick="tapGloss(this)">preserved<span class="gloss-tip">🧊 kept in good condition over time</span></span> in rock, ancient shells, and even parts of <span class="gloss" onclick="tapGloss(this)">dinosaur<span class="gloss-tip">🦖 a large animal that lived long ago</span></span> bones. His <span class="gloss" onclick="tapGloss(this)">passion<span class="gloss-tip">❤️ a very strong interest or love</span></span> for fossils grew stronger every year. He decided to study at a university to learn the <span class="gloss" onclick="tapGloss(this)">proper<span class="gloss-tip">✅ correct or right</span></span> way to find and study fossils.',
+   gate:{q:'What did Jørn find preserved in rock?',opts:['Bugs, shells, and dinosaur bones','Books and toys','Trees and flowers'],ans:0}},
+  {num:'Pages 8-9',text:'Jørn became a <span class="gloss" onclick="tapGloss(this)">paleontologist<span class="gloss-tip">🦴 a scientist who studies fossils</span></span> — a scientist who studies fossils and ancient life. He became a <span class="gloss" onclick="tapGloss(this)">professor<span class="gloss-tip">🎓 a teacher at a university</span></span> at the Natural History Museum in Oslo. For <span class="gloss" onclick="tapGloss(this)">decades<span class="gloss-tip">📅 periods of ten years</span></span>, he has <span class="gloss" onclick="tapGloss(this)">enjoyed<span class="gloss-tip">😊 liked doing something</span></span> his work. He gives <span class="gloss" onclick="tapGloss(this)">lectures<span class="gloss-tip">🎤 talks to teach people</span></span>, leads <span class="gloss" onclick="tapGloss(this)">tours<span class="gloss-tip">🎭 trips around a place</span></span>, and has <span class="gloss" onclick="tapGloss(this)">escorted<span class="gloss-tip">🚶 went with someone to show them around</span></span> thousands of visitors through the museum <span class="gloss" onclick="tapGloss(this)">exhibits<span class="gloss-tip">🏛️ objects shown to the public</span></span>, <span class="gloss" onclick="tapGloss(this)">showing<span class="gloss-tip">👀 letting someone see something</span></span> them fossils that are millions of years old. His biggest discovery was a <span class="gloss" onclick="tapGloss(this)">primate<span class="gloss-tip">🐒 a type of mammal — monkeys, apes, humans</span></span> fossil called "Ida" that is 47 million years old!',
+   gate:{q:'What was Hurum\'s biggest discovery?',opts:['A primate fossil called "Ida"','A dinosaur called "Rex"','A bug called "Buggy"'],ans:0}}
+];
+
+var m3Page = 0, m3Answered = {};
+function m3Build() {
+  var host = document.getElementById('m3-pages');
+  var h = '';
+  PAGES.forEach(function(p, i) {
+    var unlocked = i === 0 || m3Answered[i-1];
+    var answered = m3Answered[i];
+    h += '<div class="story-page' + (unlocked ? ' show' : '') + ((!unlocked) ? ' locked' : '') + '" id="m3-p' + i + '">';
+    h += '<div class="page-num">📄 ' + p.num + '</div>';
+    h += '<p>' + p.text + '</p>';
+    h += '<div class="page-gate' + (answered ? ' answered' : '') + '" id="m3-gate-' + i + '">';
+    h += '<div style="font-family:var(--fnh);font-size:.65rem;font-weight:700;letter-spacing:1.5px;color:var(--rd);margin-bottom:6px">❓ COMPREHENSION CHECK</div>';
+    h += '<div style="font-size:.82rem;font-weight:800;color:var(--ink);margin-bottom:8px">' + p.gate.q + '</div>';
+    h += '<div class="mcq-opts">';
+    p.gate.opts.forEach(function(o, j) {
+      h += '<button class="mcq-opt' + (answered && j === p.gate.ans ? ' ok' : '') + '" ' + (answered ? 'disabled' : '') + ' onclick="m3GateAns(' + i + ',' + j + ')">' + esc(o) + '</button>';
+    });
+    h += '</div>';
+    if (answered) h += '<div class="mcq-fb show ok" style="margin-top:7px">✓ Correct! Next page unlocked.</div>';
+    h += '</div></div>';
+  });
+  host.innerHTML = h;
+  if (Object.keys(m3Answered).length >= PAGES.length) {
+    document.getElementById('m3-complete').style.display = 'block';
+  }
+}
+function m3GateAns(page, choice) {
+  var p = PAGES[page];
+  var btns = document.querySelectorAll('#m3-gate-' + page + ' .mcq-opt');
+  if (choice === p.gate.ans) {
+    btns.forEach(function(b) { b.disabled = true; });
+    btns[choice].classList.add('ok');
+    m3Answered[page] = true;
+    lSave('m3-answers', m3Answered);
+    var gate = document.getElementById('m3-gate-' + page);
+    gate.classList.add('answered');
+    var fb = document.createElement('div');
+    fb.className = 'mcq-fb show ok';
+    fb.style.marginTop = '7px';
+    fb.textContent = '✓ Correct! Next page unlocked.';
+    gate.appendChild(fb);
+    if (page + 1 < PAGES.length) {
+      var next = document.getElementById('m3-p' + (page + 1));
+      next.classList.add('show');
+      next.classList.remove('locked');
+      setTimeout(function() { next.scrollIntoView({behavior:'smooth',block:'start'}); }, 300);
+    }
+    if (Object.keys(m3Answered).length >= PAGES.length) {
+      document.getElementById('m3-complete').style.display = 'block';
+      lSave('m3-done-auto', true);
+      setDone('m3');
+    }
+    setProg('m3');
+  } else {
+    btns[choice].classList.add('bad');
+    setTimeout(function() { btns[choice].classList.remove('bad'); }, 600);
+  }
+}
+function tapGloss(el) {
+  document.querySelectorAll('.gloss.tapped').forEach(function(g) { if (g !== el) g.classList.remove('tapped'); });
+  el.classList.toggle('tapped');
+}
+function restore_m3() {
+  m3Answered = lLoad('m3-answers', {});
+  m3Build();
+}
+function init_m3() {
+  m3Answered = {};
+  m3Build();
+  document.getElementById('m3-complete').style.display = 'none';
+}
+
+// ═══ M4 — COMPREHENSION ═══
+var SEQ_EVENTS = [
+  'Jørn found a book about fossils as a child in Oslo.',
+  'He started collecting fossils in the woods and forests.',
+  'As a teenager, he found bugs, shells, and dinosaur bones.',
+  'He decided to study at university to become a paleontologist.',
+  'He became a professor at the Natural History Museum in Oslo.',
+  'He discovered a 47-million-year-old primate fossil called "Ida".'
+];
+var m4SeqOrder = [], m4SeqDone = false;
+
+var M4_TF = [
+  {stmt:'Jørn Hurum grew up in London, England.',ans:false,fb:'He grew up in Oslo, Norway.'},
+  {stmt:'Hurum found a book about fossils that changed his life.',ans:true,fb:'Correct! The book inspired his passion.'},
+  {stmt:'Hurum became a professor at a university in America.',ans:false,fb:'He became a professor at the Natural History Museum in Oslo.'},
+  {stmt:'The fossil "Ida" is a primate that is 47 million years old.',ans:true,fb:'Correct! Ida is one of the most complete primate fossils ever found.'},
+  {stmt:'Hurum stopped collecting fossils when he grew up.',ans:false,fb:'He turned his hobby into his career!'},
+  {stmt:'A paleontologist studies fossils and ancient life.',ans:true,fb:'Correct! That is exactly what a paleontologist does.'}
+];
+var m4TfDone = {};
+
+var M4_MCQ = [
+  {q:'Where did Jørn Hurum grow up?',opts:['Oslo, Norway','London, England','Tokyo, Japan'],ans:0},
+  {q:'What inspired Jørn to start collecting fossils?',opts:['A book about fossils','A movie about dinosaurs','A trip to a museum'],ans:0},
+  {q:'What is a paleontologist?',opts:['A scientist who studies fossils','A teacher who teaches math','A doctor who helps animals'],ans:0},
+  {q:'What was special about the fossil called "Ida"?',opts:['It is a 47-million-year-old primate','It was the biggest dinosaur','It was found on the moon'],ans:0}
+];
+var m4McqDone = {};
+
+function m4BuildSeq() {
+  var shuffled = SEQ_EVENTS.map(function(e, i) { return {text:e, idx:i}; });
+  var saved = lLoad('m4-seq', null);
+  if (saved) {
+    m4SeqOrder = saved;
+    m4SeqDone = m4SeqOrder.length >= SEQ_EVENTS.length;
+  }
+  if (!m4SeqDone) {
+    for (var i = shuffled.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = shuffled[i]; shuffled[i] = shuffled[j]; shuffled[j] = t;
+    }
+  }
+  var host = document.getElementById('m4-seq-host');
+  var h = '';
+  if (m4SeqDone) {
+    SEQ_EVENTS.forEach(function(e, i) {
+      h += '<div class="seq-item correct"><span class="seq-num">' + (i+1) + '</span>' + esc(e) + '</div>';
+    });
+    document.getElementById('m4-seq-msg').style.display = 'block';
+    document.getElementById('m4-seq-msg').textContent = '🎉 Perfect order! You know the story well.';
+  } else {
+    h += '<div style="margin-bottom:8px">';
+    m4SeqOrder.forEach(function(idx, pos) {
+      h += '<div class="seq-item correct"><span class="seq-num">' + (pos+1) + '</span>' + esc(SEQ_EVENTS[idx]) + '</div>';
+    });
+    h += '</div>';
+    var nextIdx = m4SeqOrder.length;
+    shuffled.forEach(function(item) {
+      if (m4SeqOrder.indexOf(item.idx) >= 0) return;
+      h += '<div class="seq-item" onclick="m4TapSeq(' + item.idx + ')" style="cursor:pointer"><span class="seq-num" style="background:var(--ink3)">?</span>' + esc(item.text) + '</div>';
+    });
+  }
+  host.innerHTML = h;
+}
+function m4TapSeq(idx) {
+  var expected = m4SeqOrder.length;
+  if (idx === expected) {
+    m4SeqOrder.push(idx);
+    lSave('m4-seq', m4SeqOrder);
+    if (m4SeqOrder.length >= SEQ_EVENTS.length) m4SeqDone = true;
+    m4BuildSeq();
+    setProg('m4');
+  } else {
+    var items = document.querySelectorAll('#m4-seq-host .seq-item:not(.correct)');
+    items.forEach(function(el) {
+      if (el.onclick && el.textContent.indexOf(SEQ_EVENTS[idx]) >= 0) {
+        el.style.background = 'var(--redl)';
+        el.style.borderColor = 'var(--red)';
+        setTimeout(function() { el.style.background = ''; el.style.borderColor = ''; }, 500);
+      }
+    });
+  }
+}
+
+function m4BuildTf() {
+  var host = document.getElementById('m4-tf-host');
+  var h = '';
+  M4_TF.forEach(function(item, i) {
+    var done = m4TfDone[i] !== undefined;
+    h += '<div class="qz-card" style="margin-bottom:8px"><div class="qz-q" style="font-size:.82rem">' + esc(item.stmt) + '</div>';
+    h += '<div class="fo-btns">';
+    h += '<button class="fo-btn' + (done && m4TfDone[i] === true ? (item.ans ? ' ans-ok' : ' ans-bad') : '') + '" ' + (done ? 'disabled' : '') + ' onclick="m4AnsTf(' + i + ',true)">✅ True</button>';
+    h += '<button class="fo-btn' + (done && m4TfDone[i] === false ? (!item.ans ? ' ans-ok' : ' ans-bad') : '') + '" ' + (done ? 'disabled' : '') + ' onclick="m4AnsTf(' + i + ',false)">❌ False</button>';
+    h += '</div>';
+    if (done) h += '<div class="fo-fb show ' + (m4TfDone[i] === item.ans ? 'ok' : 'bad') + '">' + item.fb + '</div>';
+    h += '</div>';
+  });
+  host.innerHTML = h;
+}
+function m4AnsTf(i, val) {
+  m4TfDone[i] = val;
+  lSave('m4-tf', m4TfDone);
+  m4BuildTf();
+  setProg('m4');
+}
+
+function m4BuildMcq() {
+  var host = document.getElementById('m4-mcq-host');
+  var h = '';
+  M4_MCQ.forEach(function(q, i) {
+    var done = m4McqDone[i] !== undefined;
+    h += '<div class="qz-card" style="margin-bottom:8px"><div class="qz-tag rd">COMPREHENSION</div><div class="qz-q">' + q.q + '</div><div class="mcq-opts">';
+    q.opts.forEach(function(o, j) {
+      var cls = '';
+      if (done && j === q.ans) cls = ' ok';
+      if (done && m4McqDone[i] !== q.ans && j === m4McqDone[i]) cls = ' bad';
+      h += '<button class="mcq-opt' + cls + '" ' + (done ? 'disabled' : '') + ' onclick="m4AnsMcq(' + i + ',' + j + ')">' + String.fromCharCode(65+j) + ') ' + esc(o) + '</button>';
+    });
+    h += '</div></div>';
+  });
+  host.innerHTML = h;
+}
+function m4AnsMcq(i, j) {
+  m4McqDone[i] = j;
+  lSave('m4-mcq', m4McqDone);
+  m4BuildMcq();
+  var allDone = Object.keys(m4McqDone).length >= M4_MCQ.length && m4SeqDone && Object.keys(m4TfDone).length >= M4_TF.length;
+  if (allDone) { lSave('m4-done-auto', true); setDone('m4'); }
+  setProg('m4');
+}
+
+function restore_m4() {
+  m4SeqOrder = lLoad('m4-seq', []);
+  m4SeqDone = m4SeqOrder.length >= SEQ_EVENTS.length;
+  m4TfDone = lLoad('m4-tf', {});
+  m4McqDone = lLoad('m4-mcq', {});
+  m4BuildSeq();
+  m4BuildTf();
+  m4BuildMcq();
+}
+function init_m4() {
+  m4SeqOrder = []; m4SeqDone = false; m4TfDone = {}; m4McqDone = {};
+  document.getElementById('m4-seq-msg').style.display = 'none';
+  m4BuildSeq(); m4BuildTf(); m4BuildMcq();
+}
+
+// ═══ M5 — ASK QUESTIONS CHART + RETELL ═══
+var RETELL_SENTENCES = [
+  'Jørn Hurum grew up in Oslo, Norway and loved exploring the woods.',
+  'He found a book about fossils and started collecting them.',
+  'As a teenager, he collected bugs, shells, and dinosaur bones.',
+  'He studied at university to become a paleontologist.',
+  'He became a professor at the Natural History Museum in Oslo.',
+  'He discovered the primate fossil "Ida" and has enjoyed his career for decades.'
+];
+var m5RetellOrder = [];
+
+function m5BuildChart() {
+  var host = document.getElementById('m5-chart-host');
+  host.innerHTML = window.buildNColChart({
+    id: 'qa-chart',
+    mode: 'fill',
+    title: '❓ Ask Questions — Reading Strategy',
+    columns: ['Question', 'Answer'],
+    rowCount: 5,
+    storageKey: SP + 'm5-chart'
+  });
+  setProg('m5');
+}
+
+function m5BuildRetell() {
+  var host = document.getElementById('m5-retell-host');
+  var saved = lLoad('m5-retell-order', []);
+  m5RetellOrder = saved;
+  var done = m5RetellOrder.length >= RETELL_SENTENCES.length;
+
+  var shuffled = RETELL_SENTENCES.map(function(s, i) { return {text:s, idx:i}; });
+  if (!done) {
+    for (var i = shuffled.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = shuffled[i]; shuffled[i] = shuffled[j]; shuffled[j] = t;
+    }
+  }
+
+  var h = '';
+  if (done) {
+    RETELL_SENTENCES.forEach(function(s, i) {
+      h += '<div class="seq-item correct"><span class="seq-num">' + (i+1) + '</span>' + esc(s) + '</div>';
+    });
+    document.getElementById('m5-retell-msg').style.display = 'block';
+    document.getElementById('m5-retell-msg').textContent = '🎉 Great retelling! You put the story in order.';
+  } else {
+    h += '<div style="margin-bottom:8px">';
+    m5RetellOrder.forEach(function(idx, pos) {
+      h += '<div class="seq-item correct"><span class="seq-num">' + (pos+1) + '</span>' + esc(RETELL_SENTENCES[idx]) + '</div>';
+    });
+    h += '</div>';
+    shuffled.forEach(function(item) {
+      if (m5RetellOrder.indexOf(item.idx) >= 0) return;
+      h += '<div class="seq-item" onclick="m5TapRetell(' + item.idx + ')" style="cursor:pointer"><span class="seq-num" style="background:var(--ink3)">?</span>' + esc(item.text) + '</div>';
+    });
+  }
+  host.innerHTML = h;
+}
+function m5TapRetell(idx) {
+  var expected = m5RetellOrder.length;
+  if (idx === expected) {
+    m5RetellOrder.push(idx);
+    lSave('m5-retell-order', m5RetellOrder);
+    m5BuildRetell();
+    setProg('m5');
+  } else {
+    var items = document.querySelectorAll('#m5-retell-host .seq-item:not(.correct)');
+    items.forEach(function(el) {
+      if (el.textContent.indexOf(RETELL_SENTENCES[idx]) >= 0) {
+        el.style.background = 'var(--redl)';
+        el.style.borderColor = 'var(--red)';
+        setTimeout(function() { el.style.background = ''; el.style.borderColor = ''; }, 500);
+      }
+    });
+  }
+}
+
+function m5SaveAll() {
+  lSave('m5-retell-text', document.getElementById('m5-retell').value);
+  lSave('m5-connect', document.getElementById('m5-connect').value);
+  setProg('m5');
+  showSaveInd('m5');
+}
+
+function restore_m5() {
+  m5BuildChart();
+  m5BuildRetell();
+  document.getElementById('m5-retell').value = lLoad('m5-retell-text', '');
+  document.getElementById('m5-connect').value = lLoad('m5-connect', '');
+}
+function init_m5() {
+  m5RetellOrder = [];
+  document.getElementById('m5-retell-msg').style.display = 'none';
+  m5BuildChart();
+  m5BuildRetell();
+  document.getElementById('m5-retell').value = '';
+  document.getElementById('m5-connect').value = '';
+}
+
+// ═══ M6 — FINAL QUIZ ═══
+var M6_QUIZ = [
+  {q:'What type of text is "Hurum\'s Hobby"?',opts:['A biography','A fairy tale','A recipe'],ans:0,tag:'TEXT'},
+  {q:'Where did Jørn Hurum grow up?',opts:['Oslo, Norway','London, England','New York, USA'],ans:0,tag:'STORY'},
+  {q:'What inspired Jørn to collect fossils?',opts:['A book about fossils','A movie about dinosaurs','A school project'],ans:0,tag:'STORY'},
+  {q:'What is a paleontologist?',opts:['A scientist who studies fossils','A doctor for animals','A teacher of art'],ans:0,tag:'VOCAB'},
+  {q:'What does "preserved" mean?',opts:['Kept in good condition over time','Broken into pieces','Hidden from people'],ans:0,tag:'GLOSSARY'},
+  {q:'What was the name of Hurum\'s famous fossil discovery?',opts:['Ida','Rex','Buggy'],ans:0,tag:'STORY'},
+  {q:'The reading strategy for this reader is:',opts:['Ask Questions','Cause and Effect','Compare and Contrast'],ans:0,tag:'STRATEGY'},
+  {q:'Which word means "a very strong interest in something"?',opts:['passion','lectures','exhibits'],ans:0,tag:'GLOSSARY'}
+];
+
+var m6Started = false, m6Idx = 0, m6Score = 0;
+function initM6() {
+  m6Started = true;
+  m6Idx = 0; m6Score = 0;
+  document.getElementById('m6-result').style.display = 'none';
+  renderM6();
+}
+function renderM6() {
+  var host = document.getElementById('m6-quiz');
+  if (m6Idx >= M6_QUIZ.length) return showM6Result();
+  var q = M6_QUIZ[m6Idx];
+  var pct = Math.round(m6Idx / M6_QUIZ.length * 100);
+  var h = '<div class="qz-prog"><span class="qz-num">Question ' + (m6Idx+1) + ' of ' + M6_QUIZ.length + '</span><span class="qz-sc">Score: ' + m6Score + ' ⚽</span></div>' +
+    '<div class="qz-bar"><div class="qz-bar-fill" style="width:' + pct + '%"></div></div>' +
+    '<div class="qz-card"><div class="qz-tag rd">' + q.tag + '</div><div class="qz-q">' + q.q + '</div><div class="mcq-opts">';
+  q.opts.forEach(function(o, i) { h += '<button class="mcq-opt" onclick="ansM6(' + i + ')">' + String.fromCharCode(65+i) + ') ' + esc(o) + '</button>'; });
+  h += '</div><div class="mcq-fb" id="m6-fb"></div></div>';
+  host.innerHTML = h;
+}
+function ansM6(choice) {
+  var q = M6_QUIZ[m6Idx];
+  var ok = choice === q.ans;
+  document.querySelectorAll('#m6-quiz .mcq-opt').forEach(function(b) { b.disabled = true; });
+  var fb = document.getElementById('m6-fb');
+  if (ok) {
+    m6Score++;
+    document.querySelectorAll('#m6-quiz .mcq-opt')[choice].classList.add('ok');
+    fb.className = 'mcq-fb show ok'; fb.textContent = '✓ Correct!';
+  } else {
+    document.querySelectorAll('#m6-quiz .mcq-opt')[choice].classList.add('bad');
+    document.querySelectorAll('#m6-quiz .mcq-opt')[q.ans].classList.add('ok');
+    fb.className = 'mcq-fb show bad';
+    fb.textContent = '✕ Correct: ' + q.opts[q.ans];
+  }
+  setTimeout(function() { m6Idx++; if (m6Idx >= M6_QUIZ.length) showM6Result(); else renderM6(); }, 1400);
+}
+function showM6Result() {
+  var host = document.getElementById('m6-quiz');
+  var res = document.getElementById('m6-result');
+  host.innerHTML = '';
+  res.style.display = 'block';
+  var pass = m6Score >= 6;
+  var pct = Math.round(m6Score / M6_QUIZ.length * 100);
+  res.innerHTML = '<div class="qz-res"><div class="qz-trophy">' + (pass ? '⚽🏆' : '⚽') + '</div>' +
+    '<div class="qz-score-big">' + m6Score + ' / ' + M6_QUIZ.length + '</div>' +
+    '<div class="qz-msg">' + (pass ? '🎉 GOAL! You scored ' + pct + '% — well above 75%!' : 'Almost! ' + pct + '% — you need 75% to score. Try the modules again, then come back.') + '</div>' +
+    (pass ? '' : '<button class="qz-retry" onclick="initM6()">🔄 Try Again</button>') +
+    '</div>';
+  saveScore(m6Score, M6_QUIZ.length, pass, {quiz:'final'});
+  lSave('m6-quiz-score', m6Score);
+  if (pass) setDone('m6');
+  m6Started = false;
+}
+function restore_m6() {
+  var saved = lLoad('score');
+  if (saved && saved.quiz === 'final') {
+    m6Score = saved.score;
+    m6Idx = M6_QUIZ.length;
+    showM6Result();
+  } else if (!m6Started) {
+    initM6();
+  }
+}
+function init_m6() { m6Started = false; m6Idx = 0; m6Score = 0; }
+
+// ═══ REVIEW MODE ═══
+function initReviewMode() {
+  document.getElementById('appRoot').style.display = 'none';
+  var rs = document.getElementById('reviewScreen');
+  rs.classList.add('show');
+  var body = document.getElementById('reviewBody');
+  var scoreData = lLoad('score');
+  var retellText = lLoad('m5-retell-text', '');
+  var connectText = lLoad('m5-connect', '');
+
+  if (!scoreData && !retellText) {
+    body.innerHTML = '<div class="rv-not-started">📋 Work not started yet.</div>';
+    return;
+  }
+  var html = '';
+  if (scoreData) {
+    html += '<div class="rv-card" style="border-color:' + (scoreData.done ? 'var(--gn)' : 'var(--rd)') + '"><div class="rv-lbl">FINAL QUIZ</div>' +
+      '<div class="rv-val" style="color:' + (scoreData.done ? 'var(--gn)' : 'var(--rd)') + '">' + scoreData.score + '/' + scoreData.total + ' · ' + scoreData.pct + '% ' + (scoreData.done ? '✅ PASSED' : 'IN PROGRESS') + '</div></div>';
+  }
+  if (retellText) html += '<div class="rv-card"><div class="rv-lbl">RETELLING</div><div class="rv-text">' + esc(retellText) + '</div></div>';
+  if (connectText) html += '<div class="rv-card"><div class="rv-lbl">CONNECTION</div><div class="rv-text">' + esc(connectText) + '</div></div>';
+  body.innerHTML = html || '<div class="rv-not-started">📋 No content yet.</div>';
+}
+
+// ═══ HW BANNER ═══
+function maybeShowHwBanner() {
+  if (!new URLSearchParams(location.search).get('hw')) return;
+  var b = document.getElementById('hwBanner');
+  b.style.display = 'flex';
+  b.innerHTML = '📖 Homework mode — your progress will be saved to Neritan.';
+}
+
+// ═══ BOOT ═══
+window.addEventListener('DOMContentLoaded', function() {
+  if (REVIEW) { initReviewMode(); return; }
+  maybeShowHwBanner();
+  for (var i = 1; i <= MC; i++) {
+    var s = getBadge('m' + i);
+    if (s && s !== 'new') updateBadge('m' + i, s);
+  }
+  updateProgress();
+  m1Render();
+  m2Render();
+});
+</script>
+</body>
+</html>

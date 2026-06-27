@@ -25,6 +25,18 @@ export function getWordById(id: string): WordEntry | undefined {
   return allWords.find((entry) => entry.id === id);
 }
 
+export function getWordNav(currentId: string): PrevNext<WordEntry> {
+  const list = allWords.filter((entry) => entry.type !== "academic");
+  const i = list.findIndex((entry) => entry.id === currentId);
+  if (i < 0) return { prev: null, next: null, index: 0, total: list.length };
+  return {
+    prev: i > 0 ? list[i - 1] : null,
+    next: i < list.length - 1 ? list[i + 1] : null,
+    index: i + 1,
+    total: list.length
+  };
+}
+
 /* ─── academic-only (richer card) ─── */
 export const academicWords: AcademicEntry[] = vocabularyItems
   .map(toAcademicEntry)
@@ -106,7 +118,9 @@ function buildSourceTree(): TreeCourse[] {
     "4-8": "That's Really Interesting!"
   };
 
-  const levels = new Map<number, TreeLevel>();
+  const levels = new Map<number, TreeLevel>(
+    Array.from({ length: 6 }, (_, index) => [index + 1, { level: index + 1, units: [], active: index + 1 === 4 }])
+  );
   for (const bucket of byUnit.values()) {
     bucket.unitTitle = unitTitleHints[`${bucket.level}-${bucket.unit}`] ?? `Unit ${bucket.unit}`;
     const level =

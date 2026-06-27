@@ -3,7 +3,7 @@ import { LessonsPage } from "@/components/LessonsPage";
 
 export default function LessonsRoute() {
   return (
-    <AppShell active="english" crumbs={["Home", "English", "Lessons"]}>
+    <AppShell active="english" crumbs={["Home", "English"]}>
       <LessonsPage />
     </AppShell>
   );

@@ -456,6 +456,8 @@ Examples:
 | grammar-2 | `public/lessons/ow-l4-u8-grammar-2.html` | `public/learn/ow-l4-u8-grammar-2.html` | not yet built |
 | reading | `public/lessons/ow-l4-u8-reading.html` | `public/learn/ow-l4-u8-reading.html` | not yet built |
 | writing | `public/lessons/ow-l4-u8-writing.html` | `public/learn/ow-l4-u8-writing.html` | not yet built |
+| mission | `public/lessons/ow-l4-u8-mission.html` | `public/learn/ow-l4-u8-mission.html` | `live` |
+| project | `public/lessons/ow-l4-u8-project.html` | `public/learn/ow-l4-u8-project.html` | `live` (8-module, PR #129) |
 
 Build priority: grammar-1 → grammar-2 → reading → writing.
 

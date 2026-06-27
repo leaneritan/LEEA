@@ -27,7 +27,7 @@ Examples:
    - `docs/lesson-plans/<course-path>/planner.pdf` for the Project pages (typically 2 pages: Be the Expert + Prepare + Share + Project Rubric + Now I Can)
    - `content/.../<unit>/vocabulary.json` — for any content vocabulary listed on the Project pages
 3. **Generates the teacher slideshow** at `public/lessons/<lesson-id>.html` (~13 slides, 1920×1080 LEEA shell, project-blue accent `--project: #0369A1`)
-4. **Generates the Leo learner app** at `public/learn/<lesson-id>.html` (6-module modal home-grid)
+4. **Generates the Leo learner app** at `public/learn/<lesson-id>.html` (8-module modal home-grid)
 5. **Registers both lessons**:
    - `content/.../<unit>/lessons/project.teacher.json` (teacher)
    - `content/.../<unit>/lessons/project-app.learner.json` (learner)
@@ -253,7 +253,7 @@ File: `public/lessons/<lesson-id>.html`
 
 File: `public/learn/<lesson-id>.html`
 
-6-module modal home-grid. Each module has save/restore. Final quiz uses 75% gate (6/8).
+8-module modal home-grid (2 Vocab Foundations + 6 content modules). Each module has save/restore. Final quiz uses 75% gate (6/8).
 
 ### Step 4 — Register both lessons
 
@@ -297,5 +297,5 @@ Push to the current working branch. Do NOT create a PR.
 - Projects appear in all levels (1-6). The Be the Expert topic and Now I Can items vary per unit — always read from LP, never guess.
 - The learner app must work fully offline (no external API calls)
 - Report writing text areas must auto-save on input (no data loss)
-- M3 (Write Your Report) MUST pull saved notes from M2 (Choose & Research) as read-only reference
+- M5 (Write Your Report) MUST pull saved notes from M4 (Choose & Research) as read-only reference
 - Japanese drafts stay `needsReview: true` until the parent confirms

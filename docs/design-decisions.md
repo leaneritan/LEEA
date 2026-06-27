@@ -456,6 +456,8 @@ Examples:
 | grammar-2 | `public/lessons/ow-l4-u8-grammar-2.html` | `public/learn/ow-l4-u8-grammar-2.html` | not yet built |
 | reading | `public/lessons/ow-l4-u8-reading.html` | `public/learn/ow-l4-u8-reading.html` | not yet built |
 | writing | `public/lessons/ow-l4-u8-writing.html` | `public/learn/ow-l4-u8-writing.html` | not yet built |
+| mission | `public/lessons/ow-l4-u8-mission.html` | `public/learn/ow-l4-u8-mission.html` | `live` |
+| project | `public/lessons/ow-l4-u8-project.html` | `public/learn/ow-l4-u8-project.html` | `live` (8-module, PR #129) |
 
 Build priority: grammar-1 → grammar-2 → reading → writing.
 
@@ -613,7 +615,7 @@ Per-lesson design docs (`grammar-1.design.md`, `writing.design.md`, etc.) were o
 **Rule going forward:**
 
 - Do NOT create a new design doc per unit per component just because the existing Unit 8 docs have that shape.
-- The four existing Unit 8 docs (`grammar-1` / `grammar-2` / `reading` / `writing`.design.md) stay as historical reference for the skills that were extracted from them — do not delete, but do not multiply.
+- Per-unit design docs (`*.design.md`) were deleted once their patterns were extracted into skills. All patterns now live in `.claude/commands/*.md` skills — do not create new design docs.
 - When a lesson needs to be generated for a new unit, invoke the matching skill (`/grammar-app`, `/reading-app`, `/vocab-app`, `/writing-app`) with the unit number + an optional creative theme. The skill reads `index.json` + the unit's `vocabulary.json` and produces the lesson. No bespoke design doc needed.
 - If a lesson has truly one-off content that doesn't fit the skill, just build it and capture any standing decisions in this file — not in a per-lesson markdown that no one reads.
 - All four core component skills now exist (`/vocab-app`, `/grammar-app`, `/reading-app`, `/writing-app`). The writing skill was extracted from PR #103's Unit 8 Writing rebuild — same rule applies: no per-unit `writing.design.md` going forward.

@@ -27,7 +27,7 @@ Examples:
    - `docs/lesson-plans/<course-path>/planner.pdf` for the Mission page (typically 1 page: Be the Expert + Think + Pair + Share)
    - `content/.../<unit>/vocabulary.json` — for any content vocabulary listed on the Mission page
 3. **Generates the teacher slideshow** at `public/lessons/<lesson-id>.html` (~16 slides, 1920×1080 LEEA shell, mission-green accent `--mission: #237a3a`)
-4. **Generates the Leo learner app** at `public/learn/<lesson-id>.html` (4-module modal home-grid: Be the Expert, Think, Pair & Share, Final Quiz)
+4. **Generates the Leo learner app** at `public/learn/<lesson-id>.html` (6-module modal home-grid)
 5. **Registers both lessons**:
    - `content/.../<unit>/lessons/mission.teacher.json` (teacher)
    - `content/.../<unit>/lessons/mission-app.learner.json` (learner)
@@ -109,7 +109,7 @@ Reference: `public/lessons/ow-l4-u8-mission.html` (~16 slides, single inline `<s
 - Final slide is **Mark Done** that writes to `leea.lessonProgress.v1`
 - Source pill on content slides citing LP page: `📖 LP p.X`
 
-### Leo learner app — 7 modules (UPDATED — was 4, now includes Vocab Foundations + interactive modules)
+### Leo learner app — 6 modules
 
 ```
 🎴 VOCAB FOUNDATIONS (always-on, purple ALWAYS tag)

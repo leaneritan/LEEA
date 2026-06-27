@@ -29,7 +29,7 @@ Examples:
    - Unit reader booklet PDF from `supporting/` — for the verbatim story text, illustrations, and comprehension questions
    - `content/.../<unit>/vocabulary.json` — for recycled vocabulary that appears in the reader
 3. **Generates the teacher slideshow** at `public/lessons/<lesson-id>.html` (~12-16 slides, 1920×1080 LEEA shell)
-4. **Generates the Leo learner app** at `public/learn/<lesson-id>.html` (5-module modal home-grid)
+4. **Generates the Leo learner app** at `public/learn/<lesson-id>.html` (6-module modal home-grid)
 5. **Registers both lessons**:
    - `content/.../<unit>/lessons/reader.teacher.json` (teacher)
    - `content/.../<unit>/lessons/reader-app.learner.json` (learner)
@@ -105,7 +105,7 @@ Examples for reader modules:
 - Teacher notes panel uses verbatim LP instructions
 - Source pill on content slides citing LP page: `📖 LP p.X`
 
-### Leo learner app — 7 modules (UPDATED — includes Vocab Foundations + interactive modules)
+### Leo learner app — 6 modules
 
 ```
 🎴 VOCAB FOUNDATIONS (always-on, purple ALWAYS tag)
@@ -243,7 +243,7 @@ File: `public/lessons/<lesson-id>.html`
 
 File: `public/learn/<lesson-id>.html`
 
-5-module modal home-grid. Each module has save/restore. Final quiz uses 75% gate.
+6-module modal home-grid (2 Vocab Foundations + 4 content modules). Each module has save/restore. Final quiz uses 75% gate (6/8).
 
 ### Step 4 — Register both lessons
 

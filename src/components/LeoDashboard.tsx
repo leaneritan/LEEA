@@ -4,7 +4,7 @@ import Link from "next/link";
 import { CheckCircle2, ChevronDown, ChevronRight, Circle, Play } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { readAssignments, readAssignmentsFromCloud, type AssignmentMap, type AssignmentRecord } from "@/data/assignments";
-import { getLearnerAppProgress, type LearnerAppProgress } from "@/data/learnerProgress";
+import { getLearnerAppProgress, hydrateLearnerProgressFromCloud, type LearnerAppProgress } from "@/data/learnerProgress";
 import { getLessonGroups, learnerLessons } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
@@ -26,6 +26,9 @@ export function LeoDashboard() {
     const refresh = () => {
       setAssignments(readAssignments(learnerLessons));
       void readAssignmentsFromCloud(learnerLessons).then(setAssignments);
+      void hydrateLearnerProgressFromCloud(learnerLessons).then((changed) => {
+        if (changed) setProgressVersion((current) => current + 1);
+      });
       setProgressVersion((current) => current + 1);
     };
     refresh();

@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 8 · Book Reading — Hurum's Hobby</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../../../lib/leea-cloud-config.js"></script>
+<script src="../../../../lib/leea-cloud.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pu:#7C3AED;--pud:#6D28D9;--puk:#4C1D95;--pul:#F5F3FF;--card:#FAFAF7;
+  --gn:#16A34A;--gnl:#D1FAE5;--rd:#DC2626;--rdl:#FEE2E2;
+  --bl:#1D4ED8;--bll:#EFF6FF;
+  --ye:#FDE047;--yed:#EAB308;
+  --ink:#111111;--ink2:#374151;--ink3:#78716C;
+  --paper:#FAFAF7;--surf:#FFFFFF;--bdr:#E5E7EB;
+  --fn:"Nunito",sans-serif;--fnh:"Oswald",sans-serif;
+}
+body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+.app-hdr{background:var(--ink);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-badge{background:var(--ye);color:var(--ink);font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;padding:2px 7px;border-radius:2px}
+.hdr-title{font-family:var(--fnh);font-size:.85rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hdr-unit{font-size:.7rem;font-weight:700;color:var(--pu)}
+
+.hero{background:linear-gradient(135deg,#4C1D95,#6D28D9,#7C3AED);padding:20px 16px 16px;text-align:center}
+.hero-kick{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.7);margin-bottom:6px}
+.hero-title{font-family:var(--fnh);font-size:1.4rem;font-weight:700;color:#fff}
+.hero-title span{color:var(--ye)}
+.hero-sub{font-size:.78rem;color:rgba(255,255,255,.85);font-weight:600;margin-top:4px}
+.prog-wrap{background:rgba(0,0,0,.2);height:4px}
+.prog-fill{height:100%;background:var(--ye);transition:width .5s;width:0%}
+
+.home{max-width:680px;margin:0 auto;padding:16px 14px 80px}
+.sec-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--ink3);margin-bottom:10px;margin-top:20px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:"";flex:1;height:1px;background:var(--bdr)}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mod-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px 13px 11px;cursor:pointer;transition:all .2s}
+.mod-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.1);border-color:var(--pu)}
+.mod-card.quiz:hover{border-color:var(--yed)}
+.mod-icon{font-size:1.5rem;margin-bottom:5px}
+.mod-name{font-weight:800;font-size:.82rem;color:var(--ink);margin-bottom:2px}
+.mod-desc{font-size:.7rem;color:var(--ink3);font-weight:600;line-height:1.4}
+.mod-badge{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;margin-top:7px;display:inline-block}
+.badge-new{background:var(--paper);color:var(--ink3);border:1px solid var(--bdr)}
+.badge-done{background:var(--gnl);color:var(--gn)}
+.badge-prog{background:var(--pul);color:var(--pu)}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;overflow-y:auto}
+.modal.open{display:block}
+.mbox{background:var(--surf);min-height:100vh;display:flex;flex-direction:column;max-width:680px;margin:0 auto}
+.mhd{padding:13px 14px;display:flex;align-items:center;gap:10px;color:#fff;position:sticky;top:0;z-index:10;flex-shrink:0}
+.mhd.pu{background:var(--pu)}.mhd.puk{background:var(--puk)}.mhd.gn{background:var(--gn)}.mhd.bl{background:var(--bl)}.mhd.dk{background:var(--ink)}
+.mhd-title{font-weight:900;font-size:.95rem;flex:1;letter-spacing:.3px;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.mhd-num{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:1px;opacity:.7}
+.mhd-close{background:rgba(255,255,255,.18);border:none;color:#fff;font-size:1rem;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;margin-left:8px}
+.mhd-close:hover{background:rgba(255,255,255,.35)}
+.mbody{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
+
+.dad-card{background:#EDE9FE;border:2px solid #C4B5FD;border-radius:4px;padding:11px 13px;font-size:.82rem;font-weight:700;color:#4C1D95;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.info-card{background:var(--pul);border:2px solid #C4B5FD;border-radius:4px;padding:11px 13px;font-size:.82rem;font-weight:600;color:var(--puk);line-height:1.6}
+.info-card strong{color:var(--pud)}
+.info-title{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;color:var(--pud);margin-bottom:5px}
+
+.sent-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:12px;margin-bottom:8px}
+.sent-text{font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:9px;line-height:1.5}
+.sent-book{font-size:.8rem;font-weight:600;color:var(--ink3);font-style:italic;background:var(--pul);border-radius:4px;padding:6px 10px;margin-bottom:9px;line-height:1.5}
+.mcq-opts{display:flex;flex-direction:column;gap:7px}
+.mcq-opt{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.82rem;font-weight:700;cursor:pointer;text-align:left;transition:all .2s}
+.mcq-opt:hover:not(:disabled){border-color:var(--pu)}
+.mcq-opt.ok{background:var(--gnl);border-color:var(--gn);color:var(--gn)}
+.mcq-opt.bad{background:var(--rdl);border-color:var(--rd);color:var(--rd);animation:shake .3s}
+.mcq-opt:disabled{cursor:not-allowed}
+.mcq-fb{font-size:.75rem;font-weight:700;padding:7px 11px;border-radius:4px;margin-top:7px;display:none}
+.mcq-fb.show{display:block}
+.mcq-fb.ok{background:var(--gnl);color:#065F46}
+.mcq-fb.bad{background:var(--rdl);color:var(--rd)}
+
+.chart-table{width:100%;border-collapse:collapse;background:var(--surf);border:2px solid var(--bdr);border-radius:4px;overflow:hidden;font-size:.82rem}
+.chart-table th{background:var(--pu);color:#fff;font-family:var(--fnh);font-size:.68rem;font-weight:700;letter-spacing:1px;padding:9px 12px;text-align:left}
+.chart-table td{padding:8px 10px;border-bottom:1px solid var(--bdr);vertical-align:middle;font-weight:700}
+.chart-table tr:nth-child(even) td{background:var(--pul)}
+.chart-table .fixed-cell{font-weight:800;color:var(--puk)}
+.fill-ta{width:100%;border:none;border-bottom:2px solid var(--pu);background:transparent;font-family:var(--fn);font-size:.82rem;font-weight:700;color:var(--ink);outline:none;padding:3px 4px;resize:none;min-height:44px;line-height:1.4;transition:border-color .2s}
+.fill-ta:focus{border-bottom-color:var(--pud)}
+.fill-ta.saved-glow{border-bottom-color:var(--gn)}
+.save-check-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+.save-btn{background:var(--pu);color:#fff;border:none;border-radius:4px;padding:8px 18px;font-family:var(--fn);font-size:.8rem;font-weight:800;cursor:pointer;transition:background .2s}
+.save-btn:hover{background:var(--pud)}
+.save-ind{font-size:.7rem;font-weight:800;color:var(--gn);opacity:0;transition:opacity .5s}
+.save-ind.show{opacity:1}
+
+.write-ta{width:100%;border:2px solid var(--bdr);border-radius:4px;padding:10px 13px;font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--ink);background:var(--surf);resize:none;outline:none;min-height:80px;line-height:1.6;transition:border-color .2s}
+.write-ta:focus{border-color:var(--pu)}
+.wc{font-size:.7rem;font-weight:700;color:var(--ink3);text-align:right;margin-top:2px}
+
+.btn-row-bottom{display:flex;justify-content:space-between;align-items:stretch;gap:14px;margin-top:20px}
+.complete-btn{flex:1;padding:18px 20px;background:#16A34A;border:3px solid #15803D;border-radius:4px;font-family:var(--fn);font-size:1rem;font-weight:900;cursor:pointer;color:#fff;transition:all .2s;text-align:center}
+.complete-btn:hover{background:#15803D}
+.complete-btn.confirmed{background:var(--gnl);border-color:var(--gn);color:var(--gn);cursor:default;pointer-events:none;opacity:.85}
+.reset-btn{flex:0 0 110px;padding:18px 14px;background:#fff;border:3px solid var(--rd);border-radius:4px;font-family:var(--fn);font-size:.88rem;font-weight:900;cursor:pointer;color:var(--rd);transition:all .2s;text-align:center;pointer-events:auto !important}
+.reset-btn:hover{background:var(--rd);color:#fff}
+
+.qz-prog-bar{background:var(--bdr);height:6px;border-radius:3px;margin-bottom:14px}
+.qz-prog-fill{height:100%;background:var(--pu);border-radius:3px;transition:width .4s}
+.qz-tag{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;padding:2px 7px;border-radius:2px;display:inline-block;margin-bottom:7px;background:var(--pul);color:var(--pud)}
+.qz-q{font-size:.9rem;font-weight:800;color:var(--ink);margin-bottom:8px;line-height:1.5}
+.qz-book{font-size:.8rem;font-style:italic;color:var(--ink3);font-weight:600;background:var(--pul);border-radius:4px;padding:6px 10px;margin-bottom:9px;line-height:1.5}
+.result-box{text-align:center;padding:20px 10px}
+.result-score{font-family:var(--fnh);font-size:2.8rem;font-weight:700;color:var(--pu);line-height:1}
+.result-bullets{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+.result-bullet{background:var(--paper);border:1px solid var(--bdr);border-radius:4px;padding:7px 12px;font-size:.78rem;font-weight:700;text-align:left}
+.result-bullet.ok{background:var(--gnl);border-color:var(--gn);color:#065F46}
+.result-bullet.bad{background:var(--rdl);border-color:var(--rd);color:var(--rd)}
+
+.goal-anim{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:3.5rem;z-index:1000;pointer-events:none;transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.goal-anim.show{transform:translate(-50%,-50%) scale(1)}
+.cp{position:fixed;width:9px;height:9px;border-radius:2px;pointer-events:none;animation:cf 1.5s linear forwards;z-index:999}
+
+.review-screen{display:none;min-height:100vh;background:var(--paper)}
+.review-screen.show{display:block}
+.rv-hdr{background:var(--puk);padding:14px 16px;color:#fff}
+.rv-title{font-family:var(--fnh);font-size:.95rem;font-weight:700;letter-spacing:1px}
+.rv-sub{font-size:.72rem;color:rgba(255,255,255,.75);font-weight:600;margin-top:2px}
+.rv-body{padding:14px;max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.rv-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px}
+.rv-lbl{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;color:var(--ink3);margin-bottom:8px}
+.rv-val{font-size:.85rem;font-weight:700;color:var(--ink);line-height:1.6;white-space:pre-wrap}
+.rv-not-started{text-align:center;padding:40px;font-size:.9rem;font-weight:700;color:#78716C}
+.rv-table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:6px}
+.rv-table th{background:var(--pu);color:#fff;padding:7px 10px;font-weight:700;text-align:left}
+.rv-table td{padding:7px 10px;border-bottom:1px solid var(--bdr);font-weight:600}
+.rv-table tr:nth-child(even) td{background:var(--pul)}
+
+.seq-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:10px 12px;margin-bottom:6px;cursor:pointer;font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:8px;transition:all .2s;user-select:none}
+.seq-card:hover{border-color:var(--pu)}
+.seq-card.placed{background:var(--gnl);border-color:var(--gn);cursor:default}
+.seq-num{background:var(--pu);color:#fff;font-family:var(--fnh);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+.seq-card.placed .seq-num{background:var(--gn)}
+
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes cf{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+
+<div class="review-screen" id="reviewScreen">
+  <div class="rv-hdr">
+    <div class="rv-title">📋 Review — Unit 8 Book Reading</div>
+    <div class="rv-sub">Hurum's Hobby: A Biography of Jørn Hurum</div>
+  </div>
+  <div class="rv-body" id="reviewBody"></div>
+</div>
+
+<div class="goal-anim" id="goalAnim">⚽ GOAL!</div>
+
+<div id="appRoot">
+<div class="app-hdr">
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="hdr-badge">LEEA</div>
+    <div class="hdr-title">BOOK READING</div>
+  </div>
+  <div class="hdr-unit">UNIT 8 🦴</div>
+</div>
+<div class="hero">
+  <div class="hero-kick">OUR WORLD · LEVEL 4 · UNIT 8</div>
+  <div class="hero-title">🦴🦕 <span>Hurum's Hobby!</span></div>
+  <div class="hero-sub">A Biography of Jørn Hurum — Complete all 6 modules!</div>
+  <div style="font-size:1.2rem;margin-top:8px">📖 ❓ 🔍 🗣️ 📝 ⚽</div>
+</div>
+<div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
+
+<div class="home">
+  <div class="sec-lbl">📖 UNIT 8 · BOOK READING</div>
+  <div class="mod-grid">
+    <div class="mod-card" onclick="openModal('m1')">
+      <div class="mod-icon">📖</div>
+      <div class="mod-name">Vocabulary Quiz</div>
+      <div class="mod-desc">Test all 11 words from the reader!</div>
+      <div class="mod-badge badge-new" id="badge-m1">NOT STARTED</div>
+    </div>
+    <div class="mod-card" onclick="openModal('m2')">
+      <div class="mod-icon">❓</div>
+      <div class="mod-name">Ask Questions Chart</div>
+      <div class="mod-desc">Fill in the Q&amp;A chart — saves to cloud!</div>
+      <div class="mod-badge badge-new" id="badge-m2">NOT STARTED</div>
+    </div>
+    <div class="mod-card" onclick="openModal('m3')">
+      <div class="mod-icon">🔍</div>
+      <div class="mod-name">Story Comprehension</div>
+      <div class="mod-desc">Questions about the biography</div>
+      <div class="mod-badge badge-new" id="badge-m3">NOT STARTED</div>
+    </div>
+    <div class="mod-card" onclick="openModal('m4')">
+      <div class="mod-icon">🗣️</div>
+      <div class="mod-name">Grammar: who</div>
+      <div class="mod-desc">Relative clauses + write your own</div>
+      <div class="mod-badge badge-new" id="badge-m4">NOT STARTED</div>
+    </div>
+    <div class="mod-card" onclick="openModal('m5')">
+      <div class="mod-icon">📝</div>
+      <div class="mod-name">Sequence &amp; Retell</div>
+      <div class="mod-desc">Put events in order + retell the story!</div>
+      <div class="mod-badge badge-new" id="badge-m5">NOT STARTED</div>
+    </div>
+    <div class="mod-card quiz" onclick="openModal('m6')">
+      <div class="mod-icon">⚽</div>
+      <div class="mod-name">Can Leo Score?</div>
+      <div class="mod-desc">8 questions — need 80% to score!</div>
+      <div class="mod-badge badge-new" id="badge-m6">FINAL QUIZ</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ M1: VOCABULARY QUIZ ═══ -->
+<div class="modal" id="m1">
+<div class="mbox">
+<div class="mhd pu"><div class="mhd-title">📖 Vocabulary Quiz</div><div class="mhd-num">1 / 6</div><button class="mhd-close" onclick="closeModal('m1')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div style="font-size:1.1rem;flex-shrink:0">💬</div><div>These words are all from the reader about Jørn Hurum. You learned them in class! Read the sentence and pick the right word.</div></div>
+  <div class="info-card">
+    <div class="info-title">WORD BANK</div>
+    alone 🧍 · bug 🐛 · career 💼 · collect 🧺 · decades 📅 · dinosaur 🦕 · enjoy 😊 · escorted 🚶 · fossil 🪨 · paleontologist 🦴 · preserved 🧊
+  </div>
+  <div id="m1-qs"></div>
+  <div id="m1-score-disp" style="display:none;text-align:center;font-size:.9rem;font-weight:800;color:var(--pu);margin-top:4px"></div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m1" onclick="markComplete('m1','Vocabulary Quiz')">Mark Vocabulary Quiz complete ✓</button>
+    <button class="reset-btn" onclick="resetModule('m1')">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ═══ M2: ASK QUESTIONS CHART ═══ -->
+<div class="modal" id="m2">
+<div class="mbox">
+<div class="mhd puk"><div class="mhd-title">❓ Ask Questions Chart</div><div class="mhd-num">2 / 6</div><button class="mhd-close" onclick="closeModal('m2')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div style="font-size:1.1rem;flex-shrink:0">💬</div><div>Fill in the chart! Write a question about each part of the story, then write the answer you found. Click Save when you are done. Dad will read this later.</div></div>
+  <div class="info-card">
+    <div class="info-title">READING STRATEGY</div>
+    <strong>ASK QUESTIONS</strong> while you read! Use <strong>who, what, when, where, why, how</strong> to ask questions. Then find the <strong>ANSWERS</strong> in the text.
+  </div>
+  <table class="chart-table">
+    <thead><tr><th>Part of the Story 📖</th><th>My Question ❓</th><th>Answer from the Text 📝</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="fixed-cell">Pages 2–3 (Introduction)</td>
+        <td><textarea class="fill-ta" id="qa-q1" placeholder="What question did you ask?" oninput="m2AutoSave()"></textarea></td>
+        <td><textarea class="fill-ta" id="qa-a1" placeholder="What answer did you find?" oninput="m2AutoSave()"></textarea></td>
+      </tr>
+      <tr>
+        <td class="fixed-cell">Pages 4–5 (Childhood)</td>
+        <td><textarea class="fill-ta" id="qa-q2" placeholder="Who...? What...?" oninput="m2AutoSave()"></textarea></td>
+        <td><textarea class="fill-ta" id="qa-a2" placeholder="The text says..." oninput="m2AutoSave()"></textarea></td>
+      </tr>
+      <tr>
+        <td class="fixed-cell">Pages 6–7 (Growing Passion)</td>
+        <td><textarea class="fill-ta" id="qa-q3" placeholder="What...? Why...?" oninput="m2AutoSave()"></textarea></td>
+        <td><textarea class="fill-ta" id="qa-a3" placeholder="He collected..." oninput="m2AutoSave()"></textarea></td>
+      </tr>
+      <tr>
+        <td class="fixed-cell">Pages 8–9 (Career)</td>
+        <td><textarea class="fill-ta" id="qa-q4" placeholder="How...? Where...?" oninput="m2AutoSave()"></textarea></td>
+        <td><textarea class="fill-ta" id="qa-a4" placeholder="He became..." oninput="m2AutoSave()"></textarea></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="save-check-row">
+    <button class="save-btn" onclick="saveM2()">💾 Save my chart</button>
+    <span class="save-ind" id="m2-saved">✅ Saved to cloud!</span>
+  </div>
+  <div class="info-card" style="margin-top:4px">
+    <div class="info-title">HINT — EXAMPLE QUESTIONS</div>
+    ❓ <strong>What</strong> is Jørn Hurum's hobby? → 📝 Collecting fossils.<br/>
+    ❓ <strong>Who</strong> is Ida? → 📝 A primate fossil that is 47 million years old!<br/>
+    ❓ <strong>How</strong> did Jørn turn his hobby into a career? → 📝 He studied at university and became a professor.
+  </div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m2" onclick="markComplete('m2','Ask Questions Chart')">Mark Ask Questions Chart complete ✓</button>
+    <button class="reset-btn" onclick="resetModule('m2')">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ═══ M3: STORY COMPREHENSION ═══ -->
+<div class="modal" id="m3">
+<div class="mbox">
+<div class="mhd puk"><div class="mhd-title">🔍 Story Comprehension</div><div class="mhd-num">3 / 6</div><button class="mhd-close" onclick="closeModal('m3')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div style="font-size:1.1rem;flex-shrink:0">💬</div><div>Answer these questions about the biography of Jørn Hurum. Think about what you read in class!</div></div>
+  <div id="m3-qs"></div>
+  <div id="m3-score-disp" style="display:none;text-align:center;font-size:.9rem;font-weight:800;color:var(--puk);margin-top:4px"></div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m3" onclick="markComplete('m3','Story Comprehension')">Mark Story Comprehension complete ✓</button>
+    <button class="reset-btn" onclick="resetModule('m3')">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ═══ M4: GRAMMAR — WHO ═══ -->
+<div class="modal" id="m4">
+<div class="mbox">
+<div class="mhd bl"><div class="mhd-title">🗣️ Grammar: who</div><div class="mhd-num">4 / 6</div><button class="mhd-close" onclick="closeModal('m4')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div style="font-size:1.1rem;flex-shrink:0">💬</div><div>Remember: we use <strong>who</strong> to describe people! "A person + who + verb" tells us more about that person.</div></div>
+  <div class="info-card">
+    <div class="info-title">EXAMPLES FROM THE BOOK</div>
+    🦴 "Jørn Hurum is a man <strong>who</strong> studies fossils."<br/>
+    🐒 "He is a scientist <strong>who</strong> discovered the primate fossil Ida."<br/>
+    ⚽ "Mohamed Salah is a player <strong>who</strong> scores amazing goals!"
+  </div>
+  <div id="m4-qs"></div>
+  <div style="font-weight:800;font-size:.88rem;color:var(--ink);margin-top:8px;margin-bottom:4px">Now write YOUR own sentence with "who": ✏️</div>
+  <textarea class="write-ta" id="m4-sentence" placeholder='Write here... Example: "A paleontologist is a scientist who studies fossils."' oninput="m4Save()"></textarea>
+  <div class="wc" id="m4-wc">Words: 0</div>
+  <div class="save-check-row">
+    <button class="save-btn" onclick="m4Save(true)">💾 Save my sentence</button>
+    <span class="save-ind" id="m4-saved">✅ Saved!</span>
+  </div>
+  <div id="m4-score-disp" style="display:none;text-align:center;font-size:.9rem;font-weight:800;color:var(--bl);margin-top:4px"></div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m4" onclick="markComplete('m4','Grammar: who')">Mark Grammar: who complete ✓</button>
+    <button class="reset-btn" onclick="resetModule('m4')">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ═══ M5: SEQUENCE & RETELL ═══ -->
+<div class="modal" id="m5">
+<div class="mbox">
+<div class="mhd pu"><div class="mhd-title">📝 Sequence &amp; Retell</div><div class="mhd-num">5 / 6</div><button class="mhd-close" onclick="closeModal('m5')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div style="font-size:1.1rem;flex-shrink:0">💬</div><div>Put the events from the biography in order! Then retell the story in your own words. Save when done!</div></div>
+  <div style="font-weight:800;font-size:.88rem;color:var(--ink);margin-bottom:4px">🔢 Tap the events in the correct order (1st → last):</div>
+  <div id="m5-seq"></div>
+  <div id="m5-seq-msg" style="display:none;font-size:.85rem;font-weight:800;color:var(--gn);text-align:center;padding:8px;background:var(--gnl);border-radius:4px;margin-top:6px"></div>
+  <div style="font-weight:800;font-size:.88rem;color:var(--ink);margin-top:14px;margin-bottom:4px">✍️ Retell the story in your own words:</div>
+  <textarea class="write-ta" id="m5-retell" placeholder="Write your retelling here... How did Jørn turn his hobby into a career?" oninput="m5Save()" style="min-height:100px"></textarea>
+  <div class="wc" id="m5-wc">Words: 0</div>
+  <div class="save-check-row">
+    <button class="save-btn" onclick="m5Save(true)">💾 Save my retelling</button>
+    <span class="save-ind" id="m5-saved">✅ Saved to cloud!</span>
+  </div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m5" onclick="markComplete('m5','Sequence and Retell')">Mark Sequence and Retell complete ✓</button>
+    <button class="reset-btn" onclick="resetModule('m5')">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ═══ M6: CAN LEO SCORE? ═══ -->
+<div class="modal" id="m6">
+<div class="mbox">
+<div class="mhd dk"><div class="mhd-title">⚽ Can Leo Score?</div><div class="mhd-num">6 / 6</div><button class="mhd-close" onclick="closeModal('m6')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div style="font-size:1.1rem;flex-shrink:0">💬</div><div>8 questions from everything you learned! You need 7 out of 8 to score the goal! ⚽ Good luck!</div></div>
+  <div id="m6-quiz"></div>
+  <div id="m6-result" style="display:none"></div>
+  <div class="btn-row-bottom" id="m6-bottom" style="display:none">
+    <button class="complete-btn" id="cbtn-m6" onclick="markComplete('m6','Can Leo Score')">Mark Can Leo Score complete ✓</button>
+    <button class="reset-btn" onclick="resetModule('m6')">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<script>
+// ═══ LEEA SAVE ═══
+var SAVE_PREFIX = '4-8-book-reading-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-8-book-reading';
+var isReview = new URLSearchParams(location.search).get('review') === '1';
+
+function lSave(key, val) {
+  try { localStorage.setItem('leea-' + key, JSON.stringify(val)); } catch(e) {}
+  if (window.LEEA_CLOUD && window.LEEA_CLOUD.enabled) {
+    window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val);
+  }
+}
+function lLoad(key, fallback) {
+  if (fallback === undefined) fallback = null;
+  try { var v = localStorage.getItem('leea-'+key); return v!==null ? JSON.parse(v) : fallback; } catch(e) { return fallback; }
+}
+async function restoreProgressFromCloud() {
+  if (!window.LEEA_CLOUD || !window.LEEA_CLOUD.enabled) return;
+  var rows = await window.LEEA_CLOUD.fetchProgress(HOMEWORK_ID);
+  if (!rows) return;
+  rows.forEach(function(row) { localStorage.setItem('leea-'+row.storage_key, JSON.stringify(row.value)); });
+}
+
+// ═══ REVIEW MODE ═══
+function initReviewMode() {
+  document.getElementById('appRoot').style.display = 'none';
+  document.getElementById('reviewScreen').classList.add('show');
+  var body = document.getElementById('reviewBody');
+  var score = lLoad(SAVE_PREFIX+'score');
+  var sentence = lLoad(SAVE_PREFIX+'m4-sentence','');
+  var retell = lLoad(SAVE_PREFIX+'m5-retell','');
+  var qaData = {};
+  for (var i = 1; i <= 4; i++) {
+    qaData['q'+i] = lLoad(SAVE_PREFIX+'qa-q'+i,'');
+    qaData['a'+i] = lLoad(SAVE_PREFIX+'qa-a'+i,'');
+  }
+  var MOD_NAMES = { m1:'Vocabulary Quiz', m2:'Ask Questions Chart', m3:'Story Comprehension', m4:'Grammar: who', m5:'Sequence and Retell', m6:'Can Leo Score' };
+  var completedMods = Object.keys(MOD_NAMES).filter(function(id) {
+    var d = lLoad(SAVE_PREFIX + id + '-complete', null);
+    return d && d.timestamp;
+  });
+  var hasQA = Object.values(qaData).some(Boolean);
+  var hasAnything = score || sentence || retell || completedMods.length > 0 || hasQA;
+  if (!hasAnything) { body.innerHTML = '<div class="rv-not-started">📋 Work not started yet.</div>'; return; }
+  var html = '';
+  if (completedMods.length > 0) {
+    var lines = completedMods.map(function(id) {
+      var d = lLoad(SAVE_PREFIX + id + '-complete', null);
+      var ts = (d && d.timestamp) ? ' · ' + new Date(d.timestamp).toLocaleString() : '';
+      return '✅ ' + MOD_NAMES[id] + ts;
+    }).join('\n');
+    html += '<div class="rv-card"><div class="rv-lbl">COMPLETED MODULES — ' + completedMods.length + ' / ' + Object.keys(MOD_NAMES).length + '</div>' +
+      '<div class="rv-val" style="font-size:.82rem;line-height:1.9;white-space:pre-line">' + lines + '</div></div>';
+  }
+  if (score) {
+    var pct = Math.round(score.score/score.total*100);
+    html += '<div class="rv-card"><div class="rv-lbl">FINAL QUIZ</div><div style="font-family:var(--fnh);font-size:2rem;color:var(--pu);font-weight:700">' + score.score + '/' + score.total + ' — ' + pct + '% ' + (pct>=80?'✅ PASS':'❌ Retry') + '</div>' +
+      (score.wrongQuestions&&score.wrongQuestions.length?'<div style="margin-top:6px;font-size:.78rem;font-weight:700;color:var(--rd)">Missed: '+score.wrongQuestions.map(function(w){return 'Q'+w.question;}).join(', ')+'</div>':'') + '</div>';
+  }
+  if (hasQA) {
+    html += '<div class="rv-card"><div class="rv-lbl">ASK QUESTIONS CHART</div>' +
+      '<table class="rv-table"><thead><tr><th>Part</th><th>Question</th><th>Answer</th></tr></thead><tbody>';
+    var parts = ['Pages 2–3','Pages 4–5','Pages 6–7','Pages 8–9'];
+    for (var j = 0; j < 4; j++) {
+      html += '<tr><td>' + parts[j] + '</td><td>' + (qaData['q'+(j+1)]||'—') + '</td><td>' + (qaData['a'+(j+1)]||'—') + '</td></tr>';
+    }
+    html += '</tbody></table></div>';
+  }
+  if (sentence) html += '<div class="rv-card"><div class="rv-lbl">MY "WHO" SENTENCE</div><div class="rv-val">' + sentence + '</div></div>';
+  if (retell) html += '<div class="rv-card"><div class="rv-lbl">MY RETELLING</div><div class="rv-val">' + retell + '</div></div>';
+  body.innerHTML = html || '<div style="padding:20px;font-size:.9rem;font-weight:700;color:#78716C">Some modules completed. No quiz result yet.</div>';
+}
+
+// ═══ MODAL ═══
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (id==='m6' && !m6Started) initM6();
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ═══ BADGE ═══
+function updateBadge(id, state) {
+  try {
+    var el = document.getElementById('badge-'+id);
+    if (!el) return;
+    el.className = 'mod-badge '+(state==='done'?'badge-done':state==='prog'?'badge-prog':'badge-new');
+    el.textContent = state==='done'?'✅ DONE':state==='prog'?'▶ IN PROGRESS':id==='m6'?'FINAL QUIZ':'NOT STARTED';
+    var pf = document.getElementById('progFill');
+    if (pf) {
+      var done = ['m1','m2','m3','m4','m5','m6'].filter(function(m) {
+        var b = document.getElementById('badge-'+m);
+        return b && b.classList && b.classList.contains('badge-done');
+      }).length;
+      pf.style.width = (done/6*100)+'%';
+    }
+  } catch(e) { console.warn(e); }
+}
+
+function showSaveInd(id) {
+  var el = document.getElementById(id+'-saved');
+  if (!el) return;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2500);
+}
+
+// ═══ MARK COMPLETE ═══
+function markComplete(id, name) {
+  try {
+    lSave(SAVE_PREFIX+id+'-complete', {name:name, timestamp:new Date().toISOString(), done:true});
+    lSave(SAVE_PREFIX+id+'-done', true);
+    lSave(HOMEWORK_ID+'-'+id+'-done', true);
+    updateBadge(id, 'done');
+    var btn = document.getElementById('cbtn-'+id);
+    if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ '+name+' complete'; }
+    setTimeout(function() { closeModal(id); }, 400);
+  } catch(e) { console.error(e); }
+}
+
+// ═══ RESET ═══
+function resetModule(id) {
+  var names = {m1:'Vocabulary Quiz',m2:'Ask Questions Chart',m3:'Story Comprehension',m4:'Grammar: who',m5:'Sequence and Retell',m6:'Can Leo Score'};
+  var redoBtn = null;
+  document.querySelectorAll('.reset-btn').forEach(function(b) {
+    if (b.getAttribute('onclick')==="resetModule('"+id+"')") redoBtn = b;
+  });
+  if (redoBtn && !redoBtn.dataset.armed) {
+    redoBtn.dataset.armed = '1'; redoBtn.textContent = 'Sure? ↺';
+    redoBtn.style.background = '#DC2626'; redoBtn.style.color = '#fff';
+    setTimeout(function() {
+      if (redoBtn && redoBtn.dataset.armed) {
+        delete redoBtn.dataset.armed; redoBtn.textContent = '↺ Redo';
+        redoBtn.style.background = ''; redoBtn.style.color = '';
+      }
+    }, 3000);
+    return;
+  }
+  if (redoBtn) { delete redoBtn.dataset.armed; redoBtn.textContent = '↺ Redo'; redoBtn.style.background=''; redoBtn.style.color=''; }
+  var prefix = 'leea-'+SAVE_PREFIX;
+  Object.keys(localStorage).filter(function(k){ return k.startsWith(prefix+id+'-'); }).forEach(function(k){ localStorage.removeItem(k); });
+  localStorage.removeItem('leea-'+HOMEWORK_ID+'-'+id+'-done');
+  updateBadge(id, 'new');
+  var cb = document.getElementById('cbtn-'+id);
+  if (cb) { cb.classList.remove('confirmed'); cb.textContent = 'Mark '+(names[id]||id)+' complete ✓'; }
+  if (id==='m1') { lSave(SAVE_PREFIX+'m1-ans', new Array(8).fill(null)); initM1(); }
+  else if (id==='m2') { ['qa-q1','qa-a1','qa-q2','qa-a2','qa-q3','qa-a3','qa-q4','qa-a4'].forEach(function(k){ var el=document.getElementById(k); if(el){ el.value=''; el.classList.remove('saved-glow'); } }); }
+  else if (id==='m3') { lSave(SAVE_PREFIX+'m3-ans', new Array(5).fill(null)); initM3(); }
+  else if (id==='m4') { lSave(SAVE_PREFIX+'m4-ans', new Array(3).fill(null)); initM4(); var ta=document.getElementById('m4-sentence'); if(ta){ta.value='';} var wc=document.getElementById('m4-wc'); if(wc) wc.textContent='Words: 0'; }
+  else if (id==='m5') { m5SeqStep=0; lSave(SAVE_PREFIX+'m5-seq', []); lSave(SAVE_PREFIX+'m5-retell',''); initM5(); var ta2=document.getElementById('m5-retell'); if(ta2) ta2.value=''; var wc2=document.getElementById('m5-wc'); if(wc2) wc2.textContent='Words: 0'; document.getElementById('m5-seq-msg').style.display='none'; }
+  else if (id==='m6') { m6Started=false; var q=document.getElementById('m6-quiz'); if(q) q.innerHTML=''; var r=document.getElementById('m6-result'); if(r) r.style.display='none'; var bot=document.getElementById('m6-bottom'); if(bot) bot.style.display='none'; }
+}
+
+// ═══ MCQ BUILDER ═══
+function buildMCQ(containerId, dataArr, saveKey, scoreDisplayId, badgeId, passScore) {
+  var container = document.getElementById(containerId);
+  container.innerHTML = '';
+  dataArr.forEach(function(item, i) {
+    var div = document.createElement('div');
+    div.className = 'sent-card';
+    var inner = '';
+    if (item.book) inner += '<div class="sent-book">📖 From the book: “'+item.book+'”</div>';
+    inner += '<div class="sent-text">'+item.q+'</div>';
+    inner += '<div class="mcq-opts" id="'+containerId+'-opts'+i+'"></div>';
+    inner += '<div class="mcq-fb" id="'+containerId+'-fb'+i+'"></div>';
+    div.innerHTML = inner;
+    container.appendChild(div);
+    var opts = document.getElementById(containerId+'-opts'+i);
+    item.opts.forEach(function(o, j) {
+      var btn = document.createElement('button');
+      btn.className = 'mcq-opt';
+      btn.textContent = String.fromCharCode(65+j)+') '+o;
+      btn.onclick = function() { answerMCQ(containerId, i, j, dataArr, saveKey, scoreDisplayId, badgeId, passScore); };
+      opts.appendChild(btn);
+    });
+  });
+  var saved = lLoad(SAVE_PREFIX+saveKey, new Array(dataArr.length).fill(null));
+  saved.forEach(function(ans, i) { if (ans!==null) answerMCQ(containerId, i, ans, dataArr, saveKey, scoreDisplayId, badgeId, passScore, true); });
+}
+
+function answerMCQ(containerId, qi, choice, dataArr, saveKey, scoreDisplayId, badgeId, passScore, restore) {
+  var saved = lLoad(SAVE_PREFIX+saveKey, new Array(dataArr.length).fill(null));
+  if (!restore && saved[qi]!==null) return;
+  if (!restore) { saved[qi]=choice; lSave(SAVE_PREFIX+saveKey, saved); }
+  var opts = document.querySelectorAll('#'+containerId+'-opts'+qi+' .mcq-opt');
+  opts.forEach(function(o){ o.disabled=true; });
+  var isOk = choice===dataArr[qi].correct;
+  opts[choice].classList.add(isOk?'ok':'bad');
+  if (!isOk) opts[dataArr[qi].correct].classList.add('ok');
+  var fb = document.getElementById(containerId+'-fb'+qi);
+  fb.className = 'mcq-fb show '+(isOk?'ok':'bad');
+  fb.textContent = isOk ? '✅ '+dataArr[qi].fb : '❌ '+dataArr[qi].fb;
+  if (!restore) {
+    var all = lLoad(SAVE_PREFIX+saveKey, []);
+    if (all.filter(function(a){return a!==null;}).length===dataArr.length) {
+      var sc = all.filter(function(a,j){return a===dataArr[j].correct;}).length;
+      lSave(SAVE_PREFIX+saveKey.replace('-ans','')+'-score', sc);
+      var disp = document.getElementById(scoreDisplayId);
+      if (disp) { disp.style.display='block'; disp.textContent='Score: '+sc+'/'+dataArr.length+' ⚽'; }
+      updateBadge(badgeId, sc>=passScore?'done':'prog');
+    }
+  }
+}
+
+// ═══ M1 DATA ═══
+var m1Data = [
+  { q:'What does "fossil" mean?', opts:['A type of food 🍕','The hard remains of an ancient plant or animal, preserved in rock 🪨','A modern tool for digging','A large tree in the forest'],
+    correct:1, fb:'A fossil is the hard remains of an ancient plant or animal, preserved in rock for millions of years!' },
+  { book:'Jørn loved to collect fossils in the woods near his home.', q:'"Collect" means…', opts:['To throw things away','To break into small pieces','To get and keep things of the same kind 🧺','To cook food'],
+    correct:2, fb:'Collect = to get and keep things of the same kind! Jørn collected fossils as a hobby.' },
+  { q:'A scientist who studies fossils and ancient life is called a…', opts:['professor','paleontologist 🦴','carer','footballer'],
+    correct:1, fb:'A paleontologist is a scientist who studies fossils and ancient life. Jørn Hurum is a paleontologist!' },
+  { book:'He read the book alone in his room. That book changed his life!', q:'"Alone" means…', opts:['With many friends','Without other people — by yourself 🧍','Very quickly','In a loud voice'],
+    correct:1, fb:'Alone = without other people — by yourself. Jørn read the fossil book alone in his room.' },
+  { q:'What is a "dinosaur"?', opts:['A modern animal at the zoo','A type of fish','A very large reptile that lived millions of years ago 🦕','A bird that can fly'],
+    correct:2, fb:'A dinosaur is a very large reptile that lived millions of years ago. We know about them from fossils!' },
+  { book:'For decades, he has enjoyed his work at the museum.', q:'"Decades" means…', opts:['A few days','Periods of ten years 📅','One hundred years','A type of fossil'],
+    correct:1, fb:'Decades = periods of ten years! Jørn has worked with fossils for decades — many groups of 10 years.' },
+  { q:'Jørn loves his work. He has _______ studying fossils for many years.', opts:['escaped','preserved','enjoyed 😊','collected'],
+    correct:2, fb:'Enjoyed = to like doing something, to get pleasure from it. Jørn has enjoyed fossils his whole life!' },
+  { book:'He escorted thousands of visitors through the museum exhibits.', q:'"Escorted" means he…', opts:['Ignored the visitors','Went with them to show them around 🚶','Told them to leave','Sold them tickets'],
+    correct:1, fb:'Escorted = went with someone to show them around or guide them. He escorted visitors through the museum.' },
+  { q:'A "bug" is…', opts:['A large animal','A small insect 🐛','A type of rock','A musical instrument'],
+    correct:1, fb:'A bug is a small insect. Jørn found bugs preserved in rock — ancient insects millions of years old!' },
+  { q:'The fossil was perfectly _______ in stone — it looked like new!', opts:['melted','broken','preserved 🧊','collected'],
+    correct:2, fb:'Preserved = kept in good condition over a long time. The fossil was perfectly preserved for millions of years!' },
+  { q:'Jørn turned his hobby of collecting fossils into a _______.', opts:['game','career 💼','holiday','problem'],
+    correct:1, fb:'A career is a job you do for a long time. Jørn turned his hobby into a career as a paleontologist!' }
+];
+function initM1() { buildMCQ('m1-qs', m1Data, 'm1-ans', 'm1-score-disp', 'm1', 8); }
+
+// ═══ M2: ASK QUESTIONS CHART ═══
+var m2SaveTimer = null;
+function m2AutoSave() {
+  clearTimeout(m2SaveTimer);
+  m2SaveTimer = setTimeout(function() { saveM2(false); }, 1500);
+}
+function saveM2(manual) {
+  var fields = ['qa-q1','qa-a1','qa-q2','qa-a2','qa-q3','qa-a3','qa-q4','qa-a4'];
+  fields.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      lSave(SAVE_PREFIX+id, el.value);
+      if (el.value.trim()) el.classList.add('saved-glow'); else el.classList.remove('saved-glow');
+    }
+  });
+  if (manual!==false) showSaveInd('m2');
+  var hasContent = fields.some(function(id){ var el=document.getElementById(id); return el && el.value.trim().length > 0; });
+  updateBadge('m2', hasContent ? 'prog' : 'new');
+}
+function loadM2() {
+  ['qa-q1','qa-a1','qa-q2','qa-a2','qa-q3','qa-a3','qa-q4','qa-a4'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      var val = lLoad(SAVE_PREFIX+id, '');
+      el.value = val;
+      if (val) el.classList.add('saved-glow');
+    }
+  });
+}
+
+// ═══ M3 DATA ═══
+var m3Data = [
+  { q:'What was Jørn Hurum’s hobby as a child?', opts:['Playing football','Collecting fossils 🪨','Cooking food','Playing video games'],
+    correct:1, fb:'Jørn’s hobby was collecting fossils! He found them in the woods near his home in Oslo, Norway.' },
+  { book:'One day, he found a book about fossils. He read it alone in his room. That book changed his life!', q:'Why did the book change Jørn’s life?', opts:['It taught him to cook','It made him want to find fossils everywhere 💡','It was about football','It was very expensive'],
+    correct:1, fb:'After reading that book, Jørn started looking for fossils everywhere — under rocks, near rivers, and in the forest!' },
+  { q:'What did Jørn become when he grew up?', opts:['A footballer','A chef','A paleontologist and professor 🦴🎓','A musician'],
+    correct:2, fb:'Jørn became a paleontologist (scientist who studies fossils) and a professor at the Natural History Museum in Oslo!' },
+  { book:'His biggest discovery was a primate fossil called "Ida" that is 47 million years old!', q:'What was special about "Ida"?', opts:['She was a dinosaur','She was a primate fossil, 47 million years old! 🐒','She was found in the ocean','She was made of gold'],
+    correct:1, fb:'Ida is a primate fossil that is 47 million years old — Jørn’s biggest and most famous discovery!' },
+  { q:'How did Jørn turn his hobby into a career?', opts:['He won the lottery','He moved to a different country','He studied at university and learned the proper way to find fossils 🎓','He stopped collecting fossils'],
+    correct:2, fb:'Jørn studied at university to learn the proper way to find and study fossils. His hobby became his career!' }
+];
+function initM3() { buildMCQ('m3-qs', m3Data, 'm3-ans', 'm3-score-disp', 'm3', 4); }
+
+// ═══ M4: GRAMMAR DATA ═══
+var m4GramData = [
+  { q:'Which sentence uses "who" correctly to describe a person?', opts:['Jørn Hurum is a man who studies fossils.','Jørn Hurum is a fossils who studies man.','Jørn Hurum is a man fossils who.','Who is a man Jørn studies fossils.'],
+    correct:0, fb:'"A man WHO studies fossils" — "who" connects the person to what they do!' },
+  { q:'Complete: "A paleontologist is a scientist _______ studies ancient life."', opts:['what','where','who','when'],
+    correct:2, fb:'"A scientist WHO studies ancient life" — we use "who" to describe people!' },
+  { q:'Which sentence uses "who" correctly?', opts:['The museum who has fossils is big.','The fossil who is old was found.','He is a professor who gives lectures at the museum.','The rock who was heavy fell.'],
+    correct:2, fb:'"A professor WHO gives lectures" — "who" describes a PERSON, not a thing!' }
+];
+function initM4() {
+  buildMCQ('m4-qs', m4GramData, 'm4-ans', 'm4-score-disp', 'm4', 2);
+  document.getElementById('m4-sentence').value = lLoad(SAVE_PREFIX+'m4-sentence', '');
+  updateWordCount();
+}
+function updateWordCount() {
+  var ta = document.getElementById('m4-sentence');
+  if (!ta) return;
+  var w = ta.value.trim().split(/\s+/).filter(function(x){ return x.length>0; }).length;
+  var wc = document.getElementById('m4-wc');
+  if (wc) wc.textContent = 'Words: ' + w;
+}
+function m4Save(manual) {
+  var val = document.getElementById('m4-sentence').value;
+  lSave(SAVE_PREFIX+'m4-sentence', val);
+  updateWordCount();
+  if (manual) showSaveInd('m4');
+  updateBadge('m4', val.trim() ? 'prog' : 'new');
+}
+
+// ═══ M5: SEQUENCE & RETELL ═══
+var m5Events = [
+  'Jørn grew up in Oslo, Norway, and loved exploring the woods.',
+  'He found a book about fossils and read it alone in his room.',
+  'As a teenager, he collected bugs, shells, and dinosaur bones.',
+  'He studied at university to learn the proper way to find fossils.',
+  'He became a paleontologist and professor at the Natural History Museum.',
+  'He discovered a primate fossil called "Ida" that is 47 million years old!'
+];
+var m5Correct = [0,1,2,3,4,5];
+var m5Shuffled = [];
+var m5SeqStep = 0;
+
+function initM5() {
+  m5Shuffled = m5Events.map(function(e,i){return {text:e,idx:i};});
+  for (var i = m5Shuffled.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = m5Shuffled[i]; m5Shuffled[i] = m5Shuffled[j]; m5Shuffled[j] = tmp;
+  }
+  m5SeqStep = 0;
+  var saved = lLoad(SAVE_PREFIX+'m5-seq', []);
+  if (saved && saved.length > 0) { m5SeqStep = saved.length; }
+  renderM5Seq();
+  var retell = lLoad(SAVE_PREFIX+'m5-retell', '');
+  document.getElementById('m5-retell').value = retell;
+  var w = retell.trim().split(/\s+/).filter(function(x){return x.length>0;}).length;
+  document.getElementById('m5-wc').textContent = 'Words: ' + w;
+}
+
+function renderM5Seq() {
+  var host = document.getElementById('m5-seq');
+  var saved = lLoad(SAVE_PREFIX+'m5-seq', []);
+  var html = '';
+  m5Shuffled.forEach(function(item, i) {
+    var placedIdx = saved.indexOf(item.idx);
+    var isPlaced = placedIdx !== -1;
+    html += '<div class="seq-card'+(isPlaced?' placed':'')+'" data-si="'+i+'" '+(isPlaced?'':'onclick="m5Pick('+i+')"')+'>';
+    html += '<div class="seq-num">'+(isPlaced?(placedIdx+1):'?')+'</div>';
+    html += '<span>'+item.text+'</span></div>';
+  });
+  host.innerHTML = html;
+  if (saved.length === m5Events.length) {
+    var allCorrect = saved.every(function(v,i){return v===i;});
+    var msg = document.getElementById('m5-seq-msg');
+    if (allCorrect) {
+      msg.style.display = 'block';
+      msg.textContent = '✅ Perfect order! You know the biography!';
+      msg.style.color = 'var(--gn)'; msg.style.background = 'var(--gnl)';
+    } else {
+      msg.style.display = 'block';
+      msg.textContent = '❌ Not quite right. Try again!';
+      msg.style.color = 'var(--rd)'; msg.style.background = 'var(--rdl)';
+      setTimeout(function() { m5SeqStep = 0; lSave(SAVE_PREFIX+'m5-seq', []); renderM5Seq(); msg.style.display='none'; }, 2000);
+    }
+  }
+}
+
+function m5Pick(shuffledIdx) {
+  var saved = lLoad(SAVE_PREFIX+'m5-seq', []);
+  if (saved.length >= m5Events.length) return;
+  saved.push(m5Shuffled[shuffledIdx].idx);
+  m5SeqStep = saved.length;
+  lSave(SAVE_PREFIX+'m5-seq', saved);
+  renderM5Seq();
+  updateBadge('m5', 'prog');
+}
+
+function m5Save(manual) {
+  var val = document.getElementById('m5-retell').value;
+  lSave(SAVE_PREFIX+'m5-retell', val);
+  var w = val.trim().split(/\s+/).filter(function(x){return x.length>0;}).length;
+  document.getElementById('m5-wc').textContent = 'Words: ' + w;
+  if (manual) showSaveInd('m5');
+  if (val.trim()) updateBadge('m5', 'prog');
+}
+
+// ═══ M6: CAN LEO SCORE? ═══
+var m6Qs = [
+  { tag:'VOCABULARY', q:'What does "paleontologist" mean?', opts:['A type of dinosaur','A scientist who studies fossils and ancient life 🦴','A museum visitor','A type of fossil'], correct:1,
+    fb:'A paleontologist is a scientist who studies fossils and ancient life — like Jørn Hurum!' },
+  { tag:'VOCABULARY', q:'What does "preserved" mean?', opts:['Broken into pieces','Lost forever','Kept in good condition over a long time 🧊','Eaten by animals'], correct:2,
+    fb:'Preserved = kept in good condition over time. Fossils are preserved in rock for millions of years!' },
+  { tag:'STORY', q:'Where did Jørn Hurum grow up?', opts:['London, England','Tokyo, Japan','Oslo, Norway 🇳🇴','New York, USA'], correct:2,
+    fb:'Jørn grew up in Oslo, Norway. He explored the woods near his home looking for fossils.' },
+  { tag:'STORY', q:'What was Jørn’s biggest discovery?', opts:['A dinosaur skeleton','A primate fossil called "Ida" — 47 million years old! 🐒','A golden treasure','A new planet'], correct:1,
+    fb:'Ida is a primate fossil that is 47 million years old — Jørn’s biggest discovery!' },
+  { tag:'GRAMMAR', q:'Which sentence uses "who" correctly?', opts:['The fossil who was old broke.','He is a professor who gives lectures. 🎓','The museum who has exhibits is nice.','The rock who fell was heavy.'], correct:1,
+    fb:'"A professor WHO gives lectures" — "who" describes a PERSON, not a thing!' },
+  { tag:'READING STRATEGY', q:'The reading strategy for this unit is "Ask Questions." Which is a good question to ask while reading?', opts:['What time is lunch?','What is Jørn’s hobby and how did it become his career? ❓','Is it raining outside?','What colour is the book?'], correct:1,
+    fb:'Good reading questions are about the TEXT! "What is his hobby?" helps you understand the story.' },
+  { tag:'STORY', q:'How did Jørn turn his hobby into a career?', opts:['He won a competition','He studied at university to learn the proper way to find fossils 🎓','He found treasure','He moved to another country'], correct:1,
+    fb:'Jørn studied at university to learn the proper way to find and study fossils. His hobby became his career!' },
+  { tag:'VOCABULARY', q:'A person who looks after someone is called a…', opts:['paleontologist','professor','carer 🤝','escorted'], correct:2,
+    fb:'A carer is a person who looks after someone. Nurses, parents, and grandparents can all be carers!' }
+];
+
+var m6Started=false, m6Idx=0, m6Score=0, m6Wrong=[], m6StartTime=null;
+
+function initM6() {
+  m6Started=true; m6Idx=0; m6Score=0; m6Wrong=[];
+  m6StartTime=Date.now();
+  document.getElementById('m6-result').style.display='none';
+  document.getElementById('m6-bottom').style.display='none';
+  renderM6();
+}
+
+function renderM6() {
+  var container = document.getElementById('m6-quiz');
+  if (m6Idx>=m6Qs.length) { showM6Result(); return; }
+  var q = m6Qs[m6Idx];
+  var pct = Math.round(m6Idx/m6Qs.length*100);
+  var html = '<div class="qz-prog-bar"><div class="qz-prog-fill" style="width:'+pct+'%"></div></div>';
+  html += '<div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-family:var(--fnh);font-size:.7rem;color:var(--ink3)">Question '+(m6Idx+1)+' of 8</span><span style="font-family:var(--fnh);font-size:.7rem;color:var(--pu)">Score: '+m6Score+' ⚽</span></div>';
+  html += '<div class="sent-card"><div class="qz-tag">'+q.tag+'</div><div class="qz-q">'+q.q+'</div>';
+  html += '<div class="mcq-opts">'+q.opts.map(function(o,i){ return '<button class="mcq-opt" onclick="ansM6('+i+')">'+String.fromCharCode(65+i)+') '+o+'</button>'; }).join('')+'</div>';
+  html += '<div class="mcq-fb" id="m6-fb"></div></div>';
+  container.innerHTML = html;
+}
+
+function ansM6(choice) {
+  var q = m6Qs[m6Idx];
+  var isOk = choice===q.correct;
+  document.querySelectorAll('#m6-quiz .mcq-opt').forEach(function(b){b.disabled=true;});
+  var opts = document.querySelectorAll('#m6-quiz .mcq-opt');
+  opts[choice].classList.add(isOk?'ok':'bad');
+  if (!isOk) opts[q.correct].classList.add('ok');
+  var fb = document.getElementById('m6-fb');
+  fb.className = 'mcq-fb show '+(isOk?'ok':'bad');
+  fb.textContent = isOk ? '⚽ GOAL! '+q.fb : '❌ '+q.fb;
+  if (isOk) { m6Score++; showGoalAnim(); }
+  else m6Wrong.push({question:m6Idx+1, prompt:q.q, tag:q.tag});
+  setTimeout(function(){ m6Idx++; renderM6(); }, 1800);
+}
+
+function showM6Result() {
+  document.getElementById('m6-quiz').innerHTML = '';
+  var total = m6Qs.length;
+  var pct = Math.round(m6Score/total*100);
+  var pass = pct>=80;
+  var timeSpent = Math.round((Date.now()-m6StartTime)/1000)+'s';
+  lSave(SAVE_PREFIX+'score', {score:m6Score, total:total, percent:pct, done:pass, timestamp:new Date().toISOString(), wrongQuestions:m6Wrong});
+  lSave(SAVE_PREFIX+'done', pass);
+  lSave(HOMEWORK_ID+'-done', pass);
+  updateBadge('m6', pass?'done':'prog');
+  var res = document.getElementById('m6-result');
+  res.style.display = 'block';
+  res.innerHTML = '<div class="result-box"><div style="font-size:3rem">'+(pass?'🏆':'💪')+'</div>' +
+    '<div class="result-score">'+m6Score+'/'+total+'</div>' +
+    '<div style="font-family:var(--fnh);font-size:1.1rem;font-weight:700;color:'+(pass?'var(--gn)':'var(--rd)')+'">'+pct+'% — '+(pass?'⚽ GOAL! You passed!':'Keep trying!')+'</div>' +
+    '<div style="font-size:.88rem;font-weight:800;color:var(--ink);margin-top:8px">'+(pass?'🎉 Well done Leo! You know Hurum’s Hobby inside out!':'📚 Review the modules and try again!')+'</div>' +
+    '<div style="font-size:.75rem;color:var(--ink3);margin-top:4px">Time: '+timeSpent+'</div>' +
+    '<div class="result-bullets" style="margin-top:12px">'+
+    m6Qs.map(function(q,i){ var wrong=m6Wrong.some(function(w){return w.question===i+1;}); return '<div class="result-bullet '+(wrong?'bad':'ok')+'">'+(wrong?'❌':'✅')+' Q'+(i+1)+': '+q.tag+'</div>'; }).join('')+
+    '</div></div>';
+  document.getElementById('m6-bottom').style.display = 'flex';
+  if (pass) launchConfetti();
+}
+
+// ═══ ANIMATIONS ═══
+function showGoalAnim() {
+  var el = document.getElementById('goalAnim');
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 900);
+}
+function launchConfetti() {
+  var colors = ['#7C3AED','#FDE047','#16A34A','#DC2626','#1D4ED8','#fff'];
+  for (var i=0; i<55; i++) {
+    setTimeout(function() {
+      var d = document.createElement('div'); d.className='cp';
+      d.style.left=Math.random()*100+'vw'; d.style.top='-10px';
+      d.style.background=colors[Math.floor(Math.random()*colors.length)];
+      d.style.width=d.style.height=(7+Math.random()*8)+'px';
+      d.style.animationDuration=(1.2+Math.random()*1.5)+'s';
+      document.body.appendChild(d);
+      setTimeout(function(){d.remove();},2500);
+    }, i*30);
+  }
+}
+
+// ═══ INIT ═══
+window.addEventListener('DOMContentLoaded', async function() {
+  await restoreProgressFromCloud();
+  if (isReview) { initReviewMode(); return; }
+  initM1(); initM3(); initM4(); initM5();
+  loadM2();
+  var modNames = {m1:'Vocabulary Quiz',m2:'Ask Questions Chart',m3:'Story Comprehension',m4:'Grammar: who',m5:'Sequence and Retell',m6:'Can Leo Score'};
+  Object.keys(modNames).forEach(function(id) {
+    var data = lLoad(SAVE_PREFIX+id+'-complete', null);
+    var btn = document.getElementById('cbtn-'+id);
+    if (data && data.timestamp && btn) {
+      btn.classList.add('confirmed');
+      btn.textContent = '✅ '+modNames[id]+' complete';
+      updateBadge(id, 'done');
+    }
+  });
+  var scoreData = lLoad(SAVE_PREFIX+'score');
+  if (scoreData) updateBadge('m6', scoreData.done?'done':'prog');
+  var m2Fields = ['qa-q1','qa-a1','qa-q2','qa-a2','qa-q3','qa-a3','qa-q4','qa-a4'];
+  if (m2Fields.some(function(id){ return lLoad(SAVE_PREFIX+id,'').trim(); })) updateBadge('m2','prog');
+  var m4Sent = lLoad(SAVE_PREFIX+'m4-sentence','');
+  if (m4Sent.trim()) updateBadge('m4','prog');
+  var m5Retell = lLoad(SAVE_PREFIX+'m5-retell','');
+  var m5Seq = lLoad(SAVE_PREFIX+'m5-seq',[]);
+  if (m5Retell.trim() || m5Seq.length > 0) updateBadge('m5','prog');
+});
+</script>
+</body>
+</html>

@@ -330,7 +330,7 @@ function TeacherLessonRow({
           <>
             <LeoAppStatus assignment={assignment} appProgress={appProgress} />
             <div className="teacher-leo-actions">
-              {assignment ? (
+              {appProgress.done || assignment ? (
                 <Link className="teacher-done-button" href={`/teacher/review/${learner.id}`}>Review</Link>
               ) : (
                 <button className="teacher-done-button" onClick={() => assignLesson(learner.id)} type="button">Assign to Leo</button>
@@ -384,10 +384,12 @@ function LeoAppStatus({ assignment, appProgress }: { assignment: AssignmentRecor
   const percent = appProgress.moduleCount ? Math.round((appProgress.completedModules / appProgress.moduleCount) * 100) : 0;
   const label = appProgress.done ? "✓ Done" : assignment ? "In progress" : "Not assigned";
 
+  const showBar = appProgress.done || !!assignment;
+
   return (
     <div className="teacher-leo-progress">
-      <div><span className={appProgress.done ? "status-pill done" : assignment ? "status-pill active" : "muted-status"}>{label}</span><strong>{assignment ? `${percent}%` : ""}</strong></div>
-      {assignment ? (
+      <div><span className={appProgress.done ? "status-pill done" : assignment ? "status-pill active" : "muted-status"}>{label}</span><strong>{showBar ? `${percent}%` : ""}</strong></div>
+      {showBar ? (
         <>
           <i><b style={{ width: `${percent}%` }} /></i>
           <small>{appProgress.completedModules}/{appProgress.moduleCount}</small>

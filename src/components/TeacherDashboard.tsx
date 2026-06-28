@@ -327,21 +327,25 @@ function TeacherLessonRow({
       <div className="teacher-table-leo">
         {learner && appProgress ? (
           <>
-            <LeoAppStatus assignment={assignment} appProgress={appProgress} />
-            <div className="teacher-leo-actions">
-              {assignment ? (
-                <>
+            {assignment ? (
+              <>
+                <LeoAppStatus assignment={assignment} appProgress={appProgress} />
+                <div className="teacher-leo-actions">
                   <Link className="teacher-done-button" href={`/teacher/review/${learner.id}`}>Review</Link>
-                  <Link className="teacher-done-button" href={`/lessons/${learner.id}`}>Open Leo App <ExternalLink size={13} /></Link>
-                  <button className="teacher-done-button ghost" onClick={() => unassignLesson(learner.id)} type="button">Unassign</button>
-                </>
-              ) : (
-                <>
-                  <span className="muted-status">Not assigned</span>
-                  <button className="teacher-done-button" onClick={() => assignLesson(learner.id)} type="button">Assign to Leo</button>
-                </>
-              )}
-            </div>
+                  {!appProgress.done && (
+                    <span className="teacher-quiet-links">
+                      <Link className="teacher-quiet-link" href={`/lessons/${learner.id}`}>Open Leo App</Link>
+                      <button className="teacher-quiet-link" onClick={() => unassignLesson(learner.id)} type="button">Unassign</button>
+                    </span>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="teacher-leo-actions">
+                <span className="muted-status">Not assigned</span>
+                <button className="teacher-done-button" onClick={() => assignLesson(learner.id)} type="button">Assign to Leo</button>
+              </div>
+            )}
           </>
         ) : (
           <span className="muted-status">—</span>

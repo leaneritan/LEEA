@@ -76,11 +76,11 @@ export function AppShell({
         <aside className="sidebar">
         <Link className="brand" href="/">
           <span className="brand-logo-wrap">
-            <Image alt="" className="brand-logo" height={48} src="/brand/leea_brand_mark.png" width={48} />
+            <Image alt="" className="brand-logo" height={42} src="/brand/leea_brand_mark.png" width={42} />
           </span>
           <span>
             <strong>LEEA</strong>
-            <small>Leo&apos;s Elite Education Academy</small>
+            <small>Elite Education Academy</small>
           </span>
         </Link>
 

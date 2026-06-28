@@ -14,7 +14,7 @@ import {
   type AssignmentMap,
   type AssignmentRecord
 } from "@/data/assignments";
-import { getLearnerAppProgress, hydrateLearnerProgressFromCloud, loadLocalValue, type LearnerAppProgress } from "@/data/learnerProgress";
+import { getLearnerAppProgress, syncLearnerProgressWithCloud, loadLocalValue, type LearnerAppProgress } from "@/data/learnerProgress";
 import { learnerLessons } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
@@ -60,7 +60,7 @@ export function TeacherReviewPage({ lesson }: { lesson: Lesson }) {
     function refresh() {
       setAssignments(readAssignments(learnerLessons));
       void readAssignmentsFromCloud(learnerLessons).then(setAssignments);
-      void hydrateLearnerProgressFromCloud([lesson]).then((changed) => {
+      void syncLearnerProgressWithCloud([lesson]).then((changed) => {
         if (changed) {
           setProgress(getLearnerAppProgress(lesson.source));
           setSavedScore(readSavedScore(lesson));

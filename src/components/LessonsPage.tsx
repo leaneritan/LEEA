@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { lessonProgressStorageKey, type LessonProgressMap } from "@/data/lessonProgress";
+import { readLessonProgress, syncLessonProgressWithCloud, type LessonProgressMap } from "@/data/lessonProgress";
 import { teacherLessons } from "@/data/lessons";
 import { allGrammar, allWords } from "./reference/ref-data";
 import { useKnownWordIds } from "./useKnownWordIds";
@@ -17,9 +17,9 @@ export function LessonsPage() {
 
   useEffect(() => {
     const refresh = () => {
-      const saved = window.localStorage.getItem(lessonProgressStorageKey);
-      if (!saved) return setProgress({});
-      try { setProgress(JSON.parse(saved) as LessonProgressMap); } catch { setProgress({}); }
+      const localProgress = readLessonProgress();
+      setProgress(localProgress);
+      void syncLessonProgressWithCloud(localProgress).then(setProgress);
     };
     refresh();
     window.addEventListener("storage", refresh);

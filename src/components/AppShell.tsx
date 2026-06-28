@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { BarChart3, BookOpen, CheckSquare, ChevronLeft, ChevronRight, GraduationCap, Home, Library, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getOpenAssignmentCount, readAssignments, readAssignmentsFromCloud } from "@/data/assignments";
 import { learnerLessons } from "@/data/lessons";
@@ -108,8 +108,14 @@ export function AppShell({
           <span className="disabled" data-tooltip="Science"><i className="dot-disabled" />Science</span>
         </div>
 
-        <div className="sidebar-progress" data-tooltip={`${assignmentsLeft ?? 0} left`}>
-          <strong>{active === "teacher" || active === "progress" ? "This week" : active === "english" ? "Our World" : "Leo&apos;s Progress"}</strong>
+        <div
+          className="sidebar-progress"
+          data-tooltip={`${assignmentsLeft ?? 0} left`}
+          data-ring-count={assignmentsLeft ?? 0}
+          style={{ "--ring-pct": `${assignmentsLeft ? Math.min(100, Math.round(((12 - assignmentsLeft) / 12) * 100)) : 100}%` } as CSSProperties}
+        >
+          <strong className="progress-label">{active === "teacher" || active === "progress" ? "This week" : active === "english" ? "Our World" : "Leo&apos;s Progress"}</strong>
+          <strong className="progress-ring-count">{assignmentsLeft ?? 0}</strong>
           {active === "english" ? (
             <><span>Level 4 · Unit 8</span><div className="sidebar-mini-progress"><i /></div></>
           ) : (

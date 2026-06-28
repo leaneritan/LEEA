@@ -90,6 +90,15 @@ create index if not exists teacher_lesson_progress_student_status_idx
 create index if not exists reference_confidence_student_confidence_idx
   on public.reference_confidence (student_id, confidence, updated_at desc);
 
+-- Expose only the app state tables to the browser anon role.
+-- Row Level Security policies below still decide which rows the browser can read/write.
+grant usage on schema public to anon;
+grant select on public.students to anon;
+grant select, insert, update, delete on public.assignments to anon;
+grant select, insert, update, delete on public.learner_progress to anon;
+grant select, insert, update, delete on public.teacher_lesson_progress to anon;
+grant select, insert, update, delete on public.reference_confidence to anon;
+
 -- Keep updated_at fresh on row changes.
 create or replace function public.set_updated_at()
 returns trigger

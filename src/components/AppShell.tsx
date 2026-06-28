@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { BarChart3, BookOpen, CheckSquare, GraduationCap, Home, Library, PanelLeftClose, PanelLeftOpen, Search } from "lucide-react";
+import { BarChart3, BookOpen, CheckSquare, ChevronLeft, ChevronRight, GraduationCap, Home, Library, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -13,11 +13,11 @@ import { useJapaneseSetting } from "@/components/useJapaneseSetting";
 type NavKey = "home" | "teacher" | "progress" | "english" | "assignments" | "reference" | "search";
 
 const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNode }> = [
-  { key: "home", label: "Home", href: "/", icon: <Home size={20} /> },
-  { key: "assignments", label: "Leo", href: "/leo", icon: <CheckSquare size={20} /> },
-  { key: "teacher", label: "Neritan", href: "/teacher", icon: <GraduationCap size={20} /> },
-  { key: "reference", label: "Reference", href: "/reference", icon: <Library size={20} /> },
-  { key: "progress", label: "Progress", href: "/teacher/progress", icon: <BarChart3 size={20} /> }
+  { key: "home", label: "Home", href: "/", icon: <Home size={20} strokeWidth={2} /> },
+  { key: "assignments", label: "Leo", href: "/leo", icon: <CheckSquare size={20} strokeWidth={2} /> },
+  { key: "teacher", label: "Neritan", href: "/teacher", icon: <GraduationCap size={20} strokeWidth={2} /> },
+  { key: "reference", label: "Reference", href: "/reference", icon: <Library size={20} strokeWidth={2} /> },
+  { key: "progress", label: "Progress", href: "/teacher/progress", icon: <BarChart3 size={20} strokeWidth={2} /> }
 ];
 
 const mobileNavItems = [navItems[0], navItems[1], navItems[2], { key: "english" as const, label: "English", href: "/english", icon: <BookOpen size={20} /> }, navItems[3]];
@@ -74,26 +74,26 @@ export function AppShell({
     <JapanesePreferenceContext.Provider value={japaneseOn}>
       <div className={`${japaneseOn ? "app jp-on" : "app"} ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
         <aside className="sidebar">
-        <Link className="brand" href="/">
-          <span className="brand-logo-wrap">
-            <Image alt="" className="brand-logo" height={42} src="/brand/leea_brand_mark.png" width={42} />
-          </span>
-          <span>
-            <strong>LEEA</strong>
-            <small>Elite Education Academy</small>
-          </span>
-        </Link>
-
-        <button className="sidebar-toggle" onClick={toggleSidebar} type="button">
-          {sidebarCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
-          <span>{sidebarCollapsed ? "Open menu" : "Collapse menu"}</span>
-        </button>
+        <div className="brand-row">
+          <Link className="brand" href="/">
+            <span className="brand-logo-wrap">
+              <Image alt="" className="brand-logo" height={42} src="/brand/leea_brand_mark.png" width={42} />
+            </span>
+            <span className="brand-text">
+              <strong>LEEA</strong>
+              <small>Elite Education Academy</small>
+            </span>
+          </Link>
+          <button className="sidebar-toggle" onClick={toggleSidebar} type="button" aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
+            {sidebarCollapsed ? <ChevronRight size={16} strokeWidth={2.5} /> : <ChevronLeft size={16} strokeWidth={2.5} />}
+          </button>
+        </div>
 
         <nav className="side-nav" aria-label="Main navigation">
           {navItems.map((item) => (
-            <Link className={active === item.key ? "active" : ""} href={item.href} key={item.key}>
-              {item.icon}
-              <span>{item.label}</span>
+            <Link className={active === item.key ? "active" : ""} data-tooltip={item.label} href={item.href} key={item.key}>
+              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-label">{item.label}</span>
               {item.key === "assignments" && assignmentsLeft !== null && assignmentsLeft > 0 && (
                 <b className="nav-count">{assignmentsLeft}</b>
               )}
@@ -102,13 +102,13 @@ export function AppShell({
         </nav>
 
         <div className="sidebar-subjects">
-          <span>Subjects</span>
-          <Link className={active === "english" ? "active" : ""} href="/english"><i />English</Link>
-          <span className="disabled"><i />Math</span>
-          <span className="disabled"><i />Science</span>
+          <span className="sidebar-subjects-title">Subjects</span>
+          <Link className={active === "english" ? "active" : ""} data-tooltip="English" href="/english"><i className="dot-english" />English</Link>
+          <span className="disabled" data-tooltip="Math"><i className="dot-disabled" />Math</span>
+          <span className="disabled" data-tooltip="Science"><i className="dot-disabled" />Science</span>
         </div>
 
-        <div className="sidebar-progress">
+        <div className="sidebar-progress" data-tooltip={`${assignmentsLeft ?? 0} left`}>
           <strong>{active === "teacher" || active === "progress" ? "This week" : active === "english" ? "Our World" : "Leo&apos;s Progress"}</strong>
           {active === "english" ? (
             <><span>Level 4 · Unit 8</span><div className="sidebar-mini-progress"><i /></div></>

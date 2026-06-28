@@ -1,20 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, ChevronDown, ChevronRight, Circle, ExternalLink } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronRight, Circle, ExternalLink, MoreHorizontal } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   assignLesson as assignLessonRecord,
   readAssignments,
+  readAssignmentsFromCloud,
   unassignLesson as unassignLessonRecord,
   type AssignmentMap,
   type AssignmentRecord
 } from "@/data/assignments";
-import { getLearnerAppProgress, type LearnerAppProgress } from "@/data/learnerProgress";
+import { getLearnerAppProgress, syncLearnerProgressWithCloud, type LearnerAppProgress } from "@/data/learnerProgress";
 import {
   createLessonProgressRecord,
   getDoneLessonCount,
-  lessonProgressStorageKey,
+  readLessonProgress,
+  saveLessonProgressRecord,
+  syncLessonProgressWithCloud,
   type LessonProgressMap
 } from "@/data/lessonProgress";
 import { getLessonGroups, learnerLessons, lessons, teacherLessons } from "@/data/lessons";
@@ -97,18 +100,18 @@ export function TeacherDashboard() {
   useEffect(() => {
     function refreshAll() {
       setAssignments(readAssignments(learnerLessons));
+      void readAssignmentsFromCloud(learnerLessons).then(setAssignments);
+      void syncLearnerProgressWithCloud(learnerLessons).then((changed) => {
+        if (changed) setProgressVersion((value) => value + 1);
+      });
+      const localProgress = readLessonProgress();
+      setProgress(localProgress);
+      void syncLessonProgressWithCloud(localProgress).then(setProgress);
       setAssignmentsReady(true);
       setProgressVersion((value) => value + 1);
     }
 
-    const savedProgress = window.localStorage.getItem(lessonProgressStorageKey);
-    if (savedProgress) {
-      try {
-        setProgress(JSON.parse(savedProgress) as LessonProgressMap);
-      } catch {
-        setProgress({});
-      }
-    }
+    setProgress(readLessonProgress());
 
     refreshAll();
 
@@ -153,8 +156,9 @@ export function TeacherDashboard() {
 
   function setLessonDone(lessonId: string, done: boolean) {
     setProgress((current) => {
-      const next = { ...current, [lessonId]: createLessonProgressRecord(lessonId, done) };
-      window.localStorage.setItem(lessonProgressStorageKey, JSON.stringify(next));
+      const record = createLessonProgressRecord(lessonId, done);
+      const next = { ...current, [lessonId]: record };
+      void saveLessonProgressRecord(record);
       return next;
     });
   }
@@ -319,39 +323,60 @@ function TeacherLessonRow({
       <div className="teacher-table-teaching">
         <span className={done ? "status-pill done" : "status-pill todo"}>{done ? "✓ Taught" : "To teach"}</span>
         <Link className="teacher-open-button" href={`/lessons/${lesson.id}`}>Open deck</Link>
-        <button className="teacher-mark-link" onClick={() => setLessonDone(lesson.id, !done)} type="button">
-          {done ? "Mark not taught" : "Mark taught"}
-        </button>
       </div>
 
       <div className="teacher-table-leo">
         {learner && appProgress ? (
           <>
-            {assignment ? (
-              <>
-                <LeoAppStatus assignment={assignment} appProgress={appProgress} />
-                <div className="teacher-leo-actions">
-                  <Link className="teacher-done-button" href={`/teacher/review/${learner.id}`}>Review</Link>
-                  {!appProgress.done && (
-                    <span className="teacher-quiet-links">
-                      <Link className="teacher-quiet-link" href={`/lessons/${learner.id}`}>Open Leo App</Link>
-                      <button className="teacher-quiet-link" onClick={() => unassignLesson(learner.id)} type="button">Unassign</button>
-                    </span>
-                  )}
-                </div>
-              </>
-            ) : (
-              <div className="teacher-leo-actions">
-                <span className="muted-status">Not assigned</span>
+            <LeoAppStatus assignment={assignment} appProgress={appProgress} />
+            <div className="teacher-leo-actions">
+              {assignment ? (
+                <Link className="teacher-done-button" href={`/teacher/review/${learner.id}`}>Review</Link>
+              ) : (
                 <button className="teacher-done-button" onClick={() => assignLesson(learner.id)} type="button">Assign to Leo</button>
-              </div>
-            )}
+              )}
+              <TeacherRowMenu
+                done={done}
+                learner={learner}
+                lesson={lesson}
+                markLesson={() => setLessonDone(lesson.id, !done)}
+                unassignLesson={assignment ? () => unassignLesson(learner.id) : undefined}
+              />
+            </div>
           </>
         ) : (
           <span className="muted-status">—</span>
         )}
       </div>
     </article>
+  );
+}
+
+function TeacherRowMenu({
+  done,
+  learner,
+  lesson,
+  markLesson,
+  unassignLesson
+}: {
+  done: boolean;
+  learner: Lesson;
+  lesson: Lesson;
+  markLesson: () => void;
+  unassignLesson?: () => void;
+}) {
+  return (
+    <div className="teacher-row-menu">
+      <button aria-label={`More actions for ${lesson.title}`} type="button">
+        <MoreHorizontal size={18} />
+      </button>
+      <div className="teacher-row-menu-popover">
+        <Link href={`/lessons/${lesson.id}`}>Open deck</Link>
+        <Link href={`/lessons/${learner.id}`}>Open Leo App <ExternalLink size={13} /></Link>
+        <button onClick={markLesson} type="button">{done ? "Mark not taught" : "Mark taught"}</button>
+        {unassignLesson ? <button onClick={unassignLesson} type="button">Unassign</button> : null}
+      </div>
+    </div>
   );
 }
 

@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getOpenAssignmentCount, readAssignments, type AssignmentMap } from "@/data/assignments";
-import { getLearnerAppProgress } from "@/data/learnerProgress";
-import { getDoneLessonCount, lessonProgressStorageKey, type LessonProgressMap } from "@/data/lessonProgress";
+import { getOpenAssignmentCount, readAssignments, readAssignmentsFromCloud, type AssignmentMap } from "@/data/assignments";
+import { getLearnerAppProgress, syncLearnerProgressWithCloud } from "@/data/learnerProgress";
+import { getDoneLessonCount, readLessonProgress, syncLessonProgressWithCloud, type LessonProgressMap } from "@/data/lessonProgress";
 import { learnerLessons, teacherLessons } from "@/data/lessons";
 import { allGrammar, allWords } from "@/components/reference/ref-data";
 import type { Lesson } from "@/data/types";
@@ -26,15 +26,14 @@ export function HomeDashboard() {
 
   useEffect(() => {
     function refreshProgress() {
-      const saved = window.localStorage.getItem(lessonProgressStorageKey);
-      if (saved) {
-        try {
-          setProgress(JSON.parse(saved) as LessonProgressMap);
-        } catch {
-          setProgress({});
-        }
-      }
+      const localProgress = readLessonProgress();
+      setProgress(localProgress);
+      void syncLessonProgressWithCloud(localProgress).then(setProgress);
       setAssignments(readAssignments(learnerLessons));
+      void readAssignmentsFromCloud(learnerLessons).then(setAssignments);
+      void syncLearnerProgressWithCloud(learnerLessons).then((changed) => {
+        if (changed) setProgressVersion((current) => current + 1);
+      });
       setProgressVersion((current) => current + 1);
     }
 

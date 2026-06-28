@@ -6,14 +6,15 @@ import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import {
   assignLesson,
-  assignmentStorageKey,
   createAssignmentRecord,
   createReviewRecord,
   readAssignments,
+  readAssignmentsFromCloud,
+  saveAssignments,
   type AssignmentMap,
   type AssignmentRecord
 } from "@/data/assignments";
-import { getLearnerAppProgress, loadLocalValue, type LearnerAppProgress } from "@/data/learnerProgress";
+import { getLearnerAppProgress, syncLearnerProgressWithCloud, loadLocalValue, type LearnerAppProgress } from "@/data/learnerProgress";
 import { learnerLessons } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
@@ -58,6 +59,13 @@ export function TeacherReviewPage({ lesson }: { lesson: Lesson }) {
   useEffect(() => {
     function refresh() {
       setAssignments(readAssignments(learnerLessons));
+      void readAssignmentsFromCloud(learnerLessons).then(setAssignments);
+      void syncLearnerProgressWithCloud([lesson]).then((changed) => {
+        if (changed) {
+          setProgress(getLearnerAppProgress(lesson.source));
+          setSavedScore(readSavedScore(lesson));
+        }
+      });
       setProgress(getLearnerAppProgress(lesson.source));
       setSavedScore(readSavedScore(lesson));
     }
@@ -210,11 +218,6 @@ function SkillBar({ label, value, total, warn = false }: { label: string; value:
 
 function ReviewStat({ label, value }: { label: string; value: string }) {
   return <div><strong>{value}</strong><span>{label}</span></div>;
-}
-
-function saveAssignments(assignments: AssignmentMap) {
-  window.localStorage.setItem(assignmentStorageKey, JSON.stringify(assignments));
-  return assignments;
 }
 
 function readSavedScore(lesson: Lesson): SavedScore | null {

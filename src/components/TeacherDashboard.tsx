@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, ChevronDown, ChevronRight, Circle, ExternalLink } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronRight, Circle, ExternalLink, MoreHorizontal } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   assignLesson as assignLessonRecord,
@@ -323,9 +323,6 @@ function TeacherLessonRow({
       <div className="teacher-table-teaching">
         <span className={done ? "status-pill done" : "status-pill todo"}>{done ? "✓ Taught" : "To teach"}</span>
         <Link className="teacher-open-button" href={`/lessons/${lesson.id}`}>Open deck</Link>
-        <button className="teacher-mark-link" onClick={() => setLessonDone(lesson.id, !done)} type="button">
-          {done ? "Mark not taught" : "Mark taught"}
-        </button>
       </div>
 
       <div className="teacher-table-leo">
@@ -334,17 +331,17 @@ function TeacherLessonRow({
             <LeoAppStatus assignment={assignment} appProgress={appProgress} />
             <div className="teacher-leo-actions">
               {assignment ? (
-                <>
-                  <Link className="teacher-done-button" href={`/teacher/review/${learner.id}`}>Review</Link>
-                  <Link className="teacher-done-button" href={`/lessons/${learner.id}`}>Open Leo App <ExternalLink size={13} /></Link>
-                  <button className="teacher-done-button ghost" onClick={() => unassignLesson(learner.id)} type="button">Unassign</button>
-                </>
+                <Link className="teacher-done-button" href={`/teacher/review/${learner.id}`}>Review</Link>
               ) : (
-                <>
-                  <span className="muted-status">Not assigned</span>
-                  <button className="teacher-done-button" onClick={() => assignLesson(learner.id)} type="button">Assign to Leo</button>
-                </>
+                <button className="teacher-done-button" onClick={() => assignLesson(learner.id)} type="button">Assign to Leo</button>
               )}
+              <TeacherRowMenu
+                done={done}
+                learner={learner}
+                lesson={lesson}
+                markLesson={() => setLessonDone(lesson.id, !done)}
+                unassignLesson={assignment ? () => unassignLesson(learner.id) : undefined}
+              />
             </div>
           </>
         ) : (
@@ -352,6 +349,34 @@ function TeacherLessonRow({
         )}
       </div>
     </article>
+  );
+}
+
+function TeacherRowMenu({
+  done,
+  learner,
+  lesson,
+  markLesson,
+  unassignLesson
+}: {
+  done: boolean;
+  learner: Lesson;
+  lesson: Lesson;
+  markLesson: () => void;
+  unassignLesson?: () => void;
+}) {
+  return (
+    <div className="teacher-row-menu">
+      <button aria-label={`More actions for ${lesson.title}`} type="button">
+        <MoreHorizontal size={18} />
+      </button>
+      <div className="teacher-row-menu-popover">
+        <Link href={`/lessons/${lesson.id}`}>Open deck</Link>
+        <Link href={`/lessons/${learner.id}`}>Open Leo App <ExternalLink size={13} /></Link>
+        <button onClick={markLesson} type="button">{done ? "Mark not taught" : "Mark taught"}</button>
+        {unassignLesson ? <button onClick={unassignLesson} type="button">Unassign</button> : null}
+      </div>
+    </div>
   );
 }
 

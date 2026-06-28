@@ -21,6 +21,8 @@ export type LearnerProgressStorageRow = {
 
 type LearnerProgressCloudRow = {
   homework_id: string;
+  completed_modules?: number | null;
+  updated_at?: string | null;
   raw_progress: Record<string, unknown> | null;
 };
 
@@ -128,6 +130,54 @@ export async function hydrateLearnerProgressFromCloud(lessons: Lesson[]): Promis
   }
 }
 
+export async function syncLearnerProgressWithCloud(lessons: Lesson[]): Promise<boolean> {
+  const homeworkIds = lessons.map((lesson) => lesson.source.homeworkId).filter((id): id is string => Boolean(id));
+  if (!homeworkIds.length || !isSupabaseConfigured || !supabase || typeof window === "undefined") return false;
+
+  try {
+    const { data, error } = await supabase
+      .from("learner_progress")
+      .select("homework_id, completed_modules, updated_at, raw_progress")
+      .eq("student_id", "leo")
+      .in("homework_id", homeworkIds);
+
+    if (error) throw error;
+
+    const cloudByHomeworkId = new Map(
+      ((data ?? []) as LearnerProgressCloudRow[]).map((row) => [row.homework_id, row])
+    );
+    let changed = false;
+
+    for (const lesson of lessons) {
+      if (!lesson.source.homeworkId) continue;
+      const localRawProgress = collectLocalProgress(lesson);
+      if (!Object.keys(localRawProgress).length) continue;
+
+      const localProgress = getLearnerAppProgress(lesson.source);
+      const cloudProgress = cloudByHomeworkId.get(lesson.source.homeworkId);
+      const cloudRawCount = Object.keys(cloudProgress?.raw_progress ?? {}).length;
+      const shouldPushLocal =
+        !cloudProgress
+        || localProgress.completedModules > (cloudProgress.completed_modules ?? 0)
+        || (
+          localProgress.completedModules === (cloudProgress.completed_modules ?? 0)
+          && Object.keys(localRawProgress).length > cloudRawCount
+        );
+
+      if (shouldPushLocal) {
+        await upsertLearnerProgressSummary(lesson, localRawProgress);
+        changed = true;
+      }
+    }
+
+    const hydrated = await hydrateLearnerProgressFromCloud(lessons);
+    return changed || hydrated;
+  } catch (error) {
+    console.warn("LEEA Supabase learner progress sync failed", error);
+    return false;
+  }
+}
+
 export async function saveLearnerProgressValue(lesson: Lesson, key: string, value: unknown) {
   if (!lesson.source.homeworkId || !isSupabaseConfigured || !supabase || typeof window === "undefined") return;
 
@@ -205,4 +255,20 @@ export function loadLocalValue<T>(key: string, fallback: T): T {
 
 function normalizeLearnerStorageKey(key: string) {
   return key.startsWith("leea-") ? key : `leea-${key}`;
+}
+
+function collectLocalProgress(lesson: Lesson) {
+  const rawProgress: Record<string, unknown> = {};
+  const storagePrefix = lesson.source.storagePrefix;
+  if (!storagePrefix || typeof window === "undefined") return rawProgress;
+
+  for (let index = 0; index < window.localStorage.length; index += 1) {
+    const key = window.localStorage.key(index);
+    if (!key) continue;
+    if (key.startsWith(storagePrefix) || key === `leea-${lesson.source.homeworkId}-done`) {
+      rawProgress[key] = loadLocalValue<unknown>(key, null);
+    }
+  }
+
+  return rawProgress;
 }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getLearnerAppProgress, hydrateLearnerProgressFromCloud } from "@/data/learnerProgress";
+import { getLearnerAppProgress, syncLearnerProgressWithCloud } from "@/data/learnerProgress";
 import { getLessonGroups } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
@@ -81,7 +81,7 @@ export function OurWorldUnitPage() {
     const currentGroup = getLessonGroups().find((item) => item.course === "our-world" && item.level === 4 && item.unit === 8);
     if (!currentGroup) return;
     const learners = currentGroup.lessons.filter((lesson) => lesson.mode === "learner");
-    void hydrateLearnerProgressFromCloud(learners).then((changed) => {
+    void syncLearnerProgressWithCloud(learners).then((changed) => {
       if (changed) setProgressVersion((value) => value + 1);
     });
   }, []);

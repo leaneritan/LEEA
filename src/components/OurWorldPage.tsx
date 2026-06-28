@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { lessonProgressStorageKey, type LessonProgressMap } from "@/data/lessonProgress";
+import { readLessonProgress, syncLessonProgressWithCloud, type LessonProgressMap } from "@/data/lessonProgress";
 import { teacherLessons } from "@/data/lessons";
 
 type SequenceItem = {
@@ -39,9 +39,9 @@ export function OurWorldPage() {
 
   useEffect(() => {
     const refresh = () => {
-      const saved = window.localStorage.getItem(lessonProgressStorageKey);
-      if (!saved) return setProgress({});
-      try { setProgress(JSON.parse(saved) as LessonProgressMap); } catch { setProgress({}); }
+      const localProgress = readLessonProgress();
+      setProgress(localProgress);
+      void syncLessonProgressWithCloud(localProgress).then(setProgress);
     };
     refresh();
     window.addEventListener("storage", refresh);

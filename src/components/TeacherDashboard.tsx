@@ -11,11 +11,13 @@ import {
   type AssignmentMap,
   type AssignmentRecord
 } from "@/data/assignments";
-import { getLearnerAppProgress, hydrateLearnerProgressFromCloud, type LearnerAppProgress } from "@/data/learnerProgress";
+import { getLearnerAppProgress, syncLearnerProgressWithCloud, type LearnerAppProgress } from "@/data/learnerProgress";
 import {
   createLessonProgressRecord,
   getDoneLessonCount,
-  lessonProgressStorageKey,
+  readLessonProgress,
+  saveLessonProgressRecord,
+  syncLessonProgressWithCloud,
   type LessonProgressMap
 } from "@/data/lessonProgress";
 import { getLessonGroups, learnerLessons, lessons, teacherLessons } from "@/data/lessons";
@@ -99,21 +101,17 @@ export function TeacherDashboard() {
     function refreshAll() {
       setAssignments(readAssignments(learnerLessons));
       void readAssignmentsFromCloud(learnerLessons).then(setAssignments);
-      void hydrateLearnerProgressFromCloud(learnerLessons).then((changed) => {
+      void syncLearnerProgressWithCloud(learnerLessons).then((changed) => {
         if (changed) setProgressVersion((value) => value + 1);
       });
+      const localProgress = readLessonProgress();
+      setProgress(localProgress);
+      void syncLessonProgressWithCloud(localProgress).then(setProgress);
       setAssignmentsReady(true);
       setProgressVersion((value) => value + 1);
     }
 
-    const savedProgress = window.localStorage.getItem(lessonProgressStorageKey);
-    if (savedProgress) {
-      try {
-        setProgress(JSON.parse(savedProgress) as LessonProgressMap);
-      } catch {
-        setProgress({});
-      }
-    }
+    setProgress(readLessonProgress());
 
     refreshAll();
 
@@ -158,8 +156,9 @@ export function TeacherDashboard() {
 
   function setLessonDone(lessonId: string, done: boolean) {
     setProgress((current) => {
-      const next = { ...current, [lessonId]: createLessonProgressRecord(lessonId, done) };
-      window.localStorage.setItem(lessonProgressStorageKey, JSON.stringify(next));
+      const record = createLessonProgressRecord(lessonId, done);
+      const next = { ...current, [lessonId]: record };
+      void saveLessonProgressRecord(record);
       return next;
     });
   }

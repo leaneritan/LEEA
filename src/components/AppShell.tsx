@@ -77,7 +77,7 @@ export function AppShell({
         <div className="brand-row">
           <Link className="brand" href="/">
             <span className="brand-logo-wrap">
-              <Image alt="" className="brand-logo" height={42} src="/brand/leea_brand_mark.png" width={42} />
+              <Image alt="" className="brand-logo" height={42} src="/brand/leea_brand_logo.png" width={42} />
             </span>
             <span className="brand-text">
               <strong>LEEA</strong>

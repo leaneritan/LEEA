@@ -177,25 +177,20 @@ body{display:flex;flex-direction:column}
 .svy-input.filled{background:var(--green-l);border-color:var(--green);color:var(--green-d);font-weight:600}
 
 /* GUESS WHO */
-.gw-controls{background:#fff;border:2px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:12px}
-.gw-clue{font-size:15px;color:var(--ink-2);font-weight:600;line-height:1.5;margin-bottom:10px;min-height:28px}
-.gw-clue strong{color:var(--blue)}
-.gw-clue-btn{background:var(--blue);color:#fff;border:0;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif}
-.gw-clue-btn:disabled{opacity:.4;cursor:not-allowed}
-.gw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.gw-card{background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .15s}
-.gw-card:hover{border-color:var(--blue);transform:translateY(-2px)}
-.gw-card.revealed{background:var(--green-l);border-color:var(--green)}
-.gw-card.wrong{background:var(--red-l);border-color:var(--red);animation:shake .4s}
-.gw-card .silh{font-size:38px;filter:blur(0)}
-.gw-card.hidden .silh{filter:blur(14px)}
-.gw-card .nm{font-size:12px;font-weight:800;color:var(--ink);margin-top:4px;opacity:0;line-height:1.2}
-.gw-card.revealed .nm{opacity:1}
+.wgw-prompt{font-size:13px;color:var(--ink-3);font-weight:600;margin-bottom:6px}
+.wgw-sentence{font-size:17px;color:var(--ink);font-weight:700;line-height:1.5;margin-bottom:14px;padding:14px 16px;background:#fff;border:2px solid var(--border);border-radius:14px}
+.wgw-sentence .wgw-blank{display:inline-block;min-width:80px;border-bottom:3px solid var(--blue);color:transparent;margin:0 2px}
+.wgw-sentence .wgw-filled{color:var(--green-d);border-bottom-color:var(--green)}
+.wgw-choices{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+.wgw-choice{background:#fff;border:2px solid var(--border);border-radius:12px;padding:12px 14px;text-align:center;cursor:pointer;font-size:15px;font-weight:700;font-family:Outfit,sans-serif;transition:all .15s;color:var(--ink)}
+.wgw-choice:hover{border-color:var(--blue);transform:translateY(-2px)}
+.wgw-choice.correct{background:var(--green-l);border-color:var(--green);color:var(--green-d);pointer-events:none}
+.wgw-choice.wrong{background:var(--red-l);border-color:var(--red);animation:shake .4s}
+.wgw-progress{display:flex;gap:5px;justify-content:center;margin-top:8px}
+.wgw-dot{width:10px;height:10px;border-radius:50%;background:var(--border)}
+.wgw-dot.done{background:var(--green)}
+.wgw-dot.current{background:var(--blue)}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.gw-round-tabs{display:flex;gap:6px;margin-bottom:12px}
-.gw-round-tab{flex:1;padding:8px;border:2px solid var(--border);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:#fff;font-family:Outfit,sans-serif;color:var(--ink-3)}
-.gw-round-tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-.gw-round-tab.done{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
 
 /* QUIZ (formative, scored) */
 .quiz-score{background:var(--blue);color:#fff;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:800;display:inline-block;margin-bottom:10px}
@@ -279,7 +274,7 @@ body{display:flex;flex-direction:column}
   <button class="tab-btn" onclick="showTab(6)" id="tb6"><span class="tab-icon">✏️</span><span class="tab-name">Practice</span><span class="tab-check">✅</span></button>
   <button class="tab-btn" onclick="showTab(7)" id="tb7"><span class="tab-icon">📋</span><span class="tab-name">Survey</span><span class="tab-check">✅</span></button>
   <button class="tab-btn" onclick="showTab(8)" id="tb8"><span class="tab-icon">🕸️</span><span class="tab-name">Word Web</span><span class="tab-check">✅</span></button>
-  <button class="tab-btn" onclick="showTab(9)" id="tb9"><span class="tab-icon">💬</span><span class="tab-name">Guess Who</span><span class="tab-check">✅</span></button>
+  <button class="tab-btn" onclick="showTab(9)" id="tb9"><span class="tab-icon">💬</span><span class="tab-name">Who Gets What</span><span class="tab-check">✅</span></button>
   <button class="tab-btn" onclick="showTab(10)" id="tb10"><span class="tab-icon">✅</span><span class="tab-name">Quiz</span><span class="tab-check">✅</span></button>
   <button class="tab-btn" onclick="showTab(11)" id="tb11"><span class="tab-icon">⚽</span><span class="tab-name">Dribble!</span><span class="tab-check">✅</span></button>
 </div>
@@ -490,40 +485,18 @@ body{display:flex;flex-direction:column}
 <div class="tab-content" id="tc9">
   <div class="tab-body">
     <div>
-      <div class="section-title">💬 Guess Who · 3 Rounds</div>
-      <div class="section-sub">Get a clue about who gave what. Tap the silhouette you think matches. Family · Soccer · Movies.</div>
+      <div class="section-title">💬 Who Gets What? · 8 Rounds</div>
+      <div class="section-sub">Read each sentence and tap the person who receives the object. Practice direct and indirect objects!</div>
     </div>
-    <div class="gw-round-tabs">
-      <button class="gw-round-tab active" id="gw-rt-0" onclick="gwSwitch(0)">👨‍👩‍👧 Family</button>
-      <button class="gw-round-tab" id="gw-rt-1" onclick="gwSwitch(1)">⚽ Soccer</button>
-      <button class="gw-round-tab" id="gw-rt-2" onclick="gwSwitch(2)">🎬 Movies</button>
-    </div>
-    <div id="gw-round-0" class="gw-round">
-      <div class="gw-controls"><div class="gw-clue" id="gw-clue-0">Tap "Get a clue" to start the Family round.</div>
-        <button class="gw-clue-btn" id="gw-btn-0" onclick="gwClue(0)">🔍 Get a clue</button>
-        <span style="margin-left:12px;font-size:13px;color:var(--ink-3);font-weight:600" id="gw-cnt-0">Clue 0 of 3</span>
-      </div>
-      <div class="gw-grid" id="gw-grid-0"></div>
-    </div>
-    <div id="gw-round-1" class="gw-round" style="display:none">
-      <div class="gw-controls"><div class="gw-clue" id="gw-clue-1">Tap "Get a clue" to start the Soccer round.</div>
-        <button class="gw-clue-btn" id="gw-btn-1" onclick="gwClue(1)">🔍 Get a clue</button>
-        <span style="margin-left:12px;font-size:13px;color:var(--ink-3);font-weight:600" id="gw-cnt-1">Clue 0 of 3</span>
-      </div>
-      <div class="gw-grid" id="gw-grid-1"></div>
-    </div>
-    <div id="gw-round-2" class="gw-round" style="display:none">
-      <div class="gw-controls"><div class="gw-clue" id="gw-clue-2">Tap "Get a clue" to start the Movies round.</div>
-        <button class="gw-clue-btn" id="gw-btn-2" onclick="gwClue(2)">🔍 Get a clue</button>
-        <span style="margin-left:12px;font-size:13px;color:var(--ink-3);font-weight:600" id="gw-cnt-2">Clue 0 of 3</span>
-      </div>
-      <div class="gw-grid" id="gw-grid-2"></div>
-    </div>
-    <div class="done-banner" id="gw-done">🏆 All 3 rounds won! Mark complete below.</div>
+    <div class="wgw-prompt" id="wgw-prompt">Read the sentence and tap the correct receiver.</div>
+    <div class="wgw-sentence" id="wgw-sentence"></div>
+    <div class="wgw-choices" id="wgw-choices"></div>
+    <div class="wgw-progress" id="wgw-progress"></div>
+    <div class="done-banner" id="wgw-done">🏆 All matched! Mark complete below.</div>
   </div>
   <div class="tab-footer">
     <button class="btn-redo" id="redo-9" onclick="doRedo(9)">↺ Redo</button>
-    <button class="btn-complete" id="complete-9" onclick="markComplete(9)">Mark Guess Who complete ✓</button>
+    <button class="btn-complete" id="complete-9" onclick="markComplete(9)">Mark Who Gets What complete ✓</button>
   </div>
 </div>
 
@@ -593,7 +566,7 @@ body{display:flex;flex-direction:column}
 const SAVE_PREFIX = 'leea-4-8-grammar-2-';
 const HOMEWORK_ID = 'leo-4-8-grammar-2';
 const TAB_COUNT = 12;
-const TAB_NAMES = ['Academic','Warm Up','The Rule','Detective','Build It','Sort','Practice','Survey','Word Web','Guess Who','Quiz','Dribble!'];
+const TAB_NAMES = ['Academic','Warm Up','The Rule','Detective','Build It','Sort','Practice','Survey','Word Web','Who Gets What','Quiz','Dribble!'];
 const TAB_INIT = {};
 const TAB_RESET = {};
 const TAB_RESTORE = {};
@@ -1227,99 +1200,76 @@ TAB_RESTORE[8] = function(){
 /* ═════════════════════════════════════════════════════════════════════
    TAB 9 — GUESS WHO (3 rounds)
 ═════════════════════════════════════════════════════════════════════ */
-const GW_DATA = [
-  { lbl: 'Family Gifts', icons: ['👨','👩','⚽','👵'], names: ['Dad','Mom','Leo','Grandma'],
-    clues: [
-      ['who gave Leo a comic book','who bought Mom flowers','who is the dad'],
-      ['who made Leo a birthday cake','who gave Dad a watch','who cooks dinner'],
-      ['who gave his friend a dinosaur toy','who made Dad a card','who is in 4th grade'],
-      ['who gave Leo cookies','who made a scarf for Dad','who tells old stories']
-    ]},
-  { lbl: 'Soccer Gifts', icons: ['⚽','🎯','⚡','🔥'], names: ['Bellingham','Vinicius','Haaland','Salah'],
-    clues: [
-      ['who gave his jersey to a fan','who plays for Real Madrid','who is English'],
-      ['who showed his medal to the fans','who is Brazilian','who plays on the left wing'],
-      ['who gave his boots to a young player','who plays for Man City','who is Norwegian'],
-      ['who sent his gloves to a fan','who plays for Liverpool','who is Egyptian']
-    ]},
-  { lbl: 'Movie Gifts', icons: ['🦇','🌊','🤖','🕷️'], names: ['Batman','Jake Sully','Iron Man','Spider-Man'],
-    clues: [
-      ['who gave Gotham peace','who is Bruce Wayne','who fights crime'],
-      ['who gave the Na\'vi hope','who rides a banshee','who lives on Pandora'],
-      ['who built armor for his friends','who is Tony Stark','who has an arc reactor'],
-      ['who gave his identity to save others','who is Peter Parker','who shoots webs']
-    ]}
+const WGW_DATA = [
+  { sentence: 'Sara gave ___ the pencil.', choices: ['Sara','the pencil','me','gave'], correct: 2, explain: 'Me is the indirect object — the person who receives the pencil.' },
+  { sentence: 'My brother made ___ breakfast.', choices: ['breakfast','my brother','us','made'], correct: 2, explain: 'Us is the indirect object — the people who receive breakfast.' },
+  { sentence: 'She showed ___ the photo.', choices: ['the photo','she','showed','them'], correct: 3, explain: 'Them is the indirect object — the people who see the photo.' },
+  { sentence: 'Lea made ___ a birthday card.', choices: ['Lea','a card','made','her'], correct: 3, explain: 'Her is the indirect object — the person who gets the card.' },
+  { sentence: 'I sent two games to ___.', choices: ['two games','I','sent','them'], correct: 3, explain: 'Them is the indirect object after "to" — the people who receive the games.' },
+  { sentence: 'My friends bought a dinosaur for ___.', choices: ['my friends','a dinosaur','Monica','bought'], correct: 2, explain: 'Monica is the indirect object after "for" — the person who gets the dinosaur.' },
+  { sentence: 'I bought ___ a comic book.', choices: ['a comic book','I','him','bought'], correct: 2, explain: 'Him is the indirect object — the person who receives the comic book.' },
+  { sentence: 'Dad gave ___ his old camera.', choices: ['Dad','his camera','gave','Leo'], correct: 3, explain: 'Leo is the indirect object — the person who receives the camera.' }
 ];
-window._gwState = { round: 0, targets: [null,null,null], clueIdx: [0,0,0], wonRounds: [] };
-TAB_INIT[9] = function(){
-  for(let r = 0; r < 3; r++){
-    const grid = document.getElementById('gw-grid-' + r);
-    grid.innerHTML = '';
-    const d = GW_DATA[r];
-    for(let i = 0; i < d.names.length; i++){
-      const card = document.createElement('div');
-      card.className = 'gw-card hidden';
-      card.dataset.name = d.names[i];
-      card.innerHTML = '<div class="silh">' + d.icons[i] + '</div><div class="nm">' + d.names[i] + '</div>';
-      card.onclick = function(){ gwGuess(r, this); };
-      grid.appendChild(card);
-    }
+window._wgwState = { current: 0, answered: [] };
+function wgwRender(){
+  const s = window._wgwState;
+  const q = WGW_DATA[s.current];
+  const sentEl = document.getElementById('wgw-sentence');
+  const choicesEl = document.getElementById('wgw-choices');
+  const progEl = document.getElementById('wgw-progress');
+  const promptEl = document.getElementById('wgw-prompt');
+  if(s.current >= WGW_DATA.length){
+    sentEl.innerHTML = '<strong style="color:var(--green-d)">All done! You matched every indirect object.</strong>';
+    choicesEl.innerHTML = '';
+    promptEl.textContent = '';
+    document.getElementById('wgw-done').classList.add('show');
+    lSave('tab-9-state', { state: s });
+    return;
   }
-};
+  promptEl.textContent = 'Round ' + (s.current + 1) + ' of ' + WGW_DATA.length + ' — Who receives it?';
+  const parts = q.sentence.split('___');
+  const alreadyAnswered = s.answered.includes(s.current);
+  const blankClass = alreadyAnswered ? 'wgw-blank wgw-filled' : 'wgw-blank';
+  const blankText = alreadyAnswered ? q.choices[q.correct] : '     ';
+  sentEl.innerHTML = esc(parts[0]) + '<span class="' + blankClass + '">' + esc(blankText) + '</span>' + esc(parts[1] || '');
+  if(alreadyAnswered){
+    choicesEl.innerHTML = '<div style="color:var(--green-d);font-size:14px;font-weight:600;padding:8px">' + esc(q.explain) + '</div>';
+  } else {
+    const shuffled = q.choices.map((c, i) => ({ text: c, idx: i })).sort(() => Math.random() - 0.5);
+    choicesEl.innerHTML = shuffled.map(c =>
+      '<button class="wgw-choice" data-idx="' + c.idx + '" onclick="wgwPick(this,' + c.idx + ')">' + esc(c.text) + '</button>'
+    ).join('');
+  }
+  progEl.innerHTML = WGW_DATA.map((_, i) =>
+    '<span class="wgw-dot' + (s.answered.includes(i) ? ' done' : i === s.current ? ' current' : '') + '"></span>'
+  ).join('');
+  function esc(t){ const d = document.createElement('span'); d.textContent = t; return d.innerHTML; }
+}
+function wgwPick(btn, idx){
+  const s = window._wgwState;
+  const q = WGW_DATA[s.current];
+  if(idx === q.correct){
+    btn.classList.add('correct');
+    s.answered.push(s.current);
+    lSave('tab-9-state', { state: s });
+    setTimeout(() => { s.current++; wgwRender(); }, 900);
+  } else {
+    btn.classList.add('wrong');
+    setTimeout(() => btn.classList.remove('wrong'), 500);
+  }
+}
+TAB_INIT[9] = function(){ wgwRender(); };
 TAB_RESET[9] = function(){
-  window._gwState = { round: 0, targets: [null,null,null], clueIdx: [0,0,0], wonRounds: [] };
-  ['gw-clue-0','gw-clue-1','gw-clue-2'].forEach((id, r) => {
-    document.getElementById(id).innerHTML = 'Tap "Get a clue" to start.';
-    document.getElementById('gw-cnt-' + r).textContent = 'Clue 0 of 3';
-    document.getElementById('gw-btn-' + r).disabled = false;
-    document.getElementById('gw-rt-' + r).classList.remove('done');
-  });
-  document.getElementById('gw-done').classList.remove('show');
-  TAB_INIT[9]._initialized = false; TAB_INIT[9](); TAB_INIT[9]._initialized = true;
-  gwSwitch(0);
+  window._wgwState = { current: 0, answered: [] };
+  document.getElementById('wgw-done').classList.remove('show');
+  wgwRender();
 };
 TAB_RESTORE[9] = function(){
   const saved = lLoad('tab-9-state');
   if(!saved) return;
-  window._gwState = saved.state || window._gwState;
-  (window._gwState.wonRounds || []).forEach(r => document.getElementById('gw-rt-' + r).classList.add('done'));
-  if((window._gwState.wonRounds || []).length >= 3) document.getElementById('gw-done').classList.add('show');
+  window._wgwState = saved.state || window._wgwState;
+  wgwRender();
 };
-function gwSwitch(r){
-  document.querySelectorAll('.gw-round-tab').forEach((t, i) => t.classList.toggle('active', i === r && !t.classList.contains('done')));
-  document.getElementById('gw-rt-' + r).classList.add('active');
-  ['gw-round-0','gw-round-1','gw-round-2'].forEach((id, i) => document.getElementById(id).style.display = i === r ? 'block' : 'none');
-  window._gwState.round = r;
-}
-function gwClue(r){
-  if(window._gwState.targets[r] == null) window._gwState.targets[r] = Math.floor(Math.random() * GW_DATA[r].names.length);
-  if(window._gwState.clueIdx[r] >= 3) return;
-  const target = window._gwState.targets[r];
-  const clue = GW_DATA[r].clues[target][window._gwState.clueIdx[r]];
-  const el = document.getElementById('gw-clue-' + r);
-  el.innerHTML = (window._gwState.clueIdx[r] === 0 ? '' : el.innerHTML + '<br>') + '<strong>This person…</strong> ' + clue;
-  window._gwState.clueIdx[r]++;
-  document.getElementById('gw-cnt-' + r).textContent = 'Clue ' + window._gwState.clueIdx[r] + ' of 3';
-  if(window._gwState.clueIdx[r] >= 3) document.getElementById('gw-btn-' + r).disabled = true;
-  lSave('tab-9-state', { state: window._gwState });
-}
-function gwGuess(r, card){
-  if(card.classList.contains('revealed')) return;
-  const target = window._gwState.targets[r];
-  if(target == null){ document.getElementById('gw-clue-' + r).innerHTML = '⚠️ Get a clue first!'; return; }
-  const name = card.dataset.name;
-  if(name === GW_DATA[r].names[target]){
-    card.classList.remove('hidden'); card.classList.add('revealed');
-    document.getElementById('gw-clue-' + r).innerHTML += '<br><strong style="color:var(--green-d)">✅ YES! It was ' + name + '!</strong>';
-    if(!window._gwState.wonRounds.includes(r)) window._gwState.wonRounds.push(r);
-    document.getElementById('gw-rt-' + r).classList.add('done');
-    if(window._gwState.wonRounds.length >= 3) document.getElementById('gw-done').classList.add('show');
-    lSave('tab-9-state', { state: window._gwState });
-  } else {
-    card.classList.add('wrong');
-    setTimeout(() => card.classList.remove('wrong'), 500);
-  }
-}
 
 /* ═════════════════════════════════════════════════════════════════════
    TAB 10 — QUIZ (10 questions, scored) — Rule 2: save score

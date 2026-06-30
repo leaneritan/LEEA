@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useJapanesePreference } from "@/components/AppShell";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
 import type { WordEntry } from "@/data/reference-shapes";
+import { getVerbForms } from "@/data/verbForms";
 import { allWords } from "./ref-data";
 
 const POS_LABEL: Record<string, string> = {
@@ -25,6 +26,10 @@ export function WordCard({ entry }: { entry: WordEntry }) {
 
   const family = useMemo(() => getWordFamily(entry), [entry]);
   const similar = useMemo(() => getSimilarWords(entry, family), [entry, family]);
+  const verbForms = useMemo(
+    () => (entry.pos === "verb" ? getVerbForms(entry.word) : null),
+    [entry]
+  );
 
   function playAudio() {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
@@ -127,6 +132,26 @@ export function WordCard({ entry }: { entry: WordEntry }) {
               )}
             </div>
           </section>
+
+          {verbForms && (
+            <section className="rcardv2-section">
+              <div className="rcardv2-eyebrow">Forms</div>
+              <div className="rcardv2-forms">
+                <div className="rcardv2-form">
+                  <span className="rcardv2-form-label">Infinitive</span>
+                  <span className="rcardv2-form-value">{verbForms.infinitive}</span>
+                </div>
+                <div className="rcardv2-form">
+                  <span className="rcardv2-form-label">Past</span>
+                  <span className="rcardv2-form-value">{verbForms.past}</span>
+                </div>
+                <div className="rcardv2-form">
+                  <span className="rcardv2-form-label">Past participle</span>
+                  <span className="rcardv2-form-value">{verbForms.pastParticiple}</span>
+                </div>
+              </div>
+            </section>
+          )}
 
           {entry.examples.length > 0 && (
             <section className="rcardv2-section">

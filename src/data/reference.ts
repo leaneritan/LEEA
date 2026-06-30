@@ -35,8 +35,12 @@ function toVocabularyItem(word: UnitVocabularyWord): VocabularyItem {
     partOfSpeech: word.partOfSpeech,
     meaning: word.meaning,
     example: word.example,
+    exampleJp: hasKey(word, "exampleJp") ? (word.exampleJp as string) : undefined,
     additionalExamples: hasKey(word, "additionalExamples")
       ? (word.additionalExamples as string[])
+      : undefined,
+    additionalExamplesJp: hasKey(word, "additionalExamplesJp")
+      ? (word.additionalExamplesJp as string[])
       : undefined,
     additionalMeanings: hasKey(word, "additionalMeanings")
       ? (word.additionalMeanings as VocabularyItem["additionalMeanings"])

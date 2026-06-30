@@ -75,6 +75,7 @@ export type WordEntry = {
   definition: string;
   senses: Array<{ text: string; context?: string; jp?: string }>;
   examples: string[];
+  examplesJp: string[];
   family: string[];
   sources: RefSource[];
   jp: {
@@ -96,6 +97,7 @@ export function toWordEntry(item: VocabularyItem): WordEntry {
     definition: item.meaning,
     senses: [{ text: item.meaning }, ...(item.additionalMeanings ?? [])],
     examples: item.example ? [item.example, ...(item.additionalExamples ?? [])] : [],
+    examplesJp: item.example ? [item.exampleJp ?? "", ...(item.additionalExamplesJp ?? [])] : [],
     family: [],
     sources: normalizeSources(item.sources),
     jp: {

@@ -73,7 +73,7 @@ export type WordEntry = {
   syllables: string;
   pronUS: string;             // US IPA (UK dropped per spec)
   definition: string;
-  senses: Array<{ text: string; context?: string }>;
+  senses: Array<{ text: string; context?: string; jp?: string }>;
   examples: string[];
   family: string[];
   sources: RefSource[];

@@ -25,7 +25,7 @@ export type VocabularyItem = {
   meaning: string;
   example: string;
   additionalExamples?: string[];
-  additionalMeanings?: Array<{ text: string; context?: string }>;
+  additionalMeanings?: Array<{ text: string; context?: string; jp?: string }>;
   japanese?: {
     word: string;
     reading?: string;

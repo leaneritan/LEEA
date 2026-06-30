@@ -130,10 +130,17 @@ export function WordCard({ entry }: { entry: WordEntry }) {
               {entry.senses.map((sense, idx) => (
                 <div className="rcardv2-sense" key={idx}>
                   <span className="rcardv2-sense-num">{idx + 1}</span>
-                  <p>
-                    {sense.text}
-                    {sense.context && <span className="rcardv2-sense-context">{sense.context}</span>}
-                  </p>
+                  <div className="rcardv2-sense-body">
+                    <p>
+                      {sense.text}
+                      {sense.context && <span className="rcardv2-sense-context">{sense.context}</span>}
+                    </p>
+                    {jp && sense.jp && (
+                      <p className="rcardv2-sense-jp" lang="ja">
+                        {sense.jp}
+                      </p>
+                    )}
+                  </div>
                 </div>
               ))}
               {jp && entry.jp.sentence && (

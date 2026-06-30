@@ -22,11 +22,14 @@ const STORAGE_KEY = "leea.japaneseOn";
 const CHANGE_EVENT = "leea:japaneseOn-change";
 
 function readStored(): boolean {
-  if (typeof window === "undefined") return false;
+  if (typeof window === "undefined") return true;
   try {
-    return window.localStorage.getItem(STORAGE_KEY) === "true";
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    // Default ON when the learner has never touched the toggle; respect an
+    // explicit "false" choice once they've turned it off themselves.
+    return stored === null ? true : stored === "true";
   } catch {
-    return false;
+    return true;
   }
 }
 

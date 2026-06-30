@@ -93,6 +93,19 @@ function CourseNode({ course }: { course: (typeof sourceTree)[number] }) {
   );
 }
 
+/* Units that have a built Unit Reference page. Add an entry here once
+   /reference/our-world/level-N/unit-M/page.tsx exists for that unit. */
+const UNIT_REFERENCE_PAGES: Record<string, string> = {
+  "4-8": "/reference/our-world/level-4/unit-8"
+};
+
+const GROUP_ANCHOR: Record<string, string> = {
+  "Vocabulary 1": "vocab1",
+  "Vocabulary 2": "vocab2",
+  Academic: "academic",
+  Glossary: "glossary"
+};
+
 function LevelNode({ level }: { level: (typeof sourceTree)[number]["levels"][number] }) {
   const [open, setOpen] = useState(level.active);
   return (
@@ -106,7 +119,7 @@ function LevelNode({ level }: { level: (typeof sourceTree)[number]["levels"][num
       </button>
       {open ? (
         <div className="refv2-tree-children">
-          {getDisplayUnits(level).map((unit) => unit.real ? <UnitNode key={unit.unit} unit={unit.real} /> : <UnitPlaceholder key={unit.unit} unit={unit.unit} title={unit.title} />)}
+          {getDisplayUnits(level).map((unit) => unit.real ? <UnitNode key={unit.unit} level={level.level} unit={unit.real} /> : <UnitPlaceholder key={unit.unit} unit={unit.unit} title={unit.title} />)}
           {level.level === 4 ? <CheckpointPlaceholder /> : null}
         </div>
       ) : null}
@@ -124,9 +137,10 @@ function getDisplayUnits(level: (typeof sourceTree)[number]["levels"][number]) {
   ];
 }
 
-function UnitNode({ unit }: { unit: (typeof sourceTree)[number]["levels"][number]["units"][number] }) {
-  const [open, setOpen] = useState(unit.unit === 8);
+function UnitNode({ level, unit }: { level: number; unit: (typeof sourceTree)[number]["levels"][number]["units"][number] }) {
+  const [open, setOpen] = useState(false);
   const totalWords = unit.vocabGroups.reduce((sum, group) => sum + group.words.length, 0);
+  const unitHref = UNIT_REFERENCE_PAGES[`${level}-${unit.unit}`];
   return (
     <>
       <button type="button" className={`refv2-tree-row refv2-tree-unit${open ? " is-open" : ""}`} onClick={() => setOpen((value) => !value)}>
@@ -137,17 +151,30 @@ function UnitNode({ unit }: { unit: (typeof sourceTree)[number]["levels"][number
       </button>
       {open ? (
         <div className="refv2-tree-children">
+          {unitHref ? (
+            <Link className="refv2-tree-leaf refv2-tree-leaf--unit-ref" href={unitHref}>
+              <span className="refv2-group-dot" data-group="unit-ref" aria-hidden />
+              <span className="refv2-tree-leaf-label">Open Unit Reference</span>
+              <span className="refv2-tree-arrow refv2-tree-arrow--right">→</span>
+            </Link>
+          ) : null}
           {unit.vocabGroups.length ? (
             <>
               <div className="refv2-tree-section">Vocabulary</div>
-              {unit.vocabGroups.map((group) => <VocabGroupLeaf group={group} key={group.label} />)}
+              {unit.vocabGroups.map((group) => (
+                <VocabGroupLeaf
+                  group={group}
+                  key={group.label}
+                  href={unitHref ? `${unitHref}#${GROUP_ANCHOR[group.label] ?? ""}` : undefined}
+                />
+              ))}
             </>
           ) : null}
           {unit.grammar.length ? (
             <>
               <div className="refv2-tree-section">Grammar</div>
               {unit.grammar.map((grammar) => (
-                <Link key={grammar.grammarId} className="refv2-tree-leaf" href={`/reference/grammar/${grammar.grammarId}`}>
+                <Link key={grammar.grammarId} className="refv2-tree-leaf" href={unitHref ? `${unitHref}#grammar` : `/reference/grammar/${grammar.grammarId}`}>
                   <span className="refv2-group-dot" data-group="grammar" aria-hidden />
                   <span className="refv2-tree-leaf-label">{grammar.title}</span>
                   <span className="refv2-tag-chip">{grammar.tag}</span>
@@ -162,9 +189,10 @@ function UnitNode({ unit }: { unit: (typeof sourceTree)[number]["levels"][number
   );
 }
 
-function VocabGroupLeaf({ group }: { group: { label: string; words: WordEntry[] } }) {
+function VocabGroupLeaf({ group, href: hrefOverride }: { group: { label: string; words: WordEntry[] }; href?: string }) {
   const firstWord = group.words[0];
-  const href = group.label === "Academic" ? `/reference/academic/${firstWord?.id ?? ""}` : `/reference/word/${firstWord?.id ?? ""}`;
+  const fallbackHref = group.label === "Academic" ? `/reference/academic/${firstWord?.id ?? ""}` : `/reference/word/${firstWord?.id ?? ""}`;
+  const href = hrefOverride ?? fallbackHref;
   return (
     <Link className="refv2-tree-leaf" href={href}>
       <span className="refv2-group-dot" data-group={group.label === "Academic" ? "academic" : group.label === "Glossary" ? "glossary" : "vocab"} aria-hidden />

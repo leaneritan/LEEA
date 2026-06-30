@@ -38,6 +38,9 @@ function toVocabularyItem(word: UnitVocabularyWord): VocabularyItem {
     additionalExamples: hasKey(word, "additionalExamples")
       ? (word.additionalExamples as string[])
       : undefined,
+    additionalMeanings: hasKey(word, "additionalMeanings")
+      ? (word.additionalMeanings as VocabularyItem["additionalMeanings"])
+      : undefined,
     japanese: word.japanese,
     sources: word.sources as SourceTag[],
     tags: word.tags,

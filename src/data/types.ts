@@ -24,6 +24,7 @@ export type VocabularyItem = {
   countability?: string;
   meaning: string;
   example: string;
+  additionalExamples?: string[];
   japanese?: {
     word: string;
     reading?: string;

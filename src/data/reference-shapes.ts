@@ -93,7 +93,7 @@ export function toWordEntry(item: VocabularyItem): WordEntry {
     syllables: item.syllables ?? "",
     pronUS: item.ipa ?? "",
     definition: item.meaning,
-    examples: item.example ? [item.example] : [],
+    examples: item.example ? [item.example, ...(item.additionalExamples ?? [])] : [],
     family: [],
     sources: normalizeSources(item.sources),
     jp: {

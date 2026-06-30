@@ -157,15 +157,15 @@ export function WordCard({ entry }: { entry: WordEntry }) {
               <div className="rcardv2-eyebrow">Forms</div>
               <div className="rcardv2-forms">
                 <div className="rcardv2-form">
-                  <span className="rcardv2-form-label">Infinitive</span>
+                  <span className="rcardv2-form-label">Infinitive{jp && <span lang="ja"> · 原形</span>}</span>
                   <span className="rcardv2-form-value">{verbForms.infinitive}</span>
                 </div>
                 <div className="rcardv2-form">
-                  <span className="rcardv2-form-label">Past</span>
+                  <span className="rcardv2-form-label">Past{jp && <span lang="ja"> · 過去形</span>}</span>
                   <span className="rcardv2-form-value">{verbForms.past}</span>
                 </div>
                 <div className="rcardv2-form">
-                  <span className="rcardv2-form-label">Past participle</span>
+                  <span className="rcardv2-form-label">Past participle{jp && <span lang="ja"> · 過去分詞</span>}</span>
                   <span className="rcardv2-form-value">{verbForms.pastParticiple}</span>
                 </div>
               </div>
@@ -179,6 +179,11 @@ export function WordCard({ entry }: { entry: WordEntry }) {
                 {entry.examples.map((example, idx) => (
                   <div key={idx} className="rcardv2-example">
                     <p>{highlightWord(example, entry.word)}</p>
+                    {jp && entry.examplesJp[idx] && (
+                      <p className="rcardv2-example-jp" lang="ja">
+                        {entry.examplesJp[idx]}
+                      </p>
+                    )}
                     <div className="rcardv2-example-src">
                       {sourceLabel(entry.sources[idx] ?? entry.sources[0])}
                     </div>

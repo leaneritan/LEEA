@@ -73,6 +73,7 @@ export type WordEntry = {
   syllables: string;
   pronUS: string;             // US IPA (UK dropped per spec)
   definition: string;
+  senses: Array<{ text: string; context?: string }>;
   examples: string[];
   family: string[];
   sources: RefSource[];
@@ -93,6 +94,7 @@ export function toWordEntry(item: VocabularyItem): WordEntry {
     syllables: item.syllables ?? "",
     pronUS: item.ipa ?? "",
     definition: item.meaning,
+    senses: [{ text: item.meaning }, ...(item.additionalMeanings ?? [])],
     examples: item.example ? [item.example, ...(item.additionalExamples ?? [])] : [],
     family: [],
     sources: normalizeSources(item.sources),

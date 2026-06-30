@@ -120,10 +120,15 @@ export function WordCard({ entry }: { entry: WordEntry }) {
           <section className="rcardv2-section">
             <div className="rcardv2-eyebrow">Meaning</div>
             <div className="rcardv2-meaning">
-              <div className="rcardv2-sense">
-                <span className="rcardv2-sense-num">1</span>
-                <p>{entry.definition}</p>
-              </div>
+              {entry.senses.map((sense, idx) => (
+                <div className="rcardv2-sense" key={idx}>
+                  <span className="rcardv2-sense-num">{idx + 1}</span>
+                  <p>
+                    {sense.text}
+                    {sense.context && <span className="rcardv2-sense-context">{sense.context}</span>}
+                  </p>
+                </div>
+              ))}
               {jp && entry.jp.sentence && (
                 <div className="rcardv2-sense">
                   <span className="rcardv2-sense-num">日</span>

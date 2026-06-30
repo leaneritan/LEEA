@@ -81,13 +81,28 @@ export function WordCard({ entry }: { entry: WordEntry }) {
               </button>
               {entry.pronUS && (
                 <>
-                  <span className="rcardv2-ipa">{entry.pronUS}</span>
+                  <span className="rcardv2-ipa">/{entry.pronUS}/</span>
                   <span className="rcardv2-dot-sep">·</span>
                   <span className="rcardv2-ipa-mark">US</span>
                 </>
               )}
-              {entry.syllables && <span className="rcardv2-syllables">{entry.syllables}</span>}
             </div>
+
+            {entry.syllables && (
+              <div className="rcardv2-hero-syll">
+                <span className="rcardv2-syll-label">Syllables</span>
+                <span className="rcardv2-syll-chips">
+                  {entry.syllables.split("-").map((part, idx) => (
+                    <span key={idx} className="rcardv2-syll-chip">
+                      {part}
+                    </span>
+                  ))}
+                </span>
+                <span className="rcardv2-syll-count">
+                  {entry.syllables.split("-").length} syllables
+                </span>
+              </div>
+            )}
 
             {jp && entry.jp.gloss && (
               <p className="rcardv2-hero-jp" lang="ja">

@@ -114,7 +114,7 @@ export function AppShell({
           data-ring-count={assignmentsLeft ?? 0}
           style={{ "--ring-pct": `${assignmentsLeft ? Math.min(100, Math.round(((12 - assignmentsLeft) / 12) * 100)) : 100}%` } as CSSProperties}
         >
-          <strong className="progress-label">{active === "teacher" || active === "progress" ? "This week" : active === "english" ? "Our World" : "Leo&apos;s Progress"}</strong>
+          <strong className="progress-label">{active === "teacher" || active === "progress" ? "This week" : active === "english" ? "Our World" : "Leo’s Progress"}</strong>
           <strong className="progress-ring-count">{assignmentsLeft ?? 0}</strong>
           {active === "english" ? (
             <><span>Level 4 · Unit 8</span><div className="sidebar-mini-progress"><i /></div></>

@@ -264,11 +264,13 @@ Push to the working branch. Do NOT auto-create a PR — Leaneritan reviews + mer
 - [ ] `npm run validate:content` ✅
 - [ ] `npx tsc --noEmit` ✅
 - [ ] `node -e` parse-check on BOTH HTML files ✅
+- [ ] Learner `component` ends in `-app` and matches the teacher lesson's `component` once stripped — the parent's "Mark Done" checklist only auto-updates when Leo finishes his app if this matches (see `docs/supabase.md`)
 - [ ] Commit pushed; no auto-PR
 
 ## Important constraints
 
 - Never modify `src/lib/supabase.ts`
+- Read `docs/supabase.md` before wiring progress — `learner_progress` (Leo's app) and `teacher_lesson_progress` (the parent's checklist) are separate tables that only stay in sync if `component` naming matches between the teacher and learner JSON
 - Never paraphrase the passage — verbatim from the TR transcript only
 - Don't introduce structures Leo hasn't learned (instructions stay A1-A2)
 - The WB reading is usually a DIFFERENT topic from the SB reading (Unit 8: SB = Geocaching, WB = Video Games). Each gets its own Vocab tab + its own scope.

@@ -224,6 +224,8 @@ Add to `content/.../<unit>/lessons/`:
 
 Update `src/data/lessons.ts` — import both JSONs and add to the `lessons[]` array.
 
+Confirm `component: "writing"` (teacher) and `component: "writing-app"` (learner) actually match once the `-app` suffix is stripped — this is what lets the parent's "Mark Done" checklist auto-update when Leo finishes his app. See `docs/supabase.md` for why this matters; a mismatch here fails silently (no error, the checklist just never updates).
+
 ### Step 5 — Validate
 
 ```bash
@@ -257,6 +259,7 @@ Do NOT auto-create a PR. Leaneritan reviews + merges.
 - ❌ Do not add a second JP toggle inside any flashcard or quiz. The global topbar toggle is the only one.
 - ❌ Do not paraphrase the model passage. Verbatim only.
 - ❌ Do not skip the `?review=1` review mode or the `?hw=` banner. Both are required for the LEEA shell integration.
+- ❌ Do not register the learner JSON without a real `homeworkId`, and do not let its `component` diverge from the teacher lesson's `component` (minus `-app`) — either mistake silently breaks the auto Mark-Done propagation described in `docs/supabase.md`, with no error surfaced anywhere.
 
 ## When the writing has features this skill doesn't cover
 

@@ -168,10 +168,12 @@ Report what was generated:
 - [ ] Grammar card added / none needed
 - [ ] validate:content passes
 - [ ] MD files updated
+- [ ] Teacher/learner component pairing verified working, not just named correctly — see `docs/supabase.md`
 
 ## Important constraints
 
 - Never modify `src/lib/supabase.ts`
+- Read `docs/supabase.md` before wiring progress — `learner_progress` (Leo's app) and `teacher_lesson_progress` (the parent's checklist) are two separate tables. A learner app finishing does NOT automatically flip the teacher's "Mark Done" checklist unless the component pairing below matches exactly. This fails silently — no error anywhere — so naming it correctly is not enough; it must actually be checked.
 - All save/restore rules must be implemented — do not skip Rule 2 or Rule 3
 - All four universal LEEA app rules (A-D) must be implemented — do not skip Vocab Foundations, Save+Redo, or interactivity
 - Component tone must use the correct CSS variable block from `src/components/componentMeta.ts`

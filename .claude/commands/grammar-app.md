@@ -285,6 +285,7 @@ Push to the current working branch. Do NOT create a PR — Leaneritan reviews + 
 ## Important constraints
 
 - Never modify `src/lib/supabase.ts`
+- If this skill ever registers its own learner JSON (rather than folding grammar practice into an existing vocab app), read `docs/supabase.md` first — `learner_progress` (Leo's app) and `teacher_lesson_progress` (the parent's checklist) are separate tables that only stay in sync automatically if the learner `component` matches the teacher `component` once `-app` is stripped
 - Never override the LP's verbatim content (objectives, Grammar Box, official Practice items, Recap joins)
 - Japanese drafts stay `needsReview: true` until the parent confirms
 - Teacher slides have NO save/restore (Neritan marks done from the dashboard); the Leo app (separate skill, later) follows the four save/restore rules

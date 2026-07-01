@@ -1,5 +1,7 @@
 import type { Lesson } from "./types";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { teacherLessons } from "./lessons";
+import { createLessonProgressRecord, saveLessonProgressRecord } from "./lessonProgress";
 
 export type LearnerAppProgress = {
   completedModules: number;
@@ -242,6 +244,29 @@ async function upsertLearnerProgressSummary(lesson: Lesson, rawProgress: Record<
   );
 
   if (error) throw error;
+
+  if (progress.done) await markTeacherLessonDone(lesson);
+}
+
+/* When Leo finishes a learner app, the matching teacher-side lesson (same
+   course/level/unit, component with "-app" stripped) should auto-tick as
+   done too — the teacher checklist is a separate table and previously
+   required a manual click even after Leo had already completed his app. */
+async function markTeacherLessonDone(learnerLesson: Lesson) {
+  const teacherComponent = learnerLesson.component.endsWith("-app")
+    ? learnerLesson.component.slice(0, -"-app".length)
+    : learnerLesson.component;
+
+  const teacherLesson = teacherLessons.find(
+    (candidate) =>
+      candidate.course === learnerLesson.course
+      && candidate.level === learnerLesson.level
+      && candidate.unit === learnerLesson.unit
+      && candidate.component === teacherComponent
+  );
+  if (!teacherLesson) return;
+
+  await saveLessonProgressRecord(createLessonProgressRecord(teacherLesson.id, true));
 }
 
 export function loadLocalValue<T>(key: string, fallback: T): T {

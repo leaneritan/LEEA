@@ -58,8 +58,12 @@ Follows `docs/vocab.md` end to end:
   "emojiDescription": "person standing alone",
   "partOfSpeech": "adjective/adverb",
   "syllables": "a-lone",
+  "ipa": "əˈloʊn",
   "meaning": "without other people",
   "example": "Sometimes I like to read alone.",
+  "exampleJp": "私は時々一人で読書をするのが好きです。",
+  "additionalExamples": ["She walked home alone after practice."],
+  "additionalExamplesJp": ["彼女は練習の後、一人で家に歩いて帰りました。"],
   "japanese": {
     "word": "ひとりで",
     "reading": "ひとりで",
@@ -83,6 +87,18 @@ Follows `docs/vocab.md` end to end:
 ```
 
 `japanese.needsReview` stays `true` until the parent has confirmed the Japanese draft.
+
+### Required fields the WordCard depends on — never skip these
+
+The Reference word card (`src/components/reference/WordCard.tsx`) renders pronunciation, syllables, and bilingual examples directly from this schema. A word missing any of these renders a visibly broken/incomplete card, so every new word built by this skill MUST include:
+
+- **`ipa`** — required, no exceptions. This drives the `/ipa/ · US` pronunciation line and is what makes the audio/IPA row render at all. Use standard US IPA transcription. If genuinely unsure of a transcription, flag it for the user rather than guessing wildly — but do not omit the field.
+- **`syllables`** — required (already enforced), drives the syllable pill chips (`col` / `lect` style) and the "N syllables" count.
+- **`exampleJp`** — required whenever `example` is set. Every English example sentence needs a matching Japanese translation; the card shows them stacked (EN above, JP below) when the Japanese toggle is on (default ON for all learners).
+- **`additionalExamplesJp`** — required, one per entry in `additionalExamples`, same array order.
+- If the word has `additionalMeanings` (a second sense), each entry should include a `jp` field translating that sense — not just the primary meaning.
+
+**Rule of thumb: if a learner-facing English string exists, a Japanese counterpart exists too** (`needsReview: true` until confirmed). This was a recurring gap in Units 6-8 that had to be backfilled after the fact — building it correctly the first time during scanning avoids that rework.
 
 For mission / project / reader content words, **omit `lessonId`** (there is no teacher lesson) and use `component: "mission" | "project" | "reader"` with tag `OW<level>-U<unit>-MI | -PJ | -RDR`.
 
@@ -233,6 +249,9 @@ Push to the current working branch. Do not create a PR automatically — the use
 ## Output checklist
 
 - [ ] `vocabulary.json` created at correct path with N words
+- [ ] Every word has `ipa` and `syllables` set
+- [ ] Every `example`/`additionalExamples` has a matching `exampleJp`/`additionalExamplesJp`
+- [ ] Every `additionalMeanings` entry has a `jp` translation
 - [ ] All Japanese fields drafted with `needsReview: true`
 - [ ] `vocabulary-index.json` updated (only new IDs)
 - [ ] `reference.ts` imports + filter exports added

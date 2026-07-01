@@ -104,6 +104,15 @@ export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
   unit6Vocabulary.words as UnitVocabularyWord[]
 ]);
 
+/* Real unit titles, sourced from each unit's own vocabulary.json — keyed
+   "<level>-<unit>". Add a new entry here whenever a unit is scanned, so the
+   Reference tree never has to guess or hardcode a title elsewhere. */
+export const unitTitles: Record<string, string> = {
+  [`${unit6Vocabulary.level}-${unit6Vocabulary.unit}`]: unit6Vocabulary.unitTitle,
+  [`${unit7Vocabulary.level}-${unit7Vocabulary.unit}`]: unit7Vocabulary.unitTitle,
+  [`${unit8Vocabulary.level}-${unit8Vocabulary.unit}`]: unit8Vocabulary.unitTitle
+};
+
 export const unit6Vocab1Items = vocabularyItems.filter(
   (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U6-V1")
 );

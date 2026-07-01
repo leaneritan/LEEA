@@ -37,14 +37,15 @@ Follows `docs/vocab.md` end to end:
    - Add four filter exports: `unit<N>Vocab1Items`, `unit<N>Vocab2Items`, `unit<N>AcademicItems`, `unit<N>GlossaryItems`
 9. Update `scripts/validate-content.mjs`:
    - Add the new unit path to `unitVocabularyPaths`
-10. Update `src/components/ReferencePage.tsx` source tree:
+10. Update `src/components/reference/ReferenceBrowse.tsx` source tree:
     - Add a sibling node under the matching Level / Course for the new unit
     - Same five sub-sections: Vocabulary 1 / Vocabulary 2 / Grammar / Academic / Glossary
     - Grammar shows a placeholder if `grammar.json` for this unit does not exist yet
     - Keep the existing build target open by default; the new unit collapses unless it is the current target
-11. Update `docs/lesson-plans/<course-path>/index.json` for this unit with the verified page range and `pdf_offset` if the entry is empty or still has `pdf_offset: 0` from an excerpt
-12. Run `npm run validate:content` and `npx tsc --noEmit`
-13. Commit with a clear message and push to the current working branch
+11. **Build the Unit Reference page** (`UnitReference<N>.tsx` + route + `UNIT_REFERENCE_PAGES` entry) — see "Unit Reference page — required every time" below. This is not optional polish; without it, clicking a vocabulary group in the tree silently falls back to a single word card instead of the unit overview.
+12. Update `docs/lesson-plans/<course-path>/index.json` for this unit with the verified page range and `pdf_offset` if the entry is empty or still has `pdf_offset: 0` from an excerpt
+13. Run `npm run validate:content` and `npx tsc --noEmit`
+14. Commit with a clear message and push to the current working branch
 
 ## Word schema (clean — no legacy flat fields)
 
@@ -101,6 +102,60 @@ The Reference word card (`src/components/reference/WordCard.tsx`) renders pronun
 **Rule of thumb: if a learner-facing English string exists, a Japanese counterpart exists too** (`needsReview: true` until confirmed). This was a recurring gap in Units 6-8 that had to be backfilled after the fact — building it correctly the first time during scanning avoids that rework.
 
 For mission / project / reader content words, **omit `lessonId`** (there is no teacher lesson) and use `component: "mission" | "project" | "reader"` with tag `OW<level>-U<unit>-MI | -PJ | -RDR`.
+
+## Unit Reference page — required every time
+
+**Standing product rule: in every level, clicking Vocabulary 1, Vocabulary 2, Academic, or Glossary under any unit in the Reference tree must open that unit's Unit Reference overview page (with the browser jumping to the matching section anchor) — never a single word card.** This must be true for every unit in every level, with no exceptions and no "we'll get to it later."
+
+This behavior is wired through two things that MUST both exist for a unit, or the tree silently degrades to a per-word fallback link (`/reference/word/<firstWordId>`) with no error or warning:
+
+1. A `UnitReference<N>.tsx` component (e.g. `UnitReference7.tsx`) + its route at `src/app/reference/<course>/level-<n>/unit-<n>/page.tsx`
+2. A `"<level>-<unit>": "/reference/<course>/level-<n>/unit-<n>"` entry in `UNIT_REFERENCE_PAGES` inside `src/components/reference/ReferenceBrowse.tsx`
+
+If either is missing, `VocabGroupLeaf` in `ReferenceBrowse.tsx` falls back silently — nothing breaks, nothing logs, it just quietly links to the wrong place. Always verify both pieces exist before calling a unit scan done.
+
+### Building `UnitReference<N>.tsx`
+
+Copy the shape of the existing `src/components/UnitReference.tsx` (Unit 8) or `src/components/UnitReference7.tsx` — they are the reference pattern. Each unit gets its own file (data is hardcoded per unit for now; do not try to genericize this into one parametrized component unless the user asks for that refactor explicitly). For the new unit's file:
+
+- Pull `unitTitle`, and the `vocab1WordIds` / `vocab2WordIds` / `academicWordIds` / `contentWordIds` + `relatedWordIds` (content + related merge into the "Glossary" section) straight from the unit's `vocabulary.json` — do not re-derive or guess word data, read it from the JSON you just built
+- Sections in this exact order: Vocabulary 1, Vocabulary 2, Academic, Glossary, then Grammar (only if `grammar.json` exists for this unit — omit the Grammar section entirely if it doesn't, same as `UnitReference7.tsx` does)
+- Academic words link to `/reference/academic/<id>` (they're `type: "academic"`); everything else links to `/reference/word/<id>`
+- Section `id`s must be `vocab1` / `vocab2` / `academic` / `glossary` / `grammar` — these are the anchors `ReferenceBrowse.tsx` jumps to, do not rename them
+- Update the `crumbs` prop on `<AppShell>` to `["Reference", "Our World", "Unit <N>"]` (or the matching course label)
+
+### Wiring the route and the tree
+
+1. Create `src/app/reference/<course>/level-<n>/unit-<n>/page.tsx`:
+   ```tsx
+   import UnitReference<N> from "@/components/UnitReference<N>";
+   export default function Page() { return <UnitReference<N> />; }
+   ```
+2. Add the mapping to `UNIT_REFERENCE_PAGES` in `ReferenceBrowse.tsx`:
+   ```ts
+   "<level>-<unit>": "/reference/<course>/level-<n>/unit-<n>"
+   ```
+
+### Verify it actually works — do not skip this
+
+A clean `tsc`/build pass does NOT prove the navigation works, because the fallback path is also valid TypeScript and also builds successfully. After building and starting the app, verify with a real click-through (Playwright is fine): expand the unit in the Reference tree, click each of Vocabulary 1 / Vocabulary 2 / Academic / Glossary, and confirm the resulting URL is `/reference/<course>/level-<n>/unit-<n>#<anchor>` — not `/reference/word/...` or `/reference/academic/...`.
+
+### Registering the real unit title — never hardcode a guessed one
+
+The Level tree in `ReferenceBrowse.tsx` shows every unit 1–9 (1–8 for Level 1) for every level automatically — units without a `vocabulary.json` yet render as "planned" placeholders, scanned units render with real data. **This is by design and scales as more units/levels get scanned — do not re-introduce a hardcoded per-level unit list** (a previous version of this code hardcoded Level 4 to only show units 7–9 with guessed titles like "Let's Explore!" that didn't match the real unit title "Good Idea!" in the JSON — that bug is why this note exists).
+
+The unit title shown in the tree comes from `unitTitles` in `src/data/reference.ts`, keyed `"<level>-<unit>"`, sourced directly from each unit's own `vocabulary.json` `unitTitle` field. When you scan a new unit, add its entry to that map:
+
+```ts
+export const unitTitles: Record<string, string> = {
+  [`${unit6Vocabulary.level}-${unit6Vocabulary.unit}`]: unit6Vocabulary.unitTitle,
+  [`${unit7Vocabulary.level}-${unit7Vocabulary.unit}`]: unit7Vocabulary.unitTitle,
+  [`${unit8Vocabulary.level}-${unit8Vocabulary.unit}`]: unit8Vocabulary.unitTitle
+  // add the new unit's import here too
+};
+```
+
+Never type a title by hand — always read it off the raw import (`unitN Vocabulary.unitTitle`), the same way the existing entries do, so the tree title can never drift from the source JSON.
 
 ## Academic words — rich schema required
 
@@ -217,11 +272,13 @@ In order:
    - Add four `unit<N>*Items` filter exports modeled on the existing pattern
 4. Update `scripts/validate-content.mjs`:
    - Add the new unit path to `unitVocabularyPaths`
-5. Update `src/components/ReferencePage.tsx`:
+5. Update `src/components/reference/ReferenceBrowse.tsx`:
    - Import the four new filter exports
    - Add a new `<details>` node under the matching Level with five sub-sections (Vocab 1 / Vocab 2 / Grammar / Academic / Glossary)
    - Grammar shows placeholder if no `grammar.json` yet
-6. Update `docs/lesson-plans/<course-path>/index.json` if the unit's page range or `pdf_offset` were not yet verified
+   - Add the unit's entry to `UNIT_REFERENCE_PAGES` (see "Unit Reference page — required every time" above)
+6. Build `UnitReference<N>.tsx` + its route (see "Unit Reference page — required every time" above)
+7. Update `docs/lesson-plans/<course-path>/index.json` if the unit's page range or `pdf_offset` were not yet verified
 
 ### Step 8 — Validate
 
@@ -256,7 +313,10 @@ Push to the current working branch. Do not create a PR automatically — the use
 - [ ] `vocabulary-index.json` updated (only new IDs)
 - [ ] `reference.ts` imports + filter exports added
 - [ ] `validate-content.mjs` path list updated
-- [ ] `ReferencePage.tsx` source tree updated
+- [ ] `ReferenceBrowse.tsx` source tree updated
+- [ ] `UnitReference<N>.tsx` component + route built, `UNIT_REFERENCE_PAGES` entry added
+- [ ] Real `unitTitle` (read from the JSON, never guessed) added to `unitTitles` in `src/data/reference.ts`
+- [ ] Click-through verified: Vocabulary 1/2, Academic, and Glossary all navigate to the Unit Reference page (not a word-card fallback)
 - [ ] `docs/lesson-plans/.../index.json` unit entry verified
 - [ ] `npm run validate:content` passes — report the new card count
 - [ ] `npx tsc --noEmit` clean

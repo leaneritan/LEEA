@@ -8,7 +8,7 @@
  * it needs.
  */
 
-import { grammarPoints, vocabularyItems } from "@/data/reference";
+import { grammarPoints, unitTitles, vocabularyItems } from "@/data/reference";
 import {
   toAcademicEntry,
   toGrammarEntry,
@@ -112,17 +112,11 @@ function buildSourceTree(): TreeCourse[] {
     byUnit.set(key, bucket);
   }
 
-  /* Look up unit titles from the source JSON */
-  const unitTitleHints: Record<string, string> = {
-    "4-7": "Let's Explore!",
-    "4-8": "That's Really Interesting!"
-  };
-
   const levels = new Map<number, TreeLevel>(
     Array.from({ length: 6 }, (_, index) => [index + 1, { level: index + 1, units: [], active: index + 1 === 4 }])
   );
   for (const bucket of byUnit.values()) {
-    bucket.unitTitle = unitTitleHints[`${bucket.level}-${bucket.unit}`] ?? `Unit ${bucket.unit}`;
+    bucket.unitTitle = unitTitles[`${bucket.level}-${bucket.unit}`] ?? `Unit ${bucket.unit}`;
     const level =
       levels.get(bucket.level) ?? { level: bucket.level, units: [], active: bucket.level === 4 };
     level.units.push({

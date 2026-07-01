@@ -96,6 +96,7 @@ function CourseNode({ course }: { course: (typeof sourceTree)[number] }) {
 /* Units that have a built Unit Reference page. Add an entry here once
    /reference/our-world/level-N/unit-M/page.tsx exists for that unit. */
 const UNIT_REFERENCE_PAGES: Record<string, string> = {
+  "4-6": "/reference/our-world/level-4/unit-6",
   "4-7": "/reference/our-world/level-4/unit-7",
   "4-8": "/reference/our-world/level-4/unit-8"
 };
@@ -128,14 +129,18 @@ function LevelNode({ level }: { level: (typeof sourceTree)[number]["levels"][num
   );
 }
 
+/* Every Our World level has 9 units (level 1 has 8). Show the full run for
+   every level — scanned units render as real UnitNodes, unscanned ones show
+   as "planned" placeholders — so the tree looks the same shape whether a
+   level has 1 unit scanned or all 9. */
 function getDisplayUnits(level: (typeof sourceTree)[number]["levels"][number]) {
-  if (level.level !== 4) return level.units.map((unit) => ({ unit: unit.unit, title: unit.unitTitle, real: unit }));
+  const unitCount = level.level === 1 ? 8 : 9;
   const byUnit = new Map(level.units.map((unit) => [unit.unit, unit]));
-  return [
-    { unit: 7, title: "Let's Explore!", real: byUnit.get(7) },
-    { unit: 8, title: "That's Really Interesting!", real: byUnit.get(8) },
-    { unit: 9, title: "Looking Back", real: byUnit.get(9) }
-  ];
+  return Array.from({ length: unitCount }, (_, index) => {
+    const unitNumber = index + 1;
+    const real = byUnit.get(unitNumber);
+    return { unit: unitNumber, title: real?.unitTitle ?? `Unit ${unitNumber}`, real };
+  });
 }
 
 function UnitNode({ level, unit }: { level: number; unit: (typeof sourceTree)[number]["levels"][number]["units"][number] }) {

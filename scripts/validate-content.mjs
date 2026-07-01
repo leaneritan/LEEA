@@ -118,7 +118,63 @@ for (const word of wordsById.values()) {
   assertPresent(word.japanese?.reading, sourceLabel(word, "japanese.reading"));
   assertPresent(word.japanese?.meaning, sourceLabel(word, "japanese.meaning"));
 
+  validateWordCardFields(word);
   if (word.type === "academic") validateAcademicWord(word);
+}
+
+/* Catches the recurring "looks done but isn't" gaps from Units 6/7: missing
+   pronunciation data, missing Japanese translations, and example sentences
+   that won't actually highlight the target word on the card. A clean
+   tsc/build pass does not catch any of these — they only show up visually,
+   so they must be enforced here instead of relying on someone noticing. */
+function validateWordCardFields(word) {
+  assertPresent(word.ipa, sourceLabel(word, "ipa"));
+  if (present(word.ipa) && (word.ipa.startsWith("/") || word.ipa.endsWith("/"))) {
+    fail(sourceLabel(word, "ipa must not include the surrounding slashes — the card adds them"));
+  }
+  assertPresent(word.syllables, sourceLabel(word, "syllables"));
+
+  /* AcademicCard renders academic.examples.{test,school,real} (validated in
+     validateAcademicWord below), not the base example/additionalExamples
+     fields — so those base fields are inert for academic-type words and
+     are not checked here. */
+  if (word.type !== "academic") {
+    if (present(word.example)) {
+      assertPresent(word.exampleJp, sourceLabel(word, "exampleJp"));
+      if (!highlightableTextIncludesWord(word.example, word)) {
+        fail(sourceLabel(word, `example does not contain a highlightable form of "${word.word}" — check word/normalizedWord vs. the sentence text`));
+      }
+    }
+
+    const additional = word.additionalExamples ?? [];
+    const additionalJp = word.additionalExamplesJp ?? [];
+    if (additional.length !== additionalJp.length) {
+      fail(sourceLabel(word, "additionalExamples and additionalExamplesJp must have the same length"));
+    }
+    for (const [index, example] of additional.entries()) {
+      if (!highlightableTextIncludesWord(example, word)) {
+        fail(sourceLabel(word, `additionalExamples[${index}] does not contain a highlightable form of "${word.word}"`));
+      }
+    }
+  }
+
+  for (const [index, sense] of (word.additionalMeanings ?? []).entries()) {
+    assertPresent(sense.text, sourceLabel(word, `additionalMeanings[${index}].text`));
+    assertPresent(sense.jp, sourceLabel(word, `additionalMeanings[${index}].jp`));
+  }
+}
+
+/* Mirrors highlightWord() in src/components/reference/WordCard.tsx, which
+   searches example text for entry.normalizedWord — never the display "word"
+   field, since that often carries an article ("a creature") or joins a
+   phrase with underscores ("sea_sponges") that never appears verbatim in a
+   sentence. Underscores match either a space or a hyphen in the sentence. */
+function highlightableTextIncludesWord(text, word) {
+  const key = word.normalizedWord || word.word || "";
+  if (!key) return true;
+  const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = key.split("_").map(escapeRegex).join("[-\\s]");
+  return new RegExp(pattern, "i").test(text);
 }
 
 function validateAcademicWord(word) {

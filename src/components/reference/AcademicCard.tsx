@@ -15,8 +15,14 @@ import { useMemo, useState } from "react";
 import { useJapanesePreference } from "@/components/AppShell";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
 import type { AcademicEntry } from "@/data/reference-shapes";
+import sanseidoIndex from "../../../content/subjects/english/junior-high/sanseido-index.json";
 import { posPillClass } from "./pos-pill";
 import { getAcademicNav } from "./ref-data";
+
+type SanseidoEntry = { w: string; u: string };
+const sanseidoByWord = new Map(
+  (sanseidoIndex as SanseidoEntry[]).map((entry) => [entry.w.toLowerCase(), entry.u])
+);
 
 const POS_LABEL: Record<string, string> = {
   verb: "verb",
@@ -36,6 +42,7 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
   const known = knownWordSet.has(entry.id);
   const [picks, setPicks] = useState<QuizState>({});
   const nav = useMemo(() => getAcademicNav(entry.id), [entry.id]);
+  const sanseidoUrl = useMemo(() => sanseidoByWord.get(entry.word.toLowerCase()), [entry]);
 
   const quizScoreLine = useMemo(() => {
     if (entry.academic.quiz.length === 0) return "";
@@ -336,6 +343,25 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
                   <span className="rcardv2-source-arrow">→</span>
                 </div>
               ))}
+              {sanseidoUrl && (
+                <a
+                  href={sanseidoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rcardv2-source-row"
+                >
+                  <span className="rcardv2-source-tile rcardv2-source-tile--junior-high" aria-hidden>
+                    S
+                  </span>
+                  <div className="rcardv2-source-info">
+                    <div className="rcardv2-source-label">Sanseido</div>
+                    <div className="rcardv2-source-tag">Dictionary · external</div>
+                  </div>
+                  <span className="rcardv2-source-arrow" aria-hidden>
+                    ↗
+                  </span>
+                </a>
+              )}
             </div>
           </section>
 

@@ -68,6 +68,7 @@ export type WordEntry = {
   id: string;
   type: "vocabulary" | "academic" | "content" | "related" | "glossary";
   word: string;
+  normalizedWord: string;
   emoji: string;
   pos: PosTag;
   syllables: string;
@@ -90,6 +91,7 @@ export function toWordEntry(item: VocabularyItem): WordEntry {
     id: item.id,
     type: item.type,
     word: item.word,
+    normalizedWord: item.normalizedWord,
     emoji: item.emoji,
     pos: normalizePos(item.partOfSpeech ?? item.pos),
     syllables: item.syllables ?? "",

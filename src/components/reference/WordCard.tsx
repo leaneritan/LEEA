@@ -193,7 +193,7 @@ export function WordCard({ entry }: { entry: WordEntry }) {
               <div className="rcardv2-examples">
                 {entry.examples.map((example, idx) => (
                   <div key={idx} className="rcardv2-example">
-                    <p>{highlightWord(example, entry.word)}</p>
+                    <p>{highlightWord(example, entry.normalizedWord || entry.word)}</p>
                     {jp && entry.examplesJp[idx] && (
                       <p className="rcardv2-example-jp" lang="ja">
                         {entry.examplesJp[idx]}
@@ -373,10 +373,14 @@ function tokenize(text: string) {
 }
 
 function highlightWord(text: string, word: string) {
-  const re = new RegExp(`(${escapeRegex(word)}\\w*)`, "ig");
+  /* normalizedWord joins multi-word phrases with "_" (e.g. "pop_top",
+     "sea_sponges"); match that as either a space or a hyphen in the actual
+     sentence, since either is valid English spelling. */
+  const pattern = word.split("_").map(escapeRegex).join("[-\\s]");
+  const re = new RegExp(`(${pattern}\\w*)`, "ig");
   const parts = text.split(re);
   return parts.map((part, i) =>
-    part && new RegExp(`^${escapeRegex(word)}\\w*$`, "i").test(part) ? (
+    part && new RegExp(`^${pattern}\\w*$`, "i").test(part) ? (
       <strong key={i}>{part}</strong>
     ) : (
       <span key={i}>{part}</span>

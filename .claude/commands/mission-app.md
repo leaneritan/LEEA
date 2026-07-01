@@ -237,12 +237,14 @@ Push to the current working branch. Do NOT create a PR.
 - [ ] All four save/restore rules
 - [ ] Teacher JSON + learner JSON registered
 - [ ] `src/data/lessons.ts` updated
+- [ ] Learner `component` ends in `-app` and matches the teacher lesson's `component` once stripped — the parent's "Mark Done" checklist only auto-updates when Leo finishes his app if this matches (see `docs/supabase.md`)
 - [ ] `npm run validate:content` ✅
 - [ ] Commit pushed; no auto-PR
 
 ## Important constraints
 
 - Never modify `src/lib/supabase.ts`
+- Read `docs/supabase.md` before wiring progress — `learner_progress` (Leo's app) and `teacher_lesson_progress` (the parent's checklist) are separate tables that only stay in sync if `component` naming matches between the teacher and learner JSON
 - Mission is **Levels 4-6 only**. Levels 1-3 use "Value" instead.
 - The learner app must work fully offline (no external API calls)
 - Do not expand Think/Pair/Share beyond what the LP provides

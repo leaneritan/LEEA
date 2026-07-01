@@ -313,11 +313,13 @@ Push to the current working branch. Do NOT create a PR — Leaneritan reviews + 
 - [ ] `npm run validate:content` ✅
 - [ ] `npx tsc --noEmit` ✅
 - [ ] `node -e "$(awk '<script> extract)"` ✅ (catches `\\'` escape bugs before shipping)
+- [ ] The `<vocab-1|vocab-2>` / `<vocab-1|vocab-2>-app` component pair actually matches once `-app` is stripped — the parent's "Mark Done" checklist only auto-updates when Leo finishes his app if this matches exactly (see `docs/supabase.md`)
 - [ ] Commit pushed; no auto-PR
 
 ## Important constraints
 
 - Never modify `src/lib/supabase.ts`
+- Read `docs/supabase.md` before wiring progress — `learner_progress` (Leo's app) and `teacher_lesson_progress` (the parent's checklist) are separate tables that only stay in sync if `component` naming matches between the teacher and learner JSON
 - Never override per-word `displayEmoji` — read from `vocabulary.json` so Reference, teacher slides, and Leo apps stay consistent
 - Japanese drafts stay `needsReview: true` until the parent confirms
 - Teacher slides have NO save/restore (Neritan marks done from the dashboard); Leo apps follow all 4 rules

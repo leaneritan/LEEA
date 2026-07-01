@@ -278,11 +278,13 @@ Push to the current working branch. Do NOT create a PR.
 - [ ] Teacher JSON + learner JSON registered
 - [ ] `src/data/lessons.ts` updated
 - [ ] `npm run validate:content` ✅
+- [ ] Learner `component` ends in `-app` and matches the teacher lesson's `component` once that suffix is stripped — confirm the teacher/learner `Mark Done` link actually works (see `docs/supabase.md`), don't just assume it
 - [ ] Commit pushed; no auto-PR
 
 ## Important constraints
 
 - Never modify `src/lib/supabase.ts`
+- Read `docs/supabase.md` before wiring progress — `learner_progress` (Leo's app) and `teacher_lesson_progress` (the parent's checklist) are separate tables that only stay in sync if `component` naming matches between the teacher and learner JSON
 - Unit Readers appear in all levels (1-6). Story content and complexity vary by level.
 - The reader story text must be **verbatim** from the booklet — never paraphrased
 - The learner app must work fully offline (no external API calls)

@@ -140,6 +140,23 @@ Copy the shape of the existing `src/components/UnitReference.tsx` (Unit 8) or `s
 
 A clean `tsc`/build pass does NOT prove the navigation works, because the fallback path is also valid TypeScript and also builds successfully. After building and starting the app, verify with a real click-through (Playwright is fine): expand the unit in the Reference tree, click each of Vocabulary 1 / Vocabulary 2 / Academic / Glossary, and confirm the resulting URL is `/reference/<course>/level-<n>/unit-<n>#<anchor>` — not `/reference/word/...` or `/reference/academic/...`.
 
+### Registering the real unit title — never hardcode a guessed one
+
+The Level tree in `ReferenceBrowse.tsx` shows every unit 1–9 (1–8 for Level 1) for every level automatically — units without a `vocabulary.json` yet render as "planned" placeholders, scanned units render with real data. **This is by design and scales as more units/levels get scanned — do not re-introduce a hardcoded per-level unit list** (a previous version of this code hardcoded Level 4 to only show units 7–9 with guessed titles like "Let's Explore!" that didn't match the real unit title "Good Idea!" in the JSON — that bug is why this note exists).
+
+The unit title shown in the tree comes from `unitTitles` in `src/data/reference.ts`, keyed `"<level>-<unit>"`, sourced directly from each unit's own `vocabulary.json` `unitTitle` field. When you scan a new unit, add its entry to that map:
+
+```ts
+export const unitTitles: Record<string, string> = {
+  [`${unit6Vocabulary.level}-${unit6Vocabulary.unit}`]: unit6Vocabulary.unitTitle,
+  [`${unit7Vocabulary.level}-${unit7Vocabulary.unit}`]: unit7Vocabulary.unitTitle,
+  [`${unit8Vocabulary.level}-${unit8Vocabulary.unit}`]: unit8Vocabulary.unitTitle
+  // add the new unit's import here too
+};
+```
+
+Never type a title by hand — always read it off the raw import (`unitN Vocabulary.unitTitle`), the same way the existing entries do, so the tree title can never drift from the source JSON.
+
 ## Academic words — rich schema required
 
 For `type: "academic"`, the validator requires the full rich card:
@@ -298,6 +315,7 @@ Push to the current working branch. Do not create a PR automatically — the use
 - [ ] `validate-content.mjs` path list updated
 - [ ] `ReferenceBrowse.tsx` source tree updated
 - [ ] `UnitReference<N>.tsx` component + route built, `UNIT_REFERENCE_PAGES` entry added
+- [ ] Real `unitTitle` (read from the JSON, never guessed) added to `unitTitles` in `src/data/reference.ts`
 - [ ] Click-through verified: Vocabulary 1/2, Academic, and Glossary all navigate to the Unit Reference page (not a word-card fallback)
 - [ ] `docs/lesson-plans/.../index.json` unit entry verified
 - [ ] `npm run validate:content` passes — report the new card count

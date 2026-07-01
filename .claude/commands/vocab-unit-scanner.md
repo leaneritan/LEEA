@@ -101,6 +101,19 @@ The Reference word card (`src/components/reference/WordCard.tsx`) renders pronun
 
 **Rule of thumb: if a learner-facing English string exists, a Japanese counterpart exists too** (`needsReview: true` until confirmed). This was a recurring gap in Units 6-8 that had to be backfilled after the fact — building it correctly the first time during scanning avoids that rework.
 
+**All of the above is now enforced by `npm run validate:content`, not just this checklist** — `scripts/validate-content.mjs` fails the build if a word is missing `ipa`/`syllables`/`exampleJp`, has mismatched `additionalExamples`/`additionalExamplesJp` lengths, has `ipa` with the slashes already baked in (they get double-added by the card), or has an example sentence that won't actually highlight its target word (see "Example sentences must actually highlight" below). Run the validator as you go, not just at the end — it will catch a gap immediately instead of it surfacing later as a visual bug someone has to notice by eye.
+
+### Example sentences must actually highlight the target word
+
+`WordCard.tsx`'s `highlightWord()` bolds the target word inside each example sentence by searching for `normalizedWord` (not `word` — `word` often carries an article like "a creature" or joins a phrase with underscores like "sea_sponges", neither of which appears verbatim in a sentence). This means every example sentence you write must use the **same word form** as `normalizedWord`:
+
+- If `normalizedWord` is `"battery"`, the sentence must contain "battery" (or "battery" + a suffix like "-ies" won't match "batteries" — keep it singular, or match irregular plurals aren't handled, so avoid them)
+- If `normalizedWord` is a multi-word phrase joined with `_` (e.g. `"pop_top"`, `"sea_sponges"`), the sentence can use either a space or a hyphen ("pop-top" or "pop top" both match) — but not a different word form (don't write "popping the top")
+- Avoid tense/number shifts that break the literal match: don't write "took photos" for a word whose `normalizedWord` is `"take photos"`, don't write "polyp" (singular) for `"polyps"` (plural)
+- This check only applies to `type: "vocabulary" | "content" | "related" | "glossary"` words — academic words render their examples from the separate `examples.{test,school,real-world}` schema, not the base `example`/`additionalExamples` fields, so this rule doesn't apply to them
+
+If the validator flags "does not contain a highlightable form of X," don't fight the regex — simplify the sentence to use the word's base form instead.
+
 For mission / project / reader content words, **omit `lessonId`** (there is no teacher lesson) and use `component: "mission" | "project" | "reader"` with tag `OW<level>-U<unit>-MI | -PJ | -RDR`.
 
 ## Unit Reference page — required every time

@@ -147,7 +147,7 @@ Reference:
 
 Teacher lessons are only for teaching. Learner apps are for Leo's independent homework/practice.
 
-Academic Progress is a parent-facing Neritan page at `/teacher/progress`. It tracks Leo's real school test results across Japanese, Social Studies, Math, Science, and English, plus goals for total score, rank, and each subject. It is not a lesson and not Reference. First storage is local through `src/data/academicProgress.ts`, but the records are shaped to map directly to future Supabase tables for test results and academic goals.
+Academic Progress is a parent-facing Neritan page at `/teacher/progress`, implemented entirely in `src/components/AcademicProgressPage.tsx`. It tracks Leo's real school test results across Japanese, Social Studies, Math, Science, and English, plus goals for total score, rank, and each subject. It is not a lesson and not Reference. Storage is local-only for now, under the `leeaTestsJPDashboardV2` / `leeaGoalsJPDashboardV2` localStorage keys defined inline in that component — there is no Supabase table for this data yet. (A separate `src/data/academicProgress.ts` module with a different schema/key set was planned but never wired up; it was removed rather than left as dead code that looked like the real storage layer.)
 
 ## Visual Direction
 

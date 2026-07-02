@@ -84,9 +84,15 @@ export function AcademicProgressPage() {
     avg_english: "" as string | number,
   });
 
-  const [compareFromIdx, setCompareFromIdx] = useState<number>(0);
-  const [compareToIdx, setCompareToIdx] = useState<number>(0);
-  const [radarCompareIdx, setRadarCompareIdx] = useState<number>(0);
+  // Identify the selected "compare" tests by a stable key (date+name), not
+  // by their position in sortedTests. sortedTests re-sorts whenever a test
+  // is added/edited/deleted, so an index-based selection would silently
+  // point at a different test than the one the user picked as soon as the
+  // list changes underneath it — the dropdown's own label would keep
+  // updating to match, giving no indication anything had shifted.
+  const [compareFromKey, setCompareFromKey] = useState<string>("");
+  const [compareToKey, setCompareToKey] = useState<string>("");
+  const [radarCompareKey, setRadarCompareKey] = useState<string>("");
 
   const [showDeleteModal, setShowDeleteModal] = useState<number | null>(null);
   const [toastMsg, setToastMsg] = useState("");
@@ -136,6 +142,12 @@ export function AcademicProgressPage() {
 
   const totalScore = (t: TestRecord) => subjects.reduce((sum, s) => sum + Number(t.scores[s] || 0), 0);
   const avgTotalScore = (t: TestRecord) => Math.round(subjects.reduce((sum, s) => sum + Number(t.average?.[s] || 0), 0) * 10) / 10;
+  // Average fields are optional and default to 0 when left blank, so
+  // avgTotalScore(t) === 0 is ambiguous between "no data entered" and "the
+  // school average really is 0". This checks the real intent — was any
+  // average field actually filled in — so callers can show "—" instead of
+  // silently treating an empty form as "average score of 0".
+  const hasAvgData = (t: TestRecord) => subjects.some((s) => Number(t.average?.[s] || 0) > 0);
 
   const clearForm = useCallback((show = true) => {
     setForm({
@@ -306,6 +318,7 @@ export function AcademicProgressPage() {
   }, [sortedTests, goals]);
 
   const esc = (s: any) => String(s ?? "").replace(/[&<>\"]/g, m => (({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" } as any)[m]));
+  const testKey = (t: TestRecord | undefined) => (t ? `${t.date}__${t.name}` : "");
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
   const renderTotalAverageChart = useCallback(() => {
@@ -345,7 +358,7 @@ export function AcademicProgressPage() {
     const svg = radarChartRef.current;
     if (!svg || !sortedTests.length) return;
     const cur = sortedTests[sortedTests.length - 1];
-    const pre = sortedTests[radarCompareIdx] || sortedTests[Math.max(0, sortedTests.length - 2)];
+    const pre = sortedTests.find(t => testKey(t) === radarCompareKey) || sortedTests[Math.max(0, sortedTests.length - 2)];
     const W = 620, H = 340, cx = 300, cy = 172, R = 110;
     const angle = (i: number) => -Math.PI / 2 + i * 2 * Math.PI / subjects.length;
     const pt = (score: number, i: number, rad = R) => [cx + Math.cos(angle(i)) * rad * score / 100, cy + Math.sin(angle(i)) * rad * score / 100];
@@ -357,7 +370,7 @@ export function AcademicProgressPage() {
     subjects.forEach((s, i) => { const [x, y] = pt(cur.scores[s], i); html += `<circle cx="${x}" cy="${y}" r="6" fill="#fff" stroke="#2563eb" stroke-width="3"/><text x="${x + 8}" y="${y + 4}" font-size="12" fill="#172033" font-weight="1000">${cur.scores[s]}</text>`; });
     html += `<rect x="446" y="24" width="146" height="86" rx="16" fill="#fff" stroke="#e5eaf3"/><line x1="466" y1="50" x2="492" y2="50" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/><text x="502" y="54" font-size="13" fill="#172033" font-weight="1000">最新</text><line x1="466" y1="78" x2="492" y2="78" stroke="#ea580c" stroke-width="4" stroke-dasharray="7 6"/><text x="502" y="82" font-size="13" fill="#172033" font-weight="1000">比較</text>`;
     svg.innerHTML = html;
-  }, [sortedTests, radarCompareIdx]);
+  }, [sortedTests, radarCompareKey]);
 
   const renderImprovementChart = useCallback(() => {
     const svg = improvementChartRef.current;
@@ -367,8 +380,8 @@ export function AcademicProgressPage() {
       svg.innerHTML = `<rect x="20" y="76" width="520" height="126" rx="22" fill="#f8fafc" stroke="#e5eaf3"/><text x="42" y="124" font-size="17" fill="#667085" font-weight="900">次のテストを追加すると改善グラフが出ます。</text><text x="42" y="155" font-size="13" fill="#667085">「サンプル改善データを入力」で動きを確認できます。</text>`;
       return;
     }
-    const from = sortedTests[compareFromIdx] || sortedTests[Math.max(0, sortedTests.length - 2)];
-    const to = sortedTests[compareToIdx] || sortedTests[sortedTests.length - 1];
+    const from = sortedTests.find(t => testKey(t) === compareFromKey) || sortedTests[Math.max(0, sortedTests.length - 2)];
+    const to = sortedTests.find(t => testKey(t) === compareToKey) || sortedTests[sortedTests.length - 1];
     const diffs = subjects.map(s => Number(to.scores[s]) - Number(from.scores[s]));
     const max = Math.max(20, Math.ceil(Math.max(...diffs.map(Math.abs)) / 5) * 5);
     const zero = T + (H - T - B) / 2;
@@ -384,7 +397,7 @@ export function AcademicProgressPage() {
       html += `<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="9" fill="${d >= 0 ? "#16a34a" : "#dc2626"}"/><text x="${x + bw / 2 - 14}" y="${d >= 0 ? y - 8 : y + h + 19}" font-size="13" fill="#172033" font-weight="1000">${d >= 0 ? "+" : ""}${d}</text><text x="${x + bw / 2 - 14}" y="${H - 18}" font-size="12" fill="${colors[s]}" font-weight="1000">${labels[s]}</text>`;
     });
     svg.innerHTML = html;
-  }, [sortedTests, compareFromIdx, compareToIdx]);
+  }, [sortedTests, compareFromKey, compareToKey]);
 
   const renderSubjectTrendChart = useCallback(() => {
     const svg = subjectTrendChartRef.current;
@@ -435,7 +448,7 @@ export function AcademicProgressPage() {
       renderSubjectTrendChart();
       renderRankChart();
     }
-  }, [isLoaded, sortedTests, goals, compareFromIdx, compareToIdx, radarCompareIdx, renderTotalAverageChart, renderRadarChart, renderImprovementChart, renderSubjectTrendChart, renderRankChart]);
+  }, [isLoaded, sortedTests, goals, compareFromKey, compareToKey, radarCompareKey, renderTotalAverageChart, renderRadarChart, renderImprovementChart, renderSubjectTrendChart, renderRankChart]);
 
   return (
     <>
@@ -850,7 +863,7 @@ export function AcademicProgressPage() {
                       <div className="goal-card">
                         <div className="goal-title">順位</div>
                         <div className="goal-value">{latest.rank || "—"}位 / {goals.students || 150}人</div>
-                        <div className="goal-progress"><div className="goal-fill" style={{ width: `${rankOk ? 100 : clamp(goals.rank / (latest.rank || goals.rank) * 100, 0, 100)}%`, background: rankOk ? '#16a34a' : '#f59e0b' }}></div></div>
+                        <div className="goal-progress"><div className="goal-fill" style={{ width: `${!latest.rank ? 0 : rankOk ? 100 : clamp(goals.rank / latest.rank * 100, 0, 100)}%`, background: rankOk ? '#16a34a' : '#f59e0b' }}></div></div>
                         <div className="small">{latest.rank ? `上位${rankPct}%・${rankOk ? <span className="goodtxt">目標達成</span> : `あと${Math.max(0, latest.rank - goals.rank)}人`}` : '順位なし'}</div>
                       </div>
                       {subjects.map(s => {
@@ -880,8 +893,8 @@ export function AcademicProgressPage() {
               <div className="twocol" style={{ marginBottom: "10px" }}>
                 <div>
                   <label>比較するテスト</label>
-                  <select id="radarCompareSelect" value={radarCompareIdx} onChange={(e) => setRadarCompareIdx(Number(e.target.value))}>
-                    {sortedTests.map((t, i) => <option key={i} value={i}>{t.name}（{t.date}）</option>)}
+                  <select id="radarCompareSelect" value={radarCompareKey || testKey(sortedTests[Math.max(0, sortedTests.length - 2)] ?? sortedTests[0])} onChange={(e) => setRadarCompareKey(e.target.value)}>
+                    {sortedTests.map((t) => <option key={testKey(t)} value={testKey(t)}>{t.name}（{t.date}）</option>)}
                   </select>
                 </div>
                 <div><label>最新テスト</label><input id="radarLatestName" disabled value={sortedTests[sortedTests.length - 1]?.name || ""} /></div>
@@ -895,22 +908,22 @@ export function AcademicProgressPage() {
               <div className="twocol" style={{ marginBottom: "10px" }}>
                 <div>
                   <label>比較元</label>
-                  <select id="compareFrom" value={compareFromIdx} onChange={(e) => setCompareFromIdx(Number(e.target.value))}>
-                    {sortedTests.map((t, i) => <option key={i} value={i}>{t.name}（{t.date}）</option>)}
+                  <select id="compareFrom" value={compareFromKey || testKey(sortedTests[Math.max(0, sortedTests.length - 2)] ?? sortedTests[0])} onChange={(e) => setCompareFromKey(e.target.value)}>
+                    {sortedTests.map((t) => <option key={testKey(t)} value={testKey(t)}>{t.name}（{t.date}）</option>)}
                   </select>
                 </div>
                 <div>
                   <label>比較先</label>
-                  <select id="compareTo" value={compareToIdx} onChange={(e) => setCompareToIdx(Number(e.target.value))}>
-                    {sortedTests.map((t, i) => <option key={i} value={i}>{t.name}（{t.date}）</option>)}
+                  <select id="compareTo" value={compareToKey || testKey(sortedTests[sortedTests.length - 1] ?? sortedTests[0])} onChange={(e) => setCompareToKey(e.target.value)}>
+                    {sortedTests.map((t) => <option key={testKey(t)} value={testKey(t)}>{t.name}（{t.date}）</option>)}
                   </select>
                 </div>
               </div>
               <svg ref={improvementChartRef} className="chart" viewBox="0 0 560 320" preserveAspectRatio="none"></svg>
               <div id="improvementHint" className="small">
                 {sortedTests.length >= 2 && (() => {
-                  const from = sortedTests[compareFromIdx];
-                  const to = sortedTests[compareToIdx];
+                  const from = sortedTests.find(t => testKey(t) === compareFromKey) || sortedTests[Math.max(0, sortedTests.length - 2)];
+                  const to = sortedTests.find(t => testKey(t) === compareToKey) || sortedTests[sortedTests.length - 1];
                   if (!from || !to) return null;
                   const diffs = subjects.map(s => Number(to.scores[s]) - Number(from.scores[s]));
                   const bestIdx = diffs.indexOf(Math.max(...diffs));
@@ -984,7 +997,8 @@ export function AcademicProgressPage() {
                       const prev = sortedTests[i - 1];
                       const td = prev ? totalScore(t) - totalScore(prev) : null;
                       const curTotal = totalScore(t);
-                      const curAvgTotal = avgTotalScore(t);
+                      const curAvgTotal = hasAvgData(t) ? avgTotalScore(t) : null;
+                      const avgDiff = curAvgTotal === null ? null : Math.round((curTotal - curAvgTotal) * 10) / 10;
                       const rankPct = (t.rank && goals.students) ? Math.round((t.rank / goals.students * 100) * 10) / 10 : null;
                       return (
                         <tr key={i}>
@@ -992,8 +1006,8 @@ export function AcademicProgressPage() {
                           <td className="nowrap">{t.date}</td>
                           <td className="right"><b>{curTotal}</b></td>
                           <td className={`right ${td === null ? '' : td >= 0 ? 'goodtxt' : 'badtxt'}`}>{td === null ? '—' : (td >= 0 ? '+' : '') + td}</td>
-                          <td className="right">{curAvgTotal || "—"}</td>
-                          <td className={`right ${curTotal - curAvgTotal >= 0 ? 'goodtxt' : 'badtxt'}`}>{curTotal - curAvgTotal >= 0 ? '+' : ''}{Math.round((curTotal - curAvgTotal) * 10) / 10}</td>
+                          <td className="right">{curAvgTotal === null ? "—" : curAvgTotal}</td>
+                          <td className={`right ${avgDiff === null ? '' : avgDiff >= 0 ? 'goodtxt' : 'badtxt'}`}>{avgDiff === null ? '—' : (avgDiff >= 0 ? '+' : '') + avgDiff}</td>
                           <td className="right">{t.rank ? t.rank + '位' : '—'}</td>
                           <td className="right">{rankPct ? rankPct + '%' : '—'}</td>
                           {subjects.map(s => <td key={s} className="right">{t.scores[s]}</td>)}
@@ -1011,24 +1025,27 @@ export function AcademicProgressPage() {
                 {sortedTests.length > 0 && (() => {
                   const latest = sortedTests[sortedTests.length - 1];
                   const curTotal = totalScore(latest);
-                  const curAvgTotal = avgTotalScore(latest);
+                  const curAvgTotal = hasAvgData(latest) ? avgTotalScore(latest) : null;
                   const gap = Math.max(0, goals.total - curTotal);
                   const rankAhead = latest.rank ? Math.max(0, latest.rank - 1) : 0;
                   const rankBehind = latest.rank ? Math.max(0, goals.students - latest.rank) : 0;
                   const rankPct = (latest.rank && goals.students) ? Math.round((latest.rank / goals.students * 100) * 10) / 10 : null;
 
-                  const diffRows = subjects.map(s => ({
-                    s,
-                    d: Math.round((latest.scores[s] - (latest.average?.[s] || 0)) * 10) / 10,
-                    score: latest.scores[s],
-                    gap: Math.max(0, (goals[s] || 100) - latest.scores[s])
-                  }));
+                  const diffRows = subjects.map(s => {
+                    const subjectHasAvg = Number(latest.average?.[s] || 0) > 0;
+                    return {
+                      s,
+                      d: subjectHasAvg ? Math.round((latest.scores[s] - (latest.average?.[s] || 0)) * 10) / 10 : null,
+                      score: latest.scores[s],
+                      gap: Math.max(0, (goals[s] || 100) - latest.scores[s])
+                    };
+                  });
                   const weak = diffRows.reduce((a, b) => a.gap > b.gap ? a : b).s;
                   const strong = diffRows.reduce((a, b) => a.score > b.score ? a : b).s;
 
                   return (
                     <>
-                      <p><b>率直に言うと：</b> 最新の合計は <b>{curTotal}点</b>。学校平均合計は <b>{curAvgTotal}点</b> なので、平均との差は <b className={curTotal - curAvgTotal >= 0 ? 'goodtxt' : 'badtxt'}>{curTotal - curAvgTotal >= 0 ? '+' : ''}{Math.round((curTotal - curAvgTotal) * 10) / 10}点</b> です。合計目標の <b>{goals.total}点</b> までは <b className={gap === 0 ? 'goodtxt' : 'warntxt'}>{gap === 0 ? '達成' : `あと${gap}点`}</b> です。</p>
+                      <p><b>率直に言うと：</b> 最新の合計は <b>{curTotal}点</b>。{curAvgTotal === null ? '学校平均データは未入力です。' : <>学校平均合計は <b>{curAvgTotal}点</b> なので、平均との差は <b className={curTotal - curAvgTotal >= 0 ? 'goodtxt' : 'badtxt'}>{curTotal - curAvgTotal >= 0 ? '+' : ''}{Math.round((curTotal - curAvgTotal) * 10) / 10}点</b> です。</>} 合計目標の <b>{goals.total}点</b> までは <b className={gap === 0 ? 'goodtxt' : 'warntxt'}>{gap === 0 ? '達成' : `あと${gap}点`}</b> です。</p>
                       <p><b>順位：</b> {latest.rank ? `${latest.rank}位 / ${goals.students || 150}人。上位${rankPct}%・前に${rankAhead}人・後ろに${rankBehind}人。` : '順位データなし'} 目標の{goals.rank}位以内に入るには、順位だけで見るとあと <b>{latest.rank ? Math.max(0, latest.rank - goals.rank) : '—'}人</b> 抜く必要があります。</p>
                       <p>一番強い教科は <b>{labels[strong]}</b>。今いちばん点数を取りに行くべき教科は <b>{labels[weak]}</b> です。英語が強いなら、英語だけに時間を使いすぎず、国語・数学・理科の底上げで合計点を上げる方が効率的です。</p>
                       <table>
@@ -1044,7 +1061,7 @@ export function AcademicProgressPage() {
                               <td className="right">{r.score}</td>
                               <td className="right">{goals[r.s] || 100}</td>
                               <td className={`right ${r.gap === 0 ? 'goodtxt' : 'warntxt'}`}>{r.gap === 0 ? '達成' : r.gap + '点'}</td>
-                              <td className={`right ${r.d >= 0 ? 'goodtxt' : 'badtxt'}`}>{r.d >= 0 ? '+' : ''}{r.d}</td>
+                              <td className={`right ${r.d === null ? '' : r.d >= 0 ? 'goodtxt' : 'badtxt'}`}>{r.d === null ? '—' : (r.d >= 0 ? '+' : '') + r.d}</td>
                               <td className="right">{r.score >= 90 ? '強み' : r.score >= 80 ? '良い' : r.score >= 70 ? '改善余地あり' : '最優先'}</td>
                             </tr>
                           ))}

@@ -180,6 +180,7 @@ For `type: "academic"`, the validator requires the full rich card:
 - `how_to_use` — `{ structure, patterns[] }` (patterns non-empty)
 - `jp_how_to_use` — `{ structure }` (`needsReview: true`)
 - `examples` — 3+ entries each `{ en, jp, context }` with context in the same 3 values
+  - **When the word is a verb** (`partOfSpeech`/`pos: "verb"`), the 3 examples must also cover the three verb forms — one sentence using the infinitive/base form, one using the past tense, one using the past participle (e.g. a perfect-tense or passive sentence) — combined with the existing test/school/real-world context requirement (one example naturally fills both axes at once, e.g. the "school" example uses the past tense). Don't let all 3 examples sit in the same base form — see `src/data/verbForms.ts`'s `getVerbForms()` for the canonical form of any given verb (handles irregulars).
 - `collocations` — 5–6 strings
 - `nonExamples` — 2–3 entries each `{ en, jp }`
 - `practice_prompt`, `jp_practice_prompt`

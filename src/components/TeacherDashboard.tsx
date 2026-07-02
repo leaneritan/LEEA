@@ -11,7 +11,12 @@ import {
   type AssignmentMap,
   type AssignmentRecord
 } from "@/data/assignments";
-import { getLearnerAppProgress, syncLearnerProgressWithCloud, type LearnerAppProgress } from "@/data/learnerProgress";
+import {
+  fetchLearnerCompletionTimestamps,
+  getLearnerAppProgress,
+  syncLearnerProgressWithCloud,
+  type LearnerAppProgress
+} from "@/data/learnerProgress";
 import {
   createLessonProgressRecord,
   getDoneLessonCount,
@@ -95,6 +100,7 @@ export function TeacherDashboard() {
   const [assignmentsReady, setAssignmentsReady] = useState(false);
   const [progressVersion, setProgressVersion] = useState(0);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  const [completionTimestamps, setCompletionTimestamps] = useState<Record<string, string>>({});
   const groups = useMemo(() => getTeacherLevels(), []);
 
   useEffect(() => {
@@ -104,6 +110,7 @@ export function TeacherDashboard() {
       void syncLearnerProgressWithCloud(learnerLessons).then((changed) => {
         if (changed) setProgressVersion((value) => value + 1);
       });
+      void fetchLearnerCompletionTimestamps(learnerLessons).then(setCompletionTimestamps);
       const localProgress = readLessonProgress();
       setProgress(localProgress);
       void syncLessonProgressWithCloud(localProgress).then(setProgress);
@@ -141,13 +148,22 @@ export function TeacherDashboard() {
     () => learnerLessons.find((lesson) => !assignments[lesson.id] && !getLearnerAppProgress(lesson.source).done),
     [assignments]
   );
-  const nextLearnerToReview = useMemo(
-    () => learnerLessons.find((lesson) => {
+  const nextLearnerToReview = useMemo(() => {
+    const candidates = learnerLessons.filter((lesson) => {
       const assignment = assignments[lesson.id];
       return assignment && assignment.status !== "reviewed" && getLearnerAppProgress(lesson.source).done;
-    }),
-    [assignments]
-  );
+    });
+    if (!candidates.length) return undefined;
+    // Show whichever one Leo actually finished most recently, not just the
+    // first match in the app's static registration order — a lesson he
+    // finished weeks ago (e.g. Opener) would otherwise permanently block
+    // anything he finishes later from ever showing here.
+    return candidates.slice().sort((a, b) => {
+      const aTime = completionTimestamps[a.id] ? Date.parse(completionTimestamps[a.id]) : -Infinity;
+      const bTime = completionTimestamps[b.id] ? Date.parse(completionTimestamps[b.id]) : -Infinity;
+      return bTime - aTime;
+    })[0];
+  }, [assignments, completionTimestamps]);
   const avgQuiz = useMemo(() => {
     const scores = learnerLessons.map((lesson) => getLearnerAppProgress(lesson.source).score).filter((score): score is number => score !== null);
     if (!scores.length) return null;

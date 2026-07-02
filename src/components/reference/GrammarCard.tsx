@@ -231,6 +231,15 @@ export function GrammarCard({ entry }: { entry: GrammarEntry }) {
 }
 
 function PatternChart({ entry, jp }: { entry: GrammarEntry; jp: boolean }) {
+  // The general table shape fits every grammar point (data tables, Q&A
+  // pairs, sentence patterns via single-row tables); prefer it whenever the
+  // source data has it. The chip-row renderer below stays for the two
+  // existing Unit 8 points and any future point that's a pure S-V-O
+  // sentence pattern, where chips read more naturally than table cells.
+  if (entry.chart.table) {
+    return <GrammarTableChart table={entry.chart.table} />;
+  }
+
   return (
     <section className="gcardv2-chart">
       <div className="gcardv2-chart-head">
@@ -277,6 +286,73 @@ function PatternChart({ entry, jp }: { entry: GrammarEntry; jp: boolean }) {
         <div className="gcardv2-chart-notes">
           <div>Use both word orders to say the same idea.</div>
           <div>Check whether the person or the thing comes first.</div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* General-purpose grammar table renderer — mirrors the print Grammar
+   Workbook's boxed-table visual language (shaded header, bordered rows,
+   optional Question/Answer mini-table, footer rule notes) so any grammar
+   point's chart can be expressed as data instead of one-off UI code. See
+   GrammarChartTable in src/data/types.ts for the schema. */
+function GrammarTableChart({ table }: { table: NonNullable<GrammarEntry["chart"]["table"]> }) {
+  return (
+    <section className="gcardv2-chart">
+      <div className="gcardv2-chart-head">
+        <div className="rcardv2-eyebrow">Pattern chart</div>
+        {table.title && <div className="gcardv2-table-title">{table.title}</div>}
+      </div>
+
+      <div className="gcardv2-table-wrap">
+        <table className="gcardv2-table">
+          {table.columns && (
+            <thead>
+              <tr>
+                {table.rows.some((row) => row.label !== undefined) && <th className="gcardv2-table-rowlabel-head" />}
+                {table.columns.map((col, ci) => (
+                  <th key={ci}>{col}</th>
+                ))}
+              </tr>
+            </thead>
+          )}
+          <tbody>
+            {table.rows.map((row, ri) => (
+              <tr key={ri}>
+                {row.label !== undefined && <th scope="row" className="gcardv2-table-rowlabel">{row.label}</th>}
+                {row.cells.map((cell, ci) => (
+                  <td key={ci} className={row.highlight?.includes(ci) ? "gcardv2-table-cell--highlight" : undefined}>
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {table.qa && table.qa.length > 0 && (
+        <div className="gcardv2-table-qa">
+          <div className="gcardv2-table-qa-head">Question / Answer</div>
+          <table className="gcardv2-table gcardv2-table--qa">
+            <tbody>
+              {table.qa.map((pair, qi) => (
+                <tr key={qi}>
+                  <td className="gcardv2-table-qa-q">{pair.question}</td>
+                  <td className="gcardv2-table-qa-a">{pair.answer}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {table.notes && table.notes.length > 0 && (
+        <div className="gcardv2-chart-notes">
+          {table.notes.map((note, ni) => (
+            <div key={ni}>{note}</div>
+          ))}
         </div>
       )}
     </section>

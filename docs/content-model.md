@@ -518,7 +518,36 @@ OW4-U8-G2 - Direct and indirect objects
 }
 ```
 
-The `chart` field may optionally include a `workbookChart` object (`GrammarWorkbookChart`) when the source is a workbook answer key. `workbookChart` holds the structured table (label, columns, rows, rule, and a `seeHowItWorks` block) so the renderer can display the original workbook chart layout. The plain `chart` fields (`intro_examples`, `rows`, `note_rule`) are always required alongside it.
+The `chart` field may optionally include a `workbookChart` object (`GrammarWorkbookChart`) when the source is a workbook answer key. `workbookChart` holds the structured table (label, columns, rows, rule, and a `seeHowItWorks` block) so the renderer can display the original workbook chart layout. The plain `chart` fields (`intro_examples`, `rows`, `note_rule`) are always required alongside it. `workbookChart` is a legacy, one-off shape hard-coded to the "who"-clause pattern specifically — do not model new grammar points after it.
+
+**For any new grammar point, prefer `chart.table` (`GrammarChartTable`) instead.** This is the one general-purpose chart shape meant to fit every grammar point, not just sentence patterns — built after noticing the print Level 4 Grammar Workbook has roughly 14 different boxed chart shapes across its 9 units (comparatives, have-to, would-like, reflexive pronouns, superlatives, future will/won't, used to, double comparatives, definitions with *which*, plus the two sentence-pattern points already built), and the old `chart.rows`/`chart.patterns` chip renderer only cleanly fits an S-V-O sentence pattern. Shape:
+
+```json
+"table": {
+  "title": "Have to",
+  "columns": ["", "", "Answer"],
+  "rows": [
+    { "label": "I / You / We / They", "cells": ["don't have to", "have to cook", "tomorrow."] },
+    { "label": "She / He", "cells": ["doesn't have to", "has to cook", "tomorrow."], "highlight": [1] }
+  ],
+  "qa": [
+    { "question": "What do they have to do?", "answer": "They have to cook lunch." },
+    { "question": "What does he have to do?", "answer": "He has to wash the lettuce." }
+  ],
+  "notes": [
+    "Use have to in the negative for all forms: You don't have to cook.",
+    "He doesn't have to wash lettuce."
+  ]
+}
+```
+
+- `columns` is optional — omit it for a plain two-column label/value table.
+- `rows[].label` is the left-side row label (e.g. "I'm" / "You're"); omit it for a table with no row labels.
+- `rows[].highlight` is a list of cell indices to visually emphasize (the target form being taught).
+- `qa` renders a small Question/Answer mini-table underneath the main one — most workbook charts that have a Q&A block pair it with a rule table this way.
+- `notes` are footer rule lines, shown the same way `workbookChart.rule`/`but` are today.
+- When `chart.table` is present, `GrammarCard.tsx`'s `PatternChart` renders it instead of the chip patterns — you still need `chart.rows`/`intro_examples`/`note_rule` populated (existing validator requirement), but the chip UI won't be shown once `table` is set.
+- Keep using the existing chip-pattern renderer (`chart.rows` with a `pattern` string like `"subject + verb + person + thing"`) for grammar points that genuinely are a single S-V-O sentence pattern — it reads better than forcing that into a one-row table. Reach for `chart.table` for anything else: real data tables, multi-row conjugations, or a chart with a Question/Answer block.
 
 Grammar cards always use the four-tab model:
 

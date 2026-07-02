@@ -1,6 +1,7 @@
 import unit6Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-6/vocabulary.json";
 import unit7Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-7/vocabulary.json";
 import unit8Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json";
+import unit7Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-7/grammar.json";
 import unit8Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-8/grammar.json";
 import type {
   GrammarChart,
@@ -16,7 +17,9 @@ type UnitVocabularyWord =
   | (typeof unit8Vocabulary.words)[number]
   | (typeof unit7Vocabulary.words)[number]
   | (typeof unit6Vocabulary.words)[number];
-type UnitGrammarPoint = (typeof unit8Grammar.grammarPoints)[number];
+type UnitGrammarPoint =
+  | (typeof unit8Grammar.grammarPoints)[number]
+  | (typeof unit7Grammar.grammarPoints)[number];
 
 function hasKey<T extends object, K extends string>(word: T, key: K): word is T & Record<K, unknown> {
   return key in word;
@@ -185,8 +188,12 @@ function toGrammarPoint(point: UnitGrammarPoint): GrammarPoint {
   };
 }
 
-export const grammarPoints: GrammarPoint[] = unit8Grammar.grammarPoints.map(toGrammarPoint);
+export const grammarPoints: GrammarPoint[] = [
+  ...unit8Grammar.grammarPoints.map(toGrammarPoint),
+  ...unit7Grammar.grammarPoints.map(toGrammarPoint)
+];
 export const unit8GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 8);
+export const unit7GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 7);
 
 export const referenceWordOrder = vocabularyItems.map((item) => item.id);
 

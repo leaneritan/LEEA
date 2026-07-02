@@ -30,11 +30,15 @@ const unitVocabularyPaths = [
   "content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json"
 ];
 const vocabularyIndexPath = "content/subjects/english/reference/vocabulary-index.json";
-const unit8GrammarPath = "content/subjects/english/courses/our-world/level-4/unit-8/grammar.json";
+const unitGrammarPaths = [
+  "content/subjects/english/courses/our-world/level-4/unit-7/grammar.json",
+  "content/subjects/english/courses/our-world/level-4/unit-8/grammar.json"
+];
 const sanseidoPath = "content/subjects/english/junior-high/sanseido-index.json";
 
 const vocabularyIndex = readJson(vocabularyIndexPath);
-const grammar = readJson(unit8GrammarPath);
+const grammarFiles = unitGrammarPaths.map(readJson);
+const grammar = { grammarPoints: grammarFiles.flatMap((file) => file.grammarPoints ?? []) };
 const sanseido = readJson(sanseidoPath);
 
 const wordsById = new Map();

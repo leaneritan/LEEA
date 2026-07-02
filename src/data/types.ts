@@ -248,6 +248,11 @@ export type GrammarPoint = {
     sentence: string;
     highlight: string;
   }>;
+  /** Grammatical role of the `examples[].highlight` substring, for color-
+      coding it the same way chart chips/cells are colored (e.g. "clause"
+      for relative-clause points, "verb" for used-to). Defaults to "clause"
+      (the neutral/general-content color) when omitted. */
+  highlightRole?: GrammarRoleKey;
   workbookActivities?: Array<{
     number: number;
     type: string;

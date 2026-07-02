@@ -13,7 +13,7 @@
  * No JSON files were edited to introduce these shapes.
  */
 
-import type { GrammarChartTable, GrammarPoint, VocabularyItem } from "./types";
+import type { GrammarChartTable, GrammarPoint, GrammarRoleKey, VocabularyItem } from "./types";
 
 /* ─── POS color tag ─── */
 export type PosTag = "verb" | "noun" | "adjective" | "adverb" | "adj/adv" | "phrase" | "other";
@@ -259,6 +259,10 @@ export type GrammarEntry = {
      GrammarCard.tsx. Sourced from GrammarPoint.examples. */
   highlightsBySentence: Record<string, string>;
 
+  /* Grammatical role of the highlighted substring — colors it the same way
+     as the chart's chips/cells (see GrammarPoint.highlightRole). */
+  highlightRole: GrammarRoleKey;
+
   /* Tab 2: Level Up */
   levelUp: {
     rules: Array<{ heading: string; body: string; jpHeading?: string; jpBody?: string }>;
@@ -318,6 +322,7 @@ export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
     highlightsBySentence: Object.fromEntries(
       (point.examples ?? []).map((example) => [example.sentence, example.highlight])
     ),
+    highlightRole: point.highlightRole ?? "clause",
 
     levelUp: {
       rules: (point.tab2_levelup?.rules ?? []).map((rule) => ({

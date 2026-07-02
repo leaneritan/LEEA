@@ -455,7 +455,9 @@ function SamplesList({
           <div key={idx} className="gcardv2-sample">
             <span className="gcardv2-sample-num">{idx + 1}</span>
             <div className="gcardv2-sample-text">
-              <div>{highlightGrammarPhrase(sample.en, entry.highlightsBySentence[sample.en])}</div>
+              <div>
+                {highlightGrammarPhrase(sample.en, entry.highlightsBySentence[sample.en], entry.highlightRole)}
+              </div>
               {jp && sample.jp && (
                 <p className="gcardv2-sample-jp" lang="ja">
                   {sample.jp}
@@ -762,7 +764,7 @@ function QuizFeedback({
    back to plain text if no highlight is known for this exact sentence, or
    if the highlight substring isn't actually found in it (keeps a data
    mismatch from crashing the render). */
-function highlightGrammarPhrase(text: string, highlight: string | undefined) {
+function highlightGrammarPhrase(text: string, highlight: string | undefined, role: string) {
   if (!highlight) return text;
   const idx = text.toLowerCase().indexOf(highlight.toLowerCase());
   if (idx === -1) return text;
@@ -772,7 +774,7 @@ function highlightGrammarPhrase(text: string, highlight: string | undefined) {
   return (
     <>
       {before}
-      <strong className="gcardv2-sample-highlight">{match}</strong>
+      <strong className={`gcardv2-sample-highlight gcardv2-sample-highlight--${role}`}>{match}</strong>
       {after}
     </>
   );

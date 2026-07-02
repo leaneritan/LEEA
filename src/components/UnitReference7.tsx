@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { allGrammar } from "@/components/reference/ref-data";
 
 /* ============================================================
    Unit Reference page — Our World · Level 4 · Unit 7
@@ -145,17 +146,27 @@ const unitSections: Section[] = [
   }
 ];
 
-/* Source: content/subjects/english/courses/our-world/level-4/unit-7/grammar.json */
-const unitGrammar = [
-  { n: "1", title: "Used to for past habits", code: "OW4-U7-G1", sample: "People used to travel across the sea in boats.", href: "/reference/grammar/ow_l4_u7_g1_used_to" }
-];
+/* Source: content/subjects/english/courses/our-world/level-4/unit-7/grammar.json —
+   derived from allGrammar (reference-shapes.ts) so this list can never drift
+   out of sync with the real grammar.json content (see the U7G2 bug this
+   replaced: a hand-maintained array silently missed newly added points). */
+const unitGrammarEntries = allGrammar
+  .filter((g) => g.course === "our-world" && g.level === 4 && g.unit === 7)
+  .sort((a, b) => a.tag.localeCompare(b.tag));
+const unitGrammar = unitGrammarEntries.map((g, idx) => ({
+  n: String(idx + 1),
+  title: g.title,
+  code: g.tag,
+  sample: g.chartAndSamples.samples[0]?.en ?? "",
+  href: `/reference/grammar/${g.grammarId}`
+}));
 
 const jumps = [
   { label: "Vocabulary 1", count: 14, dot: "var(--good)", href: "#vocab1" },
   { label: "Vocabulary 2", count: 5, dot: "#2f9c8e", href: "#vocab2" },
   { label: "Academic", count: 7, dot: "var(--amber)", href: "#academic" },
   { label: "Glossary", count: 20, dot: "var(--muted-2)", href: "#glossary" },
-  { label: "Grammar", count: 1, dot: "var(--accent)", href: "#grammar" }
+  { label: "Grammar", count: unitGrammar.length, dot: "var(--accent)", href: "#grammar" }
 ];
 
 function dotStyle(state: WordState) {
@@ -186,7 +197,7 @@ export default function UnitReference7() {
             <i className="unit-stat-sep" />
             <div className="unit-stat"><b style={{ color: "var(--amber)" }}>7</b><span>academic</span></div>
             <i className="unit-stat-sep" />
-            <div className="unit-stat"><b style={{ color: "var(--accent)" }}>1</b><span>grammar</span></div>
+            <div className="unit-stat"><b style={{ color: "var(--accent)" }}>{unitGrammar.length}</b><span>grammar</span></div>
           </div>
         </section>
 
@@ -251,7 +262,7 @@ export default function UnitReference7() {
                 <div className="unit-section-sub">Each opens its grammar card</div>
               </div>
             </div>
-            <span className="unit-section-count">1 point</span>
+            <span className="unit-section-count">{unitGrammar.length} point{unitGrammar.length === 1 ? "" : "s"}</span>
           </div>
           <div className="unit-word-list">
             {unitGrammar.map((g) => (

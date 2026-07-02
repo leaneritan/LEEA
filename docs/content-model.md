@@ -43,39 +43,30 @@ First version can store this locally. Later it should live in Supabase user sett
 
 ## Academic Progress
 
-School test tracking is parent-facing first and lives under Neritan at `/teacher/progress`.
+School test tracking is parent-facing first and lives under Neritan at `/teacher/progress`, implemented entirely in `src/components/AcademicProgressPage.tsx` (no separate data module — the types and helpers live inline in that component).
 
-Local storage keys:
+Local storage keys actually in use:
 
 ```text
-leea.academicProgress.testResults.v1
-leea.academicProgress.goals.v1
+leeaTestsJPDashboardV2
+leeaGoalsJPDashboardV2
 ```
 
-Test result records should stay Supabase-shaped:
+(A `leea.academicProgress.testResults.v1` / `leea.academicProgress.goals.v1` schema with `studentId`/`schoolYear`/`term`/Supabase-shaped records was planned at one point but never implemented — don't build against it. Storage is local-only for now; there is no Supabase table for test results yet.)
+
+The actual `TestRecord` shape (defined inline in `AcademicProgressPage.tsx`):
 
 ```json
 {
-  "id": "test-leo-2026-05-17-term-1-midterm",
-  "studentId": "leo",
-  "schoolYear": "2026",
-  "term": "Term 1",
-  "testName": "Term 1 Midterm",
-  "testDate": "2026-05-17",
+  "date": "2026-05-17",
+  "name": "1学期中間テスト",
+  "scores": { "japanese": 70, "social": 75, "math": 75, "science": 80, "english": 92 },
   "rank": 65,
-  "studentCount": 150,
-  "subjects": [
-    { "subject": "japanese", "score": 70, "average": 74.2, "maxScore": 100 },
-    { "subject": "social", "score": 75, "average": 56.3, "maxScore": 100 },
-    { "subject": "math", "score": 75, "average": 67.2, "maxScore": 100 },
-    { "subject": "science", "score": 80, "average": 67.6, "maxScore": 100 },
-    { "subject": "english", "score": 92, "average": 82.7, "maxScore": 100 }
-  ],
-  "notes": "",
-  "createdAt": "2026-05-17T00:00:00.000Z",
-  "updatedAt": "2026-05-17T00:00:00.000Z"
+  "average": { "japanese": 74.2, "social": 56.3, "math": 67.2, "science": 67.6, "english": 82.7 }
 }
 ```
+
+`average` fields default to `0` when left blank in the form — they are not optional/nullable at the type level, so any code reading them must check "did the user actually enter this" separately from "is the value 0" (see `hasAvgData()` in the component). Treating a blank average as a real value of 0 produced a real bug once (misleading "school average is 0点" text) — don't reintroduce that assumption.
 
 Keep school subjects flexible enough for future subjects, but the first tracker uses Japanese, Social Studies, Math, Science, and English. This is different from LEEA lesson progress: test results are real school outcomes, not lesson completion records.
 

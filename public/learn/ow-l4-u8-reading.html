@@ -19,12 +19,12 @@ html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--paper);co
 body{display:flex;flex-direction:column;height:100vh}
 
 /* HEADER */
-.app-header{background:var(--green);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-.logo{font-size:32px}
-.title{font-size:17px;font-weight:800}
-.subtitle{font-size:13px;opacity:.9;margin-top:2px}
+.app-header{background:var(--green);color:#fff;padding:8px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.logo{font-size:22px}
+.title{font-size:14px;font-weight:800}
+.subtitle{font-size:11px;opacity:.9;margin-top:1px}
 .badge-row{margin-left:auto;display:flex;gap:8px;align-items:center}
-.prog-pill{background:rgba(255,255,255,.2);color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:800}
+.prog-pill{background:rgba(255,255,255,.2);color:#fff;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:800}
 
 /* TABS */
 .tab-nav{display:flex;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
@@ -762,9 +762,8 @@ function enterMode(m){
     document.getElementById("wb-mode").style.display = m === "wb" ? "flex" : "none";
   } catch(e){}
   if (m === "sb"){
-    // Default to Vocab (tab 5) the first time; otherwise restore last-tab
-    var last = lLoad("last-tab");
-    showTab(last != null ? last : 5);
+    // Always open on the Vocab tab (tab 5) — never resume the last tab.
+    showTab(5);
   }
 }
 function backToLanding(){
@@ -1719,19 +1718,12 @@ document.addEventListener("DOMContentLoaded", function(){
   refreshProg();
   // Init WB tab 0 immediately so it renders when WB opens
   if (WB_INIT[0]){ WB_INIT[0](); WB_INIT[0]._init = true; if (WB_RESTORE[0]) WB_RESTORE[0](); }
-  // If user comes back to WB mode, restore the last WB tab too
-  var wbLast = lLoad("wb-last-tab");
-  if (wbLast != null && wbLast !== 0){
-    // pre-init the requested tab so restore runs
-    if (WB_INIT[wbLast] && !WB_INIT[wbLast]._init){ WB_INIT[wbLast](); WB_INIT[wbLast]._init = true; if (WB_RESTORE[wbLast]) WB_RESTORE[wbLast](); }
-    // visually switch only happens once enterMode('wb') is called below
-  }
-  // Restore last-mode
+  // Restore last-mode (SB/WB), but always land on each mode's first tab
   var lastMode = lLoad("last-mode");
   if (lastMode === "sb"){ enterMode("sb"); }
   else if (lastMode === "wb"){
     enterMode("wb");
-    if (wbLast != null && wbLast !== 0) wbShowTab(wbLast);
+    wbShowTab(0);
   } else {
     try {
       document.getElementById("landing").style.display = "flex";

@@ -24,6 +24,7 @@ Examples:
 
 1. **Verifies prerequisites**
    - `grammar.json` for the unit must already exist. There is no `/grammar-unit-scanner` skill (unlike `/vocab-unit-scanner`) — if it's missing, scan the source PDFs (planner + workbook answer key) and build it manually, matching an existing unit's `grammar.json` schema (see Unit 7/8 for reference), including a full `examples[]` array with a `highlight` entry for every sample sentence in both `tab1_samples` and `tab2_levelup.mixed_samples` — see `docs/content-model.md`.
+   - **⚠️ If you build grammar.json from scratch**, you MUST also wire it into `src/data/reference.ts` in the same commit — three edits: (1) import, (2) extend `UnitGrammarPoint` union, (3) spread into `grammarPoints` array + add filter export. See `docs/grammar.md` Step 3 for the exact code. Missing any of the three edits causes the Grammar section to silently not appear in the reference tree with no build error or warning.
    - For grammar-1: the chosen grammar point must be `vocab1WordIds`-aligned (uses words/structures from V1). For grammar-2: aligned with V2 + sometimes G1.
    - `docs/lesson-plans/<course-path>/index.json` must have a `pdf_offset` and the section page range for the chosen component
 2. **Reads sources** (the more, the richer the deck):

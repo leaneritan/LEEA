@@ -140,13 +140,35 @@ content/subjects/english/reference/grammar-index.json
 }
 ```
 
-In `src/data/reference.ts`, add a filter export for the unit:
+In `src/data/reference.ts`, three edits are required — all three must land in the same commit or the grammar silently disappears from the reference tree:
 
+**1. Import** (top of file, beside the other unit grammar imports):
 ```ts
-export const unit8GrammarItems = grammarPoints.filter(
-  (item) => item.level === 4 && item.unit === 8
+import unit6Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-6/grammar.json";
+```
+
+**2. Union type** (extend `UnitGrammarPoint`):
+```ts
+type UnitGrammarPoint =
+  | (typeof unit8Grammar.grammarPoints)[number]
+  | (typeof unit7Grammar.grammarPoints)[number]
+  | (typeof unit6Grammar.grammarPoints)[number];  // ← add new unit here
+```
+
+**3. grammarPoints array + filter export**:
+```ts
+export const grammarPoints: GrammarPoint[] = [
+  ...unit8Grammar.grammarPoints.map(toGrammarPoint),
+  ...unit7Grammar.grammarPoints.map(toGrammarPoint),
+  ...unit6Grammar.grammarPoints.map(toGrammarPoint)  // ← add new unit here
+];
+export const unit6GrammarItems = grammarPoints.filter(
+  (item) => item.level === 4 && item.unit === 6
 );
 ```
+
+> **⚠️ Do NOT commit grammar.json without these three reference.ts edits in the same PR.**
+> Missing any one of them causes the Grammar section to silently not appear in the reference tree — no build error, no warning.
 
 ## Step 4 — Validate
 

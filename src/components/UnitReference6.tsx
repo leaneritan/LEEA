@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { allGrammar } from "@/components/reference/ref-data";
 
 /* ============================================================
    Unit Reference page — Our World · Level 4 · Unit 6
@@ -158,11 +159,23 @@ const unitSections: Section[] = [
   }
 ];
 
+const unitGrammarEntries = allGrammar
+  .filter((g) => g.course === "our-world" && g.level === 4 && g.unit === 6)
+  .sort((a, b) => a.tag.localeCompare(b.tag));
+const unitGrammar = unitGrammarEntries.map((g, idx) => ({
+  n: String(idx + 1),
+  title: g.title,
+  code: g.tag,
+  sample: g.chartAndSamples.samples[0]?.en ?? "",
+  href: `/reference/grammar/${g.grammarId}`
+}));
+
 const jumps = [
   { label: "Vocabulary 1", count: 16, dot: "var(--good)", href: "#vocab1" },
   { label: "Vocabulary 2", count: 5, dot: "#2f9c8e", href: "#vocab2" },
   { label: "Academic", count: 8, dot: "var(--amber)", href: "#academic" },
-  { label: "Glossary", count: 30, dot: "var(--muted-2)", href: "#glossary" }
+  { label: "Glossary", count: 30, dot: "var(--muted-2)", href: "#glossary" },
+  { label: "Grammar", count: unitGrammar.length, dot: "var(--accent)", href: "#grammar" }
 ];
 
 function dotStyle(state: WordState) {
@@ -192,6 +205,8 @@ export default function UnitReference6() {
             <div className="unit-stat"><b>59</b><span>words</span></div>
             <i className="unit-stat-sep" />
             <div className="unit-stat"><b style={{ color: "var(--amber)" }}>8</b><span>academic</span></div>
+            <i className="unit-stat-sep" />
+            <div className="unit-stat"><b style={{ color: "var(--accent)" }}>{unitGrammar.length}</b><span>grammar</span></div>
           </div>
         </section>
 
@@ -244,6 +259,35 @@ export default function UnitReference6() {
             </div>
           </section>
         ))}
+        {/* grammar */}
+        <section className="unit-section" id="grammar">
+          <div className="unit-section-accent" style={{ background: "var(--accent)" }} />
+          <div className="unit-section-head">
+            <div className="unit-section-head-left">
+              <span className="unit-section-icon" style={{ background: "var(--accent-tint)", color: "var(--accent-ink)" }}>¶</span>
+              <div>
+                <h2 className="unit-section-title">Grammar</h2>
+                <div className="unit-section-sub">Each opens its grammar card</div>
+              </div>
+            </div>
+            <span className="unit-section-count">{unitGrammar.length} point{unitGrammar.length === 1 ? "" : "s"}</span>
+          </div>
+          <div className="unit-word-list">
+            {unitGrammar.map((g) => (
+              <Link className="unit-grammar" href={g.href} key={g.code}>
+                <span className="unit-grammar-badge">G{g.n}</span>
+                <span className="unit-word-main">
+                  <span className="unit-word-headline">
+                    <span className="unit-word-text">{g.title}</span>
+                    <span className="unit-grammar-code">{g.code}</span>
+                  </span>
+                  <span className="unit-word-meaning">{g.sample}</span>
+                </span>
+                <span className="unit-word-arrow">→</span>
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
     </AppShell>
   );

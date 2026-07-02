@@ -13,7 +13,7 @@
  * No JSON files were edited to introduce these shapes.
  */
 
-import type { GrammarPoint, VocabularyItem } from "./types";
+import type { GrammarChartTable, GrammarPoint, VocabularyItem } from "./types";
 
 /* ─── POS color tag ─── */
 export type PosTag = "verb" | "noun" | "adjective" | "adverb" | "adj/adv" | "phrase" | "other";
@@ -239,6 +239,11 @@ export type GrammarEntry = {
   chart: {
     legend: Array<{ key: string; label: string; color: string }>;
     patterns: Array<{ title: string; chips: Array<{ key: string; text: string }> }>;
+    /* General table shape — set when the source grammar point has
+       chart.table. Prefer this over `patterns` when both are present,
+       since it can express chart shapes patterns can't (data tables,
+       Q&A pairs) — see GrammarChartTable in src/data/types.ts. */
+    table?: GrammarChartTable;
   };
 
   /* Tab 1: Chart & Samples */
@@ -291,7 +296,8 @@ export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
 
     chart: {
       legend: CHART_LEGEND,
-      patterns: buildGrammarPatterns(point)
+      patterns: buildGrammarPatterns(point),
+      table: point.chart.table
     },
 
     chartAndSamples: {

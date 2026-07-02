@@ -115,9 +115,45 @@ export type GrammarWorkbookChart = {
   but?: string;
 };
 
+/* General-purpose grammar table — the one shape meant to fit every grammar
+   point's chart, not just sentence-pattern ones. The Level 4 print Grammar
+   Workbook has ~14 different boxed chart shapes across its 9 units
+   (comparatives, have-to, would-like, reflexive pronouns, superlatives,
+   future will/won't, used to, double comparatives, definitions with which,
+   plus the two sentence-pattern ones already built). Most of those are
+   genuine rows-and-columns tables, not S-V-O sentence chips, so they need a
+   real table renderer rather than being forced into the chip-pattern shape
+   that only fits "subject + verb + object"-style points. Add this data
+   once per grammar point; the UI figures out how to draw it. */
+export type GrammarTableRow = {
+  /** Optional left-side row label, e.g. "I'm" / "You're" / "My cat is". */
+  label?: string;
+  /** One string per column, in the same order as GrammarChartTable.columns. */
+  cells: string[];
+  /** Indices into `cells` to visually emphasize (e.g. the target form). */
+  highlight?: number[];
+};
+
+export type GrammarChartTable = {
+  /** Shown above the table, e.g. "Have to" or "Comparatives with -er". */
+  title?: string;
+  /** Column headers. Omit for a label-only two-column table. */
+  columns?: string[];
+  rows: GrammarTableRow[];
+  /** Optional small Question/Answer pairs shown under the main table
+      (many workbook charts pair a rule table with one of these), e.g.
+      Have to's "What do they have to do? / They have to cook." */
+  qa?: Array<{ question: string; answer: string }>;
+  /** Footer rule lines, e.g. "Add -er: tall -> taller. But: good -> better." */
+  notes?: string[];
+};
+
 export type GrammarChart = {
   title: string;
   workbookChart?: GrammarWorkbookChart;
+  /** General table shape — prefer this for any new grammar point whose
+      chart isn't a simple subject/verb/object sentence pattern. */
+  table?: GrammarChartTable;
   intro_examples: GrammarSample[];
   rows: GrammarChartRow[];
   note_rule?: string;

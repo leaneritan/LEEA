@@ -252,6 +252,13 @@ export type GrammarEntry = {
     samples: GrammarSampleDisplay[];     // currently <=10
   };
 
+  /* Substring of each sample sentence that demonstrates the grammar point
+     (e.g. "who plays basketball", "used to travel"), keyed by the sentence
+     text itself. Used to color-highlight the target phrase wherever a
+     sample sentence is shown — see highlightGrammarPhrase in
+     GrammarCard.tsx. Sourced from GrammarPoint.examples. */
+  highlightsBySentence: Record<string, string>;
+
   /* Tab 2: Level Up */
   levelUp: {
     rules: Array<{ heading: string; body: string; jpHeading?: string; jpBody?: string }>;
@@ -307,6 +314,10 @@ export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
         jp: sample.jp ?? ""
       }))
     },
+
+    highlightsBySentence: Object.fromEntries(
+      (point.examples ?? []).map((example) => [example.sentence, example.highlight])
+    ),
 
     levelUp: {
       rules: (point.tab2_levelup?.rules ?? []).map((rule) => ({

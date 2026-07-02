@@ -23,7 +23,7 @@ Examples:
 ## What this skill does
 
 1. **Verifies prerequisites**
-   - `grammar.json` for the unit must already exist (run `/grammar-unit-scanner` first if it doesn't)
+   - `grammar.json` for the unit must already exist. There is no `/grammar-unit-scanner` skill (unlike `/vocab-unit-scanner`) — if it's missing, scan the source PDFs (planner + workbook answer key) and build it manually, matching an existing unit's `grammar.json` schema (see Unit 7/8 for reference), including a full `examples[]` array with a `highlight` entry for every sample sentence in both `tab1_samples` and `tab2_levelup.mixed_samples` — see `docs/content-model.md`.
    - For grammar-1: the chosen grammar point must be `vocab1WordIds`-aligned (uses words/structures from V1). For grammar-2: aligned with V2 + sometimes G1.
    - `docs/lesson-plans/<course-path>/index.json` must have a `pdf_offset` and the section page range for the chosen component
 2. **Reads sources** (the more, the richer the deck):
@@ -195,7 +195,7 @@ test -s content/subjects/english/courses/<course>/level-<n>/unit-<n>/grammar.jso
 test -s docs/lesson-plans/<course-path>/index.json
 ```
 
-If `grammar.json` is missing for the unit, stop and tell Leaneritan to run `/grammar-unit-scanner` first.
+If `grammar.json` is missing for the unit, stop and tell Leaneritan it needs to be built manually first (no `/grammar-unit-scanner` skill exists) — scan the source PDFs and build it matching an existing unit's schema, including full `examples[].highlight` coverage per `docs/content-model.md`.
 
 Use the Read tool with the `pages` parameter (max 20 per call). Combine the absolute page from `pdf_offset + section.start` to `pdf_offset + section.end`.
 

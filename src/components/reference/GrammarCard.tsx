@@ -418,7 +418,7 @@ function SamplesList({
           <div key={idx} className="gcardv2-sample">
             <span className="gcardv2-sample-num">{idx + 1}</span>
             <div className="gcardv2-sample-text">
-              <div>{sample.en}</div>
+              <div>{highlightGrammarPhrase(sample.en, entry.highlightsBySentence[sample.en])}</div>
               {jp && sample.jp && (
                 <p className="gcardv2-sample-jp" lang="ja">
                   {sample.jp}
@@ -716,5 +716,27 @@ function QuizFeedback({
         </p>
       )}
     </div>
+  );
+}
+
+/* Bolds+colors the grammar-point substring within a sample sentence (e.g.
+   "who plays basketball" inside "Mateo has two friends who plays basketball."),
+   mirroring how WordCard.tsx highlights the target vocabulary word. Falls
+   back to plain text if no highlight is known for this exact sentence, or
+   if the highlight substring isn't actually found in it (keeps a data
+   mismatch from crashing the render). */
+function highlightGrammarPhrase(text: string, highlight: string | undefined) {
+  if (!highlight) return text;
+  const idx = text.toLowerCase().indexOf(highlight.toLowerCase());
+  if (idx === -1) return text;
+  const before = text.slice(0, idx);
+  const match = text.slice(idx, idx + highlight.length);
+  const after = text.slice(idx + highlight.length);
+  return (
+    <>
+      {before}
+      <strong className="gcardv2-sample-highlight">{match}</strong>
+      {after}
+    </>
   );
 }

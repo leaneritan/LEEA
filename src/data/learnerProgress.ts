@@ -23,8 +23,10 @@ export type LearnerProgressStorageRow = {
 
 type LearnerProgressCloudRow = {
   homework_id: string;
+  lesson_id?: string | null;
   completed_modules?: number | null;
   updated_at?: string | null;
+  completed_at?: string | null;
   raw_progress: Record<string, unknown> | null;
 };
 
@@ -99,6 +101,37 @@ export async function fetchLearnerProgressRows(homeworkId: string | undefined): 
   } catch (error) {
     console.warn("LEEA Supabase learner progress read failed", error);
     return [];
+  }
+}
+
+/* Returns { [learnerLessonId]: completedAtISOString } for every lesson that
+   has actually finished, sourced from Supabase's learner_progress.completed_at
+   — the only reliable "when did Leo finish this" signal that exists. Local
+   done-flags carry no timestamp, which is what let the teacher dashboard's
+   "Leo finished X" callout show a stale lesson (picked by array order)
+   instead of whichever one he most recently completed. */
+export async function fetchLearnerCompletionTimestamps(lessons: Lesson[]): Promise<Record<string, string>> {
+  const homeworkIds = lessons.map((lesson) => lesson.source.homeworkId).filter((id): id is string => Boolean(id));
+  if (!homeworkIds.length || !isSupabaseConfigured || !supabase) return {};
+
+  try {
+    const { data, error } = await supabase
+      .from("learner_progress")
+      .select("lesson_id, homework_id, completed_at")
+      .eq("student_id", "leo")
+      .eq("done", true)
+      .in("homework_id", homeworkIds);
+
+    if (error) throw error;
+
+    const byLessonId: Record<string, string> = {};
+    for (const row of (data ?? []) as LearnerProgressCloudRow[]) {
+      if (row.lesson_id && row.completed_at) byLessonId[row.lesson_id] = row.completed_at;
+    }
+    return byLessonId;
+  } catch (error) {
+    console.warn("LEEA Supabase learner completion timestamp fetch failed", error);
+    return {};
   }
 }
 

@@ -183,6 +183,7 @@ function toGrammarPoint(point: UnitGrammarPoint): GrammarPoint {
     tab4_master: point.tab4_master as GrammarMasterQuestion[],
     japanese: point.japanese,
     examples: point.examples,
+    highlightRole: point.highlightRole as GrammarPoint["highlightRole"],
     workbookActivities: point.workbookActivities,
     tags: point.tags
   };

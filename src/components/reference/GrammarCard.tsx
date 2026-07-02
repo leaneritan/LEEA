@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useJapanesePreference } from "@/components/AppShell";
-import type {
-  GrammarEntry,
-  GrammarMasterDisplay,
-  GrammarQuizDisplay,
-  GrammarSampleDisplay
+import {
+  CHART_LEGEND,
+  type GrammarEntry,
+  type GrammarMasterDisplay,
+  type GrammarQuizDisplay,
+  type GrammarSampleDisplay
 } from "@/data/reference-shapes";
 import { getGrammarNav } from "./ref-data";
 
@@ -236,7 +237,7 @@ function PatternChart({ entry, jp }: { entry: GrammarEntry; jp: boolean }) {
   // source data has it. The chip-row renderer below stays for the two
   // existing Unit 8 points and any future point that's a pure S-V-O
   // sentence pattern, where chips read more naturally than table cells.
-  if (entry.chart.table) {
+  if (entry.chart.table && !entry.chart.table.preferChips) {
     return <GrammarTableChart table={entry.chart.table} />;
   }
 
@@ -298,11 +299,28 @@ function PatternChart({ entry, jp }: { entry: GrammarEntry; jp: boolean }) {
    point's chart can be expressed as data instead of one-off UI code. See
    GrammarChartTable in src/data/types.ts for the schema. */
 function GrammarTableChart({ table }: { table: NonNullable<GrammarEntry["chart"]["table"]> }) {
+  const usedRoleKeys = new Set<string>();
+  for (const row of table.rows) {
+    if (row.labelRole) usedRoleKeys.add(row.labelRole);
+    row.roles?.forEach((role) => role && usedRoleKeys.add(role));
+  }
+  const roleLegend = CHART_LEGEND.filter((item) => usedRoleKeys.has(item.key));
+
   return (
     <section className="gcardv2-chart">
       <div className="gcardv2-chart-head">
         <div className="rcardv2-eyebrow">Pattern chart</div>
         {table.title && <div className="gcardv2-table-title">{table.title}</div>}
+        {roleLegend.length > 0 && (
+          <div className="gcardv2-legend">
+            {roleLegend.map((item) => (
+              <span key={item.key} className="gcardv2-legend-item">
+                <span className="gcardv2-legend-swatch" style={{ background: item.color }} />
+                {item.label}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="gcardv2-table-wrap">
@@ -320,12 +338,31 @@ function GrammarTableChart({ table }: { table: NonNullable<GrammarEntry["chart"]
           <tbody>
             {table.rows.map((row, ri) => (
               <tr key={ri}>
-                {row.label !== undefined && <th scope="row" className="gcardv2-table-rowlabel">{row.label}</th>}
-                {row.cells.map((cell, ci) => (
-                  <td key={ci} className={row.highlight?.includes(ci) ? "gcardv2-table-cell--highlight" : undefined}>
-                    {cell}
-                  </td>
-                ))}
+                {row.label !== undefined && (
+                  <th
+                    scope="row"
+                    className={
+                      row.labelRole
+                        ? `gcardv2-table-rowlabel gcardv2-table-cell--role-${row.labelRole}`
+                        : "gcardv2-table-rowlabel"
+                    }
+                  >
+                    {row.label}
+                  </th>
+                )}
+                {row.cells.map((cell, ci) => {
+                  const role = row.roles?.[ci];
+                  const className = role
+                    ? `gcardv2-table-cell--role-${role}`
+                    : row.highlight?.includes(ci)
+                      ? "gcardv2-table-cell--highlight"
+                      : undefined;
+                  return (
+                    <td key={ci} className={className}>
+                      {cell}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

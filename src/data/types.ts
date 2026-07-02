@@ -125,13 +125,26 @@ export type GrammarWorkbookChart = {
    real table renderer rather than being forced into the chip-pattern shape
    that only fits "subject + verb + object"-style points. Add this data
    once per grammar point; the UI figures out how to draw it. */
+/** Grammatical role keys shared with CHART_LEGEND in reference-shapes.ts —
+    used to color-code table cells the same way pattern-chart chips are
+    colored (subject blue, verb green, direct object gold, indirect object
+    purple, etc). */
+export type GrammarRoleKey = "subject" | "verb" | "directObject" | "indirectObject" | "prep" | "clause";
+
 export type GrammarTableRow = {
   /** Optional left-side row label, e.g. "I'm" / "You're" / "My cat is". */
   label?: string;
+  /** Grammatical role of the row label, for color-coding (e.g. "subject"). */
+  labelRole?: GrammarRoleKey;
   /** One string per column, in the same order as GrammarChartTable.columns. */
   cells: string[];
-  /** Indices into `cells` to visually emphasize (e.g. the target form). */
+  /** Indices into `cells` to visually emphasize (e.g. the target form). Used
+      only when `roles` isn't set — `roles` takes precedence. */
   highlight?: number[];
+  /** Grammatical role per cell (same order as `cells`), for role color
+      coding instead of the plain single-color `highlight`. Use `null` for
+      cells that shouldn't be tinted. */
+  roles?: Array<GrammarRoleKey | null>;
 };
 
 export type GrammarChartTable = {
@@ -146,6 +159,10 @@ export type GrammarChartTable = {
   qa?: Array<{ question: string; answer: string }>;
   /** Footer rule lines, e.g. "Add -er: tall -> taller. But: good -> better." */
   notes?: string[];
+  /** Set true when this chart is a pure subject/verb/object sentence
+      pattern — renders the color-coded chip/legend view (PatternChart's
+      chip branch) instead of this plain table. See docs/content-model.md. */
+  preferChips?: boolean;
 };
 
 export type GrammarChart = {

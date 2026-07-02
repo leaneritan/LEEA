@@ -275,7 +275,7 @@ export type GrammarEntry = {
   lessonStatus: "live" | "draft";
 };
 
-const CHART_LEGEND: Array<{ key: string; label: string; color: string }> = [
+export const CHART_LEGEND: Array<{ key: string; label: string; color: string }> = [
   { key: "subject", label: "Subject", color: "#36618e" },
   { key: "verb", label: "Verb", color: "#5f8a4e" },
   { key: "directObject", label: "Direct object", color: "#c9a227" },

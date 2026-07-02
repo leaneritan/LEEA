@@ -548,6 +548,19 @@ The `chart` field may optionally include a `workbookChart` object (`GrammarWorkb
 - `rows[].highlight` is a list of cell indices to visually emphasize (the target form being taught).
 - `qa` renders a small Question/Answer mini-table underneath the main one — most workbook charts that have a Q&A block pair it with a rule table this way.
 - `notes` are footer rule lines, shown the same way `workbookChart.rule`/`but` are today.
+
+**Every grammar point should get role-based color coding** (subject/verb/direct-object/etc, matching the colors already used for pattern-chart chips) — pick one of these two mechanisms depending on the chart's shape:
+
+- **Pure subject/verb/object sentence patterns** (e.g. "who"-clauses, direct & indirect objects): set `"preferChips": true` inside `chart.table`. `GrammarCard.tsx`'s `PatternChart()` then renders the color-coded chip/legend view (auto-derived from `chart.rows` by `buildGrammarPatterns()` in `reference-shapes.ts`) instead of the plain table. `chart.table` itself can still be populated for its notes/qa detail — it's just not the primary view.
+- **Data-grid / workbook-style charts** that don't fit S-V-O chips (comparatives, have-to, used to, superlatives, etc.): tag `chart.table.rows[].roles` (one entry per cell, matching `cells` order) and optionally `rows[].labelRole`, using the same role keys as the chip legend: `subject` / `verb` / `directObject` / `indirectObject` / `prep` / `clause`. `clause` is the neutral/general-content color — use it for cells that carry grammar content but don't map to a specific role. `GrammarTableChart` then shows a legend (only for roles actually used) and tints each cell accordingly, replacing the old single-color `highlight` (which still works as a fallback when `roles` isn't set).
+
+```json
+"rows": [
+  { "cells": ["People used to travel by boat.", "We don't travel that way now."], "roles": ["verb", "clause"] }
+]
+```
+
+Every new grammar point's chart should use one of these two mechanisms — don't ship a chart with no role color coding at all.
 - When `chart.table` is present, `GrammarCard.tsx`'s `PatternChart` renders it instead of the chip patterns — you still need `chart.rows`/`intro_examples`/`note_rule` populated (existing validator requirement), but the chip UI won't be shown once `table` is set.
 - Keep using the existing chip-pattern renderer (`chart.rows` with a `pattern` string like `"subject + verb + person + thing"`) for grammar points that genuinely are a single S-V-O sentence pattern — it reads better than forcing that into a one-row table. Reach for `chart.table` for anything else: real data tables, multi-row conjugations, or a chart with a Question/Answer block.
 

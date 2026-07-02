@@ -204,8 +204,8 @@ window.buildFourColChart({
 ### `word-web` — Editable Word Web (graphic organizer)
 
 **File:** `public/components/wordweb.js`
-**Surface:** Teacher slide decks (works inside the 1920×1080 scaled deck)
-**First used in:** OW L4 U8 Grammar 1 teacher deck (`public/lessons/ow-l4-u8-grammar-1.html`) — Extend phase
+**Surface:** Leo learner apps (works inside the modal home-grid shell). Nothing prevents using it in a teacher slide deck too (same 1920×1080 scaler pattern), but it has not actually shipped there yet — don't trust the "Surface" line below any doc revision that predates this one.
+**First used in:** Grammar 1 and Grammar 2 Leo apps' Word Web tabs (`public/learn/ow-l4-u8-grammar-1.html`, `public/learn/ow-l4-u8-grammar-2.html`)
 
 #### API
 
@@ -214,19 +214,22 @@ window.buildFourColChart({
 // <script src="/components/wordweb.js"></script>
 
 el.innerHTML = buildWordWeb({
-  id:         'web-dad',                       // unique per page
-  center:     { text: 'Dad', emoji: '👨' },
+  id:              'web-dad',                  // unique per page
+  center:          { text: 'Dad', emoji: '👨' },
+  centerEditable:  true,                        // Leo can type the center oval too (default true)
   nodes: [                                     // initial outer ovals (optional)
     { text: 'watches movies', emoji: '🎬' },
     { text: 'plays soccer',  emoji: '⚽' }
   ],
   addable:    true,                            // show "+ Add oval" button
   removable:  true,                            // show "×" on filled ovals
-  editable:   true,                            // click oval → prompt to edit text
+  editable:   true,                            // ovals are directly typable
   maxNodes:   8,
   minNodes:   0,
-  storageKey: 'leea-4-8-grammar-1-web1',       // optional — persists to localStorage
-  onChange:   (nodes) => { ... }               // optional callback after every change
+  storageKey: 'leea-4-8-grammar-1-web1',       // optional — persists nodes + sentences to localStorage
+  sentenceBuilder:   true,                      // show one editable sentence line per filled oval (default true)
+  sentenceTemplate:  '{center} is a person who {node}.', // {center}/{node} placeholders, Leo can rewrite freely
+  onChange:   (nodes) => { ... }               // optional callback after every change, nodes include .sentence
   // optional colors:
   // accent:       '#3B82F6', accentDark:   '#1E3A8A',
   // filledFill:   '#DCFCE7', filledStroke: '#16A34A', filledInk: '#14532D'
@@ -235,25 +238,27 @@ el.innerHTML = buildWordWeb({
 
 #### Behaviour
 
-- SVG layout, viewBox 900×540, scales responsively (max-width 900).
+- Ovals are real HTML elements (only the text is `contenteditable`, kept separate from the emoji/remove-button so typing can't corrupt the oval's structure) laid over an SVG that draws just the connector lines — **Leo types directly on the oval**, no popup.
 - Center oval + N outer ovals around it (1 to `maxNodes`), connector lines beneath.
-- Tap an oval → `prompt()` for text (pre-filled if it already has text).
-- Tap "**+ Add oval**" → adds an empty oval. Outer ovals auto-redistribute.
+- Tapping an oval selects its existing text so typing immediately overwrites it, rather than inserting mid-word wherever the tap landed.
+- Tap "**+ Add oval**" → adds an empty oval and focuses it immediately. Outer ovals auto-redistribute.
 - Tap the red "×" on a filled oval → removes it (respects `minNodes`).
 - Tap "↺ Reset" → confirms then clears all nodes.
-- `storageKey` persists `nodes[]` to localStorage and reloads on next render.
-- `onChange(nodes)` fires after every save (edit/add/remove/reset).
+- `storageKey` persists `{ center, nodes }` (nodes include `.text`, `.emoji`, `.sentence`) to localStorage and reloads on next render.
+- `onChange(nodes)` fires once Leo leaves an oval/sentence line (not on every keystroke) — after edit/add/remove/reset.
+- Below the web, `sentenceBuilder` renders one editable line per filled oval, pre-filled from `sentenceTemplate` but fully rewritable — this is the built-in replacement for the old manual "live sentence-builder pairing" pattern below; prefer it unless you need a sentence shape more complex than a single `{center}`/`{node}` template.
 
 #### Notes for Codex
 
-- Single global exposed: `window.buildWordWeb` (plus `window._leeaWeb*` click bridges).
-- Re-rendering replaces the parent element's innerHTML, so wrap the call in its own container.
-- The `prompt()` UX is intentionally simple — swap for a custom modal when needed.
+- Single global exposed: `window.buildWordWeb` (plus `window._leeaWeb*` click/input bridges).
+- Re-rendering replaces the parent element's innerHTML, so wrap the call in its own container. A re-render is deferred by one tick after an oval loses focus (see source comments) — don't "simplify" this back to a synchronous rerender, it was a real bug: it silently swallowed clicks on "+ Add oval" / "×" / Reset when they happened right after typing elsewhere, because the synchronous DOM replacement destroyed the button before its own click could fire.
 - Custom `accent` / `filledFill` colors let any component-toned deck use the web.
-- Text > 22 chars is truncated with an ellipsis in the SVG; the full text stays in state.
+- Text > 22 chars is truncated with an ellipsis; the full text stays in state.
 - Defaults: 0 min, 8 max nodes. Pass `addable:false, removable:false` for a fixed-size web that's only editable in place.
 
-#### Live sentence-builder pairing (Grammar lessons)
+#### Live sentence-builder pairing (Grammar lessons) — legacy pattern, superseded by the built-in `sentenceBuilder` option above
+
+This manual pattern predates `sentenceBuilder`/`sentenceTemplate` being built into `wordweb.js` itself. Keep it only for cases where you need a sentence shape the simple `{center}`/`{node}` template can't express (e.g. multi-clause sentences pulling from more than one oval at once). For anything that fits the simple template, just pass `sentenceTemplate` instead of hand-rolling this.
 
 When a `buildWordWeb` lives on a **grammar** slide, pair it with a **live sentence builder** that uses the `onChange(nodes)` callback to render one full grammar-pattern sentence per filled oval. Example for who-clauses (`public/lessons/ow-l4-u8-grammar-1.html` s42):
 

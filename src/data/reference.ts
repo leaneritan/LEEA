@@ -5,6 +5,7 @@ import unit9Vocabulary from "../../content/subjects/english/courses/our-world/le
 import unit6Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-6/grammar.json";
 import unit7Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-7/grammar.json";
 import unit8Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-8/grammar.json";
+import unit9Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-9/grammar.json";
 import type {
   GrammarChart,
   GrammarLevelUp,
@@ -21,6 +22,7 @@ type UnitVocabularyWord =
   | (typeof unit7Vocabulary.words)[number]
   | (typeof unit6Vocabulary.words)[number];
 type UnitGrammarPoint =
+  | (typeof unit9Grammar.grammarPoints)[number]
   | (typeof unit8Grammar.grammarPoints)[number]
   | (typeof unit7Grammar.grammarPoints)[number]
   | (typeof unit6Grammar.grammarPoints)[number];
@@ -205,16 +207,20 @@ function toGrammarPoint(point: UnitGrammarPoint): GrammarPoint {
     japanese: point.japanese,
     examples: point.examples,
     highlightRole: point.highlightRole as GrammarPoint["highlightRole"],
-    workbookActivities: point.workbookActivities,
+    workbookActivities: hasKey(point, "workbookActivities")
+      ? (point.workbookActivities as GrammarPoint["workbookActivities"])
+      : undefined,
     tags: point.tags
   };
 }
 
 export const grammarPoints: GrammarPoint[] = [
+  ...unit9Grammar.grammarPoints.map(toGrammarPoint),
   ...unit8Grammar.grammarPoints.map(toGrammarPoint),
   ...unit7Grammar.grammarPoints.map(toGrammarPoint),
   ...unit6Grammar.grammarPoints.map(toGrammarPoint)
 ];
+export const unit9GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 9);
 export const unit8GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 8);
 export const unit7GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 7);
 export const unit6GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 6);

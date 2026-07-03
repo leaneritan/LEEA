@@ -129,7 +129,19 @@ export type GrammarWorkbookChart = {
     used to color-code table cells the same way pattern-chart chips are
     colored (subject blue, verb green, direct object gold, indirect object
     purple, etc). */
-export type GrammarRoleKey = "subject" | "verb" | "directObject" | "indirectObject" | "prep" | "clause";
+export type GrammarRoleKey =
+  | "subject"
+  | "verb"
+  | "directObject"
+  | "indirectObject"
+  | "prep"
+  | "clause"
+  | "cause"
+  | "effect"
+  | "obligation"
+  | "prohibition"
+  | "futurePositive"
+  | "futureNegative";
 
 export type GrammarTableRow = {
   /** Optional left-side row label, e.g. "I'm" / "You're" / "My cat is". */

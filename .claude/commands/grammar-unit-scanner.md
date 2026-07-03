@@ -55,6 +55,18 @@ If `docs/grammar.md`'s workbook sources (`supporting/l4_ak-gwb.pdf`, `supporting
 - Note this in the grammar point's `source` block, e.g. `"note": "No Grammar Workbook answer key was available for this unit; chart built from planner content only."`
 - Compose the 10/10/10/10 sample sentences yourself, staying faithful to the rule and pattern shown in the planner's grammar box and practice activities — this is normal and matches how Unit 9 was built
 
+## `chart.table.rows[].roles` — only use a role that already has color
+
+`GrammarTableChart` colors a table cell by applying `gcardv2-table-cell--role-<role>` directly from whatever string is in `roles[]` — **if that CSS class doesn't exist, the cell silently renders with no color and no error.** This exact gap shipped in Units 6 and 9: `obligation`/`prohibition`, `future-positive`/`future-negative`, and `cause`/`effect` were all used as roles with no matching CSS, so those tables rendered as plain gray instead of the nicely color-coded look Unit 8's table has.
+
+Before assigning `roles`, check the current list in `GrammarRoleKey` (`src/data/types.ts`): `subject` / `verb` / `directObject` / `indirectObject` / `prep` / `clause` / `cause` / `effect` / `obligation` / `prohibition` / `futurePositive` / `futureNegative`. If the pattern you're scanning fits one of these, use it as-is. **If none fit and you need a new role pair (e.g. a new contrast like "past" vs "present"), add all three of the following in the same change — not just the JSON:**
+
+1. The new key(s) added to `GrammarRoleKey` in `src/data/types.ts`
+2. A `.gcardv2-table-cell--role-<key>` rule in `src/app/globals.css` (pick a color visually distinct from the other roles already in the table)
+3. A `{ key, label, color }` entry in `CHART_LEGEND` (`src/data/reference-shapes.ts`) — this is what makes the legend chip show up above the table
+
+Verify by loading the grammar card in-browser and confirming the table cells are actually colored, not just checking that `tsc`/validate pass — neither of those catches a missing CSS class.
+
 ## Required schema — copy the shape, don't skip fields
 
 ```json

@@ -285,7 +285,13 @@ export const CHART_LEGEND: Array<{ key: string; label: string; color: string }> 
   { key: "directObject", label: "Direct object", color: "#c9a227" },
   { key: "indirectObject", label: "Indirect object", color: "#74508c" },
   { key: "prep", label: "Preposition", color: "#9aa49c" },
-  { key: "clause", label: "Clause", color: "#6f9cc6" }
+  { key: "clause", label: "Clause", color: "#6f9cc6" },
+  { key: "cause", label: "Cause", color: "#c17a35" },
+  { key: "effect", label: "Effect", color: "#2f7d74" },
+  { key: "obligation", label: "Obligation", color: "#c1552f" },
+  { key: "prohibition", label: "Prohibition", color: "#b23a3a" },
+  { key: "futurePositive", label: "Will", color: "#2f8566" },
+  { key: "futureNegative", label: "Won't", color: "#a24571" }
 ];
 
 export function toGrammarEntry(point: GrammarPoint): GrammarEntry {

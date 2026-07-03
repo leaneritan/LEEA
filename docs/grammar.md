@@ -179,6 +179,8 @@ npm run validate:content
 Grammar validator requires:
 - `id`, `title`, `rule`, `pattern`, `tag` on every point
 - `japanese.title`, `japanese.rule`, `japanese.pattern` (can be drafts with `needsReview: true`)
+- **Every sentence in `tab1_samples` and `tab2_levelup.mixed_samples` must have a matching `examples[].sentence` entry.** A sentence with no matching entry renders with no color-coded highlight on the grammar card — a silent visual gap, not a build error, so the validator checks it explicitly. Build the full sentence list from both tabs first, then add one `examples` entry per sentence with the target phrase as `highlight`.
+- Only the unit paths listed in `unitGrammarPaths` (`scripts/validate-content.mjs`) are actually checked — a new unit's `grammar.json` must be added there or its content is never validated at all (this is exactly how Unit 6's coverage gap above went unnoticed for so long).
 
 Then any academic / content words you identified in Step 1 must be added to `vocabulary.json` with their proper type and source tag.
 

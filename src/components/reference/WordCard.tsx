@@ -8,6 +8,7 @@ import type { WordEntry } from "@/data/reference-shapes";
 import { getVerbForms } from "@/data/verbForms";
 import sanseidoIndex from "../../../content/subjects/english/junior-high/sanseido-index.json";
 import { allWords } from "./ref-data";
+import { isMultiEmoji } from "./emoji-utils";
 
 type SanseidoEntry = { w: string; u: string };
 const sanseidoByWord = new Map(
@@ -59,7 +60,7 @@ export function WordCard({ entry }: { entry: WordEntry }) {
 
       <section className="rcardv2-hero">
         <div className="rcardv2-hero-main">
-          <div className="rcardv2-emoji" aria-hidden>
+          <div className={`rcardv2-emoji${isMultiEmoji(entry.emoji) ? " rcardv2-emoji--multi" : ""}`} aria-hidden>
             {entry.emoji}
           </div>
 

@@ -18,6 +18,7 @@ import type { AcademicEntry } from "@/data/reference-shapes";
 import sanseidoIndex from "../../../content/subjects/english/junior-high/sanseido-index.json";
 import { posPillClass } from "./pos-pill";
 import { getAcademicNav } from "./ref-data";
+import { isMultiEmoji } from "./emoji-utils";
 
 type SanseidoEntry = { w: string; u: string };
 const sanseidoByWord = new Map(
@@ -63,7 +64,7 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
         <div className="rcardv2-academic-strip" />
         <div className="rcardv2-hero-inner">
           <div className="rcardv2-hero-main">
-            <div className="rcardv2-emoji rcardv2-emoji--academic" aria-hidden>
+            <div className={`rcardv2-emoji rcardv2-emoji--academic${isMultiEmoji(entry.emoji) ? " rcardv2-emoji--multi" : ""}`} aria-hidden>
               {entry.emoji}
             </div>
             <div className="rcardv2-hero-text">

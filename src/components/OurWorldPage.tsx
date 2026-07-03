@@ -24,7 +24,7 @@ const levelFourSequence: SequenceItem[] = [
   { kind: "unit", number: 6, title: "Sports & Games", subtitle: "8 lessons", state: "planned" },
   { kind: "review", title: "Review · Units 4–6", subtitle: "Mixed quiz, grammar and reading from this band.", state: "planned" },
   { kind: "reading", title: "Extra Reading 2", subtitle: "Extra reading to stretch a little further.", state: "planned" },
-  { kind: "unit", number: 7, title: "The Human Body", subtitle: "Vocabulary reference started", state: "reference" },
+  { kind: "unit", number: 7, title: "Good Idea!", subtitle: "1 lesson ready", state: "active" },
   { kind: "unit", number: 8, title: "That's Really Interesting!", subtitle: "8 teaching components", state: "active" },
   { kind: "unit", number: 9, title: "Our Planet", subtitle: "8 lessons", state: "locked" },
   { kind: "review", title: "Review · Units 7–9", subtitle: "Mixed quiz, grammar and reading from this band.", state: "locked" },
@@ -86,5 +86,7 @@ function SequenceRow({ item, taught, total }: { item: SequenceItem; taught: numb
     </>
   );
 
-  return item.state === "active" ? <Link className="ow-sequence-row active" href="/english/our-world/level-4/unit-8">{content}</Link> : <article className={`ow-sequence-row ${item.kind} ${item.state}`}>{content}</article>;
+  const unitHrefs: Record<number, string> = { 7: "/english/our-world/level-4/unit-7", 8: "/english/our-world/level-4/unit-8" };
+  const href = item.kind === "unit" && item.number != null ? unitHrefs[item.number] : null;
+  return href ? <Link className="ow-sequence-row active" href={href}>{content}</Link> : <article className={`ow-sequence-row ${item.kind} ${item.state}`}>{content}</article>;
 }

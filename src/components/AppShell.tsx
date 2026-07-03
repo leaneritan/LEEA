@@ -9,6 +9,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { getOpenAssignmentCount, readAssignments, readAssignmentsFromCloud } from "@/data/assignments";
 import { learnerLessons } from "@/data/lessons";
 import { useJapaneseSetting } from "@/components/useJapaneseSetting";
+import { useKnownWordIds } from "@/components/useKnownWordIds";
+import { allWords } from "@/components/reference/ref-data";
 
 type NavKey = "home" | "teacher" | "progress" | "english" | "assignments" | "reference" | "search";
 
@@ -41,6 +43,10 @@ export function AppShell({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [assignmentsLeft, setAssignmentsLeft] = useState<number | null>(null);
   const pathname = usePathname();
+  const { knownWordSet } = useKnownWordIds();
+  const isReferenceContext = active === "reference" || active === "search";
+  const knownWordCount = knownWordSet.size;
+  const reviewWordCount = Math.max(0, allWords.length - knownWordCount);
 
   useEffect(() => {
     const saved = window.localStorage.getItem("leea-sidebar-collapsed");
@@ -91,7 +97,7 @@ export function AppShell({
 
         <nav className="side-nav" aria-label="Main navigation">
           {navItems.map((item) => (
-            <Link className={active === item.key ? "active" : ""} data-tooltip={item.label} href={item.href} key={item.key}>
+            <Link className={active === item.key || (item.key === "reference" && isReferenceContext) ? "active" : ""} data-tooltip={item.label} href={item.href} key={item.key}>
               <span className="nav-icon">{item.icon}</span>
               <span className="nav-label">{item.label}</span>
               {item.key === "assignments" && assignmentsLeft !== null && assignmentsLeft > 0 && (
@@ -108,20 +114,33 @@ export function AppShell({
           <span className="disabled" data-tooltip="Science"><i className="dot-disabled" />Science</span>
         </div>
 
-        <div
-          className="sidebar-progress"
-          data-tooltip={`${assignmentsLeft ?? 0} left`}
-          data-ring-count={assignmentsLeft ?? 0}
-          style={{ "--ring-pct": `${assignmentsLeft ? Math.min(100, Math.round(((12 - assignmentsLeft) / 12) * 100)) : 100}%` } as CSSProperties}
-        >
-          <strong className="progress-label">{active === "teacher" || active === "progress" ? "This week" : active === "english" ? "Our World" : "Leo’s Progress"}</strong>
-          <strong className="progress-ring-count">{assignmentsLeft ?? 0}</strong>
-          {active === "english" ? (
-            <><span>Level 4 · Unit 8</span><div className="sidebar-mini-progress"><i /></div></>
-          ) : (
-            <span>{assignmentsLeft === null ? "…" : assignmentsLeft === 0 ? "No homework waiting" : `${assignmentsLeft} assignment${assignmentsLeft === 1 ? "" : "s"} left`}</span>
-          )}
-        </div>
+        {isReferenceContext ? (
+          <div
+            className="sidebar-progress"
+            data-tooltip={`${knownWordCount} known · ${reviewWordCount} to review`}
+            data-ring-count={knownWordCount}
+            style={{ "--ring-pct": `${allWords.length ? Math.min(100, Math.round((knownWordCount / allWords.length) * 100)) : 0}%` } as CSSProperties}
+          >
+            <strong className="progress-label">Reference</strong>
+            <strong className="progress-ring-count">{knownWordCount}</strong>
+            <span>{knownWordCount} known · {reviewWordCount} to review</span>
+          </div>
+        ) : (
+          <div
+            className="sidebar-progress"
+            data-tooltip={`${assignmentsLeft ?? 0} left`}
+            data-ring-count={assignmentsLeft ?? 0}
+            style={{ "--ring-pct": `${assignmentsLeft ? Math.min(100, Math.round(((12 - assignmentsLeft) / 12) * 100)) : 100}%` } as CSSProperties}
+          >
+            <strong className="progress-label">{active === "teacher" || active === "progress" ? "This week" : active === "english" ? "Our World" : "Leo’s Progress"}</strong>
+            <strong className="progress-ring-count">{assignmentsLeft ?? 0}</strong>
+            {active === "english" ? (
+              <><span>Level 4 · Unit 8</span><div className="sidebar-mini-progress"><i /></div></>
+            ) : (
+              <span>{assignmentsLeft === null ? "…" : assignmentsLeft === 0 ? "No homework waiting" : `${assignmentsLeft} assignment${assignmentsLeft === 1 ? "" : "s"} left`}</span>
+            )}
+          </div>
+        )}
         </aside>
 
         <main className="main">

@@ -268,7 +268,7 @@ export function TeacherDashboard() {
                     const isUnitOpen = openGroups[unitKey] ?? true;
 
                     return (
-                      <div className="teacher-table-band" key={unitGroup.id}>
+                      <div className={`teacher-table-band source-level-${group.level ?? 4}`} key={unitGroup.id}>
                         {unitGroup.unit != null ? (
                           <button className="teacher-table-unit-header" onClick={() => toggleGroup(unitKey)} type="button">
                             {isUnitOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}

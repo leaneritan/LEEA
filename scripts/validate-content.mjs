@@ -32,6 +32,7 @@ const unitVocabularyPaths = [
 ];
 const vocabularyIndexPath = "content/subjects/english/reference/vocabulary-index.json";
 const unitGrammarPaths = [
+  "content/subjects/english/courses/our-world/level-4/unit-6/grammar.json",
   "content/subjects/english/courses/our-world/level-4/unit-7/grammar.json",
   "content/subjects/english/courses/our-world/level-4/unit-8/grammar.json",
   "content/subjects/english/courses/our-world/level-4/unit-9/grammar.json"
@@ -278,6 +279,24 @@ for (const point of grammar.grammarPoints ?? []) {
   assertPresent(point.japanese?.title, `grammar ${point.id} japanese.title`);
   assertPresent(point.japanese?.rule, `grammar ${point.id} japanese.rule`);
   assertPresent(point.japanese?.pattern, `grammar ${point.id} japanese.pattern`);
+
+  /* GrammarCard.tsx's highlightGrammarPhrase() looks up the highlight for a
+     sample sentence by exact text match against examples[].sentence. Any
+     sentence in tab1_samples or tab2_levelup.mixed_samples with no matching
+     examples[] entry silently renders with no color-coded phrase — no error,
+     no warning, just a card that looks slightly wrong. Unit 6 shipped with 4
+     such gaps (2 per grammar point) that went unnoticed until this check was
+     added, so this is enforced rather than left as a documentation note. */
+  const sampleTexts = new Set([
+    ...(point.tab1_samples ?? []).map((s) => s.text),
+    ...(point.tab2_levelup?.mixed_samples ?? []).map((s) => s.text)
+  ]);
+  const exampleTexts = new Set((point.examples ?? []).map((e) => e.sentence));
+  for (const text of sampleTexts) {
+    if (!exampleTexts.has(text)) {
+      fail(`grammar ${point.tag}: sample sentence "${text}" has no matching examples[] entry — it will render with no highlighted phrase`);
+    }
+  }
 }
 
 if (!Array.isArray(sanseido) || sanseido.length === 0) fail("sanseido-index must be a non-empty array");

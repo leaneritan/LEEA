@@ -140,6 +140,8 @@ Japanese fields are required for learning cards and charts. They should not be l
 
 Cards and charts read the global Japanese ON/OFF setting from the app shell. Avoid duplicate per-card Japanese toggles.
 
+Every non-academic word (`vocabulary` / `content` / `related` / `glossary`) needs 3 example sentences total: the base `example` plus exactly 2 entries in `additionalExamples` (each with a matching Japanese translation). `scripts/validate-content.mjs` fails any such word with fewer than 2 `additionalExamples` — see `docs/vocab.md` for why this is enforced rather than left as a style guideline.
+
 ### Vocabulary JSON structure
 
 The unit vocabulary JSON (`vocabulary.json`) uses named word-list ID arrays that the validator checks:

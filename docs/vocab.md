@@ -78,6 +78,12 @@ Notes:
 - `displayEmoji` is the visual; one emoji is the common case, but the field is a plain string — multi-emoji values like `"🔋⚡"` are allowed when two emojis help picture the word
 - `emojiDescription` is what the emoji shows
 
+### Example sentences — 3 per word, no exceptions
+
+Every non-academic word (`vocabulary` / `content` / `related` / `glossary`) needs **3 example sentences total**: the base `example` plus exactly 2 entries in `additionalExamples` (each with a matching `exampleJp` / `additionalExamplesJp` translation). This is not optional depth to add later — build all 3 during the initial scan, the same way Units 6-8 were built.
+
+**`npm run validate:content` enforces this: any word with fewer than 2 `additionalExamples` fails the build.** Unit 9 originally shipped with only the base example on 41 of 42 non-academic words and still passed validation, because at the time nothing checked the count — only that `additionalExamples` and `additionalExamplesJp` matched each other in length (which is trivially true at zero). That gap had to be caught by eye and backfilled after the fact. Don't rely on remembering the 3-sentence rule — the validator now catches it immediately if you skip it, so if you see this failure, add the missing examples rather than treating it as a false positive.
+
 ### Emoji consistency
 
 Emojis must be consistent across units so Leo learns one visual per concept.

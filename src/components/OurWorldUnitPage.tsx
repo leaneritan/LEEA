@@ -147,7 +147,7 @@ export function OurWorldUnitPage({ unit }: { unit: number }) {
       <div className="unit-design-list">
         {lessonRows.map(({ teacher, state }) => {
           const meta = getComponentMeta(teacher.component);
-          const copy = lessonCopy[teacher.component] ?? { title: teacher.title, subtitle: teacher.subtitle };
+          const copy = (teacher.unit === 8 ? lessonCopy[teacher.component] : undefined) ?? { title: teacher.title, subtitle: teacher.subtitle };
           return (
             <article className={`unit-design-row unit-design-row--${meta.tone} ${state.className}`} key={teacher.id}>
               <span className="unit-design-icon" aria-hidden="true">{meta.emoji}</span>

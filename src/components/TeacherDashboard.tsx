@@ -264,34 +264,43 @@ export function TeacherDashboard() {
                     const nextUnit = group.unitGroups[unitIndex + 1]?.unit;
                     const nextBand = getUnitBand(nextUnit);
                     const isLastUnitInVisibleBand = nextBand.start !== band.start;
+                    const unitKey = `${group.id}-u${unitGroup.unit}`;
+                    const isUnitOpen = openGroups[unitKey] ?? true;
 
                     return (
                       <div className="teacher-table-band" key={unitGroup.id}>
                         {unitGroup.unit != null ? (
-                          <div className="teacher-table-unit-header">Unit {unitGroup.unit}</div>
+                          <button className="teacher-table-unit-header" onClick={() => toggleGroup(unitKey)} type="button">
+                            {isUnitOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                            Unit {unitGroup.unit}
+                          </button>
                         ) : null}
-                        {unitGroup.lessons.filter((lesson) => lesson.mode === "teacher").map((lesson) => {
-                          const learnerCounterpart = unitGroup.lessons.find((item) => item.mode === "learner" && item.component === `${lesson.component}-app`);
-                          return (
-                            <TeacherLessonRow
-                              assignment={learnerCounterpart ? assignments[learnerCounterpart.id] : undefined}
-                              key={lesson.id}
-                              learner={learnerCounterpart}
-                              lesson={lesson}
-                              progress={progress[lesson.id]}
-                              setLessonDone={setLessonDone}
-                              assignLesson={assignLesson}
-                              unassignLesson={unassignLesson}
-                            />
-                          );
-                        })}
-                        {isLastUnitInVisibleBand ? (
-                          <div className="teacher-checkpoint-rows">
-                            <div className="teacher-checkpoint-label">Checkpoint after Units {band.start}–{band.end}</div>
-                            {checkpointComponents.map((checkpoint) => (
-                              <CheckpointRow checkpoint={checkpoint} key={checkpoint.component} unitBand={band} />
-                            ))}
-                          </div>
+                        {isUnitOpen ? (
+                          <>
+                            {unitGroup.lessons.filter((lesson) => lesson.mode === "teacher").map((lesson) => {
+                              const learnerCounterpart = unitGroup.lessons.find((item) => item.mode === "learner" && item.component === `${lesson.component}-app`);
+                              return (
+                                <TeacherLessonRow
+                                  assignment={learnerCounterpart ? assignments[learnerCounterpart.id] : undefined}
+                                  key={lesson.id}
+                                  learner={learnerCounterpart}
+                                  lesson={lesson}
+                                  progress={progress[lesson.id]}
+                                  setLessonDone={setLessonDone}
+                                  assignLesson={assignLesson}
+                                  unassignLesson={unassignLesson}
+                                />
+                              );
+                            })}
+                            {isLastUnitInVisibleBand ? (
+                              <div className="teacher-checkpoint-rows">
+                                <div className="teacher-checkpoint-label">Checkpoint after Units {band.start}–{band.end}</div>
+                                {checkpointComponents.map((checkpoint) => (
+                                  <CheckpointRow checkpoint={checkpoint} key={checkpoint.component} unitBand={band} />
+                                ))}
+                              </div>
+                            ) : null}
+                          </>
                         ) : null}
                       </div>
                     );

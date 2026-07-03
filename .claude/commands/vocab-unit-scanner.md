@@ -97,6 +97,7 @@ The Reference word card (`src/components/reference/WordCard.tsx`) renders pronun
 - **`syllables`** — required (already enforced), drives the syllable pill chips (`col` / `lect` style) and the "N syllables" count.
 - **`exampleJp`** — required whenever `example` is set. Every English example sentence needs a matching Japanese translation; the card shows them stacked (EN above, JP below) when the Japanese toggle is on (default ON for all learners).
 - **`additionalExamplesJp`** — required, one per entry in `additionalExamples`, same array order.
+- **`additionalExamples` must have exactly 2 entries for every non-academic word** (`vocabulary` / `content` / `related` / `glossary`), giving 3 example sentences total (base `example` + 2 more). Write all 3 during the initial scan — do not ship with just the base example and plan to backfill later. Unit 9 shipped with only 1 sentence on 41/42 words the first time through and had to be corrected afterward once the user pointed it out; that rework is exactly what this rule exists to prevent. `npm run validate:content` now fails any word with fewer than 2 `additionalExamples`, so this can't slip through unnoticed again — if the validator flags it, add the missing sentences, don't treat it as a false positive.
 - If the word has `additionalMeanings` (a second sense), each entry should include a `jp` field translating that sense — not just the primary meaning.
 
 **Rule of thumb: if a learner-facing English string exists, a Japanese counterpart exists too** (`needsReview: true` until confirmed). This was a recurring gap in Units 6-8 that had to be backfilled after the fact — building it correctly the first time during scanning avoids that rework.
@@ -321,6 +322,7 @@ Push to the current working branch. Do not create a PR automatically — the use
 
 - [ ] `vocabulary.json` created at correct path with N words
 - [ ] Every word has `ipa` and `syllables` set
+- [ ] Every non-academic word has 3 example sentences (base `example` + exactly 2 `additionalExamples`), not just the base one
 - [ ] Every `example`/`additionalExamples` has a matching `exampleJp`/`additionalExamplesJp`
 - [ ] Every `additionalMeanings` entry has a `jp` translation
 - [ ] All Japanese fields drafted with `needsReview: true`

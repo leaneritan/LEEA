@@ -156,6 +156,14 @@ function validateWordCardFields(word) {
     if (additional.length !== additionalJp.length) {
       fail(sourceLabel(word, "additionalExamples and additionalExamplesJp must have the same length"));
     }
+    /* Every non-academic word needs 3 example sentences total (1 base +
+       2 additionalExamples), matching the depth Units 6-8 established.
+       Unit 9 originally shipped with only the base example on 41/42 words
+       and still passed validation, because nothing enforced a minimum here
+       — this check exists so that gap can't ship silently again. */
+    if (additional.length < 2) {
+      fail(sourceLabel(word, "needs at least 2 additionalExamples (3 example sentences total) — see docs/vocab.md"));
+    }
     for (const [index, example] of additional.entries()) {
       if (!highlightableTextIncludesWord(example, word)) {
         fail(sourceLabel(word, `additionalExamples[${index}] does not contain a highlightable form of "${word.word}"`));

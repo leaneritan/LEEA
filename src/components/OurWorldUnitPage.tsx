@@ -21,7 +21,7 @@ const lessonCopy: Record<string, { title: string; subtitle: string }> = {
     subtitle: "“What’s Your Hobby?” — sing along"
   },
   "grammar-1": {
-    title: "Describing people with ‘who’",
+    title: "Describing people with 'who'",
     subtitle: "Relative clauses for people"
   },
   "vocab-2": {
@@ -39,6 +39,19 @@ const lessonCopy: Record<string, { title: string; subtitle: string }> = {
   writing: {
     title: "Explain a Hobby",
     subtitle: "Origami how-to writing"
+  }
+};
+
+const unitMeta: Record<number, { title: string; subtitle: string; chips: string[] }> = {
+  7: {
+    title: "Good Idea!",
+    subtitle: "Inventions, ideas & the Space Projection Helmet.",
+    chips: ["💡 Inventions", "🔬 Ideas", "🚀 Solutions"]
+  },
+  8: {
+    title: "That's Really Interesting!",
+    subtitle: "Hobbies, interests & the Arctic.",
+    chips: ["🎨 Hobbies", "📷 Photography", "🐻‍❄️ Polar Bears"]
   }
 };
 
@@ -73,18 +86,19 @@ function getLessonState(teacher: Lesson, learner: Lesson | undefined) {
   };
 }
 
-export function OurWorldUnitPage() {
+export function OurWorldUnitPage({ unit }: { unit: number }) {
   const [progressVersion, setProgressVersion] = useState(0);
-  const group = getLessonGroups().find((item) => item.course === "our-world" && item.level === 4 && item.unit === 8);
+  const meta = unitMeta[unit] ?? { title: `Unit ${unit}`, subtitle: "", chips: [] };
+  const group = getLessonGroups().find((item) => item.course === "our-world" && item.level === 4 && item.unit === unit);
 
   useEffect(() => {
-    const currentGroup = getLessonGroups().find((item) => item.course === "our-world" && item.level === 4 && item.unit === 8);
+    const currentGroup = getLessonGroups().find((item) => item.course === "our-world" && item.level === 4 && item.unit === unit);
     if (!currentGroup) return;
     const learners = currentGroup.lessons.filter((lesson) => lesson.mode === "learner");
     void syncLearnerProgressWithCloud(learners).then((changed) => {
       if (changed) setProgressVersion((value) => value + 1);
     });
-  }, []);
+  }, [unit]);
 
   progressVersion;
 
@@ -103,18 +117,16 @@ export function OurWorldUnitPage() {
         <div className="ow-unit-hero__brand">
           <span>National Geographic</span>
           <h1>Our<br />World</h1>
-          <b>Level 4 · Unit 8</b>
-          <p>That&apos;s Really Interesting! — Hobbies, interests & the Arctic.</p>
+          <b>Level 4 · Unit {unit}</b>
+          <p>{meta.subtitle}</p>
           <div className="ow-hero-chips" aria-label="Unit themes">
-            <span>🎨 Hobbies</span>
-            <span>📷 Photography</span>
-            <span>🐻‍❄️ Polar Bears</span>
+            {meta.chips.map((chip) => <span key={chip}>{chip}</span>)}
           </div>
         </div>
 
         {nextRow && nextCopy ? (
           <aside className="ow-unit-next">
-            <span>Continue Unit 8</span>
+            <span>Continue Unit {unit}</span>
             <strong>{nextCopy.title}</strong>
             {nextRow.state.progress ? (
               <div className="ow-unit-next__meter" aria-label={`${nextRow.state.progress.done} of ${nextRow.state.progress.total} modules complete`}>
@@ -128,7 +140,7 @@ export function OurWorldUnitPage() {
       </section>
 
       <header className="unit-list-heading ow-unit-heading">
-        <h2>Unit 8 lessons</h2>
+        <h2>Unit {unit} lessons</h2>
         <strong>{completedCount} of {teacherLessons.length} done · keep climbing!</strong>
       </header>
 

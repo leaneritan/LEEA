@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { isMultiEmoji } from "@/components/reference/emoji-utils";
 
 /* ============================================================
    Unit Reference page — Our World · Level 4 · Unit 9
@@ -197,7 +198,7 @@ export default function UnitReference9() {
             <div className="unit-word-list">
               {s.words.map((w) => (
                 <Link className="unit-word" href={w.href} key={w.word}>
-                  <span className="unit-word-emoji" style={{ background: s.tint }}>{w.emoji}</span>
+                  <span className={`unit-word-emoji${isMultiEmoji(w.emoji) ? " unit-word-emoji--multi" : ""}`} style={{ background: s.tint }}>{w.emoji}</span>
                   <span className="unit-word-main">
                     <span className="unit-word-headline">
                       <span className="unit-word-text">{w.word}</span>

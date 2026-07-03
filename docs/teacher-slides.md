@@ -25,17 +25,30 @@ Every teacher slideshow uses the same outer structure:
 - Same Mark Done button that writes to `leea.lessonProgress.v1` via `lessonProgress.ts`
 - Same component tone left edge from `getComponentMeta()`
 
-Look at `public/lessons/ow-l4-u8-opener.html` for the current shell. New teacher slideshows copy that shell and replace the inner slide content.
+Look at `public/lessons/ow-l4-u7-opener.html` (locked reference, 1404 lines, 21 slides) for the opener shell. Use `/opener-app` skill to generate opener slideshows + Leo apps for any unit. New teacher slideshows for other component types copy the outer shell and replace the inner slide content.
 
 ## What each component's slides should cover
 
 Use the NatGeo planner activity sections as the slide flow:
 
 ### opener
-- Theme reveal (right column photo + caption)
-- Discussion prompts (from teacher notes)
-- Caption writing activity
-- Unit goals (4 bullets from the In This Unit I Will box)
+
+> **Skill**: `/opener-app` — generates both teacher slideshow and Leo learner app end-to-end.
+
+21-slide structure:
+- s1: Title card (gradient, unit theme chips)
+- s2–s3: Anchor photo + discussion prompts
+- s4: Caption writing activity
+- s5–s8: Content vocabulary (4 words, bespoke game per word)
+- s9: Content vocab flip-card recap
+- s10–s13: Academic vocabulary (4 words, arctic blue theme)
+- s14: Academic vocab flip-card recap
+- s15: Unit goals — "In This Unit I Will…" (4 goals from planner)
+- s16: Teaching Tip / Look and Check
+- s17: Be the Expert (tap-to-reveal fact cards)
+- s18: Discussion wrap-up (reveal question cards)
+- s19–s20: Unit preview / Coming up
+- s21: Mark Done
 
 ### vocab-1 / vocab-2
 - Warm Up

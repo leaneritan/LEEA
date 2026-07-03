@@ -24,7 +24,7 @@ REFERENCE
 
 COMPONENT PAIRS (slideshow + Leo app)
 For each component in this order:
-   9.  opener     (slideshow + Leo opener app)
+   9.  opener     (slideshow + Leo opener app) — use /opener-app skill
    10. vocab-1    (slideshow + Leo vocab-1 app)
    11. song       (slideshow + Leo song app)
    12. grammar-1  (slideshow + Leo grammar-1 app)

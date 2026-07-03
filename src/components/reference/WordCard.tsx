@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { useJapanesePreference } from "@/components/AppShell";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
 import type { WordEntry } from "@/data/reference-shapes";
-import { getVerbForms } from "@/data/verbForms";
+import { getVerbForms, type VerbForms } from "@/data/verbForms";
 import sanseidoIndex from "../../../content/subjects/english/junior-high/sanseido-index.json";
 import { allWords } from "./ref-data";
 import { isMultiEmoji } from "./emoji-utils";
@@ -194,7 +194,7 @@ export function WordCard({ entry }: { entry: WordEntry }) {
               <div className="rcardv2-examples">
                 {entry.examples.map((example, idx) => (
                   <div key={idx} className="rcardv2-example">
-                    <p>{highlightWord(example, entry.normalizedWord || entry.word)}</p>
+                    <p>{highlightWord(example, entry.normalizedWord || entry.word, verbForms)}</p>
                     {jp && entry.examplesJp[idx] && (
                       <p className="rcardv2-example-jp" lang="ja">
                         {entry.examplesJp[idx]}
@@ -373,15 +373,30 @@ function tokenize(text: string) {
     .filter(Boolean);
 }
 
-function highlightWord(text: string, word: string) {
+function highlightWord(text: string, word: string, verbForms?: VerbForms | null) {
   /* normalizedWord joins multi-word phrases with "_" (e.g. "pop_top",
      "sea_sponges"); match that as either a space or a hyphen in the actual
      sentence, since either is valid English spelling. */
-  const pattern = word.split("_").map(escapeRegex).join("[-\\s]");
-  const re = new RegExp(`(${pattern}\\w*)`, "ig");
+  const toPattern = (candidate: string) => candidate.split(/[_\s]+/).map(escapeRegex).join("[-\\s]");
+
+  /* Verb example sentences legitimately use the past or past-participle
+     form ("fell over", "spun", "took photos"), which for irregular verbs
+     shares no substring with the base word — so the base-word-only pattern
+     would never bold anything in those sentences. Try the base word first,
+     then each verb form, and highlight whichever one actually appears. */
+  const candidates = [word, verbForms?.past, verbForms?.pastParticiple].filter(
+    (value): value is string => Boolean(value)
+  );
+  /* The \w* suffix must sit outside the alternation group, not inside it —
+     `(a|b\w*)` only lets \w* extend the LAST alternative, so matching "leaned"
+     against `(lean|leaned\w*)` stops at "lean" (the first, shorter alternative
+     wins and the trailing "ed" is left un-bolded). `(?:a|b)\w*` lets \w*
+     extend whichever alternative actually matched. */
+  const pattern = candidates.map(toPattern).join("|");
+  const re = new RegExp(`((?:${pattern})\\w*)`, "ig");
   const parts = text.split(re);
   return parts.map((part, i) =>
-    part && new RegExp(`^${pattern}\\w*$`, "i").test(part) ? (
+    part && new RegExp(`^(?:${pattern})\\w*$`, "i").test(part) ? (
       <strong key={i}>{part}</strong>
     ) : (
       <span key={i}>{part}</span>

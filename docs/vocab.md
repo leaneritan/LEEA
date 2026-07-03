@@ -84,6 +84,20 @@ Every non-academic word (`vocabulary` / `content` / `related` / `glossary`) need
 
 **`npm run validate:content` enforces this: any word with fewer than 2 `additionalExamples` fails the build.** Unit 9 originally shipped with only the base example on 41 of 42 non-academic words and still passed validation, because at the time nothing checked the count — only that `additionalExamples` and `additionalExamplesJp` matched each other in length (which is trivially true at zero). That gap had to be caught by eye and backfilled after the fact. Don't rely on remembering the 3-sentence rule — the validator now catches it immediately if you skip it, so if you see this failure, add the missing examples rather than treating it as a false positive.
 
+### For verb-type words, the 3 sentences are Infinitive / Past / Past participle
+
+When `partOfSpeech` resolves to a verb (`"verb"`, `"noun/verb"`, `"verb phrase"`, `"verb/adjective"`, etc. — anything containing the word "verb"), the 3 example sentences aren't just "3 different sentences using the word" — they should each demonstrate one of the three forms shown in the card's Forms chips:
+
+1. **`example`** — infinitive/base form (present tense or imperative is fine: "You push the door to open it.")
+2. **`additionalExamples[0]`** — simple past tense ("She pushed the swing gently.")
+3. **`additionalExamples[1]`** — past participle, via present perfect or passive ("The box has been pushed across the floor.")
+
+This mirrors the rule already required for academic verbs (see "Academic words" below) — it's now the standard for every verb-type word, not just academic ones. Use `src/data/verbForms.ts`'s `getVerbForms()` to get the canonical past/past-participle spelling for any verb (it handles irregulars and multi-word phrasal verbs like "fall over" → "fell over"/"fallen over").
+
+**Irregular verbs' past/participle forms don't literally contain the base word** ("fell" doesn't contain "fall"), which used to be a hard blocker: the card only bolds/validates the literal `normalizedWord` substring. This is now handled — `WordCard.tsx`'s `highlightWord()` and `validate-content.mjs`'s `highlightableTextIncludesWord()` both accept the word's computed past/past-participle forms as valid alternatives for verb-type words, so an irregular past-tense sentence bolds and validates correctly. You do not need to avoid irregular verbs' real past tense to satisfy the highlight rule — write the grammatically correct sentence.
+
+**A word only gets this treatment if `partOfSpeech` actually resolves to `"verb"`.** `normalizePos()` (`src/data/reference-shapes.ts`) exact-matches common single-category strings first, then falls back to token-matching compound strings like `"noun/verb"` — if you introduce a new compound `partOfSpeech` string that token-matching doesn't already cover, check `normalizePos()` before assuming the Forms chips will show up.
+
 ### Emoji consistency
 
 Emojis must be consistent across units so Leo learns one visual per concept.

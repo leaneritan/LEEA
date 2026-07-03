@@ -63,6 +63,7 @@ const IRREGULAR_VERBS: Record<string, [string, string]> = {
   sleep: ["slept", "slept"],
   speak: ["spoke", "spoken"],
   spend: ["spent", "spent"],
+  spin: ["spun", "spun"],
   stand: ["stood", "stood"],
   swim: ["swam", "swum"],
   take: ["took", "taken"],
@@ -99,15 +100,25 @@ function conjugateRegularPast(verb: string): string {
   return `${verb}ed`;
 }
 
+/* Multi-word verbs (phrasal verbs like "fall over", verb phrases like "take
+   photos") only conjugate their first word — "fall over" -> "fell over",
+   not "fall overred". Without this, an irregular phrasal verb's head word
+   never hits IRREGULAR_VERBS (the full phrase isn't a lookup key) and falls
+   through to the regular suffix rule, producing a nonsense past form. */
 export function getVerbForms(word: string): VerbForms {
   const infinitive = word.trim();
-  const lower = infinitive.toLowerCase();
+  const [head, ...rest] = infinitive.toLowerCase().split(/\s+/);
+  const suffix = rest.length > 0 ? ` ${rest.join(" ")}` : "";
 
-  const irregular = IRREGULAR_VERBS[lower];
+  const irregular = IRREGULAR_VERBS[head];
   if (irregular) {
-    return { infinitive, past: irregular[0], pastParticiple: irregular[1] };
+    return {
+      infinitive,
+      past: `${irregular[0]}${suffix}`,
+      pastParticiple: `${irregular[1]}${suffix}`
+    };
   }
 
-  const past = conjugateRegularPast(lower);
+  const past = `${conjugateRegularPast(head)}${suffix}`;
   return { infinitive, past, pastParticiple: past };
 }

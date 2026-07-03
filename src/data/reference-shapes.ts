@@ -32,9 +32,28 @@ const POS_NORMALIZE: Record<string, PosTag> = {
   phrase: "phrase"
 };
 
+/* Exact-match lookup covers the common single-category strings, but content
+   also has compound strings like "noun/verb", "verb phrase", and
+   "verb/adjective" (score, take photos, sinking) — none of those match the
+   dictionary exactly, so they silently fell to "other". That's not just a
+   cosmetic pos-pill issue: WordCard.tsx only shows the Forms chips and
+   accepts past/past-participle example sentences when the resolved pos is
+   "verb", so words with a compound pos never got Forms or verb-aware
+   highlighting at all. Token-match as a fallback, prioritizing "verb" since
+   that's the capability that unlocks the richer card behavior. */
 function normalizePos(raw: string | undefined): PosTag {
   if (!raw) return "other";
-  return POS_NORMALIZE[raw.toLowerCase().trim()] ?? "other";
+  const lower = raw.toLowerCase().trim();
+  if (POS_NORMALIZE[lower]) return POS_NORMALIZE[lower];
+
+  const tokens = lower.split(/[^a-z]+/).filter(Boolean);
+  if (tokens.includes("verb")) return "verb";
+  if (tokens.includes("adjective") && tokens.includes("adverb")) return "adj/adv";
+  if (tokens.includes("noun")) return "noun";
+  if (tokens.includes("adjective")) return "adjective";
+  if (tokens.includes("adverb")) return "adverb";
+  if (tokens.includes("phrase")) return "phrase";
+  return "other";
 }
 
 /* ─── Source rendered on cards ─── */

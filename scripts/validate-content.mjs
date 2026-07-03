@@ -103,6 +103,69 @@ for (const id of allWordIds) {
   if (!(vocabularyIndex.words ?? []).includes(id)) fail(`vocabulary-index is missing ${id}`);
 }
 
+/* Duplicated from src/data/verbForms.ts (this script runs under plain node,
+   which can't import the TS file directly) — keep in sync if that file's
+   irregular list or conjugation rules change. Only used here to let verb
+   example sentences legitimately use past/past-participle forms without
+   failing the highlight check below. */
+const IRREGULAR_VERBS_FOR_VALIDATION = {
+  be: ["was/were", "been"], begin: ["began", "begun"], break: ["broke", "broken"],
+  bring: ["brought", "brought"], build: ["built", "built"], buy: ["bought", "bought"],
+  catch: ["caught", "caught"], choose: ["chose", "chosen"], come: ["came", "come"],
+  cut: ["cut", "cut"], do: ["did", "done"], draw: ["drew", "drawn"],
+  drink: ["drank", "drunk"], drive: ["drove", "driven"], eat: ["ate", "eaten"],
+  fall: ["fell", "fallen"], feel: ["felt", "felt"], find: ["found", "found"],
+  fly: ["flew", "flown"], forget: ["forgot", "forgotten"], get: ["got", "gotten"],
+  give: ["gave", "given"], go: ["went", "gone"], grow: ["grew", "grown"],
+  have: ["had", "had"], hear: ["heard", "heard"], hide: ["hid", "hidden"],
+  hold: ["held", "held"], keep: ["kept", "kept"], know: ["knew", "known"],
+  leave: ["left", "left"], lose: ["lost", "lost"], make: ["made", "made"],
+  meet: ["met", "met"], pay: ["paid", "paid"], put: ["put", "put"],
+  read: ["read", "read"], ride: ["rode", "ridden"], run: ["ran", "run"],
+  say: ["said", "said"], see: ["saw", "seen"], sell: ["sold", "sold"],
+  send: ["sent", "sent"], sing: ["sang", "sung"], sit: ["sat", "sat"],
+  sleep: ["slept", "slept"], speak: ["spoke", "spoken"], spend: ["spent", "spent"],
+  spin: ["spun", "spun"], stand: ["stood", "stood"], swim: ["swam", "swum"],
+  take: ["took", "taken"], teach: ["taught", "taught"], tell: ["told", "told"],
+  think: ["thought", "thought"], throw: ["threw", "thrown"],
+  understand: ["understood", "understood"], wake: ["woke", "woken"],
+  wear: ["wore", "worn"], win: ["won", "won"], write: ["wrote", "written"]
+};
+const VOWELS_FOR_VALIDATION = new Set(["a", "e", "i", "o", "u"]);
+function conjugateRegularPastForValidation(verb) {
+  if (verb.endsWith("e")) return `${verb}d`;
+  if (verb.endsWith("y") && verb.length > 1 && !VOWELS_FOR_VALIDATION.has(verb[verb.length - 2])) {
+    return `${verb.slice(0, -1)}ied`;
+  }
+  if (
+    verb.length >= 3 &&
+    !VOWELS_FOR_VALIDATION.has(verb[verb.length - 1]) &&
+    VOWELS_FOR_VALIDATION.has(verb[verb.length - 2]) &&
+    !VOWELS_FOR_VALIDATION.has(verb[verb.length - 3]) &&
+    !["w", "x", "y"].includes(verb[verb.length - 1])
+  ) {
+    return `${verb}${verb[verb.length - 1]}ed`;
+  }
+  return `${verb}ed`;
+}
+function getVerbFormsForValidation(word) {
+  const [head, ...rest] = word.toLowerCase().split(/\s+/);
+  const suffix = rest.length > 0 ? ` ${rest.join(" ")}` : "";
+  const irregular = IRREGULAR_VERBS_FOR_VALIDATION[head];
+  if (irregular) return { past: `${irregular[0]}${suffix}`, pastParticiple: `${irregular[1]}${suffix}` };
+  const past = `${conjugateRegularPastForValidation(head)}${suffix}`;
+  return { past, pastParticiple: past };
+}
+
+/* Mirrors highlightWord() in src/components/reference/WordCard.tsx, which
+   searches example text for entry.normalizedWord — never the display "word"
+   field, since that often carries an article ("a creature") or joins a
+   phrase with underscores ("sea_sponges") that never appears verbatim in a
+   sentence. Underscores match either a space or a hyphen in the sentence.
+   For verb-type words, past/past-participle forms are also accepted, since
+   an irregular verb's past tense ("fell", "spun", "took") shares no
+   substring with the base word. */
+
 for (const word of wordsById.values()) {
   assertPresent(word.id, sourceLabel(word, "id"));
   assertPresent(word.type, sourceLabel(word, "type"));
@@ -179,16 +242,20 @@ function validateWordCardFields(word) {
   }
 }
 
-/* Mirrors highlightWord() in src/components/reference/WordCard.tsx, which
-   searches example text for entry.normalizedWord — never the display "word"
-   field, since that often carries an article ("a creature") or joins a
-   phrase with underscores ("sea_sponges") that never appears verbatim in a
-   sentence. Underscores match either a space or a hyphen in the sentence. */
 function highlightableTextIncludesWord(text, word) {
   const key = word.normalizedWord || word.word || "";
   if (!key) return true;
   const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const pattern = key.split("_").map(escapeRegex).join("[-\\s]");
+  const toPattern = (candidate) => candidate.split(/[_\s]+/).map(escapeRegex).join("[-\\s]");
+
+  const candidates = [key];
+  const pos = (word.partOfSpeech || word.pos || "").toLowerCase();
+  if (/\bverb\b/.test(pos)) {
+    const forms = getVerbFormsForValidation(key);
+    candidates.push(forms.past, forms.pastParticiple);
+  }
+
+  const pattern = candidates.map(toPattern).join("|");
   return new RegExp(pattern, "i").test(text);
 }
 

@@ -1,3 +1,5 @@
+import unit7Opener from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/opener.teacher.json";
+import unit7OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/opener.learner.json";
 import unit8Opener from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.teacher.json";
 import unit8OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.learner.json";
 import unit8Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab1.teacher.json";
@@ -25,6 +27,8 @@ import unit8BookReadingLearner from "../../content/subjects/english/courses/our-
 import type { Lesson } from "./types";
 
 export const lessons: Lesson[] = [
+  unit7Opener as Lesson,
+  unit7OpenerLearner as Lesson,
   unit8Opener as Lesson,
   unit8OpenerLearner as Lesson,
   unit8Vocab1 as Lesson,

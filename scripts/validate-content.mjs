@@ -278,12 +278,18 @@ for (const [index, entry] of (sanseido ?? []).entries()) {
 }
 
 // Lesson registration + teacher/learner pairing check
-const lessonsDir = "content/subjects/english/courses/our-world/level-4/unit-8/lessons";
+const lessonsDirs = [
+  "content/subjects/english/courses/our-world/level-4/unit-7/lessons",
+  "content/subjects/english/courses/our-world/level-4/unit-8/lessons",
+];
 const lessons = [];
-for (const file of fs.readdirSync(path.join(root, lessonsDir))) {
-  if (!file.endsWith(".json")) continue;
-  const lesson = readJson(path.join(lessonsDir, file));
-  lessons.push({ ...lesson, file });
+for (const lessonsDir of lessonsDirs) {
+  if (!fs.existsSync(path.join(root, lessonsDir))) continue;
+  for (const file of fs.readdirSync(path.join(root, lessonsDir))) {
+    if (!file.endsWith(".json")) continue;
+    const lesson = readJson(path.join(lessonsDir, file));
+    lessons.push({ ...lesson, file });
+  }
 }
 
 const lessonsTsPath = "src/data/lessons.ts";

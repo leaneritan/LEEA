@@ -93,7 +93,7 @@ const unitSections: Section[] = [
       word("🚶‍♂️↗️", "away from", "preposition", "moving in the opposite direction from something or someone", "/reference/word/global_away_from"),
       word("🧭", "direction", "noun", "the way something moves or points", "/reference/word/global_direction"),
       word("🚶‍♂️↘️", "toward", "preposition", "moving in the direction of something or someone", "/reference/word/global_toward"),
-      word("📐↘️", "lean", "verb", "to bend your body to one side", "/reference/word/global_lean"),
+      word("🚵", "lean", "verb", "to bend your body to one side", "/reference/word/global_lean"),
       word("🌍⬇️", "gravity", "noun", "the force that pulls things down toward the Earth", "/reference/word/global_gravity")
     ]
   },
@@ -120,7 +120,7 @@ const unitSections: Section[] = [
       word("🛹", "skateboarder", "noun", "a person who rides a skateboard", "/reference/word/global_skateboarder"),
       word("🎾🔗", "tetherball", "noun", "a game where you hit a ball tied to a pole with a rope", "/reference/word/global_tetherball"),
       word("🔒🎢", "safety bar", "noun", "a bar you hold and pull down to stay safe in a moving ride", "/reference/word/global_safety_bar"),
-      word("⛰️📐", "steep", "adjective", "rising or falling very sharply, like a hill", "/reference/word/global_steep"),
+      word("⛰️", "steep", "adjective", "rising or falling very sharply, like a hill", "/reference/word/global_steep"),
       word("🎡🔄", "centripetal force", "noun", "the force that keeps something moving in a circle", "/reference/word/global_centripetal_force"),
       word("➡️🛑", "inertia", "noun", "the tendency of something moving to keep moving", "/reference/word/global_inertia"),
       word("🙌🎢", "experience", "verb", "something that happens to you that you feel or notice", "/reference/word/global_experience"),

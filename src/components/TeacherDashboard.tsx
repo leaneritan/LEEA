@@ -248,7 +248,7 @@ export function TeacherDashboard() {
             <section className="teacher-group teacher-design-group" id={group.id} key={group.id}>
               <button className="teacher-group-header teacher-design-group-header" onClick={() => toggleGroup(group.id)} type="button">
                 <span>{isOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />} {group.courseLabel}</span>
-                <h2>Level {group.level} · Unit 8</h2>
+                <h2>Level {group.level} · {group.unitGroups.map((g) => `Unit ${g.unit}`).join(" & ")}</h2>
                 <small><i><b style={{ width: `${teacherInGroup.length ? Math.round((groupDone / teacherInGroup.length) * 100) : 0}%` }} /></i>{groupDone} / {teacherInGroup.length} taught</small>
               </button>
 
@@ -267,6 +267,9 @@ export function TeacherDashboard() {
 
                     return (
                       <div className="teacher-table-band" key={unitGroup.id}>
+                        {group.unitGroups.length > 1 && unitGroup.unit != null ? (
+                          <div className="teacher-table-unit-label">Unit {unitGroup.unit}</div>
+                        ) : null}
                         {unitGroup.lessons.filter((lesson) => lesson.mode === "teacher").map((lesson) => {
                           const learnerCounterpart = unitGroup.lessons.find((item) => item.mode === "learner" && item.component === `${lesson.component}-app`);
                           return (
@@ -322,7 +325,7 @@ function TeacherLessonRow({
 }) {
   const done = progress?.status === "done";
   const meta = getComponentMeta(lesson.component);
-  const copy = shortLessonCopy[lesson.component] ?? { label: meta.label, title: lesson.title, subtitle: lesson.subtitle };
+  const copy = (lesson.unit === 8 ? shortLessonCopy[lesson.component] : undefined) ?? { label: meta.label, title: lesson.title, subtitle: lesson.subtitle };
   const appProgress = learner ? getLearnerAppProgress(learner.source) : null;
 
   return (

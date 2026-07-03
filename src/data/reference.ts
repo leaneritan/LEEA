@@ -1,6 +1,7 @@
 import unit6Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-6/vocabulary.json";
 import unit7Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-7/vocabulary.json";
 import unit8Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json";
+import unit9Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-9/vocabulary.json";
 import unit6Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-6/grammar.json";
 import unit7Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-7/grammar.json";
 import unit8Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-8/grammar.json";
@@ -15,6 +16,7 @@ import type {
 } from "./types";
 
 type UnitVocabularyWord =
+  | (typeof unit9Vocabulary.words)[number]
   | (typeof unit8Vocabulary.words)[number]
   | (typeof unit7Vocabulary.words)[number]
   | (typeof unit6Vocabulary.words)[number];
@@ -104,6 +106,7 @@ function mergeWordsAcrossUnits(unitWordLists: UnitVocabularyWord[][]): Vocabular
 }
 
 export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
+  unit9Vocabulary.words as UnitVocabularyWord[],
   unit8Vocabulary.words as UnitVocabularyWord[],
   unit7Vocabulary.words as UnitVocabularyWord[],
   unit6Vocabulary.words as UnitVocabularyWord[]
@@ -115,7 +118,8 @@ export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
 export const unitTitles: Record<string, string> = {
   [`${unit6Vocabulary.level}-${unit6Vocabulary.unit}`]: unit6Vocabulary.unitTitle,
   [`${unit7Vocabulary.level}-${unit7Vocabulary.unit}`]: unit7Vocabulary.unitTitle,
-  [`${unit8Vocabulary.level}-${unit8Vocabulary.unit}`]: unit8Vocabulary.unitTitle
+  [`${unit8Vocabulary.level}-${unit8Vocabulary.unit}`]: unit8Vocabulary.unitTitle,
+  [`${unit9Vocabulary.level}-${unit9Vocabulary.unit}`]: unit9Vocabulary.unitTitle
 };
 
 export const unit6Vocab1Items = vocabularyItems.filter(
@@ -161,6 +165,21 @@ export const unit8GlossaryItems = vocabularyItems.filter(
   (item) =>
     (item.type === "content" || item.type === "related" || item.type === "glossary") &&
     item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 8)
+);
+
+export const unit9Vocab1Items = vocabularyItems.filter(
+  (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U9-V1")
+);
+export const unit9Vocab2Items = vocabularyItems.filter(
+  (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U9-V2")
+);
+export const unit9AcademicItems = vocabularyItems.filter(
+  (item) => item.type === "academic" && item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 9)
+);
+export const unit9GlossaryItems = vocabularyItems.filter(
+  (item) =>
+    (item.type === "content" || item.type === "related" || item.type === "glossary") &&
+    item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 9)
 );
 
 function toGrammarPoint(point: UnitGrammarPoint): GrammarPoint {

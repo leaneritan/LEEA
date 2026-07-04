@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 9 · Vocabulary 1 · The Science of Fun</title>
+<script src="/components/charts.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+
+/* HEADER */
+.slide-header{height:64px;background:#7C3AED;display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.65);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.2);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.ac{background:rgba(14,165,233,.4)}
+.hd-chip.src{background:rgba(0,0,0,.25);font-size:15px}
+
+/* TWO-COLUMN VOCAB LAYOUT */
+.vocab-body{flex:1;display:flex;min-height:0}
+.word-panel{width:36%;padding:32px 36px;display:flex;flex-direction:column;border-right:2px solid #e5e7eb;background:#fff}
+.game-panel{width:64%;padding:24px 36px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;overflow:hidden}
+
+/* TAGS */
+.vtag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;width:fit-content}
+.vtag.rel{background:#f3f4f6;color:#6b7280}
+.vtag.v1{background:#ede9fe;color:#5b21b6}
+.vtag.ac{background:#e0f2fe;color:#0369a1}
+
+/* WORD PANEL CONTENT */
+.word-emoji{font-size:72px;line-height:1;margin-bottom:10px}
+.word-main{font-size:52px;font-weight:800;color:#111;line-height:1.1;margin-bottom:8px}
+.word-ipa{font-size:19px;color:#6b7280;margin-bottom:4px}
+.word-syl{font-size:17px;color:#9ca3af;margin-bottom:6px;letter-spacing:1px}
+.word-pos{font-size:18px;color:#7C3AED;font-weight:700;margin-bottom:18px}
+.dad-say{background:#f5f3ff;border-left:4px solid #7C3AED;padding:14px 16px;border-radius:0 12px 12px 0;font-size:18px;color:#374151;line-height:1.5;margin-top:auto}
+.dad-say b{color:#5b21b6}
+
+/* DEFINITION BOX */
+.def-box{background:#f5f3ff;border:2px solid #7C3AED;border-radius:16px;padding:18px 24px;text-align:center;opacity:0;transform:translateY(16px);transition:all .5s ease;width:100%;flex-shrink:0}
+.def-box.show{opacity:1;transform:translateY(0)}
+.def-en{font-size:22px;font-weight:700;color:#5b21b6}
+.def-jp{font-size:18px;color:#4c1d95;margin-top:4px}
+.def-done{display:inline-block;background:#7C3AED;color:#fff;padding:6px 20px;border-radius:20px;font-size:17px;font-weight:700;margin-top:8px}
+
+/* GAME ELEMENTS */
+.game-title{font-size:20px;font-weight:700;color:#374151;text-align:center;background:#f9fafb;border:2px solid #e5e7eb;border-radius:12px;padding:10px 20px;width:100%;flex-shrink:0}
+.game-area{flex:1;width:100%;position:relative;display:flex;align-items:center;justify-content:center;min-height:0}
+.btn-g{background:#7C3AED;color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.btn-g:hover{background:#5b21b6;transform:scale(1.04)}
+.btn-g:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+.btn-outline{background:#fff;color:#7C3AED;border:2px solid #7C3AED;border-radius:12px;padding:12px 28px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.btn-outline:hover{background:#f5f3ff}
+.btn-red{background:#ef4444;color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.btn-red:hover{background:#dc2626;transform:scale(1.04)}
+
+/* PROGRESS BAR */
+.prog-bar-wrap{width:100%;background:#e5e7eb;border-radius:99px;height:14px;overflow:hidden}
+.prog-bar-fill{height:100%;background:#7C3AED;border-radius:99px;transition:width .3s}
+
+/* RECAP FLIP CARDS */
+.rc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;width:100%;padding:16px}
+.rc-card{background:#fff;border-radius:16px;padding:20px 14px;text-align:center;cursor:pointer;border:2px solid #e5e7eb;transition:transform .2s,border-color .2s;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.rc-card:hover{transform:scale(1.03);border-color:#7C3AED}
+.rc-card.flipped{border-color:#7C3AED;background:#f5f3ff}
+.rc-card .rc-front{display:flex;flex-direction:column;align-items:center}
+.rc-card .rc-back{display:none;flex-direction:column;align-items:center}
+.rc-card.flipped .rc-front{display:none}
+.rc-card.flipped .rc-back{display:flex}
+.rc-emoji{font-size:38px;margin-bottom:8px}
+.rc-word{font-size:17px;font-weight:700;color:#111}
+.rc-def{font-size:13px;color:#374151;line-height:1.35}
+.rc-tap{font-size:12px;color:#9ca3af;margin-top:6px}
+
+/* NAV BAR */
+#nav-bar{position:absolute;bottom:0;left:0;width:1920px;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px;transition:background .2s}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn{background:rgba(124,58,237,.35)!important;color:#c4b5fd!important}
+#unit-label{color:#c4b5fd;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+
+/* TEACHER NOTES PANEL */
+#tn-panel{position:absolute;right:-460px;top:0;width:440px;height:1028px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#c4b5fd;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-panel ul{padding-left:18px;margin-bottom:8px}
+#tn-panel .tn-lbl{color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+
+/* CONTENT SLIDES */
+.content-body{flex:1;padding:36px 60px;display:flex;flex-direction:column;gap:20px}
+.slide-h1{font-size:42px;font-weight:800;color:#111}
+.slide-h2{font-size:26px;font-weight:600;color:#374151}
+
+/* READING */
+.reading-block{background:#fff;border-radius:16px;padding:30px 40px;font-size:24px;line-height:1.75;color:#1f2937;box-shadow:0 4px 16px rgba(0,0,0,.05);border-left:6px solid #7C3AED}
+.reading-block b{color:#5b21b6;font-weight:700}
+
+/* OBJECTIVE CARDS */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:16px}
+.obj-card{background:#fff;border-radius:16px;padding:24px 28px;border:2px solid #e5e7eb;display:flex;align-items:flex-start;gap:16px}
+.obj-icon{font-size:36px;flex-shrink:0}
+.obj-text{font-size:20px;color:#374151;line-height:1.4;font-weight:500}
+.obj-text b{color:#7C3AED}
+
+/* FORMATIVE ASSESSMENT */
+.assess-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:10px}
+.assess-card{background:#fff;border-radius:16px;padding:24px 28px;border:2px solid #e5e7eb;cursor:pointer;transition:all .2s}
+.assess-card:hover{border-color:#7C3AED}
+.assess-card.yes{border-color:#7C3AED;background:#f5f3ff}
+.assess-q{font-size:20px;color:#374151;font-weight:600;margin-bottom:12px}
+.assess-btns{display:flex;gap:12px}
+.assess-btns button{padding:8px 20px;border-radius:8px;border:none;font-size:16px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+
+/* GREAT JOB SLIDE */
+.great-job-slide{background:linear-gradient(135deg,#4c1d95,#7C3AED,#a78bfa);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:20px}
+
+/* PRACTICE / WRAP UP CARDS */
+.task-card{background:#fff;border-radius:16px;padding:24px 32px;border:2px solid #e5e7eb;font-size:22px;color:#374151;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card b{color:#7C3AED}
+.q-list{display:flex;flex-direction:column;gap:14px}
+.q-item{background:#fff;border-radius:12px;padding:18px 24px;border:2px solid #e5e7eb;font-size:20px;color:#374151;display:flex;align-items:flex-start;gap:12px}
+.q-num{background:#7C3AED;color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0;margin-top:2px}
+
+/* BE THE EXPERT */
+.bte-header{background:#7C3AED;color:#fff;border-radius:12px 12px 0 0;padding:14px 28px;font-size:20px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bte-body{background:#fff;border:2px solid #7C3AED;border-radius:0 0 16px 16px;padding:28px;font-size:20px;color:#374151;line-height:1.6}
+.bte-body b{color:#5b21b6}
+
+/* WORD CHIPS ROW */
+.chips-row{display:flex;flex-wrap:wrap;gap:10px;padding:16px}
+.chip{background:#ede9fe;color:#5b21b6;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700}
+.chip.used{background:#7C3AED;color:#fff}
+
+/* TITLE SLIDE SPECIFIC */
+.title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#4c1d95 0%,#7C3AED 50%,#a78bfa 100%);color:#fff;gap:24px}
+
+/* AUDIO CUE */
+.audio-cue{display:inline-flex;align-items:center;gap:10px;background:#1f2937;color:#c4b5fd;padding:10px 22px;border-radius:30px;font-size:18px;font-weight:700}
+
+/* TWO-COL CONTENT */
+.two-col-content{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1}
+.col-block{background:#fff;border-radius:16px;padding:24px;border:2px solid #e5e7eb;display:flex;flex-direction:column;gap:12px}
+
+/* DIALOGUE */
+.dial-card{background:#fff;border-radius:14px;padding:20px 24px;border:2px solid #e5e7eb;display:flex;gap:14px;align-items:flex-start}
+.dial-who{font-size:28px;flex-shrink:0}
+.dial-text{font-size:20px;color:#374151;line-height:1.5}
+.dial-text b{color:#7C3AED}
+
+/* MCQ options */
+.opt-btn{padding:12px 20px;border:2px solid #e5e7eb;border-radius:10px;background:#fff;font-size:18px;font-weight:600;cursor:pointer;font-family:Outfit,sans-serif;transition:all .2s;text-align:left}
+.opt-btn:hover{border-color:#7C3AED}
+.opt-btn.correct{background:#f5f3ff;border-color:#7C3AED;color:#5b21b6;pointer-events:none}
+.opt-btn.wrong{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.ans-reveal{animation:fadeIn .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* Vocab Review Slide */
+.vr-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:0 0 14px 0;border-bottom:2px solid #e5e7eb;flex-shrink:0}
+.vr-tab{padding:7px 14px;border:2px solid #e5e7eb;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s;white-space:nowrap}
+.vr-tab:hover{border-color:#7C3AED;color:#7C3AED}
+.vr-tab.active{background:#7C3AED;color:#fff;border-color:#7C3AED}
+.vr-tab.done{background:#ede9fe;border-color:#7C3AED;color:#5b21b6}
+.vr-tab.done.active{background:#7C3AED;color:#fff}
+.vr-body{flex:1;display:flex;gap:0;min-height:0}
+.vr-left{width:25%;padding:20px 18px;border-right:2px solid #e5e7eb;display:flex;flex-direction:column;gap:10px;background:#fafaf7}
+.vr-right{flex:1;padding:20px 24px;display:flex;flex-direction:column;gap:14px}
+.vr-emoji{font-size:52px;line-height:1}
+.vr-word{font-size:30px;font-weight:800;color:#111;line-height:1.1}
+.vr-ipa{font-size:15px;color:#6b7280}
+.vr-pos{font-size:14px;color:#7C3AED;font-weight:700}
+.vr-mcq-opt{padding:10px 16px;border:2px solid #e5e7eb;border-radius:10px;cursor:pointer;font-size:16px;font-weight:600;background:#fff;font-family:Outfit,sans-serif;transition:all .15s;text-align:left}
+.vr-mcq-opt:hover{border-color:#7C3AED}
+.vr-mcq-opt.vr-correct{background:#f5f3ff;border-color:#7C3AED;color:#5b21b6;pointer-events:none}
+.vr-mcq-opt.vr-wrong{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+.vr-yn{display:flex;gap:10px}
+.vr-yn button{flex:1;padding:10px;border:2px solid #e5e7eb;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s}
+.vr-mark{background:#7C3AED;color:#fff;border:none;border-radius:10px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;margin-top:auto;transition:all .2s}
+.vr-mark:hover{background:#5b21b6}
+.vr-mark.done{background:#9ca3af;cursor:not-allowed}
+
+/* Bespoke game bits */
+.tug-track{position:relative;width:100%;height:70px;background:#f3f4f6;border-radius:35px;overflow:hidden;border:3px solid #e5e7eb}
+.tug-fill{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#c4b5fd,#7C3AED);border-radius:35px;transition:width .2s}
+.tug-flag{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:36px;transition:left .2s}
+.dom-row{display:flex;gap:14px;align-items:flex-end;height:130px}
+.dom{width:20px;height:80px;background:#7C3AED;border-radius:5px;transform-origin:bottom center;transition:transform .4s}
+.dom.fallen{transform:rotate(70deg)}
+.tap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;width:100%}
+.tap-tile{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:18px 6px;font-size:38px;cursor:pointer;transition:all .15s}
+.tap-tile:hover{transform:translateY(-2px);border-color:#7C3AED}
+.tap-tile.hit{background:#f5f3ff;border-color:#7C3AED;opacity:.5;cursor:default}
+.tap-tile.miss{background:#fef2f2;border-color:#ef4444;animation:shake .3s ease}
+.track-lane{position:relative;width:100%;height:120px;background:linear-gradient(180deg,#dbeafe,#f5f3ff);border-radius:16px;overflow:hidden}
+.track-runner{position:absolute;bottom:14px;font-size:44px;transition:left .3s}
+.track-flag{position:absolute;bottom:10px;font-size:40px}
+.spin-icon{font-size:90px;display:inline-block;transition:transform .3s ease}
+.beam-wrap{width:100%;height:120px;background:linear-gradient(180deg,#e0f2fe,#f5f3ff);border-radius:16px;position:relative;overflow:hidden}
+.beam-line{position:absolute;bottom:30px;left:5%;right:5%;height:6px;background:#7C3AED;border-radius:3px}
+.beam-skater{position:absolute;bottom:34px;font-size:40px;transition:left .25s}
+.beam-zone{position:absolute;bottom:20px;left:40%;width:20%;height:30px;background:rgba(124,58,237,.15);border:2px dashed #7C3AED;border-radius:8px}
+</style>
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<!-- SLIDE 1: TITLE -->
+<div class="slide active" id="s1">
+  <div class="title-bg">
+    <div style="font-size:22px;font-weight:700;letter-spacing:3px;opacity:.75;text-transform:uppercase">Our World · Level 4 · Unit 9</div>
+    <div style="font-size:80px;font-weight:900;text-align:center;line-height:1.1">The Science of Fun</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;font-size:30px;font-weight:700">⚡ Vocabulary 1</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;max-width:1100px">
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">💪⚡ force</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">❓➡️ happen</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">👉💥 push</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">🤚⬅️ pull</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">🛝 a swing</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">⛸️ a skater</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">⏩ forward</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">⏪ backward</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">🌀 spin</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">💥⬇️ fall over</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">⚖️ balance</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">⬇️ down</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">🔗 connect</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">🤲💫 rub</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:8px 20px;font-size:18px">🤚🔥 friction</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2: OBJECTIVES -->
+<div class="slide" id="s2">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1 — Objectives</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 In This Lesson</div>
+    <div class="obj-grid">
+      <div class="obj-card"><div class="obj-icon">📚</div><div class="obj-text"><b>Content:</b> Identify and use words about how athletes move</div></div>
+      <div class="obj-card"><div class="obj-icon">🗣️</div><div class="obj-text"><b>Language:</b> Talk about force, direction, and balance using new vocabulary</div></div>
+      <div class="obj-card"><div class="obj-icon">⚡</div><div class="obj-text"><b>Today's Words:</b> 15 new words — force, push, pull, spin, and more</div></div>
+      <div class="obj-card"><div class="obj-icon">🧩</div><div class="obj-text"><b>Strategy:</b> Learn <b>antonyms</b> (opposite words) to remember pairs</div></div>
+    </div>
+    <div style="background:#f5f3ff;border-radius:14px;padding:18px 28px;font-size:20px;color:#5b21b6;font-weight:600;border:2px solid #ddd6fe">
+      📖 Big Question: <span style="color:#111">What do you use when you push or pull? Do you know how to balance without falling over?</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3: RELATED VOCAB — figure skating -->
+<div class="slide" id="s3">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Related Vocabulary</span><span class="hd-chip">1 / 4</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag rel">Related</span>
+      <div class="word-emoji">⛸️✨</div>
+      <div class="word-main">figure skating</div>
+      <div class="word-ipa">/ˈfɪɡjər ˈskeɪtɪŋ/</div>
+      <div class="word-syl">fig·ure skat·ing</div>
+      <div class="word-pos">Noun</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Look at the small photo on p.149 — a pair doing a death-spiral! That's <b>figure skating</b>."</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">⛸️ Which pictures show figure skating? Tap all 4!</div>
+      <div class="game-area">
+        <div class="tap-grid" id="fs-grid">
+          <div class="tap-tile" data-is="1" onclick="tapCheck(this,'fs',4)">⛸️</div>
+          <div class="tap-tile" data-is="0" onclick="tapCheck(this,'fs',4)">🏀</div>
+          <div class="tap-tile" data-is="1" onclick="tapCheck(this,'fs',4)">💃</div>
+          <div class="tap-tile" data-is="0" onclick="tapCheck(this,'fs',4)">🚴</div>
+          <div class="tap-tile" data-is="1" onclick="tapCheck(this,'fs',4)">🧊</div>
+          <div class="tap-tile" data-is="0" onclick="tapCheck(this,'fs',4)">🏈</div>
+          <div class="tap-tile" data-is="1" onclick="tapCheck(this,'fs',4)">🥇</div>
+          <div class="tap-tile" data-is="0" onclick="tapCheck(this,'fs',4)">🎾</div>
+        </div>
+      </div>
+      <div id="fs-msg" style="font-size:18px;color:#374151;min-height:28px;text-align:center"></div>
+      <div class="def-box" id="def-fs">
+        <div class="def-en">a sport where skaters move and spin on ice in patterns</div>
+        <div class="def-jp">氷の上で模様を描くように滑ったり回転したりするスポーツ（フィギュアスケート）</div>
+        <div class="def-done">✅ Found figure skating!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: RELATED VOCAB — freestyle skiing -->
+<div class="slide" id="s4">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Related Vocabulary</span><span class="hd-chip">2 / 4</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag rel">Related</span>
+      <div class="word-emoji">⛷️🕺</div>
+      <div class="word-main">freestyle skiing</div>
+      <div class="word-ipa">/ˈfriːstaɪl ˈskiːɪŋ/</div>
+      <div class="word-syl">free·style ski·ing</div>
+      <div class="word-pos">Noun</div>
+      <div class="dad-say">💬 <b>Dad:</b> "The big photo on p.148-149 shows <b>freestyle skiing</b> — jumps and tricks in the air!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">⛷️ Tug the rope! Pull to launch the skier off the jump!</div>
+      <div class="game-area" style="flex-direction:column;gap:18px">
+        <div class="tug-track" id="fss-track">
+          <div class="tug-fill" id="fss-fill" style="width:0%"></div>
+          <span class="tug-flag" id="fss-flag" style="left:0%">⛷️</span>
+        </div>
+        <button class="btn-g" id="fss-btn" onclick="tugPull('fss')">🤚 PULL! (tap fast!)</button>
+      </div>
+      <div class="def-box" id="def-fss">
+        <div class="def-en">a sport where skiers do jumps and tricks in the air</div>
+        <div class="def-jp">ジャンプや技を見せるスキーの競技（フリースタイルスキー）</div>
+        <div class="def-done">✅ Off the jump!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: RELATED VOCAB — ice rink -->
+<div class="slide" id="s5">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Related Vocabulary</span><span class="hd-chip">3 / 4</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag rel">Related</span>
+      <div class="word-emoji">🧊⛸️</div>
+      <div class="word-main">ice rink</div>
+      <div class="word-ipa">/ˈaɪs rɪŋk/</div>
+      <div class="word-syl">ice rink</div>
+      <div class="word-pos">Noun</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Skaters practice their spins at the <b>ice rink</b> — a flat, icy place made for skating!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">🧊 Build the Rink! Tap only things you'd find at an ice rink.</div>
+      <div class="game-area">
+        <div class="tap-grid" id="rink-grid">
+          <div class="tap-tile" data-is="1" onclick="tapCheck(this,'rink',4)">⛸️</div>
+          <div class="tap-tile" data-is="0" onclick="tapCheck(this,'rink',4)">🏖️</div>
+          <div class="tap-tile" data-is="1" onclick="tapCheck(this,'rink',4)">🧊</div>
+          <div class="tap-tile" data-is="0" onclick="tapCheck(this,'rink',4)">🌵</div>
+          <div class="tap-tile" data-is="1" onclick="tapCheck(this,'rink',4)">🥅</div>
+          <div class="tap-tile" data-is="0" onclick="tapCheck(this,'rink',4)">🏄</div>
+          <div class="tap-tile" data-is="1" onclick="tapCheck(this,'rink',4)">🧤</div>
+          <div class="tap-tile" data-is="0" onclick="tapCheck(this,'rink',4)">🍦</div>
+        </div>
+      </div>
+      <div id="rink-msg" style="font-size:18px;color:#374151;min-height:28px;text-align:center"></div>
+      <div class="def-box" id="def-rink">
+        <div class="def-en">a flat, icy surface where people skate</div>
+        <div class="def-jp">人々がスケートをする、氷でできた広い場所（アイスリンク）</div>
+        <div class="def-done">✅ Rink complete!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: RELATED VOCAB — twist -->
+<div class="slide" id="s6">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Related Vocabulary</span><span class="hd-chip">4 / 4</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag rel">Related</span>
+      <div class="word-emoji">🌀↩️</div>
+      <div class="word-main">twist</div>
+      <div class="word-ipa">/twɪst/</div>
+      <div class="word-syl">twist</div>
+      <div class="word-pos">Verb</div>
+      <div class="dad-say">💬 <b>Dad:</b> "The skaters <b>twist</b> and spin together on the ice — turning their bodies quickly!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">🌀 Twist Counter! Tap the cap to twist it open — reach 6 twists!</div>
+      <div class="game-area" style="flex-direction:column;gap:18px">
+        <span class="spin-icon" id="twist-icon" onclick="twistTap()" style="cursor:pointer">🧴</span>
+        <div class="prog-bar-wrap"><div class="prog-bar-fill" id="twist-bar" style="width:0%"></div></div>
+        <div style="font-size:18px;font-weight:700;color:#5b21b6" id="twist-count">0 / 6 twists</div>
+      </div>
+      <div class="def-box" id="def-twist">
+        <div class="def-en">to turn your body or an object around quickly</div>
+        <div class="def-jp">体や物を回すように動かすこと（ひねる）</div>
+        <div class="def-done">✅ Pop! Twisted open!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: ACADEMIC LANGUAGE — MINI GAMES -->
+<div class="slide" id="s7">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Academic Language — Mini Games</span><span class="hd-chip ac">4 words</span></div>
+  <div class="content-body" style="gap:12px">
+    <div style="font-size:20px;color:#374151;font-weight:600">Play each game to unlock the definition! 🔓</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;min-height:0">
+
+      <!-- GAME A: describe -->
+      <div style="background:#fff;border:2px solid #0EA5E9;border-radius:16px;display:flex;flex-direction:column;overflow:hidden">
+        <div style="background:#0EA5E9;color:#fff;padding:10px 18px;font-size:18px;font-weight:700">🗣️📝 describe</div>
+        <div style="padding:14px 18px;flex:1;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:52px;text-align:center;line-height:1">⛷️🏔️💨</div>
+          <div style="font-size:15px;color:#374151;font-weight:600">Which sentence BEST describes this photo?</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button onclick="acGame('de','short','best')" style="background:#f0f9ff;border:2px solid #0EA5E9;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Outfit,sans-serif">A) A skier.</button>
+            <button onclick="acGame('de','best','best')" style="background:#f0f9ff;border:2px solid #0EA5E9;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Outfit,sans-serif">B) A freestyle skier jumps off a steep, snowy hill.</button>
+            <button onclick="acGame('de','vague','best')" style="background:#f0f9ff;border:2px solid #0EA5E9;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Outfit,sans-serif">C) Cool picture!</button>
+          </div>
+          <div id="ac-de-fb" style="font-size:14px;font-weight:700;min-height:18px"></div>
+        </div>
+        <div class="def-box" id="ac-def-describe" style="margin:0 12px 12px;font-size:14px">
+          <div class="def-en">to say or write what a person, place, or thing is like</div>
+          <div class="def-jp">人や物、場所がどんなものかを言葉で伝えること（説明する）</div>
+        </div>
+      </div>
+
+      <!-- GAME B: match -->
+      <div style="background:#fff;border:2px solid #7C3AED;border-radius:16px;display:flex;flex-direction:column;overflow:hidden">
+        <div style="background:#7C3AED;color:#fff;padding:10px 18px;font-size:18px;font-weight:700">🧩✅ match</div>
+        <div style="padding:14px 18px;flex:1;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:15px;color:#374151;font-weight:600">Which picture MATCHES the word "gravity"?</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button onclick="acGame('ma','sun','earth')" style="background:#f5f3ff;border:2px solid #7C3AED;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Outfit,sans-serif">A) ☀️ a hot sun</button>
+            <button onclick="acGame('ma','earth','earth')" style="background:#f5f3ff;border:2px solid #7C3AED;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Outfit,sans-serif">B) 🌍⬇️ a ball falling to the ground</button>
+            <button onclick="acGame('ma','rain','earth')" style="background:#f5f3ff;border:2px solid #7C3AED;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Outfit,sans-serif">C) 🌧️ rain clouds</button>
+          </div>
+          <div id="ac-ma-fb" style="font-size:14px;font-weight:700;min-height:18px"></div>
+        </div>
+        <div class="def-box" id="ac-def-match" style="margin:0 12px 12px;font-size:14px">
+          <div class="def-en">to find two things that go together or are the same</div>
+          <div class="def-jp">同じもの、または合うもの同士を見つけること（合わせる）</div>
+        </div>
+      </div>
+
+      <!-- GAME C: definitions -->
+      <div style="background:#fff;border:2px solid #F59E0B;border-radius:16px;display:flex;flex-direction:column;overflow:hidden">
+        <div style="background:#F59E0B;color:#fff;padding:10px 18px;font-size:18px;font-weight:700">📖🔎 definitions</div>
+        <div style="padding:14px 18px;flex:1;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:15px;color:#374151;font-weight:600">Which is the clearest DEFINITION of friction?</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button onclick="acGame('df','vague','clear')" style="background:#fffbeb;border:2px solid #F59E0B;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Outfit,sans-serif">A) It's a thing that happens.</button>
+            <button onclick="acGame('df','clear','clear')" style="background:#fffbeb;border:2px solid #F59E0B;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Outfit,sans-serif">B) Friction is a force which happens when two things rub together.</button>
+            <button onclick="acGame('df','short','clear')" style="background:#fffbeb;border:2px solid #F59E0B;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Outfit,sans-serif">C) Rubbing.</button>
+          </div>
+          <div id="ac-df-fb" style="font-size:14px;font-weight:700;min-height:18px"></div>
+        </div>
+        <div class="def-box" id="ac-def-definitions" style="margin:0 12px 12px;font-size:14px">
+          <div class="def-en">sentences that explain what a word means</div>
+          <div class="def-jp">言葉の意味を説明する文（定義）</div>
+        </div>
+      </div>
+
+      <!-- GAME D: instructions -->
+      <div style="background:#fff;border:2px solid #16A34A;border-radius:16px;display:flex;flex-direction:column;overflow:hidden">
+        <div style="background:#16A34A;color:#fff;padding:10px 18px;font-size:18px;font-weight:700">📋➡️ instructions</div>
+        <div style="padding:14px 18px;flex:1;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:44px;text-align:center;line-height:1">🎢📋</div>
+          <div style="font-size:15px;color:#374151;font-weight:600">Which is written as clear INSTRUCTIONS?</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button onclick="acGame('in','short','steps')" style="background:#f0fdf4;border:2px solid #16A34A;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Outfit,sans-serif">A) Roller coasters are fun.</button>
+            <button onclick="acGame('in','steps','steps')" style="background:#f0fdf4;border:2px solid #16A34A;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Outfit,sans-serif">B) First sit down. Then pull the safety bar down. Finally hold on tight!</button>
+            <button onclick="acGame('in','vague','steps')" style="background:#f0fdf4;border:2px solid #16A34A;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Outfit,sans-serif">C) Be careful on the ride.</button>
+          </div>
+          <div id="ac-in-fb" style="font-size:14px;font-weight:700;min-height:18px"></div>
+        </div>
+        <div class="def-box" id="ac-def-instructions" style="margin:0 12px 12px;font-size:14px">
+          <div class="def-en">steps that tell you how to do something</div>
+          <div class="def-jp">何かのやり方を伝える手順（説明書）</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8: force — Tug of War -->
+<div class="slide" id="s8">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">1 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">💪⚡</div>
+      <div class="word-main">a force</div>
+      <div class="word-ipa">/fɔːrs/</div>
+      <div class="word-syl">force</div>
+      <div class="word-pos">Noun</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Haaland uses a <b>force</b> every time he kicks the ball — a force can push or pull!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">💪 Tug of War! Tap PULL fast to drag the flag across the line!</div>
+      <div class="game-area" style="flex-direction:column;gap:18px">
+        <div class="tug-track" id="force-track">
+          <div class="tug-fill" id="force-fill" style="width:0%"></div>
+          <span class="tug-flag" id="force-flag" style="left:0%">🚩</span>
+        </div>
+        <button class="btn-g" id="force-btn" onclick="tugPull('force')">🤚 PULL!</button>
+      </div>
+      <div class="def-box" id="def-force">
+        <div class="def-en">a push or a pull that can move something</div>
+        <div class="def-jp">物を動かすための押す力や引く力（力）</div>
+        <div class="def-done">✅ You won the tug of war!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 9: happen — Chain Reaction -->
+<div class="slide" id="s9">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">2 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">❓➡️</div>
+      <div class="word-main">happen</div>
+      <div class="word-ipa">/ˈhæpən/</div>
+      <div class="word-syl">hap·pen</div>
+      <div class="word-pos">Verb</div>
+      <div class="dad-say">💬 <b>Dad:</b> "What <b>happens</b> when Vinícius Jr. dodges two defenders? A goal usually happens next!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">❓ Chain Reaction! Tap START — watch what happens next.</div>
+      <div class="game-area" style="flex-direction:column;gap:18px">
+        <button class="btn-g" id="hap-btn" onclick="startDomino()">👉 START — Push the First Domino!</button>
+        <div class="dom-row" id="hap-row">
+          <span class="dom"></span><span class="dom"></span><span class="dom"></span><span class="dom"></span>
+          <span id="hap-goal" style="font-size:44px;opacity:.3;transition:opacity .3s;margin-left:8px">🥇</span>
+        </div>
+        <div id="hap-msg" style="font-size:17px;font-weight:700;color:#5b21b6;min-height:24px;text-align:center"></div>
+      </div>
+      <div class="def-box" id="def-happen">
+        <div class="def-en">to take place; to occur</div>
+        <div class="def-jp">何かが実際に生じること（起こる）</div>
+        <div class="def-done">✅ You saw it happen!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10: push — Hold to Launch -->
+<div class="slide" id="s10">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">3 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">👉💥</div>
+      <div class="word-main">push</div>
+      <div class="word-ipa">/pʊʃ/</div>
+      <div class="word-syl">push</div>
+      <div class="word-pos">Verb</div>
+      <div class="dad-say">💬 <b>Dad:</b> "A skier <b>pushes</b> on the snow to move forward. Press and hold the button to push!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">👉 Hold to Push! Press and hold — release to launch the skier!</div>
+      <div class="game-area" style="flex-direction:column;gap:16px">
+        <div class="track-lane" id="push-lane">
+          <span class="track-runner" id="push-runner" style="left:4%">⛷️</span>
+          <span class="track-flag" style="right:4%">🏁</span>
+        </div>
+        <button class="btn-g" id="push-btn"
+          onmousedown="pushDown()" onmouseup="pushUp()" onmouseleave="pushUp()"
+          ontouchstart="pushDown()" ontouchend="pushUp()">👉 HOLD TO PUSH</button>
+        <div class="prog-bar-wrap"><div class="prog-bar-fill" id="push-meter" style="width:0%"></div></div>
+      </div>
+      <div class="def-box" id="def-push">
+        <div class="def-en">to press something away from you to make it move</div>
+        <div class="def-jp">物を自分から離れる方向に力を加えて動かすこと（押す）</div>
+        <div class="def-done">✅ Pushed to the finish line!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 11: pull — Drag to Pull -->
+<div class="slide" id="s11">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">4 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">🤚⬅️</div>
+      <div class="word-main">pull</div>
+      <div class="word-ipa">/pʊl/</div>
+      <div class="word-syl">pull</div>
+      <div class="word-pos">Verb</div>
+      <div class="dad-say">💬 <b>Dad:</b> "You <b>pull</b> the rope to bring it closer. Click and drag the sled toward you!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">🤚 Drag to Pull! Click the sled and drag it all the way to you.</div>
+      <div class="game-area">
+        <div class="track-lane" id="pull-lane" style="cursor:grab">
+          <span class="track-runner" id="pull-sled" style="left:80%;bottom:14px">🛷</span>
+          <span class="track-flag" style="left:4%;bottom:10px">🧍</span>
+        </div>
+      </div>
+      <div class="def-box" id="def-pull">
+        <div class="def-en">to move something toward you using force</div>
+        <div class="def-jp">物を自分の方に力を加えて動かすこと（引く）</div>
+        <div class="def-done">✅ Pulled it all the way!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 12: swing — Swing Higher -->
+<div class="slide" id="s12">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">5 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">🛝</div>
+      <div class="word-main">a swing</div>
+      <div class="word-ipa">/swɪŋ/</div>
+      <div class="word-syl">swing</div>
+      <div class="word-pos">Noun</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Do you push or pull when you move on a <b>swing</b>? You do both!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">🛝 Swing Higher! Tap in rhythm to swing higher and higher!</div>
+      <div class="game-area" style="flex-direction:column;gap:16px">
+        <span class="spin-icon" id="swing-icon" style="font-size:80px">🧒</span>
+        <div class="prog-bar-wrap"><div class="prog-bar-fill" id="swing-bar" style="width:0%"></div></div>
+        <button class="btn-g" onclick="swingTap()">👉 Tap to Swing!</button>
+      </div>
+      <div class="def-box" id="def-swing">
+        <div class="def-en">a seat that hangs from ropes or chains and moves back and forth</div>
+        <div class="def-jp">ロープや鎖でつるされた、前後に揺れる座席（ブランコ）</div>
+        <div class="def-done">✅ Swinging high!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 13: skater — Spot the Skaters -->
+<div class="slide" id="s13">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">6 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">⛸️</div>
+      <div class="word-main">a skater</div>
+      <div class="word-ipa">/ˈskeɪtər/</div>
+      <div class="word-syl">skat·er</div>
+      <div class="word-pos">Noun</div>
+      <div class="dad-say">💬 <b>Dad:</b> "A <b>skater</b> is a person who moves on skates — like the ones on p.149!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">⛸️ Spot the Skaters! Tap only the ones on skates.</div>
+      <div class="game-area">
+        <div class="tap-grid" id="skater-grid">
+          <div class="tap-tile" data-is="1" onclick="tapCheck(this,'skater',4)">⛸️</div>
+          <div class="tap-tile" data-is="0" onclick="tapCheck(this,'skater',4)">🚲</div>
+          <div class="tap-tile" data-is="1" onclick="tapCheck(this,'skater',4)">🧑‍🦽‍➡️</div>
+          <div class="tap-tile" data-is="0" onclick="tapCheck(this,'skater',4)">🏊</div>
+          <div class="tap-tile" data-is="1" onclick="tapCheck(this,'skater',4)">💃</div>
+          <div class="tap-tile" data-is="0" onclick="tapCheck(this,'skater',4)">🤾</div>
+          <div class="tap-tile" data-is="1" onclick="tapCheck(this,'skater',4)">🕺</div>
+          <div class="tap-tile" data-is="0" onclick="tapCheck(this,'skater',4)">🚣</div>
+        </div>
+      </div>
+      <div id="skater-msg" style="font-size:18px;color:#374151;min-height:28px;text-align:center"></div>
+      <div class="def-box" id="def-skater">
+        <div class="def-en">a person who moves on skates</div>
+        <div class="def-jp">スケートをする人（スケーター）</div>
+        <div class="def-done">✅ Found every skater!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 14: forward — Direction Dash -->
+<div class="slide" id="s14">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">7 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">⏩</div>
+      <div class="word-main">forward</div>
+      <div class="word-ipa">/ˈfɔːrwərd/</div>
+      <div class="word-syl">for·ward</div>
+      <div class="word-pos">Adverb</div>
+      <div class="dad-say">💬 <b>Dad:</b> "A push can move a skier <b>forward</b> — toward the front!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">⏩ Direction Dash! Tap FORWARD to reach the finish flag!</div>
+      <div class="game-area" style="flex-direction:column;gap:16px">
+        <div class="track-lane" id="fwd-lane">
+          <span class="track-runner" id="fwd-runner" style="left:4%">⛷️</span>
+          <span class="track-flag" style="right:4%">🏁</span>
+        </div>
+        <button class="btn-g" onclick="dashTap('fwd',1)">⏩ FORWARD!</button>
+      </div>
+      <div class="def-box" id="def-forward">
+        <div class="def-en">toward the front; in the direction ahead of you</div>
+        <div class="def-jp">前の方向へ進むこと（前へ）</div>
+        <div class="def-done">✅ Reached the flag!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 15: backward — Reverse Dash -->
+<div class="slide" id="s15">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">8 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">⏪</div>
+      <div class="word-main">backward</div>
+      <div class="word-ipa">/ˈbækwərd/</div>
+      <div class="word-syl">back·ward</div>
+      <div class="word-pos">Adverb</div>
+      <div class="dad-say">💬 <b>Dad:</b> "It can also move a skier <b>backward</b> — toward the back!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">⏪ Reverse Dash! Tap BACKWARD to reach the flag on the left!</div>
+      <div class="game-area" style="flex-direction:column;gap:16px">
+        <div class="track-lane" id="bwd-lane">
+          <span class="track-flag" style="left:4%">🏁</span>
+          <span class="track-runner" id="bwd-runner" style="left:88%">⛷️</span>
+        </div>
+        <button class="btn-g" onclick="dashTap('bwd',-1)">⏪ BACKWARD!</button>
+      </div>
+      <div class="def-box" id="def-backward">
+        <div class="def-en">toward the back; in the direction behind you</div>
+        <div class="def-jp">後ろの方向へ進むこと（後ろへ）</div>
+        <div class="def-done">✅ Reached the flag!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 16: spin — Spin Counter -->
+<div class="slide" id="s16">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">9 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">🌀</div>
+      <div class="word-main">spin</div>
+      <div class="word-ipa">/spɪn/</div>
+      <div class="word-syl">spin</div>
+      <div class="word-pos">Verb</div>
+      <div class="dad-say">💬 <b>Dad:</b> "The more one skater pulls, the more they <b>spin</b>! Tap to spin all the way around 3 times!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">🌀 Spin Counter! Tap the skater to spin — land 3 full turns!</div>
+      <div class="game-area" style="flex-direction:column;gap:16px">
+        <span class="spin-icon" id="spin-icon" onclick="spinTap()" style="cursor:pointer">⛸️</span>
+        <div style="font-size:18px;font-weight:700;color:#5b21b6" id="spin-count">0 / 3 spins</div>
+      </div>
+      <div class="def-box" id="def-spin">
+        <div class="def-en">to turn around and around quickly in a circle</div>
+        <div class="def-jp">円を描くように速く回ること（回転する）</div>
+        <div class="def-done">✅ Landed the spin!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 17: fall over — Steady! -->
+<div class="slide" id="s17">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">10 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">💥⬇️</div>
+      <div class="word-main">fall over</div>
+      <div class="word-ipa">/fɔːl ˈoʊvər/</div>
+      <div class="word-syl">fall o·ver</div>
+      <div class="word-pos">Verb</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Skaters don't <b>fall over</b> because they know how to balance!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">💥 Steady! Tap STEADY the moment the skater wobbles — 3 rounds!</div>
+      <div class="game-area" style="flex-direction:column;gap:16px">
+        <span class="spin-icon" id="steady-icon" style="font-size:80px">⛸️</span>
+        <button class="btn-g" id="steady-btn" onclick="steadyTap()">✋ STEADY!</button>
+        <div style="font-size:16px;font-weight:700;color:#5b21b6" id="steady-msg">Watch closely...</div>
+      </div>
+      <div class="def-box" id="def-fallover">
+        <div class="def-en">to lose your balance and drop down</div>
+        <div class="def-jp">バランスを失って倒れること（転ぶ）</div>
+        <div class="def-done">✅ Stayed steady 3 times!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 18: balance — Balance Beam -->
+<div class="slide" id="s18">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">11 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">⚖️</div>
+      <div class="word-main">balance</div>
+      <div class="word-ipa">/ˈbæləns/</div>
+      <div class="word-syl">bal·ance</div>
+      <div class="word-pos">Noun/Verb</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Can you <b>balance</b> on one leg? Skaters need great balance!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">⚖️ Balance Beam! Tap LEFT / RIGHT to keep the skater in the zone!</div>
+      <div class="game-area" style="flex-direction:column;gap:16px">
+        <div class="beam-wrap" id="beam-wrap">
+          <div class="beam-line"></div>
+          <div class="beam-zone"></div>
+          <span class="beam-skater" id="beam-skater" style="left:10%">⛸️</span>
+        </div>
+        <div style="display:flex;gap:16px">
+          <button class="btn-g" onclick="beamNudge(-1)">⬅️ LEFT</button>
+          <button class="btn-g" onclick="beamNudge(1)">RIGHT ➡️</button>
+        </div>
+        <div style="font-size:16px;font-weight:700;color:#5b21b6" id="beam-msg">Get into the purple zone and hold for 3 seconds!</div>
+      </div>
+      <div class="def-box" id="def-balance">
+        <div class="def-en">the ability to stay steady and not fall over</div>
+        <div class="def-jp">体を安定させて倒れないようにすること（バランス）</div>
+        <div class="def-done">✅ Perfect balance!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 19: down — Push It Down -->
+<div class="slide" id="s19">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">12 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">⬇️</div>
+      <div class="word-main">down</div>
+      <div class="word-ipa">/daʊn/</div>
+      <div class="word-syl">down</div>
+      <div class="word-pos">Adverb</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Skaters push <b>down</b> hard on their skates to stop!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">⬇️ Push It Down! Hold the button to push the lever all the way down.</div>
+      <div class="game-area" style="flex-direction:column;gap:16px">
+        <div style="position:relative;width:120px;height:220px;background:#f3f4f6;border-radius:16px;border:3px solid #e5e7eb;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px">
+          <span id="down-lever" style="font-size:60px;position:relative;bottom:0px;transition:bottom .1s">🛼</span>
+        </div>
+        <button class="btn-g" id="down-btn"
+          onmousedown="downDown()" onmouseup="downUp()" onmouseleave="downUp()"
+          ontouchstart="downDown()" ontouchend="downUp()">⬇️ HOLD TO PUSH DOWN</button>
+        <div class="prog-bar-wrap"><div class="prog-bar-fill" id="down-meter" style="width:0%"></div></div>
+      </div>
+      <div class="def-box" id="def-down">
+        <div class="def-en">toward a lower place; from a higher position to a lower one</div>
+        <div class="def-jp">高い場所から低い場所への方向（下へ）</div>
+        <div class="def-done">✅ All the way down!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 20: connect — Snap It Together -->
+<div class="slide" id="s20">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">13 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">🔗</div>
+      <div class="word-main">connect</div>
+      <div class="word-ipa">/kəˈnɛkt/</div>
+      <div class="word-syl">con·nect</div>
+      <div class="word-pos">Verb</div>
+      <div class="dad-say">💬 <b>Dad:</b> "The skates <b>connect</b> with the ice. Tap both puzzle pieces to join them!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">🔗 Snap It Together! Tap the skate, then tap the ice to connect them.</div>
+      <div class="game-area" style="gap:30px">
+        <div class="tap-tile" id="conn-a" onclick="connectPick('a')" style="font-size:60px">⛸️</div>
+        <span style="font-size:36px;color:#9ca3af" id="conn-link">┄┄┄</span>
+        <div class="tap-tile" id="conn-b" onclick="connectPick('b')" style="font-size:60px">🧊</div>
+      </div>
+      <div id="conn-msg" style="font-size:17px;color:#5b21b6;font-weight:700;min-height:24px">Tap both pieces to connect them!</div>
+      <div class="def-box" id="def-connect">
+        <div class="def-en">to join two things together</div>
+        <div class="def-jp">二つのものを結びつけること（つながる）</div>
+        <div class="def-done">✅ Connected!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 21: rub — Rub for Warmth -->
+<div class="slide" id="s21">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">14 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">🤲💫</div>
+      <div class="word-main">rub</div>
+      <div class="word-ipa">/rʌb/</div>
+      <div class="word-syl">rub</div>
+      <div class="word-pos">Verb</div>
+      <div class="dad-say">💬 <b>Dad:</b> "It's cold! <b>Rub</b> your hands together fast — feel the heat build up!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">🤲 Rub for Warmth! Tap FAST 10 times to warm up your hands!</div>
+      <div class="game-area" style="flex-direction:column;gap:16px">
+        <span class="spin-icon" id="rub-icon" style="font-size:80px">🤲</span>
+        <div class="prog-bar-wrap"><div class="prog-bar-fill" id="rub-bar" style="width:0%;background:linear-gradient(90deg,#c4b5fd,#f59e0b)"></div></div>
+        <button class="btn-g" onclick="rubTap()">🤲 RUB!</button>
+      </div>
+      <div class="def-box" id="def-rub">
+        <div class="def-en">to move one thing back and forth against another</div>
+        <div class="def-jp">物を他の物に何度も押し当てて動かすこと（こする）</div>
+        <div class="def-done">✅ Nice and warm!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 22: friction — Friction Lab -->
+<div class="slide" id="s22">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">15 / 15</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji">🤚🔥</div>
+      <div class="word-main">friction</div>
+      <div class="word-ipa">/ˈfrɪkʃən/</div>
+      <div class="word-syl">fric·tion</div>
+      <div class="word-pos">Noun</div>
+      <div class="dad-say">💬 <b>Dad:</b> "When two things rub together, it's called <b>friction</b>! Which surface makes MORE friction?"</div>
+    </div>
+    <div class="game-panel">
+      <div class="game-title">🔥 Friction Lab! Which surface stops the block SOONER — more friction?</div>
+      <div class="game-area">
+        <div style="display:flex;gap:20px;width:100%">
+          <button class="btn-g" onclick="frictionPick('ice',this)" style="flex:1;background:#0EA5E9">🧊 Ice</button>
+          <button class="btn-g" onclick="frictionPick('sand',this)" style="flex:1">🏖️ Sandpaper</button>
+        </div>
+      </div>
+      <div id="friction-msg" style="font-size:17px;color:#5b21b6;font-weight:700;min-height:24px;text-align:center"></div>
+      <div class="def-box" id="def-friction">
+        <div class="def-en">the force created when two things rub together</div>
+        <div class="def-jp">二つの物がこすれ合うときに生じる力（摩擦）</div>
+        <div class="def-done">✅ Sandpaper has more friction!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 23: VOCABULARY REVIEW -->
+<div class="slide" id="s23">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary Review</span><span class="hd-chip" id="vr-prog">0 / 15 done</span></div>
+  <div class="content-body" style="padding:20px 40px 20px;gap:0">
+    <div class="vr-tabs" id="vr-tabs"></div>
+    <div class="vr-body">
+      <div class="vr-left" id="vr-left"></div>
+      <div class="vr-right" id="vr-right"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 24: WARM UP 1 — Act It Out -->
+<div class="slide" id="s24">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Act It Out!</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⛸️ Let's Imagine We Are Ice Skaters!</div>
+    <div class="task-card">Pretend to skate across the floor. <b>Move forward</b>. Now try <b>moving backward</b>. Can you <b>balance</b> on one leg? Don't fall over!</div>
+    <div class="chips-row" id="actout-chips">
+      <button class="chip" onclick="this.classList.toggle('used')">⏩ forward</button>
+      <button class="chip" onclick="this.classList.toggle('used')">⏪ backward</button>
+      <button class="chip" onclick="this.classList.toggle('used')">⚖️ balance</button>
+      <button class="chip" onclick="this.classList.toggle('used')">💥⬇️ fall over</button>
+    </div>
+    <div class="dial-card"><span class="dial-who">💬</span><div class="dial-text"><b>Dad:</b> "Who can show me how to move forward? Now who can show backward? Can you balance on one leg?"</div></div>
+  </div>
+</div>
+
+<!-- SLIDE 25: WARM UP 2 — Preteach -->
+<div class="slide" id="s25">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Preteach</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📝 New Words on the Board</div>
+    <div class="two-col-content">
+      <div class="col-block">
+        <div style="font-size:22px;font-weight:800;color:#7C3AED">forward · backward</div>
+        <div style="font-size:18px;color:#374151">Have students repeat the phrases. Ask: <em>"Who can show me how to move forward?"</em></div>
+      </div>
+      <div class="col-block">
+        <div style="font-size:22px;font-weight:800;color:#7C3AED">balance · fall over</div>
+        <div style="font-size:18px;color:#374151">Show how to balance on one leg. Ask: <em>"Can you do this? Sometimes skaters fall over — don't fall over!"</em></div>
+      </div>
+    </div>
+    <div class="audio-cue">🎥 Video Sc. 2-3</div>
+  </div>
+</div>
+
+<!-- SLIDE 26: PRESENT — Explore the Photos -->
+<div class="slide" id="s26">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Present — Explore the Photos</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📸 Open your books to pages 148 and 149</div>
+    <div class="reading-block">"Look at this skier. To move, a skier <b>pushes</b> on the snow. A push can move a skier <b>forward</b>. It can also move a skier <b>backward</b>."</div>
+    <div class="reading-block">"Skaters <b>pull</b>, too. Look at these skaters. The more one skater pulls, the more they <b>spin</b>. The skaters don't <b>fall over</b> because they know how to <b>balance</b>."</div>
+    <div class="audio-cue">📖 Student Book p. 148–149</div>
+  </div>
+</div>
+
+<!-- SLIDE 27: PRESENT — Word Web -->
+<div class="slide" id="s27">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Present — Build the Word Web</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center">
+    <div class="slide-h1" style="text-align:center">💡 Draw a word web with FORCE in the center</div>
+    <div style="font-size:20px;color:#374151;text-align:center;max-width:900px">"I <b>push</b> on the desk. When I push, I use force. I can use a little force. Or I can use a lot of force. When I <b>pull</b>, I use force too. When I <b>rub</b> my hands together, I make friction. Friction is a force, too."</div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:20px">
+      <span class="chip">👉 push</span>
+      <span class="chip">🤚 pull</span>
+      <span class="chip" style="background:#7C3AED;color:#fff;font-size:24px;padding:14px 28px">💪⚡ force</span>
+      <span class="chip">🌀 spin</span>
+      <span class="chip">🤲 rub</span>
+      <span class="chip">🔥 friction</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 28: READING — Paragraph 1 -->
+<div class="slide" id="s28">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Reading — Paragraph 1</span><span class="hd-chip src">TR: 9.1</span></div>
+  <div class="content-body">
+    <div class="audio-cue">🔊 Listen and read. TR: 9.1</div>
+    <div class="reading-block">We use <b>force</b> to move. Force <b>happens</b> when we <b>push</b> or <b>pull</b>. Do you push or pull when you move on a <b>swing</b>? You do both.</div>
+    <div class="reading-block">Look at this <b>skier</b>. To move, a skier pushes on the snow. A push can move a skier <b>forward</b>. It can also move a skier <b>backward</b>.</div>
+  </div>
+</div>
+
+<!-- SLIDE 29: READING — Paragraph 2 -->
+<div class="slide" id="s29">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Reading — Paragraph 2</span><span class="hd-chip src">TR: 9.1</span></div>
+  <div class="content-body">
+    <div class="reading-block"><b>Skaters</b> pull, too. Look at these skaters. The more one skater pulls, the more they <b>spin</b>. The skaters don't <b>fall over</b> because they know how to <b>balance</b>.</div>
+    <div class="reading-block">How do skaters stop? They use force. Skaters push <b>down</b> hard on their skates. The skates <b>connect</b> with the ice. The ice and skates <b>rub</b> together. When two things rub together, it's called <b>friction</b>.</div>
+  </div>
+</div>
+
+<!-- SLIDE 30: PRACTICE 1 — Listen & Read -->
+<div class="slide" id="s30">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Practice 1 — Listen &amp; Read</span><span class="hd-chip src">TR: 9.1</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔊 Read along as you listen</div>
+    <div class="task-card">Let's read and listen to information about how athletes use force to move. Read along as you listen to the paragraphs on pages 148 and 149. Play <b>TR: 9.1</b>.</div>
+    <div class="audio-cue">🔊 Play TR: 9.1</div>
+  </div>
+</div>
+
+<!-- SLIDE 31: PRACTICE 1B — Discussion Questions -->
+<div class="slide" id="s31">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Practice 1 — Ask &amp; Answer</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💬 Discuss the four paragraphs</div>
+    <div class="q-list">
+      <div class="q-item"><span class="q-num">1</span>What do we use when we push or pull? <i style="color:#7C3AED;margin-left:auto">(force)</i></div>
+      <div class="q-item"><span class="q-num">2</span>How do skiers move? <i style="color:#7C3AED;margin-left:auto">(They push on the snow.)</i></div>
+      <div class="q-item"><span class="q-num">3</span>Why don't the skaters fall over? <i style="color:#7C3AED;margin-left:auto">(They know how to balance.)</i></div>
+      <div class="q-item"><span class="q-num">4</span>What is made when two things rub together? <i style="color:#7C3AED;margin-left:auto">(friction)</i></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 32: PRACTICE — Sort the Vocabulary -->
+<div class="slide" id="s32">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Practice — Sort the Vocabulary</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🧠 Actions or Things &amp; Directions?</div>
+    <div id="sort-teacher" style="flex:1;min-height:0"></div>
+  </div>
+</div>
+
+<!-- SLIDE 33: PRACTICE 2 — Listen & Say -->
+<div class="slide" id="s33">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Practice 2 — Listen &amp; Say</span><span class="hd-chip src">TR: 9.2</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔊 Listen to words, then sentences</div>
+    <div class="task-card">Next we're going to hear words and then listen to sentences with those words. Repeat each word and sentence after you hear it. Play <b>TR: 9.2</b>.</div>
+    <div class="audio-cue">🔊 Play TR: 9.2</div>
+  </div>
+</div>
+
+<!-- SLIDE 34: PRACTICE 2B — Word by Word -->
+<div class="slide" id="s34">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Practice 2 — Word by Word</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🗣️ Repeat after Dad!</div>
+    <div id="p2w-wrap" style="flex:1;display:flex;flex-direction:column;gap:14px;justify-content:center"></div>
+    <div style="display:flex;gap:14px;justify-content:center">
+      <button class="btn-outline" onclick="p2wNav(-1)">◀ Prev</button>
+      <button class="btn-g" onclick="p2wNav(1)">Next ▶</button>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 35: RECAP — Act It Out! -->
+<div class="slide" id="s35">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Recap — Act It Out!</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎭 Guess the Word!</div>
+    <div class="task-card">Act out the word <b>rub</b> by rubbing your hands together. Have students guess what word you are acting out. Then ask <em>"What did I just make?"</em> (friction) Call on other students to act out more target words. When a student guesses correctly, she takes a turn acting.</div>
+    <div class="chips-row">
+      <span class="chip">🤲💫 rub</span><span class="chip">🌀 spin</span><span class="chip">⚖️ balance</span><span class="chip">👉 push</span><span class="chip">🤚 pull</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 36: RECAP — Antonyms -->
+<div class="slide" id="s36">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Recap — Antonyms (Opposites)</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔄 Word ↔ Opposite</div>
+    <div class="task-card" style="font-size:20px">Say <em>"Let's review some of the words we learned about how skiers and skaters move."</em> Point to <b>forward</b> and ask <em>"What's the opposite of forward?"</em></div>
+    <div class="two-col-content" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="col-block" style="align-items:center"><div style="font-size:28px;font-weight:800">forward ⏩</div><div style="font-size:24px">↕</div><div style="font-size:28px;font-weight:800;color:#7C3AED">backward ⏪</div></div>
+      <div class="col-block" style="align-items:center"><div style="font-size:28px;font-weight:800">push 👉</div><div style="font-size:24px">↕</div><div style="font-size:28px;font-weight:800;color:#7C3AED">pull 🤚</div></div>
+      <div class="col-block" style="align-items:center"><div style="font-size:28px;font-weight:800">balance ⚖️</div><div style="font-size:24px">↕</div><div style="font-size:28px;font-weight:800;color:#7C3AED">fall over 💥⬇️</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 37: APPLY A — Model Dialogue -->
+<div class="slide" id="s37">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Apply — Leo Answers!</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💬 Model Dialogue (p.149)</div>
+    <div class="dial-card"><span class="dial-who">👦</span><div class="dial-text">"How do skaters stop?"</div></div>
+    <div class="dial-card"><span class="dial-who">👧</span><div class="dial-text"><b>"They use force."</b></div></div>
+    <div class="task-card">Ask and answer. Work with a partner. What did you learn?</div>
+  </div>
+</div>
+
+<!-- SLIDE 38: APPLY B — Build a Question -->
+<div class="slide" id="s38">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Apply — Build a Question!</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🧩 Build your own question about the words</div>
+    <div id="qb-wrap" style="display:flex;flex-wrap:wrap;gap:10px"></div>
+    <div class="task-card" id="qb-built" style="min-height:60px">Tap the chips in order to build a question…</div>
+    <div style="display:flex;gap:14px">
+      <button class="btn-outline" onclick="qbReset()">↺ Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 39: EXTEND 1 — Sport Word Web -->
+<div class="slide" id="s39">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Extend — Another Sport</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🏊 Write About a Different Sport</div>
+    <div class="task-card">Have students use the target words to create sentences about a sport other than skiing or skating — a sport they know well. Draw a word web on the board and hand out copies.</div>
+    <div style="display:flex;justify-content:center;gap:40px;margin-top:10px">
+      <div class="chip" style="font-size:22px">forward</div>
+      <div class="chip" style="background:#7C3AED;color:#fff;font-size:26px;padding:16px 30px">⚽ soccer</div>
+      <div class="chip" style="font-size:22px">force</div>
+    </div>
+    <div class="task-card">"Write the name of your sport in the middle of the web. In the other circles, write new words from this lesson that tell about your sport. Then use those words to write sentences."</div>
+  </div>
+</div>
+
+<!-- SLIDE 40: EXTEND 2 — Share -->
+<div class="slide" id="s40">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Extend — Share &amp; Listen</span></div>
+  <div class="content-body">
+    <div class="slide-h1">👥 Share in Small Groups</div>
+    <div class="task-card">When students finish, place them in small groups. Make sure a variety of sports are included in each group. Have students share their sentences to tell about their sport.</div>
+    <div class="dial-card"><span class="dial-who">⚽</span><div class="dial-text">"When Mbappé <b>pushes</b> off the ground, he uses <b>force</b> to run <b>forward</b> faster than the defender!"</div></div>
+  </div>
+</div>
+
+<!-- SLIDE 41: WRAP UP 1 — Circle the Word -->
+<div class="slide" id="s41">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — Circle the Word</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✏️ Have students circle the correct word</div>
+    <div id="wu-wrap" style="display:flex;flex-direction:column;gap:14px"></div>
+  </div>
+</div>
+
+<!-- SLIDE 42: WRAP UP 2 — I Need a Skill! -->
+<div class="slide" id="s42">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — Antonym Race</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⚡ Antonym Race — call out the opposite!</div>
+    <div id="ant-wrap" style="flex:1;display:flex;flex-direction:column;gap:14px;justify-content:center"></div>
+  </div>
+</div>
+
+<!-- SLIDE 43: BE THE EXPERT — Vocabulary Strategy -->
+<div class="slide" id="s43">
+  <div class="content-body" style="padding:0">
+    <div class="bte-header">⭐ Be the Expert — Vocabulary Strategy</div>
+    <div class="bte-body" style="flex:1">
+      <b>Antonyms.</b> Antonyms are words with opposite meanings, such as <em>hot</em> and <em>cold</em>. Learning words in antonym pairs can help students categorize and understand new vocabulary words.<br><br>
+      To teach antonym pairs that include verbs, act out the opposite verbs for students. For other antonym pairs, display two sentences with opposite meanings.<br><br>
+      Students can write the sentences in a vocabulary log and refer to them later. In this unit, antonym pairs include <b>backward/forward</b>, <b>push/pull</b>, and <b>balance/fall down</b>.
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 44: BE THE EXPERT — Teaching Tip -->
+<div class="slide" id="s44">
+  <div class="content-body" style="padding:0">
+    <div class="bte-header">💡 Be the Expert — Teaching Tip</div>
+    <div class="bte-body" style="flex:1">
+      If a student is having difficulty with an assignment, avoid jumping in too quickly to help. It's natural for a student to struggle with learning something new — students will feel more of a sense of accomplishment when they do something difficult on their own.<br><br>
+      Give students enough time to work through the activity on their own, even if they find it difficult to do so. If they are still struggling, then offer help.
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 45: FORMATIVE ASSESSMENT -->
+<div class="slide" id="s45">
+  <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✔️ Can students identify and use words about how athletes move?</div>
+    <div class="assess-grid">
+      <div class="assess-card" onclick="this.classList.toggle('yes')">
+        <div class="assess-q">What do we use force to do?</div>
+        <div style="font-size:17px;color:#7C3AED;font-weight:700">(move)</div>
+      </div>
+      <div class="assess-card" onclick="this.classList.toggle('yes')">
+        <div class="assess-q">What do you need to have so you don't fall over?</div>
+        <div style="font-size:17px;color:#7C3AED;font-weight:700">(balance)</div>
+      </div>
+    </div>
+    <div style="background:#f5f3ff;border-radius:14px;padding:18px 28px;font-size:18px;color:#5b21b6;font-weight:600;border:2px solid #ddd6fe">📗 Workbook and Online Practice · Vocabulary 1 · Activity Worksheet 9.1</div>
+  </div>
+</div>
+
+<!-- SLIDE 46: GREAT JOB -->
+<div class="slide" id="s46">
+  <div class="great-job-slide" style="height:100%">
+    <div style="font-size:100px">🏆</div>
+    <div style="font-size:68px;font-weight:900;text-align:center">Great Job, Leo!</div>
+    <div style="font-size:26px;opacity:.9;text-align:center;max-width:900px">You learned 15 new words about how athletes use force to move — plus 4 academic words and 4 related words! ⚡⛸️</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:1000px">
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">💪⚡ force</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">👉💥 push</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🤚⬅️ pull</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🌀 spin</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">⚖️ balance</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🤚🔥 friction</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
+
+<!-- NAV BAR -->
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 46</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+  <span id="unit-label">Unit 9 · Vocabulary 1</span>
+</div>
+
+<!-- TEACHER NOTES PANEL -->
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+<script>
+// ─── NOTES ─────────────────────────────────────────────────────
+const NOTES = {
+  1: '<p class="tn-lbl">Title</p><p>Show Leo the 15 words. Ask: "Which of these do you already know?"</p>',
+  2: '<p class="tn-lbl">Objectives</p><p>Read objectives together. Ask the Big Question before starting.</p>',
+  3: '<p class="tn-lbl">Related: figure skating</p><p>Point to the small photo on p.149 — the death-spiral move.</p>',
+  4: '<p class="tn-lbl">Related: freestyle skiing</p><p>Freestyle skiing has 5 judged events — difficulty, height, form, landing.</p>',
+  5: '<p class="tn-lbl">Related: ice rink</p><p>Ask: "Have you ever been to an ice rink?"</p>',
+  6: '<p class="tn-lbl">Related: twist</p><p>Twist your own wrist to demonstrate before the game.</p>',
+  7: '<p class="tn-lbl">Academic Language</p><p>Play all 4 mini games. These are the same 4 skills Leo will use in every unit.</p>',
+  8: '<p class="tn-lbl">force</p><p>Tap PULL fast with Leo — cheer him on!</p>',
+  9: '<p class="tn-lbl">happen</p><p>Click START together and count the dominoes falling.</p>',
+  10:'<p class="tn-lbl">push</p><p>Hold the button together — the longer you hold, the farther the skier goes.</p>',
+  11:'<p class="tn-lbl">pull</p><p>Drag the sled all the way to the left.</p>',
+  12:'<p class="tn-lbl">a swing</p><p>Tap in a steady rhythm — too fast or slow won\'t fill the bar as well.</p>',
+  13:'<p class="tn-lbl">a skater</p><p>Find all 4 skaters among the distractors.</p>',
+  14:'<p class="tn-lbl">forward</p><p>Tap FORWARD until the skier reaches the flag.</p>',
+  15:'<p class="tn-lbl">backward</p><p>Tap BACKWARD until the skier reaches the left flag.</p>',
+  16:'<p class="tn-lbl">spin</p><p>Each tap turns the skater 120° — land exactly 3 full spins (1080°).</p>',
+  17:'<p class="tn-lbl">fall over</p><p>Tap STEADY only when the skater wobbles — timing matters!</p>',
+  18:'<p class="tn-lbl">balance</p><p>Nudge left/right to keep the skater centered in the purple zone.</p>',
+  19:'<p class="tn-lbl">down</p><p>Hold the button — the lever pushes down the longer you hold.</p>',
+  20:'<p class="tn-lbl">connect</p><p>Tap the skate, then the ice — they snap together.</p>',
+  21:'<p class="tn-lbl">rub</p><p>Tap fast 10 times to warm up!</p>',
+  22:'<p class="tn-lbl">friction</p><p>Correct answer: sandpaper — it has more friction so the block stops sooner.</p>',
+  23:'<p class="tn-lbl">Vocabulary Review</p><p>Quick oral recall of all 15 words before moving on.</p>',
+  24:'<p class="tn-lbl">Act It Out</p><p>Physically act out skating, forward, backward, and balancing with Leo.</p>',
+  25:'<p class="tn-lbl">Preteach</p><p>Model forward/backward/balance/fall over before the reading.</p>',
+  26:'<p class="tn-lbl">Explore the Photos</p><p>Let Leo look at the photos before reading the captions aloud.</p>',
+  27:'<p class="tn-lbl">Word Web</p><p>Build the web on paper together: force in the center.</p>',
+  28:'<p class="tn-lbl">Reading 1</p><p>Play TR 9.1 and read along.</p>',
+  29:'<p class="tn-lbl">Reading 2</p><p>Continue TR 9.1.</p>',
+  30:'<p class="tn-lbl">Practice — Listen &amp; Read</p><p>Play TR 9.1 in full.</p>',
+  31:'<p class="tn-lbl">Ask &amp; Answer</p><p>Ask each question aloud; let Leo answer before revealing.</p>',
+  32:'<p class="tn-lbl">Sort</p><p>Drag each tile into Actions or Things &amp; Directions.</p>',
+  33:'<p class="tn-lbl">Listen &amp; Say</p><p>Play TR 9.2 — repeat each word and sentence.</p>',
+  34:'<p class="tn-lbl">Word by Word</p><p>Go through all 15 words one at a time with Leo repeating.</p>',
+  35:'<p class="tn-lbl">Act It Out</p><p>Take turns acting out target words for each other.</p>',
+  36:'<p class="tn-lbl">Antonyms</p><p>Ask "What\'s the opposite of forward?" before revealing.</p>',
+  37:'<p class="tn-lbl">Model Dialogue</p><p>Have two students model the dialogue from p.149.</p>',
+  38:'<p class="tn-lbl">Build a Question</p><p>Let Leo build his own question using the chips.</p>',
+  39:'<p class="tn-lbl">Extend</p><p>Pick a sport Leo knows well — soccer works great!</p>',
+  40:'<p class="tn-lbl">Share</p><p>Have Leo share his sentences aloud.</p>',
+  41:'<p class="tn-lbl">Circle the Word</p><p>1. down 2. balance 3. connect 4. rub</p>',
+  42:'<p class="tn-lbl">Antonym Race</p><p>Say a word, have Leo shout the opposite as fast as he can!</p>',
+  43:'<p class="tn-lbl">Vocabulary Strategy</p><p>Antonyms strategy — read together.</p>',
+  44:'<p class="tn-lbl">Teaching Tip</p><p>Give Leo time to struggle before helping.</p>',
+  45:'<p class="tn-lbl">Formative Assessment</p><p>Tap each card once Leo answers correctly.</p>',
+  46:'<p class="tn-lbl">Great Job!</p><p>Celebrate! Leo learned 15 + 4 + 4 words today.</p>',
+};
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+const TOTAL = 46;
+let cur = 1;
+function goTo(n) {
+  n = Math.max(1, Math.min(TOTAL, n));
+  document.getElementById('s' + cur).classList.remove('active');
+  cur = n;
+  document.getElementById('s' + cur).classList.add('active');
+  document.getElementById('slide-counter').textContent = cur + ' / ' + TOTAL;
+  const tn = document.getElementById('tn-content');
+  tn.innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
+  if (cur === 23) initVocabReview();
+  if (cur === 32) initSortTeacher();
+  if (cur === 34) { p2wIdx = 0; renderP2W(); }
+  if (cur === 38) initQuestionBuilder();
+  if (cur === 41) initWrapUpCircle();
+  if (cur === 42) initAntonymRace();
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+});
+function toggleNotes() { document.getElementById('tn-panel').classList.toggle('open'); }
+function scale() {
+  const s = document.getElementById('scaler');
+  const r = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  s.style.transform = 'scale(' + r + ')';
+  s.style.left = ((window.innerWidth - 1920 * r) / 2) + 'px';
+  s.style.top = ((window.innerHeight - 1080 * r) / 2) + 'px';
+  s.style.position = 'fixed';
+}
+window.addEventListener('resize', scale);
+scale();
+
+// ─── VOCAB DATA (15 target words, TR 9.2 order) ────────────────
+const vocabWords = [
+  { key:'force',    word:'a force',   emoji:'💪⚡', ipa:'/fɔːrs/',            pos:'noun',   def:'a push or a pull that can move something',            jp:'物を動かすための押す力や引く力（力）',      sent:'A force can push or pull.' },
+  { key:'happen',   word:'happen',    emoji:'❓➡️', ipa:'/ˈhæpən/',           pos:'verb',   def:'to take place; to occur',                              jp:'何かが実際に生じること（起こる）',           sent:'What happens when skaters stop?' },
+  { key:'push',     word:'push',      emoji:'👉💥', ipa:'/pʊʃ/',              pos:'verb',   def:'to press something away from you to make it move',    jp:'物を自分から離れる方向に力を加えて動かすこと（押す）', sent:'To close the door, push it.' },
+  { key:'pull',     word:'pull',      emoji:'🤚⬅️', ipa:'/pʊl/',              pos:'verb',   def:'to move something toward you using force',             jp:'物を自分の方に力を加えて動かすこと（引く）',    sent:'To open the door, pull it.' },
+  { key:'swing',    word:'a swing',   emoji:'🛝',   ipa:'/swɪŋ/',             pos:'noun',   def:'a seat that hangs from ropes or chains and moves back and forth', jp:'ロープや鎖でつるされた、前後に揺れる座席（ブランコ）', sent:'My brother is playing on the swings.' },
+  { key:'skater',   word:'a skater',  emoji:'⛸️',   ipa:'/ˈskeɪtər/',         pos:'noun',   def:'a person who moves on skates',                          jp:'スケートをする人（スケーター）',              sent:'Look at those skaters. They\'re wonderful!' },
+  { key:'forward',  word:'forward',   emoji:'⏩',   ipa:'/ˈfɔːrwərd/',        pos:'adverb', def:'toward the front; in the direction ahead of you',      jp:'前の方向へ進むこと（前へ）',                 sent:'The car moves forward.' },
+  { key:'backward', word:'backward',  emoji:'⏪',   ipa:'/ˈbækwərd/',         pos:'adverb', def:'toward the back; in the direction behind you',         jp:'後ろの方向へ進むこと（後ろへ）',              sent:'On the swings, I move backward and forward.' },
+  { key:'spin',     word:'spin',      emoji:'🌀',   ipa:'/spɪn/',             pos:'verb',   def:'to turn around and around quickly in a circle',        jp:'円を描くように速く回ること（回転する）',        sent:'Can you stand on one leg and spin in a circle?' },
+  { key:'fallover', word:'fall over', emoji:'💥⬇️', ipa:'/fɔːl ˈoʊvər/',      pos:'verb',   def:'to lose your balance and drop down',                    jp:'バランスを失って倒れること（転ぶ）',           sent:'I often fall over and get bruises.' },
+  { key:'balance',  word:'balance',   emoji:'⚖️',   ipa:'/ˈbæləns/',          pos:'noun',   def:'the ability to stay steady and not fall over',          jp:'体を安定させて倒れないようにすること（バランス）', sent:'I can\'t balance very well when I skate.' },
+  { key:'down',     word:'down',      emoji:'⬇️',   ipa:'/daʊn/',             pos:'adverb', def:'toward a lower place; from a higher position to a lower one', jp:'高い場所から低い場所への方向（下へ）',        sent:'To move, push down on the ice.' },
+  { key:'connect',  word:'connect',   emoji:'🔗',   ipa:'/kəˈnɛkt/',          pos:'verb',   def:'to join two things together',                           jp:'二つのものを結びつけること（つながる）',        sent:'Skates connect with the ice.' },
+  { key:'rub',      word:'rub',       emoji:'🤲💫', ipa:'/rʌb/',              pos:'verb',   def:'to move one thing back and forth against another',      jp:'物を他の物に何度も押し当てて動かすこと（こする）', sent:'It\'s cold. Rub your hands together.' },
+  { key:'friction', word:'friction',  emoji:'🤚🔥', ipa:'/ˈfrɪkʃən/',         pos:'noun',   def:'the force created when two things rub together',        jp:'二つの物がこすれ合うときに生じる力（摩擦）',     sent:'Friction happens when two things rub together.' },
+];
+
+// ─── GENERIC TAP-GRID GAME (used by related-vocab slides + skater) ──
+const tapState = {};
+function tapCheck(el, key, need) {
+  if (el.classList.contains('hit') || el.classList.contains('miss')) return;
+  if (!tapState[key]) tapState[key] = 0;
+  if (el.dataset.is === '1') {
+    el.classList.add('hit');
+    tapState[key]++;
+    const msg = document.getElementById(key + '-msg');
+    if (msg) msg.textContent = '✅ Found ' + tapState[key] + ' / ' + need + '!';
+    if (tapState[key] >= need) {
+      const def = document.getElementById('def-' + key);
+      if (def) def.classList.add('show');
+    }
+  } else {
+    el.classList.add('miss');
+    setTimeout(() => el.classList.remove('miss'), 500);
+  }
+}
+
+// ─── GAME: TUG OF WAR (force, freestyle skiing) ────────────────
+const tugState = {};
+function tugPull(key) {
+  if (!tugState[key]) tugState[key] = 0;
+  if (tugState[key] >= 100) return;
+  tugState[key] = Math.min(100, tugState[key] + 8);
+  document.getElementById(key + '-fill').style.width = tugState[key] + '%';
+  document.getElementById(key + '-flag').style.left = tugState[key] + '%';
+  if (tugState[key] >= 100) {
+    document.getElementById(key + '-btn').disabled = true;
+    document.getElementById('def-' + key).classList.add('show');
+  }
+}
+
+// ─── GAME: happen — CHAIN REACTION ─────────────────────────────
+let dominoStarted = false;
+function startDomino() {
+  if (dominoStarted) return;
+  dominoStarted = true;
+  const btn = document.getElementById('hap-btn');
+  btn.disabled = true;
+  btn.textContent = '⚡ It\'s happening…';
+  const doms = document.querySelectorAll('#hap-row .dom');
+  doms.forEach((d, i) => setTimeout(() => {
+    d.classList.add('fallen');
+    document.getElementById('hap-msg').textContent = (i + 1) + ' thing' + (i > 0 ? 's' : '') + ' happened!';
+  }, 300 + i * 400));
+  setTimeout(() => {
+    document.getElementById('hap-goal').style.opacity = '1';
+    document.getElementById('hap-msg').textContent = '🎉 See? One push made it ALL happen!';
+    document.getElementById('def-happen').classList.add('show');
+  }, 300 + doms.length * 400 + 400);
+}
+
+// ─── GAME: push — HOLD TO LAUNCH ───────────────────────────────
+let pushCharge = 0, pushTimer = null, pushDone = false;
+function pushDown() {
+  if (pushDone || pushTimer) return;
+  pushCharge = 0;
+  pushTimer = setInterval(() => {
+    pushCharge = Math.min(100, pushCharge + 4);
+    document.getElementById('push-meter').style.width = pushCharge + '%';
+  }, 40);
+}
+function pushUp() {
+  if (pushDone || !pushTimer) return;
+  clearInterval(pushTimer); pushTimer = null;
+  const dist = 4 + pushCharge * 0.8;
+  document.getElementById('push-runner').style.left = dist + '%';
+  if (pushCharge >= 70) {
+    pushDone = true;
+    document.getElementById('def-push').classList.add('show');
+  } else if (pushCharge > 0) {
+    setTimeout(() => { document.getElementById('push-runner').style.left = '4%'; document.getElementById('push-meter').style.width = '0%'; pushCharge = 0; }, 900);
+  }
+}
+
+// ─── GAME: pull — DRAG THE SLED ─────────────────────────────────
+(function initPullDrag() {
+  let dragging = false;
+  document.addEventListener('DOMContentLoaded', () => {
+    const sled = document.getElementById('pull-sled');
+    const lane = document.getElementById('pull-lane');
+    if (!sled || !lane) return;
+    sled.addEventListener('mousedown', () => dragging = true);
+    sled.addEventListener('touchstart', () => dragging = true, { passive: true });
+    document.addEventListener('mouseup', () => dragging = false);
+    document.addEventListener('touchend', () => dragging = false);
+    lane.addEventListener('mousemove', e => pullMove(e, lane, sled));
+    lane.addEventListener('touchmove', e => pullMove(e, lane, sled), { passive: true });
+    function pullMove(e, lane, sled) {
+      if (!dragging) return;
+      const rect = lane.getBoundingClientRect();
+      const src = e.touches ? e.touches[0] : e;
+      let pct = (src.clientX - rect.left) / rect.width * 100;
+      pct = Math.max(4, Math.min(80, pct));
+      sled.style.left = pct + '%';
+      if (pct <= 8) {
+        dragging = false;
+        document.getElementById('def-pull').classList.add('show');
+      }
+    }
+  });
+})();
+
+// ─── GAME: swing — SWING HIGHER ────────────────────────────────
+let swingVal = 0;
+function swingTap() {
+  if (swingVal >= 100) return;
+  swingVal = Math.min(100, swingVal + 12);
+  document.getElementById('swing-bar').style.width = swingVal + '%';
+  const icon = document.getElementById('swing-icon');
+  icon.style.transform = 'translateY(-' + (swingVal * 0.4) + 'px) rotate(' + (swingVal / 4) + 'deg)';
+  if (swingVal >= 100) document.getElementById('def-swing').classList.add('show');
+}
+
+// ─── GAME: forward/backward — DIRECTION DASH ───────────────────
+const dashPos = { fwd: 4, bwd: 88 };
+function dashTap(key, dir) {
+  if (dashPos[key] === undefined) return;
+  dashPos[key] = Math.max(4, Math.min(88, dashPos[key] + dir * 12));
+  document.getElementById(key + '-runner').style.left = dashPos[key] + '%';
+  if ((key === 'fwd' && dashPos[key] >= 88) || (key === 'bwd' && dashPos[key] <= 4)) {
+    document.getElementById('def-' + (key === 'fwd' ? 'forward' : 'backward')).classList.add('show');
+  }
+}
+
+// ─── GAME: spin — SPIN COUNTER ─────────────────────────────────
+let spinCount = 0, spinDeg = 0;
+function spinTap() {
+  if (spinCount >= 3) return;
+  spinDeg += 120;
+  document.getElementById('spin-icon').style.transform = 'rotate(' + spinDeg + 'deg)';
+  if (spinDeg % 360 === 0) {
+    spinCount++;
+    document.getElementById('spin-count').textContent = spinCount + ' / 3 spins';
+    if (spinCount >= 3) document.getElementById('def-spin').classList.add('show');
+  }
+}
+
+// ─── GAME: fall over — STEADY! ──────────────────────────────────
+let steadyRound = 0, steadyWobbling = false;
+function steadyLoop() {
+  if (steadyRound >= 3) return;
+  steadyWobbling = false;
+  document.getElementById('steady-msg').textContent = 'Watch closely…';
+  const delay = 800 + Math.random() * 1200;
+  setTimeout(() => {
+    if (steadyRound >= 3) return;
+    steadyWobbling = true;
+    document.getElementById('steady-icon').style.transform = 'rotate(18deg)';
+    document.getElementById('steady-msg').textContent = '⚠️ WOBBLING — tap STEADY now!';
+    setTimeout(() => {
+      if (steadyWobbling) {
+        steadyWobbling = false;
+        document.getElementById('steady-icon').style.transform = 'rotate(0deg)';
+        document.getElementById('steady-msg').textContent = '💥 Fell over! Watch again…';
+        steadyLoop();
+      }
+    }, 700);
+  }, delay);
+}
+function steadyTap() {
+  if (!steadyWobbling) return;
+  steadyWobbling = false;
+  document.getElementById('steady-icon').style.transform = 'rotate(0deg)';
+  steadyRound++;
+  document.getElementById('steady-msg').textContent = '✅ Steady! (' + steadyRound + ' / 3)';
+  if (steadyRound >= 3) {
+    document.getElementById('def-fallover').classList.add('show');
+  } else {
+    setTimeout(steadyLoop, 700);
+  }
+}
+
+// ─── GAME: balance — BALANCE BEAM ──────────────────────────────
+let beamPos = 10, beamHoldTime = 0, beamTimerInt = null;
+function beamNudge(dir) {
+  beamPos = Math.max(0, Math.min(90, beamPos + dir * 8));
+  document.getElementById('beam-skater').style.left = beamPos + '%';
+  const inZone = beamPos >= 40 && beamPos <= 58;
+  if (inZone && !beamTimerInt) {
+    beamTimerInt = setInterval(() => {
+      beamHoldTime += 0.2;
+      document.getElementById('beam-msg').textContent = '⚖️ Holding… ' + beamHoldTime.toFixed(1) + 's';
+      if (beamHoldTime >= 3) {
+        clearInterval(beamTimerInt); beamTimerInt = null;
+        document.getElementById('beam-msg').textContent = '✅ Perfect balance!';
+        document.getElementById('def-balance').classList.add('show');
+      }
+    }, 200);
+  } else if (!inZone && beamTimerInt) {
+    clearInterval(beamTimerInt); beamTimerInt = null; beamHoldTime = 0;
+    document.getElementById('beam-msg').textContent = 'Out of the zone — try again!';
+  }
+}
+
+// ─── GAME: down — PUSH IT DOWN ─────────────────────────────────
+let downCharge = 0, downTimer = null, downDone = false;
+function downDown() {
+  if (downDone || downTimer) return;
+  downTimer = setInterval(() => {
+    downCharge = Math.min(100, downCharge + 5);
+    document.getElementById('down-meter').style.width = downCharge + '%';
+    document.getElementById('down-lever').style.bottom = '-' + (downCharge * 0.6) + 'px';
+    if (downCharge >= 100) {
+      clearInterval(downTimer); downTimer = null; downDone = true;
+      document.getElementById('def-down').classList.add('show');
+    }
+  }, 60);
+}
+function downUp() {
+  if (downDone) return;
+  clearInterval(downTimer); downTimer = null;
+}
+
+// ─── GAME: connect — SNAP TOGETHER ─────────────────────────────
+let connA = false, connB = false;
+function connectPick(which) {
+  if (which === 'a') connA = true; else connB = true;
+  document.getElementById('conn-' + which).classList.add('hit');
+  if (connA && connB) {
+    document.getElementById('conn-link').textContent = '🔗🔗🔗';
+    document.getElementById('conn-link').style.color = '#7C3AED';
+    document.getElementById('conn-msg').textContent = '✅ Connected!';
+    document.getElementById('def-connect').classList.add('show');
+  }
+}
+
+// ─── GAME: rub — RUB FOR WARMTH ────────────────────────────────
+let rubCount = 0;
+function rubTap() {
+  if (rubCount >= 10) return;
+  rubCount++;
+  document.getElementById('rub-bar').style.width = (rubCount * 10) + '%';
+  document.getElementById('rub-icon').style.transform = 'scale(' + (1 + rubCount * 0.02) + ')';
+  if (rubCount >= 10) document.getElementById('def-rub').classList.add('show');
+}
+
+// ─── GAME: friction — FRICTION LAB ──────────────────────────────
+function frictionPick(choice, btn) {
+  const msg = document.getElementById('friction-msg');
+  document.querySelectorAll('#s22 .btn-g').forEach(b => b.disabled = true);
+  if (choice === 'sand') {
+    btn.style.background = '#16A34A';
+    msg.textContent = '✅ Correct! Sandpaper is rougher — MORE friction, the block stops sooner!';
+    document.getElementById('def-friction').classList.add('show');
+  } else {
+    btn.style.background = '#ef4444';
+    msg.textContent = '❌ Ice is smooth — LESS friction. Sandpaper has more! Try again next time.';
+    setTimeout(() => document.querySelectorAll('#s22 .btn-g').forEach(b => b.disabled = false), 1200);
+  }
+}
+
+// ─── GAME: Related vocab — twist counter ───────────────────────
+let twistCount = 0;
+function twistTap() {
+  if (twistCount >= 6) return;
+  twistCount++;
+  document.getElementById('twist-bar').style.width = (twistCount / 6 * 100) + '%';
+  document.getElementById('twist-icon').style.transform = 'rotate(' + (twistCount * 60) + 'deg)';
+  document.getElementById('twist-count').textContent = twistCount + ' / 6 twists';
+  if (twistCount >= 6) {
+    document.getElementById('twist-icon').textContent = '🍾';
+    document.getElementById('def-twist').classList.add('show');
+  }
+}
+
+// ─── ACADEMIC MINI GAMES ────────────────────────────────────────
+const acAnswers = { de:'best', ma:'earth', df:'clear', in:'steps' };
+const acWordMap = { de:'describe', ma:'match', df:'definitions', in:'instructions' };
+function acGame(code, chosen, correct) {
+  const fb = document.getElementById('ac-' + code + '-fb');
+  if (chosen === correct) {
+    fb.style.color = '#7C3AED'; fb.textContent = '✅ Correct!';
+    document.getElementById('ac-def-' + acWordMap[code]).classList.add('show');
+  } else {
+    fb.style.color = '#ef4444'; fb.textContent = '❌ Try again!';
+  }
+}
+
+// ─── VOCABULARY REVIEW (Slide 23) ───────────────────────────────
+const vrDone = new Array(vocabWords.length).fill(false);
+let vrCur = 0;
+function initVocabReview() {
+  const tabs = document.getElementById('vr-tabs');
+  tabs.innerHTML = vocabWords.map((w, i) =>
+    '<button class="vr-tab' + (i === vrCur ? ' active' : '') + (vrDone[i] ? ' done' : '') + '" id="vrt-' + i + '" onclick="vrShow(' + i + ')">' + w.emoji + ' ' + w.word + '</button>'
+  ).join('');
+  vrShow(vrCur);
+}
+function vrShow(i) {
+  vrCur = i;
+  document.querySelectorAll('.vr-tab').forEach((t, ti) => t.classList.toggle('active', ti === i));
+  const w = vocabWords[i];
+  document.getElementById('vr-left').innerHTML =
+    '<div class="vr-emoji">' + w.emoji + '</div>' +
+    '<div class="vr-word">' + w.word + '</div>' +
+    '<div class="vr-ipa">' + w.ipa + '</div>' +
+    '<div class="vr-pos">' + w.pos + '</div>';
+  document.getElementById('vr-right').innerHTML =
+    '<div style="font-size:19px;font-weight:700;color:#374151">' + w.def + '</div>' +
+    '<div style="font-size:16px;font-weight:700;color:#374151">✋ Quick check — is this TRUE?</div>' +
+    '<div style="font-size:17px;color:#374151;font-weight:600">"' + w.sent + '"</div>' +
+    '<div class="vr-yn"><button onclick="vrMark(' + i + ')" style="background:#f5f3ff;border-color:#7C3AED;color:#5b21b6">✅ I understand this word</button></div>' +
+    '<button class="vr-mark' + (vrDone[i] ? ' done' : '') + '" id="vr-mark-' + i + '" onclick="vrMark(' + i + ')">' + (vrDone[i] ? '✅ Done!' : '✓ Mark as done') + '</button>';
+}
+function vrMark(i) {
+  if (vrDone[i]) return;
+  vrDone[i] = true;
+  document.getElementById('vrt-' + i).classList.add('done');
+  const doneCount = vrDone.filter(Boolean).length;
+  document.getElementById('vr-prog').textContent = doneCount + ' / ' + vocabWords.length + ' done';
+  const next = vrDone.findIndex((d, j) => !d && j > i);
+  if (next > -1) setTimeout(() => vrShow(next), 350);
+}
+
+// ─── SORT (teacher deck, Slide 32) ───────────────────────────────
+function initSortTeacher() {
+  const el = document.getElementById('sort-teacher');
+  if (!el || el.innerHTML.trim()) return;
+  el.innerHTML = pickChart('classification sort', {
+    id: 'dnd-teacher9',
+    tiles: [
+      { text:'💪⚡ a force',   answer:'things'  },
+      { text:'❓➡️ happen',    answer:'actions' },
+      { text:'👉💥 push',      answer:'actions' },
+      { text:'🤚⬅️ pull',      answer:'actions' },
+      { text:'🛝 a swing',    answer:'things'  },
+      { text:'⛸️ a skater',   answer:'things'  },
+      { text:'⏩ forward',     answer:'things'  },
+      { text:'⏪ backward',    answer:'things'  },
+      { text:'🌀 spin',       answer:'actions' },
+      { text:'💥⬇️ fall over', answer:'actions' },
+      { text:'⚖️ balance',    answer:'actions' },
+      { text:'⬇️ down',       answer:'things'  },
+      { text:'🔗 connect',    answer:'actions' },
+      { text:'🤲💫 rub',       answer:'actions' },
+      { text:'🤚🔥 friction',  answer:'things'  },
+    ],
+    zones: [
+      { key:'things',  label:'🧭 Things &amp; Directions', color:'#1A6BB5' },
+      { key:'actions', label:'⚡ Actions',                   color:'#7C3AED' },
+    ],
+    onComplete: function() {}
+  });
+}
+
+// ─── PRACTICE 2B — WORD BY WORD (Slide 34) ──────────────────────
+let p2wIdx = 0;
+function renderP2W() {
+  const w = vocabWords[p2wIdx];
+  document.getElementById('p2w-wrap').innerHTML =
+    '<div class="task-card" style="text-align:center;font-size:26px">' + w.emoji + ' <b>' + w.word + '</b></div>' +
+    '<div class="task-card" style="text-align:center;font-style:italic">"' + w.sent + '"</div>' +
+    '<div style="text-align:center;color:#7C3AED;font-weight:700;font-size:18px">Word ' + (p2wIdx + 1) + ' of ' + vocabWords.length + '</div>';
+}
+function p2wNav(dir) {
+  p2wIdx = Math.max(0, Math.min(vocabWords.length - 1, p2wIdx + dir));
+  renderP2W();
+}
+
+// ─── QUESTION BUILDER (Slide 38) ────────────────────────────────
+const qbChips = ['How', 'do', 'you', 'balance', 'on', 'one', 'leg', '?', 'What', 'happens', 'when', 'push', 'pull', 'a', 'swing'];
+let qbBuilt = [];
+function initQuestionBuilder() {
+  qbBuilt = [];
+  document.getElementById('qb-wrap').innerHTML = qbChips.map((c, i) =>
+    '<button class="chip" id="qb-' + i + '" onclick="qbPick(' + i + ')" style="cursor:pointer;border:none">' + c + '</button>'
+  ).join('');
+  document.getElementById('qb-built').textContent = 'Tap the chips in order to build a question…';
+}
+function qbPick(i) {
+  const chip = document.getElementById('qb-' + i);
+  if (chip.classList.contains('used')) return;
+  chip.classList.add('used');
+  qbBuilt.push(qbChips[i]);
+  document.getElementById('qb-built').textContent = qbBuilt.join(' ');
+}
+function qbReset() { initQuestionBuilder(); }
+
+// ─── WRAP UP — CIRCLE THE WORD (Slide 41) ───────────────────────
+const wuCircle = [
+  { text:'When skaters want to stop, they push', opts:['backward','down'], ans:1 },
+  { text:'If skaters know how to (X), they don\'t fall over.', opts:['balance','connect'], ans:0 },
+  { text:'Skates (X) with the ice.', opts:['happen','connect'], ans:1 },
+  { text:'Friction happens when two things (X) together.', opts:['rub','fall over'], ans:0 },
+];
+function initWrapUpCircle() {
+  document.getElementById('wu-wrap').innerHTML = wuCircle.map((q, qi) =>
+    '<div class="task-card">' + (qi + 1) + '. ' + q.text.replace('(X)', '___') + ' &nbsp; ' +
+    q.opts.map((o, oi) => '<button class="opt-btn" style="display:inline-block;margin:4px" onclick="wuCircleAnswer(' + qi + ',' + oi + ',this)">' + o + '</button>').join('') +
+    '</div>'
+  ).join('');
+}
+function wuCircleAnswer(qi, oi, btn) {
+  const q = wuCircle[qi];
+  const row = btn.parentElement;
+  row.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('correct', 'wrong'));
+  if (oi === q.ans) btn.classList.add('correct');
+  else { btn.classList.add('wrong'); row.querySelectorAll('.opt-btn')[q.ans].classList.add('correct'); }
+}
+
+// ─── ANTONYM RACE (Slide 42) ─────────────────────────────────────
+const antonymPairs = [
+  ['forward', 'backward'], ['push', 'pull'], ['balance', 'fall over'], ['down', 'up']
+];
+function initAntonymRace() {
+  document.getElementById('ant-wrap').innerHTML = antonymPairs.map((p, i) =>
+    '<div class="task-card" style="display:flex;align-items:center;gap:20px;cursor:pointer" onclick="this.querySelector(\'.ans-word\').style.visibility=\'visible\'">' +
+    '<b style="font-size:24px">' + p[0] + '</b><span style="color:#9ca3af">→ opposite is…</span>' +
+    '<span class="ans-word" style="visibility:hidden;font-size:24px;font-weight:800;color:#7C3AED;margin-left:auto">' + p[1] + '</span></div>'
+  ).join('');
+}
+
+// ─── INIT ────────────────────────────────────────────────────────
+goTo(1);
+</script>
+</body>
+</html>

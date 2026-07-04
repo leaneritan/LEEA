@@ -57,7 +57,7 @@ For units not in this table, choose a Tailwind 600/800/50/200 set that matches t
 **Teacher**: `public/lessons/ow-l4-u7-opener.html` (1404 lines, 21 slides)  
 **Learner**: `public/learn/ow-l4-u7-opener.html`
 
-Read both files before generating. The structure is non-negotiable — produce the same outer skeleton; replace only slide content, theme colors, and unit-specific copy.
+Read both files before generating. The **outer skeleton** is non-negotiable — same `#wrap`/`#deck`/`#nav`/`#tn-drawer` shell, same nav/notes/scaling JS, same slide sequence and layout classes (`.sh`, `.sb`, `.gl`, `.wp`/`.gp`, `.def-box`, `.recap-grid`, etc.). What's explicitly *not* locked: the per-word game **mechanics** inside slides 5–8 and 10–13 (see the mini-game guidance under "Slides 5–8" below) — those must be redesigned per word, not copy-pasted from the reference unit with new emoji.
 
 ### Outer HTML structure (teacher)
 
@@ -128,13 +128,25 @@ Same as teacher except:
 
 One slide per word. Use the first 4 words from `vocab1WordIds` in `vocabulary.json`.
 
-Each slide: 2-col layout. Left: big emoji, word, pronunciation, definition, example. Right: **bespoke mini-game** widget (theme-matched: e.g., Invention Spinner, Lab Reveal, Mountain Trail, Lightbulb Tap for Unit 7).
+Each slide: 2-col layout. Left: big emoji, word, pronunciation, definition, example. Right: **bespoke mini-game** widget, designed fresh per word (Invention Spinner, Lab Reveal, Mountain Trail, Lightbulb Tap were built specifically for Unit 7's words — they are examples of the *pattern*, not a template of shells to relabel for a different unit's different words).
 
 Game widget rules:
 - Has a clear goal (find, match, reveal, sort)
 - Running score counter or visual progress
 - Win / success state
 - Theme matches the unit (invent gadgets for Unit 7, arctic animals for Unit 8, etc.)
+
+**The mechanic must embody the word — don't reuse a shape with new emoji.** It's tempting to take last unit's game shells (a spinner, a dark-room reveal, a waypoint trail, a tap counter) and just relabel the emoji for this unit's words. Don't. A generic "tap 5 times" counter doesn't teach "pull" any better than it taught "solution" — the interaction itself has to demonstrate what the word means. Before building each vocab slide, ask: *if a learner only watched the interaction and never read the word, could they guess its meaning from the motion/goal alone?* If not, redesign it — a new mechanic that has never been built before (real drag physics, hold-to-charge-and-launch, a chain reaction, tap-to-order) is expected and fine. The prior unit's shells are a starting inventory of techniques, not a checklist to fill in.
+
+Concrete example — Unit 9 (`ow-l4-u9-opener.html`) rebuilt six games after the first pass reused Unit 7/8 shells with swapped emoji:
+- **force** — two buttons, PUSH and PULL; pressing one visibly sends a ball away from the learner, the other pulls it back toward them
+- **push** — press-and-hold to charge a meter, release to launch something — the longer the hold, the farther it travels
+- **pull** — real pointer drag: grab an object and drag it away (an elastic rope stretches), release to watch it swing back
+- **happen** — knock over the first domino and watch a chain reaction cascade to a result (cause → effect, in sequence)
+- **match** (academic) — tap a word chip, then tap the picture that matches it; wrong picks shake, no static list-building
+- **instructions** (academic) — tap scrambled steps into the correct order; wrong order shakes and offers a reset
+
+`describe` (photo hotspot detective) and `definitions` (zoom from vague to specific) were kept from the first pass because they already matched their words — reuse is fine when the mechanic genuinely fits, just don't default to it.
 
 ### Slide 9 — Content vocab recap
 
@@ -291,6 +303,7 @@ Report what was generated:
 
 - [ ] Teacher slideshow created: `public/lessons/ow-l{level}-u{unit}-opener.html` (21 slides)
 - [ ] Learner app created: `public/learn/ow-l{level}-u{unit}-opener.html` (7 modules)
+- [ ] **Each vocab mini-game's mechanic embodies its word** (not a reused shell with relabeled emoji) — sanity-check against the "if a learner only watched the interaction, could they guess the word's meaning?" test
 - [ ] **Vocab Foundations** at top of learner app (Academic + Lesson Words flashcards + quiz)
 - [ ] **Save + Redo footer** on every learner module (Rule B)
 - [ ] **Every module is interactive** — no passive text-only screens (Rule D)

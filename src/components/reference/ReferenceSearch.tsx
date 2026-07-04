@@ -29,6 +29,10 @@ const FILTERS: Array<{ key: ResultFilter; label: string; dotColor?: string }> = 
 
 const SANSEIDO_LIMIT_PER_QUERY = 20;
 
+const sanseidoByWord = new Map(
+  (sanseidoIndex as SanseidoEntry[]).map((entry) => [entry.w.toLowerCase(), entry.u])
+);
+
 export function ReferenceSearch() {
   const sanseidoItems = sanseidoIndex as SanseidoEntry[];
   const searchParams = useSearchParams();
@@ -243,6 +247,7 @@ function WordResultCard({
 }) {
   const route = word.type === "academic" ? `/reference/academic/${word.id}` : `/reference/word/${word.id}`;
   const known = knownSet.has(word.id);
+  const sanseidoUrl = sanseidoByWord.get(word.word.toLowerCase());
 
   return (
     <article className="refv2-result ref-search-card">
@@ -265,20 +270,24 @@ function WordResultCard({
 
       <div className="refv2-open-in">
         <span className="refv2-open-in-label">Open in</span>
-        {word.sources.map((source, index) => (
-          <Link key={`${source.tag}-${index}`} href={route} className="refv2-source-chip">
-            <span className="refv2-course-dot" style={{ background: courseColor(source.course) }} />
-            <span>{courseLabel(source.course)}</span>
-            <span className="refv2-source-chip-tag">{source.tag}</span>
-            <span className="refv2-source-chip-arrow">→</span>
-          </Link>
-        ))}
-        {hasSanseidoLikeSource(word) ? (
-          <span className="refv2-source-chip">
+        {word.sources.map((source, index) => {
+          const liveLessonHref = source.lessonId && source.lessonStatus === "live" ? `/lessons/${source.lessonId}` : null;
+          return (
+            <Link key={`${source.tag}-${index}`} href={liveLessonHref ?? route} className="refv2-source-chip">
+              <span className="refv2-course-dot" style={{ background: courseColor(source.course) }} />
+              <span>{courseLabel(source.course)}</span>
+              <span className="refv2-source-chip-tag">{source.tag}</span>
+              <span className="refv2-source-chip-arrow">{liveLessonHref ? "↗" : "→"}</span>
+            </Link>
+          );
+        })}
+        {sanseidoUrl ? (
+          <a className="refv2-source-chip" href={sanseidoUrl} target="_blank" rel="noreferrer">
             <span className="refv2-course-dot" style={{ background: courseColor("junior-high") }} />
             <span>Sanseido</span>
-            <span className="refv2-source-chip-tag">linked</span>
-          </span>
+            <span className="refv2-source-chip-tag">dictionary</span>
+            <span className="refv2-source-chip-arrow">↗</span>
+          </a>
         ) : null}
       </div>
     </article>
@@ -384,10 +393,6 @@ function typeLabel(type: WordEntry["type"]) {
   if (type === "glossary") return "Glossary";
   if (type === "academic") return "Academic";
   return "Vocabulary";
-}
-
-function hasSanseidoLikeSource(word: WordEntry) {
-  return word.sources.some((source) => source.course === "junior-high");
 }
 
 function highlightMatch(text: string, q: string) {

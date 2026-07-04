@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit 9 Opener — Teach · Leo's English League</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green:    #7C3AED;
+      --green-dk: #5B21B6;
+      --green-lt: #F5F3FF;
+      --green-md: #C4B5FD;
+      --arctic:   #0EA5E9;
+      --arc-bg:   #F0F9FF;
+      --arc-dk:   #075985;
+      --yellow:   #FFCC00;
+      --ybg:      #FFFBE6;
+      --paper:    #FAFAF7;
+      --surface:  #FFFFFF;
+      --soft:     #F0EEE8;
+      --border:   #E5E3DC;
+      --ink:      #111111;
+      --ink2:     #5A5853;
+      --ink3:     #6B6963;
+      --ink4:     #9A9A95;
+      --red:      #DC2626;
+      --red-lt:   #FEE2E2;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#111; font-family:'Outfit',sans-serif; overflow:hidden; user-select:none; }
+    button { font-family:'Outfit',sans-serif; }
+
+    #wrap {
+      position:fixed; top:0; left:0;
+      width:100vw; height:calc(100vh - 52px);
+      overflow:hidden; transition:height .3s;
+    }
+    #deck {
+      position:absolute; width:1920px; height:1080px;
+      transform-origin:top left;
+    }
+    .slide { position:absolute; inset:0; background:var(--paper); display:none; overflow:hidden; }
+    .slide.active { display:block; }
+
+    /* NAV */
+    #nav {
+      position:fixed; bottom:0; left:0; right:0; height:52px;
+      background:#0D0D0D; display:flex; align-items:center;
+      padding:0 16px; gap:10px; z-index:9000;
+    }
+    .nb { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); color:#fff; padding:6px 18px; border-radius:4px; cursor:pointer; font-weight:600; font-size:14px; transition:all .15s; }
+    .nb:hover { background:rgba(255,255,255,.2); }
+    .nb.amber { background:var(--green); border-color:var(--green); }
+    #sc { color:rgba(255,255,255,.65); font-size:13px; font-weight:600; min-width:64px; text-align:center; }
+    #pgbar { flex:1; height:4px; background:rgba(255,255,255,.12); border-radius:2px; overflow:hidden; }
+    #pgfill { height:100%; background:var(--green); transition:width .3s; }
+    #unit-lbl { color:var(--green-md); font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; margin-left:auto; }
+
+    /* TEACHER NOTES — BOTTOM DRAWER */
+    #tn-drawer {
+      position:fixed; bottom:52px; left:0; right:0;
+      height:0; background:#1a2332;
+      transition:height .3s ease; z-index:8000;
+      overflow:hidden; display:flex; flex-direction:column;
+    }
+    #tn-drawer.open { height:200px; }
+    .tn-head {
+      background:var(--green-dk); padding:10px 20px;
+      font-weight:800; font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+      color:#fff; display:flex; justify-content:space-between; align-items:center;
+      flex-shrink:0;
+    }
+    .tn-close { cursor:pointer; font-size:20px; opacity:.7; }
+    .tn-close:hover { opacity:1; }
+    #tn-body {
+      flex:1; overflow-y:auto; padding:12px 22px;
+      font-size:14px; line-height:1.7; color:rgba(255,255,255,.82);
+    }
+    #tn-body strong { color:var(--yellow); }
+    #tn-body .tn-sec { display:inline; }
+    #tn-body .tn-lbl { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--green-md); font-weight:700; margin-right:8px; }
+    #tn-body .tn-qa { display:inline; margin-left:10px; background:rgba(255,255,255,.06); border-left:3px solid var(--yellow); padding:4px 10px; border-radius:0 4px 4px 0; font-style:italic; }
+
+    /* SHARED COMPONENTS */
+    .sh { height:88px; display:flex; align-items:center; padding:0 72px; gap:22px; flex-shrink:0; }
+    .sh.gr  { background:var(--green); }
+    .sh.arc { background:var(--arctic); }
+    .sh.dk  { background:var(--ink); }
+    .sh.gld { background:#5B21B6; }
+    .sh-icon { font-size:44px; line-height:1; }
+    .sh-text .sh-title { font-size:36px; font-weight:800; color:#fff; letter-spacing:-.01em; }
+    .sh-text .sh-sub   { font-size:18px; font-weight:500; color:rgba(255,255,255,.68); margin-top:1px; }
+    .sh-tag { margin-left:auto; background:rgba(255,255,255,.16); color:#fff; padding:6px 18px 5px; border-radius:20px; font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+
+    .sb { padding:50px 72px; height:calc(1080px - 88px); overflow:hidden; }
+    .gl { display:grid; grid-template-columns:36% 64%; height:100%; }
+    .wp { display:flex; flex-direction:column; justify-content:center; padding-right:52px; border-right:1px solid var(--border); }
+    .gp { display:flex; flex-direction:column; justify-content:center; padding-left:56px; }
+
+    .vtag { display:inline-block; padding:5px 14px 4px; border-radius:4px; font-size:12px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; margin-bottom:18px; }
+    .vtag.rel { background:#F3F4F6; color:#6B7280; border:1.5px solid #D1D5DB; }
+    .vtag.ac  { background:var(--arctic); color:#fff; }
+    .big-em   { font-size:76px; line-height:1; margin-bottom:8px; display:block; }
+    .big-w    { font-size:76px; font-weight:900; line-height:1; color:var(--ink); letter-spacing:-.02em; margin-bottom:6px; }
+    .w-pron   { font-size:20px; color:var(--ink3); font-style:italic; margin-bottom:22px; }
+    .dad-bbl  { background:var(--ybg); border-left:4px solid var(--yellow); padding:16px 20px; border-radius:0 12px 12px 0; font-size:17px; line-height:1.65; color:var(--ink2); }
+    .dad-bbl strong { color:var(--ink); font-weight:700; }
+
+    .def-box { border:2px solid var(--green); border-radius:12px; padding:20px 24px; margin-top:18px; background:var(--green-lt); }
+    .def-box.ac { background:var(--arc-bg); border-color:var(--arctic); }
+    .def-t  { font-size:22px; line-height:1.5; font-weight:500; }
+    .def-t strong { color:var(--green); font-weight:800; }
+    .def-t.ac strong { color:var(--arc-dk); }
+    .def-ex { font-size:17px; color:var(--ink2); line-height:1.65; margin-top:10px; }
+
+    .gbtn { background:var(--green); color:#fff; border:none; padding:16px 36px; border-radius:10px; font-weight:800; font-size:22px; cursor:pointer; transition:all .2s; }
+    .gbtn:hover:not(:disabled) { background:var(--green-dk); transform:translateY(-2px); }
+    .gbtn:disabled { opacity:.45; cursor:default; transform:none; }
+    .gbtn.arc { background:var(--arctic); }
+    .gbtn.arc:hover:not(:disabled) { background:var(--arc-dk); }
+
+    /* GAME 1 — FORCE SPINNER */
+    .spin-wrap { display:flex; flex-direction:column; align-items:center; gap:22px; }
+    .wheel-box { position:relative; width:380px; height:380px; }
+    .hw { width:100%; height:100%; position:relative; }
+    .hw-ctr { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:68px; height:68px; border-radius:50%; background:var(--green); border:4px solid var(--green-dk); display:flex; align-items:center; justify-content:center; font-size:28px; z-index:5; }
+    .hw-it { position:absolute; font-size:52px; left:50%; top:50%; transform:translate(-50%,-50%) rotate(calc(var(--i) * 45deg)) translateY(-156px); }
+
+    /* GAME 2 — FORCE LAB (reveal) */
+    .dark-room { position:relative; background:#0D1117; border-radius:20px; padding:38px 28px; display:flex; flex-direction:column; align-items:center; gap:20px; overflow:hidden; min-height:310px; }
+    .dr-lbl { color:rgba(255,255,255,.38); font-size:13px; letter-spacing:.22em; text-transform:uppercase; font-weight:600; }
+    .cam-big { font-size:96px; filter:drop-shadow(0 0 20px rgba(124,58,237,.5)); }
+    .cam-flash { position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; transition:opacity .14s; border-radius:20px; }
+    .polaroid { background:#fff; border:1px solid var(--border); padding:13px 13px 36px; max-width:210px; box-shadow:0 10px 30px rgba(0,0,0,.22); animation:polaDrop .5s cubic-bezier(.34,1.56,.64,1); text-align:center; }
+    @keyframes polaDrop { from{transform:translateY(-38px) rotate(-5deg);opacity:0} to{transform:none;opacity:1} }
+    .pola-img { font-size:52px; }
+    .pola-s   { font-size:13px; color:var(--ink3); font-style:italic; margin-top:6px; }
+    .shutter { display:inline-flex; align-items:center; gap:10px; background:#1E293B; border:2px solid rgba(255,255,255,.25); color:#fff; padding:14px 28px; border-radius:10px; font-weight:700; font-size:18px; cursor:pointer; transition:all .2s; }
+    .shutter:hover:not(:disabled) { background:#334155; }
+    .shutter:disabled { opacity:.45; cursor:default; }
+    .sh-dot { width:15px; height:15px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); }
+
+    /* GAME 3 — PUSH TO THE GOAL (trail) */
+    .hike-instr { font-size:18px; font-weight:600; color:var(--ink2); margin-bottom:10px; }
+    .mt-wrap { position:relative; width:100%; height:370px; background:linear-gradient(to bottom,#BFDBFE 0%,#93C5FD 34%,#86EFAC 34%); border-radius:18px; overflow:hidden; }
+    .mt-body { position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:80%; height:70%; background:#16A34A; clip-path:polygon(50% 0%,5% 100%,95% 100%); }
+    .mt-snow { position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:80%; height:70%; background:#F0FDF4; clip-path:polygon(50% 0%,38% 26%,62% 26%); opacity:.5; }
+    .mt-trees { position:absolute; bottom:28%; left:0; right:0; display:flex; justify-content:space-around; padding:0 16%; font-size:22px; pointer-events:none; }
+    .wp-dot { position:absolute; transform:translate(-50%,50%); width:44px; height:44px; border-radius:50%; background:var(--yellow); border:3px solid var(--green-dk); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; font-weight:800; color:var(--green-dk); z-index:10; transition:all .2s; }
+    .wp-dot:hover:not(.locked):not(.visited) { transform:translate(-50%,50%) scale(1.15); }
+    .wp-dot.locked  { opacity:.3; cursor:not-allowed; }
+    .wp-dot.visited { background:var(--green); color:#fff; cursor:default; }
+    .wp-dot.hint    { animation:hintP 1.2s ease infinite; }
+    @keyframes hintP { 0%,100%{box-shadow:0 0 0 6px rgba(124,58,237,.3)} 50%{box-shadow:0 0 0 12px rgba(124,58,237,.08)} }
+    .hiker-em { position:absolute; font-size:32px; transform:translate(-50%,50%); transition:all .65s cubic-bezier(.34,1.56,.64,1); z-index:11; pointer-events:none; filter:drop-shadow(0 2px 4px rgba(0,0,0,.3)); }
+    .sum-flag { position:absolute; font-size:34px; z-index:12; animation:flagP .4s ease; pointer-events:none; }
+    @keyframes flagP { from{transform:scale(0) rotate(-15deg)} to{transform:scale(1)} }
+
+    /* GAME 4 — TUG TAP (pull the tetherball rope) */
+    .lb-stg { position:relative; width:100%; height:350px; background:linear-gradient(to bottom,#1E293B 0%,#334155 45%,#475569 100%); border-radius:18px; overflow:hidden; cursor:crosshair; user-select:none; }
+    .lb-glow { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 40%,rgba(196,181,253,.22) 0%,transparent 70%); opacity:0; transition:opacity .4s; pointer-events:none; }
+    .lb-over { position:absolute; top:14px; left:50%; transform:translateX(-50%); background:rgba(255,255,255,.9); padding:8px 20px; border-radius:20px; font-size:16px; font-weight:600; white-space:nowrap; pointer-events:none; z-index:10; }
+    .lb-c    { position:absolute; bottom:14px; right:18px; font-weight:800; font-size:20px; color:#EDE9FE; background:rgba(0,0,0,.5); padding:5px 14px; border-radius:10px; pointer-events:none; z-index:10; }
+    .lb-spark { position:absolute; font-size:32px; pointer-events:none; transform:translate(-50%,-50%); animation:sparkP .4s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes sparkP { from{transform:translate(-50%,-50%) scale(0);opacity:0} to{transform:translate(-50%,-50%) scale(1);opacity:1} }
+    .lb-big { position:absolute; font-size:110px; top:50%; left:-160px; transform:translateY(-50%); transition:left .9s cubic-bezier(.34,1.56,.64,1); pointer-events:none; z-index:10; filter:drop-shadow(0 0 30px rgba(196,181,253,.8)); }
+    .lb-big.go { left:calc(50% - 55px); }
+
+    /* GAME 5 — DESCRIPTION DETECTIVE */
+    .det-layout { display:grid; grid-template-columns:52% 48%; gap:24px; height:100%; }
+    .scene-art { position:relative; width:100%; background:linear-gradient(to bottom,#BAE6FD 0%,#93C5FD 30%,#A3E635 60%,#4D7C0F 100%); border-radius:16px; overflow:hidden; border:1px solid var(--border); aspect-ratio:4/3; align-self:start; }
+    .sc-i1 { position:absolute; bottom:5%; left:3%;  font-size:24px; opacity:.4; pointer-events:none; }
+    .sc-i2 { position:absolute; bottom:8%; right:5%; font-size:20px; opacity:.4; pointer-events:none; }
+    .hs { position:absolute; transform:translate(-50%,-50%); background:none; border:none; cursor:pointer; z-index:10; padding:0; }
+    .hs-d { width:36px; height:36px; border-radius:50%; background:rgba(255,204,0,.92); border:2.5px solid var(--ink); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; color:var(--ink); animation:dotP 1.5s ease infinite; transition:all .2s; }
+    .hs.found .hs-d { background:var(--green); color:#fff; border-color:var(--green-dk); animation:none; }
+    .hs.found .hs-d::before { content:'✓'; font-size:15px; }
+    @keyframes dotP { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+    .fi-panel { display:flex; flex-direction:column; gap:8px; overflow-y:auto; padding-top:4px; }
+    .fi-hdr   { font-weight:700; font-size:13px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink3); margin-bottom:6px; }
+    .fi-card  { display:flex; align-items:flex-start; gap:12px; background:var(--surface); border-radius:10px; padding:12px 16px; font-size:17px; line-height:1.5; border:1px solid var(--border); animation:fadeIn .3s ease; }
+    .fi-em    { font-size:24px; flex-shrink:0; }
+    .fi-ph    { color:var(--ink4); font-size:16px; font-style:italic; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
+    /* GAME 6 — MATCH NOTEBOOK */
+    .desc-gl { display:grid; grid-template-columns:auto 1fr; gap:22px; height:100%; align-items:start; }
+    .desc-btns { display:flex; flex-direction:column; gap:10px; padding-top:4px; }
+    .d-btn { padding:12px 20px; border:2px solid var(--arctic); border-radius:10px; background:var(--surface); font-weight:700; font-size:17px; color:var(--arc-dk); cursor:pointer; transition:all .2s; white-space:nowrap; text-align:left; }
+    .d-btn:hover:not(.used) { background:var(--arctic); color:#fff; }
+    .d-btn.used { background:var(--green-lt); border-color:var(--green); color:var(--green-dk); cursor:default; }
+    .nb-paper { background:#fff; border:1px solid var(--border); border-radius:10px; padding:18px 22px; min-height:280px; background-image:repeating-linear-gradient(transparent,transparent 34px,#EDE9FE 34px,#EDE9FE 35px); background-position:0 8px; }
+    .nb-line { padding:4px 0; font-size:19px; line-height:2; animation:fadeIn .3s ease; }
+    .nl-k    { font-weight:800; color:var(--arc-dk); font-size:17px; margin-right:8px; }
+    .nb-ph   { color:var(--ink4); font-size:16px; font-style:italic; }
+
+    /* GAME 7 — ZOOM CHAIN (definitions) */
+    .why-chain { display:flex; align-items:center; gap:14px; width:100%; }
+    .why-c { flex:1; border:2.5px solid var(--border); border-radius:14px; padding:28px 18px; text-align:center; cursor:pointer; background:var(--soft); transition:all .25s; font-size:18px; line-height:1.55; }
+    .why-c.locked   { opacity:.3; cursor:not-allowed; }
+    .why-c.unlocked { background:var(--surface); border-color:var(--arctic); }
+    .why-c.unlocked:hover { background:var(--arc-bg); transform:translateY(-3px); }
+    .why-c.revealed { background:var(--arc-bg); border-color:var(--arctic); cursor:default; }
+    .why-em  { font-size:48px; display:block; margin-bottom:12px; }
+    .why-arr { font-size:28px; color:var(--arctic); flex-shrink:0; }
+
+    /* GAME 8 — CLEAR INSTRUCTIONS MATCH */
+    .cap-gl   { display:grid; grid-template-columns:40% 60%; gap:24px; height:100%; }
+    .cap-ph   { background:linear-gradient(to bottom,#DDD6FE 0%,#C4B5FD 50%,#7C3AED 100%); border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:80px; border:1px solid var(--border); position:relative; padding:24px; }
+    .cap-stmp { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(124,58,237,.92); color:#fff; font-weight:700; font-size:15px; padding:7px 18px; border-radius:6px; border:2px solid #fff; white-space:nowrap; }
+    .cap-opts { display:flex; flex-direction:column; gap:14px; justify-content:center; }
+    .cap-o    { display:flex; align-items:flex-start; gap:14px; padding:16px 20px; border:2.5px solid var(--border); border-radius:12px; background:var(--surface); cursor:pointer; text-align:left; font-size:19px; line-height:1.55; transition:all .18s; }
+    .cap-o:hover    { border-color:var(--arctic); background:var(--arc-bg); }
+    .cap-o.correct  { border-color:var(--green); background:var(--green-lt); }
+    .cap-o.wrong    { border-color:var(--red); background:var(--red-lt); animation:shake .4s ease; }
+    .cap-l   { font-weight:800; font-size:22px; color:var(--ink3); flex-shrink:0; min-width:24px; }
+    .cap-hint { font-size:16px; color:var(--ink2); font-style:italic; min-height:20px; margin-top:6px; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+    /* RECAP */
+    .recap-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+    .rc-card { background:var(--surface); border:1.5px solid var(--border); border-radius:16px; padding:28px 28px; display:flex; align-items:flex-start; gap:18px; cursor:pointer; transition:all .2s; }
+    .rc-card:hover { border-color:var(--green); transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.06); }
+    .rc-card.flipped { background:var(--green-lt); border-color:var(--green); }
+    .rc-card.flipped.ac { background:var(--arc-bg); border-color:var(--arctic); }
+    .rc-em   { font-size:52px; flex-shrink:0; }
+    .rc-word { font-size:36px; font-weight:800; color:var(--ink); margin-bottom:6px; }
+    .rc-def  { font-size:17px; color:var(--ink2); line-height:1.55; display:none; }
+    .rc-card.flipped .rc-def { display:block; }
+    .rc-tap  { font-size:13px; color:var(--ink4); font-style:italic; }
+    .rc-card.flipped .rc-tap { display:none; }
+
+    /* TITLE SLIDE */
+    .title-slide { background:linear-gradient(135deg,var(--green-dk) 0%,var(--green) 55%,#4C1D95 100%); display:flex; flex-direction:column; justify-content:center; padding:80px 100px; position:relative; overflow:hidden; }
+    .ts-bg  { position:absolute; right:60px; top:50%; transform:translateY(-50%); font-size:320px; opacity:.1; pointer-events:none; line-height:1; }
+    .ts-unit  { font-size:20px; font-weight:700; letter-spacing:.28em; text-transform:uppercase; color:rgba(255,255,255,.55); margin-bottom:14px; }
+    .ts-title { font-size:88px; font-weight:900; color:#fff; line-height:1.05; margin-bottom:14px; letter-spacing:-.02em; }
+    .ts-sub   { font-size:34px; font-weight:500; color:rgba(255,255,255,.75); margin-bottom:44px; }
+    .ts-chips { display:flex; gap:14px; flex-wrap:wrap; }
+    .ts-chip  { background:rgba(255,255,255,.14); border:1.5px solid rgba(255,255,255,.28); color:#fff; padding:10px 22px; border-radius:24px; font-size:20px; font-weight:600; }
+
+    /* OBJECTIVES */
+    .obj-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    .obj-card { background:var(--surface); border:1.5px solid var(--border); border-radius:14px; padding:28px 28px; }
+    .obj-icon { font-size:40px; margin-bottom:12px; }
+    .obj-head { font-size:13px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--ink3); margin-bottom:10px; }
+    .obj-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+    .obj-list li { font-size:20px; line-height:1.5; padding-left:24px; position:relative; }
+    .obj-list li::before { content:'•'; position:absolute; left:4px; color:var(--green); font-weight:700; }
+
+    /* BUILD BACKGROUND */
+    .step-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:4px; }
+    .step-item { background:var(--surface); border:2.5px solid var(--border); border-radius:14px; padding:22px 16px; text-align:center; cursor:pointer; transition:all .22s; }
+    .step-item:hover { border-color:var(--green); background:var(--green-lt); transform:translateY(-3px); }
+    .step-item.on { border-color:var(--green); background:var(--green-lt); }
+    .si-em  { font-size:42px; margin-bottom:10px; display:block; }
+    .si-lbl { font-size:18px; font-weight:700; }
+    .step-instr { font-size:24px; font-weight:600; color:var(--ink); margin-bottom:18px; }
+
+    /* PHOTO DISCUSSION */
+    .photo-disc { display:grid; grid-template-columns:52% 48%; height:100%; }
+    .pd-photo { position:relative; margin:8px 32px 8px 0; background:linear-gradient(to bottom,#BAE6FD 0%,#93C5FD 30%,#A3E635 60%,#4D7C0F 100%); border-radius:20px; overflow:hidden; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
+    .pd-bear   { font-size:150px; }
+    .pd-cap    { position:absolute; bottom:20px; left:20px; right:20px; background:rgba(0,0,0,.7); color:#fff; padding:14px 18px; border-radius:10px; font-size:17px; line-height:1.5; font-style:italic; }
+    .pd-panel  { display:flex; flex-direction:column; gap:18px; padding-top:16px; overflow-y:auto; }
+    .dq-card   { background:var(--surface); border:2px solid var(--border); border-radius:12px; padding:18px 22px; cursor:pointer; transition:all .2s; }
+    .dq-card:hover { border-color:var(--green); }
+    .dq-card.open  { border-color:var(--green); background:var(--green-lt); }
+    .dq-q { font-size:20px; font-weight:700; }
+    .dq-a { font-size:17px; color:var(--green-dk); margin-top:8px; display:none; }
+    .dq-card.open .dq-a { display:block; }
+
+    /* BE THE EXPERT */
+    .expert-slide { display:grid; grid-template-columns:42% 58%; height:100%; gap:0; }
+    .ex-left  { padding-right:44px; display:flex; flex-direction:column; gap:18px; justify-content:center; border-right:1px solid var(--border); }
+    .ex-right { padding-left:44px; display:flex; flex-direction:column; gap:16px; justify-content:center; overflow-y:auto; }
+    .ex-tag   { display:inline-block; background:var(--green); color:#fff; padding:5px 14px 4px; font-size:12px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; border-radius:4px; margin-bottom:8px; }
+    .ex-block { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+    .ex-bt    { font-size:12px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--ink3); margin-bottom:10px; }
+    .ex-txt   { font-size:18px; line-height:1.75; color:var(--ink); }
+
+    /* LOOK AND CHECK */
+    .lc-slide { display:grid; grid-template-columns:48% 52%; height:100%; }
+    .lc-photo { margin:8px 32px 8px 0; background:linear-gradient(to bottom,#BAE6FD,#93C5FD 40%,#A3E635 70%,#4D7C0F 100%); border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:150px; border:1px solid var(--border); }
+    .lc-panel { display:flex; flex-direction:column; gap:18px; padding-top:8px; justify-content:center; }
+    .lc-q     { font-size:28px; font-weight:700; }
+    .lc-opts  { display:flex; flex-direction:column; gap:14px; }
+    .lc-opt   { display:flex; align-items:center; gap:16px; padding:18px 22px; border:2.5px solid var(--border); border-radius:12px; background:var(--surface); cursor:pointer; transition:all .2s; font-size:22px; font-weight:600; }
+    .lc-opt:hover   { border-color:var(--green); background:var(--green-lt); }
+    .lc-opt.correct { border-color:var(--green); background:var(--green-lt); }
+    .lc-opt.wrong   { border-color:var(--red); background:var(--red-lt); animation:shake .4s; }
+    .lc-radio { width:24px; height:24px; border-radius:50%; border:2.5px solid var(--border); flex-shrink:0; }
+    .lc-opt.correct .lc-radio { background:var(--green); border-color:var(--green); }
+
+    /* CAPTION WRITING */
+    .cw-slide { display:grid; grid-template-columns:44% 56%; height:100%; }
+    .cw-photo { margin:8px 36px 8px 0; background:linear-gradient(to bottom,#BAE6FD,#93C5FD 45%,#4D7C0F 100%); border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:130px; border:1px solid var(--border); flex-direction:column; gap:8px; }
+    .cw-panel { display:flex; flex-direction:column; gap:16px; justify-content:center; }
+    .cw-title { font-size:32px; font-weight:900; color:var(--green); }
+    .cw-tip   { background:var(--arc-bg); border-left:4px solid var(--arctic); padding:12px 18px; border-radius:0 10px 10px 0; font-size:18px; color:var(--arc-dk); }
+    .cw-ex    { background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:14px 18px; font-size:18px; line-height:1.55; }
+    .cw-ex.gd { border-color:var(--green); background:var(--green-lt); }
+    .cw-ex.bd { border-color:var(--red); background:var(--red-lt); }
+
+    /* FORMATIVE ASSESSMENT */
+    .fa-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:8px; }
+    .fa-card { background:var(--surface); border:2.5px solid var(--border); border-radius:14px; padding:28px 26px; cursor:pointer; transition:all .2s; }
+    .fa-card:hover { border-color:var(--green); transform:translateY(-2px); }
+    .fa-card.done  { border-color:var(--green); background:var(--green-lt); }
+    .fa-icon { font-size:38px; margin-bottom:12px; }
+    .fa-q    { font-size:21px; font-weight:700; margin-bottom:6px; }
+    .fa-a    { font-size:17px; color:var(--ink2); line-height:1.55; }
+
+    /* GREAT JOB */
+    .gj-slide { background:linear-gradient(135deg,var(--green-dk),var(--green)); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; text-align:center; }
+    .gj-trophy { font-size:130px; }
+    .gj-title  { font-size:90px; font-weight:900; color:#fff; letter-spacing:-.02em; }
+    .gj-sub    { font-size:34px; color:rgba(255,255,255,.78); }
+    .gj-chips  { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:8px; }
+    .gj-chip   { background:rgba(255,255,255,.16); color:#fff; border:1.5px solid rgba(255,255,255,.3); padding:8px 20px; border-radius:20px; font-size:18px; font-weight:600; }
+    .gj-done-btn { background:#fff; color:var(--green-dk); border:none; padding:16px 40px; border-radius:12px; font-weight:900; font-size:22px; cursor:pointer; margin-top:10px; transition:all .2s; }
+    .gj-done-btn:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,.25); }
+    .gj-done-btn:disabled { opacity:.75; cursor:default; transform:none; }
+
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+
+<div id="wrap">
+  <div id="deck">
+
+    <!-- SLIDE 1 — TITLE -->
+    <div class="slide active" id="s1">
+      <div class="title-slide">
+        <div class="ts-bg">🎢</div>
+        <div class="ts-unit">Unit 9 · Our World 2E Level 4</div>
+        <div class="ts-title">The Science<br>of Fun</div>
+        <div class="ts-sub">Force, Motion &amp; Playground Physics</div>
+        <div class="ts-chips">
+          <span class="ts-chip">⚡ Force</span>
+          <span class="ts-chip">🎡 Motion</span>
+          <span class="ts-chip">🚵 Mountain Biking</span>
+          <span class="ts-chip">⚖️ Balance</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2 — OBJECTIVES -->
+    <div class="slide" id="s2">
+      <div class="sh gr">
+        <span class="sh-icon">🎯</span>
+        <div class="sh-text"><div class="sh-title">Unit 9 Opener</div><div class="sh-sub">What we'll learn today</div></div>
+        <span class="sh-tag">Objectives</span>
+      </div>
+      <div class="sb">
+        <div class="obj-grid">
+          <div class="obj-card">
+            <div class="obj-icon">📚</div>
+            <div class="obj-head">Content Objective</div>
+            <ul class="obj-list">
+              <li>Identify how force and motion create fun — pushing, pulling, spinning, and balancing</li>
+              <li>Analyze a photo for information and meaning</li>
+              <li>Write a caption describing force or motion in action</li>
+            </ul>
+          </div>
+          <div class="obj-card">
+            <div class="obj-icon">🗣️</div>
+            <div class="obj-head">Language Objectives</div>
+            <ul class="obj-list">
+              <li>Talk about force and motion using: force, happen, push, pull</li>
+              <li>Use academic language: describe, match, definitions, instructions</li>
+              <li>Talk about cause and effect using double comparatives — <em>the more…, the more…</em></li>
+              <li>Write cause-and-effect sentences using <em>because</em>, <em>so</em>, and <em>as a result</em></li>
+            </ul>
+          </div>
+          <div class="obj-card">
+            <div class="obj-icon">🌍</div>
+            <div class="obj-head">Unit 9 — Big Picture</div>
+            <ul class="obj-list">
+              <li>Grammar 1: Cause and effect with double comparatives</li>
+              <li>Grammar 2: Definitions with <em>which</em></li>
+              <li>Reading: <em>Up, Down, and All Around!</em></li>
+              <li>Writing: Cause-and-effect writing about a game</li>
+            </ul>
+          </div>
+          <div class="obj-card" style="background:var(--green-lt);border-color:var(--green)">
+            <div class="obj-icon">⭐</div>
+            <div class="obj-head" style="color:var(--green)">Today's 8 Words</div>
+            <ul class="obj-list">
+              <li>💪⚡ force · ❓➡️ happen · 👉💥 push · 🤚⬅️ pull</li>
+              <li>📝 describe · 🧩 match · 📖 definitions · 📋 instructions</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3 — force (SPINNER) -->
+    <div class="slide" id="s3">
+      <div class="sh gr">
+        <span class="sh-icon">💪⚡</span>
+        <div class="sh-text"><div class="sh-title">a force</div><div class="sh-sub">/fɔːrs/ · noun</div></div>
+        <span class="sh-tag">Content Vocabulary</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag rel">Content Vocabulary</span>
+            <span class="big-em">💪⚡</span>
+            <div class="big-w">force</div>
+            <div class="w-pron">/fɔːrs/ · force · noun</div>
+            <div class="dad-bbl">💬 Dad: "Leo, every time you kick a soccer ball, push a swing, or pedal a bike, you're using a <strong>force</strong>! Spin the wheel — every picture needs force to move!"</div>
+          </div>
+          <div class="gp">
+            <div class="spin-wrap">
+              <div class="wheel-box">
+                <div class="hw" id="hw">
+                  <div class="hw-ctr">⚡</div>
+                  <span class="hw-it" style="--i:0">⚽</span>
+                  <span class="hw-it" style="--i:1">🛝</span>
+                  <span class="hw-it" style="--i:2">🚲</span>
+                  <span class="hw-it" style="--i:3">🛹</span>
+                  <span class="hw-it" style="--i:4">⛸️</span>
+                  <span class="hw-it" style="--i:5">🎢</span>
+                  <span class="hw-it" style="--i:6">🪀</span>
+                  <span class="hw-it" style="--i:7">🏀</span>
+                </div>
+              </div>
+              <p style="font-size:18px;color:var(--ink3)">Every one of these needs <strong>force</strong> to move!</p>
+              <button class="gbtn" id="spin-btn" onclick="spinWheel()">⚡ Spin the Force Wheel!</button>
+            </div>
+            <div class="def-box hidden" id="idea-def">
+              <div class="def-t">A <strong>force</strong> is a push or a pull that can move something.</div>
+              <div class="def-ex">⚽ You use force every time you kick a soccer ball! · 💪 A force can push or pull.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4 — happen (FORCE LAB REVEAL) -->
+    <div class="slide" id="s4">
+      <div class="sh gr">
+        <span class="sh-icon">❓➡️</span>
+        <div class="sh-text"><div class="sh-title">happen</div><div class="sh-sub">/ˈhæpən/ · verb</div></div>
+        <span class="sh-tag">Content Vocabulary</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag rel">Content Vocabulary</span>
+            <span class="big-em">❓➡️</span>
+            <div class="big-w">happen</div>
+            <div class="w-pron">/ˈhæpən/ · hap·pen · verb</div>
+            <div class="dad-bbl">💬 Dad: "Watch closely! When you push this ball with a lot of force, something is about to <strong>happen</strong>… Click the button to see what happens next!"</div>
+          </div>
+          <div class="gp">
+            <div class="dark-room" id="lab-room">
+              <div class="dr-lbl">⚡ Force Lab — what will happen?</div>
+              <span class="cam-big">⚽</span>
+              <div id="lab-reveal" style="display:none">
+                <div class="polaroid">
+                  <div class="pola-img">⚽💨🥅</div>
+                  <div class="pola-s">GOAL! Force made it happen.</div>
+                </div>
+              </div>
+              <div class="cam-flash" id="lab-flash"></div>
+            </div>
+            <div style="text-align:center;margin-top:14px">
+              <button class="shutter" id="lab-btn" onclick="clickLab()">
+                <span class="sh-dot"></span> ⚡ Push it — see what happens!
+              </button>
+            </div>
+            <div class="def-box hidden" id="inv-def">
+              <div class="def-t"><strong>Happen</strong> means to take place, or to occur.</div>
+              <div class="def-ex">⚽ What happens when you kick the ball hard? It happens to fly into the goal! · Force happens when we push or pull.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5 — push (PUSH TO THE GOAL trail) -->
+    <div class="slide" id="s5">
+      <div class="sh gr">
+        <span class="sh-icon">👉💥</span>
+        <div class="sh-text"><div class="sh-title">push</div><div class="sh-sub">/pʊʃ/ · verb</div></div>
+        <span class="sh-tag">Content Vocabulary</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag rel">Content Vocabulary</span>
+            <span class="big-em">👉💥</span>
+            <div class="big-w">push</div>
+            <div class="w-pron">/pʊʃ/ · push · verb</div>
+            <div class="dad-bbl">💬 Dad: "To score a goal, you need to <strong>push</strong> the ball all the way down the field! Tap each waypoint in order to push the ball to the goal!"</div>
+          </div>
+          <div class="gp">
+            <div class="hike-instr">👇 Tap each waypoint in order to push the ball to the goal!</div>
+            <div class="mt-wrap" id="mt-wrap">
+              <div class="mt-body"></div>
+              <div class="mt-snow"></div>
+              <div class="mt-trees"><span>🌿</span><span>🌿</span><span>🌿</span></div>
+              <button class="wp-dot hint"   id="wp-0" style="left:22%;bottom:13%" onclick="clickWP(0)">1</button>
+              <button class="wp-dot locked" id="wp-1" style="left:32%;bottom:27%" onclick="clickWP(1)">2</button>
+              <button class="wp-dot locked" id="wp-2" style="left:41%;bottom:42%" onclick="clickWP(2)">3</button>
+              <button class="wp-dot locked" id="wp-3" style="left:49%;bottom:55%" onclick="clickWP(3)">4</button>
+              <button class="wp-dot locked" id="wp-4" style="left:50%;bottom:67%" onclick="clickWP(4)">🥅</button>
+              <span class="hiker-em" id="hiker-em" style="left:22%;bottom:3%">⚽</span>
+              <span class="sum-flag hidden" id="sum-flag" style="left:51%;bottom:72%">🥅</span>
+            </div>
+            <div class="def-box hidden" id="prob-def">
+              <div class="def-t"><strong>Push</strong> means to press something away from you to make it move.</div>
+              <div class="def-ex">⚽ Push the ball toward the goal to score! · You push the door to open it.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6 — pull (TUG TAP tetherball) -->
+    <div class="slide" id="s6">
+      <div class="sh gr">
+        <span class="sh-icon">🤚⬅️</span>
+        <div class="sh-text"><div class="sh-title">pull</div><div class="sh-sub">/pʊl/ · verb</div></div>
+        <span class="sh-tag">Content Vocabulary</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag rel">Content Vocabulary</span>
+            <span class="big-em">🤚⬅️</span>
+            <div class="big-w">pull</div>
+            <div class="w-pron">/pʊl/ · pull · verb</div>
+            <div class="dad-bbl">💬 Dad: "At recess, kids play tetherball — you <strong>pull</strong> back and hit the ball around the pole! Tap 5 times to pull the rope and start the game!"</div>
+          </div>
+          <div class="gp">
+            <div class="lb-stg" id="lb-stg" onclick="tapLB(event)" ontouchstart="tapLB(event)">
+              <div class="lb-glow" id="lb-glow"></div>
+              <div class="lb-over" id="lb-over">🌙 Tap 5 times to pull the rope! (0/5)</div>
+              <div class="lb-c" id="lb-c">0/5</div>
+              <span class="lb-big" id="lb-bulb">🎾</span>
+            </div>
+            <div class="def-box hidden" id="sol-def">
+              <div class="def-t"><strong>Pull</strong> means to move something toward you using force.</div>
+              <div class="def-ex">🎾🔗 Pull the tetherball rope to swing the ball around the pole! · You pull the rope to bring it closer.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7 — CONTENT VOCAB RECAP -->
+    <div class="slide" id="s7">
+      <div class="sh gr">
+        <span class="sh-icon">🔄</span>
+        <div class="sh-text"><div class="sh-title">Content Vocabulary — Quick Recap</div><div class="sh-sub">Tap each card to reveal the definition</div></div>
+        <span class="sh-tag">Recap</span>
+      </div>
+      <div class="sb">
+        <div class="recap-grid">
+          <div class="rc-card" onclick="this.classList.toggle('flipped')">
+            <span class="rc-em">💪⚡</span>
+            <div><div class="rc-word">force</div><div class="rc-def">A push or a pull that can move something.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+          <div class="rc-card" onclick="this.classList.toggle('flipped')">
+            <span class="rc-em">❓➡️</span>
+            <div><div class="rc-word">happen</div><div class="rc-def">To take place, or to occur.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+          <div class="rc-card" onclick="this.classList.toggle('flipped')">
+            <span class="rc-em">👉💥</span>
+            <div><div class="rc-word">push</div><div class="rc-def">To press something away from you to make it move.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+          <div class="rc-card" onclick="this.classList.toggle('flipped')">
+            <span class="rc-em">🤚⬅️</span>
+            <div><div class="rc-word">pull</div><div class="rc-def">To move something toward you using force.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+        </div>
+        <div style="margin-top:20px;background:var(--green-lt);border:1.5px solid var(--green);border-radius:12px;padding:18px 24px;font-size:20px;color:var(--green-dk)">
+          <strong>Force in action:</strong> ⚡ <em>force</em> → 👉 <em>push</em> / 🤚 <em>pull</em> → ❓➡️ it <em>happens</em>! Every game and ride on the playground moves because of force.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8 — describe (DESCRIPTION DETECTIVE) -->
+    <div class="slide" id="s8">
+      <div class="sh arc">
+        <span class="sh-icon">📝</span>
+        <div class="sh-text"><div class="sh-title">describe</div><div class="sh-sub">/dɪˈskraɪb/ · verb</div></div>
+        <span class="sh-tag">Academic Language</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag ac">Academic Language</span>
+            <span class="big-em">📝</span>
+            <div class="big-w">describe</div>
+            <div class="w-pron">/dɪˈskraɪb/ · de·scribe · verb</div>
+            <div class="dad-bbl" style="border-color:var(--arctic)">💬 Dad: "A good writer doesn't just look — they <strong>DESCRIBE</strong>! Tap all 5 ❓ spots on the mountain biker to find describing words!"</div>
+          </div>
+          <div class="gp">
+            <div class="det-layout">
+              <div>
+                <div class="scene-art" id="an-scene">
+                  <span style="position:absolute;top:14%;left:52%;font-size:56px">🚵</span>
+                  <span class="sc-i1">🌳</span>
+                  <span class="sc-i2">🌳</span>
+                  <button class="hs" id="hs-0" style="left:47%;top:22%" onclick="clickHS(0)"><div class="hs-d">?</div></button>
+                  <button class="hs" id="hs-1" style="left:60%;top:36%" onclick="clickHS(1)"><div class="hs-d">?</div></button>
+                  <button class="hs" id="hs-2" style="left:38%;top:55%" onclick="clickHS(2)"><div class="hs-d">?</div></button>
+                  <button class="hs" id="hs-3" style="left:70%;top:70%" onclick="clickHS(3)"><div class="hs-d">?</div></button>
+                  <button class="hs" id="hs-4" style="left:20%;top:82%" onclick="clickHS(4)"><div class="hs-d">?</div></button>
+                </div>
+              </div>
+              <div>
+                <div class="fi-hdr">📝 Describing words — <span id="fi-n">0</span>/5</div>
+                <div class="fi-panel" id="fi-list">
+                  <div class="fi-ph">Click the ❓ hotspots on the photo →</div>
+                </div>
+              </div>
+            </div>
+            <div class="def-box ac hidden" id="analyze-def" style="margin-top:14px">
+              <div class="def-t ac">To <strong>describe</strong> means to use words to tell what someone or something is like.</div>
+              <div class="def-ex">🚵 Describe the mountain biker: fast, careful, and wearing a helmet and knee pads!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9 — match (MATCH NOTEBOOK) -->
+    <div class="slide" id="s9">
+      <div class="sh arc">
+        <span class="sh-icon">🧩</span>
+        <div class="sh-text"><div class="sh-title">match</div><div class="sh-sub">/mætʃ/ · verb</div></div>
+        <span class="sh-tag">Academic Language</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag ac">Academic Language</span>
+            <span class="big-em">🧩</span>
+            <div class="big-w">match</div>
+            <div class="w-pron">/mætʃ/ · match · verb</div>
+            <div class="dad-bbl" style="border-color:var(--arctic)">💬 Dad: "To <strong>MATCH</strong> means to put two things together that go well — like a word and its picture! Tap each button to match a force word with its picture."</div>
+          </div>
+          <div class="gp">
+            <div class="desc-gl">
+              <div class="desc-btns">
+                <button class="d-btn" id="db-FORCE" onclick="addFact('FORCE')">⚡ force</button>
+                <button class="d-btn" id="db-PUSH"  onclick="addFact('PUSH')">👉 push</button>
+                <button class="d-btn" id="db-PULL" onclick="addFact('PULL')">🤚 pull</button>
+                <button class="d-btn" id="db-SPIN"  onclick="addFact('SPIN')">🌀 spin</button>
+                <button class="d-btn" id="db-BALANCE"   onclick="addFact('BALANCE')">⚖️ balance</button>
+              </div>
+              <div class="nb-paper">
+                <div class="nb-ph" id="nb-ph">Tap a word to match it with its picture →</div>
+                <div id="nb-lines"></div>
+              </div>
+            </div>
+            <div class="def-box ac hidden" id="fact-def" style="margin-top:14px">
+              <div class="def-t ac">To <strong>match</strong> means to find two things that go together or are the same.</div>
+              <div class="def-ex">🧩 Match the word "push" with a picture of a hand pushing a swing! · ⚽ "kick" matches with a soccer ball.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10 — definitions (ZOOM CHAIN) -->
+    <div class="slide" id="s10">
+      <div class="sh arc">
+        <span class="sh-icon">📖</span>
+        <div class="sh-text"><div class="sh-title">definitions</div><div class="sh-sub">/ˌdɛfɪˈnɪʃənz/ · noun</div></div>
+        <span class="sh-tag">Academic Language</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag ac">Academic Language</span>
+            <span class="big-em">📖</span>
+            <div class="big-w">definitions</div>
+            <div class="w-pron">/ˌdɛfɪˈnɪʃənz/ · def·i·ni·tions · noun</div>
+            <div class="dad-bbl" style="border-color:var(--arctic)">💬 Dad: "A good <strong>definition</strong> is clear and specific — not just 'a thing'! Tap the cards to zoom from a vague idea to a clear definition."</div>
+          </div>
+          <div class="gp" style="justify-content:center;gap:20px">
+            <div class="why-chain">
+              <div class="why-c unlocked" id="why-0" onclick="clickWhy(0)">
+                <span class="why-em">🔒</span>
+                <p style="font-size:16px;color:var(--ink3)">Tap to zoom in!</p>
+              </div>
+              <div class="why-arr">🔍→</div>
+              <div class="why-c locked" id="why-1" onclick="clickWhy(1)">
+                <span class="why-em">🔒</span>
+                <p style="font-size:16px;color:var(--ink4)">Locked</p>
+              </div>
+              <div class="why-arr">🔍→</div>
+              <div class="why-c locked" id="why-2" onclick="clickWhy(2)">
+                <span class="why-em">🔒</span>
+                <p style="font-size:16px;color:var(--ink4)">Locked</p>
+              </div>
+            </div>
+            <div class="def-box ac hidden" id="specific-def">
+              <div class="def-t ac"><strong>Definitions</strong> explain exactly what a word means, clearly and specifically.</div>
+              <div class="def-ex">📖 Definition: "Friction is a force which happens when two things rub together."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11 — instructions (CLEAR INSTRUCTIONS MATCH) -->
+    <div class="slide" id="s11">
+      <div class="sh arc">
+        <span class="sh-icon">📋</span>
+        <div class="sh-text"><div class="sh-title">instructions</div><div class="sh-sub">/ɪnˈstrʌkʃənz/ · noun</div></div>
+        <span class="sh-tag">Academic Language</span>
+      </div>
+      <div class="sb">
+        <div class="gl">
+          <div class="wp">
+            <span class="vtag ac">Academic Language</span>
+            <span class="big-em">📋</span>
+            <div class="big-w">instructions</div>
+            <div class="w-pron">/ɪnˈstrʌkʃənz/ · in·struc·tions · noun</div>
+            <div class="dad-bbl" style="border-color:var(--arctic)">💬 Dad: "<strong>Instructions</strong> tell you exactly what to do, in order! Which of these is written as clear instructions for a roller coaster? Leo, you choose first!"</div>
+          </div>
+          <div class="gp">
+            <div class="cap-gl">
+              <div class="cap-ph" id="cap-photo">
+                🎢
+                <div style="font-size:18px;text-align:center;color:#fff;padding:0 10px;margin-top:8px"><em>"Which set of directions is clearest?"</em></div>
+                <span class="cap-stmp hidden" id="cap-stmp">✓ Clear instructions!</span>
+              </div>
+              <div>
+                <div class="cap-opts">
+                  <button class="cap-o" id="cm-A" onclick="pickCap('A')"><span class="cap-l">A</span><span>It's fun.</span></button>
+                  <button class="cap-o" id="cm-B" onclick="pickCap('B')"><span class="cap-l">B</span><span>First, sit down. Then, pull the safety bar down. Finally, hold on tight!</span></button>
+                  <button class="cap-o" id="cm-C" onclick="pickCap('C')"><span class="cap-l">C</span><span>Roller coasters are big.</span></button>
+                </div>
+                <p class="cap-hint" id="cm-hint"></p>
+                <div class="def-box ac hidden" id="support-def" style="margin-top:12px">
+                  <div class="def-t ac"><strong>Instructions</strong> are steps that tell you what to do, in order.</div>
+                  <div class="def-ex">📋 Good instructions: First sit down, then pull the safety bar down, finally hold on tight! · Look for words like "first," "then," and "finally."</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12 — ACADEMIC RECAP -->
+    <div class="slide" id="s12">
+      <div class="sh arc">
+        <span class="sh-icon">🔄</span>
+        <div class="sh-text"><div class="sh-title">Academic Language — Quick Recap</div><div class="sh-sub">Tap each card to reveal</div></div>
+        <span class="sh-tag">Recap</span>
+      </div>
+      <div class="sb">
+        <div class="recap-grid">
+          <div class="rc-card" onclick="this.classList.toggle('flipped');this.classList.toggle('ac')">
+            <span class="rc-em">📝</span>
+            <div><div class="rc-word">describe</div><div class="rc-def">Use words to tell what someone or something is like.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+          <div class="rc-card" onclick="this.classList.toggle('flipped');this.classList.toggle('ac')">
+            <span class="rc-em">🧩</span>
+            <div><div class="rc-word">match</div><div class="rc-def">Find two things that go together or are the same.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+          <div class="rc-card" onclick="this.classList.toggle('flipped');this.classList.toggle('ac')">
+            <span class="rc-em">📖</span>
+            <div><div class="rc-word">definitions</div><div class="rc-def">Explanations of exactly what a word means.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+          <div class="rc-card" onclick="this.classList.toggle('flipped');this.classList.toggle('ac')">
+            <span class="rc-em">📋</span>
+            <div><div class="rc-word">instructions</div><div class="rc-def">Steps that tell you what to do, in order.</div><div class="rc-tap">Tap to reveal ↓</div></div>
+          </div>
+        </div>
+        <div style="margin-top:20px;background:var(--arc-bg);border:1.5px solid var(--arctic);border-radius:12px;padding:18px 24px;font-size:20px;color:var(--arc-dk)">
+          <strong>Unit 9 Writing goal:</strong> DESCRIBE what happens using cause-and-effect words like <em>because</em> and <em>so</em> — and use clear DEFINITIONS with <em>which</em> to explain what things are!
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 13 — BUILD BACKGROUND -->
+    <div class="slide" id="s13">
+      <div class="sh gr">
+        <span class="sh-icon">⚡</span>
+        <div class="sh-text"><div class="sh-title">Build Background — The Force Game</div><div class="sh-sub">Push or pull a prop when you hear force in action!</div></div>
+        <span class="sh-tag">Introduce</span>
+      </div>
+      <div class="sb">
+        <div class="step-instr">⚡ Dad reads each activity aloud. <strong>Leo pushes or pulls</strong> a prop (or taps the screen) when he hears a force happening!</div>
+        <div class="step-grid">
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">🛝</span><div class="si-lbl">Swinging on a swing</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">⚽</span><div class="si-lbl">Kicking a soccer ball</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">🚲</span><div class="si-lbl">Riding a bike downhill</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">⛸️</span><div class="si-lbl">Spinning on ice skates</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">🎢</span><div class="si-lbl">Looping on a roller coaster</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">🪢</span><div class="si-lbl">Playing tetherball</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">🛹</span><div class="si-lbl">Pushing off on a skateboard</div></div>
+          <div class="step-item" onclick="this.classList.toggle('on')"><span class="si-em">🎠</span><div class="si-lbl">Spinning on a merry-go-round</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 14 — THE PHOTO -->
+    <div class="slide" id="s14">
+      <div class="sh dk">
+        <span class="sh-icon">📷</span>
+        <div class="sh-text"><div class="sh-title">Look at This Photo…</div><div class="sh-sub">Unit Opener — What is he doing?</div></div>
+        <span class="sh-tag">The Anchor Photo</span>
+      </div>
+      <div class="sb">
+        <div class="photo-disc">
+          <div class="pd-photo">
+            <span style="font-size:36px;margin-bottom:6px;opacity:.8">🌲🌲🌲</span>
+            <span class="pd-bear">🚵</span>
+            <div class="pd-cap">"A mountain biker rides down a hilly trail, wearing a helmet and knee pads for protection."</div>
+          </div>
+          <div class="pd-panel">
+            <div style="font-size:24px;font-weight:700;margin-bottom:4px">🗣️ Discussion Questions</div>
+            <div style="font-size:17px;color:var(--ink2);margin-bottom:14px">Tap each card to reveal the model answer — ask Leo first!</div>
+            <div class="dq-card" onclick="this.classList.toggle('open')">
+              <div class="dq-q">What is he doing?</div>
+              <div class="dq-a">He is mountain biking — riding his bicycle down a hilly, bumpy trail.</div>
+            </div>
+            <div class="dq-card" onclick="this.classList.toggle('open')">
+              <div class="dq-q">What do you think?</div>
+              <div class="dq-a">Answers will vary — for example: "It looks exciting and fast!" or "It looks a little scary!"</div>
+            </div>
+            <div class="dq-card" onclick="this.classList.toggle('open')">
+              <div class="dq-q">What safety gear is he wearing?</div>
+              <div class="dq-a">A helmet and knee pads — for protection, in case he falls over.</div>
+            </div>
+            <div class="dq-card" onclick="this.classList.toggle('open')">
+              <div class="dq-q">Write a caption for this photo.</div>
+              <div class="dq-a">Example: "A mountain biker leans and uses gravity and balance to race down a steep trail, wearing a helmet and knee pads for safety."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 15 — BE THE EXPERT -->
+    <div class="slide" id="s15">
+      <div class="sh gld">
+        <span class="sh-icon">⭐</span>
+        <div class="sh-text"><div class="sh-title">BE THE EXPERT — About the Photo</div><div class="sh-sub">Background knowledge for Dad to share with Leo</div></div>
+        <span class="sh-tag">Be the Expert</span>
+      </div>
+      <div class="sb">
+        <div class="expert-slide">
+          <div class="ex-left">
+            <span class="ex-tag">About the Photo</span>
+            <div style="font-size:80px;text-align:center">🚵🌲</div>
+            <div style="background:var(--ybg);border:1.5px solid var(--yellow);border-radius:12px;padding:18px 20px;font-size:18px;color:var(--ink2);line-height:1.65">
+              <strong>Activity:</strong> Mountain biking<br>
+              <strong>Safety gear:</strong> Helmet &amp; knee pads<br>
+              <strong>Forces at play:</strong> gravity, direction, balance, lean
+            </div>
+          </div>
+          <div class="ex-right">
+            <div class="ex-block">
+              <div class="ex-bt">What's Happening</div>
+              <div class="ex-txt">A mountain biker rides down a bumpy, hilly trail. He has to choose a <strong>direction</strong> and <strong>lean</strong> his body to turn — the same way a cyclist leans left to turn left. <strong>Gravity</strong> pulls him down the hill, so he has to control his speed carefully.</div>
+            </div>
+            <div class="ex-block">
+              <div class="ex-bt">The Science</div>
+              <div class="ex-txt">Mountain biking uses several forces at once: <strong>gravity</strong> pulls the rider downhill, <strong>friction</strong> from the brakes slows the bike down, and <strong>balance</strong> keeps the rider from falling over. That's why a helmet and knee pads matter — if a force makes him fall, the gear protects his body!</div>
+            </div>
+            <div class="ex-block">
+              <div class="ex-bt">Discussion Prompts</div>
+              <div class="ex-txt">⚡ "What forces do you feel when you ride down a hill fast?"<br>⚡ "Why do mountain bikers wear helmets and knee pads?"<br>⚡ "Would you like to try mountain biking?"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 16 — TEACHING TIP -->
+    <div class="slide" id="s16">
+      <div class="sh gld">
+        <span class="sh-icon">⚡</span>
+        <div class="sh-text"><div class="sh-title">BE THE EXPERT — Teaching Tip</div><div class="sh-sub">Teaching vocabulary in context</div></div>
+        <span class="sh-tag">Be the Expert</span>
+      </div>
+      <div class="sb" style="display:flex;flex-direction:column;gap:24px;justify-content:center">
+        <div class="ex-block">
+          <div class="ex-bt">Teaching Tip — Feel the Force First</div>
+          <div class="ex-txt" style="font-size:20px">Teach force vocabulary through <strong>physical actions</strong> before naming them. Have Leo push a chair, then pull it back. Ask: <em>"What did you just do to the chair?"</em> Let him describe the action before you give the word "push" or "pull." This builds understanding through experience, not just memorisation.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+          <div class="ex-block" style="text-align:center">
+            <div style="font-size:36px;margin-bottom:8px">👐</div>
+            <div class="ex-bt">Act it out first</div>
+            <div class="ex-txt" style="font-size:16px">Push and pull real objects before naming the words — Leo discovers the meaning through action</div>
+          </div>
+          <div class="ex-block" style="text-align:center">
+            <div style="font-size:36px;margin-bottom:8px">💬</div>
+            <div class="ex-bt">Use it in sentences</div>
+            <div class="ex-txt" style="font-size:16px">Model sentences with the new word first, then ask Leo to use it — "What happens when YOU push it?"</div>
+          </div>
+          <div class="ex-block" style="text-align:center">
+            <div style="font-size:36px;margin-bottom:8px">⚽</div>
+            <div class="ex-bt">Connect to soccer</div>
+            <div class="ex-txt" style="font-size:16px">Ask: "What force do you use when you kick a soccer ball?" — Leo's favorite sport makes force vocabulary stick</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 17 — LOOK AND CHECK -->
+    <div class="slide" id="s17">
+      <div class="sh gr">
+        <span class="sh-icon">✔️</span>
+        <div class="sh-text"><div class="sh-title">Look and Answer</div><div class="sh-sub">Unit Opener — What safety gear is he wearing?</div></div>
+        <span class="sh-tag">Activity</span>
+      </div>
+      <div class="sb">
+        <div class="lc-slide">
+          <div class="lc-photo">🚵</div>
+          <div class="lc-panel">
+            <div class="lc-q">What safety gear is the mountain biker wearing?</div>
+            <div style="font-size:17px;color:var(--ink2);margin-bottom:4px">Tap your answer — Leo chooses first!</div>
+            <div class="lc-opts">
+              <div class="lc-opt" id="lc-a" onclick="pickLC('a')">
+                <div class="lc-radio"></div>
+                A helmet and knee pads
+              </div>
+              <div class="lc-opt" id="lc-b" onclick="pickLC('b')">
+                <div class="lc-radio"></div>
+                A swimsuit and goggles
+              </div>
+              <div class="lc-opt" id="lc-c" onclick="pickLC('c')">
+                <div class="lc-radio"></div>
+                A winter coat and boots
+              </div>
+            </div>
+            <div id="lc-feedback" style="display:none;font-size:18px;color:var(--green-dk);font-weight:600;background:var(--green-lt);border-radius:10px;padding:14px 18px;margin-top:4px">
+              ✅ A helmet and knee pads! Mountain bikers wear this gear for protection, in case the forces of the trail make them fall.<br><br>
+              ⚡ Fun connection: A fall happens because of gravity — the safety gear protects the rider's body from the force of hitting the ground!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 18 — WRITE A CAPTION -->
+    <div class="slide" id="s18">
+      <div class="sh gr">
+        <span class="sh-icon">✍️</span>
+        <div class="sh-text"><div class="sh-title">Write a Caption</div><div class="sh-sub">Unit Opener — Describe force and motion in action!</div></div>
+        <span class="sh-tag">Activity</span>
+      </div>
+      <div class="sb">
+        <div class="cw-slide">
+          <div class="cw-photo">🚵<span style="font-size:40px">✍️</span></div>
+          <div class="cw-panel">
+            <div class="cw-title">📓 Write your caption!</div>
+            <div class="cw-tip">💡 A great caption is <strong>specific</strong> (who, what, where), <strong>short</strong>, and describes the force or motion happening!</div>
+            <div style="font-size:19px;font-weight:700;color:var(--ink)">Useful words:</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">force</span>
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">direction</span>
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">lean</span>
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">balance</span>
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">gravity</span>
+              <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">mountain biking</span>
+            </div>
+            <div class="cw-ex gd">✅ <strong>Good:</strong> "A mountain biker leans into the turn and uses gravity and balance to race down a steep trail — wearing a helmet and knee pads for safety."</div>
+            <div class="cw-ex bd">❌ <strong>Too simple:</strong> "He rides a bike." — <em>Not specific! What forces? What gear? What trail?</em></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 19 — FORMATIVE ASSESSMENT -->
+    <div class="slide" id="s19">
+      <div class="sh gr">
+        <span class="sh-icon">✔</span>
+        <div class="sh-text"><div class="sh-title">Formative Assessment</div><div class="sh-sub">Check Leo's understanding — tap each card when confirmed</div></div>
+        <span class="sh-tag">Assessment</span>
+      </div>
+      <div class="sb">
+        <div style="font-size:20px;color:var(--ink2);margin-bottom:20px">Four checks from the Lesson Planner — confirm all before finishing the opener.</div>
+        <div class="fa-grid">
+          <div class="fa-card" onclick="this.classList.toggle('done')">
+            <div class="fa-icon">👁️</div>
+            <div class="fa-q">Task 1 — Look and Answer ✓</div>
+            <div class="fa-a">Leo correctly identified that the mountain biker wears a <strong>helmet and knee pads</strong> and explained why.</div>
+          </div>
+          <div class="fa-card" onclick="this.classList.toggle('done')">
+            <div class="fa-icon">✍️</div>
+            <div class="fa-q">Task 2 — Write a Caption ✓</div>
+            <div class="fa-a">Leo wrote a caption for the photo — specific, short, and uses at least one force vocabulary word.</div>
+          </div>
+          <div class="fa-card" onclick="this.classList.toggle('done')">
+            <div class="fa-icon">🔤</div>
+            <div class="fa-q">Vocabulary Check ✓</div>
+            <div class="fa-a">Leo can define all 8 words: force, happen, push, pull, describe, match, definitions, instructions. Quick oral check!</div>
+          </div>
+          <div class="fa-card" onclick="this.classList.toggle('done')">
+            <div class="fa-icon">⚽</div>
+            <div class="fa-q">Cause and Effect Check ✓</div>
+            <div class="fa-a">Can Leo complete this sentence? <em>"The more you play soccer, ___ you get."</em> → <strong>"the better"</strong> — a real double-comparative from Unit 9!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 20 — UNIT PREVIEW -->
+    <div class="slide" id="s20">
+      <div class="sh gr">
+        <span class="sh-icon">🗺️</span>
+        <div class="sh-text"><div class="sh-title">What's Next in Unit 9?</div><div class="sh-sub">The science of fun continues…</div></div>
+        <span class="sh-tag">Unit Preview</span>
+      </div>
+      <div class="sb">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px">
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">📚</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Vocab 1</div>
+            <div style="font-size:15px;color:var(--ink2)">force, happen, push, pull, spin, balance, friction…</div>
+          </div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">📖</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Vocab 2</div>
+            <div style="font-size:15px;color:var(--ink2)">away from, direction, toward, lean, gravity</div>
+          </div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">🔧</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Grammar 1</div>
+            <div style="font-size:15px;color:var(--ink2)">Cause and effect with double comparatives</div>
+          </div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">🔧</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Grammar 2</div>
+            <div style="font-size:15px;color:var(--ink2)">Definitions with <em>which</em></div>
+          </div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">🎵</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Song</div>
+            <div style="font-size:15px;color:var(--ink2)"><em>I'm on the Move!</em></div>
+          </div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">📰</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Reading</div>
+            <div style="font-size:15px;color:var(--ink2)"><em>Up, Down, and All Around!</em></div>
+          </div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">✍️</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px">Writing</div>
+            <div style="font-size:15px;color:var(--ink2)">Cause-and-effect writing about a game</div>
+          </div>
+          <div style="background:var(--green-lt);border:1.5px solid var(--green);border-radius:14px;padding:24px 18px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">🎯</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px;color:var(--green)">Mission + Project</div>
+            <div style="font-size:15px;color:var(--green-dk)">Explore forces in everyday fun · Design a playground ride</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 21 — GREAT JOB! -->
+    <div class="slide" id="s21">
+      <div class="gj-slide">
+        <div class="gj-trophy">🏆</div>
+        <div class="gj-title">Great Job, Leo!</div>
+        <div class="gj-sub">Unit 9 Opener Complete · Caption written!</div>
+        <div class="gj-chips">
+          <span class="gj-chip">💪⚡ force</span>
+          <span class="gj-chip">❓➡️ happen</span>
+          <span class="gj-chip">👉💥 push</span>
+          <span class="gj-chip">🤚⬅️ pull</span>
+          <span class="gj-chip">📝 describe</span>
+          <span class="gj-chip">🧩 match</span>
+          <span class="gj-chip">📖 definitions</span>
+          <span class="gj-chip">📋 instructions</span>
+        </div>
+        <button class="gj-done-btn" id="done-btn">Mark Done ✓</button>
+      </div>
+    </div>
+
+  </div><!-- /deck -->
+</div><!-- /wrap -->
+
+<!-- NAV BAR -->
+<div id="nav">
+  <button class="nb" onclick="prevSlide()">◀ Prev</button>
+  <span id="sc">1 / 21</span>
+  <button class="nb" onclick="nextSlide()">Next ▶</button>
+  <div id="pgbar"><div id="pgfill"></div></div>
+  <button class="nb" id="fs-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+  <button class="nb" id="tn-btn" onclick="toggleNotes()">📝 Notes</button>
+  <span id="unit-lbl">Unit 9 · Opener</span>
+</div>
+
+<!-- TEACHER NOTES DRAWER -->
+<div id="tn-drawer">
+  <div class="tn-head">
+    📝 Teacher Notes — <span id="tn-slide-lbl">Slide 1</span>
+    <span class="tn-close" onclick="toggleNotes()">✕</span>
+  </div>
+  <div id="tn-body"></div>
+</div>
+
+<script>
+const NOTES = {
+  1:`<span class="tn-lbl">Slide 1 — Title</span>Show Leo the title and ask: <strong>"What do you think Unit 9 is about?"</strong> Wait for his answer. Introduce the force and motion theme — "The Science of Fun" means the physics behind games and rides. Ask: "What's fun that also uses force?"`,
+  2:`<span class="tn-lbl">Slide 2 — Objectives</span>Read objectives together. Highlight <strong>force</strong> and <strong>happen</strong> — these are the key content words. Ask: <strong>"What's a force you use every day?"</strong> Accept any answer — builds curiosity for the game slides ahead.`,
+  3:`<span class="tn-lbl">Slide 3 — force (Spinner)</span>Click <strong>SPIN</strong> and watch with Leo. When it stops, say: <em>"Every one of these things needs FORCE to move! What force do YOU use when you play soccer, Leo?"</em> Wait for his answer before clicking Next. Definition appears after spin.`,
+  4:`<span class="tn-lbl">Slide 4 — happen (Force Lab)</span>Build suspense: <em>"Watch — when you push this ball with force, something is about to happen… Click to see what happens!"</em> Click together. React to the reveal. <span class="tn-qa">Ask: "What happened when the force was used?"</span>`,
+  5:`<span class="tn-lbl">Slide 5 — push (Push to the Goal)</span>Guide Leo to tap waypoints <strong>IN ORDER (1→4→🥅)</strong>. Each waypoint = a push moving the ball toward the goal. At the goal: <em>"You pushed the ball all the way there! What did you push?"</em>`,
+  6:`<span class="tn-lbl">Slide 6 — pull (Tug Tap)</span>Say: <em>"Tetherball needs a big pull to get started — tap 5 times to pull the rope!"</em> Let Leo do ALL the tapping. React with excitement when the tetherball slides in. <span class="tn-qa">Ask: "Why is a pull different from a push?"</span>`,
+  7:`<span class="tn-lbl">Slide 7 — Content Vocab Recap</span>Quick oral check — ask Leo to define each word WITHOUT tapping. Tap to confirm. Key connection to reinforce: <strong>force → push/pull → happen</strong>. Ask: "What's an example from your own life?"`,
+  8:`<span class="tn-lbl">Slide 8 — describe (Description Detective)</span>Click each hotspot SLOWLY. Read each describing word aloud. Emphasise: <em>"Describing words tell us MORE — not just 'a bike' but 'a fast mountain bike on a bumpy trail.'"</em> <span class="tn-qa">All 5 must be clicked before definition appears.</span>`,
+  9:`<span class="tn-lbl">Slide 9 — match (Match Notebook)</span>Tap buttons one at a time. For each, ask Leo to act out the word or point to something in the room that matches. After all 5, ask: <em>"Why is matching useful when you're learning new words?"</em> Definition appears after all 5.`,
+  10:`<span class="tn-lbl">Slide 10 — definitions (Zoom Chain)</span>Tap cards left to right. For each, ask Leo to say it in his own words. The zoom: 🌍 A vague thing → ⚡ A force in sports → 📖 A full, specific definition! Ask: <em>"Why does a good definition need details?"</em>`,
+  11:`<span class="tn-lbl">Slide 11 — instructions (Clear Instructions Match)</span><strong>Let Leo choose FIRST.</strong> If he picks A or C, listen to WHY before guiding. Then click B and discuss: <em>"Why is B better than A or C? What makes it clear INSTRUCTIONS?"</em> <span class="tn-qa">A = no steps. C = not instructions at all. B = first/then/finally, in order!</span>`,
+  12:`<span class="tn-lbl">Slide 12 — Academic Recap</span>Quick oral recall. Ask: <strong>"What's the difference between describing something and giving instructions?"</strong> Key unit goal: "Describe cause and effect, and write clear definitions using which."`,
+  13:`<span class="tn-lbl">Slide 13 — Build Background</span><strong>DO THIS PHYSICALLY</strong> — actually push or pull a real object (or point at the screen)! Leo raises hand or taps when he identifies the force at work. Compare answers. This builds force vocabulary in context — the LP's "Build Background" activity.`,
+  14:`<span class="tn-lbl">Slide 14 — The Photo</span><strong>Don't describe the photo immediately.</strong> Let Leo look for 30 seconds. Ask: "What is he doing?" Then "What do you think?" Then "What safety gear is he wearing?" Tap each discussion card only AFTER Leo answers. Build anticipation before revealing.`,
+  15:`<span class="tn-lbl">Slide 15 — About the Photo (Be the Expert)</span>Share the science: a mountain biker uses gravity, direction, lean, and balance to control speed on a hilly trail. Key discussion: <em>"What forces do you feel when you ride down a hill? Why does he wear safety gear?"</em>`,
+  16:`<span class="tn-lbl">Slide 16 — Teaching Tip</span>Key strategy: <strong>teach force words through physical action first</strong>. Push a chair, then pull it back, before naming the word. This approach makes vocabulary stick — not just memorisation. The soccer connection works especially well for Leo.`,
+  17:`<span class="tn-lbl">Slide 17 — Look and Answer</span>Ask Leo to point to his answer <strong>before clicking</strong>. Correct: A helmet and knee pads. Then discuss: <em>"Why does he need this gear? What force could make him fall?"</em>`,
+  18:`<span class="tn-lbl">Slide 18 — Write a Caption</span>Give Leo at least <strong>3 minutes</strong> to write. Encourage: specific + force vocabulary word + safety gear mentioned. Review: <em>"Is your caption specific? Does it describe the force or motion happening?"</em>`,
+  19:`<span class="tn-lbl">Slide 19 — Formative Assessment</span>Tap each card when confirmed. Four checks: Look and Answer ✓ · Caption written ✓ · 8 vocab words ✓ · Cause and Effect ✓. <strong>Praise effort on the caption regardless</strong> — this is the start of Unit 9's cause-and-effect writing journey.`,
+  20:`<span class="tn-lbl">Slide 20 — Unit Preview</span>Show Leo what's coming. Highlight: <em>"The writing goal is to explain cause and effect — like 'The more you practice soccer, the better you get!'"</em> Ask: "Which part are you most excited about?"`,
+  21:`<span class="tn-lbl">Slide 21 — Great Job!</span>Celebrate! Leo completed the Unit 9 Opener and wrote his first force-and-motion caption. Remind him to open the <strong>Leo App</strong> to practice the 8 words independently. Tap "Mark Done" together. ⚡ Nice work, Leo!`,
+};
+
+let notesOpen = false;
+let fsActive  = false;
+const TOTAL   = 21;
+let current   = 1;
+
+function scaleSlides() {
+  const notesH = notesOpen ? 200 : 0;
+  const aw = window.innerWidth;
+  const ah = window.innerHeight - 52 - notesH;
+  const s  = Math.min(aw / 1920, ah / 1080);
+  const deck = document.getElementById('deck');
+  const left = (aw - 1920 * s) / 2;
+  const top  = (ah - 1080 * s) / 2;
+  deck.style.transform = `scale(${s})`;
+  deck.style.left      = left + 'px';
+  deck.style.top       = top  + 'px';
+}
+window.addEventListener('resize', scaleSlides);
+scaleSlides();
+
+function goTo(n) {
+  if (n < 1 || n > TOTAL) return;
+  document.getElementById('s' + current).classList.remove('active');
+  current = n;
+  document.getElementById('s' + current).classList.add('active');
+  document.getElementById('sc').textContent    = current + ' / ' + TOTAL;
+  document.getElementById('pgfill').style.width = ((current - 1) / (TOTAL - 1) * 100) + '%';
+  showNotes();
+}
+function nextSlide() { goTo(current + 1); }
+function prevSlide() { goTo(current - 1); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); prevSlide(); }
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+
+function showNotes() {
+  document.getElementById('tn-body').innerHTML = NOTES[current]
+    ? '<div style="padding:4px 0">' + NOTES[current] + '</div>'
+    : '<div style="color:var(--ink4);font-style:italic">No notes for this slide.</div>';
+  document.getElementById('tn-slide-lbl').textContent = 'Slide ' + current;
+}
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-drawer').classList.toggle('open', notesOpen);
+  document.getElementById('tn-btn').classList.toggle('amber', notesOpen);
+  document.getElementById('wrap').style.height = notesOpen
+    ? 'calc(100vh - 52px - 200px)'
+    : 'calc(100vh - 52px)';
+  scaleSlides();
+  showNotes();
+}
+showNotes();
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+document.addEventListener('fullscreenchange', () => {
+  const btn = document.getElementById('fs-btn');
+  btn.textContent = document.fullscreenElement ? '⛶ Exit Full' : '⛶ Fullscreen';
+  scaleSlides();
+});
+
+/* GAME 1 — FORCE SPINNER (s3) */
+let spun = false;
+function spinWheel() {
+  if (spun) return;
+  const wheel = document.getElementById('hw');
+  const btn   = document.getElementById('spin-btn');
+  btn.disabled = true; btn.textContent = '🌀 Spinning…';
+  const deg = 7 * 360 + Math.floor(Math.random() * 360);
+  wheel.style.transition = 'transform 2.6s cubic-bezier(.2,.8,.3,1)';
+  wheel.style.transform  = 'rotate(' + deg + 'deg)';
+  setTimeout(() => {
+    document.getElementById('idea-def').classList.remove('hidden');
+    btn.textContent = '✓ Done!';
+    spun = true;
+  }, 2700);
+}
+
+/* GAME 2 — FORCE LAB REVEAL (s4) */
+function clickLab() {
+  const btn   = document.getElementById('lab-btn');
+  const flash = document.getElementById('lab-flash');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="sh-dot"></span> ✓ It happened!';
+  flash.style.opacity = '1';
+  setTimeout(() => {
+    flash.style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('lab-reveal').style.display = 'block';
+      document.getElementById('inv-def').classList.remove('hidden');
+    }, 300);
+  }, 170);
+}
+
+/* GAME 3 — PUSH TO THE GOAL (s5) */
+let wpStep = 0;
+const wpPos = [
+  {left:'22%',bottom:'13%'},{left:'32%',bottom:'27%'},
+  {left:'41%',bottom:'42%'},{left:'49%',bottom:'55%'},
+  {left:'50%',bottom:'67%'}
+];
+function clickWP(n) {
+  if (n !== wpStep) return;
+  const wp = document.getElementById('wp-' + n);
+  wp.classList.remove('locked','hint'); wp.classList.add('visited');
+  wp.textContent = '✓';
+  const hiker = document.getElementById('hiker-em');
+  hiker.style.left = wpPos[n].left; hiker.style.bottom = wpPos[n].bottom;
+  wpStep++;
+  if (n < 4) {
+    const nxt = document.getElementById('wp-' + (n + 1));
+    nxt.classList.remove('locked'); nxt.classList.add('hint');
+  } else {
+    document.getElementById('sum-flag').classList.remove('hidden');
+    setTimeout(() => document.getElementById('prob-def').classList.remove('hidden'), 350);
+  }
+}
+
+/* GAME 4 — TUG TAP (s6) */
+let lbTaps = 0;
+function tapLB(e) {
+  if (lbTaps >= 5) return;
+  e.preventDefault();
+  const stg  = document.getElementById('lb-stg');
+  const rect = stg.getBoundingClientRect();
+  const src  = e.touches ? e.touches[0] : e;
+  const x    = (src.clientX - rect.left) / rect.width  * 100;
+  const y    = (src.clientY - rect.top)  / rect.height * 100;
+  const spark = document.createElement('span');
+  spark.className   = 'lb-spark';
+  spark.textContent = '✨';
+  spark.style.left  = Math.max(8, Math.min(88, x)) + '%';
+  spark.style.top   = Math.max(15, Math.min(78, y)) + '%';
+  stg.appendChild(spark);
+  lbTaps++;
+  document.getElementById('lb-c').textContent    = lbTaps + '/5';
+  document.getElementById('lb-over').textContent = lbTaps < 5
+    ? '🤚 Keep pulling! (' + lbTaps + '/5)' : '✅ Pulled it!';
+  if (lbTaps >= 5) {
+    const glow = document.getElementById('lb-glow');
+    glow.style.opacity = '1';
+    setTimeout(() => {
+      const bulb = document.getElementById('lb-bulb');
+      bulb.style.display = 'block';
+      requestAnimationFrame(() => bulb.classList.add('go'));
+      setTimeout(() => document.getElementById('sol-def').classList.remove('hidden'), 950);
+    }, 200);
+  }
+}
+
+/* GAME 5 — DESCRIPTION DETECTIVE (s8) */
+const opData = [
+  { emoji:'⛑️', label:'Wearing a helmet',      text:'Describing words tell us the mountain biker is wearing a helmet for safety.' },
+  { emoji:'🦵', label:'Wearing knee pads',       text:'Knee pads protect his legs if he falls.' },
+  { emoji:'🚴', label:'Fast and careful',  text:'He moves fast, but he stays careful and balanced.' },
+  { emoji:'⛰️', label:'On a bumpy trail',  text:'The trail is hilly and bumpy — not a smooth road!' },
+  { emoji:'🌳', label:'In the forest',         text:'Signal words like "in," "on," and "wearing" help you describe a scene.' },
+];
+let opFound = 0;
+function clickHS(n) {
+  const hs = document.getElementById('hs-' + n);
+  if (hs.classList.contains('found')) return;
+  hs.classList.add('found');
+  const list = document.getElementById('fi-list');
+  const ph = list.querySelector('.fi-ph');
+  if (ph) ph.remove();
+  const f = opData[n];
+  const card = document.createElement('div');
+  card.className = 'fi-card';
+  card.innerHTML = '<span class="fi-em">' + f.emoji + '</span><div><strong>' + f.label + '</strong><br>' + f.text + '</div>';
+  list.appendChild(card);
+  opFound++;
+  document.getElementById('fi-n').textContent = opFound;
+  if (opFound >= 5) document.getElementById('analyze-def').classList.remove('hidden');
+}
+
+/* GAME 6 — MATCH NOTEBOOK (s9) */
+const factMap = {
+  FORCE:   { emoji:'⚡', text:'A push or a pull — like kicking a soccer ball' },
+  PUSH:  { emoji:'👉', text:'Pressing something away from you — like a swing' },
+  PULL: { emoji:'🤚', text:'Moving something toward you — like a tetherball rope' },
+  SPIN:  { emoji:'🌀', text:'Turning around and around — like an ice skater' },
+  BALANCE:   { emoji:'⚖️', text:'Staying steady without falling — like on a seesaw' },
+};
+let factCt = 0; const factDone = new Set();
+function addFact(k) {
+  if (factDone.has(k)) return; factDone.add(k);
+  const ph = document.getElementById('nb-ph');
+  if (ph) ph.remove();
+  const d = factMap[k];
+  const l = document.createElement('div');
+  l.className = 'nb-line';
+  l.innerHTML = '<span class="nl-k">' + d.emoji + ' ' + k + ':</span>' + d.text;
+  document.getElementById('nb-lines').appendChild(l);
+  document.getElementById('db-' + k).classList.add('used');
+  if (++factCt >= 5) document.getElementById('fact-def').classList.remove('hidden');
+}
+
+/* GAME 7 — ZOOM CHAIN (s10) */
+const zoomD = [
+  { emoji:'🌍', text:'<strong>General:</strong> "A thing"<br><small style="color:var(--ink3)">Too vague — which thing?</small>' },
+  { emoji:'⚡', text:'<strong>More specific:</strong> "A force in sports"<br><small style="color:var(--ink3)">Getting closer — which force?</small>' },
+  { emoji:'📖', text:'<strong>Specific!</strong> "Friction: the force which happens when two things rub together"<br><small style="color:var(--arc-dk)">✅ Perfect — clear and exact!</small>' },
+];
+let zoomStep = 0;
+function clickWhy(n) {
+  if (n !== zoomStep) return;
+  const c = document.getElementById('why-' + n);
+  c.classList.remove('locked','unlocked'); c.classList.add('revealed');
+  c.innerHTML = '<span class="why-em">' + zoomD[n].emoji + '</span><p>' + zoomD[n].text + '</p>';
+  zoomStep++;
+  if (n < 2) {
+    const nxt = document.getElementById('why-' + (n + 1));
+    nxt.classList.remove('locked'); nxt.classList.add('unlocked');
+    nxt.innerHTML = '<span class="why-em" style="font-size:36px">🔍</span><p style="font-size:16px;color:var(--arc-dk)">Zoom in further!</p>';
+  } else {
+    document.getElementById('specific-def').classList.remove('hidden');
+  }
+}
+
+/* GAME 8 — CLEAR INSTRUCTIONS MATCH (s11) */
+const rmFb = {
+  A: "💡 That's very short — it doesn't tell you what to DO. Give clear steps instead!",
+  C: "💡 That's true, but it doesn't tell you what to DO. Instructions need steps in order!",
+};
+let rmDone = false;
+function pickCap(c) {
+  if (rmDone) return;
+  if (c === 'B') {
+    rmDone = true;
+    ['A','B','C'].forEach(x => { const el = document.getElementById('cm-' + x); el.style.opacity='.5'; el.disabled=true; });
+    document.getElementById('cm-B').classList.add('correct');
+    document.getElementById('cm-B').style.opacity = '1';
+    document.getElementById('cap-stmp').classList.remove('hidden');
+    document.getElementById('cm-hint').textContent = '';
+    document.getElementById('support-def').classList.remove('hidden');
+  } else {
+    const el = document.getElementById('cm-' + c);
+    el.classList.add('wrong');
+    document.getElementById('cm-hint').textContent = rmFb[c];
+    setTimeout(() => el.classList.remove('wrong'), 1800);
+  }
+}
+
+/* LOOK AND CHECK (s17) */
+function pickLC(c) {
+  ['a','b','c'].forEach(x => document.getElementById('lc-' + x).classList.remove('correct','wrong'));
+  document.getElementById('lc-' + c).classList.add(c === 'a' ? 'correct' : 'wrong');
+  if (c === 'a') {
+    document.getElementById('lc-feedback').style.display = 'block';
+  } else {
+    setTimeout(() => document.getElementById('lc-' + c).classList.remove('wrong'), 1500);
+  }
+}
+
+/* MARK DONE (s21) */
+document.getElementById('done-btn').addEventListener('click', function() {
+  try {
+    const p = JSON.parse(localStorage.getItem('leea.lessonProgress.v1') || '{}');
+    p['ow-l4-u9-opener'] = { status: 'done', ts: Date.now() };
+    localStorage.setItem('leea.lessonProgress.v1', JSON.stringify(p));
+    this.textContent = '✓ Marked Done';
+    this.disabled = true;
+  } catch(e) {}
+});
+</script>
+</body>
+</html>

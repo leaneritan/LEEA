@@ -52,6 +52,11 @@ const unitMeta: Record<number, { title: string; subtitle: string; chips: string[
     title: "That's Really Interesting!",
     subtitle: "Hobbies, interests & the Arctic.",
     chips: ["🎨 Hobbies", "📷 Photography", "🐻‍❄️ Polar Bears"]
+  },
+  9: {
+    title: "The Science of Fun",
+    subtitle: "Force, motion & a mountain biking photo.",
+    chips: ["⚡ Force", "🎡 Motion", "🚵 Mountain Biking"]
   }
 };
 

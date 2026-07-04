@@ -7,10 +7,12 @@ import { getComponentMeta } from "./componentMeta";
 
 type Item = { lesson: Lesson; progress: LearnerAppProgress };
 
-export function LeoHomeworkHero({ items }: { items: Item[] }) {
+export function LeoHomeworkHero({ items, suggested }: { items: Item[]; suggested?: Item }) {
   const openItems = items.filter((item) => !item.progress.done);
   const sorted = [...openItems].sort((a, b) => b.progress.completedModules - a.progress.completedModules);
-  const next = sorted[0];
+  const assignedNext = sorted[0];
+  const next = assignedNext ?? suggested;
+  const isSuggested = !assignedNext && !!suggested;
   const completedToday = items.filter((item) => item.progress.done).length;
   const dateText = new Intl.DateTimeFormat("en", { weekday: "long", month: "long", day: "numeric" }).format(new Date());
 
@@ -42,17 +44,23 @@ export function LeoHomeworkHero({ items }: { items: Item[] }) {
       <div className="leo-design-copy">
         <span>{dateText}</span>
         <h1>Hi Leo —<br />ready to play?</h1>
-        <p>Dad set you <b>{countText}</b> today. Let&apos;s pick up where you left off!</p>
-        <div className="leo-today-meter">
-          <b>Today</b>
-          {items.slice(0, 3).map((item) => <i className={item.progress.done ? "done" : ""} key={item.lesson.id} />)}
-          {Array.from({ length: Math.max(0, 3 - items.length) }).map((_, index) => <i key={`empty-${index}`} />)}
-          <strong>{completedToday} of {items.length} done</strong>
-        </div>
+        {isSuggested ? (
+          <p>Nothing new from Dad yet — here&apos;s what&apos;s <b>up next</b>! Start it now, or wait for Dad.</p>
+        ) : (
+          <p>Dad set you <b>{countText}</b> today. Let&apos;s pick up where you left off!</p>
+        )}
+        {isSuggested ? null : (
+          <div className="leo-today-meter">
+            <b>Today</b>
+            {items.slice(0, 3).map((item) => <i className={item.progress.done ? "done" : ""} key={item.lesson.id} />)}
+            {Array.from({ length: Math.max(0, 3 - items.length) }).map((_, index) => <i key={`empty-${index}`} />)}
+            <strong>{completedToday} of {items.length} done</strong>
+          </div>
+        )}
       </div>
 
       <aside className="leo-pick-card">
-        <span>Pick up where you left off</span>
+        <span>{isSuggested ? "Up next" : "Pick up where you left off"}</span>
         <div className="leo-pick-title">
           <i aria-hidden="true">{meta.emoji}</i>
           <div>

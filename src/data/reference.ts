@@ -1,3 +1,4 @@
+import unit5Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-5/vocabulary.json";
 import unit6Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-6/vocabulary.json";
 import unit7Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-7/vocabulary.json";
 import unit8Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json";
@@ -20,7 +21,8 @@ type UnitVocabularyWord =
   | (typeof unit9Vocabulary.words)[number]
   | (typeof unit8Vocabulary.words)[number]
   | (typeof unit7Vocabulary.words)[number]
-  | (typeof unit6Vocabulary.words)[number];
+  | (typeof unit6Vocabulary.words)[number]
+  | (typeof unit5Vocabulary.words)[number];
 type UnitGrammarPoint =
   | (typeof unit9Grammar.grammarPoints)[number]
   | (typeof unit8Grammar.grammarPoints)[number]
@@ -80,6 +82,14 @@ function toVocabularyItem(word: UnitVocabularyWord): VocabularyItem {
   };
 }
 
+function typeRank(type: VocabularyItem["type"]) {
+  if (type === "academic") return 4;
+  if (type === "vocabulary") return 3;
+  if (type === "content") return 2;
+  if (type === "related") return 1;
+  return 0;
+}
+
 function mergeWordsAcrossUnits(unitWordLists: UnitVocabularyWord[][]): VocabularyItem[] {
   const byId = new Map<string, VocabularyItem>();
   const order: string[] = [];
@@ -94,6 +104,9 @@ function mergeWordsAcrossUnits(unitWordLists: UnitVocabularyWord[][]): Vocabular
             existing.sources.push(source);
             seenTags.add(source.tag);
           }
+        }
+        if (typeRank(item.type) > typeRank(existing.type)) {
+          existing.type = item.type;
         }
         for (const tag of item.tags) {
           if (!existing.tags.includes(tag)) existing.tags.push(tag);
@@ -111,18 +124,35 @@ export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
   unit9Vocabulary.words as UnitVocabularyWord[],
   unit8Vocabulary.words as UnitVocabularyWord[],
   unit7Vocabulary.words as UnitVocabularyWord[],
-  unit6Vocabulary.words as UnitVocabularyWord[]
+  unit6Vocabulary.words as UnitVocabularyWord[],
+  unit5Vocabulary.words as UnitVocabularyWord[]
 ]);
 
 /* Real unit titles, sourced from each unit's own vocabulary.json — keyed
    "<level>-<unit>". Add a new entry here whenever a unit is scanned, so the
    Reference tree never has to guess or hardcode a title elsewhere. */
 export const unitTitles: Record<string, string> = {
+  [`${unit5Vocabulary.level}-${unit5Vocabulary.unit}`]: unit5Vocabulary.unitTitle,
   [`${unit6Vocabulary.level}-${unit6Vocabulary.unit}`]: unit6Vocabulary.unitTitle,
   [`${unit7Vocabulary.level}-${unit7Vocabulary.unit}`]: unit7Vocabulary.unitTitle,
   [`${unit8Vocabulary.level}-${unit8Vocabulary.unit}`]: unit8Vocabulary.unitTitle,
   [`${unit9Vocabulary.level}-${unit9Vocabulary.unit}`]: unit9Vocabulary.unitTitle
 };
+
+export const unit5Vocab1Items = vocabularyItems.filter(
+  (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U5-V1")
+);
+export const unit5Vocab2Items = vocabularyItems.filter(
+  (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U5-V2")
+);
+export const unit5AcademicItems = vocabularyItems.filter(
+  (item) => item.type === "academic" && item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 5)
+);
+export const unit5GlossaryItems = vocabularyItems.filter(
+  (item) =>
+    (item.type === "content" || item.type === "related" || item.type === "glossary") &&
+    item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 5)
+);
 
 export const unit6Vocab1Items = vocabularyItems.filter(
   (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U6-V1")

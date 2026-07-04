@@ -3,6 +3,7 @@ import unit6Vocabulary from "../../content/subjects/english/courses/our-world/le
 import unit7Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-7/vocabulary.json";
 import unit8Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json";
 import unit9Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-9/vocabulary.json";
+import unit5Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-5/grammar.json";
 import unit6Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-6/grammar.json";
 import unit7Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-7/grammar.json";
 import unit8Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-8/grammar.json";
@@ -27,7 +28,8 @@ type UnitGrammarPoint =
   | (typeof unit9Grammar.grammarPoints)[number]
   | (typeof unit8Grammar.grammarPoints)[number]
   | (typeof unit7Grammar.grammarPoints)[number]
-  | (typeof unit6Grammar.grammarPoints)[number];
+  | (typeof unit6Grammar.grammarPoints)[number]
+  | (typeof unit5Grammar.grammarPoints)[number];
 
 function hasKey<T extends object, K extends string>(word: T, key: K): word is T & Record<K, unknown> {
   return key in word;
@@ -248,12 +250,14 @@ export const grammarPoints: GrammarPoint[] = [
   ...unit9Grammar.grammarPoints.map(toGrammarPoint),
   ...unit8Grammar.grammarPoints.map(toGrammarPoint),
   ...unit7Grammar.grammarPoints.map(toGrammarPoint),
-  ...unit6Grammar.grammarPoints.map(toGrammarPoint)
+  ...unit6Grammar.grammarPoints.map(toGrammarPoint),
+  ...unit5Grammar.grammarPoints.map(toGrammarPoint)
 ];
 export const unit9GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 9);
 export const unit8GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 8);
 export const unit7GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 7);
 export const unit6GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 6);
+export const unit5GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 5);
 
 export const referenceWordOrder = vocabularyItems.map((item) => item.id);
 

@@ -378,6 +378,7 @@ for (const [index, entry] of (sanseido ?? []).entries()) {
 const lessonsDirs = [
   "content/subjects/english/courses/our-world/level-4/unit-7/lessons",
   "content/subjects/english/courses/our-world/level-4/unit-8/lessons",
+  "content/subjects/english/courses/our-world/level-4/unit-9/lessons",
 ];
 const lessons = [];
 for (const lessonsDir of lessonsDirs) {

@@ -28,6 +28,45 @@ import unit8BookReading from "../../content/subjects/english/courses/our-world/l
 import unit8BookReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/book-reading.learner.json";
 import type { Lesson } from "./types";
 
+// Canonical within-unit teaching order. Lessons are always sorted by this
+// regardless of the order they were built/imported in, so a unit built out
+// of sequence (e.g. Unit 9 added before Unit 8 was finished) never jumbles
+// the displayed order or "what's next" logic.
+const componentOrder = [
+  "opener",
+  "vocab-1",
+  "song",
+  "grammar-1",
+  "vocab-2",
+  "grammar-2",
+  "reading",
+  "writing",
+  "mission",
+  "project",
+  "reader",
+  "book-reading",
+  "extra-reading",
+  "review"
+];
+
+function componentOrderIndex(component: string) {
+  const base = component.endsWith("-app") ? component.slice(0, -4) : component;
+  const index = componentOrder.indexOf(base);
+  return index === -1 ? componentOrder.length : index;
+}
+
+function compareLessonOrder(a: Lesson, b: Lesson) {
+  if (a.course !== b.course) return a.course.localeCompare(b.course);
+  const levelDiff = (a.level ?? 0) - (b.level ?? 0);
+  if (levelDiff !== 0) return levelDiff;
+  const unitDiff = (a.unit ?? 0) - (b.unit ?? 0);
+  if (unitDiff !== 0) return unitDiff;
+  const componentDiff = componentOrderIndex(a.component) - componentOrderIndex(b.component);
+  if (componentDiff !== 0) return componentDiff;
+  if (a.mode !== b.mode) return a.mode === "teacher" ? -1 : 1;
+  return 0;
+}
+
 export const lessons: Lesson[] = [
   unit7Opener as Lesson,
   unit7OpenerLearner as Lesson,
@@ -57,7 +96,7 @@ export const lessons: Lesson[] = [
   unit8ReaderLearner as Lesson,
   unit8BookReading as Lesson,
   unit8BookReadingLearner as Lesson
-];
+].sort(compareLessonOrder);
 export const teacherLessons = lessons.filter((lesson) => lesson.mode === "teacher");
 export const learnerLessons = lessons.filter((lesson) => lesson.mode === "learner");
 

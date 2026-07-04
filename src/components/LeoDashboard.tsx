@@ -66,6 +66,18 @@ export function LeoDashboard() {
     () => heroItems.filter((item) => !item.progress.done).sort((a, b) => b.progress.completedModules - a.progress.completedModules),
     [heroItems]
   );
+  // Once everything Dad assigned is done and nothing new is waiting, surface
+  // the natural next lesson (in unit/component order) so Leo isn't stuck —
+  // but this is only a suggestion, not a real assignment Dad made.
+  const suggestedNextLesson = useMemo(() => {
+    if (todaysHomework.length > 0) return undefined;
+    return learnerLessons.find((lesson) => !assignments[lesson.id] && !getLearnerAppProgress(lesson.source).done);
+  }, [todaysHomework, assignments]);
+  const suggestedItem = useMemo(() => {
+    if (!suggestedNextLesson) return undefined;
+    return { lesson: suggestedNextLesson, progress: appProgress[suggestedNextLesson.id] ?? getLearnerAppProgress(suggestedNextLesson.source) };
+  }, [suggestedNextLesson, appProgress]);
+  const focusItem = todaysHomework[0] ?? suggestedItem;
   const totalDone = useMemo(() => Object.values(appProgress).filter((progress) => progress.done).length, [appProgress]);
 
   function toggleGroup(groupId: string) {
@@ -78,7 +90,7 @@ export function LeoDashboard() {
 
   return (
     <section className="leo-page">
-      <LeoHomeworkHero items={heroItems} />
+      <LeoHomeworkHero items={heroItems} suggested={suggestedItem} />
 
       <section className="leo-today-section">
         <header>
@@ -86,10 +98,14 @@ export function LeoDashboard() {
           <span>From Dad · finish them all for a 🔥 streak</span>
         </header>
         <div className="leo-today-list">
-          {todaysHomework.length ? (
-            todaysHomework.map((item) => (
-              <LeoHomeworkRow assignment={assignments[item.lesson.id]} key={item.lesson.id} lesson={item.lesson} progress={item.progress} />
-            ))
+          {focusItem ? (
+            <LeoHomeworkRow
+              assignment={assignments[focusItem.lesson.id]}
+              key={focusItem.lesson.id}
+              lesson={focusItem.lesson}
+              progress={focusItem.progress}
+              suggested={!todaysHomework.length}
+            />
           ) : (
             <article className="leo-note-card">
               <span className="leo-note-avatar">L</span>
@@ -183,7 +199,17 @@ export function LeoDashboard() {
   );
 }
 
-function LeoHomeworkRow({ assignment, lesson, progress }: { assignment: AssignmentRecord | undefined; lesson: Lesson; progress: LearnerAppProgress }) {
+function LeoHomeworkRow({
+  assignment,
+  lesson,
+  progress,
+  suggested
+}: {
+  assignment: AssignmentRecord | undefined;
+  lesson: Lesson;
+  progress: LearnerAppProgress;
+  suggested?: boolean;
+}) {
   const meta = getComponentMeta(lesson.component);
   const percent = progress.moduleCount ? Math.round((progress.completedModules / progress.moduleCount) * 100) : 0;
   const isStarted = progress.completedModules > 0;
@@ -203,7 +229,7 @@ function LeoHomeworkRow({ assignment, lesson, progress }: { assignment: Assignme
         ) : null}
       </div>
       <div className="leo-homework-action">
-        <span>{assignment?.status === "needs-redo" ? "Try again" : isStarted ? "In progress" : "New from Dad"}</span>
+        <span>{suggested ? "Up next" : assignment?.status === "needs-redo" ? "Try again" : isStarted ? "In progress" : "New from Dad"}</span>
         <Link href={`/lessons/${lesson.id}`}>{isStarted ? "Keep going" : "Start"}</Link>
       </div>
     </article>

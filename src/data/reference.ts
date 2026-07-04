@@ -1,3 +1,4 @@
+import unit4Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-4/vocabulary.json";
 import unit5Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-5/vocabulary.json";
 import unit6Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-6/vocabulary.json";
 import unit7Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-7/vocabulary.json";
@@ -23,7 +24,8 @@ type UnitVocabularyWord =
   | (typeof unit8Vocabulary.words)[number]
   | (typeof unit7Vocabulary.words)[number]
   | (typeof unit6Vocabulary.words)[number]
-  | (typeof unit5Vocabulary.words)[number];
+  | (typeof unit5Vocabulary.words)[number]
+  | (typeof unit4Vocabulary.words)[number];
 type UnitGrammarPoint =
   | (typeof unit9Grammar.grammarPoints)[number]
   | (typeof unit8Grammar.grammarPoints)[number]
@@ -127,19 +129,36 @@ export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
   unit8Vocabulary.words as UnitVocabularyWord[],
   unit7Vocabulary.words as UnitVocabularyWord[],
   unit6Vocabulary.words as UnitVocabularyWord[],
-  unit5Vocabulary.words as UnitVocabularyWord[]
+  unit5Vocabulary.words as UnitVocabularyWord[],
+  unit4Vocabulary.words as UnitVocabularyWord[]
 ]);
 
 /* Real unit titles, sourced from each unit's own vocabulary.json — keyed
    "<level>-<unit>". Add a new entry here whenever a unit is scanned, so the
    Reference tree never has to guess or hardcode a title elsewhere. */
 export const unitTitles: Record<string, string> = {
+  [`${unit4Vocabulary.level}-${unit4Vocabulary.unit}`]: unit4Vocabulary.unitTitle,
   [`${unit5Vocabulary.level}-${unit5Vocabulary.unit}`]: unit5Vocabulary.unitTitle,
   [`${unit6Vocabulary.level}-${unit6Vocabulary.unit}`]: unit6Vocabulary.unitTitle,
   [`${unit7Vocabulary.level}-${unit7Vocabulary.unit}`]: unit7Vocabulary.unitTitle,
   [`${unit8Vocabulary.level}-${unit8Vocabulary.unit}`]: unit8Vocabulary.unitTitle,
   [`${unit9Vocabulary.level}-${unit9Vocabulary.unit}`]: unit9Vocabulary.unitTitle
 };
+
+export const unit4Vocab1Items = vocabularyItems.filter(
+  (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U4-V1")
+);
+export const unit4Vocab2Items = vocabularyItems.filter(
+  (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U4-V2")
+);
+export const unit4AcademicItems = vocabularyItems.filter(
+  (item) => item.type === "academic" && item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 4)
+);
+export const unit4GlossaryItems = vocabularyItems.filter(
+  (item) =>
+    (item.type === "content" || item.type === "related" || item.type === "glossary") &&
+    item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 4)
+);
 
 export const unit5Vocab1Items = vocabularyItems.filter(
   (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U5-V1")

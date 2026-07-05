@@ -35,8 +35,11 @@ export function WordCard({ entry }: { entry: WordEntry }) {
   const family = useMemo(() => getWordFamily(entry), [entry]);
   const similar = useMemo(() => getSimilarWords(entry, family), [entry, family]);
   const verbForms = useMemo(
-    () => (entry.pos === "verb" ? getVerbForms(entry.word) : null),
-    [entry]
+    /* Use the normalized form for conjugation. The display word may include
+       an article ("a cut"), which would make the forms engine conjugate "a"
+       and produce nonsense like "aed cut". */
+    () => (entry.pos === "verb" ? getVerbForms(entry.normalizedWord || entry.word) : null),
+    [entry.normalizedWord, entry.pos, entry.word]
   );
 
   function playAudio() {

@@ -461,6 +461,16 @@ Examples:
 
 Build priority: grammar-1 → grammar-2 → reading → writing.
 
+### Unit 9 current build status
+
+| Component | Teacher lesson | Leo app | Leo status |
+|---|---|---|---|
+| opener | `public/lessons/ow-l4-u9-opener.html` | `public/learn/ow-l4-u9-opener.html` | `assigned` (auto-seeds) |
+| vocab-1 | `public/lessons/ow-l4-u9-vocab-1.html` | `public/learn/ow-l4-u9-vocab-1.html` | `live` |
+| song | `public/lessons/ow-l4-u9-song.html` | `public/learn/ow-l4-u9-song.html` | `draft` |
+
+Song vocabulary (push, pull, spin, a force, down, gravity) was already scanned into `content/subjects/english/courses/our-world/level-4/unit-9/vocabulary.json` as part of Vocabulary 1/2, so no new vocabulary entries were needed to build the song lesson pair.
+
 Current teacher tracking:
 
 - Teacher Menu shows only teacher slide cards, grouped by course, level, and unit — Leo's app cards never appear as separate boxes on the Neritan page.

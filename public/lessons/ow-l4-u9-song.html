@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 9 · Song · I'm on the Move!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#16A34A; --green-d:#15803D; --green-l:#DCFCE7;
+  --blue:#0EA5E9; --blue-l:#E0F2FE;
+  --amber:#F59E0B; --amber-l:#FEF3C7;
+  --purple:#7C3AED;
+  --ink:#14241D; --ink-2:#3F5147; --ink-3:#6B7B73;
+  --paper:#FAFAF7; --surface:#FFFFFF; --border:#E3E8E4;
+  --rose:#E11D48;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#0c1410;font-family:'Outfit',sans-serif;overflow:hidden}
+.ja{font-family:'Noto Sans JP','Outfit',sans-serif}
+
+/* ===== Scale wrapper ===== */
+#scaler{position:absolute;top:50%;left:50%;width:1920px;height:1080px;transform-origin:center center}
+#stage{position:relative;width:1920px;height:1080px;background:var(--paper);overflow:hidden}
+
+/* ===== Slides ===== */
+.slide{position:absolute;inset:0;padding:70px 96px 96px;display:none;flex-direction:column;opacity:0;transition:opacity .35s ease}
+.slide.active{display:flex;opacity:1}
+.slide-tag{display:inline-flex;align-items:center;gap:10px;font-size:19px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:6px}
+.slide-tag .dot{width:11px;height:11px;border-radius:50%;background:var(--green)}
+.slide-h{font-size:62px;font-weight:800;color:var(--ink);line-height:1.04;letter-spacing:-.01em}
+.slide-sub{font-size:26px;color:var(--ink-2);font-weight:500;margin-top:10px}
+.slide-num{position:absolute;bottom:24px;right:40px;font-size:17px;font-weight:600;color:var(--ink-3)}
+
+/* ===== Title slide ===== */
+.title-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  background:radial-gradient(circle at 30% 20%,#1f7a43 0%,#16A34A 45%,#0f7a55 100%);margin:-70px -96px -96px;color:#fff;position:relative;overflow:hidden}
+.title-wrap::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.10) 2px,transparent 2px);background-size:46px 46px;opacity:.5}
+.t-note{position:relative;font-size:120px;animation:float 3.2s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+.t-badge{position:relative;font-size:22px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;background:rgba(255,255,255,.18);padding:10px 26px;border-radius:999px;margin-bottom:22px}
+.t-title{position:relative;font-size:130px;font-weight:900;letter-spacing:-.02em;line-height:.98;text-shadow:0 6px 26px rgba(0,0,0,.25)}
+.t-meta{position:relative;display:flex;gap:18px;margin-top:34px;flex-wrap:wrap;justify-content:center}
+.t-chip{font-size:24px;font-weight:600;background:rgba(255,255,255,.92);color:var(--green-d);padding:12px 26px;border-radius:14px}
+.t-chips-words{position:relative;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:38px;max-width:1300px}
+.t-word{font-size:20px;font-weight:600;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.4);padding:8px 16px;border-radius:999px}
+
+/* ===== Objective cards ===== */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px;margin-top:40px;flex:1;align-content:center}
+.obj-card{background:var(--surface);border:2px solid var(--border);border-left:9px solid var(--green);border-radius:20px;padding:30px 34px;display:flex;gap:22px;align-items:flex-start;box-shadow:0 5px 20px rgba(20,40,30,.05)}
+.obj-card .ic{font-size:48px;line-height:1}
+.obj-card h3{font-size:28px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.obj-card p{font-size:21px;color:var(--ink-2);line-height:1.4}
+.bigq{margin-top:30px;background:var(--amber-l);border:2px dashed var(--amber);border-radius:18px;padding:24px 34px;display:flex;align-items:center;gap:20px}
+.bigq .ic{font-size:44px}
+.bigq b{font-size:25px;color:#7c5b06}
+
+/* ===== Vocab game layout ===== */
+.vg{flex:1;display:flex;gap:42px;margin-top:26px;min-height:0}
+.vg-left{width:35%;display:flex;flex-direction:column;background:var(--surface);border:2px solid var(--border);border-radius:24px;padding:38px 34px;position:relative;overflow:hidden}
+.vg-left::before{content:"";position:absolute;top:0;left:0;right:0;height:8px;background:var(--green)}
+.vg-tag{font-size:16px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:6px 14px;border-radius:999px;align-self:flex-start;margin-bottom:auto}
+.vg-tag.recycle{background:var(--blue-l);color:#075985}
+.vg-tag.newword{background:var(--green-l);color:var(--green-d)}
+.vg-emoji{font-size:118px;line-height:1;margin:8px 0 6px}
+.vg-word{font-size:62px;font-weight:800;color:var(--ink);line-height:1}
+.vg-ipa{font-size:25px;color:var(--ink-3);margin-top:8px;font-weight:500}
+.vg-pos{display:inline-block;font-size:17px;font-weight:600;color:var(--green-d);background:var(--green-l);padding:4px 12px;border-radius:8px;margin-top:14px}
+.vg-dad{margin-top:auto;font-size:21px;color:var(--ink-2);line-height:1.45;border-top:2px solid var(--border);padding-top:18px}
+.vg-dad b{color:var(--green-d)}
+.vg-right{flex:1;display:flex;flex-direction:column;min-width:0}
+.game-bar{display:flex;align-items:center;gap:14px;font-size:20px;font-weight:700;color:var(--ink);background:var(--surface);border:2px solid var(--border);border-radius:16px 16px 0 0;border-bottom:none;padding:16px 26px}
+.game-bar .gtype{margin-left:auto;font-size:15px;font-weight:600;color:#fff;background:var(--green);padding:5px 14px;border-radius:999px;letter-spacing:.04em}
+.game-area{flex:1;background:var(--surface);border:2px solid var(--border);border-radius:0 0 16px 16px;padding:34px;display:flex;flex-direction:column;justify-content:center;gap:18px;min-height:0;overflow:auto}
+.def-box{margin-top:16px;background:var(--green-l);border:2px solid var(--green);border-radius:16px;padding:0 26px;max-height:0;opacity:0;overflow:hidden;transition:all .45s ease}
+.def-box.show{max-height:240px;opacity:1;padding:22px 26px}
+.def-box .d-l{font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--green-d);margin-bottom:6px}
+.def-box .d-t{font-size:25px;color:var(--ink);font-weight:500;line-height:1.4}
+
+/* game widgets */
+.q-prompt{font-size:30px;font-weight:600;color:var(--ink);line-height:1.35;text-align:center}
+.opts{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.opt{font-size:25px;font-weight:600;background:#fff;border:2.5px solid var(--border);color:var(--ink);padding:18px 30px;border-radius:16px;cursor:pointer;transition:all .15s;min-width:150px;text-align:center}
+.opt:hover{border-color:var(--green);transform:translateY(-2px)}
+.opt.correct{background:var(--green);border-color:var(--green);color:#fff;animation:pop .3s}
+.opt.wrong{background:#fee2e2;border-color:var(--rose);color:var(--rose)}
+@keyframes pop{50%{transform:scale(1.08)}}
+.lyric-lines{display:flex;flex-direction:column;gap:14px;max-width:880px;margin:0 auto;width:100%}
+.lyric-line{font-size:25px;font-weight:500;background:#fff;border:2.5px solid var(--border);color:var(--ink);padding:16px 26px;border-radius:14px;cursor:pointer;transition:all .15s;line-height:1.3}
+.lyric-line:hover{border-color:var(--blue);background:var(--blue-l)}
+.lyric-line.correct{background:var(--green);border-color:var(--green);color:#fff}
+.lyric-line.wrong{background:#fee2e2;border-color:var(--rose)}
+.chips{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.chip{font-size:24px;font-weight:600;background:var(--blue-l);border:2px solid var(--blue);color:#075985;padding:14px 24px;border-radius:12px;cursor:pointer;transition:all .15s}
+.chip:hover{transform:translateY(-2px)}
+.chip.used{opacity:.35;pointer-events:none}
+.slot-line{font-size:30px;font-weight:600;color:var(--ink);text-align:center;line-height:1.5}
+.slot{display:inline-block;min-width:150px;border-bottom:3px dashed var(--green);padding:2px 12px;color:var(--green-d);font-weight:700}
+.fb{text-align:center;font-size:24px;font-weight:700;min-height:34px}
+.fb.ok{color:var(--green-d)}
+.fb.no{color:var(--rose)}
+.win-tag{text-align:center;font-size:22px;font-weight:700;color:var(--green-d)}
+
+/* ===== Academic grid ===== */
+.ac-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:24px;flex:1;margin-top:26px;min-height:0}
+.ac-card{border-radius:20px;padding:26px 30px;display:flex;flex-direction:column;color:#fff;position:relative;overflow:hidden;cursor:pointer}
+.ac-card .acw{font-size:40px;font-weight:800}
+.ac-card .ace{font-size:40px;position:absolute;top:22px;right:26px;opacity:.9}
+.ac-card .acq{font-size:22px;font-weight:500;margin-top:10px;line-height:1.35}
+.ac-card .acopts{display:flex;gap:12px;margin-top:auto;flex-wrap:wrap}
+.ac-o{font-size:19px;font-weight:600;background:rgba(255,255,255,.9);color:var(--ink);padding:10px 18px;border-radius:11px;cursor:pointer;transition:all .12s}
+.ac-o:hover{transform:translateY(-2px)}
+.ac-o.correct{background:#052e16;color:#fff}
+.ac-o.wrong{background:#7f1d1d;color:#fff}
+.ac-done .ac-reveal{opacity:1;max-height:80px}
+.ac-reveal{opacity:0;max-height:0;overflow:hidden;transition:all .4s;font-size:19px;font-weight:600;margin-top:8px}
+
+/* ===== Karaoke lyrics ===== */
+.kar{flex:1;display:flex;gap:34px;margin-top:24px;min-height:0}
+.kar-main{flex:1;background:var(--surface);border:2px solid var(--border);border-radius:22px;padding:34px 44px;overflow:auto}
+.kar-verse-label{font-size:17px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);margin:14px 0 8px}
+.kar-verse-label.chorus{color:var(--amber)}
+.kl{font-size:27px;font-weight:500;color:var(--ink);line-height:1.7;padding:2px 0}
+.kw{display:inline-block;font-weight:700;color:var(--green-d);background:var(--green-l);border-radius:8px;padding:1px 9px;cursor:pointer;transition:all .15s;border:2px solid transparent}
+.kw:hover{border-color:var(--green)}
+.kw.tapped{background:var(--green);color:#fff}
+.kar-side{width:300px;background:var(--green-l);border:2px solid var(--green);border-radius:22px;padding:28px 26px;display:flex;flex-direction:column}
+.kar-side h4{font-size:23px;font-weight:700;color:var(--green-d);margin-bottom:14px}
+.kar-count{font-size:78px;font-weight:900;color:var(--green);line-height:1;text-align:center;margin:10px 0}
+.kar-side p{font-size:19px;color:var(--ink-2);line-height:1.45}
+.kar-found{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.kar-found span{font-size:17px;font-weight:600;background:#fff;border:1.5px solid var(--green);color:var(--green-d);padding:5px 11px;border-radius:999px}
+
+/* ===== Generic info panels ===== */
+.panel{background:var(--surface);border:2px solid var(--border);border-radius:22px;padding:34px 40px;font-size:24px;color:var(--ink-2);line-height:1.5}
+.expert-tag{display:inline-flex;align-items:center;gap:10px;font-size:18px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.two-col{display:flex;gap:34px;flex:1;margin-top:24px;min-height:0}
+.photo-card{width:42%;background:linear-gradient(140deg,#0c5e8a,#0EA5E9);border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:40px;position:relative;overflow:hidden}
+.photo-card .pe{font-size:150px}
+.photo-card .pc{font-size:23px;font-weight:600;margin-top:14px;background:rgba(0,0,0,.22);padding:8px 18px;border-radius:10px}
+.fact-list{flex:1;display:flex;flex-direction:column;gap:16px;justify-content:center}
+.fact{background:var(--surface);border:2px solid var(--border);border-left:8px solid var(--blue);border-radius:16px;padding:20px 26px;font-size:23px;color:var(--ink-2);line-height:1.4}
+.fact b{color:var(--ink)}
+
+/* write new lines */
+.wnl{flex:1;display:flex;flex-direction:column;gap:20px;margin-top:24px;min-height:0}
+.wnl-model{background:var(--amber-l);border:2px solid var(--amber);border-radius:16px;padding:22px 30px;font-size:26px;color:#7c5b06;font-weight:600;line-height:1.5}
+.wnl-build{background:var(--surface);border:2px solid var(--border);border-radius:18px;padding:30px;flex:1;display:flex;flex-direction:column;gap:20px;justify-content:center}
+.wnl-frame{font-size:34px;font-weight:600;color:var(--ink);text-align:center;line-height:1.6}
+.wnl-frame .blank{display:inline-block;min-width:240px;border-bottom:4px solid var(--green);margin:0 6px;color:var(--green-d);font-weight:800;padding-bottom:2px}
+
+/* assessment */
+.assess{flex:1;display:flex;flex-direction:column;gap:18px;margin-top:24px;justify-content:center}
+.assess-row{display:flex;align-items:center;gap:22px;background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:22px 30px}
+.assess-row .qn{font-size:26px;color:var(--ink);font-weight:500;flex:1;line-height:1.35}
+.assess-btns{display:flex;gap:12px}
+.ab{font-size:22px;font-weight:700;padding:12px 26px;border-radius:12px;border:2.5px solid var(--border);background:#fff;cursor:pointer;transition:all .15s}
+.ab.yes:hover{border-color:var(--green);color:var(--green-d)}
+.ab.no:hover{border-color:var(--rose);color:var(--rose)}
+.ab.on-yes{background:var(--green);color:#fff;border-color:var(--green)}
+.ab.on-no{background:var(--rose);color:#fff;border-color:var(--rose)}
+
+/* great job */
+.gj{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  background:radial-gradient(circle at 50% 30%,#1f7a43,#16A34A 60%,#0f7a55);margin:-70px -96px -96px;color:#fff;position:relative;overflow:hidden}
+.gj .trophy{font-size:140px;animation:float 3s ease-in-out infinite}
+.gj h2{font-size:104px;font-weight:900;letter-spacing:-.02em;margin:6px 0}
+.gj .checks{display:flex;flex-direction:column;gap:12px;margin-top:18px}
+.gj .ck{font-size:26px;font-weight:600;background:rgba(255,255,255,.16);padding:12px 28px;border-radius:14px}
+
+/* ===== Nav bar ===== */
+#nav{position:fixed;left:0;right:0;bottom:0;height:52px;background:rgba(18,36,29,.96);display:flex;align-items:center;justify-content:center;gap:26px;z-index:50;color:#fff}
+#nav button{background:none;border:none;color:#fff;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;opacity:.8;display:flex;align-items:center;gap:6px}
+#nav button:hover{opacity:1}
+#nav .nbtn{background:var(--green);padding:7px 16px;border-radius:8px;opacity:1}
+#prog{font-size:14px;opacity:.7;min-width:96px;text-align:center}
+.arrowbtn{font-size:20px}
+
+/* ===== Notes panel ===== */
+#notes{position:fixed;top:0;right:-460px;width:440px;height:100%;background:#fff;box-shadow:-8px 0 40px rgba(0,0,0,.22);z-index:60;transition:right .3s ease;padding:34px 32px;overflow:auto}
+#notes.open{right:0}
+#notes h3{font-size:15px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:16px;border-bottom:2px solid var(--border);padding-bottom:12px}
+#notes .tn-lbl{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin:18px 0 4px}
+#notes p{font-size:17px;color:var(--ink-2);line-height:1.5;margin-bottom:8px}
+#notes b{color:var(--ink)}
+#notes .say{background:var(--green-l);border-left:4px solid var(--green);padding:10px 14px;border-radius:8px;font-style:italic;color:var(--ink)}
+#closeNotes{position:absolute;top:24px;right:24px;font-size:22px;cursor:pointer;color:var(--ink-3);background:none;border:none}
+</style>
+</head>
+<body>
+<div id="scaler">
+  <div id="stage"><!-- SLIDES_INJECTED_HERE --></div>
+</div>
+
+<div id="nav">
+  <button class="arrowbtn" onclick="prevSlide()">◀</button>
+  <span id="prog">1 / 1</span>
+  <button class="arrowbtn" onclick="nextSlide()">▶</button>
+  <button class="nbtn" onclick="toggleNotes()">📝 Notes (N)</button>
+</div>
+
+<div id="notes">
+  <button id="closeNotes" onclick="toggleNotes()">✕</button>
+  <h3>Teacher Notes</h3>
+  <div id="notesBody"></div>
+</div>
+
+<script>
+/* ===================================================================
+   UNIT 9 · SONG · "I'm on the Move!"  — interactive slide engine
+   =================================================================== */
+
+/* ---------- VOCAB REFRESH GAMES (recycled words = light) ---------- */
+const VOCAB = [
+  { word:"push", emoji:"👉💥", ipa:"/pʊʃ/", pos:"Verb", tag:"recycle",
+    dad:`Dad 💬 "Push the swing and watch it fly!"`,
+    def:"Push = to press something away from you to make it move.",
+    game:{type:"lyric", prompt:"Tap the line where you hear the word <b>push</b>.",
+      lines:["Push it, pull it, push it, pull it, push, pull.","If you spin around, and around and around.","I'm on the move."], correct:0} },
+
+  { word:"pull", emoji:"🤚⬅️", ipa:"/pʊl/", pos:"Verb", tag:"recycle",
+    dad:`Dad 💬 "Pull the rope hard, and watch it move!"`,
+    def:"Pull = to move something toward you using force.",
+    game:{type:"gap", before:"Push it,", after:"it, push it, pull it, push, pull.", chips:["pull","spin","force"], answer:"pull"} },
+
+  { word:"spin", emoji:"🌀", ipa:"/spɪn/", pos:"Verb", tag:"recycle",
+    dad:`Dad 💬 "Figure skaters spin so fast on the ice!"`,
+    def:"Spin = to turn around and around quickly in a circle.",
+    game:{type:"pick", prompt:"What does <b>spin</b> mean?", opts:["to turn around and around","to sit very still","to read a book"], correct:0} },
+
+  { word:"force", emoji:"💪⚡", ipa:"/fɔːrs/", pos:"Noun", tag:"recycle",
+    dad:`Dad 💬 "You need force to push or pull something — like kicking a ball!"`,
+    def:"A force = a push or a pull that can move something.",
+    game:{type:"tf", statement:"In the song, force is what you feel when you spin around.", answer:true} },
+
+  { word:"down", emoji:"⬇️", ipa:"/daʊn/", pos:"Adverb", tag:"recycle",
+    dad:`Dad 💬 "Skaters push down hard on the ice to go fast!"`,
+    def:"Down = toward a lower place, from a higher position to a lower one.",
+    game:{type:"scramble", prompt:"Put the words in order.", pieces:["down","push"], answer:"push down"} },
+
+  { word:"gravity", emoji:"🌍⬇️", ipa:"/ˈɡrævəti/", pos:"Noun", tag:"recycle",
+    dad:`Dad 💬 "Without gravity, we would float away like astronauts!"`,
+    def:"Gravity = the force that pulls things down toward the Earth.",
+    game:{type:"pick", prompt:"What is <b>gravity</b>?", opts:["the force that pulls things down","a kind of ball","a type of music"], correct:0} }
+];
+
+/* ---------- NEW WORDS (full introduction) ---------- */
+const NEWWORDS = [
+  { word:"chorus", emoji:"🔁", ipa:"/ˈkɔːrəs/", pos:"Noun",
+    dad:`Dad 💬 "Sing the <b>chorus</b> with me — it comes back every time!"`,
+    def:"A chorus = the part of a song that repeats. We sing it again and again.",
+    game:{type:"chorus"} },
+  { word:"verse", emoji:"📜", ipa:"/vɜːrs/", pos:"Noun",
+    dad:`Dad 💬 "Each <b>verse</b> tells a new part of the story."`,
+    def:"A verse = a part of a song that tells the story. Each verse is different.",
+    game:{type:"verse"} },
+  { word:"rhyme", emoji:"🎶", ipa:"/raɪm/", pos:"Noun / Verb",
+    dad:`Dad 💬 "Songs use <b>rhymes</b> — they make the words fun to sing!"`,
+    def:"Rhyme = words that end with the same sound, like go and slow.",
+    game:{type:"rhyme"} }
+];
+
+/* ---------- ACADEMIC (Tier B — proper games, recycled but full weight) ---------- */
+const ACADEMIC = [
+  { word:"describe", emoji:"🗣️📝", ipa:"/dɪˈskraɪb/", pos:"Verb",
+    dad:`Dad 💬 "Describe how a skater moves — push, glide, spin!"`,
+    def:"Describe = to say or write what a person, place, or thing is like.",
+    game:{type:"pick", prompt:"What does <b>describe</b> mean?", opts:["to say what something is like","to run very fast","to throw a ball"], correct:0} },
+  { word:"match", emoji:"🧩✅", ipa:"/mætʃ/", pos:"Verb",
+    dad:`Dad 💬 "Match each force word to its picture!"`,
+    def:"Match = to find two things that go together or are the same.",
+    game:{type:"gap", before:"Can you", after:"the word to its meaning?", chips:["match","describe","spin"], answer:"match"} },
+  { word:"definitions", emoji:"📖🔎", ipa:"/ˌdɛfəˈnɪʃənz/", pos:"Noun",
+    dad:`Dad 💬 "Good definitions help us understand new science words like gravity."`,
+    def:"Definitions = sentences that explain what a word means.",
+    game:{type:"tf", statement:"A definition tells you what a word means.", answer:true} },
+  { word:"instructions", emoji:"📋➡️", ipa:"/ɪnˈstrʌkʃənz/", pos:"Noun",
+    dad:`Dad 💬 "Read the instructions before you try a new ride at the park!"`,
+    def:"Instructions = steps that tell you how to do something.",
+    game:{type:"scramble", prompt:"Build the word.", pieces:["in","struc","tions"], answer:"instructions", joinChar:""} }
+];
+
+/* ---------- SONG LYRICS (kw = tappable vocab) ---------- */
+function kw(w,word){ return `<span class="kw" data-w="${word||w}">${w}</span>`; }
+const SONG = {
+  verse1:[
+    `${kw("Push it","push")}, ${kw("pull it","pull")}, push it, pull it, push, pull.`,
+    `Push, pull, push, pull! Watch it go!`
+  ],
+  verse2:[
+    `If you ${kw("spin","spin")} around, and around and around and around,`,
+    `what you feel is ${kw("force","force")}.`,
+    `If you fall ${kw("down","down")}, down, down, down, down to the ground,`,
+    `that's ${kw("gravity","gravity")}, of course.`
+  ],
+  bridge:[
+    `I'm on the move.`,
+    `I'm in the groove.`,
+    `It's amazing what you can do`,
+    `when you let ${kw("force","force")} do the work for you!`
+  ],
+  prechorus:[
+    `The more you ${kw("push","push")}, the faster some things go.`,
+    `When you ${kw("spin","spin")} around, the force comes and goes.`
+  ],
+  chorus:[
+    `The more you push, the faster some things go`,
+    `When you spin around, the force comes and goes`
+  ],
+  outro:[`I'm on the move!`]
+};
+
+/* ---------- SLIDE NOTES ---------- */
+const NOTES = {};
+
+/* ===================================================================
+   BUILD THE DECK
+   =================================================================== */
+const stage = document.getElementById('stage');
+let SLIDE_HTML = [];
+let initFns = {};   // slideIndex -> init function
+let idx = 0;
+
+function add(html, init){ const i = SLIDE_HTML.length; SLIDE_HTML.push(`<section class="slide" data-i="${i}">${html}<div class="slide-num">Unit 9 · Song</div></section>`); if(init) initFns[i]=init; }
+
+/* helper: header */
+function head(tag, h, sub){ return `<div class="slide-tag"><span class="dot"></span>${tag}</div><div class="slide-h">${h}</div>${sub?`<div class="slide-sub">${sub}</div>`:""}`; }
+
+/* ---- S1 Title ---- */
+add(`<div class="title-wrap">
+  <div class="t-note">🎵</div>
+  <div class="t-badge">Unit 9 · Song</div>
+  <div class="t-title">I'm on the<br>Move!</div>
+  <div class="t-meta"><span class="t-chip">🎧 TR: 9.3</span><span class="t-chip">📖 Workbook p. 108</span><span class="t-chip">🎬 Video Sc. 7</span></div>
+  <div class="t-chips-words">${[...NEWWORDS,...VOCAB].map(v=>`<span class="t-word">${v.emoji.slice(0,2)} ${v.word}</span>`).join('')}</div>
+</div>`);
+NOTES[0]=`<p class="tn-lbl">Open here</p><p>This is the Unit 9 song lesson. The words are not new — Leo already learned them in Vocabulary 1 and 2. Today we <b>sing</b> them and meet 3 song words: chorus, verse, rhyme.</p><p class="say">"Leo, today we sing! Our song is called I'm on the Move!"</p>`;
+
+/* ---- S2 Objectives ---- */
+add(`${head("Today","What we will do")}
+<div class="obj-grid">
+  <div class="obj-card"><div class="ic">🎤</div><div><h3>Sing the song</h3><p>Listen, read, and sing "I'm on the Move!"</p></div></div>
+  <div class="obj-card"><div class="ic">🔁</div><div><h3>Meet 3 song words</h3><p>chorus, verse, and rhyme</p></div></div>
+  <div class="obj-card"><div class="ic">🔎</div><div><h3>Find our words</h3><p>Hear force and motion words inside the song</p></div></div>
+  <div class="obj-card"><div class="ic">✍️</div><div><h3>Make new lines</h3><p>Write our own "the more... the more..." line</p></div></div>
+</div>
+<div class="bigq"><div class="ic">💭</div><b>Big question: What makes things move?</b></div>`);
+NOTES[1]=`<p class="tn-lbl">Goals</p><p>Read each card with Leo. Keep it light and fun — this is a singing lesson about force and motion.</p><p class="say">"By the end, you will sing the whole chorus by yourself!"</p>`;
+
+/* ---- S3-S5 NEW WORDS ---- */
+NEWWORDS.forEach((v,n)=>{
+  const slot = `nw${n}`;
+  add(`${head("New word · Introduce", "Song words")}
+  <div class="vg">
+    <div class="vg-left">
+      <div class="vg-tag newword">New word</div>
+      <div class="vg-emoji">${v.emoji}</div>
+      <div class="vg-word">${v.word}</div>
+      <div class="vg-ipa">${v.ipa} · ${v.pos}</div>
+      <div class="vg-dad">${v.dad}</div>
+    </div>
+    <div class="vg-right">
+      <div class="game-bar">🎮 <span>${v.word==="chorus"?"Find the part that repeats":v.word==="verse"?"Find the story part":"Find the rhyme"}</span><span class="gtype">Introduce</span></div>
+      <div class="game-area" id="${slot}"></div>
+      <div class="def-box" id="${slot}_def"><div class="d-l">What it means</div><div class="d-t">${v.def}</div></div>
+    </div>
+  </div>`, ()=>initNew(v, slot));
+  NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Introduce: ${v.word}</p><p>${v.def}</p><p>Let Leo solve the little game, then the meaning appears in green. Say the word together 3 times.</p><p class="say">${v.dad.replace(/<[^>]+>/g,'')}</p>`;
+});
+
+/* ---- ACADEMIC — proper games (Tier B: recycled but full weight) ---- */
+ACADEMIC.forEach((v,n)=>{
+  const slot = `ac${n}`;
+  const gtypeLabel = {lyric:"Find it in the song",tf:"True or False",gap:"Fill the gap",pick:"Choose",scramble:"Word order"}[v.game.type];
+  add(`${head("Academic language · Recycle", "Tricky words we keep strong")}
+  <div class="vg">
+    <div class="vg-left">
+      <div class="vg-tag" style="background:#EDE9FE;color:#5b21b6">Academic word</div>
+      <div class="vg-emoji">${v.emoji}</div>
+      <div class="vg-word">${v.word}</div>
+      <div class="vg-ipa">${v.ipa} · ${v.pos}</div>
+      <div class="vg-dad">${v.dad}</div>
+    </div>
+    <div class="vg-right">
+      <div class="game-bar">🎮 <span>${gtypeLabel}</span><span class="gtype" style="background:#7C3AED">Academic</span></div>
+      <div class="game-area" id="${slot}"></div>
+      <div class="def-box" id="${slot}_def"><div class="d-l">What it means</div><div class="d-t">${v.def}</div></div>
+    </div>
+  </div>`, ()=>initGame(v.game, slot));
+  NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Academic: ${v.word}</p><p>${v.def}</p><p>Academic words are hard and easy to forget, so we give them a <b>real game</b> every time — not just a quick tap. Leo solves it, then the meaning appears.</p><p class="say">${v.dad.replace(/<[^>]+>/g,'')}</p>`;
+});
+
+/* ---- VOCAB REFRESH GAMES ---- */
+VOCAB.forEach((v,n)=>{
+  const slot = `vg${n}`;
+  const gtypeLabel = {lyric:"Find it in the song",tf:"True or False",gap:"Fill the gap",pick:"Choose",scramble:"Word order"}[v.game.type];
+  add(`${head("Vocabulary · Refresh", "From the song")}
+  <div class="vg">
+    <div class="vg-left">
+      <div class="vg-tag recycle">Review</div>
+      <div class="vg-emoji">${v.emoji}</div>
+      <div class="vg-word">${v.word}</div>
+      <div class="vg-ipa">${v.ipa} · ${v.pos}</div>
+      <div class="vg-dad">${v.dad}</div>
+    </div>
+    <div class="vg-right">
+      <div class="game-bar">🎮 <span>${gtypeLabel}</span><span class="gtype">Review</span></div>
+      <div class="game-area" id="${slot}"></div>
+      <div class="def-box" id="${slot}_def"><div class="d-l">Remember</div><div class="d-t">${v.def}</div></div>
+    </div>
+  </div>`, ()=>initGame(v.game, slot));
+  NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Refresh: ${v.word}</p><p>${v.def}</p><p>Leo learned this in Vocabulary 1 or 2. This is a quick reminder before we sing — keep it fast and warm.</p><p class="say">${v.dad.replace(/<[^>]+>/g,'')}</p>`;
+});
+
+/* ---- Use the Song: Act it out ---- */
+const ACTIONS = ["🌀 Spin around slowly","⚖️ Balance on one leg","⬇️ Pretend to fall over","🦵 Push down and jump!"];
+add(`${head("Use the Song · Act it out","Show how people move")}
+<div class="panel" style="margin-top:24px">We've talked about ways people move when they play sports — sometimes they spin, sometimes they balance, and sometimes they fall over! Act out each move with Leo, then tap it.</div>
+<div class="chips" id="actBoard" style="margin-top:28px;gap:14px"></div>
+<div class="bigq" style="margin-top:auto"><div class="ic">🦘</div><b>When you jump, you push your feet against the ground. The more you push down, the higher you jump!</b></div>`, initActOut);
+NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Move before you sing</p><p>Say: "We've talked about ways that people move when they do a sport. Sometimes they spin. Turn around slowly to show spin." Then balance on one leg, pretend to lose your balance and fall over, and finally bend your knees and jump.</p><p class="say">"When you push your feet against the ground, the more you push, the higher you jump!"</p>`;
+
+/* ---- Karaoke 1 ---- */
+add(`${head("Listen, read & sing · TR 9.3","Verse 1 + Verse 2 + Bridge")}
+<div class="kar">
+  <div class="kar-main" id="kar1">
+    <div class="kar-verse-label">Verse 1 📜</div>
+    ${SONG.verse1.map(l=>`<div class="kl">${l}</div>`).join('')}
+    <div class="kar-verse-label">Verse 2 📜</div>
+    ${SONG.verse2.map(l=>`<div class="kl">${l}</div>`).join('')}
+    <div class="kar-verse-label">Bridge 🎶</div>
+    ${SONG.bridge.map(l=>`<div class="kl">${l}</div>`).join('')}
+  </div>
+  <div class="kar-side">
+    <h4>Tap the green words!</h4>
+    <div class="kar-count" id="karc1">0</div>
+    <p>Tap every force word you can find while we sing.</p>
+    <div class="kar-found" id="karf1"></div>
+  </div>
+</div>`, ()=>initKaraoke("kar1","karc1","karf1"));
+NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Sing it</p><p>Play TR 9.3. First time: just listen. Second time: Leo taps the green force words as he hears them and sings along.</p>`;
+
+/* ---- Karaoke 2 ---- */
+add(`${head("Listen, read & sing · TR 9.3","Pre-Chorus + Chorus + repeat")}
+<div class="kar">
+  <div class="kar-main" id="kar2">
+    <div class="kar-verse-label">Pre-Chorus 📜</div>
+    ${SONG.prechorus.map(l=>`<div class="kl">${l}</div>`).join('')}
+    <div class="kar-verse-label chorus">Chorus 🔁</div>
+    ${SONG.chorus.map(l=>`<div class="kl">${l}</div>`).join('')}
+    <div class="kar-verse-label">Verse 1 again 📜</div>
+    ${SONG.verse1.map(l=>`<div class="kl">${l}</div>`).join('')}
+    <div class="kar-verse-label">Verse 2 again 📜</div>
+    ${SONG.verse2.map(l=>`<div class="kl">${l}</div>`).join('')}
+    <div class="kar-verse-label chorus">Chorus again 🔁</div>
+    ${SONG.chorus.map(l=>`<div class="kl">${l}</div>`).join('')}
+    <div class="kar-verse-label">Ending 🎤</div>
+    ${SONG.outro.map(l=>`<div class="kl">${l}</div>`).join('')}
+  </div>
+  <div class="kar-side">
+    <h4>Tap the green words!</h4>
+    <div class="kar-count" id="karc2">0</div>
+    <p>The chorus is back! Sing it loud.</p>
+    <div class="kar-found" id="karf2"></div>
+  </div>
+</div>`, ()=>initKaraoke("kar2","karc2","karf2"));
+NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Finish the song</p><p>Same idea — tap and sing. Notice the chorus comes back. Ask Leo how many times we sang the chorus today (2).</p>`;
+
+/* ---- Which part of the song ---- */
+const WV = [
+  {word:"push 👉", v:0}, {word:"pull 🤚", v:0}, {word:"spin 🌀", v:1}, {word:"gravity 🌍", v:1}, {word:"force 💪", v:2}
+];
+add(`${head("Think · Which part of the song?","Match each word to where you hear it")}
+<div class="wnl" style="gap:16px;justify-content:center">
+  ${WV.map((w,i)=>`<div class="assess-row"><div class="qn">${w.word}</div><div class="assess-btns">
+    <button class="ab" data-wv="${i}" data-v="0">Verse 1</button>
+    <button class="ab" data-wv="${i}" data-v="1">Verse 2</button>
+    <button class="ab" data-wv="${i}" data-v="2">Bridge</button>
+  </div></div>`).join('')}
+</div>`, ()=>initWhichVerse(WV));
+NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Listening memory</p><p>Where did each word appear? If Leo is unsure, sing that part again. Push and pull = Verse 1; spin and gravity = Verse 2; force = the Bridge.</p>`;
+
+/* ---- Answer questions ---- */
+add(`${head("Answer · Work with a partner","Talk about the song and photo")}
+<div class="wnl" style="justify-content:center">
+  <div class="wnl-build" style="gap:26px">
+    <div><div class="wnl-frame" style="font-size:30px">1. How do you feel when you spin? And when you fall?</div>
+      <button class="opt" style="margin:14px auto 0;display:block" onclick="this.nextElementSibling.classList.add('show')">Show sample answer</button>
+      <div class="def-box"><div class="d-t">"I feel dizzy when I spin, and I feel surprised when I fall down!"</div></div>
+    </div>
+    <div><div class="wnl-frame" style="font-size:30px">2. Look at the photo. What is the boy doing?</div>
+      <button class="opt" style="margin:14px auto 0;display:block" onclick="this.nextElementSibling.classList.add('show')">Show sample answer</button>
+      <div class="def-box"><div class="d-t">"He is riding inside a gyroscope. He is spinning around in every direction."</div></div>
+    </div>
+  </div>
+</div>`);
+NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Speak in pairs</p><p>Dad and Leo take turns asking and answering. Leo answers in his own words first; reveal the sample only if he needs help.</p>`;
+
+/* ---- Use It Again: Vocabulary 1 — Motion Match ---- */
+const MOTION = [
+  {word:"push 👉", opts:["push motion 🙌","pull motion 🤝","spin motion 🌀"], correct:0},
+  {word:"pull 🤚", opts:["push motion 🙌","pull motion 🤝","spin motion 🌀"], correct:1},
+  {word:"spin 🌀", opts:["push motion 🙌","pull motion 🤝","spin motion 🌀"], correct:2},
+  {word:"fall over ⬇️", opts:["falling motion ⬇️","balancing motion ⚖️","pushing motion 👉"], correct:0},
+  {word:"balance ⚖️", opts:["falling motion ⬇️","balancing motion ⚖️","pushing motion 👉"], correct:1}
+];
+add(`${head("Use It Again · Vocabulary 1","Match each word to its motion")}
+<div class="wnl" style="gap:14px;justify-content:center">
+  ${MOTION.map((m,i)=>`<div class="assess-row"><div class="qn">${m.word}</div><div class="assess-btns">
+    ${m.opts.map((o,k)=>`<button class="ab" data-mm="${i}" data-mv="${k}">${o}</button>`).join('')}
+  </div></div>`).join('')}
+</div>`, ()=>initMotionMatch(MOTION));
+NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Move like the word</p><p>Put students in small groups and assign each a verse. Have them think of a motion for each vocabulary word, then act it out when they hear it while singing again.</p>`;
+
+/* ---- Use It Again: Grammar 1 preview ---- */
+const GPREVIEW = [
+  {q:"The more one skater pulls...", a:"...the more the other one spins."},
+  {q:"The more you push the swing...", a:"...the faster it goes."},
+  {q:"The more you practice...", a:"...the faster you run."}
+];
+add(`${head("Use It Again · A peek at “the more... the more...”","Tap each card to see the effect")}
+<div class="panel" style="margin-top:20px">The song joins a cause and an effect with <b>the more..., the more/faster...</b>. Tap each card. We will learn this properly in the next lesson!</div>
+<div class="wnl" style="gap:14px;margin-top:18px;justify-content:center">
+  ${GPREVIEW.map((w,i)=>`<div class="assess-row" id="gp${i}" style="cursor:pointer">
+    <div class="qn">${w.q}</div>
+    <div class="qn" style="flex:1;text-align:right;color:var(--green-d);font-weight:700;opacity:0;transition:opacity .3s" id="gpa${i}">${w.a}</div>
+    <div class="ab" style="pointer-events:none">👀</div>
+  </div>`).join('')}
+</div>`, ()=>initGrammarPreview(GPREVIEW));
+NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Gentle preview — no rules yet</p><p>This is Leo's FIRST taste of double comparatives ("the more..., the more..."), straight from the song. Just notice the pattern — the real grammar lesson comes next. Tap a card to reveal the effect.</p>`;
+
+/* ---- Write a new line ---- */
+add(`${head("Write · Make a new line for the song","Use the model")}
+<div class="wnl">
+  <div class="wnl-model">🎵 Model: "The more you <b>spin</b>,<br>the <b>dizzier</b> you get."</div>
+  <div class="wnl-build">
+    <div class="wnl-frame">The more you <span class="blank" id="b1">______</span>,<br>the <span class="blank" id="b2">______</span> you get.</div>
+    <div style="text-align:center;color:var(--ink-3);font-size:20px;margin-top:6px">Tap one from each row:</div>
+    <div class="chips" id="row1" style="margin-top:6px">
+      <span class="chip" data-row="1" data-t="spin">spin</span>
+      <span class="chip" data-row="1" data-t="jump">jump</span>
+      <span class="chip" data-row="1" data-t="push">push</span>
+    </div>
+    <div class="chips" id="row2">
+      <span class="chip" data-row="2" data-t="dizzier">dizzier</span>
+      <span class="chip" data-row="2" data-t="higher">higher</span>
+      <span class="chip" data-row="2" data-t="stronger">stronger</span>
+    </div>
+    <div class="fb ok" id="wnlfb"></div>
+  </div>
+</div>`, initWriteLines);
+NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Leo's own line</p><p>Leo builds a new "the more... the more..." line from the chips, then sings it to the tune. Encourage him to invent his own ending too. This is the creative high point — celebrate it.</p>`;
+
+/* ---- Be the Expert: About the Photo ---- */
+add(`${head("Be the Expert · About the Photo","")}
+<div class="two-col">
+  <div class="photo-card"><div class="pe">🌀</div><div class="pc">Edinburgh, Scotland</div></div>
+  <div class="fact-list">
+    <div class="fact">A young rider is testing a <b>gyroscope</b> in <b>Edinburgh, Scotland</b>.</div>
+    <div class="fact">A gyroscope has two or three rings that move <b>independently</b>, one inside the other.</div>
+    <div class="fact">The rider is strapped safely inside the rings and can spin sideways, vertically, and in every direction!</div>
+    <div class="fact">Spinning like this doesn't cause <b>motion sickness</b> — it feels a little like floating in space. 🧑‍🚀</div>
+    <div class="fact">Astronauts use similar <b>structures</b> to train for space travel.</div>
+  </div>
+</div>`);
+NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Photo talk</p><p>Ask Leo: would you try a gyroscope? Connect it to force, spin, and gravity from the song. Point out Edinburgh on a map if you can.</p>`;
+
+/* ---- Be the Expert: Teaching Tip ---- */
+add(`${head("Be the Expert · For Dad","Teaching tip")}
+<div class="two-col">
+  <div class="fact-list">
+    <div class="fact" style="border-left-color:var(--green)">🎧 Use a song to check students' ability to identify familiar words in unfamiliar sentences.</div>
+    <div class="fact" style="border-left-color:var(--green)">🔁 The first time you play the song, have Leo listen with his book closed. See how many words he can catch.</div>
+    <div class="fact" style="border-left-color:var(--green)">🙌 Play a few lines, then repeat. See if Leo identifies more words each time.</div>
+  </div>
+  <div class="photo-card" style="background:linear-gradient(140deg,#15803D,#16A34A)"><div class="pe">🎤</div><div class="pc">End of lesson: write &amp; sing a new line</div></div>
+</div>`);
+NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">End of lesson</p><p>Play the first two verses again. Ask Leo to name words that tell what skaters do (push, pull, balance, fall down, spin), then sing the new "the more... the more..." line together.</p>`;
+
+/* ---- Formative Assessment ---- */
+const ASSESS = [
+  "Can Leo sing or say the chorus of “I'm on the Move!”?",
+  "Can Leo name 3 force words from the song (push, pull, spin, force, down, gravity)?",
+  "Can Leo use push, pull, or spin in a sentence?",
+  "Can Leo hear and find a force word inside the song?"
+];
+add(`${head("✔ Formative Assessment","Check what Leo can do")}
+<div class="assess">
+  ${ASSESS.map((q,i)=>`<div class="assess-row"><div class="qn">${q}</div><div class="assess-btns">
+    <button class="ab yes" data-as="${i}" data-v="yes">✓ Yes</button>
+    <button class="ab no" data-as="${i}" data-v="no">Not yet</button>
+  </div></div>`).join('')}
+</div>`, initAssess);
+NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Honest check</p><p>"Not yet" is fine — it just tells us what to sing again next time. Tap together with Leo.</p>`;
+
+/* ---- Great Job ---- */
+add(`<div class="gj">
+  <div class="trophy">🏆</div>
+  <h2>Great Job, Leo!</h2>
+  <div class="checks">
+    <div class="ck">✅ You sang "I'm on the Move!"</div>
+    <div class="ck">✅ New words: chorus 🔁 · verse 📜 · rhyme 🎶</div>
+    <div class="ck">✅ You found our force words in the song</div>
+    <div class="ck">✅ You wrote your own "the more... the more..." line!</div>
+  </div>
+  <div class="t-badge" style="margin-top:30px;background:rgba(255,255,255,.2)">Keep moving! 🌀</div>
+</div>`);
+NOTES[SLIDE_HTML.length-1]=`<p class="tn-lbl">Celebrate</p><p>Big finish. Ask Leo to sing the chorus one last time, on his own. High five.</p>`;
+
+/* render */
+stage.innerHTML = SLIDE_HTML.join('');
+const slides = [...document.querySelectorAll('.slide')];
+
+/* ===================================================================
+   GAMES
+   =================================================================== */
+function reveal(slot){ const d=document.getElementById(slot+"_def"); if(d) d.classList.add("show"); }
+
+function initGame(g, slot){
+  const el=document.getElementById(slot); if(!el||el.dataset.done) return;
+  if(g.type==="lyric"){
+    el.innerHTML=`<div class="q-prompt">${g.prompt}</div><div class="lyric-lines">${g.lines.map((l,i)=>`<div class="lyric-line" data-i="${i}">${l}</div>`).join('')}</div>`;
+    el.querySelectorAll(".lyric-line").forEach(line=>line.onclick=()=>{
+      if(+line.dataset.i===g.correct){line.classList.add("correct");reveal(slot);el.dataset.done=1;}
+      else{line.classList.add("wrong");setTimeout(()=>line.classList.remove("wrong"),500);}
+    });
+  }
+  else if(g.type==="tf"){
+    el.innerHTML=`<div class="q-prompt">${g.statement}</div><div class="opts"><div class="opt" data-v="true">✓ True</div><div class="opt" data-v="false">✗ False</div></div><div class="fb" id="${slot}fb"></div>`;
+    el.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{
+      const v=(o.dataset.v==="true"); const fb=document.getElementById(slot+"fb");
+      if(v===g.answer){o.classList.add("correct");fb.className="fb ok";fb.textContent="Yes! 🎉";reveal(slot);el.dataset.done=1;}
+      else{o.classList.add("wrong");fb.className="fb no";fb.textContent="Try again!";setTimeout(()=>o.classList.remove("wrong"),500);}
+    });
+  }
+  else if(g.type==="gap"){
+    el.innerHTML=`<div class="slot-line">${g.before} <span class="slot" id="${slot}s">______</span> ${g.after}</div><div class="chips" style="margin-top:6px">${g.chips.map(c=>`<span class="chip" data-c="${c}">${c}</span>`).join('')}</div><div class="fb" id="${slot}fb"></div>`;
+    el.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{
+      const fb=document.getElementById(slot+"fb");
+      if(c.dataset.c===g.answer){document.getElementById(slot+"s").textContent=g.answer;c.classList.add("used");fb.className="fb ok";fb.textContent="Perfect! 🎉";reveal(slot);el.dataset.done=1;}
+      else{c.style.background="#fee2e2";fb.className="fb no";fb.textContent="Not that one!";setTimeout(()=>c.style.background="",500);}
+    });
+  }
+  else if(g.type==="pick"){
+    el.innerHTML=`<div class="q-prompt">${g.prompt}</div><div class="opts">${g.opts.map((o,i)=>`<div class="opt" data-i="${i}">${o}</div>`).join('')}</div>`;
+    el.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{
+      if(+o.dataset.i===g.correct){o.classList.add("correct");reveal(slot);el.dataset.done=1;}
+      else{o.classList.add("wrong");setTimeout(()=>o.classList.remove("wrong"),500);}
+    });
+  }
+  else if(g.type==="scramble"){
+    const jc = g.joinChar===undefined?" ":g.joinChar;
+    let order=[];
+    const pieces=[...g.pieces].sort(()=>Math.random()-.5);
+    el.innerHTML=`<div class="q-prompt">${g.prompt}</div><div class="slot-line"><span class="slot" id="${slot}s" style="min-width:280px">______</span></div><div class="chips">${pieces.map(p=>`<span class="chip" data-p="${p}">${p}</span>`).join('')}</div><div class="fb" id="${slot}fb"></div>`;
+    el.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{
+      if(c.classList.contains("used"))return;
+      c.classList.add("used");order.push(c.dataset.p);
+      document.getElementById(slot+"s").textContent=order.join(jc);
+      const fb=document.getElementById(slot+"fb");
+      if(order.length===g.pieces.length){
+        if(order.join(jc).toLowerCase()===g.answer.toLowerCase()){fb.className="fb ok";fb.textContent="You got it! 🎉";reveal(slot);el.dataset.done=1;}
+        else{fb.className="fb no";fb.textContent="Hmm, tap reset.";el.querySelectorAll(".chip").forEach(x=>x.classList.remove("used"));order=[];setTimeout(()=>{document.getElementById(slot+"s").textContent="______";fb.textContent="";},900);}
+      }
+    });
+  }
+}
+
+/* NEW words */
+function initNew(v, slot){
+  const el=document.getElementById(slot); if(!el||el.dataset.done)return;
+  if(v.game.type==="chorus"){
+    el.innerHTML=`<div class="q-prompt">Which part do we sing <b>again and again</b>?</div><div class="opts">
+      <div class="opt" data-ok="1">The Chorus</div><div class="opt" data-ok="0">Verse 1</div><div class="opt" data-ok="0">The Bridge</div></div><div class="win-tag" id="${slot}w" style="opacity:0">🔁 The chorus repeats 2 times in this song!</div>`;
+  } else if(v.game.type==="verse"){
+    el.innerHTML=`<div class="q-prompt">Which part <b>tells the story</b> and changes each time?</div><div class="opts">
+      <div class="opt" data-ok="0">The Chorus</div><div class="opt" data-ok="1">A Verse</div></div><div class="win-tag" id="${slot}w" style="opacity:0">📜 Each verse is different — it tells a new part!</div>`;
+  } else { // rhyme
+    el.innerHTML=`<div class="q-prompt">Which word <b>rhymes</b> with <b>go</b>?</div><div class="opts">
+      <div class="opt" data-ok="1">slow</div><div class="opt" data-ok="0">push</div><div class="opt" data-ok="0">spin</div></div><div class="win-tag" id="${slot}w" style="opacity:0">🎶 go + slow = rhyme! Same ending sound.</div>`;
+  }
+  el.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{
+    if(o.dataset.ok==="1"){o.classList.add("correct");const w=document.getElementById(slot+"w");if(w)w.style.opacity=1;reveal(slot);el.dataset.done=1;}
+    else{o.classList.add("wrong");setTimeout(()=>o.classList.remove("wrong"),500);}
+  });
+}
+
+/* Act it out */
+function initActOut(){
+  const board=document.getElementById("actBoard"); if(board.dataset.done)return; board.dataset.done=1;
+  board.innerHTML=ACTIONS.map(a=>`<span class="chip">${a}</span>`).join('');
+  board.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{ c.style.background=c.style.background?"":"var(--green)"; c.style.color=c.style.color?"":"#fff"; });
+}
+
+/* Karaoke */
+function initKaraoke(mainId,countId,foundId){
+  const main=document.getElementById(mainId); if(main.dataset.done)return; main.dataset.done=1;
+  let count=0; const found=new Set();
+  main.querySelectorAll(".kw").forEach(w=>w.onclick=()=>{
+    if(w.classList.contains("tapped"))return;
+    w.classList.add("tapped");count++;
+    document.getElementById(countId).textContent=count;
+    const word=w.dataset.w; if(!found.has(word)){found.add(word);
+      const s=document.createElement("span");s.textContent=word;document.getElementById(foundId).appendChild(s);}
+  });
+}
+
+/* Which verse */
+function initWhichVerse(WV){
+  document.querySelectorAll("[data-wv]").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.wv, v=+b.dataset.v; const row=b.closest(".assess-row");
+    if(row.dataset.done)return;
+    if(v===WV[i].v){b.classList.add("on-yes");row.dataset.done=1;}
+    else{b.classList.add("on-no");setTimeout(()=>b.classList.remove("on-no"),500);}
+  });
+}
+
+/* Motion match (Use It Again — Vocabulary 1) */
+function initMotionMatch(rows){
+  document.querySelectorAll("[data-mm]").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.mm, v=+b.dataset.mv; const row=b.closest(".assess-row");
+    if(row.dataset.done)return;
+    if(v===rows[i].correct){b.classList.add("on-yes");row.dataset.done=1;}
+    else{b.classList.add("on-no");setTimeout(()=>b.classList.remove("on-no"),500);}
+  });
+}
+
+/* Grammar preview (Use It Again — Grammar 1) */
+function initGrammarPreview(rows){
+  rows.forEach((r,i)=>{
+    const card=document.getElementById("gp"+i);
+    if(card) card.onclick=()=>{ const a=document.getElementById("gpa"+i); if(a)a.style.opacity=1; };
+  });
+}
+
+/* Write lines */
+function initWriteLines(){
+  const fb=document.getElementById("wnlfb"); let r1=null,r2=null;
+  document.querySelectorAll("[data-row]").forEach(c=>c.onclick=()=>{
+    const row=c.dataset.row;
+    document.querySelectorAll(`[data-row="${row}"]`).forEach(x=>{x.style.background="";x.style.color="";});
+    c.style.background="var(--green)";c.style.color="#fff";
+    if(row==="1"){r1=c.dataset.t;document.getElementById("b1").textContent=c.dataset.t;}
+    else{r2=c.dataset.t;document.getElementById("b2").textContent=c.dataset.t;}
+    if(r1&&r2){fb.textContent="🎵 "+'"The more you '+r1+', the '+r2+' you get." Sing it!';}
+  });
+}
+
+/* Assessment */
+function initAssess(){
+  document.querySelectorAll("[data-as]").forEach(b=>b.onclick=()=>{
+    const i=b.dataset.as; document.querySelectorAll(`[data-as="${i}"]`).forEach(x=>x.classList.remove("on-yes","on-no"));
+    b.classList.add(b.dataset.v==="yes"?"on-yes":"on-no");
+  });
+}
+
+/* ===================================================================
+   NAVIGATION
+   =================================================================== */
+function fitScale(){
+  const s=Math.min(window.innerWidth/1920,(window.innerHeight-52)/1080);
+  document.getElementById('scaler').style.transform=`translate(-50%,-50%) scale(${s})`;
+}
+window.addEventListener('resize',fitScale); fitScale();
+
+function showSlide(n){
+  idx=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,i)=>s.classList.toggle('active',i===idx));
+  document.getElementById('prog').textContent=`${idx+1} / ${slides.length}`;
+  document.getElementById('notesBody').innerHTML=NOTES[idx]||`<p>—</p>`;
+  if(initFns[idx]) initFns[idx]();
+}
+function nextSlide(){ showSlide(idx+1); }
+function prevSlide(){ showSlide(idx-1); }
+function toggleNotes(){ document.getElementById('notes').classList.toggle('open'); }
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nextSlide();}
+  else if(e.key==='ArrowLeft'){prevSlide();}
+  else if(e.key==='n'||e.key==='N'){toggleNotes();}
+});
+
+showSlide(0);
+</script>
+</body>
+</html>

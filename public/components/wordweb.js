@@ -34,8 +34,12 @@
      • Tap "×" on a filled oval → removes it.
      • storageKey persists nodes (text/emoji/sentence) + center text to
        localStorage and reloads on re-render.
-     • sentenceBuilder renders one editable sentence line per filled node,
-       pre-filled from sentenceTemplate but fully rewritable by Leo.
+     • sentenceBuilder renders one sentence "card" per filled node: a row
+       of tappable word chips (center + every filled node's word) that
+       append into an editable line below, pre-filled from sentenceTemplate
+       but fully rewritable by Leo (typing or an "⌫ Undo" last-word button).
+       The whole sentence box scrolls internally past a few lines so it
+       never gets clipped by a host page's fixed-height layout.
 ═══════════════════════════════════════════════════════════════════════ */
 
 (function () {
@@ -188,23 +192,42 @@
     }
     controls += '</div>';
 
-    // Sentence builder — one editable line per filled node, Leo writes/rewrites freely
+    // Sentence builder — tap word chips to build each line (or type/edit
+    // directly). The whole box is its own scroll region (max-height +
+    // overflow-y) so a web with several filled nodes never gets clipped
+    // by a host page's fixed-height slide — only this inner box scrolls.
     let builder = '';
     if (opts.sentenceBuilder) {
       const filledNodes = nodes.map((n, i) => ({ n, i })).filter((entry) => entry.n.text && entry.n.text.trim());
       if (filledNodes.length) {
-        builder += '<div class="leea-web-sentences" style="margin-top:18px;display:flex;flex-direction:column;gap:10px">';
-        builder += '<div style="font-size:13px;font-weight:800;color:#6B7280;letter-spacing:.04em;text-transform:uppercase">✏️ Build your sentences</div>';
+        const chipWords = [center.text, ...filledNodes.map((entry) => entry.n.text)]
+          .map((w) => (w || '').trim())
+          .filter((w, idx, arr) => w && arr.indexOf(w) === idx);
+
+        builder += '<div class="leea-web-sentences" style="margin-top:18px;max-height:230px;overflow-y:auto;padding:2px 4px 4px;display:flex;flex-direction:column;gap:14px">';
+        builder += '<div style="font-size:13px;font-weight:800;color:#6B7280;letter-spacing:.04em;text-transform:uppercase;position:sticky;top:0;background:inherit">✏️ Build your sentences — tap words to add them</div>';
         for (const entry of filledNodes) {
           const { n, i } = entry;
           const defaultSentence = opts.sentenceTemplate
             .replace('{center}', center.text || '')
             .replace('{node}', n.text || '');
           const value = (n.sentence && n.sentence.trim()) ? n.sentence : defaultSentence;
-          builder += '<div contenteditable="true" class="leea-web-sentence-line" data-idx="' + i + '"'
+
+          const chipsRow = chipWords.map((w) =>
+            '<button type="button" onclick="window._leeaWebChipTap(\'' + id + '\',' + i + ',\'' + w.replace(/'/g, "\\'").replace(/"/g, '&quot;') + '\')" '
+            + 'style="background:#fff;color:' + opts.accentDark + ';border:2px solid ' + opts.accent + ';border-radius:20px;padding:4px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif">'
+            + esc(w) + '</button>'
+          ).join('');
+
+          builder += '<div class="leea-web-sentence-card" style="background:#F9FAFB;border:2px solid #E5E3DC;border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:8px">'
+            + '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">' + chipsRow
+            + '<button type="button" onclick="window._leeaWebUndoWord(\'' + id + '\',' + i + ')" style="margin-left:auto;background:none;border:1px dashed #9CA3AF;color:#6B7280;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;flex-shrink:0">⌫ Undo</button>'
+            + '</div>'
+            + '<div contenteditable="true" class="leea-web-sentence-line" data-idx="' + i + '"'
             + ' oninput="window._leeaWebSentenceInput(\'' + id + '\',' + i + ', this)"'
             + ' style="background:#fff;border:2px solid #E5E3DC;border-radius:12px;padding:12px 14px;font-size:15px;font-weight:600;color:#374151;font-family:Outfit,sans-serif;outline:none;cursor:text">'
-            + esc(value) + '</div>';
+            + esc(value) + '</div>'
+            + '</div>';
         }
         builder += '</div>';
       }
@@ -326,6 +349,29 @@
     if (!state || !state.nodes[idx]) return;
     state.nodes[idx].sentence = el.textContent || '';
     save(id);
+  };
+
+  // Tapping a word chip appends it to that line's sentence — repeatable
+  // (chips never get "used up") so a word can appear more than once in
+  // a sentence. Mutates textContent directly (not user typing), so the
+  // usual oninput handler must be called manually to persist state.
+  window._leeaWebChipTap = function (id, idx, word) {
+    const el = document.querySelector('[data-web-id="' + id + '"] .leea-web-sentence-line[data-idx="' + idx + '"]');
+    if (!el) return;
+    const current = (el.textContent || '').replace(/\s+$/, '');
+    el.textContent = current ? current + ' ' + word : word;
+    window._leeaWebSentenceInput(id, idx, el);
+  };
+
+  // Removes the last whitespace-separated word from a line — a quick
+  // "oops" undo that doesn't require selecting/deleting text by hand.
+  window._leeaWebUndoWord = function (id, idx) {
+    const el = document.querySelector('[data-web-id="' + id + '"] .leea-web-sentence-line[data-idx="' + idx + '"]');
+    if (!el) return;
+    const words = (el.textContent || '').trim().split(/\s+/).filter(Boolean);
+    words.pop();
+    el.textContent = words.join(' ');
+    window._leeaWebSentenceInput(id, idx, el);
   };
 
   window._leeaWebRemove = function (id, idx) {

@@ -205,12 +205,21 @@ export function TeacherDashboard() {
 
       {assignmentsReady ? (
         <section className="teacher-next-assignment teacher-design-next" aria-label="Next Leo app to assign">
+          <i className="teacher-hero-blob teacher-hero-blob-a" aria-hidden="true" />
+          <i className="teacher-hero-blob teacher-hero-blob-b" aria-hidden="true" />
           <div>
             <span className="teacher-next-label">Next to assign</span>
             {nextLearnerToAssign ? (
               <>
                 <h2>{formatTeacherNextTitle(nextLearnerToAssign)}</h2>
-                <p>Our World · Level {nextLearnerToAssign.level} · Unit {nextLearnerToAssign.unit} · {getComponentMeta(nextLearnerToAssign.component).label}</p>
+                <p>
+                  Our World ·{" "}
+                  <span className={`level-tag level-${nextLearnerToAssign.level ?? 4}`}>
+                    <i className="level-tag-dot" aria-hidden="true" />
+                    <b className="level-tag-label on-navy">Level {nextLearnerToAssign.level}</b>
+                  </span>{" "}
+                  · Unit {nextLearnerToAssign.unit} · {getComponentMeta(nextLearnerToAssign.component).label}
+                </p>
                 <div className="teacher-next-actions">
                   <button className="teacher-open-button" onClick={() => assignLesson(nextLearnerToAssign.id)} type="button">
                     Assign to Leo
@@ -248,7 +257,10 @@ export function TeacherDashboard() {
             <section className="teacher-group teacher-design-group" id={group.id} key={group.id}>
               <button className="teacher-group-header teacher-design-group-header" onClick={() => toggleGroup(group.id)} type="button">
                 <span>{isOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />} {group.courseLabel}</span>
-                <h2>Level {group.level}</h2>
+                <h2 className={`level-${group.level ?? 4}`}>
+                  <i className="level-tag-dot" aria-hidden="true" />
+                  Level {group.level}
+                </h2>
                 <small><i><b style={{ width: `${teacherInGroup.length ? Math.round((groupDone / teacherInGroup.length) * 100) : 0}%` }} /></i>{groupDone} / {teacherInGroup.length} taught</small>
               </button>
 
@@ -268,7 +280,7 @@ export function TeacherDashboard() {
                     const isUnitOpen = openGroups[unitKey] ?? true;
 
                     return (
-                      <div className={`teacher-table-band source-level-${group.level ?? 4}`} key={unitGroup.id}>
+                      <div className={`teacher-table-band level-${group.level ?? 4}`} key={unitGroup.id}>
                         {unitGroup.unit != null ? (
                           <button className="teacher-table-unit-header" onClick={() => toggleGroup(unitKey)} type="button">
                             {isUnitOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -416,10 +428,10 @@ function LeoAppStatus({ assignment, appProgress }: { assignment: AssignmentRecor
 
   return (
     <div className="teacher-leo-progress">
-      <div><span className={appProgress.done ? "status-pill done" : assignment ? "status-pill active" : "muted-status"}>{label}</span><strong>{showBar ? `${percent}%` : ""}</strong></div>
+      <div><span className={appProgress.done ? "status-pill done" : assignment ? "status-pill active" : "muted-status"}>{label}</span>{appProgress.done ? <strong>{percent}%</strong> : null}</div>
       {showBar ? (
         <>
-          <i><b style={{ width: `${percent}%` }} /></i>
+          <i className={appProgress.done ? "done" : "active"}><b style={{ width: `${percent}%` }} /></i>
           <small>{appProgress.completedModules}/{appProgress.moduleCount}</small>
         </>
       ) : null}

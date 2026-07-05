@@ -1,5 +1,24 @@
 import type { Metadata } from "next";
+import { Albert_Sans, Bricolage_Grotesque, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
+
+const albertSans = Albert_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-albert-sans"
+});
+
+const bricolageGrotesque = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-bricolage-grotesque"
+});
+
+const notoSansJp = Noto_Sans_JP({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-noto-sans-jp"
+});
 
 export const metadata: Metadata = {
   title: "LEEA",
@@ -8,7 +27,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${albertSans.variable} ${bricolageGrotesque.variable} ${notoSansJp.variable}`}>
       <body>{children}</body>
     </html>
   );

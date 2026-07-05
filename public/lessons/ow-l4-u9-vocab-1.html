@@ -142,8 +142,40 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
 
 /* WORD CHIPS ROW */
 .chips-row{display:flex;flex-wrap:wrap;gap:10px;padding:16px}
-.chip{background:#ede9fe;color:#5b21b6;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700}
+.chip{background:#ede9fe;color:#5b21b6;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
 .chip.used{background:#7C3AED;color:#fff}
+
+/* WORLD CUP 2026 FLAVOR CALLOUT */
+.wc-note{background:#ecfdf5;border:2px solid #10b981;border-radius:14px;padding:14px 20px;font-size:17px;color:#065f46;line-height:1.5;display:flex;gap:12px;align-items:flex-start}
+.wc-note b{color:#047857}
+.wc-note .wc-globe{font-size:26px;flex-shrink:0}
+
+/* TAP-TO-REVEAL CARDS (discussion Q&A / share gallery) */
+.reveal-card{background:#fff;border-radius:14px;border:2px solid #e5e7eb;padding:18px 24px;cursor:pointer;transition:all .2s}
+.reveal-card:hover{border-color:#7C3AED}
+.reveal-card.done{border-color:#10b981;background:#ecfdf5}
+.reveal-q{font-size:20px;font-weight:700;color:#374151;display:flex;align-items:center;gap:12px}
+.reveal-a{max-height:0;overflow:hidden;transition:max-height .3s ease;font-size:18px;color:#5b21b6;font-weight:600}
+.reveal-card.done .reveal-a{max-height:100px;margin-top:10px}
+
+/* TAP-TO-MATCH (antonym recap) */
+.match-row{display:flex;gap:40px;justify-content:center;align-items:flex-start;flex:1}
+.match-col{display:flex;flex-direction:column;gap:14px}
+.match-btn{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:14px 28px;font-size:22px;font-weight:700;color:#374151;cursor:pointer;transition:all .15s;min-width:220px;text-align:center;font-family:'Outfit',sans-serif}
+.match-btn:hover{border-color:#7C3AED}
+.match-btn.selected{border-color:#7C3AED;background:#f5f3ff}
+.match-btn.matched{border-color:#10b981;background:#ecfdf5;color:#047857;pointer-events:none}
+.match-btn.wrong{animation:wc-shake .4s}
+@keyframes wc-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+/* WORD-BY-WORD STREAK CARD */
+.streak-card{background:#fff;border-radius:16px;padding:28px;border:2px solid #e5e7eb;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.streak-word{font-size:44px;font-weight:800;color:#111}
+.streak-sent{font-size:20px;color:#374151;font-style:italic}
+
+/* TAP-TO-EXPLORE WORDS INSIDE READING TEXT */
+.tap-word{background:#ede9fe;color:#5b21b6;border:none;border-radius:6px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.tap-word.done{background:#7C3AED;color:#fff}
 
 /* TITLE SLIDE SPECIFIC */
 .title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#4c1d95 0%,#7C3AED 50%,#a78bfa 100%);color:#fff;gap:24px}
@@ -971,13 +1003,16 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
   <div class="content-body">
     <div class="slide-h1">⛸️ Let's Imagine We Are Ice Skaters!</div>
     <div class="task-card">Pretend to skate across the floor. <b>Move forward</b>. Now try <b>moving backward</b>. Can you <b>balance</b> on one leg? Don't fall over!</div>
+    <div class="game-title" id="actout-title">🎯 Tap each move after you try it — 0 / 4</div>
     <div class="chips-row" id="actout-chips">
-      <button class="chip" onclick="this.classList.toggle('used')">⏩ forward</button>
-      <button class="chip" onclick="this.classList.toggle('used')">⏪ backward</button>
-      <button class="chip" onclick="this.classList.toggle('used')">⚖️ balance</button>
-      <button class="chip" onclick="this.classList.toggle('used')">💥⬇️ fall over</button>
+      <button class="chip" onclick="actOutTap(this)">⏩ forward</button>
+      <button class="chip" onclick="actOutTap(this)">⏪ backward</button>
+      <button class="chip" onclick="actOutTap(this)">⚖️ balance</button>
+      <button class="chip" onclick="actOutTap(this)">💥⬇️ fall over</button>
     </div>
-    <div class="dial-card"><span class="dial-who">💬</span><div class="dial-text"><b>Dad:</b> "Who can show me how to move forward? Now who can show backward? Can you balance on one leg?"</div></div>
+    <div class="def-box" id="actout-win"><div class="def-en">🎉 All 4 moves done — just like Haaland warming up before a match!</div></div>
+    <div class="wc-note"><span class="wc-globe">🌍</span><div><b>World Cup 2026:</b> Norway's Erling Haaland just became the fastest player ever to reach 60 international goals — in only 53 matches! Every one of those goals used force, balance, and a powerful push.</div></div>
+    <div class="dial-card"><span class="dial-who">💬</span><div class="dial-text"><b>Dad:</b> "Who can show me how to move forward? Now who can show backward? Can you balance on one leg — like a skater at the Olympics?"</div></div>
   </div>
 </div>
 
@@ -996,6 +1031,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
         <div style="font-size:18px;color:#374151">Show how to balance on one leg. Ask: <em>"Can you do this? Sometimes skaters fall over — don't fall over!"</em></div>
       </div>
     </div>
+    <div class="wc-note"><span class="wc-globe">🌍</span><div><b>World Cup 2026:</b> Norway is back at the World Cup for the first time in 28 years — and just moved <b>forward</b> into the Round of 16, with Haaland leading the way!</div></div>
     <div class="audio-cue">🎥 Video Sc. 2-3</div>
   </div>
 </div>
@@ -1005,8 +1041,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
   <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Present — Explore the Photos</span></div>
   <div class="content-body">
     <div class="slide-h1">📸 Open your books to pages 148 and 149</div>
-    <div class="reading-block">"Look at this skier. To move, a skier <b>pushes</b> on the snow. A push can move a skier <b>forward</b>. It can also move a skier <b>backward</b>."</div>
-    <div class="reading-block">"Skaters <b>pull</b>, too. Look at these skaters. The more one skater pulls, the more they <b>spin</b>. The skaters don't <b>fall over</b> because they know how to <b>balance</b>."</div>
+    <div class="game-title" id="explore-title">🔍 Tap each bold word to explore it — 0 / 6</div>
+    <div class="reading-block">"Look at this skier. To move, a skier <button class="tap-word" onclick="exploreTap(this,'push')">pushes</button> on the snow. A push can move a skier <button class="tap-word" onclick="exploreTap(this,'forward')">forward</button>. It can also move a skier <button class="tap-word" onclick="exploreTap(this,'backward')">backward</button>."</div>
+    <div class="reading-block">"Skaters <button class="tap-word" onclick="exploreTap(this,'pull')">pull</button>, too. Look at these skaters. The more one skater pulls, the more they <button class="tap-word" onclick="exploreTap(this,'spin')">spin</button>. The skaters don't <button class="tap-word" onclick="exploreTap(this,'fallover')">fall over</button> because they know how to balance."</div>
+    <div id="explore-facts" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="def-box" id="explore-win"><div class="def-en">🎉 Great exploring! You found all 6 force words in the photos.</div></div>
     <div class="audio-cue">📖 Student Book p. 148–149</div>
   </div>
 </div>
@@ -1016,15 +1055,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
   <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Present — Build the Word Web</span></div>
   <div class="content-body" style="align-items:center;justify-content:center">
     <div class="slide-h1" style="text-align:center">💡 Draw a word web with FORCE in the center</div>
-    <div style="font-size:20px;color:#374151;text-align:center;max-width:900px">"I <b>push</b> on the desk. When I push, I use force. I can use a little force. Or I can use a lot of force. When I <b>pull</b>, I use force too. When I <b>rub</b> my hands together, I make friction. Friction is a force, too."</div>
-    <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:20px">
-      <span class="chip">👉 push</span>
-      <span class="chip">🤚 pull</span>
-      <span class="chip" style="background:#7C3AED;color:#fff;font-size:24px;padding:14px 28px">💪⚡ force</span>
-      <span class="chip">🌀 spin</span>
-      <span class="chip">🤲 rub</span>
-      <span class="chip">🔥 friction</span>
-    </div>
+    <div style="font-size:18px;color:#6b7280;text-align:center;max-width:900px">"I push on the desk. When I push, I use force. I can use a little force. Or I can use a lot of force. When I pull, I use force too. When I rub my hands together, I make friction. Friction is a force, too."</div>
+    <div id="force-web-teacher" style="flex:1;min-height:0;width:100%"></div>
   </div>
 </div>
 
@@ -1053,6 +1085,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
   <div class="content-body">
     <div class="slide-h1">🔊 Read along as you listen</div>
     <div class="task-card">Let's read and listen to information about how athletes use force to move. Read along as you listen to the paragraphs on pages 148 and 149. Play <b>TR: 9.1</b>.</div>
+    <div class="wc-note"><span class="wc-globe">🌍</span><div><b>World Cup 2026:</b> Lionel Messi and Kylian Mbappé are tied at 7 goals each in the race for the Golden Boot — every goal starts with force!</div></div>
     <div class="audio-cue">🔊 Play TR: 9.1</div>
   </div>
 </div>
@@ -1062,12 +1095,15 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
   <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Practice 1 — Ask &amp; Answer</span></div>
   <div class="content-body">
     <div class="slide-h1">💬 Discuss the four paragraphs</div>
-    <div class="q-list">
-      <div class="q-item"><span class="q-num">1</span>What do we use when we push or pull? <i style="color:#7C3AED;margin-left:auto">(force)</i></div>
-      <div class="q-item"><span class="q-num">2</span>How do skiers move? <i style="color:#7C3AED;margin-left:auto">(They push on the snow.)</i></div>
-      <div class="q-item"><span class="q-num">3</span>Why don't the skaters fall over? <i style="color:#7C3AED;margin-left:auto">(They know how to balance.)</i></div>
-      <div class="q-item"><span class="q-num">4</span>What is made when two things rub together? <i style="color:#7C3AED;margin-left:auto">(friction)</i></div>
+    <div class="game-title" id="disc-title">🙋 Tap a question to reveal the answer — 0 / 5</div>
+    <div class="q-list" id="disc-list">
+      <div class="reveal-card" onclick="discReveal(this)"><div class="reveal-q"><span class="q-num">1</span>What do we use when we push or pull?</div><div class="reveal-a">force</div></div>
+      <div class="reveal-card" onclick="discReveal(this)"><div class="reveal-q"><span class="q-num">2</span>How do skiers move?</div><div class="reveal-a">They push on the snow.</div></div>
+      <div class="reveal-card" onclick="discReveal(this)"><div class="reveal-q"><span class="q-num">3</span>Why don't the skaters fall over?</div><div class="reveal-a">They know how to balance.</div></div>
+      <div class="reveal-card" onclick="discReveal(this)"><div class="reveal-q"><span class="q-num">4</span>What is made when two things rub together?</div><div class="reveal-a">friction</div></div>
+      <div class="reveal-card" onclick="discReveal(this)"><div class="reveal-q"><span class="q-num">⚽</span>At the World Cup, how does Haaland move forward faster than defenders?</div><div class="reveal-a">He uses a powerful push and force from his legs!</div></div>
     </div>
+    <div class="def-box" id="disc-win"><div class="def-en">🎉 Great discussion — all 5 answered!</div></div>
   </div>
 </div>
 
@@ -1086,6 +1122,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
   <div class="content-body">
     <div class="slide-h1">🔊 Listen to words, then sentences</div>
     <div class="task-card">Next we're going to hear words and then listen to sentences with those words. Repeat each word and sentence after you hear it. Play <b>TR: 9.2</b>.</div>
+    <div class="wc-note"><span class="wc-globe">🌍</span><div><b>World Cup 2026:</b> Lionel Messi just became the first player ever — man or woman — to score 20 career World Cup goals!</div></div>
     <div class="audio-cue">🔊 Play TR: 9.2</div>
   </div>
 </div>
@@ -1095,10 +1132,12 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
   <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Practice 2 — Word by Word</span></div>
   <div class="content-body">
     <div class="slide-h1">🗣️ Repeat after Dad!</div>
+    <div class="game-title" id="p2w-progress">🔥 Streak: 0 / 15 words repeated</div>
     <div id="p2w-wrap" style="flex:1;display:flex;flex-direction:column;gap:14px;justify-content:center"></div>
     <div style="display:flex;gap:14px;justify-content:center">
       <button class="btn-outline" onclick="p2wNav(-1)">◀ Prev</button>
-      <button class="btn-g" onclick="p2wNav(1)">Next ▶</button>
+      <button class="btn-g" id="p2w-say-btn" onclick="p2wMarkSaid()">🗣️ I said it!</button>
+      <button class="btn-outline" onclick="p2wNav(1)">Next ▶</button>
     </div>
   </div>
 </div>
@@ -1109,9 +1148,15 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
   <div class="content-body">
     <div class="slide-h1">🎭 Guess the Word!</div>
     <div class="task-card">Act out the word <b>rub</b> by rubbing your hands together. Have students guess what word you are acting out. Then ask <em>"What did I just make?"</em> (friction) Call on other students to act out more target words. When a student guesses correctly, she takes a turn acting.</div>
-    <div class="chips-row">
-      <span class="chip">🤲💫 rub</span><span class="chip">🌀 spin</span><span class="chip">⚖️ balance</span><span class="chip">👉 push</span><span class="chip">🤚 pull</span>
+    <div class="game-title" id="recap-actout-title">🎯 Tap each word as it gets acted out — 0 / 5</div>
+    <div class="chips-row" id="recap-actout-chips">
+      <button class="chip" onclick="actOutTap2(this)">🤲💫 rub</button>
+      <button class="chip" onclick="actOutTap2(this)">🌀 spin</button>
+      <button class="chip" onclick="actOutTap2(this)">⚖️ balance</button>
+      <button class="chip" onclick="actOutTap2(this)">👉 push</button>
+      <button class="chip" onclick="actOutTap2(this)">🤚 pull</button>
     </div>
+    <div class="def-box" id="recap-actout-win"><div class="def-en">🎉 All 5 acted out — like Messi spinning away from two defenders!</div></div>
   </div>
 </div>
 
@@ -1120,12 +1165,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
   <div class="slide-header"><span class="hd-unit">Unit 9</span><span class="hd-sep">·</span><span class="hd-section">Recap — Antonyms (Opposites)</span></div>
   <div class="content-body">
     <div class="slide-h1">🔄 Word ↔ Opposite</div>
-    <div class="task-card" style="font-size:20px">Say <em>"Let's review some of the words we learned about how skiers and skaters move."</em> Point to <b>forward</b> and ask <em>"What's the opposite of forward?"</em></div>
-    <div class="two-col-content" style="grid-template-columns:1fr 1fr 1fr">
-      <div class="col-block" style="align-items:center"><div style="font-size:28px;font-weight:800">forward ⏩</div><div style="font-size:24px">↕</div><div style="font-size:28px;font-weight:800;color:#7C3AED">backward ⏪</div></div>
-      <div class="col-block" style="align-items:center"><div style="font-size:28px;font-weight:800">push 👉</div><div style="font-size:24px">↕</div><div style="font-size:28px;font-weight:800;color:#7C3AED">pull 🤚</div></div>
-      <div class="col-block" style="align-items:center"><div style="font-size:28px;font-weight:800">balance ⚖️</div><div style="font-size:24px">↕</div><div style="font-size:28px;font-weight:800;color:#7C3AED">fall over 💥⬇️</div></div>
-    </div>
+    <div class="task-card" style="font-size:18px">Say <em>"Let's review some of the words we learned about how skiers and skaters move."</em> Have students tap to match each word to its opposite.</div>
+    <div class="game-title" id="ant-match-title">🧲 Match each word to its opposite — 0 / 3</div>
+    <div class="match-row" id="ant-match-row"></div>
+    <div class="def-box" id="ant-match-win"><div class="def-en">🎉 All matched — great antonym skills!</div></div>
   </div>
 </div>
 
@@ -1137,6 +1180,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
     <div class="dial-card"><span class="dial-who">👦</span><div class="dial-text">"How do skaters stop?"</div></div>
     <div class="dial-card"><span class="dial-who">👧</span><div class="dial-text"><b>"They use force."</b></div></div>
     <div class="task-card">Ask and answer. Work with a partner. What did you learn?</div>
+    <div class="wc-note"><span class="wc-globe">🌍</span><div><b>World Cup 2026:</b> A goalkeeper uses force to stop a shot too — just like a skater uses force to stop moving!</div></div>
   </div>
 </div>
 
@@ -1170,7 +1214,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif
   <div class="content-body">
     <div class="slide-h1">👥 Share in Small Groups</div>
     <div class="task-card">When students finish, place them in small groups. Make sure a variety of sports are included in each group. Have students share their sentences to tell about their sport.</div>
-    <div class="dial-card"><span class="dial-who">⚽</span><div class="dial-text">"When Mbappé <b>pushes</b> off the ground, he uses <b>force</b> to run <b>forward</b> faster than the defender!"</div></div>
+    <div class="game-title" id="share-title">🎁 Tap each sport for a sample sentence — 0 / 3</div>
+    <div class="q-list" id="share-list">
+      <div class="reveal-card" onclick="shareReveal(this)"><div class="reveal-q">🏊 Swimming</div><div class="reveal-a">"A swimmer pulls the water backward to push their body forward."</div></div>
+      <div class="reveal-card" onclick="shareReveal(this)"><div class="reveal-q">🏀 Basketball</div><div class="reveal-a">"A player pushes off the ground with force to jump for the ball."</div></div>
+      <div class="reveal-card" onclick="shareReveal(this)"><div class="reveal-q">🏃 Running</div><div class="reveal-a">"A sprinter uses force to move forward as fast as possible."</div></div>
+    </div>
+    <div class="dial-card"><span class="dial-who">⚽</span><div class="dial-text">"At the 2026 World Cup, Haaland became the fastest player ever to reach 60 international goals — in just 53 matches! Every shot uses force, balance, and a powerful push, just like Mbappé pushing off the ground to run forward faster than a defender."</div></div>
   </div>
 </div>
 
@@ -1334,8 +1384,10 @@ function goTo(n) {
   const tn = document.getElementById('tn-content');
   tn.innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
   if (cur === 23) initVocabReview();
+  if (cur === 27) initForceWeb();
   if (cur === 32) initSortTeacher();
   if (cur === 34) { p2wIdx = 0; renderP2W(); }
+  if (cur === 36) initAntMatch();
   if (cur === 38) initQuestionBuilder();
   if (cur === 39) initSportWeb();
   if (cur === 41) initWrapUpCircle();
@@ -1747,16 +1799,171 @@ function initSortTeacher() {
 
 // ─── PRACTICE 2B — WORD BY WORD (Slide 34) ──────────────────────
 let p2wIdx = 0;
+const p2wDone = new Set();
 function renderP2W() {
   const w = vocabWords[p2wIdx];
+  const said = p2wDone.has(p2wIdx);
   document.getElementById('p2w-wrap').innerHTML =
-    '<div class="task-card" style="text-align:center;font-size:26px">' + w.emoji + ' <b>' + w.word + '</b></div>' +
-    '<div class="task-card" style="text-align:center;font-style:italic">"' + w.sent + '"</div>' +
+    '<div class="streak-card">' +
+      '<div class="streak-word">' + w.emoji + ' ' + w.word + '</div>' +
+      '<div class="streak-sent">"' + w.sent + '"</div>' +
+    '</div>' +
     '<div style="text-align:center;color:#7C3AED;font-weight:700;font-size:18px">Word ' + (p2wIdx + 1) + ' of ' + vocabWords.length + '</div>';
+  const btn = document.getElementById('p2w-say-btn');
+  if (btn) { btn.textContent = said ? '✅ Said it!' : '🗣️ I said it!'; btn.disabled = said; }
+  const prog = document.getElementById('p2w-progress');
+  if (prog) prog.textContent = '🔥 Streak: ' + p2wDone.size + ' / ' + vocabWords.length + ' words repeated' + (p2wDone.size >= vocabWords.length ? ' — 🎉 All done!' : '');
+}
+function p2wMarkSaid() {
+  p2wDone.add(p2wIdx);
+  renderP2W();
+  if (p2wIdx < vocabWords.length - 1) setTimeout(() => { p2wIdx++; renderP2W(); }, 500);
 }
 function p2wNav(dir) {
   p2wIdx = Math.max(0, Math.min(vocabWords.length - 1, p2wIdx + dir));
   renderP2W();
+}
+
+// ─── ACT IT OUT — WARM UP (Slide 24) ────────────────────────────
+let actOutCount = 0;
+function actOutTap(btn) {
+  const already = btn.classList.contains('used');
+  btn.classList.toggle('used');
+  actOutCount += already ? -1 : 1;
+  document.getElementById('actout-title').textContent = '🎯 Tap each move after you try it — ' + actOutCount + ' / 4';
+  document.getElementById('actout-win').classList.toggle('show', actOutCount >= 4);
+}
+
+// ─── EXPLORE THE PHOTOS (Slide 26) ──────────────────────────────
+const exploreFacts = {
+  push: '👉💥 Push — Salah pushes off the ground to jump for a header.',
+  forward: '⏩ Forward — Mbappé sprints forward faster than any defender.',
+  backward: '⏪ Backward — A goalkeeper often steps backward before a save.',
+  pull: '🤚⬅️ Pull — A skater pulls their arms in tight to spin faster.',
+  spin: '🌀 Spin — Messi can spin away from two defenders in one touch.',
+  fallover: '💥⬇️ Fall over — Without balance, even a small push can make you fall over.'
+};
+let exploreCount = 0;
+function exploreTap(btn, key) {
+  if (btn.classList.contains('done')) return;
+  btn.classList.add('done');
+  exploreCount++;
+  document.getElementById('explore-title').textContent = '🔍 Tap each bold word to explore it — ' + exploreCount + ' / 6';
+  const factsEl = document.getElementById('explore-facts');
+  const p = document.createElement('div');
+  p.className = 'task-card';
+  p.style.fontSize = '18px';
+  p.textContent = exploreFacts[key];
+  factsEl.appendChild(p);
+  if (exploreCount >= 6) document.getElementById('explore-win').classList.add('show');
+}
+
+// ─── FORCE WORD WEB (Slide 27) ───────────────────────────────────
+function initForceWeb() {
+  const el = document.getElementById('force-web-teacher');
+  if (!el || el.innerHTML.trim()) return;
+  el.innerHTML = pickChart('word web', {
+    id: 'force-web-teacher-chart',
+    center: { text: 'force', emoji: '💪⚡' },
+    nodes: [
+      { text: 'push', emoji: '👉💥', sentence: 'When I push, I use force.' },
+      { text: 'pull', emoji: '🤚⬅️', sentence: 'When I pull, I use force too.' },
+      { text: 'rub', emoji: '🤲💫', sentence: 'When I rub my hands together, I make friction.' },
+      { text: 'friction', emoji: '🤚🔥', sentence: 'Friction is a force, too.' }
+    ],
+    addable: true,
+    removable: true,
+    editable: true,
+    centerEditable: false,
+    sentenceBuilder: true,
+    sentenceTemplate: 'Write your own sentence about force using "{node}".'
+  });
+}
+
+// ─── DISCUSSION Q&A (Slide 31) ───────────────────────────────────
+let discCount = 0;
+function discReveal(card) {
+  if (card.classList.contains('done')) return;
+  card.classList.add('done');
+  discCount++;
+  document.getElementById('disc-title').textContent = '🙋 Tap a question to reveal the answer — ' + discCount + ' / 5';
+  if (discCount >= 5) document.getElementById('disc-win').classList.add('show');
+}
+
+// ─── RECAP ACT IT OUT (Slide 35) ────────────────────────────────
+let actOutCount2 = 0;
+function actOutTap2(btn) {
+  const already = btn.classList.contains('used');
+  btn.classList.toggle('used');
+  actOutCount2 += already ? -1 : 1;
+  document.getElementById('recap-actout-title').textContent = '🎯 Tap each word as it gets acted out — ' + actOutCount2 + ' / 5';
+  document.getElementById('recap-actout-win').classList.toggle('show', actOutCount2 >= 5);
+}
+
+// ─── ANTONYM MATCH (Slide 36) ────────────────────────────────────
+const antMatchPairs = [
+  { a: 'forward ⏩', b: 'backward ⏪' },
+  { a: 'push 👉', b: 'pull 🤚' },
+  { a: 'balance ⚖️', b: 'fall over 💥⬇️' }
+];
+let antMatchSelected = null, antMatchDone = 0;
+function initAntMatch() {
+  const row = document.getElementById('ant-match-row');
+  if (!row || row.innerHTML.trim()) return;
+  antMatchSelected = null; antMatchDone = 0;
+  const leftCol = document.createElement('div'); leftCol.className = 'match-col';
+  const rightCol = document.createElement('div'); rightCol.className = 'match-col';
+  antMatchPairs.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.className = 'match-btn'; b.textContent = p.a;
+    b.onclick = () => antMatchTap(b, 'a' + i);
+    leftCol.appendChild(b);
+  });
+  const shuffled = antMatchPairs.map((p, i) => ({ p, i })).sort(() => Math.random() - 0.5);
+  shuffled.forEach((entry) => {
+    const b = document.createElement('button');
+    b.className = 'match-btn'; b.textContent = entry.p.b;
+    b.onclick = () => antMatchTap(b, 'b' + entry.i);
+    rightCol.appendChild(b);
+  });
+  row.appendChild(leftCol); row.appendChild(rightCol);
+}
+function antMatchTap(btn, key) {
+  if (btn.classList.contains('matched')) return;
+  const idx = key.slice(1);
+  if (!antMatchSelected) { antMatchSelected = { btn, key, idx }; btn.classList.add('selected'); return; }
+  if (antMatchSelected.key[0] === key[0]) {
+    antMatchSelected.btn.classList.remove('selected');
+    antMatchSelected = { btn, key, idx };
+    btn.classList.add('selected');
+    return;
+  }
+  if (antMatchSelected.idx === idx) {
+    btn.classList.add('matched');
+    antMatchSelected.btn.classList.remove('selected');
+    antMatchSelected.btn.classList.add('matched');
+    antMatchDone++;
+    document.getElementById('ant-match-title').textContent = '🧲 Match each word to its opposite — ' + antMatchDone + ' / 3';
+    antMatchSelected = null;
+    if (antMatchDone >= 3) document.getElementById('ant-match-win').classList.add('show');
+  } else {
+    const prev = antMatchSelected;
+    btn.classList.add('wrong'); prev.btn.classList.add('wrong');
+    antMatchSelected = null;
+    setTimeout(() => {
+      btn.classList.remove('wrong', 'selected');
+      prev.btn.classList.remove('wrong', 'selected');
+    }, 500);
+  }
+}
+
+// ─── SHARE GALLERY (Slide 40) ────────────────────────────────────
+let shareCount = 0;
+function shareReveal(card) {
+  if (card.classList.contains('done')) return;
+  card.classList.add('done');
+  shareCount++;
+  document.getElementById('share-title').textContent = '🎁 Tap each sport for a sample sentence — ' + shareCount + ' / 3';
 }
 
 // ─── SPORT WORD WEB (Slide 39) ──────────────────────────────────

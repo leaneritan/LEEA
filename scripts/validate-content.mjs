@@ -192,6 +192,19 @@ for (const word of wordsById.values()) {
   assertPresent(word.japanese?.word, sourceLabel(word, "japanese.word"));
   assertPresent(word.japanese?.reading, sourceLabel(word, "japanese.reading"));
   assertPresent(word.japanese?.meaning, sourceLabel(word, "japanese.meaning"));
+  for (const [field, value] of [
+    ["displayEmoji", word.displayEmoji ?? word.emoji],
+    ["ipa", word.ipa],
+    ["japanese.word", word.japanese?.word],
+    ["japanese.reading", word.japanese?.reading],
+    ["japanese.meaning", word.japanese?.meaning],
+    ["exampleJp", word.exampleJp],
+    ["additionalExamplesJp", (word.additionalExamplesJp ?? []).join(" ")]
+  ]) {
+    if (typeof value === "string" && value.includes("?")) {
+      fail(sourceLabel(word, `${field} contains literal "?" replacement characters`));
+    }
+  }
 
   validateWordCardFields(word);
   if (word.type === "academic") validateAcademicWord(word);

@@ -114,7 +114,11 @@ function mergeWordsAcrossUnits(unitWordLists: UnitVocabularyWord[][]): Vocabular
           }
         }
         if (typeRank(item.type) > typeRank(existing.type)) {
-          existing.type = item.type;
+          byId.set(item.id, {
+            ...item,
+            sources: existing.sources,
+            tags: existing.tags
+          });
         }
         for (const tag of item.tags) {
           if (!existing.tags.includes(tag)) existing.tags.push(tag);

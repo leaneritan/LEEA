@@ -34,6 +34,7 @@ const unitVocabularyPaths = [
 ];
 const vocabularyIndexPath = "content/subjects/english/reference/vocabulary-index.json";
 const unitGrammarPaths = [
+  "content/subjects/english/courses/our-world/level-4/unit-4/grammar.json",
   "content/subjects/english/courses/our-world/level-4/unit-5/grammar.json",
   "content/subjects/english/courses/our-world/level-4/unit-6/grammar.json",
   "content/subjects/english/courses/our-world/level-4/unit-7/grammar.json",

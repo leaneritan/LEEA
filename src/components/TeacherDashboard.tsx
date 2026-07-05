@@ -205,8 +205,6 @@ export function TeacherDashboard() {
 
       {assignmentsReady ? (
         <section className="teacher-next-assignment teacher-design-next" aria-label="Next Leo app to assign">
-          <i className="teacher-hero-blob teacher-hero-blob-a" aria-hidden="true" />
-          <i className="teacher-hero-blob teacher-hero-blob-b" aria-hidden="true" />
           <div>
             <span className="teacher-next-label">Next to assign</span>
             {nextLearnerToAssign ? (

@@ -1,3 +1,4 @@
+import unit3Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-3/vocabulary.json";
 import unit4Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-4/vocabulary.json";
 import unit5Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-5/vocabulary.json";
 import unit6Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-6/vocabulary.json";
@@ -21,6 +22,7 @@ import type {
 } from "./types";
 
 type UnitVocabularyWord =
+  | (typeof unit3Vocabulary.words)[number]
   | (typeof unit9Vocabulary.words)[number]
   | (typeof unit8Vocabulary.words)[number]
   | (typeof unit7Vocabulary.words)[number]
@@ -127,6 +129,7 @@ function mergeWordsAcrossUnits(unitWordLists: UnitVocabularyWord[][]): Vocabular
 }
 
 export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
+  unit3Vocabulary.words as UnitVocabularyWord[],
   unit9Vocabulary.words as UnitVocabularyWord[],
   unit8Vocabulary.words as UnitVocabularyWord[],
   unit7Vocabulary.words as UnitVocabularyWord[],
@@ -139,6 +142,7 @@ export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
    "<level>-<unit>". Add a new entry here whenever a unit is scanned, so the
    Reference tree never has to guess or hardcode a title elsewhere. */
 export const unitTitles: Record<string, string> = {
+  [`${unit3Vocabulary.level}-${unit3Vocabulary.unit}`]: unit3Vocabulary.unitTitle,
   [`${unit4Vocabulary.level}-${unit4Vocabulary.unit}`]: unit4Vocabulary.unitTitle,
   [`${unit5Vocabulary.level}-${unit5Vocabulary.unit}`]: unit5Vocabulary.unitTitle,
   [`${unit6Vocabulary.level}-${unit6Vocabulary.unit}`]: unit6Vocabulary.unitTitle,
@@ -146,6 +150,13 @@ export const unitTitles: Record<string, string> = {
   [`${unit8Vocabulary.level}-${unit8Vocabulary.unit}`]: unit8Vocabulary.unitTitle,
   [`${unit9Vocabulary.level}-${unit9Vocabulary.unit}`]: unit9Vocabulary.unitTitle
 };
+
+export const unit3Vocab1Items = vocabularyItems.filter((item) => unit3Vocabulary.vocab1WordIds.includes(item.id));
+export const unit3Vocab2Items = vocabularyItems.filter((item) => unit3Vocabulary.vocab2WordIds.includes(item.id));
+export const unit3AcademicItems = vocabularyItems.filter((item) => unit3Vocabulary.academicWordIds.includes(item.id));
+export const unit3GlossaryItems = vocabularyItems.filter(
+  (item) => unit3Vocabulary.contentWordIds.includes(item.id) || unit3Vocabulary.relatedWordIds.includes(item.id)
+);
 
 export const unit4Vocab1Items = vocabularyItems.filter(
   (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U4-V1")

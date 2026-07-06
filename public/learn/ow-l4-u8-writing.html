@@ -196,6 +196,11 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
 .qz-retry{background:var(--bl);color:#fff;border:none;border-radius:4px;padding:9px 18px;font-family:var(--fn);font-size:.82rem;font-weight:800;cursor:pointer;margin-top:12px}
 .qz-pass{background:var(--gn) !important}
 
+.mod-footer{display:flex;gap:8px;margin-top:10px}
+.mark-btn{flex:1;background:var(--gn);color:#fff;border:none;border-radius:4px;padding:11px 14px;font-family:var(--fn);font-size:.82rem;font-weight:800;cursor:pointer}
+.mark-btn:disabled{background:var(--ink3);cursor:not-allowed;opacity:.6}
+.redo-btn{background:var(--rd);color:#fff;border:none;border-radius:4px;padding:11px 14px;font-family:var(--fn);font-size:.78rem;font-weight:800;cursor:pointer;min-width:96px}
+
 /* MODULE-SPECIFIC */
 /* m3 — clue cards */
 .clue-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
@@ -725,6 +730,10 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
   </div>
   <div id="m5-leo-chart"></div>
   <span class="save-ind" id="m5-saved">SAVED</span>
+  <div class="mod-footer">
+    <button class="redo-btn" id="m5-redo-btn" onclick="m5Redo()">↺ Redo</button>
+    <button class="mark-btn" id="m5-mark-btn" disabled onclick="m5MarkDone()">Fill all 4 boxes first ✋</button>
+  </div>
 </div>
 </div></div>
 
@@ -1416,7 +1425,32 @@ function m5CellEdit(col, val) {
 }
 function m5CheckDone() {
   const cur = lLoad(SAVE_PREFIX + 'fcc-leo', {});
-  if (M5_COLS.every(k => (cur[k] || '').toString().trim().length > 0)) setDone('m5');
+  const filled = M5_COLS.every(k => (cur[k] || '').toString().trim().length > 0);
+  if (filled) setDone('m5');
+  const btn = document.getElementById('m5-mark-btn');
+  if (btn) {
+    btn.disabled = !filled;
+    btn.textContent = filled ? 'Mark Plan complete ✓' : 'Fill all 4 boxes first ✋';
+  }
+}
+function m5MarkDone() { setDone('m5'); closeModal('m5'); }
+function m5Redo() {
+  const btn = document.getElementById('m5-redo-btn');
+  if (!btn.dataset.armed) {
+    btn.dataset.armed = '1';
+    btn.textContent = 'Sure? ↺';
+    setTimeout(() => { delete btn.dataset.armed; btn.textContent = '↺ Redo'; }, 3000);
+    return;
+  }
+  delete btn.dataset.armed;
+  btn.textContent = '↺ Redo';
+  lSave(SAVE_PREFIX + 'fcc-leo', { hobby:'', what:'', how:'', ex:'' });
+  lSave(SAVE_PREFIX + 'm5-done', false);
+  document.querySelectorAll('#m5 .hobby-chip').forEach(c => c.classList.remove('selected'));
+  updateBadge('m5', 'new');
+  m5BuildLeo();
+  m5CheckDone();
+  updateProgress();
 }
 function m5PickHobby(name, em) {
   document.querySelectorAll('#m5 .hobby-chip').forEach(c => c.classList.remove('selected'));
@@ -1429,7 +1463,7 @@ function m5PickHobby(name, em) {
   showSaveInd('m5');
   m5CheckDone();
 }
-function restore_m5() { m5BuildModel(); m5BuildLeo(); }
+function restore_m5() { m5BuildModel(); m5BuildLeo(); m5CheckDone(); }
 
 // ═══════════════════════════════════════════════
 // M6 — WRITE!

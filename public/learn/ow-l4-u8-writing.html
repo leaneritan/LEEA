@@ -1380,31 +1380,54 @@ function m5BuildModel() {
     return;
   }
   document.getElementById('m5-model-chart').innerHTML = window.pickChart('4-column chart', {
+    id: 'm5-model-fcc',
     columns: ['Hobby', 'What it is', 'How you do it', 'Examples'],
     rows: [{ hobby:'origami', what:'folding paper into shapes', how:'start with a square · fold many times', ex:'a little bug · a dragon · a paper crane' }],
     mode: 'static'
   });
 }
+const M5_COLS = ['hobby', 'what', 'how', 'ex'];
 function m5BuildLeo() {
   if (!window.buildFourColChart) return;
   const saved = lLoad(SAVE_PREFIX + 'fcc-leo', { hobby:'', what:'', how:'', ex:'' });
   document.getElementById('m5-leo-chart').innerHTML = window.pickChart('4-column chart', {
+    id: 'm5-leo-fcc',
     columns: ['Hobby', 'What it is', 'How you do it', 'Examples'],
     rows: [saved],
     mode: 'fill',
-    storageKey: 'leea-' + SAVE_PREFIX + 'fcc-leo',
-    onChange: () => { setProg('m5'); showSaveInd('m5'); }
+    onCellEdit: (r, c, val) => m5CellEdit(c, val)
   });
+  // buildFourColChart's fill-mode textareas render empty and self-init on a
+  // deferred setTimeout(0); populate them from our own saved object right after.
+  setTimeout(() => {
+    document.querySelectorAll('#m5-leo-chart .fcc-input').forEach(inp => {
+      const key = M5_COLS[parseInt(inp.getAttribute('data-col'), 10)];
+      if (saved[key]) inp.value = saved[key];
+    });
+  }, 30);
+}
+function m5CellEdit(col, val) {
+  const cur = lLoad(SAVE_PREFIX + 'fcc-leo', { hobby:'', what:'', how:'', ex:'' });
+  cur[M5_COLS[col]] = val;
+  lSave(SAVE_PREFIX + 'fcc-leo', cur);
+  setProg('m5');
+  showSaveInd('m5');
+  m5CheckDone();
+}
+function m5CheckDone() {
+  const cur = lLoad(SAVE_PREFIX + 'fcc-leo', {});
+  if (M5_COLS.every(k => (cur[k] || '').toString().trim().length > 0)) setDone('m5');
 }
 function m5PickHobby(name, em) {
   document.querySelectorAll('#m5 .hobby-chip').forEach(c => c.classList.remove('selected'));
   event.target.classList.add('selected');
-  const cur = lLoad(SAVE_PREFIX + 'fcc-leo', {});
+  const cur = lLoad(SAVE_PREFIX + 'fcc-leo', { hobby:'', what:'', how:'', ex:'' });
   cur.hobby = em + ' ' + name;
   lSave(SAVE_PREFIX + 'fcc-leo', cur);
   m5BuildLeo();
   setProg('m5');
   showSaveInd('m5');
+  m5CheckDone();
 }
 function restore_m5() { m5BuildModel(); m5BuildLeo(); }
 

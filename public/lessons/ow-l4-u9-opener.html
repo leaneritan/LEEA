@@ -299,6 +299,27 @@
     .cw-ex    { background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:14px 18px; font-size:18px; line-height:1.55; }
     .cw-ex.gd { border-color:var(--green); background:var(--green-lt); }
     .cw-ex.bd { border-color:var(--red); background:var(--red-lt); }
+    .cw-ex.gr { border-color:var(--yellow); background:var(--ybg); }
+
+    /* CAPTION JUDGE */
+    .judge-box   { margin-top:4px; background:var(--surface); border:1.5px dashed var(--border); border-radius:10px; padding:14px 18px; }
+    .judge-q     { font-size:17px; font-weight:700; color:var(--ink); margin-bottom:10px; }
+    .judge-row   { display:flex; gap:10px; }
+    .judge-btn   { flex:1; padding:10px 8px; border-radius:8px; border:1.5px solid var(--border); background:var(--surface); font-size:15px; font-weight:700; cursor:pointer; color:var(--ink2); }
+    .judge-btn.wk { color:var(--red); }
+    .judge-btn.gd { color:var(--green-dk); }
+    .judge-btn.gr { color:#92400E; }
+    .judge-btn.picked { outline:3px solid var(--yellow); }
+    .judge-msg   { margin-top:10px; font-size:16px; color:var(--ink2); display:none; }
+    .judge-msg.shown { display:block; }
+
+    /* RAMP TILT */
+    .ramp-wrap   { display:flex; flex-direction:column; gap:10px; }
+    .ramp-track  { position:relative; height:90px; border-radius:12px; overflow:hidden; background:linear-gradient(115deg,#BAE6FD 0%,#A3E635 55%,#4D7C0F 100%); }
+    .ramp-slope  { position:absolute; left:0; bottom:0; width:100%; height:100%; background:linear-gradient(to top right, rgba(0,0,0,.18) 0%, rgba(0,0,0,0) 55%); transform-origin:bottom left; transition:transform .15s linear; }
+    .ramp-bike   { position:absolute; left:6%; bottom:10%; font-size:34px; transition:left .5s ease, bottom .5s ease; }
+    .ramp-slider { width:100%; }
+    .ramp-caption{ font-size:17px; font-weight:700; color:var(--ink); }
 
     /* FORMATIVE ASSESSMENT */
     .fa-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:8px; }
@@ -959,8 +980,19 @@
               <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">gravity</span>
               <span style="background:var(--green-lt);border:1.5px solid var(--green);padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;color:var(--green-dk)">mountain biking</span>
             </div>
-            <div class="cw-ex gd">✅ <strong>Good:</strong> "A mountain biker leans into the turn and uses gravity and balance to race down a steep trail — wearing a helmet and knee pads for safety."</div>
-            <div class="cw-ex bd">❌ <strong>Too simple:</strong> "He rides a bike." — <em>Not specific! What forces? What gear? What trail?</em></div>
+            <div class="cw-ex bd">❌ <strong>Weak:</strong> "He rides a bike." — <em>Not specific! What forces? What gear? What trail?</em></div>
+            <div class="cw-ex gd">✅ <strong>Good:</strong> "A mountain biker rides down a steep trail wearing a helmet for safety."</div>
+            <div class="cw-ex gr">🌟 <strong>Great:</strong> "A mountain biker leans into the turn and uses gravity and balance to race down a steep trail — wearing a helmet and knee pads for safety."</div>
+
+            <div class="judge-box">
+              <div class="judge-q">🏅 Caption Judge — which caption is Leo's closest to?</div>
+              <div class="judge-row">
+                <button class="judge-btn wk" onclick="judgePick('wk')">Weak</button>
+                <button class="judge-btn gd" onclick="judgePick('gd')">Good</button>
+                <button class="judge-btn gr" onclick="judgePick('gr')">Great</button>
+              </div>
+              <div class="judge-msg" id="judge-msg"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -996,6 +1028,14 @@
             <div class="fa-q">Cause and Effect Check ✓</div>
             <div class="fa-a">Can Leo complete this sentence? <em>"The more you play soccer, ___ you get."</em> → <strong>"the better"</strong> — a real double-comparative from Unit 9!</div>
           </div>
+        </div>
+        <div class="ramp-wrap" style="margin-top:20px">
+          <div class="ramp-caption" id="ramp-caption">🚵 Drag the slider — how does trail <strong>steepness</strong> change the ride?</div>
+          <div class="ramp-track">
+            <div class="ramp-slope" id="ramp-slope"></div>
+            <span class="ramp-bike" id="ramp-bike">🚵</span>
+          </div>
+          <input type="range" class="ramp-slider" id="ramp-slider" min="0" max="100" value="10" oninput="rampTilt(this.value)">
         </div>
       </div>
     </div>
@@ -1115,8 +1155,8 @@ const NOTES = {
   15:`<span class="tn-lbl">Slide 15 — About the Photo (Be the Expert)</span>Share the science: a mountain biker uses gravity, direction, lean, and balance to control speed on a hilly trail. Key discussion: <em>"What forces do you feel when you ride down a hill? Why does he wear safety gear?"</em>`,
   16:`<span class="tn-lbl">Slide 16 — Teaching Tip</span>Key strategy: <strong>teach force words through physical action first</strong>. Push a chair, then pull it back, before naming the word. This approach makes vocabulary stick — not just memorisation. The soccer connection works especially well for Leo.`,
   17:`<span class="tn-lbl">Slide 17 — Look and Answer</span>Ask Leo to point to his answer <strong>before clicking</strong>. Correct: A helmet and knee pads. Then discuss: <em>"Why does he need this gear? What force could make him fall?"</em>`,
-  18:`<span class="tn-lbl">Slide 18 — Write a Caption</span>Give Leo at least <strong>3 minutes</strong> to write. Encourage: specific + force vocabulary word + safety gear mentioned. Review: <em>"Is your caption specific? Does it describe the force or motion happening?"</em>`,
-  19:`<span class="tn-lbl">Slide 19 — Formative Assessment</span>Tap each card when confirmed. Four checks: Look and Answer ✓ · Caption written ✓ · 8 vocab words ✓ · Cause and Effect ✓. <strong>Praise effort on the caption regardless</strong> — this is the start of Unit 9's cause-and-effect writing journey.`,
+  18:`<span class="tn-lbl">Slide 18 — Write a Caption</span>Give Leo at least <strong>3 minutes</strong> to write. Encourage: specific + force vocabulary word + safety gear mentioned. Review: <em>"Is your caption specific? Does it describe the force or motion happening?"</em> Then run <strong>Caption Judge</strong>: read all three sample captions aloud, ask Leo to tap the one closest to his own — no wrong answer, the goal is noticing what makes a caption stronger.`,
+  19:`<span class="tn-lbl">Slide 19 — Formative Assessment</span>Tap each card when confirmed. Four checks: Look and Answer ✓ · Caption written ✓ · 8 vocab words ✓ · Cause and Effect ✓. <strong>Praise effort on the caption regardless</strong> — this is the start of Unit 9's cause-and-effect writing journey. Finish with the <strong>Ramp Tilt</strong> slider — let Leo drag it and narrate what he notices about steepness and speed, out loud, before Grammar 1 ever names "the more…, the more…".`,
   20:`<span class="tn-lbl">Slide 20 — Unit Preview</span>Show Leo what's coming. Highlight: <em>"The writing goal is to explain cause and effect — like 'The more you practice soccer, the better you get!'"</em> Ask: "Which part are you most excited about?"`,
   21:`<span class="tn-lbl">Slide 21 — Great Job!</span>Celebrate! Leo completed the Unit 9 Opener and wrote his first force-and-motion caption. Remind him to open the <strong>Leo App</strong> to practice the 8 words independently. Tap "Mark Done" together. ⚡ Nice work, Leo!`,
 };
@@ -1140,6 +1180,7 @@ function scaleSlides() {
 }
 window.addEventListener('resize', scaleSlides);
 scaleSlides();
+rampTilt(10);
 
 function goTo(n) {
   if (n < 1 || n > TOTAL) return;
@@ -1456,6 +1497,34 @@ function pickLC(c) {
   } else {
     setTimeout(() => document.getElementById('lc-' + c).classList.remove('wrong'), 1500);
   }
+}
+
+/* CAPTION JUDGE (s18) */
+const judgeMsgs = {
+  wk: '💡 A weak caption just names the photo. Push Leo one step further — what force, what gear, what trail?',
+  gd: '✅ A good caption is specific and mentions safety gear or the trail — nice work!',
+  gr: '🌟 A great caption adds the FORCES too — gravity, balance, lean — that’s the science of fun in one sentence!'
+};
+function judgePick(tier) {
+  document.querySelectorAll('.judge-btn').forEach(b => b.classList.remove('picked'));
+  document.querySelector('.judge-btn.' + tier).classList.add('picked');
+  const msg = document.getElementById('judge-msg');
+  msg.textContent = judgeMsgs[tier];
+  msg.classList.add('shown');
+}
+
+/* RAMP TILT (s19) */
+function rampTilt(val) {
+  const pct = Number(val);
+  document.getElementById('ramp-slope').style.transform = 'rotate(' + (pct * 0.12) + 'deg)';
+  const bike = document.getElementById('ramp-bike');
+  bike.style.left = (6 + pct * 0.7) + '%';
+  bike.style.bottom = (10 + pct * 0.35) + '%';
+  bike.style.transitionDuration = Math.max(0.15, 0.6 - pct * 0.004) + 's';
+  const cap = document.getElementById('ramp-caption');
+  if (pct < 25) cap.innerHTML = '🐢 A <strong>flat</strong> trail — a slow, easy ride.';
+  else if (pct < 65) cap.innerHTML = '🚵 A <strong>steeper</strong> trail — a faster ride!';
+  else cap.innerHTML = '🚀 A very <strong>steep</strong> trail — the fastest, wildest ride!';
 }
 
 /* MARK DONE (s21) */

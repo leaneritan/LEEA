@@ -187,6 +187,17 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
 .starter{background:var(--gnl);border:1px solid var(--mint);border-radius:20px;padding:4px 10px;font-size:.72rem;font-weight:700;color:var(--gnd);cursor:pointer;transition:all .15s}
 .starter:hover{background:var(--gn);color:#fff;border-color:var(--gn)}
 
+.judge-box{margin-top:8px;background:var(--surf);border:1.5px dashed var(--bdr);border-radius:6px;padding:10px 12px}
+.judge-q{font-size:.76rem;font-weight:800;color:var(--ink);margin-bottom:8px}
+.judge-row{display:flex;gap:6px}
+.judge-btn{flex:1;padding:8px 4px;border-radius:6px;border:1.5px solid var(--bdr);background:var(--surf);font-size:.72rem;font-weight:800;cursor:pointer}
+.judge-btn.wk{color:var(--rd)}
+.judge-btn.gd{color:var(--gnd)}
+.judge-btn.gr{color:var(--ord)}
+.judge-btn.picked{outline:2px solid var(--ye)}
+.judge-msg{margin-top:8px;font-size:.74rem;color:var(--ink2);line-height:1.5;display:none}
+.judge-msg.shown{display:block}
+
 .save-ind{font-size:.68rem;font-weight:700;color:var(--gn);text-align:right;height:14px;opacity:0;transition:opacity .5s}
 .save-ind.show{opacity:1}
 
@@ -626,6 +637,17 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
     <button class="starter" onclick="insertCapApp('Gravity and balance help')">Gravity and balance help…</button>
     <button class="starter" onclick="insertCapApp('He wears a helmet because')">He wears a helmet because…</button>
     <button class="starter" onclick="insertCapApp('The biker leans to')">The biker leans to…</button>
+  </div>
+
+  <div class="judge-box">
+    <div class="judge-q">🏅 Caption Judge — which one is closest to yours?</div>
+    <div style="font-size:.72rem;color:var(--ink3);margin-bottom:6px">❌ Weak: "He rides a bike." · ✅ Good: "A mountain biker rides down a steep trail wearing a helmet." · 🌟 Great: "A mountain biker leans and uses gravity and balance to race down a steep trail — wearing a helmet for safety."</div>
+    <div class="judge-row">
+      <button class="judge-btn wk" onclick="judgePick('wk')">Weak</button>
+      <button class="judge-btn gd" onclick="judgePick('gd')">Good</button>
+      <button class="judge-btn gr" onclick="judgePick('gr')">Great</button>
+    </div>
+    <div class="judge-msg" id="judge-msg"></div>
   </div>
 
   <div class="save-ind" id="m5-saved">✓ Saved</div>
@@ -1234,12 +1256,26 @@ function insertCapApp(text) {
   ta.focus();
   updateCapApp();
 }
+const judgeMsgs = {
+  wk: '💡 A weak caption just names the photo. Try adding what force or gear is in the picture!',
+  gd: '✅ Good — specific and mentions the trail or safety gear!',
+  gr: '🌟 Great — it names the FORCES too, like gravity, balance, or lean!'
+};
+function judgePick(tier) {
+  document.querySelectorAll('.judge-btn').forEach(b => b.classList.remove('picked'));
+  document.querySelector('.judge-btn.' + tier).classList.add('picked');
+  const msg = document.getElementById('judge-msg');
+  msg.textContent = judgeMsgs[tier];
+  msg.classList.add('shown');
+}
 function resetM5UI() {
   localStorage.removeItem('leea-' + SAVE_PREFIX + 'm5-caption');
   document.getElementById('cap-ta').value = '';
   const wcEl = document.getElementById('cap-wc');
   wcEl.textContent = '0 words (need at least 3)';
   wcEl.classList.remove('met');
+  document.querySelectorAll('.judge-btn').forEach(b => b.classList.remove('picked'));
+  document.getElementById('judge-msg').classList.remove('shown');
 }
 function restoreM5() {
   const v = lLoad(SAVE_PREFIX + 'm5-caption', '');

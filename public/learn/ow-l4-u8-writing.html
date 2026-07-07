@@ -292,12 +292,18 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
 .step-u.open .sb{display:block}
 .step-u.open{border-color:var(--bl)}
 
-/* m9 — word map */
-.wmap{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.wmap-c{grid-column:1/-1;text-align:center;background:var(--bll);border:2px solid var(--bl);border-radius:4px;padding:10px;font-family:var(--fnh);font-size:1.05rem;font-weight:700;color:var(--bld);letter-spacing:1px}
-.wmap-arm{background:var(--paper);border:1px solid var(--bdr);border-left:3px solid var(--bl);border-radius:0 4px 4px 0;padding:8px 11px}
-.wmap-arm .lb{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:1px;color:var(--ink3);margin-bottom:3px}
-.wmap-arm .v{font-size:.78rem;font-weight:700;color:var(--ink);line-height:1.45}
+/* m9 — word map (radial diagram: center oval + 4 linked ovals, matches WB p.102 artwork) */
+.wword-stage{position:relative;width:100%;max-width:600px;margin:8px auto 0;aspect-ratio:900/640}
+.wword-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.wword-node{position:absolute;transform:translate(-50%,-50%);border-radius:999px;border:2px solid var(--bdr);background:var(--surf);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px 10px;overflow:hidden}
+.wword-node .lb{font-family:var(--fnh);font-size:.52rem;font-weight:700;letter-spacing:.5px;color:var(--bld);margin-bottom:2px}
+.wword-node .v{font-size:.66rem;font-weight:700;color:var(--ink);line-height:1.25}
+.wword-node.center{background:var(--bl);border-color:var(--bld)}
+.wword-node.center .v{color:#fff;font-family:var(--fnh);font-size:.78rem;letter-spacing:.3px}
+.wword-node textarea{width:100%;height:100%;border:none;background:transparent;resize:none;outline:none;font-family:var(--fn);font-size:.66rem;font-weight:700;color:var(--ink);text-align:center;line-height:1.25;overflow-y:auto}
+.wword-node input{width:100%;border:none;background:transparent;outline:none;font-family:var(--fnh);font-size:.78rem;font-weight:700;color:#fff;text-align:center}
+.wword-node input::placeholder{color:rgba(255,255,255,.75)}
+.wword-node textarea::placeholder{color:var(--ink3);font-weight:600}
 
 /* m11 — pattern card */
 .pattern{background:var(--bll);border:2px dashed var(--bl);border-radius:4px;padding:12px;text-align:center;line-height:1.8}
@@ -895,12 +901,18 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
   <div class="dad-card"><div class="dad-icon">💬</div><div>A word map gathers IDEAS before you write. Topic in the middle, 4 questions around it.</div></div>
 
   <div class="section-h">🌟 Modeled Word Map — origami</div>
-  <div class="wmap">
-    <div class="wmap-c">📜 origami</div>
-    <div class="wmap-arm"><div class="lb">❓ What IS it?</div><div class="v">folding paper into shapes (Japanese art)</div></div>
-    <div class="wmap-arm"><div class="lb">🌍 Where is it FROM?</div><div class="v">Japan, invented in the 17th century</div></div>
-    <div class="wmap-arm"><div class="lb">🛠️ What can you MAKE?</div><div class="v">simple shapes (a little bug) · difficult ones (a dragon, a crane)</div></div>
-    <div class="wmap-arm"><div class="lb">📐 HOW do you do it?</div><div class="v">start with a square sheet · fold many times</div></div>
+  <div class="wword-stage">
+    <svg class="wword-svg" viewBox="0 0 900 640">
+      <line x1="450" y1="320" x2="450" y2="95" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="765" y2="320" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="450" y2="545" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="135" y2="320" stroke="#93C5FD" stroke-width="4"/>
+    </svg>
+    <div class="wword-node center" style="left:50%;top:50%;width:32%;height:17%"><div class="v">📜 origami</div></div>
+    <div class="wword-node" style="left:50%;top:15%;width:34%;height:21%"><div class="lb">🌍 WHERE FROM?</div><div class="v">Japan, 17th century</div></div>
+    <div class="wword-node" style="left:85%;top:50%;width:32%;height:23%"><div class="lb">❓ WHAT IS IT?</div><div class="v">Folding paper into shapes</div></div>
+    <div class="wword-node" style="left:50%;top:85%;width:34%;height:21%"><div class="lb">📐 HOW?</div><div class="v">Fold a square sheet many times</div></div>
+    <div class="wword-node" style="left:15%;top:50%;width:32%;height:23%"><div class="lb">🛠️ CAN MAKE?</div><div class="v">Simple bug → difficult dragon</div></div>
   </div>
 
   <div class="section-h">✍️ YOUR word map</div>
@@ -912,11 +924,33 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
     <button class="hobby-chip" onclick="m9PickHobby('fossils','🪨')">🪨 fossils</button>
     <button class="hobby-chip" onclick="m9PickHobby('soccer cards','🏈')">🏈 soccer cards</button>
   </div>
-  <input class="text-inp" id="m9-hobby" placeholder="…or type your own hobby" oninput="m9Save()">
-  <textarea class="text-inp" id="m9-q1" placeholder="❓ What IS it?" rows="2" oninput="m9Save()" style="resize:vertical"></textarea>
-  <textarea class="text-inp" id="m9-q2" placeholder="🌍 Where is it FROM?" rows="2" oninput="m9Save()" style="resize:vertical"></textarea>
-  <textarea class="text-inp" id="m9-q3" placeholder="🛠️ What can you MAKE / DO?" rows="2" oninput="m9Save()" style="resize:vertical"></textarea>
-  <textarea class="text-inp" id="m9-q4" placeholder="📐 HOW do you do it?" rows="2" oninput="m9Save()" style="resize:vertical"></textarea>
+  <div class="wword-stage">
+    <svg class="wword-svg" viewBox="0 0 900 640">
+      <line x1="450" y1="320" x2="450" y2="95" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="765" y2="320" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="450" y2="545" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="135" y2="320" stroke="#93C5FD" stroke-width="4"/>
+    </svg>
+    <div class="wword-node center" style="left:50%;top:50%;width:32%;height:17%">
+      <input id="m9-hobby" placeholder="your hobby" oninput="m9Save()">
+    </div>
+    <div class="wword-node" style="left:50%;top:15%;width:34%;height:21%">
+      <div class="lb">🌍 WHERE FROM?</div>
+      <textarea id="m9-q2" placeholder="Where is it from?" oninput="m9Save()"></textarea>
+    </div>
+    <div class="wword-node" style="left:85%;top:50%;width:32%;height:23%">
+      <div class="lb">❓ WHAT IS IT?</div>
+      <textarea id="m9-q1" placeholder="What is it?" oninput="m9Save()"></textarea>
+    </div>
+    <div class="wword-node" style="left:50%;top:85%;width:34%;height:21%">
+      <div class="lb">📐 HOW?</div>
+      <textarea id="m9-q4" placeholder="How do you do it?" oninput="m9Save()"></textarea>
+    </div>
+    <div class="wword-node" style="left:15%;top:50%;width:32%;height:23%">
+      <div class="lb">🛠️ CAN MAKE?</div>
+      <textarea id="m9-q3" placeholder="What can you make?" oninput="m9Save()"></textarea>
+    </div>
+  </div>
   <span class="save-ind" id="m9-saved">SAVED</span>
   <div class="mod-footer">
     <button class="redo-btn" id="m9-redo-btn" onclick="m9Redo()">↺ Redo</button>
@@ -1051,6 +1085,35 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
     <button class="hobby-chip" onclick="m12PickTopic('a toy you like','🧸')">🧸 A toy you like</button>
     <button class="hobby-chip" onclick="m12PickTopic('a video game','🎮')">🎮 A video game</button>
     <button class="hobby-chip" onclick="m12PickTopic('a sport you enjoy','⚽')">⚽ A sport you enjoy</button>
+  </div>
+
+  <div class="section-h">🕸️ Word map</div>
+  <div class="wword-stage">
+    <svg class="wword-svg" viewBox="0 0 900 640">
+      <line x1="450" y1="320" x2="450" y2="95" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="765" y2="320" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="450" y2="545" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="135" y2="320" stroke="#93C5FD" stroke-width="4"/>
+    </svg>
+    <div class="wword-node center" style="left:50%;top:50%;width:32%;height:17%">
+      <input id="m12-webtopic" placeholder="your topic" oninput="m12Save()">
+    </div>
+    <div class="wword-node" style="left:50%;top:15%;width:34%;height:21%">
+      <div class="lb">🌍 WHERE FROM?</div>
+      <textarea id="m12-q2" placeholder="Where is it from?" oninput="m12Save()"></textarea>
+    </div>
+    <div class="wword-node" style="left:85%;top:50%;width:32%;height:23%">
+      <div class="lb">❓ WHAT IS IT?</div>
+      <textarea id="m12-q1" placeholder="What is it?" oninput="m12Save()"></textarea>
+    </div>
+    <div class="wword-node" style="left:50%;top:85%;width:34%;height:21%">
+      <div class="lb">📐 HOW?</div>
+      <textarea id="m12-q4" placeholder="How do you do it?" oninput="m12Save()"></textarea>
+    </div>
+    <div class="wword-node" style="left:15%;top:50%;width:32%;height:23%">
+      <div class="lb">🛠️ CAN MAKE?</div>
+      <textarea id="m12-q3" placeholder="What can you make?" oninput="m12Save()"></textarea>
+    </div>
   </div>
 
   <div class="section-h">📋 Mini plan</div>
@@ -1946,11 +2009,17 @@ function m12PickTopic(name, em) {
   document.querySelectorAll('#m12 .hobby-chip').forEach(c => c.classList.remove('selected'));
   event.target.classList.add('selected');
   document.getElementById('m12-topic').value = em + ' ' + name;
+  document.getElementById('m12-webtopic').value = name;
   m12Save();
 }
 function m12Save() {
   const d = {
     topic: document.getElementById('m12-topic').value,
+    webtopic: document.getElementById('m12-webtopic').value,
+    q1: document.getElementById('m12-q1').value,
+    q2: document.getElementById('m12-q2').value,
+    q3: document.getElementById('m12-q3').value,
+    q4: document.getElementById('m12-q4').value,
     def: document.getElementById('m12-def').value,
     ex1: document.getElementById('m12-ex1').value,
     ex2: document.getElementById('m12-ex2').value,
@@ -1998,11 +2067,11 @@ function m12Redo() {
     return;
   }
   delete btn.dataset.armed; btn.textContent = '↺ Redo';
-  lSave(SAVE_PREFIX + 'm12', { topic:'', def:'', ex1:'', ex2:'', draft:'' });
+  lSave(SAVE_PREFIX + 'm12', { topic:'', webtopic:'', q1:'', q2:'', q3:'', q4:'', def:'', ex1:'', ex2:'', draft:'' });
   lSave(SAVE_PREFIX + 'm12-chk', [false, false, false, false]);
   updateBadge('m12', 'new');
   document.querySelectorAll('#m12 .hobby-chip').forEach(c => c.classList.remove('selected'));
-  ['m12-topic','m12-def','m12-ex1','m12-ex2','m12-draft'].forEach(id => { document.getElementById(id).value = ''; });
+  ['m12-topic','m12-webtopic','m12-q1','m12-q2','m12-q3','m12-q4','m12-def','m12-ex1','m12-ex2','m12-draft'].forEach(id => { document.getElementById(id).value = ''; });
   Array.from(document.getElementById('m12-chklist').children).forEach(c => c.classList.remove('checked'));
   m12Update();
   m12CheckDone();
@@ -2011,6 +2080,11 @@ function m12Redo() {
 function restore_m12() {
   const d = lLoad(SAVE_PREFIX + 'm12', {});
   document.getElementById('m12-topic').value = d.topic || '';
+  document.getElementById('m12-webtopic').value = d.webtopic || '';
+  document.getElementById('m12-q1').value = d.q1 || '';
+  document.getElementById('m12-q2').value = d.q2 || '';
+  document.getElementById('m12-q3').value = d.q3 || '';
+  document.getElementById('m12-q4').value = d.q4 || '';
   document.getElementById('m12-def').value = d.def || '';
   document.getElementById('m12-ex1').value = d.ex1 || '';
   document.getElementById('m12-ex2').value = d.ex2 || '';
@@ -2175,6 +2249,7 @@ function initReviewMode() {
   if (m9.hobby) html += `<div class="rv-card"><div class="rv-lbl">WORD MAP (${esc(m9.hobby)})</div><div class="rv-text">❓ ${esc(m9.q1)}\n🌍 ${esc(m9.q2)}\n🛠️ ${esc(m9.q3)}\n📐 ${esc(m9.q4)}</div></div>`;
   if (m10.defword || m10.exSimple) html += `<div class="rv-card"><div class="rv-lbl">DEFINE (apply)</div><div class="rv-text">🏷️ ${esc(m10.defword)}\n🟢 ${esc(m10.exSimple)}\n🔴 ${esc(m10.exHard)}</div></div>`;
   if (m11.draft) html += `<div class="rv-card"><div class="rv-lbl">INTRO DRAFT</div><div class="rv-text">${esc(m11.draft)}</div></div>`;
+  if (m12.webtopic) html += `<div class="rv-card"><div class="rv-lbl">WORD MAP (${esc(m12.webtopic)})</div><div class="rv-text">❓ ${esc(m12.q1)}\n🌍 ${esc(m12.q2)}\n🛠️ ${esc(m12.q3)}\n📐 ${esc(m12.q4)}</div></div>`;
   if (m12.draft) html += `<div class="rv-card"><div class="rv-lbl">WB DRAFT (${esc(m12.topic)})</div><div class="rv-text">${esc(m12.draft)}</div></div>`;
   body.innerHTML = html || '<div class="rv-not-started">📋 No content yet.</div>';
 }

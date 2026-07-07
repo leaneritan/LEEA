@@ -136,7 +136,11 @@ Every save writes BOTH keys: `leea-<SAVE_PREFIX>-<key>` AND `leea-<HOMEWORK_ID>-
 
 ### Per-module `restore_mN()` pattern
 
-Each modal-open triggers `restore_m{N}()` which repaints saved state. If a module has no state (m3 warm-up, m4 phrase bank), the function can be a no-op. Required for any module with form inputs, chart fills, quiz progress, or check-list state.
+Each modal-open triggers `restore_m{N}()` which repaints saved state — including for m3/m4-style modules that only track per-question `mcq-opt` answers (`M3_ANS`/`M4_ANS`-style objects guarded by `if (ANS[qk]) return;`). Restoring the data object alone is not enough: the buttons must also be re-disabled and the objectively-correct one re-marked, or a reopened module shows fresh, clickable-looking buttons that silently do nothing when tapped. Use a shared `restoreAnsweredButtons(groupPrefix, answeredObj, btnClass)` helper (see `ow-l4-u8-writing.html` for the reference implementation) rather than a no-op. m8's step-reveal + quiz-section visibility must also restore (if any `M8_ANS` keys are saved, all 6 steps were necessarily opened — reopen them and reveal the quiz section on restore instead of leaving them collapsed).
+
+### Every module needs a Mark Complete + Redo footer
+
+This is not optional for any module, including ones whose completion is fully automatic (quiz pass, word count, filled-field threshold). Every module's footer needs: a `"Mark <Module> complete ✓"` button, disabled until that module's own completion check passes, using the exact same check that would have auto-saved the done-key; and a two-tap-armed `"↺ Redo"` button that clears that module's saved keys and resets its DOM to fresh (see `m1Redo`/`m5Redo`/`m13Redo` in `ow-l4-u8-writing.html` for the two-tap pattern and per-module-shape reset logic). A prior generation of this app shipped 10 of 13 modules with no button at all — this was reported as a real bug, not a nice-to-have.
 
 ### Final quiz (m13) — locked shape
 

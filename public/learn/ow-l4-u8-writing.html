@@ -1245,6 +1245,21 @@ function showSaveInd(id) {
   setTimeout(() => el.classList.remove('show'), 2000);
 }
 
+// Re-applies the disabled/"ok" look to already-answered question buttons on
+// modal reopen. Without this, an answered question's data is restored but its
+// buttons render fresh and clickable — tapping one silently does nothing
+// (the mXAns guard returns early), which looks broken.
+function restoreAnsweredButtons(groupPrefix, answeredObj, btnClass) {
+  Object.keys(answeredObj).forEach(qk => {
+    const group = document.getElementById(groupPrefix + '-' + qk);
+    if (!group) return;
+    group.querySelectorAll('.' + btnClass).forEach(b => {
+      b.disabled = true;
+      if (/,\s*true\)/.test(b.getAttribute('onclick') || '')) b.classList.add('ok');
+    });
+  });
+}
+
 // ═══════════════════════════════════════════════
 // M1 — ACADEMIC LANGUAGE: 10 flashcards + 10Q quiz
 // ═══════════════════════════════════════════════
@@ -1540,6 +1555,7 @@ function m3Redo() {
 function restore_m3() {
   const saved = lLoad(SAVE_PREFIX + 'm3-ans', {});
   Object.assign(M3_ANS, saved);
+  restoreAnsweredButtons('m3', M3_ANS, 'mcq-opt');
 }
 
 // ═══════════════════════════════════════════════
@@ -1569,7 +1585,10 @@ function m4Redo() {
   document.querySelectorAll('#m4 .mcq-opt').forEach(b => { b.disabled = false; b.classList.remove('ok', 'bad'); });
   updateProgress();
 }
-function restore_m4() { Object.assign(M4_ANS, lLoad(SAVE_PREFIX + 'm4-ans', {})); }
+function restore_m4() {
+  Object.assign(M4_ANS, lLoad(SAVE_PREFIX + 'm4-ans', {}));
+  restoreAnsweredButtons('m4', M4_ANS, 'mcq-opt');
+}
 
 // ═══════════════════════════════════════════════
 // M5 — PLAN MY CHART (4-col)
@@ -1763,6 +1782,7 @@ function m7Redo() {
 }
 function restore_m7() {
   Object.assign(M7_ITS, lLoad(SAVE_PREFIX + 'm7-its', {}));
+  restoreAnsweredButtons('m7-its', M7_ITS, 'its-btn');
   const chk = lLoad(SAVE_PREFIX + 'm7-chk', [false,false,false,false]);
   chk.forEach((v, i) => { if (v) document.getElementById('m7-chklist').children[i].classList.add('checked'); });
   m7CheckDone();
@@ -1816,6 +1836,12 @@ function m8Redo() {
 }
 function restore_m8() {
   Object.assign(M8_ANS, lLoad(SAVE_PREFIX + 'm8-ans', {}));
+  if (Object.keys(M8_ANS).length > 0) {
+    // reaching the quiz requires all 6 steps to have been opened
+    document.querySelectorAll('#m8-steps .step-u').forEach(c => c.classList.add('open'));
+    document.getElementById('m8-qs').style.display = 'block';
+  }
+  restoreAnsweredButtons('m8', M8_ANS, 'mcq-opt');
   m8CheckDone();
 }
 
@@ -1934,6 +1960,7 @@ function m10Redo() {
 }
 function restore_m10() {
   Object.assign(M10_ANS, lLoad(SAVE_PREFIX + 'm10-ans', {}));
+  restoreAnsweredButtons('m10', M10_ANS, 'mcq-opt');
   const d = lLoad(SAVE_PREFIX + 'm10', {});
   document.getElementById('m10-defword').value = d.defword || '';
   document.getElementById('m10-exSimple').value = d.exSimple || '';
@@ -1995,6 +2022,7 @@ function m11Redo() {
 }
 function restore_m11() {
   Object.assign(M11_ANS, lLoad(SAVE_PREFIX + 'm11-ans', {}));
+  restoreAnsweredButtons('m11', M11_ANS, 'mcq-opt');
   const d = lLoad(SAVE_PREFIX + 'm11', {});
   document.getElementById('m11-name').value = d.name || '';
   document.getElementById('m11-hook').value = d.hook || '';

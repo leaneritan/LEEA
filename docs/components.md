@@ -21,6 +21,8 @@ Every module or quiz in a Leo app must obey these four rules. Same rules are in 
 2. Persist quiz score to localStorage in the quiz finish function: `saveScore(score, total, true, { ...extras })`.
 3. Restore the result view on modal/tab reopen — never restart a completed module from zero. Use a dedicated `restoreXResult()` function.
 4. ↺ Redo clears saved state before re-initializing.
+5. Every module still needs its own visible footer — a "Mark [Module] complete ✓" button (disabled until that module's own criteria are met) plus a two-tap-armed ↺ Redo button — even though rule 1 says completion auto-saves without a tap. Rule 1 governs the data; this rule governs the UI, and both are required. Ten of thirteen modules in `ow-l4-u8-writing.html` shipped without this and it read as a real, reported bug.
+6. If a module tracks per-question answers in an object guarded by `if (ANS[qk]) return;`, its restore function must re-apply the disabled/"correct" look to those buttons, not just restore the data — see `restoreAnsweredButtons()` in `ow-l4-u8-writing.html`.
 
 `SAVE_PREFIX` format: `leea-<level>-<unit>-<component>-`
 `HOMEWORK_ID` format: `leo-<level>-<unit>-<component>`
@@ -203,17 +205,31 @@ homeworkId:      leo-<l>-<u>-reading
 
 **Reference rule:** if the workbook reading uses words Leo hasn't met yet, they get added to `vocabulary.json` + the global `vocabulary-index.json` BEFORE the WB tabs are built — tagged with source `OW<level>-U<unit>-RD-WB`. (See Unit 8 Reading where arcade / console / portable / virtual reality / headset were added for the Video Games WB reading.)
 
-### writing (TO LOCK)
+### writing (LOCKED — Unit 8 Writing)
 
-Target shape:
+Reference: `public/learn/ow-l4-u8-writing.html` (13 modules, `m1`–`m13`).
 
-- Read Model
-- Plan (editable column chart)
-- Write (free-text with word count)
-- Edit Checklist
-- Share / Peer Feedback frames
+13 modules, all sequential, covering both the Student Book and Workbook writing tasks for the unit:
 
-To be locked when the first writing Leo app is built.
+| ID | Title | Type | Done criteria |
+|---|---|---|---|
+| m1 | Academic Language | Flashcards + 10Q quiz | Quiz pass (≥7/10) |
+| m2 | Related Vocab | Flashcards + 12Q quiz | Quiz pass (≥9/12) |
+| m3 | What is Explanation Writing? | Warm-up + model reading + 6 comp. Qs + 4-step structure | Manual Mark Complete (ungated) |
+| m4 | Key Expressions | 3 quick-check Qs | Manual Mark Complete (ungated) |
+| m5 | Plan My Chart | 4-column fill chart (`buildFourColChart`, `mode:'fill'`) | All 4 columns filled |
+| m6 | Write! | Free-text draft, word/sentence counter | ≥60 words and ≥4 sentences |
+| m7 | Edit Checklist | 3 its/it's Qs + 4-item checklist | All 3 Qs + all 4 boxes checked |
+| m8 | 6 Steps (WB Act 1) | Tap-to-reveal steps + 3 quick-check Qs | All 3 Qs answered (requires all 6 steps opened first) |
+| m9 | Word Map (WB Act 2) | Hobby + 4 free-text questions | All 5 fields filled |
+| m10 | Define (WB Act 3) | 4 comp. Qs + 3 apply fields | All 4 Qs + all 3 fields filled |
+| m11 | Compare Intros (WB Act 4) | 3 comp. Qs + intro draft | All 3 Qs + draft >25 chars |
+| m12 | Draft on a New Topic (WB Act 5) | Topic pick + mini-plan + draft + 4-item checklist | Topic + ≥60 words + all 4 boxes checked |
+| m13 | Can Leo Score? | Final quiz, 10Q, 80% gate | Score ≥8/10 |
+
+Source JSON shape — `content/subjects/english/courses/our-world/level-4/unit-8/lessons/writing.learner.json`. `moduleCount: 13`, `moduleKeyFormat: m{n}-done` (default, no custom `moduleKeys` needed), `scoreKey: score` (default — m13's final quiz is the only one using `saveScore()`).
+
+Every module — including the ones whose completion is fully automatic (quiz pass, word count, filled-field thresholds) — has a visible footer: a "Mark [Module] complete ✓" button disabled until that module's own criteria are met, and a two-tap-armed "↺ Redo" that clears that module's saved keys and resets its DOM. m13 additionally restores its saved result (pass/fail screen) on modal reopen instead of restarting the quiz, per rule 3. When rebuilding this app for a future unit's writing lesson, copy the module list and the footer pattern exactly — data and content vocabulary/theme swap only.
 
 ### review (TO LOCK)
 

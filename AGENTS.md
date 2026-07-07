@@ -156,6 +156,10 @@ onclick="lSave('score', null); initQuiz()"
 // or doRedo / resetModule clears: localStorage.removeItem('leea-' + prefix + 'score')
 ```
 
+**5. Every module needs a visible footer with both a Mark Complete button and a ↺ Redo button.** Rule 1 says the done-key must auto-save without waiting for a tap — that governs the *data*, not the UI. A module that only auto-detects completion with no visible button is still non-compliant: the learner has no explicit way to confirm they're finished, and (this happened for real, in `ow-l4-u8-writing.html`, where 10 of 13 modules shipped with no button at all) there is no way to intentionally reset one module's work without clearing the whole app's storage. Every module's footer needs: a "Mark [Module] complete ✓" button, disabled until that module's own completion criteria are met, enabled by the same check that would have auto-saved the done-key; and a two-tap-armed "↺ Redo" button that clears that module's saved keys and resets its DOM back to a fresh state (see `m5Redo`/`m1Redo`/etc. in `ow-l4-u8-writing.html` for the two-tap pattern).
+
+**6. Restoring per-question answered state means restoring the DOM, not just the data object.** A module that tracks per-question answers in a JS object (e.g. `const M3_ANS = {}`, saved/loaded via `lSave`/`lLoad`) and guards its answer handler with `if (M3_ANS[qk]) return;` must also re-apply the disabled/"correct" look to those buttons in its `restore_mX()` function. Restoring only the data object leaves the buttons rendered fresh and clickable; tapping one then silently does nothing (the guard blocks it) with zero feedback, which reads as broken. `restoreAnsweredButtons(groupPrefix, answeredObj, btnClass)` in `ow-l4-u8-writing.html` is the reusable pattern — re-disables every button in an answered question's group and marks the objectively-correct one, regardless of which option the learner originally picked.
+
 Home current-focus progress counts unit components, not every route. If a teacher lesson and Leo learner app cover the same component, such as `opener` and `opener-app`, they count as one lesson/component in the Home progress total.
 
 Before Supabase is connected, Neritan assignment/review uses local storage with Supabase-shaped records. The assignment loop is: Neritan assigns a learner app, Leo completes it, Neritan reviews saved module/score/caption progress, then marks it reviewed or needs redo.
@@ -172,30 +176,17 @@ Academic test tracking lives under Neritan at `/teacher/progress`, implemented e
 
 Leo's app card list uses a third CSS variable layer: `.leo-app-card-{tone}` classes set `--leo-component`, `--leo-component-soft`, and `--leo-component-ink` on each card. The tone comes from `getComponentMeta(lesson.component).tone`. All three surfaces (Leo hero `--hero-accent`, Home next-card `--next-accent`/`--next-accent-deep`, Leo app card `--leo-component`) are driven by `getComponentMeta` — do not add per-surface hardcoded color maps.
 
-## Current Build Status — Unit 8 (Our World Level 4)
+## Current Build Status — Our World Level 4
 
-These lesson pairs are registered in `src/data/lessons.ts` and live on the working branch:
+Unit 8 is fully built: opener, vocab-1, song, grammar-1, grammar-2, vocab-2, reading, writing, mission, project, and reader/book-reading all have registered teacher + learner lesson pairs in `src/data/lessons.ts`.
 
-| Component | Teacher file | Learner file | Learner status |
-|---|---|---|---|
-| opener | `public/lessons/ow-l4-u8-opener.html` | `public/learn/ow-l4-u8-opener.html` | `assigned` (auto-seeds) |
-| vocab-1 | `public/lessons/ow-l4-u8-vocab-1.html` | `public/learn/ow-l4-u8-vocab-1.html` | `live` (Neritan assigns) |
-| song | `public/lessons/ow-l4-u8-song.html` | `public/learn/ow-l4-u8-song.html` | `live` (Neritan assigns) |
+Unit 9 ("The Science of Fun") is in progress — opener, song, and vocab-1 are built; grammar-1, grammar-2, vocab-2, reading, writing, mission, project, and reader are still to build, in that priority order per `docs/build-order.md`.
 
-Still to build in priority order: grammar-1 (OW4-U8-G1), grammar-2 (OW4-U8-G2), reading, writing.
+Target file paths follow the standard naming convention: `public/lessons/ow-l<level>-u<unit>-<component>.html` (teacher) and `public/learn/ow-l<level>-u<unit>-<component>.html` (learner) — see `docs/components.md` for each component's locked module structure.
 
-Target file paths when built:
+### Grammar lesson HTML structure (locked — Unit 8 Grammar 1/2)
 
-| Component | Teacher file | Learner file |
-|---|---|---|
-| grammar-1 | `public/lessons/ow-l4-u8-grammar-1.html` | `public/learn/ow-l4-u8-grammar-1.html` |
-| grammar-2 | `public/lessons/ow-l4-u8-grammar-2.html` | `public/learn/ow-l4-u8-grammar-2.html` |
-| reading | `public/lessons/ow-l4-u8-reading.html` | `public/learn/ow-l4-u8-reading.html` |
-| writing | `public/lessons/ow-l4-u8-writing.html` | `public/learn/ow-l4-u8-writing.html` |
-
-### Grammar lesson HTML structure (no existing template — follow this spec)
-
-Grammar is the first component type with no existing example. Use this spec:
+Reference: `public/lessons/ow-l4-u8-grammar-1.html` + `public/learn/ow-l4-u8-grammar-1.html`.
 
 **Teacher lesson** (`public/lessons/ow-l4-u8-grammar-1.html`):
 - Slide-based deck, same HTML/CSS shell as `public/lessons/ow-l4-u8-opener.html`

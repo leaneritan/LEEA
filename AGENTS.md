@@ -301,6 +301,8 @@ npm run validate:content
 
 The validator checks that vocabulary IDs and indexes line up, every card has Japanese display fields, academic cards have the full rich schema and mini-quiz shape, grammar cards have Japanese support, Sanseido junior-high entries are valid search-only links, every lesson JSON under the unit `lessons/` folder is imported by `src/data/lessons.ts`, and every `mode: "learner"` lesson's component ends with `-app` AND has a matching teacher-mode lesson with the base component in the same course/level/unit. Do not weaken the validator to make bad content pass; fix the content or update the documented rule in the same PR.
 
+Every lesson HTML under `public/lessons/` and `public/learn/` is embedded inside an `<iframe>` in the real app (`src/components/LessonPage.tsx`) — teacher decks via `src=`, learner apps via `srcdoc=` with a cloud-sync bridge script injected before the lesson's own script. A render-blocking cross-origin `<link rel="stylesheet">` (Google Fonts) can stall that iframe's entire document parser indefinitely if the request never resolves (blocked network, slow DNS, an ad/privacy blocker on the domain) — every script on the page silently does nothing, with no console error, while the lesson still opens and renders fine when tested directly/fullscreen. Always load the Google Fonts stylesheet non-blocking: `<link rel="stylesheet" href="..." media="print" onload="this.media='all'">` with a `<noscript>` fallback. The validator enforces this on every lesson HTML file.
+
 Vocabulary cards need:
 
 - Previous

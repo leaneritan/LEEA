@@ -443,6 +443,36 @@ if (fs.existsSync(lessonsHtmlDir)) {
   }
 }
 
+// Non-blocking font check: every lesson HTML file is embedded inside an <iframe>
+// (teacher decks via src=, learner apps via srcdoc= with a cloud-sync bridge script
+// injected before the lesson's own script). A render-blocking cross-origin
+// stylesheet <link> can stall that iframe's entire document parser indefinitely if
+// the request never resolves (blocked network, slow DNS, an ad/privacy blocker on
+// the domain) — silently breaking every script on the page with no console error.
+// Fullscreen/direct navigation to the same file does not hit this failure mode,
+// which is why it is easy to miss when testing a lesson on its own. Load any
+// Google Fonts stylesheet non-blocking: media="print" onload="this.media='all'",
+// with a <noscript> fallback.
+for (const dir of ["public/lessons", "public/learn"]) {
+  const dirPath = path.join(root, dir);
+  if (!fs.existsSync(dirPath)) continue;
+  for (const file of fs.readdirSync(dirPath)) {
+    if (!file.endsWith(".html")) continue;
+    const html = fs.readFileSync(path.join(dirPath, file), "utf8");
+    // Strip <noscript> fallback links — those intentionally omit media="print".
+    const htmlWithoutNoscript = html.replace(/<noscript>[\s\S]*?<\/noscript>/gi, "");
+    const linkTags = htmlWithoutNoscript.match(/<link\b[^>]*>/gi) || [];
+    for (const tag of linkTags) {
+      if (!/fonts\.googleapis\.com/i.test(tag)) continue;
+      if (!/rel=["']stylesheet["']/i.test(tag)) continue; // preconnect links are fine
+      if (/media=["']print["']/i.test(tag)) continue; // already non-blocking
+      fail(
+        `${dir}/${file} loads a Google Fonts stylesheet as a render-blocking <link> — every lesson is embedded in an <iframe>, and a stalled font request can hang the whole document parser. Use media="print" onload="this.media='all'" with a <noscript> fallback (see any fixed lesson file for the pattern).`
+      );
+    }
+  }
+}
+
 if (errors.length) {
   console.error(`Content validation failed with ${errors.length} issue(s):`);
   for (const error of errors) console.error(`- ${error}`);

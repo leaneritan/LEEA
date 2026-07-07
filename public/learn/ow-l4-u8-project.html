@@ -1296,9 +1296,13 @@ function m7SetConf(i, j) {
 function m7BuildReview() {
   var h = '';
   M7_REVIEW.forEach(function(q, i) {
+    var done = !!m7RevDone[i];
     h += '<div class="qz-card" style="margin-bottom:8px"><div class="qz-q">' + q.q + '</div><div class="mcq-opts" id="m7-rq-' + i + '">';
-    q.opts.forEach(function(o, j) { h += '<button class="mcq-opt" onclick="m7RevAns(' + i + ',' + j + ',this)">' + esc(o) + '</button>'; });
-    h += '</div><div class="mcq-fb" id="m7-rq-fb-' + i + '"></div></div>';
+    q.opts.forEach(function(o, j) {
+      var cls = 'mcq-opt' + (done && j === q.ans ? ' ok' : '');
+      h += '<button class="' + cls + '" onclick="m7RevAns(' + i + ',' + j + ',this)"' + (done ? ' disabled' : '') + '>' + esc(o) + '</button>';
+    });
+    h += '</div><div class="mcq-fb' + (done ? ' show ok' : '') + '" id="m7-rq-fb-' + i + '">' + (done ? '✓ Correct: ' + esc(q.opts[q.ans]) : '') + '</div></div>';
   });
   document.getElementById('m7-review-qs').innerHTML = h;
 }

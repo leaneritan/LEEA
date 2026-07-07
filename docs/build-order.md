@@ -60,20 +60,22 @@ REGISTER
 
 ## Skill plan
 
-Each step becomes its own skill so a unit can be built one chunk at a time. The vocab scanner is built; the rest are planned and named for clarity.
+Each step becomes its own skill so a unit can be built one chunk at a time. Most are built now; checkpoints and the song app skill are still planned.
 
 ```text
 /vocab-unit-scanner    steps 1-4   BUILT (.claude/commands/vocab-unit-scanner.md)
-/grammar-unit-scanner  steps 5-8   planned (scans + builds unit grammar.json)
-/opener-app            step 9      planned (teacher slides + Leo opener app)
+/grammar-unit-scanner  steps 5-8   BUILT (.claude/commands/grammar-unit-scanner.md)
+/opener-app            step 9      BUILT (.claude/commands/opener-app.md; teacher slides + Leo opener app)
 /vocab-app             steps 10,13 BUILT (.claude/commands/vocab-app.md; handles vocab-1 and vocab-2)
-/song-app              step 11     planned
-/grammar-app           steps 12,14 BUILT (.claude/commands/grammar-app.md; teacher slideshow only — handles grammar-1 and grammar-2; Leo app pattern locked later)
+/song-app              step 11     planned (song teacher slides + Leo app exist for Units 8-9 but were hand-built, not yet generalized into a skill)
+/grammar-app           steps 12,14 BUILT (.claude/commands/grammar-app.md; handles grammar-1 and grammar-2)
 /reading-app           step 15     BUILT (.claude/commands/reading-app.md; teacher slideshow + Leo app with SB/WB landing-screen mode pattern)
-/writing-app           step 16     planned
+/writing-app           step 16     BUILT (.claude/commands/writing-app.md; teacher slideshow + 13-module Leo app, see docs/components.md)
 /review-app            checkpoint  planned (teacher review + Leo review app)
 /extra-reading-app     checkpoint  planned (teacher extra reading + Leo extra-reading app)
 ```
+
+Also built beyond the original numbered pipeline: `/mission-app`, `/project-app`, `/reader-app` (`.claude/commands/mission-app.md`, `project-app.md`, `reader-app.md`) — see `docs/components.md` for each component's locked module structure.
 
 Naming rule going forward: the **`-unit-scanner`** suffix means "scans the unit PDF and produces unit-level JSON (vocabulary or grammar)"; the **`-app`** suffix means "builds the teacher slideshow + paired Leo learner app for that component" (except `/grammar-app`, which currently builds the teacher slideshow only — the Leo grammar app pattern is locked after grammar-2's Leo app ships, same way `/vocab-app` waited for vocab-2). Skills are added after the corresponding template/Leo app is built and locked.
 

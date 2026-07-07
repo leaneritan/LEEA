@@ -292,12 +292,18 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
 .step-u.open .sb{display:block}
 .step-u.open{border-color:var(--bl)}
 
-/* m9 — word map */
-.wmap{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.wmap-c{grid-column:1/-1;text-align:center;background:var(--bll);border:2px solid var(--bl);border-radius:4px;padding:10px;font-family:var(--fnh);font-size:1.05rem;font-weight:700;color:var(--bld);letter-spacing:1px}
-.wmap-arm{background:var(--paper);border:1px solid var(--bdr);border-left:3px solid var(--bl);border-radius:0 4px 4px 0;padding:8px 11px}
-.wmap-arm .lb{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:1px;color:var(--ink3);margin-bottom:3px}
-.wmap-arm .v{font-size:.78rem;font-weight:700;color:var(--ink);line-height:1.45}
+/* m9 — word map (radial diagram: center oval + 4 linked ovals, matches WB p.102 artwork) */
+.wword-stage{position:relative;width:100%;max-width:600px;margin:8px auto 0;aspect-ratio:900/640}
+.wword-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.wword-node{position:absolute;transform:translate(-50%,-50%);border-radius:999px;border:2px solid var(--bdr);background:var(--surf);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px 10px;overflow:hidden}
+.wword-node .lb{font-family:var(--fnh);font-size:.52rem;font-weight:700;letter-spacing:.5px;color:var(--bld);margin-bottom:2px}
+.wword-node .v{font-size:.66rem;font-weight:700;color:var(--ink);line-height:1.25}
+.wword-node.center{background:var(--bl);border-color:var(--bld)}
+.wword-node.center .v{color:#fff;font-family:var(--fnh);font-size:.9rem;letter-spacing:.5px}
+.wword-node textarea{width:100%;height:100%;border:none;background:transparent;resize:none;outline:none;font-family:var(--fn);font-size:.66rem;font-weight:700;color:var(--ink);text-align:center;line-height:1.25;overflow-y:auto}
+.wword-node input{width:100%;border:none;background:transparent;outline:none;font-family:var(--fnh);font-size:.9rem;font-weight:700;color:#fff;text-align:center}
+.wword-node input::placeholder{color:rgba(255,255,255,.75)}
+.wword-node textarea::placeholder{color:var(--ink3);font-weight:600}
 
 /* m11 — pattern card */
 .pattern{background:var(--bll);border:2px dashed var(--bl);border-radius:4px;padding:12px;text-align:center;line-height:1.8}
@@ -895,12 +901,18 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
   <div class="dad-card"><div class="dad-icon">💬</div><div>A word map gathers IDEAS before you write. Topic in the middle, 4 questions around it.</div></div>
 
   <div class="section-h">🌟 Modeled Word Map — origami</div>
-  <div class="wmap">
-    <div class="wmap-c">📜 origami</div>
-    <div class="wmap-arm"><div class="lb">❓ What IS it?</div><div class="v">folding paper into shapes (Japanese art)</div></div>
-    <div class="wmap-arm"><div class="lb">🌍 Where is it FROM?</div><div class="v">Japan, invented in the 17th century</div></div>
-    <div class="wmap-arm"><div class="lb">🛠️ What can you MAKE?</div><div class="v">simple shapes (a little bug) · difficult ones (a dragon, a crane)</div></div>
-    <div class="wmap-arm"><div class="lb">📐 HOW do you do it?</div><div class="v">start with a square sheet · fold many times</div></div>
+  <div class="wword-stage">
+    <svg class="wword-svg" viewBox="0 0 900 640">
+      <line x1="450" y1="320" x2="450" y2="95" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="765" y2="320" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="450" y2="545" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="135" y2="320" stroke="#93C5FD" stroke-width="4"/>
+    </svg>
+    <div class="wword-node center" style="left:50%;top:50%;width:26%;height:15%"><div class="v">📜 origami</div></div>
+    <div class="wword-node" style="left:50%;top:15%;width:34%;height:21%"><div class="lb">🌍 WHERE FROM?</div><div class="v">Japan, 17th century</div></div>
+    <div class="wword-node" style="left:85%;top:50%;width:32%;height:23%"><div class="lb">❓ WHAT IS IT?</div><div class="v">Folding paper into shapes</div></div>
+    <div class="wword-node" style="left:50%;top:85%;width:34%;height:21%"><div class="lb">📐 HOW?</div><div class="v">Fold a square sheet many times</div></div>
+    <div class="wword-node" style="left:15%;top:50%;width:32%;height:23%"><div class="lb">🛠️ CAN MAKE?</div><div class="v">Simple bug → difficult dragon</div></div>
   </div>
 
   <div class="section-h">✍️ YOUR word map</div>
@@ -912,11 +924,33 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
     <button class="hobby-chip" onclick="m9PickHobby('fossils','🪨')">🪨 fossils</button>
     <button class="hobby-chip" onclick="m9PickHobby('soccer cards','🏈')">🏈 soccer cards</button>
   </div>
-  <input class="text-inp" id="m9-hobby" placeholder="…or type your own hobby" oninput="m9Save()">
-  <textarea class="text-inp" id="m9-q1" placeholder="❓ What IS it?" rows="2" oninput="m9Save()" style="resize:vertical"></textarea>
-  <textarea class="text-inp" id="m9-q2" placeholder="🌍 Where is it FROM?" rows="2" oninput="m9Save()" style="resize:vertical"></textarea>
-  <textarea class="text-inp" id="m9-q3" placeholder="🛠️ What can you MAKE / DO?" rows="2" oninput="m9Save()" style="resize:vertical"></textarea>
-  <textarea class="text-inp" id="m9-q4" placeholder="📐 HOW do you do it?" rows="2" oninput="m9Save()" style="resize:vertical"></textarea>
+  <div class="wword-stage">
+    <svg class="wword-svg" viewBox="0 0 900 640">
+      <line x1="450" y1="320" x2="450" y2="95" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="765" y2="320" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="450" y2="545" stroke="#93C5FD" stroke-width="4"/>
+      <line x1="450" y1="320" x2="135" y2="320" stroke="#93C5FD" stroke-width="4"/>
+    </svg>
+    <div class="wword-node center" style="left:50%;top:50%;width:26%;height:15%">
+      <input id="m9-hobby" placeholder="your hobby" oninput="m9Save()">
+    </div>
+    <div class="wword-node" style="left:50%;top:15%;width:34%;height:21%">
+      <div class="lb">🌍 WHERE FROM?</div>
+      <textarea id="m9-q2" placeholder="Where is it from?" oninput="m9Save()"></textarea>
+    </div>
+    <div class="wword-node" style="left:85%;top:50%;width:32%;height:23%">
+      <div class="lb">❓ WHAT IS IT?</div>
+      <textarea id="m9-q1" placeholder="What is it?" oninput="m9Save()"></textarea>
+    </div>
+    <div class="wword-node" style="left:50%;top:85%;width:34%;height:21%">
+      <div class="lb">📐 HOW?</div>
+      <textarea id="m9-q4" placeholder="How do you do it?" oninput="m9Save()"></textarea>
+    </div>
+    <div class="wword-node" style="left:15%;top:50%;width:32%;height:23%">
+      <div class="lb">🛠️ CAN MAKE?</div>
+      <textarea id="m9-q3" placeholder="What can you make?" oninput="m9Save()"></textarea>
+    </div>
+  </div>
   <span class="save-ind" id="m9-saved">SAVED</span>
   <div class="mod-footer">
     <button class="redo-btn" id="m9-redo-btn" onclick="m9Redo()">↺ Redo</button>

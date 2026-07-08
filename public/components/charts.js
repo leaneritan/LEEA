@@ -320,8 +320,8 @@
     var css = [
       '#' + id + '{font-family:Outfit,sans-serif;display:flex;flex-direction:column;gap:10px;width:100%}',
       '#' + id + ' .fcc-title{font-size:22px;font-weight:900;color:#15803d;text-align:center;letter-spacing:0.5px}',
-      '#' + id + ' .fcc-wrap{background:#fff;border:3px solid #d1d5db;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.06)}',
-      '#' + id + ' table{width:100%;border-collapse:collapse;table-layout:fixed}',
+      '#' + id + ' .fcc-wrap{background:#fff;border:3px solid #d1d5db;border-radius:14px;overflow-x:auto;overflow-y:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.06)}',
+      '#' + id + ' table{width:100%;min-width:' + (columns.length * 150) + 'px;border-collapse:collapse;table-layout:fixed}',
       '#' + id + ' thead th{background:#374151;color:#fff;padding:16px 18px;font-size:18px;font-weight:800;text-align:left;letter-spacing:0.3px;border-right:1px solid rgba(255,255,255,0.15)}',
       '#' + id + ' thead th:last-child{border-right:none}',
       '#' + id + ' tbody td{padding:20px 22px;font-size:20px;color:#1f2937;font-weight:600;line-height:1.5;vertical-align:top;border-top:1px solid #e5e7eb;border-right:1px solid #e5e7eb;min-height:80px}',

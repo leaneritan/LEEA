@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, ChevronDown, ChevronRight, Circle, ExternalLink, MoreHorizontal } from "lucide-react";
+import { CheckCircle2, Circle, ExternalLink, MoreHorizontal } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   assignLesson as assignLessonRecord,
@@ -25,24 +25,42 @@ import {
   syncLessonProgressWithCloud,
   type LessonProgressMap
 } from "@/data/lessonProgress";
-import { getLessonGroups, learnerLessons, lessons, teacherLessons } from "@/data/lessons";
+import { getLessonGroups, learnerLessons, lessons } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
 
-const groupOpenStorageKey = "leea.teacher.lessonGroupsOpen.v1";
+const LEVELS = [1, 2, 3, 4, 5, 6];
 
-const checkpointComponents = [
-  {
-    component: "review",
-    title: "Review",
-    subtitle: "Mixed checkpoint — deck appears here when generated."
-  },
-  {
-    component: "extra-reading",
-    title: "Extra Reading",
-    subtitle: "Extended comprehension & vocabulary practice."
-  }
+// Fixed syllabus topics shown on every level's unit chips.
+const UNIT_TITLES = [
+  "Animals & Habitats",
+  "My Town",
+  "Food Around the World",
+  "Weather & Seasons",
+  "Jobs People Do",
+  "Sports & Games",
+  "The Human Body",
+  "That's Really Interesting!",
+  "Our Planet"
 ];
+
+const SPINE_LESSONS = ["Opener", "Vocabulary 1", "Song", "Grammar 1", "Vocabulary 2", "Grammar 2", "Reading", "Writing"];
+
+// Only Level 4 · Unit 8 has real content and progress tracking today.
+const LIVE_LEVEL = 4;
+const LIVE_UNIT = 8;
+
+type MockLessonStatus = "taught" | "todo" | "locked";
+
+// Levels below the live one are already taught end-to-end; levels ahead
+// haven't started. Within the live level, units before the live one have
+// already been taught and units after it haven't, since that level is
+// where teaching is actively happening.
+function getMockUnitStatuses(level: number, unit: number): MockLessonStatus[] {
+  if (level < LIVE_LEVEL) return SPINE_LESSONS.map(() => "taught");
+  if (level > LIVE_LEVEL) return SPINE_LESSONS.map(() => "locked");
+  return SPINE_LESSONS.map(() => (unit < LIVE_UNIT ? "taught" : "todo"));
+}
 
 const shortLessonCopy: Record<string, { label: string; title: string; subtitle: string }> = {
   opener: { label: "Opener", title: "Unit 8 Opener", subtitle: "Hobbies, interests, and the Arctic photo." },
@@ -88,19 +106,14 @@ function getTeacherLevels(): TeacherLevel[] {
   }));
 }
 
-function getUnitBand(unit?: number) {
-  if (!unit) return { start: undefined, end: undefined };
-  const start = Math.floor((unit - 1) / 3) * 3 + 1;
-  return { start, end: start + 2 };
-}
-
 export function TeacherDashboard() {
   const [progress, setProgress] = useState<LessonProgressMap>({});
   const [assignments, setAssignments] = useState<AssignmentMap>({});
   const [assignmentsReady, setAssignmentsReady] = useState(false);
   const [progressVersion, setProgressVersion] = useState(0);
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const [completionTimestamps, setCompletionTimestamps] = useState<Record<string, string>>({});
+  const [selectedLevel, setSelectedLevel] = useState(LIVE_LEVEL);
+  const [selectedUnit, setSelectedUnit] = useState(LIVE_UNIT);
   const groups = useMemo(() => getTeacherLevels(), []);
 
   useEffect(() => {
@@ -122,28 +135,16 @@ export function TeacherDashboard() {
 
     refreshAll();
 
-    const savedGroups = window.localStorage.getItem(groupOpenStorageKey);
-    if (savedGroups) {
-      try {
-        setOpenGroups(JSON.parse(savedGroups) as Record<string, boolean>);
-      } catch {
-        setOpenGroups({});
-      }
-    } else {
-      setOpenGroups(Object.fromEntries(groups.map((group, index) => [group.id, index === 0])));
-    }
-
     window.addEventListener("storage", refreshAll);
     window.addEventListener("focus", refreshAll);
     return () => {
       window.removeEventListener("storage", refreshAll);
       window.removeEventListener("focus", refreshAll);
     };
-  }, [groups]);
+  }, []);
 
   progressVersion;
 
-  const doneCount = useMemo(() => getDoneLessonCount(teacherLessons.map((lesson) => lesson.id), progress), [progress]);
   const nextLearnerToAssign = useMemo(
     () => learnerLessons.find((lesson) => !assignments[lesson.id] && !getLearnerAppProgress(lesson.source).done),
     [assignments]
@@ -164,11 +165,38 @@ export function TeacherDashboard() {
       return bTime - aTime;
     })[0];
   }, [assignments, completionTimestamps]);
-  const avgQuiz = useMemo(() => {
-    const scores = learnerLessons.map((lesson) => getLearnerAppProgress(lesson.source).score).filter((score): score is number => score !== null);
+
+  const isLiveUnit = selectedLevel === LIVE_LEVEL && selectedUnit === LIVE_UNIT;
+
+  const liveUnitGroup = useMemo(
+    () => groups.find((group) => group.level === LIVE_LEVEL)?.unitGroups.find((unitGroup) => unitGroup.unit === LIVE_UNIT),
+    [groups]
+  );
+  const liveTeacherLessons = useMemo(
+    () => liveUnitGroup?.lessons.filter((lesson) => lesson.mode === "teacher") ?? [],
+    [liveUnitGroup]
+  );
+  const liveDoneCount = useMemo(
+    () => getDoneLessonCount(liveTeacherLessons.map((lesson) => lesson.id), progress),
+    [liveTeacherLessons, progress]
+  );
+  const liveAvgQuiz = useMemo(() => {
+    const learnerInUnit = liveUnitGroup?.lessons.filter((lesson) => lesson.mode === "learner") ?? [];
+    const scores = learnerInUnit.map((lesson) => getLearnerAppProgress(lesson.source).score).filter((score): score is number => score !== null);
     if (!scores.length) return null;
     return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
-  }, [progressVersion]);
+  }, [liveUnitGroup, progressVersion]);
+
+  const mockStatuses = useMemo(() => getMockUnitStatuses(selectedLevel, selectedUnit), [selectedLevel, selectedUnit]);
+
+  const rosterStats = isLiveUnit
+    ? { lessons: liveTeacherLessons.length, taught: liveDoneCount, avgLabel: liveAvgQuiz === null ? "—" : `${liveAvgQuiz}%` }
+    : {
+        lessons: SPINE_LESSONS.length,
+        taught: mockStatuses.filter((status) => status === "taught").length,
+        avgLabel: "—"
+      };
+  const rosterPercent = rosterStats.lessons ? Math.round((rosterStats.taught / rosterStats.lessons) * 100) : 0;
 
   function setLessonDone(lessonId: string, done: boolean) {
     setProgress((current) => {
@@ -179,12 +207,9 @@ export function TeacherDashboard() {
     });
   }
 
-  function toggleGroup(groupId: string) {
-    setOpenGroups((current) => {
-      const next = { ...current, [groupId]: !(current[groupId] ?? true) };
-      window.localStorage.setItem(groupOpenStorageKey, JSON.stringify(next));
-      return next;
-    });
+  function selectLevel(level: number) {
+    setSelectedLevel(level);
+    setSelectedUnit(1);
   }
 
   function assignLesson(lessonId: string) {
@@ -238,89 +263,114 @@ export function TeacherDashboard() {
         </section>
       ) : null}
 
-      <section className="teacher-stats teacher-design-stats" aria-label="Teaching stats">
-        <div><span>Lessons in unit</span><strong>{teacherLessons.length}</strong></div>
-        <div><span>Taught</span><strong>{doneCount}</strong></div>
-        <div><span>To teach</span><strong>{teacherLessons.length - doneCount}</strong></div>
-        <div className="dark"><span>Leo&apos;s avg quiz</span><strong>{avgQuiz === null ? "—" : `${avgQuiz}%`}</strong></div>
+      <section className="teacher-navigator teacher-design-navigator" aria-label="Choose a level and unit">
+        <div className="teacher-navigator-levels" role="tablist" aria-label="Level">
+          {LEVELS.map((level) => (
+            <button
+              aria-selected={selectedLevel === level}
+              className={`teacher-level-tab level-${level}${selectedLevel === level ? " is-selected" : ""}`}
+              key={level}
+              onClick={() => selectLevel(level)}
+              role="tab"
+              type="button"
+            >
+              <i className="teacher-level-tab-dot" aria-hidden="true" />
+              Level {level}
+            </button>
+          ))}
+        </div>
+
+        <div className={`teacher-navigator-units level-${selectedLevel}`}>
+          <span className="teacher-navigator-units-label">
+            <i className="level-tag-dot" aria-hidden="true" />
+            Choose a unit
+          </span>
+          <div aria-label="Unit" className="teacher-unit-chips" role="tablist">
+            {UNIT_TITLES.map((title, index) => {
+              const unitNumber = index + 1;
+              const isSelected = selectedUnit === unitNumber;
+              return (
+                <button
+                  aria-selected={isSelected}
+                  className={`teacher-unit-chip${isSelected ? " is-selected" : ""}`}
+                  key={unitNumber}
+                  onClick={() => setSelectedUnit(unitNumber)}
+                  role="tab"
+                  type="button"
+                >
+                  <span>UNIT {unitNumber}</span>
+                  <strong>{title}</strong>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </section>
 
-      <div className="teacher-group-grid teacher-design-groups">
-        {groups.map((group) => {
-          const teacherInGroup = group.unitGroups.flatMap((unitGroup) => unitGroup.lessons.filter((lesson) => lesson.mode === "teacher"));
-          const groupDone = getDoneLessonCount(teacherInGroup.map((lesson) => lesson.id), progress);
-          const isOpen = openGroups[group.id] ?? true;
+      <section className="teacher-stats teacher-design-stats" aria-label="Teaching stats">
+        <div><span>Lessons in unit</span><strong>{rosterStats.lessons}</strong></div>
+        <div><span>Taught</span><strong>{rosterStats.taught}</strong></div>
+        <div><span>To teach</span><strong>{rosterStats.lessons - rosterStats.taught}</strong></div>
+        <div className="dark"><span>Leo&apos;s avg quiz</span><strong>{rosterStats.avgLabel}</strong></div>
+      </section>
 
-          return (
-            <section className="teacher-group teacher-design-group" id={group.id} key={group.id}>
-              <button className="teacher-group-header teacher-design-group-header" onClick={() => toggleGroup(group.id)} type="button">
-                <span>{isOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />} {group.courseLabel}</span>
-                <h2 className={`level-${group.level ?? 4}`}>
-                  <i className="level-tag-dot" aria-hidden="true" />
-                  Level {group.level}
-                </h2>
-                <small><i><b style={{ width: `${teacherInGroup.length ? Math.round((groupDone / teacherInGroup.length) * 100) : 0}%` }} /></i>{groupDone} / {teacherInGroup.length} taught</small>
-              </button>
+      <section className={`teacher-group teacher-design-group level-${selectedLevel}`} aria-label={`Level ${selectedLevel}, Unit ${selectedUnit}`}>
+        <div className="teacher-group-header teacher-design-group-header">
+          <span>Our World</span>
+          <h2>
+            <i className="level-tag-dot" aria-hidden="true" />
+            Level {selectedLevel} · Unit {selectedUnit}
+          </h2>
+          <small><i><b style={{ width: `${rosterPercent}%` }} /></i>{rosterStats.taught} / {rosterStats.lessons} taught</small>
+        </div>
 
-              {isOpen ? (
-                <div className="teacher-table">
-                  <div className="teacher-table-head">
-                    <span>Lesson</span>
-                    <span>Teaching</span>
-                    <span>Leo&apos;s App</span>
+        {isLiveUnit ? (
+          <div className="teacher-table">
+            <div className="teacher-table-head">
+              <span>Lesson</span>
+              <span>Teaching</span>
+              <span>Leo&apos;s App</span>
+            </div>
+            {liveTeacherLessons.map((lesson) => {
+              const learnerCounterpart = liveUnitGroup?.lessons.find((item) => item.mode === "learner" && item.component === `${lesson.component}-app`);
+              return (
+                <TeacherLessonRow
+                  assignment={learnerCounterpart ? assignments[learnerCounterpart.id] : undefined}
+                  key={lesson.id}
+                  learner={learnerCounterpart}
+                  lesson={lesson}
+                  progress={progress[lesson.id]}
+                  setLessonDone={setLessonDone}
+                  assignLesson={assignLesson}
+                  unassignLesson={unassignLesson}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <div className="teacher-table teacher-table-simple">
+            <div className="teacher-table-head">
+              <span>Lesson</span>
+              <span>Status</span>
+            </div>
+            {SPINE_LESSONS.map((label, index) => {
+              const status = mockStatuses[index];
+              const statusLabel = status === "taught" ? "✓ Taught" : status === "todo" ? "To teach" : "Locked";
+              const statusClass = status === "taught" ? "done" : status === "todo" ? "todo" : "locked";
+              return (
+                <div className="teacher-table-row teacher-table-row-simple" key={label}>
+                  <div className="teacher-table-lesson">
+                    <h3>{label}</h3>
                   </div>
-                  {group.unitGroups.map((unitGroup, unitIndex) => {
-                    const band = getUnitBand(unitGroup.unit);
-                    const nextUnit = group.unitGroups[unitIndex + 1]?.unit;
-                    const nextBand = getUnitBand(nextUnit);
-                    const isLastUnitInVisibleBand = nextBand.start !== band.start;
-                    const unitKey = `${group.id}-u${unitGroup.unit}`;
-                    const isUnitOpen = openGroups[unitKey] ?? true;
-
-                    return (
-                      <div className={`teacher-table-band level-${group.level ?? 4}`} key={unitGroup.id}>
-                        {unitGroup.unit != null ? (
-                          <button className="teacher-table-unit-header" onClick={() => toggleGroup(unitKey)} type="button">
-                            {isUnitOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                            Unit {unitGroup.unit}
-                          </button>
-                        ) : null}
-                        {isUnitOpen ? (
-                          <>
-                            {unitGroup.lessons.filter((lesson) => lesson.mode === "teacher").map((lesson) => {
-                              const learnerCounterpart = unitGroup.lessons.find((item) => item.mode === "learner" && item.component === `${lesson.component}-app`);
-                              return (
-                                <TeacherLessonRow
-                                  assignment={learnerCounterpart ? assignments[learnerCounterpart.id] : undefined}
-                                  key={lesson.id}
-                                  learner={learnerCounterpart}
-                                  lesson={lesson}
-                                  progress={progress[lesson.id]}
-                                  setLessonDone={setLessonDone}
-                                  assignLesson={assignLesson}
-                                  unassignLesson={unassignLesson}
-                                />
-                              );
-                            })}
-                            {isLastUnitInVisibleBand ? (
-                              <div className="teacher-checkpoint-rows">
-                                <div className="teacher-checkpoint-label">Checkpoint after Units {band.start}–{band.end}</div>
-                                {checkpointComponents.map((checkpoint) => (
-                                  <CheckpointRow checkpoint={checkpoint} key={checkpoint.component} unitBand={band} />
-                                ))}
-                              </div>
-                            ) : null}
-                          </>
-                        ) : null}
-                      </div>
-                    );
-                  })}
+                  <div className="teacher-table-teaching">
+                    <span className={`status-pill ${statusClass}`}>{statusLabel}</span>
+                  </div>
                 </div>
-              ) : null}
-            </section>
-          );
-        })}
-      </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
     </section>
   );
 }
@@ -446,21 +496,6 @@ function ReviewCallout({ lesson }: { lesson: Lesson }) {
       <small>{progress.completedModules} / {progress.moduleCount} modules{progress.score !== null ? ` · quiz ${progress.score}%` : ""}</small>
       <Link href={`/teacher/review/${lesson.id}`}>Review results</Link>
     </aside>
-  );
-}
-
-function CheckpointRow({ checkpoint, unitBand }: { checkpoint: (typeof checkpointComponents)[number]; unitBand: { start?: number; end?: number } }) {
-  const meta = getComponentMeta(checkpoint.component);
-  return (
-    <article className={`teacher-table-row teacher-table-row-${meta.tone} planned`}>
-      <div className="teacher-table-lesson">
-        <span>{checkpoint.component === "review" ? "Review" : "Extra Reading"}</span>
-        <h3>{checkpoint.title} {unitBand.start}–{unitBand.end}</h3>
-        <p>{checkpoint.subtitle}</p>
-      </div>
-      <div className="teacher-table-teaching"><span className="status-pill planned">Planned</span></div>
-      <div className="teacher-table-leo"><span className="muted-status">—</span></div>
-    </article>
   );
 }
 

@@ -192,6 +192,25 @@ for (const word of wordsById.values()) {
   assertPresent(word.japanese?.word, sourceLabel(word, "japanese.word"));
   assertPresent(word.japanese?.reading, sourceLabel(word, "japanese.reading"));
   assertPresent(word.japanese?.meaning, sourceLabel(word, "japanese.meaning"));
+  const serializedWord = JSON.stringify(word);
+  for (const weakPhrase of ["helps us study Unit", "part of Unit", "The useful is", "reviewed problem with Leo", "reviewed solution with Leo"]) {
+    if (serializedWord.includes(weakPhrase)) {
+      fail(sourceLabel(word, `contains generic placeholder phrase "${weakPhrase}"`));
+    }
+  }
+  for (const [field, value] of [
+    ["displayEmoji", word.displayEmoji ?? word.emoji],
+    ["ipa", word.ipa],
+    ["japanese.word", word.japanese?.word],
+    ["japanese.reading", word.japanese?.reading],
+    ["japanese.meaning", word.japanese?.meaning],
+    ["exampleJp", word.exampleJp],
+    ["additionalExamplesJp", (word.additionalExamplesJp ?? []).join(" ")]
+  ]) {
+    if (typeof value === "string" && value.includes("?")) {
+      fail(sourceLabel(word, `${field} contains literal "?" replacement characters`));
+    }
+  }
 
   validateWordCardFields(word);
   if (word.type === "academic") validateAcademicWord(word);

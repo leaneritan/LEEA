@@ -227,6 +227,8 @@ A clean `tsc`/validate pass does not prove navigation works — the broken fallb
 
 ## Step 7 — Commit and push
 
+Check off this unit's Vocab box in `docs/scan-progress.md` (and update its "Status snapshot" section) in the same commit.
+
 Commit message format:
 
 ```

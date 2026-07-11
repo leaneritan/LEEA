@@ -182,6 +182,8 @@ If you cannot run a browser in your environment, say so explicitly rather than c
 
 ## Step 7 — Commit and push
 
+Check off this unit's Grammar box in `docs/scan-progress.md` (and update its "Status snapshot" section) in the same commit.
+
 Push to the working branch. Do not open a PR unless asked to — a human merges when ready.
 
 ## Output checklist

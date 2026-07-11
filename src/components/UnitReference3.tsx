@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { isMultiEmoji } from "@/components/reference/emoji-utils";
-import { allGrammar } from "@/components/reference/ref-data";
 import {
   unit3AcademicItems,
   unit3GlossaryItems,
+  unit3GrammarItems,
   unit3Vocab1Items,
   unit3Vocab2Items
 } from "@/data/reference";
@@ -81,15 +81,13 @@ const unitSections: Section[] = [
   }
 ];
 
-const unitGrammarEntries = allGrammar
-  .filter((g) => g.course === "our-world" && g.level === 4 && g.unit === 3)
-  .sort((a, b) => a.tag.localeCompare(b.tag));
+const unitGrammarEntries = [...unit3GrammarItems].sort((a, b) => a.tag.localeCompare(b.tag));
 const unitGrammar = unitGrammarEntries.map((g, idx) => ({
   n: String(idx + 1),
   title: g.title,
   code: g.tag,
-  sample: g.chartAndSamples.samples[0]?.en ?? "",
-  href: `/reference/grammar/${g.grammarId}`
+  sample: g.tab1_samples[0]?.text ?? "",
+  href: `/reference/grammar/${g.id}`
 }));
 
 const jumps = [

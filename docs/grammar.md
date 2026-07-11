@@ -32,6 +32,8 @@ The planner PDF is at `docs/lesson-plans/<course-path>/planner.pdf`.
 
 If neither workbook answer key is present in this repo/session, don't block on it — see "When no workbook answer key is available" below.
 
+**Regardless of whether a workbook answer key is available, always build `chart.table` — never `chart.workbookChart`.** This applies unconditionally to every new grammar point, not just the no-workbook case (see "chart.table — the required chart shape" below).
+
 ## Step 1 — Scan grammar from the PDF
 
 For each grammar point (G1 and G2) extract:
@@ -43,14 +45,18 @@ For each grammar point (G1 and G2) extract:
 - **Practice activities** — numbered exercises, mine these for more sample sentences and quiz material
 - **Academic Language terms** (e.g. clause, contraction) and **Content Vocabulary terms** — note these; they go into `vocabulary.json` as `type: "academic"` / `"content"`. They may already be captured if vocab scan ran first — don't duplicate, check first.
 
+### chart.table — the required chart shape
+
+`chart.table` (`GrammarChartTable`) is the one general-purpose chart shape for every grammar point — built because a print Level 4 Grammar Workbook has roughly 14 different boxed chart shapes across its 9 units (comparatives, have-to, would-like, reflexive pronouns, superlatives, future will/won't, used to, double comparatives, definitions with *which*, etc.), and no single hardcoded shape fits all of them. Shape: `columns` (optional), `rows[].label` (optional row label) + `rows[].cells`, optional `rows[].roles` (color per cell) and `rows[].highlight` (cell indices to tint via the fallback single-color path), optional `qa` (a small Question/Answer mini-table, common when the workbook source has one), optional `notes` (footer rule lines). Full shape and a worked "have to" example: `docs/content-model.md`.
+
+**Never use `chart.workbookChart`** for a new grammar point — per `docs/content-model.md` it's a legacy shape hard-coded to one specific "who"-clause pattern from when only one grammar point existed. This holds even when a Grammar Workbook Answer Key **is** available for the unit: extract its chart layout, Q&A block, and exercises into `chart.table` / `qa` / sample sentences — don't reach for `workbookChart` just because the source happens to be a workbook page.
+
 ### When no workbook answer key is available
 
-Build the chart from the planner content alone:
+Build the chart from the planner content alone (still `chart.table`, per above):
 
-- Use `chart.table` (the general-purpose `GrammarChartTable` shape: `columns`, `rows[].cells`/`roles`, optional `qa`/`notes`) instead of `chart.workbookChart`
-- **Never use `workbookChart`** for a new grammar point — per `docs/content-model.md` it's a legacy shape hard-coded to one specific "who"-clause pattern
 - Note this in the grammar point's `source` block, e.g. `"note": "No Grammar Workbook answer key was available for this unit; chart built from planner content only."`
-- Compose the 10/10/10/10 sample sentences yourself, staying faithful to the rule and pattern in the planner's grammar box and practice activities — this is the normal path, not a fallback to apologize for
+- Compose the 10/10/10/10 sample sentences yourself, staying faithful to the rule and pattern in the planner's grammar box and practice activities — this is a normal path, not a fallback to apologize for
 
 ## Step 2 — Present a scratch summary, then wait for approval
 

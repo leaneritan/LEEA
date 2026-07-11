@@ -6,6 +6,7 @@ import unit6Vocabulary from "../../content/subjects/english/courses/our-world/le
 import unit7Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-7/vocabulary.json";
 import unit8Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json";
 import unit9Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-9/vocabulary.json";
+import unit2Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-2/grammar.json";
 import unit3Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-3/grammar.json";
 import unit4Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-4/grammar.json";
 import unit5Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-5/grammar.json";
@@ -33,6 +34,7 @@ type UnitVocabularyWord =
   | (typeof unit5Vocabulary.words)[number]
   | (typeof unit4Vocabulary.words)[number];
 type UnitGrammarPoint =
+  | (typeof unit2Grammar.grammarPoints)[number]
   | (typeof unit3Grammar.grammarPoints)[number]
   | (typeof unit4Grammar.grammarPoints)[number]
   | (typeof unit9Grammar.grammarPoints)[number]
@@ -302,8 +304,10 @@ export const grammarPoints: GrammarPoint[] = [
   ...unit6Grammar.grammarPoints.map(toGrammarPoint),
   ...unit5Grammar.grammarPoints.map(toGrammarPoint),
   ...unit4Grammar.grammarPoints.map(toGrammarPoint),
-  ...unit3Grammar.grammarPoints.map(toGrammarPoint)
+  ...unit3Grammar.grammarPoints.map(toGrammarPoint),
+  ...unit2Grammar.grammarPoints.map(toGrammarPoint)
 ];
+export const unit2GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 2);
 export const unit3GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 3);
 export const unit4GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 4);
 

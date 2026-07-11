@@ -57,6 +57,7 @@ REGISTER
 | 9-16 Leo apps | `docs/components.md` |
 | PDF page math | `docs/pdf-mapping.md` |
 | Schema details | `docs/content-model.md` |
+| Which units are scanned so far | `docs/scan-progress.md` |
 
 ## Skill plan
 

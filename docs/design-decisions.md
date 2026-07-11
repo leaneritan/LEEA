@@ -468,13 +468,14 @@ Build priority: grammar-1 → grammar-2 → reading → writing.
 | opener | `public/lessons/ow-l4-u9-opener.html` | `public/learn/ow-l4-u9-opener.html` | `assigned` (auto-seeds) |
 | vocab-1 | `public/lessons/ow-l4-u9-vocab-1.html` | `public/learn/ow-l4-u9-vocab-1.html` | `live` |
 | song | `public/lessons/ow-l4-u9-song.html` | `public/learn/ow-l4-u9-song.html` | `draft` |
+| grammar-1 | `public/lessons/ow-l4-u9-grammar-1.html` | not yet built | teacher-only |
 
 Song vocabulary (push, pull, spin, a force, down, gravity) was already scanned into `content/subjects/english/courses/our-world/level-4/unit-9/vocabulary.json` as part of Vocabulary 1/2, so no new vocabulary entries were needed to build the song lesson pair.
 
 Current teacher tracking:
 
 - Teacher Menu shows only teacher slide cards, grouped by course, level, and unit — Leo's app cards never appear as separate boxes on the Neritan page.
-- Level/unit groups are collapsible because more levels and units will be added.
+- Navigation is a Level 1-6 tab row plus a Unit 1-9 chip row that drill down to one unit's roster at a time (`TeacherDashboard.tsx`), rather than a stacked list of collapsible level/unit groups. A unit renders its real roster as soon as any teacher lesson exists for it — Unit 7 and Unit 9 show their (partial) real lessons the same way Unit 8 does; only truly unauthored units fall back to the placeholder 8-lesson spine.
 - Each teacher card carries all controls in one place: Open (slides) and Mark Done are the teaching controls; Assign/Assigned, Review, and Unassign live inside a tinted "Leo's App" group box so app controls are visually separate from teaching controls.
 - A teacher lesson finds its learner counterpart by component name: teacher `opener` pairs with learner `opener-app` in the same level/unit. Cards with a counterpart show a "Leo's App" label plus inline progress pills (modules done, quiz score).
 - Button hierarchy: Open is the primary black button; Mark Done is a standard outline button; app-group buttons are compact; Unassign is a quiet underlined ghost button because it is a rare corrective action.

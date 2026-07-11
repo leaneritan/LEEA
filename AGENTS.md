@@ -70,9 +70,9 @@ Reference
 - show I Know / I Don't Know lists
 ```
 
-Home is a high-level launcher for all subjects and modes. Keep detailed English course/level/unit browsing inside the English area, not on Home. Neritan's Teacher Menu owns teacher lesson tracking, including collapsible level/unit groups and Mark Done state.
+Home is a high-level launcher for all subjects and modes. Keep detailed English course/level/unit browsing inside the English area, not on Home. Neritan's Teacher Menu owns teacher lesson tracking and Mark Done state, navigated with a Level 1-6 tab row and a Unit 1-9 chip row (`TeacherDashboard.tsx`) that drill down to a single unit's roster — picking a level resets the unit to 1. A unit is "live" (full roster with Teaching + Leo's App columns) the moment any teacher lesson is authored for it, regardless of level or unit number — it is not hardcoded to one flagship unit. Units with no authored lesson yet render a placeholder 2-column Lesson/Status roster over the fixed 8-lesson spine (Opener → Writing), with status derived from where that level/unit sits relative to Level 4 · Unit 8 (today's actively-taught unit): earlier levels read all Taught, later levels read all Locked, and other units within the current level read Taught if before Unit 8 or To Teach if after.
 
-Our World also has checkpoint material after each three-unit band. Treat Review and Extra Reading after Units 1-3, 4-6, and 7-9 as first-class checkpoint lessons, not as part of Unit 3, 6, or 9. In the Neritan Teacher Menu they appear at the end of the matching band (`Units 1-3`, `Units 4-6`, `Units 7-9`) after the unit cards. Until their deck/app files are generated, show them as planned checkpoint cards rather than broken lesson links.
+Our World also has checkpoint material after each three-unit band. Treat Review and Extra Reading after Units 1-3, 4-6, and 7-9 as first-class checkpoint lessons, not as part of Unit 3, 6, or 9. In the Neritan Teacher Menu they render as planned checkpoint rows under the roster whenever the selected unit is the last of its band (3, 6, or 9) and that unit has real content. Until their deck/app files are generated, show them as planned checkpoint cards rather than broken lesson links.
 
 Teacher lessons are only for teaching. Learner apps are for Leo's independent homework/practice.
 
@@ -180,7 +180,7 @@ Leo's app card list uses a third CSS variable layer: `.leo-app-card-{tone}` clas
 
 Unit 8 is fully built: opener, vocab-1, song, grammar-1, grammar-2, vocab-2, reading, writing, mission, project, and reader/book-reading all have registered teacher + learner lesson pairs in `src/data/lessons.ts`.
 
-Unit 9 ("The Science of Fun") is in progress — opener, song, and vocab-1 are built; grammar-1, grammar-2, vocab-2, reading, writing, mission, project, and reader are still to build, in that priority order per `docs/build-order.md`.
+Unit 9 ("The Science of Fun") is in progress — opener, vocab-1, song, and grammar-1 are built (grammar-1 is teacher-only so far, no Leo app yet); grammar-2, vocab-2, reading, writing, mission, project, and reader are still to build, in that priority order per `docs/build-order.md`.
 
 Target file paths follow the standard naming convention: `public/lessons/ow-l<level>-u<unit>-<component>.html` (teacher) and `public/learn/ow-l<level>-u<unit>-<component>.html` (learner) — see `docs/components.md` for each component's locked module structure.
 

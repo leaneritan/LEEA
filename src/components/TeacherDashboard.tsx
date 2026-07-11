@@ -46,7 +46,9 @@ const UNIT_TITLES = [
 
 const SPINE_LESSONS = ["Opener", "Vocabulary 1", "Song", "Grammar 1", "Vocabulary 2", "Grammar 2", "Reading", "Writing"];
 
-// Only Level 4 · Unit 8 has real content and progress tracking today.
+// Level 4 is where teaching is actively happening today, with Unit 8 as the
+// current flagship unit. Units that don't have any authored lesson yet fall
+// back to the placeholder spine below, positioned relative to this cursor.
 const LIVE_LEVEL = 4;
 const LIVE_UNIT = 8;
 
@@ -61,6 +63,19 @@ function getMockUnitStatuses(level: number, unit: number): MockLessonStatus[] {
   if (level > LIVE_LEVEL) return SPINE_LESSONS.map(() => "locked");
   return SPINE_LESSONS.map(() => (unit < LIVE_UNIT ? "taught" : "todo"));
 }
+
+const checkpointComponents = [
+  {
+    component: "review",
+    title: "Review",
+    subtitle: "Mixed checkpoint — deck appears here when generated."
+  },
+  {
+    component: "extra-reading",
+    title: "Extra Reading",
+    subtitle: "Extended comprehension & vocabulary practice."
+  }
+];
 
 const shortLessonCopy: Record<string, { label: string; title: string; subtitle: string }> = {
   opener: { label: "Opener", title: "Unit 8 Opener", subtitle: "Hobbies, interests, and the Arctic photo." },
@@ -166,31 +181,34 @@ export function TeacherDashboard() {
     })[0];
   }, [assignments, completionTimestamps]);
 
-  const isLiveUnit = selectedLevel === LIVE_LEVEL && selectedUnit === LIVE_UNIT;
-
-  const liveUnitGroup = useMemo(
-    () => groups.find((group) => group.level === LIVE_LEVEL)?.unitGroups.find((unitGroup) => unitGroup.unit === LIVE_UNIT),
-    [groups]
+  // A unit is "live" once any teacher lesson has been authored for it —
+  // not just the flagship Level 4 · Unit 8 — so units built out of the
+  // usual order (e.g. Unit 9 before Unit 8 was finished) still surface
+  // their real roster instead of falling back to the placeholder spine.
+  const selectedUnitGroup = useMemo(
+    () => groups.find((group) => group.level === selectedLevel)?.unitGroups.find((unitGroup) => unitGroup.unit === selectedUnit),
+    [groups, selectedLevel, selectedUnit]
   );
-  const liveTeacherLessons = useMemo(
-    () => liveUnitGroup?.lessons.filter((lesson) => lesson.mode === "teacher") ?? [],
-    [liveUnitGroup]
+  const selectedTeacherLessons = useMemo(
+    () => selectedUnitGroup?.lessons.filter((lesson) => lesson.mode === "teacher") ?? [],
+    [selectedUnitGroup]
   );
-  const liveDoneCount = useMemo(
-    () => getDoneLessonCount(liveTeacherLessons.map((lesson) => lesson.id), progress),
-    [liveTeacherLessons, progress]
+  const isLiveUnit = selectedTeacherLessons.length > 0;
+  const selectedDoneCount = useMemo(
+    () => getDoneLessonCount(selectedTeacherLessons.map((lesson) => lesson.id), progress),
+    [selectedTeacherLessons, progress]
   );
-  const liveAvgQuiz = useMemo(() => {
-    const learnerInUnit = liveUnitGroup?.lessons.filter((lesson) => lesson.mode === "learner") ?? [];
+  const selectedAvgQuiz = useMemo(() => {
+    const learnerInUnit = selectedUnitGroup?.lessons.filter((lesson) => lesson.mode === "learner") ?? [];
     const scores = learnerInUnit.map((lesson) => getLearnerAppProgress(lesson.source).score).filter((score): score is number => score !== null);
     if (!scores.length) return null;
     return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
-  }, [liveUnitGroup, progressVersion]);
+  }, [selectedUnitGroup, progressVersion]);
 
   const mockStatuses = useMemo(() => getMockUnitStatuses(selectedLevel, selectedUnit), [selectedLevel, selectedUnit]);
 
   const rosterStats = isLiveUnit
-    ? { lessons: liveTeacherLessons.length, taught: liveDoneCount, avgLabel: liveAvgQuiz === null ? "—" : `${liveAvgQuiz}%` }
+    ? { lessons: selectedTeacherLessons.length, taught: selectedDoneCount, avgLabel: selectedAvgQuiz === null ? "—" : `${selectedAvgQuiz}%` }
     : {
         lessons: SPINE_LESSONS.length,
         taught: mockStatuses.filter((status) => status === "taught").length,
@@ -331,8 +349,8 @@ export function TeacherDashboard() {
               <span>Teaching</span>
               <span>Leo&apos;s App</span>
             </div>
-            {liveTeacherLessons.map((lesson) => {
-              const learnerCounterpart = liveUnitGroup?.lessons.find((item) => item.mode === "learner" && item.component === `${lesson.component}-app`);
+            {selectedTeacherLessons.map((lesson) => {
+              const learnerCounterpart = selectedUnitGroup?.lessons.find((item) => item.mode === "learner" && item.component === `${lesson.component}-app`);
               return (
                 <TeacherLessonRow
                   assignment={learnerCounterpart ? assignments[learnerCounterpart.id] : undefined}
@@ -346,6 +364,14 @@ export function TeacherDashboard() {
                 />
               );
             })}
+            {selectedUnit % 3 === 0 ? (
+              <div className="teacher-checkpoint-rows">
+                <div className="teacher-checkpoint-label">Checkpoint after Units {selectedUnit - 2}–{selectedUnit}</div>
+                {checkpointComponents.map((checkpoint) => (
+                  <CheckpointRow checkpoint={checkpoint} key={checkpoint.component} unitBand={{ start: selectedUnit - 2, end: selectedUnit }} />
+                ))}
+              </div>
+            ) : null}
           </div>
         ) : (
           <div className="teacher-table teacher-table-simple">
@@ -496,6 +522,21 @@ function ReviewCallout({ lesson }: { lesson: Lesson }) {
       <small>{progress.completedModules} / {progress.moduleCount} modules{progress.score !== null ? ` · quiz ${progress.score}%` : ""}</small>
       <Link href={`/teacher/review/${lesson.id}`}>Review results</Link>
     </aside>
+  );
+}
+
+function CheckpointRow({ checkpoint, unitBand }: { checkpoint: (typeof checkpointComponents)[number]; unitBand: { start: number; end: number } }) {
+  const meta = getComponentMeta(checkpoint.component);
+  return (
+    <article className={`teacher-table-row teacher-table-row-${meta.tone} planned`}>
+      <div className="teacher-table-lesson">
+        <span>{checkpoint.component === "review" ? "Review" : "Extra Reading"}</span>
+        <h3>{checkpoint.title} {unitBand.start}–{unitBand.end}</h3>
+        <p>{checkpoint.subtitle}</p>
+      </div>
+      <div className="teacher-table-teaching"><span className="status-pill planned">Planned</span></div>
+      <div className="teacher-table-leo"><span className="muted-status">—</span></div>
+    </article>
   );
 }
 

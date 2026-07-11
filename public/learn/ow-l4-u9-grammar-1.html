@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leo · Unit 9 · Grammar 1 — The more..., the more...</title>
+<script src="/components/charts.js"></script>
+<script src="/components/chart-picker.js"></script>
+<script src="/components/wordweb.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#DC2626;--red-d:#991B1B;--red-l:#FEF2F2;--red-b:#FECACA;
+  --yellow:#FACC15;--yellow-d:#CA8A04;--yellow-l:#FEFCE8;--yellow-b:#FDE68A;
+  --amber:#F59E0B;--amber-l:#FFFBEB;
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --blue:#2563EB;--blue-d:#1D4ED8;--blue-l:#EFF6FF;--blue-b:#BFDBFE;
+  --purple:#7C3AED;--purple-l:#F5F3FF;
+  --ink:#111;--ink-2:#374151;--ink-3:#6B7280;--ink-4:#9CA3AF;--border:#E5E7EB;
+  --surface:#fff;--paper:#FFFDF5;--navy:#0f172a;
+}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink)}
+body{display:flex;flex-direction:column}
+
+/* HEADER */
+.app-header{background:var(--red);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-header .logo{font-size:24px}
+.app-header .title{font-size:20px;font-weight:800;line-height:1.1}
+.app-header .subtitle{font-size:13px;opacity:.85;margin-top:2px}
+.app-header .badge-row{margin-left:auto;display:flex;gap:8px;align-items:center}
+.prog-pill{background:rgba(255,255,255,.22);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700}
+
+/* TAB NAV */
+.tab-nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:12px 14px;font-size:13px;font-weight:700;font-family:'Outfit',sans-serif;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;min-width:74px}
+.tab-btn .tab-icon{font-size:18px}
+.tab-btn .tab-name{font-size:11px;letter-spacing:.3px}
+.tab-btn.active{color:var(--red);border-bottom-color:var(--red)}
+.tab-btn.done::after{content:'✓';position:absolute;top:4px;right:6px;color:var(--green);font-weight:900;font-size:12px}
+
+/* CONTENT */
+.tab-content{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.tab-content.active{display:flex}
+.tab-body{flex:1;padding:18px 20px;display:flex;flex-direction:column;gap:14px;max-width:900px;width:100%;margin:0 auto}
+.tab-footer{flex-shrink:0;border-top:2px solid var(--border);background:#fff;padding:10px 20px;display:flex;gap:10px}
+.section-title{font-size:21px;font-weight:900;color:var(--navy)}
+.section-sub{font-size:14px;color:var(--ink-3);font-weight:600;margin-top:2px}
+.dad-hint{background:var(--amber-l);border:2px solid var(--yellow-b);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:600;color:var(--ink-2)}
+
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:12px 16px;font-size:15px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.btn-complete:disabled{opacity:.4;cursor:not-allowed}
+.btn-complete.confirmed{background:var(--green-d);pointer-events:none}
+.btn-redo{width:110px;flex-shrink:0;background:#fff;color:var(--red);border:2px solid var(--red-b);border-radius:12px;padding:12px 8px;font-size:13px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.btn-redo.armed{background:var(--red-l);border-color:var(--red)}
+
+.done-banner{display:none;background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;color:var(--green-d);text-align:center}
+.done-banner.show{display:block;animation:pop .35s}
+@keyframes pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+/* OPTION BUTTONS */
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid var(--border);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.opt:hover{border-color:var(--amber)}
+.opt.good{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default}
+.qcard{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px}
+.qcard .qtext{font-size:16px;font-weight:800;margin-bottom:10px;color:var(--navy)}
+.tag-more{background:var(--red);color:#fff;padding:2px 10px;border-radius:8px;font-weight:900}
+.tag-comp{background:var(--yellow);color:var(--navy);padding:2px 10px;border-radius:8px;font-weight:900}
+
+/* FLASHCARDS (tab 0) */
+.fc-modeswitch{display:flex;gap:8px}
+.fc-modebtn{flex:1;padding:9px;border-radius:10px;border:2px solid var(--border);background:#fff;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;color:var(--ink-3)}
+.fc-modebtn.active{background:var(--red);color:#fff;border-color:var(--red)}
+.fc-pane{display:none}
+.fc-pane.active{display:block}
+.fc-card{background:linear-gradient(135deg,#fff,var(--yellow-l));border:4px solid var(--yellow);border-radius:20px;padding:26px;text-align:center}
+.fc-card .fc-emoji{font-size:64px}
+.fc-card .fc-word{font-size:32px;font-weight:900;color:var(--navy);margin-top:6px}
+.fc-card .fc-ipa{font-size:14px;color:var(--ink-3);font-weight:600}
+.fc-card .fc-def{font-size:16px;color:var(--ink-2);font-weight:600;margin-top:10px}
+.fc-card .fc-sample{font-size:15px;background:var(--blue-l);border-radius:10px;padding:8px 12px;margin-top:10px;font-weight:600}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.fc-nav button{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.fc-dots{display:flex;gap:6px}
+.fc-dot{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.fc-dot.on{background:var(--red)}
+
+/* CHIP BUILDER */
+.chip{display:inline-block;background:#fff;border:3px solid var(--amber);border-radius:10px;padding:8px 16px;font-size:16px;font-weight:800;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;margin:3px}
+.chip:hover{background:var(--amber-l)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.err{animation:shake .35s;border-color:var(--red)}
+.build-line{min-height:56px;background:#fff;border:3px dashed var(--border);border-radius:12px;padding:10px 14px;font-size:18px;font-weight:800;color:var(--navy);display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.build-line.done{border-style:solid;border-color:var(--green);background:var(--green-l)}
+.bpart{background:var(--yellow-l);border:2px solid var(--yellow);border-radius:8px;padding:3px 10px}
+
+/* SURVEY */
+.svy-row{background:#fff;border:2px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.svy-row input{border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:15px;font-family:'Outfit',sans-serif;flex:1;min-width:140px}
+.svy-row input:focus{border-color:var(--amber);outline:none}
+.svy-row.filled{border-color:var(--green);background:var(--green-l)}
+
+/* GUESS THE ENDING */
+.ge-round-tabs{display:flex;gap:8px}
+.ge-round-tab{flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:#fff;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;color:var(--ink-3);font-size:14px}
+.ge-round-tab.active{background:var(--yellow);border-color:var(--yellow-d);color:var(--navy)}
+.ge-round{display:none}
+.ge-round.showround{display:block}
+.ge-clue-box{background:var(--red-l);border:2px solid var(--red-b);border-radius:12px;padding:14px 18px;font-size:17px;font-weight:800;color:var(--navy);margin:10px 0}
+.ge-clue-btn{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.ge-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.ge-tile{background:#fff;border:3px solid var(--border);border-radius:12px;padding:14px;font-weight:700;font-size:15px;cursor:pointer;text-align:center}
+.ge-tile.win{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.ge-tile.lose{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.ge-tile.locked{pointer-events:none;opacity:.5}
+
+/* QUIZ */
+.quiz-progress{display:flex;gap:5px}
+.quiz-progress div{flex:1;height:8px;border-radius:4px;background:var(--border)}
+.quiz-progress div.answered{background:var(--amber)}
+.quiz-result{text-align:center;padding:20px}
+.quiz-result .trophy{font-size:70px}
+.quiz-result .qscore{font-size:38px;font-weight:900;color:var(--navy);margin:8px 0}
+.wrong-review{background:var(--red-l);border:2px solid var(--red-b);border-radius:10px;padding:10px 14px;text-align:left;margin-top:8px;font-size:14px}
+
+/* DRIBBLE */
+.pitch{background:linear-gradient(180deg,#166534,#15803d);border-radius:16px;padding:16px;color:#fff;position:relative;overflow:hidden}
+.pitch::before{content:'';position:absolute;inset:8px;border:2px solid rgba(255,255,255,.3);border-radius:10px}
+.score-row{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+.goal-tally{font-size:26px}
+.drib-q{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.3);border-radius:12px;padding:12px 16px;margin-top:10px;position:relative;z-index:1}
+.drib-opt{display:block;width:100%;text-align:left;background:rgba(255,255,255,.9);border:2px solid transparent;border-radius:10px;padding:10px 14px;margin-top:6px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.drib-opt.good{background:var(--yellow)}
+.drib-opt.bad{background:#fecaca;animation:shake .35s}
+
+.web-host,.sort-host{min-height:80px}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo">⚡🔬</div>
+  <div>
+    <div class="title">Unit 9 · Grammar 1 — Force Lab Test</div>
+    <div class="subtitle">The more..., the more... / the more..., the -er...</div>
+  </div>
+  <div class="badge-row"><div class="prog-pill" id="prog-pill">0 / 12 done</div></div>
+</div>
+
+<div class="tab-nav" id="tab-nav">
+  <button class="tab-btn active" onclick="showTab(0)" id="tb0"><span class="tab-icon">🧪</span><span class="tab-name">Word Lab</span></button>
+  <button class="tab-btn" onclick="showTab(1)" id="tb1"><span class="tab-icon">🔥</span><span class="tab-name">Warm Up</span></button>
+  <button class="tab-btn" onclick="showTab(2)" id="tb2"><span class="tab-icon">📐</span><span class="tab-name">The Rule</span></button>
+  <button class="tab-btn" onclick="showTab(3)" id="tb3"><span class="tab-icon">🕵️</span><span class="tab-name">Detective</span></button>
+  <button class="tab-btn" onclick="showTab(4)" id="tb4"><span class="tab-icon">🔧</span><span class="tab-name">Build It</span></button>
+  <button class="tab-btn" onclick="showTab(5)" id="tb5"><span class="tab-icon">🗂️</span><span class="tab-name">Sort</span></button>
+  <button class="tab-btn" onclick="showTab(6)" id="tb6"><span class="tab-icon">✏️</span><span class="tab-name">Practice</span></button>
+  <button class="tab-btn" onclick="showTab(7)" id="tb7"><span class="tab-icon">📋</span><span class="tab-name">Survey</span></button>
+  <button class="tab-btn" onclick="showTab(8)" id="tb8"><span class="tab-icon">🕸️</span><span class="tab-name">Word Web</span></button>
+  <button class="tab-btn" onclick="showTab(9)" id="tb9"><span class="tab-icon">🎯</span><span class="tab-name">Guess End</span></button>
+  <button class="tab-btn" onclick="showTab(10)" id="tb10"><span class="tab-icon">📝</span><span class="tab-name">Quiz</span></button>
+  <button class="tab-btn" onclick="showTab(11)" id="tb11"><span class="tab-icon">⚽</span><span class="tab-name">Dribble!</span></button>
+</div>
+
+<!-- ═══════════ TAB 0 — WORD LAB FLASHCARDS ═══════════ -->
+<div class="tab-content active" id="tc0">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🧪 Word Lab — 5 words from the lesson</div>
+      <div class="section-sub">Practice mode first, then switch to Quiz mode to test yourself.</div>
+    </div>
+    <div class="fc-modeswitch">
+      <button class="fc-modebtn active" id="fc-mode-prac" onclick="fcSetMode('practice')">📖 Practice</button>
+      <button class="fc-modebtn" id="fc-mode-quiz" onclick="fcSetMode('quiz')">🎯 Quiz</button>
+    </div>
+    <div class="fc-pane active" id="fc0-prac">
+      <div class="fc-card" id="fc-card"></div>
+      <div class="fc-nav">
+        <button onclick="fcPrev()">◀ Prev</button>
+        <div class="fc-dots" id="fc-dots"></div>
+        <button onclick="fcNext()">Next ▶</button>
+      </div>
+    </div>
+    <div class="fc-pane" id="fc0-quiz">
+      <div id="fc-quiz-host"></div>
+    </div>
+    <div class="done-banner" id="fc-done">🎉 Word Lab complete — all 5 words practiced and quizzed!</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-0" onclick="doRedo(0)">↺ Redo</button>
+    <button class="btn-complete" id="complete-0" onclick="markComplete(0)">Mark Word Lab complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 1 — WARM UP (fill-in) ═══════════ -->
+<div class="tab-content" id="tc1">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🔥 Warm Up — Finish the pattern</div>
+      <div class="section-sub">Tap the missing word or phrase. 8 quick items.</div>
+    </div>
+    <div class="dad-hint">Every sentence has two halves joined by a comma. Find the piece that's missing!</div>
+    <div id="wu-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="wu-done">🎉 All 8 warmed up! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-1" onclick="doRedo(1)">↺ Redo</button>
+    <button class="btn-complete" id="complete-1" onclick="markComplete(1)">Mark Warm Up complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 2 — THE RULE (mini-MCQ) ═══════════ -->
+<div class="tab-content" id="tc2">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📐 The Rule — 6 quick checks</div>
+      <div class="section-sub">Pattern A, Pattern B, the comma law, and the good→better trap.</div>
+    </div>
+    <div id="rule-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="rule-done">🎉 6/6! You know the rule. Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-2" onclick="doRedo(2)">↺ Redo</button>
+    <button class="btn-complete" id="complete-2" onclick="markComplete(2)">Mark The Rule complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 3 — DETECTIVE ═══════════ -->
+<div class="tab-content" id="tc3">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🕵️ Grammar Detective — find the mistake</div>
+      <div class="section-sub">6 broken sentences. Pick the fixed version.</div>
+    </div>
+    <div id="det-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="det-done">🎉 Case closed — all 6 fixed! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-3" onclick="doRedo(3)">↺ Redo</button>
+    <button class="btn-complete" id="complete-3" onclick="markComplete(3)">Mark Detective complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 4 — BUILD IT ═══════════ -->
+<div class="tab-content" id="tc4">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🔧 Build It — 6 sentences</div>
+      <div class="section-sub">Tap the chips in order to build each double comparative.</div>
+    </div>
+    <div id="bld-list" style="display:flex;flex-direction:column;gap:16px"></div>
+    <div class="done-banner" id="bld-done">🎉 All 6 built! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-4" onclick="doRedo(4)">↺ Redo</button>
+    <button class="btn-complete" id="complete-4" onclick="markComplete(4)">Mark Build It complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 5 — SORT (buildDndSorter) ═══════════ -->
+<div class="tab-content" id="tc5">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🗂️ Sort: ✅ Correct vs ❌ Wrong</div>
+      <div class="section-sub">Drag each sentence chip into the right column. 12 chips — 6 correct, 6 broken.</div>
+    </div>
+    <div class="dad-hint">Check for: the comma, both halves starting right, and good→<b>better</b> (never "gooder")!</div>
+    <div class="sort-host" id="sort-host"></div>
+    <div class="done-banner" id="sort-done">🎉 All 12 sorted! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-5" onclick="doRedo(5)">↺ Redo</button>
+    <button class="btn-complete" id="complete-5" onclick="markComplete(5)">Mark Sort complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 6 — PRACTICE ═══════════ -->
+<div class="tab-content" id="tc6">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">✏️ Practice — Word Machine Round 2</div>
+      <div class="section-sub">5 NatGeo-style items + 3 bonus soccer items. Tap the missing comparative.</div>
+    </div>
+    <div class="dad-hint">Tap the word that finishes the sentence — it drops right into place.</div>
+    <div id="prac-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="prac-done">🎉 All 8 done! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-6" onclick="doRedo(6)">↺ Redo</button>
+    <button class="btn-complete" id="complete-6" onclick="markComplete(6)">Mark Practice complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 7 — SURVEY ═══════════ -->
+<div class="tab-content" id="tc7">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📋 Survey — My Life Lab</div>
+      <div class="section-sub">Finish 6 sentences about your own life. Type your own ideas!</div>
+    </div>
+    <div class="dad-hint">There's no wrong answer here — any true sentence about you counts!</div>
+    <div id="svy-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="done-banner" id="svy-done">🎉 Survey complete! Mark below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-7" onclick="doRedo(7)">↺ Redo</button>
+    <button class="btn-complete" id="complete-7" onclick="markComplete(7)">Mark Survey complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 8 — WORD WEB (buildWordWeb) ═══════════ -->
+<div class="tab-content" id="tc8">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🕸️ Word Web — Double Comparatives</div>
+      <div class="section-sub">Tap each oval to type. Add your own examples!</div>
+    </div>
+    <div class="dad-hint">Fill in at least 2 ovals with your own "the more..." ideas.</div>
+    <div class="web-host" id="web-host"></div>
+    <div class="done-banner" id="web-done">🎉 Word web saved! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-8" onclick="doRedo(8)">↺ Redo</button>
+    <button class="btn-complete" id="complete-8" onclick="markComplete(8)">Mark Word Web complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 9 — GUESS THE ENDING ═══════════ -->
+<div class="tab-content" id="tc9">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🎯 Guess the Ending · 3 Rounds</div>
+      <div class="section-sub">Get a clue (the first half). Tap the ending you think is correct. Playground · World Cup · Movies.</div>
+    </div>
+    <div class="ge-round-tabs">
+      <button class="ge-round-tab active" id="ge-rt-0" onclick="geSwitch(0)">🛝 Playground</button>
+      <button class="ge-round-tab" id="ge-rt-1" onclick="geSwitch(1)">⚽ World Cup</button>
+      <button class="ge-round-tab" id="ge-rt-2" onclick="geSwitch(2)">🎬 Movies</button>
+    </div>
+    <div id="ge-round-0" class="ge-round showround">
+      <div class="ge-clue-box" id="ge-clue-0">Tap "Get a clue" to start the Playground round.</div>
+      <button class="ge-clue-btn" id="ge-btn-0" onclick="geClue(0)">🔍 Get a clue</button>
+      <span style="margin-left:12px;font-size:13px;color:var(--ink-3);font-weight:600" id="ge-cnt-0">Clue 0 of 3</span>
+      <div class="ge-grid" id="ge-grid-0"></div>
+    </div>
+    <div id="ge-round-1" class="ge-round">
+      <div class="ge-clue-box" id="ge-clue-1">Tap "Get a clue" to start the World Cup round.</div>
+      <button class="ge-clue-btn" id="ge-btn-1" onclick="geClue(1)">🔍 Get a clue</button>
+      <span style="margin-left:12px;font-size:13px;color:var(--ink-3);font-weight:600" id="ge-cnt-1">Clue 0 of 3</span>
+      <div class="ge-grid" id="ge-grid-1"></div>
+    </div>
+    <div id="ge-round-2" class="ge-round">
+      <div class="ge-clue-box" id="ge-clue-2">Tap "Get a clue" to start the Movies round.</div>
+      <button class="ge-clue-btn" id="ge-btn-2" onclick="geClue(2)">🔍 Get a clue</button>
+      <span style="margin-left:12px;font-size:13px;color:var(--ink-3);font-weight:600" id="ge-cnt-2">Clue 0 of 3</span>
+      <div class="ge-grid" id="ge-grid-2"></div>
+    </div>
+    <div class="done-banner" id="ge-done">🏆 All 3 rounds won! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-9" onclick="doRedo(9)">↺ Redo</button>
+    <button class="btn-complete" id="complete-9" onclick="markComplete(9)">Mark Guess End complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 10 — QUIZ (scored) ═══════════ -->
+<div class="tab-content" id="tc10">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📝 Formative Quiz — 10 questions</div>
+      <div class="section-sub">Score 8/10 or better to power the Lab!</div>
+    </div>
+    <div id="quiz-active">
+      <div class="quiz-progress" id="quiz-progress"></div>
+      <div class="qcard" style="margin-top:14px" id="quiz-qcard"></div>
+    </div>
+    <div id="quiz-result" style="display:none"></div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-10" onclick="doRedo(10)">↺ Redo</button>
+    <button class="btn-complete" id="complete-10" onclick="markComplete(10)" disabled>Finish all 10 questions first</button>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 11 — DRIBBLE! ═══════════ -->
+<div class="tab-content" id="tc11">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">⚽ Dribble! — World Cup grammar round</div>
+      <div class="section-sub">Answer right, score a goal. 6 real July 2026 World Cup moments.</div>
+    </div>
+    <div class="pitch">
+      <div class="score-row">
+        <div>⚽ Goals: <span class="goal-tally" id="drib-goals">0</span> / 6</div>
+        <div id="drib-defenders">🛡️🛡️🛡️🛡️🛡️🛡️</div>
+      </div>
+    </div>
+    <div id="drib-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="drib-done">⚽ Match complete! Mark below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-11" onclick="doRedo(11)">↺ Redo</button>
+    <button class="btn-complete" id="complete-11" onclick="markComplete(11)">Mark Dribble complete ✓</button>
+  </div>
+</div>
+
+<script>
+/* ═════════════════════════════════════════════════════════════════════
+   UNIT 9 GRAMMAR 1 — LEO APP
+   SAVE_PREFIX: leea-4-9-grammar-1-
+   HOMEWORK_ID: leo-4-9-grammar-1
+   moduleCount: 12 (tabs 0-11)
+   moduleKeyFormat: tab-{i}-done
+   scoreKey: score (Tab 10)
+═════════════════════════════════════════════════════════════════════ */
+
+const SAVE_PREFIX = 'leea-4-9-grammar-1-';
+const HOMEWORK_ID = 'leo-4-9-grammar-1';
+const TAB_COUNT = 12;
+const TAB_NAMES = ['Word Lab','Warm Up','The Rule','Detective','Build It','Sort','Practice','Survey','Word Web','Guess End','Quiz','Dribble!'];
+const TAB_INIT = {};
+const TAB_RESET = {};
+const TAB_RESTORE = {};
+
+/* localStorage helpers */
+function lSave(suffix, value){
+  try{ localStorage.setItem(SAVE_PREFIX + suffix, JSON.stringify(value)); }catch(e){}
+}
+function lLoad(suffix){
+  try{ const raw = localStorage.getItem(SAVE_PREFIX + suffix); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
+}
+function lDel(suffix){
+  try{ localStorage.removeItem(SAVE_PREFIX + suffix); }catch(e){}
+}
+
+/* ── PROGRESS BADGE + TAB CHECKMARKS ── */
+function refreshProgress(){
+  try{
+    let done = 0;
+    for(let i=0;i<TAB_COUNT;i++){
+      const k = 'tab-' + i + '-done';
+      if(lLoad(k)){
+        done++;
+        const tb = document.getElementById('tb'+i);
+        if(tb) tb.classList.add('done');
+      }
+    }
+    const pill = document.getElementById('prog-pill');
+    if(pill) pill.textContent = done + ' / ' + TAB_COUNT + ' done';
+    if(done >= TAB_COUNT) lSave(HOMEWORK_ID + '-done', { complete: true, completedAt: new Date().toISOString() });
+  }catch(e){}
+}
+
+/* ── MARK COMPLETE (Rule 1: auto-save done-key) ── */
+function markComplete(tab){
+  try{
+    lSave('tab-' + tab + '-done', { done: true, completedAt: new Date().toISOString() });
+    const btn = document.getElementById('complete-' + tab);
+    btn.textContent = '✓ ' + TAB_NAMES[tab] + ' done';
+    btn.classList.add('confirmed');
+    refreshProgress();
+  }catch(e){}
+}
+
+/* ── REDO (Rule 4: clear before reinit, two-tap armed) ── */
+function doRedo(tab){
+  try{
+    const btn = document.getElementById('redo-' + tab);
+    if(!btn.classList.contains('armed')){
+      btn.classList.add('armed'); btn.textContent = 'Tap again ↺';
+      setTimeout(()=>{ btn.classList.remove('armed'); btn.textContent = '↺ Redo'; }, 3000);
+      return;
+    }
+    btn.classList.remove('armed'); btn.textContent = '↺ Redo';
+    lDel('tab-' + tab + '-done');
+    if(tab === 10) lDel('score');
+    const keys = Object.keys(localStorage).filter(k => k.startsWith(SAVE_PREFIX + 'tab-' + tab + '-'));
+    keys.forEach(k => localStorage.removeItem(k));
+    if(TAB_RESET[tab]) TAB_RESET[tab]();
+    const cb = document.getElementById('complete-' + tab);
+    cb.classList.remove('confirmed');
+    cb.textContent = 'Mark ' + TAB_NAMES[tab] + ' complete ✓';
+    document.getElementById('tb'+tab).classList.remove('done');
+    refreshProgress();
+  }catch(e){}
+}
+
+/* ── TAB NAV (Rule 3: restore on switch) ── */
+let _activeTab = 0;
+function showTab(n){
+  try{
+    document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', i===n));
+    document.querySelectorAll('.tab-content').forEach((c,i)=>c.classList.toggle('active', i===n));
+    _activeTab = n;
+    const cb = document.getElementById('complete-' + n);
+    if(cb){
+      if(lLoad('tab-' + n + '-done')){
+        cb.classList.add('confirmed');
+        cb.textContent = '✓ ' + TAB_NAMES[n] + ' done';
+      } else if(!cb.disabled || n !== 10){
+        cb.classList.remove('confirmed');
+        cb.textContent = 'Mark ' + TAB_NAMES[n] + ' complete ✓';
+      }
+    }
+    if(TAB_INIT[n] && !TAB_INIT[n]._initialized){
+      TAB_INIT[n]();
+      TAB_INIT[n]._initialized = true;
+    }
+    if(TAB_RESTORE[n]) TAB_RESTORE[n]();
+  }catch(e){}
+}
+
+function pick(btn, correct){
+  try{
+    const group = btn.parentElement;
+    if(group.dataset.solved) return;
+    if(correct){
+      group.dataset.solved = '1';
+      btn.classList.add('good');
+      group.querySelectorAll('.opt,.drib-opt').forEach(o=>o.disabled=true);
+      return true;
+    } else {
+      btn.classList.add('bad');
+      setTimeout(()=>btn.classList.remove('bad'),380);
+      return false;
+    }
+  }catch(e){ return false; }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 0 — WORD LAB FLASHCARDS (practice + quiz)
+═════════════════════════════════════════════════════════════════════ */
+const FC_WORDS = [
+  { word: 'describe', emoji: '🗣️📝', ipa: '/dɪˈskraɪb/', def: 'To say what something is like or what is happening.', jp: '説明（せつめい）する', sample: "<b>Describe</b> the picture: the goalkeeper jumps to catch the ball." },
+  { word: 'match', emoji: '🧩✅', ipa: '/mætʃ/', def: 'To put together two things that belong together.', jp: '合わせる', sample: "<b>Match</b> the beginning to the ending: The more she pushes, the higher she goes." },
+  { word: 'merry-go-round', emoji: '🎠', ipa: '/ˈmɛri.ɡoʊ.raʊnd/', def: 'A playground ride that spins around and around.', jp: 'メリーゴーランド', sample: "The more you push the <b>merry-go-round</b>, the faster it spins." },
+  { word: 'seesaw', emoji: '⬆️⬇️', ipa: '/ˈsiːsɔː/', def: 'A playground ride — one side goes up when the other goes down.', jp: 'シーソー', sample: "The more he goes down on the <b>seesaw</b>, the more she goes up." },
+  { word: 'skateboarder', emoji: '🛹', ipa: '/ˈskeɪtbɔːrdər/', def: 'A person who rides a skateboard. (-er = the person who does it!)', jp: 'スケートボーダー', sample: "The more the <b>skateboarder</b> pushes, the faster he moves." }
+];
+let fcIdx = 0, fcMode = 'practice', fcQuizIdx = 0, fcQuizSolved = new Set();
+
+TAB_INIT[0] = function(){};
+TAB_RESET[0] = function(){
+  fcIdx = 0; fcMode = 'practice'; fcQuizIdx = 0; fcQuizSolved = new Set();
+  document.getElementById('fc-mode-prac').classList.add('active');
+  document.getElementById('fc-mode-quiz').classList.remove('active');
+  document.getElementById('fc0-prac').classList.add('active');
+  document.getElementById('fc0-quiz').classList.remove('active');
+  document.getElementById('fc-done').classList.remove('show');
+  fcRenderCard(); fcRenderQuizQ();
+};
+TAB_RESTORE[0] = function(){
+  const visited = lLoad('tab-0-visited') || [];
+  const solved = lLoad('tab-0-solved') || [];
+  fcQuizSolved = new Set(solved);
+  fcRenderCard(); fcRenderQuizQ();
+  if(visited.length >= 5 && solved.length >= 5) document.getElementById('fc-done').classList.add('show');
+};
+function fcSetMode(m){
+  fcMode = m;
+  document.getElementById('fc-mode-prac').classList.toggle('active', m==='practice');
+  document.getElementById('fc-mode-quiz').classList.toggle('active', m==='quiz');
+  document.getElementById('fc0-prac').classList.toggle('active', m==='practice');
+  document.getElementById('fc0-quiz').classList.toggle('active', m==='quiz');
+}
+function fcRenderCard(){
+  const w = FC_WORDS[fcIdx];
+  document.getElementById('fc-card').innerHTML =
+    '<div class="fc-emoji">'+w.emoji+'</div><div class="fc-word">'+w.word+'</div><div class="fc-ipa">'+w.ipa+'</div>'+
+    '<div class="fc-def">'+w.def+'</div><div class="fc-sample">'+w.sample+'</div>';
+  document.getElementById('fc-dots').innerHTML = FC_WORDS.map((x,i)=>'<div class="fc-dot'+(i===fcIdx?' on':'')+'"></div>').join('');
+  const visited = new Set(lLoad('tab-0-visited') || []);
+  visited.add(fcIdx);
+  lSave('tab-0-visited', Array.from(visited));
+  fcCheckDone();
+}
+function fcNext(){ fcIdx = (fcIdx+1) % FC_WORDS.length; fcRenderCard(); }
+function fcPrev(){ fcIdx = (fcIdx-1+FC_WORDS.length) % FC_WORDS.length; fcRenderCard(); }
+function fcRenderQuizQ(){
+  const host = document.getElementById('fc-quiz-host');
+  const remaining = FC_WORDS.map((w,i)=>i).filter(i=>!fcQuizSolved.has(i));
+  if(remaining.length === 0){
+    host.innerHTML = '<div class="done-banner show">🎉 All 5 words quizzed correctly!</div>';
+    return;
+  }
+  const qi = remaining[fcQuizIdx % remaining.length];
+  const w = FC_WORDS[qi];
+  const distractors = FC_WORDS.filter((x,i)=>i!==qi).sort(()=>Math.random()-0.5).slice(0,2);
+  const opts = [w, ...distractors].sort(()=>Math.random()-0.5);
+  host.innerHTML = '<div class="qcard"><div class="qtext">'+w.emoji+' Which word is this?</div>' +
+    opts.map(o=>'<button class="opt" onclick="fcQuizPick(this,'+(o.word===w.word)+','+qi+')">'+o.word+'</button>').join('') + '</div>';
+}
+function fcQuizPick(btn, correct, qi){
+  if(pick(btn, correct)){
+    fcQuizSolved.add(qi);
+    lSave('tab-0-solved', Array.from(fcQuizSolved));
+    setTimeout(()=>{ fcQuizIdx++; fcRenderQuizQ(); fcCheckDone(); }, 700);
+  }
+}
+function fcCheckDone(){
+  const visited = lLoad('tab-0-visited') || [];
+  if(visited.length >= 5 && fcQuizSolved.size >= 5) document.getElementById('fc-done').classList.add('show');
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 1 — WARM UP (8 fill-in)
+═════════════════════════════════════════════════════════════════════ */
+const WU_ITEMS = [
+  { s1: "The more I push,", opts: ["the higher he goes.","I like pizza.","she is nice."], ok: 0 },
+  { s1: "The more you practice,", opts: ["the more you learn.","the ball is round.","he plays soccer."], ok: 0 },
+  { s1: "The more force I use,", opts: ["the farther it goes.","the color is red.","she has a dog."], ok: 0 },
+  { s1: "The more they spin,", opts: ["the faster they go.","the game is fun.","it is Tuesday."], ok: 0 },
+  { s1: "The higher she climbs,", opts: ["the more tired she gets.","the sky is blue.","he likes cats."], ok: 0 },
+  { s1: "The more you play soccer,", opts: ["the better you get.","the ball is old.","she runs fast today."], ok: 0 },
+  { s1: "The more we win,", opts: ["the happier we feel.","the field is green.","he wears red."], ok: 0 },
+  { s1: "The more it rains,", opts: ["the wetter the field gets.","the sun is hot.","she has a ball."], ok: 0 }
+];
+TAB_INIT[1] = function(){
+  const host = document.getElementById('wu-list');
+  host.innerHTML = WU_ITEMS.map((it,i)=>{
+    const shuffled = it.opts.map((o,oi)=>({text:o, ok:oi===it.ok})).sort(()=>Math.random()-0.5);
+    return '<div class="qcard" data-idx="'+i+'"><div class="qtext">'+(i+1)+'. "'+it.s1+' ___"</div>' +
+      shuffled.map(o=>'<button class="opt" onclick="wuPick(this,'+o.ok+','+i+')">'+o.text+'</button>').join('') + '</div>';
+  }).join('');
+};
+TAB_RESET[1] = function(){
+  lDel('tab-1-solved');
+  document.getElementById('wu-done').classList.remove('show');
+  TAB_INIT[1]._initialized = false; TAB_INIT[1](); TAB_INIT[1]._initialized = true;
+};
+TAB_RESTORE[1] = function(){
+  const solved = lLoad('tab-1-solved') || [];
+  solved.forEach(i=>{
+    const card = document.querySelector('#wu-list [data-idx="'+i+'"]');
+    if(!card) return;
+    card.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+    card.dataset.solved='1';
+  });
+  if(solved.length >= 8) document.getElementById('wu-done').classList.add('show');
+};
+function wuPick(btn, correct, idx){
+  if(pick(btn, correct)){
+    const solved = new Set(lLoad('tab-1-solved') || []);
+    solved.add(idx);
+    lSave('tab-1-solved', Array.from(solved));
+    if(solved.size >= 8) document.getElementById('wu-done').classList.add('show');
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 2 — THE RULE (6 mini-MCQ)
+═════════════════════════════════════════════════════════════════════ */
+const RULE_ITEMS = [
+  { q: 'Pattern A looks like:', opts: ['The more..., the more...','The more..., the faster...','More the..., the...'], ok: 0 },
+  { q: 'Pattern B looks like:', opts: ['The more..., the more...','The more..., the faster...','Faster the..., more the...'], ok: 1 },
+  { q: 'A comma goes:', opts: ['At the very end','Between the two halves','After every word'], ok: 1 },
+  { q: 'good becomes:', opts: ['gooder','more good','better'], ok: 2 },
+  { q: 'The FIRST half is the:', opts: ['cause','effect','question'], ok: 0 },
+  { q: '"The more you spin, the ___ you feel dizzy." Missing word:', opts: ['more','spin','good'], ok: 0 }
+];
+TAB_INIT[2] = function(){
+  const host = document.getElementById('rule-list');
+  host.innerHTML = RULE_ITEMS.map((it,i)=>{
+    const shuffled = it.opts.map((o,oi)=>({text:o, ok:oi===it.ok})).sort(()=>Math.random()-0.5);
+    return '<div class="qcard" data-idx="'+i+'"><div class="qtext">'+(i+1)+'. '+it.q+'</div>' +
+      shuffled.map(o=>'<button class="opt" onclick="rulePick(this,'+o.ok+','+i+')">'+o.text+'</button>').join('') + '</div>';
+  }).join('');
+};
+TAB_RESET[2] = function(){
+  lDel('tab-2-solved');
+  document.getElementById('rule-done').classList.remove('show');
+  TAB_INIT[2]._initialized = false; TAB_INIT[2](); TAB_INIT[2]._initialized = true;
+};
+TAB_RESTORE[2] = function(){
+  const solved = lLoad('tab-2-solved') || [];
+  solved.forEach(i=>{
+    const card = document.querySelector('#rule-list [data-idx="'+i+'"]');
+    if(!card) return;
+    card.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+    card.dataset.solved='1';
+  });
+  if(solved.length >= 6) document.getElementById('rule-done').classList.add('show');
+};
+function rulePick(btn, correct, idx){
+  if(pick(btn, correct)){
+    const solved = new Set(lLoad('tab-2-solved') || []);
+    solved.add(idx);
+    lSave('tab-2-solved', Array.from(solved));
+    if(solved.size >= 6) document.getElementById('rule-done').classList.add('show');
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 3 — DETECTIVE (6 broken sentences)
+═════════════════════════════════════════════════════════════════════ */
+const DET_ITEMS = [
+  { bad: '"More you push, faster it goes."', opts: ['The more you push, the faster it goes.','You push more, it goes faster more.'], ok: 0 },
+  { bad: '"The more you spin, the more faster you go."', opts: ['It is already correct.','The more you spin, the faster you go.'], ok: 1 },
+  { bad: '"The more we practice the more we win."', opts: ['The more we practice, the more we win.','The more, we practice the more we win.'], ok: 0 },
+  { bad: '"The more you play soccer, the gooder you get."', opts: ['The more you play soccer, the better you get.','The more you play soccer, the more good you get.'], ok: 0 },
+  { bad: '"The higher you climb the more tired you get."', opts: ['The higher you climb, the more tired you get.','The higher, you climb the more tired you get.'], ok: 0 },
+  { bad: '"The more it rains the wetter the field gets."', opts: ['The more it rains, the wetter the field gets.','More it rains, wetter the field it gets.'], ok: 0 }
+];
+TAB_INIT[3] = function(){
+  const host = document.getElementById('det-list');
+  host.innerHTML = DET_ITEMS.map((it,i)=>{
+    const shuffled = it.opts.map((o,oi)=>({text:o, ok:oi===it.ok})).sort(()=>Math.random()-0.5);
+    return '<div class="qcard" data-idx="'+i+'"><div class="qtext">🚨 '+(i+1)+'. '+it.bad+'</div>' +
+      shuffled.map(o=>'<button class="opt" onclick="detPick(this,'+o.ok+','+i+')">'+o.text+'</button>').join('') + '</div>';
+  }).join('');
+};
+TAB_RESET[3] = function(){
+  lDel('tab-3-solved');
+  document.getElementById('det-done').classList.remove('show');
+  TAB_INIT[3]._initialized = false; TAB_INIT[3](); TAB_INIT[3]._initialized = true;
+};
+TAB_RESTORE[3] = function(){
+  const solved = lLoad('tab-3-solved') || [];
+  solved.forEach(i=>{
+    const card = document.querySelector('#det-list [data-idx="'+i+'"]');
+    if(!card) return;
+    card.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+    card.dataset.solved='1';
+  });
+  if(solved.length >= 6) document.getElementById('det-done').classList.add('show');
+};
+function detPick(btn, correct, idx){
+  if(pick(btn, correct)){
+    const solved = new Set(lLoad('tab-3-solved') || []);
+    solved.add(idx);
+    lSave('tab-3-solved', Array.from(solved));
+    if(solved.size >= 6) document.getElementById('det-done').classList.add('show');
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 4 — BUILD IT (6 chip builders)
+═════════════════════════════════════════════════════════════════════ */
+const BLD_ITEMS = [
+  { id:'b1', parts: ['The more','you practice',',','the more','you learn.'] },
+  { id:'b2', parts: ['The more','you push the swing',',','the faster','it goes.'] },
+  { id:'b3', parts: ['The more','the skateboarder pushes',',','the faster','he moves.'] },
+  { id:'b4', parts: ['The higher','she goes',',','the more','she feels dizzy.'] },
+  { id:'b5', parts: ['The more','you play soccer',',','the better','you get.'] },
+  { id:'b6', parts: ['The more','we practice',',','the more','we win.'] }
+];
+TAB_INIT[4] = function(){
+  const host = document.getElementById('bld-list');
+  host.innerHTML = BLD_ITEMS.map((it,i)=>{
+    const shuffled = it.parts.map((p,pi)=>({text:p, idx:pi})).sort(()=>Math.random()-0.5);
+    return '<div><div style="text-align:center">' +
+      shuffled.map(c=>'<span class="chip" data-b="'+it.id+'" data-idx="'+c.idx+'" onclick="bldChip(this)">'+c.text+'</span>').join('') +
+      '</div><div class="build-line" data-build="'+it.id+'" data-need="'+it.parts.length+'"></div></div>';
+  }).join('');
+};
+let bldState = {};
+TAB_RESET[4] = function(){
+  lDel('tab-4-done-ids');
+  bldState = {};
+  document.getElementById('bld-done').classList.remove('show');
+  TAB_INIT[4]._initialized = false; TAB_INIT[4](); TAB_INIT[4]._initialized = true;
+};
+TAB_RESTORE[4] = function(){
+  const doneIds = lLoad('tab-4-done-ids') || [];
+  doneIds.forEach(id=>{
+    const it = BLD_ITEMS.find(x=>x.id===id);
+    if(!it) return;
+    const line = document.querySelector('[data-build="'+id+'"]');
+    if(!line) return;
+    line.innerHTML = it.parts.map(p=>'<span class="bpart">'+p+'</span>').join('');
+    line.classList.add('done');
+    document.querySelectorAll('.chip[data-b="'+id+'"]').forEach(c=>c.classList.add('used'));
+  });
+  if(doneIds.length >= 6) document.getElementById('bld-done').classList.add('show');
+};
+function bldChip(chip){
+  const b = chip.dataset.b;
+  const line = document.querySelector('[data-build="'+b+'"]');
+  if(!line || line.classList.contains('done')) return;
+  const st = bldState[b] || (bldState[b] = {next:0});
+  const idx = parseInt(chip.dataset.idx,10);
+  if(idx === st.next){
+    chip.classList.add('used');
+    const span = document.createElement('span');
+    span.className = 'bpart';
+    span.textContent = chip.textContent;
+    line.appendChild(span);
+    st.next++;
+    const need = parseInt(line.dataset.need,10);
+    if(st.next >= need){
+      line.classList.add('done');
+      const doneIds = new Set(lLoad('tab-4-done-ids') || []);
+      doneIds.add(b);
+      lSave('tab-4-done-ids', Array.from(doneIds));
+      if(doneIds.size >= 6) document.getElementById('bld-done').classList.add('show');
+    }
+  } else {
+    chip.classList.add('err');
+    setTimeout(()=>chip.classList.remove('err'),380);
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 5 — SORT (uses buildDndSorter via pickChart)
+═════════════════════════════════════════════════════════════════════ */
+TAB_INIT[5] = function(){
+  const host = document.getElementById('sort-host');
+  if(typeof window.pickChart !== 'function'){
+    host.innerHTML = '<div style="background:var(--red-l);border:2px solid var(--red);border-radius:12px;padding:14px;color:#7F1D1D;font-weight:700">⚠️ Sorter component not loaded. Check /components/charts.js</div>';
+    return;
+  }
+  host.innerHTML = window.pickChart('classification sort', {
+    id: 'leo-g1u9-sort',
+    tiles: [
+      { text: '✓ The more you push, the faster it goes.', answer: 'ok' },
+      { text: '✗ More you push, faster it goes.', answer: 'wrong' },
+      { text: '✓ The more we practice, the more we win.', answer: 'ok' },
+      { text: '✗ The more we practice we win.', answer: 'wrong' },
+      { text: '✓ The more you play, the better you get.', answer: 'ok' },
+      { text: '✗ The more you play, the gooder you get.', answer: 'wrong' },
+      { text: '✓ The higher she climbs, the more tired she gets.', answer: 'ok' },
+      { text: '✗ Higher she climbs the more tired she gets.', answer: 'wrong' },
+      { text: "✓ The more Mbappé runs, the harder he is to stop.", answer: 'ok' },
+      { text: '✗ The more Mbappé runs the more faster harder.', answer: 'wrong' },
+      { text: '✓ The more it rains, the wetter the field gets.', answer: 'ok' },
+      { text: '✗ The more it rains wetter the field gets.', answer: 'wrong' }
+    ],
+    zones: [
+      { key: 'ok', label: '✅ CORRECT double comparative', color: '#16A34A' },
+      { key: 'wrong', label: '❌ WRONG — needs a fix!', color: '#EF4444' }
+    ],
+    onComplete: function(){
+      lSave('tab-5-state', { complete: true });
+      document.getElementById('sort-done').classList.add('show');
+    }
+  });
+};
+TAB_RESET[5] = function(){
+  window._sortInit = false;
+  document.getElementById('sort-done').classList.remove('show');
+  TAB_INIT[5]._initialized = false; TAB_INIT[5](); TAB_INIT[5]._initialized = true;
+};
+TAB_RESTORE[5] = function(){
+  const saved = lLoad('tab-5-state');
+  if(saved && saved.complete) document.getElementById('sort-done').classList.add('show');
+};
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 6 — PRACTICE (5 SB-style + 3 bonus)
+═════════════════════════════════════════════════════════════════════ */
+const PRAC_ITEMS = [
+  { s: 'The more she pushes on the swing, the ___ she goes.', opts:['higher','shorter'], ok:0 },
+  { s: 'The more the skateboarder pushes, the ___ he moves forward.', opts:['slower','faster'], ok:1 },
+  { s: 'The higher she goes, the more she feels ___.', opts:['dizzy','hungry'], ok:0 },
+  { s: 'The more you play soccer, the ___ you get.', opts:['gooder','better'], ok:1 },
+  { s: 'The more we practice, the more we ___.', opts:['win','sleep'], ok:0 },
+  { s: '⚽ The more Haaland shoots, the more Norway ___.', opts:['scores','sleeps'], ok:0 },
+  { s: '⚽ The more England attacked, the ___ exciting the game got.', opts:['more','less'], ok:0 },
+  { s: '⚽ The harder the game, the ___ Messi plays.', opts:['worse','better'], ok:1 }
+];
+TAB_INIT[6] = function(){
+  const host = document.getElementById('prac-list');
+  host.innerHTML = PRAC_ITEMS.map((it,i)=>{
+    const shuffled = it.opts.map((o,oi)=>({text:o, ok:oi===it.ok})).sort(()=>Math.random()-0.5);
+    return '<div class="qcard" data-idx="'+i+'"><div class="qtext">'+(i+1)+'. '+it.s+'</div>' +
+      shuffled.map(o=>'<button class="opt" onclick="pracPick(this,'+o.ok+','+i+')">'+o.text+'</button>').join('') + '</div>';
+  }).join('');
+};
+TAB_RESET[6] = function(){
+  lDel('tab-6-solved');
+  document.getElementById('prac-done').classList.remove('show');
+  TAB_INIT[6]._initialized = false; TAB_INIT[6](); TAB_INIT[6]._initialized = true;
+};
+TAB_RESTORE[6] = function(){
+  const solved = lLoad('tab-6-solved') || [];
+  solved.forEach(i=>{
+    const card = document.querySelector('#prac-list [data-idx="'+i+'"]');
+    if(!card) return;
+    card.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+    card.dataset.solved='1';
+  });
+  if(solved.length >= 8) document.getElementById('prac-done').classList.add('show');
+};
+function pracPick(btn, correct, idx){
+  if(pick(btn, correct)){
+    const solved = new Set(lLoad('tab-6-solved') || []);
+    solved.add(idx);
+    lSave('tab-6-solved', Array.from(solved));
+    if(solved.size >= 8) document.getElementById('prac-done').classList.add('show');
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 7 — SURVEY (open text, Leo types)
+═════════════════════════════════════════════════════════════════════ */
+const SVY_PROMPTS = [
+  'The more I play soccer, the more I ___',
+  'The more I practice English, the better I ___',
+  'The more I watch movies, the more I ___',
+  'The more I run, the more I ___',
+  'The more I play video games, the more I ___',
+  'The higher I climb, the more I ___'
+];
+TAB_INIT[7] = function(){
+  const host = document.getElementById('svy-list');
+  host.innerHTML = SVY_PROMPTS.map((p,i)=>
+    '<div class="svy-row" id="svy-row-'+i+'"><div style="font-weight:800">'+(i+1)+'. '+p+'</div>' +
+    '<input type="text" placeholder="type your idea..." id="svy-in-'+i+'" oninput="svyCheck('+i+')"></div>'
+  ).join('');
+};
+TAB_RESET[7] = function(){
+  lDel('tab-7-answers');
+  document.getElementById('svy-done').classList.remove('show');
+  TAB_INIT[7]._initialized = false; TAB_INIT[7](); TAB_INIT[7]._initialized = true;
+};
+TAB_RESTORE[7] = function(){
+  const answers = lLoad('tab-7-answers') || {};
+  Object.keys(answers).forEach(i=>{
+    const inp = document.getElementById('svy-in-'+i);
+    if(inp){ inp.value = answers[i]; document.getElementById('svy-row-'+i).classList.add('filled'); }
+  });
+  if(Object.keys(answers).filter(k=>answers[k] && answers[k].trim()).length >= 6) document.getElementById('svy-done').classList.add('show');
+};
+function svyCheck(i){
+  const inp = document.getElementById('svy-in-'+i);
+  const answers = lLoad('tab-7-answers') || {};
+  answers[i] = inp.value;
+  lSave('tab-7-answers', answers);
+  document.getElementById('svy-row-'+i).classList.toggle('filled', inp.value.trim().length > 0);
+  const filled = Object.values(answers).filter(v=>v && v.trim()).length;
+  if(filled >= 6) document.getElementById('svy-done').classList.add('show');
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 8 — WORD WEB (uses buildWordWeb)
+═════════════════════════════════════════════════════════════════════ */
+TAB_INIT[8] = function(){
+  const host = document.getElementById('web-host');
+  if(typeof window.pickChart !== 'function'){
+    host.innerHTML = '<div style="background:var(--red-l);border:2px solid var(--red);border-radius:12px;padding:14px;color:#7F1D1D;font-weight:700">⚠️ Word web component not loaded. Check /components/wordweb.js</div>';
+    return;
+  }
+  host.innerHTML = window.pickChart('word web', {
+    id: 'leo-g1u9-web',
+    center: { text: 'The more...', emoji: '⚡' },
+    nodes: [],
+    addable: true,
+    removable: true,
+    editable: true,
+    maxNodes: 8,
+    storageKey: SAVE_PREFIX + 'web-more',
+    onChange: function(nodes){
+      const filled = nodes.filter(n => n.text && n.text.trim()).length;
+      lSave('tab-8-state', { count: filled });
+      if(filled >= 2) document.getElementById('web-done').classList.add('show');
+    }
+  });
+};
+TAB_RESET[8] = function(){
+  lDel('web-more');
+  document.getElementById('web-done').classList.remove('show');
+  TAB_INIT[8]._initialized = false; TAB_INIT[8](); TAB_INIT[8]._initialized = true;
+};
+TAB_RESTORE[8] = function(){
+  const saved = lLoad('tab-8-state');
+  if(saved && (saved.count || 0) >= 2) document.getElementById('web-done').classList.add('show');
+};
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 9 — GUESS THE ENDING (3 rounds)
+═════════════════════════════════════════════════════════════════════ */
+const GE_ROUNDS = [
+  { name:'Playground', clues:[
+      { clue:'"The more he pushes down on the seesaw,"', tiles:['the more she goes up.','he eats lunch.','the sky is blue.'], ok:0 },
+      { clue:'"The more you spin the merry-go-round,"', tiles:['it is Monday.','the faster it goes.','he has a hat.'], ok:1 },
+      { clue:'"The more she practices skateboarding,"', tiles:['the better she gets.','the ball is red.','she likes tea.'], ok:0 }
+  ]},
+  { name:'World Cup', clues:[
+      { clue:'⚽ "The more Mbappé runs,"', tiles:['the harder he is to stop.','the grass gets shorter.','the ball is old.'], ok:0 },
+      { clue:'⚽ "The harder the game,"', tiles:['the more Messi sleeps.','the better Messi plays.','the field turns blue.'], ok:1 },
+      { clue:'⚽ "The more Haaland shoots,"', tiles:['the more Norway scores.','the goal gets smaller.','it starts raining.'], ok:0 }
+  ]},
+  { name:'Movies', clues:[
+      { clue:'🦸 "The more training Spider-Man does,"', tiles:['the stronger he gets.','the pizza gets cold.','it is nighttime.'], ok:0 },
+      { clue:'🚗 "The faster the car chase goes,"', tiles:['the more exciting the movie gets.','the popcorn disappears.','the cat sleeps.'], ok:0 },
+      { clue:'🦥 "The more Sid talks,"', tiles:['the more the herd laughs.','the ice melts slowly.','it is winter.'], ok:0 }
+  ]}
+];
+let geActive = 0, geIdx = [0,0,0], geWon = [0,0,0];
+TAB_INIT[9] = function(){};
+TAB_RESET[9] = function(){
+  lDel('tab-9-won');
+  geIdx=[0,0,0]; geWon=[0,0,0]; geActive=0;
+  [0,1,2].forEach(r=>{
+    document.getElementById('ge-clue-'+r).textContent = 'Tap "Get a clue" to start the '+GE_ROUNDS[r].name+' round.';
+    document.getElementById('ge-cnt-'+r).textContent = 'Clue 0 of 3';
+    document.getElementById('ge-grid-'+r).innerHTML = '';
+  });
+  document.getElementById('ge-done').classList.remove('show');
+  geSwitch(0);
+};
+TAB_RESTORE[9] = function(){
+  geWon = lLoad('tab-9-won') || [0,0,0];
+  if(geWon[0]>=3 && geWon[1]>=3 && geWon[2]>=3) document.getElementById('ge-done').classList.add('show');
+};
+function geSwitch(r){
+  geActive = r;
+  [0,1,2].forEach(i=>{
+    document.getElementById('ge-rt-'+i).classList.toggle('active', i===r);
+    document.getElementById('ge-round-'+i).classList.toggle('showround', i===r);
+  });
+}
+function geClue(r){
+  if(geIdx[r] >= 3) return;
+  const item = GE_ROUNDS[r].clues[geIdx[r]];
+  document.getElementById('ge-clue-'+r).textContent = item.clue;
+  document.getElementById('ge-cnt-'+r).textContent = 'Clue ' + (geIdx[r]+1) + ' of 3';
+  const grid = document.getElementById('ge-grid-'+r);
+  const shuffled = item.tiles.map((t,ti)=>({text:t, ok:ti===item.ok})).sort(()=>Math.random()-0.5);
+  grid.innerHTML = shuffled.map(t=>'<div class="ge-tile" onclick="geTilePick(this,'+t.ok+','+r+')">'+t.text+'</div>').join('');
+}
+function geTilePick(tile, correct, r){
+  if(tile.classList.contains('locked')) return;
+  const grid = document.getElementById('ge-grid-'+r);
+  if(correct){
+    tile.classList.add('win');
+    grid.querySelectorAll('.ge-tile').forEach(t=>t.classList.add('locked'));
+    geIdx[r]++;
+    geWon[r]++;
+    lSave('tab-9-won', geWon);
+    if(geIdx[r] < 3){
+      setTimeout(()=>geClue(r), 700);
+    } else if(geWon[0]>=3 && geWon[1]>=3 && geWon[2]>=3){
+      document.getElementById('ge-done').classList.add('show');
+    }
+  } else {
+    tile.classList.add('lose');
+    setTimeout(()=>tile.classList.remove('lose'),380);
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 10 — QUIZ (10 questions, scored) — Rule 2: save score
+═════════════════════════════════════════════════════════════════════ */
+const QUIZ_ITEMS = [
+  { q:'"The more you push, ___ it goes."', opts:['the faster','faster the','the fastest'], ok:0 },
+  { q:'"The more we practice, the more we ___."', opts:['win','wins','winning'], ok:0 },
+  { q:'Where does the comma go? "The more I read ___ the more I learn."', opts:['after "read"','no comma needed','after "learn"'], ok:0 },
+  { q:'good → ?', opts:['gooder','better','more good'], ok:1 },
+  { q:'"The higher she climbs, ___"', opts:['the more tired she gets.','she gets tired more.','tired she gets more.'], ok:0 },
+  { q:'Which is Pattern B (uses -er)?', opts:['The more we laugh, the more we play.','The more you practice, the faster you run.'], ok:1 },
+  { q:'The ___ goes around and around. 🎠', opts:['seesaw','merry-go-round'], ok:1 },
+  { q:'"The more Mbappé runs, ___"', opts:['the harder he is to stop.','harder he is more to stop.'], ok:0 },
+  { q:'Which sentence is broken?', opts:['The more we practice, the more we win.','More we practice, more we win.'], ok:1 },
+  { q:'"The more you play soccer, the ___ you get."', opts:['better','gooder'], ok:0 }
+];
+let quizIdx = 0, quizScore = 0, quizAnswered = [];
+TAB_INIT[10] = function(){};
+TAB_RESET[10] = function(){
+  lDel('score');
+  quizIdx = 0; quizScore = 0; quizAnswered = [];
+  document.getElementById('quiz-active').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+  const cb = document.getElementById('complete-10');
+  cb.disabled = true; cb.textContent = 'Finish all 10 questions first';
+  quizRender();
+};
+TAB_RESTORE[10] = function(){
+  const saved = lLoad('score');
+  if(saved && saved.done){
+    quizShowResult(saved);
+  } else {
+    quizIdx = 0; quizScore = 0; quizAnswered = [];
+    document.getElementById('quiz-active').style.display = 'block';
+    document.getElementById('quiz-result').style.display = 'none';
+    quizRender();
+  }
+};
+function quizRender(){
+  document.getElementById('quiz-progress').innerHTML = QUIZ_ITEMS.map((x,i)=>'<div class="'+(i<quizIdx?'answered':'')+'"></div>').join('');
+  if(quizIdx >= QUIZ_ITEMS.length){ quizFinish(); return; }
+  const it = QUIZ_ITEMS[quizIdx];
+  const shuffled = it.opts.map((o,oi)=>({text:o, ok:oi===it.ok})).sort(()=>Math.random()-0.5);
+  document.getElementById('quiz-qcard').innerHTML = '<div class="qtext">Q'+(quizIdx+1)+'. '+it.q+'</div>' +
+    shuffled.map(o=>'<button class="opt" onclick="quizPick(this,'+o.ok+')">'+o.text+'</button>').join('');
+}
+function quizPick(btn, correct){
+  const group = document.getElementById('quiz-qcard');
+  if(group.dataset.solved) return;
+  group.dataset.solved = '1';
+  if(correct){ btn.classList.add('good'); quizScore++; } else { btn.classList.add('bad'); }
+  group.querySelectorAll('.opt').forEach(o=>o.disabled=true);
+  quizAnswered.push({ question: QUIZ_ITEMS[quizIdx].q, correct: correct });
+  setTimeout(()=>{ quizIdx++; delete group.dataset.solved; quizRender(); }, 650);
+}
+function quizFinish(){
+  const total = QUIZ_ITEMS.length;
+  const percent = Math.round((quizScore/total)*100);
+  const trophy = percent >= 80 ? '🏆' : percent >= 50 ? '🥈' : '💪';
+  const text = percent >= 80 ? 'Force Lab Master!' : percent >= 50 ? 'Great effort!' : 'Keep practicing!';
+  const wrongQuestions = quizAnswered.filter(a=>!a.correct).map(a=>a.question);
+  const scoreData = { score: quizScore, total: total, percent: percent, done: true, timestamp: new Date().toISOString(), trophy: trophy, text: text, wrongQuestions: wrongQuestions };
+  lSave('score', scoreData);
+  quizShowResult(scoreData);
+}
+function quizShowResult(data){
+  document.getElementById('quiz-active').style.display = 'none';
+  const rz = document.getElementById('quiz-result');
+  rz.style.display = 'block';
+  rz.innerHTML = '<div class="quiz-result"><div class="trophy">'+data.trophy+'</div>' +
+    '<div class="qscore">'+data.score+' / '+data.total+'</div>' +
+    '<div style="font-weight:800;font-size:18px">'+data.text+'</div>' +
+    (data.wrongQuestions && data.wrongQuestions.length ? '<div class="wrong-review"><b>Review:</b><br>' + data.wrongQuestions.map(w=>'• '+w).join('<br>') + '</div>' : '') +
+    '</div>';
+  const cb = document.getElementById('complete-10');
+  cb.disabled = false;
+  if(lLoad('tab-10-done')){ cb.classList.add('confirmed'); cb.textContent = '✓ Quiz done'; }
+  else { cb.textContent = 'Mark Quiz complete ✓'; }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 11 — DRIBBLE! (World Cup grammar round, score a goal each)
+═════════════════════════════════════════════════════════════════════ */
+const DRIB_ITEMS = [
+  { q: '🇫🇷 France beat Morocco 2-0. "The more France attacked, ___"', opts:['the more chances they created.','the more tired the ball got.'], ok:0 },
+  { q: '🇳🇴 Haaland led Norway past Brazil. "The more he shoots, ___"', opts:['the more Norway scores.','the smaller the goal gets.'], ok:0 },
+  { q: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England beat Mexico 3-2. "The more England attacked, ___"', opts:['the more exciting the game got.','the quieter the fans got.'], ok:0 },
+  { q: '🇦🇷 Argentina came back from 2-0 down. "The harder the game, ___"', opts:['the more Messi sleeps.','the better Messi plays.'], ok:1 },
+  { q: '⚽ "The more you practice soccer, ___"', opts:['the better you get.','the gooder you get.'], ok:0 },
+  { q: '⚽ "The more the crowd cheers, ___"', opts:['the harder the team tries.','the shorter the game gets.'], ok:0 }
+];
+let dribGoals = 0, dribIdx = 0;
+TAB_INIT[11] = function(){};
+TAB_RESET[11] = function(){
+  lDel('tab-11-goals');
+  dribGoals = 0; dribIdx = 0;
+  document.getElementById('drib-goals').textContent = '0';
+  document.getElementById('drib-defenders').textContent = '🛡️🛡️🛡️🛡️🛡️🛡️';
+  document.getElementById('drib-done').classList.remove('show');
+  dribRender();
+};
+TAB_RESTORE[11] = function(){
+  const saved = lLoad('tab-11-goals');
+  if(saved){
+    dribGoals = saved.goals; dribIdx = saved.idx;
+    document.getElementById('drib-goals').textContent = dribGoals;
+    document.getElementById('drib-defenders').textContent = '🛡️'.repeat(Math.max(0,6-dribGoals));
+    if(dribIdx >= DRIB_ITEMS.length){ document.getElementById('drib-done').classList.add('show'); document.getElementById('drib-list').innerHTML=''; }
+    else dribRender();
+  } else {
+    dribRender();
+  }
+};
+function dribRender(){
+  const host = document.getElementById('drib-list');
+  if(dribIdx >= DRIB_ITEMS.length){
+    host.innerHTML = '';
+    document.getElementById('drib-done').classList.add('show');
+    return;
+  }
+  const it = DRIB_ITEMS[dribIdx];
+  const shuffled = it.opts.map((o,oi)=>({text:o, ok:oi===it.ok})).sort(()=>Math.random()-0.5);
+  host.innerHTML = '<div class="drib-q"><div style="font-weight:800;margin-bottom:6px">'+it.q+'</div>' +
+    shuffled.map(o=>'<button class="drib-opt" onclick="dribPick(this,'+o.ok+')">'+o.text+'</button>').join('') + '</div>';
+}
+function dribPick(btn, correct){
+  const group = btn.parentElement;
+  if(group.dataset.solved) return;
+  group.dataset.solved = '1';
+  if(correct){
+    btn.classList.add('good'); dribGoals++;
+    document.getElementById('drib-goals').textContent = dribGoals;
+    document.getElementById('drib-defenders').textContent = '🛡️'.repeat(Math.max(0,6-dribGoals));
+  } else {
+    btn.classList.add('bad');
+  }
+  group.querySelectorAll('.drib-opt').forEach(o=>o.disabled=true);
+  dribIdx++;
+  lSave('tab-11-goals', { goals: dribGoals, idx: dribIdx });
+  setTimeout(dribRender, 700);
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   INIT
+═════════════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    fcRenderCard(); fcRenderQuizQ();
+    quizRender();
+    dribRender();
+    showTab(0);
+    refreshProgress();
+  }catch(e){}
+});
+</script>
+</body>
+</html>

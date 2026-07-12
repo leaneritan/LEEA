@@ -96,6 +96,7 @@ function CourseNode({ course }: { course: (typeof sourceTree)[number] }) {
 /* Units that have a built Unit Reference page. Add an entry here once
    /reference/our-world/level-N/unit-M/page.tsx exists for that unit. */
 const UNIT_REFERENCE_PAGES: Record<string, string> = {
+  "4-1": "/reference/our-world/level-4/unit-1",
   "4-2": "/reference/our-world/level-4/unit-2",
   "4-3": "/reference/our-world/level-4/unit-3",
   "4-4": "/reference/our-world/level-4/unit-4",

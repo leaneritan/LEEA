@@ -25,6 +25,7 @@ function sourceLabel(word, suffix) {
 }
 
 const unitVocabularyPaths = [
+  "content/subjects/english/courses/our-world/level-5/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-4/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-4/unit-2/vocabulary.json",
   "content/subjects/english/courses/our-world/level-4/unit-3/vocabulary.json",
@@ -125,6 +126,7 @@ const IRREGULAR_VERBS_FOR_VALIDATION = {
   cut: ["cut", "cut"], dig: ["dug", "dug"], do: ["did", "done"], draw: ["drew", "drawn"],
   drink: ["drank", "drunk"], drive: ["drove", "driven"], eat: ["ate", "eaten"],
   fall: ["fell", "fallen"], feel: ["felt", "felt"], find: ["found", "found"],
+  rise: ["rose", "risen"],
   fly: ["flew", "flown"], forget: ["forgot", "forgotten"], get: ["got", "gotten"],
   give: ["gave", "given"], go: ["went", "gone"], grow: ["grew", "grown"],
   have: ["had", "had"], hear: ["heard", "heard"], hide: ["hid", "hidden"],
@@ -313,7 +315,8 @@ function validateAcademicWord(word) {
     assertPresent(word[key], sourceLabel(word, key));
   }
 
-  if (!word.tags?.includes("OW4-AC")) fail(sourceLabel(word, "missing OW4-AC tag"));
+  const hasAcademicTag = word.sources?.some((s) => word.tags?.includes(`OW${s.level}-AC`));
+  if (!hasAcademicTag) fail(sourceLabel(word, "missing OW<level>-AC tag"));
   for (const source of word.sources ?? []) {
     if (!word.tags?.includes(source.tag)) fail(sourceLabel(word, `missing source tag ${source.tag}`));
   }

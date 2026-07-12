@@ -26,6 +26,7 @@ function sourceLabel(word, suffix) {
 
 const unitVocabularyPaths = [
   "content/subjects/english/courses/our-world/level-5/unit-1/vocabulary.json",
+  "content/subjects/english/courses/our-world/level-3/unit-9/vocabulary.json",
   "content/subjects/english/courses/our-world/level-4/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-4/unit-2/vocabulary.json",
   "content/subjects/english/courses/our-world/level-4/unit-3/vocabulary.json",
@@ -142,7 +143,8 @@ const IRREGULAR_VERBS_FOR_VALIDATION = {
   take: ["took", "taken"], teach: ["taught", "taught"], tell: ["told", "told"],
   think: ["thought", "thought"], throw: ["threw", "thrown"],
   understand: ["understood", "understood"], wake: ["woke", "woken"],
-  wear: ["wore", "worn"], win: ["won", "won"], write: ["wrote", "written"]
+  wear: ["wore", "worn"], win: ["won", "won"], write: ["wrote", "written"],
+  visit: ["visited", "visited"]
 };
 const VOWELS_FOR_VALIDATION = new Set(["a", "e", "i", "o", "u"]);
 function conjugateRegularPastForValidation(verb) {

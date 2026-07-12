@@ -53,6 +53,7 @@ const IRREGULAR_VERBS: Record<string, [string, string]> = {
   put: ["put", "put"],
   read: ["read", "read"],
   ride: ["rode", "ridden"],
+  rise: ["rose", "risen"],
   run: ["ran", "run"],
   say: ["said", "said"],
   see: ["saw", "seen"],

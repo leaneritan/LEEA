@@ -76,7 +76,8 @@ const IRREGULAR_VERBS: Record<string, [string, string]> = {
   wake: ["woke", "woken"],
   wear: ["wore", "worn"],
   win: ["won", "won"],
-  write: ["wrote", "written"]
+  write: ["wrote", "written"],
+  visit: ["visited", "visited"]
 };
 
 const VOWELS = new Set(["a", "e", "i", "o", "u"]);

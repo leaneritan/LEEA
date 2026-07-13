@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getOpenAssignmentCount, readAssignments, readAssignmentsFromCloud } from "@/data/assignments";
 import { learnerLessons } from "@/data/lessons";
+import { fetchLearnerCompletionTimestamps } from "@/data/learnerProgress";
 import { useJapaneseSetting } from "@/components/useJapaneseSetting";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
 import { allWords } from "@/components/reference/ref-data";
@@ -42,6 +43,7 @@ export function AppShell({
   const [japaneseOn, setJapaneseOn] = useJapaneseSetting();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [assignmentsLeft, setAssignmentsLeft] = useState<number | null>(null);
+  const [streakDays, setStreakDays] = useState(0);
   const pathname = usePathname();
   const { knownWordSet } = useKnownWordIds();
   const isReferenceContext = active === "reference" || active === "search";
@@ -66,6 +68,16 @@ export function AppShell({
       window.removeEventListener("storage", refreshAssignments);
       window.removeEventListener("focus", refreshAssignments);
     };
+  }, []);
+
+  useEffect(() => {
+    // Real day-streak, derived from Supabase's completed_at timestamps — the
+    // only trustworthy "when did Leo finish this" signal in the app. When
+    // that data isn't available (offline/local dev) this honestly shows 0
+    // rather than a fabricated number.
+    void fetchLearnerCompletionTimestamps(learnerLessons).then((timestamps) => {
+      setStreakDays(computeStreakDays(Object.values(timestamps)));
+    });
   }, []);
 
   function toggleSidebar() {
@@ -141,6 +153,19 @@ export function AppShell({
             )}
           </div>
         )}
+
+        <div className="sidebar-streak" data-tooltip={`${streakDays} day streak`}>
+          <span className="sidebar-streak-label">Day streak</span>
+          <div className="sidebar-streak-count">
+            <strong>{streakDays}</strong>
+            <small>days 🔥</small>
+          </div>
+          <div className="sidebar-streak-bar">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <i className={index < Math.min(streakDays, 5) ? "filled" : ""} key={index} />
+            ))}
+          </div>
+        </div>
         </aside>
 
         <main className="main">
@@ -185,6 +210,32 @@ export function AppShell({
       </div>
     </JapanesePreferenceContext.Provider>
   );
+}
+
+// Consecutive-day streak, counting backward from today (or from yesterday if
+// nothing is done yet today, so the streak isn't marked "broken" mid-day).
+// Returns 0 — not a guess — once the trail of completed days has a gap.
+function computeStreakDays(completedAtTimestamps: string[]): number {
+  const days = new Set<string>();
+  for (const iso of completedAtTimestamps) {
+    const date = new Date(iso);
+    if (!Number.isNaN(date.getTime())) days.add(toLocalDateKey(date));
+  }
+  if (!days.size) return 0;
+
+  const cursor = new Date();
+  if (!days.has(toLocalDateKey(cursor))) cursor.setDate(cursor.getDate() - 1);
+
+  let streak = 0;
+  while (days.has(toLocalDateKey(cursor))) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+}
+
+function toLocalDateKey(date: Date) {
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 }
 
 function getCrumbHref(crumb: string, pathname: string) {

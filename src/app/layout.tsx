@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Albert_Sans, Bricolage_Grotesque, Noto_Sans_JP } from "next/font/google";
+import { Albert_Sans, Anton, Bricolage_Grotesque, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 
 const albertSans = Albert_Sans({
@@ -20,6 +20,13 @@ const notoSansJp = Noto_Sans_JP({
   variable: "--font-noto-sans-jp"
 });
 
+// World-tile wordmarks only (e.g. "OUR WORLD" / "TRAINING GROUND" on Leo's dashboard).
+const anton = Anton({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-anton"
+});
+
 export const metadata: Metadata = {
   title: "LEEA",
   description: "Leo's Elite Education Academy"
@@ -27,7 +34,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${albertSans.variable} ${bricolageGrotesque.variable} ${notoSansJp.variable}`}>
+    <html lang="en" className={`${albertSans.variable} ${bricolageGrotesque.variable} ${notoSansJp.variable} ${anton.variable}`}>
       <body>{children}</body>
     </html>
   );

@@ -5,7 +5,8 @@ export type ComponentTone =
   | "reading"
   | "writing"
   | "song"
-  | "review";
+  | "review"
+  | "activity";
 
 export type ComponentMeta = {
   emoji: string;
@@ -23,5 +24,10 @@ export function getComponentMeta(component: string): ComponentMeta {
   if (component.includes("writing")) return { emoji: "✍️", label: "Writing", tone: "writing" };
   if (component.includes("song")) return { emoji: "🎵", label: "Song", tone: "song" };
   if (component.includes("review")) return { emoji: "🏁", label: "Review", tone: "review" };
-  return { emoji: "💡", label: "Activity", tone: "opener" };
+  // Mission / Project / Reader apps are all free-play "activity" components —
+  // not openers — so they get their own tone/tint instead of borrowing gold.
+  if (component.includes("mission") || component.includes("project") || component.includes("reader")) {
+    return { emoji: "🎯", label: "Activity", tone: "activity" };
+  }
+  return { emoji: "🎯", label: "Activity", tone: "activity" };
 }

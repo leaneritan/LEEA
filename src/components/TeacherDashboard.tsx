@@ -26,31 +26,14 @@ import {
   type LessonProgressMap
 } from "@/data/lessonProgress";
 import { getLessonGroups, learnerLessons, lessons } from "@/data/lessons";
+import { LEVELS, LIVE_LEVEL, LIVE_UNIT, UNIT_TITLES } from "@/data/curriculum";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
 
-const LEVELS = [1, 2, 3, 4, 5, 6];
-
-// Fixed syllabus topics shown on every level's unit chips.
-const UNIT_TITLES = [
-  "Animals & Habitats",
-  "My Town",
-  "Food Around the World",
-  "Weather & Seasons",
-  "Jobs People Do",
-  "Sports & Games",
-  "The Human Body",
-  "That's Really Interesting!",
-  "Our Planet"
-];
-
 const SPINE_LESSONS = ["Opener", "Vocabulary 1", "Song", "Grammar 1", "Vocabulary 2", "Grammar 2", "Reading", "Writing"];
 
-// Level 4 is where teaching is actively happening today, with Unit 8 as the
-// current flagship unit. Units that don't have any authored lesson yet fall
-// back to the placeholder spine below, positioned relative to this cursor.
-const LIVE_LEVEL = 4;
-const LIVE_UNIT = 8;
+// Units that don't have any authored lesson yet fall back to the placeholder
+// spine above, positioned relative to the LIVE_LEVEL/LIVE_UNIT cursor.
 
 type MockLessonStatus = "taught" | "todo" | "locked";
 

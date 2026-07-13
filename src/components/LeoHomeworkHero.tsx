@@ -21,15 +21,15 @@ export function LeoHomeworkHero({ items, suggested }: { items: Item[]; suggested
       <section className="leo-design-hero leo-design-hero-empty" aria-label="Today's homework">
         <div className="leo-design-copy">
           <span>{dateText}</span>
-          <h1>Hi Leo —<br />all caught up!</h1>
-          <p>Nothing is waiting from Dad. Pick a world below for free play, or visit Reference.</p>
-          <div className="leo-today-meter"><b>Today</b><i className="done" /><i className="done" /><i className="done" /><strong>clean streak</strong></div>
+          <h1>Hi Leo —<br />ready to play?</h1>
+          <p>You finished <b>everything Dad set</b> today. Superstar! 🌟</p>
+          <div className="leo-today-meter"><b>Today</b><i className="done" /><i className="done" /><i className="done" /><strong className="all-done">3 of 3 done!</strong></div>
         </div>
-        <aside className="leo-pick-card">
-          <span>Free play</span>
-          <strong>Reference</strong>
-          <small>Words, grammar & review</small>
-          <Link href="/reference">Open Reference →</Link>
+        <aside className="leo-pick-card leo-pick-card-done">
+          <div className="leo-pick-celebrate">🎉</div>
+          <strong>All done!</strong>
+          <small>Want to explore your worlds?</small>
+          <Link className="leo-pick-cta-done" href="/english">Free play →</Link>
         </aside>
       </section>
     );

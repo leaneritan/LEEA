@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { getCourseLabel } from "@/data/lessons";
 import type { LearnerAppProgress } from "@/data/learnerProgress";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
@@ -65,7 +66,7 @@ export function LeoHomeworkHero({ items, suggested }: { items: Item[]; suggested
           <i aria-hidden="true">{meta.emoji}</i>
           <div>
             <strong>{cleanLeoTitle(next.lesson.title)}</strong>
-            <small>Our World · {next.progress.moduleCount - next.progress.completedModules} modules left</small>
+            <small>{getCourseLabel(next.lesson.course)} · {next.progress.moduleCount - next.progress.completedModules} modules left</small>
           </div>
         </div>
         <div className="leo-pick-progress" aria-label={`${percent}% complete`}>

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Training Ground · Phonics · Short Vowels &amp; Magic E</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#07120b}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:absolute;top:0;left:0}
+#deck{width:1920px;height:1080px;position:relative}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FCFEF9;overflow:hidden}
+.slide.active{display:flex}
+:root{
+  --green:#16A34A;--green-d:#15803d;--green-bg:#F0FDF4;
+  --cone:#F97316;--cone-d:#C2410C;--cone-bg:#FFF7ED;
+  --yellow:#FACC15;--yellow-d:#CA8A04;--yellow-bg:#FEFCE8;
+  --red:#DC2626;--red-d:#991B1B;--red-bg:#FEF2F2;
+  --blue:#2563EB;--blue-d:#1D4ED8;--blue-bg:#EFF6FF;
+  --navy:#0f172a;--ink:#1f2937;
+}
+.slide-header{height:64px;background:var(--green);display:flex;align-items:center;padding:0 44px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.8);font-size:17px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.45);font-size:20px}
+.hd-section{color:#fff;font-size:23px;font-weight:800}
+.hd-chip{background:rgba(255,255,255,.22);color:#fff;padding:5px 18px;border-radius:20px;font-size:17px;font-weight:800;margin-left:auto}
+.hd-chip.cone{background:var(--cone);color:#fff}
+.body{flex:1;padding:30px 60px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.body.center{align-items:center;justify-content:center;text-align:center}
+.body.grad-pitch{background:radial-gradient(circle at 30% 20%,#14532d,#07120b);color:#fff}
+.header-bar{display:flex;align-items:center;gap:14px;font-size:30px;font-weight:900;color:var(--navy);padding-left:18px;border-left:10px solid var(--green)}
+.header-bar.cone{border-color:var(--cone)}
+.header-bar.blue{border-color:var(--blue)}
+.header-bar.red{border-color:var(--red)}
+.sub{font-size:22px;color:#475569;font-weight:600}
+.two-col{display:flex;gap:26px;flex:1;min-height:0}
+.col{display:flex;flex-direction:column;gap:16px;flex:1;min-height:0}
+.info-box{border-radius:16px;padding:18px 24px;border:3px solid}
+.tint-green{background:var(--green-bg);border-color:#bbf7d0}
+.tint-cone{background:var(--cone-bg);border-color:#fed7aa}
+.tint-yellow{background:var(--yellow-bg);border-color:#fde68a}
+.tint-red{background:var(--red-bg);border-color:#fecaca}
+.tint-blue{background:var(--blue-bg);border-color:#bfdbfe}
+.box-title{font-size:21px;font-weight:900;margin-bottom:8px}
+.tint-green .box-title{color:var(--green-d)}.tint-cone .box-title{color:var(--cone-d)}
+.tint-yellow .box-title{color:var(--yellow-d)}.tint-red .box-title{color:var(--red-d)}
+.tint-blue .box-title{color:var(--blue-d)}
+.btn{border:none;border-radius:14px;font-family:'Outfit',sans-serif;font-weight:800;cursor:pointer;transition:transform .12s}
+.btn:hover{transform:translateY(-2px)}
+.btn.green{background:var(--green);color:#fff}
+.btn.cone{background:var(--cone);color:#fff}
+.btn.dark{background:#1e293b;color:#fff}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;font-size:23px;font-weight:700;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.opt:hover{border-color:var(--cone);transform:translateX(4px)}
+.opt.good{background:var(--green-bg);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-bg);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default;opacity:.85}
+.opt:disabled:hover{transform:none}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.on-correct{display:none;margin-top:6px}
+.on-correct.show{display:block;animation:pop .4s}
+@keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+.reveal-box{background:var(--green-bg);border:3px solid var(--green);border-radius:16px;padding:16px 24px;font-size:24px;font-weight:800;color:var(--green-d)}
+.sound-card{background:linear-gradient(135deg,#fff,var(--cone-bg));border:4px solid var(--cone);border-radius:20px;padding:20px 30px;display:flex;align-items:center;gap:24px}
+.sc-emoji{font-size:76px;line-height:1}
+.sc-letter{font-size:64px;font-weight:900;color:var(--cone-d);line-height:1}
+.sc-sound{font-size:26px;font-weight:800;color:var(--navy)}
+.sc-mouth{font-size:20px;color:#475569;font-weight:600;margin-top:4px}
+.cone-board{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.cone-st{width:200px;background:rgba(255,255,255,.07);border:3px solid rgba(255,255,255,.18);border-radius:16px;padding:14px;text-align:center;transition:all .4s}
+.cone-st .st-ico{font-size:42px;filter:grayscale(1);opacity:.45;transition:all .4s}
+.cone-st .st-name{font-size:17px;font-weight:800;color:rgba(255,255,255,.55);margin-top:6px}
+.cone-st.on{border-color:var(--cone);background:rgba(249,115,22,.16);box-shadow:0 0 26px rgba(249,115,22,.4)}
+.cone-st.on .st-ico{filter:none;opacity:1}
+.cone-st.on .st-name{color:var(--cone)}
+.wordbtn{display:inline-block;background:#fff;border:3px solid #e2e8f0;border-radius:12px;padding:12px 24px;font-size:27px;font-weight:800;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;margin:6px}
+.wordbtn:hover{border-color:var(--cone);transform:translateY(-2px)}
+.wordbtn.good{background:var(--green-bg);border-color:var(--green);color:var(--green-d);pointer-events:none}
+.wordbtn.bad{animation:shake .35s;border-color:var(--red)}
+.mitem{background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 20px;font-size:23px;font-weight:800;color:var(--ink);cursor:pointer;transition:all .15s;text-align:left;font-family:'Outfit',sans-serif}
+.mitem:hover{border-color:var(--cone)}
+.mitem.lock{border-color:var(--green);background:var(--green-bg);color:var(--green-d);pointer-events:none}
+.meter{height:26px;background:#e2e8f0;border-radius:13px;overflow:hidden}
+.meter>div{height:100%;width:0;background:linear-gradient(90deg,var(--yellow),var(--cone));border-radius:13px;transition:width .5s}
+.magic-word{background:#fff;border:4px solid var(--blue);border-radius:16px;padding:14px 30px;font-size:44px;font-weight:900;color:var(--navy);letter-spacing:6px;display:inline-block;transition:all .5s}
+.magic-word .vowel{color:var(--cone-d)}
+.magic-word .magic-e{color:var(--blue);opacity:0;transition:all .5s}
+.magic-word.transformed{border-color:var(--cone);background:linear-gradient(135deg,#fff,var(--yellow-bg))}
+.magic-word.transformed .magic-e{opacity:1}
+.dlg{display:flex;gap:14px;align-items:flex-start}
+.dlg .who{font-size:20px;font-weight:900;white-space:nowrap;padding-top:8px}
+.dlg .bub{background:#fff;border:3px solid #e2e8f0;border-radius:16px;padding:12px 20px;font-size:24px;font-weight:700;color:var(--ink)}
+.dlg.dad .who{color:var(--green-d)}.dlg.dad .bub{border-color:#bbf7d0;background:var(--green-bg)}
+.dlg.leo .who{color:var(--blue-d)}.dlg.leo .bub{border-color:#bfdbfe;background:var(--blue-bg)}
+.big-emoji{font-size:88px;line-height:1}
+.pattern-pill{background:#fff;border:3px solid var(--cone);border-radius:14px;padding:12px 22px;font-size:25px;font-weight:800;color:var(--navy);text-align:center}
+#bar{position:absolute;left:0;bottom:0;width:1920px;height:52px;background:var(--navy);display:flex;align-items:center;padding:0 24px;gap:18px;z-index:50}
+#bar button{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:10px;padding:7px 18px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif}
+#bar button:hover{background:rgba(255,255,255,.25)}
+#counter{color:rgba(255,255,255,.7);font-size:16px;font-weight:800;margin-left:auto}
+#minist{display:flex;gap:7px}
+.mdot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.18);transition:all .3s}
+.mdot.on{background:var(--cone);box-shadow:0 0 8px rgba(249,115,22,.8)}
+#pwrap{position:absolute;left:0;top:0;width:100%;height:6px;background:rgba(255,255,255,.12)}
+#pfill{height:100%;width:0;background:var(--cone);transition:width .3s}
+#notesPanel{position:absolute;right:24px;bottom:64px;width:640px;max-height:520px;overflow:auto;background:#fff;border:3px solid var(--cone);border-radius:16px;padding:20px 24px;font-size:19px;color:var(--ink);line-height:1.5;display:none;z-index:60;box-shadow:0 16px 44px rgba(0,0,0,.35)}
+#notesPanel.show{display:block}
+#notesPanel b{color:var(--cone-d)}
+.confetti{position:absolute;font-size:34px;animation:fall 3.2s linear infinite}
+@keyframes fall{0%{transform:translateY(-80px) rotate(0)}100%{transform:translateY(1150px) rotate(540deg)}}
+</style>
+</head>
+<body>
+<div id="scaler"><div id="deck">
+
+<!-- ============ 1 · TITLE ============ -->
+<div class="slide" data-notes="<b>Sound Training Camp ⚽🔤.</b> Training Ground = extra practice on something tricky — today: English vowel SOUNDS. Coach Dad, Player Leo. Six training drills (cones). The story: Leo's reading is good, but English vowels play tricks that Japanese vowels never do — today we train the ear and mouth like we train feet. No book needed.">
+  <div class="body grad-pitch center" style="gap:18px">
+    <div style="font-size:21px;font-weight:800;color:#86efac;letter-spacing:4px">⚽ TRAINING GROUND · EXTRA SESSION</div>
+    <div style="font-size:96px;line-height:1">🔤⚽🎯</div>
+    <div style="font-size:64px;font-weight:900;color:#fff;line-height:1.05">Sound Training Camp</div>
+    <div style="font-size:32px;font-weight:800;color:var(--cone)">Short Vowels &amp; the Magic E</div>
+    <div style="background:rgba(255,255,255,.12);border:2px solid var(--cone);border-radius:14px;padding:12px 26px;font-size:25px;font-weight:800;color:#fff">
+      a 🐱 · e 🥚 · i 🐷 · o 🐙 · u ☂️ &nbsp;+&nbsp; the Super Sub 🪄E
+    </div>
+    <div class="cone-board" data-coneboard></div>
+    <div style="font-size:22px;color:rgba(255,255,255,.85);font-weight:600">Coach Dad 💬 + Player Leo 💬 — complete all <b style="color:var(--cone)">6 drills</b>!</div>
+    <button class="btn cone" style="font-size:24px;padding:14px 40px" onclick="changeSlide(1)">Start Training ▶</button>
+  </div>
+</div>
+
+<!-- ============ 2 · WHY THIS TRAINING ============ -->
+<div class="slide" data-notes="<b>Why this session exists.</b> The core problem for Japanese speakers: Japanese has 5 vowel SOUNDS that never change (あいうえお). English has 5 vowel LETTERS but each letter can make different sounds. Show the trap: the letter 'a' in cat vs cake — same letter, different sound! Today: master the SHORT sounds first, then the Magic E trick that switches them.">
+  <div class="slide-header"><span class="hd-unit">Training</span><span class="hd-sep">·</span><span class="hd-section">Why We Train Today</span><span class="hd-chip cone">🎯 the mission</span></div>
+  <div class="body">
+    <div class="header-bar cone">🎯 The problem: English vowels play tricks!</div>
+    <div class="two-col" style="flex:1">
+      <div class="col">
+        <div class="info-box tint-blue">
+          <div class="box-title">🇯🇵 JAPANESE VOWELS — honest players</div>
+          <div style="font-size:23px;font-weight:700">あ い う え お<br>5 sounds. They NEVER change. あ is always あ!</div>
+        </div>
+        <div class="info-box tint-red">
+          <div class="box-title">🇬🇧 ENGLISH VOWELS — tricky players</div>
+          <div style="font-size:23px;font-weight:700">a e i o u<br>5 letters… but each letter can make DIFFERENT sounds! 😱</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="info-box tint-yellow">
+          <div class="box-title">👀 SEE THE TRICK</div>
+          <div style="font-size:26px;font-weight:800;line-height:1.8">c<span style="color:var(--cone-d)">a</span>t 🐱 → "ah-eh" short sound<br>c<span style="color:var(--cone-d)">a</span>ke 🎂 → "ay" long sound<br><span style="font-size:20px;color:#64748b">Same letter <b>a</b> — two different sounds!</span></div>
+        </div>
+        <div class="info-box tint-green">
+          <div class="box-title">💪 TODAY'S TRAINING PLAN</div>
+          <div style="font-size:21px;font-weight:700">① Master the 5 SHORT sounds (drills 1–5)<br>② Learn the Magic E — the trick that changes them (drill 6)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 3 · HOW TO TRAIN ============ -->
+<div class="slide" data-notes="<b>Training method.</b> Every sound: Coach says it → Leo copies 3 times → mouth check → word drill. IMPORTANT: this deck has no audio — Coach Dad IS the audio. Say every sound and word clearly, exaggerate the mouth. Leo should watch your mouth, then feel his own.">
+  <div class="slide-header"><span class="hd-unit">Training</span><span class="hd-sep">·</span><span class="hd-section">The Training Method</span><span class="hd-chip">📋 how we drill</span></div>
+  <div class="body center" style="gap:20px">
+    <div class="big-emoji">🗣️👂🔁</div>
+    <div style="display:flex;gap:18px;max-width:1400px">
+      <div class="info-box tint-green" style="flex:1;text-align:center"><div style="font-size:44px">1️⃣</div><div style="font-size:22px;font-weight:800">Coach SAYS the sound</div><div style="font-size:19px;color:#64748b;font-weight:600">watch Coach's mouth! 👄</div></div>
+      <div class="info-box tint-cone" style="flex:1;text-align:center"><div style="font-size:44px">2️⃣</div><div style="font-size:22px;font-weight:800">Leo COPIES ×3</div><div style="font-size:19px;color:#64748b;font-weight:600">feel your own mouth!</div></div>
+      <div class="info-box tint-yellow" style="flex:1;text-align:center"><div style="font-size:44px">3️⃣</div><div style="font-size:22px;font-weight:800">WORD DRILL</div><div style="font-size:19px;color:#64748b;font-weight:600">find the sound in real words ⚽</div></div>
+    </div>
+    <div class="dlg dad" style="max-width:1000px"><div class="who">Coach 💬</div><div class="bub">"Ears first, then mouth, then words. Just like soccer: watch → copy → play!"</div></div>
+  </div>
+</div>
+
+<!-- ============ 4 · DRILL 1: SHORT A ============ -->
+<div class="slide" data-notes="<b>Drill 1 — short a /æ/ (cat 🐱).</b> The famous one from Unit 9's Sound Lab! Mouth: open WIDE like a cat yawning, tongue at the FRONT. It is NOT Japanese あ — it is between あ and え. Coach says: æ æ æ — cat! Leo copies 3×. Then the drill: tap ALL the words that have the cat sound (hat, map, back — not cup, not hot).">
+  <div class="slide-header"><span class="hd-unit">Drill 1 / 6</span><span class="hd-sep">·</span><span class="hd-section">Short a — the CAT sound 🐱</span><span class="hd-chip cone">🔶 Cone 1</span></div>
+  <div class="body">
+    <div class="sound-card">
+      <div class="sc-letter">a</div>
+      <div class="sc-emoji">🐱</div>
+      <div>
+        <div class="sc-sound">/æ/ — like <b>cat</b>! Open wide like a cat's yawn 😸</div>
+        <div class="sc-mouth">👄 Mouth WIDE open · tongue at the FRONT · between Japanese あ and え</div>
+      </div>
+    </div>
+    <div class="header-bar cone" style="font-size:24px">🎯 DRILL: Tap every word with the CAT sound! (3 to find)</div>
+    <div style="text-align:center" data-hunt="a" data-need="3">
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">hat 🎩</button>
+      <button class="wordbtn" onclick="huntTap(this)">cup ☕</button>
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">map 🗺️</button>
+      <button class="wordbtn" onclick="huntTap(this)">hot 🔥</button>
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">back 🔙</button>
+      <button class="wordbtn" onclick="huntTap(this)">ten 🔟</button>
+    </div>
+    <div id="hunt-a-done" class="on-correct"><div class="reveal-box" style="text-align:center">🔶 Cone 1 conquered! Say them all: <b>hat, map, back — æ æ æ!</b> 🐱</div></div>
+  </div>
+</div>
+
+<!-- ============ 5 · DRILL 2: SHORT E ============ -->
+<div class="slide" data-notes="<b>Drill 2 — short e /ɛ/ (egg 🥚).</b> Mouth: half open, relaxed smile — close to Japanese え but shorter and lazier. Coach: eh eh eh — egg! Leo ×3. Drill: find the 3 egg-sound words (bed, red, leg — not big, not bag).">
+  <div class="slide-header"><span class="hd-unit">Drill 2 / 6</span><span class="hd-sep">·</span><span class="hd-section">Short e — the EGG sound 🥚</span><span class="hd-chip cone">🔶 Cone 2</span></div>
+  <div class="body">
+    <div class="sound-card">
+      <div class="sc-letter">e</div>
+      <div class="sc-emoji">🥚</div>
+      <div>
+        <div class="sc-sound">/e/ — like <b>egg</b>! A short, relaxed "eh"</div>
+        <div class="sc-mouth">👄 Half open · relaxed smile · close to Japanese え but shorter</div>
+      </div>
+    </div>
+    <div class="header-bar cone" style="font-size:24px">🎯 DRILL: Tap every word with the EGG sound! (3 to find)</div>
+    <div style="text-align:center" data-hunt="e" data-need="3">
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">bed 🛏️</button>
+      <button class="wordbtn" onclick="huntTap(this)">big 🐘</button>
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">red 🔴</button>
+      <button class="wordbtn" onclick="huntTap(this)">bag 👜</button>
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">leg 🦵</button>
+      <button class="wordbtn" onclick="huntTap(this)">run 🏃</button>
+    </div>
+    <div id="hunt-e-done" class="on-correct"><div class="reveal-box" style="text-align:center">🔶 Cone 2 conquered! <b>bed, red, leg — eh eh eh!</b> 🥚</div></div>
+  </div>
+</div>
+
+<!-- ============ 6 · DRILL 3: SHORT I ============ -->
+<div class="slide" data-notes="<b>Drill 3 — short i /ɪ/ (pig 🐷).</b> THE trap for Japanese speakers: it is NOT い! Japanese い is long and tight; English short i is quick and lazy — mouth barely moves. sit ≠ seat! Coach: ih ih ih — pig! Drill: find sit, win, kick (not see, not set).">
+  <div class="slide-header"><span class="hd-unit">Drill 3 / 6</span><span class="hd-sep">·</span><span class="hd-section">Short i — the PIG sound 🐷</span><span class="hd-chip cone">🔶 Cone 3</span></div>
+  <div class="body">
+    <div class="sound-card">
+      <div class="sc-letter">i</div>
+      <div class="sc-emoji">🐷</div>
+      <div>
+        <div class="sc-sound">/ɪ/ — like <b>pig</b>! Quick and lazy "ih"</div>
+        <div class="sc-mouth">👄 Mouth almost closed, relaxed · NOT Japanese い — shorter and lazier! (sit ≠ seat!)</div>
+      </div>
+    </div>
+    <div class="header-bar cone" style="font-size:24px">🎯 DRILL: Tap every word with the PIG sound! (3 to find)</div>
+    <div style="text-align:center" data-hunt="i" data-need="3">
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">sit 🪑</button>
+      <button class="wordbtn" onclick="huntTap(this)">set 🎯</button>
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">win 🏆</button>
+      <button class="wordbtn" onclick="huntTap(this)">sun ☀️</button>
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">kick ⚽</button>
+      <button class="wordbtn" onclick="huntTap(this)">cat 🐱</button>
+    </div>
+    <div id="hunt-i-done" class="on-correct"><div class="reveal-box" style="text-align:center">🔶 Cone 3 conquered! <b>sit, win, kick — ih ih ih!</b> 🐷⚽</div></div>
+  </div>
+</div>
+
+<!-- ============ 7 · DRILL 4: SHORT O ============ -->
+<div class="slide" data-notes="<b>Drill 4 — short o /ɒ/ (octopus 🐙).</b> Mouth: round and open, jaw drops — deeper than Japanese お. Coach: oh(ah) oh oh — hot! Drill: find hot, top, stop (not hat, not hit).">
+  <div class="slide-header"><span class="hd-unit">Drill 4 / 6</span><span class="hd-sep">·</span><span class="hd-section">Short o — the OCTOPUS sound 🐙</span><span class="hd-chip cone">🔶 Cone 4</span></div>
+  <div class="body">
+    <div class="sound-card">
+      <div class="sc-letter">o</div>
+      <div class="sc-emoji">🐙</div>
+      <div>
+        <div class="sc-sound">/ɒ/ — like <b>hot</b>! Round open "o(ah)"</div>
+        <div class="sc-mouth">👄 Round lips, jaw DROPS · deeper and shorter than Japanese お</div>
+      </div>
+    </div>
+    <div class="header-bar cone" style="font-size:24px">🎯 DRILL: Tap every word with the OCTOPUS sound! (3 to find)</div>
+    <div style="text-align:center" data-hunt="o" data-need="3">
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">hot 🔥</button>
+      <button class="wordbtn" onclick="huntTap(this)">hat 🎩</button>
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">top 🔝</button>
+      <button class="wordbtn" onclick="huntTap(this)">hit 👊</button>
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">stop 🛑</button>
+      <button class="wordbtn" onclick="huntTap(this)">leg 🦵</button>
+    </div>
+    <div id="hunt-o-done" class="on-correct"><div class="reveal-box" style="text-align:center">🔶 Cone 4 conquered! <b>hot, top, stop!</b> 🐙</div></div>
+  </div>
+</div>
+
+<!-- ============ 8 · DRILL 5: SHORT U ============ -->
+<div class="slide" data-notes="<b>Drill 5 — short u /ʌ/ (umbrella ☂️ / cup).</b> The OTHER famous one from Unit 9 (cat vs cut!). Mouth: barely opens, tongue relaxed at the BACK — a lazy grunt 'uh'. NOT Japanese う (no lip rounding!). Coach: uh uh uh — cup! Drill: find run, sun, cut (not ran, not sit).">
+  <div class="slide-header"><span class="hd-unit">Drill 5 / 6</span><span class="hd-sep">·</span><span class="hd-section">Short u — the UMBRELLA sound ☂️</span><span class="hd-chip cone">🔶 Cone 5</span></div>
+  <div class="body">
+    <div class="sound-card">
+      <div class="sc-letter">u</div>
+      <div class="sc-emoji">☂️</div>
+      <div>
+        <div class="sc-sound">/ʌ/ — like <b>cup</b>! A lazy little "uh"</div>
+        <div class="sc-mouth">👄 Mouth barely opens · tongue relaxed at the BACK · NOT Japanese う — no round lips!</div>
+      </div>
+    </div>
+    <div class="header-bar cone" style="font-size:24px">🎯 DRILL: Tap every word with the UMBRELLA sound! (3 to find)</div>
+    <div style="text-align:center" data-hunt="u" data-need="3">
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">run 🏃</button>
+      <button class="wordbtn" onclick="huntTap(this)">ran 🏃💨</button>
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">sun ☀️</button>
+      <button class="wordbtn" onclick="huntTap(this)">sit 🪑</button>
+      <button class="wordbtn" data-ok="1" onclick="huntTap(this)">cut ✂️</button>
+      <button class="wordbtn" onclick="huntTap(this)">stop 🛑</button>
+    </div>
+    <div id="hunt-u-done" class="on-correct"><div class="reveal-box" style="text-align:center">🔶 Cone 5 conquered! <b>run, sun, cut — uh uh uh!</b> ☂️</div></div>
+  </div>
+</div>
+
+<!-- ============ 9 · THE 5 SOUNDS TOGETHER ============ -->
+<div class="slide" data-notes="<b>Recap of all 5 — the vowel warm-up chant.</b> Do the chant twice, with body actions: a (cat claws!) → e (crack an egg) → i (pig nose) → o (octopus arms) → u (umbrella up). Fast round: Coach points at random cards, Leo says the sound instantly.">
+  <div class="slide-header"><span class="hd-unit">Training</span><span class="hd-sep">·</span><span class="hd-section">The 5-Sound Chant! 🎵</span><span class="hd-chip">warm-up complete</span></div>
+  <div class="body center">
+    <div class="header-bar" style="border:none;padding:0">🎵 Chant it with actions — twice, then faster!</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:14px">
+      <div class="sound-card" style="flex-direction:column;width:250px;text-align:center;gap:6px;padding:16px"><div class="sc-letter" style="font-size:52px">a</div><div class="sc-emoji" style="font-size:56px">🐱</div><div style="font-size:22px;font-weight:800">cat!</div></div>
+      <div class="sound-card" style="flex-direction:column;width:250px;text-align:center;gap:6px;padding:16px"><div class="sc-letter" style="font-size:52px">e</div><div class="sc-emoji" style="font-size:56px">🥚</div><div style="font-size:22px;font-weight:800">egg!</div></div>
+      <div class="sound-card" style="flex-direction:column;width:250px;text-align:center;gap:6px;padding:16px"><div class="sc-letter" style="font-size:52px">i</div><div class="sc-emoji" style="font-size:56px">🐷</div><div style="font-size:22px;font-weight:800">pig!</div></div>
+      <div class="sound-card" style="flex-direction:column;width:250px;text-align:center;gap:6px;padding:16px"><div class="sc-letter" style="font-size:52px">o</div><div class="sc-emoji" style="font-size:56px">🐙</div><div style="font-size:22px;font-weight:800">hot!</div></div>
+      <div class="sound-card" style="flex-direction:column;width:250px;text-align:center;gap:6px;padding:16px"><div class="sc-letter" style="font-size:52px">u</div><div class="sc-emoji" style="font-size:56px">☂️</div><div style="font-size:22px;font-weight:800">cup!</div></div>
+    </div>
+    <div class="dlg dad" style="max-width:900px;margin-top:14px"><div class="who">Coach 💬</div><div class="bub">"Now FAST round — I point, you shout the sound! ⚡"</div></div>
+  </div>
+</div>
+
+<!-- ============ 10 · EAR TRAINING 1: æ vs ʌ ============ -->
+<div class="slide" data-notes="<b>Ear training — the cat/cup battle (/æ/ vs /ʌ/).</b> The #1 confusion pair. HOW TO PLAY: Coach secretly picks ONE word from each pair and says it aloud. Leo taps the word he heard. Both correct answers work in the game — the WIN is Leo hearing the difference. Coach should say each pair slowly first: cat–cut, bat–but, ran–run, cap–cup. Then test one from each pair.">
+  <div class="slide-header"><span class="hd-unit">Ear Training</span><span class="hd-sep">·</span><span class="hd-section">Battle 1: cat 🐱 vs cup ☂️</span><span class="hd-chip cone">👂 listen!</span></div>
+  <div class="body">
+    <div class="header-bar blue">👂 Coach says ONE word from each pair — tap the word you HEAR!</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;align-content:center">
+      <div class="info-box tint-yellow" style="text-align:center"><div style="font-size:20px;font-weight:700;color:#92400e;margin-bottom:8px">Pair 1</div>
+        <button class="wordbtn" onclick="earTap(this)">c<span style="color:var(--cone-d)">a</span>t 🐱</button>
+        <button class="wordbtn" onclick="earTap(this)">c<span style="color:var(--blue-d)">u</span>t ✂️</button>
+      </div>
+      <div class="info-box tint-yellow" style="text-align:center"><div style="font-size:20px;font-weight:700;color:#92400e;margin-bottom:8px">Pair 2</div>
+        <button class="wordbtn" onclick="earTap(this)">b<span style="color:var(--cone-d)">a</span>t 🦇</button>
+        <button class="wordbtn" onclick="earTap(this)">b<span style="color:var(--blue-d)">u</span>t 🙅</button>
+      </div>
+      <div class="info-box tint-yellow" style="text-align:center"><div style="font-size:20px;font-weight:700;color:#92400e;margin-bottom:8px">Pair 3</div>
+        <button class="wordbtn" onclick="earTap(this)">r<span style="color:var(--cone-d)">a</span>n 🏃💨</button>
+        <button class="wordbtn" onclick="earTap(this)">r<span style="color:var(--blue-d)">u</span>n 🏃</button>
+      </div>
+      <div class="info-box tint-yellow" style="text-align:center"><div style="font-size:20px;font-weight:700;color:#92400e;margin-bottom:8px">Pair 4</div>
+        <button class="wordbtn" onclick="earTap(this)">c<span style="color:var(--cone-d)">a</span>p 🧢</button>
+        <button class="wordbtn" onclick="earTap(this)">c<span style="color:var(--blue-d)">u</span>p ☕</button>
+      </div>
+    </div>
+    <div class="info-box tint-green" style="text-align:center"><div id="earScore1" style="font-size:22px;font-weight:800">Tapped: 0 / 4 pairs — Coach confirms if Leo heard right! 👂</div></div>
+  </div>
+</div>
+
+<!-- ============ 11 · EAR TRAINING 2: i vs e ============ -->
+<div class="slide" data-notes="<b>Ear training — pig/egg battle (/ɪ/ vs /e/).</b> Second confusion pair. Same game: Coach says one from each pair, Leo taps what he heard. Pairs: pig–peg? Use clearer ones: sit–set, big–beg? Keep child-known words: sit–set, pin–pen, bit–bet, hit–het? het isn't a word — use: sit/set, pin/pen, bit/bet, tin/ten. Coach says pairs slowly first.">
+  <div class="slide-header"><span class="hd-unit">Ear Training</span><span class="hd-sep">·</span><span class="hd-section">Battle 2: pig 🐷 vs egg 🥚</span><span class="hd-chip cone">👂 listen!</span></div>
+  <div class="body">
+    <div class="header-bar blue">👂 Round 2 — even sneakier! Tap the word you HEAR!</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;align-content:center">
+      <div class="info-box tint-yellow" style="text-align:center"><div style="font-size:20px;font-weight:700;color:#92400e;margin-bottom:8px">Pair 1</div>
+        <button class="wordbtn" onclick="earTap2(this)">s<span style="color:var(--cone-d)">i</span>t 🪑</button>
+        <button class="wordbtn" onclick="earTap2(this)">s<span style="color:var(--blue-d)">e</span>t 🎯</button>
+      </div>
+      <div class="info-box tint-yellow" style="text-align:center"><div style="font-size:20px;font-weight:700;color:#92400e;margin-bottom:8px">Pair 2</div>
+        <button class="wordbtn" onclick="earTap2(this)">p<span style="color:var(--cone-d)">i</span>n 📌</button>
+        <button class="wordbtn" onclick="earTap2(this)">p<span style="color:var(--blue-d)">e</span>n 🖊️</button>
+      </div>
+      <div class="info-box tint-yellow" style="text-align:center"><div style="font-size:20px;font-weight:700;color:#92400e;margin-bottom:8px">Pair 3</div>
+        <button class="wordbtn" onclick="earTap2(this)">b<span style="color:var(--cone-d)">i</span>t 🍪</button>
+        <button class="wordbtn" onclick="earTap2(this)">b<span style="color:var(--blue-d)">e</span>t 🤝</button>
+      </div>
+      <div class="info-box tint-yellow" style="text-align:center"><div style="font-size:20px;font-weight:700;color:#92400e;margin-bottom:8px">Pair 4</div>
+        <button class="wordbtn" onclick="earTap2(this)">t<span style="color:var(--cone-d)">i</span>n 🥫</button>
+        <button class="wordbtn" onclick="earTap2(this)">t<span style="color:var(--blue-d)">e</span>n 🔟</button>
+      </div>
+    </div>
+    <div class="info-box tint-green" style="text-align:center"><div id="earScore2" style="font-size:22px;font-weight:800">Tapped: 0 / 4 pairs — great ears win matches! 👂⚽</div></div>
+  </div>
+</div>
+
+<!-- ============ 12 · MAGIC E ENTERS ============ -->
+<div class="slide" data-notes="<b>The Super Sub enters! 🪄E.</b> The story: the team has a secret player — E. He comes on at the END of the word, says NOTHING himself (silent!)… but he changes everything: the vowel before him says its NAME (the alphabet name!). cap→cape: a stops saying æ and says 'AY' (its name). Sell this hard — it's the coolest trick in English reading.">
+  <div class="slide-header"><span class="hd-unit">Drill 6 / 6</span><span class="hd-sep">·</span><span class="hd-section">The Super Sub: Magic E 🪄</span><span class="hd-chip cone">🔶 Final Cone</span></div>
+  <div class="body">
+    <div class="header-bar cone">🪄 Meet the strangest player on the team…</div>
+    <div class="two-col" style="flex:1">
+      <div class="col" style="justify-content:center">
+        <div class="info-box tint-blue">
+          <div class="box-title">🪄 THE SUPER SUB "E"</div>
+          <div style="font-size:23px;font-weight:700;line-height:1.8">
+            🤫 He is <b>SILENT</b> — says nothing himself<br>
+            🔚 He plays at the <b>END</b> of the word<br>
+            ⚡ But he makes the vowel before him <b>SAY ITS NAME!</b>
+          </div>
+        </div>
+        <div class="dlg dad"><div class="who">Coach 💬</div><div class="bub">"Like a super sub — he doesn't score, but the whole game changes when he comes on!"</div></div>
+      </div>
+      <div class="col" style="justify-content:center;align-items:center">
+        <div style="font-size:22px;font-weight:800;color:#64748b">WITHOUT the sub:</div>
+        <div class="magic-word">c<span class="vowel">a</span>p 🧢</div>
+        <div style="font-size:20px;font-weight:700;color:#64748b">a says "æ" (cat sound)</div>
+        <div style="font-size:36px;margin:6px 0">⬇️ 🪄E comes on!</div>
+        <div class="magic-word transformed">c<span class="vowel">a</span>p<span class="magic-e">e</span> 🦸</div>
+        <div style="font-size:20px;font-weight:700;color:var(--cone-d)">a now says "AY" — its NAME!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 13 · MAGIC E MACHINE ============ -->
+<div class="slide" data-notes="<b>The Magic E Machine — interactive.</b> Tap each word to send the Super Sub on. Watch the transformation and SAY both versions each time: kit→kite, hop→hope, cub→cube, mad→made. All 4 transformed = final cone conquered! (tap = substitution whistle 📣)">
+  <div class="slide-header"><span class="hd-unit">Drill 6 / 6</span><span class="hd-sep">·</span><span class="hd-section">The Magic E Machine ⚙️🪄</span><span class="hd-chip cone">🔶 Power the Cone!</span></div>
+  <div class="body">
+    <div class="header-bar cone">📣 Tap each word — send the Super Sub on! Say BOTH versions aloud!</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;align-content:center;justify-items:center">
+      <div style="text-align:center"><div class="magic-word" id="mw1" onclick="magicTap(this)" style="cursor:pointer">k<span class="vowel">i</span>t 🎒<span class="magic-e">e 🪁</span></div><div style="font-size:18px;font-weight:700;color:#64748b;margin-top:6px" id="mw1t">kit — "ih" (pig sound)</div></div>
+      <div style="text-align:center"><div class="magic-word" id="mw2" onclick="magicTap(this)" style="cursor:pointer">h<span class="vowel">o</span>p 🐇<span class="magic-e">e 🙏</span></div><div style="font-size:18px;font-weight:700;color:#64748b;margin-top:6px" id="mw2t">hop — "o" (octopus sound)</div></div>
+      <div style="text-align:center"><div class="magic-word" id="mw3" onclick="magicTap(this)" style="cursor:pointer">c<span class="vowel">u</span>b 🐻<span class="magic-e">e 🧊</span></div><div style="font-size:18px;font-weight:700;color:#64748b;margin-top:6px" id="mw3t">cub — "uh" (cup sound)</div></div>
+      <div style="text-align:center"><div class="magic-word" id="mw4" onclick="magicTap(this)" style="cursor:pointer">m<span class="vowel">a</span>d 😠<span class="magic-e">e 🛠️</span></div><div style="font-size:18px;font-weight:700;color:#64748b;margin-top:6px" id="mw4t">mad — "æ" (cat sound)</div></div>
+    </div>
+    <div id="magicDone" class="on-correct"><div class="reveal-box" style="text-align:center">🔶 FINAL CONE CONQUERED! kit→kite · hop→hope · cub→cube · mad→made 🪄⚡</div></div>
+  </div>
+</div>
+
+<!-- ============ 14 · SHORT OR MAGIC? SORT ============ -->
+<div class="slide" data-notes="<b>Sort drill — short sound or Magic E?</b> 8 words. Leo READS each aloud FIRST (that's the real test), then taps the team it belongs to. Short team: cap, win, hot, cut. Magic team: cape, wine, note, cute.">
+  <div class="slide-header"><span class="hd-unit">Training</span><span class="hd-sep">·</span><span class="hd-section">Team Sort — Short or Magic? 🔀</span><span class="hd-chip">read FIRST, then tap!</span></div>
+  <div class="body">
+    <div class="header-bar">🔀 READ the word aloud… then tap its team!</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;align-content:center">
+      <div class="info-box tint-cone" data-group style="display:flex;align-items:center;gap:10px"><div style="font-size:26px;font-weight:900;flex:1">cape 🦸</div>
+        <button class="opt" style="width:200px;text-align:center;font-size:19px" onclick="pick(this)">SHORT team</button>
+        <button class="opt" data-ok="1" style="width:200px;text-align:center;font-size:19px" onclick="pick(this)">MAGIC 🪄 team</button>
+      </div>
+      <div class="info-box tint-cone" data-group style="display:flex;align-items:center;gap:10px"><div style="font-size:26px;font-weight:900;flex:1">win 🏆</div>
+        <button class="opt" data-ok="1" style="width:200px;text-align:center;font-size:19px" onclick="pick(this)">SHORT team</button>
+        <button class="opt" style="width:200px;text-align:center;font-size:19px" onclick="pick(this)">MAGIC 🪄 team</button>
+      </div>
+      <div class="info-box tint-cone" data-group style="display:flex;align-items:center;gap:10px"><div style="font-size:26px;font-weight:900;flex:1">note 📝</div>
+        <button class="opt" style="width:200px;text-align:center;font-size:19px" onclick="pick(this)">SHORT team</button>
+        <button class="opt" data-ok="1" style="width:200px;text-align:center;font-size:19px" onclick="pick(this)">MAGIC 🪄 team</button>
+      </div>
+      <div class="info-box tint-cone" data-group style="display:flex;align-items:center;gap:10px"><div style="font-size:26px;font-weight:900;flex:1">hot 🔥</div>
+        <button class="opt" data-ok="1" style="width:200px;text-align:center;font-size:19px" onclick="pick(this)">SHORT team</button>
+        <button class="opt" style="width:200px;text-align:center;font-size:19px" onclick="pick(this)">MAGIC 🪄 team</button>
+      </div>
+      <div class="info-box tint-cone" data-group style="display:flex;align-items:center;gap:10px"><div style="font-size:26px;font-weight:900;flex:1">cute 🐶</div>
+        <button class="opt" style="width:200px;text-align:center;font-size:19px" onclick="pick(this)">SHORT team</button>
+        <button class="opt" data-ok="1" style="width:200px;text-align:center;font-size:19px" onclick="pick(this)">MAGIC 🪄 team</button>
+      </div>
+      <div class="info-box tint-cone" data-group style="display:flex;align-items:center;gap:10px"><div style="font-size:26px;font-weight:900;flex:1">cut ✂️</div>
+        <button class="opt" data-ok="1" style="width:200px;text-align:center;font-size:19px" onclick="pick(this)">SHORT team</button>
+        <button class="opt" style="width:200px;text-align:center;font-size:19px" onclick="pick(this)">MAGIC 🪄 team</button>
+      </div>
+    </div>
+    <div id="sortDone" class="on-correct"><div class="reveal-box" style="text-align:center">🎉 6/6 sorted — you can SEE the Magic E working!</div></div>
+  </div>
+</div>
+
+<!-- ============ 15 · READING SPRINT 1 ============ -->
+<div class="slide" data-notes="<b>Reading sprint — real sentences.</b> Leo reads each sentence ALOUD, Coach listens for the vowel sounds. Tap the sentence after reading it to mark it done. Sentences mix short + magic words. Correct gently: point at the tricky word, do the sound, re-read the whole sentence.">
+  <div class="slide-header"><span class="hd-unit">Training</span><span class="hd-sep">·</span><span class="hd-section">Reading Sprint 🏃 — Part 1</span><span class="hd-chip cone">read ALOUD!</span></div>
+  <div class="body">
+    <div class="header-bar cone">🏃 Read each sentence out loud — tap it when Coach says "CLEAR!"</div>
+    <div class="col" style="flex:1;justify-content:center;gap:14px">
+      <button class="mitem sprint" style="font-size:26px" onclick="sprintTap(this)">The <b>cat</b> sat on my <b>cap</b>. 🐱🧢</button>
+      <button class="mitem sprint" style="font-size:26px" onclick="sprintTap(this)">I <b>hope</b> we <b>win</b> the <b>cup</b>! 🏆☕</button>
+      <button class="mitem sprint" style="font-size:26px" onclick="sprintTap(this)">He <b>ran</b> in the hot <b>sun</b>. 🏃☀️</button>
+      <button class="mitem sprint" style="font-size:26px" onclick="sprintTap(this)">My <b>kite</b> got stuck on the <b>net</b>. 🪁🥅</button>
+    </div>
+    <div id="sprint1Done" class="on-correct"><div class="reveal-box" style="text-align:center">🏃💨 Sprint 1 CLEAR! Your mouth is warming up!</div></div>
+  </div>
+</div>
+
+<!-- ============ 16 · READING SPRINT 2: MATCH COMMENTARY ============ -->
+<div class="slide" data-notes="<b>Reading sprint 2 — soccer commentary! 🎙️</b> Leo is the TV commentator. He reads the commentary aloud with ENERGY (that's the fun). Every bold word is a target sound. Coach taps each line CLEAR after a good read. Do it twice — second time faster and louder!">
+  <div class="slide-header"><span class="hd-unit">Training</span><span class="hd-sep">·</span><span class="hd-section">🎙️ Commentator Challenge!</span><span class="hd-chip cone">read with ENERGY!</span></div>
+  <div class="body">
+    <div class="header-bar red">🎙️ YOU are the commentator — read it LOUD like TV!</div>
+    <div class="col" style="flex:1;justify-content:center;gap:14px">
+      <button class="mitem sprint2" style="font-size:25px" onclick="sprint2Tap(this)">"He gets the ball… he can <b>run</b>, he can <b>cut</b> inside!" ⚽</button>
+      <button class="mitem sprint2" style="font-size:25px" onclick="sprint2Tap(this)">"What a <b>hit</b>! The keeper <b>cannot</b> <b>stop</b> it!" 🧤</button>
+      <button class="mitem sprint2" style="font-size:25px" onclick="sprint2Tap(this)">"The fans go <b>mad</b> — they <b>made</b> so much noise!" 📣</button>
+      <button class="mitem sprint2" style="font-size:25px" onclick="sprint2Tap(this)">"I <b>hope</b> you did not <b>miss</b> that — what a <b>game</b>!" 🏟️</button>
+    </div>
+    <div id="sprint2Done" class="on-correct"><div class="reveal-box" style="text-align:center">🎙️🔥 Commentator level: WORLD CLASS! (Did you hear mad→made? The Super Sub was playing!)</div></div>
+  </div>
+</div>
+
+<!-- ============ 17 · TRAP ROUND ============ -->
+<div class="slide" data-notes="<b>Trap round — the sneaky final test.</b> 4 questions mixing everything. Q2 is the deep one: WHY does 'hope' have a long o? (the Magic E). Q4 checks the silent-E fact itself.">
+  <div class="slide-header"><span class="hd-unit">Training</span><span class="hd-sep">·</span><span class="hd-section">⚠️ Trap Round — Stay Sharp!</span><span class="hd-chip">4 traps</span></div>
+  <div class="body">
+    <div class="header-bar red">⚠️ Four tricky questions — think before you tap!</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;align-content:center">
+      <div class="info-box tint-blue" data-group style="padding:14px 18px"><div style="font-size:20px;font-weight:800;margin-bottom:8px">1. Which word has the CAT sound 🐱?</div>
+        <button class="opt" style="font-size:19px" onclick="pick(this)">cake 🎂</button>
+        <button class="opt" data-ok="1" style="font-size:19px" onclick="pick(this)">cap 🧢</button>
+      </div>
+      <div class="info-box tint-blue" data-group style="padding:14px 18px"><div style="font-size:20px;font-weight:800;margin-bottom:8px">2. WHY does "hope" say "OH" not "o(ah)"?</div>
+        <button class="opt" data-ok="1" style="font-size:19px" onclick="pick(this)">The Magic E makes o say its name 🪄</button>
+        <button class="opt" style="font-size:19px" onclick="pick(this)">Because it is a long word</button>
+      </div>
+      <div class="info-box tint-blue" data-group style="padding:14px 18px"><div style="font-size:20px;font-weight:800;margin-bottom:8px">3. Which pair sounds DIFFERENT only in the vowel?</div>
+        <button class="opt" data-ok="1" style="font-size:19px" onclick="pick(this)">cat / cut</button>
+        <button class="opt" style="font-size:19px" onclick="pick(this)">cat / cats</button>
+      </div>
+      <div class="info-box tint-blue" data-group style="padding:14px 18px"><div style="font-size:20px;font-weight:800;margin-bottom:8px">4. What sound does the Magic E make itself?</div>
+        <button class="opt" style="font-size:19px" onclick="pick(this)">"eh" like egg</button>
+        <button class="opt" data-ok="1" style="font-size:19px" onclick="pick(this)">Nothing — he is silent! 🤫</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="font-size:21px;font-weight:900;color:var(--navy)">TRAPS BEATEN:</div>
+      <div class="meter" style="flex:1"><div id="trapMeter"></div></div>
+      <div id="trapScore" style="font-size:21px;font-weight:900;color:var(--cone-d)">0/4</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 18 · COACH'S FINAL TEST ============ -->
+<div class="slide" data-notes="<b>✔ Final test — read these 6 aloud (formative).</b> No taps, all voice. 3 short + 3 magic, shuffled: cut, kite, map, cube, ten, hope. Coach listens: short vowels correct? Magic E flipped correctly? If 5/6 clean → training complete. If not, tap back to that vowel's drill slide and repeat — that's what Training Ground is for.">
+  <div class="slide-header"><span class="hd-unit">Training</span><span class="hd-sep">·</span><span class="hd-section">✔ Coach's Final Test</span><span class="hd-chip cone">🎙️ voice only!</span></div>
+  <div class="body center" style="gap:20px">
+    <div class="big-emoji">🎙️✅</div>
+    <div class="header-bar" style="border:none;padding:0">Read all 6 aloud — Coach is listening! 👂</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;max-width:1300px">
+      <div class="pattern-pill" style="font-size:34px">cut ✂️</div>
+      <div class="pattern-pill" style="font-size:34px">kite 🪁</div>
+      <div class="pattern-pill" style="font-size:34px">map 🗺️</div>
+      <div class="pattern-pill" style="font-size:34px">cube 🧊</div>
+      <div class="pattern-pill" style="font-size:34px">ten 🔟</div>
+      <div class="pattern-pill" style="font-size:34px">hope 🙏</div>
+    </div>
+    <div class="info-box tint-green" style="max-width:1000px"><div style="font-size:22px;font-weight:700">✔ PASS = 5 or 6 clean reads. Tricky one? Jump back to that drill and run it again — that's what training is for! 💪</div></div>
+  </div>
+</div>
+
+<!-- ============ 19 · TRAINING REPORT ============ -->
+<div class="slide" data-notes="<b>Training report.</b> Review the cone board — all 6 lit if every drill was completed. The take-home rules. Homework idea: tonight, find 3 Magic E words in any English text (game, book, video subtitle) and show Coach tomorrow.">
+  <div class="slide-header"><span class="hd-unit">Training</span><span class="hd-sep">·</span><span class="hd-section">Training Report 📋</span><span class="hd-chip">session summary</span></div>
+  <div class="body grad-pitch">
+    <div style="font-size:30px;font-weight:900;color:var(--cone);text-align:center">📋 SOUND TRAINING CAMP — REPORT</div>
+    <div class="cone-board" data-coneboard style="margin-top:4px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;align-content:center">
+      <div style="background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);border-radius:14px;padding:14px 20px"><div style="font-size:19px;font-weight:900;color:var(--cone)">THE 5 SHORT SOUNDS</div><div style="font-size:20px;font-weight:700">a🐱 e🥚 i🐷 o🐙 u☂️ — quick, lazy, NOT Japanese vowels!</div></div>
+      <div style="background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);border-radius:14px;padding:14px 20px"><div style="font-size:19px;font-weight:900;color:var(--cone)">THE SUPER SUB 🪄E</div><div style="font-size:20px;font-weight:700">silent, plays at the end, makes the vowel SAY ITS NAME</div></div>
+      <div style="background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);border-radius:14px;padding:14px 20px"><div style="font-size:19px;font-weight:900;color:var(--cone)">DANGER PAIRS ⚠️</div><div style="font-size:20px;font-weight:700">cat/cut · sit/set · cap/cape · hop/hope</div></div>
+      <div style="background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);border-radius:14px;padding:14px 20px"><div style="font-size:19px;font-weight:900;color:var(--cone)">🏠 HOMEWORK</div><div style="font-size:20px;font-weight:700">Find 3 Magic E words tonight — in a game, book, or video!</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 20 · CELEBRATION ============ -->
+<div class="slide" data-notes="<b>Celebration.</b> Training complete — high five! If any cone stayed dark, note which drill to redo next session. Training Ground sessions are short and repeatable — coming back IS the method.">
+  <div class="body grad-pitch center" id="celebSlide" style="gap:18px">
+    <div style="font-size:110px">🏆🔤⚽</div>
+    <div style="font-size:60px;font-weight:900;color:#fff">TRAINING COMPLETE!</div>
+    <div style="font-size:30px;font-weight:800;color:var(--cone)">Great session, Leo — your English ears and mouth got stronger! 💪</div>
+    <div style="background:rgba(255,255,255,.12);border:2px solid var(--cone);border-radius:14px;padding:14px 30px;font-size:24px;font-weight:800;color:#fff">
+      a🐱 e🥚 i🐷 o🐙 u☂️ + 🪄E — the sounds are YOURS now!
+    </div>
+    <div class="dlg dad" style="max-width:900px"><div class="who">Coach 💬</div><div class="bub">"Same time next week if any sound fights back. That's what the Training Ground is for!" ⚽</div></div>
+  </div>
+</div>
+
+<!-- ============ BOTTOM BAR ============ -->
+<div id="bar">
+  <div id="pwrap"><div id="pfill"></div></div>
+  <button onclick="changeSlide(-1)">◀ Back</button>
+  <button onclick="changeSlide(1)">Next ▶</button>
+  <div id="minist"></div>
+  <button onclick="toggleNotes()">📝 Notes (N)</button>
+  <div id="counter">1 / 20</div>
+</div>
+<div id="notesPanel"></div>
+
+</div></div>
+
+<script>
+var slides=[], cur=0, TOTAL=0;
+var cones=[
+  {ico:'🐱',name:'① a — cat',on:false},
+  {ico:'🥚',name:'② e — egg',on:false},
+  {ico:'🐷',name:'③ i — pig',on:false},
+  {ico:'🐙',name:'④ o — hot',on:false},
+  {ico:'☂️',name:'⑤ u — cup',on:false},
+  {ico:'🪄',name:'⑥ Magic E',on:false}
+];
+var HUNT_CONE={a:0,e:1,i:2,o:3,u:4};
+
+function scale(){
+  var s=Math.min(window.innerWidth/1920, window.innerHeight/1080);
+  var sc=document.getElementById('scaler');
+  sc.style.transform='scale('+s+')';
+  sc.style.left=((window.innerWidth-1920*s)/2)+'px';
+  sc.style.top=((window.innerHeight-1080*s)/2)+'px';
+}
+function renderCones(){
+  document.querySelectorAll('[data-coneboard]').forEach(function(b){
+    b.innerHTML=cones.map(function(st){
+      return '<div class="cone-st'+(st.on?' on':'')+'"><div class="st-ico">'+st.ico+'</div><div class="st-name">'+st.name+'</div></div>';
+    }).join('');
+  });
+  var mini=document.getElementById('minist');
+  mini.innerHTML=cones.map(function(st){return '<div class="mdot'+(st.on?' on':'')+'"></div>';}).join('');
+}
+function powerCone(i){
+  if(cones[i].on) return;
+  cones[i].on=true;
+  renderCones();
+}
+function changeSlide(dir){ goTo(cur+dir); }
+function goTo(i){
+  if(i<0||i>=TOTAL) return;
+  slides[cur].classList.remove('active');
+  cur=i;
+  slides[cur].classList.add('active');
+  document.getElementById('counter').textContent=(cur+1)+' / '+TOTAL;
+  document.getElementById('pfill').style.width=(((cur+1)/TOTAL)*100)+'%';
+  document.getElementById('notesPanel').classList.remove('show');
+  if(cur===TOTAL-1) confetti();
+}
+function toggleNotes(){
+  var np=document.getElementById('notesPanel');
+  if(np.classList.contains('show')){ np.classList.remove('show'); return; }
+  np.innerHTML=slides[cur].getAttribute('data-notes')||'No notes for this slide.';
+  np.classList.add('show');
+}
+
+/* generic pick (sort + trap round) */
+function pick(btn){
+  var group=btn.closest('[data-group]');
+  if(!group||group.dataset.solved) return;
+  if(btn.dataset.ok==='1'){
+    group.dataset.solved='1';
+    btn.classList.add('good');
+    group.querySelectorAll('.opt').forEach(function(o){o.disabled=true;});
+    var rc=group.querySelector('.on-correct');
+    if(rc) rc.classList.add('show');
+    checkSort();
+    checkTrap();
+  } else {
+    btn.classList.add('bad');
+    setTimeout(function(){btn.classList.remove('bad'),400});
+  }
+}
+function checkSort(){
+  var done=document.getElementById('sortDone');
+  if(!done) return;
+  var slide=done.closest('.slide');
+  var groups=slide.querySelectorAll('[data-group]');
+  var solved=0;
+  groups.forEach(function(g){ if(g.dataset.solved) solved++; });
+  if(solved>=groups.length) done.classList.add('show');
+}
+function checkTrap(){
+  var meter=document.getElementById('trapMeter');
+  if(!meter) return;
+  var slide=meter.closest('.slide');
+  var groups=slide.querySelectorAll('[data-group]');
+  var solved=0;
+  groups.forEach(function(g){ if(g.dataset.solved) solved++; });
+  meter.style.width=(solved/groups.length*100)+'%';
+  document.getElementById('trapScore').textContent=solved+'/'+groups.length;
+}
+
+/* sound hunt drills (slides 4-8) — tap all data-ok words; wrong shakes */
+function huntTap(btn){
+  var zone=btn.closest('[data-hunt]');
+  if(!zone) return;
+  if(btn.dataset.ok==='1'){
+    btn.classList.add('good');
+    var found=zone.querySelectorAll('.wordbtn.good').length;
+    var need=parseInt(zone.dataset.need,10);
+    if(found>=need){
+      var v=zone.dataset.hunt;
+      document.getElementById('hunt-'+v+'-done').classList.add('show');
+      powerCone(HUNT_CONE[v]);
+    }
+  } else {
+    btn.classList.add('bad');
+    setTimeout(function(){btn.classList.remove('bad');},380);
+  }
+}
+
+/* ear training — no wrong answers (Coach confirms verbally); count taps */
+var ear1=0, ear2=0;
+function earTap(btn){
+  var box=btn.closest('.info-box');
+  if(box.dataset.done) return;
+  box.dataset.done='1';
+  btn.classList.add('good');
+  ear1++;
+  document.getElementById('earScore1').textContent='Tapped: '+ear1+' / 4 pairs — Coach confirms if Leo heard right! 👂';
+  if(ear1>=4) document.getElementById('earScore1').textContent='🎉 All 4 pairs tested — golden ears! 👂✨';
+}
+function earTap2(btn){
+  var box=btn.closest('.info-box');
+  if(box.dataset.done) return;
+  box.dataset.done='1';
+  btn.classList.add('good');
+  ear2++;
+  document.getElementById('earScore2').textContent='Tapped: '+ear2+' / 4 pairs — great ears win matches! 👂⚽';
+  if(ear2>=4) document.getElementById('earScore2').textContent='🎉 All 4 pairs tested — world-class listening! 👂🏆';
+}
+
+/* magic e machine (slide 13) — cone 6 when all 4 transformed */
+var magicNames={mw1:'kite — "EYE"! (i says its name) 🪁',mw2:'hope — "OH"! (o says its name) 🙏',mw3:'cube — "YOU"! (u says its name) 🧊',mw4:'made — "AY"! (a says its name) 🛠️'};
+var magicCount=0;
+function magicTap(el){
+  if(el.classList.contains('transformed')) return;
+  el.classList.add('transformed');
+  document.getElementById(el.id+'t').innerHTML='🪄 '+magicNames[el.id];
+  magicCount++;
+  if(magicCount>=4){
+    document.getElementById('magicDone').classList.add('show');
+    powerCone(5);
+  }
+}
+
+/* reading sprints */
+function sprintTap(btn){
+  if(btn.classList.contains('lock')) return;
+  btn.classList.add('lock');
+  var slide=btn.closest('.slide');
+  var all=slide.querySelectorAll('.sprint');
+  var done=slide.querySelectorAll('.sprint.lock');
+  if(done.length>=all.length) document.getElementById('sprint1Done').classList.add('show');
+}
+function sprint2Tap(btn){
+  if(btn.classList.contains('lock')) return;
+  btn.classList.add('lock');
+  var slide=btn.closest('.slide');
+  var all=slide.querySelectorAll('.sprint2');
+  var done=slide.querySelectorAll('.sprint2.lock');
+  if(done.length>=all.length) document.getElementById('sprint2Done').classList.add('show');
+}
+
+/* celebration */
+function confetti(){
+  var host=document.getElementById('celebSlide');
+  if(!host||host.dataset.conf) return;
+  host.dataset.conf='1';
+  var moji=['🔤','🎉','⚽','🪄','⭐','🏆'];
+  for(var i=0;i<18;i++){
+    var s=document.createElement('div');
+    s.className='confetti';
+    s.textContent=moji[i%moji.length];
+    s.style.left=(Math.random()*1880)+'px';
+    s.style.animationDelay=(Math.random()*3)+'s';
+    s.style.animationDuration=(2.6+Math.random()*2)+'s';
+    host.appendChild(s);
+  }
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  TOTAL=slides.length;
+  slides[0].classList.add('active');
+  document.getElementById('counter').textContent='1 / '+TOTAL;
+  document.getElementById('pfill').style.width=(1/TOTAL*100)+'%';
+  renderCones();
+  scale();
+});
+window.addEventListener('resize',scale);
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'){changeSlide(1);}
+  else if(e.key==='ArrowLeft'){changeSlide(-1);}
+  else if(e.key==='n'||e.key==='N'){toggleNotes();}
+});
+</script>
+</body>
+</html>

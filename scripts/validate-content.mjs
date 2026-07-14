@@ -413,6 +413,7 @@ const lessonsDirs = [
   "content/subjects/english/courses/our-world/level-4/unit-7/lessons",
   "content/subjects/english/courses/our-world/level-4/unit-8/lessons",
   "content/subjects/english/courses/our-world/level-4/unit-9/lessons",
+  "content/subjects/english/courses/special-training/lessons",
 ];
 const lessons = [];
 for (const lessonsDir of lessonsDirs) {

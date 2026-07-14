@@ -4,13 +4,15 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { readAssignments, readAssignmentsFromCloud, type AssignmentMap, type AssignmentRecord } from "@/data/assignments";
 import { getLearnerAppProgress, syncLearnerProgressWithCloud, type LearnerAppProgress } from "@/data/learnerProgress";
-import { getLessonGroups, learnerLessons } from "@/data/lessons";
+import { getCourseLabel, getLessonGroups, learnerLessons } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
 import { LeoHomeworkHero } from "./LeoHomeworkHero";
 import { LeoLibraryNavigator } from "./LeoLibraryNavigator";
 import { allWords } from "./reference/ref-data";
 import { useKnownWordIds } from "./useKnownWordIds";
+
+const trainingGroundLearnerLessons = learnerLessons.filter((lesson) => lesson.course === "special-training");
 
 export function LeoDashboard() {
   const [progressVersion, setProgressVersion] = useState(0);
@@ -121,7 +123,7 @@ export function LeoDashboard() {
           <Link className="leo-world-card leo-world-card-tg" href="/english/training-ground">
             <div><b>Training<br />Ground</b></div>
             <h3>Training Ground</h3>
-            <footer><small>{learnerLessons.length} sessions</small></footer>
+            <footer><small>{trainingGroundLearnerLessons.length} sessions</small></footer>
           </Link>
         </div>
         <div className="leo-mini-stats">
@@ -163,7 +165,7 @@ function LeoHomeworkRow({
     <article className={`leo-homework-row leo-homework-row-${meta.tone}`}>
       <span className="leo-homework-icon" aria-hidden="true">{meta.emoji}</span>
       <div className="leo-homework-copy">
-        <small>{meta.label} · Our World</small>
+        <small>{meta.label} · {getCourseLabel(lesson.course)}</small>
         <h3>{cleanLessonTitle(lesson.title)}</h3>
         <p>{cleanLessonSubtitle(lesson.subtitle)}</p>
         {progress.moduleCount ? (

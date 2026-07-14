@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leo · Sound Dictionary — All 44 American Sounds</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --cone:#F97316;--cone-d:#C2410C;--cone-l:#FFF7ED;--cone-b:#FED7AA;
+  --yellow:#FACC15;--yellow-d:#CA8A04;--yellow-l:#FEFCE8;--yellow-b:#FDE68A;
+  --red:#DC2626;--red-d:#991B1B;--red-l:#FEF2F2;--red-b:#FECACA;
+  --blue:#2563EB;--blue-d:#1D4ED8;--blue-l:#EFF6FF;--blue-b:#BFDBFE;
+  --ink:#111;--ink-2:#374151;--ink-3:#6B7280;--border:#E5E7EB;
+  --paper:#FCFEF9;--navy:#0f172a;
+}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink)}
+body{display:flex;flex-direction:column}
+.app-header{background:var(--green);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-header .logo{font-size:24px}
+.app-header .title{font-size:20px;font-weight:800;line-height:1.1}
+.app-header .subtitle{font-size:13px;opacity:.85;margin-top:2px}
+.app-header .badge-row{margin-left:auto;display:flex;gap:8px;align-items:center}
+.prog-pill{background:rgba(255,255,255,.22);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700}
+.tab-nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:12px 14px;font-size:13px;font-weight:700;font-family:'Outfit',sans-serif;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;min-width:80px}
+.tab-btn .tab-icon{font-size:18px}
+.tab-btn .tab-name{font-size:11px;letter-spacing:.3px}
+.tab-btn.active{color:var(--cone-d);border-bottom-color:var(--cone)}
+.tab-btn.done::after{content:'✓';position:absolute;top:4px;right:4px;color:var(--green);font-weight:900;font-size:12px}
+.tab-content{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.tab-content.active{display:flex}
+.tab-body{flex:1;padding:18px 20px;display:flex;flex-direction:column;gap:14px;max-width:940px;width:100%;margin:0 auto}
+.tab-footer{flex-shrink:0;border-top:2px solid var(--border);background:#fff;padding:10px 20px;display:flex;gap:10px}
+.section-title{font-size:21px;font-weight:900;color:var(--navy)}
+.section-sub{font-size:14px;color:var(--ink-3);font-weight:600;margin-top:2px}
+.dad-hint{background:var(--cone-l);border:2px solid var(--cone-b);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:600;color:var(--ink-2)}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:12px 16px;font-size:15px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.btn-complete:disabled{opacity:.4;cursor:not-allowed}
+.btn-complete.confirmed{background:var(--green-d);pointer-events:none}
+.btn-redo{width:110px;flex-shrink:0;background:#fff;color:var(--red);border:2px solid var(--red-b);border-radius:12px;padding:12px 8px;font-size:13px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.btn-redo.armed{background:var(--red-l);border-color:var(--red)}
+.done-banner{display:none;background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;color:var(--green-d);text-align:center}
+.done-banner.show{display:block;animation:pop .35s}
+@keyframes pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid var(--border);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.opt:hover{border-color:var(--cone)}
+.opt.good{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default}
+.qcard{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px}
+.qcard .qtext{font-size:16px;font-weight:800;margin-bottom:10px;color:var(--navy)}
+/* dictionary */
+.fam-chips{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:0;z-index:10;background:var(--paper);padding:6px 0}
+.fam-chip{border:3px solid var(--border);background:#fff;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;color:var(--ink-2);transition:all .15s}
+.fam-chip.active{background:var(--cone);border-color:var(--cone);color:#fff}
+.fam-chip.visited::after{content:' ✓';color:inherit}
+.dict-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.snd-card{background:#fff;border:3px solid var(--border);border-radius:14px;padding:12px;text-align:center;cursor:pointer;transition:all .15s}
+.snd-card:hover{border-color:var(--cone);transform:translateY(-2px)}
+.snd-card.opened{border-color:var(--green-b);background:var(--green-l)}
+.snd-card .ipa{font-size:30px;font-weight:900;color:var(--cone-d)}
+.snd-card .kw{font-size:15px;font-weight:800;color:var(--navy);margin-top:2px}
+.snd-card .em{font-size:30px}
+.snd-detail{background:linear-gradient(135deg,#fff,var(--cone-l));border:4px solid var(--cone);border-radius:16px;padding:16px 20px;display:none}
+.snd-detail.show{display:block;animation:pop .3s}
+.snd-detail .d-top{display:flex;align-items:center;gap:16px}
+.snd-detail .d-ipa{font-size:44px;font-weight:900;color:var(--cone-d)}
+.snd-detail .d-em{font-size:44px}
+.snd-detail .d-kw{font-size:24px;font-weight:900;color:var(--navy)}
+.snd-detail .d-words{font-size:16px;font-weight:700;color:var(--ink-2);margin-top:8px}
+.snd-detail .d-tip{font-size:14px;font-weight:600;color:var(--ink-3);margin-top:6px;background:#fff;border-radius:10px;padding:8px 12px}
+/* match */
+.mrow{display:flex;gap:18px}
+.mcol{flex:1;display:flex;flex-direction:column;gap:10px}
+.mitem{background:#fff;border:3px solid var(--border);border-radius:12px;padding:12px 16px;font-size:17px;font-weight:800;color:var(--ink);cursor:pointer;transition:all .15s;text-align:center;font-family:'Outfit',sans-serif}
+.mitem:hover{border-color:var(--cone)}
+.mitem.sel{border-color:var(--blue);background:var(--blue-l)}
+.mitem.lock{border-color:var(--green);background:var(--green-l);color:var(--green-d);pointer-events:none}
+.mitem.err{animation:shake .35s;border-color:var(--red)}
+.round-pill{display:flex;gap:6px;align-items:center;justify-content:center}
+.round-pill .rp{width:28px;height:28px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff}
+.round-pill .rp.on{background:var(--cone)}
+.round-pill .rp.donept{background:var(--green)}
+/* hunt */
+.wordbtn{display:inline-block;background:#fff;border:3px solid var(--border);border-radius:12px;padding:10px 20px;font-size:19px;font-weight:800;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;margin:5px}
+.wordbtn:hover{border-color:var(--cone)}
+.wordbtn.good{background:var(--green-l);border-color:var(--green);color:var(--green-d);pointer-events:none}
+.wordbtn.bad{animation:shake .35s;border-color:var(--red)}
+.target-card{background:linear-gradient(135deg,#fff,var(--yellow-l));border:4px solid var(--yellow);border-radius:16px;padding:14px 22px;text-align:center}
+.target-card .t-ipa{font-size:38px;font-weight:900;color:var(--cone-d)}
+.target-card .t-kw{font-size:18px;font-weight:800;color:var(--navy)}
+.meterbar{height:14px;background:var(--border);border-radius:7px;overflow:hidden;margin-top:8px}
+.meterbar>div{height:100%;width:0;background:linear-gradient(90deg,var(--yellow),var(--cone));transition:width .4s}
+/* quiz */
+.quiz-progress{display:flex;gap:5px}
+.quiz-progress div{flex:1;height:8px;border-radius:4px;background:var(--border)}
+.quiz-progress div.answered{background:var(--cone)}
+.quiz-result{text-align:center;padding:20px}
+.quiz-result .trophy{font-size:70px}
+.quiz-result .qscore{font-size:38px;font-weight:900;color:var(--navy);margin:8px 0}
+.wrong-review{background:var(--red-l);border:2px solid var(--red-b);border-radius:10px;padding:10px 14px;text-align:left;margin-top:8px;font-size:14px}
+/* dribble */
+.pitch{background:linear-gradient(180deg,#166534,#15803d);border-radius:16px;padding:16px;color:#fff;position:relative;overflow:hidden}
+.pitch::before{content:'';position:absolute;inset:8px;border:2px solid rgba(255,255,255,.3);border-radius:10px}
+.score-row{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+.goal-tally{font-size:26px}
+.drib-q{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.3);border-radius:12px;padding:12px 16px;margin-top:10px;position:relative;z-index:1}
+.drib-opt{display:block;width:100%;text-align:left;background:rgba(255,255,255,.9);border:2px solid transparent;border-radius:10px;padding:10px 14px;margin-top:6px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;font-size:16px}
+.drib-opt.good{background:var(--yellow)}
+.drib-opt.bad{background:#fecaca;animation:shake .35s}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo">🔤⚽</div>
+  <div>
+    <div class="title">Leo's Sound Dictionary</div>
+    <div class="subtitle">All 44 American English sounds — Training Ground</div>
+  </div>
+  <div class="badge-row"><div class="prog-pill" id="prog-pill">0 / 6 done</div></div>
+</div>
+
+<div class="tab-nav" id="tab-nav">
+  <button class="tab-btn active" onclick="showTab(0)" id="tb0"><span class="tab-icon">📖</span><span class="tab-name">Dictionary</span></button>
+  <button class="tab-btn" onclick="showTab(1)" id="tb1"><span class="tab-icon">🧩</span><span class="tab-name">Match</span></button>
+  <button class="tab-btn" onclick="showTab(2)" id="tb2"><span class="tab-icon">🎯</span><span class="tab-name">Sound Hunt</span></button>
+  <button class="tab-btn" onclick="showTab(3)" id="tb3"><span class="tab-icon">🕵️</span><span class="tab-name">Odd One Out</span></button>
+  <button class="tab-btn" onclick="showTab(4)" id="tb4"><span class="tab-icon">📝</span><span class="tab-name">Quiz</span></button>
+  <button class="tab-btn" onclick="showTab(5)" id="tb5"><span class="tab-icon">⚽</span><span class="tab-name">Dribble!</span></button>
+</div>
+
+<!-- ═══════ TAB 0 — DICTIONARY ═══════ -->
+<div class="tab-content active" id="tc0">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📖 The Sound Dictionary — all 44 sounds!</div>
+      <div class="section-sub">Tap a family, then tap any card to open it. Say every sound with Dad! Visit all 5 families to complete.</div>
+    </div>
+    <div class="fam-chips" id="fam-chips"></div>
+    <div class="snd-detail" id="snd-detail"></div>
+    <div class="dict-grid" id="dict-grid"></div>
+    <div class="done-banner" id="dict-done">🎉 All 5 sound families explored! You have the whole map of English sounds!</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-0" onclick="doRedo(0)">↺ Redo</button>
+    <button class="btn-complete" id="complete-0" onclick="markComplete(0)">Mark Dictionary complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════ TAB 1 — MATCH ═══════ -->
+<div class="tab-content" id="tc1">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🧩 Match — Symbol ↔ Word</div>
+      <div class="section-sub">Tap a symbol, then tap its keyword. 6 rounds, one per sound family.</div>
+    </div>
+    <div class="round-pill" id="match-rounds"></div>
+    <div style="text-align:center;font-weight:800;font-size:17px;color:var(--cone-d)" id="match-title"></div>
+    <div class="mrow" id="match-area">
+      <div class="mcol" id="match-left"></div>
+      <div class="mcol" id="match-right"></div>
+    </div>
+    <div class="done-banner" id="match-done">🎉 All 6 rounds matched — 30 sounds locked in!</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-1" onclick="doRedo(1)">↺ Redo</button>
+    <button class="btn-complete" id="complete-1" onclick="markComplete(1)">Mark Match complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════ TAB 2 — SOUND HUNT ═══════ -->
+<div class="tab-content" id="tc2">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🎯 Sound Hunt</div>
+      <div class="section-sub">A target sound appears — tap ALL the words that contain it. Say each word aloud first!</div>
+    </div>
+    <div class="target-card" id="hunt-target"></div>
+    <div style="text-align:center" id="hunt-words"></div>
+    <div class="meterbar"><div id="hunt-meter"></div></div>
+    <div class="done-banner" id="hunt-done">🎯 All 6 hunts complete — your ears are radar now!</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-2" onclick="doRedo(2)">↺ Redo</button>
+    <button class="btn-complete" id="complete-2" onclick="markComplete(2)">Mark Sound Hunt complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════ TAB 3 — ODD ONE OUT ═══════ -->
+<div class="tab-content" id="tc3">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🕵️ Odd One Out</div>
+      <div class="section-sub">Two words have the target sound — one is an impostor. Say all three aloud, then tap the odd one!</div>
+    </div>
+    <div id="odd-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="odd-done">🕵️ All 6 impostors caught! Detective ears!</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-3" onclick="doRedo(3)">↺ Redo</button>
+    <button class="btn-complete" id="complete-3" onclick="markComplete(3)">Mark Odd One Out complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══════ TAB 4 — QUIZ ═══════ -->
+<div class="tab-content" id="tc4">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📝 Sound Quiz — 10 questions</div>
+      <div class="section-sub">Score 8/10 or better to earn the Golden Ear! 👂✨</div>
+    </div>
+    <div id="quiz-active">
+      <div class="quiz-progress" id="quiz-progress"></div>
+      <div class="qcard" style="margin-top:14px" id="quiz-qcard"></div>
+    </div>
+    <div id="quiz-result" style="display:none"></div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-4" onclick="doRedo(4)">↺ Redo</button>
+    <button class="btn-complete" id="complete-4" onclick="markComplete(4)" disabled>Finish all 10 questions first</button>
+  </div>
+</div>
+
+<!-- ═══════ TAB 5 — DRIBBLE ═══════ -->
+<div class="tab-content" id="tc5">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">⚽ Dribble! — Sound match day</div>
+      <div class="section-sub">Answer right, score a goal. 6 soccer sound questions.</div>
+    </div>
+    <div class="pitch">
+      <div class="score-row">
+        <div>⚽ Goals: <span class="goal-tally" id="drib-goals">0</span> / 6</div>
+        <div id="drib-defenders">🛡️🛡️🛡️🛡️🛡️🛡️</div>
+      </div>
+    </div>
+    <div id="drib-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="drib-done">⚽ Match complete! Mark below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-5" onclick="doRedo(5)">↺ Redo</button>
+    <button class="btn-complete" id="complete-5" onclick="markComplete(5)">Mark Dribble complete ✓</button>
+  </div>
+</div>
+
+<script>
+/* ═════════════════════════════════════════════════════════════════════
+   LEO'S SOUND DICTIONARY — TRAINING GROUND APP
+   SAVE_PREFIX: leea-tg-phonics-dict-
+   HOMEWORK_ID: leo-tg-phonics-dict
+   moduleCount: 6 (tabs 0-5) · moduleKeyFormat: tab-{i}-done · scoreKey: score (Tab 4)
+═════════════════════════════════════════════════════════════════════ */
+const SAVE_PREFIX = 'leea-tg-phonics-dict-';
+const HOMEWORK_ID = 'leo-tg-phonics-dict';
+const TAB_COUNT = 6;
+const TAB_NAMES = ['Dictionary','Match','Sound Hunt','Odd One Out','Quiz','Dribble!'];
+const TAB_INIT = {}, TAB_RESET = {}, TAB_RESTORE = {};
+
+function lSave(s,v){try{localStorage.setItem(SAVE_PREFIX+s,JSON.stringify(v));}catch(e){}}
+function lLoad(s){try{const r=localStorage.getItem(SAVE_PREFIX+s);return r?JSON.parse(r):null;}catch(e){return null;}}
+function lDel(s){try{localStorage.removeItem(SAVE_PREFIX+s);}catch(e){}}
+
+function refreshProgress(){
+  try{
+    let done=0;
+    for(let i=0;i<TAB_COUNT;i++){
+      if(lLoad('tab-'+i+'-done')){done++;const tb=document.getElementById('tb'+i);if(tb)tb.classList.add('done');}
+    }
+    const pill=document.getElementById('prog-pill');
+    if(pill)pill.textContent=done+' / '+TAB_COUNT+' done';
+    if(done>=TAB_COUNT)localStorage.setItem('leea-'+HOMEWORK_ID+'-done',JSON.stringify({complete:true,completedAt:new Date().toISOString()}));
+  }catch(e){}
+}
+function markComplete(tab){
+  try{
+    lSave('tab-'+tab+'-done',{done:true,completedAt:new Date().toISOString()});
+    const btn=document.getElementById('complete-'+tab);
+    btn.textContent='✓ '+TAB_NAMES[tab]+' done';
+    btn.classList.add('confirmed');
+    refreshProgress();
+  }catch(e){}
+}
+function doRedo(tab){
+  try{
+    const btn=document.getElementById('redo-'+tab);
+    if(!btn.classList.contains('armed')){
+      btn.classList.add('armed');btn.textContent='Tap again ↺';
+      setTimeout(()=>{btn.classList.remove('armed');btn.textContent='↺ Redo';},3000);
+      return;
+    }
+    btn.classList.remove('armed');btn.textContent='↺ Redo';
+    lDel('tab-'+tab+'-done');
+    if(tab===4)lDel('score');
+    Object.keys(localStorage).filter(k=>k.startsWith(SAVE_PREFIX+'tab-'+tab+'-')).forEach(k=>localStorage.removeItem(k));
+    if(TAB_RESET[tab])TAB_RESET[tab]();
+    const cb=document.getElementById('complete-'+tab);
+    cb.classList.remove('confirmed');
+    cb.textContent='Mark '+TAB_NAMES[tab]+' complete ✓';
+    document.getElementById('tb'+tab).classList.remove('done');
+    refreshProgress();
+  }catch(e){}
+}
+function showTab(n){
+  try{
+    document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===n));
+    document.querySelectorAll('.tab-content').forEach((c,i)=>c.classList.toggle('active',i===n));
+    const cb=document.getElementById('complete-'+n);
+    if(cb){
+      if(lLoad('tab-'+n+'-done')){cb.classList.add('confirmed');cb.textContent='✓ '+TAB_NAMES[n]+' done';}
+      else if(n!==4){cb.classList.remove('confirmed');cb.textContent='Mark '+TAB_NAMES[n]+' complete ✓';}
+    }
+    if(TAB_INIT[n]&&!TAB_INIT[n]._initialized){TAB_INIT[n]();TAB_INIT[n]._initialized=true;}
+    if(TAB_RESTORE[n])TAB_RESTORE[n]();
+  }catch(e){}
+}
+
+/* ═══ THE 44 SOUNDS ═══ */
+const FAMILIES=[
+  {key:'short',name:'Short Vowels',icon:'🐱'},
+  {key:'long',name:'Long Vowels 🪄',icon:'🎂'},
+  {key:'more',name:'More Vowels',icon:'🍌'},
+  {key:'glide',name:'Glides & R-Vowels',icon:'🐄'},
+  {key:'cons',name:'Consonants',icon:'🔑'}
+];
+const SOUNDS=[
+  /* short vowels (5) */
+  {f:'short',ipa:'æ',kw:'cat',em:'🐱',words:'hat · map · back',tip:'Mouth WIDE like a cat yawn — between あ and え. NOT Japanese あ!'},
+  {f:'short',ipa:'e',kw:'egg',em:'🥚',words:'bed · red · leg',tip:'Half open, relaxed smile — close to Japanese え but shorter.'},
+  {f:'short',ipa:'ɪ',kw:'pig',em:'🐷',words:'sit · win · kick',tip:'Quick and lazy — NOT い! Mouth barely moves. (sit ≠ seat)'},
+  {f:'short',ipa:'ɑ',kw:'hot',em:'🐙',words:'top · stop · box',tip:'Round lips, jaw DROPS — deeper than Japanese お.'},
+  {f:'short',ipa:'ʌ',kw:'cup',em:'☂️',words:'run · sun · cut',tip:'A lazy grunt "uh" — tongue at the BACK, no round lips. NOT う!'},
+  /* long vowels (5) */
+  {f:'long',ipa:'eɪ',kw:'cake',em:'🎂',words:'name · game · late',tip:'The letter a SAYS ITS NAME — often thanks to Magic E! (cap→cape)'},
+  {f:'long',ipa:'iː',kw:'bee',em:'🐝',words:'team · see · eat',tip:'Long tight smile "eee" — longer than Japanese い.'},
+  {f:'long',ipa:'aɪ',kw:'kite',em:'🪁',words:'time · five · smile',tip:'The letter i says its name — a glide: ah→ee. (kit→kite)'},
+  {f:'long',ipa:'oʊ',kw:'boat',em:'⛵',words:'home · note · go',tip:'The letter o says its name — round lips glide: oh→oo. (hop→hope)'},
+  {f:'long',ipa:'juː',kw:'cube',em:'🧊',words:'cute · music · use',tip:'The letter u says its name: "you"! (cub→cube)'},
+  /* more vowels (5) */
+  {f:'more',ipa:'ə',kw:'banana',em:'🍌',words:'about · pizza · soccer',tip:'The LAZY KING — the most common sound in English! A tiny weak "uh" in unstressed parts: ba-NA-na.'},
+  {f:'more',ipa:'uː',kw:'moon',em:'🌙',words:'food · blue · school',tip:'Long round "ooo" — lips like a small circle.'},
+  {f:'more',ipa:'ʊ',kw:'book',em:'📖',words:'look · foot · good',tip:'Short soft "u" — relaxed lips. book ≠ boot!'},
+  {f:'more',ipa:'ɔː',kw:'ball',em:'⚽',words:'fall · tall · saw',tip:'Open round "aw" — jaw drops, lips slightly round.'},
+  {f:'more',ipa:'ɝ',kw:'bird',em:'🐦',words:'girl · turn · first',tip:'The R-vowel! Tongue curls back — no Japanese sound like it. Practice: er er er!'},
+  /* glides & r-vowels (5) */
+  {f:'glide',ipa:'aʊ',kw:'cow',em:'🐄',words:'now · house · down',tip:'A slide: ah→oo. Say it slow-motion first!'},
+  {f:'glide',ipa:'ɔɪ',kw:'boy',em:'👦',words:'toy · coin · enjoy',tip:'A slide: aw→ee. Like a happy "oi!"'},
+  {f:'glide',ipa:'ɑr',kw:'car',em:'🚗',words:'star · park · far',tip:'Open ah + curl the tongue for r. NOT カー — the r is real!'},
+  {f:'glide',ipa:'ɔr',kw:'door',em:'🚪',words:'more · four · score',tip:'Round or + tongue curl. Score! ⚽'},
+  {f:'glide',ipa:'ɪr',kw:'ear',em:'👂',words:'near · here · year',tip:'ee + r curl. Listen with your ear!'},
+  /* consonants (24) */
+  {f:'cons',ipa:'p',kw:'pen',em:'🖊️',words:'play · stop · cup',tip:'Lips pop with a puff of air — put your hand in front and feel it!'},
+  {f:'cons',ipa:'b',kw:'bed',em:'🛏️',words:'ball · big · club',tip:'Like p but the voice is ON — feel your throat buzz.'},
+  {f:'cons',ipa:'t',kw:'ten',em:'🔟',words:'time · hat · team',tip:'Tongue taps behind top teeth with a puff.'},
+  {f:'cons',ipa:'d',kw:'dog',em:'🐕',words:'day · red · door',tip:'Like t but voiced — throat buzzes.'},
+  {f:'cons',ipa:'k',kw:'key',em:'🔑',words:'kick · back · cool',tip:'Back of tongue pops at the back of the mouth.'},
+  {f:'cons',ipa:'g',kw:'goal',em:'🥅',words:'game · big · go',tip:'Like k but voiced. GOOOAL!'},
+  {f:'cons',ipa:'tʃ',kw:'cheese',em:'🧀',words:'chair · watch · lunch',tip:'"ch" — like a sneeze start! Close to Japanese ち but stronger.'},
+  {f:'cons',ipa:'dʒ',kw:'juice',em:'🧃',words:'jump · giant · bridge',tip:'"j" — voiced ch. Like Japanese じ but with more push.'},
+  {f:'cons',ipa:'f',kw:'fish',em:'🐟',words:'five · life · foot',tip:'Top teeth touch bottom lip and blow — NOT ふ (no teeth in ふ!).'},
+  {f:'cons',ipa:'v',kw:'van',em:'🚐',words:'five · love · very',tip:'Like f but voiced — teeth on lip, throat buzzes. NOT b!'},
+  {f:'cons',ipa:'θ',kw:'thumb',em:'👍',words:'think · three · bath',tip:'Tongue tip BETWEEN the teeth, blow air. No Japanese sound like it — tongue out!'},
+  {f:'cons',ipa:'ð',kw:'this',em:'👉',words:'the · that · mother',tip:'Same tongue-between-teeth but voiced — throat buzzes.'},
+  {f:'cons',ipa:'s',kw:'sun',em:'☀️',words:'see · miss · soccer',tip:'Snake sound "sss" — air over the tongue tip.'},
+  {f:'cons',ipa:'z',kw:'zebra',em:'🦓',words:'zoo · his · music',tip:'Buzzing s — like a bee! "zzz".'},
+  {f:'cons',ipa:'ʃ',kw:'shoe',em:'👟',words:'she · fish · wash',tip:'"sh" — quiet-please sound! 🤫 Lips push forward.'},
+  {f:'cons',ipa:'ʒ',kw:'television',em:'📺',words:'usually · measure · Asia',tip:'Voiced sh — rare but cool. Feel the buzz!'},
+  {f:'cons',ipa:'h',kw:'hat',em:'🎩',words:'home · hope · who',tip:'Just breath — like fogging a window. Softer than Japanese は.'},
+  {f:'cons',ipa:'m',kw:'mouse',em:'🐭',words:'moon · team · my',tip:'Lips closed, hum through the nose "mmm".'},
+  {f:'cons',ipa:'n',kw:'nose',em:'👃',words:'net · win · nine',tip:'Tongue behind top teeth, hum through the nose.'},
+  {f:'cons',ipa:'ŋ',kw:'king',em:'👑',words:'ring · song · strong',tip:'"ng" — back of tongue up, air through nose. No g sound after in "sing"!'},
+  {f:'cons',ipa:'l',kw:'lion',em:'🦁',words:'like · ball · play',tip:'Tongue TIP touches behind top teeth and HOLDS. Different from r!'},
+  {f:'cons',ipa:'r',kw:'robot',em:'🤖',words:'red · run · sorry',tip:'Tongue curls BACK, touches NOTHING. The opposite of l! r/l = big training pair.'},
+  {f:'cons',ipa:'w',kw:'water',em:'💧',words:'win · we · sweet',tip:'Round lips like kissing, then open — "wuh".'},
+  {f:'cons',ipa:'j',kw:'yo-yo',em:'🪀',words:'yes · year · you',tip:'Like Japanese や row start — quick "y" glide.'}
+];
+
+/* ═══ TAB 0 — DICTIONARY ═══ */
+let currentFam='short';
+TAB_INIT[0]=function(){
+  const chips=document.getElementById('fam-chips');
+  chips.innerHTML=FAMILIES.map(f=>'<button class="fam-chip" data-f="'+f.key+'" onclick="famPick(this)">'+f.icon+' '+f.name+'</button>').join('');
+  famRender();
+};
+TAB_RESET[0]=function(){
+  lDel('tab-0-fams');lDel('tab-0-opened');
+  currentFam='short';
+  document.getElementById('dict-done').classList.remove('show');
+  document.getElementById('snd-detail').classList.remove('show');
+  TAB_INIT[0]._initialized=false;TAB_INIT[0]();TAB_INIT[0]._initialized=true;
+};
+TAB_RESTORE[0]=function(){
+  const fams=lLoad('tab-0-fams')||[];
+  document.querySelectorAll('.fam-chip').forEach(c=>{
+    c.classList.toggle('visited',fams.includes(c.dataset.f));
+    c.classList.toggle('active',c.dataset.f===currentFam);
+  });
+  famRender();
+  if(fams.length>=5)document.getElementById('dict-done').classList.add('show');
+};
+function famPick(chip){
+  currentFam=chip.dataset.f;
+  const fams=new Set(lLoad('tab-0-fams')||[]);
+  fams.add(currentFam);
+  lSave('tab-0-fams',Array.from(fams));
+  document.querySelectorAll('.fam-chip').forEach(c=>{
+    c.classList.toggle('active',c===chip);
+    c.classList.toggle('visited',fams.has(c.dataset.f));
+  });
+  document.getElementById('snd-detail').classList.remove('show');
+  famRender();
+  if(fams.size>=5)document.getElementById('dict-done').classList.add('show');
+}
+function famRender(){
+  const grid=document.getElementById('dict-grid');
+  const opened=new Set(lLoad('tab-0-opened')||[]);
+  grid.innerHTML=SOUNDS.filter(s=>s.f===currentFam).map(s=>{
+    return '<div class="snd-card'+(opened.has(s.ipa)?' opened':'')+'" onclick="openSound(this)" data-ipa="'+s.ipa+'"><div class="ipa">/'+s.ipa+'/</div><div class="em">'+s.em+'</div><div class="kw">'+s.kw+'</div></div>';
+  }).join('');
+}
+function openSound(card){
+  const s=SOUNDS.find(x=>x.ipa===card.dataset.ipa&&x.f===currentFam)||SOUNDS.find(x=>x.ipa===card.dataset.ipa);
+  if(!s)return;
+  const det=document.getElementById('snd-detail');
+  det.innerHTML='<div class="d-top"><div class="d-ipa">/'+s.ipa+'/</div><div class="d-em">'+s.em+'</div><div><div class="d-kw">'+s.kw+'</div><div style="font-size:13px;color:var(--ink-3);font-weight:700">'+(FAMILIES.find(f=>f.key===s.f).name)+'</div></div></div>'+
+    '<div class="d-words">🗣️ '+s.words+'</div>'+
+    '<div class="d-tip">👄 '+s.tip+'</div>';
+  det.classList.add('show');
+  card.classList.add('opened');
+  const opened=new Set(lLoad('tab-0-opened')||[]);
+  opened.add(s.ipa);
+  lSave('tab-0-opened',Array.from(opened));
+}
+
+/* ═══ TAB 1 — MATCH (6 rounds, two-tap pairs) ═══ */
+const MATCH_ROUNDS=[
+  {title:'Round 1 — Short Vowels 🐱',pairs:[['æ','cat 🐱'],['e','egg 🥚'],['ɪ','pig 🐷'],['ɑ','hot 🐙'],['ʌ','cup ☂️']]},
+  {title:'Round 2 — Long Vowels 🪄',pairs:[['eɪ','cake 🎂'],['iː','bee 🐝'],['aɪ','kite 🪁'],['oʊ','boat ⛵'],['juː','cube 🧊']]},
+  {title:'Round 3 — More Vowels 🍌',pairs:[['ə','banana 🍌'],['uː','moon 🌙'],['ʊ','book 📖'],['ɔː','ball ⚽'],['ɝ','bird 🐦']]},
+  {title:'Round 4 — Glides &amp; R 🐄',pairs:[['aʊ','cow 🐄'],['ɔɪ','boy 👦'],['ɑr','car 🚗'],['ɔr','door 🚪'],['ɪr','ear 👂']]},
+  {title:'Round 5 — Tricky Consonants 🧀',pairs:[['tʃ','cheese 🧀'],['ʃ','shoe 👟'],['θ','thumb 👍'],['ŋ','king 👑'],['dʒ','juice 🧃']]},
+  {title:'Round 6 — More Consonants 🤖',pairs:[['v','van 🚐'],['r','robot 🤖'],['l','lion 🦁'],['z','zebra 🦓'],['j','yo-yo 🪀']]}
+];
+let mRound=0,mSel=null,mSolved=0;
+TAB_INIT[1]=function(){matchRenderRound();};
+TAB_RESET[1]=function(){
+  lDel('tab-1-round');mRound=0;mSel=null;mSolved=0;
+  document.getElementById('match-done').classList.remove('show');
+  matchRenderRound();
+};
+TAB_RESTORE[1]=function(){
+  const saved=lLoad('tab-1-round');
+  if(saved!==null&&saved!==mRound){mRound=saved;mSel=null;mSolved=0;matchRenderRound();}
+  if(mRound>=MATCH_ROUNDS.length)document.getElementById('match-done').classList.add('show');
+};
+function matchRenderRound(){
+  const pills=document.getElementById('match-rounds');
+  pills.innerHTML=MATCH_ROUNDS.map((r,i)=>'<div class="rp'+(i<mRound?' donept':i===mRound?' on':'')+'">'+(i+1)+'</div>').join('');
+  if(mRound>=MATCH_ROUNDS.length){
+    document.getElementById('match-title').textContent='All rounds complete! 🎉';
+    document.getElementById('match-left').innerHTML='';
+    document.getElementById('match-right').innerHTML='';
+    document.getElementById('match-done').classList.add('show');
+    return;
+  }
+  const r=MATCH_ROUNDS[mRound];
+  document.getElementById('match-title').innerHTML=r.title;
+  const left=r.pairs.map((p,i)=>({k:i,t:'/'+p[0]+'/'}));
+  const right=r.pairs.map((p,i)=>({k:i,t:p[1]})).sort(()=>Math.random()-0.5);
+  document.getElementById('match-left').innerHTML=left.map(x=>'<button class="mitem m-left" data-k="'+x.k+'" onclick="mtap(this)" style="font-size:22px;color:var(--cone-d)">'+x.t+'</button>').join('');
+  document.getElementById('match-right').innerHTML=right.map(x=>'<button class="mitem m-right" data-k="'+x.k+'" onclick="mtap(this)">'+x.t+'</button>').join('');
+  mSel=null;mSolved=0;
+}
+function mtap(btn){
+  if(btn.classList.contains('lock'))return;
+  const isLeft=btn.classList.contains('m-left');
+  if(isLeft){
+    document.querySelectorAll('#match-left .m-left').forEach(x=>{if(!x.classList.contains('lock'))x.classList.remove('sel');});
+    btn.classList.add('sel');mSel=btn;
+  }else{
+    if(!mSel){btn.classList.add('err');setTimeout(()=>btn.classList.remove('err'),380);return;}
+    if(mSel.dataset.k===btn.dataset.k){
+      mSel.classList.remove('sel');mSel.classList.add('lock');btn.classList.add('lock');
+      mSel=null;mSolved++;
+      if(mSolved>=MATCH_ROUNDS[mRound].pairs.length){
+        mRound++;
+        lSave('tab-1-round',mRound);
+        setTimeout(matchRenderRound,700);
+      }
+    }else{btn.classList.add('err');setTimeout(()=>btn.classList.remove('err'),380);}
+  }
+}
+
+/* ═══ TAB 2 — SOUND HUNT (6 rounds) ═══ */
+const HUNT_ROUNDS=[
+  {ipa:'æ',kw:'cat 🐱',words:[['cat',1],['map',1],['cup',0],['back',1],['hope',0],['hat',1]]},
+  {ipa:'aɪ',kw:'kite 🪁',words:[['kite',1],['time',1],['kit',0],['smile',1],['sit',0],['five',1]]},
+  {ipa:'ʃ',kw:'shoe 👟',words:[['shoe',1],['fish',1],['sun',0],['wash',1],['shop',1],['kiss',0]]},
+  {ipa:'uː',kw:'moon 🌙',words:[['moon',1],['food',1],['book',0],['blue',1],['school',1],['cup',0]]},
+  {ipa:'θ',kw:'thumb 👍',words:[['think',1],['three',1],['tree',0],['bath',1],['sing',0],['month',1]]},
+  {ipa:'ŋ',kw:'king 👑',words:[['king',1],['ring',1],['kick',0],['song',1],['run',0],['strong',1]]}
+];
+let hRound=0,hFound=0;
+TAB_INIT[2]=function(){huntRender();};
+TAB_RESET[2]=function(){
+  lDel('tab-2-round');hRound=0;hFound=0;
+  document.getElementById('hunt-done').classList.remove('show');
+  huntRender();
+};
+TAB_RESTORE[2]=function(){
+  const saved=lLoad('tab-2-round');
+  if(saved!==null&&saved!==hRound){hRound=saved;hFound=0;huntRender();}
+  if(hRound>=HUNT_ROUNDS.length)document.getElementById('hunt-done').classList.add('show');
+};
+function huntRender(){
+  document.getElementById('hunt-meter').style.width=(hRound/HUNT_ROUNDS.length*100)+'%';
+  if(hRound>=HUNT_ROUNDS.length){
+    document.getElementById('hunt-target').innerHTML='<div class="t-ipa">🎉</div><div class="t-kw">All hunts complete!</div>';
+    document.getElementById('hunt-words').innerHTML='';
+    document.getElementById('hunt-done').classList.add('show');
+    return;
+  }
+  const r=HUNT_ROUNDS[hRound];
+  const need=r.words.filter(w=>w[1]===1).length;
+  document.getElementById('hunt-target').innerHTML='<div class="t-ipa">/'+r.ipa+'/</div><div class="t-kw">like '+r.kw+' — find '+need+' words!</div>';
+  const shuffled=r.words.slice().sort(()=>Math.random()-0.5);
+  document.getElementById('hunt-words').innerHTML=shuffled.map(w=>'<button class="wordbtn" data-ok="'+w[1]+'" onclick="huntTap(this)">'+w[0]+'</button>').join('');
+  hFound=0;
+}
+function huntTap(btn){
+  if(btn.dataset.ok==='1'){
+    btn.classList.add('good');
+    hFound++;
+    const need=HUNT_ROUNDS[hRound].words.filter(w=>w[1]===1).length;
+    if(hFound>=need){
+      hRound++;
+      lSave('tab-2-round',hRound);
+      setTimeout(huntRender,800);
+    }
+  }else{
+    btn.classList.add('bad');
+    setTimeout(()=>btn.classList.remove('bad'),380);
+  }
+}
+
+/* ═══ TAB 3 — ODD ONE OUT (6 rounds, all on one list) ═══ */
+const ODD_ROUNDS=[
+  {ipa:'e',kw:'egg 🥚',opts:[['bed',0],['red',0],['big',1]]},
+  {ipa:'oʊ',kw:'boat ⛵',opts:[['home',0],['hot',1],['note',0]]},
+  {ipa:'tʃ',kw:'cheese 🧀',opts:[['chair',0],['shark',1],['lunch',0]]},
+  {ipa:'ʊ',kw:'book 📖',opts:[['look',0],['moon',1],['foot',0]]},
+  {ipa:'ɝ',kw:'bird 🐦',opts:[['girl',0],['car',1],['turn',0]]},
+  {ipa:'dʒ',kw:'juice 🧃',opts:[['jump',0],['giant',0],['goal',1]]}
+];
+TAB_INIT[3]=function(){
+  const host=document.getElementById('odd-list');
+  host.innerHTML=ODD_ROUNDS.map((r,i)=>{
+    const sh=r.opts.map(o=>({t:o[0],odd:o[1]===1})).sort(()=>Math.random()-0.5);
+    return '<div class="qcard" data-idx="'+i+'"><div class="qtext">'+(i+1)+'. Target: <span style="color:var(--cone-d);font-size:20px">/'+r.ipa+'/</span> like '+r.kw+' — tap the IMPOSTOR!</div>'+
+      '<div style="display:flex;gap:8px">'+sh.map(o=>'<button class="opt" style="text-align:center" onclick="oddPick(this,'+o.odd+','+i+')">'+o.t+'</button>').join('')+'</div></div>';
+  }).join('');
+};
+TAB_RESET[3]=function(){
+  lDel('tab-3-solved');
+  document.getElementById('odd-done').classList.remove('show');
+  TAB_INIT[3]._initialized=false;TAB_INIT[3]();TAB_INIT[3]._initialized=true;
+};
+TAB_RESTORE[3]=function(){
+  const solved=lLoad('tab-3-solved')||[];
+  solved.forEach(i=>{const c=document.querySelector('#odd-list [data-idx="'+i+'"]');if(!c)return;c.querySelectorAll('.opt').forEach(b=>b.disabled=true);c.dataset.solved='1';});
+  if(solved.length>=6)document.getElementById('odd-done').classList.add('show');
+};
+function oddPick(btn,isOdd,idx){
+  const card=btn.closest('.qcard');
+  if(card.dataset.solved)return;
+  if(isOdd){
+    card.dataset.solved='1';btn.classList.add('good');
+    card.querySelectorAll('.opt').forEach(o=>o.disabled=true);
+    const s=new Set(lLoad('tab-3-solved')||[]);s.add(idx);lSave('tab-3-solved',Array.from(s));
+    if(s.size>=6)document.getElementById('odd-done').classList.add('show');
+  }else{btn.classList.add('bad');setTimeout(()=>btn.classList.remove('bad'),380);}
+}
+
+/* ═══ TAB 4 — QUIZ (10 scored, single-shot) ═══ */
+const QUIZ_ITEMS=[
+  {q:'Which word has /æ/ like cat 🐱?',opts:['cap','cape'],ok:0},
+  {q:'Which word has /iː/ like bee 🐝?',opts:['sit','seat'],ok:1},
+  {q:'The MOST COMMON sound in English is…',opts:['/ə/ the lazy banana sound','/r/ the robot sound'],ok:0},
+  {q:'What does the Magic E say in "hope"? 🤫',opts:['"eh"','Nothing — it is silent!'],ok:1},
+  {q:'Which word has /ʃ/ like shoe 👟?',opts:['sun','fish'],ok:1},
+  {q:'Which word has /θ/ (tongue between teeth)?',opts:['three','tree'],ok:0},
+  {q:'book 📖 and moon 🌙 — same vowel sound?',opts:['Yes, same','No — book is short /ʊ/, moon is long /uː/'],ok:1},
+  {q:'Which pair differs ONLY in /l/ vs /r/?',opts:['light / right','light / night'],ok:0},
+  {q:'Which word has /ŋ/ like king 👑?',opts:['song','son'],ok:0},
+  {q:'How many sounds does American English have?',opts:['About 44','Exactly 26 — one per letter'],ok:0}
+];
+let quizIdx=0,quizScoreN=0,quizAnswered=[];
+TAB_INIT[4]=function(){};
+TAB_RESET[4]=function(){
+  lDel('score');
+  quizIdx=0;quizScoreN=0;quizAnswered=[];
+  document.getElementById('quiz-active').style.display='block';
+  document.getElementById('quiz-result').style.display='none';
+  const cb=document.getElementById('complete-4');
+  cb.disabled=true;cb.textContent='Finish all 10 questions first';
+  quizRender();
+};
+TAB_RESTORE[4]=function(){
+  const saved=lLoad('score');
+  if(saved&&saved.done){quizShowResult(saved);}
+  else{
+    quizIdx=0;quizScoreN=0;quizAnswered=[];
+    document.getElementById('quiz-active').style.display='block';
+    document.getElementById('quiz-result').style.display='none';
+    quizRender();
+  }
+};
+function quizRender(){
+  document.getElementById('quiz-progress').innerHTML=QUIZ_ITEMS.map((x,i)=>'<div class="'+(i<quizIdx?'answered':'')+'"></div>').join('');
+  if(quizIdx>=QUIZ_ITEMS.length){quizFinish();return;}
+  const it=QUIZ_ITEMS[quizIdx];
+  const sh=it.opts.map((o,oi)=>({t:o,ok:oi===it.ok})).sort(()=>Math.random()-0.5);
+  document.getElementById('quiz-qcard').innerHTML='<div class="qtext">Q'+(quizIdx+1)+'. '+it.q+'</div>'+
+    sh.map(o=>'<button class="opt" onclick="quizPick(this,'+o.ok+')">'+o.t+'</button>').join('');
+}
+function quizPick(btn,correct){
+  const group=document.getElementById('quiz-qcard');
+  if(group.dataset.solved)return;
+  group.dataset.solved='1';
+  if(correct){btn.classList.add('good');quizScoreN++;}else{btn.classList.add('bad');}
+  group.querySelectorAll('.opt').forEach(o=>o.disabled=true);
+  quizAnswered.push({question:QUIZ_ITEMS[quizIdx].q,correct:correct});
+  setTimeout(()=>{quizIdx++;delete group.dataset.solved;quizRender();},650);
+}
+function quizFinish(){
+  const total=QUIZ_ITEMS.length;
+  const percent=Math.round((quizScoreN/total)*100);
+  const trophy=percent>=80?'👂✨':percent>=50?'🥈':'💪';
+  const text=percent>=80?'GOLDEN EAR!':percent>=50?'Great ears!':'Keep training!';
+  const wrongQuestions=quizAnswered.filter(a=>!a.correct).map(a=>a.question);
+  const data={score:quizScoreN,total:total,percent:percent,done:true,timestamp:new Date().toISOString(),trophy:trophy,text:text,wrongQuestions:wrongQuestions};
+  lSave('score',data);
+  quizShowResult(data);
+}
+function quizShowResult(data){
+  document.getElementById('quiz-active').style.display='none';
+  const rz=document.getElementById('quiz-result');
+  rz.style.display='block';
+  rz.innerHTML='<div class="quiz-result"><div class="trophy">'+data.trophy+'</div>'+
+    '<div class="qscore">'+data.score+' / '+data.total+'</div>'+
+    '<div style="font-weight:800;font-size:18px">'+data.text+'</div>'+
+    (data.wrongQuestions&&data.wrongQuestions.length?'<div class="wrong-review"><b>Review with Dad:</b><br>'+data.wrongQuestions.map(w=>'• '+w).join('<br>')+'</div>':'')+'</div>';
+  const cb=document.getElementById('complete-4');
+  cb.disabled=false;
+  if(lLoad('tab-4-done')){cb.classList.add('confirmed');cb.textContent='✓ Quiz done';}
+  else{cb.textContent='Mark Quiz complete ✓';}
+}
+
+/* ═══ TAB 5 — DRIBBLE (single-shot) ═══ */
+const DRIB_ITEMS=[
+  {q:'⚽ "team" — which vowel sound?',opts:['/iː/ like bee 🐝','/e/ like egg 🥚'],ok:0},
+  {q:'🥅 "goal" starts with which sound?',opts:['/g/','/dʒ/ like juice'],ok:0},
+  {q:'📣 Which word has /ɔː/ like ball ⚽?',opts:['fall','fan'],ok:0},
+  {q:'🎙️ The commentator shouts "SHOOT!" — first sound?',opts:['/s/ like sun','/ʃ/ like shoe 👟'],ok:1},
+  {q:'⚡ Which word has /aɪ/ like kite 🪁?',opts:['strike','strong'],ok:0},
+  {q:'☕ "cup" — which vowel?',opts:['/ʌ/ the lazy uh ☂️','/æ/ the cat sound 🐱'],ok:0}
+];
+let dribGoals=0,dribIdx=0;
+TAB_INIT[5]=function(){dribRender();};
+TAB_RESET[5]=function(){
+  lDel('tab-5-goals');
+  dribGoals=0;dribIdx=0;
+  document.getElementById('drib-goals').textContent='0';
+  document.getElementById('drib-defenders').textContent='🛡️🛡️🛡️🛡️🛡️🛡️';
+  document.getElementById('drib-done').classList.remove('show');
+  dribRender();
+};
+TAB_RESTORE[5]=function(){
+  const saved=lLoad('tab-5-goals');
+  if(saved){
+    dribGoals=saved.goals;dribIdx=saved.idx;
+    document.getElementById('drib-goals').textContent=dribGoals;
+    document.getElementById('drib-defenders').textContent='🛡️'.repeat(Math.max(0,6-dribGoals));
+    if(dribIdx>=DRIB_ITEMS.length){document.getElementById('drib-done').classList.add('show');document.getElementById('drib-list').innerHTML='';}
+    else dribRender();
+  }
+};
+function dribRender(){
+  const host=document.getElementById('drib-list');
+  if(dribIdx>=DRIB_ITEMS.length){
+    host.innerHTML='';
+    document.getElementById('drib-done').classList.add('show');
+    return;
+  }
+  const it=DRIB_ITEMS[dribIdx];
+  const sh=it.opts.map((o,oi)=>({t:o,ok:oi===it.ok})).sort(()=>Math.random()-0.5);
+  host.innerHTML='<div class="drib-q"><div style="font-weight:800;margin-bottom:6px">'+it.q+'</div>'+
+    sh.map(o=>'<button class="drib-opt" onclick="dribPick(this,'+o.ok+')">'+o.t+'</button>').join('')+'</div>';
+}
+function dribPick(btn,correct){
+  const group=btn.parentElement;
+  if(group.dataset.solved)return;
+  group.dataset.solved='1';
+  if(correct){
+    btn.classList.add('good');dribGoals++;
+    document.getElementById('drib-goals').textContent=dribGoals;
+    document.getElementById('drib-defenders').textContent='🛡️'.repeat(Math.max(0,6-dribGoals));
+  }else{btn.classList.add('bad');}
+  group.querySelectorAll('.drib-opt').forEach(o=>o.disabled=true);
+  dribIdx++;
+  lSave('tab-5-goals',{goals:dribGoals,idx:dribIdx});
+  setTimeout(dribRender,700);
+}
+
+/* ═══ INIT ═══ */
+document.addEventListener('DOMContentLoaded',function(){
+  try{
+    TAB_INIT[0]();TAB_INIT[0]._initialized=true;
+    showTab(0);
+    refreshProgress();
+  }catch(e){}
+});
+</script>
+</body>
+</html>

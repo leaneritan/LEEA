@@ -34,6 +34,8 @@ import unit8Reader from "../../content/subjects/english/courses/our-world/level-
 import unit8ReaderLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/reader-app.learner.json";
 import unit8BookReading from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/book-reading.teacher.json";
 import unit8BookReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/book-reading.learner.json";
+import tgPhonicsShortVowels from "../../content/subjects/english/courses/special-training/lessons/phonics-short-vowels.teacher.json";
+import tgPhonicsShortVowelsLearner from "../../content/subjects/english/courses/special-training/lessons/phonics-short-vowels-app.learner.json";
 import type { Lesson } from "./types";
 
 // Canonical within-unit teaching order. Lessons are always sorted by this
@@ -111,7 +113,9 @@ export const lessons: Lesson[] = [
   unit8Reader as Lesson,
   unit8ReaderLearner as Lesson,
   unit8BookReading as Lesson,
-  unit8BookReadingLearner as Lesson
+  unit8BookReadingLearner as Lesson,
+  tgPhonicsShortVowels as Lesson,
+  tgPhonicsShortVowelsLearner as Lesson
 ].sort(compareLessonOrder);
 export const teacherLessons = lessons.filter((lesson) => lesson.mode === "teacher");
 export const learnerLessons = lessons.filter((lesson) => lesson.mode === "learner");

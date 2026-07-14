@@ -8,6 +8,7 @@ import {
   saveLearnerProgressValue,
   type LearnerProgressStorageRow
 } from "@/data/learnerProgress";
+import { getCourseLabel } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
@@ -70,7 +71,14 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
       <header className="deck-lesson-bar">
         <div>
           <span className="eyebrow">
-            Our World - Level {lesson.level} - Unit {lesson.unit} - {lesson.component}
+            {[
+              getCourseLabel(lesson.course),
+              lesson.level ? `Level ${lesson.level}` : null,
+              lesson.unit ? `Unit ${lesson.unit}` : null,
+              lesson.component
+            ]
+              .filter(Boolean)
+              .join(" - ")}
           </span>
           <h1>{lesson.title}</h1>
         </div>

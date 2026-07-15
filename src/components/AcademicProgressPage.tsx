@@ -63,6 +63,15 @@ interface AcademicGoals {
   art: number;
 }
 
+const firstTermFinalExam: TestRecord = {
+  date: "2026-07-10",
+  name: "1学期期末テスト",
+  scores: { japanese: 37, social: 95, math: 75, science: 80, english: 89, music: 52, health: 50, techHome: 43, art: 46 },
+  rank: 62,
+  rank9: 80,
+  average: { japanese: 58.2, social: 64.7, math: 58.6, science: 66.7, english: 54.6, music: 49.2, health: 58.4, techHome: 43.7, art: 46.4 }
+};
+
 const starterTests: TestRecord[] = [
   {
     date: "2026-05-17",
@@ -71,15 +80,17 @@ const starterTests: TestRecord[] = [
     rank: 65,
     average: { japanese: 74.2, social: 56.3, math: 67.2, science: 67.6, english: 82.7 }
   },
-  {
-    date: "2026-07-10",
-    name: "1学期期末テスト",
-    scores: { japanese: 37, social: 95, math: 75, science: 80, english: 89, music: 52, health: 50, techHome: 43, art: 46 },
-    rank: 62,
-    rank9: 80,
-    average: { japanese: 58.2, social: 64.7, math: 58.6, science: 66.7, english: 54.6, music: 49.2, health: 58.4, techHome: 43.7, art: 46.4 }
-  }
+  firstTermFinalExam
 ];
+
+// Existing users already have savedTests in localStorage from before the
+// 期末 exam was recorded, so the starterTests fallback above never runs for
+// them. Merge the real exam result in once, keyed by name+date so this is a
+// no-op on every later load.
+function withFirstTermFinalExam(tests: TestRecord[]): TestRecord[] {
+  const alreadyPresent = tests.some((t) => t.name === firstTermFinalExam.name && t.date === firstTermFinalExam.date);
+  return alreadyPresent ? tests : [...tests, firstTermFinalExam];
+}
 
 const defaultGoals: AcademicGoals = {
   total: 420,
@@ -148,7 +159,7 @@ export function AcademicProgressPage() {
     if (savedTests) {
       try {
         const parsed = JSON.parse(savedTests);
-        setTests(parsed);
+        setTests(withFirstTermFinalExam(parsed));
       } catch (e) {
         setTests(starterTests);
       }

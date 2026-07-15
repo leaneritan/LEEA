@@ -3,14 +3,22 @@
 import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 
 const subjects = ["japanese", "social", "math", "science", "english"] as const;
-type SubjectId = typeof subjects[number];
+// 音楽・保体・技家・美術 are only graded on 期末 (term-final) exams, not 中間
+// (mid-term) exams, so historical tests may not have scores for these.
+const extraSubjects = ["music", "health", "techHome", "art"] as const;
+const allSubjects = [...subjects, ...extraSubjects] as const;
+type SubjectId = typeof allSubjects[number];
 
 const labels: Record<SubjectId, string> = {
   japanese: "国語",
   social: "社会",
   math: "数学",
   science: "理科",
-  english: "英語"
+  english: "英語",
+  music: "音楽",
+  health: "保体",
+  techHome: "技家",
+  art: "美術"
 };
 
 const colors: Record<SubjectId, string> = {
@@ -18,15 +26,26 @@ const colors: Record<SubjectId, string> = {
   social: "#ea580c",
   math: "#2563eb",
   science: "#16a34a",
-  english: "#7c3aed"
+  english: "#7c3aed",
+  music: "#db2777",
+  health: "#0ea5e9",
+  techHome: "#f59e0b",
+  art: "#0d9488"
 };
+
+// Core subjects (japanese/social/math/science/english) are always present —
+// every test has them. Extra subjects (music/health/techHome/art) are only
+// graded on 期末 exams, so they stay optional.
+type CoreSubjectId = typeof subjects[number];
+type ExtraSubjectId = typeof extraSubjects[number];
 
 interface TestRecord {
   date: string;
   name: string;
-  scores: Record<SubjectId, number>;
+  scores: Record<CoreSubjectId, number> & Partial<Record<ExtraSubjectId, number>>;
   rank: number | null;
-  average: Record<SubjectId, number>;
+  rank9?: number | null;
+  average: Record<CoreSubjectId, number> & Partial<Record<ExtraSubjectId, number>>;
 }
 
 interface AcademicGoals {
@@ -38,6 +57,10 @@ interface AcademicGoals {
   math: number;
   science: number;
   english: number;
+  music: number;
+  health: number;
+  techHome: number;
+  art: number;
 }
 
 const starterTests: TestRecord[] = [
@@ -47,6 +70,14 @@ const starterTests: TestRecord[] = [
     scores: { japanese: 70, social: 75, math: 75, science: 80, english: 92 },
     rank: 65,
     average: { japanese: 74.2, social: 56.3, math: 67.2, science: 67.6, english: 82.7 }
+  },
+  {
+    date: "2026-07-10",
+    name: "1学期期末テスト",
+    scores: { japanese: 37, social: 95, math: 75, science: 80, english: 89, music: 52, health: 50, techHome: 43, art: 46 },
+    rank: 62,
+    rank9: 80,
+    average: { japanese: 58.2, social: 64.7, math: 58.6, science: 66.7, english: 54.6, music: 49.2, health: 58.4, techHome: 43.7, art: 46.4 }
   }
 ];
 
@@ -58,7 +89,11 @@ const defaultGoals: AcademicGoals = {
   social: 85,
   math: 85,
   science: 85,
-  english: 95
+  english: 95,
+  music: 70,
+  health: 70,
+  techHome: 70,
+  art: 70
 };
 
 export function AcademicProgressPage() {
@@ -72,16 +107,25 @@ export function AcademicProgressPage() {
     name: "1学期期末テスト",
     date: new Date().toISOString().slice(0, 10),
     rank: "" as string | number,
+    rank9: "" as string | number,
     japanese: "" as string | number,
     social: "" as string | number,
     math: "" as string | number,
     science: "" as string | number,
     english: "" as string | number,
+    music: "" as string | number,
+    health: "" as string | number,
+    techHome: "" as string | number,
+    art: "" as string | number,
     avg_japanese: "" as string | number,
     avg_social: "" as string | number,
     avg_math: "" as string | number,
     avg_science: "" as string | number,
     avg_english: "" as string | number,
+    avg_music: "" as string | number,
+    avg_health: "" as string | number,
+    avg_techHome: "" as string | number,
+    avg_art: "" as string | number,
   });
 
   // Identify the selected "compare" tests by a stable key (date+name), not
@@ -149,22 +193,39 @@ export function AcademicProgressPage() {
   // silently treating an empty form as "average score of 0".
   const hasAvgData = (t: TestRecord) => subjects.some((s) => Number(t.average?.[s] || 0) > 0);
 
+  // 音楽・保体・技家・美術 only appear on 期末 exams, so the same "0 means no
+  // data" convention used above for averages applies here too.
+  const hasExtraData = (t: TestRecord) => extraSubjects.some((s) => Number(t.scores[s] || 0) > 0);
+  const extraTotalScore = (t: TestRecord) => extraSubjects.reduce((sum, s) => sum + Number(t.scores[s] || 0), 0);
+  const nineSubjectTotal = (t: TestRecord) => totalScore(t) + extraTotalScore(t);
+  const hasExtraAvgData = (t: TestRecord) => extraSubjects.some((s) => Number(t.average?.[s] || 0) > 0);
+  const extraAvgTotal = (t: TestRecord) => Math.round(extraSubjects.reduce((sum, s) => sum + Number(t.average?.[s] || 0), 0) * 10) / 10;
+
   const clearForm = useCallback((show = true) => {
     setForm({
       editIndex: null,
       name: "1学期期末テスト",
       date: new Date().toISOString().slice(0, 10),
       rank: "",
+      rank9: "",
       japanese: "",
       social: "",
       math: "",
       science: "",
       english: "",
+      music: "",
+      health: "",
+      techHome: "",
+      art: "",
       avg_japanese: "",
       avg_social: "",
       avg_math: "",
       avg_science: "",
       avg_english: "",
+      avg_music: "",
+      avg_health: "",
+      avg_techHome: "",
+      avg_art: "",
     });
     if (show) showToast("入力欄をクリアしました");
   }, [showToast]);
@@ -179,19 +240,29 @@ export function AcademicProgressPage() {
         math: Number(form.math || 0),
         science: Number(form.science || 0),
         english: Number(form.english || 0),
+        music: Number(form.music || 0),
+        health: Number(form.health || 0),
+        techHome: Number(form.techHome || 0),
+        art: Number(form.art || 0),
       },
       rank: form.rank === "" ? null : Number(form.rank),
+      rank9: form.rank9 === "" ? null : Number(form.rank9),
       average: {
         japanese: Number(form.avg_japanese || 0),
         social: Number(form.avg_social || 0),
         math: Number(form.avg_math || 0),
         science: Number(form.avg_science || 0),
         english: Number(form.avg_english || 0),
+        music: Number(form.avg_music || 0),
+        health: Number(form.avg_health || 0),
+        techHome: Number(form.avg_techHome || 0),
+        art: Number(form.avg_art || 0),
       }
     };
 
-    for (const s of subjects) {
-      if (t.scores[s] < 0 || t.scores[s] > 100) {
+    for (const s of allSubjects) {
+      const score = t.scores[s] ?? 0;
+      if (score < 0 || score > 100) {
         alert(labels[s] + "は0〜100で入力してください。");
         return;
       }
@@ -220,16 +291,25 @@ export function AcademicProgressPage() {
       name: t.name,
       date: t.date,
       rank: t.rank ?? "",
-      japanese: t.scores.japanese,
-      social: t.scores.social,
-      math: t.scores.math,
-      science: t.scores.science,
-      english: t.scores.english,
+      rank9: t.rank9 ?? "",
+      japanese: t.scores.japanese ?? "",
+      social: t.scores.social ?? "",
+      math: t.scores.math ?? "",
+      science: t.scores.science ?? "",
+      english: t.scores.english ?? "",
+      music: t.scores.music || "",
+      health: t.scores.health || "",
+      techHome: t.scores.techHome || "",
+      art: t.scores.art || "",
       avg_japanese: t.average.japanese || "",
       avg_social: t.average.social || "",
       avg_math: t.average.math || "",
       avg_science: t.average.science || "",
       avg_english: t.average.english || "",
+      avg_music: t.average.music || "",
+      avg_health: t.average.health || "",
+      avg_techHome: t.average.techHome || "",
+      avg_art: t.average.art || "",
     });
     window.location.hash = "#input";
     showToast("編集モードです");
@@ -688,7 +768,7 @@ export function AcademicProgressPage() {
         }
 
         .academic-progress-container .formgrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px }
-        .academic-progress-container .goalgrid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px }
+        .academic-progress-container .goalgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px }
         .academic-progress-container .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
         .academic-progress-container .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px }
         .academic-progress-container .actions.tight { margin-top: 0 }
@@ -708,7 +788,7 @@ export function AcademicProgressPage() {
         .academic-progress-container .bar { height: 15px; background: #e5eaf3; border-radius: 999px; overflow: hidden }
         .academic-progress-container .fill { height: 100%; border-radius: 999px }
 
-        .academic-progress-container .goal-status { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 14px }
+        .academic-progress-container .goal-status { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 14px }
         .academic-progress-container .goal-card { background: #f8fafc; border: 1px solid var(--tracker-line); border-radius: 16px; padding: 11px }
         .academic-progress-container .goal-title { font-weight: 1000; font-size: 12px; color: var(--tracker-muted) }
         .academic-progress-container .goal-value { font-weight: 1000; margin-top: 6px }
@@ -827,6 +907,44 @@ export function AcademicProgressPage() {
               </div>
             </div>
 
+            <div className="card span-12">
+              <div className="card-head"><h2>新教科（音楽・保体・技家・美術）</h2><span className="small">期末テストのみ実施</span></div>
+              {sortedTests.length > 0 && hasExtraData(sortedTests[sortedTests.length - 1]) ? (() => {
+                const latest = sortedTests[sortedTests.length - 1];
+                return (
+                  <>
+                    {extraSubjects.map(s => (
+                      <div key={s}>
+                        <div className="bar-row">
+                          <b style={{ color: colors[s] }}>{labels[s]}</b>
+                          <div className="bar">
+                            <div className="fill" style={{ width: `${latest.scores[s] || 0}%`, background: colors[s] }}></div>
+                          </div>
+                          <b>{latest.scores[s] || 0}</b>
+                        </div>
+                        <div className="small" style={{ margin: "-6px 0 8px 68px" }}>
+                          平均との差：<span className={(latest.scores[s] || 0) - (latest.average?.[s] || 0) >= 0 ? 'goodtxt' : 'badtxt'}>
+                            {(latest.scores[s] || 0) - (latest.average?.[s] || 0) >= 0 ? '+' : ''}{Math.round(((latest.scores[s] || 0) - (latest.average?.[s] || 0)) * 10) / 10}
+                          </span> ／ 目標まで：{Math.max(0, (goals[s] || 100) - (latest.scores[s] || 0))}点
+                        </div>
+                      </div>
+                    ))}
+                    <div className="twocol">
+                      <div className="goal-card">
+                        <div className="goal-title">9科目合計</div>
+                        <div className="goal-value">{nineSubjectTotal(latest)}</div>
+                        <div className="small">{hasExtraAvgData(latest) ? `学校平均 ${Math.round((avgTotalScore(latest) + extraAvgTotal(latest)) * 10) / 10}点` : "学校平均は未入力です"}</div>
+                      </div>
+                      <div className="goal-card">
+                        <div className="goal-title">9科目 学年順位</div>
+                        <div className="goal-value">{latest.rank9 ? `${latest.rank9}位` : "—"} / {goals.students || 150}人</div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })() : <div className="soft">まだ音楽・保体・技家・美術のデータがありません。期末テストの結果を追加すると表示されます。</div>}
+            </div>
+
             <div className="card span-12" id="goals">
               <div className="card-head"><h2>🎯 目標設定</h2><span className="small">全教科の目標を設定できます。</span></div>
               <div className="goalgrid">
@@ -838,10 +956,14 @@ export function AcademicProgressPage() {
                 <div><label htmlFor="goalMath">数学目標</label><input id="goalMath" type="number" min="0" max="100" value={goals.math} onChange={e => setGoals({ ...goals, math: Number(e.target.value) })} /></div>
                 <div><label htmlFor="goalScience">理科目標</label><input id="goalScience" type="number" min="0" max="100" value={goals.science} onChange={e => setGoals({ ...goals, science: Number(e.target.value) })} /></div>
                 <div><label htmlFor="goalEnglish">英語目標</label><input id="goalEnglish" type="number" min="0" max="100" value={goals.english} onChange={e => setGoals({ ...goals, english: Number(e.target.value) })} /></div>
+                <div><label htmlFor="goalMusic">音楽目標</label><input id="goalMusic" type="number" min="0" max="100" value={goals.music} onChange={e => setGoals({ ...goals, music: Number(e.target.value) })} /></div>
+                <div><label htmlFor="goalHealth">保体目標</label><input id="goalHealth" type="number" min="0" max="100" value={goals.health} onChange={e => setGoals({ ...goals, health: Number(e.target.value) })} /></div>
+                <div><label htmlFor="goalTechHome">技家目標</label><input id="goalTechHome" type="number" min="0" max="100" value={goals.techHome} onChange={e => setGoals({ ...goals, techHome: Number(e.target.value) })} /></div>
+                <div><label htmlFor="goalArt">美術目標</label><input id="goalArt" type="number" min="0" max="100" value={goals.art} onChange={e => setGoals({ ...goals, art: Number(e.target.value) })} /></div>
               </div>
               <div className="actions">
                 <button className="primary" onClick={() => showToast("目標を保存しました")}>目標を保存</button>
-                <button className="ghost" onClick={() => setGoals({ total: 420, rank: 40, students: 150, japanese: 85, social: 85, math: 85, science: 85, english: 95 })}>おすすめ目標</button>
+                <button className="ghost" onClick={() => setGoals({ total: 420, rank: 40, students: 150, japanese: 85, social: 85, math: 85, science: 85, english: 95, music: 70, health: 70, techHome: 70, art: 70 })}>おすすめ目標</button>
               </div>
               <div id="goalStatus" className="goal-status">
                 {sortedTests.length > 0 && (() => {
@@ -874,6 +996,20 @@ export function AcademicProgressPage() {
                           <div className="goal-card" key={s}>
                             <div className="goal-title">{labels[s]}</div>
                             <div className="goal-value">{latest.scores[s]}/{g}</div>
+                            <div className="goal-progress"><div className="goal-fill" style={{ width: `${p}%`, background: colors[s] }}></div></div>
+                            <div className="small">{left === 0 ? <span className="goodtxt">達成</span> : `あと${left}点`}</div>
+                          </div>
+                        );
+                      })}
+                      {hasExtraData(latest) && extraSubjects.map(s => {
+                        const g = goals[s] || 100;
+                        const score = latest.scores[s] || 0;
+                        const p = clamp(score / g * 100, 0, 100);
+                        const left = Math.max(0, g - score);
+                        return (
+                          <div className="goal-card" key={s}>
+                            <div className="goal-title">{labels[s]}</div>
+                            <div className="goal-value">{score}/{g}</div>
                             <div className="goal-progress"><div className="goal-fill" style={{ width: `${p}%`, background: colors[s] }}></div></div>
                             <div className="small">{left === 0 ? <span className="goodtxt">達成</span> : `あと${left}点`}</div>
                           </div>
@@ -957,11 +1093,12 @@ export function AcademicProgressPage() {
               <div className="formgrid">
                 <div><label htmlFor="name">テスト名</label><input id="name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
                 <div><label htmlFor="date">日付</label><input id="date" type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} /></div>
-                <div><label htmlFor="rank">学年順位</label><input id="rank" type="number" min="1" value={form.rank} onChange={e => setForm({ ...form, rank: e.target.value })} /></div>
-                {subjects.map(s => (
+                <div><label htmlFor="rank">学年順位（5科目）</label><input id="rank" type="number" min="1" value={form.rank} onChange={e => setForm({ ...form, rank: e.target.value })} /></div>
+                <div><label htmlFor="rank9">学年順位（9科目・期末のみ）</label><input id="rank9" type="number" min="1" value={form.rank9} onChange={e => setForm({ ...form, rank9: e.target.value })} /></div>
+                {allSubjects.map(s => (
                   <div key={s}><label htmlFor={s}>{labels[s]}</label><input id={s} type="number" min="0" max="100" value={form[s]} onChange={e => setForm({ ...form, [s]: e.target.value })} /></div>
                 ))}
-                {subjects.map(s => (
+                {allSubjects.map(s => (
                   <div key={`avg_${s}`}><label htmlFor={`avg_${s}`}>{labels[s]} 平均点</label><input id={`avg_${s}`} type="number" step="0.1" value={form[`avg_${s}` as keyof typeof form] as string} onChange={e => setForm({ ...form, [`avg_${s}`]: e.target.value })} /></div>
                 ))}
               </div>
@@ -989,6 +1126,9 @@ export function AcademicProgressPage() {
                       <th className="right">順位</th>
                       <th className="right">上位%</th>
                       {subjects.map(s => <th key={s} className="right">{labels[s]}</th>)}
+                      {extraSubjects.map(s => <th key={s} className="right">{labels[s]}</th>)}
+                      <th className="right">9科目計</th>
+                      <th className="right">9科目順位</th>
                       <th className="center">修正</th>
                     </tr>
                   </thead>
@@ -1011,6 +1151,9 @@ export function AcademicProgressPage() {
                           <td className="right">{t.rank ? t.rank + '位' : '—'}</td>
                           <td className="right">{rankPct ? rankPct + '%' : '—'}</td>
                           {subjects.map(s => <td key={s} className="right">{t.scores[s]}</td>)}
+                          {extraSubjects.map(s => <td key={s} className="right">{hasExtraData(t) ? (t.scores[s] || 0) : '—'}</td>)}
+                          <td className="right">{hasExtraData(t) ? nineSubjectTotal(t) : '—'}</td>
+                          <td className="right">{t.rank9 ? t.rank9 + '位' : '—'}</td>
                           <td className="center nowrap"><button className="secondary" onClick={() => editTest(i)}>編集</button> <button className="danger" onClick={() => askDelete(i)}>削除</button></td>
                         </tr>
                       );

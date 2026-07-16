@@ -74,7 +74,7 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 - [ ] Unit 7 — Vocab
 - [ ] Unit 7 — Grammar
 - [x] Unit 8 — Vocab
-- [ ] Unit 8 — Grammar
+- [x] Unit 8 — Grammar
 - [x] Unit 9 — Vocab
 - [x] Unit 9 — Grammar
 

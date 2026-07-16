@@ -11,6 +11,7 @@ import unit7Vocabulary from "../../content/subjects/english/courses/our-world/le
 import unit8Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json";
 import unit9Vocabulary from "../../content/subjects/english/courses/our-world/level-4/unit-9/vocabulary.json";
 import level5Unit1Grammar from "../../content/subjects/english/courses/our-world/level-5/unit-1/grammar.json";
+import level3Unit8Grammar from "../../content/subjects/english/courses/our-world/level-3/unit-8/grammar.json";
 import level3Unit9Grammar from "../../content/subjects/english/courses/our-world/level-3/unit-9/grammar.json";
 import unit1Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-1/grammar.json";
 import unit2Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-2/grammar.json";
@@ -46,6 +47,7 @@ type UnitVocabularyWord =
   | (typeof unit4Vocabulary.words)[number];
 type UnitGrammarPoint =
   | (typeof level5Unit1Grammar.grammarPoints)[number]
+  | (typeof level3Unit8Grammar.grammarPoints)[number]
   | (typeof level3Unit9Grammar.grammarPoints)[number]
   | (typeof unit1Grammar.grammarPoints)[number]
   | (typeof unit2Grammar.grammarPoints)[number]
@@ -357,6 +359,7 @@ function toGrammarPoint(point: UnitGrammarPoint): GrammarPoint {
 
 export const grammarPoints: GrammarPoint[] = [
   ...level5Unit1Grammar.grammarPoints.map(toGrammarPoint),
+  ...level3Unit8Grammar.grammarPoints.map(toGrammarPoint),
   ...level3Unit9Grammar.grammarPoints.map(toGrammarPoint),
   ...unit9Grammar.grammarPoints.map(toGrammarPoint),
   ...unit8Grammar.grammarPoints.map(toGrammarPoint),
@@ -373,6 +376,7 @@ export const unit2GrammarItems = grammarPoints.filter((item) => item.level === 4
 export const unit3GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 3);
 export const unit4GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 4);
 
+export const level3Unit8GrammarItems = grammarPoints.filter((item) => item.level === 3 && item.unit === 8);
 export const level3Unit9GrammarItems = grammarPoints.filter((item) => item.level === 3 && item.unit === 9);
 export const unit9GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 9);
 export const unit8GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 8);

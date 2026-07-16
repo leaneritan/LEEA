@@ -46,6 +46,9 @@ interface TestRecord {
   rank: number | null;
   rank9?: number | null;
   average: Record<CoreSubjectId, number> & Partial<Record<ExtraSubjectId, number>>;
+  // 教科別の学年順位（成績表の「総合順位」行）。点数はテストの難易度で
+  // 上下するが、順位は相対的な実力を示すので、テスト間の比較はこちらが公平。
+  subjectRanks?: Partial<Record<SubjectId, number>>;
 }
 
 interface AcademicGoals {
@@ -69,7 +72,8 @@ const firstTermFinalExam: TestRecord = {
   scores: { japanese: 37, social: 95, math: 75, science: 80, english: 89, music: 52, health: 50, techHome: 43, art: 46 },
   rank: 62,
   rank9: 80,
-  average: { japanese: 58.2, social: 64.7, math: 58.6, science: 66.7, english: 54.6, music: 49.2, health: 58.4, techHome: 43.7, art: 46.4 }
+  average: { japanese: 58.2, social: 64.7, math: 58.6, science: 66.7, english: 54.6, music: 49.2, health: 58.4, techHome: 43.7, art: 46.4 },
+  subjectRanks: { japanese: 120, social: 5, math: 47, science: 67, english: 10, music: 92, health: 113, techHome: 85, art: 96 }
 };
 
 const starterTests: TestRecord[] = [
@@ -78,7 +82,8 @@ const starterTests: TestRecord[] = [
     name: "1学期中間テスト",
     scores: { japanese: 70, social: 75, math: 75, science: 80, english: 92 },
     rank: 65,
-    average: { japanese: 74.2, social: 56.3, math: 67.2, science: 67.6, english: 82.7 }
+    average: { japanese: 74.2, social: 56.3, math: 67.2, science: 67.6, english: 82.7 },
+    subjectRanks: { japanese: 98, social: 40, math: 58, science: 60, english: 60 }
   },
   firstTermFinalExam
 ];
@@ -90,6 +95,19 @@ const starterTests: TestRecord[] = [
 function withFirstTermFinalExam(tests: TestRecord[]): TestRecord[] {
   const alreadyPresent = tests.some((t) => t.name === firstTermFinalExam.name && t.date === firstTermFinalExam.date);
   return alreadyPresent ? tests : [...tests, firstTermFinalExam];
+}
+
+// Tests saved to localStorage before subjectRanks existed won't have
+// per-subject rank data, so the new rank charts would show nothing for
+// them. Backfill the known values from starterTests (matched by name+date)
+// so existing users see the rank views without re-entering anything.
+// No-op for tests that already carry subjectRanks.
+function withKnownSubjectRanks(tests: TestRecord[]): TestRecord[] {
+  return tests.map((t) => {
+    if (t.subjectRanks && Object.keys(t.subjectRanks).length) return t;
+    const known = starterTests.find((s) => s.name === t.name && s.date === t.date);
+    return known?.subjectRanks ? { ...t, subjectRanks: known.subjectRanks } : t;
+  });
 }
 
 const defaultGoals: AcademicGoals = {
@@ -137,6 +155,15 @@ export function AcademicProgressPage() {
     avg_health: "" as string | number,
     avg_techHome: "" as string | number,
     avg_art: "" as string | number,
+    rank_japanese: "" as string | number,
+    rank_social: "" as string | number,
+    rank_math: "" as string | number,
+    rank_science: "" as string | number,
+    rank_english: "" as string | number,
+    rank_music: "" as string | number,
+    rank_health: "" as string | number,
+    rank_techHome: "" as string | number,
+    rank_art: "" as string | number,
   });
 
   // Identify the selected "compare" tests by a stable key (date+name), not
@@ -159,7 +186,7 @@ export function AcademicProgressPage() {
     if (savedTests) {
       try {
         const parsed = JSON.parse(savedTests);
-        setTests(withFirstTermFinalExam(parsed));
+        setTests(withKnownSubjectRanks(withFirstTermFinalExam(parsed)));
       } catch (e) {
         setTests(starterTests);
       }
@@ -237,11 +264,35 @@ export function AcademicProgressPage() {
       avg_health: "",
       avg_techHome: "",
       avg_art: "",
+      rank_japanese: "",
+      rank_social: "",
+      rank_math: "",
+      rank_science: "",
+      rank_english: "",
+      rank_music: "",
+      rank_health: "",
+      rank_techHome: "",
+      rank_art: "",
     });
     if (show) showToast("入力欄をクリアしました");
   }, [showToast]);
 
   const addOrUpdateTest = () => {
+    // Collect per-subject ranks; empty fields are simply omitted so tests
+    // without rank data (or subjects not graded on 中間) stay clean.
+    const subjectRanks: Partial<Record<SubjectId, number>> = {};
+    for (const s of allSubjects) {
+      const v = form[`rank_${s}` as keyof typeof form];
+      if (v !== "" && v !== null) {
+        const n = Number(v);
+        if (!Number.isFinite(n) || n < 1) {
+          alert(labels[s] + "の順位は1以上で入力してください。");
+          return;
+        }
+        subjectRanks[s] = n;
+      }
+    }
+
     const t: TestRecord = {
       date: form.date || new Date().toISOString().slice(0, 10),
       name: form.name || "新しいテスト",
@@ -268,7 +319,8 @@ export function AcademicProgressPage() {
         health: Number(form.avg_health || 0),
         techHome: Number(form.avg_techHome || 0),
         art: Number(form.avg_art || 0),
-      }
+      },
+      subjectRanks: Object.keys(subjectRanks).length ? subjectRanks : undefined
     };
 
     for (const s of allSubjects) {
@@ -321,6 +373,15 @@ export function AcademicProgressPage() {
       avg_health: t.average.health || "",
       avg_techHome: t.average.techHome || "",
       avg_art: t.average.art || "",
+      rank_japanese: t.subjectRanks?.japanese ?? "",
+      rank_social: t.subjectRanks?.social ?? "",
+      rank_math: t.subjectRanks?.math ?? "",
+      rank_science: t.subjectRanks?.science ?? "",
+      rank_english: t.subjectRanks?.english ?? "",
+      rank_music: t.subjectRanks?.music ?? "",
+      rank_health: t.subjectRanks?.health ?? "",
+      rank_techHome: t.subjectRanks?.techHome ?? "",
+      rank_art: t.subjectRanks?.art ?? "",
     });
     window.location.hash = "#input";
     showToast("編集モードです");
@@ -370,6 +431,8 @@ export function AcademicProgressPage() {
   const improvementChartRef = useRef<SVGSVGElement>(null);
   const subjectTrendChartRef = useRef<SVGSVGElement>(null);
   const rankChartRef = useRef<SVGSVGElement>(null);
+  const avgDiffChartRef = useRef<SVGSVGElement>(null);
+  const subjectRankChartRef = useRef<SVGSVGElement>(null);
 
   const sortedTests = useMemo(() => {
     return [...tests].sort((a, b) => String(a.date).localeCompare(String(b.date)));
@@ -412,6 +475,20 @@ export function AcademicProgressPage() {
   const testKey = (t: TestRecord | undefined) => (t ? `${t.date}__${t.name}` : "");
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
+  const testType = (t: TestRecord) => (t.name.includes("中間") ? "中間" : t.name.includes("期末") ? "期末" : "その他");
+  // Default comparison partner: the latest earlier test of the SAME type
+  // (中間↔中間, 期末↔期末). 期末 covers 9 subjects and has different
+  // difficulty from 中間, so raw comparisons across types mislead. Falls
+  // back to the immediately previous test when no same-type test exists yet.
+  const defaultCompareFrom = (sorted: TestRecord[]): TestRecord | undefined => {
+    if (sorted.length < 2) return sorted[0];
+    const latest = sorted[sorted.length - 1];
+    for (let i = sorted.length - 2; i >= 0; i--) {
+      if (testType(sorted[i]) === testType(latest)) return sorted[i];
+    }
+    return sorted[sorted.length - 2];
+  };
+
   const renderTotalAverageChart = useCallback(() => {
     const svg = totalChartRef.current;
     if (!svg || !sortedTests.length) return;
@@ -449,7 +526,7 @@ export function AcademicProgressPage() {
     const svg = radarChartRef.current;
     if (!svg || !sortedTests.length) return;
     const cur = sortedTests[sortedTests.length - 1];
-    const pre = sortedTests.find(t => testKey(t) === radarCompareKey) || sortedTests[Math.max(0, sortedTests.length - 2)];
+    const pre = sortedTests.find(t => testKey(t) === radarCompareKey) || defaultCompareFrom(sortedTests);
     const W = 620, H = 340, cx = 300, cy = 172, R = 110;
     const angle = (i: number) => -Math.PI / 2 + i * 2 * Math.PI / subjects.length;
     const pt = (score: number, i: number, rad = R) => [cx + Math.cos(angle(i)) * rad * score / 100, cy + Math.sin(angle(i)) * rad * score / 100];
@@ -471,7 +548,7 @@ export function AcademicProgressPage() {
       svg.innerHTML = `<rect x="20" y="76" width="520" height="126" rx="22" fill="#f8fafc" stroke="#e5eaf3"/><text x="42" y="124" font-size="17" fill="#667085" font-weight="900">次のテストを追加すると改善グラフが出ます。</text><text x="42" y="155" font-size="13" fill="#667085">「サンプル改善データを入力」で動きを確認できます。</text>`;
       return;
     }
-    const from = sortedTests.find(t => testKey(t) === compareFromKey) || sortedTests[Math.max(0, sortedTests.length - 2)];
+    const from = sortedTests.find(t => testKey(t) === compareFromKey) || defaultCompareFrom(sortedTests) || sortedTests[0];
     const to = sortedTests.find(t => testKey(t) === compareToKey) || sortedTests[sortedTests.length - 1];
     const diffs = subjects.map(s => Number(to.scores[s]) - Number(from.scores[s]));
     const max = Math.max(20, Math.ceil(Math.max(...diffs.map(Math.abs)) / 5) * 5);
@@ -485,10 +562,18 @@ export function AcademicProgressPage() {
     }
     subjects.forEach((s, i) => {
       const d = diffs[i], x = L + i * step + step * .18, bw = step * .64, y = d >= 0 ? zero - d * scale : zero, h = Math.max(2, Math.abs(d * scale));
-      html += `<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="9" fill="${d >= 0 ? "#16a34a" : "#dc2626"}"/><text x="${x + bw / 2 - 14}" y="${d >= 0 ? y - 8 : y + h + 19}" font-size="13" fill="#172033" font-weight="1000">${d >= 0 ? "+" : ""}${d}</text><text x="${x + bw / 2 - 14}" y="${H - 18}" font-size="12" fill="${colors[s]}" font-weight="1000">${labels[s]}</text>`;
+      html += `<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="9" fill="${d >= 0 ? "#16a34a" : "#dc2626"}"/><text x="${x + bw / 2 - 14}" y="${d >= 0 ? y - 8 : y + h + 19}" font-size="13" fill="#172033" font-weight="1000">${d >= 0 ? "+" : ""}${d}</text><text x="${x + bw / 2 - 14}" y="${H - 20}" font-size="12" fill="${colors[s]}" font-weight="1000">${labels[s]}</text>`;
+      // Rank movement is the fair comparison — scores swing with test
+      // difficulty, ranks don't. Show it under the subject label when both
+      // tests carry per-subject rank data.
+      const fr = from.subjectRanks?.[s], tr = to.subjectRanks?.[s];
+      if (fr && tr) {
+        const rankColor = tr < fr ? "#16a34a" : tr > fr ? "#dc2626" : "#667085";
+        html += `<text x="${x + bw / 2 - 26}" y="${H - 5}" font-size="10.5" fill="${rankColor}" font-weight="1000">${fr}位→${tr}位</text>`;
+      }
     });
     svg.innerHTML = html;
-  }, [sortedTests, compareFromKey, compareToKey]);
+  }, [sortedTests, compareFromKey, compareToKey, defaultCompareFrom]);
 
   const renderSubjectTrendChart = useCallback(() => {
     const svg = subjectTrendChartRef.current;
@@ -531,6 +616,85 @@ export function AcademicProgressPage() {
     svg.innerHTML = html;
   }, [sortedTests, goals.students, goals.rank, esc]);
 
+  // 平均との差の推移 — score minus class average, per subject, across all
+  // tests. This is the difficulty-adjusted view: the 期末 was much harder
+  // than the 中間 (avg total fell ~45pts), so raw score trends mislead.
+  const renderAvgDiffChart = useCallback(() => {
+    const svg = avgDiffChartRef.current;
+    if (!svg || !sortedTests.length) return;
+    const W = 700, H = 330, L = 52, R = 92, T = 26, B = 50;
+    const vals: (number | null)[][] = subjects.map(s => sortedTests.map(t => {
+      const avg = Number(t.average?.[s] || 0);
+      return avg > 0 ? Math.round((Number(t.scores[s]) - avg) * 10) / 10 : null;
+    }));
+    const flat = vals.flat().filter((v): v is number => v !== null);
+    if (!flat.length) {
+      svg.innerHTML = `<rect x="20" y="76" width="520" height="100" rx="22" fill="#f8fafc" stroke="#e5eaf3"/><text x="42" y="132" font-size="15" fill="#667085" font-weight="900">平均点を入力すると表示されます。</text>`;
+      return;
+    }
+    const vmax = Math.max(10, Math.ceil(Math.max(...flat) / 10) * 10);
+    const vmin = Math.min(-10, Math.floor(Math.min(...flat) / 10) * 10);
+    const x = (i: number) => L + (W - L - R) * (sortedTests.length === 1 ? 0.5 : i / (sortedTests.length - 1));
+    const y = (v: number) => T + (vmax - v) / (vmax - vmin) * (H - T - B);
+    let html = "";
+    for (let g = vmin; g <= vmax; g += 10) {
+      const yy = y(g);
+      html += `<line x1="${L}" y1="${yy}" x2="${W - R}" y2="${yy}" stroke="${g === 0 ? "#172033" : "#e5eaf3"}" stroke-width="${g === 0 ? 2 : 1}"/><text x="12" y="${yy + 4}" font-size="11" fill="${g === 0 ? "#172033" : "#94a3b8"}" font-weight="${g === 0 ? 1000 : 400}">${g > 0 ? "+" : ""}${g}</text>`;
+    }
+    subjects.forEach((s, si) => {
+      let segment: string[] = [];
+      const flush = () => { if (segment.length > 1) html += `<polyline points="${segment.join(" ")}" fill="none" stroke="${colors[s]}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`; segment = []; };
+      let lastIdx = -1;
+      vals[si].forEach((v, i) => { if (v !== null) { segment.push(`${x(i)},${y(v)}`); lastIdx = i; } else { flush(); } });
+      flush();
+      vals[si].forEach((v, i) => { if (v !== null) html += `<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="#fff" stroke="${colors[s]}" stroke-width="2.5"/>`; });
+      if (lastIdx >= 0) {
+        const v = vals[si][lastIdx] as number;
+        html += `<text x="${x(lastIdx) + 9}" y="${y(v) + 4}" font-size="11.5" fill="${colors[s]}" font-weight="1000">${labels[s]} ${v >= 0 ? "+" : ""}${v}</text>`;
+      }
+    });
+    sortedTests.forEach((t, i) => html += `<text x="${x(i) - 30}" y="${H - 18}" font-size="11" fill="#667085">${esc(t.name).slice(0, 9)}</text>`);
+    svg.innerHTML = html;
+  }, [sortedTests, esc]);
+
+  // 教科別順位の推移 — the school-wide rank per subject. Inverted axis so
+  // "up" means a better rank, matching the overall rank chart.
+  const renderSubjectRankChart = useCallback(() => {
+    const svg = subjectRankChartRef.current;
+    if (!svg || !sortedTests.length) return;
+    const W = 700, H = 330, L = 52, R = 92, T = 26, B = 50;
+    const vals: (number | null)[][] = subjects.map(s => sortedTests.map(t => t.subjectRanks?.[s] ?? null));
+    const flat = vals.flat().filter((v): v is number => v !== null);
+    if (!flat.length) {
+      svg.innerHTML = `<rect x="20" y="76" width="560" height="100" rx="22" fill="#f8fafc" stroke="#e5eaf3"/><text x="42" y="132" font-size="15" fill="#667085" font-weight="900">教科別の順位を入力すると表示されます。</text>`;
+      return;
+    }
+    const vmin = 1;
+    const vmax = Math.max(goals.students || 150, ...flat);
+    const x = (i: number) => L + (W - L - R) * (sortedTests.length === 1 ? 0.5 : i / (sortedTests.length - 1));
+    const y = (v: number) => T + (v - vmin) / (vmax - vmin) * (H - T - B);
+    let html = "";
+    for (let i = 0; i < 5; i++) {
+      const yy = T + (H - T - B) * i / 4;
+      const val = Math.round(vmin + (vmax - vmin) * i / 4);
+      html += `<line x1="${L}" y1="${yy}" x2="${W - R}" y2="${yy}" stroke="#e5eaf3"/><text x="12" y="${yy + 4}" font-size="11" fill="#94a3b8">${val}位</text>`;
+    }
+    subjects.forEach((s, si) => {
+      let segment: string[] = [];
+      const flush = () => { if (segment.length > 1) html += `<polyline points="${segment.join(" ")}" fill="none" stroke="${colors[s]}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`; segment = []; };
+      let lastIdx = -1;
+      vals[si].forEach((v, i) => { if (v !== null) { segment.push(`${x(i)},${y(v)}`); lastIdx = i; } else { flush(); } });
+      flush();
+      vals[si].forEach((v, i) => { if (v !== null) html += `<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="#fff" stroke="${colors[s]}" stroke-width="2.5"/>`; });
+      if (lastIdx >= 0) {
+        const v = vals[si][lastIdx] as number;
+        html += `<text x="${x(lastIdx) + 9}" y="${y(v) + 4}" font-size="11.5" fill="${colors[s]}" font-weight="1000">${labels[s]} ${v}位</text>`;
+      }
+    });
+    sortedTests.forEach((t, i) => html += `<text x="${x(i) - 30}" y="${H - 18}" font-size="11" fill="#667085">${esc(t.name).slice(0, 9)}</text>`);
+    svg.innerHTML = html;
+  }, [sortedTests, goals.students, esc]);
+
   useEffect(() => {
     if (isLoaded) {
       renderTotalAverageChart();
@@ -538,8 +702,10 @@ export function AcademicProgressPage() {
       renderImprovementChart();
       renderSubjectTrendChart();
       renderRankChart();
+      renderAvgDiffChart();
+      renderSubjectRankChart();
     }
-  }, [isLoaded, sortedTests, goals, compareFromKey, compareToKey, radarCompareKey, renderTotalAverageChart, renderRadarChart, renderImprovementChart, renderSubjectTrendChart, renderRankChart]);
+  }, [isLoaded, sortedTests, goals, compareFromKey, compareToKey, radarCompareKey, renderTotalAverageChart, renderRadarChart, renderImprovementChart, renderSubjectTrendChart, renderRankChart, renderAvgDiffChart, renderSubjectRankChart]);
 
   return (
     <>
@@ -910,7 +1076,7 @@ export function AcademicProgressPage() {
                       <div className="small" style={{ margin: "-6px 0 8px 68px" }}>
                         平均との差：<span className={latest.scores[s] - (latest.average?.[s] || 0) >= 0 ? 'goodtxt' : 'badtxt'}>
                           {latest.scores[s] - (latest.average?.[s] || 0) >= 0 ? '+' : ''}{Math.round((latest.scores[s] - (latest.average?.[s] || 0)) * 10) / 10}
-                        </span> ／ 目標まで：{Math.max(0, (goals[s] || 100) - latest.scores[s])}点
+                        </span>{latest.subjectRanks?.[s] ? <> ／ 順位：<b>{latest.subjectRanks[s]}位</b></> : null} ／ 目標まで：{Math.max(0, (goals[s] || 100) - latest.scores[s])}点
                       </div>
                     </div>
                   );
@@ -936,7 +1102,7 @@ export function AcademicProgressPage() {
                         <div className="small" style={{ margin: "-6px 0 8px 68px" }}>
                           平均との差：<span className={(latest.scores[s] || 0) - (latest.average?.[s] || 0) >= 0 ? 'goodtxt' : 'badtxt'}>
                             {(latest.scores[s] || 0) - (latest.average?.[s] || 0) >= 0 ? '+' : ''}{Math.round(((latest.scores[s] || 0) - (latest.average?.[s] || 0)) * 10) / 10}
-                          </span> ／ 目標まで：{Math.max(0, (goals[s] || 100) - (latest.scores[s] || 0))}点
+                          </span>{latest.subjectRanks?.[s] ? <> ／ 順位：<b>{latest.subjectRanks[s]}位</b></> : null} ／ 目標まで：{Math.max(0, (goals[s] || 100) - (latest.scores[s] || 0))}点
                         </div>
                       </div>
                     ))}
@@ -1040,7 +1206,7 @@ export function AcademicProgressPage() {
               <div className="twocol" style={{ marginBottom: "10px" }}>
                 <div>
                   <label>比較するテスト</label>
-                  <select id="radarCompareSelect" value={radarCompareKey || testKey(sortedTests[Math.max(0, sortedTests.length - 2)] ?? sortedTests[0])} onChange={(e) => setRadarCompareKey(e.target.value)}>
+                  <select id="radarCompareSelect" value={radarCompareKey || testKey(defaultCompareFrom(sortedTests) ?? sortedTests[0])} onChange={(e) => setRadarCompareKey(e.target.value)}>
                     {sortedTests.map((t) => <option key={testKey(t)} value={testKey(t)}>{t.name}（{t.date}）</option>)}
                   </select>
                 </div>
@@ -1055,7 +1221,7 @@ export function AcademicProgressPage() {
               <div className="twocol" style={{ marginBottom: "10px" }}>
                 <div>
                   <label>比較元</label>
-                  <select id="compareFrom" value={compareFromKey || testKey(sortedTests[Math.max(0, sortedTests.length - 2)] ?? sortedTests[0])} onChange={(e) => setCompareFromKey(e.target.value)}>
+                  <select id="compareFrom" value={compareFromKey || testKey(defaultCompareFrom(sortedTests) ?? sortedTests[0])} onChange={(e) => setCompareFromKey(e.target.value)}>
                     {sortedTests.map((t) => <option key={testKey(t)} value={testKey(t)}>{t.name}（{t.date}）</option>)}
                   </select>
                 </div>
@@ -1069,15 +1235,27 @@ export function AcademicProgressPage() {
               <svg ref={improvementChartRef} className="chart" viewBox="0 0 560 320" preserveAspectRatio="none"></svg>
               <div id="improvementHint" className="small">
                 {sortedTests.length >= 2 && (() => {
-                  const from = sortedTests.find(t => testKey(t) === compareFromKey) || sortedTests[Math.max(0, sortedTests.length - 2)];
+                  const from = sortedTests.find(t => testKey(t) === compareFromKey) || defaultCompareFrom(sortedTests);
                   const to = sortedTests.find(t => testKey(t) === compareToKey) || sortedTests[sortedTests.length - 1];
                   if (!from || !to) return null;
                   const diffs = subjects.map(s => Number(to.scores[s]) - Number(from.scores[s]));
                   const bestIdx = diffs.indexOf(Math.max(...diffs));
                   const worstIdx = diffs.indexOf(Math.min(...diffs));
+                  // Rank movement (positive = climbed) is shown alongside raw
+                  // score deltas because scores alone mislead when test
+                  // difficulty changes between exams.
+                  const rankMoves = subjects.map(s => {
+                    const fr = from.subjectRanks?.[s], tr = to.subjectRanks?.[s];
+                    return (fr && tr) ? { s, fr, tr, up: fr - tr } : null;
+                  }).filter((v): v is { s: CoreSubjectId; fr: number; tr: number; up: number } => v !== null);
+                  const bestRank = rankMoves.length ? rankMoves.reduce((a, b) => b.up > a.up ? b : a) : null;
+                  const worstRank = rankMoves.length ? rankMoves.reduce((a, b) => b.up < a.up ? b : a) : null;
                   return (
                     <>
-                      比較：<b>{from.name}</b> → <b>{to.name}</b> ／ 一番伸びた教科：<b className="goodtxt">{labels[subjects[bestIdx]]}（{diffs[bestIdx] >= 0 ? "+" : ""}{diffs[bestIdx]}点）</b> ／ 注意：<b className={diffs[worstIdx] < 0 ? "badtxt" : "goodtxt"}>{labels[subjects[worstIdx]]}（{diffs[worstIdx] >= 0 ? "+" : ""}{diffs[worstIdx]}点）</b>
+                      比較：<b>{from.name}</b> → <b>{to.name}</b>{testType(from) !== testType(to) ? <span className="warntxt">（種類の違うテスト同士なので、点数より順位で比べてください）</span> : null} ／ 一番伸びた教科：<b className="goodtxt">{labels[subjects[bestIdx]]}（{diffs[bestIdx] >= 0 ? "+" : ""}{diffs[bestIdx]}点）</b> ／ 注意：<b className={diffs[worstIdx] < 0 ? "badtxt" : "goodtxt"}>{labels[subjects[worstIdx]]}（{diffs[worstIdx] >= 0 ? "+" : ""}{diffs[worstIdx]}点）</b>
+                      {bestRank && worstRank && (
+                        <><br />順位で見ると — 一番上がった：<b className="goodtxt">{labels[bestRank.s]}（{bestRank.fr}位→{bestRank.tr}位）</b> ／ 一番下がった：<b className={worstRank.up < 0 ? "badtxt" : "goodtxt"}>{labels[worstRank.s]}（{worstRank.fr}位→{worstRank.tr}位）</b>。点数の上下よりも、順位の動きが本当の実力の変化です。</>
+                      )}
                     </>
                   );
                 })()}
@@ -1099,6 +1277,25 @@ export function AcademicProgressPage() {
               <div className="small">上に行くほど良い順位です。赤点線は順位目標です。</div>
             </div>
 
+            <div className="card span-6">
+              <div className="card-head"><h2>平均との差の推移（5教科）</h2><div className="legend">
+                {subjects.map(s => (
+                  <span key={s} className="legend-item"><span className="dot" style={{ background: colors[s] }}></span>{labels[s]}</span>
+                ))}
+              </div></div>
+              <svg ref={avgDiffChartRef} className="chart" viewBox="0 0 700 330" preserveAspectRatio="none"></svg>
+              <div className="small">0より上＝学校平均より上。テストの難易度に左右されない「本当の実力」の動きです。点数が下がっても、この線が上がっていれば実力は伸びています。</div>
+            </div>
+            <div className="card span-6">
+              <div className="card-head"><h2>教科別順位の推移（5教科）</h2><div className="legend">
+                {subjects.map(s => (
+                  <span key={s} className="legend-item"><span className="dot" style={{ background: colors[s] }}></span>{labels[s]}</span>
+                ))}
+              </div></div>
+              <svg ref={subjectRankChartRef} className="chart" viewBox="0 0 700 330" preserveAspectRatio="none"></svg>
+              <div className="small">上に行くほど良い順位。成績表の「総合順位」行の数字です。順位はテストの難しさに関係なく比べられます。</div>
+            </div>
+
             <div className="card span-12" id="input">
               <h2 id="formTitle">{form.editIndex !== null ? "テスト結果を修正" : "新しいテスト結果を追加"}</h2>
               <div className="formgrid">
@@ -1111,6 +1308,9 @@ export function AcademicProgressPage() {
                 ))}
                 {allSubjects.map(s => (
                   <div key={`avg_${s}`}><label htmlFor={`avg_${s}`}>{labels[s]} 平均点</label><input id={`avg_${s}`} type="number" step="0.1" value={form[`avg_${s}` as keyof typeof form] as string} onChange={e => setForm({ ...form, [`avg_${s}`]: e.target.value })} /></div>
+                ))}
+                {allSubjects.map(s => (
+                  <div key={`rank_${s}`}><label htmlFor={`rank_${s}`}>{labels[s]} 順位</label><input id={`rank_${s}`} type="number" min="1" placeholder="成績表の総合順位" value={form[`rank_${s}` as keyof typeof form] as string} onChange={e => setForm({ ...form, [`rank_${s}`]: e.target.value })} /></div>
                 ))}
               </div>
               <div className="actions">
@@ -1205,7 +1405,7 @@ export function AcademicProgressPage() {
                       <table>
                         <thead>
                           <tr>
-                            <th>教科</th><th className="right">点数</th><th className="right">目標</th><th className="right">目標まで</th><th className="right">平均との差</th><th className="right">目安</th>
+                            <th>教科</th><th className="right">点数</th><th className="right">順位</th><th className="right">目標</th><th className="right">目標まで</th><th className="right">平均との差</th><th className="right">目安</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1213,6 +1413,7 @@ export function AcademicProgressPage() {
                             <tr key={r.s}>
                               <td>{labels[r.s]}</td>
                               <td className="right">{r.score}</td>
+                              <td className="right">{latest.subjectRanks?.[r.s] ? `${latest.subjectRanks[r.s]}位` : "—"}</td>
                               <td className="right">{goals[r.s] || 100}</td>
                               <td className={`right ${r.gap === 0 ? 'goodtxt' : 'warntxt'}`}>{r.gap === 0 ? '達成' : r.gap + '点'}</td>
                               <td className={`right ${r.d === null ? '' : r.d >= 0 ? 'goodtxt' : 'badtxt'}`}>{r.d === null ? '—' : (r.d >= 0 ? '+' : '') + r.d}</td>

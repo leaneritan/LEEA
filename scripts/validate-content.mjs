@@ -26,6 +26,7 @@ function sourceLabel(word, suffix) {
 
 const unitVocabularyPaths = [
   "content/subjects/english/courses/our-world/level-5/unit-1/vocabulary.json",
+  "content/subjects/english/courses/our-world/level-3/unit-7/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-8/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-9/vocabulary.json",
   "content/subjects/english/courses/our-world/level-4/unit-1/vocabulary.json",
@@ -125,7 +126,7 @@ for (const id of allWordIds) {
    example sentences legitimately use past/past-participle forms without
    failing the highlight check below. */
 const IRREGULAR_VERBS_FOR_VALIDATION = {
-  be: ["was/were", "been"], begin: ["began", "begun"], break: ["broke", "broken"],
+  be: ["was/were", "been"], begin: ["began", "begun"], bend: ["bent", "bent"], break: ["broke", "broken"],
   bring: ["brought", "brought"], build: ["built", "built"], buy: ["bought", "bought"],
   catch: ["caught", "caught"], choose: ["chose", "chosen"], come: ["came", "come"],
   cut: ["cut", "cut"], dig: ["dug", "dug"], do: ["did", "done"], draw: ["drew", "drawn"],

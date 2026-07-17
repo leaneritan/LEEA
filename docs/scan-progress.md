@@ -71,7 +71,7 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 - [ ] Unit 5 — Grammar
 - [ ] Unit 6 — Vocab
 - [ ] Unit 6 — Grammar
-- [ ] Unit 7 — Vocab
+- [x] Unit 7 — Vocab
 - [ ] Unit 7 — Grammar
 - [x] Unit 8 — Vocab
 - [x] Unit 8 — Grammar
@@ -143,9 +143,9 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 
 ## Status snapshot (2026-07-14)
 
-- **Done:** Level 4 Units 1-9 (vocab + grammar); Level 5 Unit 1 (vocab + grammar); Level 3 Unit 9 (vocab + grammar); Level 3 Unit 8 (vocab)
-- **Next up:** Level 3 Unit 8 — Grammar, or other Level 1, 2, 3, 5, 6 scans
-- **Not started:** Levels 1, 2, 6 — all 9 units each; Level 3 Units 1-7; Level 5 Units 2-9
-- **Remaining scans:** 85 of 108
+- **Done:** Level 4 Units 1-9 (vocab + grammar); Level 5 Unit 1 (vocab + grammar); Level 3 Units 7-9 (vocab), Level 3 Units 8-9 (grammar)
+- **Next up:** Level 3 Unit 7 — Grammar, or other Level 1, 2, 3, 5, 6 scans
+- **Not started:** Levels 1, 2, 6 — all 9 units each; Level 3 Units 1-6; Level 5 Units 2-9
+- **Remaining scans:** 84 of 108
 
 Recommended order: continue Level 5 (8 units left), then work Levels 1-3 and 6 in whatever order matches your teaching rollout — numeric order (1→2→3→6) is the default assumed here if no other priority applies.

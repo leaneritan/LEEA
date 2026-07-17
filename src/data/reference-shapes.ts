@@ -253,6 +253,10 @@ export type GrammarEntry = {
   course: "our-world" | "joyful-work" | "junior-high";
   level: number;
   unit: number;
+  /* Pedagogical bucket for the Browse "Topic" filter, derived from the
+     source point's tags (see classifyTopic below) — not authored per point,
+     so new grammar points get bucketed automatically as the library grows. */
+  topic: string;
 
   /* persistent sentence chart shown above every tab */
   chart: {
@@ -313,6 +317,38 @@ export const CHART_LEGEND: Array<{ key: string; label: string; color: string }> 
   { key: "futureNegative", label: "Won't", color: "#a24571" }
 ];
 
+/* Ordered keyword buckets for the Grammar Browse "Topic" filter. Each grammar
+   point's tags are checked against these keyword lists in order — first
+   bucket with a matching tag wins. New tag vocabulary that doesn't match
+   anything falls into "Other" rather than being hidden or crashing. */
+const TOPIC_RULES: Array<{ topic: string; keywords: string[] }> = [
+  {
+    topic: "Tenses",
+    keywords: [
+      "past-simple", "present-progressive", "future-plans", "future", "will", "wont",
+      "predictions", "used-to", "past-habits", "be-going-to", "conditionals",
+      "zero-conditional", "go-ing"
+    ]
+  },
+  { topic: "Comparatives", keywords: ["comparatives", "superlatives", "double-comparatives", "irregular"] },
+  {
+    topic: "Modals & Requests",
+    keywords: ["have-to", "obligation", "prohibition", "should", "advice", "would-like", "polite-requests", "must", "cant", "dont", "modals"]
+  },
+  { topic: "Pronouns", keywords: ["reflexive-pronouns", "generic-you"] },
+  {
+    topic: "Sentence Structure",
+    keywords: ["relative-clause", "who", "which", "direct-object", "indirect-object", "definitions", "contrast", "cause-and-effect"]
+  }
+];
+
+function classifyTopic(tags: string[]): string {
+  for (const rule of TOPIC_RULES) {
+    if (tags.some((tag) => rule.keywords.includes(tag))) return rule.topic;
+  }
+  return "Other";
+}
+
 export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
   return {
     grammarId: point.id,
@@ -329,6 +365,7 @@ export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
           : "our-world",
     level: point.level ?? 0,
     unit: point.unit ?? 0,
+    topic: classifyTopic(point.tags ?? []),
 
     chart: {
       legend: CHART_LEGEND,

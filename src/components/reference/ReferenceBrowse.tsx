@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useJapanesePreference } from "@/components/AppShell";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
@@ -251,16 +251,83 @@ function CoursePlaceholderRow({ course, label, hint }: { course: "joyful-work" |
   );
 }
 
+type CourseKey = "our-world" | "joyful-work" | "junior-high";
+type VocabSort = "unit" | "az";
+
 function VocabularyPane({ words, knownSet, jp }: { words: WordEntry[]; knownSet: Set<string>; jp: boolean }) {
+  const [query, setQuery] = useState("");
+  const [course, setCourse] = useState<"all" | CourseKey>("all");
+  const [sort, setSort] = useState<VocabSort>("unit");
+
+  const coursesPresent = useMemo(() => {
+    const set = new Set<CourseKey>();
+    for (const word of words) for (const source of word.sources) set.add(source.course);
+    return Array.from(set);
+  }, [words]);
+
+  const q = query.trim().toLowerCase();
+  const filtered = useMemo(() => {
+    const list = words.filter((word) => {
+      const matchesCourse = course === "all" || word.sources.some((source) => source.course === course);
+      const matchesQuery = !q || word.word.toLowerCase().includes(q) || word.definition.toLowerCase().includes(q);
+      return matchesCourse && matchesQuery;
+    });
+    if (sort === "az") return [...list].sort((a, b) => a.word.localeCompare(b.word));
+    return list;
+  }, [words, course, q, sort]);
+
+  function clearFilters() {
+    setCourse("all");
+    setQuery("");
+  }
+
   return (
-    <div className="refv2-card refv2-vocab-card">
-      <div className="refv2-vocab-head">
-        <span />
-        <span className="refv2-th">Word</span>
-        <span className="refv2-th">Meaning</span>
-        <span className="refv2-th">Source</span>
+    <div className="refv2-pane-stack">
+      <div className="refv2-fbar">
+        <div className="refv2-fbar-field">
+          <Search size={14} />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter words…" />
+        </div>
+        <div className="refv2-fbar-chips">
+          <button type="button" className={`refv2-filter${course === "all" ? " is-active" : ""}`} onClick={() => setCourse("all")}>
+            <span>All courses</span>
+          </button>
+          {coursesPresent.map((c) => (
+            <button key={c} type="button" className={`refv2-filter${course === c ? " is-active" : ""}`} onClick={() => setCourse(c)}>
+              <span className="refv2-filter-dot" style={{ background: courseColor(c) }} />
+              <span>{courseLabel(c)}</span>
+            </button>
+          ))}
+          <button
+            type="button"
+            className={`refv2-fbar-sort${sort === "az" ? " is-active" : ""}`}
+            onClick={() => setSort((current) => (current === "az" ? "unit" : "az"))}
+          >
+            A–Z
+          </button>
+        </div>
+        <span className="refv2-fbar-count">
+          Showing {filtered.length} of {words.length} words
+        </span>
       </div>
-      {words.map((word) => <VocabularyRow key={word.id} word={word} knownSet={knownSet} jp={jp} />)}
+
+      <div className="refv2-card refv2-vocab-card">
+        <div className="refv2-vocab-head">
+          <span />
+          <span className="refv2-th">Word</span>
+          <span className="refv2-th">Meaning</span>
+          <span className="refv2-th">Source</span>
+        </div>
+        {filtered.map((word) => <VocabularyRow key={word.id} word={word} knownSet={knownSet} jp={jp} />)}
+        {filtered.length === 0 ? (
+          <div className="refv2-fbar-empty-row">
+            No words match —{" "}
+            <button type="button" className="refv2-fbar-empty-action" onClick={clearFilters}>
+              clear filters
+            </button>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -280,20 +347,97 @@ function VocabularyRow({ word, knownSet, jp }: { word: WordEntry; knownSet: Set<
 }
 
 function GrammarPane() {
+  const [query, setQuery] = useState("");
+  const [level, setLevel] = useState<number | "all">("all");
+  const [topic, setTopic] = useState<string>("all");
+
+  const levelsPresent = useMemo(
+    () => Array.from(new Set(allGrammar.map((g) => g.level))).sort((a, b) => a - b),
+    []
+  );
+  const topicsPresent = useMemo(() => Array.from(new Set(allGrammar.map((g) => g.topic))), []);
+
+  const q = query.trim().toLowerCase();
+  const filtered = useMemo(() => {
+    return allGrammar.filter((g) => {
+      const matchesLevel = level === "all" || g.level === level;
+      const matchesTopic = topic === "all" || g.topic === topic;
+      const matchesQuery =
+        !q ||
+        g.title.toLowerCase().includes(q) ||
+        g.subtitle.toLowerCase().includes(q) ||
+        g.tag.toLowerCase().includes(q) ||
+        g.chartAndSamples.samples.some((sample) => sample.en.toLowerCase().includes(q));
+      return matchesLevel && matchesTopic && matchesQuery;
+    });
+  }, [level, topic, q]);
+
+  function clearFilters() {
+    setLevel("all");
+    setTopic("all");
+    setQuery("");
+  }
+
   return (
-    <div className="refv2-grammar-grid">
-      {allGrammar.map((grammar) => (
-        <Link className="refv2-grammar-card" href={`/reference/grammar/${grammar.grammarId}`} key={grammar.grammarId}>
-          <div className="refv2-grammar-head">
-            <div>
-              <div className="refv2-grammar-title-wrap"><h3 className="refv2-grammar-title">{grammar.title}</h3><span className="refv2-grammar-cat-pill">Grammar</span><span className="refv2-grammar-tag">{grammar.tag}</span></div>
-              <p className="refv2-grammar-rule">{grammar.subtitle}</p>
-            </div>
-            <span className="refv2-result-arrow">→</span>
-          </div>
-          {grammar.chartAndSamples.samples[0] ? <div className="refv2-grammar-example"><span className="refv2-eyebrow-mini">Sample</span><p className="refv2-grammar-example-en">{grammar.chartAndSamples.samples[0].en}</p></div> : null}
-        </Link>
-      ))}
+    <div className="refv2-pane-stack">
+      <div className="refv2-fbar">
+        <div className="refv2-fbar-field refv2-fbar-field--wide">
+          <Search size={14} />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter grammar points…" />
+        </div>
+        <span className="refv2-fbar-count">
+          {filtered.length} of {allGrammar.length} points
+        </span>
+      </div>
+
+      <div className="refv2-fbar-row">
+        <span className="refv2-fbar-row-label">Level</span>
+        <button type="button" className={`refv2-filter${level === "all" ? " is-active" : ""}`} onClick={() => setLevel("all")}>
+          <span>All levels</span>
+        </button>
+        {levelsPresent.map((l) => (
+          <button key={l} type="button" className={`refv2-filter${level === l ? " is-active" : ""}`} onClick={() => setLevel(l)}>
+            <span className="refv2-filter-dot--level" data-level={l} />
+            <span>Level {l}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="refv2-fbar-row">
+        <span className="refv2-fbar-row-label">Topic</span>
+        <button type="button" className={`refv2-filter${topic === "all" ? " is-active" : ""}`} onClick={() => setTopic("all")}>
+          <span>All topics</span>
+        </button>
+        {topicsPresent.map((t) => (
+          <button key={t} type="button" className={`refv2-filter${topic === t ? " is-active" : ""}`} onClick={() => setTopic(t)}>
+            <span>{t}</span>
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="refv2-fbar-empty-card">
+          <div className="refv2-fbar-empty-title">No grammar points match</div>
+          <button type="button" className="refv2-fbar-clear-btn" onClick={clearFilters}>
+            Clear filters
+          </button>
+        </div>
+      ) : (
+        <div className="refv2-grammar-grid">
+          {filtered.map((grammar) => (
+            <Link className="refv2-grammar-card" href={`/reference/grammar/${grammar.grammarId}`} key={grammar.grammarId}>
+              <div className="refv2-grammar-head">
+                <div>
+                  <div className="refv2-grammar-title-wrap"><h3 className="refv2-grammar-title">{grammar.title}</h3><span className="refv2-grammar-cat-pill">Grammar</span><span className="refv2-grammar-tag">{grammar.tag}</span></div>
+                  <p className="refv2-grammar-rule">{grammar.subtitle}</p>
+                </div>
+                <span className="refv2-result-arrow">→</span>
+              </div>
+              {grammar.chartAndSamples.samples[0] ? <div className="refv2-grammar-example"><span className="refv2-eyebrow-mini">Sample</span><p className="refv2-grammar-example-en">{grammar.chartAndSamples.samples[0].en}</p></div> : null}
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

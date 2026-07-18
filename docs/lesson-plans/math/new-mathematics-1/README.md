@@ -31,7 +31,7 @@ each file here is under 25MB.
 | 章 | 節 | Pages | Scanned | Lesson content built |
 | --- | --- | --- | --- | --- |
 | 0章 | 整数の性質 | p.11–18 | full | yes, full (`content/subjects/math/chapters/0/sections/1.json`) |
-| 1章 | 1節 正負の数 | p.19–28 | full | no |
+| 1章 | 1節 正負の数 | p.19–28 | full | yes, full (`content/subjects/math/chapters/1/sections/1.json`) |
 | 1章 | 2節 加法と減法 | p.29–40 | full | yes (`content/subjects/math/chapters/1/sections/2.json`) |
 | 1章 | 3節 乗法と除法 | p.41–58 | full | no |
 | 1章 | 4節 正負の数の利用 | p.57–59 | full | no |
@@ -39,9 +39,8 @@ each file here is under 25MB.
 | 2章–7章 | all | — | no | no |
 
 1章 is fully scanned (p.19–62, in `ch0_and_ch1-sec1_p11-21.pdf` despite
-its name) but only 2節 has been turned into lesson content so far —
-1節, 3節, 4節, and the end-of-chapter problems are ready to build
-whenever we get to them.
+its name) — 1節 and 2節 are built; 3節, 4節, and the end-of-chapter
+problems are ready to build whenever we get to them.
 
 ## Adding more scans
 

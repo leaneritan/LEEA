@@ -71,6 +71,8 @@ export type MathBlockPractice = {
   mustMaster?: boolean;
   tag?: "知識・技能" | "思考・判断・表現";
   items: string[];
+  /** Optional answer key, revealed on demand. When present, index-aligned to `items`. */
+  answers?: string[];
   chips?: MathChip[];
   page?: string;
 };

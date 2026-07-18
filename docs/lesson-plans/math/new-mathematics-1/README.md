@@ -35,15 +35,15 @@ each file here is under 25MB.
 | 1章 | 2節 加法と減法 | p.29–40 | full | yes (`content/subjects/math/chapters/1/sections/2.json`) |
 | 1章 | 3節 乗法と除法 | p.41–56 | full | yes, full (`content/subjects/math/chapters/1/sections/3.json`) |
 | 1章 | 4節 正負の数の利用 | p.57–59 | full | yes, full (`content/subjects/math/chapters/1/sections/4.json`) |
-| 1章 | 章末問題A/B | p.60–62 | full | no |
+| 1章 | 章末問題A/B | p.60–62 | full | yes (`content/subjects/math/chapters/1/sections/5.json`) |
 | 2章–7章 | all | — | no | no |
 
-**1章 正負の数 is now fully built (all four sections).** The whole
-chapter is scanned (p.19–62, in `ch0_and_ch1-sec1_p11-21.pdf` despite
-its name); only the end-of-chapter problems (章末問題A/B, p.60–62) are
-left, and 2章 onward has no scans yet. Note 3節's actual printed page
-range is p.41–56, not p.41–58 as an earlier placeholder had it — p.57
-onward is 4節's own section tab in the book.
+**1章 正負の数 is now fully built and complete — all four sections plus
+the end-of-chapter 章末問題A/B.** The whole chapter is scanned (p.19–62,
+in `ch0_and_ch1-sec1_p11-21.pdf` despite its name); 2章 onward has no
+scans yet. Note 3節's actual printed page range is p.41–56, not p.41–58
+as an earlier placeholder had it — p.57 onward is 4節's own section tab
+in the book.
 
 ## Adding more scans
 

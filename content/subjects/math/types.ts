@@ -20,6 +20,8 @@ export type MathBlockIntro = {
   question: string;
   pageRange: string;
   topicFlow: string;
+  /** Overrides the "{sectionNumber}節" pill for non-節 units like 章末問題. */
+  kicker?: string;
 };
 
 export type MathBlockGoal = {
@@ -165,6 +167,8 @@ export type MathSection = {
   pages: string;
   question: string;
   blocks: MathBlock[];
+  /** Replaces the "{number}節 {title}" topbar label for non-節 units like 章末問題. */
+  kicker?: string;
 };
 
 export type MathChapterMeta = {

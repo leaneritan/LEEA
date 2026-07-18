@@ -108,7 +108,7 @@ export type MathBlockReflect = {
 };
 
 /** A hands-on widget standing in for the textbook's "シミュレーション" digital content. */
-export type MathBlockInteractiveWidget = "kuku-table" | "prime-sieve";
+export type MathBlockInteractiveWidget = "kuku-table" | "prime-sieve" | "number-line-walk" | "card-game";
 
 export type MathBlockInteractive = {
   id: string;

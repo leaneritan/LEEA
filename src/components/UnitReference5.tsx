@@ -5,10 +5,10 @@ import { AppShell } from "@/components/AppShell";
 import { isMultiEmoji } from "@/components/reference/emoji-utils";
 import { allGrammar } from "@/components/reference/ref-data";
 import {
-  unit5AcademicItems,
-  unit5GlossaryItems,
-  unit5Vocab1Items,
-  unit5Vocab2Items
+  level3Unit5Vocab1Items,
+  level3Unit5Vocab2Items,
+  level3Unit5AcademicItems,
+  level3Unit5GlossaryItems
 } from "@/data/reference";
 import { toWordEntry, type PosTag, type WordEntry } from "@/data/reference-shapes";
 
@@ -50,16 +50,16 @@ const unitSections: Section[] = [
     icon: "①",
     accent: "var(--good)",
     tint: "var(--good-tint)",
-    words: unit5Vocab1Items.map(toWordEntry)
+    words: level3Unit5Vocab1Items.map(toWordEntry)
   },
   {
     id: "vocab2",
     title: "Vocabulary 2",
-    sub: "Favorites & interests",
+    sub: "Extension words",
     icon: "②",
     accent: "#2f9c8e",
     tint: "#e6f4f1",
-    words: unit5Vocab2Items.map(toWordEntry)
+    words: level3Unit5Vocab2Items.map(toWordEntry)
   },
   {
     id: "academic",
@@ -68,7 +68,7 @@ const unitSections: Section[] = [
     icon: "★",
     accent: "var(--amber)",
     tint: "var(--amber-panel)",
-    words: unit5AcademicItems.map(toWordEntry)
+    words: level3Unit5AcademicItems.map(toWordEntry)
   },
   {
     id: "glossary",
@@ -77,13 +77,14 @@ const unitSections: Section[] = [
     icon: "📖",
     accent: "var(--muted-2)",
     tint: "#f0f1ec",
-    words: unit5GlossaryItems.map(toWordEntry)
+    words: level3Unit5GlossaryItems.map(toWordEntry)
   }
-];
+].filter(s => s.words.length > 0);
 
 const unitGrammarEntries = allGrammar
-  .filter((g) => g.course === "our-world" && g.level === 4 && g.unit === 5)
+  .filter((g) => g.course === "our-world" && g.level === 3 && g.unit === 5)
   .sort((a, b) => a.tag.localeCompare(b.tag));
+
 const unitGrammar = unitGrammarEntries.map((g, idx) => ({
   n: String(idx + 1),
   title: g.title,
@@ -94,10 +95,10 @@ const unitGrammar = unitGrammarEntries.map((g, idx) => ({
 
 const jumps = [
   ...unitSections.map((section) => ({
-  label: section.title,
-  count: section.words.length,
-  dot: section.accent,
-  href: `#${section.id}`
+    label: section.title,
+    count: section.words.length,
+    dot: section.accent,
+    href: `#${section.id}`
   })),
   { label: "Grammar", count: unitGrammar.length, dot: "var(--accent)", href: "#grammar" }
 ];
@@ -120,9 +121,9 @@ export default function UnitReference5() {
             <div className="unit-hero-icon"><span /></div>
             <div>
               <div className="unit-hero-eyebrow-row">
-                <span className="unit-hero-eyebrow">Our World · Level 4 · Unit 5</span>
+                <span className="unit-hero-eyebrow">Our World · Level 3 · Unit 5</span>
               </div>
-              <h1 className="unit-hero-title">My Favorites</h1>
+              <h1 className="unit-hero-title">Animal Habitats</h1>
             </div>
           </div>
           <div className="unit-hero-stats">
@@ -179,34 +180,37 @@ export default function UnitReference5() {
           </section>
         ))}
 
-        <section className="unit-section" id="grammar">
-          <div className="unit-section-accent" style={{ background: "var(--accent)" }} />
-          <div className="unit-section-head">
-            <div className="unit-section-head-left">
-              <span className="unit-section-icon" style={{ background: "var(--accent-tint)", color: "var(--accent-ink)" }}>✦</span>
-              <div>
-                <h2 className="unit-section-title">Grammar</h2>
-                <div className="unit-section-sub">Each opens its grammar card</div>
+        {/* grammar */}
+        {unitGrammar.length > 0 ? (
+          <section className="unit-section" id="grammar">
+            <div className="unit-section-accent" style={{ background: "var(--accent)" }} />
+            <div className="unit-section-head">
+              <div className="unit-section-head-left">
+                <span className="unit-section-icon" style={{ background: "var(--accent-tint)", color: "var(--accent-ink)" }}>¶</span>
+                <div>
+                  <h2 className="unit-section-title">Grammar</h2>
+                  <div className="unit-section-sub">Each opens its grammar card</div>
+                </div>
               </div>
+              <span className="unit-section-count">{unitGrammar.length} point{unitGrammar.length === 1 ? "" : "s"}</span>
             </div>
-            <span className="unit-section-count">{unitGrammar.length} point{unitGrammar.length === 1 ? "" : "s"}</span>
-          </div>
-          <div className="unit-word-list">
-            {unitGrammar.map((grammar) => (
-              <Link className="unit-grammar" href={grammar.href} key={grammar.code}>
-                <span className="unit-grammar-badge">G{grammar.n}</span>
-                <span className="unit-word-main">
-                  <span className="unit-word-headline">
-                    <span className="unit-word-text">{grammar.title}</span>
-                    <span className="unit-grammar-code">{grammar.code}</span>
+            <div className="unit-word-list">
+              {unitGrammar.map((g) => (
+                <Link className="unit-grammar" href={g.href} key={g.code}>
+                  <span className="unit-grammar-badge">G{g.n}</span>
+                  <span className="unit-word-main">
+                    <span className="unit-word-headline">
+                      <span className="unit-word-text">{g.title}</span>
+                      <span className="unit-grammar-code">{g.code}</span>
+                    </span>
+                    <span className="unit-word-meaning">{g.sample}</span>
                   </span>
-                  <span className="unit-word-meaning">{grammar.sample}</span>
-                </span>
-                <span className="unit-word-arrow">→</span>
-              </Link>
-            ))}
-          </div>
-        </section>
+                  <span className="unit-word-arrow">→</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </div>
     </AppShell>
   );

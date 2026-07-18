@@ -45,12 +45,13 @@ each file here is under 25MB.
 | 2章 | 1節 文字を使った式 | p.64–74 | full | yes, full (`content/subjects/math/chapters/2/sections/1.json`) |
 | 2章 | 2節 文字式の計算 | p.75–82 | full | yes, full (`content/subjects/math/chapters/2/sections/2.json`) |
 | 2章 | 3節 文字式の利用 | p.83–87 | full | yes, full (`content/subjects/math/chapters/2/sections/3.json`) |
-| 2章 | 章末問題A/B | p.88–90 | full | no |
+| 2章 | 章末問題A/B | p.88–90 | full | yes (`content/subjects/math/chapters/2/sections/4.json`) |
 | 3章–7章 | all | — | no | no |
 
-**1章 正負の数 is fully built and complete.** 2章 文字と式 is fully
-scanned (`ch2_p63-90.pdf`) — 1節, 2節, and 3節 are built; only 2章 章末
-問題 (p.88–90) is left. 3章 onward has no scans yet.
+**1章 正負の数 and 2章 文字と式 are both fully built and complete** —
+every section plus each chapter's 章末問題. 3章 方程式 onward has no
+scans yet: photograph and drop the next chapter's pages in `scans/` to
+continue.
 
 ## Adding more scans
 

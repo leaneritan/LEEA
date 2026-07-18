@@ -39,9 +39,9 @@ export const mathChapters: MathChapterMeta[] = [
     dark: "#9c7c14",
     sections: [
       { id: "math-2-1", chapterId: "2", number: 1, name: "1節 文字を使った式", pages: "p.64–74", status: "done" },
-      { id: "math-2-2", chapterId: "2", number: 2, name: "2節 文字式の計算", pages: "p.75–82", status: "now" },
+      { id: "math-2-2", chapterId: "2", number: 2, name: "2節 文字式の計算", pages: "p.75–82", status: "done" },
       { id: "math-2-3", chapterId: "2", number: 3, name: "3節 文字式の利用", pages: "p.83–87", status: "done" },
-      { id: "math-2-4", chapterId: "2", number: 4, name: "章末問題 A・B", pages: "p.88–90", status: "now" }
+      { id: "math-2-4", chapterId: "2", number: 4, name: "章末問題 A・B", pages: "p.88–90", status: "done" }
     ]
   },
   {
@@ -53,7 +53,7 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#f9e6ec",
     dark: "#a84763",
     sections: [
-      { id: "math-3-1", chapterId: "3", number: 1, name: "1節 方程式とその解き方", pages: "p.88–101", status: "todo" },
+      { id: "math-3-1", chapterId: "3", number: 1, name: "1節 方程式とその解き方", pages: "p.88–101", status: "now" },
       { id: "math-3-2", chapterId: "3", number: 2, name: "2節 方程式の活用", pages: "p.102–112", status: "todo" }
     ]
   },

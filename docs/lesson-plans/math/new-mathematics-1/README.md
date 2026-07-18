@@ -12,30 +12,36 @@ each file here is under 25MB.
   シミュレーション / ワークシート / ヒントと解答 / 動画 / 対話シート,
   mapped to its textbook page and chapter/section. Use this first to see
   what exists for a chapter before reading the scans below.
-- `scans/front-matter.pdf` — cover, 目次 (table of contents for all 8章),
-  デジタルコンテンツの使い方, 学びをふり返ろう / 数学マイノート guidance
-  (textbook pages 1–7). No chapter content.
-- `scans/ch0_and_ch1-sec1_p11-21.pdf` — 0章 算数から数学へ (九九表の
-  きまり, 素因数分解) and the start of 1章1節 正負の数 (負の数, 予想最低
-  気温の例), textbook pages 11–21. Also repeats the front matter.
-- `scans/ch1-sec2_p38-40.pdf` — tail of 1章2節 加法と減法 (問3–問6,
-  トランプゲームのまど, 基本の問題), textbook pages 38–40. Also repeats
-  the front matter.
+- `scans/ch0-complete_p11-18.pdf` — **0章 算数から数学へ, complete**
+  (九九表のきまり, 素因数分解, 累乗, エラトステネスのふるい). Was
+  mislabeled `front-matter.pdf` in an earlier commit — it was misread as
+  front-matter-only; it's actually the full chapter.
+- `scans/ch0_and_ch1-sec1_p11-21.pdf` — mostly redundant with the file
+  above for pages 11–13. Its unique content is **1章 正負の数, complete
+  through the end-of-chapter problems** (p.19–62: 符号のついた数, 数の大
+  小, 加法と減法, 乗法と除法, 四則の混じった計算, 正負の数の利用, 章末問
+  題A/B). Not yet used beyond 1章2節.
+- `scans/ch1-sec2_p38-40.pdf` — fully redundant with the file above
+  (same p.38–40 content plus repeated front matter). Kept for now since
+  it's what 1章2節's lesson content was originally built from; safe to
+  delete once cross-checked against the fuller file.
 
 ## Coverage status
 
 | 章 | 節 | Pages | Scanned | Lesson content built |
 | --- | --- | --- | --- | --- |
-| 0章 | 整数の性質 | p.11–18 | partial (11–13 only) | yes, partial (`content/subjects/math/chapters/0/sections/1.json` — covers p.11–13 とびら/九九表 activity only; p.14–18 素数・累乗・素因数分解 not scanned, not built) |
-| 1章 | 1節 正負の数 | p.19–28 | full (19–28) | no |
-| 1章 | 2節 加法と減法 | p.29–40 | full (29–40) | yes (`content/subjects/math/chapters/1/sections/2.json`) |
-| 1章 | 3節 乗法と除法 | p.41–58 | no | no |
+| 0章 | 整数の性質 | p.11–18 | full | yes, full (`content/subjects/math/chapters/0/sections/1.json`) |
+| 1章 | 1節 正負の数 | p.19–28 | full | no |
+| 1章 | 2節 加法と減法 | p.29–40 | full | yes (`content/subjects/math/chapters/1/sections/2.json`) |
+| 1章 | 3節 乗法と除法 | p.41–58 | full | no |
+| 1章 | 4節 正負の数の利用 | p.57–59 | full | no |
+| 1章 | 章末問題A/B | p.60–62 | full | no |
 | 2章–7章 | all | — | no | no |
 
-The section-2 lesson content was built from a mix of these scans and the
-`design_handoff_math_helper` prototype's sample content (which mirrors
-what's visible on p.29–40); it hasn't been checked against the full
-p.22–37 and p.30–37 page range, since those weren't scanned yet.
+1章 is fully scanned (p.19–62, in `ch0_and_ch1-sec1_p11-21.pdf` despite
+its name) but only 2節 has been turned into lesson content so far —
+1節, 3節, 4節, and the end-of-chapter problems are ready to build
+whenever we get to them.
 
 ## Adding more scans
 
@@ -44,3 +50,8 @@ Drop the next batch of page photos/PDFs in `scans/`, named
 above in the same PR. Keep each file under ~25MB — if a batch comes in
 larger than that, split it into smaller page-range files rather than
 switching to Git LFS (this session's environment can't push LFS content).
+
+**Before naming/describing a new file, read every page of it first** —
+an earlier version of this README mislabeled a full-chapter scan as
+"front matter only" from a partial read, which cost a few rounds of
+back-and-forth to catch.

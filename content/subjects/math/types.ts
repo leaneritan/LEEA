@@ -121,7 +121,9 @@ export type MathBlockInteractiveWidget =
   | "signed-product"
   | "walk-rate"
   | "number-range-grid"
-  | "average-baseline";
+  | "average-baseline"
+  | "matchstick-squares"
+  | "substitution";
 
 export type MathBlockInteractive = {
   id: string;

@@ -33,13 +33,15 @@ export const mathChapters: MathChapterMeta[] = [
     id: "2",
     num: "2",
     title: "文字と式",
-    subtitle: "文字を使った式・式の計算",
+    subtitle: "文字を使った式・文字式の計算・文字式の利用",
     color: "#d9b23a",
     tint: "#f9f0d3",
     dark: "#9c7c14",
     sections: [
-      { id: "math-2-1", chapterId: "2", number: 1, name: "1節 文字を使った式", pages: "p.60–71", status: "now" },
-      { id: "math-2-2", chapterId: "2", number: 2, name: "2節 文字式の計算", pages: "p.72–86", status: "todo" }
+      { id: "math-2-1", chapterId: "2", number: 1, name: "1節 文字を使った式", pages: "p.64–74", status: "now" },
+      { id: "math-2-2", chapterId: "2", number: 2, name: "2節 文字式の計算", pages: "p.75–82", status: "todo" },
+      { id: "math-2-3", chapterId: "2", number: 3, name: "3節 文字式の利用", pages: "p.83–87", status: "todo" },
+      { id: "math-2-4", chapterId: "2", number: 4, name: "章末問題 A・B", pages: "p.88–90", status: "todo" }
     ]
   },
   {

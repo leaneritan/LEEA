@@ -25,7 +25,7 @@ export const mathChapters: MathChapterMeta[] = [
       { id: "math-1-1", chapterId: "1", number: 1, name: "1節 正負の数", pages: "p.19–28", status: "done" },
       { id: "math-1-2", chapterId: "1", number: 2, name: "2節 加法と減法", pages: "p.29–40", status: "done" },
       { id: "math-1-3", chapterId: "1", number: 3, name: "3節 乗法と除法", pages: "p.41–56", status: "done" },
-      { id: "math-1-4", chapterId: "1", number: 4, name: "4節 正負の数の利用", pages: "p.57–59", status: "now" }
+      { id: "math-1-4", chapterId: "1", number: 4, name: "4節 正負の数の利用", pages: "p.57–59", status: "done" }
     ]
   },
   {
@@ -37,7 +37,7 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#f9f0d3",
     dark: "#9c7c14",
     sections: [
-      { id: "math-2-1", chapterId: "2", number: 1, name: "1節 文字を使った式", pages: "p.60–71", status: "todo" },
+      { id: "math-2-1", chapterId: "2", number: 1, name: "1節 文字を使った式", pages: "p.60–71", status: "now" },
       { id: "math-2-2", chapterId: "2", number: 2, name: "2節 文字式の計算", pages: "p.72–86", status: "todo" }
     ]
   },

@@ -116,7 +116,8 @@ export type MathBlockInteractiveWidget =
   | "number-line-plot"
   | "signed-product"
   | "walk-rate"
-  | "number-range-grid";
+  | "number-range-grid"
+  | "average-baseline";
 
 export type MathBlockInteractive = {
   id: string;

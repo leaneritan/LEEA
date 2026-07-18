@@ -2,11 +2,13 @@ import type { MathBlockInteractive } from "../../../../content/subjects/math/typ
 import { AverageBaselineWidget } from "./AverageBaselineWidget";
 import { CardGameWidget } from "./CardGameWidget";
 import { KukuTableWidget } from "./KukuTableWidget";
+import { MatchstickSquaresWidget } from "./MatchstickSquaresWidget";
 import { NumberLinePlotWidget } from "./NumberLinePlotWidget";
 import { NumberLineWalkWidget } from "./NumberLineWalkWidget";
 import { NumberRangeGridWidget } from "./NumberRangeGridWidget";
 import { PrimeSieveWidget } from "./PrimeSieveWidget";
 import { SignedProductWidget } from "./SignedProductWidget";
+import { SubstitutionWidget } from "./SubstitutionWidget";
 import { WalkRateWidget } from "./WalkRateWidget";
 
 export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
@@ -26,6 +28,8 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "walk-rate" ? <WalkRateWidget /> : null}
       {block.widget === "number-range-grid" ? <NumberRangeGridWidget /> : null}
       {block.widget === "average-baseline" ? <AverageBaselineWidget /> : null}
+      {block.widget === "matchstick-squares" ? <MatchstickSquaresWidget /> : null}
+      {block.widget === "substitution" ? <SubstitutionWidget /> : null}
     </div>
   );
 }

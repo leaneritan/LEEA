@@ -25,6 +25,12 @@ each file here is under 25MB.
   (same p.38–40 content plus repeated front matter). Kept for now since
   it's what 1章2節's lesson content was originally built from; safe to
   delete once cross-checked against the fuller file.
+- `scans/ch2_p63-90.pdf` — **2章 文字と式, complete** (p.63–90: 文字を
+  使った式, 文字式の計算, 文字式の利用, 章末問題A/B). The book's 2章 has
+  **three** sections (1節 文字を使った式 p.64–74, 2節 文字式の計算
+  p.75–82, 3節 文字式の利用 p.83–87) plus 章末問題 p.88–90 — the app's
+  curriculum originally had it as only 2 sections with wrong page ranges;
+  fixed when 1節 was built.
 
 ## Coverage status
 
@@ -36,14 +42,16 @@ each file here is under 25MB.
 | 1章 | 3節 乗法と除法 | p.41–56 | full | yes, full (`content/subjects/math/chapters/1/sections/3.json`) |
 | 1章 | 4節 正負の数の利用 | p.57–59 | full | yes, full (`content/subjects/math/chapters/1/sections/4.json`) |
 | 1章 | 章末問題A/B | p.60–62 | full | yes (`content/subjects/math/chapters/1/sections/5.json`) |
-| 2章–7章 | all | — | no | no |
+| 2章 | 1節 文字を使った式 | p.64–74 | full | yes, full (`content/subjects/math/chapters/2/sections/1.json`) |
+| 2章 | 2節 文字式の計算 | p.75–82 | full | no |
+| 2章 | 3節 文字式の利用 | p.83–87 | full | no |
+| 2章 | 章末問題A/B | p.88–90 | full | no |
+| 3章–7章 | all | — | no | no |
 
-**1章 正負の数 is now fully built and complete — all four sections plus
-the end-of-chapter 章末問題A/B.** The whole chapter is scanned (p.19–62,
-in `ch0_and_ch1-sec1_p11-21.pdf` despite its name); 2章 onward has no
-scans yet. Note 3節's actual printed page range is p.41–56, not p.41–58
-as an earlier placeholder had it — p.57 onward is 4節's own section tab
-in the book.
+**1章 正負の数 is fully built and complete.** 2章 文字と式 is now fully
+scanned (`ch2_p63-90.pdf`) — 1節 is built; 2節, 3節, and 章末問題 are
+ready to build next. 3章 onward has no scans yet. Note that 2章 really
+has three sections plus 章末問題, not two as the curriculum first had it.
 
 ## Adding more scans
 

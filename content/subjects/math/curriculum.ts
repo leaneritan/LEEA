@@ -24,7 +24,8 @@ export const mathChapters: MathChapterMeta[] = [
     sections: [
       { id: "math-1-1", chapterId: "1", number: 1, name: "1節 正負の数", pages: "p.19–28", status: "done" },
       { id: "math-1-2", chapterId: "1", number: 2, name: "2節 加法と減法", pages: "p.29–40", status: "done" },
-      { id: "math-1-3", chapterId: "1", number: 3, name: "3節 乗法と除法", pages: "p.41–58", status: "now" }
+      { id: "math-1-3", chapterId: "1", number: 3, name: "3節 乗法と除法", pages: "p.41–56", status: "done" },
+      { id: "math-1-4", chapterId: "1", number: 4, name: "4節 正負の数の利用", pages: "p.57–59", status: "now" }
     ]
   },
   {

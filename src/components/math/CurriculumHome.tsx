@@ -37,7 +37,9 @@ export function CurriculumHome() {
     <div className="math-scope">
       <div className="math-topbar">
         <div className="math-home-topbar-inner">
-          <span className="math-topbar-brand">数学の学び</span>
+          <Link className="math-topbar-brand" href="/">
+            ← 数学の学び
+          </Link>
           <span className="math-home-pill">中1・新しい数学1</span>
           <span className="math-home-student">レオ</span>
         </div>

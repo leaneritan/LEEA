@@ -76,7 +76,7 @@ export function HomeDashboard() {
         <header><h2>Subjects</h2><span>Pick a subject to jump into its courses</span></header>
         <div className="design-subject-grid">
           <Link className="subject-card active" href="/english"><div><span>Active</span><b>📖</b></div><h3>English</h3><p>Our World, Joyful Work &amp; Training Ground.</p><footer><span>3 courses</span><span>L4 · U8</span></footer></Link>
-          <article className="subject-card planned"><div><span>Soon</span><b>🔢</b></div><h3>Math</h3><p>Number sense, problem solving &amp; drills.</p><footer><span>Planned</span></footer></article>
+          <Link className="subject-card active" href="/math"><div><span>Active</span><b>🔢</b></div><h3>Math</h3><p>新しい数学1 — 中1・8章, with an AI tutor chat.</p><footer><span>8 chapters</span><span>1章 2節</span></footer></Link>
           <article className="subject-card planned"><div><span>Soon</span><b>🔬</b></div><h3>Science</h3><p>Inquiry, experiments &amp; the natural world.</p><footer><span>Planned</span></footer></article>
           <article className="subject-card planned"><div><span>Soon</span><b>🏛️</b></div><h3>History</h3><p>People, places &amp; the story of the world.</p><footer><span>Planned</span></footer></article>
         </div>

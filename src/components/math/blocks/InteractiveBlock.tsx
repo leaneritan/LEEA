@@ -1,5 +1,7 @@
 import type { MathBlockInteractive } from "../../../../content/subjects/math/types";
+import { CardGameWidget } from "./CardGameWidget";
 import { KukuTableWidget } from "./KukuTableWidget";
+import { NumberLineWalkWidget } from "./NumberLineWalkWidget";
 import { PrimeSieveWidget } from "./PrimeSieveWidget";
 
 export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
@@ -12,6 +14,8 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.intro ? <p className="math-interactive-intro">{block.intro}</p> : null}
       {block.widget === "kuku-table" ? <KukuTableWidget /> : null}
       {block.widget === "prime-sieve" ? <PrimeSieveWidget /> : null}
+      {block.widget === "number-line-walk" ? <NumberLineWalkWidget /> : null}
+      {block.widget === "card-game" ? <CardGameWidget /> : null}
     </div>
   );
 }

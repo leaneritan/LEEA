@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Albert_Sans, Anton, Bricolage_Grotesque, Noto_Sans_JP } from "next/font/google";
+import { Albert_Sans, Anton, Bricolage_Grotesque, Noto_Sans_JP, Zen_Maru_Gothic } from "next/font/google";
 import "./globals.css";
 
 const albertSans = Albert_Sans({
@@ -20,6 +20,13 @@ const notoSansJp = Noto_Sans_JP({
   variable: "--font-noto-sans-jp"
 });
 
+// Math Helper headings/badges only (Zen Maru Gothic — see globals.css --font-jp-display).
+const zenMaruGothic = Zen_Maru_Gothic({
+  subsets: ["latin"],
+  weight: ["500", "700", "900"],
+  variable: "--font-zen-maru-gothic"
+});
+
 // World-tile wordmarks only (e.g. "OUR WORLD" / "TRAINING GROUND" on Leo's dashboard).
 const anton = Anton({
   subsets: ["latin"],
@@ -34,7 +41,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${albertSans.variable} ${bricolageGrotesque.variable} ${notoSansJp.variable} ${anton.variable}`}>
+    <html lang="en" className={`${albertSans.variable} ${bricolageGrotesque.variable} ${notoSansJp.variable} ${anton.variable} ${zenMaruGothic.variable}`}>
       <body>{children}</body>
     </html>
   );

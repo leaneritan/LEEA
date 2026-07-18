@@ -60,6 +60,7 @@
   --font-display: var(--font-bricolage-grotesque), 'Bricolage Grotesque', sans-serif;
   --font-ui: var(--font-albert-sans), 'Albert Sans', system-ui, sans-serif;
   --font-jp: var(--font-noto-sans-jp), 'Noto Sans JP', sans-serif;
+  --font-jp-display: var(--font-zen-maru-gothic), 'Zen Maru Gothic', sans-serif;
   --font-numeral: var(--font-anton), 'Anton', sans-serif;
 
   /* Compatibility aliases for existing selectors while the CSS migrates to the new token names. */
@@ -6629,4 +6630,307 @@ h3 {
   .unit-hero { gap: 16px; }
   .unit-hero-stats { gap: 18px; }
   .unit-jumpbar { top: 0; }
+}
+
+/* ============================================================
+   Math Helper (中1数学ヘルパー) — design_handoff_math_helper
+   Chapter accent is set per-instance via inline custom properties
+   (--m-accent / --m-tint / --m-dark) on .math-scope; every class
+   below reads those vars so one component set serves all 8 章.
+   ============================================================ */
+.math-scope {
+  --m-deep: color-mix(in srgb, var(--m-accent) 78%, black);
+  background: #f6f1e6; color: #3d3428; font-family: var(--font-jp);
+  font-size: 15px; line-height: 1.8; min-height: 100vh;
+}
+.math-scope a { color: #a05c30; text-decoration: none; }
+.math-scope a:hover { color: #7c4520; }
+.math-scope h1, .math-scope h2 { font-family: var(--font-jp-display); }
+
+/* ---- shared top bar (home + section view) ---- */
+.math-topbar {
+  position: sticky; top: 0; z-index: 10; background: #f6f1e6ee;
+  backdrop-filter: blur(6px); border-bottom: 1px solid #e5dcc8;
+}
+.math-topbar-inner {
+  max-width: 820px; margin: 0 auto; padding: 12px 24px;
+  display: flex; align-items: center; gap: 12px;
+}
+.math-topbar-brand { font-family: var(--font-jp-display); font-weight: 900; font-size: 15px; color: #8a7a5c; }
+.math-topbar-sep { color: #d8cdb4; }
+.math-topbar-chapter { display: flex; align-items: center; gap: 7px; font-weight: 700; font-size: 13px; color: #a05c30; }
+.math-topbar-dot { width: 11px; height: 11px; border-radius: 4px; background: var(--m-accent); }
+.math-topbar-chevron { color: #c8bda2; font-size: 12px; }
+.math-topbar-section { font-weight: 700; font-size: 13px; }
+.math-topbar-progress { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.math-progress-track { width: 110px; height: 8px; border-radius: 99px; background: #e9e0cc; overflow: hidden; }
+.math-progress-fill { height: 100%; border-radius: 99px; background: var(--m-accent); }
+.math-progress-label { font-size: 12px; font-weight: 700; color: #a08e6c; }
+
+.math-page { max-width: 820px; margin: 0 auto; padding: 28px 24px 100px; display: flex; flex-direction: column; gap: 22px; }
+.math-home-page { padding-top: 24px; padding-bottom: 80px; }
+
+/* ---- Curriculum Home ---- */
+.math-home-topbar-inner { max-width: 820px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 12px; }
+.math-home-pill { font-size: 12px; font-weight: 700; color: #b3a685; background: #efe8d5; border-radius: 99px; padding: 3px 12px; }
+.math-home-student { margin-left: auto; font-size: 13px; font-weight: 700; color: #a08e6c; }
+
+.math-stats-card {
+  display: grid; grid-template-columns: 1fr auto auto auto; gap: 18px; align-items: center;
+  background: #fff; border-radius: 18px; padding: 18px 26px; box-shadow: 0 1px 4px #0000000a;
+}
+.math-stats-greeting { font-family: var(--font-jp-display); font-weight: 900; font-size: 18px; }
+.math-stats-resume { font-size: 13px; color: #a08e6c; margin-top: 2px; }
+.math-stats-resume a { font-weight: 700; }
+.math-stat-block { text-align: center; }
+.math-stat-value { font-family: var(--font-jp-display); font-weight: 900; font-size: 24px; }
+.math-stat-label { font-size: 11px; font-weight: 700; color: #a08e6c; }
+
+.math-chapter-list { display: flex; flex-direction: column; gap: 12px; }
+.math-chapter-card {
+  background: #fff; border-radius: 18px; box-shadow: 0 1px 4px #0000000a; overflow: hidden;
+  border-left: 6px solid var(--m-accent);
+}
+.math-chapter-row {
+  width: 100%; border: 0; background: transparent; font: inherit; color: inherit; text-align: left;
+  cursor: pointer; display: flex; align-items: center; gap: 16px; padding: 16px 22px;
+}
+.math-chapter-row:hover { background: #fdfaf3; }
+.math-chapter-badge {
+  flex: none; width: 44px; height: 44px; border-radius: 13px; background: var(--m-tint); color: var(--m-dark);
+  display: flex; align-items: center; justify-content: center; font-family: var(--font-jp-display); font-weight: 900; font-size: 19px;
+}
+.math-chapter-titles { flex: 1; min-width: 0; }
+.math-chapter-title { display: block; font-family: var(--font-jp-display); font-weight: 900; font-size: 16.5px; }
+.math-chapter-subtitle { display: block; font-size: 12px; color: #a08e6c; font-weight: 500; }
+.math-chapter-end { flex: none; display: flex; align-items: center; gap: 10px; }
+.math-chapter-progress-label { font-size: 12px; font-weight: 700; color: #a08e6c; min-width: 64px; }
+.math-chapter-chevron { font-size: 13px; color: #c8bda2; transition: transform .2s; }
+.math-chapter-chevron--open { transform: rotate(180deg); }
+
+.math-section-list { border-top: 1.5px dashed #efe8d5; padding: 10px 22px 16px 82px; display: flex; flex-direction: column; gap: 4px; }
+.math-section-row { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 10px; color: inherit; }
+.math-section-row:hover { background: #fdfaf3; }
+.math-section-dot {
+  flex: none; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 900; border: 2px solid;
+}
+.math-section-name { font-weight: 700; font-size: 14px; }
+.math-section-pages { font-size: 11.5px; color: #b3a685; }
+.math-section-status { margin-left: auto; font-size: 11.5px; font-weight: 700; border-radius: 99px; padding: 2px 10px; }
+
+/* ---- 1. 節の導入 (intro) ---- */
+.math-block-intro { border-radius: 20px; overflow: hidden; background: var(--m-accent); color: #fff; }
+.math-block-intro-top { padding: 26px 30px 22px; display: flex; gap: 20px; align-items: center; }
+.math-block-intro-titles { flex: 1; }
+.math-block-intro-heading { display: flex; align-items: baseline; gap: 12px; }
+.math-block-intro-number { font-family: var(--font-jp-display); font-weight: 900; font-size: 40px; line-height: 1; }
+.math-block-intro-number span { font-size: 18px; }
+.math-block-intro-title { margin: 0; font-family: var(--font-jp-display); font-weight: 900; font-size: 26px; }
+.math-block-intro-question {
+  margin: 14px 0 0; font-size: 16px; font-weight: 700; background: #ffffff22; border-radius: 12px;
+  padding: 10px 16px; display: inline-block;
+}
+.math-block-intro-art {
+  flex: none; width: 150px; height: 110px; border-radius: 14px; background: #ffffff2e;
+  display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff9;
+}
+.math-block-intro-footer { background: var(--m-deep); padding: 8px 30px; font-size: 12.5px; font-weight: 700; color: #ffe8d4; display: flex; gap: 16px; flex-wrap: wrap; }
+
+/* ---- 2. 学習課題 (goal) ---- */
+.math-block-goal { display: flex; align-items: center; gap: 14px; background: var(--m-tint); border-radius: 14px; padding: 14px 20px; }
+.math-block-goal-pill {
+  flex: none; background: var(--m-accent); color: #fff; font-family: var(--font-jp-display); font-weight: 900;
+  font-size: 13px; border-radius: 99px; padding: 5px 14px;
+}
+.math-block-goal-text { margin: 0; font-weight: 700; font-size: 16px; }
+
+/* generic white card used by q / example / practice / quickcheck */
+.math-card { background: #fff; border-radius: 18px; padding: 24px 28px; box-shadow: 0 1px 4px #0000000a; }
+.math-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.math-card-head h2 { margin: 0; font-weight: 700; font-size: 16px; }
+
+/* ---- 3. Q 考えてみよう ---- */
+.math-q-badge {
+  flex: none; width: 34px; height: 34px; border-radius: 50%; background: #e8a13c; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-family: var(--font-jp-display); font-weight: 900; font-size: 18px;
+}
+.math-q-badge + h2 { font-family: var(--font-jp-display); }
+.math-q-intro { margin: 0 0 14px; }
+.math-q-prompts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+.math-q-prompt { display: flex; gap: 10px; }
+.math-q-prompt-num {
+  flex: none; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #e8a13c; color: #c07d18;
+  font-size: 13px; font-weight: 900; display: flex; align-items: center; justify-content: center;
+}
+.math-q-prompt p { margin: 0; }
+.math-diagram-panel { background: #faf6ec; border-radius: 12px; padding: 16px 18px 10px; }
+.math-diagram-panel svg { width: 100%; max-width: 600px; display: block; margin: 0 auto; }
+
+/* ---- link chips (digital content — external link only) ---- */
+.math-chip-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+.math-chip {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
+  border-radius: 8px; padding: 5px 11px;
+}
+.math-chip--simulation { color: #3a6ea8; background: #eaf2fb; }
+.math-chip--worksheet { color: #3f8a68; background: #e9f5ee; }
+.math-chip--flashcard { color: #c07d18; background: #fdf3e0; }
+.math-chip--hint-answer { color: #5a4d9c; background: #efedf9; }
+.math-chip--video { color: #b23a3a; background: #fbeaea; }
+.math-chip--dialogue-sheet { color: #1f8a82; background: #e2f2f1; }
+
+/* ---- 4. 例 (worked example) ---- */
+.math-example-label {
+  flex: none; border: 2px solid var(--m-accent); color: var(--m-dark); font-family: var(--font-jp-display);
+  font-weight: 900; font-size: 14px; border-radius: 99px; padding: 3px 14px; background: var(--m-tint);
+}
+.math-example-body { display: grid; grid-template-columns: 1fr 220px; gap: 20px; align-items: start; }
+.math-example-problem { margin: 0 0 12px; font-size: 16px; }
+.math-example-steps { background: #faf6ec; border-radius: 12px; padding: 14px 18px; font-size: 17px; display: flex; flex-direction: column; gap: 6px; }
+.math-example-steps > div:last-child { font-weight: 900; }
+.math-example-note { background: #eef4fb; border-radius: 12px; padding: 12px 14px; font-size: 13px; color: #3a5a80; font-weight: 500; }
+@media (max-width: 640px) { .math-example-body { grid-template-columns: 1fr; } }
+
+/* ---- 5. きまり (rule box — most prominent) ---- */
+.math-block-rule { border: 3px solid var(--m-accent); border-radius: 18px; background: #fffdf8; overflow: hidden; }
+.math-rule-band { background: var(--m-accent); color: #fff; padding: 9px 24px; display: flex; align-items: center; gap: 10px; }
+.math-rule-band-label { font-family: var(--font-jp-display); font-weight: 900; font-size: 15px; }
+.math-rule-band-title { font-weight: 700; font-size: 14.5px; }
+.math-rule-body { padding: 20px 26px; }
+.math-rule-statement { margin: 0; font-size: 17px; font-weight: 700; line-height: 2; }
+.math-rule-highlight { background: var(--m-tint); border-radius: 6px; padding: 1px 6px; }
+.math-rule-examples { margin-top: 12px; display: flex; gap: 24px; flex-wrap: wrap; font-size: 15.5px; color: #6d5f47; }
+.math-rule-examples span { white-space: nowrap; }
+
+/* ---- 6. 問 (practice) ---- */
+.math-practice-pill {
+  flex: none; background: #5b8ac2; color: #fff; font-family: var(--font-jp-display); font-weight: 900;
+  font-size: 14px; border-radius: 99px; padding: 3px 14px;
+}
+.math-must-master { color: #d6486e; font-size: 16px; }
+.math-practice-tag { margin-left: auto; font-size: 11px; font-weight: 700; color: #8a7a5c; background: #f1ebdc; border-radius: 6px; padding: 3px 9px; }
+.math-practice-items { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 24px; margin: 12px 0 16px; font-size: 16.5px; }
+.math-practice-item-num { color: #a08e6c; font-size: 13px; margin-right: 8px; }
+@media (max-width: 560px) { .math-practice-items { grid-template-columns: 1fr; } }
+.math-done-toggle {
+  margin-left: auto; border: 2px solid #c9d4bc; background: #fff; color: #7c9a5e; border-radius: 99px;
+  padding: 6px 16px; font: inherit; font-size: 13px; font-weight: 900; cursor: pointer; font-family: var(--font-jp-display);
+}
+.math-done-toggle--done { border-color: #7c9a5e; background: #7c9a5e; color: #fff; }
+
+/* ---- 7. ちょっと確認 ---- */
+.math-block-recall {
+  border: 2px dashed #b9c7a8; border-radius: 14px; background: #f7f9f2; padding: 16px 22px;
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.math-recall-pill { flex: none; background: #7c9a5e; color: #fff; font-family: var(--font-jp-display); font-weight: 900; font-size: 12px; border-radius: 99px; padding: 4px 12px; }
+.math-recall-pill span { font-weight: 500; }
+.math-recall-body { font-size: 14px; color: #55663f; }
+.math-recall-body p { margin: 0; }
+.math-recall-body p + p { margin-top: 4px; }
+
+/* ---- 8. クイックチェック ---- */
+.math-block-quickcheck { border-top: 5px solid #e8a13c; }
+.math-quickcheck-star { color: #e8a13c; font-size: 18px; }
+.math-quickcheck-hint { font-size: 12px; color: #a08e6c; font-weight: 700; }
+.math-quickcheck-items { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 24px; font-size: 16.5px; margin-bottom: 16px; }
+@media (max-width: 560px) { .math-quickcheck-items { grid-template-columns: 1fr; } }
+.math-reveal-toggle {
+  border: 2px solid var(--m-accent); background: #fff; color: var(--m-dark); border-radius: 99px; padding: 7px 18px;
+  font: inherit; font-size: 13px; font-weight: 900; cursor: pointer; font-family: var(--font-jp-display);
+}
+.math-reveal-toggle--open { background: var(--m-accent); color: #fff; }
+.math-quickcheck-answers {
+  margin-top: 14px; background: var(--m-tint); border-radius: 12px; padding: 12px 18px;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 24px; font-size: 15.5px; color: var(--m-dark); font-weight: 700;
+}
+
+/* ---- 9. 数学のまど ---- */
+.math-block-window {
+  border-radius: 18px; background: #fdf3e0; padding: 22px 28px; position: relative; overflow: hidden;
+}
+.math-window-dots { position: absolute; inset: 0; opacity: .5; background-image: radial-gradient(#e8cf9e 1.5px, transparent 1.5px); background-size: 18px 18px; }
+.math-window-content { position: relative; }
+.math-window-pill {
+  display: inline-block; background: #e8a13c; color: #fff; font-family: var(--font-jp-display); font-weight: 900;
+  font-size: 13px; border-radius: 99px; padding: 4px 14px; transform: rotate(-2deg);
+}
+.math-window-title { margin: 10px 0 6px; font-family: var(--font-jp-display); font-weight: 900; font-size: 17px; color: #8a5c1a; }
+.math-window-body { margin: 0; font-size: 14px; color: #77602f; }
+
+/* ---- 10. ふり返ろう ---- */
+.math-block-reflect { border-radius: 16px; background: #efecf5; padding: 18px 24px; display: flex; gap: 14px; align-items: flex-start; }
+.math-reflect-pill { flex: none; background: #8d7fb5; color: #fff; font-family: var(--font-jp-display); font-weight: 900; font-size: 12px; border-radius: 8px; padding: 5px 12px; }
+.math-reflect-body { font-size: 14px; color: #5c5375; }
+.math-reflect-body p { margin: 0; }
+.math-reflect-body p + p { margin-top: 4px; }
+
+/* ---- section nav (prev/next) ---- */
+.math-section-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+.math-nav-link {
+  display: flex; align-items: center; gap: 8px; white-space: nowrap; border-radius: 12px; padding: 10px 18px;
+  font-weight: 700; font-size: 13.5px;
+}
+.math-nav-link--prev { background: #fff; box-shadow: 0 1px 4px #0000000a; }
+.math-nav-link--next { background: var(--m-accent); color: #fff; }
+
+/* ---- AI tutor chat ---- */
+.math-chat-fab {
+  position: fixed; right: 22px; bottom: 22px; z-index: 40; display: flex; align-items: center; gap: 9px;
+  border: 0; background: var(--m-accent); color: #fff; border-radius: 99px; padding: 13px 22px;
+  font-family: var(--font-jp-display); font-weight: 900; font-size: 15px; cursor: pointer;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--m-accent) 40%, transparent);
+}
+.math-chat-fab:hover { background: var(--m-deep); }
+.math-chat-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 50; width: min(400px, 100vw); background: #fffdf8;
+  box-shadow: -6px 0 24px #00000022; display: flex; flex-direction: column;
+  transform: translateX(105%); transition: transform .25s ease;
+}
+.math-chat-panel--open { transform: translateX(0); }
+.math-chat-header { flex: none; background: var(--m-accent); color: #fff; padding: 14px 18px; display: flex; align-items: center; gap: 10px; }
+.math-chat-avatar { width: 34px; height: 34px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; flex: none; }
+.math-chat-title { flex: 1; min-width: 0; }
+.math-chat-name { font-family: var(--font-jp-display); font-weight: 900; font-size: 15px; }
+.math-chat-context { font-size: 11px; color: #ffe8d4; }
+.math-chat-close { border: 0; background: #ffffff2e; color: #fff; border-radius: 8px; width: 30px; height: 30px; font-size: 15px; cursor: pointer; flex: none; }
+.math-chat-messages { flex: 1; overflow-y: auto; padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; }
+.math-chat-bubble { border-radius: 14px 14px 14px 4px; padding: 11px 14px; font-size: 13.5px; max-width: 85%; line-height: 1.7; align-self: flex-start; white-space: pre-wrap; background: #f8e9dc; color: #3d3428; }
+.math-chat-bubble--user { border-radius: 14px 14px 4px 14px; align-self: flex-end; background: var(--m-accent); color: #fff; }
+.math-chat-busy { align-self: flex-start; background: #f8e9dc; border-radius: 14px 14px 14px 4px; padding: 11px 16px; font-size: 13.5px; color: #a05c30; }
+.math-chat-footer { flex: none; border-top: 1px solid #eee3cc; padding: 10px 14px 14px; background: #fffdf8; }
+.math-chat-suggestions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 9px; }
+.math-chat-suggestion { border: 1.5px solid #e8d9bc; background: #fff; color: #8a7a5c; border-radius: 99px; padding: 4px 11px; font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+.math-chat-suggestion:hover { background: #faf4e6; }
+.math-chat-quiz-btn { border: 0; background: #e8a13c; color: #fff; border-radius: 99px; padding: 4px 12px; font: inherit; font-size: 11.5px; font-weight: 900; cursor: pointer; }
+.math-chat-quiz-btn:hover { background: #d18f28; }
+.math-chat-input-row { display: flex; gap: 8px; }
+.math-chat-input { flex: 1; border: 2px solid #e8d9bc; border-radius: 12px; padding: 10px 14px; font: inherit; font-size: 13.5px; outline: none; background: #fff; }
+.math-chat-send { border: 0; background: var(--m-accent); color: #fff; border-radius: 12px; padding: 0 18px; font-family: var(--font-jp-display); font-weight: 900; font-size: 14px; cursor: pointer; }
+.math-chat-send:hover { background: var(--m-deep); }
+
+/* ---- in-chat quiz card ---- */
+.math-quiz-card { border: 2px solid #e8a13c; border-radius: 14px; overflow: hidden; background: #fff; }
+.math-quiz-header { background: #e8a13c; color: #fff; padding: 7px 14px; font-family: var(--font-jp-display); font-weight: 900; font-size: 13px; }
+.math-quiz-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 14px; }
+.math-quiz-question-label { font-size: 13.5px; font-weight: 700; margin-bottom: 7px; }
+.math-quiz-choices { display: flex; flex-direction: column; gap: 6px; }
+.math-quiz-choice {
+  text-align: left; border: 2px solid #e8d9bc; background: #fff; color: #3d3428; border-radius: 10px;
+  padding: 8px 12px; font: inherit; font-size: 13.5px; cursor: pointer;
+}
+.math-quiz-choice--correct { border-color: #7c9a5e; background: #eef5e8; color: #4a6b35; }
+.math-quiz-choice--wrong { border-color: #d6486e; background: #fbeaef; color: #a33352; }
+.math-quiz-choice:disabled { cursor: default; }
+.math-quiz-explain { margin-top: 7px; background: #faf6ec; border-radius: 10px; padding: 8px 12px; font-size: 12.5px; color: #6d5f47; }
+.math-quiz-score { display: flex; align-items: center; gap: 10px; border-top: 1.5px dashed #e8d9bc; padding-top: 12px; }
+.math-quiz-score-text { font-family: var(--font-jp-display); font-weight: 900; font-size: 14px; color: #a05c30; }
+.math-quiz-retry { margin-left: auto; border: 0; background: #e8a13c; color: #fff; border-radius: 99px; padding: 6px 14px; font-family: var(--font-jp-display); font-weight: 900; font-size: 12px; cursor: pointer; }
+
+@media (max-width: 640px) {
+  .math-block-intro-top { flex-direction: column; align-items: flex-start; }
+  .math-block-intro-art { display: none; }
+  .math-stats-card { grid-template-columns: 1fr; text-align: left; }
+  .math-chat-panel { width: 100vw; }
 }

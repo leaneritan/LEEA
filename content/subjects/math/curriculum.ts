@@ -22,9 +22,9 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#f8e9dc",
     dark: "#a05c30",
     sections: [
-      { id: "math-1-1", chapterId: "1", number: 1, name: "1節 正負の数", pages: "p.18–28", status: "done" },
-      { id: "math-1-2", chapterId: "1", number: 2, name: "2節 加法と減法", pages: "p.29–40", status: "now" },
-      { id: "math-1-3", chapterId: "1", number: 3, name: "3節 乗法と除法", pages: "p.41–58", status: "todo" }
+      { id: "math-1-1", chapterId: "1", number: 1, name: "1節 正負の数", pages: "p.19–28", status: "done" },
+      { id: "math-1-2", chapterId: "1", number: 2, name: "2節 加法と減法", pages: "p.29–40", status: "done" },
+      { id: "math-1-3", chapterId: "1", number: 3, name: "3節 乗法と除法", pages: "p.41–58", status: "now" }
     ]
   },
   {

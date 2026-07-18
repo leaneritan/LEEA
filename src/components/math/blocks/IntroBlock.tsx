@@ -6,10 +6,14 @@ export function IntroBlock({ block }: { block: MathBlockIntro }) {
       <div className="math-block-intro-top">
         <div className="math-block-intro-titles">
           <div className="math-block-intro-heading">
-            <span className="math-block-intro-number">
-              {block.sectionNumber}
-              <span>節</span>
-            </span>
+            {block.kicker ? (
+              <span className="math-block-intro-number math-block-intro-number--kicker">{block.kicker}</span>
+            ) : (
+              <span className="math-block-intro-number">
+                {block.sectionNumber}
+                <span>節</span>
+              </span>
+            )}
             <h1 className="math-block-intro-title">{block.title}</h1>
           </div>
           <p className="math-block-intro-question">{block.question}</p>

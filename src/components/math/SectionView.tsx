@@ -50,7 +50,7 @@ export function SectionView({ chapter, section }: { chapter: MathChapterMeta; se
           </span>
           <span className="math-topbar-chevron">›</span>
           <span className="math-topbar-section">
-            {section.number}節 {section.title}
+            {section.kicker ?? `${section.number}節 ${section.title}`}
           </span>
           <div className="math-topbar-progress">
             <div className="math-progress-track">

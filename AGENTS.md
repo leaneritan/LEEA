@@ -26,6 +26,7 @@ Do not shorten the product heading to "Leo's Elite Academy".
 9. **Do, not reveal.** Leo should choose, build, sort, fix, type, speak, answer, or complete.
 10. **Keep it maintainable by one parent plus AI.** Avoid architecture that becomes another job.
 11. **Validate content before delivery.** Run `npm run validate:content` after reference data changes, before typecheck/build/PR.
+12. **Math lessons must be interactive, not digitized text.** Take as long as needed to build a math lesson correctly, but never skip the interactive widget for a シミュレーション-tagged (or otherwise hands-on) activity — a static re-typing of the textbook page has no value over the physical book. See `docs/math-interactivity.md` for the standard and the precedent widgets to match.
 
 ## Subject Structure
 
@@ -37,7 +38,7 @@ LEEA
   - Training Ground
   - Reference
 - Math
-  - planned later
+  - 中1数学ヘルパー (新編 新しい数学1) — see `docs/math-interactivity.md`
 - Science
   - planned later
 ```

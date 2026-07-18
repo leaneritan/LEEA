@@ -1,4 +1,5 @@
 import type { MathBlockInteractive } from "../../../../content/subjects/math/types";
+import { AverageBaselineWidget } from "./AverageBaselineWidget";
 import { CardGameWidget } from "./CardGameWidget";
 import { KukuTableWidget } from "./KukuTableWidget";
 import { NumberLinePlotWidget } from "./NumberLinePlotWidget";
@@ -24,6 +25,7 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "signed-product" ? <SignedProductWidget tileCount={block.tileCount} /> : null}
       {block.widget === "walk-rate" ? <WalkRateWidget /> : null}
       {block.widget === "number-range-grid" ? <NumberRangeGridWidget /> : null}
+      {block.widget === "average-baseline" ? <AverageBaselineWidget /> : null}
     </div>
   );
 }

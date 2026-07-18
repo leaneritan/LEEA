@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import type { MathBlock } from "../../../content/subjects/math/types";
 import { ExampleBlock } from "./blocks/ExampleBlock";
 import { GoalBlock } from "./blocks/GoalBlock";
+import { InteractiveBlock } from "./blocks/InteractiveBlock";
 import { IntroBlock } from "./blocks/IntroBlock";
 import { PracticeBlock } from "./blocks/PracticeBlock";
 import { QBlock } from "./blocks/QBlock";
@@ -59,6 +60,9 @@ export function SectionBlockList({
             break;
           case "reflect":
             rendered = <ReflectBlock block={block} />;
+            break;
+          case "interactive":
+            rendered = <InteractiveBlock block={block} />;
             break;
           default:
             rendered = null;

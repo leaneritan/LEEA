@@ -26,7 +26,7 @@ export type MathBlockGoal = {
   id: string;
   type: "goal";
   text: string;
-  page?: number;
+  page?: string;
 };
 
 export type MathBlockQ = {
@@ -37,7 +37,7 @@ export type MathBlockQ = {
   prompts: string[];
   diagram?: NumberLineDiagram;
   chips?: MathChip[];
-  page?: number;
+  page?: string;
 };
 
 export type MathBlockExample = {
@@ -48,7 +48,7 @@ export type MathBlockExample = {
   problem: string;
   steps: string[];
   note?: string;
-  page?: number;
+  page?: string;
 };
 
 export type MathBlockRule = {
@@ -58,7 +58,7 @@ export type MathBlockRule = {
   statement: string;
   highlightPhrases: string[];
   examples: string[];
-  page?: number;
+  page?: string;
 };
 
 export type MathBlockPractice = {
@@ -70,7 +70,7 @@ export type MathBlockPractice = {
   tag?: "知識・技能" | "思考・判断・表現";
   items: string[];
   chips?: MathChip[];
-  page?: number;
+  page?: string;
 };
 
 export type MathBlockRecall = {
@@ -79,7 +79,7 @@ export type MathBlockRecall = {
   label: string;
   heading: string;
   body: string;
-  page?: number;
+  page?: string;
 };
 
 export type MathBlockQuickCheck = {
@@ -88,7 +88,7 @@ export type MathBlockQuickCheck = {
   heading: string;
   items: string[];
   answers: string[];
-  page?: number;
+  page?: string;
 };
 
 export type MathBlockWindow = {
@@ -97,14 +97,26 @@ export type MathBlockWindow = {
   heading: string;
   body: string;
   chips?: MathChip[];
-  page?: number;
+  page?: string;
 };
 
 export type MathBlockReflect = {
   id: string;
   type: "reflect";
   prompts: string[];
-  page?: number;
+  page?: string;
+};
+
+/** A hands-on widget standing in for the textbook's "シミュレーション" digital content. */
+export type MathBlockInteractiveWidget = "kuku-table" | "prime-sieve";
+
+export type MathBlockInteractive = {
+  id: string;
+  type: "interactive";
+  widget: MathBlockInteractiveWidget;
+  heading: string;
+  intro?: string;
+  page?: string;
 };
 
 export type MathBlock =
@@ -117,7 +129,8 @@ export type MathBlock =
   | MathBlockRecall
   | MathBlockQuickCheck
   | MathBlockWindow
-  | MathBlockReflect;
+  | MathBlockReflect
+  | MathBlockInteractive;
 
 /** Blocks with a per-student できた / 解答閲覧 state that progress tracking keys off. */
 export type MathStatefulBlock = MathBlockPractice | MathBlockQuickCheck;

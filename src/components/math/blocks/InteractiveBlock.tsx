@@ -1,6 +1,7 @@
 import type { MathBlockInteractive } from "../../../../content/subjects/math/types";
 import { AverageBaselineWidget } from "./AverageBaselineWidget";
 import { CardGameWidget } from "./CardGameWidget";
+import { EquivalentExpressionsWidget } from "./EquivalentExpressionsWidget";
 import { KukuTableWidget } from "./KukuTableWidget";
 import { MatchstickSquaresWidget } from "./MatchstickSquaresWidget";
 import { NumberLinePlotWidget } from "./NumberLinePlotWidget";
@@ -30,6 +31,7 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "average-baseline" ? <AverageBaselineWidget /> : null}
       {block.widget === "matchstick-squares" ? <MatchstickSquaresWidget /> : null}
       {block.widget === "substitution" ? <SubstitutionWidget /> : null}
+      {block.widget === "equivalent-expressions" ? <EquivalentExpressionsWidget /> : null}
     </div>
   );
 }

@@ -13,7 +13,7 @@ import { useJapaneseSetting } from "@/components/useJapaneseSetting";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
 import { allWords } from "@/components/reference/ref-data";
 
-type NavKey = "home" | "teacher" | "progress" | "english" | "assignments" | "reference" | "search";
+type NavKey = "home" | "teacher" | "progress" | "english" | "math" | "assignments" | "reference" | "search";
 
 const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNode }> = [
   { key: "home", label: "Home", href: "/", icon: <Home size={20} strokeWidth={2} /> },
@@ -122,7 +122,7 @@ export function AppShell({
         <div className="sidebar-subjects">
           <span className="sidebar-subjects-title">Subjects</span>
           <Link className={active === "english" ? "active" : ""} data-tooltip="English" href="/english"><i className="dot-english" />English</Link>
-          <span className="disabled" data-tooltip="Math"><i className="dot-disabled" />Math</span>
+          <Link className={active === "math" ? "active" : ""} data-tooltip="Math" href="/math"><i className="dot-math" />Math</Link>
           <span className="disabled" data-tooltip="Science"><i className="dot-disabled" />Science</span>
         </div>
 

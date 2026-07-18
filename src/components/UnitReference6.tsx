@@ -5,12 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { allGrammar } from "@/components/reference/ref-data";
 
 /* ============================================================
-   Unit Reference page — Our World · Level 4 · Unit 6
-   Renders inside <AppShell active="reference">. Data is local
-   for now; lift `unitSections` / `unitGrammar` into @/data later
-   without touching the markup. Styles live in unitreference.css
-   (append to globals.css). Word/grammar hrefs are placeholders —
-   point them at your real reference routes.
+   Unit Reference page — Our World · Level 3 · Unit 6
    ============================================================ */
 
 type WordState = "known" | "review" | "new";
@@ -57,8 +52,6 @@ const STATE_LABEL: Record<WordState, string> = {
   new: "Not started"
 };
 
-/* Normalize the raw vocabulary.json partOfSpeech strings (e.g. "noun phrase",
-   "adjective/adverb", "noun/verb") down to the four POS tags this page styles. */
 function normalizePos(raw: string): Pos {
   const lower = raw.toLowerCase();
   if (lower.startsWith("verb")) return "verb";
@@ -71,96 +64,79 @@ function word(emoji: string, text: string, pos: string, meaning: string, href: s
   return { emoji, word: text, pos: normalizePos(pos), meaning, state: "new", academic: academic || undefined, href };
 }
 
-/* Source: content/subjects/english/courses/our-world/level-4/unit-6/vocabulary.json
-   (vocab1WordIds / vocab2WordIds / academicWordIds / contentWordIds + relatedWordIds) */
 const unitSections: Section[] = [
   {
     id: "vocab1", title: "Vocabulary 1", sub: "Core unit words", icon: "①",
-    accent: "var(--good)", tint: "var(--good-tint)", count: 16,
+    accent: "var(--good)", tint: "var(--good-tint)", count: 10,
     words: [
-      word("🐙", "a creature", "noun", "a living animal, especially a strange or interesting one", "/reference/word/global_creature"),
-      word("❌", "disappear", "verb", "to go away so it cannot be seen", "/reference/word/global_disappear"),
-      word("🐬", "a dolphin", "noun", "a smart sea animal that lives in groups and breathes air", "/reference/word/global_dolphin"),
-      word("🐟", "fish", "noun", "an animal with fins and gills that lives in water", "/reference/word/global_fish"),
-      word("🌊", "a layer", "noun", "one level of something — like the top, middle, or bottom of the ocean", "/reference/word/global_layer"),
-      word("🌌", "midnight", "noun", "the middle of the night — also the name for the deepest, darkest ocean zone", "/reference/word/global_midnight"),
-      word("🐙", "an octopus", "noun", "a sea creature with eight arms", "/reference/word/global_octopus"),
-      word("🛢️", "pollution", "noun", "trash or harmful things that make air, water, or land dirty", "/reference/word/global_pollution"),
-      word("♻️", "a resource", "noun", "something useful in nature, like water, fish, or trees", "/reference/word/global_resource"),
-      word("🧽", "sea sponges", "noun", "soft sea animals that live on the ocean floor", "/reference/word/global_sea_sponges"),
-      word("🐢", "a sea turtle", "noun", "a turtle that lives in the ocean and swims with flippers", "/reference/word/global_sea_turtle"),
-      word("🦈", "a shark", "noun", "a large fish with sharp teeth that lives in the ocean", "/reference/word/global_shark"),
-      word("🦑", "a squid", "noun", "a sea animal with a long body and many arms", "/reference/word/global_squid"),
-      word("☀️", "sunlight", "noun", "the light that comes from the sun", "/reference/word/global_sunlight"),
-      word("🐋", "a whale", "noun", "a very large sea animal that breathes air", "/reference/word/global_whale"),
-      word("🌍", "a zone", "noun", "a part or area, like one section of the ocean", "/reference/word/global_zone")
+      word("\ud83d\udecd\ufe0f", "a bag of rice", "noun phrase", "a plastic or paper container full of rice grains", "/reference/word/global_bag_of_rice"),
+      word("\ud83c\udf7e", "a bottle of oil", "noun phrase", "a glass or plastic container full of liquid oil for cooking", "/reference/word/global_bottle_of_oil"),
+      word("\ud83e\udd63", "a bowl of sugar", "noun phrase", "a round open container filled with sweet white sugar", "/reference/word/global_bowl_of_sugar"),
+      word("\ud83e\udd63\ud83d\udce6", "a box of cereal", "noun phrase", "a cardboard container filled with breakfast grains", "/reference/word/global_box_of_cereal"),
+      word("\ud83c\udf4c", "a bunch of bananas", "noun phrase", "a group of bananas growing together on one stem", "/reference/word/global_bunch_of_bananas"),
+      word("\ud83e\udd64", "a can of soda", "noun phrase", "a metal container filled with sweet fizzy drink", "/reference/word/global_can_of_soda"),
+      word("\ud83e\udd5b", "a glass of juice", "noun phrase", "a glass container filled with fruit juice to drink", "/reference/word/global_glass_of_juice"),
+      word("\ud83e\uded2", "a jar of olives", "noun phrase", "a glass container with a lid full of small round green or black olives", "/reference/word/global_jar_of_olives"),
+      word("\ud83c\udf5e", "a loaf of bread", "noun phrase", "bread shaped and baked in one single piece", "/reference/word/global_loaf_of_bread"),
+      word("\ud83c\udf70", "a piece of cake", "noun phrase", "a single slice cut from a whole sweet cake", "/reference/word/global_piece_of_cake")
     ]
   },
   {
     id: "vocab2", title: "Vocabulary 2", sub: "Extension words", icon: "②",
     accent: "#2f9c8e", tint: "#e6f4f1", count: 5,
     words: [
-      word("🌱", "biodegradable", "adjective", "able to break down naturally over time without harming the planet", "/reference/word/global_biodegradable"),
-      word("🗑️", "garbage", "noun", "things people throw away — trash", "/reference/word/global_garbage"),
-      word("🛢️", "oil spill", "noun", "when oil escapes from a ship or pipe into the ocean", "/reference/word/global_oil_spill"),
-      word("🎣", "overfishing", "noun", "catching too many fish so there aren’t enough left to reproduce", "/reference/word/global_overfishing"),
-      word("🛍️", "plastic", "noun", "a man-made material that does not break down easily", "/reference/word/global_plastic")
+      word("\u2696\ufe0f", "compare", "verb", "to look at two or more things and say how they are the same or different", "/reference/academic/global_compare", true),
+      word("\ud83d\uded2", "buy", "verb", "to get something by paying money for it", "/reference/word/global_buy"),
+      word("\ud83d\udcb5", "money", "noun", "coins or paper notes used to buy things", "/reference/word/global_money"),
+      word("\ud83c\udff7\ufe0f", "price", "noun", "the amount of money you must pay to buy something", "/reference/word/global_price"),
+      word("\ud83d\udce6", "put away", "verb phrase", "to place something where it belongs when not in use", "/reference/word/global_put_away")
     ]
   },
   {
     id: "academic", title: "Academic", sub: "Thinking & study language", icon: "★",
-    accent: "var(--amber)", tint: "var(--amber-panel)", count: 8,
+    accent: "var(--amber)", tint: "var(--amber-panel)", count: 11,
     words: [
-      word("⚖️", "obligation", "noun", "something you must or have to do — a duty or rule", "/reference/academic/global_obligation", true),
-      word("🚫", "prohibition", "noun", "something you can’t or must not do — a rule against doing something", "/reference/academic/global_prohibition", true),
-      word("🏷️", "definition", "noun", "a statement that tells what a word or idea means", "/reference/academic/global_definition", true),
-      word("📐", "diagram", "noun", "a simple drawing with labels that shows how something works or what its parts are", "/reference/academic/global_diagram", true),
-      word("🏷️", "label", "noun / verb", "a word that names a part — or to write that word on a part", "/reference/academic/global_label", true),
-      word("⚖️", "contrast", "noun / verb", "to show how two things are different — or the difference itself", "/reference/academic/global_contrast", true),
-      word("🔀", "differences", "noun (plural)", "the ways in which two or more things are not the same", "/reference/academic/global_differences", true),
-      word("💬", "expressions", "noun (plural)", "words or short phrases that people often use to say a particular thing", "/reference/academic/global_expressions", true)
+      word("\ud83d\udd0e", "details", "noun", "small pieces of information that help explain an idea", "/reference/academic/global_details", true),
+      word("\ud83d\udcdd", "topic sentence", "noun", "a sentence that tells the main idea of a paragraph", "/reference/academic/global_topic_sentence", true),
+      word("\ud83d\udcca", "chart", "noun", "a picture or table that shows information in rows, columns, or boxes", "/reference/academic/global_chart", true),
+      word("\ud83d\uddc4\ufe0f", "column", "noun", "a vertical section of text or numbers on a page or chart, reading from top to bottom", "/reference/academic/global_column", true),
+      word("\ud83d\udcd6", "part", "noun", "a piece or section of a whole thing", "/reference/academic/global_part", true),
+      word("\ud83d\udcd6", "piece", "noun", "a single object or portion of a larger whole", "/reference/academic/global_piece", true),
+      word("\ud83d\udcd6", "row", "noun", "a line of things or people arranged side by side horizontally", "/reference/academic/global_row", true),
+      word("\ud83d\udcd6", "amount", "noun", "how much of something there is, especially non-countable things", "/reference/academic/global_amount", true),
+      word("\ud83d\udcd6", "count", "verb", "to calculate the total number of things or people", "/reference/academic/global_count", true),
+      word("\ud83d\udcd6", "guess", "verb", "to give an answer or opinion without being sure of all the facts", "/reference/academic/global_guess", true),
+      word("\ud83d\udcd6", "body", "noun", "the main physical structure of a person/animal, or the main part of a written paragraph", "/reference/academic/global_body", true)
     ]
   },
   {
     id: "glossary", title: "Glossary", sub: "Reading & topic terms", icon: "📖",
-    accent: "var(--muted-2)", tint: "#f0f1ec", count: 30,
+    accent: "var(--muted-2)", tint: "#f0f1ec", count: 18,
     words: [
-      word("🌫️", "mysterious", "adjective", "hard to understand or explain — full of mystery", "/reference/word/global_mysterious"),
-      word("🚗", "transportation", "noun", "the act of moving people or things from one place to another", "/reference/word/global_transportation"),
-      word("🌅", "twilight", "noun", "the dim light just before sunrise or after sunset — also the middle, dim layer of the ocean", "/reference/word/global_twilight"),
-      word("🏞️", "habitats", "noun (plural)", "the natural places where animals or plants live", "/reference/word/global_habitats"),
-      word("🌿", "natural", "adjective", "made by nature, not by people", "/reference/word/global_natural"),
-      word("🎣", "fishermen", "noun (plural)", "people whose job is to catch fish", "/reference/word/global_fishermen"),
-      word("🐠", "reproduce", "verb", "to have babies — to make new living things of the same kind", "/reference/word/global_reproduce"),
-      word("🚢", "tankers", "noun (plural)", "very big ships that carry oil or other liquids", "/reference/word/global_tankers"),
-      word("🚛", "transport", "verb", "to carry people or things from one place to another", "/reference/word/global_transport"),
-      word("🔮", "future", "noun", "time that has not happened yet", "/reference/word/global_future"),
-      word("🫧", "oxygen", "noun", "a gas in the air and water that animals need to breathe", "/reference/word/global_oxygen"),
-      word("🌿", "algae", "noun (plural)", "tiny plant-like living things that grow in water", "/reference/word/global_algae"),
-      word("🐜", "colonies", "noun (plural)", "large groups of the same kind of animal living together", "/reference/word/global_colonies"),
-      word("🧬", "organisms", "noun (plural)", "living things — animals, plants, or other kinds of living things", "/reference/word/global_organisms"),
-      word("🦐", "plankton", "noun", "tiny sea creatures that float in water and are food for many animals", "/reference/word/global_plankton"),
-      word("🪸", "polyps", "noun (plural)", "tiny sea animals that make up corals", "/reference/word/global_polyps"),
-      word("🐙", "tentacles", "noun (plural)", "long, thin arms that some sea animals use to catch food", "/reference/word/global_tentacles"),
-      word("💎", "transparent", "adjective", "clear — you can see through it", "/reference/word/global_transparent"),
-      word("🐊", "swamps", "noun (plural)", "wet, soft areas of land — like a marsh", "/reference/word/global_swamps"),
-      word("🌳", "woods", "noun (plural)", "a small forest — an area with many trees", "/reference/word/global_woods"),
-      word("🏘️", "community", "noun", "a group of people who live in the same area or share something", "/reference/word/global_community"),
-      word("🦭", "flippers", "noun (plural)", "flat arms or legs sea animals use to swim", "/reference/word/global_flippers"),
-      word("🌿", "kelp", "noun", "a large, tall kind of seaweed that grows like a forest underwater", "/reference/word/global_kelp"),
-      word("🦭", "seal", "noun", "a sea mammal with flippers that lives in coastal waters", "/reference/word/global_seal"),
-      word("🌿", "seaweed", "noun", "plant-like growth that lives in the sea", "/reference/word/global_seaweed"),
-      word("🐠", "underwater", "adjective / adverb", "below the surface of water", "/reference/word/global_underwater"),
-      word("〰️", "whiskers", "noun (plural)", "long stiff hairs growing on the face of some animals (like a cat or seal)", "/reference/word/global_whiskers"),
-      word("🥫", "pop-top", "noun", "the metal ring on a soda or beer can that you pull to open it", "/reference/word/global_pop_top"),
-      word("🏖️", "sand", "noun", "tiny grains of rock that cover beaches and ocean floors", "/reference/word/global_sand"),
-      word("🐚", "shells", "noun (plural)", "the hard outer covers of sea animals like clams and snails", "/reference/word/global_shells")
+      word("\ud83c\udf0e\ud83e\udd67", "whole", "adjective", "all of; entire.", "/reference/word/global_whole"),
+      word("\ud83d\udecd\ufe0f", "shopping", "noun/verb", "the activity of buying things from stores", "/reference/word/global_shopping"),
+      word("\ud83e\uddca", "fridge", "noun", "a large cold box where we store food to keep it fresh", "/reference/word/global_fridge"),
+      word("\ud83e\udd57", "beets", "noun", "dark red round root vegetables that grow underground", "/reference/word/global_beets"),
+      word("\ud83e\udd63", "borscht", "noun", "a traditional sour soup made primarily with beets", "/reference/word/global_borscht"),
+      word("\ud83c\udf5c", "noodles", "noun", "long, thin strips of pasta made from flour and water", "/reference/word/global_noodles"),
+      word("\ud83c\udf2d", "sausages", "noun", "minced meat stuffed into cylindrical casings", "/reference/word/global_sausages"),
+      word("\ud83d\ude48", "blindfold", "noun/verb", "a piece of cloth tied over the eyes to prevent someone from seeing", "/reference/word/global_blindfold"),
+      word("\ud83c\udfa4", "interview", "noun/verb", "to ask someone questions about their experiences or opinions", "/reference/word/global_interview"),
+      word("\ud83d\udcdd", "descriptions", "noun", "written or spoken details that explain what something or someone is like", "/reference/word/global_descriptions"),
+      word("\ud83e\udeb8", "coral", "noun", "a hard substance formed by the skeletons of tiny marine animals", "/reference/word/global_coral"),
+      word("\ud83c\udfa3", "fishing", "noun", "the activity of catching fish for food or sport", "/reference/word/global_fishing"),
+      word("\ud83d\udde1\ufe0f", "spear", "noun/verb", "a long weapon with a sharp point, used for fishing or hunting", "/reference/word/global_spear"),
+      word("\ud83e\uddfa", "basket", "noun", "a container made of woven strips of wood, plastic, or straw", "/reference/word/global_basket"),
+      word("\ud83d\udcb5", "bills", "noun", "pieces of paper money", "/reference/word/global_bills"),
+      word("\ud83e\ude99", "coins", "noun", "round pieces of metal used as money", "/reference/word/global_coins"),
+      word("\ud83c\udf73", "breakfast", "noun/verb", "the first meal of the day, eaten in the morning", "/reference/word/global_breakfast"),
+      word("\ud83c\udf7d\ufe0f", "dinner", "noun/verb", "the main meal of the day, eaten in the evening", "/reference/word/global_dinner")
     ]
   }
 ];
 
 const unitGrammarEntries = allGrammar
-  .filter((g) => g.course === "our-world" && g.level === 4 && g.unit === 6)
+  .filter((g) => g.course === "our-world" && g.level === 3 && g.unit === 6)
   .sort((a, b) => a.tag.localeCompare(b.tag));
 const unitGrammar = unitGrammarEntries.map((g, idx) => ({
   n: String(idx + 1),
@@ -171,11 +147,11 @@ const unitGrammar = unitGrammarEntries.map((g, idx) => ({
 }));
 
 const jumps = [
-  { label: "Vocabulary 1", count: 16, dot: "var(--good)", href: "#vocab1" },
+  { label: "Vocabulary 1", count: 10, dot: "var(--good)", href: "#vocab1" },
   { label: "Vocabulary 2", count: 5, dot: "#2f9c8e", href: "#vocab2" },
-  { label: "Academic", count: 8, dot: "var(--amber)", href: "#academic" },
-  { label: "Glossary", count: 30, dot: "var(--muted-2)", href: "#glossary" },
-  { label: "Grammar", count: unitGrammar.length, dot: "var(--accent)", href: "#grammar" }
+  { label: "Academic", count: 11, dot: "var(--amber)", href: "#academic" },
+  { label: "Glossary", count: 18, dot: "var(--muted-2)", href: "#glossary" },
+  { label: "Grammar", count: 0, dot: "var(--accent)", href: "#grammar" }
 ];
 
 function dotStyle(state: WordState) {
@@ -185,6 +161,9 @@ function dotStyle(state: WordState) {
 }
 
 export default function UnitReference6() {
+  const grammarCount = unitGrammar.length;
+  jumps[4].count = grammarCount;
+
   return (
     <AppShell active="reference" crumbs={["Reference", "Our World", "Unit 6"]}>
       <div className="unit-ref">
@@ -196,17 +175,17 @@ export default function UnitReference6() {
             <div className="unit-hero-icon"><span /></div>
             <div>
               <div className="unit-hero-eyebrow-row">
-                <span className="unit-hero-eyebrow">Our World · Level 4 · Unit 6</span>
+                <span className="unit-hero-eyebrow">Our World · Level 3 · Unit 6</span>
               </div>
-              <h1 className="unit-hero-title">Wonders of the Sea</h1>
+              <h1 className="unit-hero-title">What’s for Dinner?</h1>
             </div>
           </div>
           <div className="unit-hero-stats">
-            <div className="unit-stat"><b>59</b><span>words</span></div>
+            <div className="unit-stat"><b>44</b><span>words</span></div>
             <i className="unit-stat-sep" />
-            <div className="unit-stat"><b style={{ color: "var(--amber)" }}>8</b><span>academic</span></div>
+            <div className="unit-stat"><b style={{ color: "var(--amber)" }}>11</b><span>academic</span></div>
             <i className="unit-stat-sep" />
-            <div className="unit-stat"><b style={{ color: "var(--accent)" }}>{unitGrammar.length}</b><span>grammar</span></div>
+            <div className="unit-stat"><b style={{ color: "var(--accent)" }}>{grammarCount}</b><span>grammar</span></div>
           </div>
         </section>
 
@@ -259,6 +238,7 @@ export default function UnitReference6() {
             </div>
           </section>
         ))}
+
         {/* grammar */}
         <section className="unit-section" id="grammar">
           <div className="unit-section-accent" style={{ background: "var(--accent)" }} />
@@ -270,23 +250,29 @@ export default function UnitReference6() {
                 <div className="unit-section-sub">Each opens its grammar card</div>
               </div>
             </div>
-            <span className="unit-section-count">{unitGrammar.length} point{unitGrammar.length === 1 ? "" : "s"}</span>
+            <span className="unit-section-count">{grammarCount} point{grammarCount === 1 ? "" : "s"}</span>
           </div>
-          <div className="unit-word-list">
-            {unitGrammar.map((g) => (
-              <Link className="unit-grammar" href={g.href} key={g.code}>
-                <span className="unit-grammar-badge">G{g.n}</span>
-                <span className="unit-word-main">
-                  <span className="unit-word-headline">
-                    <span className="unit-word-text">{g.title}</span>
-                    <span className="unit-grammar-code">{g.code}</span>
+          {grammarCount > 0 ? (
+            <div className="unit-word-list">
+              {unitGrammar.map((g) => (
+                <Link className="unit-grammar" href={g.href} key={g.code}>
+                  <span className="unit-grammar-badge">G{g.n}</span>
+                  <span className="unit-word-main">
+                    <span className="unit-word-headline">
+                      <span className="unit-word-text">{g.title}</span>
+                      <span className="unit-grammar-code">{g.code}</span>
+                    </span>
+                    <span className="unit-word-meaning">{g.sample}</span>
                   </span>
-                  <span className="unit-word-meaning">{g.sample}</span>
-                </span>
-                <span className="unit-word-arrow">→</span>
-              </Link>
-            ))}
-          </div>
+                  <span className="unit-word-arrow">→</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="unit-ref-empty">
+              <p>Grammar points for this unit are coming soon!</p>
+            </div>
+          )}
         </section>
       </div>
     </AppShell>

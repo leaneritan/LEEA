@@ -108,7 +108,15 @@ export type MathBlockReflect = {
 };
 
 /** A hands-on widget standing in for the textbook's "シミュレーション" digital content. */
-export type MathBlockInteractiveWidget = "kuku-table" | "prime-sieve" | "number-line-walk" | "card-game" | "number-line-plot";
+export type MathBlockInteractiveWidget =
+  | "kuku-table"
+  | "prime-sieve"
+  | "number-line-walk"
+  | "card-game"
+  | "number-line-plot"
+  | "signed-product"
+  | "walk-rate"
+  | "number-range-grid";
 
 export type MathBlockInteractive = {
   id: string;
@@ -117,6 +125,8 @@ export type MathBlockInteractive = {
   heading: string;
   intro?: string;
   page?: string;
+  /** Only used by "signed-product" — how many sign tiles to start with. */
+  tileCount?: number;
 };
 
 export type MathBlock =

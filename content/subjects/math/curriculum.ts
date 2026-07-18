@@ -11,7 +11,7 @@ export const mathChapters: MathChapterMeta[] = [
     color: "#a89b3c",
     tint: "#f2efd9",
     dark: "#7c7222",
-    sections: [{ id: "math-0-1", chapterId: "0", number: 1, name: "整数の性質", pages: "p.10–17", status: "done" }]
+    sections: [{ id: "math-0-1", chapterId: "0", number: 1, name: "整数の性質", pages: "p.11–18", status: "now" }]
   },
   {
     id: "1",

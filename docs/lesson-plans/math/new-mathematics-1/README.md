@@ -26,9 +26,9 @@ each file here is under 25MB.
 
 | 章 | 節 | Pages | Scanned | Lesson content built |
 | --- | --- | --- | --- | --- |
-| 0章 | 整数の性質 | p.11–18 | partial (11–13 only) | no |
-| 1章 | 1節 正負の数 | p.19–28 | partial (19–21 only) | no |
-| 1章 | 2節 加法と減法 | p.29–40 | partial (29, 38–40 only) | yes (`content/subjects/math/chapters/1/sections/2.json`) |
+| 0章 | 整数の性質 | p.11–18 | partial (11–13 only) | yes, partial (`content/subjects/math/chapters/0/sections/1.json` — covers p.11–13 とびら/九九表 activity only; p.14–18 素数・累乗・素因数分解 not scanned, not built) |
+| 1章 | 1節 正負の数 | p.19–28 | full (19–28) | no |
+| 1章 | 2節 加法と減法 | p.29–40 | full (29–40) | yes (`content/subjects/math/chapters/1/sections/2.json`) |
 | 1章 | 3節 乗法と除法 | p.41–58 | no | no |
 | 2章–7章 | all | — | no | no |
 

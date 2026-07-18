@@ -124,7 +124,8 @@ export type MathBlockInteractiveWidget =
   | "average-baseline"
   | "matchstick-squares"
   | "substitution"
-  | "equivalent-expressions";
+  | "equivalent-expressions"
+  | "cube-rods";
 
 export type MathBlockInteractive = {
   id: string;

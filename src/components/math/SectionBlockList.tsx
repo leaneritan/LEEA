@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { MathBlock } from "../../../content/subjects/math/types";
 import { ExampleBlock } from "./blocks/ExampleBlock";
 import { GoalBlock } from "./blocks/GoalBlock";
@@ -24,37 +25,51 @@ export function SectionBlockList({
   return (
     <>
       {blocks.map((block) => {
-        switch (block.type) {
-          case "intro":
-            return <IntroBlock block={block} key={block.id} />;
-          case "goal":
-            return <GoalBlock block={block} key={block.id} />;
-          case "q":
-            return <QBlock block={block} key={block.id} />;
-          case "example":
-            return <ExampleBlock block={block} key={block.id} />;
-          case "rule":
-            return <RuleBlock block={block} key={block.id} />;
-          case "practice":
-            return (
-              <PracticeBlock
-                block={block}
-                done={isBlockDone(block.id)}
-                key={block.id}
-                onToggleDone={() => onTogglePracticeDone(block.id)}
-              />
-            );
-          case "recall":
-            return <RecallBlock block={block} key={block.id} />;
-          case "quickcheck":
-            return <QuickCheckBlock block={block} key={block.id} />;
-          case "window":
-            return <WindowBlock block={block} key={block.id} />;
-          case "reflect":
-            return <ReflectBlock block={block} key={block.id} />;
-          default:
-            return null;
+        if (block.type === "intro") {
+          return <IntroBlock block={block} key={block.id} />;
         }
+
+        let rendered: ReactNode;
+        switch (block.type) {
+          case "goal":
+            rendered = <GoalBlock block={block} />;
+            break;
+          case "q":
+            rendered = <QBlock block={block} />;
+            break;
+          case "example":
+            rendered = <ExampleBlock block={block} />;
+            break;
+          case "rule":
+            rendered = <RuleBlock block={block} />;
+            break;
+          case "practice":
+            rendered = (
+              <PracticeBlock block={block} done={isBlockDone(block.id)} onToggleDone={() => onTogglePracticeDone(block.id)} />
+            );
+            break;
+          case "recall":
+            rendered = <RecallBlock block={block} />;
+            break;
+          case "quickcheck":
+            rendered = <QuickCheckBlock block={block} />;
+            break;
+          case "window":
+            rendered = <WindowBlock block={block} />;
+            break;
+          case "reflect":
+            rendered = <ReflectBlock block={block} />;
+            break;
+          default:
+            rendered = null;
+        }
+
+        return (
+          <div className="math-block-wrap" key={block.id}>
+            {block.page ? <span className="math-block-page">教科書 p.{block.page}</span> : null}
+            {rendered}
+          </div>
+        );
       })}
     </>
   );

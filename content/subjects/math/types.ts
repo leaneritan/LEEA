@@ -26,6 +26,7 @@ export type MathBlockGoal = {
   id: string;
   type: "goal";
   text: string;
+  page?: number;
 };
 
 export type MathBlockQ = {
@@ -36,6 +37,7 @@ export type MathBlockQ = {
   prompts: string[];
   diagram?: NumberLineDiagram;
   chips?: MathChip[];
+  page?: number;
 };
 
 export type MathBlockExample = {
@@ -46,6 +48,7 @@ export type MathBlockExample = {
   problem: string;
   steps: string[];
   note?: string;
+  page?: number;
 };
 
 export type MathBlockRule = {
@@ -55,6 +58,7 @@ export type MathBlockRule = {
   statement: string;
   highlightPhrases: string[];
   examples: string[];
+  page?: number;
 };
 
 export type MathBlockPractice = {
@@ -66,6 +70,7 @@ export type MathBlockPractice = {
   tag?: "知識・技能" | "思考・判断・表現";
   items: string[];
   chips?: MathChip[];
+  page?: number;
 };
 
 export type MathBlockRecall = {
@@ -74,6 +79,7 @@ export type MathBlockRecall = {
   label: string;
   heading: string;
   body: string;
+  page?: number;
 };
 
 export type MathBlockQuickCheck = {
@@ -82,6 +88,7 @@ export type MathBlockQuickCheck = {
   heading: string;
   items: string[];
   answers: string[];
+  page?: number;
 };
 
 export type MathBlockWindow = {
@@ -90,12 +97,14 @@ export type MathBlockWindow = {
   heading: string;
   body: string;
   chips?: MathChip[];
+  page?: number;
 };
 
 export type MathBlockReflect = {
   id: string;
   type: "reflect";
   prompts: string[];
+  page?: number;
 };
 
 export type MathBlock =

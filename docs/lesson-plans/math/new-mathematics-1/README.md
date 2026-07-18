@@ -43,15 +43,16 @@ each file here is under 25MB.
 | 1章 | 4節 正負の数の利用 | p.57–59 | full | yes, full (`content/subjects/math/chapters/1/sections/4.json`) |
 | 1章 | 章末問題A/B | p.60–62 | full | yes (`content/subjects/math/chapters/1/sections/5.json`) |
 | 2章 | 1節 文字を使った式 | p.64–74 | full | yes, full (`content/subjects/math/chapters/2/sections/1.json`) |
-| 2章 | 2節 文字式の計算 | p.75–82 | full | no |
+| 2章 | 2節 文字式の計算 | p.75–82 | full | yes, full (`content/subjects/math/chapters/2/sections/2.json`) |
 | 2章 | 3節 文字式の利用 | p.83–87 | full | no |
 | 2章 | 章末問題A/B | p.88–90 | full | no |
 | 3章–7章 | all | — | no | no |
 
-**1章 正負の数 is fully built and complete.** 2章 文字と式 is now fully
-scanned (`ch2_p63-90.pdf`) — 1節 is built; 2節, 3節, and 章末問題 are
-ready to build next. 3章 onward has no scans yet. Note that 2章 really
-has three sections plus 章末問題, not two as the curriculum first had it.
+**1章 正負の数 is fully built and complete.** 2章 文字と式 is fully
+scanned (`ch2_p63-90.pdf`) — 1節 と 2節 are built; 3節 文字式の利用 and
+章末問題 are ready to build next. 3章 onward has no scans yet. Note that
+2章 really has three sections plus 章末問題, not two as the curriculum
+first had it.
 
 ## Adding more scans
 

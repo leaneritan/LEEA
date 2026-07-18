@@ -123,7 +123,8 @@ export type MathBlockInteractiveWidget =
   | "number-range-grid"
   | "average-baseline"
   | "matchstick-squares"
-  | "substitution";
+  | "substitution"
+  | "equivalent-expressions";
 
 export type MathBlockInteractive = {
   id: string;

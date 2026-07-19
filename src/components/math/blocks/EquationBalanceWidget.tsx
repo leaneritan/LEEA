@@ -2,16 +2,28 @@
 
 import { useState } from "react";
 
+type Problem = { coeff: number; add: number; target: number };
+type State = { coeff: number; leftConst: number; rightConst: number };
 type Step = { label: string; apply: (s: State) => State };
 
-type State = { coeff: number; leftConst: number; rightConst: number };
-
-const START: State = { coeff: 2, leftConst: 1, rightConst: 7 };
-
-const STEPS: Step[] = [
-  { label: "① 両辺から 1 をひく", apply: (s) => ({ ...s, leftConst: s.leftConst - 1, rightConst: s.rightConst - 1 }) },
-  { label: "② 両辺を 2 でわる", apply: (s) => ({ coeff: s.coeff / 2, leftConst: 0, rightConst: s.rightConst / 2 }) }
+const PROBLEMS: Problem[] = [
+  { coeff: 2, add: 1, target: 7 },
+  { coeff: 3, add: 2, target: 17 },
+  { coeff: 4, add: 3, target: 19 }
 ];
+
+function buildSteps(p: Problem): Step[] {
+  return [
+    {
+      label: `① 両辺から ${p.add} をひく`,
+      apply: (s) => ({ ...s, leftConst: s.leftConst - p.add, rightConst: s.rightConst - p.add })
+    },
+    {
+      label: `② 両辺を ${p.coeff} でわる`,
+      apply: (s) => ({ coeff: s.coeff / p.coeff, leftConst: 0, rightConst: s.rightConst / p.coeff })
+    }
+  ];
+}
 
 function Pan({ coeff, units }: { coeff: number; units: number }) {
   const items = [...Array(coeff)].map((_, i) => (
@@ -25,14 +37,25 @@ function Pan({ coeff, units }: { coeff: number; units: number }) {
 }
 
 export function EquationBalanceWidget() {
+  const [problemIndex, setProblemIndex] = useState(0);
   const [stepIndex, setStepIndex] = useState(0);
-  const state = STEPS.slice(0, stepIndex).reduce((s, step) => step.apply(s), START);
-  const done = stepIndex === STEPS.length;
+
+  const problem = PROBLEMS[problemIndex];
+  const steps = buildSteps(problem);
+  const start: State = { coeff: problem.coeff, leftConst: problem.add, rightConst: problem.target };
+  const state = steps.slice(0, stepIndex).reduce((s, step) => step.apply(s), start);
+  const done = stepIndex === steps.length;
+  const answer = (problem.target - problem.add) / problem.coeff;
 
   const leftLabel = `${state.coeff > 0 ? (state.coeff === 1 ? "x" : `${state.coeff}x`) : ""}${
     state.leftConst > 0 ? `＋${state.leftConst}` : ""
   }`;
   const rightLabel = `${state.rightConst}`;
+
+  function nextProblem() {
+    setProblemIndex((i) => (i + 1) % PROBLEMS.length);
+    setStepIndex(0);
+  }
 
   return (
     <div className="math-eqbalance">
@@ -56,13 +79,13 @@ export function EquationBalanceWidget() {
 
       {!done ? (
         <button className="math-eqbalance-btn" onClick={() => setStepIndex((i) => i + 1)} type="button">
-          {STEPS[stepIndex].label}
+          {steps[stepIndex].label}
         </button>
       ) : (
         <div className="math-eqbalance-done">
-          <p>てんびんはずっとつり合ったまま、x＝3の形になった！</p>
-          <button className="math-eqbalance-btn math-eqbalance-btn--reset" onClick={() => setStepIndex(0)} type="button">
-            もう一度やってみる
+          <p>てんびんはずっとつり合ったまま、x＝{answer}の形になった！</p>
+          <button className="math-eqbalance-btn math-eqbalance-btn--reset" onClick={nextProblem} type="button">
+            べつの問題をためす
           </button>
         </div>
       )}

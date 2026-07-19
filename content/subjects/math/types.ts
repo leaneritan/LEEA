@@ -128,7 +128,9 @@ export type MathBlockInteractiveWidget =
   | "cube-rods"
   | "equation-balance"
   | "planter-spacing"
-  | "catch-up-race";
+  | "catch-up-race"
+  | "equation-solution-table"
+  | "ratio-mixer";
 
 export type MathBlockInteractive = {
   id: string;

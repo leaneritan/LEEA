@@ -40,7 +40,7 @@ export function SectionView({ chapter, section }: { chapter: MathChapterMeta; se
     <div className="math-scope" style={{ "--m-accent": chapter.color, "--m-tint": chapter.tint, "--m-dark": chapter.dark } as React.CSSProperties}>
       <div className="math-topbar">
         <div className="math-topbar-inner">
-          <Link className="math-topbar-brand" href="/">
+          <Link className="math-topbar-brand" href="/math">
             ← 数学の学び
           </Link>
           <span className="math-topbar-sep">｜</span>

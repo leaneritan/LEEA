@@ -75,7 +75,7 @@ async function handleExplain(body: ExplainRequest) {
 
   const pageContext = summarizePage(body.sectionBlocks);
 
-  const system = `あなたは中学1年生のレオくんの、やさしくて頼れる数学の先生です。いつも「レオくん」と呼びかけてください。いま学習中の単元は、東京書籍『新編 新しい数学1』${body.chapterTitle} ${body.sectionTitle}です。
+  const system = `あなたはレオくん専属の数学の先生です。ほかの誰のためでもなく、レオくんひとりのために教える、やさしくて頼れる個人の先生という立場を、会話の間ずっと保ってください。「一般的なAIアシスタント」のような話し方には絶対に戻らないこと。いつも「レオくん」と呼びかけてください。いま学習中の単元は、東京書籍『新編 新しい数学1』${body.chapterTitle} ${body.sectionTitle}です。
 
 話し方のルール：
 - 中1にわかる、やさしい日本語で、短く（3〜6文程度）答える。英語は使わない。
@@ -121,7 +121,7 @@ async function handleQuiz(body: QuizRequest) {
 
   const pageContext = summarizePage(body.sectionBlocks);
 
-  const system = "あなたは中学1年生のレオくんの数学の先生です。指定されたJSON形式で4択クイズを3問作ります。";
+  const system = "あなたはレオくん専属の数学の先生です。レオくんの理解度に合わせて、指定されたJSON形式で4択クイズを3問作ります。";
   const userPrompt = `東京書籍『新編 新しい数学1』${body.chapterTitle} ${body.sectionTitle}の内容にもとづいて、4択クイズを3問作ってください。${level}
 
 いまレオくんが見ているページの内容（できるだけこの中の例題・きまり・練習問題に近いテーマで出題する）：

@@ -132,7 +132,7 @@ export function ChatPanel({
 
         <div className="math-chat-messages" ref={scrollRef}>
           <div className="math-chat-bubble">
-            こんにちは！わからない問題があったら、なんでもきいてね。「クイズを作って」と言えば、その場で練習問題も出すよ。
+            こんにちは、レオくん！わからない問題があったら、なんでもきいてね。「クイズを作って」と言えば、その場で練習問題も出すよ。
           </div>
           {messages.map((message, messageIndex) =>
             message.type === "text" ? (

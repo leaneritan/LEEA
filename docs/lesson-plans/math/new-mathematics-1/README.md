@@ -31,6 +31,13 @@ each file here is under 25MB.
   p.75–82, 3節 文字式の利用 p.83–87) plus 章末問題 p.88–90 — the app's
   curriculum originally had it as only 2 sections with wrong page ranges;
   fixed when 1節 was built.
+- `scans/ch3_p91-116.pdf` — **3章 方程式, complete** (p.91–116: 方程式
+  とその解、等式の性質、移項と方程式の解き方、いろいろな方程式、1次方程
+  式の利用、比例式の利用、章末問題A/B). Two sections (1節 方程式とその
+  解き方 p.92–102, 2節 1次方程式の利用 p.103–111) plus 章末問題 p.114–116
+  (p.112–113 is a cross-curricular column, not core lesson content).
+- `scans/ch4_p117-156.pdf` — **4章 比例と反比例, complete** (p.117–156).
+  Reviewed but not yet built.
 
 ## Coverage status
 
@@ -46,12 +53,17 @@ each file here is under 25MB.
 | 2章 | 2節 文字式の計算 | p.75–82 | full | yes, full (`content/subjects/math/chapters/2/sections/2.json`) |
 | 2章 | 3節 文字式の利用 | p.83–87 | full | yes, full (`content/subjects/math/chapters/2/sections/3.json`) |
 | 2章 | 章末問題A/B | p.88–90 | full | yes (`content/subjects/math/chapters/2/sections/4.json`) |
-| 3章–7章 | all | — | no | no |
+| 3章 | 1節 方程式とその解き方 | p.92–102 | full | yes, full (`content/subjects/math/chapters/3/sections/1.json`) |
+| 3章 | 2節 1次方程式の利用 | p.103–111 | full | no |
+| 3章 | 章末問題A/B | p.114–116 | full | no |
+| 4章 | all | p.117–156 | full | no |
+| 5章–7章 | all | — | no | no |
 
 **1章 正負の数 and 2章 文字と式 are both fully built and complete** —
-every section plus each chapter's 章末問題. 3章 方程式 onward has no
-scans yet: photograph and drop the next chapter's pages in `scans/` to
-continue.
+every section plus each chapter's 章末問題. 3章 方程式's 1節 is now
+built too; 2節 and 章末問題 are scanned and ready to build next. 4章
+比例と反比例 is scanned but not started. 5章 onward has no scans yet:
+photograph and drop the next chapter's pages in `scans/` to continue.
 
 ## Adding more scans
 

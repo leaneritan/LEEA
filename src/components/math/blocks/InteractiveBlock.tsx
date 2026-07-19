@@ -7,15 +7,18 @@ import { EquationBalanceWidget } from "./EquationBalanceWidget";
 import { EquationSolutionTableWidget } from "./EquationSolutionTableWidget";
 import { EquivalentExpressionsWidget } from "./EquivalentExpressionsWidget";
 import { KukuTableWidget } from "./KukuTableWidget";
+import { LoopMeetingWidget } from "./LoopMeetingWidget";
 import { MatchstickSquaresWidget } from "./MatchstickSquaresWidget";
 import { NumberLinePlotWidget } from "./NumberLinePlotWidget";
 import { NumberLineWalkWidget } from "./NumberLineWalkWidget";
 import { NumberRangeGridWidget } from "./NumberRangeGridWidget";
+import { OralRehydrationMixerWidget } from "./OralRehydrationMixerWidget";
 import { PlanterSpacingWidget } from "./PlanterSpacingWidget";
 import { PrimeSieveWidget } from "./PrimeSieveWidget";
 import { RatioMixerWidget } from "./RatioMixerWidget";
 import { SignedProductWidget } from "./SignedProductWidget";
 import { SubstitutionWidget } from "./SubstitutionWidget";
+import { TankRatioWidget } from "./TankRatioWidget";
 import { WalkRateWidget } from "./WalkRateWidget";
 
 export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
@@ -44,6 +47,9 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "catch-up-race" ? <CatchUpRaceWidget /> : null}
       {block.widget === "equation-solution-table" ? <EquationSolutionTableWidget /> : null}
       {block.widget === "ratio-mixer" ? <RatioMixerWidget /> : null}
+      {block.widget === "loop-meeting" ? <LoopMeetingWidget /> : null}
+      {block.widget === "tank-ratio" ? <TankRatioWidget /> : null}
+      {block.widget === "oral-rehydration-mixer" ? <OralRehydrationMixerWidget /> : null}
     </div>
   );
 }

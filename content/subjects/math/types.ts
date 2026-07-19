@@ -130,7 +130,10 @@ export type MathBlockInteractiveWidget =
   | "planter-spacing"
   | "catch-up-race"
   | "equation-solution-table"
-  | "ratio-mixer";
+  | "ratio-mixer"
+  | "loop-meeting"
+  | "tank-ratio"
+  | "oral-rehydration-mixer";
 
 export type MathBlockInteractive = {
   id: string;

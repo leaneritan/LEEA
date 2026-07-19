@@ -1,4 +1,5 @@
 import type { MathBlockInteractive } from "../../../../content/subjects/math/types";
+import { AlgebraAreaModelWidget } from "./AlgebraAreaModelWidget";
 import { AverageBaselineWidget } from "./AverageBaselineWidget";
 import { CardGameWidget } from "./CardGameWidget";
 import { CatchUpRaceWidget } from "./CatchUpRaceWidget";
@@ -18,6 +19,7 @@ import { PrimeSieveWidget } from "./PrimeSieveWidget";
 import { RatioMixerWidget } from "./RatioMixerWidget";
 import { SignedProductWidget } from "./SignedProductWidget";
 import { SubstitutionWidget } from "./SubstitutionWidget";
+import { SubtractionWalkWidget } from "./SubtractionWalkWidget";
 import { TankRatioWidget } from "./TankRatioWidget";
 import { WalkRateWidget } from "./WalkRateWidget";
 
@@ -50,6 +52,8 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "loop-meeting" ? <LoopMeetingWidget /> : null}
       {block.widget === "tank-ratio" ? <TankRatioWidget /> : null}
       {block.widget === "oral-rehydration-mixer" ? <OralRehydrationMixerWidget /> : null}
+      {block.widget === "algebra-area-model" ? <AlgebraAreaModelWidget /> : null}
+      {block.widget === "subtraction-walk" ? <SubtractionWalkWidget /> : null}
     </div>
   );
 }

@@ -133,7 +133,9 @@ export type MathBlockInteractiveWidget =
   | "ratio-mixer"
   | "loop-meeting"
   | "tank-ratio"
-  | "oral-rehydration-mixer";
+  | "oral-rehydration-mixer"
+  | "algebra-area-model"
+  | "subtraction-walk";
 
 export type MathBlockInteractive = {
   id: string;

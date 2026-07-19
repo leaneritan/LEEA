@@ -21,7 +21,7 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 - [ ] Unit 1 — Grammar
 - [ ] Unit 2 — Vocab
 - [ ] Unit 2 — Grammar
-- [ ] Unit 3 — Vocab
+- [x] Unit 3 — Vocab
 - [ ] Unit 3 — Grammar
 - [ ] Unit 4 — Vocab
 - [ ] Unit 4 — Grammar
@@ -42,7 +42,7 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 - [ ] Unit 1 — Grammar
 - [ ] Unit 2 — Vocab
 - [ ] Unit 2 — Grammar
-- [ ] Unit 3 — Vocab
+- [x] Unit 3 — Vocab
 - [ ] Unit 3 — Grammar
 - [ ] Unit 4 — Vocab
 - [ ] Unit 4 — Grammar
@@ -63,7 +63,7 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 - [ ] Unit 1 — Grammar
 - [ ] Unit 2 — Vocab
 - [ ] Unit 2 — Grammar
-- [ ] Unit 3 — Vocab
+- [x] Unit 3 — Vocab
 - [ ] Unit 3 — Grammar
 - [x] Unit 4 — Vocab
 - [x] Unit 4 — Grammar
@@ -105,7 +105,7 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 - [x] Unit 1 — Grammar
 - [ ] Unit 2 — Vocab
 - [ ] Unit 2 — Grammar
-- [ ] Unit 3 — Vocab
+- [x] Unit 3 — Vocab
 - [ ] Unit 3 — Grammar
 - [ ] Unit 4 — Vocab
 - [ ] Unit 4 — Grammar
@@ -126,7 +126,7 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 - [ ] Unit 1 — Grammar
 - [ ] Unit 2 — Vocab
 - [ ] Unit 2 — Grammar
-- [ ] Unit 3 — Vocab
+- [x] Unit 3 — Vocab
 - [ ] Unit 3 — Grammar
 - [ ] Unit 4 — Vocab
 - [ ] Unit 4 — Grammar

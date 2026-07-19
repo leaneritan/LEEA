@@ -25,6 +25,7 @@ function sourceLabel(word, suffix) {
 }
 
 const unitVocabularyPaths = [
+  "content/subjects/english/courses/our-world/level-3/unit-3/vocabulary.json",
   "content/subjects/english/courses/our-world/level-5/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-4/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-5/vocabulary.json",
@@ -145,13 +146,13 @@ const IRREGULAR_VERBS_FOR_VALIDATION = {
   have: ["had", "had"], hear: ["heard", "heard"], hide: ["hid", "hidden"],
   hold: ["held", "held"], keep: ["kept", "kept"], know: ["knew", "known"],
   leave: ["left", "left"], lose: ["lost", "lost"], make: ["made", "made"],
-  meet: ["met", "met"], pay: ["paid", "paid"], put: ["put", "put"],
+  meet: ["met", "met"], pay: ["paid", "paid"], pedal: ["pedaled", "pedaled"], put: ["put", "put"],
   read: ["read", "read"], ride: ["rode", "ridden"], run: ["ran", "run"],
   say: ["said", "said"], see: ["saw", "seen"], sell: ["sold", "sold"],
   send: ["sent", "sent"], sing: ["sang", "sung"], sit: ["sat", "sat"],
   sleep: ["slept", "slept"], speak: ["spoke", "spoken"], spend: ["spent", "spent"],
   spin: ["spun", "spun"], stand: ["stood", "stood"], swim: ["swam", "swum"],
-  take: ["took", "taken"], teach: ["taught", "taught"], tell: ["told", "told"],
+  take: ["took", "taken"], teach: ["taught", "taught"], tell: ["told", "told"], travel: ["traveled", "traveled"],
   think: ["thought", "thought"], throw: ["threw", "thrown"],
   understand: ["understood", "understood"], wake: ["woke", "woken"],
   wear: ["wore", "worn"], win: ["won", "won"], write: ["wrote", "written"],

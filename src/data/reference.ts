@@ -1,4 +1,5 @@
 import level5Unit1Vocabulary from "../../content/subjects/english/courses/our-world/level-5/unit-1/vocabulary.json";
+import level3Unit3Vocabulary from "../../content/subjects/english/courses/our-world/level-3/unit-3/vocabulary.json";
 import level3Unit4Vocabulary from "../../content/subjects/english/courses/our-world/level-3/unit-4/vocabulary.json";
 import level3Unit5Vocabulary from "../../content/subjects/english/courses/our-world/level-3/unit-5/vocabulary.json";
 import level3Unit6Vocabulary from "../../content/subjects/english/courses/our-world/level-3/unit-6/vocabulary.json";
@@ -42,6 +43,7 @@ import type {
 
 type UnitVocabularyWord =
   | (typeof level5Unit1Vocabulary.words)[number]
+  | (typeof level3Unit3Vocabulary.words)[number]
   | (typeof level3Unit4Vocabulary.words)[number]
   | (typeof level3Unit5Vocabulary.words)[number]
   | (typeof level3Unit6Vocabulary.words)[number]
@@ -172,6 +174,7 @@ function mergeWordsAcrossUnits(unitWordLists: UnitVocabularyWord[][]): Vocabular
 
 export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
   level5Unit1Vocabulary.words as UnitVocabularyWord[],
+  level3Unit3Vocabulary.words as UnitVocabularyWord[],
   level3Unit4Vocabulary.words as UnitVocabularyWord[],
   level3Unit5Vocabulary.words as UnitVocabularyWord[],
   level3Unit6Vocabulary.words as UnitVocabularyWord[],
@@ -194,6 +197,7 @@ export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
    Reference tree never has to guess or hardcode a title elsewhere. */
 export const unitTitles: Record<string, string> = {
   [`${level5Unit1Vocabulary.level}-${level5Unit1Vocabulary.unit}`]: level5Unit1Vocabulary.unitTitle,
+  [`${level3Unit3Vocabulary.level}-${level3Unit3Vocabulary.unit}`]: level3Unit3Vocabulary.unitTitle,
   [`${level3Unit4Vocabulary.level}-${level3Unit4Vocabulary.unit}`]: level3Unit4Vocabulary.unitTitle,
   [`${level3Unit5Vocabulary.level}-${level3Unit5Vocabulary.unit}`]: level3Unit5Vocabulary.unitTitle,
   [`${level3Unit6Vocabulary.level}-${level3Unit6Vocabulary.unit}`]: level3Unit6Vocabulary.unitTitle,
@@ -224,6 +228,13 @@ export const level5Unit1GlossaryItems = vocabularyItems.filter(
   (item) =>
     (item.type === "content" || item.type === "related" || item.type === "glossary") &&
     item.sources.some((source) => source.course === "our-world" && source.level === 5 && source.unit === 1)
+);
+
+export const level3Unit3Vocab1Items = vocabularyItems.filter((item) => (level3Unit3Vocabulary.vocab1WordIds as string[]).includes(item.id));
+export const level3Unit3Vocab2Items = vocabularyItems.filter((item) => (level3Unit3Vocabulary.vocab2WordIds as string[]).includes(item.id));
+export const level3Unit3AcademicItems = vocabularyItems.filter((item) => (level3Unit3Vocabulary.academicWordIds as string[]).includes(item.id));
+export const level3Unit3GlossaryItems = vocabularyItems.filter(
+  (item) => (level3Unit3Vocabulary.contentWordIds as string[]).includes(item.id) || (level3Unit3Vocabulary.relatedWordIds as string[]).includes(item.id)
 );
 
 export const level3Unit4Vocab1Items = vocabularyItems.filter((item) => (level3Unit4Vocabulary.vocab1WordIds as string[]).includes(item.id));

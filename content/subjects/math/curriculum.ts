@@ -54,8 +54,8 @@ export const mathChapters: MathChapterMeta[] = [
     dark: "#a84763",
     sections: [
       { id: "math-3-1", chapterId: "3", number: 1, name: "1節 方程式とその解き方", pages: "p.92–102", status: "done" },
-      { id: "math-3-2", chapterId: "3", number: 2, name: "2節 1次方程式の利用", pages: "p.103–111", status: "now" },
-      { id: "math-3-3", chapterId: "3", number: 3, name: "章末問題 A・B", pages: "p.114–116", status: "todo" }
+      { id: "math-3-2", chapterId: "3", number: 2, name: "2節 1次方程式の利用", pages: "p.103–111", status: "done" },
+      { id: "math-3-3", chapterId: "3", number: 3, name: "章末問題 A・B", pages: "p.114–116", status: "now" }
     ]
   },
   {

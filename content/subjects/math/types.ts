@@ -126,7 +126,9 @@ export type MathBlockInteractiveWidget =
   | "substitution"
   | "equivalent-expressions"
   | "cube-rods"
-  | "equation-balance";
+  | "equation-balance"
+  | "planter-spacing"
+  | "catch-up-race";
 
 export type MathBlockInteractive = {
   id: string;

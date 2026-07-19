@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import type { MathBlock } from "../../../content/subjects/math/types";
 
 type ChatTextMessage = { type: "text"; role: "user" | "ai"; text: string };
 type QuizItem = { q: string; choices: string[]; answer: number; explain: string; sel: number | null };
@@ -11,10 +12,12 @@ const SUGGESTIONS = ["この問題、なんでこう解くの？", "やさしく
 
 export function ChatPanel({
   chapterTitle,
-  sectionTitle
+  sectionTitle,
+  blocks
 }: {
   chapterTitle: string;
   sectionTitle: string;
+  blocks: MathBlock[];
 }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -51,6 +54,7 @@ export function ChatPanel({
           mode: "explain",
           chapterTitle,
           sectionTitle,
+          sectionBlocks: blocks,
           history,
           message: trimmed
         })
@@ -78,7 +82,7 @@ export function ChatPanel({
       const response = await fetch("/api/math-tutor", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ mode: "quiz", chapterTitle, sectionTitle, wrongQuestions })
+        body: JSON.stringify({ mode: "quiz", chapterTitle, sectionTitle, sectionBlocks: blocks, wrongQuestions })
       });
       if (!response.ok) throw new Error("request failed");
       const data = (await response.json()) as { items: Array<{ q: string; choices: string[]; answer: number; explain: string }> };

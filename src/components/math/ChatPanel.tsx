@@ -20,6 +20,7 @@ export function ChatPanel({
   blocks: MathBlock[];
 }) {
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [busy, setBusy] = useState(false);
@@ -120,16 +121,25 @@ export function ChatPanel({
         💬 先生にきく
       </button>
 
-      <div className={`math-chat-panel${open ? " math-chat-panel--open" : ""}`}>
+      <div className={`math-chat-panel${open ? " math-chat-panel--open" : ""}${expanded ? " math-chat-panel--expanded" : ""}`}>
         <div className="math-chat-header">
           <span className="math-chat-avatar">🦉</span>
           <div className="math-chat-title">
-            <div className="math-chat-name">数学の先生</div>
+            <div className="math-chat-name">数学の先生（レオくん専用）</div>
             <div className="math-chat-context">
               いま学習中：{chapterTitle} {sectionTitle}
             </div>
           </div>
-          <button className="math-chat-close" onClick={() => setOpen(false)} type="button">
+          <button
+            aria-label={expanded ? "チャットを元の大きさに戻す" : "チャットを大きくする（クイズが見やすくなります）"}
+            className="math-chat-resize"
+            onClick={() => setExpanded((current) => !current)}
+            title={expanded ? "元の大きさに戻す" : "大きくする"}
+            type="button"
+          >
+            {expanded ? "⤡ 縮小" : "⤢ 拡大"}
+          </button>
+          <button aria-label="チャットを閉じる" className="math-chat-close" onClick={() => setOpen(false)} title="閉じる" type="button">
             ✕
           </button>
         </div>

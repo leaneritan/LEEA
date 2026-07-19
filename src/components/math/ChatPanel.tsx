@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { MathBlock } from "../../../content/subjects/math/types";
+import { readMathQuizAttempts, saveMathQuizAttempt } from "../../data/mathQuizAttempts";
 
 type ChatTextMessage = { type: "text"; role: "user" | "ai"; text: string };
 type QuizItem = { q: string; choices: string[]; answer: number; explain: string; sel: number | null };
@@ -13,10 +14,12 @@ const SUGGESTIONS = ["この問題、なんでこう解くの？", "やさしく
 export function ChatPanel({
   chapterTitle,
   sectionTitle,
+  sectionId,
   blocks
 }: {
   chapterTitle: string;
   sectionTitle: string;
+  sectionId: string;
   blocks: MathBlock[];
 }) {
   const [open, setOpen] = useState(false);
@@ -56,6 +59,7 @@ export function ChatPanel({
           chapterTitle,
           sectionTitle,
           sectionBlocks: blocks,
+          recentQuizAttempts: readMathQuizAttempts().slice(0, 5),
           history,
           message: trimmed
         })
@@ -83,7 +87,14 @@ export function ChatPanel({
       const response = await fetch("/api/math-tutor", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ mode: "quiz", chapterTitle, sectionTitle, sectionBlocks: blocks, wrongQuestions })
+        body: JSON.stringify({
+          mode: "quiz",
+          chapterTitle,
+          sectionTitle,
+          sectionBlocks: blocks,
+          recentQuizAttempts: readMathQuizAttempts().slice(0, 5),
+          wrongQuestions
+        })
       });
       if (!response.ok) throw new Error("request failed");
       const data = (await response.json()) as { items: Array<{ q: string; choices: string[]; answer: number; explain: string }> };
@@ -99,15 +110,17 @@ export function ChatPanel({
   }
 
   function pickChoice(messageIndex: number, questionIndex: number, choiceIndex: number) {
-    setMessages((current) =>
-      current.map((message, index) => {
-        if (index !== messageIndex || message.type !== "quiz") return message;
-        return {
-          ...message,
-          items: message.items.map((item, i) => (i === questionIndex && item.sel == null ? { ...item, sel: choiceIndex } : item))
-        };
-      })
-    );
+    const message = messages[messageIndex];
+    if (!message || message.type !== "quiz") return;
+    if (message.items.every((item) => item.sel != null)) return;
+
+    const items = message.items.map((item, i) => (i === questionIndex && item.sel == null ? { ...item, sel: choiceIndex } : item));
+    setMessages((current) => current.map((m, index) => (index === messageIndex ? { ...m, items } : m)));
+
+    if (items.every((item) => item.sel != null)) {
+      const correct = items.filter((item) => item.sel === item.answer).length;
+      saveMathQuizAttempt({ sectionId, chapterTitle, sectionTitle, correct, total: items.length, createdAt: new Date().toISOString() });
+    }
   }
 
   return (

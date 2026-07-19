@@ -125,7 +125,8 @@ export type MathBlockInteractiveWidget =
   | "matchstick-squares"
   | "substitution"
   | "equivalent-expressions"
-  | "cube-rods";
+  | "cube-rods"
+  | "equation-balance";
 
 export type MathBlockInteractive = {
   id: string;

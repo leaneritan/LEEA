@@ -2,6 +2,7 @@ import type { MathBlockInteractive } from "../../../../content/subjects/math/typ
 import { AverageBaselineWidget } from "./AverageBaselineWidget";
 import { CardGameWidget } from "./CardGameWidget";
 import { CubeRodsWidget } from "./CubeRodsWidget";
+import { EquationBalanceWidget } from "./EquationBalanceWidget";
 import { EquivalentExpressionsWidget } from "./EquivalentExpressionsWidget";
 import { KukuTableWidget } from "./KukuTableWidget";
 import { MatchstickSquaresWidget } from "./MatchstickSquaresWidget";
@@ -34,6 +35,7 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "substitution" ? <SubstitutionWidget /> : null}
       {block.widget === "equivalent-expressions" ? <EquivalentExpressionsWidget /> : null}
       {block.widget === "cube-rods" ? <CubeRodsWidget /> : null}
+      {block.widget === "equation-balance" ? <EquationBalanceWidget /> : null}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { CardGameWidget } from "./CardGameWidget";
 import { CatchUpRaceWidget } from "./CatchUpRaceWidget";
 import { CubeRodsWidget } from "./CubeRodsWidget";
 import { EquationBalanceWidget } from "./EquationBalanceWidget";
+import { EquationSolutionTableWidget } from "./EquationSolutionTableWidget";
 import { EquivalentExpressionsWidget } from "./EquivalentExpressionsWidget";
 import { KukuTableWidget } from "./KukuTableWidget";
 import { MatchstickSquaresWidget } from "./MatchstickSquaresWidget";
@@ -12,6 +13,7 @@ import { NumberLineWalkWidget } from "./NumberLineWalkWidget";
 import { NumberRangeGridWidget } from "./NumberRangeGridWidget";
 import { PlanterSpacingWidget } from "./PlanterSpacingWidget";
 import { PrimeSieveWidget } from "./PrimeSieveWidget";
+import { RatioMixerWidget } from "./RatioMixerWidget";
 import { SignedProductWidget } from "./SignedProductWidget";
 import { SubstitutionWidget } from "./SubstitutionWidget";
 import { WalkRateWidget } from "./WalkRateWidget";
@@ -40,6 +42,8 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "equation-balance" ? <EquationBalanceWidget /> : null}
       {block.widget === "planter-spacing" ? <PlanterSpacingWidget /> : null}
       {block.widget === "catch-up-race" ? <CatchUpRaceWidget /> : null}
+      {block.widget === "equation-solution-table" ? <EquationSolutionTableWidget /> : null}
+      {block.widget === "ratio-mixer" ? <RatioMixerWidget /> : null}
     </div>
   );
 }

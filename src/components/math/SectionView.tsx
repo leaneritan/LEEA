@@ -86,7 +86,7 @@ export function SectionView({ chapter, section }: { chapter: MathChapterMeta; se
         </div>
       </div>
 
-      <ChatPanel chapterTitle={`${chapter.num}章 ${chapter.title}`} sectionTitle={`${section.number}節 ${section.title}`} />
+      <ChatPanel chapterTitle={`${chapter.num}章 ${chapter.title}`} sectionTitle={`${section.number}節 ${section.title}`} blocks={section.blocks} />
     </div>
   );
 }

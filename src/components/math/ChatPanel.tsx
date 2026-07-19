@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import type { MathBlock } from "../../../content/subjects/math/types";
 
 type ChatTextMessage = { type: "text"; role: "user" | "ai"; text: string };
 type QuizItem = { q: string; choices: string[]; answer: number; explain: string; sel: number | null };
@@ -11,12 +12,15 @@ const SUGGESTIONS = ["この問題、なんでこう解くの？", "やさしく
 
 export function ChatPanel({
   chapterTitle,
-  sectionTitle
+  sectionTitle,
+  blocks
 }: {
   chapterTitle: string;
   sectionTitle: string;
+  blocks: MathBlock[];
 }) {
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [busy, setBusy] = useState(false);
@@ -51,6 +55,7 @@ export function ChatPanel({
           mode: "explain",
           chapterTitle,
           sectionTitle,
+          sectionBlocks: blocks,
           history,
           message: trimmed
         })
@@ -78,7 +83,7 @@ export function ChatPanel({
       const response = await fetch("/api/math-tutor", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ mode: "quiz", chapterTitle, sectionTitle, wrongQuestions })
+        body: JSON.stringify({ mode: "quiz", chapterTitle, sectionTitle, sectionBlocks: blocks, wrongQuestions })
       });
       if (!response.ok) throw new Error("request failed");
       const data = (await response.json()) as { items: Array<{ q: string; choices: string[]; answer: number; explain: string }> };
@@ -116,23 +121,32 @@ export function ChatPanel({
         💬 先生にきく
       </button>
 
-      <div className={`math-chat-panel${open ? " math-chat-panel--open" : ""}`}>
+      <div className={`math-chat-panel${open ? " math-chat-panel--open" : ""}${expanded ? " math-chat-panel--expanded" : ""}`}>
         <div className="math-chat-header">
           <span className="math-chat-avatar">🦉</span>
           <div className="math-chat-title">
-            <div className="math-chat-name">数学の先生</div>
+            <div className="math-chat-name">数学の先生（レオくん専用）</div>
             <div className="math-chat-context">
               いま学習中：{chapterTitle} {sectionTitle}
             </div>
           </div>
-          <button className="math-chat-close" onClick={() => setOpen(false)} type="button">
+          <button
+            aria-label={expanded ? "チャットを元の大きさに戻す" : "チャットを大きくする（クイズが見やすくなります）"}
+            className="math-chat-resize"
+            onClick={() => setExpanded((current) => !current)}
+            title={expanded ? "元の大きさに戻す" : "大きくする"}
+            type="button"
+          >
+            {expanded ? "⤡ 縮小" : "⤢ 拡大"}
+          </button>
+          <button aria-label="チャットを閉じる" className="math-chat-close" onClick={() => setOpen(false)} title="閉じる" type="button">
             ✕
           </button>
         </div>
 
         <div className="math-chat-messages" ref={scrollRef}>
           <div className="math-chat-bubble">
-            こんにちは！わからない問題があったら、なんでもきいてね。「クイズを作って」と言えば、その場で練習問題も出すよ。
+            こんにちは、レオくん！わからない問題があったら、なんでもきいてね。「クイズを作って」と言えば、その場で練習問題も出すよ。
           </div>
           {messages.map((message, messageIndex) =>
             message.type === "text" ? (

@@ -67,8 +67,8 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#e8f1e6",
     dark: "#47793f",
     sections: [
-      { id: "math-4-1", chapterId: "4", number: 1, name: "1節 関数と比例", pages: "p.118–126", status: "now" },
-      { id: "math-4-2", chapterId: "4", number: 2, name: "2節 反比例", pages: "p.130–139", status: "todo" },
+      { id: "math-4-1", chapterId: "4", number: 1, name: "1節 関数と比例", pages: "p.118–126", status: "done" },
+      { id: "math-4-2", chapterId: "4", number: 2, name: "2節 比例の性質と調べ方", pages: "p.127–138", status: "now" },
       { id: "math-4-3", chapterId: "4", number: 3, name: "3節 比例と反比例の活用", pages: "p.140–148", status: "todo" }
     ]
   },

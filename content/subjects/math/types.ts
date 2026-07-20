@@ -135,7 +135,10 @@ export type MathBlockInteractiveWidget =
   | "tank-ratio"
   | "oral-rehydration-mixer"
   | "algebra-area-model"
-  | "subtraction-walk";
+  | "subtraction-walk"
+  | "tank-fill-rate"
+  | "proportion-vs-inverse"
+  | "function-check";
 
 export type MathBlockInteractive = {
   id: string;

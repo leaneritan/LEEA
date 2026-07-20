@@ -138,7 +138,9 @@ export type MathBlockInteractiveWidget =
   | "subtraction-walk"
   | "tank-fill-rate"
   | "proportion-vs-inverse"
-  | "function-check";
+  | "function-check"
+  | "proportion-slope-explorer"
+  | "proportion-representation-link";
 
 export type MathBlockInteractive = {
   id: string;

@@ -7,6 +7,7 @@ import { CubeRodsWidget } from "./CubeRodsWidget";
 import { EquationBalanceWidget } from "./EquationBalanceWidget";
 import { EquationSolutionTableWidget } from "./EquationSolutionTableWidget";
 import { EquivalentExpressionsWidget } from "./EquivalentExpressionsWidget";
+import { FunctionCheckWidget } from "./FunctionCheckWidget";
 import { KukuTableWidget } from "./KukuTableWidget";
 import { LoopMeetingWidget } from "./LoopMeetingWidget";
 import { MatchstickSquaresWidget } from "./MatchstickSquaresWidget";
@@ -16,10 +17,12 @@ import { NumberRangeGridWidget } from "./NumberRangeGridWidget";
 import { OralRehydrationMixerWidget } from "./OralRehydrationMixerWidget";
 import { PlanterSpacingWidget } from "./PlanterSpacingWidget";
 import { PrimeSieveWidget } from "./PrimeSieveWidget";
+import { ProportionVsInverseWidget } from "./ProportionVsInverseWidget";
 import { RatioMixerWidget } from "./RatioMixerWidget";
 import { SignedProductWidget } from "./SignedProductWidget";
 import { SubstitutionWidget } from "./SubstitutionWidget";
 import { SubtractionWalkWidget } from "./SubtractionWalkWidget";
+import { TankFillRateWidget } from "./TankFillRateWidget";
 import { TankRatioWidget } from "./TankRatioWidget";
 import { WalkRateWidget } from "./WalkRateWidget";
 
@@ -54,6 +57,9 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "oral-rehydration-mixer" ? <OralRehydrationMixerWidget /> : null}
       {block.widget === "algebra-area-model" ? <AlgebraAreaModelWidget /> : null}
       {block.widget === "subtraction-walk" ? <SubtractionWalkWidget /> : null}
+      {block.widget === "tank-fill-rate" ? <TankFillRateWidget /> : null}
+      {block.widget === "proportion-vs-inverse" ? <ProportionVsInverseWidget /> : null}
+      {block.widget === "function-check" ? <FunctionCheckWidget /> : null}
     </div>
   );
 }

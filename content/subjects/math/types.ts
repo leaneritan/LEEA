@@ -145,7 +145,10 @@ export type MathBlockInteractiveWidget =
   | "inverse-representation-link"
   | "queue-wait"
   | "slideshow-relation"
-  | "marathon-pace-compare";
+  | "marathon-pace-compare"
+  | "moving-point-area"
+  | "lattice-point-counter"
+  | "tank-compare";
 
 export type MathBlockInteractive = {
   id: string;

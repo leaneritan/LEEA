@@ -11,9 +11,11 @@ import { FunctionCheckWidget } from "./FunctionCheckWidget";
 import { InverseRepresentationLinkWidget } from "./InverseRepresentationLinkWidget";
 import { InverseSlopeExplorerWidget } from "./InverseSlopeExplorerWidget";
 import { KukuTableWidget } from "./KukuTableWidget";
+import { LatticePointCounterWidget } from "./LatticePointCounterWidget";
 import { LoopMeetingWidget } from "./LoopMeetingWidget";
 import { MarathonPaceCompareWidget } from "./MarathonPaceCompareWidget";
 import { MatchstickSquaresWidget } from "./MatchstickSquaresWidget";
+import { MovingPointAreaWidget } from "./MovingPointAreaWidget";
 import { NumberLinePlotWidget } from "./NumberLinePlotWidget";
 import { NumberLineWalkWidget } from "./NumberLineWalkWidget";
 import { NumberRangeGridWidget } from "./NumberRangeGridWidget";
@@ -29,6 +31,7 @@ import { SignedProductWidget } from "./SignedProductWidget";
 import { SlideshowRelationWidget } from "./SlideshowRelationWidget";
 import { SubstitutionWidget } from "./SubstitutionWidget";
 import { SubtractionWalkWidget } from "./SubtractionWalkWidget";
+import { TankCompareWidget } from "./TankCompareWidget";
 import { TankFillRateWidget } from "./TankFillRateWidget";
 import { TankRatioWidget } from "./TankRatioWidget";
 import { WalkRateWidget } from "./WalkRateWidget";
@@ -74,6 +77,9 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "queue-wait" ? <QueueWaitWidget /> : null}
       {block.widget === "slideshow-relation" ? <SlideshowRelationWidget /> : null}
       {block.widget === "marathon-pace-compare" ? <MarathonPaceCompareWidget /> : null}
+      {block.widget === "moving-point-area" ? <MovingPointAreaWidget /> : null}
+      {block.widget === "lattice-point-counter" ? <LatticePointCounterWidget /> : null}
+      {block.widget === "tank-compare" ? <TankCompareWidget /> : null}
     </div>
   );
 }

@@ -71,7 +71,7 @@ export const mathChapters: MathChapterMeta[] = [
       { id: "math-4-2", chapterId: "4", number: 2, name: "2節 比例の性質と調べ方", pages: "p.127–138", status: "done" },
       { id: "math-4-3", chapterId: "4", number: 3, name: "3節 反比例の性質と調べ方", pages: "p.139–148", status: "done" },
       { id: "math-4-4", chapterId: "4", number: 4, name: "4節 比例と反比例の利用", pages: "p.149–153", status: "done" },
-      { id: "math-4-5", chapterId: "4", number: 5, name: "章末問題 A・B", pages: "p.154–156", status: "now" }
+      { id: "math-4-5", chapterId: "4", number: 5, name: "章末問題 A・B", pages: "p.154–156", status: "done" }
     ]
   },
   {
@@ -83,7 +83,7 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#e2f2f1",
     dark: "#20736e",
     sections: [
-      { id: "math-5-1", chapterId: "5", number: 1, name: "1節 図形の移動", pages: "p.150–163", status: "todo" },
+      { id: "math-5-1", chapterId: "5", number: 1, name: "1節 図形の移動", pages: "p.150–163", status: "now" },
       { id: "math-5-2", chapterId: "5", number: 2, name: "2節 基本の作図", pages: "p.164–180", status: "todo" }
     ]
   },

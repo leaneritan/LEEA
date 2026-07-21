@@ -142,7 +142,10 @@ export type MathBlockInteractiveWidget =
   | "proportion-slope-explorer"
   | "proportion-representation-link"
   | "inverse-slope-explorer"
-  | "inverse-representation-link";
+  | "inverse-representation-link"
+  | "queue-wait"
+  | "slideshow-relation"
+  | "marathon-pace-compare";
 
 export type MathBlockInteractive = {
   id: string;

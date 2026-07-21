@@ -12,6 +12,7 @@ import { InverseRepresentationLinkWidget } from "./InverseRepresentationLinkWidg
 import { InverseSlopeExplorerWidget } from "./InverseSlopeExplorerWidget";
 import { KukuTableWidget } from "./KukuTableWidget";
 import { LoopMeetingWidget } from "./LoopMeetingWidget";
+import { MarathonPaceCompareWidget } from "./MarathonPaceCompareWidget";
 import { MatchstickSquaresWidget } from "./MatchstickSquaresWidget";
 import { NumberLinePlotWidget } from "./NumberLinePlotWidget";
 import { NumberLineWalkWidget } from "./NumberLineWalkWidget";
@@ -22,8 +23,10 @@ import { PrimeSieveWidget } from "./PrimeSieveWidget";
 import { ProportionRepresentationLinkWidget } from "./ProportionRepresentationLinkWidget";
 import { ProportionSlopeExplorerWidget } from "./ProportionSlopeExplorerWidget";
 import { ProportionVsInverseWidget } from "./ProportionVsInverseWidget";
+import { QueueWaitWidget } from "./QueueWaitWidget";
 import { RatioMixerWidget } from "./RatioMixerWidget";
 import { SignedProductWidget } from "./SignedProductWidget";
+import { SlideshowRelationWidget } from "./SlideshowRelationWidget";
 import { SubstitutionWidget } from "./SubstitutionWidget";
 import { SubtractionWalkWidget } from "./SubtractionWalkWidget";
 import { TankFillRateWidget } from "./TankFillRateWidget";
@@ -68,6 +71,9 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "proportion-representation-link" ? <ProportionRepresentationLinkWidget /> : null}
       {block.widget === "inverse-slope-explorer" ? <InverseSlopeExplorerWidget /> : null}
       {block.widget === "inverse-representation-link" ? <InverseRepresentationLinkWidget /> : null}
+      {block.widget === "queue-wait" ? <QueueWaitWidget /> : null}
+      {block.widget === "slideshow-relation" ? <SlideshowRelationWidget /> : null}
+      {block.widget === "marathon-pace-compare" ? <MarathonPaceCompareWidget /> : null}
     </div>
   );
 }

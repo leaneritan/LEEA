@@ -17,6 +17,8 @@ import { NumberRangeGridWidget } from "./NumberRangeGridWidget";
 import { OralRehydrationMixerWidget } from "./OralRehydrationMixerWidget";
 import { PlanterSpacingWidget } from "./PlanterSpacingWidget";
 import { PrimeSieveWidget } from "./PrimeSieveWidget";
+import { ProportionRepresentationLinkWidget } from "./ProportionRepresentationLinkWidget";
+import { ProportionSlopeExplorerWidget } from "./ProportionSlopeExplorerWidget";
 import { ProportionVsInverseWidget } from "./ProportionVsInverseWidget";
 import { RatioMixerWidget } from "./RatioMixerWidget";
 import { SignedProductWidget } from "./SignedProductWidget";
@@ -60,6 +62,8 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "tank-fill-rate" ? <TankFillRateWidget /> : null}
       {block.widget === "proportion-vs-inverse" ? <ProportionVsInverseWidget /> : null}
       {block.widget === "function-check" ? <FunctionCheckWidget /> : null}
+      {block.widget === "proportion-slope-explorer" ? <ProportionSlopeExplorerWidget /> : null}
+      {block.widget === "proportion-representation-link" ? <ProportionRepresentationLinkWidget /> : null}
     </div>
   );
 }

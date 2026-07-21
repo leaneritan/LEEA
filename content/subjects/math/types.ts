@@ -151,7 +151,12 @@ export type MathBlockInteractiveWidget =
   | "tank-compare"
   | "domain-number-line"
   | "proportion-graph-challenge"
-  | "inverse-graph-challenge";
+  | "inverse-graph-challenge"
+  | "translation"
+  | "rotation"
+  | "reflection"
+  | "transform-combo"
+  | "hex-tessellation";
 
 export type MathBlockInteractive = {
   id: string;

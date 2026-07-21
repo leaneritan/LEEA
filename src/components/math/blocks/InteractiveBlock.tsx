@@ -9,6 +9,7 @@ import { EquationBalanceWidget } from "./EquationBalanceWidget";
 import { EquationSolutionTableWidget } from "./EquationSolutionTableWidget";
 import { EquivalentExpressionsWidget } from "./EquivalentExpressionsWidget";
 import { FunctionCheckWidget } from "./FunctionCheckWidget";
+import { HexTessellationWidget } from "./HexTessellationWidget";
 import { InverseGraphChallengeWidget } from "./InverseGraphChallengeWidget";
 import { InverseRepresentationLinkWidget } from "./InverseRepresentationLinkWidget";
 import { InverseSlopeExplorerWidget } from "./InverseSlopeExplorerWidget";
@@ -30,6 +31,8 @@ import { ProportionSlopeExplorerWidget } from "./ProportionSlopeExplorerWidget";
 import { ProportionVsInverseWidget } from "./ProportionVsInverseWidget";
 import { QueueWaitWidget } from "./QueueWaitWidget";
 import { RatioMixerWidget } from "./RatioMixerWidget";
+import { ReflectionWidget } from "./ReflectionWidget";
+import { RotationWidget } from "./RotationWidget";
 import { SignedProductWidget } from "./SignedProductWidget";
 import { SlideshowRelationWidget } from "./SlideshowRelationWidget";
 import { SubstitutionWidget } from "./SubstitutionWidget";
@@ -37,6 +40,8 @@ import { SubtractionWalkWidget } from "./SubtractionWalkWidget";
 import { TankCompareWidget } from "./TankCompareWidget";
 import { TankFillRateWidget } from "./TankFillRateWidget";
 import { TankRatioWidget } from "./TankRatioWidget";
+import { TransformComboWidget } from "./TransformComboWidget";
+import { TranslationWidget } from "./TranslationWidget";
 import { WalkRateWidget } from "./WalkRateWidget";
 
 export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
@@ -86,6 +91,11 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "domain-number-line" ? <DomainNumberLineWidget /> : null}
       {block.widget === "proportion-graph-challenge" ? <ProportionGraphChallengeWidget /> : null}
       {block.widget === "inverse-graph-challenge" ? <InverseGraphChallengeWidget /> : null}
+      {block.widget === "translation" ? <TranslationWidget /> : null}
+      {block.widget === "rotation" ? <RotationWidget /> : null}
+      {block.widget === "reflection" ? <ReflectionWidget /> : null}
+      {block.widget === "transform-combo" ? <TransformComboWidget /> : null}
+      {block.widget === "hex-tessellation" ? <HexTessellationWidget /> : null}
     </div>
   );
 }

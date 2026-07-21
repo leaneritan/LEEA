@@ -140,7 +140,9 @@ export type MathBlockInteractiveWidget =
   | "proportion-vs-inverse"
   | "function-check"
   | "proportion-slope-explorer"
-  | "proportion-representation-link";
+  | "proportion-representation-link"
+  | "inverse-slope-explorer"
+  | "inverse-representation-link";
 
 export type MathBlockInteractive = {
   id: string;

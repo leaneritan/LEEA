@@ -8,6 +8,8 @@ import { EquationBalanceWidget } from "./EquationBalanceWidget";
 import { EquationSolutionTableWidget } from "./EquationSolutionTableWidget";
 import { EquivalentExpressionsWidget } from "./EquivalentExpressionsWidget";
 import { FunctionCheckWidget } from "./FunctionCheckWidget";
+import { InverseRepresentationLinkWidget } from "./InverseRepresentationLinkWidget";
+import { InverseSlopeExplorerWidget } from "./InverseSlopeExplorerWidget";
 import { KukuTableWidget } from "./KukuTableWidget";
 import { LoopMeetingWidget } from "./LoopMeetingWidget";
 import { MatchstickSquaresWidget } from "./MatchstickSquaresWidget";
@@ -64,6 +66,8 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "function-check" ? <FunctionCheckWidget /> : null}
       {block.widget === "proportion-slope-explorer" ? <ProportionSlopeExplorerWidget /> : null}
       {block.widget === "proportion-representation-link" ? <ProportionRepresentationLinkWidget /> : null}
+      {block.widget === "inverse-slope-explorer" ? <InverseSlopeExplorerWidget /> : null}
+      {block.widget === "inverse-representation-link" ? <InverseRepresentationLinkWidget /> : null}
     </div>
   );
 }

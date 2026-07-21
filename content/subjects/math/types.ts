@@ -148,7 +148,10 @@ export type MathBlockInteractiveWidget =
   | "marathon-pace-compare"
   | "moving-point-area"
   | "lattice-point-counter"
-  | "tank-compare";
+  | "tank-compare"
+  | "domain-number-line"
+  | "proportion-graph-challenge"
+  | "inverse-graph-challenge";
 
 export type MathBlockInteractive = {
   id: string;

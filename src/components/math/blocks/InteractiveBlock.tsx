@@ -4,10 +4,12 @@ import { AverageBaselineWidget } from "./AverageBaselineWidget";
 import { CardGameWidget } from "./CardGameWidget";
 import { CatchUpRaceWidget } from "./CatchUpRaceWidget";
 import { CubeRodsWidget } from "./CubeRodsWidget";
+import { DomainNumberLineWidget } from "./DomainNumberLineWidget";
 import { EquationBalanceWidget } from "./EquationBalanceWidget";
 import { EquationSolutionTableWidget } from "./EquationSolutionTableWidget";
 import { EquivalentExpressionsWidget } from "./EquivalentExpressionsWidget";
 import { FunctionCheckWidget } from "./FunctionCheckWidget";
+import { InverseGraphChallengeWidget } from "./InverseGraphChallengeWidget";
 import { InverseRepresentationLinkWidget } from "./InverseRepresentationLinkWidget";
 import { InverseSlopeExplorerWidget } from "./InverseSlopeExplorerWidget";
 import { KukuTableWidget } from "./KukuTableWidget";
@@ -22,6 +24,7 @@ import { NumberRangeGridWidget } from "./NumberRangeGridWidget";
 import { OralRehydrationMixerWidget } from "./OralRehydrationMixerWidget";
 import { PlanterSpacingWidget } from "./PlanterSpacingWidget";
 import { PrimeSieveWidget } from "./PrimeSieveWidget";
+import { ProportionGraphChallengeWidget } from "./ProportionGraphChallengeWidget";
 import { ProportionRepresentationLinkWidget } from "./ProportionRepresentationLinkWidget";
 import { ProportionSlopeExplorerWidget } from "./ProportionSlopeExplorerWidget";
 import { ProportionVsInverseWidget } from "./ProportionVsInverseWidget";
@@ -80,6 +83,9 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "moving-point-area" ? <MovingPointAreaWidget /> : null}
       {block.widget === "lattice-point-counter" ? <LatticePointCounterWidget /> : null}
       {block.widget === "tank-compare" ? <TankCompareWidget /> : null}
+      {block.widget === "domain-number-line" ? <DomainNumberLineWidget /> : null}
+      {block.widget === "proportion-graph-challenge" ? <ProportionGraphChallengeWidget /> : null}
+      {block.widget === "inverse-graph-challenge" ? <InverseGraphChallengeWidget /> : null}
     </div>
   );
 }

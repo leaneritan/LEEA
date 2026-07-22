@@ -156,7 +156,13 @@ export type MathBlockInteractiveWidget =
   | "rotation"
   | "reflection"
   | "transform-combo"
-  | "hex-tessellation";
+  | "hex-tessellation"
+  | "perpendicular-construction"
+  | "perpendicular-bisector-construction"
+  | "angle-bisector-construction"
+  | "perpendicular-at-point-construction"
+  | "tangent-construction"
+  | "shortest-path-reflection";
 
 export type MathBlockInteractive = {
   id: string;

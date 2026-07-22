@@ -1,5 +1,6 @@
 import type { MathBlockInteractive } from "../../../../content/subjects/math/types";
 import { AlgebraAreaModelWidget } from "./AlgebraAreaModelWidget";
+import { AngleBisectorConstructionWidget } from "./AngleBisectorConstructionWidget";
 import { AverageBaselineWidget } from "./AverageBaselineWidget";
 import { CardGameWidget } from "./CardGameWidget";
 import { CatchUpRaceWidget } from "./CatchUpRaceWidget";
@@ -23,6 +24,9 @@ import { NumberLinePlotWidget } from "./NumberLinePlotWidget";
 import { NumberLineWalkWidget } from "./NumberLineWalkWidget";
 import { NumberRangeGridWidget } from "./NumberRangeGridWidget";
 import { OralRehydrationMixerWidget } from "./OralRehydrationMixerWidget";
+import { PerpendicularAtPointConstructionWidget } from "./PerpendicularAtPointConstructionWidget";
+import { PerpendicularBisectorConstructionWidget } from "./PerpendicularBisectorConstructionWidget";
+import { PerpendicularConstructionWidget } from "./PerpendicularConstructionWidget";
 import { PlanterSpacingWidget } from "./PlanterSpacingWidget";
 import { PrimeSieveWidget } from "./PrimeSieveWidget";
 import { ProportionGraphChallengeWidget } from "./ProportionGraphChallengeWidget";
@@ -33,10 +37,12 @@ import { QueueWaitWidget } from "./QueueWaitWidget";
 import { RatioMixerWidget } from "./RatioMixerWidget";
 import { ReflectionWidget } from "./ReflectionWidget";
 import { RotationWidget } from "./RotationWidget";
+import { ShortestPathReflectionWidget } from "./ShortestPathReflectionWidget";
 import { SignedProductWidget } from "./SignedProductWidget";
 import { SlideshowRelationWidget } from "./SlideshowRelationWidget";
 import { SubstitutionWidget } from "./SubstitutionWidget";
 import { SubtractionWalkWidget } from "./SubtractionWalkWidget";
+import { TangentConstructionWidget } from "./TangentConstructionWidget";
 import { TankCompareWidget } from "./TankCompareWidget";
 import { TankFillRateWidget } from "./TankFillRateWidget";
 import { TankRatioWidget } from "./TankRatioWidget";
@@ -96,6 +102,12 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "reflection" ? <ReflectionWidget /> : null}
       {block.widget === "transform-combo" ? <TransformComboWidget /> : null}
       {block.widget === "hex-tessellation" ? <HexTessellationWidget /> : null}
+      {block.widget === "perpendicular-construction" ? <PerpendicularConstructionWidget /> : null}
+      {block.widget === "perpendicular-bisector-construction" ? <PerpendicularBisectorConstructionWidget /> : null}
+      {block.widget === "angle-bisector-construction" ? <AngleBisectorConstructionWidget /> : null}
+      {block.widget === "perpendicular-at-point-construction" ? <PerpendicularAtPointConstructionWidget /> : null}
+      {block.widget === "tangent-construction" ? <TangentConstructionWidget /> : null}
+      {block.widget === "shortest-path-reflection" ? <ShortestPathReflectionWidget /> : null}
     </div>
   );
 }

@@ -25,6 +25,7 @@ function sourceLabel(word, suffix) {
 }
 
 const unitVocabularyPaths = [
+  "content/subjects/english/courses/our-world/level-3/unit-2/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-3/vocabulary.json",
   "content/subjects/english/courses/our-world/level-5/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-4/vocabulary.json",

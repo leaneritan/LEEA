@@ -162,7 +162,8 @@ export type MathBlockInteractiveWidget =
   | "angle-bisector-construction"
   | "perpendicular-at-point-construction"
   | "tangent-construction"
-  | "shortest-path-reflection";
+  | "shortest-path-reflection"
+  | "sector";
 
 export type MathBlockInteractive = {
   id: string;

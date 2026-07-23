@@ -78,14 +78,15 @@ export const mathChapters: MathChapterMeta[] = [
     id: "5",
     num: "5",
     title: "平面図形",
-    subtitle: "図形の移動・基本の作図",
+    subtitle: "図形の移動・基本の作図・おうぎ形",
     color: "#3aa6a0",
     tint: "#e2f2f1",
     dark: "#20736e",
     sections: [
       { id: "math-5-1", chapterId: "5", number: 1, name: "1節 図形の移動", pages: "p.157–168", status: "done" },
       { id: "math-5-2", chapterId: "5", number: 2, name: "2節 基本の作図", pages: "p.169–182", status: "done" },
-      { id: "math-5-3", chapterId: "5", number: 3, name: "3節 おうぎ形", pages: "p.183–185", status: "now" }
+      { id: "math-5-3", chapterId: "5", number: 3, name: "3節 おうぎ形", pages: "p.183–187", status: "done" },
+      { id: "math-5-4", chapterId: "5", number: 4, name: "章の問題 A・B", pages: "p.188–190", status: "done" }
     ]
   },
   {
@@ -97,7 +98,7 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#e5edf8",
     dark: "#31578c",
     sections: [
-      { id: "math-6-1", chapterId: "6", number: 1, name: "1節 いろいろな立体", pages: "p.182–199", status: "todo" },
+      { id: "math-6-1", chapterId: "6", number: 1, name: "1節 いろいろな立体", pages: "p.191–199", status: "now" },
       { id: "math-6-2", chapterId: "6", number: 2, name: "2節 立体の体積と表面積", pages: "p.200–214", status: "todo" }
     ]
   },

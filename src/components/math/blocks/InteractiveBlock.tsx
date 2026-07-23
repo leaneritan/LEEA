@@ -37,6 +37,7 @@ import { QueueWaitWidget } from "./QueueWaitWidget";
 import { RatioMixerWidget } from "./RatioMixerWidget";
 import { ReflectionWidget } from "./ReflectionWidget";
 import { RotationWidget } from "./RotationWidget";
+import { SectorWidget } from "./SectorWidget";
 import { ShortestPathReflectionWidget } from "./ShortestPathReflectionWidget";
 import { SignedProductWidget } from "./SignedProductWidget";
 import { SlideshowRelationWidget } from "./SlideshowRelationWidget";
@@ -108,6 +109,7 @@ export function InteractiveBlock({ block }: { block: MathBlockInteractive }) {
       {block.widget === "perpendicular-at-point-construction" ? <PerpendicularAtPointConstructionWidget /> : null}
       {block.widget === "tangent-construction" ? <TangentConstructionWidget /> : null}
       {block.widget === "shortest-path-reflection" ? <ShortestPathReflectionWidget /> : null}
+      {block.widget === "sector" ? <SectorWidget /> : null}
     </div>
   );
 }

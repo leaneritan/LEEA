@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { AppShell } from "@/components/AppShell";
 import { LessonPage } from "@/components/LessonPage";
 import { getCourseLabel, getLessonById } from "@/data/lessons";
@@ -23,7 +24,9 @@ export default async function LessonRoute({ params }: { params: Promise<{ lesson
 
   return (
     <AppShell active={active} crumbs={crumbs}>
-      <LessonPage lesson={lesson} />
+      <Suspense fallback={null}>
+        <LessonPage lesson={lesson} />
+      </Suspense>
     </AppShell>
   );
 }

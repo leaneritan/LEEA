@@ -9,7 +9,9 @@ export type MathFreeLesson = {
   embedPath: string;
 };
 
-export const mathFreeLessons: MathFreeLesson[] = [];
+export const mathFreeLessons: MathFreeLesson[] = [
+  { id: "wariai-teika", title: "割合と定価 ―「◯割引き」のしくみ―", tag: "割合", embedPath: "/math-lessons/wariai-teika.html" }
+];
 
 export function getMathFreeLessonById(id: string) {
   return mathFreeLessons.find((lesson) => lesson.id === id);

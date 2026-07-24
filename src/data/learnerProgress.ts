@@ -1,5 +1,6 @@
 import type { Lesson } from "./types";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { reportCloudSyncFailure, reportCloudSyncSuccess } from "@/lib/syncStatus";
 import { teacherLessons } from "./lessons";
 import { createLessonProgressRecord, saveLessonProgressRecord } from "./lessonProgress";
 
@@ -94,12 +95,14 @@ export async function fetchLearnerProgressRows(homeworkId: string | undefined): 
       .maybeSingle();
 
     if (error) throw error;
+    reportCloudSyncSuccess();
 
     return Object.entries((data?.raw_progress ?? {}) as Record<string, unknown>)
       .filter(([, value]) => value !== null && value !== undefined)
       .map(([storage_key, value]) => ({ storage_key, value }));
   } catch (error) {
     console.warn("LEEA Supabase learner progress read failed", error);
+    reportCloudSyncFailure();
     return [];
   }
 }
@@ -123,6 +126,7 @@ export async function fetchLearnerCompletionTimestamps(lessons: Lesson[]): Promi
       .in("homework_id", homeworkIds);
 
     if (error) throw error;
+    reportCloudSyncSuccess();
 
     const byLessonId: Record<string, string> = {};
     for (const row of (data ?? []) as LearnerProgressCloudRow[]) {
@@ -131,6 +135,7 @@ export async function fetchLearnerCompletionTimestamps(lessons: Lesson[]): Promi
     return byLessonId;
   } catch (error) {
     console.warn("LEEA Supabase learner completion timestamp fetch failed", error);
+    reportCloudSyncFailure();
     return {};
   }
 }
@@ -147,6 +152,7 @@ export async function hydrateLearnerProgressFromCloud(lessons: Lesson[]): Promis
       .in("homework_id", homeworkIds);
 
     if (error) throw error;
+    reportCloudSyncSuccess();
 
     for (const row of (data ?? []) as LearnerProgressCloudRow[]) {
       for (const [storageKey, value] of Object.entries(row.raw_progress ?? {})) {
@@ -161,6 +167,7 @@ export async function hydrateLearnerProgressFromCloud(lessons: Lesson[]): Promis
     return Boolean(data?.length);
   } catch (error) {
     console.warn("LEEA Supabase learner progress hydrate failed", error);
+    reportCloudSyncFailure();
     return false;
   }
 }
@@ -177,6 +184,7 @@ export async function syncLearnerProgressWithCloud(lessons: Lesson[]): Promise<b
       .in("homework_id", homeworkIds);
 
     if (error) throw error;
+    reportCloudSyncSuccess();
 
     const cloudByHomeworkId = new Map(
       ((data ?? []) as LearnerProgressCloudRow[]).map((row) => [row.homework_id, row])
@@ -209,6 +217,7 @@ export async function syncLearnerProgressWithCloud(lessons: Lesson[]): Promise<b
     return changed || hydrated;
   } catch (error) {
     console.warn("LEEA Supabase learner progress sync failed", error);
+    reportCloudSyncFailure();
     return false;
   }
 }
@@ -243,6 +252,7 @@ export async function saveLearnerProgressValue(lesson: Lesson, key: string, valu
     await upsertLearnerProgressSummary(lesson, rawProgress);
   } catch (error) {
     console.warn("LEEA Supabase learner progress save failed", error);
+    reportCloudSyncFailure();
   }
 }
 
@@ -277,6 +287,7 @@ async function upsertLearnerProgressSummary(lesson: Lesson, rawProgress: Record<
   );
 
   if (error) throw error;
+  reportCloudSyncSuccess();
 
   if (progress.done) await markTeacherLessonDone(lesson);
 }

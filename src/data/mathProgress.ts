@@ -1,4 +1,5 @@
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { reportCloudSyncFailure, reportCloudSyncSuccess } from "@/lib/syncStatus";
 
 export type MathBlockProgressStatus = "not-done" | "done";
 
@@ -87,6 +88,7 @@ export async function syncMathProgressWithCloud(current: MathBlockProgressMap): 
       .eq("student_id", "leo");
 
     if (error) throw error;
+    reportCloudSyncSuccess();
 
     const cloud = ((data ?? []) as MathBlockProgressRow[]).reduce<MathBlockProgressMap>((next, row) => {
       next[progressKey(row.section_id, row.block_id)] = fromMathProgressRow(row);
@@ -110,6 +112,8 @@ export async function syncMathProgressWithCloud(current: MathBlockProgressMap): 
       }
     }
 
+    // Best-effort: reports its own outcome, so a push failure isn't masked by
+    // the read above already having reported success.
     if (localRecordsToPush.length) {
       await upsertMathProgressRecords(localRecordsToPush);
     }
@@ -118,6 +122,7 @@ export async function syncMathProgressWithCloud(current: MathBlockProgressMap): 
     return merged;
   } catch (error) {
     console.warn("LEEA Supabase math progress sync failed", error);
+    reportCloudSyncFailure();
     return current;
   }
 }
@@ -130,11 +135,17 @@ export async function saveMathBlockProgress(record: MathBlockProgressRecord) {
 async function upsertMathProgressRecords(records: MathBlockProgressRecord[]) {
   if (!isSupabaseConfigured || !supabase || records.length === 0) return;
 
-  const { error } = await supabase
-    .from("math_block_progress")
-    .upsert(records.map(toMathProgressRow), { onConflict: "student_id,section_id,block_id" });
+  try {
+    const { error } = await supabase
+      .from("math_block_progress")
+      .upsert(records.map(toMathProgressRow), { onConflict: "student_id,section_id,block_id" });
 
-  if (error) throw error;
+    if (error) throw error;
+    reportCloudSyncSuccess();
+  } catch (error) {
+    console.warn("LEEA Supabase math progress save failed", error);
+    reportCloudSyncFailure();
+  }
 }
 
 function fromMathProgressRow(row: MathBlockProgressRow): MathBlockProgressRecord {

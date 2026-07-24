@@ -12,6 +12,7 @@ import { fetchLearnerCompletionTimestamps } from "@/data/learnerProgress";
 import { useJapaneseSetting } from "@/components/useJapaneseSetting";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
 import { allWords } from "@/components/reference/ref-data";
+import { CloudSyncBadge } from "@/components/CloudSyncBadge";
 
 type NavKey = "home" | "teacher" | "progress" | "english" | "math" | "assignments" | "reference" | "search";
 
@@ -178,6 +179,7 @@ export function AppShell({
             ))}
           </div>
           <div className="top-actions">
+            <CloudSyncBadge />
             {active === "assignments" ? <span className="leo-top-greeting">Hi, Leo!</span> : (
               <>
                 <Link className="top-search" href="/reference/search"><Search size={16} />Search words &amp; grammar</Link>

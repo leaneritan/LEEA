@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>割合と定価 ステップ学習 ― 中学1年 数学</title>
+<style>
+:root{
+  --sumi:#1A1C21;
+  --ai:#16386B;
+  --ai-usu:#E7EDF6;
+  --shu:#C8102E;
+  --shu-usu:#FBEAEC;
+  --midori:#1B7A3E;
+  --midori-usu:#E6F2EA;
+  --ki:#F2B705;
+  --kami:#F1F2F4;
+  --shiro:#FFFFFF;
+  --hai:#8A8F98;
+  --keisen:#D8DBE0;
+  --gothic:"Hiragino Kaku Gothic ProN","Hiragino Sans","BIZ UDPGothic","Yu Gothic",Meiryo,sans-serif;
+  --mincho:"Hiragino Mincho ProN","Yu Mincho","BIZ UDPMincho","MS PMincho",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--kami);color:var(--sumi);font-family:var(--gothic);font-size:16px;line-height:1.9;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:28px 18px 64px}
+
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.top .ttl{font-family:var(--mincho);font-size:19px;font-weight:600;letter-spacing:.04em}
+.top .cnt{font-size:13px;color:var(--hai);letter-spacing:.1em}
+.bar{height:6px;background:var(--keisen);border-radius:3px;margin-top:10px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--ai);transition:width .35s ease}
+
+.card{background:var(--shiro);border:1px solid var(--keisen);border-radius:6px;padding:26px 22px;margin-top:20px}
+.kind{font-size:12px;letter-spacing:.2em;color:var(--ai);font-weight:700}
+h2{font-family:var(--mincho);font-size:23px;font-weight:600;line-height:1.5;letter-spacing:.03em;margin:6px 0 14px}
+.body{font-size:16px;line-height:2}
+.body p+p{margin-top:12px}
+.body strong{color:var(--ai)}
+
+.rei{background:var(--ai-usu);border-left:5px solid var(--ai);padding:14px 16px;margin-top:16px;font-size:15.5px;line-height:2}
+.rei .cap{font-size:12px;letter-spacing:.16em;color:var(--ai);font-weight:700;display:block}
+.shiki{font-family:var(--mincho);font-size:19px}
+
+.tagwrap{display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.tag{position:relative;border:2px solid var(--sumi);border-radius:3px;padding:12px 20px 10px 28px;text-align:center;min-width:150px;background:var(--shiro)}
+.tag::before{content:"";position:absolute;left:10px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;border:2px solid var(--sumi);background:var(--kami)}
+.tag .lbl{font-size:11px;letter-spacing:.18em;color:var(--hai);display:block}
+.tag .yen{font-family:var(--mincho);font-size:26px;font-weight:600;position:relative;display:inline-block}
+.tag.old .yen{color:var(--hai)}
+.tag.old .yen::after{content:"";position:absolute;left:-6%;right:-6%;top:52%;height:3px;background:var(--shu)}
+.tag.new{border-color:var(--shu)}
+.tag.new .yen{color:var(--shu)}
+.tagwrap .ar{font-size:22px;color:var(--hai)}
+
+.qbox{margin-top:22px;border-top:1px dashed var(--keisen);padding-top:18px}
+.qlab{font-size:12px;letter-spacing:.2em;color:var(--shu);font-weight:700}
+.qtext{font-size:17px;font-weight:700;line-height:1.85;margin-top:6px}
+.opts{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+.opts button{text-align:left;font-size:16px;padding:11px 15px}
+.inrow{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+input[type=number]{font-family:var(--mincho);font-size:20px;width:150px;padding:8px 12px;border:1px solid var(--ai);border-radius:3px;text-align:right;background:var(--shiro);color:var(--sumi)}
+.unit{font-size:16px}
+
+button{font-family:inherit;font-size:15px;background:var(--shiro);border:1px solid var(--ai);color:var(--ai);border-radius:3px;padding:9px 18px;cursor:pointer;transition:background .15s,color .15s}
+button:hover:not(:disabled){background:var(--ai);color:var(--shiro)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--ki);outline-offset:2px}
+button.ok{background:var(--midori);border-color:var(--midori);color:#fff}
+button.ng{background:var(--shu-usu);border-color:var(--shu);color:var(--shu)}
+button:disabled{cursor:default;opacity:.9}
+.go{background:var(--ai);color:var(--shiro);font-size:16px;padding:11px 26px}
+.go:hover{background:#0F2A50}
+
+.fb{margin-top:14px;font-size:15px;line-height:1.9;padding:12px 15px;border-radius:4px;display:none}
+.fb.show{display:block}
+.fb.hint{background:#FDF6E0;border-left:5px solid var(--ki)}
+.fb.ok{background:var(--midori-usu);border-left:5px solid var(--midori)}
+.fb.ans{background:var(--shu-usu);border-left:5px solid var(--shu)}
+.fb .cap{font-weight:700;font-size:13px;letter-spacing:.1em;display:block}
+.fb.hint .cap{color:#946A00}
+.fb.ok .cap{color:var(--midori)}
+.fb.ans .cap{color:var(--shu)}
+
+.nav{margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.back{border-color:var(--keisen);color:var(--hai);font-size:14px;padding:8px 14px}
+.back:hover{background:var(--hai);color:var(--shiro);border-color:var(--hai)}
+
+.done h2{font-size:26px}
+.done ol{margin:14px 0 0 1.4em;font-size:15.5px}
+.done li{margin-bottom:8px}
+.mark{background:var(--ai);color:var(--shiro);border-radius:6px;padding:16px 20px;margin-top:18px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.mark .k{font-size:13px;letter-spacing:.16em;opacity:.85}
+.mark .v{font-family:var(--mincho);font-size:30px;font-weight:600}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="ttl">割合と定価 ― ステップ学習</span>
+    <span class="cnt" id="cnt">1 / 13</span>
+  </div>
+  <div class="bar"><i id="bar"></i></div>
+
+  <div class="card" id="card" aria-live="polite"></div>
+
+  <div class="nav">
+    <button class="back" id="back">← もどる</button>
+    <button class="go" id="next" disabled>つぎへ →</button>
+  </div>
+</div>
+
+<script>
+(function(){
+var S = [
+{
+ kind:'ステップ 1', ttl:'割合は 3つの言い方がある',
+ body:'<p>同じ大きさなのに、言い方が3つある。これだけ先におぼえよう。</p>'+
+      '<p><strong>0.1 ＝ 10％ ＝ 1割</strong>　どれも「10こに1こ分」という意味。</p>',
+ rei:'小数を <strong>100倍</strong> すると百分率になる。<br><span class="shiki">0.3 × 100 ＝ 30％</span>',
+ q:'0.3 は百分率で表すと何％?', o:['3％','30％','300％'], a:1,
+ hint:'小数に100をかけてみよう。0.3の小数点を右に2つ動かす。',
+ ans:'0.3×100＝30％。「0.3＝30％＝3割」はセットでおぼえよう。'
+},
+{
+ kind:'ステップ 2', ttl:'百分率 → 小数 にもどす',
+ body:'<p>計算するときは、％のままだと使えない。かならず<strong>小数になおしてから</strong>かける。</p>'+
+      '<p>百分率を小数にするには <strong>100でわる</strong>。</p>',
+ rei:'<span class="shiki">45％ → 45 ÷ 100 ＝ 0.45</span><br>小数点を左に2つ動かす、と考えてもいい。',
+ q:'8％を小数で表すと?', o:['0.08','0.8','8.0'], a:0,
+ hint:'8 ÷ 100 だから、小数点を左に2つ動かす。0.08 か 0.8 か、よく見て。',
+ ans:'8÷100＝0.08。1けたの％は0が1つ増えるので注意。'
+},
+{
+ kind:'ステップ 3', ttl:'歩合（割・分）',
+ body:'<p>お店では「3割引き」のような言い方もする。</p>'+
+      '<p><strong>1割 ＝ 10％</strong>、<strong>1分 ＝ 1％</strong>。</p>',
+ rei:'<span class="shiki">2割5分 ＝ 20％ ＋ 5％ ＝ 25％ ＝ 0.25</span>',
+ q:'3割2分は何％?', o:['3.2％','32％','35％'], a:1,
+ hint:'3割＝30％、2分＝2％。たすといくつ?',
+ ans:'30％＋2％＝32％。小数なら0.32。'
+},
+{
+ kind:'ステップ 4', ttl:'いちばん大事な式',
+ body:'<p>ここから計算に入る。使う式はこれ1つだけ。</p>',
+ rei:'<span class="cap">きほんの式</span><span class="shiki">くらべる量 ＝ もとにする量 × 割合</span><br>「〜の」ときたら、かけ算だと思っていい。',
+ q:'1,000円の 30％ は何円?', o:['30円','300円','700円'], a:1,
+ hint:'30％を小数にすると0.3。1000 × 0.3 を計算しよう。',
+ ans:'1000×0.3＝300円。もとにする量は1,000円。'
+},
+{
+ kind:'ステップ 5', kw:'tag', ttl:'「◯％引き」の意味',
+ body:'<p>お店の「20％引き」は、<strong>定価の20％ぶん、値段を安くする</strong>という意味。</p>'+
+      '<p>まずは「いくら安くなるか」を計算する。</p>',
+ rei:'<span class="cap">ねびき額</span><span class="shiki">定価 × 割引きの割合</span>',
+ q:'定価2,000円の10％引き。ねびきされる金額は何円?', o:['10円','200円','1,800円'], a:1,
+ hint:'2000 × 0.1 だよ。まだ「はらう金額」ではなく「安くなる金額」。',
+ ans:'2000×0.1＝200円。これがねびき額。'
+},
+{
+ kind:'ステップ 6', kw:'tag', ttl:'はらう金額（売価）',
+ body:'<p>ねびき額が出たら、<strong>定価から引く</strong>。これがレジではらう金額、売価。</p>',
+ rei:'<span class="cap">やり方1</span><span class="shiki">売価 ＝ 定価 － ねびき額</span>',
+ q:'定価2,000円、ねびき額200円。はらう金額は何円?', o:['1,800円','2,200円','200円'], a:0,
+ hint:'2000 － 200 だね。',
+ ans:'2000－200＝1,800円。「安くなる金額」と「はらう金額」はちがう。ここをまちがえる人がとても多い。'
+},
+{
+ kind:'ステップ 7', ttl:'1回の計算で出す方法',
+ body:'<p>じつは、引き算をしなくてもいい方法がある。</p>'+
+      '<p>20％引きということは、<strong>のこりの80％をはらう</strong>ということ。</p>'+
+      '<p>だから <strong>100％ － 20％ ＝ 80％</strong> → 0.8をかければ一発で売価が出る。</p>',
+ rei:'<span class="cap">やり方2</span><span class="shiki">売価 ＝ 定価 ×（1 － 割引きの割合）</span><br>2000 × 0.8 ＝ 1,600円',
+ q:'30％引きのとき、定価に何をかければ売価が出る?', o:['0.3','0.7','1.3'], a:1,
+ hint:'100％から30％を引くと、のこりは何％? それを小数に。',
+ ans:'100－30＝70％ → 0.7をかける。「◯％引き＝(100－◯)％をはらう」。'
+},
+{
+ kind:'ステップ 8', kw:'tag', ttl:'やってみよう',
+ body:'<p>ステップ7のやり方で計算してみよう。</p><p>まず、のこりの割合を考えてから、かけ算。</p>',
+ rei:'<span class="cap">手じゅん</span>① 100－割引き％ ＝ のこり％<br>② 小数になおす<br>③ 定価にかける',
+ q:'定価1,500円の30％引き。はらう金額は何円?', o:['450円','1,050円','1,470円'], a:1,
+ hint:'のこりは70％ → 0.7。1500 × 0.7 を計算しよう。',
+ ans:'1500×0.7＝1,050円。（450円は「ねびき額」のほう。ひっかからないように!）'
+},
+{
+ kind:'ステップ 9', ttl:'文字で表してみる',
+ body:'<p>ここから中学の内容。数字を <span class="shiki">x</span> にかえるだけで、考え方は同じ。</p>'+
+      '<p>定価が <span class="shiki">x</span> 円でも、2割引きなら「のこり8割をはらう」。</p>',
+ rei:'<span class="shiki">x × 0.8 ＝ 0.8x</span>（円）<br>定価a円のy％引きなら <span class="shiki">a ×(100－y)/100</span>（円）',
+ q:'定価 x 円の 3割引き を式で表すと?', o:['0.3x 円','0.7x 円','1.3x 円'], a:1,
+ hint:'3割引き＝のこり7割。7割は小数でいくつ?',
+ ans:'0.7x 円。3割引きで 0.3x としないこと。0.3x は「安くなる金額」のほう。'
+},
+{
+ kind:'ステップ 10', ttl:'利益は「たす」',
+ body:'<p>お店は仕入れた値段（原価）より高く売る。その差が<strong>利益</strong>。</p>'+
+      '<p>引くときは 1－割合。<strong>たすときは 1＋割合</strong>。</p>',
+ rei:'<span class="cap">2割の利益を見込む</span><span class="shiki">原価 ×（1 ＋ 0.2）＝ 原価 × 1.2</span>',
+ q:'原価800円に3割の利益を見込んだ定価は何円?', type:'num', a:1040,
+ hint:'3割の利益なので 1＋0.3＝1.3倍。800 × 1.3 を計算しよう。',
+ ans:'800×1.3＝1,040円。1.3倍であって、0.3倍ではない。'
+},
+{
+ kind:'ステップ 11', ttl:'方程式にする',
+ body:'<p>「わからない値段」がある文章題は、それを <span class="shiki">x</span> とおく。</p>'+
+      '<p>そうすると、文が式になる。</p>',
+ rei:'<span class="cap">問題</span>定価の20％引きで買ったら1,600円だった。<br>'+
+     '<span class="cap" style="margin-top:8px">式のつくり方</span>定価を x 円とすると、はらったのは 0.8x 円。<br>'+
+     'それが1,600円だから <span class="shiki">0.8x ＝ 1600</span>',
+ q:'この方程式を解くと、定価は何円?', type:'num', a:2000,
+ hint:'x ＝ 1600 ÷ 0.8 を計算しよう。0.8でわると、答えは1600より大きくなるはず。',
+ ans:'1600÷0.8＝2000。定価は2,000円。たしかめ: 2000×0.8＝1600 ○'
+},
+{
+ kind:'ステップ 12', ttl:'消費税も同じ考え方',
+ body:'<p>消費税10％は、値段に10％を<strong>たす</strong>。つまり 1.1倍。</p>'+
+      '<p>税こみの値段から税ぬきを求めるときは、方程式にする。</p>',
+ rei:'<span class="cap">問題</span>消費税10％をふくめて1,320円だった。税ぬきは?<br>'+
+     '税ぬきを x 円とすると <span class="shiki">1.1x ＝ 1320</span>',
+ q:'税ぬきの値段は何円?', type:'num', a:1200,
+ hint:'x ＝ 1320 ÷ 1.1 を計算しよう。',
+ ans:'1320÷1.1＝1200。税ぬきは1,200円。たしかめ: 1200×1.1＝1320 ○'
+},
+{
+ kind:'ステップ 13', ttl:'最後の1問',
+ body:'<p>ここまでの全部を使う問題。ゆっくり考えていいよ。</p>',
+ rei:'<span class="cap">ヒントの順番</span>① のこりの割合は? ② 何倍する? ③ 計算',
+ q:'定価の25％引きで買ったら1,800円だった。定価は何円?', type:'num', a:2400,
+ hint:'のこりは75％＝0.75。定価を x とすると 0.75x＝1800。x＝1800÷0.75。',
+ ans:'1800÷0.75＝2400。定価は2,400円。たしかめ: 2400×0.75＝1800 ○'
+}
+];
+
+var i = 0, score = 0, tries = 0, answered = false;
+var card = document.getElementById('card'),
+    next = document.getElementById('next'),
+    back = document.getElementById('back');
+
+function tagHTML(){
+  return '<div class="tagwrap">'+
+    '<div class="tag old"><span class="lbl">ていか</span><span class="yen">2,000円</span></div>'+
+    '<div class="ar">→</div>'+
+    '<div class="tag new"><span class="lbl">うりね</span><span class="yen">1,600円</span></div>'+
+    '</div>';
+}
+
+function render(){
+  if(i >= S.length){ finish(); return; }
+  var s = S[i];
+  answered = false; tries = 0;
+  next.disabled = true; next.textContent = 'つぎへ →';
+  back.style.visibility = (i === 0) ? 'hidden' : 'visible';
+  document.getElementById('cnt').textContent = (i+1) + ' / ' + S.length;
+  document.getElementById('bar').style.width = ((i)/S.length*100) + '%';
+
+  var html = '<span class="kind">'+s.kind+'</span><h2>'+s.ttl+'</h2>'+
+             '<div class="body">'+s.body+'</div>';
+  if(s.kw === 'tag') html += tagHTML();
+  if(s.rei) html += '<div class="rei">'+s.rei+'</div>';
+  html += '<div class="qbox"><span class="qlab">かくにん問題</span>'+
+          '<p class="qtext">'+s.q+'</p>';
+  if(s.type === 'num'){
+    html += '<div class="inrow"><input type="number" id="na" inputmode="numeric" placeholder="答え">'+
+            '<span class="unit">円</span><button id="chk">こたえあわせ</button></div>';
+  } else {
+    html += '<div class="opts" id="opts"></div>';
+  }
+  html += '<div class="fb" id="fb"></div></div>';
+  card.innerHTML = html;
+
+  if(s.type === 'num'){
+    document.getElementById('chk').onclick = function(){
+      var v = document.getElementById('na').value;
+      if(v === ''){ show('hint','入力', '数を入れてからおそう。'); return; }
+      judge(Math.abs(+v - s.a) < 0.5, null);
+    };
+    document.getElementById('na').addEventListener('keydown', function(e){
+      if(e.key === 'Enter') document.getElementById('chk').click();
+    });
+  } else {
+    var box = document.getElementById('opts');
+    s.o.forEach(function(t, oi){
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = t;
+      b.onclick = function(){ judge(oi === s.a, b); };
+      box.appendChild(b);
+    });
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function show(cls, cap, txt){
+  var fb = document.getElementById('fb');
+  fb.className = 'fb show ' + cls;
+  fb.innerHTML = '<span class="cap">'+cap+'</span>' + txt;
+}
+
+function judge(ok, btn){
+  var s = S[i];
+  if(answered) return;
+  if(ok){
+    answered = true;
+    if(btn) btn.className = 'ok';
+    if(tries === 0) score++;
+    show('ok','せいかい!', s.ans);
+    lock();
+    next.disabled = false;
+    next.focus();
+  } else {
+    tries++;
+    if(btn) btn.className = 'ng';
+    if(tries === 1){
+      show('hint','ヒント', s.hint + '<br>もう一度やってみよう。');
+    } else {
+      answered = true;
+      show('ans','こたえ', s.ans + '<br>だいじょうぶ。もう一度ここを読んでから、つぎへ進もう。');
+      lock();
+      next.disabled = false;
+    }
+  }
+}
+
+function lock(){
+  var box = document.getElementById('opts');
+  if(box) Array.prototype.forEach.call(box.children, function(b){ b.disabled = true; });
+  var c = document.getElementById('chk');
+  if(c){ c.disabled = true; document.getElementById('na').disabled = true; }
+}
+
+function finish(){
+  document.getElementById('cnt').textContent = 'おわり';
+  document.getElementById('bar').style.width = '100%';
+  back.style.visibility = 'visible';
+  next.style.display = 'none';
+  card.className = 'card done';
+  card.innerHTML =
+    '<span class="kind">おつかれさま</span><h2>ぜんぶ終わったね</h2>'+
+    '<div class="mark"><span class="k">1回でせいかい</span><span class="v">'+score+' / '+S.length+'</span></div>'+
+    '<div class="body" style="margin-top:18px"><p>今日おぼえたこと:</p></div>'+
+    '<ol>'+
+      '<li>0.1 ＝ 10％ ＝ 1割。小数を100倍すると百分率。</li>'+
+      '<li>くらべる量 ＝ もとにする量 × 割合。</li>'+
+      '<li>◯％引き → のこり（100－◯）％をはらう。20％引きは <strong>0.8倍</strong>。</li>'+
+      '<li>◯割の利益を見込む → <strong>1＋割合</strong> をかける。3割の利益は1.3倍。</li>'+
+      '<li>わからない値段は x とおいて方程式にする。</li>'+
+    '</ol>'+
+    '<div class="rei" style="margin-top:20px"><span class="cap">つぎの宿題</span>'+
+      'スーパーのチラシから「◯％引き」の商品を3つえらんで、はらう金額を計算しよう。レシートで答え合わせができる。</div>'+
+    '<div style="margin-top:20px"><button id="again">はじめからやる</button></div>';
+  document.getElementById('again').onclick = function(){
+    i = 0; score = 0;
+    card.className = 'card';
+    next.style.display = '';
+    render();
+  };
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+next.onclick = function(){ i++; render(); };
+back.onclick = function(){ if(i > 0){ i--; render(); } };
+render();
+})();
+</script>
+</body>
+</html>

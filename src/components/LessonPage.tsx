@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   fetchLearnerProgressRows,
@@ -15,6 +16,11 @@ import { isSupabaseConfigured } from "@/lib/supabase";
 export function LessonPage({ lesson }: { lesson: Lesson }) {
   const isLearnerApp = lesson.mode === "learner";
   const [learnerSrcDoc, setLearnerSrcDoc] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  // Fullscreen still routes through this page (not the raw static file) so the
+  // Supabase cloud-sync bridge below still runs — opening the raw HTML file
+  // directly writes progress to localStorage only, with nothing to push it to Supabase.
+  const isFullscreen = isLearnerApp && searchParams.get("fullscreen") === "1";
 
   useEffect(() => {
     if (!isLearnerApp || !lesson.source.embedPath) return;
@@ -66,41 +72,62 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
     return () => window.removeEventListener("message", handleMessage);
   }, [isLearnerApp, lesson]);
 
+  const sectionClassName = [
+    "deck-lesson-page",
+    isLearnerApp ? "learner-lesson-page" : null,
+    isFullscreen ? "deck-lesson-page--fullscreen" : null
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <section className={isLearnerApp ? "deck-lesson-page learner-lesson-page" : "deck-lesson-page"}>
-      <header className="deck-lesson-bar">
-        <div>
-          <span className="eyebrow">
-            {[
-              getCourseLabel(lesson.course),
-              lesson.level ? `Level ${lesson.level}` : null,
-              lesson.unit ? `Unit ${lesson.unit}` : null,
-              lesson.component
-            ]
-              .filter(Boolean)
-              .join(" - ")}
-          </span>
-          <h1>{lesson.title}</h1>
-        </div>
-        <nav aria-label="Lesson actions">
-          <Link className="ghost-button" href={isLearnerApp ? "/leo" : "/lessons"}>
-            {isLearnerApp ? "My Assignments" : "All Lessons"}
-          </Link>
-          <Link className="ghost-button" href="/reference">
-            Reference
-          </Link>
-          {lesson.source.embedPath ? (
-            <a className="ghost-button" href={lesson.source.embedPath} rel="noreferrer" target="_blank">
-              {isLearnerApp ? "Open App Fullscreen" : "Open Fullscreen"}
-              <ExternalLink size={16} />
-            </a>
-          ) : null}
-        </nav>
-      </header>
+    <section className={sectionClassName}>
+      {isFullscreen ? (
+        <Link className="ghost-button deck-lesson-exit" href={`/lessons/${lesson.id}`}>
+          Exit Fullscreen
+        </Link>
+      ) : (
+        <header className="deck-lesson-bar">
+          <div>
+            <span className="eyebrow">
+              {[
+                getCourseLabel(lesson.course),
+                lesson.level ? `Level ${lesson.level}` : null,
+                lesson.unit ? `Unit ${lesson.unit}` : null,
+                lesson.component
+              ]
+                .filter(Boolean)
+                .join(" - ")}
+            </span>
+            <h1>{lesson.title}</h1>
+          </div>
+          <nav aria-label="Lesson actions">
+            <Link className="ghost-button" href={isLearnerApp ? "/leo" : "/lessons"}>
+              {isLearnerApp ? "My Assignments" : "All Lessons"}
+            </Link>
+            <Link className="ghost-button" href="/reference">
+              Reference
+            </Link>
+            {lesson.source.embedPath ? (
+              // Learner apps must stay on this route (not the raw static file) when
+              // opened fullscreen so the Supabase cloud-sync bridge below keeps running.
+              <a
+                className="ghost-button"
+                href={isLearnerApp ? `/lessons/${lesson.id}?fullscreen=1` : lesson.source.embedPath}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {isLearnerApp ? "Open App Fullscreen" : "Open Fullscreen"}
+                <ExternalLink size={16} />
+              </a>
+            ) : null}
+          </nav>
+        </header>
+      )}
 
       {lesson.source.embedPath ? (
         <iframe
-          className="deck-lesson-frame"
+          className={isFullscreen ? "deck-lesson-frame deck-lesson-frame--fullscreen" : "deck-lesson-frame"}
           src={isLearnerApp && learnerSrcDoc ? undefined : lesson.source.embedPath}
           srcDoc={isLearnerApp && learnerSrcDoc ? learnerSrcDoc : undefined}
           title={lesson.title}

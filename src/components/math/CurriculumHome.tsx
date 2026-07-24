@@ -46,6 +46,11 @@ export function CurriculumHome() {
       </div>
 
       <div className="math-page math-home-page">
+        <Link className="math-freelesson-banner" href="/math/free">
+          <span className="math-freelesson-banner-title">特別レッスン</span>
+          <span className="math-freelesson-banner-sub">レオが苦手なところを特訓する、教科書とは別のレッスン →</span>
+        </Link>
+
         <div className="math-stats-card">
           <div>
             <div className="math-stats-greeting">おかえり、レオくん！</div>

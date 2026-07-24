@@ -98,6 +98,7 @@ function CourseNode({ course }: { course: (typeof sourceTree)[number] }) {
 const UNIT_REFERENCE_PAGES: Record<string, string> = {
   "5-1": "/reference/our-world/level-5/unit-1",
   "4-1": "/reference/our-world/level-4/unit-1",
+  "3-1": "/reference/our-world/level-3/unit-1",
   "3-2": "/reference/our-world/level-3/unit-2",
   "3-3": "/reference/our-world/level-3/unit-3",
   "3-4": "/reference/our-world/level-3/unit-4",

@@ -33,6 +33,7 @@ const IRREGULAR_VERBS: Record<string, [string, string]> = {
   eat: ["ate", "eaten"],
   fall: ["fell", "fallen"],
   feel: ["felt", "felt"],
+  feed: ["fed", "fed"],
   find: ["found", "found"],
   fly: ["flew", "flown"],
   forget: ["forgot", "forgotten"],

@@ -25,6 +25,7 @@ function sourceLabel(word, suffix) {
 }
 
 const unitVocabularyPaths = [
+  "content/subjects/english/courses/our-world/level-3/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-2/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-3/vocabulary.json",
   "content/subjects/english/courses/our-world/level-5/unit-1/vocabulary.json",
@@ -142,7 +143,7 @@ const IRREGULAR_VERBS_FOR_VALIDATION = {
   catch: ["caught", "caught"], choose: ["chose", "chosen"], come: ["came", "come"],
   cut: ["cut", "cut"], dig: ["dug", "dug"], do: ["did", "done"], draw: ["drew", "drawn"],
   drink: ["drank", "drunk"], drive: ["drove", "driven"], eat: ["ate", "eaten"],
-  fall: ["fell", "fallen"], feel: ["felt", "felt"], find: ["found", "found"],
+  fall: ["fell", "fallen"], feel: ["felt", "felt"], feed: ["fed", "fed"], find: ["found", "found"],
   rise: ["rose", "risen"],
   fly: ["flew", "flown"], forget: ["forgot", "forgotten"], get: ["got", "gotten"],
   give: ["gave", "given"], go: ["went", "gone"], grow: ["grew", "grown"],

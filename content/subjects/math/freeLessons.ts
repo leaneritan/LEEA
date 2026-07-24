@@ -10,7 +10,8 @@ export type MathFreeLesson = {
 };
 
 export const mathFreeLessons: MathFreeLesson[] = [
-  { id: "wariai-teika", title: "割合と定価 ―「◯割引き」のしくみ―", tag: "割合", embedPath: "/math-lessons/wariai-teika.html" }
+  { id: "wariai-teika", title: "割合と定価 ―「◯割引き」のしくみ―", tag: "割合", embedPath: "/math-lessons/wariai-teika.html" },
+  { id: "wariai-teika-step", title: "割合と定価 ―ステップ学習で13問―", tag: "割合", embedPath: "/math-lessons/wariai-teika-step.html" }
 ];
 
 export function getMathFreeLessonById(id: string) {

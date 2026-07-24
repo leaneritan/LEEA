@@ -60,7 +60,7 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 ## Level 3
 
 - [x] Unit 1 — Vocab
-- [ ] Unit 1 — Grammar
+- [x] Unit 1 — Grammar
 - [x] Unit 2 — Vocab
 - [ ] Unit 2 — Grammar
 - [x] Unit 3 — Vocab
@@ -143,7 +143,7 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 
 ## Status snapshot (2026-07-18)
 
-- **Done:** Level 4 Units 1-9 (vocab + grammar); Level 5 Unit 1 (vocab + grammar); Level 3 Unit 1 (vocab only); Level 3 Unit 2 (vocab only); Level 3 Unit 3 (vocab + grammar); Level 3 Units 4-9 (vocab + grammar)
+- **Done:** Level 4 Units 1-9 (vocab + grammar); Level 5 Unit 1 (vocab + grammar); Level 3 Unit 1 (vocab + grammar); Level 3 Unit 2 (vocab only); Level 3 Unit 3 (vocab + grammar); Level 3 Units 4-9 (vocab + grammar)
 - **Next up:** other Level 1, 2, 3, 5, 6 scans
 - **Not started:** Levels 1, 2, 6 — all 9 units each; Level 3 Unit 2 (grammar only); Level 5 Units 2-9
 - **Remaining scans:** 75 of 108

@@ -1,5 +1,6 @@
 import type { Lesson } from "./types";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { reportCloudSyncFailure, reportCloudSyncSuccess } from "@/lib/syncStatus";
 
 export type AssignmentStatus = "assigned" | "completed" | "reviewed" | "needs-redo";
 
@@ -121,24 +122,30 @@ function toAssignmentRow(record: AssignmentRecord): AssignmentRow {
 async function upsertAssignmentRecords(records: AssignmentRecord[]) {
   if (!isSupabaseConfigured || !supabase || records.length === 0) return;
   try {
-    await supabase
+    const { error } = await supabase
       .from("assignments")
       .upsert(records.map(toAssignmentRow), { onConflict: "lesson_id,student_id" });
+    if (error) throw error;
+    reportCloudSyncSuccess();
   } catch (error) {
     console.warn("LEEA Supabase assignment upsert failed", error);
+    reportCloudSyncFailure();
   }
 }
 
 async function deleteAssignmentRecord(lessonId: string) {
   if (!isSupabaseConfigured || !supabase) return;
   try {
-    await supabase
+    const { error } = await supabase
       .from("assignments")
       .delete()
       .eq("lesson_id", lessonId)
       .eq("student_id", "leo");
+    if (error) throw error;
+    reportCloudSyncSuccess();
   } catch (error) {
     console.warn("LEEA Supabase assignment delete failed", error);
+    reportCloudSyncFailure();
   }
 }
 
@@ -176,6 +183,7 @@ export async function readAssignmentsFromCloud(learnerItems: Lesson[]): Promise<
       .eq("student_id", "leo");
 
     if (error) throw error;
+    reportCloudSyncSuccess();
 
     const cloudMap = (data ?? []).reduce<AssignmentMap>((next, row) => {
       const record = toAssignmentRecord(row as AssignmentRow);
@@ -190,6 +198,7 @@ export async function readAssignmentsFromCloud(learnerItems: Lesson[]): Promise<
     return merged;
   } catch (error) {
     console.warn("LEEA Supabase assignment read failed; using local assignments", error);
+    reportCloudSyncFailure();
     return localSeeded;
   }
 }

@@ -12,7 +12,17 @@ export const mathChapters: MathChapterMeta[] = [
     color: "#a89b3c",
     tint: "#f2efd9",
     dark: "#7c7222",
-    sections: [{ id: "math-0-1", chapterId: "0", number: 1, name: "整数の性質", pages: "p.11–18", status: "done" }]
+    sections: [
+      {
+        id: "math-0-1",
+        chapterId: "0",
+        number: 1,
+        name: "整数の性質",
+        pages: "p.11–18",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/c/#01"
+      }
+    ]
   },
   {
     id: "1",
@@ -23,11 +33,51 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#f8e9dc",
     dark: "#a05c30",
     sections: [
-      { id: "math-1-1", chapterId: "1", number: 1, name: "1節 正負の数", pages: "p.19–28", status: "done" },
-      { id: "math-1-2", chapterId: "1", number: 2, name: "2節 加法と減法", pages: "p.29–40", status: "done" },
-      { id: "math-1-3", chapterId: "1", number: 3, name: "3節 乗法と除法", pages: "p.41–56", status: "done" },
-      { id: "math-1-4", chapterId: "1", number: 4, name: "4節 正負の数の利用", pages: "p.57–59", status: "done" },
-      { id: "math-1-5", chapterId: "1", number: 5, name: "章末問題 A・B", pages: "p.60–62", status: "done" }
+      {
+        id: "math-1-1",
+        chapterId: "1",
+        number: 1,
+        name: "1節 正負の数",
+        pages: "p.19–28",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/d/#01"
+      },
+      {
+        id: "math-1-2",
+        chapterId: "1",
+        number: 2,
+        name: "2節 加法と減法",
+        pages: "p.29–40",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/d/#05"
+      },
+      {
+        id: "math-1-3",
+        chapterId: "1",
+        number: 3,
+        name: "3節 乗法と除法",
+        pages: "p.41–56",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/d/#16"
+      },
+      {
+        id: "math-1-4",
+        chapterId: "1",
+        number: 4,
+        name: "4節 正負の数の利用",
+        pages: "p.57–59",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/d/#29"
+      },
+      {
+        id: "math-1-5",
+        chapterId: "1",
+        number: 5,
+        name: "章末問題 A・B",
+        pages: "p.60–62",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/d/#31"
+      }
     ]
   },
   {
@@ -39,10 +89,42 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#f9f0d3",
     dark: "#9c7c14",
     sections: [
-      { id: "math-2-1", chapterId: "2", number: 1, name: "1節 文字を使った式", pages: "p.64–74", status: "done" },
-      { id: "math-2-2", chapterId: "2", number: 2, name: "2節 文字式の計算", pages: "p.75–82", status: "done" },
-      { id: "math-2-3", chapterId: "2", number: 3, name: "3節 文字式の利用", pages: "p.83–87", status: "done" },
-      { id: "math-2-4", chapterId: "2", number: 4, name: "章末問題 A・B", pages: "p.88–90", status: "done" }
+      {
+        id: "math-2-1",
+        chapterId: "2",
+        number: 1,
+        name: "1節 文字を使った式",
+        pages: "p.64–74",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/e/#02"
+      },
+      {
+        id: "math-2-2",
+        chapterId: "2",
+        number: 2,
+        name: "2節 文字式の計算",
+        pages: "p.75–82",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/e/#10"
+      },
+      {
+        id: "math-2-3",
+        chapterId: "2",
+        number: 3,
+        name: "3節 文字式の利用",
+        pages: "p.83–87",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/e/#18"
+      },
+      {
+        id: "math-2-4",
+        chapterId: "2",
+        number: 4,
+        name: "章末問題 A・B",
+        pages: "p.88–90",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/e/#21"
+      }
     ]
   },
   {
@@ -54,9 +136,33 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#f9e6ec",
     dark: "#a84763",
     sections: [
-      { id: "math-3-1", chapterId: "3", number: 1, name: "1節 方程式とその解き方", pages: "p.92–102", status: "done" },
-      { id: "math-3-2", chapterId: "3", number: 2, name: "2節 1次方程式の利用", pages: "p.103–111", status: "done" },
-      { id: "math-3-3", chapterId: "3", number: 3, name: "章末問題 A・B", pages: "p.114–116", status: "done" }
+      {
+        id: "math-3-1",
+        chapterId: "3",
+        number: 1,
+        name: "1節 方程式とその解き方",
+        pages: "p.92–102",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/f/#01"
+      },
+      {
+        id: "math-3-2",
+        chapterId: "3",
+        number: 2,
+        name: "2節 1次方程式の利用",
+        pages: "p.103–111",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/f/#09"
+      },
+      {
+        id: "math-3-3",
+        chapterId: "3",
+        number: 3,
+        name: "章末問題 A・B",
+        pages: "p.114–116",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/f/#18"
+      }
     ]
   },
   {
@@ -68,11 +174,51 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#e8f1e6",
     dark: "#47793f",
     sections: [
-      { id: "math-4-1", chapterId: "4", number: 1, name: "1節 関数と比例", pages: "p.118–126", status: "done" },
-      { id: "math-4-2", chapterId: "4", number: 2, name: "2節 比例の性質と調べ方", pages: "p.127–138", status: "done" },
-      { id: "math-4-3", chapterId: "4", number: 3, name: "3節 反比例の性質と調べ方", pages: "p.139–148", status: "done" },
-      { id: "math-4-4", chapterId: "4", number: 4, name: "4節 比例と反比例の利用", pages: "p.149–153", status: "done" },
-      { id: "math-4-5", chapterId: "4", number: 5, name: "章末問題 A・B", pages: "p.154–156", status: "done" }
+      {
+        id: "math-4-1",
+        chapterId: "4",
+        number: 1,
+        name: "1節 関数と比例",
+        pages: "p.118–126",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/g/#01"
+      },
+      {
+        id: "math-4-2",
+        chapterId: "4",
+        number: 2,
+        name: "2節 比例の性質と調べ方",
+        pages: "p.127–138",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/g/#08"
+      },
+      {
+        id: "math-4-3",
+        chapterId: "4",
+        number: 3,
+        name: "3節 反比例の性質と調べ方",
+        pages: "p.139–148",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/g/#16"
+      },
+      {
+        id: "math-4-4",
+        chapterId: "4",
+        number: 4,
+        name: "4節 比例と反比例の利用",
+        pages: "p.149–153",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/g/#23"
+      },
+      {
+        id: "math-4-5",
+        chapterId: "4",
+        number: 5,
+        name: "章末問題 A・B",
+        pages: "p.154–156",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/g/#25"
+      }
     ]
   },
   {
@@ -84,10 +230,42 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#e2f2f1",
     dark: "#20736e",
     sections: [
-      { id: "math-5-1", chapterId: "5", number: 1, name: "1節 図形の移動", pages: "p.157–168", status: "done" },
-      { id: "math-5-2", chapterId: "5", number: 2, name: "2節 基本の作図", pages: "p.169–182", status: "done" },
-      { id: "math-5-3", chapterId: "5", number: 3, name: "3節 おうぎ形", pages: "p.183–187", status: "done" },
-      { id: "math-5-4", chapterId: "5", number: 4, name: "章の問題 A・B", pages: "p.188–190", status: "done" }
+      {
+        id: "math-5-1",
+        chapterId: "5",
+        number: 1,
+        name: "1節 図形の移動",
+        pages: "p.157–168",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/h/#01"
+      },
+      {
+        id: "math-5-2",
+        chapterId: "5",
+        number: 2,
+        name: "2節 基本の作図",
+        pages: "p.169–182",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/h/#09"
+      },
+      {
+        id: "math-5-3",
+        chapterId: "5",
+        number: 3,
+        name: "3節 おうぎ形",
+        pages: "p.183–187",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/h/#21"
+      },
+      {
+        id: "math-5-4",
+        chapterId: "5",
+        number: 4,
+        name: "章の問題 A・B",
+        pages: "p.188–190",
+        status: "done",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/h/#24"
+      }
     ]
   },
   {
@@ -99,8 +277,24 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#e5edf8",
     dark: "#31578c",
     sections: [
-      { id: "math-6-1", chapterId: "6", number: 1, name: "1節 いろいろな立体", pages: "p.191–199", status: "now" },
-      { id: "math-6-2", chapterId: "6", number: 2, name: "2節 立体の体積と表面積", pages: "p.200–214", status: "todo" }
+      {
+        id: "math-6-1",
+        chapterId: "6",
+        number: 1,
+        name: "1節 いろいろな立体",
+        pages: "p.191–199",
+        status: "now",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/i/#01"
+      },
+      {
+        id: "math-6-2",
+        chapterId: "6",
+        number: 2,
+        name: "2節 立体の体積と表面積",
+        pages: "p.200–214",
+        status: "todo",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/i/#08"
+      }
     ]
   },
   {
@@ -112,8 +306,24 @@ export const mathChapters: MathChapterMeta[] = [
     tint: "#efecf5",
     dark: "#63558c",
     sections: [
-      { id: "math-7-1", chapterId: "7", number: 1, name: "1節 度数の分布", pages: "p.216–233", status: "todo" },
-      { id: "math-7-2", chapterId: "7", number: 2, name: "2節 起こりやすさ", pages: "p.234–240", status: "todo" }
+      {
+        id: "math-7-1",
+        chapterId: "7",
+        number: 1,
+        name: "1節 度数の分布",
+        pages: "p.216–233",
+        status: "todo",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/j/#01"
+      },
+      {
+        id: "math-7-2",
+        chapterId: "7",
+        number: 2,
+        name: "2節 起こりやすさ",
+        pages: "p.234–240",
+        status: "todo",
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/j/#05"
+      }
     ]
   }
 ];

@@ -1,3 +1,4 @@
+import type { MathGrade } from "./grades";
 import type { MathChapterMeta } from "./types";
 
 // Curriculum map for 東京書籍『新編 新しい数学1』(中1). Adding a 章/節 is a
@@ -137,3 +138,10 @@ export function getAdjacentSections(chapterId: string, sectionId: string) {
 }
 
 export const mathTotalSectionCount = mathChapters.reduce((sum, chapter) => sum + chapter.sections.length, 0);
+
+// 学年ごとの教科書。中2・中3は章データが揃うまで空の配列（home 側で「まだ準備中」表示になる）。
+export const mathBooksByGrade: Record<MathGrade, MathChapterMeta[]> = {
+  g1: mathChapters,
+  g2: [],
+  g3: []
+};

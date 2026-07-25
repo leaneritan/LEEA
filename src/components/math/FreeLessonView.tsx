@@ -1,9 +1,9 @@
 import Link from "next/link";
-import type { MathFreeLesson } from "../../../content/subjects/math/freeLessons";
+import type { SpecialLesson } from "../../../content/subjects/math/specialLessons";
 
-const ACCENT = { "--m-accent": "#8d7fb5", "--m-tint": "#efecf5", "--m-dark": "#63558c" } as React.CSSProperties;
+const ACCENT = { "--m-accent": "#7a5aa6", "--m-tint": "#efe7f7", "--m-dark": "#5b3f86" } as React.CSSProperties;
 
-export function FreeLessonView({ lesson }: { lesson: MathFreeLesson }) {
+export function FreeLessonView({ lesson }: { lesson: SpecialLesson }) {
   return (
     <div className="math-scope" style={ACCENT}>
       <div className="math-topbar">
@@ -21,7 +21,19 @@ export function FreeLessonView({ lesson }: { lesson: MathFreeLesson }) {
         </div>
       </div>
 
-      <iframe className="math-freelesson-frame" src={lesson.embedPath} title={lesson.title} />
+      {lesson.embedPath ? (
+        <iframe className="math-freelesson-frame" src={lesson.embedPath} title={lesson.title} />
+      ) : (
+        <div className="math-page">
+          <div className="math-card" style={{ textAlign: "center" }}>
+            <p style={{ margin: 0, fontWeight: 700 }}>{lesson.title} はまだ準備中です。</p>
+            <p style={{ margin: "8px 0 0", color: "#a08e6c", fontSize: 13 }}>レッスンができたら、ここから始められるようになるよ。</p>
+            <Link className="math-nav-link math-nav-link--next" href="/math/free" style={{ display: "inline-flex", marginTop: 16 }}>
+              ← 特別レッスン一覧へ戻る
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

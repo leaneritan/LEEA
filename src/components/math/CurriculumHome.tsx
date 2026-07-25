@@ -185,15 +185,28 @@ function SectionRow({
         : { color: "#b3a685", background: "#f3eede" };
 
   return (
-    <Link className="math-section-row" href={`/math/${chapter.id}/${section.id}`}>
-      <span className="math-section-dot" style={dotStyle}>
-        {section.status === "done" ? "✓" : section.status === "now" ? "…" : ""}
-      </span>
-      <span className="math-section-name">{section.name}</span>
-      <span className="math-section-pages">{section.pages}</span>
-      <span className="math-section-status" style={statusStyle}>
-        {STATUS_LABEL[section.status]}
-      </span>
-    </Link>
+    <div className="math-section-row-wrap">
+      <Link className="math-section-row" href={`/math/${chapter.id}/${section.id}`}>
+        <span className="math-section-dot" style={dotStyle}>
+          {section.status === "done" ? "✓" : section.status === "now" ? "…" : ""}
+        </span>
+        <span className="math-section-name">{section.name}</span>
+        <span className="math-section-pages">{section.pages}</span>
+        <span className="math-section-status" style={statusStyle}>
+          {STATUS_LABEL[section.status]}
+        </span>
+      </Link>
+      {section.digitalUrl ? (
+        <a
+          className="math-companion-link"
+          href={section.digitalUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+          title="デジタル教科書でこの節を開く"
+        >
+          📘 デジタル教科書
+        </a>
+      ) : null}
+    </div>
   );
 }

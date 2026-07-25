@@ -201,6 +201,8 @@ export type MathSectionMeta = {
   name: string;
   pages: string;
   status: MathSectionStatus;
+  /** Deep link into the textbook publisher's digital companion for this 節, if known. */
+  digitalUrl?: string;
 };
 
 export type MathSection = {

@@ -1,6 +1,6 @@
 import type { MathGrade } from "./grades";
 
-// Registry for standalone "特別レッスン" (special lessons) — hand-authored
+// Registry for standalone "特訓レッスン" (special lessons) — hand-authored
 // lessons on topics Leo struggles with, independent of the textbook's
 // chapter/section flow. The count is unknown up front: topics, filter chips,
 // counts, group colors, and badge numbers all derive from this list at
@@ -35,7 +35,7 @@ export type SpecialLesson = {
   embedPath?: string;
 };
 
-// 中1の特別レッスン。中2・中3は grade: "g2" / "g3" の行を足すだけで表示される。
+// 中1の特訓レッスン。中2・中3は grade: "g2" / "g3" の行を足すだけで表示される。
 export const specialLessons: SpecialLesson[] = [
   {
     id: "wariai-teika",

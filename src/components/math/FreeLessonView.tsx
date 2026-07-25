@@ -14,7 +14,7 @@ export function FreeLessonView({ lesson }: { lesson: SpecialLesson }) {
           <span className="math-topbar-sep">｜</span>
           <Link className="math-topbar-chapter" href="/math/free">
             <span className="math-topbar-dot" />
-            特別レッスン
+            特訓レッスン
           </Link>
           <span className="math-topbar-chevron">›</span>
           <span className="math-topbar-section">{lesson.title}</span>
@@ -29,7 +29,7 @@ export function FreeLessonView({ lesson }: { lesson: SpecialLesson }) {
             <p style={{ margin: 0, fontWeight: 700 }}>{lesson.title} はまだ準備中です。</p>
             <p style={{ margin: "8px 0 0", color: "#a08e6c", fontSize: 13 }}>レッスンができたら、ここから始められるようになるよ。</p>
             <Link className="math-nav-link math-nav-link--next" href="/math/free" style={{ display: "inline-flex", marginTop: 16 }}>
-              ← 特別レッスン一覧へ戻る
+              ← 特訓レッスン一覧へ戻る
             </Link>
           </div>
         </div>

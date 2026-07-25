@@ -2,16 +2,21 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { mathChapters, mathTotalSectionCount } from "../../../content/subjects/math/curriculum";
+import { mathBooksByGrade } from "../../../content/subjects/math/curriculum";
+import { mathGrades, type MathGrade } from "../../../content/subjects/math/grades";
+import { getSpecialLessonsByGrade } from "../../../content/subjects/math/specialLessons";
+import type { MathChapterMeta } from "../../../content/subjects/math/types";
 import { readMathProgress, syncMathProgressWithCloud, type MathBlockProgressMap } from "../../data/mathProgress";
 
 const STATUS_LABEL: Record<string, string> = { done: "完了", now: "学習中", todo: "未学習" };
 
 export function CurriculumHome() {
   const [progress, setProgress] = useState<MathBlockProgressMap>({});
+  const [grade, setGrade] = useState<MathGrade>("g1");
+  const chapters = mathBooksByGrade[grade];
   const [open, setOpen] = useState<Record<string, boolean>>(() => {
     const defaultOpen: Record<string, boolean> = {};
-    const nowChapter = mathChapters.find((chapter) => chapter.sections.some((section) => section.status === "now"));
+    const nowChapter = chapters.find((chapter) => chapter.sections.some((section) => section.status === "now"));
     if (nowChapter) defaultOpen[nowChapter.id] = true;
     return defaultOpen;
   });
@@ -22,16 +27,25 @@ export function CurriculumHome() {
     void syncMathProgressWithCloud(local).then(setProgress);
   }, []);
 
-  const doneSectionCount = mathChapters.reduce((sum, chapter) => sum + chapter.sections.filter((section) => section.status === "done").length, 0);
+  function pickGrade(nextGrade: MathGrade) {
+    setGrade(nextGrade);
+    setOpen({});
+  }
+
+  const totalSectionCount = chapters.reduce((sum, chapter) => sum + chapter.sections.length, 0);
+  const doneSectionCount = chapters.reduce((sum, chapter) => sum + chapter.sections.filter((section) => section.status === "done").length, 0);
   const doneBlockCount = useMemo(() => Object.values(progress).filter((record) => record.status === "done").length, [progress]);
 
   const resumeSection = useMemo(() => {
-    for (const chapter of mathChapters) {
+    for (const chapter of chapters) {
       const section = chapter.sections.find((s) => s.status === "now");
       if (section) return { chapter, section };
     }
-    return { chapter: mathChapters[0], section: mathChapters[0].sections[0] };
-  }, []);
+    return chapters[0]?.sections[0] ? { chapter: chapters[0], section: chapters[0].sections[0] } : null;
+  }, [chapters]);
+
+  const gradeMeta = mathGrades.find((g) => g.key === grade) ?? mathGrades[0];
+  const specialLessonCount = getSpecialLessonsByGrade(grade).length;
 
   return (
     <div className="math-scope">
@@ -40,31 +54,42 @@ export function CurriculumHome() {
           <Link className="math-topbar-brand" href="/">
             ← 数学の学び
           </Link>
-          <span className="math-home-pill">中1・新しい数学1</span>
+          <span className="math-grade-switch math-grade-switch--home">
+            {mathGrades.map((g) => (
+              <button
+                key={g.key}
+                type="button"
+                className={`math-grade-btn math-grade-btn--home${grade === g.key ? " math-grade-btn--active" : ""}`}
+                onClick={() => pickGrade(g.key)}
+              >
+                {g.label}
+              </button>
+            ))}
+          </span>
+          <span className="math-home-book-label">{gradeMeta.book}</span>
           <span className="math-home-student">レオ</span>
         </div>
       </div>
 
       <div className="math-page math-home-page">
-        <Link className="math-freelesson-banner" href="/math/free">
-          <span className="math-freelesson-banner-title">特別レッスン</span>
-          <span className="math-freelesson-banner-sub">レオが苦手なところを特訓する、教科書とは別のレッスン →</span>
-        </Link>
-
         <div className="math-stats-card">
           <div>
             <div className="math-stats-greeting">おかえり、レオくん！</div>
-            <div className="math-stats-resume">
-              つづきから：
-              <Link href={`/math/${resumeSection.chapter.id}/${resumeSection.section.id}`}>
-                {resumeSection.chapter.num}章 {resumeSection.section.name}
-              </Link>
-            </div>
+            {resumeSection ? (
+              <div className="math-stats-resume">
+                つづきから：
+                <Link href={`/math/${resumeSection.chapter.id}/${resumeSection.section.id}`}>
+                  {resumeSection.chapter.num}章 {resumeSection.section.name}
+                </Link>
+              </div>
+            ) : (
+              <div className="math-stats-resume">教科書がとどいたら、ここからはじめよう。</div>
+            )}
           </div>
           <div className="math-stat-block">
             <div className="math-stat-value" style={{ color: "#c9804f" }}>
               {doneSectionCount}
-              <span style={{ fontSize: 13 }}>/{mathTotalSectionCount}</span>
+              <span style={{ fontSize: 13 }}>/{totalSectionCount}</span>
             </div>
             <div className="math-stat-label">節 完了</div>
           </div>
@@ -83,7 +108,7 @@ export function CurriculumHome() {
         </div>
 
         <div className="math-chapter-list">
-          {mathChapters.map((chapter) => {
+          {chapters.map((chapter) => {
             const done = chapter.sections.filter((s) => s.status === "done").length;
             const pct = Math.round((done / chapter.sections.length) * 100);
             const isOpen = !!open[chapter.id];
@@ -126,7 +151,22 @@ export function CurriculumHome() {
               </div>
             );
           })}
+          {chapters.length === 0 ? (
+            <div className="math-chapter-empty">
+              <div className="math-chapter-empty-title">{gradeMeta.label}の教科書はまだ準備中</div>
+              <div className="math-chapter-empty-sub">教科書がとどいたら、ここに章がならぶよ。</div>
+            </div>
+          ) : null}
         </div>
+
+        <Link className="math-speciallesson-banner" href="/math/free">
+          <span className="math-speciallesson-banner-icon">★</span>
+          <span className="math-speciallesson-banner-body">
+            <span className="math-speciallesson-banner-title">特別レッスン</span>
+            <span className="math-speciallesson-banner-sub">レオが苦手なところを特訓する、教科書とは別のレッスン</span>
+          </span>
+          <span className="math-speciallesson-banner-count">{specialLessonCount} レッスン ›</span>
+        </Link>
       </div>
     </div>
   );
@@ -136,8 +176,8 @@ function SectionRow({
   chapter,
   section
 }: {
-  chapter: (typeof mathChapters)[number];
-  section: (typeof mathChapters)[number]["sections"][number];
+  chapter: MathChapterMeta;
+  section: MathChapterMeta["sections"][number];
 }) {
   const dotStyle =
     section.status === "done"

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { mathBooksByGrade } from "../../../content/subjects/math/curriculum";
 import { mathGrades, type MathGrade } from "../../../content/subjects/math/grades";
-import { getSpecialLessonsByGrade } from "../../../content/subjects/math/specialLessons";
 import type { MathChapterMeta } from "../../../content/subjects/math/types";
 import { readMathProgress, syncMathProgressWithCloud, type MathBlockProgressMap } from "../../data/mathProgress";
 
@@ -45,7 +44,6 @@ export function CurriculumHome() {
   }, [chapters]);
 
   const gradeMeta = mathGrades.find((g) => g.key === grade) ?? mathGrades[0];
-  const specialLessonCount = getSpecialLessonsByGrade(grade).length;
 
   return (
     <div className="math-scope">
@@ -66,6 +64,9 @@ export function CurriculumHome() {
               </button>
             ))}
           </span>
+          <Link className="math-speciallesson-navbtn" href="/math/free">
+            特訓レッスン
+          </Link>
           <span className="math-home-book-label">{gradeMeta.book}</span>
           <span className="math-home-student">レオ</span>
         </div>
@@ -158,15 +159,6 @@ export function CurriculumHome() {
             </div>
           ) : null}
         </div>
-
-        <Link className="math-speciallesson-banner" href="/math/free">
-          <span className="math-speciallesson-banner-icon">★</span>
-          <span className="math-speciallesson-banner-body">
-            <span className="math-speciallesson-banner-title">特別レッスン</span>
-            <span className="math-speciallesson-banner-sub">レオが苦手なところを特訓する、教科書とは別のレッスン</span>
-          </span>
-          <span className="math-speciallesson-banner-count">{specialLessonCount} レッスン ›</span>
-        </Link>
       </div>
     </div>
   );

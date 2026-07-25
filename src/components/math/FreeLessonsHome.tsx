@@ -38,7 +38,7 @@ export function FreeLessonsHome() {
           <Link className="math-topbar-brand" href="/math">
             ← 数学の学び
           </Link>
-          <span className="math-speciallesson-chip">特別レッスン</span>
+          <span className="math-speciallesson-chip">特訓レッスン</span>
           <span className="math-grade-switch math-grade-switch--accent">
             <button
               type="button"
@@ -64,7 +64,7 @@ export function FreeLessonsHome() {
 
       <div className="math-page math-home-page">
         <div className="math-speciallesson-intro">
-          <h1>特別レッスン</h1>
+          <h1>特訓レッスン</h1>
           <p>教科書の章とは別に、レオが苦手なところを特訓するためのレッスンだよ。すこしずつ増えていくよ。</p>
         </div>
 
@@ -129,7 +129,7 @@ export function FreeLessonsHome() {
 
           {pool.length === 0 ? (
             <div className="math-speciallesson-empty">
-              <div className="math-speciallesson-empty-title">この学年の特別レッスンはまだないよ</div>
+              <div className="math-speciallesson-empty-title">この学年の特訓レッスンはまだないよ</div>
               <div className="math-speciallesson-empty-sub">苦手が見つかったら、ここに追加していこう。</div>
             </div>
           ) : null}
@@ -137,7 +137,7 @@ export function FreeLessonsHome() {
 
         <button type="button" className="math-speciallesson-add" onClick={() => {}}>
           <span className="math-speciallesson-add-icon">＋</span>
-          <span>新しい特別レッスンをつくる</span>
+          <span>新しい特訓レッスンをつくる</span>
         </button>
       </div>
     </div>

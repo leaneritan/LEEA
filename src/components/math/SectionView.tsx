@@ -35,6 +35,7 @@ export function SectionView({ chapter, section }: { chapter: MathChapterMeta; se
 
   const percent = getSectionCompletionPercent(section.id, practiceBlockIds, progress);
   const { prev, next } = getAdjacentSections(chapter.id, section.id);
+  const sectionMeta = chapter.sections.find((s) => s.id === section.id);
 
   return (
     <div className="math-scope" style={{ "--m-accent": chapter.color, "--m-tint": chapter.tint, "--m-dark": chapter.dark } as React.CSSProperties}>
@@ -52,6 +53,17 @@ export function SectionView({ chapter, section }: { chapter: MathChapterMeta; se
           <span className="math-topbar-section">
             {section.kicker ?? `${section.number}節 ${section.title}`}
           </span>
+          {sectionMeta?.digitalUrl ? (
+            <a
+              className="math-companion-link"
+              href={sectionMeta.digitalUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+              title="デジタル教科書でこの節を開く"
+            >
+              📘 デジタル教科書
+            </a>
+          ) : null}
           <div className="math-topbar-progress">
             <div className="math-progress-track">
               <div className="math-progress-fill" style={{ width: `${percent}%` }} />

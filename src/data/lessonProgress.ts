@@ -1,4 +1,5 @@
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { reportCloudSyncFailure, reportCloudSyncSuccess } from "@/lib/syncStatus";
 
 export type LessonProgressStatus = "not-started" | "done";
 
@@ -69,6 +70,7 @@ export async function syncLessonProgressWithCloud(current: LessonProgressMap): P
       .eq("teacher_id", "neritan");
 
     if (error) throw error;
+    reportCloudSyncSuccess();
 
     const cloud = ((data ?? []) as LessonProgressRow[]).reduce<LessonProgressMap>((next, row) => {
       next[row.lesson_id] = fromLessonProgressRow(row);
@@ -92,6 +94,8 @@ export async function syncLessonProgressWithCloud(current: LessonProgressMap): P
       }
     }
 
+    // Best-effort: reports its own outcome, so a push failure isn't masked by
+    // the read above already having reported success.
     if (localRecordsToPush.length) {
       await upsertLessonProgressRecords(localRecordsToPush);
     }
@@ -100,6 +104,7 @@ export async function syncLessonProgressWithCloud(current: LessonProgressMap): P
     return merged;
   } catch (error) {
     console.warn("LEEA Supabase teacher lesson progress sync failed", error);
+    reportCloudSyncFailure();
     return current;
   }
 }
@@ -112,11 +117,17 @@ export async function saveLessonProgressRecord(record: LessonProgressRecord) {
 async function upsertLessonProgressRecords(records: LessonProgressRecord[]) {
   if (!isSupabaseConfigured || !supabase || records.length === 0) return;
 
-  const { error } = await supabase
-    .from("teacher_lesson_progress")
-    .upsert(records.map(toLessonProgressRow), { onConflict: "lesson_id,teacher_id,student_id" });
+  try {
+    const { error } = await supabase
+      .from("teacher_lesson_progress")
+      .upsert(records.map(toLessonProgressRow), { onConflict: "lesson_id,teacher_id,student_id" });
 
-  if (error) throw error;
+    if (error) throw error;
+    reportCloudSyncSuccess();
+  } catch (error) {
+    console.warn("LEEA Supabase teacher lesson progress save failed", error);
+    reportCloudSyncFailure();
+  }
 }
 
 function fromLessonProgressRow(row: LessonProgressRow): LessonProgressRecord {

@@ -1,5 +1,5 @@
-import UnitReference6 from "@/components/UnitReference6";
+import UnitReference36 from "@/components/UnitReference36";
 
 export default function Page() {
-  return <UnitReference6 />;
+  return <UnitReference36 />;
 }

@@ -76,6 +76,7 @@ export function SectionView({ chapter, section }: { chapter: MathChapterMeta; se
       <div className="math-page">
         <SectionBlockList
           blocks={section.blocks}
+          chapterId={chapter.id}
           isBlockDone={(blockId) => isBlockDone(section.id, blockId, progress)}
           onTogglePracticeDone={toggleDone}
         />

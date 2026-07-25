@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { getDigitalCompanionUrl } from "../../../content/subjects/math/digitalCompanion";
 import type { MathBlock } from "../../../content/subjects/math/types";
 import { ExampleBlock } from "./blocks/ExampleBlock";
 import { GoalBlock } from "./blocks/GoalBlock";
@@ -16,10 +17,12 @@ import { WindowBlock } from "./blocks/WindowBlock";
 
 export function SectionBlockList({
   blocks,
+  chapterId,
   isBlockDone,
   onTogglePracticeDone
 }: {
   blocks: MathBlock[];
+  chapterId: string;
   isBlockDone: (blockId: string) => boolean;
   onTogglePracticeDone: (blockId: string) => void;
 }) {
@@ -68,9 +71,25 @@ export function SectionBlockList({
             rendered = null;
         }
 
+        const digitalUrl = block.page ? getDigitalCompanionUrl(chapterId, block.page) : undefined;
+
         return (
           <div className="math-block-wrap" key={block.id}>
-            {block.page ? <span className="math-block-page">教科書 p.{block.page}</span> : null}
+            {block.page ? (
+              digitalUrl ? (
+                <a
+                  className="math-block-page"
+                  href={digitalUrl}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  title="デジタル教科書でこのページを開く"
+                >
+                  教科書 p.{block.page}
+                </a>
+              ) : (
+                <span className="math-block-page">教科書 p.{block.page}</span>
+              )
+            ) : null}
             {rendered}
           </div>
         );

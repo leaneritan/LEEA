@@ -349,6 +349,43 @@ function classifyTopic(tags: string[]): string {
   return "Other";
 }
 
+/* Deterministic (SSR-safe) shuffle for a sentence-build word bank. Seeded by
+   grammarId + question index so the order is stable across server render and
+   client hydration, but differs from the already-solved `correct` order. */
+function shuffledBank(bank: string[], correct: string[], seed: string): string[] {
+  if (bank.length < 2) return bank;
+
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (Math.imul(31, hash) + seed.charCodeAt(i)) | 0;
+  }
+  let state = (hash >>> 0) || 1;
+  const nextRandom = () => {
+    state ^= state << 13;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    state >>>= 0;
+    return state / 4294967296;
+  };
+
+  const shuffleOnce = () => {
+    const result = [...bank];
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(nextRandom() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+  };
+
+  let shuffled = shuffleOnce();
+  let attempts = 0;
+  while (shuffled.join(" ") === correct.join(" ") && attempts < 5) {
+    shuffled = shuffleOnce();
+    attempts += 1;
+  }
+  return shuffled;
+}
+
 export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
   return {
     grammarId: point.id,
@@ -407,12 +444,12 @@ export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
       explanationJP: question.jp
     })),
 
-    masterQuiz: (point.tab4_master ?? []).map((question) => {
+    masterQuiz: (point.tab4_master ?? []).map((question, index) => {
       if (question.type === "build") {
         return {
           kind: "sentence-build" as const,
           prompt: question.cue,
-          tokens: question.bank,
+          tokens: shuffledBank(question.bank, question.correct, `${point.id}-master-${index}`),
           correctOrder: question.correct,
           explanationEN: "",
           explanationJP: question.jp

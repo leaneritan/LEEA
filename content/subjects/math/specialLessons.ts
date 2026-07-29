@@ -92,16 +92,6 @@ export const specialLessons: SpecialLesson[] = [
     kind: "かいせつ＋問題",
     meta: "全 6 問",
     status: "todo"
-  },
-  {
-    id: "risshiki-training-ch3-sec2",
-    grade: "g1",
-    topic: "方程式",
-    title: "立式トレーニング — 3章2節 方程式の利用",
-    kind: "れんしゅう",
-    meta: "全 14 問",
-    status: "done",
-    embedPath: "/math-lessons/risshiki-training-ch3-sec2.html"
   }
 ];
 

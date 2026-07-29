@@ -214,8 +214,6 @@ export type MathSectionMeta = {
   status: MathSectionStatus;
   /** Deep link into the textbook publisher's digital companion for this 節, if known. */
   digitalUrl?: string;
-  /** Link to a hand-authored extra-practice lesson (public/math-lessons/<id>.html) tied to this 節. */
-  extraTrainingUrl?: string;
 };
 
 export type MathSection = {

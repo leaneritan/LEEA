@@ -152,7 +152,8 @@ export const mathChapters: MathChapterMeta[] = [
         name: "2節 1次方程式の利用",
         pages: "p.103–111",
         status: "done",
-        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/f/#09"
+        digitalUrl: "https://sw111.tsho.jp/07jk/m/1/f/#09",
+        extraTrainingUrl: "/math-lessons/risshiki-training-ch3-sec2.html"
       },
       {
         id: "math-3-3",

@@ -64,6 +64,17 @@ export function SectionView({ chapter, section }: { chapter: MathChapterMeta; se
               📘 デジタル教科書
             </a>
           ) : null}
+          {sectionMeta?.extraTrainingUrl ? (
+            <a
+              className="math-companion-link"
+              href={sectionMeta.extraTrainingUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+              title="この節の特訓レッスンを開く"
+            >
+              ✏️ 特訓レッスン
+            </a>
+          ) : null}
           <div className="math-topbar-progress">
             <div className="math-progress-track">
               <div className="math-progress-fill" style={{ width: `${percent}%` }} />

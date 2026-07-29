@@ -1,4 +1,5 @@
 import level5Unit1Vocabulary from "../../content/subjects/english/courses/our-world/level-5/unit-1/vocabulary.json";
+import level2Unit9Vocabulary from "../../content/subjects/english/courses/our-world/level-2/unit-9/vocabulary.json";
 import level3Unit1Vocabulary from "../../content/subjects/english/courses/our-world/level-3/unit-1/vocabulary.json";
 import level3Unit2Vocabulary from "../../content/subjects/english/courses/our-world/level-3/unit-2/vocabulary.json";
 import level3Unit3Vocabulary from "../../content/subjects/english/courses/our-world/level-3/unit-3/vocabulary.json";
@@ -56,6 +57,7 @@ type UnitVocabularyWord =
   | (typeof level3Unit7Vocabulary.words)[number]
   | (typeof level3Unit8Vocabulary.words)[number]
   | (typeof level3Unit9Vocabulary.words)[number]
+  | (typeof level2Unit9Vocabulary.words)[number]
   | (typeof unit1Vocabulary.words)[number]
   | (typeof unit2Vocabulary.words)[number]
   | (typeof unit3Vocabulary.words)[number]
@@ -182,6 +184,7 @@ function mergeWordsAcrossUnits(unitWordLists: UnitVocabularyWord[][]): Vocabular
 }
 
 export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
+  level2Unit9Vocabulary.words as UnitVocabularyWord[],
   level5Unit1Vocabulary.words as UnitVocabularyWord[],
   level3Unit1Vocabulary.words as UnitVocabularyWord[],
   level3Unit2Vocabulary.words as UnitVocabularyWord[],
@@ -207,6 +210,7 @@ export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
    "<level>-<unit>". Add a new entry here whenever a unit is scanned, so the
    Reference tree never has to guess or hardcode a title elsewhere. */
 export const unitTitles: Record<string, string> = {
+  [`${level2Unit9Vocabulary.level}-${level2Unit9Vocabulary.unit}`]: level2Unit9Vocabulary.unitTitle,
   [`${level5Unit1Vocabulary.level}-${level5Unit1Vocabulary.unit}`]: level5Unit1Vocabulary.unitTitle,
   [`${level3Unit1Vocabulary.level}-${level3Unit1Vocabulary.unit}`]: level3Unit1Vocabulary.unitTitle,
   [`${level3Unit2Vocabulary.level}-${level3Unit2Vocabulary.unit}`]: level3Unit2Vocabulary.unitTitle,
@@ -304,6 +308,13 @@ export const level3Unit9Vocab2Items = vocabularyItems.filter((item) => level3Uni
 export const level3Unit9AcademicItems = vocabularyItems.filter((item) => (level3Unit9Vocabulary.academicWordIds as string[]).includes(item.id));
 export const level3Unit9GlossaryItems = vocabularyItems.filter(
   (item) => level3Unit9Vocabulary.contentWordIds.includes(item.id) || level3Unit9Vocabulary.relatedWordIds.includes(item.id)
+);
+
+export const level2Unit9Vocab1Items = vocabularyItems.filter((item) => (level2Unit9Vocabulary.vocab1WordIds as string[]).includes(item.id));
+export const level2Unit9Vocab2Items = vocabularyItems.filter((item) => (level2Unit9Vocabulary.vocab2WordIds as string[]).includes(item.id));
+export const level2Unit9AcademicItems = vocabularyItems.filter((item) => (level2Unit9Vocabulary.academicWordIds as string[]).includes(item.id));
+export const level2Unit9GlossaryItems = vocabularyItems.filter(
+  (item) => (level2Unit9Vocabulary.contentWordIds as string[]).includes(item.id) || (level2Unit9Vocabulary.relatedWordIds as string[]).includes(item.id)
 );
 
 export const unit1Vocab1Items = vocabularyItems.filter((item) => unit1Vocabulary.vocab1WordIds.includes(item.id));
@@ -482,6 +493,7 @@ export const level3Unit6GrammarItems = grammarPoints.filter((item) => item.level
 export const level3Unit7GrammarItems = grammarPoints.filter((item) => item.level === 3 && item.unit === 7);
 export const level3Unit8GrammarItems = grammarPoints.filter((item) => item.level === 3 && item.unit === 8);
 export const level3Unit9GrammarItems = grammarPoints.filter((item) => item.level === 3 && item.unit === 9);
+export const level2Unit9GrammarItems = grammarPoints.filter((item) => item.level === 2 && item.unit === 9);
 export const unit9GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 9);
 export const unit8GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 8);
 export const unit7GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 7);

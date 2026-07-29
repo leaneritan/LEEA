@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>立式トレーニング ｜ 3章 2節 方程式の利用</title>
+<style>
+  :root{
+    --ink:#2B2233;
+    --ink-soft:#665A70;
+    --paper:#ECEAF0;
+    --card:#FFFFFF;
+    --plum:#6B3E7A;
+    --plum-bg:#F0E9F3;
+    --sage:#4F7A5B;
+    --sage-bg:#E6EFE8;
+    --red:#A33B45;
+    --red-bg:#F8EAEC;
+    --line:#DAD4E0;
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Meiryo",sans-serif;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP","MS Mincho",serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--gothic);
+       font-size:17px;line-height:1.85;-webkit-text-size-adjust:100%}
+  .wrap{max-width:640px;margin:0 auto;padding:18px 15px 70px}
+
+  header.top{background:var(--ink);color:#fff;border-radius:14px;padding:16px 18px 14px;margin-bottom:16px}
+  header.top .eyebrow{font-size:11.5px;letter-spacing:.2em;color:#A497AE;margin:0 0 3px}
+  header.top h1{font-size:24px;font-weight:800;margin:0;letter-spacing:.03em}
+  header.top .sub{font-size:13.5px;color:#A497AE;margin:3px 0 0}
+  .bar{display:flex;gap:3px;margin-top:12px}
+  .bar i{flex:1;height:4px;border-radius:2px;background:#463A50;transition:background .25s}
+  .bar i.hit{background:var(--sage)}
+  .bar i.miss{background:#8A5560}
+  .bar i.now{background:#fff}
+
+  .card{background:var(--card);border-radius:14px;padding:20px 18px;
+        box-shadow:0 1px 2px rgba(43,34,51,.06),0 8px 20px rgba(43,34,51,.08)}
+  .screen{animation:rise .3s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+  .stage{display:inline-block;font-size:12px;letter-spacing:.12em;font-weight:700;
+         padding:3px 11px;border-radius:20px;background:var(--plum-bg);color:var(--plum);margin-bottom:8px}
+  .stage.d{background:var(--red-bg);color:var(--red)}
+  h2{font-size:20px;font-weight:800;margin:0 0 10px;letter-spacing:.02em}
+  p{margin:0 0 13px}
+  .lead{color:var(--ink-soft);font-size:15.5px}
+  .qno{font-size:12.5px;color:var(--ink-soft);letter-spacing:.08em;margin:16px 0 2px}
+
+  /* the problem statement, set like the textbook */
+  .prob{background:#FAF9FB;border:1px solid var(--line);border-radius:11px;
+        padding:14px 16px;margin:14px 0;font-size:16.5px;line-height:1.95}
+  .prob .ask{display:block;margin-top:8px;font-weight:700;color:var(--plum)}
+
+  /* ---- signature: the same quantity, two ways ---- */
+  .two{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch;margin:16px 0 4px}
+  .pane{background:var(--sage-bg);border:1.5px solid #BFD4C6;border-radius:11px;padding:11px 10px;text-align:center}
+  .pane .tag{display:block;font-size:11.5px;letter-spacing:.1em;color:var(--sage);font-weight:700;margin-bottom:3px}
+  .pane .val{font-family:var(--mincho);font-size:20px;line-height:1.45}
+  .eqsign{display:flex;align-items:center;font-family:var(--mincho);font-size:26px;color:var(--ink-soft)}
+  .twocap{text-align:center;font-size:13.5px;color:var(--ink-soft);margin:0 0 4px}
+
+  .note{border-left:3px solid var(--plum);background:var(--plum-bg);
+        padding:11px 13px;border-radius:0 8px 8px 0;font-size:15px;margin:14px 0}
+
+  .choices{display:grid;gap:9px;margin-top:10px}
+  .choice{text-align:center;padding:12px 14px;border-radius:10px;border:1.5px solid var(--line);
+          background:#fff;color:var(--ink);font-family:var(--mincho);font-size:19px;
+          transition:border-color .15s,background .15s;line-height:1.5}
+  .choice.txt{font-family:var(--gothic);font-size:16px;text-align:left}
+  .choice:hover:not(:disabled){border-color:var(--plum)}
+  .choice:disabled{cursor:default;opacity:.85}
+  .choice.ok{border-color:var(--sage);background:var(--sage-bg);font-weight:700}
+  .choice.no{border-color:var(--red);background:var(--red-bg)}
+  .choice.reveal{border-color:var(--sage);background:var(--sage-bg)}
+  button{font-family:inherit;font-size:16px;cursor:pointer}
+
+  .row{display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:8px}
+  .row .pre{font-family:var(--mincho);font-size:22px}
+  .row .post{font-family:var(--gothic);font-size:16px;color:var(--ink-soft)}
+  input[type=text]{font-family:var(--mincho);font-size:22px;width:132px;padding:8px 10px;
+    border:1.5px solid var(--line);border-radius:10px;text-align:center;color:var(--ink);background:#fff}
+  input[type=text]:focus{outline:2px solid var(--plum);outline-offset:1px;border-color:var(--plum)}
+  input[type=text]:disabled{background:#F5F3F7}
+  .btn{padding:11px 20px;border-radius:10px;border:none;background:var(--ink);color:#fff;font-weight:700}
+  .btn:hover:not(:disabled){background:#3E3247}
+  .btn:disabled{opacity:.4;cursor:default}
+  .btn.plum{background:var(--plum)}
+  .btn.plum:hover:not(:disabled){background:#56305F}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+
+  .fb{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:15px;display:none}
+  .fb.show{display:block;animation:rise .22s ease both}
+  .fb.hint{background:var(--plum-bg);border:1px solid #DCC9E2}
+  .fb.wrong{background:var(--red-bg);border:1px solid #E9C2C7}
+  .fb.right{background:var(--sage-bg);border:1px solid #BFD4C6}
+  .fb b{display:block;margin-bottom:2px}
+  .fb .work{font-family:var(--mincho);font-size:17px;display:block;margin-top:4px;line-height:1.75}
+
+  .nav{margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .stepno{font-size:12.5px;color:var(--ink-soft);letter-spacing:.08em}
+
+  .big{font-size:42px;font-weight:800;text-align:center;margin:6px 0 0}
+  .big small{font-size:18px;color:var(--ink-soft);font-weight:400}
+  table{width:100%;border-collapse:collapse;margin:16px 0 6px;font-size:15px}
+  th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+  th{font-size:12.5px;letter-spacing:.08em;color:var(--ink-soft);font-weight:700}
+  td.s{text-align:right;font-family:var(--mincho);font-size:18px;white-space:nowrap}
+  .pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .pill.good{background:var(--sage-bg);color:var(--sage)}
+  .pill.watch{background:var(--red-bg);color:var(--red)}
+  ol.steps{padding-left:1.3em;margin:6px 0 0;font-size:15.5px}
+  ol.steps li{margin-bottom:4px}
+
+  :focus-visible{outline:2px solid var(--plum);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (max-width:420px){
+    body{font-size:16px}
+    header.top h1{font-size:21px}
+    .two{grid-template-columns:1fr;gap:5px}
+    .eqsign{justify-content:center;font-size:20px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <p class="eyebrow">3章 方程式 ／ 2節　教科書 p.103〜</p>
+  <h1>立式トレーニング</h1>
+  <p class="sub">解かなくていい。式をつくるところだけ、集中して練習する。</p>
+  <div class="bar" id="bar"></div>
+</header>
+
+<main id="stage"></main>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  function two(t1,v1,t2,v2,cap){
+    return '<div class="two">'+
+      '<div class="pane"><span class="tag">'+t1+'</span><span class="val">'+v1+'</span></div>'+
+      '<div class="eqsign">＝</div>'+
+      '<div class="pane"><span class="tag">'+t2+'</span><span class="val">'+v2+'</span></div>'+
+      '</div><p class="twocap">'+cap+'</p>';
+  }
+
+  var STEPS = [
+
+  /* ---------- A : 何を x とおくか ---------- */
+  { st:"ステージ A", cls:"", title:"何を x とおくか",
+    lead:'方程式の利用は、ここから始まる。ふつうは <b>求めたいもの</b> を x とおく。',
+    body:'<div class="prob">1冊が同じ値段のノートを5冊と、100円のペンを1本買ったところ、代金は700円だった。'+
+         '<span class="ask">ノート1冊の値段を求めなさい。</span></div>',
+    q:{ type:"choice", ans:1, prompt:"何を x とおけばよい？",
+        opts:["ノートの冊数","ノート1冊の値段","代金の合計","ペンの値段"], txt:true,
+        hint:"問題文の最後の一文を読もう。「求めなさい」と言われているものは何？",
+        work:"ノート1冊の値段を x 円とおく。求めたいものをそのまま x とおくのが基本。" } },
+
+  { st:"ステージ A", cls:"", title:"2つの数量があるとき",
+    lead:'登場する数量が2つでも、x はひとつでいい。もう一方を x で表せばよい。',
+    body:'<div class="prob">妹は姉より4歳年下で、2人の年齢の和は22歳である。'+
+         '<span class="ask">姉の年齢を求めなさい。</span></div>',
+    q:{ type:"choice", ans:0, prompt:"何を x とおけばよい？",
+        opts:["姉の年齢","姉と妹の年齢の差","2人の年齢の和","妹の年齢の2倍"], txt:true,
+        hint:"求めたいのは姉の年齢。妹の年齢は、姉の年齢を使って表せる。",
+        work:"姉の年齢を x 歳とおく。すると妹は x − 4 歳と表せる。x をひとつに決めるのがコツ。" } },
+
+  { st:"ステージ A", cls:"", title:"かくれた数量を x にする",
+    lead:'求めたいものが直接 x にならないこともある。全体をつなぐ数量をさがそう。',
+    body:'<div class="prob">あめを何人かの子どもに配る。1人に4個ずつ配ると3個あまり、1人に5個ずつ配ると2個たりない。'+
+         '<span class="ask">子どもの人数を求めなさい。</span></div>',
+    q:{ type:"choice", ans:0, prompt:"何を x とおけばよい？",
+        opts:["子どもの人数","あめの総数","あまった3個","1人に配る個数"], txt:true,
+        hint:"2つの配り方に共通して出てくる数量はどれだろう。",
+        work:"子どもの人数を x 人とおく。人数はどちらの配り方でも変わらないので、これを x にすると両方の式が書ける。" } },
+
+  /* ---------- B : 数量を x で表す ---------- */
+  { st:"ステージ B", cls:"", title:"x で表してみる",
+    lead:'x が決まったら、ほかの数量を x を使った式で書く。ここが式づくりの材料になる。',
+    body:'<div class="prob">ノート1冊の値段を x 円とする。</div>',
+    q:{ type:"choice", ans:2, prompt:"ノート5冊の代金は？",
+        opts:["x ＋ 5","5 ÷ x","5x","x − 5"],
+        hint:"1冊 x 円のものを5冊。値段×個数だね。",
+        work:"5x 円。単価 × 個数 で代金になる。" } },
+
+  { st:"ステージ B", cls:"", title:"x で表してみる",
+    lead:'「〜より4歳年下」のような言い方を、式に直す。',
+    body:'<div class="prob">姉の年齢を x 歳とする。妹は姉より4歳年下である。</div>',
+    q:{ type:"choice", ans:1, prompt:"妹の年齢は？",
+        opts:["x ＋ 4","x − 4","4x","4 − x"],
+        hint:"年下ということは、姉より小さい。ひき算になるね。",
+        work:"x − 4 歳。「〜より○年下」はひく、「〜より○年上」はたす。" } },
+
+  { st:"ステージ B", cls:"", title:"あまり・不足を式にする",
+    lead:'過不足の問題は、ここさえ書ければ半分終わったようなもの。',
+    body:'<div class="prob">子どもの人数を x 人とする。1人に4個ずつ配ると、3個あまった。</div>',
+    q:{ type:"choice", ans:0, prompt:"あめの総数は？",
+        opts:["4x ＋ 3","4x − 3","4 ＋ 3x","3x ＋ 4"],
+        hint:"配った分が 4x 個。それに、あまった3個がまだ残っている。合わせると？",
+        work:"4x ＋ 3 個。「あまる」は配った分にたす。「たりない」なら、ひく。" } },
+
+  { st:"ステージ B", cls:"", title:"速さを式にする",
+    lead:'速さ × 時間 ＝ 道のり。この関係は 4章 でも使い続ける。',
+    body:'<div class="prob">分速60mで x 分間歩いた。</div>',
+    q:{ type:"choice", ans:1, prompt:"進んだ道のりは？",
+        opts:["60 ＋ x","60x","60 ÷ x","x ÷ 60"],
+        hint:"1分で60m。それが x 分続く。",
+        work:"60x m。速さ × 時間 ＝ 道のり。" } },
+
+  /* ---------- C : 立式 ---------- */
+  { st:"ステージ C", cls:"", title:"等しい関係を見つける",
+    lead:'方程式は、<b>同じ量を2通りに表して「＝」で結んだもの</b>。ここが2節のいちばん大事な考え方。',
+    body:'<div class="prob">1冊 x 円のノートを5冊と、100円のペンを1本買ったところ、代金は700円だった。</div>'+
+         two("① 買ったものの合計","5x ＋ 100","② 実際にはらった代金","700","どちらも「代金」を表している。だから ＝ で結べる。"),
+    q:{ type:"choice", ans:0, prompt:"方程式はどれ？",
+        opts:["5x ＋ 100 ＝ 700","5x ＝ 700 ＋ 100","5(x ＋ 100) ＝ 700","x ＋ 100 ＝ 700"],
+        hint:"ノート5冊で 5x 円、ペンが100円。その合計が700円。",
+        work:"5x ＋ 100 ＝ 700　　左辺も右辺も「代金」を表している。" } },
+
+  { st:"ステージ C", cls:"", title:"和を使って立式する",
+    lead:'「2つを合わせると〜になる」という文は、そのまま式になる。',
+    body:'<div class="prob">姉の年齢を x 歳とすると、妹は x − 4 歳。2人の年齢の和は22歳である。</div>'+
+         two("① 2人の年齢をたす","x ＋ (x − 4)","② 問題文の和","22","どちらも「2人の年齢の和」。"),
+    q:{ type:"choice", ans:1, prompt:"方程式はどれ？",
+        opts:["x − (x − 4) ＝ 22","x ＋ (x − 4) ＝ 22","x(x − 4) ＝ 22","x ＝ 22 − 4"],
+        hint:"和ということは、たし算。姉の年齢と妹の年齢をたそう。",
+        work:"x ＋ (x − 4) ＝ 22　　これを解くと x ＝ 13。姉13歳、妹9歳で和は22歳。" } },
+
+  { st:"ステージ C", cls:"", title:"過不足の立式",
+    lead:'2通りの配り方で、<b>あめの総数</b>という同じものを2回表すのがポイント。',
+    body:'<div class="prob">子どもが x 人いる。1人に4個ずつ配ると3個あまり、1人に5個ずつ配ると2個たりない。</div>'+
+         two("① 4個ずつ配ったとき","4x ＋ 3","② 5個ずつ配ったとき","5x − 2","どちらも「あめの総数」。人数が変わらないから等しい。"),
+    q:{ type:"choice", ans:2, prompt:"方程式はどれ？",
+        opts:["4x ＋ 3 ＝ 5x ＋ 2","4x − 3 ＝ 5x ＋ 2","4x ＋ 3 ＝ 5x − 2","4x ＝ 5x"],
+        hint:"「たりない」ということは、必要な数より少ない。5x から2をひく。",
+        work:"4x ＋ 3 ＝ 5x − 2　　解くと x ＝ 5。子ども5人、あめは23個。" } },
+
+  { st:"ステージ C", cls:"", title:"追いつく問題",
+    lead:'追いつくとは、<b>2人の進んだ道のりが等しくなる</b>ということ。',
+    body:'<div class="prob">姉は分速60mで家を出発した。その10分後に、妹が分速210mで同じ道を追いかけた。'+
+         '妹が出発してから x 分後に姉に追いつくとする。</div>'+
+         two("① 妹の進んだ道のり","210x","② 姉の進んだ道のり","60(x ＋ 10)","追いついた地点までの道のりは同じ。"),
+    q:{ type:"choice", ans:3, prompt:"方程式はどれ？",
+        opts:["210x ＝ 60x","210x ＝ 60x ＋ 10","210(x ＋ 10) ＝ 60x","210x ＝ 60(x ＋ 10)"],
+        hint:"姉は妹より10分ぶん長く歩いている。姉の歩いた時間は x ＋ 10 分。",
+        work:"210x ＝ 60(x ＋ 10)　　解くと x ＝ 4。妹は出発して4分後、家から840mの地点で追いつく。" } },
+
+  { st:"ステージ C", cls:"", title:"比例式で立式する",
+    lead:'a : b ＝ c : d のとき、<b>ad ＝ bc</b>。外側どうし、内側どうしをかける。',
+    body:'<div class="prob">みかん3個の値段は240円である。同じみかん8個の値段を x 円とする。</div>'+
+         two("① 個数の比","3 : 8","② 値段の比","240 : x","個数の比と値段の比は等しい。"),
+    q:{ type:"choice", ans:0, prompt:"3 : 8 ＝ 240 : x を、かけ算の形にすると？",
+        opts:["3x ＝ 8 × 240","8x ＝ 3 × 240","3 × 8 ＝ 240x","3x ＝ 240 ＋ 8"],
+        hint:"外側は 3 と x、内側は 8 と 240。外側の積と内側の積が等しい。",
+        work:"3x ＝ 8 × 240　　つまり 3x ＝ 1920 で x ＝ 640。みかん8個は640円。" } },
+
+  /* ---------- D : 解の吟味 ---------- */
+  { st:"ステージ D", cls:"d", title:"その答えでいいか確かめる",
+    lead:'方程式を正しく解いても、問題の答えとしてふさわしくないことがある。これを確かめるのが <b>解の吟味</b>。',
+    body:'<div class="prob">子どもの人数を x 人として方程式を解いたところ、x ＝ −2 となった。</div>',
+    q:{ type:"choice", ans:1, prompt:"この解は、答えとしてよい？",
+        opts:["よい。方程式を正しく解いたから","よくない。人数は負の数にならないから","よい。あとで符号を変えればよいから","よくない。x は必ず整数だから"], txt:true,
+        hint:"人数、個数、長さ、時間。これらが −2 になることはあるだろうか。",
+        work:"よくない。人数は0以上の整数なので、−2 は問題に適していない。この場合は式の立て方を見直す。" } },
+
+  { st:"ステージ D", cls:"d", title:"問題の場面に合っているか",
+    lead:'計算は合っていても、場面としてありえないことがある。教科書 p.107 と同じ考え方。',
+    body:'<div class="prob">姉に妹が追いつくのは、家から840mの地点だと求められた。'+
+         'ただし、家から学校までの道のりは600mである。</div>',
+    q:{ type:"choice", ans:2, prompt:"この解は、問題に適している？",
+        opts:["適している。840mは正しく計算されたから","適している。840 − 600 ＝ 240m だけ行きすぎるだけだから","適していない。追いつく前に姉が学校に着いてしまうから","適していない。妹のほうが速いから"], txt:true,
+        hint:"追いつく地点は840m。でも姉は600mで学校に着いてしまう。それより先で追いつけるだろうか。",
+        work:"適していない。姉は600m地点で学校に着くので、840m地点まで進まない。したがって妹は学校までに追いつけない。" } }
+  ];
+
+  var GROUPS = [
+    {name:"A　何を x とおくか", idx:[0,1,2]},
+    {name:"B　x で表す",        idx:[3,4,5,6]},
+    {name:"C　立式する",        idx:[7,8,9,10,11]},
+    {name:"D　解の吟味",        idx:[12,13]}
+  ];
+
+  var i=0, tries=0, finished=false;
+  var first=new Array(STEPS.length).fill(null);
+
+  var stage=document.getElementById("stage"), bar=document.getElementById("bar");
+  STEPS.forEach(function(){ bar.appendChild(document.createElement("i")); });
+  bar.appendChild(document.createElement("i"));
+
+  function paintBar(){
+    var b=bar.children;
+    for(var k=0;k<STEPS.length;k++){
+      b[k].className = first[k]===true?"hit":first[k]===false?"miss":(k===i&&!finished?"now":"");
+    }
+    b[STEPS.length].className = finished?"now":"";
+  }
+
+  function render(){
+    var s=STEPS[i], q=s.q; tries=0;
+    stage.innerHTML =
+      '<section class="screen"><div class="card">'+
+        '<span class="stage '+s.cls+'">'+s.st+'</span>'+
+        '<h2>'+s.title+'</h2>'+
+        '<p class="lead">'+s.lead+'</p>'+
+        s.body+
+        '<p class="qno">'+q.prompt+'</p>'+
+        '<div class="choices" id="opts">'+
+          q.opts.map(function(o,k){ return '<button class="choice'+(q.txt?" txt":"")+'" data-k="'+k+'">'+o+'</button>'; }).join("")+
+        '</div>'+
+        '<div class="fb" id="fb"></div>'+
+        '<div class="nav"><span class="stepno">'+(i+1)+' / '+STEPS.length+'</span>'+
+        '<button class="btn" id="next" disabled>'+(i===STEPS.length-1?"けっかを見る →":"次へ →")+'</button></div>'+
+      '</div></section>';
+
+    var opts=document.getElementById("opts");
+    Array.prototype.forEach.call(opts.children,function(b){
+      b.addEventListener("click",function(){
+        if(b.disabled) return;
+        judge(Number(b.getAttribute("data-k"))===q.ans, b);
+      });
+    });
+    document.getElementById("next").addEventListener("click",function(){
+      if(this.disabled) return;
+      if(i===STEPS.length-1){ report(); return; }
+      i++; render();
+    });
+    paintBar();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function judge(ok, btn){
+    var q=STEPS[i].q, fb=document.getElementById("fb");
+    tries++;
+    if(ok){
+      if(first[i]===null) first[i]=(tries===1);
+      btn.classList.add("ok");
+      fb.className="fb show right";
+      fb.innerHTML="<b>せいかい！</b><span class='work'>"+q.work+"</span>";
+      lock(); paintBar(); return;
+    }
+    first[i]=false;
+    btn.classList.add("no");
+    if(tries===1){
+      fb.className="fb show hint";
+      fb.innerHTML="<b>おしい。ヒント</b>"+q.hint;
+    } else {
+      fb.className="fb show wrong";
+      fb.innerHTML="<b>答えは「"+q.opts[q.ans]+"」</b><span class='work'>"+q.work+"</span>";
+      document.getElementById("opts").children[q.ans].classList.add("reveal");
+      lock();
+    }
+    paintBar();
+  }
+
+  function lock(){
+    var opts=document.getElementById("opts");
+    Array.prototype.forEach.call(opts.children,function(b){ b.disabled=true; });
+    document.getElementById("next").disabled=false;
+  }
+
+  function report(){
+    finished=true;
+    var n=first.filter(function(x){return x===true;}).length;
+    var rows=GROUPS.map(function(g){
+      var got=g.idx.filter(function(k){return first[k]===true;}).length;
+      return "<tr><td>"+g.name+"</td><td class='s'>"+got+" / "+g.idx.length+"</td>"+
+        "<td style='text-align:right'><span class='pill "+(got===g.idx.length?"good":"watch")+"'>"+
+        (got===g.idx.length?"OK":"要復習")+"</span></td></tr>";
+    }).join("");
+
+    var cGot=GROUPS[2].idx.filter(function(k){return first[k]===true;}).length;
+    var aGot=GROUPS[0].idx.filter(function(k){return first[k]===true;}).length;
+    var advice;
+    if(n===STEPS.length) advice="全問1回で正解。あとは実際に解いて、答えを出す練習をすればよい。";
+    else if(aGot<3) advice="まず「何を x とおくか」を確実にしよう。ここがずれると、そのあとの式もすべてずれてしまう。";
+    else if(cGot<4) advice="立式でつまずいたときは、<b>同じ量を2通りに表せているか</b>を確かめよう。左辺と右辺が別のものを表していたら、その式はまちがい。";
+    else advice="式づくりはできている。次は実際に解いて、解の吟味までやってみよう。";
+
+    stage.innerHTML=
+      '<section class="screen"><div class="card">'+
+        '<span class="stage">けっか</span><h2>今日の結果</h2>'+
+        '<p class="big">'+n+' <small>/ '+STEPS.length+'</small></p>'+
+        '<table><thead><tr><th>ステージ</th><th style="text-align:right">正答</th><th></th></tr></thead>'+
+        '<tbody>'+rows+'</tbody></table>'+
+        '<div class="note">'+advice+'</div>'+
+        '<p class="lead" style="margin:16px 0 2px"><b>方程式の利用 手順</b></p>'+
+        '<ol class="steps">'+
+          '<li>何を x とおくかを決める</li>'+
+          '<li>ほかの数量を x を使って表す</li>'+
+          '<li>同じ量を2通りに表して ＝ で結ぶ</li>'+
+          '<li>方程式を解く</li>'+
+          '<li>その解が問題に適しているか確かめる</li>'+
+        '</ol>'+
+        '<div class="nav" style="justify-content:center"><button class="btn ghost" id="again">もう一度</button></div>'+
+      '</div></section>';
+    document.getElementById("again").addEventListener("click",function(){ location.reload(); });
+    paintBar();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -12,7 +12,9 @@ import { allGrammar, allWords } from "./ref-data";
 import { posPillClass } from "./pos-pill";
 
 type SanseidoEntry = { w: string; u: string };
-type ResultFilter = "all" | "vocabulary" | "academic" | "junior-high" | "grammar";
+/* Course-origin lenses, matching the universal scope bar's course set,
+   plus one type lens (Grammar) since grammar isn't itself a course. */
+type ResultFilter = "all" | "our-world" | "joyful-work" | "junior-high" | "grammar";
 
 type ResultWord = { kind: "word"; entry: WordEntry; score: number };
 type ResultJh = { kind: "junior-high"; word: string; url: string; score: number };
@@ -21,11 +23,21 @@ type SearchResult = ResultWord | ResultJh | ResultGrammar;
 
 const FILTERS: Array<{ key: ResultFilter; label: string; dotColor?: string }> = [
   { key: "all", label: "All" },
-  { key: "vocabulary", label: "Vocabulary" },
-  { key: "academic", label: "Academic" },
-  { key: "junior-high", label: "Junior High" },
+  { key: "our-world", label: "Our World", dotColor: "var(--ref-course-ow)" },
+  { key: "joyful-work", label: "Joyful Work", dotColor: "var(--ref-course-jw)" },
+  { key: "junior-high", label: "Junior High", dotColor: "var(--ref-course-jh)" },
   { key: "grammar", label: "Grammar", dotColor: "var(--ref-accent)" }
 ];
+
+function resultMatchesFilter(result: SearchResult, filter: ResultFilter): boolean {
+  if (filter === "all") return true;
+  if (filter === "grammar") return result.kind === "grammar";
+  if (filter === "junior-high") {
+    if (result.kind === "junior-high") return true;
+    return result.kind === "word" && result.entry.sources.some((source) => source.course === "junior-high");
+  }
+  return result.kind === "word" && result.entry.sources.some((source) => source.course === filter);
+}
 
 const SANSEIDO_LIMIT_PER_QUERY = 20;
 
@@ -90,15 +102,10 @@ export function ReferenceSearch() {
   }, [trimmed, sanseidoItems]);
 
   const counts = useMemo(() => {
-    const totals: Record<ResultFilter, number> = { all: results.length, vocabulary: 0, academic: 0, "junior-high": 0, grammar: 0 };
+    const totals: Record<ResultFilter, number> = { all: results.length, "our-world": 0, "joyful-work": 0, "junior-high": 0, grammar: 0 };
     for (const result of results) {
-      if (result.kind === "word") {
-        if (result.entry.type === "academic") totals.academic++;
-        else totals.vocabulary++;
-      } else if (result.kind === "junior-high") {
-        totals["junior-high"]++;
-      } else {
-        totals.grammar++;
+      for (const key of ["our-world", "joyful-work", "junior-high", "grammar"] as const) {
+        if (resultMatchesFilter(result, key)) totals[key]++;
       }
     }
     return totals;
@@ -106,12 +113,7 @@ export function ReferenceSearch() {
 
   const filteredResults = useMemo(() => {
     if (filter === "all") return results;
-    return results.filter((result) => {
-      if (filter === "vocabulary") return result.kind === "word" && result.entry.type !== "academic";
-      if (filter === "academic") return result.kind === "word" && result.entry.type === "academic";
-      if (filter === "junior-high") return result.kind === "junior-high";
-      return result.kind === "grammar";
-    });
+    return results.filter((result) => resultMatchesFilter(result, filter));
   }, [filter, results]);
 
   const bestMatches = filteredResults.filter((result) => result.score >= 60);

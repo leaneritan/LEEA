@@ -83,7 +83,7 @@ export function GrammarCard({ entry }: { entry: GrammarEntry }) {
       <section className="gcardv2-header">
         <div className="gcardv2-header-text">
           <div className="gcardv2-header-tags">
-            <span className="gcardv2-cat-pill">Sentence structure</span>
+            <span className="gcardv2-cat-pill">{entry.topic}</span>
             <span className="gcardv2-code-pill">{entry.tag}</span>
           </div>
           <h1 className="gcardv2-title">{entry.title}</h1>

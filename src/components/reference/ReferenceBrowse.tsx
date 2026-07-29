@@ -5,32 +5,203 @@ import { ChevronDown, ChevronRight, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useJapanesePreference } from "@/components/AppShell";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
+import { currentFocus } from "@/data/registry";
+import { LEVEL_COLORS, LEVEL_TINTS, OUR_WORLD_LEVELS, OUR_WORLD_TOTAL_UNITS, OUR_WORLD_UNIT_TOTALS } from "@/data/reference-units";
 import type { GrammarEntry, WordEntry } from "@/data/reference-shapes";
-import { allGrammar, allWords, groupByCourse, sourceTree, splitKnown } from "./ref-data";
+import { allGrammar, allWords, groupByCourse, groupByLevel, sourceTree, type TreeLevel, type TreeUnit } from "./ref-data";
 import { posPillClass } from "./pos-pill";
 
-type TabKey = "browse" | "vocabulary" | "grammar" | "know" | "dontknow";
+type TabKey = "browse" | "vocabulary" | "grammar";
+type ScopeCourse = "all" | "our-world" | "joyful-work" | "junior-high" | "training-ground";
+type ScopeLevel = "all" | number;
+
+const COURSES: Array<{ key: ScopeCourse; label: string }> = [
+  { key: "all", label: "All courses" },
+  { key: "our-world", label: "Our World" },
+  { key: "joyful-work", label: "Joyful Work" },
+  { key: "junior-high", label: "Junior High" },
+  { key: "training-ground", label: "Training Ground" }
+];
+
+const POS_LABELS: Record<string, string> = {
+  verb: "verb",
+  noun: "noun",
+  adjective: "adjective",
+  adverb: "adverb",
+  "adj/adv": "adj/adv",
+  phrase: "phrase",
+  other: "other"
+};
+
+function courseColor(course: ScopeCourse | "our-world" | "joyful-work" | "junior-high") {
+  if (course === "joyful-work") return "var(--ref-course-jw)";
+  if (course === "junior-high") return "var(--ref-course-jh)";
+  if (course === "training-ground") return "var(--ref-course-tg)";
+  return "var(--ref-course-ow)";
+}
+
+function courseLabel(course: ScopeCourse | "our-world" | "joyful-work" | "junior-high") {
+  const found = COURSES.find((c) => c.key === course);
+  return found?.label ?? "Our World";
+}
+
+/* Every word/grammar's inclusion in scope is derived from this single
+   predicate — Browse, Vocabulary and Grammar all call the same function so
+   they can never disagree about what "in scope" means. */
+function wordInScope(word: WordEntry, course: ScopeCourse, level: ScopeLevel): boolean {
+  if (course === "all") return true;
+  if (course === "training-ground") return false;
+  return word.sources.some((source) => source.course === course && (level === "all" || source.level === level));
+}
+
+function grammarInScope(grammar: GrammarEntry, course: ScopeCourse, level: ScopeLevel): boolean {
+  if (course === "all") return true;
+  if (course === "training-ground") return false;
+  return grammar.course === course && (level === "all" || grammar.level === level);
+}
+
+/* A word can carry sources from several units/levels/courses (one card,
+   many sources). Rows must show the source that actually put the word in
+   the CURRENT scope, not just sources[0] — otherwise a Level 4 row could
+   show an OW2-U9 tag, contradicting the scope bar above it. */
+function pickScopedSource(word: WordEntry, course: ScopeCourse, level: ScopeLevel) {
+  if (course !== "all" && course !== "training-ground") {
+    const match = word.sources.find((source) => source.course === course && (level === "all" || source.level === level));
+    if (match) return match;
+  }
+  return word.sources[0];
+}
+
+const owCourseTree = sourceTree.find((c) => c.course === "our-world");
+function importedUnitsForLevel(level: number) {
+  return owCourseTree?.levels.find((l) => l.level === level)?.units.length ?? 0;
+}
+const owImportedTotal = OUR_WORLD_LEVELS.reduce((sum, level) => sum + importedUnitsForLevel(level), 0);
+
+function courseMeta(key: ScopeCourse): string {
+  if (key === "all") return `${allWords.length} words · ${allGrammar.length} grammar`;
+  if (key === "our-world") {
+    return `${OUR_WORLD_LEVELS.length} levels · ${owImportedTotal} of ${OUR_WORLD_TOTAL_UNITS} units imported`;
+  }
+  const wordCount = allWords.filter((word) => word.sources.some((source) => source.course === key)).length;
+  const grammarCount = allGrammar.filter((grammar) => grammar.course === key).length;
+  const total = wordCount + grammarCount;
+  return total ? `${total} imported` : "not imported yet";
+}
 
 export function ReferenceBrowse() {
   const [tab, setTab] = useState<TabKey>("browse");
+  const [course, setCourse] = useState<ScopeCourse>("our-world");
+  const [level, setLevel] = useState<ScopeLevel>(currentFocus.level);
+  const [scopeOpen, setScopeOpen] = useState(true);
+
   const { knownWordSet } = useKnownWordIds();
   const jp = useJapanesePreference();
-  const { known, unknown } = useMemo(() => splitKnown(allWords, knownWordSet), [knownWordSet]);
 
-  const tabs: Array<{ key: TabKey; label: string; badge?: number; badgeKind?: "known" | "review" }> = [
+  const hasLevels = course === "our-world";
+  const scopeLabel = hasLevels ? `${courseLabel(course)} · ${level === "all" ? "all levels" : `Level ${level}`}` : courseLabel(course);
+  const scopeColor = hasLevels && level !== "all" ? LEVEL_COLORS[level as number] : "var(--ref-body)";
+  const scopeKey = `${course}-${level}`;
+
+  const scopedWords = useMemo(() => allWords.filter((word) => wordInScope(word, course, level)), [course, level]);
+  const scopedGrammar = useMemo(() => allGrammar.filter((grammar) => grammarInScope(grammar, course, level)), [course, level]);
+  const scopedReviewCount = scopedWords.filter((word) => !knownWordSet.has(word.id)).length;
+
+  function pickCourse(next: ScopeCourse) {
+    setCourse(next);
+    if (next !== "our-world") setLevel("all");
+  }
+
+  const tabs: Array<{ key: TabKey; label: string; badge?: number }> = [
     { key: "browse", label: "Browse" },
-    { key: "vocabulary", label: "Vocabulary" },
-    { key: "grammar", label: "Grammar" },
-    { key: "know", label: "I Know", badge: known.length, badgeKind: "known" },
-    { key: "dontknow", label: "I Don't Know", badge: unknown.length, badgeKind: "review" }
+    { key: "vocabulary", label: "Vocabulary", badge: scopedReviewCount > 0 ? scopedReviewCount : undefined },
+    { key: "grammar", label: "Grammar" }
   ];
   const tabLabel = tabs.find((item) => item.key === tab)?.label ?? "Browse";
+
+  const levelEntries = hasLevels
+    ? [
+        {
+          key: "all" as ScopeLevel,
+          label: "All levels",
+          color: "var(--ref-muted-2)",
+          tint: "var(--ref-nav-hover)",
+          isActiveLevel: false,
+          meta: `${owImportedTotal} of ${OUR_WORLD_TOTAL_UNITS} units imported`
+        },
+        ...OUR_WORLD_LEVELS.map((lvl) => {
+          const imported = importedUnitsForLevel(lvl);
+          return {
+            key: lvl as ScopeLevel,
+            label: `Level ${lvl}`,
+            color: LEVEL_COLORS[lvl],
+            tint: LEVEL_TINTS[lvl],
+            isActiveLevel: lvl === currentFocus.level,
+            meta: imported > 0 ? `${imported} of ${OUR_WORLD_UNIT_TOTALS[lvl]} units imported` : `${OUR_WORLD_UNIT_TOTALS[lvl]} units · not imported`
+          };
+        })
+      ]
+    : [];
 
   return (
     <div className="refv2-shell ref-browse-design">
       <div className="refv2-head">
         <div className="refv2-eyebrow">Reference Library</div>
         <h1 className="refv2-h1">{tabLabel}</h1>
+      </div>
+
+      <div className="refv2-scope">
+        <div className="refv2-scope-row1">
+          <span className="refv2-scope-showing">Showing</span>
+          <span className="refv2-scope-label" style={{ color: scopeColor }}>
+            {scopeLabel}
+          </span>
+          <button type="button" className="refv2-scope-toggle" onClick={() => setScopeOpen((value) => !value)}>
+            {scopeOpen ? "Hide ▴" : "Change ▾"}
+          </button>
+        </div>
+
+        {scopeOpen ? (
+          <>
+            <div className="refv2-scope-courses">
+              {COURSES.map((c) => (
+                <button
+                  key={c.key}
+                  type="button"
+                  className={`refv2-course-pill${course === c.key ? " is-active" : ""}`}
+                  onClick={() => pickCourse(c.key)}
+                >
+                  <span className={`refv2-course-mark refv2-course-mark--sm refv2-course-mark--${c.key}`} aria-hidden>
+                    <span className="refv2-course-mark-inner" />
+                  </span>
+                  {c.label}
+                  <span className="refv2-course-pill-meta">{courseMeta(c.key)}</span>
+                </button>
+              ))}
+            </div>
+
+            {hasLevels ? (
+              <div className="refv2-scope-levels">
+                {levelEntries.map((entry) => (
+                  <button
+                    key={String(entry.key)}
+                    type="button"
+                    className={`refv2-level-btn${level === entry.key ? " is-active" : ""}`}
+                    style={level === entry.key ? { background: entry.tint, borderColor: entry.color, color: entry.color } : undefined}
+                    onClick={() => setLevel(entry.key)}
+                  >
+                    <span className="refv2-level-btn-top">
+                      <span className="refv2-level-btn-dot" style={{ background: entry.color }} />
+                      <span className="refv2-level-btn-label">{entry.label}</span>
+                      {entry.isActiveLevel ? <span className="refv2-pill refv2-pill--active">Active</span> : null}
+                    </span>
+                    <span className="refv2-level-btn-meta">{entry.meta}</span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </>
+        ) : null}
       </div>
 
       <div className="refv2-tabbar ref-browse-tabs" role="tablist">
@@ -44,53 +215,100 @@ export function ReferenceBrowse() {
             onClick={() => setTab(item.key)}
           >
             <span>{item.label}</span>
-            {item.badge != null ? <span className={`refv2-tab-badge refv2-tab-badge--${item.badgeKind}`}>{item.badge}</span> : null}
+            {item.badge != null ? <span className="refv2-tab-badge refv2-tab-badge--review">{item.badge}</span> : null}
           </button>
         ))}
       </div>
 
-      {tab === "browse" ? <SourceTreePane /> : null}
-      {tab === "vocabulary" ? <VocabularyPane words={allWords} knownSet={knownWordSet} jp={jp} /> : null}
-      {tab === "grammar" ? <GrammarPane /> : null}
-      {tab === "know" ? <KnownPane words={known} jp={jp} cut="known" /> : null}
-      {tab === "dontknow" ? <KnownPane words={unknown} jp={jp} cut="review" /> : null}
+      {tab === "browse" ? <SourceTreePane key={scopeKey} course={course} level={level} /> : null}
+      {tab === "vocabulary" ? (
+        <VocabularyPane key={scopeKey} words={scopedWords} knownSet={knownWordSet} jp={jp} course={course} level={level} scopeLabel={scopeLabel} />
+      ) : null}
+      {tab === "grammar" ? <GrammarPane key={scopeKey} grammar={scopedGrammar} scopeLabel={scopeLabel} /> : null}
     </div>
   );
 }
 
-function SourceTreePane() {
+/* ============ BROWSE (unit tree, scoped) ============ */
+
+function SourceTreePane({ course, level }: { course: ScopeCourse; level: ScopeLevel }) {
+  if (course === "joyful-work" || course === "junior-high" || course === "training-ground") {
+    return (
+      <div className="refv2-fbar-empty-card">
+        <div className="refv2-fbar-empty-title">{courseLabel(course)} isn&rsquo;t browsable yet</div>
+        <div className="refv2-fbar-empty-note">Its unit tree hasn&rsquo;t been imported into Reference. Try Search instead.</div>
+      </div>
+    );
+  }
+
+  const showAllLevels = course === "all" || level === "all";
+  const levelsToShow = showAllLevels ? OUR_WORLD_LEVELS : [level as number];
+  const unitsHeading = showAllLevels ? "All units" : `Level ${level} units`;
+  const totalUnitsShown = levelsToShow.reduce((sum, l) => sum + OUR_WORLD_UNIT_TOTALS[l], 0);
+  const importedUnitsShown = levelsToShow.reduce((sum, l) => sum + importedUnitsForLevel(l), 0);
+  const unitsMeta = `${importedUnitsShown} of ${totalUnitsShown} units imported`;
+
+  const treeLevels = owCourseTree?.levels ?? [];
+
   return (
     <div className="refv2-card ref-browse-card">
-      {sourceTree.map((course) => <CourseNode key={course.course} course={course} />)}
-      <div className="refv2-tree-divider" />
-      <CoursePlaceholderRow course="joyful-work" label="Joyful Work" hint="3 years · planned" />
-      <CoursePlaceholderRow course="junior-high" label="Training Ground" hint="drills · by topic" />
+      <div className="refv2-units-head">
+        <span className="refv2-units-heading">{unitsHeading}</span>
+        <span className="refv2-tree-meta">{unitsMeta}</span>
+      </div>
+      <div className="refv2-tree-children refv2-tree-children--root">
+        {levelsToShow.map((lvl) => {
+          const levelData = treeLevels.find((l) => l.level === lvl);
+          return (
+            <div key={lvl}>
+              {showAllLevels ? (
+                <div className="refv2-level-header-row">
+                  <span className="refv2-level-dot" data-level={lvl} aria-hidden />
+                  <span className="refv2-level-header-label" style={{ color: LEVEL_COLORS[lvl] }}>
+                    LEVEL {lvl}
+                  </span>
+                  <span className="refv2-tree-meta">
+                    {importedUnitsForLevel(lvl) > 0
+                      ? `${importedUnitsForLevel(lvl)} of ${OUR_WORLD_UNIT_TOTALS[lvl]} units imported`
+                      : `${OUR_WORLD_UNIT_TOTALS[lvl]} units · not imported`}
+                  </span>
+                </div>
+              ) : null}
+              {getDisplayUnits(lvl, levelData).map((unit) =>
+                unit.real ? (
+                  <UnitNode key={unit.unit} level={lvl} unit={unit.real} />
+                ) : (
+                  <UnitPlaceholder key={unit.unit} unit={unit.unit} title={unit.title} />
+                )
+              )}
+              {lvl === 4 ? <CheckpointPlaceholder /> : null}
+            </div>
+          );
+        })}
+      </div>
+      {course === "all" ? (
+        <>
+          <div className="refv2-tree-divider" />
+          <CoursePlaceholderRow course="joyful-work" label="Joyful Work" hint={courseMeta("joyful-work")} />
+          <CoursePlaceholderRow course="junior-high" label="Junior High" hint={courseMeta("junior-high")} />
+          <CoursePlaceholderRow course="training-ground" label="Training Ground" hint={courseMeta("training-ground")} />
+        </>
+      ) : null}
     </div>
   );
 }
 
-function CourseNode({ course }: { course: (typeof sourceTree)[number] }) {
-  const [open, setOpen] = useState(true);
-  const totalWords = course.levels.reduce(
-    (sum, level) => sum + level.units.reduce((unitSum, unit) => unitSum + unit.vocabGroups.reduce((groupSum, group) => groupSum + group.words.length, 0), 0),
-    0
-  );
-
-  return (
-    <>
-      <button type="button" className="refv2-tree-row refv2-tree-course" onClick={() => setOpen((value) => !value)}>
-        {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-        <span className="refv2-course-mark refv2-course-mark--ow" aria-hidden><span className="refv2-course-mark-inner" /></span>
-        <span className="refv2-tree-label">{course.label}</span>
-        <span className="refv2-tree-meta">{course.levels.length} levels · {totalWords.toLocaleString()} words</span>
-      </button>
-      {open ? (
-        <div className="refv2-tree-children">
-          {course.levels.map((level) => <LevelNode key={level.level} level={level} />)}
-        </div>
-      ) : null}
-    </>
-  );
+/* Every Our World level has 9 units (level 1 has 8) — see reference-units.ts.
+   Show the full run for every level: scanned units render as real
+   UnitNodes, unscanned ones show as "planned" placeholders. */
+function getDisplayUnits(level: number, levelData: TreeLevel | undefined) {
+  const unitCount = OUR_WORLD_UNIT_TOTALS[level] ?? 9;
+  const byUnit = new Map((levelData?.units ?? []).map((unit) => [unit.unit, unit]));
+  return Array.from({ length: unitCount }, (_, index) => {
+    const unitNumber = index + 1;
+    const real = byUnit.get(unitNumber);
+    return { unit: unitNumber, title: real?.unitTitle ?? `Unit ${unitNumber}`, real };
+  });
 }
 
 /* Units that have a built Unit Reference page. Add an entry here once
@@ -125,42 +343,7 @@ const GROUP_ANCHOR: Record<string, string> = {
   Glossary: "glossary"
 };
 
-function LevelNode({ level }: { level: (typeof sourceTree)[number]["levels"][number] }) {
-  const [open, setOpen] = useState(level.active);
-  return (
-    <>
-      <button type="button" className={`refv2-tree-row refv2-tree-level${level.active ? " is-active" : ""}`} onClick={() => setOpen((value) => !value)}>
-        {open ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-        <span className="refv2-level-dot" data-level={level.level} aria-hidden />
-        <span className="refv2-tree-label">Level {level.level}</span>
-        {level.active ? <span className="refv2-pill refv2-pill--active">Active</span> : null}
-        <span className="refv2-tree-meta">{level.level === 1 ? "8 units" : "9 units"}</span>
-      </button>
-      {open ? (
-        <div className="refv2-tree-children">
-          {getDisplayUnits(level).map((unit) => unit.real ? <UnitNode key={unit.unit} level={level.level} unit={unit.real} /> : <UnitPlaceholder key={unit.unit} unit={unit.unit} title={unit.title} />)}
-          {level.level === 4 ? <CheckpointPlaceholder /> : null}
-        </div>
-      ) : null}
-    </>
-  );
-}
-
-/* Every Our World level has 9 units (level 1 has 8). Show the full run for
-   every level — scanned units render as real UnitNodes, unscanned ones show
-   as "planned" placeholders — so the tree looks the same shape whether a
-   level has 1 unit scanned or all 9. */
-function getDisplayUnits(level: (typeof sourceTree)[number]["levels"][number]) {
-  const unitCount = level.level === 1 ? 8 : 9;
-  const byUnit = new Map(level.units.map((unit) => [unit.unit, unit]));
-  return Array.from({ length: unitCount }, (_, index) => {
-    const unitNumber = index + 1;
-    const real = byUnit.get(unitNumber);
-    return { unit: unitNumber, title: real?.unitTitle ?? `Unit ${unitNumber}`, real };
-  });
-}
-
-function UnitNode({ level, unit }: { level: number; unit: (typeof sourceTree)[number]["levels"][number]["units"][number] }) {
+function UnitNode({ level, unit }: { level: number; unit: TreeUnit }) {
   const [open, setOpen] = useState(false);
   const totalWords = unit.vocabGroups.reduce((sum, group) => sum + group.words.length, 0);
   const unitHref = UNIT_REFERENCE_PAGES[`${level}-${unit.unit}`];
@@ -232,7 +415,7 @@ function UnitPlaceholder({ unit, title }: { unit: number; title: string }) {
       <ChevronRight size={12} />
       <span className="refv2-tree-unit-name">Unit {unit}</span>
       <span className="refv2-tree-unit-title">· {title}</span>
-      <span className="refv2-tree-meta">planned</span>
+      <span className="refv2-tree-meta">not imported yet</span>
     </div>
   );
 }
@@ -243,12 +426,12 @@ function CheckpointPlaceholder() {
       <ChevronRight size={12} />
       <span className="refv2-pill refv2-pill--checkpoint">Checkpoint</span>
       <span className="refv2-tree-unit-name">Units 7–9</span>
-      <span className="refv2-tree-unit-title">· Review & Extra Reading</span>
+      <span className="refv2-tree-unit-title">· Review &amp; Extra Reading</span>
     </div>
   );
 }
 
-function CoursePlaceholderRow({ course, label, hint }: { course: "joyful-work" | "junior-high"; label: string; hint: string }) {
+function CoursePlaceholderRow({ course, label, hint }: { course: "joyful-work" | "junior-high" | "training-ground"; label: string; hint: string }) {
   return (
     <div className={`refv2-tree-row refv2-tree-course is-placeholder refv2-course-${course}`}>
       <ChevronRight size={14} />
@@ -259,91 +442,131 @@ function CoursePlaceholderRow({ course, label, hint }: { course: "joyful-work" |
   );
 }
 
-type CourseKey = "our-world" | "joyful-work" | "junior-high";
+/* ============ VOCABULARY (All / Known / To review) ============ */
+
+type VStatus = "all" | "known" | "review";
 type VocabSort = "unit" | "az";
 
-function VocabularyPane({ words, knownSet, jp }: { words: WordEntry[]; knownSet: Set<string>; jp: boolean }) {
+function VocabularyPane({
+  words,
+  knownSet,
+  jp,
+  course,
+  level,
+  scopeLabel
+}: {
+  words: WordEntry[];
+  knownSet: Set<string>;
+  jp: boolean;
+  course: ScopeCourse;
+  level: ScopeLevel;
+  scopeLabel: string;
+}) {
+  const [status, setStatus] = useState<VStatus>("all");
   const [query, setQuery] = useState("");
-  const [course, setCourse] = useState<"all" | CourseKey>("all");
+  const [posType, setPosType] = useState<string>("all");
   const [sort, setSort] = useState<VocabSort>("unit");
 
-  const coursesPresent = useMemo(() => {
-    const set = new Set<CourseKey>();
-    for (const word of words) for (const source of word.sources) set.add(source.course);
+  const known = useMemo(() => words.filter((word) => knownSet.has(word.id)), [words, knownSet]);
+  const review = useMemo(() => words.filter((word) => !knownSet.has(word.id)), [words, knownSet]);
+
+  const posPresent = useMemo(() => {
+    const set = new Set<string>();
+    for (const word of words) set.add(word.pos);
     return Array.from(set);
   }, [words]);
 
   const q = query.trim().toLowerCase();
   const filtered = useMemo(() => {
     const list = words.filter((word) => {
-      const matchesCourse = course === "all" || word.sources.some((source) => source.course === course);
+      const matchesType = posType === "all" || word.pos === posType;
       const matchesQuery = !q || word.word.toLowerCase().includes(q) || word.definition.toLowerCase().includes(q);
-      return matchesCourse && matchesQuery;
+      return matchesType && matchesQuery;
     });
     if (sort === "az") return [...list].sort((a, b) => a.word.localeCompare(b.word));
     return list;
-  }, [words, course, q, sort]);
+  }, [words, posType, q, sort]);
 
   function clearFilters() {
-    setCourse("all");
+    setPosType("all");
     setQuery("");
   }
 
   return (
     <div className="refv2-pane-stack">
-      <div className="refv2-fbar">
-        <div className="refv2-fbar-field">
-          <Search size={14} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter words…" />
-        </div>
-        <div className="refv2-fbar-chips">
-          <button type="button" className={`refv2-filter${course === "all" ? " is-active" : ""}`} onClick={() => setCourse("all")}>
-            <span>All courses</span>
-          </button>
-          {coursesPresent.map((c) => (
-            <button key={c} type="button" className={`refv2-filter${course === c ? " is-active" : ""}`} onClick={() => setCourse(c)}>
-              <span className="refv2-filter-dot" style={{ background: courseColor(c) }} />
-              <span>{courseLabel(c)}</span>
-            </button>
-          ))}
-          <button
-            type="button"
-            className={`refv2-fbar-sort${sort === "az" ? " is-active" : ""}`}
-            onClick={() => setSort((current) => (current === "az" ? "unit" : "az"))}
-          >
-            A–Z
-          </button>
-        </div>
-        <span className="refv2-fbar-count">
-          Showing {filtered.length} of {words.length} words
-        </span>
+      <div className="refv2-vstatus" role="tablist" aria-label="Word status">
+        <button type="button" className={`refv2-vstatus-btn${status === "all" ? " is-active" : ""}`} onClick={() => setStatus("all")}>
+          All <span className="refv2-vstatus-count">{words.length}</span>
+        </button>
+        <button type="button" className={`refv2-vstatus-btn${status === "known" ? " is-active" : ""}`} onClick={() => setStatus("known")}>
+          <span className="refv2-vstatus-dot refv2-vstatus-dot--known" />
+          Known <span className="refv2-vstatus-count">{known.length}</span>
+        </button>
+        <button type="button" className={`refv2-vstatus-btn${status === "review" ? " is-active" : ""}`} onClick={() => setStatus("review")}>
+          <span className="refv2-vstatus-dot refv2-vstatus-dot--review" />
+          To review <span className="refv2-vstatus-count">{review.length}</span>
+        </button>
       </div>
 
-      <div className="refv2-card refv2-vocab-card">
-        <div className="refv2-vocab-head">
-          <span />
-          <span className="refv2-th">Word</span>
-          <span className="refv2-th">Meaning</span>
-          <span className="refv2-th">Source</span>
-        </div>
-        {filtered.map((word) => <VocabularyRow key={word.id} word={word} knownSet={knownSet} jp={jp} />)}
-        {filtered.length === 0 ? (
-          <div className="refv2-fbar-empty-row">
-            No words match —{" "}
-            <button type="button" className="refv2-fbar-empty-action" onClick={clearFilters}>
-              clear filters
-            </button>
+      {status === "all" ? (
+        <>
+          <div className="refv2-fbar">
+            <div className="refv2-fbar-field">
+              <Search size={14} />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter words…" />
+            </div>
+            <div className="refv2-fbar-chips">
+              <button type="button" className={`refv2-filter${posType === "all" ? " is-active" : ""}`} onClick={() => setPosType("all")}>
+                <span>All types</span>
+              </button>
+              {posPresent.map((pos) => (
+                <button key={pos} type="button" className={`refv2-filter${posType === pos ? " is-active" : ""}`} onClick={() => setPosType(pos)}>
+                  <span>{POS_LABELS[pos] ?? pos}</span>
+                </button>
+              ))}
+              <button
+                type="button"
+                className={`refv2-fbar-sort${sort === "az" ? " is-active" : ""}`}
+                onClick={() => setSort((current) => (current === "az" ? "unit" : "az"))}
+              >
+                A–Z
+              </button>
+            </div>
+            <span className="refv2-fbar-count">
+              Showing {filtered.length} of {words.length} words in {scopeLabel}
+            </span>
           </div>
-        ) : null}
-      </div>
+
+          <div className="refv2-card refv2-vocab-card">
+            <div className="refv2-vocab-head">
+              <span />
+              <span className="refv2-th">Word</span>
+              <span className="refv2-th">Meaning</span>
+              <span className="refv2-th">Source</span>
+            </div>
+            {filtered.map((word) => <VocabularyRow key={word.id} word={word} knownSet={knownSet} jp={jp} course={course} level={level} />)}
+            {filtered.length === 0 ? (
+              <div className="refv2-fbar-empty-row">
+                No words match —{" "}
+                <button type="button" className="refv2-fbar-empty-action" onClick={clearFilters}>
+                  clear filters
+                </button>
+              </div>
+            ) : null}
+          </div>
+        </>
+      ) : null}
+
+      {status === "known" ? <KnownVocabPane words={known} jp={jp} course={course} level={level} scopeLabel={scopeLabel} /> : null}
+      {status === "review" ? <ReviewVocabPane words={review} jp={jp} course={course} level={level} scopeLabel={scopeLabel} /> : null}
     </div>
   );
 }
 
-function VocabularyRow({ word, knownSet, jp }: { word: WordEntry; knownSet: Set<string>; jp: boolean }) {
+function VocabularyRow({ word, knownSet, jp, course, level }: { word: WordEntry; knownSet: Set<string>; jp: boolean; course: ScopeCourse; level: ScopeLevel }) {
   const isKnown = knownSet.has(word.id);
   const route = word.type === "academic" ? `/reference/academic/${word.id}` : `/reference/word/${word.id}`;
-  const primary = word.sources[0];
+  const primary = pickScopedSource(word, course, level);
   return (
     <Link className="refv2-vocab-row" href={route}>
       <span className={`refv2-known-dot${isKnown ? " is-known" : ""}`} />
@@ -354,21 +577,173 @@ function VocabularyRow({ word, knownSet, jp }: { word: WordEntry; knownSet: Set<
   );
 }
 
-function GrammarPane() {
+function KnownVocabPane({ words, jp, course, level, scopeLabel }: { words: WordEntry[]; jp: boolean; course: ScopeCourse; level: ScopeLevel; scopeLabel: string }) {
+  const groups = course === "our-world" && level === "all" ? groupByLevel(words) : course === "all" ? groupByCourse(words) : words.length ? [{ key: "scope", label: null as string | null, color: null as string | null, words }] : [];
+
+  return (
+    <div>
+      <div className="refv2-know-banner">
+        <div>
+          <div className="refv2-know-headline">{words.length} words mastered</div>
+          <div className="refv2-know-note">In {scopeLabel}. Quiz yourself now and then so they stay sharp.</div>
+        </div>
+        <button type="button" className="refv2-know-quiz-btn">
+          Quiz me →
+        </button>
+      </div>
+
+      {groups.length ? (
+        <div className="refv2-cut-groups">
+          {groups.map((group) => (
+            <section key={group.key}>
+              {group.label ? (
+                <div className="refv2-cut-group-head">
+                  <span className="refv2-course-dot" style={{ background: group.color ?? "var(--ref-muted)" }} />
+                  <strong>{group.label}</strong>
+                  <span className="refv2-cut-group-count">{group.words.length}</span>
+                </div>
+              ) : null}
+              <div className="refv2-chips">
+                {group.words.map((word) => (
+                  <Link className="refv2-chip" href={word.type === "academic" ? `/reference/academic/${word.id}` : `/reference/word/${word.id}`} key={word.id}>
+                    <span className="refv2-chip-word">{word.word}</span>
+                    {jp && word.jp.gloss ? <span className="refv2-chip-jp">{word.jp.gloss}</span> : null}
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      ) : (
+        <div className="refv2-fbar-empty-card">
+          <div className="refv2-fbar-empty-title">No mastered words in {scopeLabel} yet.</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+type ReviewFilter = "all" | "flagged" | "untested";
+
+function ReviewVocabPane({
+  words,
+  jp,
+  course,
+  level,
+  scopeLabel
+}: {
+  words: WordEntry[];
+  jp: boolean;
+  course: ScopeCourse;
+  level: ScopeLevel;
+  scopeLabel: string;
+}) {
+  const { confidenceRecords, setWordKnown } = useKnownWordIds();
+  const [quick, setQuick] = useState<ReviewFilter>("all");
+
+  const flagged = words.filter((word) => confidenceRecords[word.id]);
+  const untested = words.filter((word) => !confidenceRecords[word.id]);
+  const shown = quick === "flagged" ? flagged : quick === "untested" ? untested : words;
+
+  return (
+    <div>
+      <div className="refv2-review-banner">
+        <div>
+          <div className="refv2-review-eyebrow">To review</div>
+          <div className="refv2-review-headline">{words.length} words to review</div>
+          <div className="refv2-review-note">In {scopeLabel} — a 5-minute session keeps them from slipping away.</div>
+        </div>
+        <button type="button" className="refv2-review-start-btn">
+          Start review →
+        </button>
+      </div>
+
+      <div className="refv2-review-chips">
+        <button type="button" className={`refv2-review-chip${quick === "all" ? " is-active" : ""}`} onClick={() => setQuick("all")}>
+          All {words.length}
+        </button>
+        <button type="button" className={`refv2-review-chip refv2-review-chip--outline${quick === "flagged" ? " is-active" : ""}`} onClick={() => setQuick("flagged")}>
+          Marked to review {flagged.length}
+        </button>
+        <button type="button" className={`refv2-review-chip refv2-review-chip--outline${quick === "untested" ? " is-active" : ""}`} onClick={() => setQuick("untested")}>
+          Never tested {untested.length}
+        </button>
+      </div>
+
+      {shown.length ? (
+        <div className="refv2-review-cards">
+          {shown.map((word) => (
+            <ReviewCard
+              key={word.id}
+              word={word}
+              jp={jp}
+              course={course}
+              level={level}
+              hasRecord={Boolean(confidenceRecords[word.id])}
+              onKnow={() => setWordKnown(word.id, true)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="refv2-fbar-empty-card">
+          <div className="refv2-fbar-empty-title">Nothing to review in {scopeLabel} — nice work.</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReviewCard({
+  word,
+  jp,
+  course,
+  level,
+  hasRecord,
+  onKnow
+}: {
+  word: WordEntry;
+  jp: boolean;
+  course: ScopeCourse;
+  level: ScopeLevel;
+  hasRecord: boolean;
+  onKnow: () => void;
+}) {
+  const primary = pickScopedSource(word, course, level);
+  return (
+    <article className="refv2-review-card">
+      <div className="refv2-review-card-body">
+        <div className="refv2-review-card-head">
+          <h3 className="refv2-review-card-word">{word.word}</h3>
+          <span className={`refv2-pos-pill ${posPillClass(word.pos)}`}>{POS_LABELS[word.pos] ?? word.pos}</span>
+          <span className="refv2-source-chip refv2-source-chip--flat">
+            <span className="refv2-course-dot" style={{ background: courseColor(primary?.course ?? "our-world") }} />
+            {courseLabel(primary?.course ?? "our-world")}
+          </span>
+        </div>
+        <p className="refv2-review-card-meaning">{word.definition}</p>
+        {jp && word.jp.gloss ? <p className="refv2-review-card-jp" lang="ja">{word.jp.gloss}</p> : null}
+      </div>
+      <div className="refv2-review-card-aside">
+        <span className="refv2-review-card-note">{hasRecord ? "Marked to review" : "Never tested"}</span>
+        <button type="button" className="refv2-review-know-btn" onClick={onKnow}>
+          ✓ I know it
+        </button>
+      </div>
+    </article>
+  );
+}
+
+/* ============ GRAMMAR (rule cards, scoped) ============ */
+
+function GrammarPane({ grammar, scopeLabel }: { grammar: GrammarEntry[]; scopeLabel: string }) {
   const [query, setQuery] = useState("");
-  const [level, setLevel] = useState<number | "all">("all");
   const [topic, setTopic] = useState<string>("all");
 
-  const levelsPresent = useMemo(
-    () => Array.from(new Set(allGrammar.map((g) => g.level))).sort((a, b) => a - b),
-    []
-  );
-  const topicsPresent = useMemo(() => Array.from(new Set(allGrammar.map((g) => g.topic))), []);
+  const topicsPresent = useMemo(() => Array.from(new Set(grammar.map((g) => g.topic))), [grammar]);
 
   const q = query.trim().toLowerCase();
   const filtered = useMemo(() => {
-    return allGrammar.filter((g) => {
-      const matchesLevel = level === "all" || g.level === level;
+    return grammar.filter((g) => {
       const matchesTopic = topic === "all" || g.topic === topic;
       const matchesQuery =
         !q ||
@@ -376,14 +751,23 @@ function GrammarPane() {
         g.subtitle.toLowerCase().includes(q) ||
         g.tag.toLowerCase().includes(q) ||
         g.chartAndSamples.samples.some((sample) => sample.en.toLowerCase().includes(q));
-      return matchesLevel && matchesTopic && matchesQuery;
+      return matchesTopic && matchesQuery;
     });
-  }, [level, topic, q]);
+  }, [grammar, topic, q]);
 
   function clearFilters() {
-    setLevel("all");
     setTopic("all");
     setQuery("");
+  }
+
+  if (grammar.length === 0) {
+    return (
+      <div className="refv2-pane-stack">
+        <div className="refv2-fbar-empty-card">
+          <div className="refv2-fbar-empty-title">No grammar points in {scopeLabel} yet.</div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -394,21 +778,8 @@ function GrammarPane() {
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter grammar points…" />
         </div>
         <span className="refv2-fbar-count">
-          {filtered.length} of {allGrammar.length} points
+          {filtered.length} of {grammar.length} points in {scopeLabel}
         </span>
-      </div>
-
-      <div className="refv2-fbar-row">
-        <span className="refv2-fbar-row-label">Level</span>
-        <button type="button" className={`refv2-filter${level === "all" ? " is-active" : ""}`} onClick={() => setLevel("all")}>
-          <span>All levels</span>
-        </button>
-        {levelsPresent.map((l) => (
-          <button key={l} type="button" className={`refv2-filter${level === l ? " is-active" : ""}`} onClick={() => setLevel(l)}>
-            <span className="refv2-filter-dot--level" data-level={l} />
-            <span>Level {l}</span>
-          </button>
-        ))}
       </div>
 
       <div className="refv2-fbar-row">
@@ -432,59 +803,20 @@ function GrammarPane() {
         </div>
       ) : (
         <div className="refv2-grammar-grid">
-          {filtered.map((grammar) => (
-            <Link className="refv2-grammar-card" href={`/reference/grammar/${grammar.grammarId}`} key={grammar.grammarId}>
+          {filtered.map((g) => (
+            <Link className="refv2-grammar-card" href={`/reference/grammar/${g.grammarId}`} key={g.grammarId}>
               <div className="refv2-grammar-head">
                 <div>
-                  <div className="refv2-grammar-title-wrap"><h3 className="refv2-grammar-title">{grammar.title}</h3><span className="refv2-grammar-cat-pill">Grammar</span><span className="refv2-grammar-tag">{grammar.tag}</span></div>
-                  <p className="refv2-grammar-rule">{grammar.subtitle}</p>
+                  <div className="refv2-grammar-title-wrap"><h3 className="refv2-grammar-title">{g.title}</h3><span className="refv2-grammar-cat-pill">{g.topic}</span><span className="refv2-grammar-tag">{g.tag}</span></div>
+                  <p className="refv2-grammar-rule">{g.subtitle}</p>
                 </div>
                 <span className="refv2-result-arrow">→</span>
               </div>
-              {grammar.chartAndSamples.samples[0] ? <div className="refv2-grammar-example"><span className="refv2-eyebrow-mini">Sample</span><p className="refv2-grammar-example-en">{grammar.chartAndSamples.samples[0].en}</p></div> : null}
+              {g.chartAndSamples.samples[0] ? <div className="refv2-grammar-example"><span className="refv2-eyebrow-mini">Sample</span><p className="refv2-grammar-example-en">{g.chartAndSamples.samples[0].en}</p></div> : null}
             </Link>
           ))}
         </div>
       )}
     </div>
   );
-}
-
-function KnownPane({ words, jp, cut }: { words: WordEntry[]; jp: boolean; cut: "known" | "review" }) {
-  const groups = groupByCourse(words);
-  return (
-    <div>
-      <div className={`refv2-cut-banner refv2-cut-banner--${cut === "known" ? "known" : "review"}`}>
-        <div className="refv2-cut-count">{words.length}</div>
-        <div className="refv2-cut-sub">{cut === "known" ? "words Leo knows" : "words to review"}</div>
-      </div>
-      <div className="refv2-cut-groups">
-        {groups.map((group) => (
-          <section key={group.key}>
-            <div className="refv2-cut-group-head"><span className="refv2-course-dot" style={{ background: group.color }} /><strong>{group.label}</strong><span className="refv2-cut-group-count">{group.words.length}</span></div>
-            <div className="refv2-chips">
-              {group.words.map((word) => (
-                <Link className="refv2-chip" href={word.type === "academic" ? `/reference/academic/${word.id}` : `/reference/word/${word.id}`} key={word.id}>
-                  <span className="refv2-chip-word">{word.word}</span>
-                  {jp && word.jp.gloss ? <span className="refv2-chip-jp">{word.jp.gloss}</span> : null}
-                </Link>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function courseColor(course: "our-world" | "joyful-work" | "junior-high") {
-  if (course === "joyful-work") return "var(--ref-course-jw)";
-  if (course === "junior-high") return "var(--ref-course-jh)";
-  return "var(--ref-course-ow)";
-}
-
-function courseLabel(course: "our-world" | "joyful-work" | "junior-high") {
-  if (course === "joyful-work") return "Joyful Work";
-  if (course === "junior-high") return "Junior High";
-  return "Our World";
 }

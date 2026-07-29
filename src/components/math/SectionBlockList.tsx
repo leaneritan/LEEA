@@ -7,6 +7,7 @@ import { ExampleBlock } from "./blocks/ExampleBlock";
 import { GoalBlock } from "./blocks/GoalBlock";
 import { InteractiveBlock } from "./blocks/InteractiveBlock";
 import { IntroBlock } from "./blocks/IntroBlock";
+import { LessonLinkBlock } from "./blocks/LessonLinkBlock";
 import { PracticeBlock } from "./blocks/PracticeBlock";
 import { QBlock } from "./blocks/QBlock";
 import { QuickCheckBlock } from "./blocks/QuickCheckBlock";
@@ -66,6 +67,9 @@ export function SectionBlockList({
             break;
           case "interactive":
             rendered = <InteractiveBlock block={block} />;
+            break;
+          case "lesson-link":
+            rendered = <LessonLinkBlock block={block} />;
             break;
           default:
             rendered = null;

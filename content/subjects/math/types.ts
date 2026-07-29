@@ -77,6 +77,16 @@ export type MathBlockPractice = {
   page?: string;
 };
 
+export type MathBlockLessonLink = {
+  id: string;
+  type: "lesson-link";
+  heading: string;
+  body: string;
+  label: string;
+  href: string;
+  page?: string;
+};
+
 export type MathBlockRecall = {
   id: string;
   type: "recall";
@@ -187,7 +197,8 @@ export type MathBlock =
   | MathBlockQuickCheck
   | MathBlockWindow
   | MathBlockReflect
-  | MathBlockInteractive;
+  | MathBlockInteractive
+  | MathBlockLessonLink;
 
 /** Blocks with a per-student できた / 解答閲覧 state that progress tracking keys off. */
 export type MathStatefulBlock = MathBlockPractice | MathBlockQuickCheck;

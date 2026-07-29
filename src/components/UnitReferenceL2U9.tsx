@@ -125,7 +125,7 @@ export default function UnitReferenceL2U9() {
               <div className="unit-hero-eyebrow-row">
                 <span className="unit-hero-eyebrow">Our World · Level 2 · Unit 9</span>
               </div>
-              <h1 className="unit-hero-title">Let's Eat</h1>
+              <h1 className="unit-hero-title">Let&apos;s Eat</h1>
             </div>
           </div>
           <div className="unit-hero-stats">

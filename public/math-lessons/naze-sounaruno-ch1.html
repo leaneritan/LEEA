@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>なぜそうなるの？ ｜ 1章 正負の数</title>
+<style>
+  :root{
+    --ink:#22312C;
+    --ink-soft:#5C6E67;
+    --paper:#E8EDE9;
+    --card:#FFFFFF;
+    --board:#2F4739;
+    --board-2:#26392E;
+    --chalk:#F2F5EE;
+    --gold:#9C6B15;
+    --gold-bg:#FAF2E2;
+    --ok:#3D7A5A;
+    --ok-bg:#E7F1EB;
+    --pen:#A64B3C;
+    --pen-bg:#F9EDEA;
+    --line:#D3DCD6;
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Meiryo",sans-serif;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP","MS Mincho",serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--gothic);
+       font-size:17px;line-height:1.9;-webkit-text-size-adjust:100%}
+  .wrap{max-width:660px;margin:0 auto;padding:18px 15px 70px}
+
+  header.top{background:var(--board);color:var(--chalk);border-radius:13px;
+             padding:16px 18px 14px;margin-bottom:16px}
+  header.top .eyebrow{font-size:11.5px;letter-spacing:.2em;color:#9BB3A4;margin:0 0 3px}
+  header.top h1{font-size:25px;font-weight:800;margin:0;letter-spacing:.04em}
+  header.top .sub{font-size:13.5px;color:#9BB3A4;margin:3px 0 0}
+  .bar{display:flex;gap:4px;margin-top:12px}
+  .bar i{flex:1;height:4px;border-radius:2px;background:#476552;transition:background .25s}
+  .bar i.hit{background:#8FC5A5}
+  .bar i.miss{background:#B98276}
+  .bar i.now{background:var(--chalk)}
+
+  .card{background:var(--card);border-radius:13px;padding:21px 19px;
+        box-shadow:0 1px 2px rgba(34,49,44,.06),0 8px 20px rgba(34,49,44,.08)}
+  .screen{animation:rise .3s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+  .tag{display:inline-block;font-size:12px;letter-spacing:.12em;font-weight:700;
+       padding:3px 11px;border-radius:20px;background:var(--gold-bg);color:var(--gold);margin-bottom:8px}
+  .sec{display:inline-block;font-size:12px;letter-spacing:.06em;color:var(--ink-soft);
+       margin:0 0 8px 9px;font-weight:700}
+  .pg{display:inline-block;font-size:11.5px;letter-spacing:.06em;font-weight:700;
+      padding:2px 9px;border-radius:6px;background:var(--board);color:var(--chalk);
+      margin:0 0 8px 8px;vertical-align:2px}
+  h2{font-size:21px;font-weight:800;margin:0 0 12px;letter-spacing:.02em}
+  p{margin:0 0 13px}
+  .lead{color:var(--ink-soft);font-size:15.5px}
+  .prompt{font-size:12.5px;letter-spacing:.1em;color:var(--gold);font-weight:700;margin:18px 0 4px}
+
+  .m{font-family:var(--mincho);font-size:27px;text-align:center;margin:14px 0;letter-spacing:.04em}
+  .m.sm{font-size:21px}
+
+  .choices{display:grid;gap:9px;margin-top:8px}
+  .choice{text-align:left;padding:12px 15px;border-radius:10px;border:1.5px solid var(--line);
+          background:#fff;color:var(--ink);font-size:15.5px;line-height:1.7;
+          transition:border-color .15s,background .15s}
+  .choice:hover:not(:disabled){border-color:var(--gold)}
+  .choice:disabled{cursor:default;opacity:.82}
+  .choice.ok{border-color:var(--ok);background:var(--ok-bg);font-weight:700}
+  .choice.no{border-color:var(--pen);background:var(--pen-bg)}
+  .choice.reveal{border-color:var(--ok);background:var(--ok-bg)}
+  button{font-family:inherit;font-size:16px;cursor:pointer}
+
+  /* ---- ordering ---- */
+  .ord{display:grid;gap:8px;margin-top:8px}
+  .ord .item{text-align:left;padding:11px 14px;border-radius:10px;border:1.5px solid var(--line);
+             background:#fff;color:var(--ink);font-size:15.5px;line-height:1.7;position:relative}
+  .ord .item:hover:not(:disabled){border-color:var(--gold)}
+  .ord .item.placed{border-color:var(--ok);background:var(--ok-bg);opacity:.9}
+  .ord .item.placed .rank{position:absolute;left:-9px;top:-9px;width:22px;height:22px;border-radius:50%;
+    background:var(--ok);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .ord .item.shake{animation:shake .32s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .ordcap{font-size:13.5px;color:var(--ink-soft);margin:8px 0 0;text-align:center}
+
+  /* ---- write your own ---- */
+  textarea{width:100%;min-height:110px;font-family:var(--gothic);font-size:16px;line-height:1.8;
+    padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);resize:vertical}
+  textarea:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+  textarea:disabled{background:#F7F8F6;color:var(--ink-soft)}
+  .cnt{font-size:12.5px;color:var(--ink-soft);text-align:right;margin:4px 0 0}
+
+  /* ---- signature: the chalkboard model answer ---- */
+  .board{background:var(--board);color:var(--chalk);border-radius:12px;padding:16px 18px;margin-top:16px;
+         display:none;box-shadow:inset 0 0 40px rgba(0,0,0,.22)}
+  .board.show{display:block;animation:rise .35s ease both}
+  .board .who{font-size:11.5px;letter-spacing:.16em;color:#9BB3A4;font-weight:700;margin:0 0 6px}
+  .board .say{font-family:var(--mincho);font-size:18px;line-height:1.95;margin:0}
+  .board .say em{font-style:normal;border-bottom:1.5px solid #7FA98D;padding-bottom:1px}
+
+  .selfcheck{background:var(--gold-bg);border-radius:11px;padding:14px 16px;margin-top:14px;display:none}
+  .selfcheck.show{display:block;animation:rise .3s ease both}
+  .selfcheck .t{font-size:12.5px;letter-spacing:.1em;font-weight:700;color:var(--gold);margin:0 0 8px}
+  .selfcheck label{display:flex;gap:10px;align-items:flex-start;font-size:15.5px;
+                   line-height:1.7;margin-bottom:7px;cursor:pointer}
+  .selfcheck input{width:19px;height:19px;margin-top:5px;flex-shrink:0;accent-color:var(--ok)}
+  .selfcheck .hintline{font-size:14px;color:var(--ink-soft);margin:8px 0 0}
+
+  .note{border-left:3px solid var(--gold);background:var(--gold-bg);
+        padding:11px 13px;border-radius:0 8px 8px 0;font-size:15px;margin:14px 0}
+
+  .fb{margin-top:12px;padding:12px 14px;border-radius:10px;font-size:15px;display:none}
+  .fb.show{display:block;animation:rise .22s ease both}
+  .fb.hint{background:var(--gold-bg);border:1px solid #E8D6AE}
+  .fb.wrong{background:var(--pen-bg);border:1px solid #E5C3BB}
+  .fb.right{background:var(--ok-bg);border:1px solid #BCD8C7}
+  .fb b{display:block;margin-bottom:2px}
+
+  .btn{padding:11px 20px;border-radius:10px;border:none;background:var(--ink);color:#fff;font-weight:700}
+  .btn:hover:not(:disabled){background:#2E4239}
+  .btn:disabled{opacity:.4;cursor:default}
+  .btn.gold{background:var(--gold)}
+  .btn.gold:hover:not(:disabled){background:#7E5510}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+
+  .nav{margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .stepno{font-size:12.5px;color:var(--ink-soft);letter-spacing:.08em}
+
+  .big{font-size:40px;font-weight:800;text-align:center;margin:6px 0 0}
+  .big small{font-size:17px;color:var(--ink-soft);font-weight:400}
+  table{width:100%;border-collapse:collapse;margin:16px 0 6px;font-size:15px}
+  th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+  th{font-size:12.5px;letter-spacing:.08em;color:var(--ink-soft);font-weight:700}
+  td.s{text-align:right;font-family:var(--mincho);font-size:18px;white-space:nowrap}
+  ul.tips{padding-left:1.15em;margin:6px 0 0;font-size:15.5px}
+  ul.tips li{margin-bottom:6px}
+
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (max-width:420px){body{font-size:16px}header.top h1{font-size:21px}.m{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <p class="eyebrow">1章 正負の数 ／ 2節・3節 ／ 説明モード</p>
+  <h1>なぜそうなるの？</h1>
+  <p class="sub">教科書 2節 加法と減法 p.29〜40 ／ 3節 乗法と除法 p.41〜（ページ要確認）</p>
+  <div class="bar" id="bar"></div>
+</header>
+
+<main id="stage"></main>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STEPS = [
+
+  /* 1 — what counts as an explanation */
+  { kind:"choice", tag:"はじめに", sec:"2節 加法と減法", pg:"p.29〜40", title:"「説明する」ってどういうこと？",
+    lead:'答えが合っていることと、理由が言えることはちがう。まずは、よい説明とはどんなものかを考えよう。',
+    body:'<div class="m">−3 ＋ (−5) ＝ −8</div>'+
+         '<p class="lead">この答えになる理由の説明として、いちばんよいのはどれだろう。</p>',
+    prompt:"いちばんよい説明はどれ？",
+    opts:[
+      "そういうルールだから。",
+      "同じ符号のときは絶対値をたして符号はそのまま、というきまりがあるから。",
+      "0から左へ3進み、そこからさらに左へ5進むので、合計で左へ8進んだ位置になるから。",
+      "3と5をたすと8になるから。"],
+    ans:2,
+    hint:"「きまりだから」で止まっていない説明はどれかな。数や場面で確かめられているものをさがそう。",
+    work:'よい説明は、きまりを言うだけでなく、<b>なぜそのきまりになるのか</b>を数直線や場面で示せる。'+
+         '2番は正しいけれど、きまりをくり返しているだけ。3番は数直線で確かめられている。' },
+
+  /* 2 — write: subtracting a negative */
+  { kind:"write", tag:"説明してみよう", sec:"2節 加法と減法", pg:"p.29〜40", title:"マイナスをひくと、なぜ増えるのか",
+    lead:'これは1章でいちばん「気持ち悪い」ところ。だからこそ、自分のことばにする価値がある。',
+    body:'<div class="m">−3 − (−5) ＝ 2</div>',
+    prompt:"なぜ答えが増えて 2 になるのか、数直線か身近な場面を使って説明しよう。",
+    ph:"例：数直線では…／おこづかいで考えると…",
+    model:'「−5 を <em>ひく</em>」は「−5 の <em>反対</em> をたす」と同じこと。−5 の反対は ＋5。'+
+          'だから −3 − (−5) ＝ −3 ＋ 5 ＝ 2 になる。<br>'+
+          '数直線で見ると、−3 の位置から右へ5進んで、2 にたどりつく。<br>'+
+          '場面で言えば、5円の借金が取り消されたら、その分だけ手もとは増える、ということ。',
+    checks:["「ひく」を「反対をたす」に言いかえた",
+            "−5 の反対が ＋5 だと示した",
+            "数直線か、身近な場面で確かめた"] },
+
+  /* 3 — choose best explanation: negative times positive */
+  { kind:"choice", tag:"見きわめる", sec:"3節 乗法と除法", pg:"3節 p.41〜?", title:"どの説明が本物？",
+    lead:'もっともらしく聞こえても、説明になっていないものがある。見分けられるかな。',
+    body:'<div class="m">(−2) × 3 ＝ −6</div>',
+    prompt:"説明として最もよいのはどれ？",
+    opts:[
+      "−2 を3回たすということなので、(−2) ＋ (−2) ＋ (−2) ＝ −6 になるから。",
+      "マイナスとプラスをかけると、答えはマイナスになるから。",
+      "2 × 3 ＝ 6 を計算して、あとからマイナスをつけるから。",
+      "かけ算はたし算の逆だから。"],
+    ans:0,
+    hint:"かけ算のもともとの意味は「同じ数を何回かたすこと」。その意味に戻っている説明はどれ？",
+    work:'かけ算は「同じ数をくり返したすこと」。この意味に戻れば、−6 になる理由が見える。<br>'+
+         '2番と3番は、やり方を言っているだけで理由になっていない。4番はそもそも正しくない。' },
+
+  /* 4 — ordering: why negative times negative is positive */
+  { kind:"order", tag:"組み立てる", sec:"3節 乗法と除法", pg:"3節 p.41〜?", title:"マイナス × マイナス は、なぜプラス？",
+    lead:'ここは中1でいちばん説明しにくいところ。無理に「意味」で考えず、<b>きまりが続くように</b>考えるのが数学のやり方。',
+    body:'<p class="lead">次の4つを、説明の順番になるように並べよう。</p>',
+    prompt:"上から順になるように、正しい順にタップしよう。",
+    items:[
+      "(−2)×3 ＝ −6、(−2)×2 ＝ −4、(−2)×1 ＝ −2。かける数が1へるごとに、答えは2ずつ増えている。",
+      "このきまりをそのまま続けると、(−2)×0 ＝ 0 になる。",
+      "さらに続けると、(−2)×(−1) ＝ ＋2、(−2)×(−2) ＝ ＋4 となる。",
+      "だから (−2)×(−3) ＝ ＋6 と決めると、きまりがくずれない。"],
+    hint:"まずは、かける数がプラスのときの表をつくるところから。そこから1ずつ減らしていこう。",
+    work:'「マイナス×マイナスがプラスになる意味」を探すより、<b>これまでのきまりが続くように決めた</b>と考えるほうが正確。'+
+         '数学では、都合よく決めるのではなく、<b>すでにあるきまりがこわれない</b>ように新しいことを決める。' },
+
+  /* 5 — error hunt with reason */
+  { kind:"choice", tag:"まちがいさがし", sec:"3節 乗法と除法（累乗）", pg:"3節 p.41〜?", title:"どこがまちがい？",
+    lead:'まちがいの理由を言えることは、正しさの理由を言えることと同じくらい大事。',
+    body:'<div class="m sm">ある人が　(−3)² ＝ −9　と答えた。</div>',
+    prompt:"このまちがいの説明として正しいのはどれ？",
+    opts:[
+      "(−3)² は −3 を2回かけるので (−3)×(−3) ＝ ＋9。マイナスもふくめて2乗される。",
+      "3 を2回かけて9、それにマイナスをつけるので −9 で正しい。",
+      "2乗した数は必ずプラスになると決まっているから。",
+      "(−3)² は −3² と同じ意味なので −9 で正しい。"],
+    ans:0,
+    hint:"かっこがついている。かっこの中の何が2乗されているだろう。",
+    work:'(−3)² ＝ (−3)×(−3) ＝ ＋9。かっこの中身<b>全体</b>が2乗される。<br>'+
+         '3番は結論は合っているが、「決まっているから」では説明になっていない。' },
+
+  /* 6 — write: teach the difference */
+  { kind:"write", tag:"教えてみよう", sec:"3節 乗法と除法（累乗）", pg:"3節 p.41〜?", title:"弟に教えるつもりで",
+    lead:'人に教えられたら、本当にわかっている。むずかしいことばを使わずに書いてみよう。',
+    body:'<div class="m sm">(−3)² ＝ 9　　　−3² ＝ −9</div>',
+    prompt:"この2つのちがいを、年下の子に教えるつもりで説明しよう。",
+    ph:"例：かっこがあるときは…／かっこがないときは…",
+    model:'(−3)² は、かっこの中の <em>−3 全体</em> を2回かける。だから (−3)×(−3) ＝ 9。<br>'+
+          '−3² は、かっこがないので2乗されるのは <em>3 だけ</em>。3×3 ＝ 9 を計算してから、前のマイナスをつけて −9。<br>'+
+          'かっこがあるかないかで、<em>2乗されるものが変わる</em>。だから答えもちがう。',
+    checks:["かっこの中身全体が2乗されると書けた",
+            "かっこがないときは 3 だけが2乗されると書けた",
+            "答えが 9 と −9 でちがうことを示した"] },
+
+  /* 7 — reflection */
+  { kind:"write", tag:"ふり返り", sec:"1章 全体", pg:"1章", title:"today's いちばん",
+    lead:'教科書の「ふり返る」と同じ。新しく学んだこと、大切だと思った考え方を、自分のことばでまとめよう。',
+    body:'',
+    prompt:"今日いちばん「なるほど」と思ったことを、ひとつだけ書こう。",
+    ph:"例：〜だとわかった。／〜という考え方が大事だと思った。",
+    model:'説明するときに使える形：<br>'+
+          '「<em>〜だから、〜になる</em>」　理由 → 結論の順で言う。<br>'+
+          '「<em>たとえば〜の場合は</em>」　例をあげて確かめる。<br>'+
+          '「<em>もし〜だとしたら、〜になってしまう</em>」　まちがいのほうを試して確かめる。<br>'+
+          'この3つの言い方が使えると、説明がぐっとしっかりする。',
+    checks:["自分のことばで書けた（教科書の丸写しではない）",
+            "「なぜなら」「〜だから」を使って理由を書いた"] }
+  ];
+
+  var i=0, tries=0, finished=false;
+  var res = STEPS.map(function(s){
+    return s.kind === "write" ? {kind:"write", checks:0, of:s.checks.length, wrote:false}
+                              : {kind:"auto", first:null};
+  });
+
+  var stage=document.getElementById("stage"), bar=document.getElementById("bar");
+  STEPS.forEach(function(){ bar.appendChild(document.createElement("i")); });
+  bar.appendChild(document.createElement("i"));
+
+  function paintBar(){
+    var b=bar.children;
+    for(var k=0;k<STEPS.length;k++){
+      var r=res[k], cls="";
+      if(k===i && !finished) cls="now";
+      else if(r.kind==="auto") cls = r.first===true?"hit":r.first===false?"miss":"";
+      else cls = r.wrote ? (r.checks===r.of ? "hit" : r.checks>0 ? "hit" : "miss") : "";
+      b[k].className=cls;
+    }
+    b[STEPS.length].className = finished?"now":"";
+  }
+
+  function shuffled(n){
+    var a=[]; for(var k=0;k<n;k++) a.push(k);
+    for(var k=a.length-1;k>0;k--){ var j=Math.floor(Math.random()*(k+1)); var t=a[k]; a[k]=a[j]; a[j]=t; }
+    return a;
+  }
+
+  function render(){
+    var s=STEPS[i]; tries=0;
+    var mid="";
+
+    if(s.kind==="choice"){
+      mid='<p class="prompt">'+s.prompt+'</p><div class="choices" id="opts">'+
+          s.opts.map(function(o,k){ return '<button class="choice" data-k="'+k+'">'+o+'</button>'; }).join("")+
+          '</div><div class="fb" id="fb"></div>';
+    }
+    else if(s.kind==="order"){
+      var order = shuffled(s.items.length);
+      mid='<p class="prompt">'+s.prompt+'</p><div class="ord" id="ord">'+
+          order.map(function(k){ return '<button class="item" data-k="'+k+'"><span class="rank"></span>'+s.items[k]+'</button>'; }).join("")+
+          '</div><p class="ordcap" id="ordcap">0 / '+s.items.length+' 並んだ</p><div class="fb" id="fb"></div>';
+    }
+    else {
+      mid='<p class="prompt">'+s.prompt+'</p>'+
+          '<textarea id="ta" placeholder="'+s.ph+'"></textarea>'+
+          '<p class="cnt" id="cnt">0 文字</p>'+
+          '<p style="text-align:right;margin:0"><button class="btn gold" id="send">書けた。先生の説明を見る</button></p>'+
+          '<div class="board" id="board"><p class="who">先生の説明</p><p class="say">'+s.model+'</p></div>'+
+          '<div class="selfcheck" id="sc"><p class="t">自分の説明とくらべよう</p>'+
+          s.checks.map(function(c,k){ return '<label><input type="checkbox" data-c="'+k+'"><span>'+c+'</span></label>'; }).join("")+
+          '<p class="hintline">できていなかったところは、いま書きたして直してみよう。</p></div>';
+    }
+
+    stage.innerHTML=
+      '<section class="screen"><div class="card">'+
+        '<span class="tag">'+s.tag+'</span><span class="sec">'+s.sec+'</span><span class="pg">'+s.pg+'</span><h2>'+s.title+'</h2>'+
+        '<p class="lead">'+s.lead+'</p>'+ s.body + mid +
+        '<div class="nav"><span class="stepno">'+(i+1)+' / '+STEPS.length+'</span>'+
+        '<button class="btn" id="next" disabled>'+(i===STEPS.length-1?"けっかを見る →":"次へ →")+'</button></div>'+
+      '</div></section>';
+
+    wire();
+    paintBar();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function wire(){
+    var s=STEPS[i];
+
+    if(s.kind==="choice"){
+      var opts=document.getElementById("opts");
+      Array.prototype.forEach.call(opts.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return;
+          var ok = Number(b.getAttribute("data-k"))===s.ans, fb=document.getElementById("fb");
+          tries++;
+          if(ok){
+            if(res[i].first===null) res[i].first=(tries===1);
+            b.classList.add("ok");
+            fb.className="fb show right"; fb.innerHTML="<b>そのとおり。</b>"+s.work;
+            lockChoices(); return;
+          }
+          res[i].first=false; b.classList.add("no");
+          if(tries===1){ fb.className="fb show hint"; fb.innerHTML="<b>もう一度考えよう</b>"+s.hint; }
+          else{
+            fb.className="fb show wrong";
+            fb.innerHTML="<b>答えは「"+s.opts[s.ans]+"」</b>"+s.work;
+            opts.children[s.ans].classList.add("reveal");
+            lockChoices();
+          }
+          paintBar();
+        });
+      });
+    }
+
+    else if(s.kind==="order"){
+      var placed=0;
+      var ord=document.getElementById("ord");
+      Array.prototype.forEach.call(ord.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return;
+          var k=Number(b.getAttribute("data-k"));
+          if(k===placed){
+            b.disabled=true; b.classList.add("placed");
+            b.querySelector(".rank").textContent=placed+1;
+            placed++;
+            document.getElementById("ordcap").textContent=placed+" / "+s.items.length+" 並んだ";
+            if(placed===s.items.length){
+              if(res[i].first===null) res[i].first=(tries===0);
+              var fb=document.getElementById("fb");
+              fb.className="fb show right"; fb.innerHTML="<b>きれいにつながった。</b>"+s.work;
+              document.getElementById("next").disabled=false;
+              paintBar();
+            }
+          } else {
+            tries++; res[i].first=false;
+            b.classList.add("shake");
+            setTimeout(function(){ b.classList.remove("shake"); },340);
+            var fb=document.getElementById("fb");
+            fb.className="fb show hint"; fb.innerHTML="<b>その順番ではないみたい</b>"+s.hint;
+            paintBar();
+          }
+        });
+      });
+    }
+
+    else {
+      var ta=document.getElementById("ta"), send=document.getElementById("send");
+      ta.addEventListener("input",function(){
+        document.getElementById("cnt").textContent=ta.value.trim().length+" 文字";
+      });
+      send.addEventListener("click",function(){
+        if(ta.disabled) return;
+        if(ta.value.trim().length<10){
+          document.getElementById("cnt").textContent="もう少し書いてみよう（10文字以上）";
+          ta.focus(); return;
+        }
+        res[i].wrote=true;
+        ta.disabled=true; send.disabled=true;
+        document.getElementById("board").classList.add("show");
+        document.getElementById("sc").classList.add("show");
+        document.getElementById("next").disabled=false;
+        var sc=document.getElementById("sc");
+        Array.prototype.forEach.call(sc.querySelectorAll("input"),function(cb){
+          cb.addEventListener("change",function(){
+            res[i].checks = sc.querySelectorAll("input:checked").length;
+            paintBar();
+          });
+        });
+        paintBar();
+      });
+      ta.focus();
+    }
+
+    document.getElementById("next").addEventListener("click",function(){
+      if(this.disabled) return;
+      if(i===STEPS.length-1){ report(); return; }
+      i++; render();
+    });
+  }
+
+  function lockChoices(){
+    var opts=document.getElementById("opts");
+    Array.prototype.forEach.call(opts.children,function(b){ b.disabled=true; });
+    document.getElementById("next").disabled=false;
+    paintBar();
+  }
+
+  function report(){
+    finished=true;
+    var autos=res.filter(function(r){ return r.kind==="auto"; });
+    var autoOk=autos.filter(function(r){ return r.first===true; }).length;
+    var writes=res.filter(function(r){ return r.kind==="write"; });
+    var wrote=writes.filter(function(r){ return r.wrote; }).length;
+    var checks=writes.reduce(function(a,r){ return a+r.checks; },0);
+    var checksOf=writes.reduce(function(a,r){ return a+r.of; },0);
+
+    var advice;
+    if(autoOk===autos.length && checks>=checksOf-1)
+      advice="説明する力がしっかりついている。次は 2章 や 3章 でも、同じように「なぜ？」を言えるか試してみよう。";
+    else if(autoOk<autos.length)
+      advice="「どの説明がよいか」を見分けるところを、もう一度やってみよう。きまりをくり返しているだけの説明と、理由を示している説明のちがいに注目。";
+    else
+      advice="書くところはよくがんばった。チェックが入らなかった項目を見て、その部分をつけ足して書きなおすと、説明がぐっとよくなる。";
+
+    stage.innerHTML=
+      '<section class="screen"><div class="card">'+
+        '<span class="tag">けっか</span><h2>今日のふり返り</h2>'+
+        '<p class="big">'+autoOk+' <small>/ '+autos.length+'</small></p>'+
+        '<p class="lead" style="text-align:center;margin-top:0">見きわめ問題</p>'+
+        '<table><tbody>'+
+          '<tr><td>説明を書いた回数</td><td class="s">'+wrote+' / '+writes.length+'</td></tr>'+
+          '<tr><td>自己チェックがついた数</td><td class="s">'+checks+' / '+checksOf+'</td></tr>'+
+        '</tbody></table>'+
+        '<div class="note">'+advice+'</div>'+
+        '<p class="lead" style="margin:16px 0 2px"><b>説明するときの3つの型</b></p>'+
+        '<ul class="tips">'+
+          '<li><b>〜だから、〜になる。</b>　理由を先に、結論をあとに。</li>'+
+          '<li><b>たとえば〜の場合は。</b>　具体的な数や場面で確かめる。</li>'+
+          '<li><b>もし〜だとしたら、〜になってしまう。</b>　まちがいのほうを試して確かめる。</li>'+
+        '</ul>'+
+        '<div class="note" style="border-color:var(--ok);background:var(--ok-bg)">'+
+        'おうちの人へ：書いた説明を声に出して読んでもらい、「どうしてそう思ったの？」と一度だけ聞き返すと、'+
+        '説明がもう一段くわしくなります。正しさより、理由が言えたことをほめてください。</div>'+
+        '<div class="nav" style="justify-content:center"><button class="btn ghost" id="again">もう一度</button></div>'+
+      '</div></section>';
+    document.getElementById("again").addEventListener("click",function(){ location.reload(); });
+    paintBar();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

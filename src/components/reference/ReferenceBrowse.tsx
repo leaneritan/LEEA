@@ -314,6 +314,7 @@ function getDisplayUnits(level: number, levelData: TreeLevel | undefined) {
 /* Units that have a built Unit Reference page. Add an entry here once
    /reference/our-world/level-N/unit-M/page.tsx exists for that unit. */
 const UNIT_REFERENCE_PAGES: Record<string, string> = {
+  "2-8": "/reference/our-world/level-2/unit-8",
   "2-9": "/reference/our-world/level-2/unit-9",
   "5-1": "/reference/our-world/level-5/unit-1",
   "4-1": "/reference/our-world/level-4/unit-1",

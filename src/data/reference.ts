@@ -36,6 +36,7 @@ import unit5Grammar from "../../content/subjects/english/courses/our-world/level
 import unit6Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-6/grammar.json";
 import unit7Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-7/grammar.json";
 import unit8Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-8/grammar.json";
+import level2Unit9Grammar from "../../content/subjects/english/courses/our-world/level-2/unit-9/grammar.json";
 import unit9Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-9/grammar.json";
 import type {
   GrammarChart,
@@ -69,6 +70,7 @@ type UnitVocabularyWord =
   | (typeof unit4Vocabulary.words)[number];
 type UnitGrammarPoint =
   | (typeof level5Unit1Grammar.grammarPoints)[number]
+  | (typeof level2Unit9Grammar.grammarPoints)[number]
   | (typeof level3Unit1Grammar.grammarPoints)[number]
   | (typeof level3Unit2Grammar.grammarPoints)[number]
   | (typeof level3Unit3Grammar.grammarPoints)[number]
@@ -460,6 +462,7 @@ function toGrammarPoint(point: UnitGrammarPoint): GrammarPoint {
 
 export const grammarPoints: GrammarPoint[] = [
   ...level5Unit1Grammar.grammarPoints.map(toGrammarPoint),
+  ...level2Unit9Grammar.grammarPoints.map(toGrammarPoint),
   ...level3Unit1Grammar.grammarPoints.map(toGrammarPoint),
   ...level3Unit2Grammar.grammarPoints.map(toGrammarPoint),
   ...level3Unit3Grammar.grammarPoints.map(toGrammarPoint),

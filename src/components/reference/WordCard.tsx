@@ -7,7 +7,7 @@ import { useKnownWordIds } from "@/components/useKnownWordIds";
 import type { WordEntry } from "@/data/reference-shapes";
 import { getVerbForms, type VerbForms } from "@/data/verbForms";
 import sanseidoIndex from "../../../content/subjects/english/junior-high/sanseido-index.json";
-import { allWords } from "./ref-data";
+import { allWords, getWordNav } from "./ref-data";
 import { isMultiEmoji } from "./emoji-utils";
 
 type SanseidoEntry = { w: string; u: string };
@@ -32,6 +32,7 @@ export function WordCard({ entry }: { entry: WordEntry }) {
   const [playing, setPlaying] = useState(false);
 
   const sanseidoUrl = useMemo(() => sanseidoByWord.get(entry.word.toLowerCase()), [entry]);
+  const nav = useMemo(() => getWordNav(entry.id), [entry.id]);
   const family = useMemo(() => getWordFamily(entry), [entry]);
   const similar = useMemo(() => getSimilarWords(entry, family), [entry, family]);
   const verbForms = useMemo(
@@ -140,6 +141,36 @@ export function WordCard({ entry }: { entry: WordEntry }) {
           </div>
         </div>
       </section>
+
+      <nav className="rcardv2-prevnext" aria-label="Word navigation">
+        {nav.prev ? (
+          <Link href={`/reference/word/${nav.prev.id}`} className="rcardv2-prevnext-btn">
+            <span className="rcardv2-prevnext-arrow">←</span>
+            {nav.prev.word}
+          </Link>
+        ) : (
+          <button type="button" className="rcardv2-prevnext-btn is-disabled" disabled>
+            <span className="rcardv2-prevnext-arrow">←</span> Start
+          </button>
+        )}
+
+        <div className="rcardv2-prevnext-pos">
+          <div className="rcardv2-prevnext-count">
+            Word {nav.index} of {nav.total}
+          </div>
+        </div>
+
+        {nav.next ? (
+          <Link href={`/reference/word/${nav.next.id}`} className="rcardv2-prevnext-btn">
+            {nav.next.word}
+            <span className="rcardv2-prevnext-arrow">→</span>
+          </Link>
+        ) : (
+          <button type="button" className="rcardv2-prevnext-btn is-disabled" disabled>
+            Next <span className="rcardv2-prevnext-arrow">→</span>
+          </button>
+        )}
+      </nav>
 
       <div className="rcardv2-grid">
         <div className="rcardv2-col-left">

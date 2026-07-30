@@ -17,6 +17,7 @@ import {
   type GrammarEntry,
   type WordEntry
 } from "@/data/reference-shapes";
+import { LEVEL_COLORS } from "@/data/reference-units";
 
 /* ─── all words (vocab + academic + content + glossary + related) ─── */
 export const allWords: WordEntry[] = vocabularyItems.map(toWordEntry);
@@ -235,4 +236,19 @@ export function groupByCourse(words: WordEntry[]) {
     { key: "joyful-work", label: "Joyful Work", color: "var(--ref-course-jw)", words: groups["joyful-work"] },
     { key: "junior-high", label: "Junior High", color: "var(--ref-course-jh)", words: groups["junior-high"] }
   ].filter((group) => group.words.length > 0);
+}
+
+/* ─── group words by Our World level (for Known chips when scope = all levels) ─── */
+export function groupByLevel(words: WordEntry[]) {
+  const groups = new Map<number, WordEntry[]>();
+  for (const word of words) {
+    const owSource = word.sources.find((source) => source.course === "our-world" && source.level != null);
+    if (!owSource?.level) continue;
+    const list = groups.get(owSource.level) ?? [];
+    list.push(word);
+    groups.set(owSource.level, list);
+  }
+  return Array.from(groups.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map(([level, list]) => ({ key: `level-${level}`, label: `Level ${level}`, color: LEVEL_COLORS[level], words: list }));
 }

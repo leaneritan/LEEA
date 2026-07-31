@@ -45,7 +45,8 @@ const unitVocabularyPaths = [
   "content/subjects/english/courses/our-world/level-4/unit-8/vocabulary.json",
   "content/subjects/english/courses/our-world/level-4/unit-9/vocabulary.json",
   "content/subjects/english/courses/our-world/level-2/unit-9/vocabulary.json",
-  "content/subjects/english/courses/our-world/level-2/unit-8/vocabulary.json"
+  "content/subjects/english/courses/our-world/level-2/unit-8/vocabulary.json",
+  "content/subjects/english/courses/our-world/level-2/unit-7/vocabulary.json"
 ];
 const vocabularyIndexPath = "content/subjects/english/reference/vocabulary-index.json";
 const unitGrammarPaths = [
@@ -160,7 +161,7 @@ const IRREGULAR_VERBS_FOR_VALIDATION = {
   say: ["said", "said"], see: ["saw", "seen"], sell: ["sold", "sold"],
   send: ["sent", "sent"], sing: ["sang", "sung"], sit: ["sat", "sat"],
   sleep: ["slept", "slept"], speak: ["spoke", "spoken"], spend: ["spent", "spent"],
-  spin: ["spun", "spun"], stand: ["stood", "stood"], swim: ["swam", "swum"],
+  spin: ["spun", "spun"], stand: ["stood", "stood"], swim: ["swam", "swum"], swing: ["swung", "swung"],
   take: ["took", "taken"], teach: ["taught", "taught"], tell: ["told", "told"], travel: ["traveled", "traveled"],
   think: ["thought", "thought"], throw: ["threw", "thrown"],
   understand: ["understood", "understood"], wake: ["woke", "woken"],

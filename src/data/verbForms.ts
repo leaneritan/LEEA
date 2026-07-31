@@ -18,6 +18,7 @@ const IRREGULAR_VERBS: Record<string, [string, string]> = {
   be: ["was/were", "been"],
   begin: ["began", "begun"],
   bend: ["bent", "bent"],
+  bite: ["bit", "bitten"],
   break: ["broke", "broken"],
   bring: ["brought", "brought"],
   build: ["built", "built"],

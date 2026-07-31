@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>九九表のきまり ｜ 0章 p.10-13</title>
+<style>
+  :root{
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Meiryo",sans-serif;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP","MS Mincho",serif;
+  }
+  /* ---- 説明編：黒板 ---- */
+  .theme-setsumei{
+    --ink:#22312C; --ink-soft:#5C6E67; --paper:#E8EDE9; --card:#FFFFFF;
+    --accent:#9C6B15; --accent-bg:#FAF2E2; --deep:#2F4739; --deep-fg:#F2F5EE;
+    --ok:#3D7A5A; --ok-bg:#E7F1EB; --no:#A64B3C; --no-bg:#F9EDEA; --line:#D3DCD6;
+  }
+  /* ---- テスト編：赤ペン ---- */
+  .theme-test{
+    --ink:#1F2328; --ink-soft:#63696F; --paper:#F4F3EF; --card:#FFFFFF;
+    --accent:#C62828; --accent-bg:#FBEDEC; --deep:#1F2328; --deep-fg:#FFFFFF;
+    --ok:#2F6F4E; --ok-bg:#E8F1EC; --no:#C62828; --no-bg:#FBEDEC; --line:#DEDCD4;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--gothic);font-size:17px;line-height:1.9;-webkit-text-size-adjust:100%;
+       background:var(--paper);color:var(--ink);transition:background .3s}
+  .wrap{max-width:660px;margin:0 auto;padding:18px 15px 70px}
+
+  header.top{background:var(--deep);color:var(--deep-fg);border-radius:13px;
+             padding:16px 18px 0;margin-bottom:16px;transition:background .3s}
+  header.top .eyebrow{font-size:11.5px;letter-spacing:.2em;opacity:.68;margin:0 0 3px}
+  header.top h1{font-size:24px;font-weight:800;margin:0;letter-spacing:.03em}
+  header.top .sub{font-size:13.5px;opacity:.68;margin:3px 0 0}
+  .bar{display:flex;gap:4px;margin-top:12px}
+  .bar i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.22);transition:background .25s}
+  .bar i.hit{background:#8FC5A5} .bar i.miss{background:#C58C82} .bar i.now{background:#fff}
+
+  /* ---- tabs ---- */
+  .tabs{display:flex;gap:6px;margin:14px -18px 0;padding:0 18px;border-top:1px solid rgba(255,255,255,.14)}
+  .tabs button{flex:1;background:none;border:none;color:inherit;opacity:.55;
+    font-family:inherit;font-size:14.5px;font-weight:700;padding:12px 4px 11px;
+    cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.04em}
+  .tabs button:hover{opacity:.85}
+  .tabs button.on{opacity:1;border-bottom-color:currentColor}
+  .tabs .badge{display:inline-block;font-size:11px;font-weight:700;margin-left:6px;
+    padding:1px 7px;border-radius:20px;background:rgba(255,255,255,.16)}
+  .tabs .badge.done{background:#8FC5A5;color:#1B2E24}
+
+  .card{background:var(--card);border-radius:13px;padding:21px 19px;
+        box-shadow:0 1px 2px rgba(0,0,0,.05),0 8px 20px rgba(0,0,0,.07)}
+  .screen{animation:rise .3s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+  .tag{display:inline-block;font-size:12px;letter-spacing:.12em;font-weight:700;
+       padding:3px 11px;border-radius:20px;background:var(--accent-bg);color:var(--accent);margin-bottom:8px}
+  .sec{display:inline-block;font-size:12px;letter-spacing:.06em;color:var(--ink-soft);
+       margin:0 0 8px 9px;font-weight:700}
+  .pg{display:inline-block;font-size:11.5px;letter-spacing:.06em;font-weight:700;
+      padding:2px 9px;border-radius:6px;background:var(--deep);color:var(--deep-fg);
+      margin:0 0 8px 8px;vertical-align:2px}
+  h2{font-size:21px;font-weight:800;margin:0 0 12px;letter-spacing:.02em}
+  p{margin:0 0 13px}
+  .lead{color:var(--ink-soft);font-size:15.5px}
+  .prompt{font-size:12.5px;letter-spacing:.1em;color:var(--accent);font-weight:700;margin:18px 0 4px}
+
+  .m{font-family:var(--mincho);font-size:27px;text-align:center;margin:14px 0;letter-spacing:.04em}
+  .m.sm{font-size:21px;line-height:1.8}
+  .quote{background:rgba(0,0,0,.02);border:1px dashed var(--line);border-radius:10px;
+         padding:12px 14px;margin:12px 0;font-size:15.5px}
+  .quote .src{display:block;font-size:11.5px;letter-spacing:.1em;color:var(--accent);
+              font-weight:700;margin-bottom:4px}
+  .prob{background:rgba(0,0,0,.02);border:1px solid var(--line);border-radius:11px;
+        padding:13px 15px;margin:12px 0;font-size:16px;line-height:1.95}
+
+  .choices{display:grid;gap:9px;margin-top:8px}
+  .choice{text-align:left;padding:12px 15px;border-radius:10px;border:1.5px solid var(--line);
+          background:#fff;color:var(--ink);font-size:15.5px;line-height:1.7;
+          transition:border-color .15s,background .15s;font-family:inherit;cursor:pointer}
+  .choice.mid{text-align:center;font-family:var(--mincho);font-size:19px}
+  .choice:hover:not(:disabled){border-color:var(--accent)}
+  .choice:disabled{cursor:default;opacity:.82}
+  .choice.ok{border-color:var(--ok);background:var(--ok-bg);font-weight:700}
+  .choice.no{border-color:var(--no);background:var(--no-bg)}
+  .choice.reveal{border-color:var(--ok);background:var(--ok-bg)}
+
+  .ord{display:grid;gap:8px;margin-top:8px}
+  .ord .item{text-align:left;padding:11px 14px;border-radius:10px;border:1.5px solid var(--line);
+             background:#fff;color:var(--ink);font-size:15.5px;line-height:1.7;
+             position:relative;font-family:inherit;cursor:pointer}
+  .ord .item:hover:not(:disabled){border-color:var(--accent)}
+  .ord .item.placed{border-color:var(--ok);background:var(--ok-bg);opacity:.9;cursor:default}
+  .ord .item.placed .rank{position:absolute;left:-9px;top:-9px;width:22px;height:22px;border-radius:50%;
+    background:var(--ok);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .ord .item.shake{animation:shake .32s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .ordcap{font-size:13.5px;color:var(--ink-soft);margin:8px 0 0;text-align:center}
+
+  textarea{width:100%;min-height:110px;font-family:var(--gothic);font-size:16px;line-height:1.8;
+    padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);resize:vertical}
+  textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  textarea:disabled{background:rgba(0,0,0,.03);color:var(--ink-soft)}
+  .cnt{font-size:12.5px;color:var(--ink-soft);text-align:right;margin:4px 0 0}
+
+  .board{background:var(--deep);color:var(--deep-fg);border-radius:12px;padding:16px 18px;margin-top:16px;
+         display:none;box-shadow:inset 0 0 40px rgba(0,0,0,.22)}
+  .board.show{display:block;animation:rise .35s ease both}
+  .board .who{font-size:11.5px;letter-spacing:.16em;opacity:.7;font-weight:700;margin:0 0 6px}
+  .board .say{font-family:var(--mincho);font-size:18px;line-height:1.95;margin:0}
+  .board .say em{font-style:normal;border-bottom:1.5px solid rgba(255,255,255,.45);padding-bottom:1px}
+
+  .selfcheck{background:var(--accent-bg);border-radius:11px;padding:14px 16px;margin-top:14px;display:none}
+  .selfcheck.show{display:block;animation:rise .3s ease both}
+  .selfcheck .t{font-size:12.5px;letter-spacing:.1em;font-weight:700;color:var(--accent);margin:0 0 8px}
+  .selfcheck label{display:flex;gap:10px;align-items:flex-start;font-size:15.5px;
+                   line-height:1.7;margin-bottom:7px;cursor:pointer}
+  .selfcheck input{width:19px;height:19px;margin-top:5px;flex-shrink:0;accent-color:var(--ok)}
+  .selfcheck .hintline{font-size:14px;color:var(--ink-soft);margin:8px 0 0}
+
+  .row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .row .pre{font-family:var(--mincho);font-size:22px}
+  .row .unit{font-size:15px;color:var(--ink-soft)}
+  input[type=text]{font-family:var(--mincho);font-size:22px;width:120px;padding:8px 10px;
+    border:1.5px solid var(--line);border-radius:10px;text-align:center;color:var(--ink);background:#fff}
+  input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  input[type=text]:disabled{background:rgba(0,0,0,.03)}
+
+  .btn{padding:11px 20px;border-radius:10px;border:none;background:var(--ink);color:#fff;
+       font-weight:700;font-family:inherit;font-size:16px;cursor:pointer}
+  .btn:hover:not(:disabled){opacity:.88}
+  .btn:disabled{opacity:.4;cursor:default}
+  .btn.accent{background:var(--accent)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .helprow{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+  .btn.tiny{padding:7px 14px;font-size:13.5px;background:#fff;color:var(--ink-soft);
+            border:1.5px solid var(--line);font-weight:700}
+  .btn.tiny:hover:not(:disabled){color:var(--accent);border-color:var(--accent)}
+  .btn.tiny[hidden]{display:none}
+  .usedmark{font-size:12.5px;color:var(--ink-soft);margin:10px 0 0;text-align:right}
+
+  .fb{margin-top:13px;padding:12px 14px;border-radius:10px;font-size:15px;display:none}
+  .fb.show{display:block;animation:rise .22s ease both}
+  .fb.hint{background:var(--accent-bg);border:1px solid var(--line)}
+  .fb.wrong{background:var(--no-bg);border:1px solid var(--line)}
+  .fb.right{background:var(--ok-bg);border:1px solid var(--line)}
+  .fb b{display:block;margin-bottom:2px}
+  .fb .work{font-family:var(--mincho);font-size:16.5px;display:block;margin-top:4px;line-height:1.75}
+
+  .nav{margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .stepno{font-size:12.5px;color:var(--ink-soft);letter-spacing:.08em}
+
+  .big{font-size:42px;font-weight:800;text-align:center;margin:6px 0 0}
+  .big small{font-size:18px;color:var(--ink-soft);font-weight:400}
+  table{width:100%;border-collapse:collapse;margin:16px 0 6px;font-size:15px}
+  th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+  th{font-size:12.5px;letter-spacing:.08em;color:var(--ink-soft);font-weight:700}
+  td.s{text-align:right;font-family:var(--mincho);font-size:18px;white-space:nowrap}
+  .pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .pill.good{background:var(--ok-bg);color:var(--ok)}
+  .pill.watch{background:var(--no-bg);color:var(--no)}
+  .note{border-left:3px solid var(--accent);background:var(--accent-bg);
+        padding:11px 13px;border-radius:0 8px 8px 0;font-size:15px;margin:14px 0}
+  ul.rev,ul.tips{padding-left:1.15em;margin:6px 0 0;font-size:15px}
+  ul.rev li,ul.tips li{margin-bottom:5px}
+
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (max-width:420px){body{font-size:16px}header.top h1{font-size:21px}.m{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap theme-setsumei" id="root">
+
+<header class="top">
+  <p class="eyebrow">0章 算数から数学へ ／ 九九表のきまり</p>
+  <h1>九九表のきまり</h1>
+  <p class="sub">教科書 p.10〜13　きまりを見つけ、理由を説明する</p>
+  <div class="bar" id="bar"></div>
+  <nav class="tabs">
+    <button data-tab="setsumei" class="on">説明編<span class="badge" id="b-setsumei">8問</span></button>
+    <button data-tab="test">テスト編<span class="badge" id="b-test">10問</span></button>
+  </nav>
+</header>
+
+<main id="stage"></main>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= 説明編 ================= */
+  var STEPS = [
+
+  { kind:"choice", tag:"はじめに", sec:"0章 算数から数学へ", pg:"p.10",
+    title:"算数と数学は、何がちがうのか",
+    lead:'0章 の最初のページに、この章で何をするかが書いてある。九九表は小学校でさんざん使ったのに、なぜもう一度出てくるのだろう。',
+    body:'<div class="quote"><span class="src">教科書 p.10</span>'+
+         'この章では、九九表を見なおして、いろいろなきまりを見つけます。'+
+         '<b>きまりを見つけたら、それが成り立つ理由を考えて説明したり、友だちと伝え合ったりしてみましょう。</b></div>',
+    prompt:"算数と数学のいちばん大きなちがいは？",
+    opts:[
+      "算数は答えを出す。数学は<b>なぜその答えになるのかを説明する</b>。",
+      "算数は整数を使い、数学は文字を使う。",
+      "算数は小学校で、数学は中学校で習う、というだけのちがい。",
+      "数学のほうが計算がむずかしい。"],
+    ans:0,
+    hint:"教科書の文の、太字になっている部分を読もう。「見つけたら」そのあとに何をせよと書いてある？",
+    work:'九九表そのものは何も変わっていない。変わるのは <b>向き合い方</b>。<br><br>'+
+         '小学校では「8×15 はいくつ？」と聞かれて 120 と答えた。'+
+         'これからは「なぜそうなるの？」「いつでもそうなるの？」と問う。<br><br>'+
+         'この章に新しい計算はほとんど出てこない。'+
+         'かわりに <b>きまりを見つける → 理由を考える → ことばで説明する</b> という'+
+         '流れを練習する。1年間ずっと使うやり方なので、ここで身につけておくと後が楽になる。' },
+
+  { kind:"choice", tag:"見つける", sec:"0章 九九表のきまり", pg:"p.12〜13",
+    title:"はるきさんの予想",
+    lead:'教科書 p.12〜13。九九表を、縦2ます・横2ますの正方形で囲む。はるきさんは、その4つの数にきまりがあることに気づいた。',
+    body:'<div class="quote"><span class="src">囲んだ4つの数</span>'+
+         '<span style="font-family:var(--mincho);font-size:20px">'+
+         '　8　　10<br>　12　　15</span></div>'+
+         '<p class="lead">斜めどうしをかけてみると…</p>',
+    prompt:"はるきさんが見つけたきまりは？",
+    opts:[
+      "斜めの数どうしの和が等しくなる。",
+      "4つの数の合計が、いつも同じになる。",
+      "斜めの数どうしの積が等しくなる。",
+      "左上の数と右下の数の差が、いつも同じになる。"],
+    ans:2,
+    hint:"8 と 15、10 と 12。それぞれかけ算してみよう。",
+    work:'8 × 15 ＝ 120、10 × 12 ＝ 120。<b>斜めの数どうしの積が等しい</b>。<br><br>'+
+         'ちなみに和のほうは 8 ＋ 15 ＝ 23、10 ＋ 12 ＝ 22 で、'+
+         '等しくならない（1 だけちがう）。<br>'+
+         'だから「和」ではなく「積」に目をつけたところが、はるきさんの発見。<br><br>'+
+         '九九表は <b>かけ算</b> の表なのだから、かけ算で見ると'+
+         'きまりが見つかりやすい。これも大事な見方。' },
+
+  { kind:"choice", tag:"たしかめる", sec:"0章 九九表のきまり", pg:"p.13",
+    title:"1回では足りない",
+    lead:'教科書 p.13 には「ほかのところを囲んで、成り立つことを確かめてみましょう」とあり、吹き出しにも「ほかの場合も調べることが大切だよ」と書かれている。',
+    body:'<div class="m sm">8 × 15 ＝ 120　　10 × 12 ＝ 120</div>'+
+         '<p class="lead">1か所で成り立った。それで終わりにしてよいだろうか。</p>',
+    prompt:"なぜ、ほかの場所でも調べるのだろう？",
+    opts:[
+      "計算まちがいがないか、念のため確かめるため。",
+      "1か所で成り立っても、<b>たまたま</b>かもしれないから。ほかでも成り立つか調べる必要がある。",
+      "先生に「調べなさい」と言われているから。",
+      "調べる場所が多いほど、答えが正確になるから。"],
+    ans:1,
+    hint:"もし別のところで成り立たなかったら、このきまりはどうなるだろう。",
+    work:'<b>1つの例は、証拠にならない。</b><br>'+
+         'たまたまその場所だけ成り立っただけかもしれない。'+
+         'ほかの場所でも成り立つとわかって、はじめて「きまり」といえそうだと思える。<br><br>'+
+         'ただし ここが数学のおもしろいところ '+
+         '<b>いくつ調べても「いつでも成り立つ」ことの証明にはならない</b>。'+
+         '九九表のマスは限られているから全部調べられるが、'+
+         'ふつうは調べきれないほどたくさんある。<br><br>'+
+         'だから次のページで、<b>理由</b> を考える。'+
+         '理由がわかれば、調べなくても「いつでも成り立つ」といえる。' },
+
+  { kind:"choice", tag:"もどす", sec:"0章 九九表のきまり", pg:"p.13",
+    title:"もとの九九にもどす",
+    lead:'教科書 p.13 の説明のしかた。120 という答えを見ていても理由はわからない。囲んだ4つの数を、<b>もとの九九の形</b>にもどしてみる。',
+    body:'<div class="quote"><span class="src">九九表の 2の段・3の段 と 4・5 のところ</span>'+
+         '<span style="font-family:var(--mincho);font-size:19px">'+
+         '　8 ＝ 2×4　　10 ＝ 2×5<br>　12 ＝ 3×4　　15 ＝ 3×5</span></div>',
+    prompt:"8 × 15 をもとの九九にもどして書くと？",
+    opts:[
+      "2 × 4 × 3 × 5",
+      "2 × 5 × 3 × 4",
+      "8 × 3 × 5",
+      "2 × 4 ＋ 3 × 5"],
+    ans:0,
+    hint:"8 は 2×4、15 は 3×5。かけ算なので、そのまま並べて書ける。",
+    work:'8 × 15 ＝ (2×4) × (3×5) ＝ 2 × 4 × 3 × 5<br><br>'+
+         '<b>なぜこう書けるのか。</b> かけ算だけの式は、かっこをはずして並べても値が変わらない'+
+         '（結合法則）。だから (2×4)×(3×5) をそのまま 2×4×3×5 と書ける。<br><br>'+
+         '同じように 10 × 12 ＝ (2×5) × (3×4) ＝ 2 × 5 × 3 × 4。<br><br>'+
+         '<b>ここで見くらべてみよう。</b><br>'+
+         '2 × 4 × 3 × 5　と　2 × 5 × 3 × 4<br>'+
+         '使われている数は、どちらも 2、3、4、5 の4つ。<b>順番がちがうだけ</b>。' },
+
+  { kind:"write", tag:"説明してみよう", sec:"0章 九九表のきまり", pg:"p.13",
+    title:"なぜ積が等しくなるのか",
+    lead:'これが 0章 のいちばん大事なところ。そして、Leo が数学で書く最初の「証明」でもある。',
+    body:'<div class="m sm">8 × 15 ＝ 2 × 4 × 3 × 5<br>10 × 12 ＝ 2 × 5 × 3 × 4</div>',
+    prompt:"なぜこの2つが等しくなるのか、説明しよう。",
+    ph:"例：どちらも…／かけ算は…",
+    model:'どちらの式も、<em>2・3・4・5 という同じ4つの数をかけている</em>。'+
+          'ちがうのは <em>かける順番だけ</em>。<br><br>'+
+          'かけ算は順番を入れかえても答えが変わらない（交換法則）。'+
+          'だから 2×4×3×5 と 2×5×3×4 は、どちらも同じ 120 になる。<br><br>'+
+          '<b>なぜ4つの数が同じになるのか。</b><br>'+
+          '囲んだ4つの数は、2の段と3の段、4のところと5のところが交わったところ。'+
+          'だから どのマスも「2か3」と「4か5」のかけ算でできている。<br>'+
+          '斜めどうしをかけると、2と3が1回ずつ、4と5が1回ずつ。'+
+          '<em>どちらの斜めでも、必ずこの4つがそろう</em>。<br><br>'+
+          'これで「たまたま」ではないことがわかった。'+
+          '<em>どこを囲んでも同じ理由で成り立つ</em>。',
+    checks:["どちらも同じ4つの数をかけている、と書けた",
+            "かける順番がちがうだけだ、と書けた",
+            "だから答えが等しくなる、と理由をつなげられた"] },
+
+  { kind:"order", tag:"組み立てる", sec:"0章 九九表のきまり", pg:"p.13",
+    title:"説明の筋道を並べる",
+    lead:'いま考えたことを、人に伝えられる順番に並べてみよう。数学の説明は、この順で書く。',
+    body:'<div class="m sm">なぜ斜めの積は等しくなるのか</div>',
+    prompt:"説明の順になるように、正しい順にタップしよう。",
+    items:[
+      "囲んだ4つの数を、もとの九九の形にもどす。8＝2×4、15＝3×5、10＝2×5、12＝3×4。",
+      "斜めどうしをかけると、8×15＝2×4×3×5、10×12＝2×5×3×4 となる。",
+      "どちらも 2・3・4・5 の4つをかけていて、ちがうのは順番だけである。",
+      "かけ算は順番を入れかえても答えが変わらないので、2つの積は等しくなる。"],
+    hint:"まず「見た目を変える」ところから。次に「見くらべる」。最後に「だから」で結ぶ。",
+    work:'この4段階が、数学の説明の基本の形。<br><br>'+
+         '① <b>形を変える</b>（もとの九九にもどす）<br>'+
+         '② <b>並べて書く</b>（両方を同じ形で表す）<br>'+
+         '③ <b>見くらべる</b>（同じところ・ちがうところを見つける）<br>'+
+         '④ <b>理由で結ぶ</b>（すでに知っているきまりを使って「だから」という）<br><br>'+
+         '④で使ったのは「かけ算は順番を入れかえてよい」という、'+
+         '小学校で習ったきまり。<b>新しいことを、すでに知っていることで説明する</b> '+
+         'これが数学のやり方。' },
+
+  { kind:"choice", tag:"ひろげる", sec:"0章 九九表のきまり", pg:"p.13",
+    title:"どこを囲んでも成り立つか",
+    lead:'理由がわかったので、こんどは別の場所で試してみよう。6の段と7の段、3のところと4のところを囲む。',
+    body:'<div class="quote"><span class="src">囲んだ4つの数</span>'+
+         '<span style="font-family:var(--mincho);font-size:20px">'+
+         '　18　　24<br>　21　　28</span></div>'+
+         '<p class="lead">18＝6×3、24＝6×4、21＝7×3、28＝7×4</p>',
+    prompt:"18 × 28 と 24 × 21 について、正しいのはどれ？",
+    opts:[
+      "18×28 のほうが大きい。囲む場所によってきまりは変わる。",
+      "どちらも 6×3×7×4 と 6×4×7×3 で、同じ4つの数のかけ算だから等しい。",
+      "9の段をふくまないので、このきまりは使えない。",
+      "計算してみないとわからない。"],
+    ans:1,
+    hint:"さっきと同じように、4つの数をもとの九九にもどして見くらべよう。",
+    work:'18×28 ＝ (6×3)×(7×4) ＝ 6×3×7×4 ＝ 504<br>'+
+         '24×21 ＝ (6×4)×(7×3) ＝ 6×4×7×3 ＝ 504<br><br>'+
+         '<b>数はちがっても、理由はまったく同じ。</b>'+
+         'どちらも 6・7・3・4 の4つをかけていて、順番がちがうだけ。<br><br>'+
+         'ここが「理由を考える」ことのごほうび。'+
+         '<b>1か所で理由がわかれば、ほかの場所は計算しなくても成り立つとわかる</b>。'+
+         '64か所すべてを計算する必要はない。<br><br>'+
+         '（実際、九九表の 2×2 のマスは64通りあるが、そのすべてで成り立つ）' },
+
+  { kind:"write", tag:"ふり返り", sec:"0章 ふり返り", pg:"p.10〜13",
+    title:"今日のふり返り",
+    lead:'教科書 p.12 にも「学習をふり返って、学んだことや大切だと思った考え方、もっと考えてみたいことを書いてみましょう」とある。自分のことばでまとめよう。',
+    body:'',
+    prompt:"きまりを見つけてから、それを説明するまでに、どんなことをしたか書こう。",
+    ph:"例：まず〜を見つけて、つぎに〜。そして…",
+    model:'<b>今日たどった道すじ</b><br>'+
+          '① <em>見つける</em>　… 九九表を2×2で囲むと、斜めの積が等しい<br>'+
+          '② <em>たしかめる</em>　… ほかの場所でも試してみる<br>'+
+          '③ <em>理由を考える</em>　… もとの九九にもどして見くらべる<br>'+
+          '④ <em>説明する</em>　… 同じ4つの数を順番を変えてかけているから、と伝える<br><br>'+
+          '<b>いちばん大事なこと</b><br>'+
+          '②までは「たぶんそうなりそう」だが、③④まで進むと'+
+          '<em>「いつでもそうなる」と言いきれる</em>ようになる。<br>'+
+          'たくさん例を集めることと、理由を1つ見つけることは、まったくちがう。'+
+          '数学が強いのは、後者ができるから。<br><br>'+
+          '<b>次のページから</b><br>'+
+          '「もとの形にもどして見る」という今日の考え方が、'+
+          'そのまま <em>素因数分解</em>（p.14〜）につながっていく。',
+    checks:["見つける→たしかめる→理由→説明、の流れを書けた",
+            "理由がわかると「いつでも成り立つ」といえることにふれた",
+            "自分のことばで書けた（教科書の丸写しではない）"] }
+  ];
+
+  /* ================= テスト編 ================= */
+  var Q = [
+
+  { cat:"九九表を読む", pg:"p.11", type:"num", pre:"",
+    body:'<div class="prob">九九表で、4の段と 7 のところが交わるマスの数は？</div>',
+    prompt:"その数を答えなさい。", ans:28,
+    hint:"4 の段の 7 番目。つまり 4 × 7。",
+    work:"4 × 7 ＝ 28<br><br>"+
+         "<b>九九表のマスの数は、行と列のかけ算になっている。</b>"+
+         "だから表の中のどの数も「何かと何かの積」として見ることができる。<br>"+
+         "この見方が、このあとの説明でずっと効いてくる。"+
+         "28 を「28」としか見ないと理由が見えないが、「4×7」と見ると仕組みが見えてくる。" },
+
+  { cat:"九九表を読む", pg:"p.13", type:"choice",
+    body:'<div class="quote"><span class="src">九九表から囲んだ4つ</span>'+
+         '<span style="font-family:var(--mincho);font-size:20px">　24　　28<br>　30　　35</span></div>',
+    prompt:"この 4 つは、それぞれ何の段と何のところが交わったマス？",
+    opts:["4の段と5の段、6のところと7のところ",
+          "6の段と7の段、4のところと5のところ",
+          "24の段と28の段",
+          "決められない"],
+    ans:0,
+    hint:"24 ＝ 4×6、28 ＝ 4×7。上の行は何の段だろう。",
+    work:"24 ＝ 4×6、28 ＝ 4×7、30 ＝ 5×6、35 ＝ 5×7。<br>"+
+         "つまり <b>4の段と5の段</b>、<b>6のところと7のところ</b>。<br><br>"+
+         "2番も同じ4つの数を作れるが（6×4、7×4…）、"+
+         "表の並びと合わせると上の行が4の段になる。<br>"+
+         "どちらの見方でも積のきまりは成り立つ。かけ算は順番を入れかえてよいから。" },
+
+  { cat:"きまりを確かめる", pg:"p.13", type:"num", pre:"",
+    body:'<div class="quote"><span class="src">囲んだ4つ</span>'+
+         '<span style="font-family:var(--mincho);font-size:20px">　18　　24<br>　21　　28</span></div>',
+    prompt:"18 × 28 を計算しなさい。", ans:504,
+    hint:"まず 18 × 28 をふつうに計算しよう。あとで 24 × 21 と見くらべる。",
+    work:"18 × 28 ＝ 504<br><br>"+
+         "そして 24 × 21 ＝ 504。<b>斜めの積が等しい</b>。<br><br>"+
+         "<b>なぜか。</b> 18＝6×3、28＝7×4、24＝6×4、21＝7×3 なので<br>"+
+         "18×28 ＝ 6×3×7×4、24×21 ＝ 6×4×7×3。<br>"+
+         "どちらも 6・7・3・4 の4つをかけていて、順番がちがうだけ。" },
+
+  { cat:"きまりを確かめる", pg:"p.13", type:"num", pre:"",
+    body:'<div class="quote"><span class="src">囲んだ4つ</span>'+
+         '<span style="font-family:var(--mincho);font-size:20px">　21　　24<br>　28　　32</span></div>',
+    prompt:"21 × 32 と等しくなるのは、24 × いくつ？", ans:28,
+    hint:"斜めどうしをかける。21 の反対の角にあるのは 32、では 24 の反対は？",
+    work:"24 × 28（＝ 672、21 × 32 も 672）<br><br>"+
+         "<b>斜め</b> とは、正方形の向かい合った角どうしのこと。"+
+         "21 と 32 が一方の斜め、24 と 28 がもう一方の斜め。<br><br>"+
+         "理由：21＝3×7、32＝4×8、24＝3×8、28＝4×7 なので<br>"+
+         "21×32 ＝ 3×7×4×8、24×28 ＝ 3×8×4×7。同じ4つの数。" },
+
+  { cat:"きまりを確かめる", pg:"p.13", type:"choice",
+    body:'<div class="quote"><span class="src">囲んだ4つ</span>'+
+         '<span style="font-family:var(--mincho);font-size:20px">　8　　10<br>　12　　15</span></div>',
+    prompt:"斜めの数どうしの「和」についていえることは？",
+    opts:["和も等しくなる。","和は 2 倍になる。","和は 1 だけちがう。","和は決まった関係にならない。"],
+    ans:2,
+    hint:"8 ＋ 15 と 10 ＋ 12 を、実際に計算してみよう。",
+    work:"8 ＋ 15 ＝ 23、10 ＋ 12 ＝ 22。<b>1 だけちがう</b>。<br><br>"+
+         "<b>ここが大事なところ。</b> 積は等しくなるが、和は等しくならない。<br>"+
+         "だから「なんとなく対称だから、どんな計算でも同じになるはず」"+
+         "と思いこんではいけない。<br>"+
+         "九九表は <b>かけ算</b> の表なので、かけ算で見たときにきれいなきまりが現れる。"+
+         "はるきさんが「積」に目をつけたのは、それが理由。" },
+
+  { cat:"もとの九九にもどす", pg:"p.13", type:"choice",
+    body:'<div class="m sm">12 をもとの九九にもどす</div>',
+    prompt:"九九表で 3の段 と 4 のところが交わるマスとして見ると？",
+    opts:["12 ＝ 6 × 2","12 ＝ 12 × 1","12 ＝ 2 × 2 × 3","12 ＝ 3 × 4"],
+    ans:3,
+    hint:"3 の段の 4 番目のマス、という意味。",
+    work:"12 ＝ 3 × 4<br><br>"+
+         "<b>12 はいろいろな形に分けられる。</b> 6×2 でも 2×2×3 でも 12 になる。"+
+         "どれもまちがいではない。<br>"+
+         "でも <b>いま知りたいのは「表のどこにあるか」</b> なので、"+
+         "その位置を表す 3×4 という形にもどす。<br><br>"+
+         "同じ数でも、<b>何を知りたいかによって、便利な形がちがう</b>。"+
+         "これは p.14 からの素因数分解にもつながる考え方。" },
+
+  { cat:"もとの九九にもどす", pg:"p.13", type:"choice",
+    body:'<div class="m sm">10 × 12 をもとの九九にもどして書く</div>'+
+         '<p class="lead" style="text-align:center">10 ＝ 2×5、　12 ＝ 3×4</p>',
+    prompt:"正しく書けているのはどれ？",
+    opts:["2 × 5 × 3 × 4","2 × 5 ＋ 3 × 4","10 × 3 × 4","(2 ＋ 5) × (3 ＋ 4)"],
+    ans:0,
+    hint:"10 と 12 をかけるのだから、分けたあともぜんぶかけ算でつながる。",
+    work:"10 × 12 ＝ (2×5) × (3×4) ＝ 2 × 5 × 3 × 4<br><br>"+
+         "<b>なぜかっこをはずしてよいのか。</b> かけ算だけでつながっている式は、"+
+         "かっこがあってもなくても値が同じ（結合法則）。<br>"+
+         "だから並べて書ける。そして並べて書くと、<b>使われている数が一目でわかる</b>。<br><br>"+
+         "1番のようにたし算にしてしまうと、まったく別の式になってしまうので注意。" },
+
+  { cat:"理由を説明する", pg:"p.13", type:"choice",
+    body:'<div class="m sm">8 × 15 ＝ 2 × 4 × 3 × 5<br>10 × 12 ＝ 2 × 5 × 3 × 4</div>',
+    prompt:"この2つが等しい理由として、いちばんよい説明は？",
+    opts:["どちらも計算すると 120 になるから。",
+          "九九表にはそういうきまりがあるから。",
+          "どちらも 2・3・4・5 の同じ4つをかけていて、順番がちがうだけだから。",
+          "8 と 15、10 と 12 が、それぞれとなりどうしだから。"],
+    ans:2,
+    hint:"2つの式に出てくる数を、それぞれ書き出して見くらべよう。",
+    work:"<b>同じ4つの数を、順番を変えてかけているだけ</b>だから。<br>"+
+         "かけ算は順番を入れかえても答えが変わらない（交換法則）。<br><br>"+
+         "<b>1番がなぜ説明として弱いのか。</b> 「計算したら同じだった」は"+
+         "<b>結果</b>であって<b>理由</b>ではない。ほかの場所でも成り立つかどうかは、これでは何もいえない。<br>"+
+         "<b>2番もだめ。</b>「そういうきまりだから」は、"+
+         "いま説明しようとしていることをくり返しているだけ。" },
+
+  { cat:"理由を説明する", pg:"p.13", type:"choice",
+    body:'<div class="m sm">1か所で成り立つことを確かめた。</div>',
+    prompt:"このとき、まだいえないことは？",
+    opts:["この場所では、斜めの積が等しい。",
+          "この場所の4つの数は、九九にもどせる。",
+          "九九表のどこを囲んでも、斜めの積は等しい。",
+          "8 × 15 は 120 である。"],
+    ans:2,
+    hint:"1か所調べただけで、まだ調べていない場所のことまでいえるだろうか。",
+    work:"<b>「どこを囲んでも」はまだいえない。</b><br>"+
+         "1か所で成り立ったことは、その場所についての事実にすぎない。"+
+         "ほかの場所は、たまたまちがうかもしれない。<br><br>"+
+         "<b>ではどうすればいえるようになるか。</b> 全部調べる方法もあるが、"+
+         "九九表は64か所もあって大変。<br>"+
+         "そこで <b>理由</b> を考える。「同じ4つの数を順番を変えてかけているから」"+
+         "という理由がわかれば、それはどの場所にもあてはまるので、"+
+         "調べなくても「いつでも成り立つ」といえる。<br><br>"+
+         "<b>例をいくつ集めても証明にはならないが、理由が1つあれば証明になる。</b>" },
+
+  { cat:"理由を説明する", pg:"p.10", type:"choice",
+    body:'<div class="m sm">0章 でいちばん練習したいことは？</div>',
+    prompt:"教科書 p.10 の書き方に合っているのはどれ？",
+    opts:["九九を速く正確に言えるようにすること。",
+          "きまりを見つけ、それが成り立つ理由を考えて説明すること。",
+          "九九表をすべて暗記すること。",
+          "大きな数のかけ算ができるようになること。"],
+    ans:1,
+    hint:"p.10 の「きまりを見つけたら、そのあと何をしましょう」と書いてあるかを思い出そう。",
+    work:"<b>きまりを見つけ、成り立つ理由を考えて説明すること。</b><br><br>"+
+         "教科書 p.10 にはこう書いてある。"+
+         "「きまりを見つけたら、それが成り立つ理由を考えて説明したり、"+
+         "友だちと伝え合ったりしてみましょう」。<br><br>"+
+         "九九の計算そのものは小学校でもう身につけている。"+
+         "0章 で新しいのは <b>そのあと</b>。"+
+         "答えを出したところで終わりにせず、「なぜ？」と問うところから数学が始まる。" }
+  ];
+
+  /* ================= shared engine ================= */
+  var CATS = ["九九表を読む","きまりを確かめる","もとの九九にもどす","理由を説明する"];
+  var BACK = {
+    "九九表を読む":"p.11　九九表のきまりを見つけよう",
+    "きまりを確かめる":"p.12〜13　はるきさんの予想と確かめ",
+    "もとの九九にもどす":"p.13　かけ算の式に分解する",
+    "理由を説明する":"p.10・p.13　理由を考えて説明する"
+  };
+
+  var mode = "setsumei";
+  var S = {                       // per-tab state, kept when switching
+    setsumei:{ i:0, tries:0, done:false,
+      res: STEPS.map(function(s){ return s.kind==="write"
+              ? {kind:"write", checks:0, of:s.checks.length, wrote:false}
+              : {kind:"auto", first:null}; }) },
+    test:{ i:0, tries:0, done:false, first:new Array(Q.length).fill(null),
+           help:new Array(Q.length).fill(0) }   /* 0=自力 1=ヒント 2=答えを見た */
+  };
+
+  var root=document.getElementById("root"), stage=document.getElementById("stage"),
+      bar=document.getElementById("bar");
+
+  function norm(s){
+    return String(s).trim()
+      .replace(/[０-９]/g,function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); })
+      .replace(/[\u2212\u30FC\uFF0D\u2010\u2011\u2013\u2014\u2015\uFF70]/g,"-")
+      .replace(/\uFF0B/g,"+").replace(/\uFF0F/g,"/").replace(/\uFF0E/g,".")
+      .replace(/[,\uFF0C\s]/g,"").replace(/^\+/,"");
+  }
+  function val(s){
+    if(/^-?\d+(\.\d+)?$/.test(s)) return Number(s);
+    var m=s.match(/^(-?\d+)\/(\d+)$/);
+    return m ? Number(m[1])/Number(m[2]) : NaN;
+  }
+  function fmt(n){ return String(n).replace("-","−"); }
+
+  function paintBar(){
+    var n = (mode==="setsumei") ? STEPS.length : Q.length;
+    while(bar.children.length < n+1) bar.appendChild(document.createElement("i"));
+    while(bar.children.length > n+1) bar.removeChild(bar.lastChild);
+    var st=S[mode], b=bar.children;
+    for(var k=0;k<n;k++){
+      var cls="";
+      if(k===st.i && !st.done) cls="now";
+      else if(mode==="setsumei"){
+        var r=st.res[k];
+        cls = r.kind==="auto" ? (r.first===true?"hit":r.first===false?"miss":"")
+                              : (r.wrote ? (r.checks>0?"hit":"miss") : "");
+      } else {
+        cls = st.first[k]===true?"hit":st.first[k]===false?"miss":"";
+      }
+      b[k].className=cls;
+    }
+    b[n].className = st.done ? "now" : "";
+    // tab badges
+    var sDone=S.setsumei.res.filter(function(r){
+          return r.kind==="auto" ? r.first!==null : r.wrote; }).length;
+    var tDone=S.test.first.filter(function(v){ return v!==null; }).length;
+    var bs=document.getElementById("b-setsumei"), bt=document.getElementById("b-test");
+    bs.textContent = sDone ? sDone+"/"+STEPS.length : STEPS.length+"問";
+    bt.textContent = tDone ? tDone+"/"+Q.length : Q.length+"問";
+    bs.className = "badge"+(sDone===STEPS.length?" done":"");
+    bt.className = "badge"+(tDone===Q.length?" done":"");
+  }
+
+  function shuffled(n){
+    var a=[],k,j,t; for(k=0;k<n;k++) a.push(k);
+    for(k=a.length-1;k>0;k--){ j=Math.floor(Math.random()*(k+1)); t=a[k];a[k]=a[j];a[j]=t; }
+    return a;
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    if(S[mode].done){ report(); return; }
+    return (mode==="setsumei") ? renderStep() : renderQ();
+  }
+
+  function renderStep(){
+    var st=S.setsumei, s=STEPS[st.i]; st.tries=0;
+    var mid;
+    if(s.kind==="choice"){
+      mid='<p class="prompt">'+s.prompt+'</p><div class="choices" id="opts">'+
+          s.opts.map(function(o,k){ return '<button class="choice" data-k="'+k+'">'+o+'</button>'; }).join("")+
+          '</div><div class="fb" id="fb"></div>';
+    } else if(s.kind==="order"){
+      mid='<p class="prompt">'+s.prompt+'</p><div class="ord" id="ord">'+
+          shuffled(s.items.length).map(function(k){
+            return '<button class="item" data-k="'+k+'"><span class="rank"></span>'+s.items[k]+'</button>'; }).join("")+
+          '</div><p class="ordcap" id="ordcap">0 / '+s.items.length+' 並んだ</p><div class="fb" id="fb"></div>';
+    } else {
+      mid='<p class="prompt">'+s.prompt+'</p>'+
+          '<textarea id="ta" placeholder="'+s.ph+'"></textarea><p class="cnt" id="cnt">0 文字</p>'+
+          '<p style="text-align:right;margin:0"><button class="btn accent" id="send">書けた。先生の説明を見る</button></p>'+
+          '<div class="board" id="board"><p class="who">先生の説明</p><p class="say">'+s.model+'</p></div>'+
+          '<div class="selfcheck" id="sc"><p class="t">自分の説明とくらべよう</p>'+
+          s.checks.map(function(c,k){ return '<label><input type="checkbox" data-c="'+k+'"><span>'+c+'</span></label>'; }).join("")+
+          '<p class="hintline">できていなかったところは、いま書きたして直してみよう。</p></div>';
+    }
+    stage.innerHTML='<section class="screen"><div class="card">'+
+      '<span class="tag">'+s.tag+'</span><span class="sec">'+s.sec+'</span><span class="pg">'+s.pg+'</span>'+
+      '<h2>'+s.title+'</h2><p class="lead">'+s.lead+'</p>'+s.body+mid+
+      '<div class="nav"><span class="stepno">'+(st.i+1)+' / '+STEPS.length+'</span>'+
+      '<button class="btn" id="next" disabled>'+(st.i===STEPS.length-1?"けっかを見る →":"次へ →")+'</button></div>'+
+      '</div></section>';
+    wireStep();
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function wireStep(){
+    var st=S.setsumei, s=STEPS[st.i];
+    if(s.kind==="choice"){
+      var opts=document.getElementById("opts");
+      Array.prototype.forEach.call(opts.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return;
+          var ok=Number(b.getAttribute("data-k"))===s.ans, fb=document.getElementById("fb");
+          st.tries++;
+          if(ok){
+            if(st.res[st.i].first===null) st.res[st.i].first=(st.tries===1);
+            b.classList.add("ok");
+            fb.className="fb show right"; fb.innerHTML="<b>そのとおり。</b>"+s.work;
+            lockChoices();
+          } else {
+            st.res[st.i].first=false; b.classList.add("no");
+            if(st.tries===1){ fb.className="fb show hint"; fb.innerHTML="<b>もう一度考えよう</b>"+s.hint; }
+            else{ fb.className="fb show wrong";
+                  fb.innerHTML="<b>答えは「"+s.opts[s.ans].replace(/<[^>]+>/g,"")+"」</b>"+s.work;
+                  opts.children[s.ans].classList.add("reveal"); lockChoices(); }
+            paintBar();
+          }
+        });
+      });
+    } else if(s.kind==="order"){
+      var placed=0, ord=document.getElementById("ord");
+      Array.prototype.forEach.call(ord.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return;
+          if(Number(b.getAttribute("data-k"))===placed){
+            b.disabled=true; b.classList.add("placed");
+            b.querySelector(".rank").textContent=++placed;
+            document.getElementById("ordcap").textContent=placed+" / "+s.items.length+" 並んだ";
+            if(placed===s.items.length){
+              if(st.res[st.i].first===null) st.res[st.i].first=(st.tries===0);
+              var fb=document.getElementById("fb");
+              fb.className="fb show right"; fb.innerHTML="<b>きれいにつながった。</b>"+s.work;
+              document.getElementById("next").disabled=false; paintBar();
+            }
+          } else {
+            st.tries++; st.res[st.i].first=false;
+            b.classList.add("shake"); setTimeout(function(){ b.classList.remove("shake"); },340);
+            var fb2=document.getElementById("fb");
+            fb2.className="fb show hint"; fb2.innerHTML="<b>その順番ではないみたい</b>"+s.hint;
+            paintBar();
+          }
+        });
+      });
+    } else {
+      var ta=document.getElementById("ta"), send=document.getElementById("send");
+      ta.addEventListener("input",function(){
+        document.getElementById("cnt").textContent=ta.value.trim().length+" 文字"; });
+      send.addEventListener("click",function(){
+        if(ta.disabled) return;
+        if(ta.value.trim().length<10){
+          document.getElementById("cnt").textContent="もう少し書いてみよう（10文字以上）"; ta.focus(); return; }
+        st.res[st.i].wrote=true; ta.disabled=true; send.disabled=true;
+        document.getElementById("board").classList.add("show");
+        var sc=document.getElementById("sc"); sc.classList.add("show");
+        document.getElementById("next").disabled=false;
+        Array.prototype.forEach.call(sc.querySelectorAll("input"),function(cb){
+          cb.addEventListener("change",function(){
+            st.res[st.i].checks=sc.querySelectorAll("input:checked").length; paintBar(); });
+        });
+        paintBar();
+      });
+      ta.focus();
+    }
+    document.getElementById("next").addEventListener("click",function(){
+      if(this.disabled) return;
+      if(st.i===STEPS.length-1){ st.done=true; report(); return; }
+      st.i++; renderStep();
+    });
+  }
+
+  function lockChoices(){
+    var opts=document.getElementById("opts");
+    Array.prototype.forEach.call(opts.children,function(b){ b.disabled=true; });
+    document.getElementById("next").disabled=false; paintBar();
+  }
+
+  function renderQ(){
+    var st=S.test, q=Q[st.i]; st.tries=0;
+    var input = q.type==="choice"
+      ? '<div class="choices" id="opts">'+
+        q.opts.map(function(o,k){ return '<button class="choice'+(o.length<12?" mid":"")+'" data-k="'+k+'">'+o+'</button>'; }).join("")+'</div>'
+      : '<div class="row"><span class="pre">'+q.pre+'</span>'+
+        '<input type="text" id="ans" autocomplete="off" aria-label="答え">'+
+        (q.unit?'<span class="unit">'+q.unit+'</span>':'')+
+        '<button class="btn accent" id="check">たしかめる</button></div>';
+    stage.innerHTML='<section class="screen"><div class="card">'+
+      '<span class="tag">第 '+(st.i+1)+' 問</span><span class="pg">'+q.pg+'</span>'+
+      q.body+'<p class="prompt">'+q.prompt+'</p>'+input+
+      '<div class="helprow">'+
+        '<button class="btn tiny" id="hintbtn">ヒントを見る</button>'+
+        '<button class="btn tiny" id="showbtn" hidden>答えを見る</button>'+
+      '</div>'+
+      '<div class="fb" id="fb"></div>'+
+      '<div class="nav"><span class="stepno">'+(st.i+1)+' / '+Q.length+'</span>'+
+      '<button class="btn" id="next" disabled>'+(st.i===Q.length-1?"けっかを見る →":"次へ →")+'</button></div>'+
+      '</div></section>';
+
+    if(q.type==="choice"){
+      var opts=document.getElementById("opts");
+      Array.prototype.forEach.call(opts.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return; judgeQ(Number(b.getAttribute("data-k"))===q.ans,b); });
+      });
+    } else {
+      var inp=document.getElementById("ans");
+      var go=function(){
+        if(inp.disabled) return;
+        var raw=norm(inp.value), fb=document.getElementById("fb");
+        if(raw===""){ fb.className="fb show hint"; fb.innerHTML="<b>答えを入れてね</b>数字を入力してから、たしかめるを押そう。"; return; }
+        var v=val(raw);
+        if(isNaN(v)){ fb.className="fb show hint"; fb.innerHTML="<b>数字で答えよう</b>マイナスは − でも - でも入力できるよ。"; return; }
+        judgeQ(Math.abs(v-q.ans)<1e-9,null);
+      };
+      document.getElementById("check").addEventListener("click",go);
+      inp.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); go(); } });
+      inp.focus();
+    }
+    var hintbtn=document.getElementById("hintbtn"), showbtn=document.getElementById("showbtn");
+    hintbtn.addEventListener("click",function(){
+      if(hintbtn.disabled) return;
+      if(st.help[st.i]<1) st.help[st.i]=1;
+      if(st.first[st.i]===null) st.first[st.i]=false;   // no longer counts as 自力
+      var fb=document.getElementById("fb");
+      fb.className="fb show hint"; fb.innerHTML="<b>ヒント</b>"+q.hint;
+      hintbtn.disabled=true; showbtn.hidden=false;
+      paintBar();
+    });
+    showbtn.addEventListener("click",function(){
+      if(showbtn.disabled) return;
+      st.help[st.i]=2; st.first[st.i]=false;
+      var fb=document.getElementById("fb");
+      fb.className="fb show wrong";
+      fb.innerHTML="<b>答えは "+(q.type==="choice"?"「"+q.opts[q.ans]+"」":fmt(q.ans))+
+                   "</b><span class='work'>"+q.work+"</span>";
+      var opts=document.getElementById("opts");
+      if(opts) opts.children[q.ans].classList.add("reveal");
+      lockQ();
+      var m=document.createElement("p");
+      m.className="usedmark"; m.textContent="この問題は、あとでもう一度といてみよう。";
+      fb.parentNode.insertBefore(m, fb.nextSibling);
+      paintBar();
+    });
+
+    document.getElementById("next").addEventListener("click",function(){
+      if(this.disabled) return;
+      if(st.i===Q.length-1){ st.done=true; report(); return; }
+      st.i++; renderQ();
+    });
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function judgeQ(ok,btn){
+    var st=S.test, q=Q[st.i], fb=document.getElementById("fb");
+    st.tries++;
+    if(ok){
+      if(st.first[st.i]===null) st.first[st.i]=(st.tries===1 && st.help[st.i]===0);
+      if(btn) btn.classList.add("ok");
+      fb.className="fb show right";
+      fb.innerHTML="<b>"+(st.help[st.i]>0?"よくできました。":"せいかい！")+
+                   "</b><span class='work'>"+q.work+"</span>";
+      lockQ(); paintBar(); return;
+    }
+    st.first[st.i]=false;
+    if(btn) btn.classList.add("no");
+    if(st.tries===1){
+      if(st.help[st.i]<1) st.help[st.i]=1;
+      fb.className="fb show hint"; fb.innerHTML="<b>おしい。ヒント</b>"+q.hint;
+      var hb=document.getElementById("hintbtn"), sb=document.getElementById("showbtn");
+      if(hb) hb.disabled=true; if(sb) sb.hidden=false;
+    }
+    else{
+      fb.className="fb show wrong";
+      fb.innerHTML="<b>答えは "+(q.type==="choice"?"「"+q.opts[q.ans]+"」":fmt(q.ans))+"</b><span class='work'>"+q.work+"</span>";
+      var opts=document.getElementById("opts");
+      if(opts) opts.children[q.ans].classList.add("reveal");
+      st.help[st.i]=2;
+      lockQ();
+    }
+    paintBar();
+  }
+
+  function lockQ(){
+    var opts=document.getElementById("opts");
+    if(opts) Array.prototype.forEach.call(opts.children,function(b){ b.disabled=true; });
+    var inp=document.getElementById("ans");
+    if(inp){ inp.disabled=true; document.getElementById("check").disabled=true; }
+    var hb=document.getElementById("hintbtn"), sb=document.getElementById("showbtn");
+    if(hb) hb.disabled=true;
+    if(sb) sb.disabled=true;
+    document.getElementById("next").disabled=false;
+  }
+
+  /* ---------- reports ---------- */
+  function report(){
+    if(mode==="setsumei"){
+      var st=S.setsumei;
+      var autos=st.res.filter(function(r){ return r.kind==="auto"; });
+      var autoOk=autos.filter(function(r){ return r.first===true; }).length;
+      var writes=st.res.filter(function(r){ return r.kind==="write"; });
+      var wrote=writes.filter(function(r){ return r.wrote; }).length;
+      var checks=writes.reduce(function(a,r){ return a+r.checks; },0);
+      var of=writes.reduce(function(a,r){ return a+r.of; },0);
+      var advice = (autoOk===autos.length && checks>=of-1)
+        ? "説明する力がついている。テスト編に進んで、身についたか確かめよう。"
+        : (autoOk<autos.length
+          ? "「どの説明がよいか」を見分けるところをもう一度。きまりをくり返すだけの説明と、理由を示す説明のちがいに注目しよう。"
+          : "書くところをよくがんばった。チェックが入らなかった項目をつけ足して書きなおすと、説明がぐっとよくなる。");
+      stage.innerHTML='<section class="screen"><div class="card">'+
+        '<span class="tag">けっか</span><h2>説明編のふり返り</h2>'+
+        '<p class="big">'+autoOk+' <small>/ '+autos.length+'</small></p>'+
+        '<p class="lead" style="text-align:center;margin-top:0">見きわめ問題</p>'+
+        '<table><tbody><tr><td>説明を書いた回数</td><td class="s">'+wrote+' / '+writes.length+'</td></tr>'+
+        '<tr><td>自己チェックがついた数</td><td class="s">'+checks+' / '+of+'</td></tr></tbody></table>'+
+        '<div class="note">'+advice+'</div>'+
+        '<p class="lead" style="margin:16px 0 2px"><b>説明するときの3つの型</b></p>'+
+        '<ul class="tips"><li><b>〜だから、〜になる。</b>　理由を先に、結論をあとに。</li>'+
+        '<li><b>たとえば〜の場合は。</b>　具体的な数や場面で確かめる。</li>'+
+        '<li><b>もし〜だとしたら、〜になってしまう。</b>　まちがいのほうを試して確かめる。</li></ul>'+
+        '<div class="note" style="border-color:var(--ok);background:var(--ok-bg)">'+
+        'おうちの人へ：書いた説明を声に出して読んでもらい、「どうしてそう思ったの？」と一度だけ聞き返すと、'+
+        '説明がもう一段くわしくなります。正しさより、理由が言えたことをほめてください。</div>'+
+        '<div class="nav" style="justify-content:center;gap:10px">'+
+        '<button class="btn ghost" id="again">もう一度</button>'+
+        '<button class="btn accent" id="goto-test">テスト編へ →</button></div>'+
+        '</div></section>';
+      document.getElementById("goto-test").addEventListener("click",function(){ switchTo("test"); });
+    } else {
+      var t=S.test, rows="", weak=[];
+      var solo=0, hinted=0, shown=0;
+      for(var k=0;k<Q.length;k++){
+        if(t.help[k]===2) shown++;
+        else if(t.first[k]===true) solo++;
+        else hinted++;
+      }
+      var n=solo;
+      CATS.forEach(function(c){
+        var idx=Q.map(function(q,k){ return q.cat===c?k:-1; }).filter(function(k){ return k>=0; });
+        var got=idx.filter(function(k){ return t.first[k]===true; }).length;
+        var sh =idx.filter(function(k){ return t.help[k]===2; }).length;
+        if(got<idx.length) weak.push(c);
+        var label = got===idx.length ? "OK" : (sh ? "要復習" : "あと少し");
+        var pill  = got===idx.length ? "good" : "watch";
+        rows+="<tr><td>"+c+"</td><td class='s'>"+got+" / "+idx.length+"</td>"+
+          "<td style='text-align:right'><span class='pill "+pill+"'>"+label+"</span></td></tr>";
+      });
+      stage.innerHTML='<section class="screen"><div class="card">'+
+        '<span class="tag">けっか</span><h2>テスト編の結果</h2>'+
+        '<p class="big">'+n+' <small>/ '+Q.length+'</small></p>'+
+        '<p class="lead" style="text-align:center;margin-top:0">自力で正解した数</p>'+
+        '<table><tbody>'+
+          '<tr><td>自力で正解</td><td class="s">'+solo+' 問</td></tr>'+
+          '<tr><td>ヒントを見て正解</td><td class="s">'+hinted+' 問</td></tr>'+
+          '<tr><td>答えを見た</td><td class="s">'+shown+' 問</td></tr>'+
+        '</tbody></table>'+
+        '<table><thead><tr><th>種類</th><th style="text-align:right">自力正答</th><th></th></tr></thead>'+
+        '<tbody>'+rows+'</tbody></table>'+
+        '<div class="note">'+(
+          solo===Q.length
+          ? "全問を自力で正解。理由を考えて説明する力がついている。次は p.14 の素数・素因数分解へ。"
+          : shown===0
+          ? "答えを見ずに、最後まで自分で解けた。ヒントが必要だった問題をもう一度といてみよう。"
+          : shown<=2
+          ? "ほとんど自分で解けている。答えを見た問題だけ、教科書のページにもどって確かめよう。"
+          : "答えを見た問題が多い。まず教科書の該当ページを読みなおしてから、もう一度このテストをやってみよう。"
+        )+'</div>'+
+        '<div class="note" style="border-color:var(--ok);background:var(--ok-bg)">'+
+        'おうちの人へ：<b>ヒントを見て正解</b>と<b>答えを見た</b>では、必要な手当てがちがいます。'+
+        'ヒントで解けたなら、理解はできていて思い出すきっかけが必要なだけ。'+
+        '答えを見た問題が続くなら、その内容をもう一度教えるところから始めてください。</div>'+
+        (weak.length ? '<p class="lead" style="margin:14px 0 2px"><b>もどるページ</b></p><ul class="rev">'+
+          weak.map(function(c){ return "<li><b>"+c+"</b>　"+BACK[c]+"</li>"; }).join("")+'</ul>' : '')+
+        '<div class="nav" style="justify-content:center;gap:10px">'+
+        '<button class="btn ghost" id="again">もう一度</button>'+
+        '<button class="btn accent" id="goto-setsumei">説明編へ →</button></div>'+
+        '</div></section>';
+      document.getElementById("goto-setsumei").addEventListener("click",function(){ switchTo("setsumei"); });
+    }
+    document.getElementById("again").addEventListener("click",function(){
+      if(mode==="setsumei"){
+        S.setsumei={ i:0, tries:0, done:false, res: STEPS.map(function(s){
+          return s.kind==="write" ? {kind:"write",checks:0,of:s.checks.length,wrote:false}
+                                  : {kind:"auto",first:null}; }) };
+      } else {
+        S.test={ i:0, tries:0, done:false, first:new Array(Q.length).fill(null),
+                 help:new Array(Q.length).fill(0) };
+      }
+      render();
+    });
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  /* ---------- tabs ---------- */
+  function switchTo(m){
+    mode=m;
+    root.className="wrap theme-"+m;
+    Array.prototype.forEach.call(document.querySelectorAll(".tabs button"),function(b){
+      b.classList.toggle("on", b.getAttribute("data-tab")===m); });
+    render();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".tabs button"),function(b){
+    b.addEventListener("click",function(){ switchTo(b.getAttribute("data-tab")); });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

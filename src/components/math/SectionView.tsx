@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getAdjacentSections } from "../../../content/subjects/math/curriculum";
-import type { MathChapterMeta, MathSection } from "../../../content/subjects/math/types";
+import type { MathBlockLessonLink, MathChapterMeta, MathSection } from "../../../content/subjects/math/types";
 import {
   createMathBlockProgressRecord,
   getSectionCompletionPercent,
@@ -36,6 +36,9 @@ export function SectionView({ chapter, section }: { chapter: MathChapterMeta; se
   const percent = getSectionCompletionPercent(section.id, practiceBlockIds, progress);
   const { prev, next } = getAdjacentSections(chapter.id, section.id);
   const sectionMeta = chapter.sections.find((s) => s.id === section.id);
+  const extraLessons = section.blocks.filter(
+    (block): block is MathBlockLessonLink => block.type === "lesson-link"
+  );
 
   return (
     <div className="math-scope" style={{ "--m-accent": chapter.color, "--m-tint": chapter.tint, "--m-dark": chapter.dark } as React.CSSProperties}>
@@ -74,6 +77,32 @@ export function SectionView({ chapter, section }: { chapter: MathChapterMeta; se
       </div>
 
       <div className="math-page">
+        {extraLessons.length > 0 ? (
+          <div className="math-section-extras-card">
+            <div className="math-section-extras-head">
+              <span className="math-section-extras-title">この節のおまけ</span>
+              <span className="math-section-extra-badge">📘 {extraLessons.length}</span>
+              <span className="math-section-extras-caption">教科書のほかに、やってみよう</span>
+            </div>
+            <div className="math-section-extras-grid">
+              {extraLessons.map((block) => (
+                <a
+                  className="math-section-extras-tile"
+                  href={block.href}
+                  key={block.id}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <span className="math-section-extras-icon">{block.label.split(" ")[0]}</span>
+                  <span className="math-section-extras-tile-text">
+                    <span className="math-section-extras-tile-title">{block.heading}</span>
+                    <span className="math-section-extras-tile-meta">{block.body}</span>
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : null}
         <SectionBlockList
           blocks={section.blocks}
           chapterId={chapter.id}

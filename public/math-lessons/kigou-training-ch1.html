@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>正負の数 復習クイズ ｜ 1章</title>
+<style>
+  :root{
+    --ink:#1D2530;
+    --ink-soft:#5B6C7E;
+    --paper:#EDF1F3;
+    --card:#FFFFFF;
+    --cold:#2C6E9B;
+    --cold-bg:#E7F0F6;
+    --warm:#B33A2B;
+    --warm-bg:#FAEBE8;
+    --ok:#2E7D5B;
+    --ok-bg:#E5F1EC;
+    --line:#D2DBE1;
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Meiryo",sans-serif;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP","MS Mincho",serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--gothic);
+       font-size:17px;line-height:1.8;-webkit-text-size-adjust:100%}
+  .wrap{max-width:620px;margin:0 auto;padding:18px 15px 70px}
+
+  /* ---- header: a thermometer strip, cold to warm ---- */
+  header.top{border-radius:14px;overflow:hidden;margin-bottom:16px;background:var(--card);
+             box-shadow:0 1px 2px rgba(29,37,48,.06),0 8px 20px rgba(29,37,48,.07)}
+  .strip{height:7px;background:linear-gradient(90deg,var(--cold) 0%,#8FA9B8 45%,#D2A79C 55%,var(--warm) 100%)}
+  .hd{padding:15px 18px 14px}
+  .hd .eyebrow{font-size:11.5px;letter-spacing:.2em;color:var(--ink-soft);margin:0 0 2px}
+  .hd h1{font-size:23px;font-weight:800;margin:0;letter-spacing:.02em}
+  .hd .sub{font-size:13.5px;color:var(--ink-soft);margin:3px 0 0}
+  .meter{display:flex;gap:3px;margin-top:12px}
+  .meter i{flex:1;height:4px;border-radius:2px;background:#DCE3E8;transition:background .25s}
+  .meter i.hit{background:var(--ok)}
+  .meter i.miss{background:#D8A9A2}
+  .meter i.now{background:var(--ink)}
+
+  .sec-tag{display:inline-block;font-size:12px;letter-spacing:.1em;font-weight:700;
+           padding:3px 10px;border-radius:20px;background:var(--cold-bg);color:var(--cold);margin-bottom:8px}
+
+  .card{background:var(--card);border-radius:14px;padding:20px 18px;
+        box-shadow:0 1px 2px rgba(29,37,48,.06),0 8px 20px rgba(29,37,48,.07)}
+  .screen{display:none;animation:rise .3s ease both}
+  .screen.on{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+  h2{font-size:20px;font-weight:800;margin:0 0 10px}
+  p{margin:0 0 13px}
+  .lead{color:var(--ink-soft);font-size:15.5px}
+
+  .qno{font-size:12.5px;color:var(--ink-soft);letter-spacing:.08em;margin:0 0 4px}
+  .expr{font-family:var(--mincho);font-size:30px;text-align:center;margin:14px 0 6px;letter-spacing:.04em}
+
+  /* ---- signature: number line ---- */
+  .nl{margin:4px 0 14px}
+  .nl svg{width:100%;height:auto;display:block}
+  .mark{opacity:0;transition:opacity .35s ease,transform .55s cubic-bezier(.34,1.3,.5,1)}
+  .mark.on{opacity:1}
+  .nl-cap{text-align:center;font-size:13px;color:var(--ink-soft);min-height:1.5em;margin:0}
+
+  .row{display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:6px}
+  .row .eqs{font-family:var(--mincho);font-size:26px}
+  input[type=text]{font-family:var(--mincho);font-size:24px;width:118px;padding:8px 10px;
+    border:1.5px solid var(--line);border-radius:10px;text-align:center;color:var(--ink);background:#fff}
+  input[type=text]:focus{outline:2px solid var(--cold);outline-offset:1px;border-color:var(--cold)}
+  input[type=text]:disabled{background:#F4F6F7}
+  button{font-family:inherit;font-size:16px;cursor:pointer}
+  .btn{padding:11px 20px;border-radius:10px;border:none;background:var(--ink);color:#fff;font-weight:700}
+  .btn:hover:not(:disabled){background:#33465C}
+  .btn:disabled{opacity:.4;cursor:default}
+  .btn.cold{background:var(--cold)}
+  .btn.cold:hover:not(:disabled){background:#215878}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+
+  .fb{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:15px;display:none}
+  .fb.show{display:block;animation:rise .22s ease both}
+  .fb.hint{background:var(--cold-bg);border:1px solid #BBD3E2}
+  .fb.wrong{background:var(--warm-bg);border:1px solid #E7C0B9}
+  .fb.right{background:var(--ok-bg);border:1px solid #B4D8C8}
+  .fb b{display:block;margin-bottom:2px}
+  .fb .work{font-family:var(--mincho);font-size:17px;display:block;margin-top:4px}
+
+  .nav{margin-top:20px;display:flex;justify-content:flex-end}
+
+  /* ---- report ---- */
+  .big{font-size:42px;font-weight:800;text-align:center;margin:6px 0 0}
+  .big small{font-size:18px;color:var(--ink-soft);font-weight:400}
+  table{width:100%;border-collapse:collapse;margin:16px 0 6px;font-size:15px}
+  th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+  th{font-size:12.5px;letter-spacing:.08em;color:var(--ink-soft);font-weight:700}
+  td.s{text-align:right;font-family:var(--mincho);font-size:18px;white-space:nowrap}
+  .pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .pill.good{background:var(--ok-bg);color:var(--ok)}
+  .pill.watch{background:var(--warm-bg);color:var(--warm)}
+  .advice{border-left:3px solid var(--cold);background:var(--cold-bg);
+          padding:11px 13px;border-radius:0 8px 8px 0;font-size:15px;margin:14px 0}
+  ul.miss{padding-left:1.15em;margin:8px 0 0;font-size:15px}
+  ul.miss li{margin-bottom:5px}
+  ul.miss .m{font-family:var(--mincho);font-size:17px}
+
+  :focus-visible{outline:2px solid var(--cold);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (max-width:400px){
+    body{font-size:16px}.expr{font-size:26px}.hd h1{font-size:20px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="strip"></div>
+  <div class="hd">
+    <p class="eyebrow">1章 正負の数 ／ 復習</p>
+    <h1>符号のトレーニング</h1>
+    <p class="sub">方程式でつまずく原因の多くは、ここにある。</p>
+    <div class="meter" id="meter"></div>
+  </div>
+</header>
+
+<!-- intro -->
+<section class="screen on" id="intro">
+  <div class="card">
+    <h2>20問、まとめてチェック</h2>
+    <p class="lead">加法・減法・乗除・累乗・四則混合の5つを、それぞれ4問ずつ。まちがえた問題は、最後にどの種類が弱いかを表にして出すよ。</p>
+    <div class="advice">3章の方程式を解いていて答えが合わないときは、移項ではなくこの計算がずれていることが多い。時間をあけて何度もやってみよう。</div>
+    <div class="nav"><button class="btn cold" id="start">はじめる</button></div>
+  </div>
+</section>
+
+<!-- quiz -->
+<section class="screen" id="quiz">
+  <div class="card">
+    <span class="sec-tag" id="sectag">加法</span>
+    <p class="qno" id="qno">第 1 問 / 20</p>
+    <div class="expr" id="expr">—</div>
+
+    <div class="nl">
+      <svg viewBox="0 0 320 54" role="img" aria-label="数直線">
+        <line x1="14" y1="34" x2="306" y2="34" stroke="#B7C4CD" stroke-width="1.6"/>
+        <g id="ticks"></g>
+        <g class="mark" id="mark">
+          <circle cx="160" cy="34" r="6.5" fill="#1D2530"/>
+          <text x="160" y="17" text-anchor="middle" font-size="14" font-family="serif" fill="#1D2530" id="marktxt">0</text>
+        </g>
+      </svg>
+    </div>
+    <p class="nl-cap" id="nlcap"></p>
+
+    <div class="row">
+      <span class="eqs">＝</span>
+      <input type="text" id="ans" aria-label="答え" autocomplete="off">
+      <button class="btn cold" id="check">たしかめる</button>
+    </div>
+    <div class="fb" id="fb"></div>
+    <div class="nav"><button class="btn" id="next" disabled>次へ →</button></div>
+  </div>
+</section>
+
+<!-- report -->
+<section class="screen" id="report">
+  <div class="card">
+    <span class="sec-tag">けっか</span>
+    <h2>今日の結果</h2>
+    <p class="big" id="total">0 <small>/ 20</small></p>
+    <p class="lead" style="text-align:center" id="totmsg"></p>
+    <table>
+      <thead><tr><th>種類</th><th style="text-align:right">正答</th><th style="text-align:right"></th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="advice" id="advice"></div>
+    <div id="missbox"></div>
+    <div class="nav" style="justify-content:center;gap:10px">
+      <button class="btn ghost" id="again">もう一度</button>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SECTIONS = ["加法","減法","乗法・除法","累乗","四則混合"];
+
+  var Q = [
+    /* 加法 */
+    {s:0, e:"(−6) ＋ (−7)", a:-13,
+      h:"同じ符号どうしのたし算。絶対値 6 と 7 をたして、符号はそのまま。",
+      w:"(−6) ＋ (−7) ＝ −(6＋7) ＝ −13"},
+    {s:0, e:"(＋8) ＋ (−3)", a:5,
+      h:"符号がちがうときは、絶対値の大きいほうから小さいほうをひく。符号は大きいほうに合わせる。",
+      w:"(＋8) ＋ (−3) ＝ ＋(8−3) ＝ 5"},
+    {s:0, e:"(−9) ＋ (＋4)", a:-5,
+      h:"絶対値は 9 と 4。大きいのは 9 で、その符号はマイナス。",
+      w:"(−9) ＋ (＋4) ＝ −(9−4) ＝ −5"},
+    {s:0, e:"(−2.5) ＋ (−1.5)", a:-4,
+      h:"小数でも考え方は同じ。同じ符号だから絶対値をたす。",
+      w:"(−2.5) ＋ (−1.5) ＝ −(2.5＋1.5) ＝ −4"},
+    /* 減法 */
+    {s:1, e:"3 − 8", a:-5,
+      h:"3 から 8 はひけない。数直線で 3 から左へ 8 すすむと？",
+      w:"3 − 8 ＝ 3 ＋ (−8) ＝ −5"},
+    {s:1, e:"(−4) − (−9)", a:5,
+      h:"「−(−9)」は「＋9」。ひくのマイナスは、たすに変わる。",
+      w:"(−4) − (−9) ＝ −4 ＋ 9 ＝ 5"},
+    {s:1, e:"(−7) − 6", a:-13,
+      h:"−7 からさらに 6 だけ左へすすむ。もっと小さくなるよ。",
+      w:"(−7) − 6 ＝ −7 ＋ (−6) ＝ −13"},
+    {s:1, e:"0 − (−12)", a:12,
+      h:"0 から −12 をひく。ひくのマイナスは、たすに変わる。",
+      w:"0 − (−12) ＝ 0 ＋ 12 ＝ 12"},
+    /* 乗除 */
+    {s:2, e:"(−3) × (−8)", a:24,
+      h:"マイナス × マイナス は プラス。",
+      w:"(−3) × (−8) ＝ ＋24"},
+    {s:2, e:"(−5) × 6", a:-30,
+      h:"符号がちがうかけ算の答えは、マイナス。",
+      w:"(−5) × 6 ＝ −30"},
+    {s:2, e:"(−36) ÷ (−4)", a:9,
+      h:"わり算も同じルール。同じ符号どうしなら答えはプラス。",
+      w:"(−36) ÷ (−4) ＝ ＋9"},
+    {s:2, e:"28 ÷ (−7)", a:-4,
+      h:"符号がちがうから、答えはマイナスになる。",
+      w:"28 ÷ (−7) ＝ −4"},
+    /* 累乗 */
+    {s:3, e:"(−3)²", a:9,
+      h:"かっこの中ぜんぶを2回かける。(−3) × (−3) だよ。",
+      w:"(−3)² ＝ (−3) × (−3) ＝ 9"},
+    {s:3, e:"−3²", a:-9,
+      h:"かっこがない。2乗されているのは 3 だけで、マイナスは後から。",
+      w:"−3² ＝ −(3 × 3) ＝ −9　　(−3)² との違いに注意。"},
+    {s:3, e:"(−2)³", a:-8,
+      h:"マイナスを3回かける。マイナスが奇数個のとき、答えの符号は？",
+      w:"(−2)³ ＝ (−2)×(−2)×(−2) ＝ −8"},
+    {s:3, e:"−(−4)²", a:-16,
+      h:"まず (−4)² を計算して 16。そのあと前のマイナスをつける。",
+      w:"−(−4)² ＝ −(16) ＝ −16"},
+    /* 四則混合 */
+    {s:4, e:"−8 ＋ 3 × (−2)", a:-14,
+      h:"たし算より、かけ算が先。3 × (−2) を先に計算しよう。",
+      w:"−8 ＋ 3×(−2) ＝ −8 ＋ (−6) ＝ −14"},
+    {s:4, e:"(−4)² − 5 × 3", a:1,
+      h:"順番は 累乗 → かけ算 → ひき算。(−4)² は 16。",
+      w:"(−4)² − 5×3 ＝ 16 − 15 ＝ 1"},
+    {s:4, e:"12 ÷ (−3) − (−5)", a:1,
+      h:"わり算が先で −4。そのあと −(−5) は ＋5。",
+      w:"12÷(−3) − (−5) ＝ −4 ＋ 5 ＝ 1"},
+    {s:4, e:"−2 × (−3)² ＋ 10", a:-8,
+      h:"まず (−3)² ＝ 9。つぎに −2 × 9。最後に ＋10。",
+      w:"−2×(−3)² ＋ 10 ＝ −2×9 ＋ 10 ＝ −18 ＋ 10 ＝ −8"}
+  ];
+
+  var i = 0, tries = 0, done = false;
+  var first = new Array(Q.length).fill(null);   // true = correct first try
+
+  var $ = function(id){ return document.getElementById(id); };
+  var meter = $("meter");
+  Q.forEach(function(){ meter.appendChild(document.createElement("i")); });
+
+  /* number line ticks */
+  (function(){
+    var g = $("ticks"), NS = "http://www.w3.org/2000/svg";
+    for(var v=-40; v<=40; v+=10){
+      var x = pos(v);
+      var l = document.createElementNS(NS,"line");
+      l.setAttribute("x1",x); l.setAttribute("x2",x);
+      l.setAttribute("y1", v===0?28:31); l.setAttribute("y2", v===0?40:37);
+      l.setAttribute("stroke", v===0?"#5B6C7E":"#B7C4CD");
+      l.setAttribute("stroke-width", v===0?1.6:1.2);
+      g.appendChild(l);
+      var t = document.createElementNS(NS,"text");
+      t.setAttribute("x",x); t.setAttribute("y",51);
+      t.setAttribute("text-anchor","middle");
+      t.setAttribute("font-size","9.5"); t.setAttribute("fill","#8A9AA7");
+      t.textContent = v;
+      g.appendChild(t);
+    }
+  })();
+  function pos(v){ return 14 + (v + 40) / 80 * 292; }
+
+  function fmt(n){ return String(n).replace("-","−"); }
+
+  function paintMeter(){
+    var m = meter.children;
+    for(var k=0;k<m.length;k++){
+      m[k].className = first[k]===true ? "hit" : first[k]===false ? "miss" : (k===i && !done ? "now" : "");
+    }
+  }
+
+  function show(id){
+    ["intro","quiz","report"].forEach(function(s){ $(s).classList.toggle("on", s===id); });
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function load(){
+    var q = Q[i];
+    tries = 0;
+    $("sectag").textContent = SECTIONS[q.s];
+    $("qno").textContent = "第 " + (i+1) + " 問 / " + Q.length;
+    $("expr").textContent = q.e;
+    var inp = $("ans");
+    inp.value = ""; inp.disabled = false;
+    $("check").disabled = false;
+    $("next").disabled = true;
+    $("next").textContent = (i === Q.length-1) ? "けっかを見る →" : "次へ →";
+    var fb = $("fb"); fb.className = "fb"; fb.innerHTML = "";
+    $("mark").classList.remove("on");
+    $("nlcap").textContent = "";
+    paintMeter();
+    inp.focus();
+  }
+
+  function placeMark(v){
+    var m = $("mark"), x = pos(Math.max(-40, Math.min(40, v)));
+    m.setAttribute("transform","translate(" + (x-160) + ",0)");
+    $("marktxt").textContent = fmt(v);
+    m.classList.add("on");
+    $("nlcap").textContent = v < 0 ? "0 より小さい ― 数直線の左がわ。"
+                          : v > 0 ? "0 より大きい ― 数直線の右がわ。"
+                          : "ちょうど 0。";
+  }
+
+  function norm(s){
+    return String(s).trim()
+      .replace(/[０-９]/g, function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); })
+      .replace(/[\u2212\u30FC\uFF0D\u2010\u2011\u2013\u2014\u2015\uFF70]/g,"-")
+      .replace(/\uFF0B/g,"+").replace(/\uFF0E/g,".")
+      .replace(/\s/g,"").replace(/^\+/,"");
+  }
+
+  function judge(){
+    if($("ans").disabled) return;                 // guards double-click
+    var raw = norm($("ans").value);
+    var fb = $("fb");
+    if(raw === ""){
+      fb.className = "fb show hint";
+      fb.innerHTML = "<b>答えを入れてね</b>数字を入力してから、たしかめるを押そう。";
+      return;
+    }
+    var v = Number(raw);
+    if(!isFinite(v)){
+      fb.className = "fb show hint";
+      fb.innerHTML = "<b>数字で答えよう</b>マイナスは − または - で入力できるよ。";
+      return;
+    }
+    tries++;
+    var q = Q[i], ok = Math.abs(v - q.a) < 1e-9;
+
+    if(ok){
+      if(first[i] === null) first[i] = (tries === 1);
+      placeMark(q.a);
+      fb.className = "fb show right";
+      fb.innerHTML = "<b>せいかい！</b><span class='work'>" + q.w + "</span>";
+      lock();
+      return;
+    }
+
+    if(tries === 1){
+      first[i] = false;
+      fb.className = "fb show hint";
+      fb.innerHTML = "<b>おしい。ヒント</b>" + q.h;
+    } else {
+      placeMark(q.a);
+      fb.className = "fb show wrong";
+      fb.innerHTML = "<b>答えは " + fmt(q.a) + "</b><span class='work'>" + q.w + "</span>";
+      lock();
+    }
+    paintMeter();
+  }
+
+  function lock(){
+    $("ans").disabled = true;
+    $("check").disabled = true;
+    $("next").disabled = false;
+    paintMeter();
+  }
+
+  $("check").addEventListener("click", judge);
+  $("ans").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); judge(); }
+  });
+
+  $("start").addEventListener("click", function(){ i = 0; show("quiz"); load(); });
+
+  $("next").addEventListener("click", function(){
+    if($("next").disabled) return;
+    if(i === Q.length-1){ finish(); return; }
+    i++; load();
+  });
+
+  function finish(){
+    done = true;
+    var n = first.filter(function(x){ return x === true; }).length;
+    $("total").innerHTML = n + " <small>/ " + Q.length + "</small>";
+    $("totmsg").textContent = n === Q.length ? "全問1回で正解。符号は完ぺき。"
+      : n >= 16 ? "よくできている。まちがえた種類だけ見なおそう。"
+      : n >= 11 ? "半分以上できている。弱い種類をしぼって練習しよう。"
+      : "ここを固めると、3章の方程式がぐっと楽になる。";
+
+    /* per-section table */
+    var tb = $("tbody"); tb.innerHTML = "";
+    var weakest = null, weakScore = 9;
+    SECTIONS.forEach(function(name, si){
+      var idx = Q.map(function(q,k){ return q.s===si ? k : -1; }).filter(function(k){ return k>=0; });
+      var got = idx.filter(function(k){ return first[k] === true; }).length;
+      if(got < weakScore){ weakScore = got; weakest = name; }
+      var tr = document.createElement("tr");
+      tr.innerHTML = "<td>" + name + "</td><td class='s'>" + got + " / " + idx.length + "</td>" +
+        "<td style='text-align:right'><span class='pill " + (got===idx.length?"good":"watch") + "'>" +
+        (got===idx.length ? "OK" : "要復習") + "</span></td>";
+      tb.appendChild(tr);
+    });
+
+    $("advice").textContent = (weakScore === 4)
+      ? "苦手な種類はなし。この状態なら、3章の方程式は移項のルールだけに集中できる。"
+      : "いちばん弱いのは「" + weakest + "」。教科書1章のこの部分をもう一度読んでから、明日もう一度このクイズをやってみよう。";
+
+    /* list of missed items */
+    var missed = Q.map(function(q,k){ return first[k]===true ? null : q; }).filter(Boolean);
+    var box = $("missbox"); box.innerHTML = "";
+    if(missed.length){
+      var h = document.createElement("p");
+      h.className = "lead"; h.style.margin = "14px 0 0";
+      h.textContent = "もう一度といてみる問題";
+      box.appendChild(h);
+      var ul = document.createElement("ul");
+      ul.className = "miss";
+      missed.forEach(function(q){
+        var li = document.createElement("li");
+        li.innerHTML = "<span class='m'>" + q.e + " ＝ " + fmt(q.a) + "</span>";
+        ul.appendChild(li);
+      });
+      box.appendChild(ul);
+    }
+
+    paintMeter();
+    show("report");
+  }
+
+  $("again").addEventListener("click", function(){ location.reload(); });
+
+  paintMeter();
+})();
+</script>
+</body>
+</html>

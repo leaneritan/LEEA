@@ -71,6 +71,7 @@ const IRREGULAR_VERBS: Record<string, [string, string]> = {
   spin: ["spun", "spun"],
   stand: ["stood", "stood"],
   swim: ["swam", "swum"],
+  swing: ["swung", "swung"],
   take: ["took", "taken"],
   teach: ["taught", "taught"],
   tell: ["told", "told"],

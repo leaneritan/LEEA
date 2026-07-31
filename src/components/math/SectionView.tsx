@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getAdjacentSections } from "../../../content/subjects/math/curriculum";
+import { getDigitalCompanionUrl } from "../../../content/subjects/math/digitalCompanion";
 import type { MathBlockLessonLink, MathChapterMeta, MathSection } from "../../../content/subjects/math/types";
 import {
   createMathBlockProgressRecord,
@@ -85,21 +86,36 @@ export function SectionView({ chapter, section }: { chapter: MathChapterMeta; se
               <span className="math-section-extras-caption">教科書のほかに、やってみよう</span>
             </div>
             <div className="math-section-extras-grid">
-              {extraLessons.map((block) => (
-                <a
-                  className="math-section-extras-tile"
-                  href={block.href}
-                  key={block.id}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <span className="math-section-extras-icon">{block.label.split(" ")[0]}</span>
-                  <span className="math-section-extras-tile-text">
-                    <span className="math-section-extras-tile-title">{block.heading}</span>
-                    <span className="math-section-extras-tile-meta">{block.body}</span>
-                  </span>
-                </a>
-              ))}
+              {extraLessons.map((block) => {
+                const pageUrl = getDigitalCompanionUrl(chapter.id, block.page);
+                return (
+                  <div className="math-section-extras-tile" key={block.id}>
+                    <a
+                      className="math-section-extras-tile-link"
+                      href={block.href}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      <span className="math-section-extras-icon">{block.label.split(" ")[0]}</span>
+                      <span className="math-section-extras-tile-text">
+                        <span className="math-section-extras-tile-title">{block.heading}</span>
+                        <span className="math-section-extras-tile-meta">{block.body}</span>
+                      </span>
+                    </a>
+                    {pageUrl && block.page ? (
+                      <a
+                        className="math-section-extras-page"
+                        href={pageUrl}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                        title="デジタル教科書でこのページを開く"
+                      >
+                        教科書 p.{block.page}
+                      </a>
+                    ) : null}
+                  </div>
+                );
+              })}
             </div>
           </div>
         ) : null}

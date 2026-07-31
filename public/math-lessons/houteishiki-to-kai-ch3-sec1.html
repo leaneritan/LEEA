@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方程式とその解 ｜ 3章1節 p.92-95</title>
+<style>
+  :root{
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Meiryo",sans-serif;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP","MS Mincho",serif;
+  }
+  /* ---- 説明編：黒板 ---- */
+  .theme-setsumei{
+    --ink:#22312C; --ink-soft:#5C6E67; --paper:#E8EDE9; --card:#FFFFFF;
+    --accent:#9C6B15; --accent-bg:#FAF2E2; --deep:#2F4739; --deep-fg:#F2F5EE;
+    --ok:#3D7A5A; --ok-bg:#E7F1EB; --no:#A64B3C; --no-bg:#F9EDEA; --line:#D3DCD6;
+  }
+  /* ---- テスト編：赤ペン ---- */
+  .theme-test{
+    --ink:#1F2328; --ink-soft:#63696F; --paper:#F4F3EF; --card:#FFFFFF;
+    --accent:#C62828; --accent-bg:#FBEDEC; --deep:#1F2328; --deep-fg:#FFFFFF;
+    --ok:#2F6F4E; --ok-bg:#E8F1EC; --no:#C62828; --no-bg:#FBEDEC; --line:#DEDCD4;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--gothic);font-size:17px;line-height:1.9;-webkit-text-size-adjust:100%;
+       background:var(--paper);color:var(--ink);transition:background .3s}
+  .wrap{max-width:660px;margin:0 auto;padding:18px 15px 70px}
+
+  header.top{background:var(--deep);color:var(--deep-fg);border-radius:13px;
+             padding:16px 18px 0;margin-bottom:16px;transition:background .3s}
+  header.top .eyebrow{font-size:11.5px;letter-spacing:.2em;opacity:.68;margin:0 0 3px}
+  header.top h1{font-size:24px;font-weight:800;margin:0;letter-spacing:.03em}
+  header.top .sub{font-size:13.5px;opacity:.68;margin:3px 0 0}
+  .bar{display:flex;gap:4px;margin-top:12px}
+  .bar i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.22);transition:background .25s}
+  .bar i.hit{background:#8FC5A5} .bar i.miss{background:#C58C82} .bar i.now{background:#fff}
+
+  /* ---- tabs ---- */
+  .tabs{display:flex;gap:6px;margin:14px -18px 0;padding:0 18px;border-top:1px solid rgba(255,255,255,.14)}
+  .tabs button{flex:1;background:none;border:none;color:inherit;opacity:.55;
+    font-family:inherit;font-size:14.5px;font-weight:700;padding:12px 4px 11px;
+    cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.04em}
+  .tabs button:hover{opacity:.85}
+  .tabs button.on{opacity:1;border-bottom-color:currentColor}
+  .tabs .badge{display:inline-block;font-size:11px;font-weight:700;margin-left:6px;
+    padding:1px 7px;border-radius:20px;background:rgba(255,255,255,.16)}
+  .tabs .badge.done{background:#8FC5A5;color:#1B2E24}
+
+  .card{background:var(--card);border-radius:13px;padding:21px 19px;
+        box-shadow:0 1px 2px rgba(0,0,0,.05),0 8px 20px rgba(0,0,0,.07)}
+  .screen{animation:rise .3s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+  .tag{display:inline-block;font-size:12px;letter-spacing:.12em;font-weight:700;
+       padding:3px 11px;border-radius:20px;background:var(--accent-bg);color:var(--accent);margin-bottom:8px}
+  .sec{display:inline-block;font-size:12px;letter-spacing:.06em;color:var(--ink-soft);
+       margin:0 0 8px 9px;font-weight:700}
+  .pg{display:inline-block;font-size:11.5px;letter-spacing:.06em;font-weight:700;
+      padding:2px 9px;border-radius:6px;background:var(--deep);color:var(--deep-fg);
+      margin:0 0 8px 8px;vertical-align:2px}
+  h2{font-size:21px;font-weight:800;margin:0 0 12px;letter-spacing:.02em}
+  p{margin:0 0 13px}
+  .lead{color:var(--ink-soft);font-size:15.5px}
+  .prompt{font-size:12.5px;letter-spacing:.1em;color:var(--accent);font-weight:700;margin:18px 0 4px}
+
+  .m{font-family:var(--mincho);font-size:27px;text-align:center;margin:14px 0;letter-spacing:.04em}
+  .m.sm{font-size:21px;line-height:1.8}
+  .quote{background:rgba(0,0,0,.02);border:1px dashed var(--line);border-radius:10px;
+         padding:12px 14px;margin:12px 0;font-size:15.5px}
+  .quote .src{display:block;font-size:11.5px;letter-spacing:.1em;color:var(--accent);
+              font-weight:700;margin-bottom:4px}
+  .prob{background:rgba(0,0,0,.02);border:1px solid var(--line);border-radius:11px;
+        padding:13px 15px;margin:12px 0;font-size:16px;line-height:1.95}
+
+  .choices{display:grid;gap:9px;margin-top:8px}
+  .choice{text-align:left;padding:12px 15px;border-radius:10px;border:1.5px solid var(--line);
+          background:#fff;color:var(--ink);font-size:15.5px;line-height:1.7;
+          transition:border-color .15s,background .15s;font-family:inherit;cursor:pointer}
+  .choice.mid{text-align:center;font-family:var(--mincho);font-size:19px}
+  .choice:hover:not(:disabled){border-color:var(--accent)}
+  .choice:disabled{cursor:default;opacity:.82}
+  .choice.ok{border-color:var(--ok);background:var(--ok-bg);font-weight:700}
+  .choice.no{border-color:var(--no);background:var(--no-bg)}
+  .choice.reveal{border-color:var(--ok);background:var(--ok-bg)}
+
+  .ord{display:grid;gap:8px;margin-top:8px}
+  .ord .item{text-align:left;padding:11px 14px;border-radius:10px;border:1.5px solid var(--line);
+             background:#fff;color:var(--ink);font-size:15.5px;line-height:1.7;
+             position:relative;font-family:inherit;cursor:pointer}
+  .ord .item:hover:not(:disabled){border-color:var(--accent)}
+  .ord .item.placed{border-color:var(--ok);background:var(--ok-bg);opacity:.9;cursor:default}
+  .ord .item.placed .rank{position:absolute;left:-9px;top:-9px;width:22px;height:22px;border-radius:50%;
+    background:var(--ok);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .ord .item.shake{animation:shake .32s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .ordcap{font-size:13.5px;color:var(--ink-soft);margin:8px 0 0;text-align:center}
+
+  textarea{width:100%;min-height:110px;font-family:var(--gothic);font-size:16px;line-height:1.8;
+    padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);resize:vertical}
+  textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  textarea:disabled{background:rgba(0,0,0,.03);color:var(--ink-soft)}
+  .cnt{font-size:12.5px;color:var(--ink-soft);text-align:right;margin:4px 0 0}
+
+  .board{background:var(--deep);color:var(--deep-fg);border-radius:12px;padding:16px 18px;margin-top:16px;
+         display:none;box-shadow:inset 0 0 40px rgba(0,0,0,.22)}
+  .board.show{display:block;animation:rise .35s ease both}
+  .board .who{font-size:11.5px;letter-spacing:.16em;opacity:.7;font-weight:700;margin:0 0 6px}
+  .board .say{font-family:var(--mincho);font-size:18px;line-height:1.95;margin:0}
+  .board .say em{font-style:normal;border-bottom:1.5px solid rgba(255,255,255,.45);padding-bottom:1px}
+
+  .selfcheck{background:var(--accent-bg);border-radius:11px;padding:14px 16px;margin-top:14px;display:none}
+  .selfcheck.show{display:block;animation:rise .3s ease both}
+  .selfcheck .t{font-size:12.5px;letter-spacing:.1em;font-weight:700;color:var(--accent);margin:0 0 8px}
+  .selfcheck label{display:flex;gap:10px;align-items:flex-start;font-size:15.5px;
+                   line-height:1.7;margin-bottom:7px;cursor:pointer}
+  .selfcheck input{width:19px;height:19px;margin-top:5px;flex-shrink:0;accent-color:var(--ok)}
+  .selfcheck .hintline{font-size:14px;color:var(--ink-soft);margin:8px 0 0}
+
+  .row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .row .pre{font-family:var(--mincho);font-size:22px}
+  .row .unit{font-size:15px;color:var(--ink-soft)}
+  input[type=text]{font-family:var(--mincho);font-size:22px;width:120px;padding:8px 10px;
+    border:1.5px solid var(--line);border-radius:10px;text-align:center;color:var(--ink);background:#fff}
+  input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  input[type=text]:disabled{background:rgba(0,0,0,.03)}
+
+  .btn{padding:11px 20px;border-radius:10px;border:none;background:var(--ink);color:#fff;
+       font-weight:700;font-family:inherit;font-size:16px;cursor:pointer}
+  .btn:hover:not(:disabled){opacity:.88}
+  .btn:disabled{opacity:.4;cursor:default}
+  .btn.accent{background:var(--accent)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .helprow{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+  .btn.tiny{padding:7px 14px;font-size:13.5px;background:#fff;color:var(--ink-soft);
+            border:1.5px solid var(--line);font-weight:700}
+  .btn.tiny:hover:not(:disabled){color:var(--accent);border-color:var(--accent)}
+  .btn.tiny[hidden]{display:none}
+  .usedmark{font-size:12.5px;color:var(--ink-soft);margin:10px 0 0;text-align:right}
+
+  .fb{margin-top:13px;padding:12px 14px;border-radius:10px;font-size:15px;display:none}
+  .fb.show{display:block;animation:rise .22s ease both}
+  .fb.hint{background:var(--accent-bg);border:1px solid var(--line)}
+  .fb.wrong{background:var(--no-bg);border:1px solid var(--line)}
+  .fb.right{background:var(--ok-bg);border:1px solid var(--line)}
+  .fb b{display:block;margin-bottom:2px}
+  .fb .work{font-family:var(--mincho);font-size:16.5px;display:block;margin-top:4px;line-height:1.75}
+
+  .nav{margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .stepno{font-size:12.5px;color:var(--ink-soft);letter-spacing:.08em}
+
+  .big{font-size:42px;font-weight:800;text-align:center;margin:6px 0 0}
+  .big small{font-size:18px;color:var(--ink-soft);font-weight:400}
+  table{width:100%;border-collapse:collapse;margin:16px 0 6px;font-size:15px}
+  th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+  th{font-size:12.5px;letter-spacing:.08em;color:var(--ink-soft);font-weight:700}
+  td.s{text-align:right;font-family:var(--mincho);font-size:18px;white-space:nowrap}
+  .pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .pill.good{background:var(--ok-bg);color:var(--ok)}
+  .pill.watch{background:var(--no-bg);color:var(--no)}
+  .note{border-left:3px solid var(--accent);background:var(--accent-bg);
+        padding:11px 13px;border-radius:0 8px 8px 0;font-size:15px;margin:14px 0}
+  ul.rev,ul.tips{padding-left:1.15em;margin:6px 0 0;font-size:15px}
+  ul.rev li,ul.tips li{margin-bottom:5px}
+
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (max-width:420px){body{font-size:16px}header.top h1{font-size:21px}.m{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap theme-setsumei" id="root">
+
+<header class="top">
+  <p class="eyebrow">3章 方程式 ／ 1節 方程式とその解</p>
+  <h1>方程式とその解</h1>
+  <p class="sub">教科書 p.92〜95　等式・方程式・解・代入して調べる</p>
+  <div class="bar" id="bar"></div>
+  <nav class="tabs">
+    <button data-tab="setsumei" class="on">説明編<span class="badge" id="b-setsumei">9問</span></button>
+    <button data-tab="test">テスト編<span class="badge" id="b-test">12問</span></button>
+  </nav>
+</header>
+
+<main id="stage"></main>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= 説明編 ================= */
+  var STEPS = [
+
+  { kind:"choice", tag:"はじめに", sec:"1節 方程式とその解", pg:"p.94",
+    title:"「＝」の意味が変わる",
+    lead:'3章 に入る前に、ひとつ確かめておきたいことがある。小学校からずっと使ってきた「＝」という記号。その意味を、あらためて考えてみよう。',
+    body:'<div class="m sm">3 ＋ 4 ＝ 7<br><br>400x ＋ 2000 ＝ 18000</div>',
+    prompt:"「＝」が本当に表しているのは、どちら？",
+    opts:["「＝」の左を計算すると、右の答えになる、という意味。",
+          "「＝」の左と右が、<b>同じ大きさである</b>、という意味。",
+          "「＝」の右に答えを書きなさい、という合図。",
+          "「＝」から先は計算しなさい、という記号。"],
+    ans:1,
+    hint:"400x ＋ 2000 ＝ 18000 で、「左を計算すると 18000 になる」と読むと、x がわからないままでは何も計算できない。それでもこの式には意味がある。なぜだろう。",
+    work:'ここが 3章 のいちばんはじめの関門。<br>'+
+         '小学校では、いつも「＝」の右に <b>答え</b> を書いてきた。だから「＝」は「計算しなさい」の合図のように見えていた。<br>'+
+         'でも本当の意味は <b>左と右がつりあっている</b>。つまり「＝」は矢印ではなく、<b>てんびん</b>。<br>'+
+         'この見方に変わると、400x ＋ 2000 ＝ 18000 は「計算しなさい」ではなく、'+
+         '<b>「x がいくつのとき、左と右はつりあうだろう？」という問い</b>だとわかる。' },
+
+  { kind:"choice", tag:"式にする", sec:"1節 方程式とその解", pg:"p.92・p.94",
+    title:"りんごの個数を式にする",
+    lead:'教科書 p.92 のりんごの収穫。かごからりんごを出して数えるのは大変なので、重さから個数を求めたい。',
+    body:'<div class="quote"><span class="src">教科書 p.92　りんごの収穫のまとめ</span>'+
+         '・りおさんの班の人数は 4人<br>・収穫したりんごは、かご1箱分<br>'+
+         '・かごをふくめた全体の重さは 18kg<br>・りんご1個の重さは 400g<br>'+
+         '・空のかご1箱の重さは 2kg</div>'+
+         '<div class="m sm">（りんごの重さ）＋（かごの重さ）＝（全体の重さ）</div>'+
+         '<p class="lead">りんごの個数を x 個とする。</p>',
+    prompt:"できる等式はどれ？",
+    opts:["400 ＋ 2000x ＝ 18000","400x ＝ 18000 ＋ 2000",
+          "400x ＋ 2000 ＝ 18000","400x ＋ 2000 ＋ 4 ＝ 18000"],
+    ans:2,
+    hint:"400g のりんごが x 個で 400x g。かごは 2kg。全体は 18kg。ただし単位に気をつけて。",
+    work:'400x ＋ 2000 ＝ 18000<br><br>'+
+         '<b>ひとつめの落とし穴は単位。</b> 重さが kg と g で混ざっている。'+
+         'g にそろえると 18kg ＝ 18000g、2kg ＝ 2000g。ここをそろえないと式が合わない。<br><br>'+
+         '<b>ふたつめは「4人」。</b>この式には使わない。問題に書いてあることを全部使うとはかぎらない。'+
+         '（4人は、あとで「1人あたり何個か」を求めるときに使う）<br>'+
+         '必要な情報を <b>選ぶ</b> のも、式をつくる力のうち。' },
+
+  { kind:"choice", tag:"調べてみる", sec:"1節 方程式とその解", pg:"p.94",
+    title:"あてはまる値をさがす",
+    lead:'教科書 p.94。x に 30、35、40、45、50 を入れて、左辺の値を右辺の 18000 と比べていく。',
+    body:'<div class="m sm">400x ＋ 2000 ＝ 18000</div>'+
+         '<div class="quote"><span class="src">左辺の値</span>'+
+         'x ＝ 30 のとき　400×30 ＋ 2000 ＝ 14000　（18000 より小さい）<br>'+
+         'x ＝ 35 のとき　400×35 ＋ 2000 ＝ 16000　（18000 より小さい）<br>'+
+         'x ＝ 40 のとき　400×40 ＋ 2000 ＝ 18000　<b>（ぴったり等しい）</b><br>'+
+         'x ＝ 45 のとき　400×45 ＋ 2000 ＝ ？</div>',
+    prompt:"x ＝ 45 のとき、左辺の値は？",
+    opts:["20000","18000","20450","22000"],
+    ans:0,
+    hint:"400 × 45 ＝ 18000。それに 2000 をたす。",
+    work:'400×45 ＋ 2000 ＝ 18000 ＋ 2000 ＝ <b>20000</b>。18000 より大きくなった。<br><br>'+
+         'x ＝ 40 のときだけ、左辺と右辺がぴったり等しくなる。このとき等式は <b>成り立つ</b> という。<br><br>'+
+         'このように、<b>文字に入れる値によって成り立ったり成り立たなかったりする等式</b>を '+
+         '<b>方程式</b> という。そして、成り立たせる値を、その方程式の <b>解</b> という。<br>'+
+         'ここでは 40 が解。りんごは40個で、4人で割ると1人あたり10個。' },
+
+  { kind:"choice", tag:"気づく", sec:"1節 方程式とその解", pg:"p.95",
+    title:"通りすぎる瞬間",
+    lead:'教科書 p.95 の 例1。2x ＋ 1 ＝ 7 の解を、1・2・3・4 を代入してさがす。左辺の値の動きに注目しよう。',
+    body:'<div class="quote"><span class="src">2x ＋ 1 ＝ 7</span>'+
+         'x ＝ 1 のとき　左辺 3　　右辺 7　　3 ＜ 7<br>'+
+         'x ＝ 2 のとき　左辺 5　　右辺 7　　5 ＜ 7<br>'+
+         'x ＝ 3 のとき　左辺 7　　右辺 7　　<b>7 ＝ 7</b><br>'+
+         'x ＝ 4 のとき　左辺 9　　右辺 7　　9 ＞ 7</div>'+
+         '<p class="lead">左辺は 3 → 5 → 7 → 9 と大きくなっていくが、右辺はずっと 7 のまま。</p>',
+    prompt:"不等号の向きが変わったことから、何がいえる？",
+    opts:["左辺はいつか必ず右辺と等しくなるので、解はいくつもある。",
+          "右辺が変わらないので、この式は方程式ではない。",
+          "x をもっと大きくしていけば、また等しくなることがある。",
+          "左辺が右辺を追いこす場所は1か所だけ。だから解は1つしかない。"],
+    ans:3,
+    hint:"左辺はずっと増え続けている。いちど右辺を追いこしたら、もどってくることはあるだろうか。",
+    work:'教科書の吹き出しが言っているのは、まさにこのこと。<br>'+
+         '左辺は <b>増え続ける</b>。右辺は <b>動かない</b>。だから追いこす瞬間は1回きりで、そこが解。<br><br>'+
+         'これがわかると、うれしいことが2つある。<br>'+
+         '① 解が見つかったら、<b>そこでさがすのをやめてよい</b>。<br>'+
+         '② 「小さすぎた」「大きすぎた」から、<b>解がどのあたりにあるか見当がつく</b>。<br>'+
+         'x ＝ 2 で小さく、x ＝ 4 で大きいなら、解はそのあいだにある。' },
+
+  { kind:"write", tag:"説明してみよう", sec:"1節 方程式とその解", pg:"p.94",
+    title:"方程式と解を、自分のことばで",
+    lead:'ここまでで、方程式と解ということばが出てきた。教科書の書き方をうつすのではなく、自分のことばにしてみよう。',
+    body:'<div class="quote"><span class="src">教科書 p.94</span>'+
+         '式のなかの文字に代入する値によって、成り立ったり成り立たなかったりする等式を '+
+         '<b>方程式</b> という。また、方程式を成り立たせる文字の値を、方程式の <b>解</b> という。</div>',
+    prompt:"方程式とは何か、解とは何か。りんごの問題を例にして説明しよう。",
+    ph:"例：方程式は…／解は…／りんごの問題では…",
+    model:'<b>方程式</b>とは、文字が入っていて、<em>その文字にどんな値を入れるかによって、'+
+          '成り立ったり成り立たなかったりする等式</em>のこと。<br>'+
+          'つまり「いつでも正しい式」ではなく、<em>正しくなるときとならないときがある式</em>。<br><br>'+
+          '<b>解</b>とは、その方程式を <em>成り立たせる（つりあわせる）値</em> のこと。<br><br>'+
+          'りんごの問題では、400x ＋ 2000 ＝ 18000 が方程式。<br>'+
+          'x に 30 を入れると 14000 ＝ 18000 となって成り立たない。'+
+          'x に 40 を入れると 18000 ＝ 18000 となって成り立つ。だから <em>40 がこの方程式の解</em>。<br><br>'+
+          'そして 40 は、ただの数ではなく <em>りんごの個数</em>。方程式を解くことが、そのまま問題の答えになっている。',
+    checks:["「入れる値によって成り立ったりしなかったりする」ことを書けた",
+            "解が「成り立たせる値」だと書けた",
+            "りんごの問題の具体的な数（40 など）で説明できた"] },
+
+  { kind:"choice", tag:"注意", sec:"1節 方程式とその解", pg:"p.95",
+    title:"負の数を代入するとき",
+    lead:'教科書 p.95 の 問2 に「負の数を代入するときは、かっこをつける」と注意書きがある。なぜだろう。',
+    body:'<div class="m sm">3x ＋ 8 ＝ x　に　x ＝ −4 を代入する</div>',
+    prompt:"左辺の正しい計算はどれ？",
+    opts:["3 − 4 ＋ 8 ＝ 7","3 × (−4) ＋ 8 ＝ −4","3 − (4 ＋ 8) ＝ −9","(3 − 4) × 8 ＝ −8"],
+    ans:1,
+    hint:"3x は「3 かける x」という意味だった。その x のところに −4 を入れる。",
+    work:'3x は <b>3 × x</b> の省略。だから x に −4 を入れるなら <b>3 × (−4)</b> ＝ −12。これに 8 をたして −4。<br><br>'+
+         'かっこをつけずに 3−4 と書いてしまうと、「3 ひく 4」と読めてしまう。かけ算のはずが、ひき算に化けてしまうのがこのミス。<br><br>'+
+         'ちなみにこの問題では、右辺も x なので 右辺 ＝ −4。左辺も右辺も −4 で等しいので、<b>−4 はこの方程式の解</b>。' },
+
+  { kind:"order", tag:"組み立てる", sec:"1節 方程式とその解", pg:"p.95",
+    title:"解かどうかを確かめる手順",
+    lead:'ある値が解かどうかを調べる手順を、順番に並べよう。教科書 p.95 の 例1 でやっていることそのもの。',
+    body:'<div class="m sm">その値は、解だろうか？</div>',
+    prompt:"説明の順になるように、正しい順にタップしよう。",
+    items:["式のなかの文字に、調べたい値を代入する。負の数のときはかっこをつける。",
+           "左辺だけを計算して、値を出す。",
+           "右辺だけを計算して、値を出す。",
+           "2つの値を比べる。等しければ、その値は解である。"],
+    hint:"左辺と右辺は、<b>べつべつに</b>計算する。いっぺんに計算しようとしないこと。",
+    work:'大事なのは <b>左辺と右辺をべつべつに計算して、あとで比べる</b> ということ。<br>'+
+         '「＝」でつないだまま計算しようとすると、何をしているのかわからなくなる。<br><br>'+
+         'この手順は、あとで方程式を解いたあとの <b>検算</b> でもそのまま使う。'+
+         '解が出たら、この4ステップでもとの式に入れて確かめる習慣をつけよう。' },
+
+  { kind:"write", tag:"次へつなぐ", sec:"1節 方程式とその解", pg:"p.95",
+    title:"代入だけでは足りない",
+    lead:'教科書 p.95 の最後で、はるきさんとあおいさんがこう言っている。この2人の気持ちを、自分のことばで説明してみよう。',
+    body:'<div class="quote"><span class="src">教科書 p.95</span>'+
+         'はるきさん「1つ1つ値を代入して解を見つけるのはたいへんだね。」<br>'+
+         'あおいさん「値を代入しなくても解を求められないかな。」</div>',
+    prompt:"代入して調べるやり方には、どんな不便さがあるだろう。",
+    ph:"例：候補がないときは…／もし解が…だったら…",
+    model:'代入は「その値が解かどうか」を <em>確かめる</em> 方法であって、<em>解を見つけ出す</em> 方法ではない。<br><br>'+
+          '不便な点は3つある。<br>'+
+          '① <em>候補を出してもらわないと使えない。</em>教科書は「1、2、3、4 のうち」と候補をくれたが、ふつうは誰もくれない。<br>'+
+          '② <em>整数とはかぎらない。</em>解が 2.5 や −7/3 だったら、整数をいくつ試しても永遠に見つからない。<br>'+
+          '③ <em>時間がかかりすぎる。</em>りんごの問題も、40 に行きあたるまで何回も計算した。<br><br>'+
+          'だから次の 2節 では、<em>代入せずに、式を変形して解を求める方法</em>を学ぶ。'+
+          'それが「等式の性質」と「移項」。この2人の「たいへんだね」が、3章 の出発点になっている。',
+    checks:["候補がないと使えない、ということにふれた",
+            "解が整数でない場合があることにふれた",
+            "だから別の方法が必要だ、とつなげられた"] },
+
+  { kind:"write", tag:"ふり返り", sec:"1節 方程式とその解", pg:"p.92〜95",
+    title:"今日のふり返り",
+    lead:'新しく出てきたことばは、等式・方程式・解・左辺・右辺。これらがどうつながっているかをまとめよう。',
+    body:'',
+    prompt:"今日いちばん「なるほど」と思ったことを、ひとつだけ書こう。",
+    ph:"例：〜だとわかった。／〜という考え方が大事だと思った。",
+    model:'<b>ことばの整理</b><br>'+
+          '<em>等式</em> … 「＝」で結ばれた式。左辺と右辺がつりあっていることを表す。<br>'+
+          '<em>左辺・右辺</em> … 「＝」の左と右。<b>べつべつに</b>計算して比べる。<br>'+
+          '<em>方程式</em> … 文字に入れる値によって、成り立ったり成り立たなかったりする等式。<br>'+
+          '<em>解</em> … その方程式を成り立たせる値。<br><br>'+
+          '<b>いちばん大事な見方</b><br>'+
+          '「＝」は「計算しなさい」ではなく <em>てんびん</em>。だから方程式は「どんな値のときつりあうか」をたずねている。<br><br>'+
+          '<b>次にやること</b><br>代入せずに解を求める方法（等式の性質・移項）を学ぶ。p.96 へ。',
+    checks:["自分のことばで書けた（教科書の丸写しではない）",
+            "「なぜなら」「〜だから」を使って理由を書いた"] }
+  ];
+
+  /* ================= テスト編 ================= */
+  var Q = [
+  { cat:"代入して計算する", pg:"p.95", type:"num", pre:"左辺 ＝",
+    body:'<div class="m">2x ＋ 1　に　x ＝ 5 を代入</div>',
+    prompt:"左辺の値を求めなさい。", ans:11,
+    hint:"2x は 2 × x。x のところに 5 を入れる。",
+    work:"2 × 5 ＋ 1 ＝ 10 ＋ 1 ＝ 11<br><br><b>なぜかけ算になるのか。</b> 2x は 2 × x の <b>×をはぶいた書き方</b>。だから x に 5 を入れても、かけ算は消えずに残っている。<br>ここを「25」と読んでしまうミスが多い。文字の前についている数は、くっついているのではなく <b>かけ算の相手</b>。<br>そして、たし算よりかけ算が先。だから 2×5 を先に計算する。" },
+
+  { cat:"代入して計算する", pg:"p.95", type:"num", pre:"左辺 ＝",
+    body:'<div class="m">3x − 4　に　x ＝ −2 を代入</div>',
+    prompt:"左辺の値を求めなさい。", ans:-10,
+    hint:"負の数だからかっこをつけて 3 × (−2)。",
+    work:"3 × (−2) − 4 ＝ −6 − 4 ＝ −10<br><br><b>なぜかっこが必要か。</b> かっこなしで 3−2 と書くと「3ひく2」に化けてしまう。かけ算だったものがひき算になるので、答えがまったく変わる。<br><b>なぜ 3×(−2) が −6 か。</b> 符号のちがう2数のかけ算はマイナス（1章3節）。<br><b>なぜ −6−4 が −10 か。</b> −6 からさらに 4 だけ左へ進むので、原点からより遠い −10 になる。数直線で確かめられる。" },
+
+  { cat:"代入して計算する", pg:"p.95", type:"num", pre:"左辺 ＝",
+    body:'<div class="m">4 − 5x　に　x ＝ −1 を代入</div>',
+    prompt:"左辺の値を求めなさい。", ans:9,
+    hint:"5x のところが 5 × (−1) ＝ −5。それを 4 からひく。ひくのマイナスに注意。",
+    work:"4 − 5×(−1) ＝ 4 − (−5) ＝ 4 ＋ 5 ＝ 9<br><br>この問題は 1章 のきまりを<b>2つ続けて</b>使う。<br><b>① 5×(−1) ＝ −5。</b> 符号がちがうかけ算はマイナス。<br><b>② 4 − (−5) ＝ 4 ＋ 5。</b> 「ひく」は「反対をたす」。−5 の反対は ＋5 なので、ひいたのに増える。<br><br>ここで 4 − 5 ＝ −1 としてしまう人が多い。それは x に −1 を入れたことを忘れて、5x を 5 のまま計算してしまったから。<b>代入した値は、最後まで符号ごと持ちはこぶ。</b>" },
+
+  { cat:"解かどうか調べる", pg:"p.95 例1", type:"choice",
+    body:'<div class="m sm">2x ＋ 1 ＝ 7　　x ＝ 3</div>',
+    prompt:"x ＝ 3 は、この方程式の解といえる？",
+    opts:["いえる。左辺も右辺も 7 になるから。","いえない。左辺は 6 になるから。",
+          "いえない。右辺に x がないから。","調べただけではわからない。"],
+    ans:0,
+    hint:"左辺と右辺を、べつべつに計算して比べよう。",
+    work:"左辺 ＝ 2×3 ＋ 1 ＝ 7　　右辺 ＝ 7　　等しいので x ＝ 3 は解。<br><br><b>なぜ左辺と右辺をべつべつに計算するのか。</b><br>「＝」は「計算しなさい」ではなく「左と右がつりあっている」という意味だった。だから調べたいのは <b>2つの値が同じかどうか</b>。<br>それを確かめるには、左だけ計算し、右だけ計算して、あとで見くらべるしかない。てんびんの左の皿と右の皿を、べつべつに量るのと同じ。" },
+
+  { cat:"解かどうか調べる", pg:"p.95 問1", type:"choice",
+    body:'<div class="m sm">3x ＋ 5 ＝ 8</div><p class="lead" style="text-align:center">−1、0、1、2 のうち</p>',
+    prompt:"解はどれ？",
+    opts:["−1","0","1","2"], ans:2,
+    hint:"4つとも代入して、左辺が 8 になるものをさがそう。負の数はかっこをつけて。",
+    work:"x＝−1 → 2　／　x＝0 → 5　／　<b>x＝1 → 8</b>　／　x＝2 → 11<br><br><b>なぜ1つしかないのか。</b> x が 1 増えるごとに、左辺は 3 ずつ増えている（2 → 5 → 8 → 11）。右辺の 8 は動かない。<br>ずっと増え続けるものが、動かないものを追いこすのは <b>1回きり</b>。だから解は1つで、見つかったらそこでさがすのをやめてよい。<br>x＝0 で小さく、x＝2 で大きいとわかった時点で、答えはそのあいだにあると見当がつく。" },
+
+  { cat:"解かどうか調べる", pg:"p.95 問2", type:"choice",
+    body:'<div class="m sm">−4 が解であるものはどれ？</div>',
+    prompt:"次のうち、−4 が解である方程式は？",
+    opts:["2x − 8 ＝ 1","x ＋ 4 ＝ 8","3x ＋ 8 ＝ x","2(1 − x) ＝ x ＋ 2"],
+    ans:2,
+    hint:"それぞれ x に −4 を代入して、左辺と右辺が等しくなるものをさがす。右辺にも x があることに注意。",
+    work:"左辺 ＝ 3×(−4) ＋ 8 ＝ −12 ＋ 8 ＝ −4　　右辺 ＝ x ＝ −4　　等しいので解。<br><br><b>この問題のわなは、右辺にも x があること。</b><br>これまでの問題は右辺が 7 や 8 のような数で、動かなかった。でもここでは <b>右辺も x といっしょに変わる</b>。x に −4 を入れたら、右辺も −4 になる。<br>右辺を見ずに左辺だけ計算して「−4 だから解ではない」と決めつけてしまうのが、いちばん多いまちがい。<br><b>代入は、式の中のすべての x に対しておこなう。</b>" },
+
+  { cat:"場面を式にする", pg:"p.94", type:"choice",
+    body:'<div class="prob">1個 400g のりんごが x 個、それに 2kg のかごを合わせて、全体の重さが 18kg になった。</div>',
+    prompt:"できる方程式はどれ？",
+    opts:["400x ＋ 2 ＝ 18","400x ＋ 2000 ＝ 18000","400 ＋ 2000x ＝ 18000","400x ＝ 18000"],
+    ans:1,
+    hint:"kg と g が混ざっている。まず単位をそろえよう。",
+    work:"単位を g にそろえて 18kg ＝ 18000g、2kg ＝ 2000g。よって 400x ＋ 2000 ＝ 18000。<br><br><b>なぜ単位をそろえるのか。</b> てんびんの左の皿にグラム、右の皿にキログラムをのせても比べられない。同じものさしで測ってはじめて「等しい」といえる。<br>400x ＋ 2 ＝ 18 としてしまうと、りんごだけグラム、かごと全体はキログラムという、ばらばらの式になってしまう。<br><br><b>なぜ「4人」を使わないのか。</b> この式が表しているのは <b>重さの関係</b> だけ。人数は重さに関係しない。問題に書いてあることを全部使うとはかぎらない。" },
+
+  { cat:"場面を式にする", pg:"p.93", type:"num", pre:"1人あたり", unit:"個",
+    body:'<div class="prob">りんごは全部で 40 個とれた。りおさんの班は 4人。</div>',
+    prompt:"1人あたり何個？", ans:10,
+    hint:"全部の個数を人数でわる。",
+    work:"40 ÷ 4 ＝ 10 個<br><br><b>なぜわり算なのか。</b> 40個を4人で <b>同じ数ずつ</b> 分けるから。「全体をいくつかに等しく分ける」場面がわり算。<br>確かめ方は、逆にかけ算にもどすこと。10個 × 4人 ＝ 40個 で、もとの数にもどれば正しい。" },
+
+  { cat:"場面を式にする", pg:"p.94", type:"choice",
+    body:'<div class="prob">1本 80円のペンを x 本と、150円のノートを1冊買ったら、代金の合計は 630円だった。</div>',
+    prompt:"できる方程式はどれ？",
+    opts:["80x ＋ 150 ＝ 630","80 ＋ 150x ＝ 630","80x ＝ 630 ＋ 150","(80 ＋ 150)x ＝ 630"],
+    ans:0,
+    hint:"ペンの代金は 1本の値段 × 本数。それにノートの150円をたすと合計になる。",
+    work:"80x ＋ 150 ＝ 630<br><br><b>式の形に注目しよう。</b> りんごの問題は 400x ＋ 2000 ＝ 18000 だった。この問題は 80x ＋ 150 ＝ 630。<b>数はちがうが、形はまったく同じ</b>。<br>（1個あたりの数）×（個数）＋（決まった数）＝（合計）<br><br>ペンは買う本数で代金が変わるので 80x。ノートは1冊と決まっているので 150 のまま。<b>変わるものに文字をつけ、変わらないものはそのまま書く。</b><br>（ちなみに x ＝ 6。80×6 ＋ 150 ＝ 630 ○）" },
+
+  { cat:"ことばの意味", pg:"p.94", type:"choice",
+    body:'<div class="m sm">方程式とは？</div>',
+    prompt:"方程式の説明として正しいのはどれ？",
+    opts:["文字がふくまれている式のこと。",
+          "「＝」がふくまれている式のこと。",
+          "文字に入れる値によって、成り立ったり成り立たなかったりする等式のこと。",
+          "答えが1つに決まる式のこと。"],
+    ans:2,
+    hint:"「＝」があるだけでは方程式とはいわない。値によって成り立つかどうかが変わることが大事。",
+    work:"文字に代入する値によって、成り立ったり成り立たなかったりする等式が方程式。<br><br><b>ほかの答えがなぜちがうのか。</b><br>「文字がある式」… 2x ＋ 3 には文字があるが「＝」がないので等式ですらない。<br>「＝がある式」… 2 ＋ 3 ＝ 5 は等式だが、いつでも成り立つので「どんな値のとき成り立つか」をたずねる意味がない。<br><br>方程式が方程式であるのは、<b>成り立つときと成り立たないときがあるから</b>。だからこそ「どのときか」をさがす価値がある。" },
+
+  { cat:"ことばの意味", pg:"p.94", type:"choice",
+    body:'<div class="m sm">解とは？</div>',
+    prompt:"方程式の解の説明として正しいのはどれ？",
+    opts:["方程式を成り立たせる文字の値。","方程式の右辺の値。",
+          "方程式の左辺を計算した答え。","方程式にふくまれる文字のこと。"],
+    ans:0,
+    hint:"「解く」とは、その値をさがすこと。何をさがしているのだろう。",
+    work:"方程式を成り立たせる（左辺と右辺を等しくする）文字の値が解。<br><br><b>てんびんで考えるとわかりやすい。</b> 方程式は、左の皿と右の皿がつりあうかどうかの話。x にいろいろな値を入れると、左の皿の重さが変わる。<br><b>ちょうどつりあったときの値</b>が解。<br><br>「左辺を計算した答え」ではないことに注意。左辺の値は x によって変わってしまうので、答えが1つに決まらない。決まるのは <b>つりあわせる x のほう</b>。" },
+
+  { cat:"ことばの意味", pg:"p.95", type:"choice",
+    body:'<div class="m sm">2x ＋ 1 ＝ 7</div>',
+    prompt:"この式の「右辺」はどれ？",
+    opts:["2x","2x ＋ 1","7","x"],
+    ans:2,
+    hint:"「＝」の右がわにあるもの。",
+    work:"右辺は 7、左辺は 2x ＋ 1。<br><br><b>なぜわざわざ名前をつけるのか。</b> これから何度も「左辺を計算して、右辺と比べる」「x の項を左辺に集める」といった話をするから。<br>そのたびに「＝の左のほう」と言っていては長い。名前があると、手順を短く正確に言える。<br><br>大事なのは、左辺と右辺が <b>別々に計算されるもの</b> だということ。ひとつながりの式ではなく、<b>比べあう2つの値</b>と見る。" }
+  ];
+
+  /* ================= shared engine ================= */
+  var CATS = ["代入して計算する","解かどうか調べる","場面を式にする","ことばの意味"];
+  var BACK = {
+    "代入して計算する":"p.95　例1（代入のしかた・負の数のかっこ）",
+    "解かどうか調べる":"p.95　例1・問1・問2",
+    "場面を式にする":"p.92〜94　りんごの収穫と等式",
+    "ことばの意味":"p.94　方程式と解のきまり"
+  };
+
+  var mode = "setsumei";
+  var S = {                       // per-tab state, kept when switching
+    setsumei:{ i:0, tries:0, done:false,
+      res: STEPS.map(function(s){ return s.kind==="write"
+              ? {kind:"write", checks:0, of:s.checks.length, wrote:false}
+              : {kind:"auto", first:null}; }) },
+    test:{ i:0, tries:0, done:false, first:new Array(Q.length).fill(null),
+           help:new Array(Q.length).fill(0) }   /* 0=自力 1=ヒント 2=答えを見た */
+  };
+
+  var root=document.getElementById("root"), stage=document.getElementById("stage"),
+      bar=document.getElementById("bar");
+
+  function norm(s){
+    return String(s).trim()
+      .replace(/[０-９]/g,function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); })
+      .replace(/[\u2212\u30FC\uFF0D\u2010\u2011\u2013\u2014\u2015\uFF70]/g,"-")
+      .replace(/\uFF0B/g,"+").replace(/\uFF0F/g,"/").replace(/\uFF0E/g,".")
+      .replace(/[,\uFF0C\s]/g,"").replace(/^\+/,"");
+  }
+  function val(s){
+    if(/^-?\d+(\.\d+)?$/.test(s)) return Number(s);
+    var m=s.match(/^(-?\d+)\/(\d+)$/);
+    return m ? Number(m[1])/Number(m[2]) : NaN;
+  }
+  function fmt(n){ return String(n).replace("-","−"); }
+
+  function paintBar(){
+    var n = (mode==="setsumei") ? STEPS.length : Q.length;
+    while(bar.children.length < n+1) bar.appendChild(document.createElement("i"));
+    while(bar.children.length > n+1) bar.removeChild(bar.lastChild);
+    var st=S[mode], b=bar.children;
+    for(var k=0;k<n;k++){
+      var cls="";
+      if(k===st.i && !st.done) cls="now";
+      else if(mode==="setsumei"){
+        var r=st.res[k];
+        cls = r.kind==="auto" ? (r.first===true?"hit":r.first===false?"miss":"")
+                              : (r.wrote ? (r.checks>0?"hit":"miss") : "");
+      } else {
+        cls = st.first[k]===true?"hit":st.first[k]===false?"miss":"";
+      }
+      b[k].className=cls;
+    }
+    b[n].className = st.done ? "now" : "";
+    // tab badges
+    var sDone=S.setsumei.res.filter(function(r){
+          return r.kind==="auto" ? r.first!==null : r.wrote; }).length;
+    var tDone=S.test.first.filter(function(v){ return v!==null; }).length;
+    var bs=document.getElementById("b-setsumei"), bt=document.getElementById("b-test");
+    bs.textContent = sDone ? sDone+"/"+STEPS.length : STEPS.length+"問";
+    bt.textContent = tDone ? tDone+"/"+Q.length : Q.length+"問";
+    bs.className = "badge"+(sDone===STEPS.length?" done":"");
+    bt.className = "badge"+(tDone===Q.length?" done":"");
+  }
+
+  function shuffled(n){
+    var a=[],k,j,t; for(k=0;k<n;k++) a.push(k);
+    for(k=a.length-1;k>0;k--){ j=Math.floor(Math.random()*(k+1)); t=a[k];a[k]=a[j];a[j]=t; }
+    return a;
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    if(S[mode].done){ report(); return; }
+    return (mode==="setsumei") ? renderStep() : renderQ();
+  }
+
+  function renderStep(){
+    var st=S.setsumei, s=STEPS[st.i]; st.tries=0;
+    var mid;
+    if(s.kind==="choice"){
+      mid='<p class="prompt">'+s.prompt+'</p><div class="choices" id="opts">'+
+          s.opts.map(function(o,k){ return '<button class="choice" data-k="'+k+'">'+o+'</button>'; }).join("")+
+          '</div><div class="fb" id="fb"></div>';
+    } else if(s.kind==="order"){
+      mid='<p class="prompt">'+s.prompt+'</p><div class="ord" id="ord">'+
+          shuffled(s.items.length).map(function(k){
+            return '<button class="item" data-k="'+k+'"><span class="rank"></span>'+s.items[k]+'</button>'; }).join("")+
+          '</div><p class="ordcap" id="ordcap">0 / '+s.items.length+' 並んだ</p><div class="fb" id="fb"></div>';
+    } else {
+      mid='<p class="prompt">'+s.prompt+'</p>'+
+          '<textarea id="ta" placeholder="'+s.ph+'"></textarea><p class="cnt" id="cnt">0 文字</p>'+
+          '<p style="text-align:right;margin:0"><button class="btn accent" id="send">書けた。先生の説明を見る</button></p>'+
+          '<div class="board" id="board"><p class="who">先生の説明</p><p class="say">'+s.model+'</p></div>'+
+          '<div class="selfcheck" id="sc"><p class="t">自分の説明とくらべよう</p>'+
+          s.checks.map(function(c,k){ return '<label><input type="checkbox" data-c="'+k+'"><span>'+c+'</span></label>'; }).join("")+
+          '<p class="hintline">できていなかったところは、いま書きたして直してみよう。</p></div>';
+    }
+    stage.innerHTML='<section class="screen"><div class="card">'+
+      '<span class="tag">'+s.tag+'</span><span class="sec">'+s.sec+'</span><span class="pg">'+s.pg+'</span>'+
+      '<h2>'+s.title+'</h2><p class="lead">'+s.lead+'</p>'+s.body+mid+
+      '<div class="nav"><span class="stepno">'+(st.i+1)+' / '+STEPS.length+'</span>'+
+      '<button class="btn" id="next" disabled>'+(st.i===STEPS.length-1?"けっかを見る →":"次へ →")+'</button></div>'+
+      '</div></section>';
+    wireStep();
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function wireStep(){
+    var st=S.setsumei, s=STEPS[st.i];
+    if(s.kind==="choice"){
+      var opts=document.getElementById("opts");
+      Array.prototype.forEach.call(opts.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return;
+          var ok=Number(b.getAttribute("data-k"))===s.ans, fb=document.getElementById("fb");
+          st.tries++;
+          if(ok){
+            if(st.res[st.i].first===null) st.res[st.i].first=(st.tries===1);
+            b.classList.add("ok");
+            fb.className="fb show right"; fb.innerHTML="<b>そのとおり。</b>"+s.work;
+            lockChoices();
+          } else {
+            st.res[st.i].first=false; b.classList.add("no");
+            if(st.tries===1){ fb.className="fb show hint"; fb.innerHTML="<b>もう一度考えよう</b>"+s.hint; }
+            else{ fb.className="fb show wrong";
+                  fb.innerHTML="<b>答えは「"+s.opts[s.ans].replace(/<[^>]+>/g,"")+"」</b>"+s.work;
+                  opts.children[s.ans].classList.add("reveal"); lockChoices(); }
+            paintBar();
+          }
+        });
+      });
+    } else if(s.kind==="order"){
+      var placed=0, ord=document.getElementById("ord");
+      Array.prototype.forEach.call(ord.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return;
+          if(Number(b.getAttribute("data-k"))===placed){
+            b.disabled=true; b.classList.add("placed");
+            b.querySelector(".rank").textContent=++placed;
+            document.getElementById("ordcap").textContent=placed+" / "+s.items.length+" 並んだ";
+            if(placed===s.items.length){
+              if(st.res[st.i].first===null) st.res[st.i].first=(st.tries===0);
+              var fb=document.getElementById("fb");
+              fb.className="fb show right"; fb.innerHTML="<b>きれいにつながった。</b>"+s.work;
+              document.getElementById("next").disabled=false; paintBar();
+            }
+          } else {
+            st.tries++; st.res[st.i].first=false;
+            b.classList.add("shake"); setTimeout(function(){ b.classList.remove("shake"); },340);
+            var fb2=document.getElementById("fb");
+            fb2.className="fb show hint"; fb2.innerHTML="<b>その順番ではないみたい</b>"+s.hint;
+            paintBar();
+          }
+        });
+      });
+    } else {
+      var ta=document.getElementById("ta"), send=document.getElementById("send");
+      ta.addEventListener("input",function(){
+        document.getElementById("cnt").textContent=ta.value.trim().length+" 文字"; });
+      send.addEventListener("click",function(){
+        if(ta.disabled) return;
+        if(ta.value.trim().length<10){
+          document.getElementById("cnt").textContent="もう少し書いてみよう（10文字以上）"; ta.focus(); return; }
+        st.res[st.i].wrote=true; ta.disabled=true; send.disabled=true;
+        document.getElementById("board").classList.add("show");
+        var sc=document.getElementById("sc"); sc.classList.add("show");
+        document.getElementById("next").disabled=false;
+        Array.prototype.forEach.call(sc.querySelectorAll("input"),function(cb){
+          cb.addEventListener("change",function(){
+            st.res[st.i].checks=sc.querySelectorAll("input:checked").length; paintBar(); });
+        });
+        paintBar();
+      });
+      ta.focus();
+    }
+    document.getElementById("next").addEventListener("click",function(){
+      if(this.disabled) return;
+      if(st.i===STEPS.length-1){ st.done=true; report(); return; }
+      st.i++; renderStep();
+    });
+  }
+
+  function lockChoices(){
+    var opts=document.getElementById("opts");
+    Array.prototype.forEach.call(opts.children,function(b){ b.disabled=true; });
+    document.getElementById("next").disabled=false; paintBar();
+  }
+
+  function renderQ(){
+    var st=S.test, q=Q[st.i]; st.tries=0;
+    var input = q.type==="choice"
+      ? '<div class="choices" id="opts">'+
+        q.opts.map(function(o,k){ return '<button class="choice'+(o.length<12?" mid":"")+'" data-k="'+k+'">'+o+'</button>'; }).join("")+'</div>'
+      : '<div class="row"><span class="pre">'+q.pre+'</span>'+
+        '<input type="text" id="ans" autocomplete="off" aria-label="答え">'+
+        (q.unit?'<span class="unit">'+q.unit+'</span>':'')+
+        '<button class="btn accent" id="check">たしかめる</button></div>';
+    stage.innerHTML='<section class="screen"><div class="card">'+
+      '<span class="tag">第 '+(st.i+1)+' 問</span><span class="pg">'+q.pg+'</span>'+
+      q.body+'<p class="prompt">'+q.prompt+'</p>'+input+
+      '<div class="helprow">'+
+        '<button class="btn tiny" id="hintbtn">ヒントを見る</button>'+
+        '<button class="btn tiny" id="showbtn" hidden>答えを見る</button>'+
+      '</div>'+
+      '<div class="fb" id="fb"></div>'+
+      '<div class="nav"><span class="stepno">'+(st.i+1)+' / '+Q.length+'</span>'+
+      '<button class="btn" id="next" disabled>'+(st.i===Q.length-1?"けっかを見る →":"次へ →")+'</button></div>'+
+      '</div></section>';
+
+    if(q.type==="choice"){
+      var opts=document.getElementById("opts");
+      Array.prototype.forEach.call(opts.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return; judgeQ(Number(b.getAttribute("data-k"))===q.ans,b); });
+      });
+    } else {
+      var inp=document.getElementById("ans");
+      var go=function(){
+        if(inp.disabled) return;
+        var raw=norm(inp.value), fb=document.getElementById("fb");
+        if(raw===""){ fb.className="fb show hint"; fb.innerHTML="<b>答えを入れてね</b>数字を入力してから、たしかめるを押そう。"; return; }
+        var v=val(raw);
+        if(isNaN(v)){ fb.className="fb show hint"; fb.innerHTML="<b>数字で答えよう</b>マイナスは − でも - でも入力できるよ。"; return; }
+        judgeQ(Math.abs(v-q.ans)<1e-9,null);
+      };
+      document.getElementById("check").addEventListener("click",go);
+      inp.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); go(); } });
+      inp.focus();
+    }
+    var hintbtn=document.getElementById("hintbtn"), showbtn=document.getElementById("showbtn");
+    hintbtn.addEventListener("click",function(){
+      if(hintbtn.disabled) return;
+      if(st.help[st.i]<1) st.help[st.i]=1;
+      if(st.first[st.i]===null) st.first[st.i]=false;   // no longer counts as 自力
+      var fb=document.getElementById("fb");
+      fb.className="fb show hint"; fb.innerHTML="<b>ヒント</b>"+q.hint;
+      hintbtn.disabled=true; showbtn.hidden=false;
+      paintBar();
+    });
+    showbtn.addEventListener("click",function(){
+      if(showbtn.disabled) return;
+      st.help[st.i]=2; st.first[st.i]=false;
+      var fb=document.getElementById("fb");
+      fb.className="fb show wrong";
+      fb.innerHTML="<b>答えは "+(q.type==="choice"?"「"+q.opts[q.ans]+"」":fmt(q.ans))+
+                   "</b><span class='work'>"+q.work+"</span>";
+      var opts=document.getElementById("opts");
+      if(opts) opts.children[q.ans].classList.add("reveal");
+      lockQ();
+      var m=document.createElement("p");
+      m.className="usedmark"; m.textContent="この問題は、あとでもう一度といてみよう。";
+      fb.parentNode.insertBefore(m, fb.nextSibling);
+      paintBar();
+    });
+
+    document.getElementById("next").addEventListener("click",function(){
+      if(this.disabled) return;
+      if(st.i===Q.length-1){ st.done=true; report(); return; }
+      st.i++; renderQ();
+    });
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function judgeQ(ok,btn){
+    var st=S.test, q=Q[st.i], fb=document.getElementById("fb");
+    st.tries++;
+    if(ok){
+      if(st.first[st.i]===null) st.first[st.i]=(st.tries===1 && st.help[st.i]===0);
+      if(btn) btn.classList.add("ok");
+      fb.className="fb show right";
+      fb.innerHTML="<b>"+(st.help[st.i]>0?"よくできました。":"せいかい！")+
+                   "</b><span class='work'>"+q.work+"</span>";
+      lockQ(); paintBar(); return;
+    }
+    st.first[st.i]=false;
+    if(btn) btn.classList.add("no");
+    if(st.tries===1){
+      if(st.help[st.i]<1) st.help[st.i]=1;
+      fb.className="fb show hint"; fb.innerHTML="<b>おしい。ヒント</b>"+q.hint;
+      var hb=document.getElementById("hintbtn"), sb=document.getElementById("showbtn");
+      if(hb) hb.disabled=true; if(sb) sb.hidden=false;
+    }
+    else{
+      fb.className="fb show wrong";
+      fb.innerHTML="<b>答えは "+(q.type==="choice"?"「"+q.opts[q.ans]+"」":fmt(q.ans))+"</b><span class='work'>"+q.work+"</span>";
+      var opts=document.getElementById("opts");
+      if(opts) opts.children[q.ans].classList.add("reveal");
+      st.help[st.i]=2;
+      lockQ();
+    }
+    paintBar();
+  }
+
+  function lockQ(){
+    var opts=document.getElementById("opts");
+    if(opts) Array.prototype.forEach.call(opts.children,function(b){ b.disabled=true; });
+    var inp=document.getElementById("ans");
+    if(inp){ inp.disabled=true; document.getElementById("check").disabled=true; }
+    var hb=document.getElementById("hintbtn"), sb=document.getElementById("showbtn");
+    if(hb) hb.disabled=true;
+    if(sb) sb.disabled=true;
+    document.getElementById("next").disabled=false;
+  }
+
+  /* ---------- reports ---------- */
+  function report(){
+    if(mode==="setsumei"){
+      var st=S.setsumei;
+      var autos=st.res.filter(function(r){ return r.kind==="auto"; });
+      var autoOk=autos.filter(function(r){ return r.first===true; }).length;
+      var writes=st.res.filter(function(r){ return r.kind==="write"; });
+      var wrote=writes.filter(function(r){ return r.wrote; }).length;
+      var checks=writes.reduce(function(a,r){ return a+r.checks; },0);
+      var of=writes.reduce(function(a,r){ return a+r.of; },0);
+      var advice = (autoOk===autos.length && checks>=of-1)
+        ? "説明する力がついている。テスト編に進んで、身についたか確かめよう。"
+        : (autoOk<autos.length
+          ? "「どの説明がよいか」を見分けるところをもう一度。きまりをくり返すだけの説明と、理由を示す説明のちがいに注目しよう。"
+          : "書くところをよくがんばった。チェックが入らなかった項目をつけ足して書きなおすと、説明がぐっとよくなる。");
+      stage.innerHTML='<section class="screen"><div class="card">'+
+        '<span class="tag">けっか</span><h2>説明編のふり返り</h2>'+
+        '<p class="big">'+autoOk+' <small>/ '+autos.length+'</small></p>'+
+        '<p class="lead" style="text-align:center;margin-top:0">見きわめ問題</p>'+
+        '<table><tbody><tr><td>説明を書いた回数</td><td class="s">'+wrote+' / '+writes.length+'</td></tr>'+
+        '<tr><td>自己チェックがついた数</td><td class="s">'+checks+' / '+of+'</td></tr></tbody></table>'+
+        '<div class="note">'+advice+'</div>'+
+        '<p class="lead" style="margin:16px 0 2px"><b>説明するときの3つの型</b></p>'+
+        '<ul class="tips"><li><b>〜だから、〜になる。</b>　理由を先に、結論をあとに。</li>'+
+        '<li><b>たとえば〜の場合は。</b>　具体的な数や場面で確かめる。</li>'+
+        '<li><b>もし〜だとしたら、〜になってしまう。</b>　まちがいのほうを試して確かめる。</li></ul>'+
+        '<div class="note" style="border-color:var(--ok);background:var(--ok-bg)">'+
+        'おうちの人へ：書いた説明を声に出して読んでもらい、「どうしてそう思ったの？」と一度だけ聞き返すと、'+
+        '説明がもう一段くわしくなります。正しさより、理由が言えたことをほめてください。</div>'+
+        '<div class="nav" style="justify-content:center;gap:10px">'+
+        '<button class="btn ghost" id="again">もう一度</button>'+
+        '<button class="btn accent" id="goto-test">テスト編へ →</button></div>'+
+        '</div></section>';
+      document.getElementById("goto-test").addEventListener("click",function(){ switchTo("test"); });
+    } else {
+      var t=S.test, rows="", weak=[];
+      var solo=0, hinted=0, shown=0;
+      for(var k=0;k<Q.length;k++){
+        if(t.help[k]===2) shown++;
+        else if(t.first[k]===true) solo++;
+        else hinted++;
+      }
+      var n=solo;
+      CATS.forEach(function(c){
+        var idx=Q.map(function(q,k){ return q.cat===c?k:-1; }).filter(function(k){ return k>=0; });
+        var got=idx.filter(function(k){ return t.first[k]===true; }).length;
+        var sh =idx.filter(function(k){ return t.help[k]===2; }).length;
+        if(got<idx.length) weak.push(c);
+        var label = got===idx.length ? "OK" : (sh ? "要復習" : "あと少し");
+        var pill  = got===idx.length ? "good" : "watch";
+        rows+="<tr><td>"+c+"</td><td class='s'>"+got+" / "+idx.length+"</td>"+
+          "<td style='text-align:right'><span class='pill "+pill+"'>"+label+"</span></td></tr>";
+      });
+      stage.innerHTML='<section class="screen"><div class="card">'+
+        '<span class="tag">けっか</span><h2>テスト編の結果</h2>'+
+        '<p class="big">'+n+' <small>/ '+Q.length+'</small></p>'+
+        '<p class="lead" style="text-align:center;margin-top:0">自力で正解した数</p>'+
+        '<table><tbody>'+
+          '<tr><td>自力で正解</td><td class="s">'+solo+' 問</td></tr>'+
+          '<tr><td>ヒントを見て正解</td><td class="s">'+hinted+' 問</td></tr>'+
+          '<tr><td>答えを見た</td><td class="s">'+shown+' 問</td></tr>'+
+        '</tbody></table>'+
+        '<table><thead><tr><th>種類</th><th style="text-align:right">自力正答</th><th></th></tr></thead>'+
+        '<tbody>'+rows+'</tbody></table>'+
+        '<div class="note">'+(
+          solo===Q.length
+          ? "全問を自力で正解。p.92〜95 はしっかり身についている。次は p.96 の等式の性質へ。"
+          : shown===0
+          ? "答えを見ずに、最後まで自分で解けた。ヒントが必要だった問題をもう一度といてみよう。"
+          : shown<=2
+          ? "ほとんど自分で解けている。答えを見た問題だけ、教科書のページにもどって確かめよう。"
+          : "答えを見た問題が多い。まず教科書の該当ページを読みなおしてから、もう一度このテストをやってみよう。"
+        )+'</div>'+
+        '<div class="note" style="border-color:var(--ok);background:var(--ok-bg)">'+
+        'おうちの人へ：<b>ヒントを見て正解</b>と<b>答えを見た</b>では、必要な手当てがちがいます。'+
+        'ヒントで解けたなら、理解はできていて思い出すきっかけが必要なだけ。'+
+        '答えを見た問題が続くなら、その内容をもう一度教えるところから始めてください。</div>'+
+        (weak.length ? '<p class="lead" style="margin:14px 0 2px"><b>もどるページ</b></p><ul class="rev">'+
+          weak.map(function(c){ return "<li><b>"+c+"</b>　"+BACK[c]+"</li>"; }).join("")+'</ul>' : '')+
+        '<div class="nav" style="justify-content:center;gap:10px">'+
+        '<button class="btn ghost" id="again">もう一度</button>'+
+        '<button class="btn accent" id="goto-setsumei">説明編へ →</button></div>'+
+        '</div></section>';
+      document.getElementById("goto-setsumei").addEventListener("click",function(){ switchTo("setsumei"); });
+    }
+    document.getElementById("again").addEventListener("click",function(){
+      if(mode==="setsumei"){
+        S.setsumei={ i:0, tries:0, done:false, res: STEPS.map(function(s){
+          return s.kind==="write" ? {kind:"write",checks:0,of:s.checks.length,wrote:false}
+                                  : {kind:"auto",first:null}; }) };
+      } else {
+        S.test={ i:0, tries:0, done:false, first:new Array(Q.length).fill(null),
+                 help:new Array(Q.length).fill(0) };
+      }
+      render();
+    });
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  /* ---------- tabs ---------- */
+  function switchTo(m){
+    mode=m;
+    root.className="wrap theme-"+m;
+    Array.prototype.forEach.call(document.querySelectorAll(".tabs button"),function(b){
+      b.classList.toggle("on", b.getAttribute("data-tab")===m); });
+    render();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".tabs button"),function(b){
+    b.addEventListener("click",function(){ switchTo(b.getAttribute("data-tab")); });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

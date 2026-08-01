@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>比例式の利用 ｜ 3章2節 p.109-110</title>
+<style>
+  :root{
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Meiryo",sans-serif;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP","MS Mincho",serif;
+  }
+  /* ---- 説明編：黒板 ---- */
+  .theme-setsumei{
+    --ink:#22312C; --ink-soft:#5C6E67; --paper:#E8EDE9; --card:#FFFFFF;
+    --accent:#9C6B15; --accent-bg:#FAF2E2; --deep:#2F4739; --deep-fg:#F2F5EE;
+    --ok:#3D7A5A; --ok-bg:#E7F1EB; --no:#A64B3C; --no-bg:#F9EDEA; --line:#D3DCD6;
+  }
+  /* ---- テスト編：赤ペン ---- */
+  .theme-test{
+    --ink:#1F2328; --ink-soft:#63696F; --paper:#F4F3EF; --card:#FFFFFF;
+    --accent:#C62828; --accent-bg:#FBEDEC; --deep:#1F2328; --deep-fg:#FFFFFF;
+    --ok:#2F6F4E; --ok-bg:#E8F1EC; --no:#C62828; --no-bg:#FBEDEC; --line:#DEDCD4;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--gothic);font-size:17px;line-height:1.9;-webkit-text-size-adjust:100%;
+       background:var(--paper);color:var(--ink);transition:background .3s}
+  .wrap{max-width:660px;margin:0 auto;padding:18px 15px 70px}
+
+  header.top{background:var(--deep);color:var(--deep-fg);border-radius:13px;
+             padding:16px 18px 0;margin-bottom:16px;transition:background .3s}
+  header.top .eyebrow{font-size:11.5px;letter-spacing:.2em;opacity:.68;margin:0 0 3px}
+  header.top h1{font-size:24px;font-weight:800;margin:0;letter-spacing:.03em}
+  header.top .sub{font-size:13.5px;opacity:.68;margin:3px 0 0}
+  .bar{display:flex;gap:4px;margin-top:12px}
+  .bar i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.22);transition:background .25s}
+  .bar i.hit{background:#8FC5A5} .bar i.miss{background:#C58C82} .bar i.now{background:#fff}
+
+  /* ---- tabs ---- */
+  .tabs{display:flex;gap:6px;margin:14px -18px 0;padding:0 18px;border-top:1px solid rgba(255,255,255,.14)}
+  .tabs button{flex:1;background:none;border:none;color:inherit;opacity:.55;
+    font-family:inherit;font-size:14.5px;font-weight:700;padding:12px 4px 11px;
+    cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.04em}
+  .tabs button:hover{opacity:.85}
+  .tabs button.on{opacity:1;border-bottom-color:currentColor}
+  .tabs .badge{display:inline-block;font-size:11px;font-weight:700;margin-left:6px;
+    padding:1px 7px;border-radius:20px;background:rgba(255,255,255,.16)}
+  .tabs .badge.done{background:#8FC5A5;color:#1B2E24}
+
+  .card{background:var(--card);border-radius:13px;padding:21px 19px;
+        box-shadow:0 1px 2px rgba(0,0,0,.05),0 8px 20px rgba(0,0,0,.07)}
+  .screen{animation:rise .3s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+  .tag{display:inline-block;font-size:12px;letter-spacing:.12em;font-weight:700;
+       padding:3px 11px;border-radius:20px;background:var(--accent-bg);color:var(--accent);margin-bottom:8px}
+  .sec{display:inline-block;font-size:12px;letter-spacing:.06em;color:var(--ink-soft);
+       margin:0 0 8px 9px;font-weight:700}
+  .pg{display:inline-block;font-size:11.5px;letter-spacing:.06em;font-weight:700;
+      padding:2px 9px;border-radius:6px;background:var(--deep);color:var(--deep-fg);
+      margin:0 0 8px 8px;vertical-align:2px}
+  h2{font-size:21px;font-weight:800;margin:0 0 12px;letter-spacing:.02em}
+  p{margin:0 0 13px}
+  .lead{color:var(--ink-soft);font-size:15.5px}
+  .prompt{font-size:12.5px;letter-spacing:.1em;color:var(--accent);font-weight:700;margin:18px 0 4px}
+
+  .m{font-family:var(--mincho);font-size:27px;text-align:center;margin:14px 0;letter-spacing:.04em}
+  .m.sm{font-size:21px;line-height:1.8}
+  .frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+        text-align:center;font-size:.62em;line-height:1.18;margin:0 .12em}
+  .frac .n{border-bottom:1.6px solid currentColor;padding:0 .35em}
+  .frac .d{padding:0 .35em}
+  .quote{background:rgba(0,0,0,.02);border:1px dashed var(--line);border-radius:10px;
+         padding:12px 14px;margin:12px 0;font-size:15.5px}
+  .quote .src{display:block;font-size:11.5px;letter-spacing:.1em;color:var(--accent);
+              font-weight:700;margin-bottom:4px}
+  .prob{background:rgba(0,0,0,.02);border:1px solid var(--line);border-radius:11px;
+        padding:13px 15px;margin:12px 0;font-size:16px;line-height:1.95}
+
+  .choices{display:grid;gap:9px;margin-top:8px}
+  .choice{text-align:left;padding:12px 15px;border-radius:10px;border:1.5px solid var(--line);
+          background:#fff;color:var(--ink);font-size:15.5px;line-height:1.7;
+          transition:border-color .15s,background .15s;font-family:inherit;cursor:pointer}
+  .choice.mid{text-align:center;font-family:var(--mincho);font-size:19px}
+  .choice:hover:not(:disabled){border-color:var(--accent)}
+  .choice:disabled{cursor:default;opacity:.82}
+  .choice.ok{border-color:var(--ok);background:var(--ok-bg);font-weight:700}
+  .choice.no{border-color:var(--no);background:var(--no-bg)}
+  .choice.reveal{border-color:var(--ok);background:var(--ok-bg)}
+
+  .ord{display:grid;gap:8px;margin-top:8px}
+  .ord .item{text-align:left;padding:11px 14px;border-radius:10px;border:1.5px solid var(--line);
+             background:#fff;color:var(--ink);font-size:15.5px;line-height:1.7;
+             position:relative;font-family:inherit;cursor:pointer}
+  .ord .item:hover:not(:disabled){border-color:var(--accent)}
+  .ord .item.placed{border-color:var(--ok);background:var(--ok-bg);opacity:.9;cursor:default}
+  .ord .item.placed .rank{position:absolute;left:-9px;top:-9px;width:22px;height:22px;border-radius:50%;
+    background:var(--ok);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .ord .item.shake{animation:shake .32s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .ordcap{font-size:13.5px;color:var(--ink-soft);margin:8px 0 0;text-align:center}
+
+  textarea{width:100%;min-height:110px;font-family:var(--gothic);font-size:16px;line-height:1.8;
+    padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);resize:vertical}
+  textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  textarea:disabled{background:rgba(0,0,0,.03);color:var(--ink-soft)}
+  .cnt{font-size:12.5px;color:var(--ink-soft);text-align:right;margin:4px 0 0}
+
+  .board{background:var(--deep);color:var(--deep-fg);border-radius:12px;padding:16px 18px;margin-top:16px;
+         display:none;box-shadow:inset 0 0 40px rgba(0,0,0,.22)}
+  .board.show{display:block;animation:rise .35s ease both}
+  .board .who{font-size:11.5px;letter-spacing:.16em;opacity:.7;font-weight:700;margin:0 0 6px}
+  .board .say{font-family:var(--mincho);font-size:18px;line-height:1.95;margin:0}
+  .board .say em{font-style:normal;border-bottom:1.5px solid rgba(255,255,255,.45);padding-bottom:1px}
+
+  .selfcheck{background:var(--accent-bg);border-radius:11px;padding:14px 16px;margin-top:14px;display:none}
+  .selfcheck.show{display:block;animation:rise .3s ease both}
+  .selfcheck .t{font-size:12.5px;letter-spacing:.1em;font-weight:700;color:var(--accent);margin:0 0 8px}
+  .selfcheck label{display:flex;gap:10px;align-items:flex-start;font-size:15.5px;
+                   line-height:1.7;margin-bottom:7px;cursor:pointer}
+  .selfcheck input{width:19px;height:19px;margin-top:5px;flex-shrink:0;accent-color:var(--ok)}
+  .selfcheck .hintline{font-size:14px;color:var(--ink-soft);margin:8px 0 0}
+
+  .row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .row .pre{font-family:var(--mincho);font-size:22px}
+  .row .unit{font-size:15px;color:var(--ink-soft)}
+  input[type=text]{font-family:var(--mincho);font-size:22px;width:120px;padding:8px 10px;
+    border:1.5px solid var(--line);border-radius:10px;text-align:center;color:var(--ink);background:#fff}
+  input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  input[type=text]:disabled{background:rgba(0,0,0,.03)}
+
+  .btn{padding:11px 20px;border-radius:10px;border:none;background:var(--ink);color:#fff;
+       font-weight:700;font-family:inherit;font-size:16px;cursor:pointer}
+  .btn:hover:not(:disabled){opacity:.88}
+  .btn:disabled{opacity:.4;cursor:default}
+  .btn.accent{background:var(--accent)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .helprow{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+  .btn.tiny{padding:7px 14px;font-size:13.5px;background:#fff;color:var(--ink-soft);
+            border:1.5px solid var(--line);font-weight:700}
+  .btn.tiny:hover:not(:disabled){color:var(--accent);border-color:var(--accent)}
+  .btn.tiny[hidden]{display:none}
+  .usedmark{font-size:12.5px;color:var(--ink-soft);margin:10px 0 0;text-align:right}
+
+  .fb{margin-top:13px;padding:12px 14px;border-radius:10px;font-size:15px;display:none}
+  .fb.show{display:block;animation:rise .22s ease both}
+  .fb.hint{background:var(--accent-bg);border:1px solid var(--line)}
+  .fb.wrong{background:var(--no-bg);border:1px solid var(--line)}
+  .fb.right{background:var(--ok-bg);border:1px solid var(--line)}
+  .fb b{display:block;margin-bottom:2px}
+  .fb .work{font-family:var(--mincho);font-size:16.5px;display:block;margin-top:4px;line-height:1.75}
+
+  .nav{margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .stepno{font-size:12.5px;color:var(--ink-soft);letter-spacing:.08em}
+
+  .big{font-size:42px;font-weight:800;text-align:center;margin:6px 0 0}
+  .big small{font-size:18px;color:var(--ink-soft);font-weight:400}
+  table{width:100%;border-collapse:collapse;margin:16px 0 6px;font-size:15px}
+  th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+  th{font-size:12.5px;letter-spacing:.08em;color:var(--ink-soft);font-weight:700}
+  td.s{text-align:right;font-family:var(--mincho);font-size:18px;white-space:nowrap}
+  .pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .pill.good{background:var(--ok-bg);color:var(--ok)}
+  .pill.watch{background:var(--no-bg);color:var(--no)}
+  .note{border-left:3px solid var(--accent);background:var(--accent-bg);
+        padding:11px 13px;border-radius:0 8px 8px 0;font-size:15px;margin:14px 0}
+  ul.rev,ul.tips{padding-left:1.15em;margin:6px 0 0;font-size:15px}
+  ul.rev li,ul.tips li{margin-bottom:5px}
+
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (max-width:420px){body{font-size:16px}header.top h1{font-size:21px}.m{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap theme-setsumei" id="root">
+
+<header class="top">
+  <p class="eyebrow">3章 方程式 ／ 2節 比例式の利用</p>
+  <h1>比例式の利用</h1>
+  <p class="sub">教科書 p.109〜110　比例式・比の値・比例式の性質</p>
+  <div class="bar" id="bar"></div>
+  <nav class="tabs">
+    <button data-tab="setsumei" class="on">説明編<span class="badge" id="b-setsumei">9問</span></button>
+    <button data-tab="test">テスト編<span class="badge" id="b-test">13問</span></button>
+  </nav>
+</header>
+
+<main id="stage"></main>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= 説明編 ================= */
+  var STEPS = [
+
+  /* 1 — p.109 : why the ratio is written in that order */
+  { kind:"choice", tag:"はじめに", sec:"2節 比例式の利用", pg:"p.109",
+    title:"なぜ x : 120 ＝ 2 : 3 なのか",
+    lead:'教科書 p.109 の Q。ウスターソースとケチャップを 2 : 3 の割合で混ぜる。ケチャップが120mLのとき、ウスターソースは何mLか。必要な量を x mL とすると、こんな式ができる。',
+    body:'<div class="quote"><span class="src">教科書 p.109</span>'+
+         'ウスターソースとケチャップを <b>2 : 3</b> の割合で混ぜて、ハンバーグソースを作ります。'+
+         'ケチャップを <b>120mL</b> 使うとき、ウスターソースは何 mL あればよいでしょうか。</div>'+
+         '<div class="m sm">x ： 120 ＝ 2 ： 3</div>',
+    prompt:"この順に書けるのは、なぜ？",
+    opts:[
+      "小さい数を左に書くという決まりがあるから。",
+      "左にウスターソース、右にケチャップを書いた順が、2 : 3 の順と同じだから。",
+      "120 が 3 の倍数だから。",
+      "割合はいつも右辺に書くから。"],
+    ans:1,
+    hint:"2 : 3 の 2 はどちらの量？ 3 はどちらの量？ 左辺も同じ順に並べる必要がある。",
+    work:'比は <b>並べる順</b> が意味をもつ。2 : 3 は「ウスターソース : ケチャップ」の順。'+
+         'だから左辺も「ウスターソース : ケチャップ」＝ x : 120 の順にそろえる。<br>'+
+         '順をまちがえて 120 : x ＝ 2 : 3 と書くと、まったくちがう答えになってしまう。' },
+
+  /* 2 — p.109 : あおいさん's scaling route */
+  { kind:"choice", tag:"あおいさんの考え", sec:"2節 比例式の利用", pg:"p.109",
+    title:"何倍かで考える",
+    lead:'あおいさんは、右辺から左辺への「何倍か」に目をつけた。',
+    body:'<div class="m sm">x ： 120 ＝ 2 ： 3</div>'+
+         '<div class="quote"><span class="src">あおいさんの考え</span>'+
+         '3 を 120 にするには ×40。だから 2 のほうも同じだけ…</div>',
+    prompt:"x はいくつになる？",
+    opts:["60", "80", "180", "240"],
+    ans:1,
+    hint:"120 ÷ 3 ＝ 40。比を等しく保つには、両方に同じ数をかける。",
+    work:'2 × 40 ＝ <b>80</b> mL。<br>'+
+         '比の両方に同じ数をかけても比は変わらない。2 : 3 の両方を40倍すると 80 : 120。<br>'+
+         '確かめ：80 : 120 を簡単にすると 2 : 3 ○' },
+
+  /* 3 — p.109 : 比の値 */
+  { kind:"choice", tag:"はるきさんの考え", sec:"2節 比例式の利用", pg:"p.109",
+    title:"比の値にしてしまう",
+    lead:'はるきさんは、比を分数に直した。p.109 の「ちょっと確認」に、比の値の意味が書いてある。',
+    body:'<div class="quote"><span class="src">教科書 p.109　ちょっと確認</span>'+
+         'a : b で表された比で、<b>a ÷ b</b> を比の値という。比の値が等しいとき、それらの比は等しい。</div>'+
+         '<div class="m sm">x ： 120 ＝ 2 ： 3　→　？</div>',
+    prompt:"はるきさんの式はどれ？",
+    opts:[
+      "120 ÷ x ＝ 3 ÷ 2",
+      "x ÷ 120 ＝ 2 ÷ 3",
+      "x ÷ 2 ＝ 120 ÷ 3",
+      "x × 120 ＝ 2 × 3"],
+    ans:1,
+    hint:"a : b の比の値は a ÷ b。左辺は x : 120 だから、比の値は？",
+    work:'x ÷ 120 ＝ 2 ÷ 3　つまり x/120 ＝ 2/3。<br>'+
+         'りおさんが言うとおり、これはもう <b>方程式</b> になっている。'+
+         '分数の方程式なので、p.101 の <b>分母をはらう</b> やり方が使える。' },
+
+  /* 4 — p.110 問1 : derive the property */
+  { kind:"order", tag:"組み立てる", sec:"2節 比例式の利用", pg:"p.110",
+    title:"比例式の性質はどこから来たか",
+    lead:'教科書 p.110 の 問1。はるきさんの式を変形していくと、比例式の性質が見えてくる。その筋道を並べよう。',
+    body:'<div class="m sm">x ： 120 ＝ 2 ： 3</div>',
+    prompt:"説明の順になるように、正しい順にタップしよう。",
+    items:[
+      "両辺の比の値が等しいので、x/120 ＝ 2/3 と書ける。",
+      "分数のままでは計算しにくいので、両辺に分母の 120 と 3 をかける。",
+      "左辺は x × 3、右辺は 2 × 120 になる。",
+      "つまり x × 3 ＝ 2 × 120。もとの比例式の外側どうし、内側どうしの積になっている。"],
+    hint:"まず比を分数に直すところから。次に分母をどうするか。",
+    work:'これで p.110 の <b>比例式の性質</b> が出てくる。<br>'+
+         '<b>a : b ＝ m : n ならば an ＝ bm</b><br>'+
+         'つまり <b>外側の積 ＝ 内側の積</b>。新しい決まりではなく、分母をはらった結果にすぎない。' },
+
+  /* 5 — p.110 : write the why */
+  { kind:"write", tag:"説明してみよう", sec:"2節 比例式の利用", pg:"p.110",
+    title:"なぜ an ＝ bm になるのか",
+    lead:'比例式の性質を、丸暗記ではなく理由つきで言えるようにしよう。使う道具は p.101 の「分母をはらう」だけ。',
+    body:'<div class="quote"><span class="src">教科書 p.110　比例式の性質</span>'+
+         'a : b ＝ m : n　ならば　<b>an ＝ bm</b></div>',
+    prompt:"なぜこの性質が成り立つのか、比の値を使って説明しよう。",
+    ph:"例：比が等しいということは…／両辺に…をかけると…",
+    model:'比が等しいということは、<em>比の値が等しい</em>ということ。だから a/b ＝ m/n と書ける。<br>'+
+          'これは分数の方程式なので、<em>分母をはらう</em>。両辺に b と n をかけると<br>'+
+          'a/b × b × n ＝ m/n × b × n<br>'+
+          '左辺は a × n、右辺は m × b が残る。よって <em>an ＝ bm</em>。<br>'+
+          'つまり比例式の性質は、新しい決まりではなく、分母をはらっただけのもの。',
+    checks:["比が等しい → 比の値が等しい、と書けた",
+            "両辺に分母をかけた（分母をはらった）と書けた",
+            "だから an ＝ bm になる、とつなげられた"] },
+
+  /* 6 — p.110 例1 : apply */
+  { kind:"choice", tag:"使ってみる", sec:"2節 比例式の利用", pg:"p.110",
+    title:"性質を使って解く",
+    lead:'教科書 p.110 の 例1。比例式の性質を使って、かけ算の式に直す。',
+    body:'<div class="m sm">x ： 10 ＝ 3 ： 2</div>',
+    prompt:"かけ算の式に直すと？",
+    opts:[
+      "x × 2 ＝ 10 × 3",
+      "x × 3 ＝ 10 × 2",
+      "x × 10 ＝ 3 × 2",
+      "x ＋ 2 ＝ 10 ＋ 3"],
+    ans:0,
+    hint:"外側は x と 2、内側は 10 と 3。外側の積 ＝ 内側の積。",
+    work:'x × 2 ＝ 10 × 3　→　2x ＝ 30　→　x ＝ 15。<br>'+
+         '検算：15 : 10 を簡単にすると 3 : 2 ○' },
+
+  /* 7 — p.110 問2(2) : x in the inner position */
+  { kind:"choice", tag:"位置に注意", sec:"2節 比例式の利用", pg:"p.110",
+    title:"x が内側にあるとき",
+    lead:'教科書 p.110 の 問2(2)。こんどは x が2番目にある。外側と内側を取りちがえやすい。',
+    body:'<div class="m sm">16 ： x ＝ 12 ： 9</div>',
+    prompt:"かけ算の式に直すと？",
+    opts:[
+      "16 × 12 ＝ x × 9",
+      "16 × 9 ＝ x × 12",
+      "16 × x ＝ 12 × 9",
+      "x × 9 ＝ 16 × 12"],
+    ans:1,
+    hint:"a : b ＝ m : n にあてはめると、a＝16、b＝x、m＝12、n＝9。an ＝ bm を書いてみよう。",
+    work:'16 × 9 ＝ x × 12　→　144 ＝ 12x　→　x ＝ 12。<br>'+
+         '外側は 16 と 9、内側は x と 12。<br>'+
+         '検算：16 : 12 を簡単にすると 4 : 3。12 : 9 も 4 : 3 ○' },
+
+  /* 8 — p.110 問3 : splitting a total */
+  { kind:"choice", tag:"全体を分ける", sec:"2節 比例式の利用", pg:"p.110",
+    title:"合計が決まっているとき",
+    lead:'教科書 p.110 の 問3。ミルクティー1200mLを、牛乳と紅茶を 3 : 5 で混ぜて作る。牛乳を x mL とする。',
+    body:'<div class="quote"><span class="src">教科書 p.110</span>'+
+         'ミルクティーを1200mL作ります。牛乳と紅茶を 3 : 5 の割合で混ぜるとき、牛乳は何 mL 必要ですか。</div>'+
+         '<div class="m sm">牛乳 … x mL　　紅茶 … ？ mL</div>',
+    prompt:"紅茶の量を x で表すと？",
+    opts:["1200 − x", "x − 1200", "1200x", "1200 ÷ x"],
+    ans:0,
+    hint:"合わせて1200mL。牛乳が x mL なら、残りが全部紅茶になる。p.105 のオレンジとりんごと同じ考え方。",
+    work:'1200 − x mL。<br>'+
+         'よって x : (1200 − x) ＝ 3 : 5。性質より 5x ＝ 3(1200 − x)　→　5x ＝ 3600 − 3x　→　8x ＝ 3600　→　x ＝ 450。<br>'+
+         '牛乳450mL、紅茶750mL。検算：450 : 750 を簡単にすると 3 : 5 ○' },
+
+  /* 9 — reflection */
+  { kind:"write", tag:"ふり返り", sec:"2節 比例式の利用", pg:"p.109・p.110",
+    title:"今日のふり返り",
+    lead:'比例式には解き方が2つあった。どちらも使えるようにしておくと、問題に合わせて選べる。',
+    body:'',
+    prompt:"比例式を解く方法を、2つとも自分のことばで書こう。",
+    ph:"例：ひとつめは何倍かを考える方法で…／ふたつめは…",
+    model:'<b>方法1（あおいさん）何倍かで考える</b><br>'+
+          'x : 120 ＝ 2 : 3 で、3 を120にするには ×40。'+
+          'だから 2 も40倍して x ＝ 80。<em>数がきれいに割れるときは速い。</em><br><br>'+
+          '<b>方法2（はるきさん）比例式の性質を使う</b><br>'+
+          'a : b ＝ m : n ならば an ＝ bm。'+
+          'x : 120 ＝ 2 : 3 なら 3x ＝ 240 で x ＝ 80。<em>どんな数でも必ず解ける。</em><br><br>'+
+          'そして性質のもとになっているのは、比の値と <em>分母をはらう</em>（p.101）だけ。',
+    checks:["何倍かで考える方法を書けた",
+            "比例式の性質 an ＝ bm を書けた",
+            "性質が比の値からできていることにふれた"] }
+  ];
+
+  /* ================= テスト編 ================= */
+  var Q = [
+
+  { cat:"比を式にする", pg:"p.109", type:"choice",
+    body:'<div class="prob">ウスターソースとケチャップを 2 : 3 の割合で混ぜます。ケチャップを 120mL 使うとき、ウスターソースは何 mL でしょうか。</div>'+
+         '<p class="lead" style="text-align:center">ウスターソースを x mL とする</p>',
+    prompt:"正しい比例式はどれ？",
+    opts:["120 : x ＝ 2 : 3","x : 120 ＝ 3 : 2","x : 120 ＝ 2 : 3","x : 2 ＝ 120 : 3"],
+    ans:2,
+    hint:"2 : 3 は「ウスターソース : ケチャップ」の順。左辺も同じ順にそろえる。",
+    work:"x : 120 ＝ 2 : 3<br><br>"+
+         "<b>比は並べる順に意味がある。</b> 2 : 3 の 2 はウスターソース、3 はケチャップ。"+
+         "だから左辺も「ウスターソース : ケチャップ」＝ x : 120 の順にそろえる。<br><br>"+
+         "120 : x ＝ 2 : 3 と書くと「ケチャップ : ウスターソース」になってしまい、"+
+         "ウスターソースのほうが多いという逆の意味になる。<br>"+
+         "<b>何を左に書くかを決めたら、両辺でそろえる。</b>" },
+
+  { cat:"比を式にする", pg:"p.109", type:"choice",
+    body:'<div class="m sm">a : b の比の値とは？</div>',
+    prompt:"教科書 p.109 の「ちょっと確認」によると？",
+    opts:["a ＋ b","b ÷ a","a ÷ b","a × b"],
+    ans:2,
+    hint:"a : b を分数の形に直したもの。分子はどちらだろう。",
+    work:"a ÷ b（つまり a/b）が比の値。<br><br>"+
+         "<b>前を後ろでわる。</b> x : 120 なら x ÷ 120、2 : 3 なら 2 ÷ 3。<br><br>"+
+         "<b>なぜ比の値が役に立つのか。</b> 教科書に「比の値が等しいとき、それらの比は等しい」"+
+         "とある。比のままでは比べにくいが、<b>分数にすれば1つの数になって比べられる</b>。<br>"+
+         "そして分数になれば、それはもう方程式。分母をはらって解ける。" },
+
+  { cat:"性質を使う", pg:"p.110", type:"choice",
+    body:'<div class="m sm">a : b ＝ m : n　ならば</div>',
+    prompt:"比例式の性質として正しいのは？",
+    opts:["ab ＝ mn","am ＝ bn","a ＋ n ＝ b ＋ m","an ＝ bm"],
+    ans:3,
+    hint:"外側どうしの積と、内側どうしの積。a と n が外側、b と m が内側。",
+    work:"an ＝ bm　（<b>外側の積 ＝ 内側の積</b>）<br><br>"+
+         "a : b ＝ m : n と並べたとき、いちばん外の a と n が外側、"+
+         "まん中の b と m が内側。<br><br>"+
+         "<b>これは新しいきまりではない。</b> 比の値が等しいので a/b ＝ m/n。"+
+         "両辺に b と n をかけて分母をはらうと an ＝ bm になる。"+
+         "つまり <b>p.101 の「分母をはらう」を比に使っただけ</b>。<br>"+
+         "覚えられなくても、比の値から作り直せる。" },
+
+  { cat:"性質を使う", pg:"p.110 例1", type:"num", pre:"x ＝",
+    body:'<div class="m">x ： 10 ＝ 3 ： 2</div>',
+    prompt:"x の値を求めなさい。", ans:15,
+    hint:"外側は x と 2、内側は 10 と 3。外側の積 ＝ 内側の積。",
+    work:"x × 2 ＝ 10 × 3　→　2x ＝ 30　→　x ＝ 15<br><br>"+
+         "<b>どれが外側か迷ったら、書き出してみる。</b> x : 10 ＝ 3 : 2 で、"+
+         "はしの x と 2 が外側、まん中の 10 と 3 が内側。<br><br>"+
+         "検算：15 : 10 の比の値は 15/10 ＝ 3/2。"+
+         "3 : 2 の比の値も 3/2。等しいので正しい。<br>"+
+         "<b>比を簡単にして確かめる方法もある。</b> 15 : 10 は両方を 5 でわって 3 : 2 ○" },
+
+  { cat:"性質を使う", pg:"p.110 問2", type:"num", pre:"x ＝",
+    body:'<div class="m">x ： 12 ＝ 3 ： 4</div>',
+    prompt:"x の値を求めなさい。", ans:9,
+    hint:"4x ＝ 12 × 3。",
+    work:"x × 4 ＝ 12 × 3　→　4x ＝ 36　→　x ＝ 9<br><br>"+
+         "<b>あおいさんの方法でも解ける。</b> 4 を 12 にするには ×3。"+
+         "だから 3 も3倍して x ＝ 9。<br>"+
+         "<b>数がきれいに割れるときは、この方法のほうが速い。</b>"+
+         "12 ÷ 4 ＝ 3 とすぐ気づけるなら、性質を使うまでもない。<br><br>"+
+         "検算：9 : 12 の両方を 3 でわると 3 : 4 ○" },
+
+  { cat:"性質を使う", pg:"p.110 問2", type:"num", pre:"x ＝",
+    body:'<div class="m">16 ： x ＝ 12 ： 9</div>',
+    prompt:"x の値を求めなさい。", ans:12,
+    hint:"x が2番目にある。a:b＝m:n にあてはめると a＝16、b＝x、m＝12、n＝9。",
+    work:"16 × 9 ＝ x × 12　→　144 ＝ 12x　→　x ＝ 12<br><br>"+
+         "<b>x が内側にあるときこそ注意。</b> 外側は 16 と 9、内側は x と 12。"+
+         "位置を取りちがえて 16×12 ＝ 9x としてしまうと、x ＝ 21.33… となって合わない。<br><br>"+
+         "<b>迷ったら a : b ＝ m : n の形に書き出して、どれが a・b・m・n か確かめる。</b><br>"+
+         "検算：16 : 12 を 4 でわると 4 : 3。12 : 9 を 3 でわっても 4 : 3 ○" },
+
+  { cat:"式が複雑なとき", pg:"p.110 問2", type:"num", pre:"x ＝",
+    body:'<div class="m">8 ： 6 ＝ (x − 6) ： 18</div>',
+    prompt:"x の値を求めなさい。", ans:30,
+    hint:"外側は 8 と 18、内側は 6 と (x − 6)。かっこをつけたまま計算しよう。",
+    work:"8 × 18 ＝ 6 × (x − 6)　→　144 ＝ 6x − 36　→　6x ＝ 180　→　x ＝ 30<br><br>"+
+         "<b>かっこのついた部分も、ひとかたまりとして扱う。</b>"+
+         "(x − 6) 全体が比の1つの項なので、6 をかけるときは"+
+         "6(x − 6) ＝ 6x − 36 と分配法則を使う。<br><br>"+
+         "6x − 6 としてしまうと、−6 に 6 をかけ忘れている。"+
+         "これは p.100 のかっこをはずす練習と同じ注意点。<br>"+
+         "検算：x ＝ 30 なら x − 6 ＝ 24。8 : 6 ＝ 4 : 3、24 : 18 ＝ 4 : 3 ○" },
+
+  { cat:"式が複雑なとき", pg:"p.110 問2", type:"num", pre:"x ＝",
+    body:'<div class="m">2x ： (x − 2) ＝ 15 ： 6</div>',
+    prompt:"x の値を求めなさい。", ans:10,
+    hint:"外側は 2x と 6、内側は (x − 2) と 15。両方に x が入っている。",
+    work:"2x × 6 ＝ 15 × (x − 2)　→　12x ＝ 15x − 30　→　−3x ＝ −30　→　x ＝ 10<br><br>"+
+         "<b>両辺に x があっても、やることは同じ。</b> 外側の積と内側の積を書いて、"+
+         "あとは 1節 で習った移項で解く。<br><br>"+
+         "<b>比例式は、方程式をつくるための入り口にすぎない。</b>"+
+         "an ＝ bm の形にしてしまえば、そこからは今までどおり。<br>"+
+         "検算：x ＝ 10 なら 2x ＝ 20、x − 2 ＝ 8。20 : 8 ＝ 5 : 2、15 : 6 ＝ 5 : 2 ○" },
+
+  { cat:"文章題に使う", pg:"p.110 問3", type:"choice",
+    body:'<div class="prob">ミルクティーを1200mL作ります。牛乳と紅茶を 3 : 5 の割合で混ぜます。牛乳を x mL とする。</div>',
+    prompt:"紅茶の量を x で表すと？",
+    opts:["1200 − x","1200 ＋ x","1200x","x − 1200"],
+    ans:0,
+    hint:"合わせて1200mL。牛乳が決まれば、残りが全部紅茶。",
+    work:"1200 − x mL<br><br>"+
+         "<b>p.105 のオレンジとりんごと同じ考え方。</b> 全体が決まっているとき、"+
+         "片方を x とすれば、もう片方は（全体 − x）で表せる。<br><br>"+
+         "<b>この形は何度も出てくる。</b> 合わせて15個ならりんごは 15 − x、"+
+         "合わせて1200mL なら紅茶は 1200 − x。"+
+         "問題がちがっても、組み立ては同じ。" },
+
+  { cat:"文章題に使う", pg:"p.110 問3", type:"num", pre:"牛乳は", unit:"mL",
+    body:'<div class="prob">ミルクティー1200mL を、牛乳と紅茶 3 : 5 の割合で作る。</div>',
+    prompt:"牛乳は何 mL 必要？", ans:450,
+    hint:"x : (1200 − x) ＝ 3 : 5。外側の積 ＝ 内側の積で式をつくろう。",
+    work:"x : (1200 − x) ＝ 3 : 5<br>"+
+         "5x ＝ 3(1200 − x)　→　5x ＝ 3600 − 3x　→　8x ＝ 3600　→　x ＝ 450<br><br>"+
+         "牛乳450mL、紅茶750mL。<br><br>"+
+         "<b>3(1200 − x) のかっこを忘れないこと。</b> 3 は 1200 にも −x にもかかる。"+
+         "3600 − x としてしまうと答えがずれる。<br>"+
+         "検算：450 : 750 を 150 でわると 3 : 5 ○　合計も 450 ＋ 750 ＝ 1200 ○" },
+
+  { cat:"文章題に使う", pg:"p.109", type:"num", pre:"", unit:"mL",
+    body:'<div class="prob">ウスターソースとケチャップを 2 : 3 で混ぜる。ケチャップを 120mL 使う。</div>',
+    prompt:"ウスターソースは何 mL？", ans:80,
+    hint:"あおいさんの方法：3 を 120 にするには何倍？　同じだけ 2 にもかける。",
+    work:"3 → 120 は ×40。だから 2 × 40 ＝ <b>80</b> mL。<br><br>"+
+         "<b>性質を使ってもよい。</b> x : 120 ＝ 2 : 3 より 3x ＝ 240、x ＝ 80。"+
+         "どちらでも同じ答えになる。<br><br>"+
+         "<b>使い分け。</b> 120 ÷ 3 ＝ 40 のようにきれいに割れるときは、"+
+         "あおいさんの方法が速い。割り切れないときは、性質を使えば必ず解ける。<br>"+
+         "検算：80 : 120 を 40 でわると 2 : 3 ○" },
+
+  { cat:"理由を説明する", pg:"p.110", type:"choice",
+    body:'<div class="m sm">なぜ an ＝ bm が成り立つのか</div>',
+    prompt:"いちばんよい説明はどれ？",
+    opts:["比例式にはそういうきまりがあるから。",
+          "外側どうし、内側どうしをかけると決まっているから。",
+          "比が等しい＝比の値が等しいので a/b ＝ m/n。両辺に b と n をかけて分母をはらうと an ＝ bm になるから。",
+          "計算してみると、いつもそうなるから。"],
+    ans:2,
+    hint:"比例式の性質は、どこから作られたのだったか。p.110 の問1でたどった道すじを思い出そう。",
+    work:"比の値が等しいことから <b>分母をはらう</b> と出てくる。<br><br>"+
+         "a : b ＝ m : n → a/b ＝ m/n → 両辺に bn をかけて → an ＝ bm<br><br>"+
+         "<b>1番と2番は説明になっていない。</b> 「そういうきまりだから」は、"+
+         "いま説明しようとしていることをくり返しているだけ。<br>"+
+         "<b>4番も弱い。</b> 「いつもそうなる」は結果であって理由ではない。"+
+         "何回計算しても、なぜそうなるかはわからない。<br><br>"+
+         "<b>理由がわかっていれば、忘れても作り直せる。</b>これが暗記との大きなちがい。" },
+
+  { cat:"理由を説明する", pg:"p.109", type:"choice",
+    body:'<div class="m sm">x : 120 ＝ 2 : 3 について</div>',
+    prompt:"はるきさんの式 x/120 ＝ 2/3 について、りおさんは何と言った？",
+    opts:["比の値を使うと計算が速くなる。",
+          "これはもう方程式になっている。",
+          "分数にすると答えが変わってしまう。",
+          "比の値は分数で表せない。"],
+    ans:1,
+    hint:"x/120 ＝ 2/3 という式を見て、これまで習ったどの形に似ていると気づいただろう。",
+    work:"<b>「はるきさんの式は、方程式になっているね」</b>（教科書 p.109）<br><br>"+
+         "x/120 ＝ 2/3 は、文字をふくむ等式で、x の値によって成り立ったり"+
+         "成り立たなかったりする。つまり <b>方程式そのもの</b>。<br><br>"+
+         "<b>これが大事な気づき。</b> 比の問題が、1節 で習った"+
+         "「分数をふくむ方程式」に変わった瞬間。"+
+         "新しい解き方を覚える必要はなく、<b>分母をはらえばよい</b>とわかる。<br><br>"+
+         "比例式の性質 an ＝ bm も、まさにこの操作から生まれている。" }
+  ];
+
+  /* ================= shared engine ================= */
+  var CATS = ["比を式にする","性質を使う","式が複雑なとき","文章題に使う","理由を説明する"];
+  var BACK = {
+    "比を式にする":"p.109　比例式の意味・比の値",
+    "性質を使う":"p.110　比例式の性質 an＝bm・例1・問2",
+    "式が複雑なとき":"p.110 問2(3)(4)／p.100 かっこをはずす",
+    "文章題に使う":"p.109 ハンバーグソース／p.110 問3 ミルクティー",
+    "理由を説明する":"p.110 問1　比の値から性質を導く"
+  };
+
+  var mode = "setsumei";
+  var S = {                       // per-tab state, kept when switching
+    setsumei:{ i:0, tries:0, done:false,
+      res: STEPS.map(function(s){ return s.kind==="write"
+              ? {kind:"write", checks:0, of:s.checks.length, wrote:false}
+              : {kind:"auto", first:null}; }) },
+    test:{ i:0, tries:0, done:false, first:new Array(Q.length).fill(null),
+           help:new Array(Q.length).fill(0) }   /* 0=自力 1=ヒント 2=答えを見た */
+  };
+
+  var root=document.getElementById("root"), stage=document.getElementById("stage"),
+      bar=document.getElementById("bar");
+
+  function norm(s){
+    return String(s).trim()
+      .replace(/[０-９]/g,function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); })
+      .replace(/[\u2212\u30FC\uFF0D\u2010\u2011\u2013\u2014\u2015\uFF70]/g,"-")
+      .replace(/\uFF0B/g,"+").replace(/\uFF0F/g,"/").replace(/\uFF0E/g,".")
+      .replace(/[,\uFF0C\s]/g,"").replace(/^\+/,"");
+  }
+  function val(s){
+    if(/^-?\d+(\.\d+)?$/.test(s)) return Number(s);
+    var m=s.match(/^(-?\d+)\/(\d+)$/);
+    return m ? Number(m[1])/Number(m[2]) : NaN;
+  }
+  function fmt(n){ return String(n).replace("-","−"); }
+
+  function paintBar(){
+    var n = (mode==="setsumei") ? STEPS.length : Q.length;
+    while(bar.children.length < n+1) bar.appendChild(document.createElement("i"));
+    while(bar.children.length > n+1) bar.removeChild(bar.lastChild);
+    var st=S[mode], b=bar.children;
+    for(var k=0;k<n;k++){
+      var cls="";
+      if(k===st.i && !st.done) cls="now";
+      else if(mode==="setsumei"){
+        var r=st.res[k];
+        cls = r.kind==="auto" ? (r.first===true?"hit":r.first===false?"miss":"")
+                              : (r.wrote ? (r.checks>0?"hit":"miss") : "");
+      } else {
+        cls = st.first[k]===true?"hit":st.first[k]===false?"miss":"";
+      }
+      b[k].className=cls;
+    }
+    b[n].className = st.done ? "now" : "";
+    // tab badges
+    var sDone=S.setsumei.res.filter(function(r){
+          return r.kind==="auto" ? r.first!==null : r.wrote; }).length;
+    var tDone=S.test.first.filter(function(v){ return v!==null; }).length;
+    var bs=document.getElementById("b-setsumei"), bt=document.getElementById("b-test");
+    bs.textContent = sDone ? sDone+"/"+STEPS.length : STEPS.length+"問";
+    bt.textContent = tDone ? tDone+"/"+Q.length : Q.length+"問";
+    bs.className = "badge"+(sDone===STEPS.length?" done":"");
+    bt.className = "badge"+(tDone===Q.length?" done":"");
+  }
+
+  function shuffled(n){
+    var a=[],k,j,t; for(k=0;k<n;k++) a.push(k);
+    for(k=a.length-1;k>0;k--){ j=Math.floor(Math.random()*(k+1)); t=a[k];a[k]=a[j];a[j]=t; }
+    return a;
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    if(S[mode].done){ report(); return; }
+    return (mode==="setsumei") ? renderStep() : renderQ();
+  }
+
+  function renderStep(){
+    var st=S.setsumei, s=STEPS[st.i]; st.tries=0;
+    var mid;
+    if(s.kind==="choice"){
+      mid='<p class="prompt">'+s.prompt+'</p><div class="choices" id="opts">'+
+          s.opts.map(function(o,k){ return '<button class="choice" data-k="'+k+'">'+o+'</button>'; }).join("")+
+          '</div><div class="fb" id="fb"></div>';
+    } else if(s.kind==="order"){
+      mid='<p class="prompt">'+s.prompt+'</p><div class="ord" id="ord">'+
+          shuffled(s.items.length).map(function(k){
+            return '<button class="item" data-k="'+k+'"><span class="rank"></span>'+s.items[k]+'</button>'; }).join("")+
+          '</div><p class="ordcap" id="ordcap">0 / '+s.items.length+' 並んだ</p><div class="fb" id="fb"></div>';
+    } else {
+      mid='<p class="prompt">'+s.prompt+'</p>'+
+          '<textarea id="ta" placeholder="'+s.ph+'"></textarea><p class="cnt" id="cnt">0 文字</p>'+
+          '<p style="text-align:right;margin:0"><button class="btn accent" id="send">書けた。先生の説明を見る</button></p>'+
+          '<div class="board" id="board"><p class="who">先生の説明</p><p class="say">'+s.model+'</p></div>'+
+          '<div class="selfcheck" id="sc"><p class="t">自分の説明とくらべよう</p>'+
+          s.checks.map(function(c,k){ return '<label><input type="checkbox" data-c="'+k+'"><span>'+c+'</span></label>'; }).join("")+
+          '<p class="hintline">できていなかったところは、いま書きたして直してみよう。</p></div>';
+    }
+    stage.innerHTML='<section class="screen"><div class="card">'+
+      '<span class="tag">'+s.tag+'</span><span class="sec">'+s.sec+'</span><span class="pg">'+s.pg+'</span>'+
+      '<h2>'+s.title+'</h2><p class="lead">'+s.lead+'</p>'+s.body+mid+
+      '<div class="nav"><span class="stepno">'+(st.i+1)+' / '+STEPS.length+'</span>'+
+      '<button class="btn" id="next" disabled>'+(st.i===STEPS.length-1?"けっかを見る →":"次へ →")+'</button></div>'+
+      '</div></section>';
+    wireStep();
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function wireStep(){
+    var st=S.setsumei, s=STEPS[st.i];
+    if(s.kind==="choice"){
+      var opts=document.getElementById("opts");
+      Array.prototype.forEach.call(opts.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return;
+          var ok=Number(b.getAttribute("data-k"))===s.ans, fb=document.getElementById("fb");
+          st.tries++;
+          if(ok){
+            if(st.res[st.i].first===null) st.res[st.i].first=(st.tries===1);
+            b.classList.add("ok");
+            fb.className="fb show right"; fb.innerHTML="<b>そのとおり。</b>"+s.work;
+            lockChoices();
+          } else {
+            st.res[st.i].first=false; b.classList.add("no");
+            if(st.tries===1){ fb.className="fb show hint"; fb.innerHTML="<b>もう一度考えよう</b>"+s.hint; }
+            else{ fb.className="fb show wrong";
+                  fb.innerHTML="<b>答えは「"+s.opts[s.ans].replace(/<[^>]+>/g,"")+"」</b>"+s.work;
+                  opts.children[s.ans].classList.add("reveal"); lockChoices(); }
+            paintBar();
+          }
+        });
+      });
+    } else if(s.kind==="order"){
+      var placed=0, ord=document.getElementById("ord");
+      Array.prototype.forEach.call(ord.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return;
+          if(Number(b.getAttribute("data-k"))===placed){
+            b.disabled=true; b.classList.add("placed");
+            b.querySelector(".rank").textContent=++placed;
+            document.getElementById("ordcap").textContent=placed+" / "+s.items.length+" 並んだ";
+            if(placed===s.items.length){
+              if(st.res[st.i].first===null) st.res[st.i].first=(st.tries===0);
+              var fb=document.getElementById("fb");
+              fb.className="fb show right"; fb.innerHTML="<b>きれいにつながった。</b>"+s.work;
+              document.getElementById("next").disabled=false; paintBar();
+            }
+          } else {
+            st.tries++; st.res[st.i].first=false;
+            b.classList.add("shake"); setTimeout(function(){ b.classList.remove("shake"); },340);
+            var fb2=document.getElementById("fb");
+            fb2.className="fb show hint"; fb2.innerHTML="<b>その順番ではないみたい</b>"+s.hint;
+            paintBar();
+          }
+        });
+      });
+    } else {
+      var ta=document.getElementById("ta"), send=document.getElementById("send");
+      ta.addEventListener("input",function(){
+        document.getElementById("cnt").textContent=ta.value.trim().length+" 文字"; });
+      send.addEventListener("click",function(){
+        if(ta.disabled) return;
+        if(ta.value.trim().length<10){
+          document.getElementById("cnt").textContent="もう少し書いてみよう（10文字以上）"; ta.focus(); return; }
+        st.res[st.i].wrote=true; ta.disabled=true; send.disabled=true;
+        document.getElementById("board").classList.add("show");
+        var sc=document.getElementById("sc"); sc.classList.add("show");
+        document.getElementById("next").disabled=false;
+        Array.prototype.forEach.call(sc.querySelectorAll("input"),function(cb){
+          cb.addEventListener("change",function(){
+            st.res[st.i].checks=sc.querySelectorAll("input:checked").length; paintBar(); });
+        });
+        paintBar();
+      });
+      ta.focus();
+    }
+    document.getElementById("next").addEventListener("click",function(){
+      if(this.disabled) return;
+      if(st.i===STEPS.length-1){ st.done=true; report(); return; }
+      st.i++; renderStep();
+    });
+  }
+
+  function lockChoices(){
+    var opts=document.getElementById("opts");
+    Array.prototype.forEach.call(opts.children,function(b){ b.disabled=true; });
+    document.getElementById("next").disabled=false; paintBar();
+  }
+
+  function renderQ(){
+    var st=S.test, q=Q[st.i]; st.tries=0;
+    var input = q.type==="choice"
+      ? '<div class="choices" id="opts">'+
+        q.opts.map(function(o,k){ return '<button class="choice'+(o.length<12?" mid":"")+'" data-k="'+k+'">'+o+'</button>'; }).join("")+'</div>'
+      : '<div class="row"><span class="pre">'+q.pre+'</span>'+
+        '<input type="text" id="ans" autocomplete="off" aria-label="答え">'+
+        (q.unit?'<span class="unit">'+q.unit+'</span>':'')+
+        '<button class="btn accent" id="check">たしかめる</button></div>';
+    stage.innerHTML='<section class="screen"><div class="card">'+
+      '<span class="tag">第 '+(st.i+1)+' 問</span><span class="pg">'+q.pg+'</span>'+
+      q.body+'<p class="prompt">'+q.prompt+'</p>'+input+
+      '<div class="helprow">'+
+        '<button class="btn tiny" id="hintbtn">ヒントを見る</button>'+
+        '<button class="btn tiny" id="showbtn" hidden>答えを見る</button>'+
+      '</div>'+
+      '<div class="fb" id="fb"></div>'+
+      '<div class="nav"><span class="stepno">'+(st.i+1)+' / '+Q.length+'</span>'+
+      '<button class="btn" id="next" disabled>'+(st.i===Q.length-1?"けっかを見る →":"次へ →")+'</button></div>'+
+      '</div></section>';
+
+    if(q.type==="choice"){
+      var opts=document.getElementById("opts");
+      Array.prototype.forEach.call(opts.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return; judgeQ(Number(b.getAttribute("data-k"))===q.ans,b); });
+      });
+    } else {
+      var inp=document.getElementById("ans");
+      var go=function(){
+        if(inp.disabled) return;
+        var raw=norm(inp.value), fb=document.getElementById("fb");
+        if(raw===""){ fb.className="fb show hint"; fb.innerHTML="<b>答えを入れてね</b>数字を入力してから、たしかめるを押そう。"; return; }
+        var v=val(raw);
+        if(isNaN(v)){ fb.className="fb show hint"; fb.innerHTML="<b>数字で答えよう</b>マイナスは − でも - でも入力できるよ。"; return; }
+        judgeQ(Math.abs(v-q.ans)<1e-9,null);
+      };
+      document.getElementById("check").addEventListener("click",go);
+      inp.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); go(); } });
+      inp.focus();
+    }
+    var hintbtn=document.getElementById("hintbtn"), showbtn=document.getElementById("showbtn");
+    hintbtn.addEventListener("click",function(){
+      if(hintbtn.disabled) return;
+      if(st.help[st.i]<1) st.help[st.i]=1;
+      if(st.first[st.i]===null) st.first[st.i]=false;   // no longer counts as 自力
+      var fb=document.getElementById("fb");
+      fb.className="fb show hint"; fb.innerHTML="<b>ヒント</b>"+q.hint;
+      hintbtn.disabled=true; showbtn.hidden=false;
+      paintBar();
+    });
+    showbtn.addEventListener("click",function(){
+      if(showbtn.disabled) return;
+      st.help[st.i]=2; st.first[st.i]=false;
+      var fb=document.getElementById("fb");
+      fb.className="fb show wrong";
+      fb.innerHTML="<b>答えは "+(q.type==="choice"?"「"+q.opts[q.ans]+"」":fmt(q.ans))+
+                   "</b><span class='work'>"+q.work+"</span>";
+      var opts=document.getElementById("opts");
+      if(opts) opts.children[q.ans].classList.add("reveal");
+      lockQ();
+      var m=document.createElement("p");
+      m.className="usedmark"; m.textContent="この問題は、あとでもう一度といてみよう。";
+      fb.parentNode.insertBefore(m, fb.nextSibling);
+      paintBar();
+    });
+
+    document.getElementById("next").addEventListener("click",function(){
+      if(this.disabled) return;
+      if(st.i===Q.length-1){ st.done=true; report(); return; }
+      st.i++; renderQ();
+    });
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function judgeQ(ok,btn){
+    var st=S.test, q=Q[st.i], fb=document.getElementById("fb");
+    st.tries++;
+    if(ok){
+      if(st.first[st.i]===null) st.first[st.i]=(st.tries===1 && st.help[st.i]===0);
+      if(btn) btn.classList.add("ok");
+      fb.className="fb show right";
+      fb.innerHTML="<b>"+(st.help[st.i]>0?"よくできました。":"せいかい！")+
+                   "</b><span class='work'>"+q.work+"</span>";
+      lockQ(); paintBar(); return;
+    }
+    st.first[st.i]=false;
+    if(btn) btn.classList.add("no");
+    if(st.tries===1){
+      if(st.help[st.i]<1) st.help[st.i]=1;
+      fb.className="fb show hint"; fb.innerHTML="<b>おしい。ヒント</b>"+q.hint;
+      var hb=document.getElementById("hintbtn"), sb=document.getElementById("showbtn");
+      if(hb) hb.disabled=true; if(sb) sb.hidden=false;
+    }
+    else{
+      fb.className="fb show wrong";
+      fb.innerHTML="<b>答えは "+(q.type==="choice"?"「"+q.opts[q.ans]+"」":fmt(q.ans))+"</b><span class='work'>"+q.work+"</span>";
+      var opts=document.getElementById("opts");
+      if(opts) opts.children[q.ans].classList.add("reveal");
+      st.help[st.i]=2;
+      lockQ();
+    }
+    paintBar();
+  }
+
+  function lockQ(){
+    var opts=document.getElementById("opts");
+    if(opts) Array.prototype.forEach.call(opts.children,function(b){ b.disabled=true; });
+    var inp=document.getElementById("ans");
+    if(inp){ inp.disabled=true; document.getElementById("check").disabled=true; }
+    var hb=document.getElementById("hintbtn"), sb=document.getElementById("showbtn");
+    if(hb) hb.disabled=true;
+    if(sb) sb.disabled=true;
+    document.getElementById("next").disabled=false;
+  }
+
+  /* ---------- reports ---------- */
+  function report(){
+    if(mode==="setsumei"){
+      var st=S.setsumei;
+      var autos=st.res.filter(function(r){ return r.kind==="auto"; });
+      var autoOk=autos.filter(function(r){ return r.first===true; }).length;
+      var writes=st.res.filter(function(r){ return r.kind==="write"; });
+      var wrote=writes.filter(function(r){ return r.wrote; }).length;
+      var checks=writes.reduce(function(a,r){ return a+r.checks; },0);
+      var of=writes.reduce(function(a,r){ return a+r.of; },0);
+      var advice = (autoOk===autos.length && checks>=of-1)
+        ? "説明する力がついている。テスト編に進んで、身についたか確かめよう。"
+        : (autoOk<autos.length
+          ? "「どの説明がよいか」を見分けるところをもう一度。きまりをくり返すだけの説明と、理由を示す説明のちがいに注目しよう。"
+          : "書くところをよくがんばった。チェックが入らなかった項目をつけ足して書きなおすと、説明がぐっとよくなる。");
+      stage.innerHTML='<section class="screen"><div class="card">'+
+        '<span class="tag">けっか</span><h2>説明編のふり返り</h2>'+
+        '<p class="big">'+autoOk+' <small>/ '+autos.length+'</small></p>'+
+        '<p class="lead" style="text-align:center;margin-top:0">見きわめ問題</p>'+
+        '<table><tbody><tr><td>説明を書いた回数</td><td class="s">'+wrote+' / '+writes.length+'</td></tr>'+
+        '<tr><td>自己チェックがついた数</td><td class="s">'+checks+' / '+of+'</td></tr></tbody></table>'+
+        '<div class="note">'+advice+'</div>'+
+        '<p class="lead" style="margin:16px 0 2px"><b>説明するときの3つの型</b></p>'+
+        '<ul class="tips"><li><b>〜だから、〜になる。</b>　理由を先に、結論をあとに。</li>'+
+        '<li><b>たとえば〜の場合は。</b>　具体的な数や場面で確かめる。</li>'+
+        '<li><b>もし〜だとしたら、〜になってしまう。</b>　まちがいのほうを試して確かめる。</li></ul>'+
+        '<div class="note" style="border-color:var(--ok);background:var(--ok-bg)">'+
+        'おうちの人へ：書いた説明を声に出して読んでもらい、「どうしてそう思ったの？」と一度だけ聞き返すと、'+
+        '説明がもう一段くわしくなります。正しさより、理由が言えたことをほめてください。</div>'+
+        '<div class="nav" style="justify-content:center;gap:10px">'+
+        '<button class="btn ghost" id="again">もう一度</button>'+
+        '<button class="btn accent" id="goto-test">テスト編へ →</button></div>'+
+        '</div></section>';
+      document.getElementById("goto-test").addEventListener("click",function(){ switchTo("test"); });
+    } else {
+      var t=S.test, rows="", weak=[];
+      var solo=0, hinted=0, shown=0;
+      for(var k=0;k<Q.length;k++){
+        if(t.help[k]===2) shown++;
+        else if(t.first[k]===true) solo++;
+        else hinted++;
+      }
+      var n=solo;
+      CATS.forEach(function(c){
+        var idx=Q.map(function(q,k){ return q.cat===c?k:-1; }).filter(function(k){ return k>=0; });
+        var got=idx.filter(function(k){ return t.first[k]===true; }).length;
+        var sh =idx.filter(function(k){ return t.help[k]===2; }).length;
+        if(got<idx.length) weak.push(c);
+        var label = got===idx.length ? "OK" : (sh ? "要復習" : "あと少し");
+        var pill  = got===idx.length ? "good" : "watch";
+        rows+="<tr><td>"+c+"</td><td class='s'>"+got+" / "+idx.length+"</td>"+
+          "<td style='text-align:right'><span class='pill "+pill+"'>"+label+"</span></td></tr>";
+      });
+      stage.innerHTML='<section class="screen"><div class="card">'+
+        '<span class="tag">けっか</span><h2>テスト編の結果</h2>'+
+        '<p class="big">'+n+' <small>/ '+Q.length+'</small></p>'+
+        '<p class="lead" style="text-align:center;margin-top:0">自力で正解した数</p>'+
+        '<table><tbody>'+
+          '<tr><td>自力で正解</td><td class="s">'+solo+' 問</td></tr>'+
+          '<tr><td>ヒントを見て正解</td><td class="s">'+hinted+' 問</td></tr>'+
+          '<tr><td>答えを見た</td><td class="s">'+shown+' 問</td></tr>'+
+        '</tbody></table>'+
+        '<table><thead><tr><th>種類</th><th style="text-align:right">自力正答</th><th></th></tr></thead>'+
+        '<tbody>'+rows+'</tbody></table>'+
+        '<div class="note">'+(
+          solo===Q.length
+          ? "全問を自力で正解。これで 3章 の学習内容はすべて終わり。章末問題に進もう。"
+          : shown===0
+          ? "答えを見ずに、最後まで自分で解けた。ヒントが必要だった問題をもう一度といてみよう。"
+          : shown<=2
+          ? "ほとんど自分で解けている。答えを見た問題だけ、教科書のページにもどって確かめよう。"
+          : "答えを見た問題が多い。まず教科書の該当ページを読みなおしてから、もう一度このテストをやってみよう。"
+        )+'</div>'+
+        '<div class="note" style="border-color:var(--ok);background:var(--ok-bg)">'+
+        'おうちの人へ：<b>ヒントを見て正解</b>と<b>答えを見た</b>では、必要な手当てがちがいます。'+
+        'ヒントで解けたなら、理解はできていて思い出すきっかけが必要なだけ。'+
+        '答えを見た問題が続くなら、その内容をもう一度教えるところから始めてください。</div>'+
+        (weak.length ? '<p class="lead" style="margin:14px 0 2px"><b>もどるページ</b></p><ul class="rev">'+
+          weak.map(function(c){ return "<li><b>"+c+"</b>　"+BACK[c]+"</li>"; }).join("")+'</ul>' : '')+
+        '<div class="nav" style="justify-content:center;gap:10px">'+
+        '<button class="btn ghost" id="again">もう一度</button>'+
+        '<button class="btn accent" id="goto-setsumei">説明編へ →</button></div>'+
+        '</div></section>';
+      document.getElementById("goto-setsumei").addEventListener("click",function(){ switchTo("setsumei"); });
+    }
+    document.getElementById("again").addEventListener("click",function(){
+      if(mode==="setsumei"){
+        S.setsumei={ i:0, tries:0, done:false, res: STEPS.map(function(s){
+          return s.kind==="write" ? {kind:"write",checks:0,of:s.checks.length,wrote:false}
+                                  : {kind:"auto",first:null}; }) };
+      } else {
+        S.test={ i:0, tries:0, done:false, first:new Array(Q.length).fill(null),
+                 help:new Array(Q.length).fill(0) };
+      }
+      render();
+    });
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  /* ---------- tabs ---------- */
+  function switchTo(m){
+    mode=m;
+    root.className="wrap theme-"+m;
+    Array.prototype.forEach.call(document.querySelectorAll(".tabs button"),function(b){
+      b.classList.toggle("on", b.getAttribute("data-tab")===m); });
+    render();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".tabs button"),function(b){
+    b.addEventListener("click",function(){ switchTo(b.getAttribute("data-tab")); });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

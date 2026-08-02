@@ -27,6 +27,14 @@ function findLearnerCounterpart(teacherLesson: Lesson) {
   return tgLearnerLessons.find((lesson) => lesson.component === `${teacherLesson.component}-app`);
 }
 
+// Training Ground drills are skill-based rather than unit-based, so the chip on
+// a session card comes from the first segment of the component slug:
+// phonics-short-vowels -> Phonics, nouns -> Nouns.
+function skillTag(component: string) {
+  const head = component.split("-")[0];
+  return head.charAt(0).toUpperCase() + head.slice(1);
+}
+
 export function TrainingGroundPage() {
   const [progress, setProgress] = useState<LessonProgressMap>({});
   const [assignments, setAssignments] = useState<AssignmentMap>({});
@@ -176,7 +184,7 @@ export function TrainingGroundPage() {
               <b>{session.number}</b>
               <div>
                 <h3>{session.lesson.title}</h3>
-                <span>Phonics</span>
+                <span>{skillTag(session.lesson.component)}</span>
                 <p>{session.lesson.subtitle}</p>
                 {session.learner ? (
                   <div className="tg-session-app">

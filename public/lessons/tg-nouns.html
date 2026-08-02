@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Ground — Noun Stadium ⚽ (Teacher Deck)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"></noscript>
+<style>
+:root{
+  --navy:#0B1E3F; --navy2:#14315F; --navy3:#1D4380;
+  --gold:#FBBF24; --gold2:#F59E0B; --lime:#A3E635;
+  --white:#FFFFFF; --paper:#F8FAFC; --mute:#94A3B8;
+  --green:#22C55E; --red:#EF4444; --sky:#38BDF8; --pink:#F472B6; --violet:#A78BFA;
+  --r:22px; --sh:0 10px 30px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#050D1C;font-family:'Outfit',system-ui,sans-serif;overflow:hidden}
+deck-stage{position:fixed;inset:0;display:block;overflow:hidden}
+#stageInner{position:absolute;top:0;left:0;width:1920px;height:1080px;transform-origin:top left}
+
+.slide{
+  position:absolute;inset:0;width:1920px;height:1080px;display:none;
+  padding:54px 72px 92px;
+  background:
+    radial-gradient(1200px 700px at 82% -10%, rgba(251,191,36,.14), transparent 60%),
+    radial-gradient(900px 600px at -5% 105%, rgba(56,189,248,.12), transparent 60%),
+    linear-gradient(160deg,var(--navy) 0%, var(--navy2) 55%, #0A2547 100%);
+  color:var(--white);
+}
+.slide.active{display:block}
+.slide::before{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.10;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 158px,rgba(255,255,255,.55) 158px 160px);
+}
+.slide::after{
+  content:'';position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;
+  border:3px solid rgba(255,255,255,.10);border-radius:50%;pointer-events:none;
+}
+.inner{position:relative;z-index:2;height:100%;display:flex;flex-direction:column}
+
+.kicker{display:inline-flex;align-items:center;gap:12px;background:rgba(251,191,36,.16);
+  border:2px solid rgba(251,191,36,.5);color:var(--gold);font-weight:800;font-size:26px;
+  padding:8px 22px;border-radius:999px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;align-self:flex-start}
+h1{font-size:86px;font-weight:900;line-height:1.02;letter-spacing:-1.5px}
+h2{font-size:62px;font-weight:900;line-height:1.05;letter-spacing:-1px}
+.sub{font-size:32px;font-weight:400;color:#D7E3F4;margin-top:14px;line-height:1.35}
+.jp{font-size:27px;color:var(--sky);font-weight:600}
+.hl{color:var(--gold)}
+.hl2{color:var(--lime)}
+
+/* ---------- title slide ---------- */
+.title-wrap{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px}
+.big-emoji{font-size:150px;line-height:1;filter:drop-shadow(0 12px 26px rgba(0,0,0,.5))}
+.title-chips{display:flex;gap:18px;margin-top:34px;flex-wrap:wrap;justify-content:center}
+.tchip{background:rgba(255,255,255,.10);border:2px solid rgba(255,255,255,.25);border-radius:999px;
+  padding:14px 30px;font-size:30px;font-weight:700;cursor:pointer;transition:.22s}
+.tchip:hover{background:var(--gold);color:var(--navy);border-color:var(--gold);transform:translateY(-4px)}
+.tchip.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+
+/* ---------- reveal cards ---------- */
+.grid{display:grid;gap:22px;margin-top:26px}
+.g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)} .g5{grid-template-columns:repeat(5,1fr)}
+.g6{grid-template-columns:repeat(6,1fr)}
+.rc{background:rgba(255,255,255,.09);border:3px solid rgba(255,255,255,.20);border-radius:var(--r);
+  padding:22px 16px;text-align:center;cursor:pointer;transition:.22s;position:relative;overflow:hidden}
+.rc:hover{transform:translateY(-6px);border-color:var(--gold);background:rgba(251,191,36,.14)}
+.rc .em{font-size:64px;line-height:1.1;display:block}
+.rc .wd{font-size:33px;font-weight:800;margin-top:6px}
+.rc .bk{max-height:0;opacity:0;transition:.3s;font-size:24px;color:var(--gold);font-weight:600;line-height:1.3}
+.rc.open{background:rgba(251,191,36,.20);border-color:var(--gold)}
+.rc.open .bk{max-height:180px;opacity:1;margin-top:10px}
+.rc .tap{font-size:19px;color:var(--mute);margin-top:8px}
+.rc.open .tap{display:none}
+
+/* ---------- door panels ---------- */
+.doors{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;margin-top:34px}
+.door{border-radius:26px;padding:30px 20px;text-align:center;cursor:pointer;transition:.25s;
+  border:4px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);min-height:330px}
+.door:hover{transform:translateY(-8px) scale(1.02)}
+.door .dem{font-size:88px;display:block}
+.door .dt{font-size:44px;font-weight:900;margin-top:8px}
+.door .dx{max-height:0;opacity:0;overflow:hidden;transition:.3s;font-size:26px;line-height:1.4;margin-top:10px}
+.door.open .dx{max-height:260px;opacity:1}
+.door.d1.open{background:rgba(56,189,248,.25);border-color:var(--sky)}
+.door.d2.open{background:rgba(34,197,94,.25);border-color:var(--green)}
+.door.d3.open{background:rgba(251,191,36,.25);border-color:var(--gold)}
+.door.d4.open{background:rgba(167,139,250,.28);border-color:var(--violet)}
+
+/* ---------- sorting game ---------- */
+.game{margin-top:22px}
+.bank{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;
+  background:rgba(0,0,0,.22);border:2px dashed rgba(255,255,255,.25);border-radius:20px;padding:18px}
+.chip{background:var(--white);color:var(--navy);font-size:30px;font-weight:800;border-radius:14px;
+  padding:12px 24px;cursor:pointer;transition:.18s;border:4px solid transparent;box-shadow:var(--sh)}
+.chip:hover{transform:translateY(-4px)}
+.chip.sel{border-color:var(--gold);background:var(--gold);transform:translateY(-6px) scale(1.05)}
+.chip.placed{opacity:.45;pointer-events:none;background:var(--green);color:#fff}
+.bins{display:grid;gap:20px;margin-top:22px}
+.bin{background:rgba(255,255,255,.08);border:4px dashed rgba(255,255,255,.3);border-radius:22px;
+  padding:16px;min-height:210px;cursor:pointer;transition:.2s;text-align:center}
+.bin:hover{border-color:var(--gold);background:rgba(251,191,36,.12)}
+.bin h4{font-size:34px;font-weight:900;margin-bottom:10px}
+.bin .drops{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.bin .drops span{background:var(--green);color:#fff;font-size:25px;font-weight:700;padding:7px 16px;border-radius:11px}
+.bin.bad{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-14px)}75%{transform:translateX(14px)}}
+.fb{margin-top:16px;font-size:30px;font-weight:700;min-height:44px;text-align:center;color:var(--gold)}
+.fb.good{color:var(--lime)} .fb.bad{color:#FCA5A5}
+
+/* ---------- sentence detective ---------- */
+.sent{background:rgba(255,255,255,.08);border:3px solid rgba(255,255,255,.18);border-radius:18px;
+  padding:16px 22px;font-size:38px;font-weight:600;margin-bottom:16px;line-height:1.6;transition:.25s}
+.sent.cleared{border-color:var(--lime);background:rgba(163,230,53,.16)}
+.w{cursor:pointer;padding:2px 8px;border-radius:9px;transition:.15s;display:inline-block}
+.w:hover{background:rgba(255,255,255,.18)}
+.w.hit{background:var(--gold);color:var(--navy);font-weight:900}
+.w.miss{background:var(--red);color:#fff}
+.tick{opacity:0;font-size:34px;transition:.3s}
+.sent.cleared .tick{opacity:1}
+
+/* ---------- MCQ ---------- */
+.q{background:rgba(255,255,255,.08);border:3px solid rgba(255,255,255,.18);border-radius:20px;padding:20px 24px;margin-bottom:18px}
+.q .qt{font-size:34px;font-weight:800;margin-bottom:14px}
+.opts{display:flex;gap:14px;flex-wrap:wrap}
+.opt{background:var(--white);color:var(--navy);font-size:29px;font-weight:800;border-radius:13px;
+  padding:11px 26px;cursor:pointer;border:4px solid transparent;transition:.18s}
+.opt:hover{transform:translateY(-4px)}
+.opt.right{background:var(--green);color:#fff;border-color:#fff}
+.opt.wrong{background:var(--red);color:#fff}
+.qfb{margin-top:12px;font-size:26px;color:var(--gold);font-weight:700;min-height:34px}
+
+/* ---------- boxes ---------- */
+.box{background:rgba(255,255,255,.09);border:3px solid rgba(255,255,255,.2);border-radius:20px;padding:22px 26px}
+.box.gold{background:rgba(251,191,36,.16);border-color:var(--gold)}
+.box.sky{background:rgba(56,189,248,.14);border-color:var(--sky)}
+.box.green{background:rgba(34,197,94,.16);border-color:var(--green)}
+.box.red{background:rgba(239,68,68,.16);border-color:#FCA5A5}
+.box h3{font-size:38px;font-weight:900;margin-bottom:10px}
+.box p,.box li{font-size:28px;line-height:1.45}
+.box ul{margin-left:26px}
+.rowx{display:flex;gap:22px;margin-top:24px}
+.rowx>*{flex:1}
+.tag{display:inline-block;font-size:22px;font-weight:800;padding:4px 14px;border-radius:999px;margin-right:8px}
+.tag.lp{background:var(--sky);color:#062A3D}
+.tag.ex{background:var(--pink);color:#3B0A22}
+
+/* machines */
+.machine{background:rgba(255,255,255,.09);border:4px solid var(--gold);border-radius:24px;padding:20px;text-align:center;cursor:pointer;transition:.22s}
+.machine:hover{transform:translateY(-6px);background:rgba(251,191,36,.18)}
+.machine .mtitle{font-size:40px;font-weight:900;color:var(--gold)}
+.machine .mrule{font-size:25px;color:#D7E3F4;margin:6px 0 10px}
+.machine .mex{font-size:30px;font-weight:700;line-height:1.5}
+.machine .mex b{color:var(--lime)}
+.machine .hidden-ex{max-height:0;opacity:0;overflow:hidden;transition:.3s}
+.machine.open .hidden-ex{max-height:260px;opacity:1}
+
+/* ---------- teacher notes ---------- */
+.tn-btn{position:absolute;right:34px;bottom:26px;z-index:40;background:var(--gold);color:var(--navy);
+  border:none;border-radius:999px;padding:12px 26px;font-family:inherit;font-size:24px;font-weight:800;cursor:pointer;box-shadow:var(--sh)}
+.tn-btn:hover{background:var(--white)}
+.tn-panel{position:absolute;right:34px;bottom:86px;width:760px;max-height:640px;overflow:auto;z-index:39;
+  background:#0A1A33;border:4px solid var(--gold);border-radius:20px;padding:24px 28px;display:none;box-shadow:var(--sh)}
+.tn-panel.show{display:block}
+.tn-panel h5{font-size:28px;color:var(--gold);margin-bottom:10px;font-weight:900}
+.tn-panel p{font-size:23px;line-height:1.5;margin-bottom:10px;color:#DCE7F7}
+.tn-panel b{color:var(--lime)}
+
+/* ---------- nav ---------- */
+#nav{position:fixed;left:0;right:0;bottom:0;height:64px;background:rgba(5,13,28,.92);
+  border-top:2px solid rgba(251,191,36,.35);display:flex;align-items:center;gap:16px;padding:0 22px;z-index:100}
+#nav button{background:var(--gold);color:var(--navy);border:none;border-radius:12px;padding:9px 20px;
+  font-family:inherit;font-size:19px;font-weight:800;cursor:pointer}
+#nav button:hover{background:var(--white)}
+#counter{color:var(--white);font-size:19px;font-weight:700;min-width:150px}
+#stitle{color:var(--mute);font-size:18px;font-weight:600;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#progWrap{width:280px;height:12px;background:rgba(255,255,255,.15);border-radius:999px;overflow:hidden}
+#progFill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--lime));transition:.3s}
+</style>
+</head>
+<body>
+<deck-stage>
+  <div id="stageInner">
+
+<!-- ============ 1 TITLE ============ -->
+<section class="slide active" data-t="Title — Noun Stadium">
+ <div class="inner title-wrap">
+   <div class="big-emoji">🏟️⚽</div>
+   <div class="kicker" style="align-self:center">Training Ground · Grammar Booster</div>
+   <h1>NOUN <span class="hl">STADIUM</span></h1>
+   <p class="sub">Every sentence needs <b class="hl2">players</b> on the field.<br>Nouns are the players. Let's meet them! 🧤</p>
+   <p class="jp">名詞（めいし）＝ 人・場所・もの・考え の名前</p>
+   <div class="title-chips">
+     <div class="tchip" onclick="tog(this)">🧍 Person</div>
+     <div class="tchip" onclick="tog(this)">📍 Place</div>
+     <div class="tchip" onclick="tog(this)">⚽ Thing</div>
+     <div class="tchip" onclick="tog(this)">💭 Idea</div>
+   </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Before you start</h5>
+ <p>Tap the four chips with Leo and say each word aloud. Don't explain yet — just plant the four doors.</p>
+ <p><b>Why this lesson:</b> Japanese has no articles, no plural -s, and no capital letters. Every one of those is an English noun feature Leo must build from zero. This deck attacks all of them in one stadium tour.</p>
+ <p><b>Pace:</b> 2 sessions. Stations 1–4 (slides 1–18) then 5–8 (slides 19–35). Don't rush the sorting games — that's where the learning is.</p></div>
+</section>
+
+<!-- ============ 2 WARM UP ============ -->
+<section class="slide" data-t="Warm Up — What do you see?">
+ <div class="inner">
+  <div class="kicker">Warm Up · Look at the pitch 👀</div>
+  <h2>Tap everything you can <span class="hl">see</span>.</h2>
+  <p class="sub">Say the English word out loud as you tap. Ready? 3… 2… 1… GO!</p>
+  <div class="grid g6" style="margin-top:34px">
+    <div class="rc" onclick="flip(this)"><span class="em">⚽</span><div class="wd">ball</div><div class="bk">a THING</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🥅</span><div class="wd">goal</div><div class="bk">a THING</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🧤</span><div class="wd">goalkeeper</div><div class="bk">a PERSON</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏟️</span><div class="wd">stadium</div><div class="bk">a PLACE</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏆</span><div class="wd">trophy</div><div class="bk">a THING</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👕</span><div class="wd">shirt</div><div class="bk">a THING</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🧑‍⚖️</span><div class="wd">referee</div><div class="bk">a PERSON</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎫</span><div class="wd">ticket</div><div class="bk">a THING</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👟</span><div class="wd">boots</div><div class="bk">a THING</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎉</span><div class="wd">fans</div><div class="bk">PEOPLE</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🌃</span><div class="wd">night</div><div class="bk">an IDEA (time)</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">😃</span><div class="wd">fun</div><div class="bk">an IDEA</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box gold" style="margin-top:30px"><p style="font-size:34px;font-weight:800">🎯 Every single word you just said is a <span class="hl">NOUN</span>. You already know hundreds of them!</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Confidence first</h5>
+ <p>The point of this slide is the last line: Leo <b>already owns</b> hundreds of nouns. Grammar labels are new; the words are not.</p>
+ <p>Let him tap in any order. Reveal only after he tries to say the word. If he says a word in Japanese, accept it, then give the English and have him repeat.</p>
+ <p>Don't correct plurals yet (fans/boots). That comes at Station 4.</p></div>
+</section>
+
+<!-- ============ 3 FOUR DOORS ============ -->
+<section class="slide" data-t="What is a noun? The 4 doors">
+ <div class="inner">
+  <div class="kicker">Station 1 · The Big Idea</div>
+  <h2>A noun is a <span class="hl">NAME</span>. 🏷️</h2>
+  <p class="sub">There are only <b class="hl2">four doors</b> into Noun Stadium. Tap each door to open it.</p>
+  <div class="doors">
+    <div class="door d1" onclick="flipDoor(this)"><span class="dem">🧍</span><div class="dt">PERSON</div>
+      <div class="dx">Someone you can meet.<br><b>Kubo · goalkeeper · Leo · dad · fans</b><br><span class="jp">人</span></div></div>
+    <div class="door d2" onclick="flipDoor(this)"><span class="dem">📍</span><div class="dt">PLACE</div>
+      <div class="dx">Somewhere you can go.<br><b>Japan · stadium · school · Tokyo · park</b><br><span class="jp">場所</span></div></div>
+    <div class="door d3" onclick="flipDoor(this)"><span class="dem">⚽</span><div class="dt">THING</div>
+      <div class="dx">Something you can touch.<br><b>ball · trophy · popcorn · phone · car</b><br><span class="jp">もの</span></div></div>
+    <div class="door d4" onclick="flipDoor(this)"><span class="dem">💭</span><div class="dt">IDEA</div>
+      <div class="dx">Something you can <b>feel or think</b> — not touch!<br><b>fun · speed · courage · time · music</b><br><span class="jp">考え・気持ち</span></div></div>
+  </div>
+  <div class="box sky" style="margin-top:28px"><p style="font-size:30px">💡 <b>Careful with Door 4:</b> you cannot kick <i>courage</i> ⚽❌ … but it still has a name, so it is still a noun.</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>The four doors</h5>
+ <p>Keep the definition to exactly these four words: <b>person, place, thing, idea</b>. Leo should be able to chant them by the end of the deck.</p>
+ <p><b>Door 4 is the hard one.</b> A1–A2 learners think nouns must be touchable. Spend extra time: "Can you touch <i>fun</i>? No. Can you <i>have</i> fun? Yes! So it has a name → noun."</p>
+ <p>Ask Leo to add one more example to each door from his own life before moving on.</p></div>
+</section>
+
+<!-- ============ 4 PERSON ============ -->
+<section class="slide" data-t="Door 1 — PERSON nouns">
+ <div class="inner">
+  <div class="kicker">Door 1 🧍 · Person</div>
+  <h2>PERSON nouns — <span class="hl">who?</span></h2>
+  <p class="sub">Tap each card to hear how we use it. <span class="jp">人の名前・よび方</span></p>
+  <div class="grid g4">
+    <div class="rc" onclick="flip(this)"><span class="em">🧤</span><div class="wd">goalkeeper</div><div class="bk">The <b>goalkeeper</b> saved the shot!</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🇯🇵</span><div class="wd">Kubo</div><div class="bk"><b>Kubo</b> plays for Real Sociedad.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">📣</span><div class="wd">coach</div><div class="bk">The <b>coach</b> shouted from the line.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🧑‍⚖️</span><div class="wd">referee</div><div class="bk">The <b>referee</b> showed a red card.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👦</span><div class="wd">Leo</div><div class="bk"><b>Leo</b> loves soccer and movies.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👨‍🏫</span><div class="wd">teacher</div><div class="bk">My <b>teacher</b> is my dad!</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🦇</span><div class="wd">Batman</div><div class="bk"><b>Batman</b> is a hero in Gotham.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎉</span><div class="wd">fans</div><div class="bk">The <b>fans</b> sang all night.</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box green" style="margin-top:26px"><p style="font-size:30px">🔍 <b>Test it:</b> can you say <i>a</i> ___ or <i>the</i> ___ ? <b>a coach ✔ · the referee ✔</b> → it is a noun.</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Person door</h5>
+ <p>Two kinds already appear here: job words (<b>goalkeeper, coach</b>) and names (<b>Kubo, Leo, Batman</b>). Don't name them "common / proper" yet — just let Leo notice the capital letters. Slide 15 pays this off.</p>
+ <p>Kubo plays for Real Sociedad in Spain (La Liga), shirt 14 — good hook if Leo wants details.</p></div>
+</section>
+
+<!-- ============ 5 PLACE ============ -->
+<section class="slide" data-t="Door 2 — PLACE nouns">
+ <div class="inner">
+  <div class="kicker">Door 2 📍 · Place</div>
+  <h2>PLACE nouns — <span class="hl">where?</span></h2>
+  <p class="sub">If you can <b class="hl2">go</b> there, it is a place noun. <span class="jp">行ける場所</span></p>
+  <div class="grid g4">
+    <div class="rc" onclick="flip(this)"><span class="em">🏟️</span><div class="wd">stadium</div><div class="bk">We watched the game at the <b>stadium</b>.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏫</span><div class="wd">school</div><div class="bk">I go to <b>school</b> in Annaka.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🗼</span><div class="wd">Tokyo</div><div class="bk"><b>Tokyo</b> is a very big city.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🇯🇵</span><div class="wd">Japan</div><div class="bk"><b>Japan</b> played in the World Cup.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🍿</span><div class="wd">cinema</div><div class="bk">We saw a movie at the <b>cinema</b>.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🌳</span><div class="wd">park</div><div class="bk">We play soccer in the <b>park</b>.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🛏️</span><div class="wd">bedroom</div><div class="bk">My posters are in my <b>bedroom</b>.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏔️</span><div class="wd">mountain</div><div class="bk">We climbed a <b>mountain</b> in Gunma.</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box gold" style="margin-top:26px"><p style="font-size:30px">🗺️ Big places get a <b>Capital Letter</b>: <b>Japan · Tokyo · Gunma · Annaka</b>. Small words do not: <i>park, school</i>.</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Place door</h5>
+ <p>Use Leo's real map: his school, Annaka, Gunma, Tokyo. Personal places anchor abstract categories.</p>
+ <p>Plant the capital-letter seed here but keep it light — full treatment at slides 15–18.</p></div>
+</section>
+
+<!-- ============ 6 THING ============ -->
+<section class="slide" data-t="Door 3 — THING nouns">
+ <div class="inner">
+  <div class="kicker">Door 3 ⚽ · Thing</div>
+  <h2>THING nouns — <span class="hl">what?</span></h2>
+  <p class="sub">If you can <b class="hl2">touch it, hold it, or point at it</b> → thing noun. <span class="jp">さわれるもの</span></p>
+  <div class="grid g4">
+    <div class="rc" onclick="flip(this)"><span class="em">⚽</span><div class="wd">ball</div><div class="bk">He kicked the <b>ball</b> very hard.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏆</span><div class="wd">trophy</div><div class="bk">They lifted the <b>trophy</b>. 🎉</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎫</span><div class="wd">ticket</div><div class="bk">My <b>ticket</b> was in my pocket.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🍿</span><div class="wd">popcorn</div><div class="bk">I eat <b>popcorn</b> at the movies.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🚗</span><div class="wd">car</div><div class="bk">Batman drives a black <b>car</b>.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">📱</span><div class="wd">phone</div><div class="bk">My <b>phone</b> is on the table.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🧊</span><div class="wd">ice</div><div class="bk">There is <b>ice</b> on the ground.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🥅</span><div class="wd">net</div><div class="bk">The ball hit the back of the <b>net</b>!</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box sky" style="margin-top:26px"><p style="font-size:30px">👀 Look around the room right now. Point at <b>five things</b> and name them in English. Go!</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Thing door + room hunt</h5>
+ <p>Do the room hunt physically — stand up, point, name. Movement locks in the category.</p>
+ <p><b>Watch:</b> <i>ice</i> and <i>popcorn</i> are uncountable. If Leo says "two popcorns", note it silently — you will fix it properly at Station 6 (slides 25–28). Don't derail now.</p></div>
+</section>
+
+<!-- ============ 7 IDEA ============ -->
+<section class="slide" data-t="Door 4 — IDEA nouns (invisible!)">
+ <div class="inner">
+  <div class="kicker">Door 4 💭 · Idea — the tricky one</div>
+  <h2>IDEA nouns — you <span class="hl">cannot touch</span> them 👻</h2>
+  <p class="sub">You cannot hold them… but they still have a name. <span class="jp">目に見えないけれど名前があるもの</span></p>
+  <div class="grid g4">
+    <div class="rc" onclick="flip(this)"><span class="em">😃</span><div class="wd">fun</div><div class="bk">Soccer is so much <b>fun</b>!</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">💨</span><div class="wd">speed</div><div class="bk">His <b>speed</b> is amazing.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🦁</span><div class="wd">courage</div><div class="bk">A hero needs <b>courage</b>.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">⏰</span><div class="wd">time</div><div class="bk">There is no <b>time</b> left!</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎵</span><div class="wd">music</div><div class="bk">I listen to <b>music</b> every day.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">💪</span><div class="wd">power</div><div class="bk">Superheroes have special <b>power</b>.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">😨</span><div class="wd">fear</div><div class="bk">Batman uses <b>fear</b> to win.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🤝</span><div class="wd">teamwork</div><div class="bk">Good <b>teamwork</b> wins games.</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box red" style="margin-top:26px"><p style="font-size:30px">🚫 You cannot say "give me two <i>funs</i>" ❌. Idea nouns are usually <b>only one shape</b>. We learn why at Station 6!</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>The abstract door</h5>
+ <p>This door is where most A1–A2 learners fail the "is it a noun?" test. Anchor with <b>feelings + qualities</b>: fun, fear, speed, power — all things Leo talks about with movies and soccer.</p>
+ <p><b>Quick check to ask:</b> "Is <i>fast</i> a noun?" (No — it describes.) "Is <i>speed</i> a noun?" (Yes — it names.) That adjective/noun pair is the clearest contrast you can give.</p>
+ <p>Foreshadow uncountability but do not explain it yet.</p></div>
+</section>
+
+<!-- ============ 8 SORT 4 DOORS ============ -->
+<section class="slide" data-t="GAME — Sort into the 4 doors">
+ <div class="inner">
+  <div class="kicker">🎮 Game 1 · Door Sort</div>
+  <h2>Which <span class="hl">door</span> does it go through?</h2>
+  <p class="sub">Tap a word 👆 then tap its door. Get all 8!</p>
+  <div class="game">
+    <div class="bank">
+      <div class="chip" data-cat="p" onclick="pickChip(this)">Kubo</div>
+      <div class="chip" data-cat="l" onclick="pickChip(this)">stadium</div>
+      <div class="chip" data-cat="t" onclick="pickChip(this)">trophy</div>
+      <div class="chip" data-cat="i" onclick="pickChip(this)">courage</div>
+      <div class="chip" data-cat="p" onclick="pickChip(this)">goalkeeper</div>
+      <div class="chip" data-cat="l" onclick="pickChip(this)">Japan</div>
+      <div class="chip" data-cat="t" onclick="pickChip(this)">popcorn</div>
+      <div class="chip" data-cat="i" onclick="pickChip(this)">speed</div>
+    </div>
+    <div class="bins g4">
+      <div class="bin" data-cat="p" onclick="dropBin(this)"><h4>🧍 PERSON</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="l" onclick="dropBin(this)"><h4>📍 PLACE</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="t" onclick="dropBin(this)"><h4>⚽ THING</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="i" onclick="dropBin(this)"><h4>💭 IDEA</h4><div class="drops"></div></div>
+    </div>
+    <div class="fb"></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 1</h5>
+ <p>Let Leo self-correct. A wrong tap shakes the bin — no penalty, no score. Ask "why?" after every correct placement; the reason matters more than the answer.</p>
+ <p><b>If he struggles:</b> give the sentence frame aloud — "Can you meet it? Can you go there? Can you touch it? Can you only feel it?"</p></div>
+</section>
+
+<!-- ============ 9 TRICK 1 ============ -->
+<section class="slide" data-t="Trick 1 — the a/the test">
+ <div class="inner">
+  <div class="kicker">Station 2 · How to RECOGNIZE a noun 🔍</div>
+  <h2>Trick 1 — the <span class="hl">"a / the" test</span> 🎩</h2>
+  <p class="sub">Put <b class="hl2">a</b> or <b class="hl2">the</b> in front. Does it sound OK? → It is a noun!</p>
+  <div class="rowx" style="margin-top:20px">
+    <div class="box green"><h3>✔ Sounds good → NOUN</h3>
+      <p style="font-size:34px;line-height:1.8"><b>a</b> ball ⚽<br><b>the</b> stadium 🏟️<br><b>a</b> ticket 🎫<br><b>the</b> coach 📣</p></div>
+    <div class="box red"><h3>✘ Sounds strange → NOT a noun</h3>
+      <p style="font-size:34px;line-height:1.8"><b>a</b> run 🏃 … hmm ❓<br><b>the</b> happy 😀 … no!<br><b>a</b> quickly 💨 … no!<br><b>the</b> jump 🦘 … no!</p></div>
+  </div>
+  <div class="game" style="margin-top:22px">
+    <p style="font-size:32px;font-weight:800;margin-bottom:12px">🎮 Your turn — tap a word, then tap YES or NO:</p>
+    <div class="bank">
+      <div class="chip" data-cat="y" onclick="pickChip(this)">hero</div>
+      <div class="chip" data-cat="n" onclick="pickChip(this)">tall</div>
+      <div class="chip" data-cat="y" onclick="pickChip(this)">jungle</div>
+      <div class="chip" data-cat="n" onclick="pickChip(this)">shout</div>
+      <div class="chip" data-cat="y" onclick="pickChip(this)">match</div>
+      <div class="chip" data-cat="n" onclick="pickChip(this)">loud</div>
+    </div>
+    <div class="bins g2">
+      <div class="bin" data-cat="y" onclick="dropBin(this)"><h4>✔ "a / the" works → NOUN</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="n" onclick="dropBin(this)"><h4>✘ does not work → not a noun</h4><div class="drops"></div></div>
+    </div>
+    <div class="fb"></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>The determiner test</h5>
+ <p>This is the single most useful recognition tool for Leo, <b>precisely because Japanese has no articles</b> — practising the test also drills the article habit.</p>
+ <p><b>Honest caveat for you, not for Leo:</b> "a run", "a jump" do exist as nouns in English. Keep the test at the level of "does it sound normal on its own?" If Leo notices, praise him hugely — he is thinking like a linguist.</p></div>
+</section>
+
+<!-- ============ 10 TRICK 2 ============ -->
+<section class="slide" data-t="Trick 2 — the counting test">
+ <div class="inner">
+  <div class="kicker">Station 2 · Trick 2</div>
+  <h2>Trick 2 — the <span class="hl">counting test</span> 🔢</h2>
+  <p class="sub">Can you say <b class="hl2">one ___ , two ___</b> ? Then it is almost always a noun.</p>
+  <div class="grid g3" style="margin-top:26px">
+    <div class="rc" onclick="flip(this)"><span class="em">⚽</span><div class="wd">goal</div><div class="bk">one goal · two goals ✔ NOUN</div><div class="tap">tap to test</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎫</span><div class="wd">ticket</div><div class="bk">one ticket · two tickets ✔ NOUN</div><div class="tap">tap to test</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🦸</span><div class="wd">hero</div><div class="bk">one hero · two heroes ✔ NOUN</div><div class="tap">tap to test</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏃</span><div class="wd">run</div><div class="bk">one run… two runs? 🤔 usually a VERB</div><div class="tap">tap to test</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">😀</span><div class="wd">happy</div><div class="bk">two happys ❌ — a describing word</div><div class="tap">tap to test</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">💧</span><div class="wd">water</div><div class="bk">two waters ❌ … but STILL a noun! 😲</div><div class="tap">tap to test</div></div>
+  </div>
+  <div class="box gold" style="margin-top:28px"><p style="font-size:30px">⚠️ <b>Surprise!</b> Some nouns can never be counted: <b>water 💧 · music 🎵 · money 💴 · homework 📚</b>. We meet them at Station 6.</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Counting test + its limit</h5>
+ <p>Teach the test, then immediately show it has a hole (<i>water</i>). Two reasons: it is honest, and it sets up Station 6 so uncountables feel like a puzzle Leo already spotted rather than a new rule dumped on him.</p>
+ <p>Japanese counts with counters (一本・二枚), so "cannot be counted" is genuinely strange to him. Expect confusion; it is normal.</p></div>
+</section>
+
+<!-- ============ 11 TRICK 3 ============ -->
+<section class="slide" data-t="Trick 3 — the position test">
+ <div class="inner">
+  <div class="kicker">Station 2 · Trick 3</div>
+  <h2>Trick 3 — the <span class="hl">position test</span> 📐</h2>
+  <p class="sub">Nouns love to sit <b class="hl2">right after</b> these little words. Tap a slot to fill it!</p>
+  <div class="grid g4" style="margin-top:22px">
+    <div class="rc" onclick="flip(this)"><span class="em">👉</span><div class="wd">the ___</div><div class="bk">the <b>ball</b> · the <b>coach</b> · the <b>stadium</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👉</span><div class="wd">my ___</div><div class="bk">my <b>boots</b> · my <b>team</b> · my <b>phone</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👉</span><div class="wd">this ___</div><div class="bk">this <b>ticket</b> · this <b>movie</b> · this <b>game</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👉</span><div class="wd">two ___</div><div class="bk">two <b>goals</b> · two <b>heroes</b> · two <b>cars</b></div><div class="tap">tap</div></div>
+  </div>
+  <div class="box sky" style="margin-top:28px">
+    <h3>🪑 Nouns also sit in two big chairs in a sentence:</h3>
+    <p style="font-size:34px;margin-top:10px"><b class="hl">Chair 1 (who does it):</b> <u>The goalkeeper</u> caught the ball.</p>
+    <p style="font-size:34px"><b class="hl">Chair 2 (what gets it):</b> The goalkeeper caught <u>the ball</u>.</p>
+  </div>
+  <div class="box gold" style="margin-top:20px"><p style="font-size:29px">🧠 So: after <b>the / a / my / this / two</b> → look for a noun. And at the <b>start</b> and <b>end</b> of most sentences → also a noun!</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Position beats meaning</h5>
+ <p>This trick works even when Leo does not know the word. Try it: "The <i>zorble</i> caught the ball." He can tell you <i>zorble</i> is a noun purely from its seat. That is a genuinely thrilling moment for a 13-year-old — use it.</p>
+ <p>Do not use the words "subject" and "object" unless Leo asks. "Chair 1 / Chair 2" is enough at A1–A2.</p></div>
+</section>
+
+<!-- ============ 12 JAPANESE BRIDGE ============ -->
+<section class="slide" data-t="Trick 4 — Japanese bridge 名前">
+ <div class="inner">
+  <div class="kicker">Station 2 · Trick 4 · 日本語ブリッジ 🌉</div>
+  <h2>Trick 4 — the <span class="hl">"name" test</span> 🏷️</h2>
+  <p class="sub">Ask yourself one question: <b class="hl2">Is this word the NAME of something?</b></p>
+  <div class="rowx" style="margin-top:26px">
+    <div class="box sky"><h3>🇯🇵 In Japanese</h3>
+      <p style="font-size:32px;line-height:1.6">名詞（めいし）＝ <b>名前のことば</b><br><br>ボール・スタジアム・友だち・じかん<br><br>These are all <b>names</b> → nouns ✔</p></div>
+    <div class="box green"><h3>🇬🇧 In English</h3>
+      <p style="font-size:32px;line-height:1.6">ball · stadium · friend · time<br><br>Ask: <b>does it NAME something?</b><br><br>YES → noun ✔ &nbsp;&nbsp; NO → not a noun ✘</p></div>
+  </div>
+  <div class="box gold" style="margin-top:26px">
+    <h3>🎒 Your 4-tool toolkit — say it with me:</h3>
+    <p style="font-size:32px;line-height:1.7">1️⃣ Can I put <b>a / the</b> in front? &nbsp; 2️⃣ Can I <b>count</b> it? &nbsp; 3️⃣ Does it sit after <b>the / my / this</b>? &nbsp; 4️⃣ Does it <b>name</b> something?</p>
+    <p style="font-size:29px;margin-top:10px">Two YES answers = it is a noun. 🎯</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>The toolkit</h5>
+ <p>Have Leo say the four tools out loud and count them on his fingers. This is the take-away he needs for the assessment at the end — everything after this is application.</p>
+ <p><b>Print tip:</b> write the four tools on a sticky note for his desk. Recall beats re-teaching.</p></div>
+</section>
+
+<!-- ============ 13 DETECTIVE ============ -->
+<section class="slide" data-t="GAME — Noun Detective (tap all nouns)">
+ <div class="inner">
+  <div class="kicker">🎮 Game 2 · Noun Detective 🕵️</div>
+  <h2>Tap <span class="hl">EVERY noun</span> in the sentence 🔦</h2>
+  <p class="sub">Green border = you found them all! Careful — some words are traps. 🪤</p>
+  <div style="margin-top:20px">
+    <p class="sent" data-need="3"><span class="w">The</span> <span class="w" data-n="1">goalkeeper</span> <span class="w">caught</span> <span class="w">the</span> <span class="w" data-n="1">ball</span> <span class="w">in</span> <span class="w">the</span> <span class="w" data-n="1">stadium</span><span class="w">.</span> <span class="tick">✅</span></p>
+    <p class="sent" data-need="4"><span class="w" data-n="1">Leo</span> <span class="w">watched</span> <span class="w">a</span> <span class="w" data-n="1">movie</span> <span class="w">with</span> <span class="w">his</span> <span class="w" data-n="1">brother</span> <span class="w">in</span> <span class="w" data-n="1">Tokyo</span><span class="w">.</span> <span class="tick">✅</span></p>
+    <p class="sent" data-need="3"><span class="w">My</span> <span class="w" data-n="1">friend</span> <span class="w">has</span> <span class="w">amazing</span> <span class="w" data-n="1">speed</span> <span class="w">and</span> <span class="w">big</span> <span class="w" data-n="1">dreams</span><span class="w">.</span> <span class="tick">✅</span></p>
+    <p class="sent" data-need="3"><span class="w">The</span> <span class="w" data-n="1">coach</span> <span class="w">put</span> <span class="w">the</span> <span class="w" data-n="1">trophy</span> <span class="w">on</span> <span class="w">the</span> <span class="w" data-n="1">table</span><span class="w">.</span> <span class="tick">✅</span></p>
+    <p class="sent" data-need="3"><span class="w" data-n="1">Batman</span> <span class="w">drives</span> <span class="w">a</span> <span class="w">fast</span> <span class="w" data-n="1">car</span> <span class="w">at</span> <span class="w" data-n="1">night</span><span class="w">.</span> <span class="tick">✅</span></p>
+  </div>
+  <div class="box gold" style="margin-top:18px"><p style="font-size:28px">🪤 <b>Traps:</b> <i>his, my, the</i> are not nouns — they are little helper words. <i>fast, big, amazing</i> describe nouns, they are not nouns.</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Detective game</h5>
+ <p>Wrong taps flash red and reset — infinite retries, zero shame. That is deliberate.</p>
+ <p><b>Sentence 3 is the hard one:</b> <i>speed</i> and <i>dreams</i> are idea nouns. If Leo misses them, go back to Door 4 for ten seconds, then return.</p>
+ <p>After each cleared sentence ask: "Which door? Person, place, thing or idea?" — it recycles Station 1 for free.</p></div>
+</section>
+
+<!-- ============ 14 SORT noun/verb/adj ============ -->
+<section class="slide" data-t="GAME — Noun vs Verb vs Describing word">
+ <div class="inner">
+  <div class="kicker">🎮 Game 3 · Team Sort</div>
+  <h2>Which <span class="hl">team</span> is this word on? 👕</h2>
+  <p class="sub">🏷️ Nouns <b>name</b>. 🏃 Verbs <b>do</b>. 🎨 Describing words <b>tell you more</b>.</p>
+  <div class="game">
+    <div class="bank">
+      <div class="chip" data-cat="n" onclick="pickChip(this)">referee</div>
+      <div class="chip" data-cat="v" onclick="pickChip(this)">jump</div>
+      <div class="chip" data-cat="a" onclick="pickChip(this)">loud</div>
+      <div class="chip" data-cat="n" onclick="pickChip(this)">ticket</div>
+      <div class="chip" data-cat="v" onclick="pickChip(this)">shout</div>
+      <div class="chip" data-cat="a" onclick="pickChip(this)">tall</div>
+      <div class="chip" data-cat="n" onclick="pickChip(this)">jungle</div>
+      <div class="chip" data-cat="v" onclick="pickChip(this)">catch</div>
+      <div class="chip" data-cat="a" onclick="pickChip(this)">happy</div>
+    </div>
+    <div class="bins g3">
+      <div class="bin" data-cat="n" onclick="dropBin(this)"><h4>🏷️ NOUN<br><span style="font-size:22px;color:#CBD5E1">names something</span></h4><div class="drops"></div></div>
+      <div class="bin" data-cat="v" onclick="dropBin(this)"><h4>🏃 VERB<br><span style="font-size:22px;color:#CBD5E1">an action</span></h4><div class="drops"></div></div>
+      <div class="bin" data-cat="a" onclick="dropBin(this)"><h4>🎨 DESCRIBING<br><span style="font-size:22px;color:#CBD5E1">tells us more</span></h4><div class="drops"></div></div>
+    </div>
+    <div class="fb"></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Contrast makes the category</h5>
+ <p>Leo cannot really know what a noun IS until he knows what it is NOT. This slide is the other half of the definition.</p>
+ <p><b>Strategy prompt:</b> tell him to try Tool 1 on every chip — "a referee ✔ / a jump ✘ / a loud ✘". The toolkit does the work.</p>
+ <p>"Describing word" is deliberate — <i>adjective</i> can wait.</p></div>
+</section>
+
+<!-- ============ 15 COMMON VS PROPER ============ -->
+<section class="slide" data-t="Station 3 — Common vs Proper nouns">
+ <div class="inner">
+  <div class="kicker">Station 3 · Capital Letters 🔠</div>
+  <h2>Position vs <span class="hl">Player</span> 👕</h2>
+  <p class="sub">A <b class="hl2">common noun</b> is the position. A <b class="hl2">proper noun</b> is the special name — it always wears a CAPITAL letter.</p>
+  <div class="grid g5" style="margin-top:30px">
+    <div class="rc" onclick="flip(this)"><span class="em">⚽</span><div class="wd">a player</div><div class="bk"><b>Kubo</b> 🇯🇵</div><div class="tap">tap for the name</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏛️</span><div class="wd">a club</div><div class="bk"><b>Real Madrid</b></div><div class="tap">tap for the name</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🗾</span><div class="wd">a country</div><div class="bk"><b>Japan</b></div><div class="tap">tap for the name</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎬</span><div class="wd">a movie</div><div class="bk"><b>Avatar</b></div><div class="tap">tap for the name</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏙️</span><div class="wd">a city</div><div class="bk"><b>Tokyo</b></div><div class="tap">tap for the name</div></div>
+  </div>
+  <div class="rowx" style="margin-top:30px">
+    <div class="box green"><h3>🔤 common noun — small letter</h3><p style="font-size:32px">a boy · a team · a city · a movie<br>There are <b>many</b> of them.</p></div>
+    <div class="box gold"><h3>🔠 proper noun — CAPITAL letter</h3><p style="font-size:32px"><b>Leo · Barcelona · Tokyo · John Wick</b><br>There is only <b>ONE</b> with that name.</p></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>⚠️ Highest-value slide for a Japanese learner</h5>
+ <p><b>Japanese has no capital letters at all.</b> This rule does not exist in Leo's first language, so it will never be picked up by exposure — it must be taught explicitly and re-taught often.</p>
+ <p>The test to give him: "Is there only ONE in the whole world with this name?" → capital letter.</p>
+ <p>Expect this error for years. Correct it gently and consistently every single time it appears in his writing.</p></div>
+</section>
+
+<!-- ============ 16 CAPITAL HUNT ============ -->
+<section class="slide" data-t="GAME — Capital letter hunt">
+ <div class="inner">
+  <div class="kicker">🎮 Game 4 · Capital Hunt 🔠</div>
+  <h2>Someone <span class="hl">stole all the capital letters!</span> 🥷</h2>
+  <p class="sub">Tap the words that need a CAPITAL letter. (The first word of a sentence needs one too!)</p>
+  <div style="margin-top:22px">
+    <p class="sent" data-need="2"><span class="w" data-n="1">kubo</span> <span class="w">plays</span> <span class="w">for</span> <span class="w" data-n="1">real sociedad</span><span class="w">.</span> <span class="tick">✅</span></p>
+    <p class="sent" data-need="2"><span class="w">i</span> <span class="w">watched</span> <span class="w" data-n="1">john wick</span> <span class="w">with</span> <span class="w" data-n="1">leo</span><span class="w">.</span> <span class="tick">✅</span></p>
+    <p class="sent" data-need="2"><span class="w">We</span> <span class="w">flew</span> <span class="w">from</span> <span class="w" data-n="1">tokyo</span> <span class="w">to</span> <span class="w" data-n="1">london</span><span class="w">.</span> <span class="tick">✅</span></p>
+    <p class="sent" data-need="2"><span class="w">The</span> <span class="w">game</span> <span class="w">is</span> <span class="w">on</span> <span class="w" data-n="1">monday</span> <span class="w">in</span> <span class="w" data-n="1">april</span><span class="w">.</span> <span class="tick">✅</span></p>
+    <p class="sent" data-need="2"><span class="w">He</span> <span class="w">speaks</span> <span class="w" data-n="1">japanese</span> <span class="w">and</span> <span class="w" data-n="1">english</span><span class="w">.</span> <span class="tick">✅</span></p>
+  </div>
+  <div class="box red" style="margin-top:20px"><p style="font-size:29px">🚨 <b>Surprise rule!</b> In English, <b>days</b> (Monday), <b>months</b> (April) and <b>languages</b> (Japanese, English) ALWAYS take a capital letter. 日本語では大文字はありません！</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>The three surprise categories</h5>
+ <p>Days, months and languages feel arbitrary to Leo because Japanese marks none of them. Drill these three separately — they are the highest-frequency capital errors in his writing.</p>
+ <p>Sentences 4 and 5 exist only for this. If he clears the first three easily, spend the whole slide on the last two.</p>
+ <p><b>Extension:</b> ask him to write three true sentences about his week using a day, a month and a language.</p></div>
+</section>
+
+<!-- ============ 17 PROPER SORT ============ -->
+<section class="slide" data-t="GAME — Common or Proper?">
+ <div class="inner">
+  <div class="kicker">🎮 Game 5 · Shirt Check 👕</div>
+  <h2>Small letter or <span class="hl">CAPITAL</span>?</h2>
+  <p class="sub">Tap the word, then choose its team.</p>
+  <div class="game">
+    <div class="bank">
+      <div class="chip" data-cat="c" onclick="pickChip(this)">stadium</div>
+      <div class="chip" data-cat="p" onclick="pickChip(this)">Gunma</div>
+      <div class="chip" data-cat="c" onclick="pickChip(this)">movie</div>
+      <div class="chip" data-cat="p" onclick="pickChip(this)">Avatar</div>
+      <div class="chip" data-cat="c" onclick="pickChip(this)">country</div>
+      <div class="chip" data-cat="p" onclick="pickChip(this)">Monday</div>
+      <div class="chip" data-cat="c" onclick="pickChip(this)">teacher</div>
+      <div class="chip" data-cat="p" onclick="pickChip(this)">English</div>
+      <div class="chip" data-cat="c" onclick="pickChip(this)">club</div>
+      <div class="chip" data-cat="p" onclick="pickChip(this)">Barcelona</div>
+    </div>
+    <div class="bins g2">
+      <div class="bin" data-cat="c" onclick="dropBin(this)"><h4>🔤 common noun<br><span style="font-size:22px;color:#CBD5E1">many of them · small letter</span></h4><div class="drops"></div></div>
+      <div class="bin" data-cat="p" onclick="dropBin(this)"><h4>🔠 proper noun<br><span style="font-size:22px;color:#CBD5E1">only ONE · CAPITAL letter</span></h4><div class="drops"></div></div>
+    </div>
+    <div class="fb"></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 5</h5>
+ <p>The capital letters on the chips are a visual clue — that is fine and intentional at this stage. Cover them with your hand and say the word aloud if you want a harder version.</p>
+ <p><b>Follow-up question for each:</b> "Give me the other one." stadium → Wembley. movie → Avatar. teacher → Dad. That pairing drill is the real objective.</p></div>
+</section>
+
+<!-- ============ 18 SINGULAR PLURAL INTRO ============ -->
+<section class="slide" data-t="Station 4 — One or many?">
+ <div class="inner">
+  <div class="kicker">Station 4 · Singular & Plural 1️⃣ / 2️⃣</div>
+  <h2>One ball ⚽ … or <span class="hl">many balls</span> ⚽⚽⚽?</h2>
+  <p class="sub">In English, the noun itself <b class="hl2">changes shape</b> when there is more than one. Tap to see!</p>
+  <div class="grid g4" style="margin-top:26px">
+    <div class="rc" onclick="flip(this)"><span class="em">⚽</span><div class="wd">one ball</div><div class="bk">⚽⚽⚽ two ball<b>s</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎫</span><div class="wd">one ticket</div><div class="bk">🎫🎫 two ticket<b>s</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏆</span><div class="wd">one trophy</div><div class="bk">🏆🏆 two troph<b>ies</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🦶</span><div class="wd">one foot</div><div class="bk">🦶🦶 two <b>feet</b> 😲</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box sky" style="margin-top:30px">
+    <h3>🌉 Japanese bridge — why this is HARD</h3>
+    <p style="font-size:31px;line-height:1.5">In Japanese, ボール is one ball <b>or</b> ten balls — the word never changes. 🇯🇵<br>
+    In English, we <b>must</b> add the ending. Your ear is not used to it yet — so we train it! 💪</p>
+  </div>
+  <div class="box gold" style="margin-top:20px"><p style="font-size:30px">🏭 There are <b>4 plural machines</b> and one gang of <b>rebels</b>. Let's meet them. →</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>⚠️ The single biggest L1 gap</h5>
+ <p><b>Japanese does not mark plural.</b> 猫 is one cat or ten cats. So adding -s is not a spelling detail for Leo — it is a brand-new grammatical habit his brain has literally never needed.</p>
+ <p>Expect dropped plurals for years, even when he "knows" the rule. Do not treat it as carelessness. Correct warmly, every time, forever.</p>
+ <p>Naming the difficulty out loud (as this slide does) removes the shame and makes practice feel like training, not failure.</p></div>
+</section>
+
+<!-- ============ 19 MACHINES 1-2 ============ -->
+<section class="slide" data-t="Plural machines 1 & 2 (+s / +es)">
+ <div class="inner">
+  <div class="kicker">Station 4 · The Plural Machines 🏭</div>
+  <h2>Machine 1 and Machine 2 ⚙️</h2>
+  <div class="rowx" style="margin-top:24px">
+    <div class="machine" onclick="flip2(this)">
+      <div class="mtitle">⚙️ MACHINE 1 · + s</div>
+      <div class="mrule">The normal machine — most words!</div>
+      <div class="mex">ball → ball<b>s</b> ⚽<br>goal → goal<b>s</b> 🥅</div>
+      <div class="hidden-ex mex" style="margin-top:10px">movie → movie<b>s</b> 🎬<br>player → player<b>s</b> 👟<br>fan → fan<b>s</b> 🎉<br>day → day<b>s</b> ☀️</div>
+      <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+    </div>
+    <div class="machine" onclick="flip2(this)">
+      <div class="mtitle">⚙️ MACHINE 2 · + es</div>
+      <div class="mrule">For hissing sounds: <b>s · x · ch · sh</b> 🐍<br>They need a BIGGER door!</div>
+      <div class="mex">match → match<b>es</b> ⚽<br>box → box<b>es</b> 📦</div>
+      <div class="hidden-ex mex" style="margin-top:10px">coach → coach<b>es</b> 📣<br>bus → bus<b>es</b> 🚌<br>dish → dish<b>es</b> 🍽️<br>sandwich → sandwich<b>es</b> 🥪</div>
+      <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+    </div>
+  </div>
+  <div class="box gold" style="margin-top:26px">
+    <h3>👂 Listen! The -s has THREE sounds:</h3>
+    <p style="font-size:30px;line-height:1.6">/s/ quiet → kick<b>s</b>, ticket<b>s</b> &nbsp;·&nbsp; /z/ noisy → goal<b>s</b>, fan<b>s</b> &nbsp;·&nbsp; /ɪz/ extra beat → match<b>es</b>, box<b>es</b></p>
+    <p style="font-size:27px;margin-top:8px">🚫 Not "goal-su" — keep it short and smooth!</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Machines + pronunciation</h5>
+ <p>Soccer gives you <b>matches</b> and <b>coaches</b> for free — use them as the anchor examples for Machine 2.</p>
+ <p><b>Pronunciation is the Japanese-specific risk:</b> Japanese is a mora language, so Leo will tend to insert a vowel — "goal-su", "kick-su". Model the clean consonant cluster and have him repeat 5×. This connects straight back to your Unit 9 Sound Lab work.</p>
+ <p>The /ɪz/ ending is easiest — it already sounds like a syllable to him.</p></div>
+</section>
+
+<!-- ============ 20 MACHINES 3-4 ============ -->
+<section class="slide" data-t="Plural machines 3 & 4 (y→ies / f→ves)">
+ <div class="inner">
+  <div class="kicker">Station 4 · The Plural Machines 🏭</div>
+  <h2>Machine 3 and Machine 4 ⚙️</h2>
+  <div class="rowx" style="margin-top:24px">
+    <div class="machine" onclick="flip2(this)">
+      <div class="mtitle">⚙️ MACHINE 3 · y → ies</div>
+      <div class="mrule">Only when the letter <b>before y</b> is a consonant.</div>
+      <div class="mex">troph<s>y</s> → troph<b>ies</b> 🏆<br>penalt<s>y</s> → penalt<b>ies</b> ⚽</div>
+      <div class="hidden-ex mex" style="margin-top:10px">cit<s>y</s> → cit<b>ies</b> 🏙️<br>stor<s>y</s> → stor<b>ies</b> 📖<br>countr<s>y</s> → countr<b>ies</b> 🗺️</div>
+      <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+    </div>
+    <div class="machine" onclick="flip2(this)">
+      <div class="mtitle">⚙️ MACHINE 4 · f → ves</div>
+      <div class="mrule">The <b>f</b> gets a little louder and becomes <b>v</b>. 🔊</div>
+      <div class="mex">lea<s>f</s> → lea<b>ves</b> 🍃<br>kni<s>fe</s> → kni<b>ves</b> 🔪</div>
+      <div class="hidden-ex mex" style="margin-top:10px">wol<s>f</s> → wol<b>ves</b> 🐺<br>hal<s>f</s> → hal<b>ves</b> ⏱️<br>shel<s>f</s> → shel<b>ves</b> 📚</div>
+      <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+    </div>
+  </div>
+  <div class="box red" style="margin-top:26px">
+    <h3>🪤 The y trap!</h3>
+    <p style="font-size:31px;line-height:1.6">If a <b class="hl">vowel</b> (a e i o u) comes before the y → just add <b>s</b>!<br>
+    da<b>y</b> → day<b>s</b> ☀️ &nbsp;·&nbsp; ke<b>y</b> → key<b>s</b> 🔑 &nbsp;·&nbsp; bo<b>y</b> → boy<b>s</b> 👦 &nbsp;<span style="color:#FCA5A5">(not "daies" ❌)</span></p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>The vowel-before-y trap</h5>
+ <p>Teach Machine 3 and its trap together — separating them creates the "daies" error. Give Leo the check: <b>look at the letter just before the y.</b></p>
+ <p>Machine 4 is smaller and lower priority; Ice Age (🐺 wolves) and cooking (🔪 knives) carry it.</p>
+ <p>Do not chase completeness — <i>roofs, chiefs</i> are exceptions Leo does not need yet.</p></div>
+</section>
+
+<!-- ============ 21 MACHINE SORT ============ -->
+<section class="slide" data-t="GAME — Which machine?">
+ <div class="inner">
+  <div class="kicker">🎮 Game 6 · Machine Sort ⚙️</div>
+  <h2>Send each word to the <span class="hl">right machine</span>!</h2>
+  <p class="sub">Tap the word 👆 then tap the machine. Say the plural out loud as you do it!</p>
+  <div class="game">
+    <div class="bank">
+      <div class="chip" data-cat="s" onclick="pickChip(this)">ball</div>
+      <div class="chip" data-cat="e" onclick="pickChip(this)">match</div>
+      <div class="chip" data-cat="i" onclick="pickChip(this)">trophy</div>
+      <div class="chip" data-cat="v" onclick="pickChip(this)">leaf</div>
+      <div class="chip" data-cat="e" onclick="pickChip(this)">box</div>
+      <div class="chip" data-cat="s" onclick="pickChip(this)">key</div>
+      <div class="chip" data-cat="i" onclick="pickChip(this)">penalty</div>
+      <div class="chip" data-cat="v" onclick="pickChip(this)">knife</div>
+      <div class="chip" data-cat="e" onclick="pickChip(this)">coach</div>
+      <div class="chip" data-cat="s" onclick="pickChip(this)">movie</div>
+      <div class="chip" data-cat="i" onclick="pickChip(this)">city</div>
+      <div class="chip" data-cat="v" onclick="pickChip(this)">wolf</div>
+    </div>
+    <div class="bins g4">
+      <div class="bin" data-cat="s" onclick="dropBin(this)"><h4>⚙️ + s</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="e" onclick="dropBin(this)"><h4>⚙️ + es</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="i" onclick="dropBin(this)"><h4>⚙️ y → ies</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="v" onclick="dropBin(this)"><h4>⚙️ f → ves</h4><div class="drops"></div></div>
+    </div>
+    <div class="fb"></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 6 — the key slide of Station 4</h5>
+ <p><b>key</b> is the trap chip: it ends in y but the letter before is a vowel, so it goes to Machine 1. If Leo sends it to "y → ies", that is the teachable moment of the whole station.</p>
+ <p>Insist he <b>says the plural aloud</b> for each placement — silent sorting builds recognition but not production, and production is what he needs.</p></div>
+</section>
+
+<!-- ============ 22 REBELS ============ -->
+<section class="slide" data-t="The Rebels — irregular plurals">
+ <div class="inner">
+  <div class="kicker">Station 4 · The Rebels 😎</div>
+  <h2>These nouns <span class="hl">break all the rules</span> 🤘</h2>
+  <p class="sub">No machine works on them. You just have to <b class="hl2">know</b> them. Tap each rebel!</p>
+  <div class="grid g4" style="margin-top:24px">
+    <div class="rc" onclick="flip(this)"><span class="em">🦶</span><div class="wd">foot</div><div class="bk">two <b>FEET</b><br><span style="font-size:20px">"He is fast on his feet!"</span></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👨</span><div class="wd">man</div><div class="bk">two <b>MEN</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👩</span><div class="wd">woman</div><div class="bk">two <b>WOMEN</b><br><span style="font-size:20px">say: WI-min 👂</span></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🧒</span><div class="wd">child</div><div class="bk">two <b>CHILDREN</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🧑</span><div class="wd">person</div><div class="bk">two <b>PEOPLE</b><br><span style="font-size:20px;color:#FCA5A5">never "two persons" ❌</span></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🦷</span><div class="wd">tooth</div><div class="bk">two <b>TEETH</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🐭</span><div class="wd">mouse</div><div class="bk">two <b>MICE</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🐟</span><div class="wd">fish</div><div class="bk">two <b>FISH</b> — no change!<br><span style="font-size:20px">also: sheep 🐑 · deer 🦌</span></div><div class="tap">tap</div></div>
+  </div>
+  <div class="box gold" style="margin-top:26px"><p style="font-size:30px">🏆 <b>Most important rebel:</b> <b>person → people</b>. You will use it every single day!</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Rebels</h5>
+ <p>Framing them as rule-breakers makes them <b>memorable instead of annoying</b> — irregulars are easier to learn when they have a personality.</p>
+ <p><b>Priority order for Leo:</b> people → children → feet → men/women → teeth. The rest are bonus.</p>
+ <p>"Two persons" is the classic error. Drill <i>people</i> hardest.</p>
+ <p><b>women</b> pronunciation (WI-min, not WOO-men) is worth 30 seconds of ear training.</p></div>
+</section>
+
+<!-- ============ 23 REBEL QUIZ ============ -->
+<section class="slide" data-t="Rebel check — quick quiz">
+ <div class="inner">
+  <div class="kicker">🎮 Game 7 · Rebel Check ✊</div>
+  <h2>Do you know the <span class="hl">rebels</span>?</h2>
+  <p class="sub">Tap the correct plural.</p>
+  <div style="margin-top:18px">
+    <div class="q"><div class="qt">1️⃣ one child → two ___ 🧒🧒</div>
+      <div class="opts"><div class="opt" onclick="opt(this)">childs</div><div class="opt" data-ok="1" onclick="opt(this)">children</div><div class="opt" onclick="opt(this)">childes</div></div>
+      <div class="qfb"></div></div>
+    <div class="q"><div class="qt">2️⃣ one person → two ___ 🧑🧑</div>
+      <div class="opts"><div class="opt" onclick="opt(this)">persons</div><div class="opt" onclick="opt(this)">peoples</div><div class="opt" data-ok="1" onclick="opt(this)">people</div></div>
+      <div class="qfb"></div></div>
+    <div class="q"><div class="qt">3️⃣ one foot → two ___ 🦶🦶</div>
+      <div class="opts"><div class="opt" onclick="opt(this)">foots</div><div class="opt" data-ok="1" onclick="opt(this)">feet</div><div class="opt" onclick="opt(this)">feets</div></div>
+      <div class="qfb"></div></div>
+    <div class="q"><div class="qt">4️⃣ one fish → three ___ 🐟🐟🐟</div>
+      <div class="opts"><div class="opt" data-ok="1" onclick="opt(this)">fish</div><div class="opt" onclick="opt(this)">fishes</div><div class="opt" onclick="opt(this)">fishs</div></div>
+      <div class="qfb"></div></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Quick check</h5>
+ <p>Wrong options here are Leo's real predicted errors, not random noise — <i>childs, persons, foots, fishes</i> are exactly what an A1–A2 Japanese learner produces.</p>
+ <p>He can retry freely. If he misses two or more, go back to slide 22 and re-tap the cards before continuing.</p></div>
+</section>
+
+<!-- ============ 24 COUNTABLE / UNCOUNTABLE ============ -->
+<section class="slide" data-t="Station 5 — Countable vs Uncountable">
+ <div class="inner">
+  <div class="kicker">Station 5 · Count or Can't Count 🔢💧</div>
+  <h2>Players ⚽ and <span class="hl">Water</span> 💧</h2>
+  <p class="sub">Some nouns you can count like players. Some are like water on the pitch — you can't count it!</p>
+  <div class="rowx" style="margin-top:26px">
+    <div class="box green"><h3>⚽ COUNTABLE — like players</h3>
+      <p style="font-size:31px;line-height:1.6">one goal · two goal<b>s</b> 🥅<br>one ticket · three ticket<b>s</b> 🎫<br>one player · eleven player<b>s</b> 👕</p>
+      <p style="font-size:27px;margin-top:12px;color:var(--lime)">✔ can take <b>-s</b> &nbsp;·&nbsp; ✔ use <b>many</b></p></div>
+    <div class="box sky"><h3>💧 UNCOUNTABLE — like water</h3>
+      <p style="font-size:31px;line-height:1.6">water 💧 · milk 🥛 · rice 🍚<br>money 💴 · time ⏰ · music 🎵<br>homework 📚 · information ℹ️</p>
+      <p style="font-size:27px;margin-top:12px;color:#7DD3FC">✘ never <b>-s</b> &nbsp;·&nbsp; ✔ use <b>much / some</b></p></div>
+  </div>
+  <div class="box gold" style="margin-top:26px">
+    <h3>🥤 Need to count water? Use a container!</h3>
+    <p style="font-size:31px">a <b>bottle of</b> water 🍶 &nbsp;·&nbsp; a <b>cup of</b> tea ☕ &nbsp;·&nbsp; a <b>bowl of</b> rice 🍚 &nbsp;·&nbsp; a <b>piece of</b> advice 💬</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>⚠️ Second big L1 minefield</h5>
+ <p>Japanese counts <b>everything</b> with counters (一本、二枚、三人). So "this noun cannot be counted" is genuinely alien — it is not laziness when Leo says "two waters".</p>
+ <p>The container structure (<i>a bottle of…</i>) is the bridge: it is exactly what Japanese counters do, so it feels natural once he sees the parallel. Point that out explicitly.</p>
+ <p>Keep the list short. These eight are the ones he will actually meet.</p></div>
+</section>
+
+<!-- ============ 25 UNCOUNTABLE TRAPS ============ -->
+<section class="slide" data-t="Uncountable traps — homework / information">
+ <div class="inner">
+  <div class="kicker">Station 5 · Trap Alert 🚨</div>
+  <h2>The words that <span class="hl">everyone</span> gets wrong 🪤</h2>
+  <p class="sub">These four look countable… but they are NOT. Tap each trap!</p>
+  <div class="grid g4" style="margin-top:26px">
+    <div class="rc" onclick="flip(this)"><span class="em">📚</span><div class="wd">homework</div><div class="bk">❌ homework<b>s</b><br>✔ <b>a lot of homework</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">ℹ️</span><div class="wd">information</div><div class="bk">❌ information<b>s</b><br>✔ <b>some information</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">💴</span><div class="wd">money</div><div class="bk">❌ money<b>s</b><br>✔ <b>much money</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">💬</span><div class="wd">advice</div><div class="bk">❌ advice<b>s</b><br>✔ <b>a piece of advice</b></div><div class="tap">tap</div></div>
+  </div>
+  <div class="rowx" style="margin-top:30px">
+    <div class="box red"><h3>🚫 Never say</h3><p style="font-size:32px;line-height:1.6">I have three homeworks. ❌<br>I need two informations. ❌<br>He has many moneys. ❌</p></div>
+    <div class="box green"><h3>✔ Say this instead</h3><p style="font-size:32px;line-height:1.6">I have a lot of homework. ✔<br>I need some information. ✔<br>He has a lot of money. ✔</p></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>The four school-life traps</h5>
+ <p><b>homework</b> and <b>information</b> are the two Leo will meet constantly in junior high school — worth over-teaching now to prevent a fossilised error.</p>
+ <p>Give him the safe escape hatch: when unsure, <b>"a lot of ___"</b> works with both countable and uncountable nouns. That one phrase saves him a hundred mistakes.</p></div>
+</section>
+
+<!-- ============ 26 COUNT SORT ============ -->
+<section class="slide" data-t="GAME — Count or Can't Count?">
+ <div class="inner">
+  <div class="kicker">🎮 Game 8 · The Count Gate 🚪</div>
+  <h2>Can you <span class="hl">count</span> it? ⚽ or 💧</h2>
+  <p class="sub">Try saying "two ___" in your head first. Does it sound right?</p>
+  <div class="game">
+    <div class="bank">
+      <div class="chip" data-cat="c" onclick="pickChip(this)">goal</div>
+      <div class="chip" data-cat="u" onclick="pickChip(this)">water</div>
+      <div class="chip" data-cat="c" onclick="pickChip(this)">ticket</div>
+      <div class="chip" data-cat="u" onclick="pickChip(this)">music</div>
+      <div class="chip" data-cat="c" onclick="pickChip(this)">sandwich</div>
+      <div class="chip" data-cat="u" onclick="pickChip(this)">homework</div>
+      <div class="chip" data-cat="c" onclick="pickChip(this)">player</div>
+      <div class="chip" data-cat="u" onclick="pickChip(this)">money</div>
+      <div class="chip" data-cat="c" onclick="pickChip(this)">movie</div>
+      <div class="chip" data-cat="u" onclick="pickChip(this)">rice</div>
+    </div>
+    <div class="bins g2">
+      <div class="bin" data-cat="c" onclick="dropBin(this)"><h4>⚽ COUNTABLE<br><span style="font-size:22px;color:#CBD5E1">one, two, three… can take -s</span></h4><div class="drops"></div></div>
+      <div class="bin" data-cat="u" onclick="dropBin(this)"><h4>💧 UNCOUNTABLE<br><span style="font-size:22px;color:#CBD5E1">no -s, ever</span></h4><div class="drops"></div></div>
+    </div>
+    <div class="fb"></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 8</h5>
+ <p>Have Leo whisper "two goals ✔ / two waters ✘" before each tap. The <b>ear test</b> is what he will actually use in real speech — not a memorised list.</p>
+ <p><b>rice</b> is a great one for a Japanese learner: 一杯のご飯 → "a bowl of rice". Same logic, different language.</p></div>
+</section>
+
+<!-- ============ 27 MUCH MANY ============ -->
+<section class="slide" data-t="much / many + is / are">
+ <div class="inner">
+  <div class="kicker">Station 5 · Why it matters 🎯</div>
+  <h2>Counting changes the <span class="hl">whole sentence</span> 🔗</h2>
+  <p class="sub">Tap each card to see the pair.</p>
+  <div class="grid g2" style="margin-top:24px">
+    <div class="rc" onclick="flip(this)"><span class="em">🔢</span><div class="wd">many ⚽ / much 💧</div>
+      <div class="bk" style="font-size:29px">How <b>many</b> goals? 🥅<br>How <b>much</b> water? 💧</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🔗</span><div class="wd">is / are</div>
+      <div class="bk" style="font-size:29px">The players <b>are</b> ready. ⚽<br>The music <b>is</b> loud. 🎵</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👉</span><div class="wd">a / an ⚽ · nothing 💧</div>
+      <div class="bk" style="font-size:29px">I want <b>a</b> ticket. 🎫<br>I want <b>___</b> water. 💧</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🍀</span><div class="wd">a lot of ⚽💧</div>
+      <div class="bk" style="font-size:29px"><b>a lot of</b> goals ✔<br><b>a lot of</b> water ✔<br>Works for BOTH! 🎉</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box gold" style="margin-top:26px">
+    <p style="font-size:31px">🧠 <b>Uncountable nouns are always singular:</b> The money <b>is</b> here. ✔ (not "the money are" ❌)</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Consequences, not just categories</h5>
+ <p>This slide answers "so what?" — countability is only worth learning because it controls <b>much/many</b>, <b>is/are</b> and articles.</p>
+ <p>The last card is the safety net: <b>a lot of</b> works with everything. Give Leo permission to use it when unsure — fluency first, precision later.</p></div>
+</section>
+
+<!-- ============ 28 POSSESSIVE ============ -->
+<section class="slide" data-t="Station 6 — Possessive 's">
+ <div class="inner">
+  <div class="kicker">Station 6 · Who owns it? 🔑</div>
+  <h2>The little key: <span class="hl">'s</span> 🔑</h2>
+  <p class="sub">Add <b class="hl2">'s</b> to a noun to say <b>it belongs to them</b>.</p>
+  <div class="box sky" style="margin-top:22px">
+    <h3>🌉 Good news — this is just like Japanese の !</h3>
+    <p style="font-size:36px;margin-top:8px">Leo<b>の</b>くつ &nbsp;=&nbsp; <b>Leo's</b> shoes 👟 &nbsp;&nbsp;|&nbsp;&nbsp; 先生<b>の</b>本 &nbsp;=&nbsp; the <b>teacher's</b> book 📕</p>
+  </div>
+  <div class="grid g4" style="margin-top:24px">
+    <div class="rc" onclick="flip(this)"><span class="em">🧤</span><div class="wd">the goalkeeper</div><div class="bk">the <b>goalkeeper's</b> gloves</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🦇</span><div class="wd">Batman</div><div class="bk"><b>Batman's</b> car 🚗</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🇯🇵</span><div class="wd">Kubo</div><div class="bk"><b>Kubo's</b> shirt is number 14 👕</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👦</span><div class="wd">Leo</div><div class="bk"><b>Leo's</b> favourite movie 🎬</div><div class="tap">tap</div></div>
+  </div>
+  <div class="rowx" style="margin-top:26px">
+    <div class="box green"><h3>👤 ONE owner → <b>'s</b></h3><p style="font-size:31px">the player<b>'s</b> boots 👟<br>my brother<b>'s</b> phone 📱</p></div>
+    <div class="box gold"><h3>👥 MANY owners (already -s) → <b>s'</b></h3><p style="font-size:31px">the players<b>'</b> locker room 🚪<br>my parents<b>'</b> car 🚗</p></div>
+    <div class="box sky"><h3>😎 Rebels → normal <b>'s</b></h3><p style="font-size:31px">the children<b>'s</b> game 🧒<br>the men<b>'s</b> team 👨</p></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>🌉 The one place L1 HELPS</h5>
+ <p>English <b>'s</b> maps almost perfectly onto Japanese <b>の</b> — same meaning, same word order. Say this loudly; Leo has spent this whole deck learning things Japanese does not have, and this is a gift.</p>
+ <p>Do not over-teach <b>s'</b> (plural possessive). Recognition is enough at A1–A2; production comes later.</p></div>
+</section>
+
+<!-- ============ 29 'S = IS OR OWNS ============ -->
+<section class="slide" data-t="GAME — 's = IS or OWNS?">
+ <div class="inner">
+  <div class="kicker">🎮 Game 9 · Key or Shortcut? 🔑✂️</div>
+  <h2>Does <span class="hl">'s</span> mean OWNS 🔑 or IS ✂️?</h2>
+  <p class="sub">The same little mark does two different jobs! Read the sentence and choose.</p>
+  <div style="margin-top:16px">
+    <div class="q"><div class="qt">1️⃣ <b>Leo's</b> ball is new. ⚽</div>
+      <div class="opts"><div class="opt" data-ok="1" onclick="opt(this)">🔑 OWNS — it belongs to Leo</div><div class="opt" onclick="opt(this)">✂️ IS — Leo is…</div></div><div class="qfb"></div></div>
+    <div class="q"><div class="qt">2️⃣ <b>Leo's</b> very fast today! 💨</div>
+      <div class="opts"><div class="opt" onclick="opt(this)">🔑 OWNS — it belongs to Leo</div><div class="opt" data-ok="1" onclick="opt(this)">✂️ IS — Leo is very fast</div></div><div class="qfb"></div></div>
+    <div class="q"><div class="qt">3️⃣ The <b>coach's</b> plan worked. 📣</div>
+      <div class="opts"><div class="opt" data-ok="1" onclick="opt(this)">🔑 OWNS — the plan of the coach</div><div class="opt" onclick="opt(this)">✂️ IS — the coach is…</div></div><div class="qfb"></div></div>
+    <div class="q"><div class="qt">4️⃣ My <b>dad's</b> a teacher. 👨‍🏫</div>
+      <div class="opts"><div class="opt" onclick="opt(this)">🔑 OWNS — it belongs to dad</div><div class="opt" data-ok="1" onclick="opt(this)">✂️ IS — my dad is a teacher</div></div><div class="qfb"></div></div>
+  </div>
+  <div class="box gold" style="margin-top:18px"><p style="font-size:29px">🔍 <b>The trick:</b> if a <b>noun</b> comes straight after → OWNS 🔑. If a <b>describing word</b> or <b>a/an</b> comes after → IS ✂️.</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>The 's ambiguity</h5>
+ <p>This confuses learners at every level. The rule in the gold box is reliable enough for A1–A2 and gives Leo something concrete to apply.</p>
+ <p>Say both sentence pairs aloud back-to-back — "Leo's ball / Leo's fast" — so he hears that the sound is identical and only the following word decides.</p></div>
+</section>
+
+<!-- ============ 30 COMPOUND NOUNS ============ -->
+<section class="slide" data-t="Station 7 — Noun teams (compound nouns)">
+ <div class="inner">
+  <div class="kicker">Station 7 · Noun Teams 🤝</div>
+  <h2>Two nouns can play <span class="hl">together</span> ⚽➕🥅</h2>
+  <p class="sub">Tap each team to see what it makes!</p>
+  <div class="grid g4" style="margin-top:24px">
+    <div class="rc" onclick="flip(this)"><span class="em">⚽👟</span><div class="wd">soccer + ball</div><div class="bk"><b>a soccer ball</b><br><span style="font-size:20px">サッカーボール</span></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🥅🧤</span><div class="wd">goal + keeper</div><div class="bk"><b>a goalkeeper</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎬🏛️</span><div class="wd">movie + theater</div><div class="bk"><b>a movie theater</b></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🍦🧊</span><div class="wd">ice + cream</div><div class="bk"><b>ice cream</b><br><span style="font-size:20px">アイスクリーム</span></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🌍🏆</span><div class="wd">world + cup</div><div class="bk"><b>the World Cup</b> 🏆</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏠📚</span><div class="wd">home + work</div><div class="bk"><b>homework</b> 📚</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👟🏪</span><div class="wd">shoe + shop</div><div class="bk"><b>a shoe shop</b><br><span style="font-size:20px;color:#FCA5A5">not "shoes shop" ❌</span></div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎂🎉</span><div class="wd">birth + day</div><div class="bk"><b>a birthday</b> 🎂</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box gold" style="margin-top:26px">
+    <h3>👑 The SECOND word is the boss!</h3>
+    <p style="font-size:31px">a <b>soccer ball</b> is a kind of <b>ball</b> ⚽ (not a kind of soccer)<br>a <b>movie theater</b> is a kind of <b>theater</b> 🏛️</p>
+    <p style="font-size:28px;margin-top:8px;color:#FCA5A5">⚠️ The first word stays singular: <b>shoe</b> shop ✔ · <b>shoes</b> shop ❌</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Katakana head start</h5>
+ <p>サッカーボール and アイスクリーム already live in Leo's head — say so. He knows more compound nouns than he thinks.</p>
+ <p><b>The "second word is the boss" test</b> also tells him where the plural goes: two soccer <b>balls</b>, not two <b>soccers</b> ball.</p>
+ <p>Ask him to invent one team: "movie + night = movie night ✔". Invention proves the pattern is understood.</p></div>
+</section>
+
+<!-- ============ 31 A / AN / THE ============ -->
+<section class="slide" data-t="Station 8 — a / an / the gate">
+ <div class="inner">
+  <div class="kicker">Station 8 · The Article Gate 🚧</div>
+  <h2>The little words in <span class="hl">front</span> of nouns 🚪</h2>
+  <div class="rowx" style="margin-top:24px">
+    <div class="box green"><h3>🆕 a / an</h3><p style="font-size:29px;line-height:1.5">ONE of many · the FIRST time you say it<br><br>I watched <b>a</b> movie. 🎬<br>He scored <b>a</b> goal. ⚽<br><br><b>an</b> before a vowel sound:<br><b>an</b> egg 🥚 · <b>an</b> idea 💡 · <b>an</b> hour ⏰</p></div>
+    <div class="box gold"><h3>🎯 the</h3><p style="font-size:29px;line-height:1.5">We BOTH know which one<br><br><b>The</b> movie was Avatar. 🎬<br><b>The</b> goal won the game! ⚽<br><br>Also for one-of-a-kind things:<br><b>the</b> sun ☀️ · <b>the</b> World Cup 🏆</p></div>
+    <div class="box sky"><h3>🚫 nothing at all</h3><p style="font-size:29px;line-height:1.5">Talking in general (plural)<br>or uncountable nouns<br><br>I like ___ movies. 🎬<br>I like ___ music. 🎵<br>___ Water is important. 💧</p></div>
+  </div>
+  <div class="game" style="margin-top:24px">
+    <p style="font-size:30px;font-weight:800;margin-bottom:10px">🎮 Tap the word, then tap its gate:</p>
+    <div class="bank">
+      <div class="chip" data-cat="a" onclick="pickChip(this)">___ apple 🍎</div>
+      <div class="chip" data-cat="a" onclick="pickChip(this)">___ ticket 🎫</div>
+      <div class="chip" data-cat="t" onclick="pickChip(this)">___ sun ☀️</div>
+      <div class="chip" data-cat="z" onclick="pickChip(this)">___ music 🎵</div>
+      <div class="chip" data-cat="t" onclick="pickChip(this)">___ World Cup 🏆</div>
+      <div class="chip" data-cat="z" onclick="pickChip(this)">___ homework 📚</div>
+    </div>
+    <div class="bins g3">
+      <div class="bin" data-cat="a" onclick="dropBin(this)" style="min-height:150px"><h4>a / an</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="t" onclick="dropBin(this)" style="min-height:150px"><h4>the</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="z" onclick="dropBin(this)" style="min-height:150px"><h4>(nothing)</h4><div class="drops"></div></div>
+    </div>
+    <div class="fb"></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>⚠️ The hardest feature in English for a Japanese speaker</h5>
+ <p>Japanese has <b>no articles at all</b>. This will take years, not one slide. The goal here is only exposure and a first rule of thumb — do not expect mastery and do not drill to frustration.</p>
+ <p><b>an hour</b> is included on purpose: it is the <i>sound</i>, not the letter, that matters. Mention it only if Leo asks.</p>
+ <p>Priority: <b>a</b> for first mention, <b>the</b> for second mention. Everything else can wait.</p></div>
+</section>
+
+<!-- ============ 32 STADIUM TOUR REVIEW ============ -->
+<section class="slide" data-t="Stadium Tour — review all 8 stations">
+ <div class="inner">
+  <div class="kicker">🏟️ Stadium Tour · Review</div>
+  <h2>What did we learn today? Tap each <span class="hl">station</span>! 🎫</h2>
+  <div class="grid g4" style="margin-top:26px">
+    <div class="rc" onclick="flip(this)"><span class="em">1️⃣</span><div class="wd">The 4 Doors</div><div class="bk">person 🧍 place 📍 thing ⚽ idea 💭</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">2️⃣</span><div class="wd">The Toolkit</div><div class="bk">a/the · count · position · name</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">3️⃣</span><div class="wd">Capital Letters</div><div class="bk">common = small 🔤<br>proper = CAPITAL 🔠</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">4️⃣</span><div class="wd">Plural Machines</div><div class="bk">+s · +es · y→ies · f→ves<br>and the rebels 😎</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">5️⃣</span><div class="wd">Count or Not</div><div class="bk">goals ⚽ many<br>water 💧 much</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">6️⃣</span><div class="wd">The 's Key</div><div class="bk">Leo's boots = Leoのくつ 🔑</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">7️⃣</span><div class="wd">Noun Teams</div><div class="bk">soccer ball · goalkeeper<br>second word is boss 👑</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">8️⃣</span><div class="wd">The Gate</div><div class="bk">a / an · the · nothing 🚪</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box gold" style="margin-top:28px"><p style="font-size:32px;font-weight:800">🗣️ Say it back to me: "A noun is a <span class="hl">person</span>, a <span class="hl">place</span>, a <span class="hl">thing</span>, or an <span class="hl">idea</span>."</p></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Retrieval, not re-reading</h5>
+ <p>Before tapping each card, ask Leo to tell you what it was. Retrieval practice is far stronger than reviewing the answer.</p>
+ <p>Finish with the chant in the gold box — he should be able to say it without looking.</p></div>
+</section>
+
+<!-- ============ 33 FORMATIVE ASSESSMENT ============ -->
+<section class="slide" data-t="✔ Formative Assessment">
+ <div class="inner">
+  <div class="kicker">✔ Formative Assessment · Final Whistle 🔔</div>
+  <h2>Match Day! <span class="hl">10 questions</span> ⚽</h2>
+  <p class="sub">No pressure — this just shows us what to practise next. 💪</p>
+  <div id="quizBox" style="margin-top:14px;max-height:660px;overflow:auto;padding-right:10px"></div>
+  <div id="quizScore" class="box gold" style="margin-top:16px;display:none"></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Reading the result</h5>
+ <p>This is <b>formative</b> — it tells you what to reteach, it does not grade Leo. Say that out loud before he starts.</p>
+ <p><b>Diagnostic map:</b> Q1–2 miss → reteach the 4 doors. Q3–4 → the toolkit. Q5 → capitals. Q6–7 → plural machines. Q8 → countability. Q9 → possessive 's. Q10 → compound nouns.</p>
+ <p>8+/10 → move on. 5–7 → replay the two weakest stations tomorrow. Under 5 → split the deck over two more sessions; no re-test needed.</p></div>
+</section>
+
+<!-- ============ 34 WRAP UP ============ -->
+<section class="slide" data-t="Wrap Up — Trophy">
+ <div class="inner title-wrap">
+  <div class="big-emoji">🏆</div>
+  <h1>You are a <span class="hl">Noun Expert</span>! 🎉</h1>
+  <p class="sub" style="max-width:1200px">Every sentence you speak today has nouns in it.<br>Now you can <b class="hl2">see</b> them. 👀</p>
+  <div class="box gold" style="max-width:1300px;margin-top:26px">
+    <h3>🎯 Your mission this week</h3>
+    <p style="font-size:31px;line-height:1.6">1️⃣ Find <b>10 nouns</b> in your bedroom and write them down 🛏️<br>
+    2️⃣ Write <b>3 sentences</b> about a soccer match — underline every noun ⚽<br>
+    3️⃣ Catch Dad using a noun wrong. Give him a yellow card! 🟨😄</p>
+  </div>
+  <p class="jp" style="margin-top:24px">名詞（めいし）マスター、おめでとう！ 🎊</p>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Homework that sticks</h5>
+ <p>Task 3 is the real one — giving Leo <b>authority to correct you</b> flips him from receiver to noticer, and noticing is what drives acquisition.</p>
+ <p><b>Next in the chain:</b> this Training Ground feeds directly into plural agreement, article use, and the "who/which" relative-clause work in Unit 8 Grammar 1 — nouns are what relative clauses attach to.</p></div>
+</section>
+
+  </div>
+</deck-stage>
+
+<div id="nav">
+  <button onclick="go(-1)">◀ Prev</button>
+  <button onclick="go(1)">Next ▶</button>
+  <span id="counter">1 / 1</span>
+  <span id="stitle"></span>
+  <div id="progWrap"><div id="progFill"></div></div>
+</div>
+
+<script>
+/* ============ deck-stage web component ============ */
+class DeckStage extends HTMLElement{
+  connectedCallback(){ this.fit(); window.addEventListener('resize', ()=>this.fit()); }
+  fit(){
+    const inner = document.getElementById('stageInner');
+    if(!inner) return;
+    const w = window.innerWidth, h = window.innerHeight - 64;
+    const s = Math.min(w/1920, h/1080);
+    inner.style.transform = 'scale(' + s + ') translate(' + ((w - 1920*s)/2/s) + 'px,' + ((h - 1080*s)/2/s) + 'px)';
+  }
+}
+if(!customElements.get('deck-stage')) customElements.define('deck-stage', DeckStage);
+
+/* ============ slide navigation ============ */
+var slides = [], cur = 0;
+
+function updateBadge(){
+  try{
+    var pf = document.getElementById('progFill');
+    if(!pf) return;
+    pf.style.width = (((cur+1)/slides.length)*100) + '%';
+    var c = document.getElementById('counter');
+    if(c) c.textContent = (cur+1) + ' / ' + slides.length;
+    var st = document.getElementById('stitle');
+    if(st) st.textContent = slides[cur].getAttribute('data-t') || '';
+  }catch(e){ /* progress bar is cosmetic */ }
+}
+
+function show(i){
+  if(i < 0 || i >= slides.length) return;
+  slides[cur].classList.remove('active');
+  cur = i;
+  slides[cur].classList.add('active');
+  document.querySelectorAll('.tn-panel').forEach(function(p){ p.classList.remove('show'); });
+  updateBadge();
+}
+function go(d){ show(cur + d); }
+
+/* ============ teacher notes ============ */
+function tn(btn){
+  var p = btn.parentElement.querySelector('.tn-panel');
+  if(!p) return;
+  var open = p.classList.contains('show');
+  document.querySelectorAll('.tn-panel').forEach(function(x){ x.classList.remove('show'); });
+  if(!open) p.classList.add('show');
+}
+
+/* ============ simple toggles ============ */
+function tog(el){ el.classList.toggle('on'); }
+function flip(el){ el.classList.toggle('open'); }
+function flip2(el){ el.classList.toggle('open'); }
+function flipDoor(el){ el.classList.toggle('open'); }
+
+/* ============ sorting game engine ============ */
+function pickChip(el){
+  if(el.classList.contains('placed')) return;
+  var g = el.closest('.game');
+  if(!g) return;
+  g.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('sel'); });
+  el.classList.add('sel');
+  g.__pick = el;
+  setFb(g, 'Now tap a box! 👇', '');
+}
+
+function dropBin(bin){
+  var g = bin.closest('.game');
+  if(!g) return;
+  var pick = g.__pick;
+  if(!pick){ setFb(g, 'Tap a word first! 👆', ''); return; }
+  if(pick.dataset.cat === bin.dataset.cat){
+    var tagx = document.createElement('span');
+    tagx.textContent = pick.textContent;
+    bin.querySelector('.drops').appendChild(tagx);
+    pick.classList.add('placed');
+    pick.classList.remove('sel');
+    g.__pick = null;
+    var total = g.querySelectorAll('.chip').length;
+    var done = g.querySelectorAll('.chip.placed').length;
+    if(done === total) setFb(g, 'PERFECT! All sorted! 🏆🎉', 'good');
+    else setFb(g, 'Yes! ' + done + ' / ' + total + ' 💪', 'good');
+  } else {
+    bin.classList.add('bad');
+    setTimeout(function(){ bin.classList.remove('bad'); }, 400);
+    setFb(g, 'Not that box — try again! 🤔', 'bad');
+  }
+}
+
+function setFb(g, txt, cls){
+  var f = g.querySelector('.fb');
+  if(!f) return;
+  f.textContent = txt;
+  f.className = 'fb ' + (cls || '');
+}
+
+/* ============ noun detective ============ */
+function tapWord(el){
+  if(el.classList.contains('hit')) return;
+  var s = el.closest('.sent');
+  if(!s) return;
+  if(el.dataset.n === '1'){
+    el.classList.add('hit');
+    var found = (parseInt(s.dataset.found || '0', 10)) + 1;
+    s.dataset.found = found;
+    if(found >= parseInt(s.dataset.need, 10)) s.classList.add('cleared');
+  } else {
+    el.classList.add('miss');
+    setTimeout(function(){ el.classList.remove('miss'); }, 550);
+  }
+}
+
+/* ============ MCQ ============ */
+function opt(el){
+  var q = el.closest('.q');
+  if(!q) return;
+  var fb = q.querySelector('.qfb');
+  if(el.dataset.ok === '1'){
+    q.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('wrong'); });
+    el.classList.add('right');
+    if(fb) fb.textContent = 'Correct! Nice one 🎉';
+  } else {
+    el.classList.add('wrong');
+    if(fb) fb.textContent = 'Not quite — try again 🤔';
+  }
+}
+
+/* ============ formative assessment quiz ============ */
+var QUIZ = [
+  { q:'1️⃣ Which word is a NOUN? 🏷️', o:['quickly','stadium','happy'], a:1, f:'A stadium is a PLACE — you can go there. 📍' },
+  { q:'2️⃣ Which door does <b>courage</b> go through? 🦁', o:['🧍 person','⚽ thing','💭 idea'], a:2, f:'You cannot touch courage, but it has a name → idea noun. 💭' },
+  { q:'3️⃣ Which one passes the "a / the" test? 🎩', o:['the ticket','the loudly','a tall'], a:0, f:'"the ticket" sounds right → ticket is a noun. ✔' },
+  { q:'4️⃣ In "The coach kicked the ball", how many nouns are there? 🔢', o:['1','2','3'], a:1, f:'coach and ball = 2 nouns. "The" and "kicked" are not nouns. 🥅' },
+  { q:'5️⃣ Which sentence has the capital letters RIGHT? 🔠', o:['kubo plays on monday.','Kubo plays on Monday.','Kubo Plays On Monday.'], a:1, f:'Names and days take a capital letter — but not every word! 🔠' },
+  { q:'6️⃣ one match → two ___ ⚽', o:['matchs','matches','matchies'], a:1, f:'Hissing sounds (ch) need the +es machine. ⚙️' },
+  { q:'7️⃣ one person → many ___ 🧑', o:['persons','peoples','people'], a:2, f:'person → people. A rebel! 😎' },
+  { q:'8️⃣ Which one is correct? 💧', o:['I have three homeworks.','I have a lot of homework.','I have many homework.'], a:1, f:'Homework is uncountable — no -s, and "a lot of" is always safe. 🍀' },
+  { q:'9️⃣ How do we say "the gloves of the goalkeeper"? 🧤', o:['the goalkeeper gloves','the goalkeepers gloves','the goalkeeper\u2019s gloves'], a:2, f:'One owner → add \u2019s. Just like Japanese の! 🔑' },
+  { q:'🔟 "a soccer ball" is a kind of… 👑', o:['soccer','ball','shoe'], a:1, f:'The SECOND word is the boss — it is a kind of ball. ⚽' }
+];
+var qAnswered = 0, qScore = 0;
+
+function buildQuiz(){
+  var box = document.getElementById('quizBox');
+  if(!box || box.dataset.built === '1') return;
+  box.dataset.built = '1';
+  QUIZ.forEach(function(item, qi){
+    var d = document.createElement('div');
+    d.className = 'q';
+    var t = document.createElement('div');
+    t.className = 'qt';
+    t.innerHTML = item.q;
+    d.appendChild(t);
+    var wrap = document.createElement('div');
+    wrap.className = 'opts';
+    item.o.forEach(function(txt, oi){
+      var b = document.createElement('div');
+      b.className = 'opt';
+      b.textContent = txt;
+      b.dataset.qi = qi;
+      b.dataset.oi = oi;
+      b.addEventListener('click', function(){ answerQuiz(b); });
+      wrap.appendChild(b);
+    });
+    d.appendChild(wrap);
+    var f = document.createElement('div');
+    f.className = 'qfb';
+    d.appendChild(f);
+    box.appendChild(d);
+  });
+}
+
+function answerQuiz(btn){
+  var q = btn.closest('.q');
+  if(!q || q.dataset.locked === '1') return;
+  var item = QUIZ[parseInt(btn.dataset.qi, 10)];
+  var fb = q.querySelector('.qfb');
+  if(parseInt(btn.dataset.oi, 10) === item.a){
+    btn.classList.add('right');
+    q.dataset.locked = '1';
+    if(q.dataset.missed !== '1') qScore++;
+    qAnswered++;
+    if(fb) fb.innerHTML = '✔ ' + item.f;
+    showScore();
+  } else {
+    btn.classList.add('wrong');
+    q.dataset.missed = '1';
+    if(fb) fb.textContent = 'Try again — you can do it! 💪';
+  }
+}
+
+function showScore(){
+  var s = document.getElementById('quizScore');
+  if(!s) return;
+  var lockedCount = document.querySelectorAll('#quizBox .q[data-locked="1"]').length;
+  if(lockedCount < QUIZ.length) return;
+  s.style.display = 'block';
+  var msg = qScore >= 8 ? 'Outstanding! You are a Noun Expert! 🏆'
+          : (qScore >= 5 ? 'Great work! Let us replay two stations tomorrow. 💪'
+          : 'Good effort! We will train again — that is what champions do. ⚽');
+  s.innerHTML = '<h3>🏁 Final score: ' + qScore + ' / ' + QUIZ.length + ' (first try)</h3><p style="font-size:30px">' + msg + '</p>';
+}
+
+/* ============ init ============ */
+document.addEventListener('DOMContentLoaded', function(){
+  slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  document.querySelectorAll('.w').forEach(function(w){
+    w.addEventListener('click', function(){ tapWord(w); });
+  });
+  buildQuiz();
+  updateBadge();
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(1); }
+    if(e.key === 'ArrowLeft'  || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+    if(e.key === 'Escape') document.querySelectorAll('.tn-panel').forEach(function(p){ p.classList.remove('show'); });
+  });
+});
+</script>
+</body>
+</html>

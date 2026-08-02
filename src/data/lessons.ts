@@ -38,6 +38,7 @@ import tgPhonicsShortVowels from "../../content/subjects/english/courses/special
 import tgPhonicsShortVowelsLearner from "../../content/subjects/english/courses/special-training/lessons/phonics-short-vowels-app.learner.json";
 import tgNouns from "../../content/subjects/english/courses/special-training/lessons/nouns.teacher.json";
 import tgNounsLearner from "../../content/subjects/english/courses/special-training/lessons/nouns-app.learner.json";
+import tgVerbs from "../../content/subjects/english/courses/special-training/lessons/verbs.teacher.json";
 import tgGrammarCup from "../../content/subjects/english/courses/special-training/lessons/grammar-cup.teacher.json";
 import tgGrammarCupLearner from "../../content/subjects/english/courses/special-training/lessons/grammar-cup-app.learner.json";
 import type { Lesson } from "./types";
@@ -122,6 +123,7 @@ export const lessons: Lesson[] = [
   tgPhonicsShortVowelsLearner as Lesson,
   tgNouns as Lesson,
   tgNounsLearner as Lesson,
+  tgVerbs as Lesson,
   tgGrammarCup as Lesson,
   tgGrammarCupLearner as Lesson
 ].sort(compareLessonOrder);

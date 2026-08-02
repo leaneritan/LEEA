@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leo · Verb Engine — Actions, BE, Time and Helpers</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0B1E3F;--navy-2:#14315F;--navy-l:#EEF3FB;
+  --gold:#F59E0B;--gold-d:#B45309;--gold-l:#FFFBEB;--gold-b:#FDE68A;
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --red:#DC2626;--red-d:#991B1B;--red-l:#FEF2F2;--red-b:#FECACA;
+  --blue:#2563EB;--blue-d:#1D4ED8;--blue-l:#EFF6FF;--blue-b:#BFDBFE;
+  --violet:#7C3AED;--violet-l:#F5F3FF;--violet-b:#DDD6FE;
+  --ink:#111;--ink-2:#374151;--ink-3:#6B7280;--border:#E5E7EB;
+  --paper:#FCFDFF;
+}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink)}
+body{display:flex;flex-direction:column}
+
+.app-header{background:var(--navy);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-header .logo{font-size:24px}
+.app-header .title{font-size:20px;font-weight:800;line-height:1.1}
+.app-header .subtitle{font-size:13px;opacity:.85;margin-top:2px}
+.app-header .badge-row{margin-left:auto;display:flex;gap:8px;align-items:center}
+.prog-pill{background:rgba(255,255,255,.22);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;white-space:nowrap}
+
+.tab-nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:12px 12px;font-size:13px;font-weight:700;font-family:'Outfit',sans-serif;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .2s,border-color .2s;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;min-width:74px}
+.tab-btn .tab-icon{font-size:18px}
+.tab-btn .tab-name{font-size:11px;letter-spacing:.3px}
+.tab-btn.active{color:var(--gold-d);border-bottom-color:var(--gold)}
+.tab-btn.done::after{content:'✓';position:absolute;top:4px;right:4px;color:var(--green);font-weight:900;font-size:12px}
+
+.tab-content{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.tab-content.active{display:flex}
+.tab-body{flex:1;padding:18px 20px;display:flex;flex-direction:column;gap:14px;max-width:940px;width:100%;margin:0 auto}
+.tab-footer{flex-shrink:0;border-top:2px solid var(--border);background:#fff;padding:10px 20px;display:flex;gap:10px}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:background .2s}
+.btn-complete:hover{background:var(--green-d)}
+.btn-complete.confirmed{background:#9CA3AF;pointer-events:none}
+.btn-redo{width:110px;background:#fff;color:var(--red);border:2px solid var(--red);border-radius:12px;padding:14px;font-size:15px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:background .2s,color .2s;flex-shrink:0}
+.btn-redo.armed{background:var(--red);color:#fff}
+
+.section-title{font-size:21px;font-weight:900;color:var(--navy)}
+.section-sub{font-size:14px;color:var(--ink-3);font-weight:600;margin-top:2px}
+.status-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.count-pill{background:var(--navy);color:#fff;border-radius:20px;padding:5px 16px;font-size:14px;font-weight:800;flex-shrink:0}
+.hint{font-size:14px;font-weight:700;color:var(--ink-3)}
+.jp{color:var(--blue-d);font-weight:700}
+.tipbox{background:var(--gold-l);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:12px 16px;font-size:15px;color:var(--ink-2);line-height:1.5}
+.tipbox b{color:var(--gold-d)}
+.done-banner{display:none;background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;color:var(--green-d);text-align:center}
+.done-banner.show{display:block;animation:pop .35s}
+@keyframes pop{0%{transform:scale(.94);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+/* flip cards (Doors, Rebels, Teams, Traps) */
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.flipcard{background:#fff;border:3px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;text-align:center;transition:border-color .15s,background .15s;min-height:112px;display:flex;flex-direction:column;justify-content:center;gap:4px;font-family:'Outfit',sans-serif}
+.flipcard .em{font-size:30px;line-height:1}
+.flipcard .front{font-size:17px;font-weight:900;color:var(--navy)}
+.flipcard .back{font-size:14px;font-weight:700;color:var(--ink-3);line-height:1.35}
+.flipcard .tap{font-size:11px;font-weight:800;color:var(--ink-3);letter-spacing:.5px}
+.flipcard.revealed{border-color:var(--gold);background:var(--gold-l)}
+.flipcard.revealed .back{color:var(--gold-d)}
+.flipcard.revealed .tap{visibility:hidden}
+
+/* bank + bins sorters */
+.bank{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:#fff;border:3px solid var(--border);border-radius:999px;padding:9px 16px;font-size:15px;font-weight:800;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:border-color .15s,background .15s}
+.chip:hover{border-color:var(--gold)}
+.chip.sel{border-color:var(--blue);background:var(--blue-l)}
+.chip.used{opacity:.35;pointer-events:none;border-color:var(--green);background:var(--green-l)}
+.chip.err{animation:shake .35s;border-color:var(--red);background:var(--red-l)}
+.bins{display:grid;gap:10px}
+.bins.g2{grid-template-columns:repeat(2,1fr)}
+.bins.g3{grid-template-columns:repeat(3,1fr)}
+.bins.g4{grid-template-columns:repeat(2,1fr)}
+@media(min-width:720px){.bins.g4{grid-template-columns:repeat(4,1fr)}}
+.bin{background:#fff;border:3px dashed var(--border);border-radius:14px;padding:12px;min-height:110px;cursor:pointer;transition:border-color .15s,background .15s}
+.bin:hover{border-color:var(--gold)}
+.bin h4{font-size:14px;font-weight:900;color:var(--navy);margin-bottom:8px;text-align:center}
+.bin .drops{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.bin .drops span{background:var(--green-l);border:2px solid var(--green-b);color:var(--green-d);border-radius:999px;padding:4px 10px;font-size:13px;font-weight:800}
+.bin.err{animation:shake .35s;border-color:var(--red)}
+
+/* tap-the-word sentences */
+.sent{background:#fff;border:3px solid var(--border);border-radius:14px;padding:14px 16px;font-size:17px;font-weight:700;line-height:2.1;color:var(--ink)}
+.sent .w{display:inline-block;background:var(--navy-l);border:2px solid transparent;border-radius:8px;padding:2px 9px;margin:2px;cursor:pointer;font-weight:800;font-family:'Outfit',sans-serif;font-size:16px;color:var(--ink)}
+.sent .w.plain{background:transparent;cursor:default}
+.sent .w.hit{background:var(--green);border-color:var(--green-d);color:#fff}
+.sent .w.miss{animation:shake .35s;background:var(--red-l);border-color:var(--red)}
+.sent .lead{font-size:14px;font-weight:800;color:var(--ink-3);display:block;margin-bottom:4px}
+
+/* multiple choice */
+.qcard{background:#fff;border:3px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.qcard .q{font-size:16px;font-weight:800;color:var(--navy);line-height:1.4}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{background:#fff;border:3px solid var(--border);border-radius:12px;padding:11px 14px;font-size:15px;font-weight:800;color:var(--ink);cursor:pointer;text-align:left;font-family:'Outfit',sans-serif;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--gold)}
+.opt.good{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default}
+.why{font-size:14px;font-weight:700;color:var(--green-d);background:var(--green-l);border-radius:10px;padding:9px 12px;display:none}
+.why.show{display:block}
+
+/* quiz + dribble */
+.scorebox{background:var(--navy);color:#fff;border-radius:14px;padding:18px;text-align:center}
+.scorebox .big{font-size:40px;font-weight:900;color:var(--gold);line-height:1.1}
+.scorebox .msg{font-size:15px;font-weight:700;margin-top:6px;opacity:.9}
+.pitch{background:linear-gradient(180deg,#166534,#15803D);border-radius:14px;padding:16px;color:#fff;text-align:center}
+.pitch .ball{font-size:40px;transition:transform .25s}
+.pitch .meter{height:12px;background:rgba(255,255,255,.25);border-radius:999px;overflow:hidden;margin-top:10px}
+.pitch .meter i{display:block;height:100%;width:0;background:var(--gold);border-radius:999px;transition:width .3s}
+.pitch .label{font-size:14px;font-weight:800;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo">⚙️</div>
+  <div>
+    <div class="title">Verb Engine — Leo's Training</div>
+    <div class="subtitle">action · BE · time · helpers</div>
+  </div>
+  <div class="badge-row"><div class="prog-pill" id="prog-pill">0 / 13 done</div></div>
+</div>
+
+<div class="tab-nav" id="tab-nav">
+  <button class="tab-btn active" onclick="showTab(0)" id="tb0"><span class="tab-icon">⚙️</span><span class="tab-name">Engine</span></button>
+  <button class="tab-btn" onclick="showTab(1)" id="tb1"><span class="tab-icon">🔍</span><span class="tab-name">Hunt</span></button>
+  <button class="tab-btn" onclick="showTab(2)" id="tb2"><span class="tab-icon">🏷️</span><span class="tab-name">Teams</span></button>
+  <button class="tab-btn" onclick="showTab(3)" id="tb3"><span class="tab-icon">🪞</span><span class="tab-name">Mirror</span></button>
+  <button class="tab-btn" onclick="showTab(4)" id="tb4"><span class="tab-icon">1️⃣</span><span class="tab-name">One s</span></button>
+  <button class="tab-btn" onclick="showTab(5)" id="tb5"><span class="tab-icon">⏱️</span><span class="tab-name">Clocks</span></button>
+  <button class="tab-btn" onclick="showTab(6)" id="tb6"><span class="tab-icon">🔧</span><span class="tab-name">-ing</span></button>
+  <button class="tab-btn" onclick="showTab(7)" id="tb7"><span class="tab-icon">⏪</span><span class="tab-name">Past</span></button>
+  <button class="tab-btn" onclick="showTab(8)" id="tb8"><span class="tab-icon">😎</span><span class="tab-name">Rebels</span></button>
+  <button class="tab-btn" onclick="showTab(9)" id="tb9"><span class="tab-icon">🪑</span><span class="tab-name">Order</span></button>
+  <button class="tab-btn" onclick="showTab(10)" id="tb10"><span class="tab-icon">🦸</span><span class="tab-name">Helpers</span></button>
+  <button class="tab-btn" onclick="showTab(11)" id="tb11"><span class="tab-icon">📝</span><span class="tab-name">Quiz</span></button>
+  <button class="tab-btn" onclick="showTab(12)" id="tb12"><span class="tab-icon">⚽</span><span class="tab-name">Dribble!</span></button>
+</div>
+
+<!-- ═══ TAB 0 — THE ENGINE ═══ -->
+<div class="tab-content active" id="tc0">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">⚙️ The Engine of the sentence</div>
+      <div class="section-sub">A verb is what the WHO <b>does</b>. Tap every card. <span class="jp">動詞（どうし）</span></div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Started: <span id="eng-count">0</span> / 8</div>
+      <div class="hint" id="eng-hint">Tap a card to start it.</div>
+    </div>
+    <div class="cardgrid" id="eng-grid"></div>
+    <div class="tipbox">🔍 <b>The verb test:</b> put <b>I can ___</b> in front of it. I can <b>kick</b> ✔ · I can <b>like</b> ✔ · I can <b>ball</b> ✘ — that one is a noun!</div>
+    <div class="done-banner" id="eng-done">🎉 Every engine started! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-0" onclick="doRedo(0)">↺ Redo</button>
+    <button class="btn-complete" id="complete-0" onclick="markComplete(0)">Mark Engine complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 1 — ENGINE HUNT ═══ -->
+<div class="tab-content" id="tc1">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🔍 Engine Hunt</div>
+      <div class="section-sub">Tap the verb in each sentence. Careful — some engines are very quiet!</div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Found: <span id="hunt-count">0</span> / <span id="hunt-total">0</span></div>
+      <div class="hint" id="hunt-hint">Tap the verb you can see.</div>
+    </div>
+    <div id="hunt-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="tipbox">🪞 In <b>Leo is a fast runner</b>, <b>runner</b> names a person and <b>fast</b> describes — the engine is the little word <b>is</b>.</div>
+    <div class="done-banner" id="hunt-done">🎉 Every engine found! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-1" onclick="doRedo(1)">↺ Redo</button>
+    <button class="btn-complete" id="complete-1" onclick="markComplete(1)">Mark Hunt complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 2 — THREE TEAMS ═══ -->
+<div class="tab-content" id="tc2">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🏷️ Which team is the word on?</div>
+      <div class="section-sub">Noun 🏷️ names it · Verb ⚙️ does it · Describing 🎨 tells us more.</div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Sorted: <span id="team-count">0</span> / 9</div>
+      <div class="hint" id="team-hint">Tap a word to start.</div>
+    </div>
+    <div class="bank" id="team-bank"></div>
+    <div class="bins g3" id="team-bins"></div>
+    <div class="tipbox">👀 Word families look alike! <b>win</b> ⚙️ (I can win) · <b>winner</b> 🏷️ (a winner) · <b>windy</b> 🎨 (very windy)</div>
+    <div class="done-banner" id="team-done">🎉 All 9 sorted! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-2" onclick="doRedo(2)">↺ Redo</button>
+    <button class="btn-complete" id="complete-2" onclick="markComplete(2)">Mark Teams complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 3 — BE VERBS ═══ -->
+<div class="tab-content" id="tc3">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🪞 The Mirror Verb — am · is · are</div>
+      <div class="section-sub">BE does no action. It links WHO to WHAT or HOW. Tap every card first.</div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Learned: <span id="be-count">0</span> / 6</div>
+      <div class="hint" id="be-hint">Tap every card first.</div>
+    </div>
+    <div class="cardgrid" id="be-grid"></div>
+    <div class="section-sub" style="margin-top:4px">Now choose the right BE — one try each:</div>
+    <div class="status-row">
+      <div class="count-pill">Right: <span id="be-qcount">0</span> / <span id="be-qtotal">0</span></div>
+    </div>
+    <div id="be-quiz" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="tipbox">🚨 Never drop BE. <s>I hungry.</s> ❌ → I <b>am</b> hungry. ✔ <span class="jp">日本語には別の言葉がないので、忘れやすい！</span></div>
+    <div class="done-banner" id="be-done">🎉 Mirror mastered! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-3" onclick="doRedo(3)">↺ Redo</button>
+    <button class="btn-complete" id="complete-3" onclick="markComplete(3)">Mark Mirror complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 4 — THE -S RULE ═══ -->
+<div class="tab-content" id="tc4">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">1️⃣ He · She · It → one little s</div>
+      <div class="section-sub">Point at the WHO first. One person → one s. Many → no s.</div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Right: <span id="ones-qcount">0</span> / <span id="ones-qtotal">0</span></div>
+      <div class="hint">One try each — think first!</div>
+    </div>
+    <div id="ones-quiz" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="section-sub" style="margin-top:4px">Now send each verb to its spelling machine:</div>
+    <div class="status-row">
+      <div class="count-pill">Sorted: <span id="ones-count">0</span> / 9</div>
+      <div class="hint" id="ones-hint">Tap a verb to start.</div>
+    </div>
+    <div class="bank" id="ones-bank"></div>
+    <div class="bins g3" id="ones-bins"></div>
+    <div class="tipbox">🪤 The <b>y</b> trap again! A vowel before the y → just add <b>s</b>: play → play<b>s</b> ✔ (not "plaies" ❌). And one rebel: have → <b>has</b>.</div>
+    <div class="done-banner" id="ones-done">🎉 One s, every time! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-4" onclick="doRedo(4)">↺ Redo</button>
+    <button class="btn-complete" id="complete-4" onclick="markComplete(4)">Mark One s complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 5 — TWO CLOCKS ═══ -->
+<div class="tab-content" id="tc5">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">⏱️ Which clock is it on?</div>
+      <div class="section-sub">Find the signal word, then pick the clock.</div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Sorted: <span id="clock-count">0</span> / 6</div>
+      <div class="hint" id="clock-hint">Tap a sentence to start.</div>
+    </div>
+    <div class="bank" id="clock-bank"></div>
+    <div class="bins g2" id="clock-bins"></div>
+    <div class="tipbox">🔴 <b>Look! · now · right now</b> → be + ing · 📅 <b>every day · always · on Saturdays</b> → plain verb (+s). <span class="jp">〜ている = be + ing</span></div>
+    <div class="done-banner" id="clock-done">🎉 Both clocks read! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-5" onclick="doRedo(5)">↺ Redo</button>
+    <button class="btn-complete" id="complete-5" onclick="markComplete(5)">Mark Clocks complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 6 — ING MACHINES ═══ -->
+<div class="tab-content" id="tc6">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🔧 Building the -ing form</div>
+      <div class="section-sub">Send each verb to the right machine. Say the -ing form out loud!</div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Sorted: <span id="ing-count">0</span> / 9</div>
+      <div class="hint" id="ing-hint">Tap a verb to start.</div>
+    </div>
+    <div class="bank" id="ing-bank"></div>
+    <div class="bins g3" id="ing-bins"></div>
+    <div class="tipbox">👂 <b>Double it</b> when the vowel is short and there is one consonant at the end: run → ru<b>nn</b>ing 🏃, stop → sto<b>pp</b>ing ✋</div>
+    <div class="done-banner" id="ing-done">🎉 All built! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-6" onclick="doRedo(6)">↺ Redo</button>
+    <button class="btn-complete" id="complete-6" onclick="markComplete(6)">Mark -ing complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 7 — PAST: MACHINE OR REBEL ═══ -->
+<div class="tab-content" id="tc7">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">⏪ Machine or rebel?</div>
+      <div class="section-sub">Does it take <b>-ed</b>, or does it break the rules? Say the past form as you sort!</div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Sorted: <span id="past-count">0</span> / 10</div>
+      <div class="hint" id="past-hint">Tap a verb to start.</div>
+    </div>
+    <div class="bank" id="past-bank"></div>
+    <div class="bins g2" id="past-bins"></div>
+    <div class="tipbox">👂 The -ed has three sounds but one spelling: /t/ watch<b>ed</b> · /d/ play<b>ed</b> · /ɪd/ want<b>ed</b>. 🚫 Not "watch-ed-o"!</div>
+    <div class="done-banner" id="past-done">🎉 All sorted! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-7" onclick="doRedo(7)">↺ Redo</button>
+    <button class="btn-complete" id="complete-7" onclick="markComplete(7)">Mark Past complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 8 — THE REBELS ═══ -->
+<div class="tab-content" id="tc8">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">😎 The past rebels</div>
+      <div class="section-sub">No machine works on these. Tap each one, then answer the check.</div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Met: <span id="reb-count">0</span> / 10</div>
+      <div class="hint" id="reb-hint">Tap every rebel first.</div>
+    </div>
+    <div class="cardgrid" id="reb-grid"></div>
+    <div class="section-sub" style="margin-top:4px">Quick check — one try each:</div>
+    <div class="status-row">
+      <div class="count-pill">Right: <span id="reb-qcount">0</span> / <span id="reb-qtotal">0</span></div>
+    </div>
+    <div id="reb-quiz" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="tipbox">💡 Saying <b>goed</b> means you learned the rule! Now just swap in the rebel: go → <b>went</b>. 😎</div>
+    <div class="done-banner" id="reb-done">🎉 Rebels met and checked! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-8" onclick="doRedo(8)">↺ Redo</button>
+    <button class="btn-complete" id="complete-8" onclick="markComplete(8)">Mark Rebels complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 9 — WORD ORDER ═══ -->
+<div class="tab-content" id="tc9">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🪑 WHO → ENGINE → WHAT</div>
+      <div class="section-sub">The engine sits in the middle. One try each.</div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Right: <span id="ord-count">0</span> / <span id="ord-total">0</span></div>
+      <div class="hint" id="ord-hint">Point at the engine in each option!</div>
+    </div>
+    <div id="ord-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="tipbox">🌉 Japanese puts the verb <b>LAST</b> — レオは サッカーを <b>する</b>。English puts it in the <b>MIDDLE</b> — Leo <b>plays</b> soccer. That is why it feels backwards!</div>
+    <div class="done-banner" id="ord-done">🎉 Seated correctly! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-9" onclick="doRedo(9)">↺ Redo</button>
+    <button class="btn-complete" id="complete-9" onclick="markComplete(9)">Mark Order complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 10 — HELPERS ═══ -->
+<div class="tab-content" id="tc10">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🦸 Do · Does · Did</div>
+      <div class="section-sub">The helper goes to the front — and the main verb goes back to plain.</div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Right: <span id="help-count">0</span> / <span id="help-total">0</span></div>
+      <div class="hint" id="help-hint">One try each — think first!</div>
+    </div>
+    <div id="help-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="tipbox">🔑 Only <b>ONE</b> word carries the ending. <s>Does he plays?</s> ❌ → <b>Does he play?</b> ✔ · And BE never asks Do for help: <b>Is</b> he playing? ✔</div>
+    <div class="done-banner" id="help-done">🎉 Helpers called! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-10" onclick="doRedo(10)">↺ Redo</button>
+    <button class="btn-complete" id="complete-10" onclick="markComplete(10)">Mark Helpers complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 11 — QUIZ ═══ -->
+<div class="tab-content" id="tc11">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📝 Engine Room Quiz</div>
+      <div class="section-sub">12 questions from all 8 stations. One try each.</div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Score: <span id="quiz-count">0</span> / <span id="quiz-total">0</span></div>
+      <div class="hint" id="quiz-hint">Answer every question.</div>
+    </div>
+    <div id="quiz-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="scorebox" id="quiz-score" style="display:none">
+      <div class="big" id="quiz-big">0%</div>
+      <div class="msg" id="quiz-msg"></div>
+    </div>
+    <div class="done-banner" id="quiz-done">🎉 Quiz finished! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-11" onclick="doRedo(11)">↺ Redo</button>
+    <button class="btn-complete" id="complete-11" onclick="markComplete(11)">Mark Quiz complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 12 — DRIBBLE! ═══ -->
+<div class="tab-content" id="tc12">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">⚽ Dribble to the goal!</div>
+      <div class="section-sub">Every right answer moves the ball one step. 8 steps to score.</div>
+    </div>
+    <div class="pitch">
+      <div class="ball" id="drib-ball">⚽</div>
+      <div class="meter"><i id="drib-meter"></i></div>
+      <div class="label" id="drib-label">0 / 8 steps</div>
+    </div>
+    <div id="drib-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="drib-done">⚽🥅 GOAL! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-12" onclick="doRedo(12)">↺ Redo</button>
+    <button class="btn-complete" id="complete-12" onclick="markComplete(12)">Mark Dribble! complete ✓</button>
+  </div>
+</div>
+
+<script>
+const SAVE_PREFIX = 'leea-tg-verbs-';
+const HOMEWORK_ID = 'leo-tg-verbs';
+const TAB_COUNT = 13;
+const TAB_NAMES = ['Engine','Hunt','Teams','Mirror','One s','Clocks','-ing','Past','Rebels','Order','Helpers','Quiz','Dribble!'];
+const TAB_INIT = {}, TAB_RESET = {}, TAB_RESTORE = {};
+
+function lSave(s,v){
+  try{localStorage.setItem(SAVE_PREFIX+s,JSON.stringify(v));}catch(e){}
+  try{if(typeof LEEA_CLOUD!=='undefined'&&LEEA_CLOUD&&LEEA_CLOUD.saveProgress)LEEA_CLOUD.saveProgress(HOMEWORK_ID,s,v);}catch(e){}
+}
+function lLoad(s){try{const r=localStorage.getItem(SAVE_PREFIX+s);return r?JSON.parse(r):null;}catch(e){return null;}}
+function lDel(s){try{localStorage.removeItem(SAVE_PREFIX+s);}catch(e){}}
+
+function refreshProgress(){
+  try{
+    let done=0;
+    for(let i=0;i<TAB_COUNT;i++){
+      if(lLoad('tab-'+i+'-done')){done++;const tb=document.getElementById('tb'+i);if(tb)tb.classList.add('done');}
+    }
+    const pill=document.getElementById('prog-pill');
+    if(pill)pill.textContent=done+' / '+TAB_COUNT+' done';
+    if(done>=TAB_COUNT)lSave('done',{complete:true,completedAt:new Date().toISOString()});
+  }catch(e){}
+}
+function markComplete(tab){
+  try{
+    lSave('tab-'+tab+'-done',{done:true,completedAt:new Date().toISOString()});
+    const btn=document.getElementById('complete-'+tab);
+    btn.textContent='✓ '+TAB_NAMES[tab]+' done';
+    btn.classList.add('confirmed');
+    refreshProgress();
+  }catch(e){}
+}
+function doRedo(tab){
+  try{
+    const btn=document.getElementById('redo-'+tab);
+    if(!btn.classList.contains('armed')){
+      btn.classList.add('armed');btn.textContent='Tap again ↺';
+      setTimeout(()=>{btn.classList.remove('armed');btn.textContent='↺ Redo';},3000);
+      return;
+    }
+    btn.classList.remove('armed');btn.textContent='↺ Redo';
+    lDel('tab-'+tab+'-done');
+    if(tab===11)lDel('score');
+    Object.keys(localStorage).filter(k=>k.startsWith(SAVE_PREFIX+'tab-'+tab+'-')).forEach(k=>localStorage.removeItem(k));
+    if(TAB_RESET[tab])TAB_RESET[tab]();
+    const cb=document.getElementById('complete-'+tab);
+    cb.classList.remove('confirmed');
+    cb.textContent='Mark '+TAB_NAMES[tab]+' complete ✓';
+    document.getElementById('tb'+tab).classList.remove('done');
+    refreshProgress();
+  }catch(e){}
+}
+function showTab(n){
+  try{
+    document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===n));
+    document.querySelectorAll('.tab-content').forEach((c,i)=>c.classList.toggle('active',i===n));
+    const cb=document.getElementById('complete-'+n);
+    if(cb){
+      if(lLoad('tab-'+n+'-done')){cb.classList.add('confirmed');cb.textContent='✓ '+TAB_NAMES[n]+' done';}
+      else{cb.classList.remove('confirmed');cb.textContent='Mark '+TAB_NAMES[n]+' complete ✓';}
+    }
+    if(TAB_INIT[n]&&!TAB_INIT[n]._initialized){TAB_INIT[n]();TAB_INIT[n]._initialized=true;}
+    if(TAB_RESTORE[n])TAB_RESTORE[n]();
+  }catch(e){}
+}
+function shuffle(arr){
+  const a=arr.slice();
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+function shake(el){el.classList.remove('err');void el.offsetWidth;el.classList.add('err');setTimeout(()=>el.classList.remove('err'),400);}
+
+/* ── Shared builder: flip-card decks (Doors, Rebels, Teams) ───────── */
+function buildFlipDeck(cfg){
+  // cfg: {grid, cards[{k,em,front,back}], storeKey, countEl, hintEl, hintText, onChange}
+  const grid=document.getElementById(cfg.grid);
+  grid.innerHTML='';
+  cfg.cards.forEach(c=>{
+    const b=document.createElement('button');
+    b.type='button';b.className='flipcard';b.dataset.k=c.k;
+    b.innerHTML='<div class="em">'+c.em+'</div><div class="front">'+c.front+'</div>'+
+                '<div class="back"></div><div class="tap">TAP</div>';
+    b.onclick=function(){
+      const seen=new Set(lLoad(cfg.storeKey)||[]);
+      seen.add(c.k);lSave(cfg.storeKey,Array.from(seen));
+      cfg.refresh();
+    };
+    grid.appendChild(b);
+  });
+}
+function refreshFlipDeck(cfg){
+  const seen=new Set(lLoad(cfg.storeKey)||[]);
+  document.querySelectorAll('#'+cfg.grid+' .flipcard').forEach(b=>{
+    const card=cfg.cards.find(c=>c.k===b.dataset.k);
+    const hit=seen.has(b.dataset.k);
+    b.classList.toggle('revealed',hit);
+    b.querySelector('.back').innerHTML=hit?card.back:'';
+  });
+  const cnt=document.getElementById(cfg.countEl);
+  if(cnt)cnt.textContent=seen.size;
+  const hint=document.getElementById(cfg.hintEl);
+  if(hint)hint.textContent=seen.size>=cfg.cards.length?'All open! ✓':cfg.hintText;
+  return seen.size>=cfg.cards.length;
+}
+
+/* ── Shared builder: tap-a-word / tap-a-bin sorters ───────────────── */
+function buildSorter(cfg){
+  // cfg: {bank, bins, words[{w,cat}], cats[{k,label}], storeKey, countEl, hintEl}
+  const bank=document.getElementById(cfg.bank), bins=document.getElementById(cfg.bins);
+  bank.innerHTML='';bins.innerHTML='';
+  cfg.sel=null;
+  shuffle(cfg.words).forEach(item=>{
+    const b=document.createElement('button');
+    b.type='button';b.className='chip';b.dataset.w=item.w;b.dataset.cat=item.cat;
+    b.textContent=item.w;
+    b.onclick=function(){
+      if(b.classList.contains('used'))return;
+      document.querySelectorAll('#'+cfg.bank+' .chip.sel').forEach(x=>x.classList.remove('sel'));
+      if(cfg.sel===b){cfg.sel=null;}
+      else{b.classList.add('sel');cfg.sel=b;}
+      cfg.refresh();
+    };
+    bank.appendChild(b);
+  });
+  cfg.cats.forEach(cat=>{
+    const d=document.createElement('div');
+    d.className='bin';d.dataset.cat=cat.k;
+    d.innerHTML='<h4>'+cat.label+'</h4><div class="drops"></div>';
+    d.onclick=function(){
+      if(!cfg.sel){shake(d);return;}
+      const chip=cfg.sel;
+      if(chip.dataset.cat===cat.k){
+        const placed=lLoad(cfg.storeKey)||{};
+        placed[chip.dataset.w]=cat.k;lSave(cfg.storeKey,placed);
+        cfg.sel=null;cfg.refresh();
+      }else{
+        shake(d);shake(chip);
+        chip.classList.remove('sel');cfg.sel=null;
+        setTimeout(cfg.refresh,410);
+      }
+    };
+    bins.appendChild(d);
+  });
+  cfg.refresh();
+}
+function refreshSorter(cfg){
+  const placed=lLoad(cfg.storeKey)||{};
+  document.querySelectorAll('#'+cfg.bank+' .chip').forEach(c=>{
+    const hit=Object.prototype.hasOwnProperty.call(placed,c.dataset.w);
+    c.classList.toggle('used',hit);
+    if(hit)c.classList.remove('sel');
+  });
+  document.querySelectorAll('#'+cfg.bins+' .bin').forEach(bin=>{
+    const drops=bin.querySelector('.drops');
+    drops.innerHTML='';
+    Object.keys(placed).filter(w=>placed[w]===bin.dataset.cat).forEach(w=>{
+      const s=document.createElement('span');s.textContent=w;drops.appendChild(s);
+    });
+  });
+  const n=Object.keys(placed).length;
+  const cnt=document.getElementById(cfg.countEl);
+  if(cnt)cnt.textContent=n;
+  const hint=document.getElementById(cfg.hintEl);
+  if(hint)hint.textContent=n>=cfg.words.length?'All sorted! ✓':(cfg.sel?'Now tap its box.':'Tap a word to start.');
+  return n>=cfg.words.length;
+}
+
+/* ── Shared builder: one-try multiple choice sets ─────────────────── */
+function buildMcq(cfg){
+  // cfg: {host, items[{q,o[],a,why}], storeKey, countEl, totalEl, onChange}
+  const host=document.getElementById(cfg.host);
+  host.innerHTML='';
+  const totalEl=document.getElementById(cfg.totalEl);
+  if(totalEl)totalEl.textContent=cfg.items.length;
+  cfg.items.forEach((item,qi)=>{
+    const card=document.createElement('div');
+    card.className='qcard';
+    const q=document.createElement('div');q.className='q';q.innerHTML=(qi+1)+'. '+item.q;
+    const opts=document.createElement('div');opts.className='opts';
+    item.o.forEach((txt,oi)=>{
+      const b=document.createElement('button');
+      b.type='button';b.className='opt';b.dataset.q=qi;b.dataset.o=oi;
+      b.innerHTML=txt;
+      b.onclick=function(){
+        const ans=lLoad(cfg.storeKey)||{};
+        if(Object.prototype.hasOwnProperty.call(ans,qi))return;
+        ans[qi]=oi;lSave(cfg.storeKey,ans);
+        cfg.refresh();
+      };
+      opts.appendChild(b);
+    });
+    const why=document.createElement('div');why.className='why';why.dataset.q=qi;why.innerHTML=item.why;
+    card.appendChild(q);card.appendChild(opts);card.appendChild(why);
+    host.appendChild(card);
+  });
+  cfg.refresh();
+}
+function refreshMcq(cfg){
+  const ans=lLoad(cfg.storeKey)||{};
+  let right=0;
+  cfg.items.forEach((item,qi)=>{
+    const answered=Object.prototype.hasOwnProperty.call(ans,qi);
+    if(answered&&ans[qi]===item.a)right++;
+    document.querySelectorAll('#'+cfg.host+' .opt[data-q="'+qi+'"]').forEach(b=>{
+      const oi=parseInt(b.dataset.o,10);
+      b.classList.remove('good','bad');
+      b.disabled=answered;
+      if(!answered)return;
+      if(oi===item.a)b.classList.add('good');
+      else if(oi===ans[qi])b.classList.add('bad');
+    });
+    const why=document.querySelector('#'+cfg.host+' .why[data-q="'+qi+'"]');
+    if(why)why.classList.toggle('show',answered);
+  });
+  const cnt=document.getElementById(cfg.countEl);
+  if(cnt)cnt.textContent=right;
+  const answeredAll=cfg.items.every((_,qi)=>Object.prototype.hasOwnProperty.call(ans,qi));
+  return {right:right,total:cfg.items.length,answeredAll:answeredAll};
+}
+
+/* ═══ TAB 0 — THE ENGINE ═══ */
+const ENGINE_CARDS=[
+  {k:'idea',em:'⚙️',front:'THE ENGINE',back:'Every sentence needs a <b>WHO</b> and an <b>ENGINE</b>.<br>Leo <b>kicks</b> the ball.'},
+  {k:'kick',em:'⚽',front:'kick',back:'He <b>kicks</b> the ball hard.<br><span class="jp">ける</span>'},
+  {k:'run',em:'🏃',front:'run',back:'They <b>run</b> down the pitch.<br><span class="jp">走る</span>'},
+  {k:'shout',em:'🗣️',front:'shout',back:'The fans <b>shout</b> his name.<br><span class="jp">さけぶ</span>'},
+  {k:'score',em:'🥅',front:'score',back:'Kubo <b>scores</b>! 🎉<br><span class="jp">得点する</span>'},
+  {k:'like',em:'❤️',front:'like',back:'I <b>like</b> soccer.<br>A quiet engine — no action to see! 🤫'},
+  {k:'know',em:'🧠',front:'know',back:'I <b>know</b> the answer.<br>Quiet, but still the engine. 🤫'},
+  {k:'have',em:'🎒',front:'have',back:'We <b>have</b> two tickets.<br>Quiet engine again! 🤫'}
+];
+const engCfg={grid:'eng-grid',cards:ENGINE_CARDS,storeKey:'tab-0-seen',countEl:'eng-count',hintEl:'eng-hint',hintText:'Tap a card to start it.'};
+engCfg.refresh=function(){
+  const all=refreshFlipDeck(engCfg);
+  document.getElementById('eng-done').classList.toggle('show',all);
+};
+TAB_INIT[0]=function(){buildFlipDeck(engCfg);engCfg.refresh();};
+TAB_RESET[0]=function(){lDel('tab-0-seen');TAB_INIT[0]._initialized=false;TAB_INIT[0]();TAB_INIT[0]._initialized=true;};
+TAB_RESTORE[0]=function(){engCfg.refresh();};
+
+/* ═══ TAB 1 — ENGINE HUNT ═══ */
+const HUNT_SENTS=[
+  {words:['The','fans','shouted','very','loudly','.'],verbs:[2]},
+  {words:['Kubo','scored','a','great','goal','.'],verbs:[1]},
+  {words:['My','brother','likes','action','movies','.'],verbs:[2]},
+  {words:['Leo','is','a','fast','runner','.'],verbs:[1]},
+  {words:['We','watched','the','game','and','ate','popcorn','.'],verbs:[1,5]}
+];
+function huntTotal(){return HUNT_SENTS.reduce((n,s)=>n+s.verbs.length,0);}
+function huntRefresh(){
+  const found=lLoad('tab-1-found')||{};
+  let n=0;
+  HUNT_SENTS.forEach((s,si)=>{
+    (found[si]||[]).forEach(()=>n++);
+    document.querySelectorAll('#hunt-list .w[data-s="'+si+'"]').forEach(b=>{
+      b.classList.toggle('hit',(found[si]||[]).indexOf(parseInt(b.dataset.w,10))!==-1);
+    });
+  });
+  document.getElementById('hunt-count').textContent=n;
+  document.getElementById('hunt-total').textContent=huntTotal();
+  const all=n>=huntTotal();
+  document.getElementById('hunt-hint').textContent=all?'Every engine found! ✓':'Tap the verb you can see.';
+  document.getElementById('hunt-done').classList.toggle('show',all);
+}
+TAB_INIT[1]=function(){
+  const host=document.getElementById('hunt-list');
+  host.innerHTML='';
+  HUNT_SENTS.forEach((s,si)=>{
+    const d=document.createElement('div');
+    d.className='sent';
+    const lead=document.createElement('span');
+    lead.className='lead';
+    lead.textContent='Sentence '+(si+1)+' — find '+s.verbs.length+(s.verbs.length>1?' verbs':' verb');
+    d.appendChild(lead);
+    s.words.forEach((w,wi)=>{
+      const b=document.createElement('button');
+      b.type='button';
+      b.className=(w==='.'||w==='!'||w==='?')?'w plain':'w';
+      b.textContent=w;b.dataset.s=si;b.dataset.w=wi;
+      if(w!=='.'&&w!=='!'&&w!=='?'){
+        b.onclick=function(){
+          const found=lLoad('tab-1-found')||{};
+          const list=found[si]||[];
+          if(list.indexOf(wi)!==-1)return;
+          if(s.verbs.indexOf(wi)!==-1){
+            list.push(wi);found[si]=list;lSave('tab-1-found',found);huntRefresh();
+          }else{
+            b.classList.add('miss');setTimeout(()=>b.classList.remove('miss'),400);
+          }
+        };
+      }
+      d.appendChild(b);
+      d.appendChild(document.createTextNode(' '));
+    });
+    host.appendChild(d);
+  });
+  huntRefresh();
+};
+TAB_RESET[1]=function(){lDel('tab-1-found');TAB_INIT[1]._initialized=false;TAB_INIT[1]();TAB_INIT[1]._initialized=true;};
+TAB_RESTORE[1]=function(){huntRefresh();};
+
+/* ═══ TAB 2 — THREE TEAMS ═══ */
+const teamCfg={
+  bank:'team-bank',bins:'team-bins',storeKey:'tab-2-placed',countEl:'team-count',hintEl:'team-hint',
+  cats:[{k:'n',label:'🏷️ NOUN<br><small>a / the ___</small>'},{k:'v',label:'⚙️ VERB<br><small>I can ___</small>'},{k:'d',label:'🎨 DESCRIBING<br><small>very ___</small>'}],
+  words:[
+    {w:'trophy',cat:'n'},{w:'winner',cat:'n'},{w:'stadium',cat:'n'},
+    {w:'celebrate',cat:'v'},{w:'win',cat:'v'},{w:'jump',cat:'v'},
+    {w:'noisy',cat:'d'},{w:'windy',cat:'d'},{w:'fast',cat:'d'}
+  ]
+};
+teamCfg.refresh=function(){
+  const all=refreshSorter(teamCfg);
+  document.getElementById('team-done').classList.toggle('show',all);
+};
+TAB_INIT[2]=function(){buildSorter(teamCfg);};
+TAB_RESET[2]=function(){lDel('tab-2-placed');TAB_INIT[2]._initialized=false;TAB_INIT[2]();TAB_INIT[2]._initialized=true;};
+TAB_RESTORE[2]=function(){teamCfg.sel=null;teamCfg.refresh();};
+
+/* ═══ TAB 3 — BE VERBS ═══ */
+const BE_CARDS=[
+  {k:'i',em:'🙋',front:'I',back:'<b>am</b><br>I am Leo.'},
+  {k:'you',em:'👉',front:'You',back:'<b>are</b><br>You are fast.'},
+  {k:'he',em:'👦',front:'He / She / It',back:'<b>is</b><br>He is a keeper.'},
+  {k:'we',em:'👨‍👦',front:'We',back:'<b>are</b><br>We are ready.'},
+  {k:'they',em:'👥',front:'They',back:'<b>are</b><br>They are here.'},
+  {k:'past',em:'⏪',front:'In the past',back:'I / he / she / it → <b>was</b><br>you / we / they → <b>were</b>'}
+];
+const BE_Q=[
+  {q:'I ___ hungry. 🍜',o:['am','is','are','(nothing)'],a:0,why:'I always takes am. And never leave BE out! 🪞'},
+  {q:'The players ___ ready for the game. ⚽',o:['is','am','are'],a:2,why:'players = they → are. 👥'},
+  {q:'The children ___ very happy. 🧒',o:['is','are','was'],a:1,why:'children is plural even with no -s → are. 👥'},
+  {q:'My dad ___ a teacher. 👨‍🏫',o:['is','are','am'],a:0,why:'My dad = he → is. 🪞'},
+  {q:'The game ___ amazing yesterday! ⏪',o:['were','was','is'],a:1,why:'One thing in the past → was. ⏪'}
+];
+const beCfg={grid:'be-grid',cards:BE_CARDS,storeKey:'tab-3-seen',countEl:'be-count',hintEl:'be-hint',hintText:'Tap every card first.'};
+const beQCfg={host:'be-quiz',items:BE_Q,storeKey:'tab-3-answers',countEl:'be-qcount',totalEl:'be-qtotal'};
+function beRefresh(){
+  const allSeen=refreshFlipDeck(beCfg);
+  const r=refreshMcq(beQCfg);
+  document.getElementById('be-done').classList.toggle('show',allSeen&&r.answeredAll);
+}
+beCfg.refresh=beRefresh;beQCfg.refresh=beRefresh;
+TAB_INIT[3]=function(){buildFlipDeck(beCfg);buildMcq(beQCfg);beRefresh();};
+TAB_RESET[3]=function(){lDel('tab-3-seen');lDel('tab-3-answers');TAB_INIT[3]._initialized=false;TAB_INIT[3]();TAB_INIT[3]._initialized=true;};
+TAB_RESTORE[3]=function(){beRefresh();};
+
+/* ═══ TAB 4 — THE -S RULE ═══ */
+const ONES_Q=[
+  {q:'She ___ soccer every Saturday. 🎽',o:['play','plays','playing'],a:1,why:'She = one person → one s. 🎽'},
+  {q:'My friends ___ movies every weekend. 🎬',o:['watch','watches','watchs'],a:0,why:'friends = they → NO s. Do not over-use the rule! 👥'},
+  {q:'Leo ___ to school in Annaka. 🏫',o:['go','goes','gos'],a:1,why:'go takes the +es machine → goes. ⚙️'},
+  {q:'He ___ two tickets for the final. 🎫',o:['have','has','haves'],a:1,why:'have → has. The one rebel. 😎'}
+];
+const onesCfg={
+  bank:'ones-bank',bins:'ones-bins',storeKey:'tab-4-placed',countEl:'ones-count',hintEl:'ones-hint',
+  cats:[{k:'s',label:'⚙️ + s'},{k:'e',label:'⚙️ + es'},{k:'i',label:'⚙️ y → ies'}],
+  words:[
+    {w:'play',cat:'s'},{w:'run',cat:'s'},{w:'like',cat:'s'},
+    {w:'watch',cat:'e'},{w:'go',cat:'e'},{w:'fix',cat:'e'},
+    {w:'study',cat:'i'},{w:'cry',cat:'i'},{w:'try',cat:'i'}
+  ]
+};
+const onesQCfg={host:'ones-quiz',items:ONES_Q,storeKey:'tab-4-answers',countEl:'ones-qcount',totalEl:'ones-qtotal'};
+function onesRefresh(){
+  const allSorted=refreshSorter(onesCfg);
+  const r=refreshMcq(onesQCfg);
+  document.getElementById('ones-done').classList.toggle('show',allSorted&&r.answeredAll);
+}
+onesCfg.refresh=onesRefresh;onesQCfg.refresh=onesRefresh;
+TAB_INIT[4]=function(){buildMcq(onesQCfg);buildSorter(onesCfg);onesRefresh();};
+TAB_RESET[4]=function(){lDel('tab-4-placed');lDel('tab-4-answers');TAB_INIT[4]._initialized=false;TAB_INIT[4]();TAB_INIT[4]._initialized=true;};
+TAB_RESTORE[4]=function(){onesCfg.sel=null;onesRefresh();};
+
+/* ═══ TAB 5 — TWO CLOCKS ═══ */
+const clockCfg={
+  bank:'clock-bank',bins:'clock-bins',storeKey:'tab-5-placed',countEl:'clock-count',hintEl:'clock-hint',
+  cats:[{k:'n',label:'🔴 RIGHT NOW<br><small>be + ing</small>'},{k:'e',label:'📅 EVERY DAY<br><small>plain verb (+s)</small>'}],
+  words:[
+    {w:'Look! He is scoring!',cat:'n'},
+    {w:'They are running right now.',cat:'n'},
+    {w:'I am doing my homework now.',cat:'n'},
+    {w:'I watch movies every weekend.',cat:'e'},
+    {w:'She always eats breakfast.',cat:'e'},
+    {w:'We play soccer on Saturdays.',cat:'e'}
+  ]
+};
+clockCfg.refresh=function(){
+  const all=refreshSorter(clockCfg);
+  document.getElementById('clock-done').classList.toggle('show',all);
+};
+TAB_INIT[5]=function(){buildSorter(clockCfg);};
+TAB_RESET[5]=function(){lDel('tab-5-placed');TAB_INIT[5]._initialized=false;TAB_INIT[5]();TAB_INIT[5]._initialized=true;};
+TAB_RESTORE[5]=function(){clockCfg.sel=null;clockCfg.refresh();};
+
+/* ═══ TAB 6 — ING MACHINES ═══ */
+const ingCfg={
+  bank:'ing-bank',bins:'ing-bins',storeKey:'tab-6-placed',countEl:'ing-count',hintEl:'ing-hint',
+  cats:[{k:'p',label:'⚙️ + ing'},{k:'e',label:'⚙️ drop the e'},{k:'d',label:'⚙️ double it'}],
+  words:[
+    {w:'play',cat:'p'},{w:'watch',cat:'p'},{w:'eat',cat:'p'},
+    {w:'make',cat:'e'},{w:'score',cat:'e'},{w:'take',cat:'e'},
+    {w:'run',cat:'d'},{w:'stop',cat:'d'},{w:'swim',cat:'d'}
+  ]
+};
+ingCfg.refresh=function(){
+  const all=refreshSorter(ingCfg);
+  document.getElementById('ing-done').classList.toggle('show',all);
+};
+TAB_INIT[6]=function(){buildSorter(ingCfg);};
+TAB_RESET[6]=function(){lDel('tab-6-placed');TAB_INIT[6]._initialized=false;TAB_INIT[6]();TAB_INIT[6]._initialized=true;};
+TAB_RESTORE[6]=function(){ingCfg.sel=null;ingCfg.refresh();};
+
+/* ═══ TAB 7 — PAST: MACHINE OR REBEL ═══ */
+const pastCfg={
+  bank:'past-bank',bins:'past-bins',storeKey:'tab-7-placed',countEl:'past-count',hintEl:'past-hint',
+  cats:[{k:'m',label:'⚙️ MACHINE<br><small>+ed</small>'},{k:'r',label:'😎 REBEL<br><small>no -ed</small>'}],
+  words:[
+    {w:'watch',cat:'m'},{w:'play',cat:'m'},{w:'study',cat:'m'},{w:'stop',cat:'m'},{w:'like',cat:'m'},
+    {w:'go',cat:'r'},{w:'see',cat:'r'},{w:'eat',cat:'r'},{w:'run',cat:'r'},{w:'take',cat:'r'}
+  ]
+};
+pastCfg.refresh=function(){
+  const all=refreshSorter(pastCfg);
+  document.getElementById('past-done').classList.toggle('show',all);
+};
+TAB_INIT[7]=function(){buildSorter(pastCfg);};
+TAB_RESET[7]=function(){lDel('tab-7-placed');TAB_INIT[7]._initialized=false;TAB_INIT[7]();TAB_INIT[7]._initialized=true;};
+TAB_RESTORE[7]=function(){pastCfg.sel=null;pastCfg.refresh();};
+
+/* ═══ TAB 8 — THE REBELS ═══ */
+const REBELS=[
+  {k:'go',em:'🚶',front:'go',back:'→ <b>WENT</b><br>We went to the stadium.'},
+  {k:'see',em:'👀',front:'see',back:'→ <b>SAW</b><br>I saw the goal!'},
+  {k:'eat',em:'🍿',front:'eat',back:'→ <b>ATE</b><br>We ate popcorn.'},
+  {k:'run',em:'🏃',front:'run',back:'→ <b>RAN</b><br>He ran very fast.'},
+  {k:'take',em:'🤲',front:'take',back:'→ <b>TOOK</b><br>She took the penalty.'},
+  {k:'come',em:'🚪',front:'come',back:'→ <b>CAME</b><br>They came late.'},
+  {k:'get',em:'🎁',front:'get',back:'→ <b>GOT</b><br>I got a red card. 🟥'},
+  {k:'have',em:'🎒',front:'have',back:'→ <b>HAD</b><br>We had two tickets.'},
+  {k:'is',em:'🪞',front:'is / am',back:'→ <b>WAS</b><br>The game was great.'},
+  {k:'are',em:'👥',front:'are',back:'→ <b>WERE</b><br>The fans were loud.'}
+];
+const REB_Q=[
+  {q:'Yesterday we ___ to the stadium. ⏪',o:['go','goed','went'],a:2,why:'go is a rebel → went. 😎'},
+  {q:'I ___ a great goal on Sunday. 👀',o:['seed','saw','seen'],a:1,why:'see → saw. 👀'},
+  {q:'We ___ the match last night. 📺',o:['watch','watched','watching'],a:1,why:'watch is a machine verb → watched. ⚙️'},
+  {q:'The fans ___ very loud. 🗣️',o:['was','were','is'],a:1,why:'fans = they → were. 👥'}
+];
+const rebCfg={grid:'reb-grid',cards:REBELS,storeKey:'tab-8-seen',countEl:'reb-count',hintEl:'reb-hint',hintText:'Tap every rebel first.'};
+const rebQCfg={host:'reb-quiz',items:REB_Q,storeKey:'tab-8-answers',countEl:'reb-qcount',totalEl:'reb-qtotal'};
+function rebRefresh(){
+  const allSeen=refreshFlipDeck(rebCfg);
+  const r=refreshMcq(rebQCfg);
+  document.getElementById('reb-done').classList.toggle('show',allSeen&&r.answeredAll);
+}
+rebCfg.refresh=rebRefresh;rebQCfg.refresh=rebRefresh;
+TAB_INIT[8]=function(){buildFlipDeck(rebCfg);buildMcq(rebQCfg);rebRefresh();};
+TAB_RESET[8]=function(){lDel('tab-8-seen');lDel('tab-8-answers');TAB_INIT[8]._initialized=false;TAB_INIT[8]();TAB_INIT[8]._initialized=true;};
+TAB_RESTORE[8]=function(){rebRefresh();};
+
+/* ═══ TAB 9 — WORD ORDER ═══ */
+const ORD_Q=[
+  {q:'Pick the correct sentence. ⚽',o:['Leo soccer plays.','Plays Leo soccer.','Leo plays soccer.'],a:2,why:'WHO → ENGINE → WHAT. The verb sits in the middle. ⚙️'},
+  {q:'Pick the correct sentence. 🍿',o:['We ate popcorn at the movies.','We popcorn ate at the movies.','At the movies popcorn we ate.'],a:0,why:'WHO (We) → ENGINE (ate) → WHAT (popcorn). ✔'},
+  {q:'Pick the correct sentence. 🧤',o:['The goalkeeper the ball saved.','The goalkeeper saved the ball.','Saved the goalkeeper the ball.'],a:1,why:'The engine goes in the middle, not at the end. ⚙️'},
+  {q:'Where does the engine sit in English? 🪑',o:['at the end','in the middle','at the start'],a:1,why:'Japanese puts it last, English puts it in the middle. 🌉'}
+];
+const ordCfg={host:'ord-list',items:ORD_Q,storeKey:'tab-9-answers',countEl:'ord-count',totalEl:'ord-total'};
+ordCfg.refresh=function(){
+  const r=refreshMcq(ordCfg);
+  document.getElementById('ord-hint').textContent=r.answeredAll?'All answered! ✓':'Point at the engine in each option!';
+  document.getElementById('ord-done').classList.toggle('show',r.answeredAll);
+};
+TAB_INIT[9]=function(){buildMcq(ordCfg);};
+TAB_RESET[9]=function(){lDel('tab-9-answers');TAB_INIT[9]._initialized=false;TAB_INIT[9]();TAB_INIT[9]._initialized=true;};
+TAB_RESTORE[9]=function(){ordCfg.refresh();};
+
+/* ═══ TAB 10 — HELPERS ═══ */
+const HELP_Q=[
+  {q:'___ he play for Barcelona? ❓',o:['Do','Does','Is'],a:1,why:'he → Does. And then play stays plain! 🎽'},
+  {q:'___ you like soccer? ⚽',o:['Do','Does','Did'],a:0,why:'you → Do. 👉'},
+  {q:'___ they watch the final last night? ⏪',o:['Do','Does','Did'],a:2,why:'"last night" is the past → Did. ⏪'},
+  {q:'Look! ___ he scoring right now? 🔴',o:['Does','Is','Do'],a:1,why:'BE is its own helper — it never asks Do. 🪞'},
+  {q:'He ___ play on Sundays. 🚫',o:['don’t','doesn’t','didn’t'],a:1,why:'He → doesn’t. The -s is hiding inside it! 1️⃣'},
+  {q:'Which one is right? 🔑',o:['Does he plays?','Does he play?'],a:1,why:'Only ONE word carries the ending — does already has the s. 🔑'}
+];
+const helpCfg={host:'help-list',items:HELP_Q,storeKey:'tab-10-answers',countEl:'help-count',totalEl:'help-total'};
+helpCfg.refresh=function(){
+  const r=refreshMcq(helpCfg);
+  document.getElementById('help-hint').textContent=r.answeredAll?'All answered! ✓':'One try each — think first!';
+  document.getElementById('help-done').classList.toggle('show',r.answeredAll);
+};
+TAB_INIT[10]=function(){buildMcq(helpCfg);};
+TAB_RESET[10]=function(){lDel('tab-10-answers');TAB_INIT[10]._initialized=false;TAB_INIT[10]();TAB_INIT[10]._initialized=true;};
+TAB_RESTORE[10]=function(){helpCfg.refresh();};
+
+/* ═══ TAB 11 — ENGINE ROOM QUIZ ═══ */
+const QUIZ_Q=[
+  {q:'Which word is a VERB? ⚙️',o:['winner','win','windy'],a:1,why:'You can say "I can win" → win is the engine. 🏆'},
+  {q:'In "The fans shouted loudly", the verb is… 🗣️',o:['fans','shouted','loudly'],a:1,why:'shouted is the action — the engine. 🗣️'},
+  {q:'In "Leo is a fast runner", the verb is… 🪞',o:['is','fast','runner'],a:0,why:'is is the engine. runner NAMES a person. 🪞'},
+  {q:'Choose the correct sentence. 🍜',o:['I hungry.','I am hungry.','I is hungry.'],a:1,why:'Never lose the BE verb — I am hungry. 🪞'},
+  {q:'The players ___ ready for the game. ⚽',o:['is','am','are'],a:2,why:'players = they → are. 👥'},
+  {q:'She ___ soccer every Saturday. 🎽',o:['play','plays','playing'],a:1,why:'he / she / it → one person, one s! 🎽'},
+  {q:'Leo ___ to school in Annaka. 🏫',o:['go','goes','gos'],a:1,why:'go takes the +es machine → goes. ⚙️'},
+  {q:'Look! Haaland ___ right now! 🔴',o:['score','scores','is scoring'],a:2,why:'"Look!" means happening now → be + ing. 〜ている'},
+  {q:'Yesterday we ___ to the stadium. ⏪',o:['go','goed','went'],a:2,why:'go is a rebel → went. 😎'},
+  {q:'We ___ the match last night. 📺',o:['watch','watched','watching'],a:1,why:'"last night" is the past → watched. ⚙️'},
+  {q:'Which sentence has the right word order? 🪑',o:['Leo soccer plays.','Plays Leo soccer.','Leo plays soccer.'],a:2,why:'WHO → ENGINE → WHAT. ⚙️'},
+  {q:'___ he play for Barcelona? ❓',o:['Do','Does','Is'],a:1,why:'he → Does. And then play stays plain! 🎽'}
+];
+const quizCfg={host:'quiz-list',items:QUIZ_Q,storeKey:'tab-11-answers',countEl:'quiz-count',totalEl:'quiz-total'};
+quizCfg.refresh=function(){
+  const r=refreshMcq(quizCfg);
+  const box=document.getElementById('quiz-score');
+  document.getElementById('quiz-hint').textContent=r.answeredAll?'Finished! ✓':'Answer every question.';
+  if(r.answeredAll){
+    const pct=Math.round((r.right/r.total)*100);
+    box.style.display='block';
+    document.getElementById('quiz-big').textContent=r.right+' / '+r.total+' ('+pct+'%)';
+    document.getElementById('quiz-msg').textContent=
+      pct>=90?'🥇 Engine Expert! Outstanding, Leo!':
+      pct>=75?'🥈 Great work — just a little polishing.':
+      pct>=60?'🥉 Good job! Replay the tricky stations.':
+      '💪 Every champion trains. Let us do this together.';
+    lSave('score',{score:r.right,total:r.total,percent:pct,done:true,timestamp:new Date().toISOString()});
+  }else{
+    box.style.display='none';
+  }
+  document.getElementById('quiz-done').classList.toggle('show',r.answeredAll);
+};
+TAB_INIT[11]=function(){buildMcq(quizCfg);};
+TAB_RESET[11]=function(){lDel('tab-11-answers');lDel('score');TAB_INIT[11]._initialized=false;TAB_INIT[11]();TAB_INIT[11]._initialized=true;};
+TAB_RESTORE[11]=function(){quizCfg.refresh();};
+
+/* ═══ TAB 12 — DRIBBLE! ═══ */
+const DRIB_Q=[
+  {q:'Which word is the engine? ⚙️',o:['runner','runs'],a:1,why:'runs is the verb; runner names a person. 🏃'},
+  {q:'I ___ a student. 🎒',o:['am','is'],a:0,why:'I always takes am. 🪞'},
+  {q:'He ___ TV every night. 📺',o:['watch','watches'],a:1,why:'He → +es machine → watches. ⚙️'},
+  {q:'run + ing = ? 🏃',o:['runing','running'],a:1,why:'Short vowel + one consonant → double it. 🏃'},
+  {q:'make + ing = ? 🍳',o:['makeing','making'],a:1,why:'Drop the silent e. 🍳'},
+  {q:'see → past = ? 👀',o:['saw','seed'],a:0,why:'A rebel! see → saw. 😎'},
+  {q:'___ they win yesterday? ⏪',o:['Do','Did'],a:1,why:'Past question → Did. ⏪'},
+  {q:'She ___ like natto. 🥢',o:['don’t','doesn’t'],a:1,why:'She → doesn’t. 🚫'}
+];
+const dribCfg={host:'drib-list',items:DRIB_Q,storeKey:'tab-12-answers',countEl:null,totalEl:null};
+dribCfg.refresh=function(){
+  const r=refreshMcq(dribCfg);
+  const steps=r.right;
+  document.getElementById('drib-meter').style.width=Math.round((steps/DRIB_Q.length)*100)+'%';
+  document.getElementById('drib-label').textContent=steps+' / '+DRIB_Q.length+' steps';
+  const shift=Math.round((steps/DRIB_Q.length)*40-20);
+  document.getElementById('drib-ball').style.transform='translateX('+shift+'px)';
+  document.getElementById('drib-done').classList.toggle('show',r.answeredAll);
+};
+TAB_INIT[12]=function(){buildMcq(dribCfg);};
+TAB_RESET[12]=function(){lDel('tab-12-answers');TAB_INIT[12]._initialized=false;TAB_INIT[12]();TAB_INIT[12]._initialized=true;};
+TAB_RESTORE[12]=function(){dribCfg.refresh();};
+
+/* ═══ boot ═══ */
+(function boot(){
+  refreshProgress();
+  showTab(0);
+})();
+</script>
+</body>
+</html>

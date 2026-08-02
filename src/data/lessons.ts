@@ -10,6 +10,7 @@ import unit9Song from "../../content/subjects/english/courses/our-world/level-4/
 import unit9SongLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/song.learner.json";
 import unit9Grammar1 from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/grammar1.teacher.json";
 import unit9Grammar1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/grammar1.learner.json";
+import unit9Grammar2 from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/grammar2.teacher.json";
 import unit8Opener from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.teacher.json";
 import unit8OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.learner.json";
 import unit8Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab1.teacher.json";
@@ -96,6 +97,7 @@ export const lessons: Lesson[] = [
   unit9SongLearner as Lesson,
   unit9Grammar1 as Lesson,
   unit9Grammar1Learner as Lesson,
+  unit9Grammar2 as Lesson,
   unit8Opener as Lesson,
   unit8OpenerLearner as Lesson,
   unit8Vocab1 as Lesson,

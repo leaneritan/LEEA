@@ -63,13 +63,37 @@ body{display:flex;flex-direction:column}
 .fc-modebtn.active{background:var(--red);color:#fff;border-color:var(--red)}
 .fc-pane{display:none}
 .fc-pane.active{display:block}
-.fc-card{background:linear-gradient(135deg,#fff,var(--yellow-l));border:4px solid var(--yellow);border-radius:20px;padding:26px;text-align:center}
-.fc-card .fc-emoji{font-size:64px}
-.fc-card .fc-word{font-size:32px;font-weight:900;color:var(--navy);margin-top:6px}
-.fc-card .fc-ipa{font-size:14px;color:var(--ink-3);font-weight:600}
-.fc-card .fc-def{font-size:16px;color:var(--ink-2);font-weight:600;margin-top:10px}
-.fc-card .fc-jp{font-size:14px;color:var(--ink-3);font-weight:600;margin-top:4px}
-.fc-card .fc-sample{font-size:15px;background:var(--blue-l);border-radius:10px;padding:8px 12px;margin-top:10px;font-weight:600}
+/* Flashcards are a two-sided flip card, the same shape as every other
+   vocabulary app: the front asks, the back answers. Showing the word and its
+   meaning on one face turns the card into a poster and removes the recall. */
+.flashcard-wrap{perspective:1000px;min-height:260px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:260px;position:relative;transform-style:preserve-3d;transition:transform .5s ease}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:8px;text-align:center}
+.fc-front{background:linear-gradient(135deg,var(--red),var(--red-d));color:#fff;border:4px solid var(--yellow)}
+.fc-back{background:linear-gradient(135deg,#fff,var(--yellow-l));border:4px solid var(--red);transform:rotateY(180deg)}
+.fc-face .fc-emoji{font-size:60px;line-height:1}
+.fc-face .fc-word{font-size:32px;font-weight:900}
+.fc-face .fc-ipa{font-size:14px;font-weight:600;opacity:.85}
+.fc-face .fc-def{font-size:17px;color:var(--ink-2);font-weight:700;line-height:1.35}
+.fc-tap{font-size:12px;font-weight:700;opacity:.75;letter-spacing:.06em;margin-top:6px}
+.fc-jp{font-size:15px;color:var(--ink-3);font-weight:700;display:none}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:none;border:1px dashed #D1D5DB;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;color:var(--ink-3);cursor:pointer;font-family:'Outfit',sans-serif;transition:border-color .2s,color .2s}
+.fc-jp-btn:hover{border-color:var(--red);color:var(--red)}
+.fc-face .fc-sample{font-size:15px;background:var(--blue-l);border-radius:10px;padding:8px 12px;font-weight:600;color:var(--ink-2);line-height:1.35}
+.fc-face .fc-sample b{color:var(--red-d)}
+/* TR 9.5 — Listen and repeat */
+.tr-row{background:#fff;border:3px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;transition:border-color .15s,background .15s}
+.tr-row.said{border-color:var(--green);background:var(--green-l)}
+.tr-row .tr-body{flex:1}
+.tr-row .tr-word{font-size:17px;font-weight:900;color:var(--red-d)}
+.tr-row .tr-sent{font-size:15px;font-weight:600;color:var(--ink-2);line-height:1.4;margin-top:2px}
+.tr-row .tr-sent b{color:var(--navy);font-weight:900}
+.tr-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.tr-btn{border:2px solid var(--border);background:#fff;border-radius:10px;padding:7px 10px;font-size:13px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.tr-btn:hover{border-color:var(--red);color:var(--red-d)}
+.tr-btn.on{background:var(--green);border-color:var(--green);color:#fff}
 .fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
 .fc-nav button{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
 .fc-dots{display:flex;gap:6px}
@@ -164,22 +188,49 @@ body{display:flex;flex-direction:column}
   <div class="tab-body">
     <div>
       <div class="section-title">🧪 The 5 Words — Direction &amp; Force</div>
-      <div class="section-sub">Practice mode first, then Quiz mode to test yourself.</div>
+      <div class="section-sub">Practice: tap the card to flip 👆 · Listen: the book's TR 9.5 · Quiz: choose the word.</div>
     </div>
     <div class="fc-modeswitch">
       <button class="fc-modebtn active" id="fc-mode-prac" onclick="fcSetMode('practice')">📖 Practice</button>
+      <button class="fc-modebtn" id="fc-mode-listen" onclick="fcSetMode('listen')">🔊 Listen</button>
       <button class="fc-modebtn" id="fc-mode-quiz" onclick="fcSetMode('quiz')">🎯 Quiz</button>
     </div>
     <div class="fc-pane active" id="fc0-prac">
-      <div class="fc-card" id="fc-card"></div>
+      <div class="flashcard-wrap" onclick="fcFlip()">
+        <div class="flashcard" id="fc-card">
+          <div class="fc-face fc-front">
+            <div class="fc-emoji" id="fc-emoji"></div>
+            <div class="fc-word" id="fc-word"></div>
+            <div class="fc-ipa" id="fc-ipa"></div>
+            <div class="fc-tap">TAP TO FLIP 👆</div>
+          </div>
+          <div class="fc-face fc-back">
+            <div class="fc-emoji" id="fc-emoji-b"></div>
+            <div class="fc-def" id="fc-def"></div>
+            <div class="fc-jp" id="fc-jp"></div>
+            <button class="fc-jp-btn" id="fc-jp-btn" onclick="fcToggleJp(event)">🇯🇵 日本語</button>
+            <div class="fc-sample" id="fc-sample"></div>
+          </div>
+        </div>
+      </div>
       <div class="fc-nav">
         <button onclick="fcPrev()">◀ Prev</button>
         <div class="fc-dots" id="fc-dots"></div>
         <button onclick="fcNext()">Next ▶</button>
       </div>
     </div>
+    <div class="fc-pane" id="fc0-listen">
+      <div class="section-sub" style="margin-bottom:10px">
+        🎧 <b>TR 9.5 · Activity 1 — Listen and repeat.</b> These are the exact sentences from the book.
+        Tap 🔊 to hear one, say it out loud, then tap ✓.
+      </div>
+      <div id="tr-list" style="display:flex;flex-direction:column;gap:10px"></div>
+      <div class="mstatus" style="margin-top:10px">
+        <div class="mcount">Repeated: <span id="tr-count">0</span> / 5</div>
+      </div>
+    </div>
     <div class="fc-pane" id="fc0-quiz"><div id="fc-quiz-host"></div></div>
-    <div class="done-banner" id="fc-done">🎉 All 5 words practiced and quizzed!</div>
+    <div class="done-banner" id="fc-done">🎉 All 5 words flipped, repeated and quizzed!</div>
   </div>
   <div class="tab-footer">
     <button class="btn-redo" id="redo-0" onclick="doRedo(0)">↺ Redo</button>
@@ -521,45 +572,124 @@ function pick(btn,correct){
 }
 
 /* ═══ TAB 0 — WORDS (flashcards + quiz) ═══ */
+/* The `sample` on each card is the book's own TR 9.5 sentence (Vocabulary 2,
+   Activity 1: Listen and repeat), so the card, the Listen pane and the book
+   all say the same thing. TR_ORDER below keeps the book's running order,
+   which is not the teaching order used for the cards. */
 const FC_WORDS=[
-  {word:'toward',emoji:'➡️',ipa:'/təˈwɔːrd/',def:'moving in the direction of something — getting closer',jp:'〜のほうへ',sample:"Ferran Torres runs <b>toward</b> the goal."},
-  {word:'away from',emoji:'⬅️',ipa:'/əˈweɪ frəm/',def:'moving in the other direction — getting farther',jp:'〜からはなれて',sample:"He is walking <b>away from</b> the loud music."},
-  {word:'direction',emoji:'🧭',ipa:'/dəˈrɛkʃən/',def:'the way something moves or points',jp:'方向（ほうこう）',sample:"Don't go in that <b>direction</b> — turn left!"},
-  {word:'lean',emoji:'🙆',ipa:'/liːn/',def:'to move your body a little to one side',jp:'(からだを)かたむける',sample:"You <b>lean</b> left when you turn your bike left."},
-  {word:'gravity',emoji:'🍎⬇️',ipa:'/ˈɡrævəti/',def:'the force that pulls things down toward the ground',jp:'重力（じゅうりょく）',sample:"<b>Gravity</b> pulls the ball toward the Earth."}
+  {word:'toward',emoji:'➡️',ipa:'/təˈwɔːrd/',def:'moving in the direction of something — getting closer',jp:'〜のほうへ',sample:"The girl is running <b>toward</b> the finish line."},
+  {word:'away from',emoji:'⬅️',ipa:'/əˈweɪ frəm/',def:'moving in the other direction — getting farther',jp:'〜からはなれて',sample:"The boy is riding <b>away from</b> the others."},
+  {word:'direction',emoji:'🧭',ipa:'/dəˈrɛkʃən/',def:'the way something moves or points',jp:'方向（ほうこう）',sample:"The boy and the girl are riding in the same <b>direction</b>."},
+  {word:'lean',emoji:'🙆',ipa:'/liːn/',def:'to move your body a little to one side',jp:'(からだを)かたむける',sample:"Don't <b>lean</b> on the table. It might break!"},
+  {word:'gravity',emoji:'🍎⬇️',ipa:'/ˈɡrævəti/',def:'the force that pulls things down toward the ground',jp:'重力（じゅうりょく）',sample:"<b>Gravity</b> pulls you toward the center of the Earth."}
 ];
+/* Indexes into FC_WORDS, in the book's TR 9.5 running order. */
+const TR_ORDER=[1,2,0,3,4];
 let fcIdx=0,fcQuizIdx=0,fcQuizSolved=new Set();
-TAB_INIT[0]=function(){};
+TAB_INIT[0]=function(){trBuild();};
 TAB_RESET[0]=function(){
   fcIdx=0;fcQuizIdx=0;fcQuizSolved=new Set();
+  lDel('tab-0-said');
   fcSetMode('practice');
   document.getElementById('fc-done').classList.remove('show');
-  fcRenderCard();fcRenderQuizQ();
+  fcRenderCard();fcRenderQuizQ();trRefresh();
 };
 TAB_RESTORE[0]=function(){
   const solved=lLoad('tab-0-solved')||[];
   fcQuizSolved=new Set(solved);
-  fcRenderCard();fcRenderQuizQ();
-  const visited=lLoad('tab-0-visited')||[];
-  if(visited.length>=5&&solved.length>=5)document.getElementById('fc-done').classList.add('show');
+  fcRenderCard();fcRenderQuizQ();trRefresh();
 };
 function fcSetMode(m){
-  document.getElementById('fc-mode-prac').classList.toggle('active',m==='practice');
-  document.getElementById('fc-mode-quiz').classList.toggle('active',m==='quiz');
-  document.getElementById('fc0-prac').classList.toggle('active',m==='practice');
-  document.getElementById('fc0-quiz').classList.toggle('active',m==='quiz');
+  ['prac','listen','quiz'].forEach(k=>{
+    const key=k==='prac'?'practice':k;
+    document.getElementById('fc-mode-'+k).classList.toggle('active',key===m);
+    document.getElementById('fc0-'+k).classList.toggle('active',key===m);
+  });
+}
+function fcToggleJp(e){
+  e.stopPropagation();
+  const jp=document.getElementById('fc-jp'),btn=document.getElementById('fc-jp-btn');
+  const revealed=jp.classList.toggle('revealed');
+  btn.textContent=revealed?'🇯🇵 隠す':'🇯🇵 日本語';
+}
+function fcFlip(){
+  const card=document.getElementById('fc-card');
+  const flipped=card.classList.toggle('flipped');
+  // A card only counts as studied once its answer side has actually been seen.
+  if(flipped){
+    const v=new Set(lLoad('tab-0-visited')||[]);v.add(fcIdx);lSave('tab-0-visited',Array.from(v));
+    fcCheckDone();
+  }
 }
 function fcRenderCard(){
   const w=FC_WORDS[fcIdx];
-  document.getElementById('fc-card').innerHTML=
-    '<div class="fc-emoji">'+w.emoji+'</div><div class="fc-word">'+w.word+'</div><div class="fc-ipa">'+w.ipa+'</div>'+
-    '<div class="fc-def">'+w.def+'</div><div class="fc-jp">🇯🇵 '+w.jp+'</div><div class="fc-sample">'+w.sample+'</div>';
+  const card=document.getElementById('fc-card');
+  card.classList.remove('flipped');
+  document.getElementById('fc-emoji').textContent=w.emoji;
+  document.getElementById('fc-word').textContent=w.word;
+  document.getElementById('fc-ipa').textContent=w.ipa;
+  document.getElementById('fc-emoji-b').textContent=w.emoji;
+  document.getElementById('fc-def').textContent=w.def;
+  const jp=document.getElementById('fc-jp');
+  jp.textContent='🇯🇵 '+w.jp;jp.classList.remove('revealed');
+  document.getElementById('fc-jp-btn').textContent='🇯🇵 日本語';
+  document.getElementById('fc-sample').innerHTML=w.sample;
   document.getElementById('fc-dots').innerHTML=FC_WORDS.map((x,i)=>'<div class="fc-dot'+(i===fcIdx?' on':'')+'"></div>').join('');
-  const v=new Set(lLoad('tab-0-visited')||[]);v.add(fcIdx);lSave('tab-0-visited',Array.from(v));
   fcCheckDone();
 }
 function fcNext(){fcIdx=(fcIdx+1)%FC_WORDS.length;fcRenderCard();}
 function fcPrev(){fcIdx=(fcIdx-1+FC_WORDS.length)%FC_WORDS.length;fcRenderCard();}
+
+/* ── TR 9.5 · Activity 1 — Listen and repeat ───────────────────── */
+function trSpeak(i){
+  try{
+    if(!('speechSynthesis' in window))return;
+    const text=FC_WORDS[i].sample.replace(/<[^>]+>/g,'');
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=.85;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function trToggle(i){
+  const said=new Set(lLoad('tab-0-said')||[]);
+  if(said.has(i))said.delete(i);else said.add(i);
+  lSave('tab-0-said',Array.from(said));
+  trRefresh();
+}
+function trBuild(){
+  const host=document.getElementById('tr-list');
+  if(!host)return;
+  host.innerHTML='';
+  const canSpeak='speechSynthesis' in window;
+  TR_ORDER.forEach(i=>{
+    const w=FC_WORDS[i];
+    const row=document.createElement('div');
+    row.className='tr-row';row.dataset.i=i;
+    row.innerHTML='<div class="tr-body"><div class="tr-word">'+w.word+'</div>'+
+                  '<div class="tr-sent">'+w.sample+'</div></div>'+
+                  '<div class="tr-actions">'+
+                  (canSpeak?'<button class="tr-btn" data-act="say">🔊 Hear</button>':'')+
+                  '<button class="tr-btn" data-act="ok">✓ I said it</button></div>';
+    row.querySelector('[data-act="ok"]').onclick=function(){trToggle(i);};
+    const say=row.querySelector('[data-act="say"]');
+    if(say)say.onclick=function(){trSpeak(i);};
+    host.appendChild(row);
+  });
+  trRefresh();
+}
+function trRefresh(){
+  const said=new Set(lLoad('tab-0-said')||[]);
+  document.querySelectorAll('#tr-list .tr-row').forEach(r=>{
+    const hit=said.has(parseInt(r.dataset.i,10));
+    r.classList.toggle('said',hit);
+    const ok=r.querySelector('[data-act="ok"]');
+    if(ok){ok.classList.toggle('on',hit);ok.textContent=hit?'✓ Said':'✓ I said it';}
+  });
+  const cnt=document.getElementById('tr-count');
+  if(cnt)cnt.textContent=said.size;
+  fcCheckDone();
+}
 function fcRenderQuizQ(){
   const host=document.getElementById('fc-quiz-host');
   const remaining=FC_WORDS.map((w,i)=>i).filter(i=>!fcQuizSolved.has(i));
@@ -580,7 +710,9 @@ function fcQuizPick(btn,correct,qi){
 }
 function fcCheckDone(){
   const v=lLoad('tab-0-visited')||[];
-  if(v.length>=5&&fcQuizSolved.size>=5)document.getElementById('fc-done').classList.add('show');
+  const said=lLoad('tab-0-said')||[];
+  const done=v.length>=5&&said.length>=5&&fcQuizSolved.size>=5;
+  document.getElementById('fc-done').classList.toggle('show',done);
 }
 
 /* ═══ TAB 1 — WARM UP: CLOSER OR FARTHER ═══ */

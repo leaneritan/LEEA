@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>🏆 Grammar Cup — Nouns &amp; Verbs Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"></noscript>
+<style>
+:root{
+  --bg:#0A1024; --bg2:#141C3E; --card:rgba(255,255,255,.07); --line:rgba(255,255,255,.18);
+  --gold:#FBBF24; --gold2:#F59E0B; --lime:#A3E635; --green:#22C55E; --red:#EF4444;
+  --sky:#38BDF8; --orange:#FB923C; --violet:#A78BFA; --white:#fff; --mute:#94A3B8;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Outfit',system-ui,sans-serif;color:var(--white);min-height:100vh;
+  background:
+   radial-gradient(900px 500px at 85% -10%, rgba(251,191,36,.16), transparent 60%),
+   radial-gradient(700px 500px at -10% 100%, rgba(56,189,248,.14), transparent 60%),
+   linear-gradient(165deg,var(--bg) 0%, var(--bg2) 60%, #0C1733 100%);
+  padding:16px 14px 40px;
+}
+.wrap{max-width:720px;margin:0 auto}
+.hidden{display:none !important}
+
+/* header */
+header{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.brand{font-size:20px;font-weight:900;letter-spacing:-.3px}
+.brand span{color:var(--gold)}
+#qcount{margin-left:auto;font-size:15px;font-weight:800;color:var(--mute)}
+#barWrap{height:12px;background:rgba(255,255,255,.13);border-radius:999px;overflow:hidden;width:100%;margin-top:4px}
+#barFill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--lime));transition:.35s}
+
+/* generic card */
+.panel{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:22px 20px}
+h1{font-size:clamp(30px,8vw,44px);font-weight:900;line-height:1.05;letter-spacing:-1px}
+h2{font-size:clamp(22px,5.5vw,30px);font-weight:900;margin-bottom:8px}
+p.lead{font-size:17px;color:#D7E3F4;line-height:1.5;margin-top:10px}
+.jp{font-size:15px;color:var(--sky);font-weight:600}
+
+.btn{
+  display:block;width:100%;border:none;border-radius:16px;padding:16px 18px;margin-top:12px;
+  font-family:inherit;font-size:19px;font-weight:800;cursor:pointer;background:var(--gold);color:#10203D;transition:.16s
+}
+.btn:active{transform:scale(.985)}
+.btn.ghost{background:rgba(255,255,255,.10);color:#fff;border:2px solid var(--line)}
+.btn.green{background:var(--green);color:#fff}
+
+/* section pill */
+.pill{display:inline-flex;align-items:center;gap:8px;background:rgba(251,191,36,.16);
+  border:2px solid rgba(251,191,36,.5);color:var(--gold);font-weight:800;font-size:13px;
+  padding:6px 14px;border-radius:999px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
+
+/* question */
+.qtext{font-size:clamp(19px,4.8vw,24px);font-weight:800;line-height:1.4}
+.sentence{background:rgba(0,0,0,.22);border:2px dashed var(--line);border-radius:16px;
+  padding:14px;margin-top:14px;font-size:clamp(19px,4.8vw,25px);font-weight:700;line-height:2;text-align:center}
+.wbtn{display:inline-block;background:rgba(255,255,255,.12);border:2px solid transparent;border-radius:10px;
+  padding:4px 12px;margin:3px;font-weight:800;cursor:pointer;font-family:inherit;font-size:inherit;color:#fff}
+.wbtn.plain{background:transparent;cursor:default;border-color:transparent}
+.opt{
+  display:block;width:100%;text-align:left;background:rgba(255,255,255,.10);border:3px solid var(--line);
+  border-radius:16px;padding:15px 18px;margin-top:11px;font-family:inherit;font-size:19px;font-weight:800;
+  color:#fff;cursor:pointer;transition:.15s
+}
+.opt:active{transform:scale(.99)}
+.opt.right,.wbtn.right{background:var(--green);border-color:#fff;color:#fff}
+.opt.wrong,.wbtn.wrong{background:var(--red);border-color:#fff;color:#fff}
+.opt.dim{opacity:.45}
+.fb{margin-top:16px;font-size:17px;font-weight:700;line-height:1.45;border-radius:14px;padding:14px;display:none}
+.fb.show{display:block}
+.fb.ok{background:rgba(34,197,94,.18);border:2px solid var(--green);color:#D9FBE4}
+.fb.no{background:rgba(239,68,68,.18);border:2px solid #FCA5A5;color:#FFE0E0}
+
+/* results */
+.scorebig{font-size:64px;font-weight:900;text-align:center;line-height:1;color:var(--gold)}
+.medal{font-size:70px;text-align:center;line-height:1.1}
+.srow{display:flex;align-items:center;gap:10px;margin-top:12px}
+.slabel{font-size:15px;font-weight:800;min-width:132px}
+.sbar{flex:1;height:14px;background:rgba(255,255,255,.13);border-radius:999px;overflow:hidden}
+.sbar i{display:block;height:100%;border-radius:999px}
+.snum{font-size:15px;font-weight:800;color:var(--mute);min-width:38px;text-align:right}
+.review{background:rgba(239,68,68,.10);border:2px solid rgba(239,68,68,.4);border-radius:16px;padding:14px;margin-top:12px}
+.review .rq{font-size:16px;font-weight:800;margin-bottom:6px}
+.review .ra{font-size:15px;line-height:1.5}
+.review .ra b{color:var(--lime)}
+.review .ra s{color:#FCA5A5}
+.tips{background:rgba(56,189,248,.12);border:2px solid rgba(56,189,248,.45);border-radius:16px;padding:16px;margin-top:14px}
+.tips li{font-size:16px;line-height:1.6;margin-left:20px}
+.two{display:flex;gap:10px}
+.two .btn{flex:1}
+.note{font-size:13px;color:var(--mute);text-align:center;margin-top:16px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap" id="appRoot">
+
+  <header>
+    <div class="brand">🏆 Grammar <span>Cup</span></div>
+    <div id="qcount"></div>
+    <div id="barWrap"><div id="barFill"></div></div>
+  </header>
+
+  <!-- START -->
+  <section id="startScreen" class="panel">
+    <div class="medal">🏆⚽⚙️</div>
+    <h1 style="text-align:center;margin-top:8px">Nouns &amp; Verbs<br><span style="color:var(--gold)">Grammar Cup</span></h1>
+    <p class="lead" style="text-align:center">30 questions · 5 rounds<br>Noun Stadium 🏟️ + Verb Engine ⚙️</p>
+    <p class="jp" style="text-align:center;margin-top:8px">がんばって、レオ！ 💪</p>
+    <div class="tips" style="margin-top:18px">
+      <p style="font-size:16px;font-weight:800;margin-bottom:8px">📋 How it works</p>
+      <ul>
+        <li>One question at a time — tap your answer</li>
+        <li>You get <b>one try</b> each, so think first! 🤔</li>
+        <li>You will see the answer straight away</li>
+        <li>At the end you get your score and a training plan 📊</li>
+      </ul>
+    </div>
+    <button class="btn" onclick="startTest()">▶️ Start the test!</button>
+  </section>
+
+  <!-- QUESTION -->
+  <section id="quizScreen" class="panel hidden">
+    <div class="pill" id="pill">Round 1</div>
+    <div class="qtext" id="qtext"></div>
+    <div id="sentBox" class="sentence hidden"></div>
+    <div id="optBox"></div>
+    <div id="fb" class="fb"></div>
+    <button class="btn hidden" id="nextBtn" onclick="nextQ()">Next ▶️</button>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="resultScreen" class="hidden">
+    <div class="panel">
+      <div class="medal" id="medal">🏆</div>
+      <div class="scorebig" id="scoreBig">0 / 30</div>
+      <p class="lead" id="scoreMsg" style="text-align:center;font-weight:800"></p>
+      <div style="margin-top:20px">
+        <p style="font-size:16px;font-weight:900;margin-bottom:4px">📊 Round by round</p>
+        <div id="sectionBars"></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:14px">
+      <h2>🎯 Your training plan</h2>
+      <div id="tipsBox"></div>
+    </div>
+    <div class="panel hidden" id="reviewPanel" style="margin-top:14px">
+      <h2>🔍 Let us look at these again</h2>
+      <div id="reviewBox"></div>
+    </div>
+    <div class="two" style="margin-top:16px">
+      <button class="btn green" onclick="saveResult()" id="saveBtn">💾 Save my score</button>
+      <button class="btn ghost" onclick="armRetry(this)" id="retryBtn">↺ Try again</button>
+    </div>
+    <p class="note">Training Ground · Nouns &amp; Verbs · Our World L4</p>
+  </section>
+
+  <!-- REVIEW MODE -->
+  <section id="reviewScreen" class="panel hidden">
+    <h2>🔍 Review</h2>
+    <div id="reviewBody"></div>
+  </section>
+
+</div>
+
+<script>
+/* ============ constants ============ */
+var SAVE_PREFIX = 'tg-nouns-verbs-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-tg-nouns-verbs-test';
+var isReview = new URLSearchParams(location.search).get('review') === '1';
+
+/* ============ storage helpers (localStorage + optional cloud) ============ */
+function lSave(key, val){
+  try{ localStorage.setItem(SAVE_PREFIX + key, JSON.stringify(val)); }catch(e){}
+  try{
+    if(typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && LEEA_CLOUD.saveProgress){
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val);
+    }
+  }catch(e){}
+}
+function lLoad(key){
+  try{
+    var v = localStorage.getItem(SAVE_PREFIX + key);
+    return v ? JSON.parse(v) : null;
+  }catch(e){ return null; }
+}
+async function restoreProgressFromCloud(){
+  try{
+    if(typeof LEEA_CLOUD === 'undefined' || !LEEA_CLOUD || !LEEA_CLOUD.fetchProgress) return;
+    var rows = await LEEA_CLOUD.fetchProgress(HOMEWORK_ID);
+    if(!rows || !rows.length) return;
+    rows.forEach(function(r){
+      if(!r || !r.storage_key) return;
+      try{ localStorage.setItem(SAVE_PREFIX + r.storage_key, JSON.stringify(r.value)); }catch(e){}
+    });
+  }catch(e){}
+}
+
+/* ============ question bank ============ */
+var SECTIONS = [
+  { n:'Round 1 · Spot it 🔍',        color:'#38BDF8', tip:'Finding nouns and verbs inside a sentence', station:'Noun Stadium Stations 1–2 · Verb Engine Stations 1–2' },
+  { n:'Round 2 · Which team? 🏷️⚙️', color:'#A78BFA', tip:'Noun vs verb vs describing word, and capital letters', station:'Noun Stadium Station 3 · Verb Engine Station 2' },
+  { n:'Round 3 · One or many? 🔢',   color:'#FBBF24', tip:'Plurals, rebels, and countable vs uncountable', station:'Noun Stadium Stations 4–5' },
+  { n:'Round 4 · Engine room ⚙️',    color:'#FB923C', tip:'BE verbs, the -s rule, now vs every day, and the past', station:'Verb Engine Stations 3–6' },
+  { n:'Round 5 · Final whistle 🔔',  color:'#22C55E', tip:'Word order, possessive s, helpers, and noun teams', station:'Noun Stadium Stations 6–7 · Verb Engine Stations 7–8' }
+];
+
+var Q = [
+  /* ---- Round 1 : spot it ---- */
+  { s:0, t:'tap', q:'Tap the NOUN in this sentence. 🏷️',
+    words:['He','scored','a','goal','.'], a:3, f:'goal is a THING — a noun. ⚽ (He is a helper word, scored is the verb.)' },
+  { s:0, t:'tap', q:'Tap the VERB in this sentence. ⚙️',
+    words:['The','fans','shouted','very','loudly','.'], a:2, f:'shouted is the action — the engine of the sentence. 🗣️' },
+  { s:0, t:'mcq', q:'Which word is a NOUN? 🏷️',
+    o:['quickly','courage','brave'], a:1, f:'courage is an IDEA noun — you cannot touch it, but it has a name. 🦁' },
+  { s:0, t:'mcq', q:'Which word is a VERB? ⚙️',
+    o:['winner','win','windy'], a:1, f:'You can say "I can win" — so win is the verb. winner NAMES a person. 🏆' },
+  { s:0, t:'tap', q:'Tap the BE verb. 🪞',
+    words:['The','stadium','is','very','big','.'], a:2, f:'is does no action — it just links stadium and big. 🪞' },
+  { s:0, t:'tap', q:'Tap the noun that is an IDEA (you cannot touch it). 💭',
+    words:['His','speed','shocked','the','goalkeeper','.'], a:1, f:'speed is invisible but it has a name → an idea noun. 💨' },
+
+  /* ---- Round 2 : which team ---- */
+  { s:1, t:'mcq', q:'What kind of word is <b>trophy</b>? 🏆',
+    o:['🏷️ noun','⚙️ verb','🎨 describing word'], a:0, f:'You can say "a trophy" → noun. 🏆' },
+  { s:1, t:'mcq', q:'What kind of word is <b>celebrate</b>? 🎉',
+    o:['🏷️ noun','⚙️ verb','🎨 describing word'], a:1, f:'You can say "I can celebrate" → verb. 🎉' },
+  { s:1, t:'mcq', q:'What kind of word is <b>noisy</b>? 🔊',
+    o:['🏷️ noun','⚙️ verb','🎨 describing word'], a:2, f:'noisy tells us more about a noun — it describes. 🎨' },
+  { s:1, t:'mcq', q:'<b>Tokyo</b> is a… 🗼',
+    o:['common noun','proper noun','verb'], a:1, f:'There is only ONE Tokyo → proper noun, always a capital letter. 🔠' },
+  { s:1, t:'mcq', q:'Which word needs a CAPITAL letter? 🔠',
+    o:['park','monday','ticket'], a:1, f:'Days always take a capital in English: Monday. 📅' },
+  { s:1, t:'mcq', q:'Which sentence has the capital letters right? 🔠',
+    o:['kubo speaks japanese.','Kubo Speaks Japanese.','Kubo speaks Japanese.'], a:2, f:'Names and languages get capitals — but not every word! 🇯🇵' },
+
+  /* ---- Round 3 : one or many ---- */
+  { s:2, t:'mcq', q:'one match → two ___ ⚽',
+    o:['matchs','matches','matchies'], a:1, f:'Hissing sounds (ch) use the +es machine. ⚙️' },
+  { s:2, t:'mcq', q:'one trophy → two ___ 🏆',
+    o:['trophys','trophyes','trophies'], a:2, f:'consonant + y → ies. 🏆' },
+  { s:2, t:'mcq', q:'one person → many ___ 🧑',
+    o:['persons','people','peoples'], a:1, f:'person → people. A rebel! 😎' },
+  { s:2, t:'mcq', q:'one knife → two ___ 🔪',
+    o:['knifes','knives','knifies'], a:1, f:'f becomes v → knives. ⚙️' },
+  { s:2, t:'mcq', q:'Which sentence is correct? 📚',
+    o:['I have three homeworks.','I have many homework.','I have a lot of homework.'], a:2, f:'homework is uncountable — no -s. "a lot of" is always safe! 🍀' },
+  { s:2, t:'mcq', q:'How ___ money do you have? 💴',
+    o:['many','much','manys'], a:1, f:'money cannot be counted → much. 💧' },
+
+  /* ---- Round 4 : engine room ---- */
+  { s:3, t:'mcq', q:'She ___ soccer every Saturday. 🎽',
+    o:['play','plays','playing'], a:1, f:'he / she / it → one person, one s! 🎽' },
+  { s:3, t:'mcq', q:'Choose the correct sentence. 🍜',
+    o:['I hungry.','I am hungry.','I is hungry.'], a:1, f:'Never lose the BE verb — I am hungry. 🪞' },
+  { s:3, t:'mcq', q:'The players ___ ready for the game. ⚽',
+    o:['is','am','are'], a:2, f:'players = they → are. 👥' },
+  { s:3, t:'mcq', q:'Look! Haaland ___ right now! 🔴',
+    o:['score','scores','is scoring'], a:2, f:'"Look!" means happening now → be + ing. 〜ている' },
+  { s:3, t:'mcq', q:'Yesterday we ___ to the stadium. ⏪',
+    o:['go','goed','went'], a:2, f:'go is a rebel → went. 😎' },
+  { s:3, t:'mcq', q:'We ___ the match last night. ⏪',
+    o:['watch','watched','watching'], a:1, f:'"last night" is the past → watched. ⚙️' },
+
+  /* ---- Round 5 : final whistle ---- */
+  { s:4, t:'mcq', q:'Which sentence has the right word order? 🪑',
+    o:['Leo soccer plays.','Plays Leo soccer.','Leo plays soccer.'], a:2, f:'WHO → ENGINE → WHAT. The verb sits in the middle. ⚙️' },
+  { s:4, t:'mcq', q:'How do we say "the gloves of the goalkeeper"? 🧤',
+    o:['the goalkeeper gloves','the goalkeepers gloves','the goalkeeper\u2019s gloves'], a:2, f:'One owner → add \u2019s. Just like Japanese の! 🔑' },
+  { s:4, t:'mcq', q:'___ he play for Barcelona? ❓',
+    o:['Do','Does','Is'], a:1, f:'he → Does. And then play stays plain! 🎽' },
+  { s:4, t:'mcq', q:'The children ___ very happy. 🧒',
+    o:['is','are','was'], a:1, f:'children is plural → are. 👥' },
+  { s:4, t:'mcq', q:'A <b>soccer ball</b> is a kind of… 👑',
+    o:['soccer','ball','shoe'], a:1, f:'The SECOND word is the boss → it is a kind of ball. ⚽' },
+  { s:4, t:'tap', q:'Tap the VERB. Careful — this one is tricky! 🕵️',
+    words:['Leo','is','a','fast','runner','.'], a:1, f:'is is the verb! runner NAMES a person (noun) and fast describes. 🪞' }
+];
+
+/* ============ state ============ */
+var idx = 0, score = 0, locked = false;
+var secScore = [0,0,0,0,0], secTotal = [0,0,0,0,0];
+var wrongQuestions = [];
+
+Q.forEach(function(item){ secTotal[item.s]++; });
+
+/* ============ helpers ============ */
+function el(id){ return document.getElementById(id); }
+function optionLabel(item, i){
+  if(item.t === 'tap') return item.words[i];
+  return item.o[i];
+}
+function updateBadge(){
+  try{
+    var bf = el('barFill');
+    if(!bf) return;
+    bf.style.width = ((idx / Q.length) * 100) + '%';
+    var qc = el('qcount');
+    if(qc) qc.textContent = 'Q ' + Math.min(idx + 1, Q.length) + ' / ' + Q.length;
+  }catch(e){}
+}
+
+/* ============ flow ============ */
+function startTest(){
+  el('startScreen').classList.add('hidden');
+  el('quizScreen').classList.remove('hidden');
+  idx = 0; score = 0; wrongQuestions = [];
+  secScore = [0,0,0,0,0];
+  renderQ();
+}
+
+function renderQ(){
+  locked = false;
+  var item = Q[idx];
+  var sec = SECTIONS[item.s];
+  el('pill').textContent = sec.n;
+  el('pill').style.color = sec.color;
+  el('pill').style.borderColor = sec.color;
+  el('qtext').innerHTML = item.q;
+  el('fb').className = 'fb';
+  el('fb').innerHTML = '';
+  el('nextBtn').classList.add('hidden');
+  el('nextBtn').textContent = (idx === Q.length - 1) ? 'See my score 🏆' : 'Next ▶️';
+
+  var sb = el('sentBox'), ob = el('optBox');
+  sb.innerHTML = ''; ob.innerHTML = '';
+
+  if(item.t === 'tap'){
+    sb.classList.remove('hidden');
+    item.words.forEach(function(w, i){
+      var b = document.createElement('button');
+      b.className = (w === '.' || w === '!' || w === '?') ? 'wbtn plain' : 'wbtn';
+      b.textContent = w;
+      b.dataset.i = i;
+      if(b.className === 'wbtn') b.addEventListener('click', function(){ answer(i, b); });
+      sb.appendChild(b);
+    });
+  } else {
+    sb.classList.add('hidden');
+    item.o.forEach(function(txt, i){
+      var b = document.createElement('button');
+      b.className = 'opt';
+      b.innerHTML = txt;
+      b.dataset.i = i;
+      b.addEventListener('click', function(){ answer(i, b); });
+      ob.appendChild(b);
+    });
+  }
+  updateBadge();
+  try{ window.scrollTo(0,0); }catch(e){}
+}
+
+function answer(i, btn){
+  if(locked) return;
+  locked = true;
+  var item = Q[idx];
+  var correct = (i === item.a);
+  var pool = (item.t === 'tap') ? el('sentBox').querySelectorAll('.wbtn') : el('optBox').querySelectorAll('.opt');
+
+  pool.forEach(function(b){
+    var bi = parseInt(b.dataset.i, 10);
+    if(bi === item.a) b.classList.add('right');
+    else if(b === btn) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+
+  var fb = el('fb');
+  if(correct){
+    score++; secScore[item.s]++;
+    fb.className = 'fb show ok';
+    fb.innerHTML = '✅ <b>Correct!</b> ' + item.f;
+  } else {
+    fb.className = 'fb show no';
+    fb.innerHTML = '❌ <b>The answer is: ' + optionLabel(item, item.a) + '</b><br>' + item.f;
+    wrongQuestions.push({
+      question: 'Q' + (idx + 1),
+      prompt: item.q.replace(/<[^>]+>/g, ''),
+      chosen: optionLabel(item, i),
+      correct: optionLabel(item, item.a),
+      why: item.f,
+      round: SECTIONS[item.s].n
+    });
+  }
+  el('nextBtn').classList.remove('hidden');
+}
+
+function nextQ(){
+  idx++;
+  if(idx >= Q.length){ finish(); return; }
+  renderQ();
+}
+
+function finish(){
+  el('quizScreen').classList.add('hidden');
+  el('resultScreen').classList.remove('hidden');
+  el('barFill').style.width = '100%';
+  el('qcount').textContent = 'Finished! 🏁';
+
+  var pct = Math.round((score / Q.length) * 100);
+  el('scoreBig').textContent = score + ' / ' + Q.length + '  (' + pct + '%)';
+  var medal = pct >= 90 ? '🥇' : (pct >= 75 ? '🥈' : (pct >= 60 ? '🥉' : '💪'));
+  el('medal').textContent = medal;
+  var msg = pct >= 90 ? 'Outstanding, Leo! You are a Grammar Champion! 🏆'
+          : (pct >= 75 ? 'Great work! Just a little polishing to do. ⭐'
+          : (pct >= 60 ? 'Good job! Let us train two rounds again. 💪'
+          : 'Nice effort! Every champion trains. We will do this together. ⚽'));
+  el('scoreMsg').textContent = msg;
+
+  /* section bars */
+  var sb = el('sectionBars');
+  sb.innerHTML = '';
+  SECTIONS.forEach(function(sec, i){
+    var p = secTotal[i] ? Math.round((secScore[i] / secTotal[i]) * 100) : 0;
+    var row = document.createElement('div');
+    row.className = 'srow';
+    row.innerHTML = '<div class="slabel">' + sec.n.replace(/^Round \d+ · /, '') + '</div>' +
+      '<div class="sbar"><i style="width:' + p + '%;background:' + sec.color + '"></i></div>' +
+      '<div class="snum">' + secScore[i] + '/' + secTotal[i] + '</div>';
+    sb.appendChild(row);
+  });
+
+  /* training plan */
+  var tips = el('tipsBox');
+  tips.innerHTML = '';
+  var weak = SECTIONS.map(function(sec, i){ return { i:i, sec:sec, p: secTotal[i] ? secScore[i]/secTotal[i] : 1 }; })
+                     .filter(function(x){ return x.p < 0.75; })
+                     .sort(function(a, b){ return a.p - b.p; });
+  if(!weak.length){
+    tips.innerHTML = '<div class="tips"><p style="font-size:17px;font-weight:800">🎉 Every round is strong! Nothing to re-train.</p>' +
+      '<p style="font-size:16px;margin-top:8px">Next challenge: write 5 sentences about a match and underline every noun 🏷️ and every verb ⚙️.</p></div>';
+  } else {
+    weak.forEach(function(x){
+      var d = document.createElement('div');
+      d.className = 'tips';
+      d.innerHTML = '<p style="font-size:17px;font-weight:800;color:' + x.sec.color + '">🔁 ' + x.sec.n + ' — ' + secScore[x.i] + '/' + secTotal[x.i] + '</p>' +
+        '<p style="font-size:16px;margin-top:6px">Practise: ' + x.sec.tip + '.</p>' +
+        '<p style="font-size:14px;margin-top:6px;color:#9CC7E8">📍 Replay: ' + x.sec.station + '</p>';
+      tips.appendChild(d);
+    });
+  }
+
+  /* wrong answer review */
+  if(wrongQuestions.length){
+    el('reviewPanel').classList.remove('hidden');
+    var rb = el('reviewBox');
+    rb.innerHTML = '';
+    wrongQuestions.forEach(function(w){
+      var d = document.createElement('div');
+      d.className = 'review';
+      d.innerHTML = '<div class="rq">' + w.question + ' · ' + w.prompt + '</div>' +
+        '<div class="ra">You chose: <s>' + w.chosen + '</s> &nbsp;→&nbsp; Correct: <b>' + w.correct + '</b><br>' + w.why + '</div>';
+      rb.appendChild(d);
+    });
+  }
+  try{ window.scrollTo(0,0); }catch(e){}
+}
+
+/* ============ save ============ */
+function saveResult(){
+  var payload = {
+    score: score,
+    total: Q.length,
+    percent: Math.round((score / Q.length) * 100),
+    done: true,
+    timestamp: new Date().toISOString(),
+    sections: SECTIONS.map(function(sec, i){ return { round: sec.n, score: secScore[i], total: secTotal[i] }; })
+  };
+  lSave('score', payload);
+  lSave('wrongQuestions', wrongQuestions);
+  lSave('test-complete', { name:'Grammar Cup — Nouns & Verbs', timestamp: payload.timestamp, done:true });
+  lSave('test-done', true);
+  var b = el('saveBtn');
+  if(b){ b.textContent = '✅ Saved!'; b.style.pointerEvents = 'none'; }
+}
+
+/* ============ two-tap retry (no confirm dialogs) ============ */
+function armRetry(btn){
+  if(btn.dataset.armed === '1'){
+    btn.dataset.armed = '0';
+    btn.textContent = '↺ Try again';
+    el('resultScreen').classList.add('hidden');
+    el('reviewPanel').classList.add('hidden');
+    el('saveBtn').textContent = '💾 Save my score';
+    el('saveBtn').style.pointerEvents = 'auto';
+    el('quizScreen').classList.remove('hidden');
+    idx = 0; score = 0; wrongQuestions = [];
+    secScore = [0,0,0,0,0];
+    renderQ();
+  } else {
+    btn.dataset.armed = '1';
+    btn.textContent = '↺ Tap again to restart';
+    setTimeout(function(){
+      if(btn.dataset.armed === '1'){ btn.dataset.armed = '0'; btn.textContent = '↺ Try again'; }
+    }, 3500);
+  }
+}
+
+/* ============ review mode ============ */
+function initReviewMode(){
+  el('startScreen').classList.add('hidden');
+  el('quizScreen').classList.add('hidden');
+  el('resultScreen').classList.add('hidden');
+  el('reviewScreen').classList.remove('hidden');
+  var body = el('reviewBody');
+  var sc = lLoad('score');
+  var wrong = lLoad('wrongQuestions') || [];
+  if(!sc){
+    body.innerHTML = '<p class="lead">No saved result yet. Take the test first! ⚽</p>';
+    return;
+  }
+  var html = '<p class="lead"><b>Score: ' + sc.score + ' / ' + sc.total + ' (' + sc.percent + '%)</b><br>' +
+             'Taken: ' + new Date(sc.timestamp).toLocaleDateString() + '</p>';
+  if(!wrong.length){
+    html += '<div class="tips" style="margin-top:12px"><p style="font-size:17px;font-weight:800">🎉 No mistakes to review!</p></div>';
+  } else {
+    wrong.forEach(function(w){
+      html += '<div class="review"><div class="rq">' + w.question + ' · ' + w.prompt + '</div>' +
+              '<div class="ra">You chose: <s>' + w.chosen + '</s> → Correct: <b>' + w.correct + '</b><br>' + (w.why || '') + '</div></div>';
+    });
+  }
+  body.innerHTML = html;
+  el('qcount').textContent = 'Review 🔍';
+  el('barFill').style.width = '100%';
+}
+
+/* ============ init ============ */
+document.addEventListener('DOMContentLoaded', async function(){
+  await restoreProgressFromCloud();
+  if(isReview){ initReviewMode(); return; }
+  updateBadge();
+  el('qcount').textContent = '30 questions';
+});
+</script>
+</body>
+</html>

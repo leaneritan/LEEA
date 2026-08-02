@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Ground — Verb Engine ⚙️ (Teacher Deck)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"></noscript>
+<style>
+:root{
+  --navy:#0B1E3F; --navy2:#14315F; --navy3:#1D4380;
+  --gold:#FBBF24; --gold2:#F59E0B; --lime:#A3E635;
+  --white:#FFFFFF; --paper:#F8FAFC; --mute:#94A3B8;
+  --green:#22C55E; --red:#EF4444; --sky:#38BDF8; --pink:#F472B6; --violet:#A78BFA;
+  --r:22px; --sh:0 10px 30px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#050D1C;font-family:'Outfit',system-ui,sans-serif;overflow:hidden}
+deck-stage{position:fixed;inset:0;display:block;overflow:hidden}
+#stageInner{position:absolute;top:0;left:0;width:1920px;height:1080px;transform-origin:top left}
+
+.slide{
+  position:absolute;inset:0;width:1920px;height:1080px;display:none;
+  padding:54px 72px 92px;
+  background:
+    radial-gradient(1200px 700px at 82% -10%, rgba(251,191,36,.14), transparent 60%),
+    radial-gradient(900px 600px at -5% 105%, rgba(56,189,248,.12), transparent 60%),
+    linear-gradient(160deg,var(--navy) 0%, var(--navy2) 55%, #0A2547 100%);
+  color:var(--white);
+}
+.slide.active{display:block}
+.slide::before{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.10;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 158px,rgba(255,255,255,.55) 158px 160px);
+}
+.slide::after{
+  content:'';position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;
+  border:3px solid rgba(255,255,255,.10);border-radius:50%;pointer-events:none;
+}
+.inner{position:relative;z-index:2;height:100%;display:flex;flex-direction:column}
+
+.kicker{display:inline-flex;align-items:center;gap:12px;background:rgba(251,191,36,.16);
+  border:2px solid rgba(251,191,36,.5);color:var(--gold);font-weight:800;font-size:26px;
+  padding:8px 22px;border-radius:999px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;align-self:flex-start}
+h1{font-size:86px;font-weight:900;line-height:1.02;letter-spacing:-1.5px}
+h2{font-size:62px;font-weight:900;line-height:1.05;letter-spacing:-1px}
+.sub{font-size:32px;font-weight:400;color:#D7E3F4;margin-top:14px;line-height:1.35}
+.jp{font-size:27px;color:var(--sky);font-weight:600}
+.hl{color:var(--gold)}
+.hl2{color:var(--lime)}
+
+/* ---------- title slide ---------- */
+.title-wrap{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px}
+.big-emoji{font-size:150px;line-height:1;filter:drop-shadow(0 12px 26px rgba(0,0,0,.5))}
+.title-chips{display:flex;gap:18px;margin-top:34px;flex-wrap:wrap;justify-content:center}
+.tchip{background:rgba(255,255,255,.10);border:2px solid rgba(255,255,255,.25);border-radius:999px;
+  padding:14px 30px;font-size:30px;font-weight:700;cursor:pointer;transition:.22s}
+.tchip:hover{background:var(--gold);color:var(--navy);border-color:var(--gold);transform:translateY(-4px)}
+.tchip.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+
+/* ---------- reveal cards ---------- */
+.grid{display:grid;gap:22px;margin-top:26px}
+.g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)} .g5{grid-template-columns:repeat(5,1fr)}
+.g6{grid-template-columns:repeat(6,1fr)}
+.rc{background:rgba(255,255,255,.09);border:3px solid rgba(255,255,255,.20);border-radius:var(--r);
+  padding:22px 16px;text-align:center;cursor:pointer;transition:.22s;position:relative;overflow:hidden}
+.rc:hover{transform:translateY(-6px);border-color:var(--gold);background:rgba(251,191,36,.14)}
+.rc .em{font-size:64px;line-height:1.1;display:block}
+.rc .wd{font-size:33px;font-weight:800;margin-top:6px}
+.rc .bk{max-height:0;opacity:0;transition:.3s;font-size:24px;color:var(--gold);font-weight:600;line-height:1.3}
+.rc.open{background:rgba(251,191,36,.20);border-color:var(--gold)}
+.rc.open .bk{max-height:180px;opacity:1;margin-top:10px}
+.rc .tap{font-size:19px;color:var(--mute);margin-top:8px}
+.rc.open .tap{display:none}
+
+/* ---------- door panels ---------- */
+.doors{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;margin-top:34px}
+.door{border-radius:26px;padding:30px 20px;text-align:center;cursor:pointer;transition:.25s;
+  border:4px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);min-height:330px}
+.door:hover{transform:translateY(-8px) scale(1.02)}
+.door .dem{font-size:88px;display:block}
+.door .dt{font-size:44px;font-weight:900;margin-top:8px}
+.door .dx{max-height:0;opacity:0;overflow:hidden;transition:.3s;font-size:26px;line-height:1.4;margin-top:10px}
+.door.open .dx{max-height:260px;opacity:1}
+.door.d1.open{background:rgba(56,189,248,.25);border-color:var(--sky)}
+.door.d2.open{background:rgba(34,197,94,.25);border-color:var(--green)}
+.door.d3.open{background:rgba(251,191,36,.25);border-color:var(--gold)}
+.door.d4.open{background:rgba(167,139,250,.28);border-color:var(--violet)}
+
+/* ---------- sorting game ---------- */
+.game{margin-top:22px}
+.bank{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;
+  background:rgba(0,0,0,.22);border:2px dashed rgba(255,255,255,.25);border-radius:20px;padding:18px}
+.chip{background:var(--white);color:var(--navy);font-size:30px;font-weight:800;border-radius:14px;
+  padding:12px 24px;cursor:pointer;transition:.18s;border:4px solid transparent;box-shadow:var(--sh)}
+.chip:hover{transform:translateY(-4px)}
+.chip.sel{border-color:var(--gold);background:var(--gold);transform:translateY(-6px) scale(1.05)}
+.chip.placed{opacity:.45;pointer-events:none;background:var(--green);color:#fff}
+.bins{display:grid;gap:20px;margin-top:22px}
+.bin{background:rgba(255,255,255,.08);border:4px dashed rgba(255,255,255,.3);border-radius:22px;
+  padding:16px;min-height:210px;cursor:pointer;transition:.2s;text-align:center}
+.bin:hover{border-color:var(--gold);background:rgba(251,191,36,.12)}
+.bin h4{font-size:34px;font-weight:900;margin-bottom:10px}
+.bin .drops{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.bin .drops span{background:var(--green);color:#fff;font-size:25px;font-weight:700;padding:7px 16px;border-radius:11px}
+.bin.bad{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-14px)}75%{transform:translateX(14px)}}
+.fb{margin-top:16px;font-size:30px;font-weight:700;min-height:44px;text-align:center;color:var(--gold)}
+.fb.good{color:var(--lime)} .fb.bad{color:#FCA5A5}
+
+/* ---------- sentence detective ---------- */
+.sent{background:rgba(255,255,255,.08);border:3px solid rgba(255,255,255,.18);border-radius:18px;
+  padding:16px 22px;font-size:38px;font-weight:600;margin-bottom:16px;line-height:1.6;transition:.25s}
+.sent.cleared{border-color:var(--lime);background:rgba(163,230,53,.16)}
+.w{cursor:pointer;padding:2px 8px;border-radius:9px;transition:.15s;display:inline-block}
+.w:hover{background:rgba(255,255,255,.18)}
+.w.hit{background:var(--gold);color:var(--navy);font-weight:900}
+.w.miss{background:var(--red);color:#fff}
+.tick{opacity:0;font-size:34px;transition:.3s}
+.sent.cleared .tick{opacity:1}
+
+/* ---------- MCQ ---------- */
+.q{background:rgba(255,255,255,.08);border:3px solid rgba(255,255,255,.18);border-radius:20px;padding:20px 24px;margin-bottom:18px}
+.q .qt{font-size:34px;font-weight:800;margin-bottom:14px}
+.opts{display:flex;gap:14px;flex-wrap:wrap}
+.opt{background:var(--white);color:var(--navy);font-size:29px;font-weight:800;border-radius:13px;
+  padding:11px 26px;cursor:pointer;border:4px solid transparent;transition:.18s}
+.opt:hover{transform:translateY(-4px)}
+.opt.right{background:var(--green);color:#fff;border-color:#fff}
+.opt.wrong{background:var(--red);color:#fff}
+.qfb{margin-top:12px;font-size:26px;color:var(--gold);font-weight:700;min-height:34px}
+
+/* ---------- boxes ---------- */
+.box{background:rgba(255,255,255,.09);border:3px solid rgba(255,255,255,.2);border-radius:20px;padding:22px 26px}
+.box.gold{background:rgba(251,191,36,.16);border-color:var(--gold)}
+.box.sky{background:rgba(56,189,248,.14);border-color:var(--sky)}
+.box.green{background:rgba(34,197,94,.16);border-color:var(--green)}
+.box.red{background:rgba(239,68,68,.16);border-color:#FCA5A5}
+.box h3{font-size:38px;font-weight:900;margin-bottom:10px}
+.box p,.box li{font-size:28px;line-height:1.45}
+.box ul{margin-left:26px}
+.rowx{display:flex;gap:22px;margin-top:24px}
+.rowx>*{flex:1}
+.tag{display:inline-block;font-size:22px;font-weight:800;padding:4px 14px;border-radius:999px;margin-right:8px}
+.tag.lp{background:var(--sky);color:#062A3D}
+.tag.ex{background:var(--pink);color:#3B0A22}
+
+/* machines */
+.machine{background:rgba(255,255,255,.09);border:4px solid var(--gold);border-radius:24px;padding:20px;text-align:center;cursor:pointer;transition:.22s}
+.machine:hover{transform:translateY(-6px);background:rgba(251,191,36,.18)}
+.machine .mtitle{font-size:40px;font-weight:900;color:var(--gold)}
+.machine .mrule{font-size:25px;color:#D7E3F4;margin:6px 0 10px}
+.machine .mex{font-size:30px;font-weight:700;line-height:1.5}
+.machine .mex b{color:var(--lime)}
+.machine .hidden-ex{max-height:0;opacity:0;overflow:hidden;transition:.3s}
+.machine.open .hidden-ex{max-height:260px;opacity:1}
+
+/* ---------- teacher notes ---------- */
+.tn-btn{position:absolute;right:34px;bottom:26px;z-index:40;background:var(--gold);color:var(--navy);
+  border:none;border-radius:999px;padding:12px 26px;font-family:inherit;font-size:24px;font-weight:800;cursor:pointer;box-shadow:var(--sh)}
+.tn-btn:hover{background:var(--white)}
+.tn-panel{position:absolute;right:34px;bottom:86px;width:760px;max-height:640px;overflow:auto;z-index:39;
+  background:#0A1A33;border:4px solid var(--gold);border-radius:20px;padding:24px 28px;display:none;box-shadow:var(--sh)}
+.tn-panel.show{display:block}
+.tn-panel h5{font-size:28px;color:var(--gold);margin-bottom:10px;font-weight:900}
+.tn-panel p{font-size:23px;line-height:1.5;margin-bottom:10px;color:#DCE7F7}
+.tn-panel b{color:var(--lime)}
+
+/* ---------- nav ---------- */
+#nav{position:fixed;left:0;right:0;bottom:0;height:64px;background:rgba(5,13,28,.92);
+  border-top:2px solid rgba(251,191,36,.35);display:flex;align-items:center;gap:16px;padding:0 22px;z-index:100}
+#nav button{background:var(--gold);color:var(--navy);border:none;border-radius:12px;padding:9px 20px;
+  font-family:inherit;font-size:19px;font-weight:800;cursor:pointer}
+#nav button:hover{background:var(--white)}
+#counter{color:var(--white);font-size:19px;font-weight:700;min-width:150px}
+#stitle{color:var(--mute);font-size:18px;font-weight:600;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#progWrap{width:280px;height:12px;background:rgba(255,255,255,.15);border-radius:999px;overflow:hidden}
+#progFill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--lime));transition:.3s}
+</style>
+</head>
+<body>
+<deck-stage>
+  <div id="stageInner">
+<!-- ============ 1 TITLE ============ -->
+<section class="slide active" data-t="Title — Verb Engine">
+ <div class="inner">
+  <div class="title-wrap">
+    <div class="big-emoji">⚙️⚽</div>
+    <div class="kicker" style="align-self:center">Training Ground · Grammar Booster</div>
+    <h1>VERB <span class="hl">ENGINE</span></h1>
+    <p class="sub">Nouns are the players 🏷️ — but nothing moves without an <b class="hl2">engine</b>.<br>Verbs are the engine. Let's start it up! 🔑</p>
+    <p class="jp">動詞（どうし） = 「する」ことば・「ある / いる」ことば</p>
+    <div class="title-chips">
+      <div class="tchip" onclick="tog(this)">🏃 Action</div>
+      <div class="tchip" onclick="tog(this)">🪞 BE</div>
+      <div class="tchip" onclick="tog(this)">⏱️ Time</div>
+      <div class="tchip" onclick="tog(this)">❓ Helpers</div>
+    </div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Before you start</h5>
+ <p>This deck is the <b>partner to Noun Stadium</b>. Run it after nouns, not before — every station here assumes Leo can already find the noun.</p>
+ <p><b>The one big idea:</b> a sentence needs a WHO and an ENGINE. If he can find those two, he can fix most of his own mistakes.</p>
+ <p>Tap the four chips to preview the stations. 8 stations, 10 games. Expect two sessions, not one — stop at Station 5 if attention drops.</p></div>
+</section>
+
+<!-- ============ 2 WARM UP ============ -->
+<section class="slide" data-t="Warm Up — What is happening?">
+ <div class="inner">
+  <div class="kicker">🔥 Warm Up · No rules yet</div>
+  <h2>What is <span class="hl">happening</span> in each picture?</h2>
+  <p class="sub">Say it out loud in English. One word is enough! <span class="jp">何をしている？</span></p>
+  <div class="grid g4" style="margin-top:30px">
+    <div class="rc" onclick="flip(this)"><span class="em">🏃</span><div class="wd">?</div><div class="bk">He <b>runs</b>. / He is <b>running</b>.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">⚽</span><div class="wd">?</div><div class="bk">She <b>kicks</b> the ball.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🧤</span><div class="wd">?</div><div class="bk">He <b>saves</b> the shot!</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎉</span><div class="wd">?</div><div class="bk">They <b>celebrate</b>! 🏆</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box gold" style="margin-top:34px">
+   <h3>💡 Every word you just said is a VERB</h3>
+   <p style="font-size:31px">run · kick · save · celebrate — these are the words that make things <b>happen</b>. Without them, a sentence just sits there. 🪑</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Warm Up — production before rules</h5>
+ <p>Do <b>not</b> say the word "verb" yet. Let Leo produce four verbs first, then name what he already did. Naming after doing sticks far better than naming before.</p>
+ <p>Accept "run" or "running" — both are right at this stage. Station 5 sorts out which to use when; correcting it now just teaches him to stay quiet.</p></div>
+</section>
+
+<!-- ============ 3 STATION 1 — THE ENGINE ============ -->
+<section class="slide" data-t="Station 1 — A verb is the ENGINE">
+ <div class="inner">
+  <div class="kicker">Station 1 · The Big Idea ⚙️</div>
+  <h2>A sentence needs a <span class="hl">WHO</span> and an <span class="hl2">ENGINE</span></h2>
+  <p class="sub">The noun is the player. The verb is what the player <b>does</b>.</p>
+  <div class="rowx" style="margin-top:34px">
+   <div class="box sky" style="text-align:center">
+     <h3>🏷️ WHO</h3>
+     <p style="font-size:56px;font-weight:900;color:var(--sky)">Leo</p>
+     <p style="font-size:26px">the noun · the player</p>
+   </div>
+   <div class="box gold" style="text-align:center">
+     <h3>⚙️ ENGINE</h3>
+     <p style="font-size:56px;font-weight:900;color:var(--gold)">kicks</p>
+     <p style="font-size:26px">the verb · what he does</p>
+   </div>
+   <div class="box green" style="text-align:center">
+     <h3>🎯 WHAT</h3>
+     <p style="font-size:56px;font-weight:900;color:var(--green)">the ball</p>
+     <p style="font-size:26px">another noun</p>
+   </div>
+  </div>
+  <div class="box red" style="margin-top:30px">
+   <h3>🚫 Take the engine away…</h3>
+   <p style="font-size:34px">Leo ______ the ball. → Nothing happens. The sentence is <b>broken</b>. ⚠️<br>
+   <span style="font-size:28px;color:#FCA5A5">Every English sentence needs a verb. Every single one.</span></p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Station 1 — the frame for the whole deck</h5>
+ <p>Come back to <b>WHO → ENGINE → WHAT</b> at every later station. It is the single organiser that makes Stations 4, 7 and 8 make sense.</p>
+ <p>Have Leo build three of his own on this frame before moving on — one about soccer, one about Batman, one about you. Production, not recognition.</p></div>
+</section>
+
+<!-- ============ 4 ACTION VERBS ============ -->
+<section class="slide" data-t="Station 1 — Action verbs you can see">
+ <div class="inner">
+  <div class="kicker">Station 1 · Action verbs 🏃</div>
+  <h2>Verbs you can <span class="hl">see</span> 👀</h2>
+  <p class="sub">If you can act it out, it is an action verb. Tap each one and DO it! 💪</p>
+  <div class="grid g4" style="margin-top:26px">
+    <div class="rc" onclick="flip(this)"><span class="em">⚽</span><div class="wd">kick</div><div class="bk">He <b>kicks</b> the ball hard.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏃</span><div class="wd">run</div><div class="bk">They <b>run</b> down the pitch.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🦘</span><div class="wd">jump</div><div class="bk">She <b>jumps</b> for the header.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🗣️</span><div class="wd">shout</div><div class="bk">The fans <b>shout</b> his name.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🥅</span><div class="wd">score</div><div class="bk">Kubo <b>scores</b>! 🎉</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🧤</span><div class="wd">save</div><div class="bk">The keeper <b>saves</b> it.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🍿</span><div class="wd">eat</div><div class="bk">We <b>eat</b> popcorn at the movies.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">📺</span><div class="wd">watch</div><div class="bk">I <b>watch</b> the match.</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box sky" style="margin-top:26px">
+   <p style="font-size:30px">🎬 <b>Try it:</b> Dad says the verb, Leo acts it out. Then swap. If you can act it, you understand it.</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Make it physical</h5>
+ <p>Do the act-it-out game for real — stand up. Verbs are the one word class you can put in the body, and Leo will remember the ones he performed far longer than the ones he read.</p>
+ <p>Note the cards quietly model the -s rule (he kicks, Kubo scores) without naming it. Station 4 will name it; the ear should meet it first.</p></div>
+</section>
+
+<!-- ============ 5 QUIET VERBS ============ -->
+<section class="slide" data-t="Station 1 — Quiet verbs (no action to see)">
+ <div class="inner">
+  <div class="kicker">Station 1 · The quiet engines 🤫</div>
+  <h2>Some verbs you <span class="hl">cannot see</span> 💭</h2>
+  <p class="sub">You cannot act these out — but they are still the engine of the sentence.</p>
+  <div class="grid g5" style="margin-top:26px">
+    <div class="rc" onclick="flip(this)"><span class="em">❤️</span><div class="wd">like</div><div class="bk">I <b>like</b> soccer.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🙏</span><div class="wd">want</div><div class="bk">He <b>wants</b> a new ball.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🧠</span><div class="wd">know</div><div class="bk">I <b>know</b> the answer.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">💭</span><div class="wd">think</div><div class="bk">She <b>thinks</b> we will win.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎒</span><div class="wd">have</div><div class="bk">We <b>have</b> two tickets.</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box gold" style="margin-top:30px">
+   <h3>🔍 The verb test — it works on ALL of them</h3>
+   <p style="font-size:32px;line-height:1.5">Put <b>I can ___</b> or <b>Yesterday I ___ed</b> in front of it.<br>
+   I can <b>kick</b> ✔ · I can <b>like</b> ✔ · I can <b class="hl">ball</b> ✘ ← that one is a noun! 🏷️</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Why quiet verbs matter</h5>
+ <p>Leo's instinct will be "verb = action". That definition breaks on <i>like, know, have</i> — and on <b>be</b>, which is Station 3. Widen the definition <b>now</b>, cheaply, before BE arrives.</p>
+ <p>The "I can ___" test is the tool he keeps. Drill it here so it is automatic by Station 2.</p></div>
+</section>
+
+<!-- ============ 6 GAME — TAP THE VERB ============ -->
+<section class="slide" data-t="GAME — Tap the verb">
+ <div class="inner">
+  <div class="kicker">🎮 Game 1 · Engine Hunt ⚙️</div>
+  <h2>Tap the <span class="hl">verb</span> in each sentence</h2>
+  <p class="sub">One engine per sentence. Wrong taps flash red — think first! 🤔</p>
+  <div style="margin-top:22px">
+    <div class="sent" data-need="1">
+      <span class="w">The</span> <span class="w">fans</span> <span class="w" data-n="1">shouted</span> <span class="w">very</span> <span class="w">loudly</span><span class="tick">✅</span>
+    </div>
+    <div class="sent" data-need="1">
+      <span class="w">Kubo</span> <span class="w" data-n="1">scored</span> <span class="w">a</span> <span class="w">great</span> <span class="w">goal</span><span class="tick">✅</span>
+    </div>
+    <div class="sent" data-need="1">
+      <span class="w">My</span> <span class="w">brother</span> <span class="w" data-n="1">likes</span> <span class="w">action</span> <span class="w">movies</span><span class="tick">✅</span>
+    </div>
+    <div class="sent" data-need="1">
+      <span class="w">The</span> <span class="w">goalkeeper</span> <span class="w" data-n="1">saved</span> <span class="w">the</span> <span class="w">penalty</span><span class="tick">✅</span>
+    </div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 1 — listen for the reasoning</h5>
+ <p>The trap words are <b>loudly</b> (describing) and <b>goal / movies</b> (nouns). If he taps a noun, ask "can you say <i>I can goal</i>?" — let the test do the correcting, not you.</p>
+ <p><b>likes</b> is the important one: no visible action, still the engine. Praise that tap loudly.</p></div>
+</section>
+
+<!-- ============ 7 STATION 2 — WHICH TEAM ============ -->
+<section class="slide" data-t="Station 2 — Which team is the word on?">
+ <div class="inner">
+  <div class="kicker">Station 2 · Three teams 🏷️⚙️🎨</div>
+  <h2>Every word plays for <span class="hl">one team</span></h2>
+  <div class="rowx" style="margin-top:34px">
+   <div class="box sky" style="text-align:center">
+     <h3>🏷️ NOUN</h3>
+     <p style="font-size:30px;line-height:1.5">It <b>names</b> something.<br><span class="hl2">a ___ · the ___</span><br>ball · winner · stadium</p>
+   </div>
+   <div class="box gold" style="text-align:center">
+     <h3>⚙️ VERB</h3>
+     <p style="font-size:30px;line-height:1.5">It <b>does</b> something.<br><span class="hl2">I can ___</span><br>win · run · like</p>
+   </div>
+   <div class="box green" style="text-align:center">
+     <h3>🎨 DESCRIBING</h3>
+     <p style="font-size:30px;line-height:1.5">It <b>tells us more</b>.<br><span class="hl2">very ___</span><br>windy · fast · noisy</p>
+   </div>
+  </div>
+  <div class="box gold" style="margin-top:30px">
+   <h3>👀 Watch out — word families look alike!</h3>
+   <p style="font-size:33px;line-height:1.6">
+   <b class="hl">win</b> ⚙️ (I can win) · <b class="hl">winner</b> 🏷️ (a winner) · <b class="hl">windy</b> 🎨 (very windy)<br>
+   <b class="hl">run</b> ⚙️ · <b class="hl">runner</b> 🏷️ · <b class="hl">fast</b> 🎨</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Station 2 — the three-test toolkit</h5>
+ <p>Each team gets <b>one</b> test frame: <i>a/the ___</i>, <i>I can ___</i>, <i>very ___</i>. Three frames, no grammar vocabulary needed. Leo can self-check every word he meets for the rest of the year.</p>
+ <p>The win/winner/windy family is the whole point of the station. English builds families from one root; Japanese does not do this the same way, so it genuinely surprises him.</p></div>
+</section>
+
+<!-- ============ 8 GAME — NOUN VS VERB VS DESCRIBING ============ -->
+<section class="slide" data-t="GAME — Noun vs Verb vs Describing word">
+ <div class="inner">
+  <div class="kicker">🎮 Game 2 · Team Sort 🏷️⚙️🎨</div>
+  <h2>Send each word to its <span class="hl">team</span>!</h2>
+  <p class="sub">Tap a word 👆 then tap its team box. Use the three tests!</p>
+  <div class="game">
+    <div class="bank">
+      <div class="chip" data-cat="n" onclick="pickChip(this)">trophy</div>
+      <div class="chip" data-cat="v" onclick="pickChip(this)">celebrate</div>
+      <div class="chip" data-cat="d" onclick="pickChip(this)">noisy</div>
+      <div class="chip" data-cat="v" onclick="pickChip(this)">win</div>
+      <div class="chip" data-cat="n" onclick="pickChip(this)">winner</div>
+      <div class="chip" data-cat="d" onclick="pickChip(this)">windy</div>
+      <div class="chip" data-cat="v" onclick="pickChip(this)">jump</div>
+      <div class="chip" data-cat="n" onclick="pickChip(this)">stadium</div>
+      <div class="chip" data-cat="d" onclick="pickChip(this)">fast</div>
+    </div>
+    <div class="bins g3">
+      <div class="bin" data-cat="n" onclick="dropBin(this)"><h4>🏷️ NOUN</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="v" onclick="dropBin(this)"><h4>⚙️ VERB</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="d" onclick="dropBin(this)"><h4>🎨 DESCRIBING</h4><div class="drops"></div></div>
+    </div>
+    <div class="fb"></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 2 — the family trio is the assessment</h5>
+ <p><b>win · winner · windy</b> are the three chips that matter. Getting the other six right proves nothing; getting these three right proves he is using the tests instead of guessing by meaning.</p>
+ <p>Make him say the test frame aloud for each of those three before placing.</p></div>
+</section>
+
+<!-- ============ 9 GAME — VERB DETECTIVE (HARDER) ============ -->
+<section class="slide" data-t="GAME — Verb detective (tricky ones)">
+ <div class="inner">
+  <div class="kicker">🎮 Game 3 · Tricky Engines 🕵️</div>
+  <h2>Careful — these ones <span class="hl">hide</span> 🙈</h2>
+  <p class="sub">Tap the verb. Some sentences have no action at all!</p>
+  <div style="margin-top:20px">
+    <div class="sent" data-need="1">
+      <span class="w">Leo</span> <span class="w" data-n="1">is</span> <span class="w">a</span> <span class="w">fast</span> <span class="w">runner</span><span class="tick">✅</span>
+    </div>
+    <div class="sent" data-need="1">
+      <span class="w">The</span> <span class="w">stadium</span> <span class="w" data-n="1">is</span> <span class="w">very</span> <span class="w">big</span><span class="tick">✅</span>
+    </div>
+    <div class="sent" data-need="1">
+      <span class="w">His</span> <span class="w">speed</span> <span class="w" data-n="1">shocked</span> <span class="w">the</span> <span class="w">goalkeeper</span><span class="tick">✅</span>
+    </div>
+    <div class="sent" data-need="2">
+      <span class="w">We</span> <span class="w" data-n="1">watched</span> <span class="w">the</span> <span class="w">game</span> <span class="w">and</span> <span class="w" data-n="1">ate</span> <span class="w">popcorn</span><span class="tick">✅</span>
+    </div>
+  </div>
+  <div class="box red" style="margin-top:24px">
+   <p style="font-size:31px">🪞 <b>runner</b> names a person 🏷️ · <b>fast</b> describes 🎨 · the engine is the little word <b class="hl">is</b>. That is Station 3! →</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 3 — the bridge into BE</h5>
+ <p>The first two sentences are designed to be <b>failed</b>. Leo will hunt for an action, find none, and tap <i>runner</i> or <i>fast</i>. That confusion is exactly what makes Station 3 land.</p>
+ <p>Do not rescue him quickly. Let him sit in it, then say: "there IS an engine — it is just a very quiet one."</p>
+ <p>The last sentence needs <b>two</b> taps — one sentence can have more than one engine.</p></div>
+</section>
+
+<!-- ============ 10 STATION 3 — BE VERBS ============ -->
+<section class="slide" data-t="Station 3 — The BE verbs (am / is / are)">
+ <div class="inner">
+  <div class="kicker">Station 3 · The Mirror Verb 🪞</div>
+  <h2>am · is · are — the verb that <span class="hl">does nothing</span></h2>
+  <p class="sub">BE does not act. It is a <b class="hl2">mirror</b>: it links WHO to WHAT or HOW. <span class="jp">〜です・〜います</span></p>
+  <div class="rowx" style="margin-top:30px">
+   <div class="box sky" style="text-align:center"><p style="font-size:34px;line-height:1.5">Leo <b class="hl">is</b> a runner.<br><span style="font-size:26px;color:var(--mute)">WHO = WHAT 🪞</span></p></div>
+   <div class="box sky" style="text-align:center"><p style="font-size:34px;line-height:1.5">The stadium <b class="hl">is</b> big.<br><span style="font-size:26px;color:var(--mute)">WHO = HOW 🪞</span></p></div>
+   <div class="box sky" style="text-align:center"><p style="font-size:34px;line-height:1.5">The fans <b class="hl">are</b> here.<br><span style="font-size:26px;color:var(--mute)">WHO = WHERE 🪞</span></p></div>
+  </div>
+  <div class="box red" style="margin-top:32px">
+   <h3>🚨 The #1 mistake — never drop BE</h3>
+   <p style="font-size:36px;line-height:1.6">
+   <s style="color:#FCA5A5">I hungry.</s> ❌ &nbsp;&nbsp;→&nbsp;&nbsp; I <b class="hl2">am</b> hungry. ✔<br>
+   <s style="color:#FCA5A5">He fast.</s> ❌ &nbsp;&nbsp;→&nbsp;&nbsp; He <b class="hl2">is</b> fast. ✔</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Station 3 — the highest-value station in the deck</h5>
+ <p><b>This is the Japanese-speaker error.</b> 「おなかがすいた」carries no separate "am", and adjectives in Japanese already behave like verbs (たかい = "is tall"). So "I hungry" is not carelessness — his L1 genuinely does not need the word.</p>
+ <p>Expect this error for years. Correct it warmly every single time, and always by <b>recasting</b> ("I am hungry too!") rather than stopping him.</p>
+ <p>The mirror image is the metaphor to keep: an action verb DOES, a mirror verb EQUALS.</p></div>
+</section>
+
+<!-- ============ 11 BE CHART ============ -->
+<section class="slide" data-t="Station 3 — The BE chart">
+ <div class="inner">
+  <div class="kicker">Station 3 · Learn the chart 📋</div>
+  <h2>Which BE goes with <span class="hl">who</span>?</h2>
+  <p class="sub">Only three words to learn. Tap each row and say it out loud. 🗣️</p>
+  <div class="grid g5" style="margin-top:26px">
+    <div class="rc" onclick="flip(this)"><span class="em">🙋</span><div class="wd">I</div><div class="bk"><b>am</b><br>I am Leo.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👉</span><div class="wd">You</div><div class="bk"><b>are</b><br>You are fast.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👦</span><div class="wd">He / She / It</div><div class="bk"><b>is</b><br>He is a keeper.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👨‍👦</span><div class="wd">We</div><div class="bk"><b>are</b><br>We are ready.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👥</span><div class="wd">They</div><div class="bk"><b>are</b><br>They are here.</div><div class="tap">tap</div></div>
+  </div>
+  <div class="rowx" style="margin-top:30px">
+   <div class="box gold">
+    <h3>🔢 Many players → <b>are</b></h3>
+    <p style="font-size:30px;line-height:1.5">The players <b>are</b> ready. ⚽<br>The children <b>are</b> happy. 🧒<br><span style="font-size:25px;color:var(--mute)">children is plural — even with no -s!</span></p>
+   </div>
+   <div class="box green">
+    <h3>⏪ In the past: was / were</h3>
+    <p style="font-size:30px;line-height:1.5">I / He / She / It → <b>was</b><br>You / We / They → <b>were</b><br><span style="font-size:25px;color:var(--mute)">The game was great. The fans were loud.</span></p>
+   </div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Chart drill, not chart reading</h5>
+ <p>Do not let him read the chart silently. Say the WHO, he fires back the BE — fast, ten rounds, no thinking time. This needs to become reflex, not knowledge.</p>
+ <p><b>children → are</b> is the trap worth pausing on: it links straight back to the Noun Stadium rebels. No -s, still plural.</p>
+ <p>Past forms are included for recognition only. Do not drill was/were today — Station 6 handles the past properly.</p></div>
+</section>
+
+<!-- ============ 12 GAME — CHOOSE THE BE VERB ============ -->
+<section class="slide" data-t="GAME — Choose the BE verb">
+ <div class="inner">
+  <div class="kicker">🎮 Game 4 · Mirror Check 🪞</div>
+  <h2>Which BE verb <span class="hl">fits</span>?</h2>
+  <div style="margin-top:24px;max-height:700px;overflow:auto;padding-right:10px">
+   <div class="q"><div class="qt">1️⃣ I ___ hungry. 🍜</div>
+    <div class="opts"><div class="opt" data-ok="1" onclick="opt(this)">am</div><div class="opt" onclick="opt(this)">is</div><div class="opt" onclick="opt(this)">are</div><div class="opt" onclick="opt(this)">(nothing)</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">2️⃣ The players ___ ready for the game. ⚽</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">is</div><div class="opt" onclick="opt(this)">am</div><div class="opt" data-ok="1" onclick="opt(this)">are</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">3️⃣ The children ___ very happy. 🧒</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">is</div><div class="opt" data-ok="1" onclick="opt(this)">are</div><div class="opt" onclick="opt(this)">was</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">4️⃣ My dad ___ a teacher. 👨‍🏫</div>
+    <div class="opts"><div class="opt" data-ok="1" onclick="opt(this)">is</div><div class="opt" onclick="opt(this)">are</div><div class="opt" onclick="opt(this)">am</div></div>
+    <div class="qfb"></div></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 4 — watch for the fourth option</h5>
+ <p>Q1 offers <b>(nothing)</b> on purpose. If Leo picks it, you have found the L1 transfer live — that is a useful thing to see, not a failure. Recast and move on.</p>
+ <p>Q3 tests the children/are link from the previous slide.</p></div>
+</section>
+
+<!-- ============ 13 STATION 4 — THE -S RULE ============ -->
+<section class="slide" data-t="Station 4 — The -s rule (he / she / it)">
+ <div class="inner">
+  <div class="kicker">Station 4 · One person, one s ⚙️</div>
+  <h2>He · She · It → the verb gets an <span class="hl">-s</span></h2>
+  <p class="sub">This is the rule Leo's ear will fight hardest. Say each line out loud. 🗣️</p>
+  <div class="rowx" style="margin-top:30px">
+   <div class="box green">
+    <h3>✅ No -s</h3>
+    <p style="font-size:34px;line-height:1.7">I <b>play</b> soccer.<br>You <b>play</b> soccer.<br>We <b>play</b> soccer.<br>They <b>play</b> soccer.</p>
+   </div>
+   <div class="box gold">
+    <h3>⚙️ Add -s</h3>
+    <p style="font-size:34px;line-height:1.7">He <b class="hl2">plays</b> soccer.<br>She <b class="hl2">plays</b> soccer.<br>It <b class="hl2">works</b>.<br>Kubo <b class="hl2">plays</b> for Real Sociedad.</p>
+   </div>
+  </div>
+  <div class="box sky" style="margin-top:30px">
+   <h3>🌉 Japanese bridge — why this is invisible to your ear</h3>
+   <p style="font-size:30px;line-height:1.5">Japanese verbs <b>never</b> change for who is doing them. する is する for 私・あなた・彼. 🇯🇵<br>
+   So this -s carries no meaning for Leo — it is pure habit. Habits are built by <b>saying</b>, not by knowing. 💪</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Station 4 — the marathon rule</h5>
+ <p>Third-person -s is the <b>last</b> thing learners master and the first thing they drop under pressure. Leo will "know" it and still omit it for years. That is completely normal.</p>
+ <p><b>Do not</b> teach it as a spelling rule. Teach it as a sound Leo must produce, out loud, in full sentences. Ten spoken reps beat any worksheet.</p>
+ <p>Point out that it is the mirror image of nouns: -s on a NOUN means many; -s on a VERB means one. That symmetry genuinely helps.</p></div>
+</section>
+
+<!-- ============ 14 VERB -S MACHINES ============ -->
+<section class="slide" data-t="Station 4 — The -s spelling machines">
+ <div class="inner">
+  <div class="kicker">Station 4 · Spelling machines 🏭</div>
+  <h2>Three machines for the <span class="hl">-s</span> ⚙️</h2>
+  <div class="rowx" style="margin-top:24px">
+    <div class="machine" onclick="flip2(this)">
+      <div class="mtitle">⚙️ + s</div>
+      <div class="mrule">The normal machine</div>
+      <div class="mex">play → play<b>s</b> ⚽<br>run → run<b>s</b> 🏃</div>
+      <div class="hidden-ex mex" style="margin-top:10px">like → like<b>s</b> ❤️<br>score → score<b>s</b> 🥅<br>want → want<b>s</b> 🙏</div>
+      <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+    </div>
+    <div class="machine" onclick="flip2(this)">
+      <div class="mtitle">⚙️ + es</div>
+      <div class="mrule">Hissing sounds <b>s · x · ch · sh</b> 🐍<br>…and go / do</div>
+      <div class="mex">watch → watch<b>es</b> 📺<br>go → go<b>es</b> 🚶</div>
+      <div class="hidden-ex mex" style="margin-top:10px">wash → wash<b>es</b> 🧼<br>fix → fix<b>es</b> 🔧<br>do → do<b>es</b> ✅</div>
+      <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+    </div>
+    <div class="machine" onclick="flip2(this)">
+      <div class="mtitle">⚙️ y → ies</div>
+      <div class="mrule">Only after a <b>consonant</b></div>
+      <div class="mex">stud<s>y</s> → stud<b>ies</b> 📚<br>cr<s>y</s> → cr<b>ies</b> 😢</div>
+      <div class="hidden-ex mex" style="margin-top:10px">tr<s>y</s> → tr<b>ies</b> 💪<br>fl<s>y</s> → fl<b>ies</b> ✈️</div>
+      <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+    </div>
+  </div>
+  <div class="rowx" style="margin-top:26px">
+   <div class="box red">
+    <h3>🪤 The same y trap as the nouns!</h3>
+    <p style="font-size:30px">Vowel before the y → just add <b>s</b>: pla<b>y</b> → play<b>s</b> ✔ &nbsp;·&nbsp; sa<b>y</b> → say<b>s</b> ✔ <span style="color:#FCA5A5">(not "plaies" ❌)</span></p>
+   </div>
+   <div class="box gold">
+    <h3>😎 One rebel</h3>
+    <p style="font-size:30px">have → <b class="hl2">has</b> 🎒<br>He <b>has</b> two tickets. (not "haves" ❌)</p>
+   </div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Reuse the noun machines deliberately</h5>
+ <p>These are the <b>same three machines</b> from Noun Stadium Station 4, and the same y trap. Say that out loud — one rule set, two jobs. It halves what he has to remember.</p>
+ <p><b>goes</b> and <b>does</b> are worth extra reps: they are high-frequency and both take -es for sound reasons he cannot predict.</p></div>
+</section>
+
+<!-- ============ 15 GAME — WHICH -S MACHINE ============ -->
+<section class="slide" data-t="GAME — Which -s machine?">
+ <div class="inner">
+  <div class="kicker">🎮 Game 5 · Machine Sort ⚙️</div>
+  <h2>Send each verb to the <span class="hl">right machine</span>!</h2>
+  <p class="sub">Tap the verb 👆 then tap the machine. Say "he ___" out loud as you place it!</p>
+  <div class="game">
+    <div class="bank">
+      <div class="chip" data-cat="s" onclick="pickChip(this)">play</div>
+      <div class="chip" data-cat="e" onclick="pickChip(this)">watch</div>
+      <div class="chip" data-cat="i" onclick="pickChip(this)">study</div>
+      <div class="chip" data-cat="s" onclick="pickChip(this)">run</div>
+      <div class="chip" data-cat="e" onclick="pickChip(this)">go</div>
+      <div class="chip" data-cat="i" onclick="pickChip(this)">cry</div>
+      <div class="chip" data-cat="s" onclick="pickChip(this)">like</div>
+      <div class="chip" data-cat="e" onclick="pickChip(this)">fix</div>
+      <div class="chip" data-cat="i" onclick="pickChip(this)">try</div>
+    </div>
+    <div class="bins g3">
+      <div class="bin" data-cat="s" onclick="dropBin(this)"><h4>⚙️ + s</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="e" onclick="dropBin(this)"><h4>⚙️ + es</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="i" onclick="dropBin(this)"><h4>⚙️ y → ies</h4><div class="drops"></div></div>
+    </div>
+    <div class="fb"></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 5 — say it, do not just sort it</h5>
+ <p><b>play</b> is the trap chip: it ends in y but a vowel comes first, so it is Machine 1. If he sends it to y → ies, that is the teachable moment.</p>
+ <p>Insist on "he plays / he watches / he studies" aloud at every placement. Silent sorting trains recognition; the goal here is production.</p></div>
+</section>
+
+<!-- ============ 16 GAME — PLAY OR PLAYS ============ -->
+<section class="slide" data-t="GAME — play or plays?">
+ <div class="inner">
+  <div class="kicker">🎮 Game 6 · One s or none? ⚙️</div>
+  <h2>Choose the <span class="hl">right engine</span></h2>
+  <div style="margin-top:24px;max-height:700px;overflow:auto;padding-right:10px">
+   <div class="q"><div class="qt">1️⃣ She ___ soccer every Saturday. 🎽</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">play</div><div class="opt" data-ok="1" onclick="opt(this)">plays</div><div class="opt" onclick="opt(this)">playing</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">2️⃣ My friends ___ movies every weekend. 🎬</div>
+    <div class="opts"><div class="opt" data-ok="1" onclick="opt(this)">watch</div><div class="opt" onclick="opt(this)">watches</div><div class="opt" onclick="opt(this)">watchs</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">3️⃣ Leo ___ to school in Annaka. 🏫</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">go</div><div class="opt" data-ok="1" onclick="opt(this)">goes</div><div class="opt" onclick="opt(this)">gos</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">4️⃣ He ___ two tickets for the final. 🎫</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">have</div><div class="opt" data-ok="1" onclick="opt(this)">has</div><div class="opt" onclick="opt(this)">haves</div></div>
+    <div class="qfb"></div></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 6 — the WHO check</h5>
+ <p>Before he answers, make him point at the WHO. One person → one s. Many → no s. The pointing is the strategy you want to survive past today.</p>
+ <p>Q2 is the reverse trap — plural subject, so <b>no</b> -s. Over-applying the rule is as common as forgetting it.</p></div>
+</section>
+
+<!-- ============ 17 STATION 5 — NOW VS EVERY DAY ============ -->
+<section class="slide" data-t="Station 5 — Now vs every day">
+ <div class="inner">
+  <div class="kicker">Station 5 · Two clocks ⏱️</div>
+  <h2>Is it happening <span class="hl">right now</span>, or <span class="hl2">every day</span>?</h2>
+  <div class="rowx" style="margin-top:32px">
+   <div class="box green">
+    <h3>📅 EVERY DAY — a habit</h3>
+    <p style="font-size:34px;line-height:1.6">He <b class="hl2">plays</b> soccer on Saturdays.<br>I <b class="hl2">watch</b> movies at home.</p>
+    <p style="font-size:26px;margin-top:12px;color:var(--mute)">Signal words: every day · always · usually · on Saturdays</p>
+   </div>
+   <div class="box gold">
+    <h3>🔴 RIGHT NOW — live!</h3>
+    <p style="font-size:34px;line-height:1.6">Look! He <b class="hl">is playing</b> right now!<br>I <b class="hl">am watching</b> the match.</p>
+    <p style="font-size:26px;margin-top:12px;color:var(--mute)">Signal words: Look! · now · right now · at the moment</p>
+   </div>
+  </div>
+  <div class="box sky" style="margin-top:30px">
+   <h3>🌉 Japanese bridge <span class="jp">〜ている</span></h3>
+   <p style="font-size:31px;line-height:1.5">「今 プレーしている」= <b>be + ing</b>. You already have this idea! 🇯🇵<br>
+   The new part is that English needs <b class="hl2">two</b> words: <b>am / is / are</b> AND <b>-ing</b>. Dropping the BE is the usual slip. ⚠️</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Station 5 — lead with the signal words</h5>
+ <p>Do not teach "present simple vs present continuous" as labels. Teach <b>two clocks</b> and the words that point to each. Leo picks the clock, the form follows.</p>
+ <p><b>The predictable error is "He playing now"</b> — the -ing arrives, the BE goes missing. That is Station 3 resurfacing, so it is worth linking the two out loud.</p>
+ <p>〜ている is a genuine gift here. Use it: he is not learning a new concept, only a new packaging.</p></div>
+</section>
+
+<!-- ============ 18 ING MACHINE ============ -->
+<section class="slide" data-t="Station 5 — The -ing machines">
+ <div class="inner">
+  <div class="kicker">Station 5 · Spelling machines 🏭</div>
+  <h2>Building the <span class="hl">-ing</span> form ⚙️</h2>
+  <div class="rowx" style="margin-top:26px">
+    <div class="machine" onclick="flip2(this)">
+      <div class="mtitle">⚙️ + ing</div>
+      <div class="mrule">Most verbs — just add it</div>
+      <div class="mex">play → play<b>ing</b> ⚽<br>watch → watch<b>ing</b> 📺</div>
+      <div class="hidden-ex mex" style="margin-top:10px">eat → eat<b>ing</b> 🍿<br>go → go<b>ing</b> 🚶<br>shout → shout<b>ing</b> 🗣️</div>
+      <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+    </div>
+    <div class="machine" onclick="flip2(this)">
+      <div class="mtitle">⚙️ drop the e</div>
+      <div class="mrule">Ends in a silent <b>e</b> → lose it</div>
+      <div class="mex">mak<s>e</s> → mak<b>ing</b> 🍳<br>scor<s>e</s> → scor<b>ing</b> 🥅</div>
+      <div class="hidden-ex mex" style="margin-top:10px">tak<s>e</s> → tak<b>ing</b> 🤲<br>sav<s>e</s> → sav<b>ing</b> 🧤<br>hav<s>e</s> → hav<b>ing</b> 🎒</div>
+      <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+    </div>
+    <div class="machine" onclick="flip2(this)">
+      <div class="mtitle">⚙️ double it</div>
+      <div class="mrule">Short vowel + one consonant</div>
+      <div class="mex">run → ru<b>nn</b>ing 🏃<br>stop → sto<b>pp</b>ing ✋</div>
+      <div class="hidden-ex mex" style="margin-top:10px">win → wi<b>nn</b>ing 🏆<br>sit → si<b>tt</b>ing 🪑<br>swim → swi<b>mm</b>ing 🏊</div>
+      <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+    </div>
+  </div>
+  <div class="box gold" style="margin-top:28px">
+   <p style="font-size:31px">👂 <b>Listen for the double:</b> ru-nning has a short, tight vowel. If the vowel is short and there is one consonant at the end, double it. 🏃</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Priorities</h5>
+ <p>Machine 1 covers most verbs — get that automatic. Machine 2 (drop the e) is the second priority because <i>making, scoring, taking</i> are everywhere.</p>
+ <p>The doubling rule is genuinely hard and low-yield. Introduce it, do not drill it. <i>Running</i> and <i>swimming</i> as memorised words will carry him further than the rule will.</p></div>
+</section>
+
+<!-- ============ 19 GAME — NOW OR EVERY DAY ============ -->
+<section class="slide" data-t="GAME — Now or every day?">
+ <div class="inner">
+  <div class="kicker">🎮 Game 7 · Two Clocks ⏱️</div>
+  <h2>Which <span class="hl">clock</span> is this sentence on?</h2>
+  <p class="sub">Tap the sentence 👆 then tap its clock. Look for the signal word!</p>
+  <div class="game">
+    <div class="bank">
+      <div class="chip" data-cat="n" onclick="pickChip(this)">Look! He is scoring!</div>
+      <div class="chip" data-cat="e" onclick="pickChip(this)">I watch movies every weekend.</div>
+      <div class="chip" data-cat="n" onclick="pickChip(this)">They are running right now.</div>
+      <div class="chip" data-cat="e" onclick="pickChip(this)">She always eats breakfast.</div>
+      <div class="chip" data-cat="n" onclick="pickChip(this)">I am doing my homework now.</div>
+      <div class="chip" data-cat="e" onclick="pickChip(this)">We play soccer on Saturdays.</div>
+    </div>
+    <div class="bins g2">
+      <div class="bin" data-cat="n" onclick="dropBin(this)"><h4>🔴 RIGHT NOW<br><span style="font-size:24px;color:var(--mute)">be + ing</span></h4><div class="drops"></div></div>
+      <div class="bin" data-cat="e" onclick="dropBin(this)"><h4>📅 EVERY DAY<br><span style="font-size:24px;color:var(--mute)">plain verb (+s)</span></h4><div class="drops"></div></div>
+    </div>
+    <div class="fb"></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 7 — make him name the clue</h5>
+ <p>For each chip ask "<b>which word told you?</b>" — Look!, right now, now vs every weekend, always, on Saturdays. The signal word is the transferable skill; the sort is just the vehicle.</p></div>
+</section>
+
+<!-- ============ 20 STATION 6 — THE PAST ============ -->
+<section class="slide" data-t="Station 6 — The past (+ed)">
+ <div class="inner">
+  <div class="kicker">Station 6 · Rewind ⏪</div>
+  <h2>Yesterday, the verb <span class="hl">changes shape</span></h2>
+  <p class="sub">Signal words: <b class="hl2">yesterday · last night · ago · in 2022</b> <span class="jp">きのう・きょねん</span></p>
+  <div class="rowx" style="margin-top:28px">
+   <div class="machine" onclick="flip2(this)">
+     <div class="mtitle">⚙️ + ed</div>
+     <div class="mrule">The normal machine</div>
+     <div class="mex">watch → watch<b>ed</b> 📺<br>play → play<b>ed</b> ⚽</div>
+     <div class="hidden-ex mex" style="margin-top:10px">shout → shout<b>ed</b> 🗣️<br>want → want<b>ed</b> 🙏<br>kick → kick<b>ed</b> 🦵</div>
+     <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+   </div>
+   <div class="machine" onclick="flip2(this)">
+     <div class="mtitle">⚙️ + d · y → ied</div>
+     <div class="mrule">Already ends in e → just <b>d</b><br>Consonant + y → <b>ied</b></div>
+     <div class="mex">like → like<b>d</b> ❤️<br>stud<s>y</s> → stud<b>ied</b> 📚</div>
+     <div class="hidden-ex mex" style="margin-top:10px">save → save<b>d</b> 🧤<br>score → score<b>d</b> 🥅<br>cr<s>y</s> → cr<b>ied</b> 😢</div>
+     <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+   </div>
+   <div class="machine" onclick="flip2(this)">
+     <div class="mtitle">⚙️ double + ed</div>
+     <div class="mrule">Short vowel + one consonant</div>
+     <div class="mex">stop → sto<b>pped</b> ✋<br>plan → pla<b>nned</b> 📝</div>
+     <div class="hidden-ex mex" style="margin-top:10px">drop → dro<b>pped</b> 📉<br>clap → cla<b>pped</b> 👏</div>
+     <div class="tap" style="font-size:20px;color:#94A3B8;margin-top:8px">tap for more</div>
+   </div>
+  </div>
+  <div class="box gold" style="margin-top:26px">
+   <h3>👂 The -ed has THREE sounds — but only ONE spelling</h3>
+   <p style="font-size:30px;line-height:1.5">/t/ → watch<b>ed</b>, kick<b>ed</b> &nbsp;·&nbsp; /d/ → play<b>ed</b>, save<b>d</b> &nbsp;·&nbsp; /ɪd/ → want<b>ed</b>, shout<b>ed</b><br>
+   🚫 Not "watch-ed-o" — keep it tight and short!</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Station 6 — pronunciation is the Japanese-specific risk</h5>
+ <p>Japanese is a mora language, so Leo will want to add a vowel: "watch-ed-o", "kick-ed-o". Model the clean cluster and have him repeat 5×. This is the same work as the -s endings in Sound Lab.</p>
+ <p>The three sounds are automatic for natives and invisible to him. Do not make him <b>learn</b> the three-way split — just make him <b>copy</b> it.</p></div>
+</section>
+
+<!-- ============ 21 PAST REBELS ============ -->
+<section class="slide" data-t="Station 6 — The past rebels">
+ <div class="inner">
+  <div class="kicker">Station 6 · The Rebels 😎</div>
+  <h2>These verbs <span class="hl">refuse the machine</span> 🤘</h2>
+  <p class="sub">No -ed. You just have to know them. Tap each rebel!</p>
+  <div class="grid g5" style="margin-top:24px">
+    <div class="rc" onclick="flip(this)"><span class="em">🚶</span><div class="wd">go</div><div class="bk">→ <b>WENT</b><br>We went to the stadium.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👀</span><div class="wd">see</div><div class="bk">→ <b>SAW</b><br>I saw the goal!</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🍿</span><div class="wd">eat</div><div class="bk">→ <b>ATE</b><br>We ate popcorn.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏃</span><div class="wd">run</div><div class="bk">→ <b>RAN</b><br>He ran very fast.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🤲</span><div class="wd">take</div><div class="bk">→ <b>TOOK</b><br>She took the penalty.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🚪</span><div class="wd">come</div><div class="bk">→ <b>CAME</b><br>They came late.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎁</span><div class="wd">get</div><div class="bk">→ <b>GOT</b><br>I got a red card. 🟥</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🎒</span><div class="wd">have</div><div class="bk">→ <b>HAD</b><br>We had two tickets.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🪞</span><div class="wd">is / am</div><div class="bk">→ <b>WAS</b><br>The game was great.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">👥</span><div class="wd">are</div><div class="bk">→ <b>WERE</b><br>The fans were loud.</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box red" style="margin-top:24px">
+   <p style="font-size:31px">🚫 Never <s>goed</s> ❌ · <s>seed</s> ❌ · <s>eated</s> ❌ — if you hear yourself add -ed to these, stop and swap in the rebel. 😎</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>"goed" is a good sign</h5>
+ <p>When Leo says <b>goed</b>, he has <b>learned the rule</b> and is over-applying it. That is a developmental step forward, not a slip backwards — say so out loud, then give him the correct form.</p>
+ <p>Ten rebels is plenty for one session. These ten cover most of what he will actually say about a match or a weekend.</p></div>
+</section>
+
+<!-- ============ 22 GAME — PAST FORMS ============ -->
+<section class="slide" data-t="GAME — Machine or rebel?">
+ <div class="inner">
+  <div class="kicker">🎮 Game 8 · Past Sort ⏪</div>
+  <h2>Does it take <span class="hl">-ed</span>, or is it a <span class="hl2">rebel</span>?</h2>
+  <p class="sub">Tap the verb 👆 then tap the box. Say the past form out loud!</p>
+  <div class="game">
+    <div class="bank">
+      <div class="chip" data-cat="m" onclick="pickChip(this)">watch</div>
+      <div class="chip" data-cat="r" onclick="pickChip(this)">go</div>
+      <div class="chip" data-cat="m" onclick="pickChip(this)">play</div>
+      <div class="chip" data-cat="r" onclick="pickChip(this)">see</div>
+      <div class="chip" data-cat="m" onclick="pickChip(this)">study</div>
+      <div class="chip" data-cat="r" onclick="pickChip(this)">eat</div>
+      <div class="chip" data-cat="m" onclick="pickChip(this)">stop</div>
+      <div class="chip" data-cat="r" onclick="pickChip(this)">run</div>
+      <div class="chip" data-cat="m" onclick="pickChip(this)">like</div>
+      <div class="chip" data-cat="r" onclick="pickChip(this)">take</div>
+    </div>
+    <div class="bins g2">
+      <div class="bin" data-cat="m" onclick="dropBin(this)"><h4>⚙️ MACHINE (+ed)</h4><div class="drops"></div></div>
+      <div class="bin" data-cat="r" onclick="dropBin(this)"><h4>😎 REBEL</h4><div class="drops"></div></div>
+    </div>
+    <div class="fb"></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 8 — the spoken form is the assessment</h5>
+ <p>Sorting into the right bin is easy once he remembers the ten rebels. The real check is whether he can <b>produce</b> went / saw / ate / ran / took at speed. Make him say each one.</p></div>
+</section>
+
+<!-- ============ 23 GAME — PAST MCQ ============ -->
+<section class="slide" data-t="GAME — Yesterday…">
+ <div class="inner">
+  <div class="kicker">🎮 Game 9 · Rewind Check ⏪</div>
+  <h2>Put the sentence in the <span class="hl">past</span></h2>
+  <div style="margin-top:24px;max-height:700px;overflow:auto;padding-right:10px">
+   <div class="q"><div class="qt">1️⃣ Yesterday we ___ to the stadium. ⏪</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">go</div><div class="opt" onclick="opt(this)">goed</div><div class="opt" data-ok="1" onclick="opt(this)">went</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">2️⃣ We ___ the match last night. 📺</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">watch</div><div class="opt" data-ok="1" onclick="opt(this)">watched</div><div class="opt" onclick="opt(this)">watching</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">3️⃣ I ___ a great goal on Sunday. 👀</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">seed</div><div class="opt" data-ok="1" onclick="opt(this)">saw</div><div class="opt" onclick="opt(this)">seen</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">4️⃣ The game ___ amazing! 🪞</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">were</div><div class="opt" data-ok="1" onclick="opt(this)">was</div><div class="opt" onclick="opt(this)">is</div></div>
+    <div class="qfb"></div></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 9 — the distractors are the lesson</h5>
+ <p><b>goed</b> and <b>seed</b> are there on purpose. If he picks one, celebrate the reasoning before correcting the form: "your rule was right — these two are rebels."</p>
+ <p>Q4 quietly brings BE back in past form. If it goes smoothly, Station 3 has landed.</p></div>
+</section>
+
+<!-- ============ 24 STATION 7 — WORD ORDER ============ -->
+<section class="slide" data-t="Station 7 — Word order (WHO → ENGINE → WHAT)">
+ <div class="inner">
+  <div class="kicker">Station 7 · The seating plan 🪑</div>
+  <h2>The engine sits in the <span class="hl">middle</span></h2>
+  <div class="box gold" style="margin-top:30px;text-align:center">
+   <p style="font-size:52px;font-weight:900;line-height:1.4">🏷️ WHO &nbsp;→&nbsp; ⚙️ ENGINE &nbsp;→&nbsp; 🎯 WHAT</p>
+   <p style="font-size:40px;margin-top:14px">Leo &nbsp;&nbsp; plays &nbsp;&nbsp; soccer. ✔</p>
+  </div>
+  <div class="rowx" style="margin-top:30px">
+   <div class="box red">
+    <h3>❌ Wrong</h3>
+    <p style="font-size:34px;line-height:1.6"><s>Leo soccer plays.</s><br><s>Plays Leo soccer.</s></p>
+   </div>
+   <div class="box sky">
+    <h3>🌉 Japanese bridge — the BIG one</h3>
+    <p style="font-size:30px;line-height:1.5">Japanese puts the verb <b>LAST</b>: レオは サッカーを <b class="hl2">する</b>。🇯🇵<br>
+    English puts it in the <b class="hl">MIDDLE</b>: Leo <b class="hl">plays</b> soccer. 🏴󠁧󠁢󠁥󠁮󠁧󠁿<br>
+    <span style="font-size:26px;color:var(--mute)">This is why the word order feels backwards. It is not you — the languages really are built differently.</span></p>
+   </div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Station 7 — name the structural difference out loud</h5>
+ <p>Japanese is SOV, English is SVO. Leo does not need those labels, but he absolutely needs to know <b>the difference is real and expected</b>. Otherwise he reads his own word-order errors as stupidity.</p>
+ <p>Whenever he produces a verb-final sentence, do not just correct it — point at the seating plan. Same frame, every time, all year.</p></div>
+</section>
+
+<!-- ============ 25 GAME — BUILD THE SENTENCE ============ -->
+<section class="slide" data-t="GAME — Which order is right?">
+ <div class="inner">
+  <div class="kicker">🎮 Game 10 · Seating Plan 🪑</div>
+  <h2>Which sentence sits in the <span class="hl">right order</span>?</h2>
+  <div style="margin-top:24px;max-height:700px;overflow:auto;padding-right:10px">
+   <div class="q"><div class="qt">1️⃣ Pick the correct sentence. ⚽</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">Leo soccer plays.</div><div class="opt" onclick="opt(this)">Plays Leo soccer.</div><div class="opt" data-ok="1" onclick="opt(this)">Leo plays soccer.</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">2️⃣ Pick the correct sentence. 🍿</div>
+    <div class="opts"><div class="opt" data-ok="1" onclick="opt(this)">We ate popcorn at the movies.</div><div class="opt" onclick="opt(this)">We popcorn ate at the movies.</div><div class="opt" onclick="opt(this)">At the movies popcorn we ate.</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">3️⃣ Pick the correct sentence. 🧤</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">The goalkeeper the ball saved.</div><div class="opt" data-ok="1" onclick="opt(this)">The goalkeeper saved the ball.</div><div class="opt" onclick="opt(this)">Saved the goalkeeper the ball.</div></div>
+    <div class="qfb"></div></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 10 — say why, not just which</h5>
+ <p>The wrong options are all Japanese-shaped (verb last). Ask him to point at the engine in each option; the wrong ones put it at the end. Naming the pattern beats memorising the three right answers.</p></div>
+</section>
+
+<!-- ============ 26 STATION 8 — HELPERS ============ -->
+<section class="slide" data-t="Station 8 — Helpers (Do / Does / Did)">
+ <div class="inner">
+  <div class="kicker">Station 8 · The helper engine ❓</div>
+  <h2>To ask a question, call a <span class="hl">helper</span> 🦸</h2>
+  <p class="sub">The helper goes to the FRONT — and the main verb goes back to <b class="hl2">plain</b>.</p>
+  <div class="rowx" style="margin-top:28px">
+   <div class="box green">
+    <h3>✅ Statement</h3>
+    <p style="font-size:33px;line-height:1.7">He <b>plays</b> for Barcelona.<br>They <b>watched</b> the game.<br>You <b>like</b> soccer.</p>
+   </div>
+   <div class="box gold">
+    <h3>❓ Question</h3>
+    <p style="font-size:33px;line-height:1.7"><b class="hl">Does</b> he <b>play</b> for Barcelona?<br><b class="hl">Did</b> they <b>watch</b> the game?<br><b class="hl">Do</b> you <b>like</b> soccer?</p>
+   </div>
+  </div>
+  <div class="box red" style="margin-top:28px">
+   <h3>🔑 The golden rule — only ONE word carries the ending</h3>
+   <p style="font-size:33px;line-height:1.6">
+   Doe<b class="hl2">s</b> he play<s style="color:#FCA5A5">s</s>? ❌ &nbsp;→&nbsp; <b>Does he play?</b> ✔<br>
+   Di<b class="hl2">d</b> they watch<s style="color:#FCA5A5">ed</s>? ❌ &nbsp;→&nbsp; <b>Did they watch?</b> ✔<br>
+   <span style="font-size:27px;color:var(--mute)">The helper takes the -s or the -ed. The main verb goes plain. 🪄</span></p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Station 8 — one rule, not two</h5>
+ <p>Teach the <b>one ending</b> idea rather than separate question rules. Once Leo sees that <i>does</i> already carries the -s, "Does he plays?" stops feeling right to him.</p>
+ <p>This is also the pay-off for Station 4. If third-person -s is still shaky, do this station tomorrow rather than today.</p></div>
+</section>
+
+<!-- ============ 27 NEGATIVES + BE HELPER ============ -->
+<section class="slide" data-t="Station 8 — Negatives and the BE helper">
+ <div class="inner">
+  <div class="kicker">Station 8 · Saying no 🚫</div>
+  <h2>Same helper, now with <span class="hl">not</span></h2>
+  <div class="grid g3" style="margin-top:28px">
+    <div class="rc" onclick="flip(this)"><span class="em">🙅</span><div class="wd">I / You / We / They</div><div class="bk"><b>don't</b><br>I don't like natto. 🥢</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🙅‍♂️</span><div class="wd">He / She / It</div><div class="bk"><b>doesn't</b><br>He doesn't play on Sundays.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">⏪</span><div class="wd">Past — everyone</div><div class="bk"><b>didn't</b><br>We didn't win. 😢</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box sky" style="margin-top:30px">
+   <h3>🪞 BE is its own helper — it needs no Do</h3>
+   <p style="font-size:33px;line-height:1.6">
+   <b>Is</b> he playing? ✔ &nbsp;<span style="color:#FCA5A5">(not "Does he is playing?" ❌)</span><br>
+   He <b>isn't</b> ready. ✔ &nbsp;·&nbsp; They <b>aren't</b> here. ✔<br>
+   <span style="font-size:27px;color:var(--mute)">BE jumps to the front all by itself. It never asks Do for help.</span></p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Keep BE separate in his head</h5>
+ <p>The classic confusion is mixing the two systems — "Does he is playing?" or "He doesn't be ready." Draw the line clearly: <b>BE moves itself; every other verb calls Do.</b></p>
+ <p><b>doesn't</b> is where third-person -s hides one more time. Point that out — it is the same rule wearing a different coat.</p></div>
+</section>
+
+<!-- ============ 28 GAME — CHOOSE THE HELPER ============ -->
+<section class="slide" data-t="GAME — Choose the helper">
+ <div class="inner">
+  <div class="kicker">🎮 Game 11 · Helper Check 🦸</div>
+  <h2>Which <span class="hl">helper</span> fits?</h2>
+  <div style="margin-top:24px;max-height:700px;overflow:auto;padding-right:10px">
+   <div class="q"><div class="qt">1️⃣ ___ he play for Barcelona? ❓</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">Do</div><div class="opt" data-ok="1" onclick="opt(this)">Does</div><div class="opt" onclick="opt(this)">Is</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">2️⃣ ___ you like soccer? ⚽</div>
+    <div class="opts"><div class="opt" data-ok="1" onclick="opt(this)">Do</div><div class="opt" onclick="opt(this)">Does</div><div class="opt" onclick="opt(this)">Did</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">3️⃣ ___ they watch the final last night? ⏪</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">Do</div><div class="opt" onclick="opt(this)">Does</div><div class="opt" data-ok="1" onclick="opt(this)">Did</div></div>
+    <div class="qfb"></div></div>
+   <div class="q"><div class="qt">4️⃣ Look! ___ he scoring right now? 🔴</div>
+    <div class="opts"><div class="opt" onclick="opt(this)">Does</div><div class="opt" data-ok="1" onclick="opt(this)">Is</div><div class="opt" onclick="opt(this)">Do</div></div>
+    <div class="qfb"></div></div>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Game 11 — the whole deck in four questions</h5>
+ <p>Q1 tests the -s rule inside a question. Q3 tests the past. Q4 tests BE-as-its-own-helper. If he gets all four, he has genuinely integrated Stations 3, 4, 6 and 8.</p></div>
+</section>
+
+<!-- ============ 29 ENGINE ROOM TOUR ============ -->
+<section class="slide" data-t="Engine Room Tour — all 8 stations">
+ <div class="inner">
+  <div class="kicker">🗺️ Engine Room Tour</div>
+  <h2>Everything we started up today ⚙️</h2>
+  <div class="grid g4" style="margin-top:24px">
+    <div class="rc" onclick="flip(this)"><span class="em">⚙️</span><div class="wd">1 · The Engine</div><div class="bk">Every sentence needs WHO + ENGINE.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🏷️</span><div class="wd">2 · Three Teams</div><div class="bk">a/the ___ · I can ___ · very ___</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🪞</span><div class="wd">3 · BE verbs</div><div class="bk">am · is · are — never drop them!</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">1️⃣</span><div class="wd">4 · The -s rule</div><div class="bk">He / She / It → one s.</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">⏱️</span><div class="wd">5 · Two clocks</div><div class="bk">every day → plain · now → be + ing</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">⏪</span><div class="wd">6 · The past</div><div class="bk">+ed machines · 10 rebels (went, saw…)</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🪑</span><div class="wd">7 · Word order</div><div class="bk">WHO → ENGINE → WHAT. Middle, not last!</div><div class="tap">tap</div></div>
+    <div class="rc" onclick="flip(this)"><span class="em">🦸</span><div class="wd">8 · Helpers</div><div class="bk">Do / Does / Did — only ONE ending.</div><div class="tap">tap</div></div>
+  </div>
+  <div class="box gold" style="margin-top:26px">
+   <h3>🗣️ Say the chant</h3>
+   <p style="font-size:33px">"Every sentence needs an <b>engine</b>. He, she, it — <b>one little s</b>. The engine sits in the <b>middle</b>." ⚙️</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>The tour is the revision tool</h5>
+ <p>Cover each card and let Leo say the rule <b>before</b> tapping. This slide is the one to reopen at the start of the next session — two minutes here beats re-running the whole deck.</p>
+ <p>The chant should be sayable without looking. Three lines, that is all.</p></div>
+</section>
+
+<!-- ============ 30 FORMATIVE ASSESSMENT ============ -->
+<section class="slide" data-t="✔ Formative Assessment">
+ <div class="inner">
+  <div class="kicker">✔ Formative Assessment · Final Whistle 🔔</div>
+  <h2>Match Day! <span class="hl">10 questions</span> ⚽</h2>
+  <p class="sub">No pressure — this just shows us what to practise next. 💪</p>
+  <div id="quizBox" style="margin-top:14px;max-height:660px;overflow:auto;padding-right:10px"></div>
+  <div id="quizScore" class="box gold" style="margin-top:16px;display:none"></div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Reading the result</h5>
+ <p>This is <b>formative</b> — it tells you what to reteach, it does not grade Leo. Say that out loud before he starts.</p>
+ <p><b>Diagnostic map:</b> Q1–2 miss → Station 1–2 (finding the engine). Q3–4 → BE verbs. Q5–6 → the -s rule. Q7 → two clocks. Q8 → the past. Q9 → word order. Q10 → helpers.</p>
+ <p>8+/10 → move on to the Grammar Cup. 5–7 → replay the two weakest stations tomorrow. Under 5 → split the deck over two more sessions; no re-test needed.</p></div>
+</section>
+
+<!-- ============ 31 WRAP UP ============ -->
+<section class="slide" data-t="Wrap Up — Trophy">
+ <div class="inner">
+  <div class="title-wrap">
+    <div class="big-emoji">🏆⚙️</div>
+    <h1>You are an <span class="hl">Engine Expert</span>!</h1>
+    <p class="sub" style="max-width:1280px">You can find the engine in any sentence, keep BE where it belongs,<br>put the little <b class="hl2">s</b> on he/she/it, switch clocks, rewind to the past,<br>and call a helper for questions. That is the whole engine room. ⚙️</p>
+    <div class="box gold" style="margin-top:34px;max-width:1300px">
+     <h3>🎯 Homework — the Noun Stadium &amp; Verb Engine app</h3>
+     <p style="font-size:31px">Then take the <b>Grammar Cup</b> 🏆 — 30 questions, 5 rounds, nouns AND verbs together.</p>
+    </div>
+    <p class="jp" style="margin-top:26px">よくがんばりました、レオ！ 🎉</p>
+  </div>
+ </div>
+ <button class="tn-btn" onclick="tn(this)">👨‍🏫 Notes</button>
+ <div class="tn-panel"><h5>Where this goes next</h5>
+ <p>Verb Engine + Noun Stadium together are the prerequisites for the <b>Grammar Cup</b> test. Run the Cup only after both decks have been taught and both apps played.</p>
+ <p><b>Next in the chain:</b> word order and helper verbs feed straight into question forms and the past-tense work in Our World; the BE verb underpins every relative-clause sentence in Unit 8 Grammar 1.</p></div>
+</section>
+
+  </div>
+</deck-stage>
+
+<div id="nav">
+  <button onclick="go(-1)">◀ Prev</button>
+  <button onclick="go(1)">Next ▶</button>
+  <span id="counter">1 / 1</span>
+  <span id="stitle"></span>
+  <div id="progWrap"><div id="progFill"></div></div>
+</div>
+
+<script>
+/* ============ deck-stage web component ============ */
+class DeckStage extends HTMLElement{
+  connectedCallback(){ this.fit(); window.addEventListener('resize', ()=>this.fit()); }
+  fit(){
+    const inner = document.getElementById('stageInner');
+    if(!inner) return;
+    const w = window.innerWidth, h = window.innerHeight - 64;
+    const s = Math.min(w/1920, h/1080);
+    inner.style.transform = 'scale(' + s + ') translate(' + ((w - 1920*s)/2/s) + 'px,' + ((h - 1080*s)/2/s) + 'px)';
+  }
+}
+if(!customElements.get('deck-stage')) customElements.define('deck-stage', DeckStage);
+
+/* ============ slide navigation ============ */
+var slides = [], cur = 0;
+
+function updateBadge(){
+  try{
+    var pf = document.getElementById('progFill');
+    if(!pf) return;
+    pf.style.width = (((cur+1)/slides.length)*100) + '%';
+    var c = document.getElementById('counter');
+    if(c) c.textContent = (cur+1) + ' / ' + slides.length;
+    var st = document.getElementById('stitle');
+    if(st) st.textContent = slides[cur].getAttribute('data-t') || '';
+  }catch(e){ /* progress bar is cosmetic */ }
+}
+
+function show(i){
+  if(i < 0 || i >= slides.length) return;
+  slides[cur].classList.remove('active');
+  cur = i;
+  slides[cur].classList.add('active');
+  document.querySelectorAll('.tn-panel').forEach(function(p){ p.classList.remove('show'); });
+  updateBadge();
+}
+function go(d){ show(cur + d); }
+
+/* ============ teacher notes ============ */
+function tn(btn){
+  var p = btn.parentElement.querySelector('.tn-panel');
+  if(!p) return;
+  var open = p.classList.contains('show');
+  document.querySelectorAll('.tn-panel').forEach(function(x){ x.classList.remove('show'); });
+  if(!open) p.classList.add('show');
+}
+
+/* ============ simple toggles ============ */
+function tog(el){ el.classList.toggle('on'); }
+function flip(el){ el.classList.toggle('open'); }
+function flip2(el){ el.classList.toggle('open'); }
+function flipDoor(el){ el.classList.toggle('open'); }
+
+/* ============ sorting game engine ============ */
+function pickChip(el){
+  if(el.classList.contains('placed')) return;
+  var g = el.closest('.game');
+  if(!g) return;
+  g.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('sel'); });
+  el.classList.add('sel');
+  g.__pick = el;
+  setFb(g, 'Now tap a box! 👇', '');
+}
+
+function dropBin(bin){
+  var g = bin.closest('.game');
+  if(!g) return;
+  var pick = g.__pick;
+  if(!pick){ setFb(g, 'Tap a word first! 👆', ''); return; }
+  if(pick.dataset.cat === bin.dataset.cat){
+    var tagx = document.createElement('span');
+    tagx.textContent = pick.textContent;
+    bin.querySelector('.drops').appendChild(tagx);
+    pick.classList.add('placed');
+    pick.classList.remove('sel');
+    g.__pick = null;
+    var total = g.querySelectorAll('.chip').length;
+    var done = g.querySelectorAll('.chip.placed').length;
+    if(done === total) setFb(g, 'PERFECT! All sorted! 🏆🎉', 'good');
+    else setFb(g, 'Yes! ' + done + ' / ' + total + ' 💪', 'good');
+  } else {
+    bin.classList.add('bad');
+    setTimeout(function(){ bin.classList.remove('bad'); }, 400);
+    setFb(g, 'Not that box — try again! 🤔', 'bad');
+  }
+}
+
+function setFb(g, txt, cls){
+  var f = g.querySelector('.fb');
+  if(!f) return;
+  f.textContent = txt;
+  f.className = 'fb ' + (cls || '');
+}
+
+/* ============ noun detective ============ */
+function tapWord(el){
+  if(el.classList.contains('hit')) return;
+  var s = el.closest('.sent');
+  if(!s) return;
+  if(el.dataset.n === '1'){
+    el.classList.add('hit');
+    var found = (parseInt(s.dataset.found || '0', 10)) + 1;
+    s.dataset.found = found;
+    if(found >= parseInt(s.dataset.need, 10)) s.classList.add('cleared');
+  } else {
+    el.classList.add('miss');
+    setTimeout(function(){ el.classList.remove('miss'); }, 550);
+  }
+}
+
+/* ============ MCQ ============ */
+function opt(el){
+  var q = el.closest('.q');
+  if(!q) return;
+  var fb = q.querySelector('.qfb');
+  if(el.dataset.ok === '1'){
+    q.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('wrong'); });
+    el.classList.add('right');
+    if(fb) fb.textContent = 'Correct! Nice one 🎉';
+  } else {
+    el.classList.add('wrong');
+    if(fb) fb.textContent = 'Not quite — try again 🤔';
+  }
+}
+
+/* ============ formative assessment quiz ============ */
+var QUIZ = [
+  { q:'1️⃣ Which word is the VERB? ⚙️', o:['winner','win','windy'], a:1, f:'You can say "I can win" → win is the engine. winner NAMES a person. 🏆' },
+  { q:'2️⃣ In "The fans shouted loudly", the verb is… 🗣️', o:['fans','shouted','loudly'], a:1, f:'shouted is the action — the engine of the sentence. 🗣️' },
+  { q:'3️⃣ Choose the correct sentence. 🍜', o:['I hungry.','I am hungry.','I is hungry.'], a:1, f:'Never lose the BE verb — I am hungry. 🪞' },
+  { q:'4️⃣ The players ___ ready for the game. ⚽', o:['is','am','are'], a:2, f:'players = they → are. 👥' },
+  { q:'5️⃣ She ___ soccer every Saturday. 🎽', o:['play','plays','playing'], a:1, f:'he / she / it → one person, one s! 🎽' },
+  { q:'6️⃣ Leo ___ to school in Annaka. 🏫', o:['go','goes','gos'], a:1, f:'go takes the +es machine → goes. ⚙️' },
+  { q:'7️⃣ Look! Haaland ___ right now! 🔴', o:['score','scores','is scoring'], a:2, f:'"Look!" means happening now → be + ing. 〜ている' },
+  { q:'8️⃣ Yesterday we ___ to the stadium. ⏪', o:['go','goed','went'], a:2, f:'go is a rebel → went. 😎' },
+  { q:'9️⃣ Which sentence has the right word order? 🪑', o:['Leo soccer plays.','Plays Leo soccer.','Leo plays soccer.'], a:2, f:'WHO → ENGINE → WHAT. The verb sits in the middle. ⚙️' },
+  { q:'🔟 ___ he play for Barcelona? ❓', o:['Do','Does','Is'], a:1, f:'he → Does. And then play stays plain! 🎽' }
+];
+var qAnswered = 0, qScore = 0;
+
+function buildQuiz(){
+  var box = document.getElementById('quizBox');
+  if(!box || box.dataset.built === '1') return;
+  box.dataset.built = '1';
+  QUIZ.forEach(function(item, qi){
+    var d = document.createElement('div');
+    d.className = 'q';
+    var t = document.createElement('div');
+    t.className = 'qt';
+    t.innerHTML = item.q;
+    d.appendChild(t);
+    var wrap = document.createElement('div');
+    wrap.className = 'opts';
+    item.o.forEach(function(txt, oi){
+      var b = document.createElement('div');
+      b.className = 'opt';
+      b.textContent = txt;
+      b.dataset.qi = qi;
+      b.dataset.oi = oi;
+      b.addEventListener('click', function(){ answerQuiz(b); });
+      wrap.appendChild(b);
+    });
+    d.appendChild(wrap);
+    var f = document.createElement('div');
+    f.className = 'qfb';
+    d.appendChild(f);
+    box.appendChild(d);
+  });
+}
+
+function answerQuiz(btn){
+  var q = btn.closest('.q');
+  if(!q || q.dataset.locked === '1') return;
+  var item = QUIZ[parseInt(btn.dataset.qi, 10)];
+  var fb = q.querySelector('.qfb');
+  if(parseInt(btn.dataset.oi, 10) === item.a){
+    btn.classList.add('right');
+    q.dataset.locked = '1';
+    if(q.dataset.missed !== '1') qScore++;
+    qAnswered++;
+    if(fb) fb.innerHTML = '✔ ' + item.f;
+    showScore();
+  } else {
+    btn.classList.add('wrong');
+    q.dataset.missed = '1';
+    if(fb) fb.textContent = 'Try again — you can do it! 💪';
+  }
+}
+
+function showScore(){
+  var s = document.getElementById('quizScore');
+  if(!s) return;
+  var lockedCount = document.querySelectorAll('#quizBox .q[data-locked="1"]').length;
+  if(lockedCount < QUIZ.length) return;
+  s.style.display = 'block';
+  var msg = qScore >= 8 ? 'Outstanding! You are an Engine Expert! 🏆'
+          : (qScore >= 5 ? 'Great work! Let us replay two stations tomorrow. 💪'
+          : 'Good effort! We will train again — that is what champions do. ⚽');
+  s.innerHTML = '<h3>🏁 Final score: ' + qScore + ' / ' + QUIZ.length + ' (first try)</h3><p style="font-size:30px">' + msg + '</p>';
+}
+
+/* ============ init ============ */
+document.addEventListener('DOMContentLoaded', function(){
+  slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  document.querySelectorAll('.w').forEach(function(w){
+    w.addEventListener('click', function(){ tapWord(w); });
+  });
+  buildQuiz();
+  updateBadge();
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(1); }
+    if(e.key === 'ArrowLeft'  || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+    if(e.key === 'Escape') document.querySelectorAll('.tn-panel').forEach(function(p){ p.classList.remove('show'); });
+  });
+});
+</script>
+</body>
+</html>

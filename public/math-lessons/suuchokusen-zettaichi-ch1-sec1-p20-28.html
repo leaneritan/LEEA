@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数直線と絶対値 ｜ 1章1節 p.20-28</title>
+<style>
+  :root{
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Meiryo",sans-serif;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP","MS Mincho",serif;
+  }
+  /* ---- 説明編：黒板 ---- */
+  .theme-setsumei{
+    --ink:#22312C; --ink-soft:#5C6E67; --paper:#E8EDE9; --card:#FFFFFF;
+    --accent:#9C6B15; --accent-bg:#FAF2E2; --deep:#2F4739; --deep-fg:#F2F5EE;
+    --ok:#3D7A5A; --ok-bg:#E7F1EB; --no:#A64B3C; --no-bg:#F9EDEA; --line:#D3DCD6;
+  }
+  /* ---- テスト編：赤ペン ---- */
+  .theme-test{
+    --ink:#1F2328; --ink-soft:#63696F; --paper:#F4F3EF; --card:#FFFFFF;
+    --accent:#C62828; --accent-bg:#FBEDEC; --deep:#1F2328; --deep-fg:#FFFFFF;
+    --ok:#2F6F4E; --ok-bg:#E8F1EC; --no:#C62828; --no-bg:#FBEDEC; --line:#DEDCD4;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--gothic);font-size:17px;line-height:1.9;-webkit-text-size-adjust:100%;
+       background:var(--paper);color:var(--ink);transition:background .3s}
+  .wrap{max-width:660px;margin:0 auto;padding:18px 15px 70px}
+
+  header.top{background:var(--deep);color:var(--deep-fg);border-radius:13px;
+             padding:16px 18px 0;margin-bottom:16px;transition:background .3s}
+  header.top .eyebrow{font-size:11.5px;letter-spacing:.2em;opacity:.68;margin:0 0 3px}
+  header.top h1{font-size:24px;font-weight:800;margin:0;letter-spacing:.03em}
+  header.top .sub{font-size:13.5px;opacity:.68;margin:3px 0 0}
+  .bar{display:flex;gap:4px;margin-top:12px}
+  .bar i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.22);transition:background .25s}
+  .bar i.hit{background:#8FC5A5} .bar i.miss{background:#C58C82} .bar i.now{background:#fff}
+
+  /* ---- tabs ---- */
+  .tabs{display:flex;gap:6px;margin:14px -18px 0;padding:0 18px;border-top:1px solid rgba(255,255,255,.14)}
+  .tabs button{flex:1;background:none;border:none;color:inherit;opacity:.55;
+    font-family:inherit;font-size:14.5px;font-weight:700;padding:12px 4px 11px;
+    cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.04em}
+  .tabs button:hover{opacity:.85}
+  .tabs button.on{opacity:1;border-bottom-color:currentColor}
+  .tabs .badge{display:inline-block;font-size:11px;font-weight:700;margin-left:6px;
+    padding:1px 7px;border-radius:20px;background:rgba(255,255,255,.16)}
+  .tabs .badge.done{background:#8FC5A5;color:#1B2E24}
+
+  .card{background:var(--card);border-radius:13px;padding:21px 19px;
+        box-shadow:0 1px 2px rgba(0,0,0,.05),0 8px 20px rgba(0,0,0,.07)}
+  .screen{animation:rise .3s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+  .tag{display:inline-block;font-size:12px;letter-spacing:.12em;font-weight:700;
+       padding:3px 11px;border-radius:20px;background:var(--accent-bg);color:var(--accent);margin-bottom:8px}
+  .sec{display:inline-block;font-size:12px;letter-spacing:.06em;color:var(--ink-soft);
+       margin:0 0 8px 9px;font-weight:700}
+  .pg{display:inline-block;font-size:11.5px;letter-spacing:.06em;font-weight:700;
+      padding:2px 9px;border-radius:6px;background:var(--deep);color:var(--deep-fg);
+      margin:0 0 8px 8px;vertical-align:2px}
+  h2{font-size:21px;font-weight:800;margin:0 0 12px;letter-spacing:.02em}
+  p{margin:0 0 13px}
+  .lead{color:var(--ink-soft);font-size:15.5px}
+  .prompt{font-size:12.5px;letter-spacing:.1em;color:var(--accent);font-weight:700;margin:18px 0 4px}
+
+  .m{font-family:var(--mincho);font-size:27px;text-align:center;margin:14px 0;letter-spacing:.04em}
+  .m.sm{font-size:21px;line-height:1.8}
+  .quote{background:rgba(0,0,0,.02);border:1px dashed var(--line);border-radius:10px;
+         padding:12px 14px;margin:12px 0;font-size:15.5px}
+  .quote .src{display:block;font-size:11.5px;letter-spacing:.1em;color:var(--accent);
+              font-weight:700;margin-bottom:4px}
+  .prob{background:rgba(0,0,0,.02);border:1px solid var(--line);border-radius:11px;
+        padding:13px 15px;margin:12px 0;font-size:16px;line-height:1.95}
+
+  .choices{display:grid;gap:9px;margin-top:8px}
+  .choice{text-align:left;padding:12px 15px;border-radius:10px;border:1.5px solid var(--line);
+          background:#fff;color:var(--ink);font-size:15.5px;line-height:1.7;
+          transition:border-color .15s,background .15s;font-family:inherit;cursor:pointer}
+  .choice.mid{text-align:center;font-family:var(--mincho);font-size:19px}
+  .choice:hover:not(:disabled){border-color:var(--accent)}
+  .choice:disabled{cursor:default;opacity:.82}
+  .choice.ok{border-color:var(--ok);background:var(--ok-bg);font-weight:700}
+  .choice.no{border-color:var(--no);background:var(--no-bg)}
+  .choice.reveal{border-color:var(--ok);background:var(--ok-bg)}
+
+  .ord{display:grid;gap:8px;margin-top:8px}
+  .ord .item{text-align:left;padding:11px 14px;border-radius:10px;border:1.5px solid var(--line);
+             background:#fff;color:var(--ink);font-size:15.5px;line-height:1.7;
+             position:relative;font-family:inherit;cursor:pointer}
+  .ord .item:hover:not(:disabled){border-color:var(--accent)}
+  .ord .item.placed{border-color:var(--ok);background:var(--ok-bg);opacity:.9;cursor:default}
+  .ord .item.placed .rank{position:absolute;left:-9px;top:-9px;width:22px;height:22px;border-radius:50%;
+    background:var(--ok);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .ord .item.shake{animation:shake .32s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .ordcap{font-size:13.5px;color:var(--ink-soft);margin:8px 0 0;text-align:center}
+
+  textarea{width:100%;min-height:110px;font-family:var(--gothic);font-size:16px;line-height:1.8;
+    padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);resize:vertical}
+  textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  textarea:disabled{background:rgba(0,0,0,.03);color:var(--ink-soft)}
+  .cnt{font-size:12.5px;color:var(--ink-soft);text-align:right;margin:4px 0 0}
+
+  .board{background:var(--deep);color:var(--deep-fg);border-radius:12px;padding:16px 18px;margin-top:16px;
+         display:none;box-shadow:inset 0 0 40px rgba(0,0,0,.22)}
+  .board.show{display:block;animation:rise .35s ease both}
+  .board .who{font-size:11.5px;letter-spacing:.16em;opacity:.7;font-weight:700;margin:0 0 6px}
+  .board .say{font-family:var(--mincho);font-size:18px;line-height:1.95;margin:0}
+  .board .say em{font-style:normal;border-bottom:1.5px solid rgba(255,255,255,.45);padding-bottom:1px}
+
+  .selfcheck{background:var(--accent-bg);border-radius:11px;padding:14px 16px;margin-top:14px;display:none}
+  .selfcheck.show{display:block;animation:rise .3s ease both}
+  .selfcheck .t{font-size:12.5px;letter-spacing:.1em;font-weight:700;color:var(--accent);margin:0 0 8px}
+  .selfcheck label{display:flex;gap:10px;align-items:flex-start;font-size:15.5px;
+                   line-height:1.7;margin-bottom:7px;cursor:pointer}
+  .selfcheck input{width:19px;height:19px;margin-top:5px;flex-shrink:0;accent-color:var(--ok)}
+  .selfcheck .hintline{font-size:14px;color:var(--ink-soft);margin:8px 0 0}
+
+  .row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .row .pre{font-family:var(--mincho);font-size:22px}
+  .row .unit{font-size:15px;color:var(--ink-soft)}
+  input[type=text]{font-family:var(--mincho);font-size:22px;width:120px;padding:8px 10px;
+    border:1.5px solid var(--line);border-radius:10px;text-align:center;color:var(--ink);background:#fff}
+  input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  input[type=text]:disabled{background:rgba(0,0,0,.03)}
+
+  .btn{padding:11px 20px;border-radius:10px;border:none;background:var(--ink);color:#fff;
+       font-weight:700;font-family:inherit;font-size:16px;cursor:pointer}
+  .btn:hover:not(:disabled){opacity:.88}
+  .btn:disabled{opacity:.4;cursor:default}
+  .btn.accent{background:var(--accent)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .helprow{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+  .btn.tiny{padding:7px 14px;font-size:13.5px;background:#fff;color:var(--ink-soft);
+            border:1.5px solid var(--line);font-weight:700}
+  .btn.tiny:hover:not(:disabled){color:var(--accent);border-color:var(--accent)}
+  .btn.tiny[hidden]{display:none}
+  .usedmark{font-size:12.5px;color:var(--ink-soft);margin:10px 0 0;text-align:right}
+
+  .fb{margin-top:13px;padding:12px 14px;border-radius:10px;font-size:15px;display:none}
+  .fb.show{display:block;animation:rise .22s ease both}
+  .fb.hint{background:var(--accent-bg);border:1px solid var(--line)}
+  .fb.wrong{background:var(--no-bg);border:1px solid var(--line)}
+  .fb.right{background:var(--ok-bg);border:1px solid var(--line)}
+  .fb b{display:block;margin-bottom:2px}
+  .fb .work{font-family:var(--mincho);font-size:16.5px;display:block;margin-top:4px;line-height:1.75}
+
+  .nav{margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .stepno{font-size:12.5px;color:var(--ink-soft);letter-spacing:.08em}
+
+  .big{font-size:42px;font-weight:800;text-align:center;margin:6px 0 0}
+  .big small{font-size:18px;color:var(--ink-soft);font-weight:400}
+  table{width:100%;border-collapse:collapse;margin:16px 0 6px;font-size:15px}
+  th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+  th{font-size:12.5px;letter-spacing:.08em;color:var(--ink-soft);font-weight:700}
+  td.s{text-align:right;font-family:var(--mincho);font-size:18px;white-space:nowrap}
+  .pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .pill.good{background:var(--ok-bg);color:var(--ok)}
+  .pill.watch{background:var(--no-bg);color:var(--no)}
+  .note{border-left:3px solid var(--accent);background:var(--accent-bg);
+        padding:11px 13px;border-radius:0 8px 8px 0;font-size:15px;margin:14px 0}
+  ul.rev,ul.tips{padding-left:1.15em;margin:6px 0 0;font-size:15px}
+  ul.rev li,ul.tips li{margin-bottom:5px}
+
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (max-width:420px){body{font-size:16px}header.top h1{font-size:21px}.m{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap theme-setsumei" id="root">
+
+<header class="top">
+  <p class="eyebrow">1章 正負の数 ／ 1節 正負の数</p>
+  <h1>数直線と絶対値</h1>
+  <p class="sub">教科書 p.20〜28　符号・数直線・原点・絶対値</p>
+  <div class="bar" id="bar"></div>
+  <nav class="tabs">
+    <button data-tab="setsumei" class="on">説明編<span class="badge" id="b-setsumei">8問</span></button>
+    <button data-tab="test">テスト編<span class="badge" id="b-test">12問</span></button>
+  </nav>
+</header>
+
+<main id="stage"></main>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= 説明編 ================= */
+  var STEPS = [
+
+  /* 1 — p.22 : why a minus sign at all */
+  { kind:"choice", tag:"はじめに", sec:"1節 正負の数", pg:"p.22",
+    title:"なぜ「−3℃」と書くのか",
+    lead:'教科書 p.21〜22。天気予報の気温から 1章 が始まる。0℃ より低い温度を −3℃ と書くのはなぜだろう。',
+    body:'<div class="quote"><span class="src">教科書 p.22</span>'+
+         '0℃ を基準にして、それより低い温度は、− を使った数で表す。'+
+         '0℃ より 3℃ 低い温度を −3℃ と表し、「マイナス3℃」と読む。</div>',
+    prompt:"− をつけて表す理由として、いちばんよい説明はどれ？",
+    opts:[
+      "寒いときはマイナスをつける、という決まりだから。",
+      "3℃ より小さい温度だから。",
+      "0℃ を基準にして、そこから高いか低いかという<b>反対の向き</b>を、符号で区別するため。",
+      "温度計の目もりが、0 より下にあるから。"],
+    ans:2,
+    hint:"＋5℃ と −3℃。この2つは、0℃ から見て何がちがう？",
+    work:'大事なのは <b>基準</b> と <b>向き</b>。0℃ を基準に決めて、'+
+         'そこから高い方向を ＋、低い方向を − で表している。<br>'+
+         'だから符号は「大きい・小さい」の印ではなく、<b>基準からどちら向きか</b>の印。'+
+         'この考え方は、標高・時刻・収支など、あらゆる場面で同じように使える。' },
+
+  /* 2 — p.25 : the origin */
+  { kind:"choice", tag:"数直線", sec:"1節 正負の数", pg:"p.25",
+    title:"原点とは何か",
+    lead:'教科書 p.25。負の数をふくめた数直線をつくる。まず基準の点をとり、そこに 0 を対応させる。',
+    body:'<div class="m sm">−3　−2　−1　　0　　+1　+2　+3</div>'+
+         '<div class="quote"><span class="src">教科書 p.25</span>'+
+         'まず、直線上に基準の点をとり、数 0 を対応させる。次に、その点から左右に一定の間隔で目もりをつけ、'+
+         '0 より右側に正の数、左側に負の数を対応させる。</div>',
+    prompt:"原点とは、どの点のこと？",
+    opts:[
+      "数直線上で 0 が対応している点。",
+      "数直線のいちばん左はしの点。",
+      "かいた数直線のちょうど真ん中の目もり。",
+      "いちばん小さい数が対応している点。"],
+    ans:0,
+    hint:"数直線をつくるとき、いちばんはじめに決めたのは何だった？",
+    work:'<b>0 が対応している点</b>が原点。<br>'+
+         '数直線をどこまでのばしても、原点は 0 の位置のまま。'+
+         '紙の真ん中にかいたかどうかは関係ない。基準の点だから原点という。' },
+
+  /* 3 — p.26 : why -1 > -3 */
+  { kind:"choice", tag:"数の大小", sec:"1節 正負の数", pg:"p.26",
+    title:"なぜ −1 は −3 より大きいのか",
+    lead:'教科書 p.26。1 より 3 のほうが大きいのに、−1 は −3 より大きい。ここでつまずく人は多い。',
+    body:'<div class="m sm">−3 ＜ −1</div>',
+    prompt:"この理由として、いちばんよい説明はどれ？",
+    opts:[
+      "1 は 3 より小さいので、マイナスをつけると逆になって −1 のほうが大きくなる。",
+      "数直線上で −1 は −3 より<b>右</b>にあるから。右にある数ほど大きい。",
+      "マイナスの数は、数字が小さいほど大きくなるという決まりだから。",
+      "−1 も −3 も 0 より小さいので、本当は大小を決められない。"],
+    ans:1,
+    hint:"教科書 p.26 には「右にある数ほど大きく、左にある数ほど小さい」とある。数直線でどちらが右？",
+    work:'数直線上の <b>位置</b> で決まる。右にあるほど大きい。'+
+         'これは正の数だけのときと同じ決まりで、負の数まで数直線をのばしても変わらない。<br>'+
+         '1番と3番は結論は合っているが、「逆になる」「決まりだから」で止まっていて理由になっていない。' },
+
+  /* 4 — p.27 : write — why |+3| = |-3| */
+  { kind:"write", tag:"説明してみよう", sec:"1節 正負の数", pg:"p.27",
+    title:"なぜ +3 と −3 の絶対値は同じなのか",
+    lead:'ここが 1節 のいちばん大事な「なぜ」。符号がちがうのに、絶対値は同じになる。',
+    body:'<div class="quote"><span class="src">教科書 p.27</span>'+
+         '数直線上で、ある数に対応する点と原点との<b>距離</b>を、その数の <b>絶対値</b> という。</div>'+
+         '<div class="m sm">+3 の絶対値 … 3　　　−3 の絶対値 … 3</div>',
+    prompt:"なぜどちらも 3 になるのか、数直線を使って説明しよう。",
+    ph:"例：絶対値は原点からの…／向きはちがうけれど…",
+    model:'絶対値は <em>原点からの距離</em>。距離には <em>向きがない</em>。<br>'+
+          '+3 は原点から右へ 3、−3 は原点から左へ 3。'+
+          '進む向きは反対だが、原点からどれだけはなれているかは、どちらも 3。<br>'+
+          'だから絶対値はどちらも 3 になる。<br>'+
+          '「符号を取りさった数」と覚えてもよいが、本当の意味は <em>原点からの距離</em>。'+
+          'その意味を持っていれば、あとで出てくる話にもつながる。',
+    checks:["絶対値が「原点からの距離」だと書けた",
+            "向きはちがうが距離は同じ、と書けた",
+            "だから符号がちがっても絶対値は同じ、とつなげられた"] },
+
+  /* 5 — p.27 問6 */
+  { kind:"choice", tag:"使ってみる", sec:"1節 正負の数", pg:"p.27",
+    title:"絶対値が7である数",
+    lead:'教科書 p.27 の 問6。絶対値から、もとの数をさかのぼって考える。',
+    body:'<div class="m sm">絶対値が 7 である数は？</div>',
+    prompt:"あてはまる数は？",
+    opts:[
+      "7 だけ。",
+      "+7 と −7 の 2つ。",
+      "−7 だけ。",
+      "0 から 7 までのすべての数。"],
+    ans:1,
+    hint:"原点から 7 の距離にある点は、数直線上にいくつあるだろう。右と左、両方を見よう。",
+    work:'<b>+7 と −7 の2つ</b>。<br>'+
+         '原点から 7 はなれた点は、右にも左にもある。'+
+         '距離だけを言われても向きは決まらないので、答えは2つになる。<br>'+
+         'ただし絶対値が 0 である数は 0 だけ。原点そのものだから向きがない。' },
+
+  /* 6 — p.27 : order — why -15 < -11 */
+  { kind:"order", tag:"組み立てる", sec:"1節 正負の数", pg:"p.27",
+    title:"なぜ −15 は −11 より小さいのか",
+    lead:'教科書 p.27 の終わり。絶対値が大きいほうが小さい数になる。その筋道を並べよう。',
+    body:'<div class="m sm">−15 と −11 をくらべる</div>',
+    prompt:"説明の順になるように、正しい順にタップしよう。",
+    items:[
+      "−15 の絶対値は 15、−11 の絶対値は 11 である。",
+      "15 は 11 より大きいので、−15 のほうが原点から遠い。",
+      "負の数は原点より左にあるので、遠いほど左にある。",
+      "よって数直線上で −15 は −11 より左にあり、−15 ＜ −11 となる。"],
+    hint:"まず2つの絶対値を出すところから。次にどちらが原点から遠いか。最後に左右の位置。",
+    work:'絶対値（＝原点からの距離）を出し、それを <b>数直線上の位置</b> に置きかえるのがコツ。<br>'+
+         '負の数は左側にあるので、原点から遠い＝より左＝より小さい、となる。' },
+
+  /* 7 — write : the two directions */
+  { kind:"write", tag:"教えてみよう", sec:"1節 正負の数", pg:"p.26・p.27",
+    title:"「絶対値が大きい」の意味",
+    lead:'同じ「絶対値が大きい」でも、正の数と負の数で結果が反対になる。ここを言えると、1節はほぼ完成。',
+    body:'<div class="m sm">+15 と +11　　→　大きいのは +15<br>−15 と −11　　→　大きいのは −11</div>',
+    prompt:"正の数と負の数で、なぜ結果が反対になるのか説明しよう。",
+    ph:"例：正の数では原点の右にあるので…／負の数では…",
+    model:'絶対値が大きい＝<em>原点から遠い</em>、ということ。'+
+          'ちがうのは、<em>どちら向きに遠いか</em>。<br>'+
+          '正の数は原点の <em>右</em> にある。だから遠いほど右へ行き、数は大きくなる。'+
+          '+15 は +11 より右にあるので、+15 のほうが大きい。<br>'+
+          '負の数は原点の <em>左</em> にある。だから遠いほど左へ行き、数は小さくなる。'+
+          '−15 は −11 より左にあるので、−15 のほうが小さい。<br>'+
+          '「遠い」は同じでも、向きが反対だから結果も反対になる。',
+    checks:["正の数では遠いほど大きくなる、と書けた",
+            "負の数では遠いほど小さくなる、と書けた",
+            "右・左（向き）のちがいで理由をつなげられた"] },
+
+  /* 8 — reflection */
+  { kind:"write", tag:"ふり返り", sec:"1節 正負の数", pg:"p.20〜28",
+    title:"今日のふり返り",
+    lead:'1節 で出てきたことばは、数直線・原点・絶対値の3つ。これらがどうつながっているかをまとめよう。',
+    body:'',
+    prompt:"数直線・原点・絶対値の関係を、自分のことばで書こう。",
+    ph:"例：数直線には原点があって…／絶対値は…",
+    model:'<b>数直線</b>… 数を直線上の点として表したもの。右へ行くほど大きい。<br>'+
+          '<b>原点</b>… 0 が対応している点。すべての基準になる。<br>'+
+          '<b>絶対値</b>… その数の点と原点との距離。向きは考えない。<br><br>'+
+          'この3つはつながっている。<em>原点</em>を決めるから <em>数直線</em> がかけて、'+
+          '数直線があるから <em>絶対値</em>（原点からの距離）が測れる。<br>'+
+          'そして数の大小は「どちらが大きい数か」ではなく、'+
+          '<em>数直線上でどちらが右にあるか</em>で決まる。'+
+          'この見方は 2節 のたし算・ひき算でもそのまま使う。',
+    checks:["原点が 0 の点であることを書けた",
+            "絶対値が原点からの距離であることを書けた",
+            "大小が数直線上の左右で決まることを書けた"] }
+  ];
+
+  /* ================= テスト編 ================= */
+  var Q = [
+
+  { cat:"符号で表す", pg:"p.22 問1", type:"choice",
+    body:'<div class="prob">0℃ を基準にして、それより低い温度を − で表します。</div>',
+    prompt:"0℃ より 5.5℃ 低い温度は？",
+    opts:["＋5.5℃","5.5℃","−0.55℃","−5.5℃"],
+    ans:3,
+    hint:"基準より「低い」ほうが − だった。",
+    work:"−5.5℃<br><br>"+
+         "<b>符号は「大きい・小さい」の印ではなく、基準からの向きの印。</b>"+
+         "0℃ を基準に決めて、高い向きを ＋、低い向きを − で表している。<br><br>"+
+         "小数でも同じ。5.5 も 8 も 41.2 も、0℃ より低ければすべて − がつく。"+
+         "<b>整数だけの話ではない</b>ことに注意。" },
+
+  { cat:"符号で表す", pg:"p.28 基本の問題", type:"choice",
+    body:'<div class="prob">ある品物の重さが、基準より 6kg 重いことを ＋6kg と表すことにします。</div>',
+    prompt:"10kg 軽いことは？",
+    opts:["−10kg","＋10kg","−4kg","10kg"],
+    ans:0,
+    hint:"「重い」を ＋ と決めたのだから、その反対は？",
+    work:"−10kg<br><br>"+
+         "<b>反対の性質をもつ量は、＋と− で表し分けられる。</b>"+
+         "重い／軽い、高い／低い、後／前、収入／支出  "+
+         "どれも一方を ＋ と決めれば、もう一方は自動的に − になる。<br><br>"+
+         "<b>どちらを ＋ にするかは自由。</b> ただし一度決めたら、"+
+         "その問題のあいだは変えないこと。" },
+
+  { cat:"符号で表す", pg:"p.28 基本の問題", type:"choice",
+    body:'<div class="prob">現在から8分後を ＋8分 と表すことにします。</div>',
+    prompt:"−5分 は何を表している？",
+    opts:["現在から5分後","5分間","現在から5分前","現在から3分後"],
+    ans:2,
+    hint:"「後」を ＋ と決めたのだから、− は？",
+    work:"現在から <b>5分前</b>。<br><br>"+
+         "<b>基準は「現在」、向きは「後か前か」。</b>"+
+         "時刻のように、前にも後にものびるものは、"+
+         "正負の数で表すとひとつの数直線として扱える。<br><br>"+
+         "この考え方は、あとで時差やグラフでも使う。"+
+         "<b>基準を決めて、向きを符号で表す</b>のは、数学のいたるところで出てくる。" },
+
+  { cat:"数直線と大小", pg:"p.25", type:"choice",
+    body:'<div class="m sm">−3　−2　−1　　0　　＋1　＋2　＋3</div>',
+    prompt:"原点とはどの点？",
+    opts:["いちばん左の点","数直線の真ん中の目もり","0 が対応している点","いちばん小さい数の点"],
+    ans:2,
+    hint:"数直線をつくるとき、いちばんはじめに決めた基準の点。",
+    work:"<b>0 が対応している点</b>が原点。<br><br>"+
+         "数直線をどこまでのばしても、原点は 0 の位置のまま。"+
+         "紙の真ん中にかいたかどうかは関係ない。<br><br>"+
+         "<b>原点は「基準」。</b> ここから右へどれだけ、左へどれだけ、"+
+         "という測り方をするための出発点。"+
+         "だから絶対値（原点からの距離）を考えるときにも、原点が必要になる。" },
+
+  { cat:"数直線と大小", pg:"p.26 問7", type:"choice",
+    body:'<div class="m">−13　と　−8</div>',
+    prompt:"大小を正しく表しているのは？",
+    opts:["−13 ＞ −8","−13 ＝ −8","−13 ＜ −8","比べられない"],
+    ans:2,
+    hint:"数直線上で、右にあるほうが大きい。−13 と −8 はどちらが右？",
+    work:"−13 ＜ −8<br><br>"+
+         "<b>数直線上の位置で決まる。</b> −13 は −8 より左にあるので、−13 のほうが小さい。<br><br>"+
+         "<b>13 ＞ 8 につられないこと。</b> 正の数なら 13 のほうが大きいが、"+
+         "負の数では逆になる。<br>"+
+         "理由は、絶対値が大きいほど原点から遠く、"+
+         "負の数は左向きに遠いので <b>より小さくなる</b> から。" },
+
+  { cat:"数直線と大小", pg:"p.26 問7", type:"choice",
+    body:'<div class="m">＋6　　−9　　0</div>',
+    prompt:"3つの数を小さい順に並べると？",
+    opts:["−9 ＜ 0 ＜ ＋6","0 ＜ −9 ＜ ＋6","−9 ＜ ＋6 ＜ 0","＋6 ＜ 0 ＜ −9"],
+    ans:0,
+    hint:"数直線に3つの点を書いてみよう。左にあるものから順に並べる。",
+    work:"−9 ＜ 0 ＜ ＋6<br><br>"+
+         "<b>0 は正の数より小さく、負の数より大きい。</b>"+
+         "0 は正でも負でもない数だが、数直線上の位置ははっきり決まっている。<br><br>"+
+         "<b>3つ以上並べるときは、まとめて書ける。</b>"+
+         "−9 ＜ 0 ＜ ＋6 と一度に書けば、3つの関係がすべてわかる。"+
+         "−9 ＜ 0 と 0 ＜ ＋6 を別々に書く必要はない。" },
+
+  { cat:"絶対値", pg:"p.27 問5", type:"num", pre:"絶対値は",
+    body:'<div class="m">−10</div>',
+    prompt:"−10 の絶対値は？", ans:10,
+    hint:"絶対値は、原点からの距離。−10 は原点からどれだけはなれている？",
+    work:"10<br><br>"+
+         "<b>絶対値は距離なので、向きは関係ない。</b>"+
+         "−10 は原点から左へ10、＋10 は右へ10。"+
+         "どちらも「10 はなれている」ことに変わりはない。<br><br>"+
+         "だから <b>−10 の絶対値も ＋10 の絶対値も、どちらも 10</b>。"+
+         "「符号を取った数」と覚えてもよいが、"+
+         "本当の意味は <b>原点からの距離</b>。" },
+
+  { cat:"絶対値", pg:"p.27 問6", type:"choice",
+    body:'<div class="m sm">絶対値が 7 である数</div>',
+    prompt:"あてはまる数は？",
+    opts:["＋7 だけ","−7 だけ","＋7 と −7 の2つ","0 から 7 までのすべての数"],
+    ans:2,
+    hint:"原点から 7 の距離にある点は、数直線上に何個あるだろう。右と左、両方を見よう。",
+    work:"<b>＋7 と −7 の2つ。</b><br><br>"+
+         "原点から 7 はなれた点は、<b>右にも左にもある</b>。"+
+         "距離だけを言われても向きは決まらないので、答えは2つになる。<br><br>"+
+         "<b>ただし絶対値が 0 である数は 0 だけ。</b>"+
+         "原点そのものなので、右も左もない。これだけが例外。" },
+
+  { cat:"絶対値", pg:"p.27", type:"choice",
+    body:'<div class="m">−15　と　−11</div>',
+    prompt:"−15 のほうが小さいのはなぜ？",
+    opts:["15 ＞ 11 だから。","負の数はすべて同じ大きさだから。","−15 のほうが数字が大きいから。","絶対値 15 のほうが大きく、負の数は原点から遠いほど左にあるから。"],
+    ans:3,
+    hint:"絶対値は原点からの距離。負の数は原点のどちら側にあるだろう。",
+    work:"<b>絶対値が大きい＝原点から遠い。負の数は原点の左にあるので、遠いほど左＝小さい。</b><br><br>"+
+         "−15 の絶対値は 15、−11 の絶対値は 11。15 のほうが大きいので、"+
+         "−15 のほうが原点から遠く、より左にある。だから −15 ＜ −11。<br><br>"+
+         "<b>1番と4番はなぜだめか。</b> 「15 ＞ 11 だから」では、"+
+         "なぜ大小が逆転するのかが説明できていない。"+
+         "正の数なら 15 ＞ 11 で大きいほうが大きいのに、"+
+         "負の数では逆になる。<b>その理由まで言えてはじめて説明になる。</b>" },
+
+  { cat:"絶対値", pg:"p.27 問7", type:"choice",
+    body:'<div class="m">−0.8　と　−0.12</div>',
+    prompt:"大小を正しく表しているのは？",
+    opts:["−0.8 ＞ −0.12","−0.8 ＜ −0.12","−0.8 ＝ −0.12","比べられない"],
+    ans:1,
+    hint:"まず絶対値を比べよう。0.8 と 0.12 では、どちらが大きい？",
+    work:"−0.8 ＜ −0.12<br><br>"+
+         "<b>0.8 と 0.12 では 0.8 のほうが大きい。</b>"+
+         "けたの数が多い 0.12 のほうが大きく見えるが、"+
+         "0.8 ＝ 0.80 と書けば 0.80 ＞ 0.12 とわかる。<br><br>"+
+         "絶対値が大きいのは −0.8 のほうなので、"+
+         "負の数の中では −0.8 のほうが小さい。<br>"+
+         "<b>小数の見た目にだまされないこと。</b>"+
+         "けた数をそろえて比べるのがコツ。" },
+
+  { cat:"ことばの意味", pg:"p.22", type:"choice",
+    body:'<div class="m sm">0 について</div>',
+    prompt:"教科書 p.22 の説明として正しいのは？",
+    opts:["0 は正の数である。","0 は負の数である。",
+          "0 は正でも負でもない数である。","0 は場合によって正にも負にもなる。"],
+    ans:2,
+    hint:"p.22 に「0 は正でも負でもない数である」と書いてある。",
+    work:"<b>0 は正でも負でもない数。</b><br><br>"+
+         "0 は基準そのものなので、「基準より高い」でも「基準より低い」でもない。"+
+         "だからどちらにも属さない。<br><br>"+
+         "<b>数直線でいえば原点。</b> 右でも左でもなく、ちょうど境目にある。"+
+         "そして 0 の絶対値は 0。これも 0 だけの特別な性質。" },
+
+  { cat:"ことばの意味", pg:"p.22", type:"choice",
+    body:'<div class="m sm">整数の分類</div>',
+    prompt:"自然数とは？",
+    opts:["すべての整数","正の整数","0 と正の整数","正の整数と負の整数"],
+    ans:1,
+    hint:"p.22 に「自然数は、正の整数である」と書いてある。0 は入るだろうか。",
+    work:"<b>正の整数</b>（1、2、3、…）が自然数。<br><br>"+
+         "整数は <b>負の整数・0・正の整数</b> の3つに分かれる。"+
+         "そのうち正の整数だけが自然数。<b>0 は自然数にふくまれない。</b><br><br>"+
+         "<b>数の世界がひろがった。</b> 小学校では 0 と正の数だけを扱ってきたが、"+
+         "1章 で負の数が加わり、数直線が左にものびた。"+
+         "この「数の範囲をひろげる」という考え方は、0章 の p.55 でも出てくる。" }
+  ];
+
+  /* ================= shared engine ================= */
+  var CATS = ["符号で表す","数直線と大小","絶対値","ことばの意味"];
+  var BACK = {
+    "符号で表す":"p.22〜23　符号のついた数・反対の性質をもつ量",
+    "数直線と大小":"p.25〜26　数直線と原点・数の大小",
+    "絶対値":"p.27　絶対値と負の数の大小",
+    "ことばの意味":"p.22　正の数・負の数・整数・自然数"
+  };
+
+  var mode = "setsumei";
+  var S = {                       // per-tab state, kept when switching
+    setsumei:{ i:0, tries:0, done:false,
+      res: STEPS.map(function(s){ return s.kind==="write"
+              ? {kind:"write", checks:0, of:s.checks.length, wrote:false}
+              : {kind:"auto", first:null}; }) },
+    test:{ i:0, tries:0, done:false, first:new Array(Q.length).fill(null),
+           help:new Array(Q.length).fill(0) }   /* 0=自力 1=ヒント 2=答えを見た */
+  };
+
+  var root=document.getElementById("root"), stage=document.getElementById("stage"),
+      bar=document.getElementById("bar");
+
+  function norm(s){
+    return String(s).trim()
+      .replace(/[０-９]/g,function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); })
+      .replace(/[\u2212\u30FC\uFF0D\u2010\u2011\u2013\u2014\u2015\uFF70]/g,"-")
+      .replace(/\uFF0B/g,"+").replace(/\uFF0F/g,"/").replace(/\uFF0E/g,".")
+      .replace(/[,\uFF0C\s]/g,"").replace(/^\+/,"");
+  }
+  function val(s){
+    if(/^-?\d+(\.\d+)?$/.test(s)) return Number(s);
+    var m=s.match(/^(-?\d+)\/(\d+)$/);
+    return m ? Number(m[1])/Number(m[2]) : NaN;
+  }
+  function fmt(n){ return String(n).replace("-","−"); }
+
+  function paintBar(){
+    var n = (mode==="setsumei") ? STEPS.length : Q.length;
+    while(bar.children.length < n+1) bar.appendChild(document.createElement("i"));
+    while(bar.children.length > n+1) bar.removeChild(bar.lastChild);
+    var st=S[mode], b=bar.children;
+    for(var k=0;k<n;k++){
+      var cls="";
+      if(k===st.i && !st.done) cls="now";
+      else if(mode==="setsumei"){
+        var r=st.res[k];
+        cls = r.kind==="auto" ? (r.first===true?"hit":r.first===false?"miss":"")
+                              : (r.wrote ? (r.checks>0?"hit":"miss") : "");
+      } else {
+        cls = st.first[k]===true?"hit":st.first[k]===false?"miss":"";
+      }
+      b[k].className=cls;
+    }
+    b[n].className = st.done ? "now" : "";
+    // tab badges
+    var sDone=S.setsumei.res.filter(function(r){
+          return r.kind==="auto" ? r.first!==null : r.wrote; }).length;
+    var tDone=S.test.first.filter(function(v){ return v!==null; }).length;
+    var bs=document.getElementById("b-setsumei"), bt=document.getElementById("b-test");
+    bs.textContent = sDone ? sDone+"/"+STEPS.length : STEPS.length+"問";
+    bt.textContent = tDone ? tDone+"/"+Q.length : Q.length+"問";
+    bs.className = "badge"+(sDone===STEPS.length?" done":"");
+    bt.className = "badge"+(tDone===Q.length?" done":"");
+  }
+
+  function shuffled(n){
+    var a=[],k,j,t; for(k=0;k<n;k++) a.push(k);
+    for(k=a.length-1;k>0;k--){ j=Math.floor(Math.random()*(k+1)); t=a[k];a[k]=a[j];a[j]=t; }
+    return a;
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    if(S[mode].done){ report(); return; }
+    return (mode==="setsumei") ? renderStep() : renderQ();
+  }
+
+  function renderStep(){
+    var st=S.setsumei, s=STEPS[st.i]; st.tries=0;
+    var mid;
+    if(s.kind==="choice"){
+      mid='<p class="prompt">'+s.prompt+'</p><div class="choices" id="opts">'+
+          s.opts.map(function(o,k){ return '<button class="choice" data-k="'+k+'">'+o+'</button>'; }).join("")+
+          '</div><div class="fb" id="fb"></div>';
+    } else if(s.kind==="order"){
+      mid='<p class="prompt">'+s.prompt+'</p><div class="ord" id="ord">'+
+          shuffled(s.items.length).map(function(k){
+            return '<button class="item" data-k="'+k+'"><span class="rank"></span>'+s.items[k]+'</button>'; }).join("")+
+          '</div><p class="ordcap" id="ordcap">0 / '+s.items.length+' 並んだ</p><div class="fb" id="fb"></div>';
+    } else {
+      mid='<p class="prompt">'+s.prompt+'</p>'+
+          '<textarea id="ta" placeholder="'+s.ph+'"></textarea><p class="cnt" id="cnt">0 文字</p>'+
+          '<p style="text-align:right;margin:0"><button class="btn accent" id="send">書けた。先生の説明を見る</button></p>'+
+          '<div class="board" id="board"><p class="who">先生の説明</p><p class="say">'+s.model+'</p></div>'+
+          '<div class="selfcheck" id="sc"><p class="t">自分の説明とくらべよう</p>'+
+          s.checks.map(function(c,k){ return '<label><input type="checkbox" data-c="'+k+'"><span>'+c+'</span></label>'; }).join("")+
+          '<p class="hintline">できていなかったところは、いま書きたして直してみよう。</p></div>';
+    }
+    stage.innerHTML='<section class="screen"><div class="card">'+
+      '<span class="tag">'+s.tag+'</span><span class="sec">'+s.sec+'</span><span class="pg">'+s.pg+'</span>'+
+      '<h2>'+s.title+'</h2><p class="lead">'+s.lead+'</p>'+s.body+mid+
+      '<div class="nav"><span class="stepno">'+(st.i+1)+' / '+STEPS.length+'</span>'+
+      '<button class="btn" id="next" disabled>'+(st.i===STEPS.length-1?"けっかを見る →":"次へ →")+'</button></div>'+
+      '</div></section>';
+    wireStep();
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function wireStep(){
+    var st=S.setsumei, s=STEPS[st.i];
+    if(s.kind==="choice"){
+      var opts=document.getElementById("opts");
+      Array.prototype.forEach.call(opts.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return;
+          var ok=Number(b.getAttribute("data-k"))===s.ans, fb=document.getElementById("fb");
+          st.tries++;
+          if(ok){
+            if(st.res[st.i].first===null) st.res[st.i].first=(st.tries===1);
+            b.classList.add("ok");
+            fb.className="fb show right"; fb.innerHTML="<b>そのとおり。</b>"+s.work;
+            lockChoices();
+          } else {
+            st.res[st.i].first=false; b.classList.add("no");
+            if(st.tries===1){ fb.className="fb show hint"; fb.innerHTML="<b>もう一度考えよう</b>"+s.hint; }
+            else{ fb.className="fb show wrong";
+                  fb.innerHTML="<b>答えは「"+s.opts[s.ans].replace(/<[^>]+>/g,"")+"」</b>"+s.work;
+                  opts.children[s.ans].classList.add("reveal"); lockChoices(); }
+            paintBar();
+          }
+        });
+      });
+    } else if(s.kind==="order"){
+      var placed=0, ord=document.getElementById("ord");
+      Array.prototype.forEach.call(ord.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return;
+          if(Number(b.getAttribute("data-k"))===placed){
+            b.disabled=true; b.classList.add("placed");
+            b.querySelector(".rank").textContent=++placed;
+            document.getElementById("ordcap").textContent=placed+" / "+s.items.length+" 並んだ";
+            if(placed===s.items.length){
+              if(st.res[st.i].first===null) st.res[st.i].first=(st.tries===0);
+              var fb=document.getElementById("fb");
+              fb.className="fb show right"; fb.innerHTML="<b>きれいにつながった。</b>"+s.work;
+              document.getElementById("next").disabled=false; paintBar();
+            }
+          } else {
+            st.tries++; st.res[st.i].first=false;
+            b.classList.add("shake"); setTimeout(function(){ b.classList.remove("shake"); },340);
+            var fb2=document.getElementById("fb");
+            fb2.className="fb show hint"; fb2.innerHTML="<b>その順番ではないみたい</b>"+s.hint;
+            paintBar();
+          }
+        });
+      });
+    } else {
+      var ta=document.getElementById("ta"), send=document.getElementById("send");
+      ta.addEventListener("input",function(){
+        document.getElementById("cnt").textContent=ta.value.trim().length+" 文字"; });
+      send.addEventListener("click",function(){
+        if(ta.disabled) return;
+        if(ta.value.trim().length<10){
+          document.getElementById("cnt").textContent="もう少し書いてみよう（10文字以上）"; ta.focus(); return; }
+        st.res[st.i].wrote=true; ta.disabled=true; send.disabled=true;
+        document.getElementById("board").classList.add("show");
+        var sc=document.getElementById("sc"); sc.classList.add("show");
+        document.getElementById("next").disabled=false;
+        Array.prototype.forEach.call(sc.querySelectorAll("input"),function(cb){
+          cb.addEventListener("change",function(){
+            st.res[st.i].checks=sc.querySelectorAll("input:checked").length; paintBar(); });
+        });
+        paintBar();
+      });
+      ta.focus();
+    }
+    document.getElementById("next").addEventListener("click",function(){
+      if(this.disabled) return;
+      if(st.i===STEPS.length-1){ st.done=true; report(); return; }
+      st.i++; renderStep();
+    });
+  }
+
+  function lockChoices(){
+    var opts=document.getElementById("opts");
+    Array.prototype.forEach.call(opts.children,function(b){ b.disabled=true; });
+    document.getElementById("next").disabled=false; paintBar();
+  }
+
+  function renderQ(){
+    var st=S.test, q=Q[st.i]; st.tries=0;
+    var input = q.type==="choice"
+      ? '<div class="choices" id="opts">'+
+        q.opts.map(function(o,k){ return '<button class="choice'+(o.length<12?" mid":"")+'" data-k="'+k+'">'+o+'</button>'; }).join("")+'</div>'
+      : '<div class="row"><span class="pre">'+q.pre+'</span>'+
+        '<input type="text" id="ans" autocomplete="off" aria-label="答え">'+
+        (q.unit?'<span class="unit">'+q.unit+'</span>':'')+
+        '<button class="btn accent" id="check">たしかめる</button></div>';
+    stage.innerHTML='<section class="screen"><div class="card">'+
+      '<span class="tag">第 '+(st.i+1)+' 問</span><span class="pg">'+q.pg+'</span>'+
+      q.body+'<p class="prompt">'+q.prompt+'</p>'+input+
+      '<div class="helprow">'+
+        '<button class="btn tiny" id="hintbtn">ヒントを見る</button>'+
+        '<button class="btn tiny" id="showbtn" hidden>答えを見る</button>'+
+      '</div>'+
+      '<div class="fb" id="fb"></div>'+
+      '<div class="nav"><span class="stepno">'+(st.i+1)+' / '+Q.length+'</span>'+
+      '<button class="btn" id="next" disabled>'+(st.i===Q.length-1?"けっかを見る →":"次へ →")+'</button></div>'+
+      '</div></section>';
+
+    if(q.type==="choice"){
+      var opts=document.getElementById("opts");
+      Array.prototype.forEach.call(opts.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return; judgeQ(Number(b.getAttribute("data-k"))===q.ans,b); });
+      });
+    } else {
+      var inp=document.getElementById("ans");
+      var go=function(){
+        if(inp.disabled) return;
+        var raw=norm(inp.value), fb=document.getElementById("fb");
+        if(raw===""){ fb.className="fb show hint"; fb.innerHTML="<b>答えを入れてね</b>数字を入力してから、たしかめるを押そう。"; return; }
+        var v=val(raw);
+        if(isNaN(v)){ fb.className="fb show hint"; fb.innerHTML="<b>数字で答えよう</b>マイナスは − でも - でも入力できるよ。"; return; }
+        judgeQ(Math.abs(v-q.ans)<1e-9,null);
+      };
+      document.getElementById("check").addEventListener("click",go);
+      inp.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); go(); } });
+      inp.focus();
+    }
+    var hintbtn=document.getElementById("hintbtn"), showbtn=document.getElementById("showbtn");
+    hintbtn.addEventListener("click",function(){
+      if(hintbtn.disabled) return;
+      if(st.help[st.i]<1) st.help[st.i]=1;
+      if(st.first[st.i]===null) st.first[st.i]=false;   // no longer counts as 自力
+      var fb=document.getElementById("fb");
+      fb.className="fb show hint"; fb.innerHTML="<b>ヒント</b>"+q.hint;
+      hintbtn.disabled=true; showbtn.hidden=false;
+      paintBar();
+    });
+    showbtn.addEventListener("click",function(){
+      if(showbtn.disabled) return;
+      st.help[st.i]=2; st.first[st.i]=false;
+      var fb=document.getElementById("fb");
+      fb.className="fb show wrong";
+      fb.innerHTML="<b>答えは "+(q.type==="choice"?"「"+q.opts[q.ans]+"」":fmt(q.ans))+
+                   "</b><span class='work'>"+q.work+"</span>";
+      var opts=document.getElementById("opts");
+      if(opts) opts.children[q.ans].classList.add("reveal");
+      lockQ();
+      var m=document.createElement("p");
+      m.className="usedmark"; m.textContent="この問題は、あとでもう一度といてみよう。";
+      fb.parentNode.insertBefore(m, fb.nextSibling);
+      paintBar();
+    });
+
+    document.getElementById("next").addEventListener("click",function(){
+      if(this.disabled) return;
+      if(st.i===Q.length-1){ st.done=true; report(); return; }
+      st.i++; renderQ();
+    });
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function judgeQ(ok,btn){
+    var st=S.test, q=Q[st.i], fb=document.getElementById("fb");
+    st.tries++;
+    if(ok){
+      if(st.first[st.i]===null) st.first[st.i]=(st.tries===1 && st.help[st.i]===0);
+      if(btn) btn.classList.add("ok");
+      fb.className="fb show right";
+      fb.innerHTML="<b>"+(st.help[st.i]>0?"よくできました。":"せいかい！")+
+                   "</b><span class='work'>"+q.work+"</span>";
+      lockQ(); paintBar(); return;
+    }
+    st.first[st.i]=false;
+    if(btn) btn.classList.add("no");
+    if(st.tries===1){
+      if(st.help[st.i]<1) st.help[st.i]=1;
+      fb.className="fb show hint"; fb.innerHTML="<b>おしい。ヒント</b>"+q.hint;
+      var hb=document.getElementById("hintbtn"), sb=document.getElementById("showbtn");
+      if(hb) hb.disabled=true; if(sb) sb.hidden=false;
+    }
+    else{
+      fb.className="fb show wrong";
+      fb.innerHTML="<b>答えは "+(q.type==="choice"?"「"+q.opts[q.ans]+"」":fmt(q.ans))+"</b><span class='work'>"+q.work+"</span>";
+      var opts=document.getElementById("opts");
+      if(opts) opts.children[q.ans].classList.add("reveal");
+      st.help[st.i]=2;
+      lockQ();
+    }
+    paintBar();
+  }
+
+  function lockQ(){
+    var opts=document.getElementById("opts");
+    if(opts) Array.prototype.forEach.call(opts.children,function(b){ b.disabled=true; });
+    var inp=document.getElementById("ans");
+    if(inp){ inp.disabled=true; document.getElementById("check").disabled=true; }
+    var hb=document.getElementById("hintbtn"), sb=document.getElementById("showbtn");
+    if(hb) hb.disabled=true;
+    if(sb) sb.disabled=true;
+    document.getElementById("next").disabled=false;
+  }
+
+  /* ---------- reports ---------- */
+  function report(){
+    if(mode==="setsumei"){
+      var st=S.setsumei;
+      var autos=st.res.filter(function(r){ return r.kind==="auto"; });
+      var autoOk=autos.filter(function(r){ return r.first===true; }).length;
+      var writes=st.res.filter(function(r){ return r.kind==="write"; });
+      var wrote=writes.filter(function(r){ return r.wrote; }).length;
+      var checks=writes.reduce(function(a,r){ return a+r.checks; },0);
+      var of=writes.reduce(function(a,r){ return a+r.of; },0);
+      var advice = (autoOk===autos.length && checks>=of-1)
+        ? "説明する力がついている。テスト編に進んで、身についたか確かめよう。"
+        : (autoOk<autos.length
+          ? "「どの説明がよいか」を見分けるところをもう一度。きまりをくり返すだけの説明と、理由を示す説明のちがいに注目しよう。"
+          : "書くところをよくがんばった。チェックが入らなかった項目をつけ足して書きなおすと、説明がぐっとよくなる。");
+      stage.innerHTML='<section class="screen"><div class="card">'+
+        '<span class="tag">けっか</span><h2>説明編のふり返り</h2>'+
+        '<p class="big">'+autoOk+' <small>/ '+autos.length+'</small></p>'+
+        '<p class="lead" style="text-align:center;margin-top:0">見きわめ問題</p>'+
+        '<table><tbody><tr><td>説明を書いた回数</td><td class="s">'+wrote+' / '+writes.length+'</td></tr>'+
+        '<tr><td>自己チェックがついた数</td><td class="s">'+checks+' / '+of+'</td></tr></tbody></table>'+
+        '<div class="note">'+advice+'</div>'+
+        '<p class="lead" style="margin:16px 0 2px"><b>説明するときの3つの型</b></p>'+
+        '<ul class="tips"><li><b>〜だから、〜になる。</b>　理由を先に、結論をあとに。</li>'+
+        '<li><b>たとえば〜の場合は。</b>　具体的な数や場面で確かめる。</li>'+
+        '<li><b>もし〜だとしたら、〜になってしまう。</b>　まちがいのほうを試して確かめる。</li></ul>'+
+        '<div class="note" style="border-color:var(--ok);background:var(--ok-bg)">'+
+        'おうちの人へ：書いた説明を声に出して読んでもらい、「どうしてそう思ったの？」と一度だけ聞き返すと、'+
+        '説明がもう一段くわしくなります。正しさより、理由が言えたことをほめてください。</div>'+
+        '<div class="nav" style="justify-content:center;gap:10px">'+
+        '<button class="btn ghost" id="again">もう一度</button>'+
+        '<button class="btn accent" id="goto-test">テスト編へ →</button></div>'+
+        '</div></section>';
+      document.getElementById("goto-test").addEventListener("click",function(){ switchTo("test"); });
+    } else {
+      var t=S.test, rows="", weak=[];
+      var solo=0, hinted=0, shown=0;
+      for(var k=0;k<Q.length;k++){
+        if(t.help[k]===2) shown++;
+        else if(t.first[k]===true) solo++;
+        else hinted++;
+      }
+      var n=solo;
+      CATS.forEach(function(c){
+        var idx=Q.map(function(q,k){ return q.cat===c?k:-1; }).filter(function(k){ return k>=0; });
+        var got=idx.filter(function(k){ return t.first[k]===true; }).length;
+        var sh =idx.filter(function(k){ return t.help[k]===2; }).length;
+        if(got<idx.length) weak.push(c);
+        var label = got===idx.length ? "OK" : (sh ? "要復習" : "あと少し");
+        var pill  = got===idx.length ? "good" : "watch";
+        rows+="<tr><td>"+c+"</td><td class='s'>"+got+" / "+idx.length+"</td>"+
+          "<td style='text-align:right'><span class='pill "+pill+"'>"+label+"</span></td></tr>";
+      });
+      stage.innerHTML='<section class="screen"><div class="card">'+
+        '<span class="tag">けっか</span><h2>テスト編の結果</h2>'+
+        '<p class="big">'+n+' <small>/ '+Q.length+'</small></p>'+
+        '<p class="lead" style="text-align:center;margin-top:0">自力で正解した数</p>'+
+        '<table><tbody>'+
+          '<tr><td>自力で正解</td><td class="s">'+solo+' 問</td></tr>'+
+          '<tr><td>ヒントを見て正解</td><td class="s">'+hinted+' 問</td></tr>'+
+          '<tr><td>答えを見た</td><td class="s">'+shown+' 問</td></tr>'+
+        '</tbody></table>'+
+        '<table><thead><tr><th>種類</th><th style="text-align:right">自力正答</th><th></th></tr></thead>'+
+        '<tbody>'+rows+'</tbody></table>'+
+        '<div class="note">'+(
+          solo===Q.length
+          ? "全問を自力で正解。1節 は身についている。次は p.29 の加法と減法へ。"
+          : shown===0
+          ? "答えを見ずに、最後まで自分で解けた。ヒントが必要だった問題をもう一度といてみよう。"
+          : shown<=2
+          ? "ほとんど自分で解けている。答えを見た問題だけ、教科書のページにもどって確かめよう。"
+          : "答えを見た問題が多い。まず教科書の該当ページを読みなおしてから、もう一度このテストをやってみよう。"
+        )+'</div>'+
+        '<div class="note" style="border-color:var(--ok);background:var(--ok-bg)">'+
+        'おうちの人へ：<b>ヒントを見て正解</b>と<b>答えを見た</b>では、必要な手当てがちがいます。'+
+        'ヒントで解けたなら、理解はできていて思い出すきっかけが必要なだけ。'+
+        '答えを見た問題が続くなら、その内容をもう一度教えるところから始めてください。</div>'+
+        (weak.length ? '<p class="lead" style="margin:14px 0 2px"><b>もどるページ</b></p><ul class="rev">'+
+          weak.map(function(c){ return "<li><b>"+c+"</b>　"+BACK[c]+"</li>"; }).join("")+'</ul>' : '')+
+        '<div class="nav" style="justify-content:center;gap:10px">'+
+        '<button class="btn ghost" id="again">もう一度</button>'+
+        '<button class="btn accent" id="goto-setsumei">説明編へ →</button></div>'+
+        '</div></section>';
+      document.getElementById("goto-setsumei").addEventListener("click",function(){ switchTo("setsumei"); });
+    }
+    document.getElementById("again").addEventListener("click",function(){
+      if(mode==="setsumei"){
+        S.setsumei={ i:0, tries:0, done:false, res: STEPS.map(function(s){
+          return s.kind==="write" ? {kind:"write",checks:0,of:s.checks.length,wrote:false}
+                                  : {kind:"auto",first:null}; }) };
+      } else {
+        S.test={ i:0, tries:0, done:false, first:new Array(Q.length).fill(null),
+                 help:new Array(Q.length).fill(0) };
+      }
+      render();
+    });
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  /* ---------- tabs ---------- */
+  function switchTo(m){
+    mode=m;
+    root.className="wrap theme-"+m;
+    Array.prototype.forEach.call(document.querySelectorAll(".tabs button"),function(b){
+      b.classList.toggle("on", b.getAttribute("data-tab")===m); });
+    render();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".tabs button"),function(b){
+    b.addEventListener("click",function(){ switchTo(b.getAttribute("data-tab")); });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

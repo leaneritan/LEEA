@@ -25,12 +25,20 @@ import {
   syncLessonProgressWithCloud,
   type LessonProgressMap
 } from "@/data/lessonProgress";
-import { getLessonGroups, learnerLessons, lessons } from "@/data/lessons";
+import { getLessonGroups, learnerLessons, lessons, teacherLessons } from "@/data/lessons";
 import { LEVELS, LIVE_LEVEL, LIVE_UNIT, UNIT_TITLES } from "@/data/curriculum";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
 
 const SPINE_LESSONS = ["Opener", "Vocabulary 1", "Song", "Grammar 1", "Vocabulary 2", "Grammar 2", "Reading", "Writing"];
+
+// Training Ground drills are skill-based, so they carry no level or unit and
+// the Level/Unit navigator above can never reach them. Without their own
+// section they exist only on /english/training-ground and are invisible from
+// the teacher menu — which is where AGENTS.md says teacher lessons get opened
+// and marked done. They are listed in authored order, which is teaching order.
+const trainingGroundTeacherLessons = teacherLessons.filter((lesson) => lesson.course === "special-training");
+const trainingGroundLearnerLessons = learnerLessons.filter((lesson) => lesson.course === "special-training");
 
 // Units that don't have any authored lesson yet fall back to the placeholder
 // spine above, positioned relative to the LIVE_LEVEL/LIVE_UNIT cursor.
@@ -172,6 +180,7 @@ export function TeacherDashboard() {
     () => groups.find((group) => group.level === selectedLevel)?.unitGroups.find((unitGroup) => unitGroup.unit === selectedUnit),
     [groups, selectedLevel, selectedUnit]
   );
+  const trainingGroundTaught = trainingGroundTeacherLessons.filter((lesson) => progress[lesson.id]?.status === "done").length;
   const selectedTeacherLessons = useMemo(
     () => selectedUnitGroup?.lessons.filter((lesson) => lesson.mode === "teacher") ?? [],
     [selectedUnitGroup]
@@ -380,6 +389,43 @@ export function TeacherDashboard() {
           </div>
         )}
       </section>
+
+      {trainingGroundTeacherLessons.length ? (
+        <section className="teacher-group teacher-design-group" aria-label="Training Ground">
+          <div className="teacher-group-header teacher-design-group-header">
+            <span>Training Ground</span>
+            <h2>Skill drills</h2>
+            <small>
+              <i>
+                <b style={{ width: `${Math.round((trainingGroundTaught / trainingGroundTeacherLessons.length) * 100)}%` }} />
+              </i>
+              {trainingGroundTaught} / {trainingGroundTeacherLessons.length} taught
+            </small>
+          </div>
+          <div className="teacher-table">
+            <div className="teacher-table-head">
+              <span>Lesson</span>
+              <span>Teaching</span>
+              <span>Leo&apos;s App</span>
+            </div>
+            {trainingGroundTeacherLessons.map((lesson) => {
+              const learnerCounterpart = trainingGroundLearnerLessons.find((item) => item.component === `${lesson.component}-app`);
+              return (
+                <TeacherLessonRow
+                  assignment={learnerCounterpart ? assignments[learnerCounterpart.id] : undefined}
+                  key={lesson.id}
+                  learner={learnerCounterpart}
+                  lesson={lesson}
+                  progress={progress[lesson.id]}
+                  setLessonDone={setLessonDone}
+                  assignLesson={assignLesson}
+                  unassignLesson={unassignLesson}
+                />
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
     </section>
   );
 }
@@ -413,7 +459,11 @@ function TeacherLessonRow({
         <h3>{copy.title}</h3>
         <p>{copy.subtitle}</p>
         <small>
-          {lesson.source.slideCount ?? 0} slides · {done && progress?.completedAt ? `taught ${new Date(progress.completedAt).toLocaleDateString()}` : "not taught yet"}
+          {/* Slide-deck lessons lead with their slide count; app-backed lessons
+              (e.g. the Grammar Cup test) have none, and read "0 slides" if the
+              count is printed unconditionally. */}
+          {lesson.source.slideCount ? `${lesson.source.slideCount} slides · ` : ""}
+          {done && progress?.completedAt ? `taught ${new Date(progress.completedAt).toLocaleDateString()}` : "not taught yet"}
         </small>
       </div>
 

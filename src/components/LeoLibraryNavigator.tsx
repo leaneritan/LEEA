@@ -1,9 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { AssignmentMap } from "@/data/assignments";
-import { getLevelStatus, LEVELS, LIVE_LEVEL, LIVE_UNIT, UNIT_TITLES } from "@/data/curriculum";
+import { LEVELS, UNIT_TITLES } from "@/data/curriculum";
+import {
+  fallbackCurrentUnit,
+  levelStatusFor,
+  readCurrentUnit,
+  syncCurrentUnitWithCloud,
+  type CurrentUnit
+} from "@/data/currentUnit";
 import { getLearnerAppProgress, type LearnerAppProgress } from "@/data/learnerProgress";
 import type { LessonGroup } from "@/data/lessons";
 import { getComponentMeta, type ComponentTone } from "./componentMeta";
@@ -114,8 +121,23 @@ export function LeoLibraryNavigator({
   assignments: AssignmentMap;
   appProgress: Record<string, LearnerAppProgress>;
 }) {
-  const [selectedLevel, setSelectedLevel] = useState(LIVE_LEVEL);
-  const [selectedUnit, setSelectedUnit] = useState(LIVE_UNIT);
+  const [currentUnit, setCurrentUnit] = useState<CurrentUnit>(fallbackCurrentUnit);
+  const [selectedLevel, setSelectedLevel] = useState(fallbackCurrentUnit.level);
+  const [selectedUnit, setSelectedUnit] = useState(fallbackCurrentUnit.unit);
+
+  // Open on whichever unit Neritan set as current, and follow it if another
+  // device changed it.
+  useEffect(() => {
+    const local = readCurrentUnit();
+    setCurrentUnit(local);
+    setSelectedLevel(local.level);
+    setSelectedUnit(local.unit);
+    void syncCurrentUnitWithCloud(local).then((synced) => {
+      setCurrentUnit(synced);
+      setSelectedLevel(synced.level);
+      setSelectedUnit(synced.unit);
+    });
+  }, []);
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
 
   const levelGroups = useMemo(() => groups.filter((group) => group.level === selectedLevel), [groups, selectedLevel]);
@@ -144,7 +166,7 @@ export function LeoLibraryNavigator({
 
   function selectLevel(level: number) {
     setSelectedLevel(level);
-    setSelectedUnit(level === LIVE_LEVEL ? LIVE_UNIT : 1);
+    setSelectedUnit(level === currentUnit.level ? currentUnit.unit : 1);
   }
 
   function toggleRow(rowId: string) {
@@ -158,7 +180,7 @@ export function LeoLibraryNavigator({
           <span className="leo-lib-label">Level</span>
           <div className="leo-lib-level-tabs" role="tablist" aria-label="Level">
             {LEVELS.map((level) => {
-              const status = getLevelStatus(level);
+              const status = levelStatusFor(level, currentUnit);
               const isSelected = level === selectedLevel;
               return (
                 <button

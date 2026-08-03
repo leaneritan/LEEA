@@ -32,35 +32,50 @@ It is **load-bearing**: every station either produces or repairs a *which*-defin
 
 | LP beat | Source | Module |
 |---|---|---|
-| Warm Up · Recycle — connect, rub, skater, spin | LP p.304 | **0 Warm Up** — the LP's four words with its own model definitions |
+| Warm Up · Recycle — connect, rub, skater, spin | LP p.304 | **1 Warm Up** — the LP's four words with its own model definitions |
 | Present · Grammar Box (TR 9.7) | SB p.155 | **2 The Rule** — both grammar-box sentences verbatim |
-| Grammar in Depth · *which* replaces *it* / *them* | LP p.305 | **3 Fusion** |
-| Grammar in Depth · the echo trap | LP p.305 | **4 Ghost Hunt** — the LP's two warnings verbatim |
-| Grammar in Depth · Unit 8 *who* → Unit 9 *which* | LP p.305 | **5 The Gate** |
-| Grammar in Depth · *that* substitutes for *which* | LP p.305 | **6 Substitute** |
-| **Practice · Activity 1 (5 items)** | **SB p.155** | **9 Dictionary** — all five verbatim with the book's own frames |
-| Wrap Up · lettuce / video games / horses | LP p.305 | **9 Dictionary** — Challenge set |
-| Extend · basketball, tennis, taking photos | LP p.305 | **9 Dictionary** — Challenge set |
-| Formative · *skater* and *swing* | LP p.305 | **9 Dictionary** — Challenge set |
+| Grammar in Depth · *which* replaces *it* / *them* | LP p.305 | **2 The Rule** — fusion round |
+| Grammar in Depth · the echo trap | LP p.305 | **3 Detective** — the LP's two warnings verbatim |
+| Grammar in Depth · Unit 8 *who* → Unit 9 *which* | LP p.305 | **5 Sort** |
+| Grammar in Depth · *that* substitutes for *which* | LP p.305 | **9 Guess It** |
+| **Practice · Activity 1 (5 items)** | **SB p.155** | **6 Practice** — all five verbatim with the book's own frames |
+| Apply · Activity 2 game (read and guess) | SB p.155 | **9 Guess It** |
+| Wrap Up · lettuce / video games / horses | LP p.305 | **6 Practice** — Challenge set |
+| Extend · basketball, tennis, taking photos | LP p.305 | **6 Practice** — Challenge set |
+| Formative · *skater* and *swing* | LP p.305 | **6 Practice** — Challenge set |
 
 The five Practice items keep the book's exact frames — *This is a machine \_\_\_ / It is a hobby \_\_\_ / This is a force \_\_\_ / It is a game \_\_\_ / This is a sport \_\_\_* — and are the module's completion condition. The Challenge set unlocks only once all five are written, so the LP's own activity is never skipped for the bonus.
 
-## Module table
+## Module spine — matches Unit 8
+
+The three sibling grammar apps (`ow-l4-u8-grammar-1`, `ow-l4-u8-grammar-2`,
+`ow-l4-u9-grammar-1`) all share one 12-module spine. This app uses it too, so the
+deck's stations live *inside* the spine rather than replacing it.
 
 | # | Module | Mechanic | Source of content |
 |---|---|---|---|
-| 0 | Warm Up | one-try MCQ | LP Recycle words + LP model definitions |
-| 1 | Word Lab | flip cards | Academic + content vocab cards |
-| 2 | The Rule | flip cards | SB p.155 grammar box + `grammar.json` chart rows |
-| 3 | Fusion | one-try MCQ | LP joins + 2 personalized |
-| 4 | Ghost Hunt | tap the echoing pronoun | LP's two warnings + 2 parallel |
-| 5 | The Gate | tap-word → tap-bin sorter | who/which, people vs things |
-| 6 | Substitute | one-try MCQ | LP's *that* note + the person trap |
-| 7 | Detective | one-try MCQ | broken entries |
-| 8 | Build It | tap words in order | `grammar.json` `tab4_master` build items, unchanged |
-| 9 | Dictionary | multi-slot writer | **SB p.155 Act 1 verbatim** + Wrap Up / Extend / Formative |
+| 0 | Word Lab | **flip flashcard + 🇯🇵 toggle + Practice/Quiz** (U8 standard) | definitions, instructions, tetherball |
+| 1 | Warm Up | one-try MCQ | LP p.304 Recycle: connect, rub, skater, spin |
+| 2 | The Rule | flip cards + fusion MCQ | SB p.155 grammar box + LP joins |
+| 3 | Detective | ghost hunt + fix-the-entry MCQ | LP p.305 echo-trap warnings |
+| 4 | Build It | tap words in order | `grammar.json` `tab4_master`, unchanged |
+| 5 | Sort | **shared `pickChart('classification sort')`** | who/which, people vs things |
+| 6 | Practice | multi-slot writer | **SB p.155 Act 1 verbatim** + Wrap Up / Extend / Formative |
+| 7 | Survey | writer ×3 | ask-and-define |
+| 8 | Word Web | **shared `pickChart('word web')`** | things Leo can define |
+| 9 | Guess It | one-try MCQ | SB p.155 Act 2 guessing game + LP's *that* note |
 | 10 | Quiz | one-try MCQ | `grammar.json` `tab3_quiz`, all 10, unchanged |
 | 11 | Dribble! | one-try MCQ speed round | mixed |
+
+**Vocabulary presentation.** Word Lab follows the Unit 8 grammar standard: a
+two-sided flip card (front = emoji + word + IPA, back = meaning + `🇯🇵 日本語`
+toggle + sample) with a Practice/Quiz mode switch, where Quiz asks Leo to *type*
+the word from its meaning. Flat reveal cards are not the pattern — Unit 9
+Grammar 1 still has that regression and should be brought in line.
+
+**Shared components.** Loads `charts.js`, `chart-picker.js` and `wordweb.js` like
+its siblings, so Sort and Word Web use the shared builders rather than
+hand-rolled copies.
 
 ## Leo personalization
 
@@ -83,7 +98,7 @@ Clubs web-searched at build time (2025-26 season) rather than recalled.
 - Quiz score persists to `score` as `{score,total,percent,done}`.
 - Restore on reopen — every module rebuilds its finished state, including the written definitions.
 - Redo clears the tab's keys, then re-initializes with a fresh shuffle.
-- Keys: `leea-4-9-grammar-2-tab-{i}-*` · homework `leo-4-9-grammar-2` · `captionKey` = `tab-9-caption` (joined definitions, for review).
+- Keys: `leea-4-9-grammar-2-tab-{i}-*` · homework `leo-4-9-grammar-2` · `captionKey` = `tab-6-caption` (joined definitions, for review).
 
 ## JS safety
 

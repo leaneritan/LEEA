@@ -26,7 +26,15 @@ import {
   type LessonProgressMap
 } from "@/data/lessonProgress";
 import { getLessonGroups, learnerLessons, lessons, teacherLessons } from "@/data/lessons";
-import { LEVELS, LIVE_LEVEL, LIVE_UNIT, UNIT_TITLES } from "@/data/curriculum";
+import { LEVELS, UNIT_TITLES } from "@/data/curriculum";
+import {
+  createCurrentUnit,
+  fallbackCurrentUnit,
+  readCurrentUnit,
+  saveCurrentUnit,
+  syncCurrentUnitWithCloud,
+  type CurrentUnit
+} from "@/data/currentUnit";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
 
@@ -41,7 +49,7 @@ const trainingGroundTeacherLessons = teacherLessons.filter((lesson) => lesson.co
 const trainingGroundLearnerLessons = learnerLessons.filter((lesson) => lesson.course === "special-training");
 
 // Units that don't have any authored lesson yet fall back to the placeholder
-// spine above, positioned relative to the LIVE_LEVEL/LIVE_UNIT cursor.
+// spine above, positioned relative to the current-unit cursor Neritan sets.
 
 type MockLessonStatus = "taught" | "todo" | "locked";
 
@@ -49,10 +57,10 @@ type MockLessonStatus = "taught" | "todo" | "locked";
 // haven't started. Within the live level, units before the live one have
 // already been taught and units after it haven't, since that level is
 // where teaching is actively happening.
-function getMockUnitStatuses(level: number, unit: number): MockLessonStatus[] {
-  if (level < LIVE_LEVEL) return SPINE_LESSONS.map(() => "taught");
-  if (level > LIVE_LEVEL) return SPINE_LESSONS.map(() => "locked");
-  return SPINE_LESSONS.map(() => (unit < LIVE_UNIT ? "taught" : "todo"));
+function getMockUnitStatuses(level: number, unit: number, cursor: CurrentUnit): MockLessonStatus[] {
+  if (level < cursor.level) return SPINE_LESSONS.map(() => "taught");
+  if (level > cursor.level) return SPINE_LESSONS.map(() => "locked");
+  return SPINE_LESSONS.map(() => (unit < cursor.unit ? "taught" : "todo"));
 }
 
 const checkpointComponents = [
@@ -118,8 +126,31 @@ export function TeacherDashboard() {
   const [assignmentsReady, setAssignmentsReady] = useState(false);
   const [progressVersion, setProgressVersion] = useState(0);
   const [completionTimestamps, setCompletionTimestamps] = useState<Record<string, string>>({});
-  const [selectedLevel, setSelectedLevel] = useState(LIVE_LEVEL);
-  const [selectedUnit, setSelectedUnit] = useState(LIVE_UNIT);
+  const [currentUnit, setCurrentUnit] = useState<CurrentUnit>(fallbackCurrentUnit);
+  const [selectedLevel, setSelectedLevel] = useState(fallbackCurrentUnit.level);
+  const [selectedUnit, setSelectedUnit] = useState(fallbackCurrentUnit.unit);
+
+  // The menu opens on whichever unit is set as current, and picks up a change
+  // made on another device.
+  useEffect(() => {
+    const local = readCurrentUnit();
+    setCurrentUnit(local);
+    setSelectedLevel(local.level);
+    setSelectedUnit(local.unit);
+    void syncCurrentUnitWithCloud(local).then((synced) => {
+      setCurrentUnit(synced);
+      setSelectedLevel(synced.level);
+      setSelectedUnit(synced.unit);
+    });
+  }, []);
+
+  const viewingCurrentUnit = selectedLevel === currentUnit.level && selectedUnit === currentUnit.unit;
+
+  function makeCurrentUnit() {
+    const next = createCurrentUnit(selectedLevel, selectedUnit);
+    setCurrentUnit(next);
+    void saveCurrentUnit(next);
+  }
   const groups = useMemo(() => getTeacherLevels(), []);
 
   useEffect(() => {
@@ -197,7 +228,7 @@ export function TeacherDashboard() {
     return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
   }, [selectedUnitGroup, progressVersion]);
 
-  const mockStatuses = useMemo(() => getMockUnitStatuses(selectedLevel, selectedUnit), [selectedLevel, selectedUnit]);
+  const mockStatuses = useMemo(() => getMockUnitStatuses(selectedLevel, selectedUnit, currentUnit), [selectedLevel, selectedUnit, currentUnit]);
 
   const rosterStats = isLiveUnit
     ? { lessons: selectedTeacherLessons.length, taught: selectedDoneCount, avgLabel: selectedAvgQuiz === null ? "—" : `${selectedAvgQuiz}%` }
@@ -313,6 +344,23 @@ export function TeacherDashboard() {
                 </button>
               );
             })}
+          </div>
+
+          <div className="teacher-current-unit">
+            {viewingCurrentUnit ? (
+              <span className="teacher-current-unit-pill">
+                <i className="level-tag-dot" aria-hidden="true" />
+                Currently teaching this unit
+              </span>
+            ) : (
+              <button className="teacher-current-unit-set" onClick={makeCurrentUnit} type="button">
+                Set Level {selectedLevel} · Unit {selectedUnit} as the current unit
+              </button>
+            )}
+            <small>
+              The current unit is where this menu and Leo&apos;s library open, and it decides which units read
+              Taught or To teach.
+            </small>
           </div>
         </div>
       </section>

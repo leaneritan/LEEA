@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Leo · Unit 9 Grammar 2 — Definitions with which</title>
+<script src="/components/charts.js"></script>
+<script src="/components/chart-picker.js"></script>
+<script src="/components/wordweb.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
 <style>
@@ -141,6 +144,38 @@ body{display:flex;flex-direction:column}
 .write-save.saved{background:#9CA3AF}
 .starter{background:var(--blue-l);border:2px solid var(--blue-b);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800;color:var(--blue-d);cursor:pointer;font-family:'Outfit',sans-serif}
 .starter:hover{background:var(--blue-b)}
+
+/* Word Lab flashcard — Unit 8 grammar standard: two-sided flip + JP toggle + Practice/Quiz */
+.fc-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mode-btn{padding:8px 18px;border-radius:20px;border:2px solid var(--red);font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;background:#fff;color:var(--red-d);transition:background .2s,color .2s}
+.mode-btn.active{background:var(--red);color:#fff}
+.flashcard-wrap{perspective:1000px;min-height:250px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:250px;position:relative;transform-style:preserve-3d;transition:transform .5s ease}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;gap:8px;text-align:center}
+.fc-front{background:linear-gradient(135deg,var(--red),var(--red-d));color:#fff;border:4px solid var(--gold)}
+.fc-back{background:#fff;border:4px solid var(--red);transform:rotateY(180deg)}
+.fc-emoji{font-size:54px;line-height:1}
+.fc-word{font-size:29px;font-weight:900}
+.fc-ipa{font-size:13px;font-weight:600;opacity:.85}
+.fc-def{font-size:16px;color:var(--ink-2);font-weight:700;line-height:1.35}
+.fc-tap{font-size:12px;font-weight:700;opacity:.75;letter-spacing:.06em}
+.fc-jp{font-size:14px;color:var(--ink-3);font-weight:700;display:none}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:none;border:1px dashed #D1D5DB;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;color:var(--ink-3);cursor:pointer;font-family:'Outfit',sans-serif}
+.fc-jp-btn:hover{border-color:var(--red);color:var(--red-d)}
+.fc-sample{font-size:14px;background:var(--blue-l);border-radius:10px;padding:7px 10px;font-weight:600;color:var(--ink-2)}
+.fc-nav{display:flex;gap:14px;align-items:center;justify-content:center;margin-top:12px}
+.fc-nav button{background:#fff;border:2px solid var(--border);border-radius:12px;padding:9px 22px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--ink)}
+.fc-nav button:hover{border-color:var(--red);color:var(--red-d)}
+.fc-counter{font-size:14px;font-weight:800;color:var(--ink-3);min-width:44px;text-align:center}
+.quiz-wrap{background:#fff;border:3px solid var(--border);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
+.quiz-input-row{display:flex;gap:8px;width:100%;max-width:380px}
+.quiz-input{flex:1;border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700}
+.quiz-input:focus{outline:none;border-color:var(--red)}
+.quiz-check{background:var(--green);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:16px;font-weight:900;cursor:pointer}
+.quiz-fb{font-size:14px;font-weight:800;min-height:20px}
+.web-host{min-height:200px}
 </style>
 </head>
 <body>
@@ -155,75 +190,115 @@ body{display:flex;flex-direction:column}
 </div>
 
 <div class="tab-nav" id="tab-nav">
-  <button class="tab-btn active" onclick="showTab(0)" id="tb0"><span class="tab-icon">🔥</span><span class="tab-name">Warm Up</span></button>
-  <button class="tab-btn" onclick="showTab(1)" id="tb1"><span class="tab-icon">🧪</span><span class="tab-name">Word Lab</span></button>
+  <button class="tab-btn active" onclick="showTab(0)" id="tb0"><span class="tab-icon">🧪</span><span class="tab-name">Word Lab</span></button>
+  <button class="tab-btn" onclick="showTab(1)" id="tb1"><span class="tab-icon">🔥</span><span class="tab-name">Warm Up</span></button>
   <button class="tab-btn" onclick="showTab(2)" id="tb2"><span class="tab-icon">📐</span><span class="tab-name">The Rule</span></button>
-  <button class="tab-btn" onclick="showTab(3)" id="tb3"><span class="tab-icon">⚡</span><span class="tab-name">Fusion</span></button>
-  <button class="tab-btn" onclick="showTab(4)" id="tb4"><span class="tab-icon">👻</span><span class="tab-name">Ghost Hunt</span></button>
-  <button class="tab-btn" onclick="showTab(5)" id="tb5"><span class="tab-icon">🚪</span><span class="tab-name">The Gate</span></button>
-  <button class="tab-btn" onclick="showTab(6)" id="tb6"><span class="tab-icon">🔁</span><span class="tab-name">Substitute</span></button>
-  <button class="tab-btn" onclick="showTab(7)" id="tb7"><span class="tab-icon">🔍</span><span class="tab-name">Detective</span></button>
-  <button class="tab-btn" onclick="showTab(8)" id="tb8"><span class="tab-icon">🔧</span><span class="tab-name">Build It</span></button>
-  <button class="tab-btn" onclick="showTab(9)" id="tb9"><span class="tab-icon">📖</span><span class="tab-name">Dictionary</span></button>
+  <button class="tab-btn" onclick="showTab(3)" id="tb3"><span class="tab-icon">🕵️</span><span class="tab-name">Detective</span></button>
+  <button class="tab-btn" onclick="showTab(4)" id="tb4"><span class="tab-icon">🔧</span><span class="tab-name">Build It</span></button>
+  <button class="tab-btn" onclick="showTab(5)" id="tb5"><span class="tab-icon">🗂️</span><span class="tab-name">Sort</span></button>
+  <button class="tab-btn" onclick="showTab(6)" id="tb6"><span class="tab-icon">✏️</span><span class="tab-name">Practice</span></button>
+  <button class="tab-btn" onclick="showTab(7)" id="tb7"><span class="tab-icon">📋</span><span class="tab-name">Survey</span></button>
+  <button class="tab-btn" onclick="showTab(8)" id="tb8"><span class="tab-icon">🕸️</span><span class="tab-name">Word Web</span></button>
+  <button class="tab-btn" onclick="showTab(9)" id="tb9"><span class="tab-icon">🎯</span><span class="tab-name">Guess It</span></button>
   <button class="tab-btn" onclick="showTab(10)" id="tb10"><span class="tab-icon">📝</span><span class="tab-name">Quiz</span></button>
   <button class="tab-btn" onclick="showTab(11)" id="tb11"><span class="tab-icon">⚽</span><span class="tab-name">Dribble!</span></button>
 </div>
 
-<!-- ═══ TAB 0 — WARM UP ═══ -->
+<!-- ═══ TAB 0 — WORD LAB (Unit 8 flashcard standard) ═══ -->
 <div class="tab-content active" id="tc0">
   <div class="tab-body">
     <div>
-      <div class="section-title">🔥 Warm Up — remember Unit 8?</div>
-      <div class="section-sub">The book’s Recycle warm-up. Say what each word means — then check yourself.</div>
+      <div class="section-title">🧪 Word Lab — today's words</div>
+      <div class="section-sub">3 words · Practice mode: tap to flip · Quiz mode: type the word</div>
+    </div>
+    <div class="fc-controls">
+      <button class="mode-btn active" id="fc0-prac" onclick="setFcMode('practice')">📖 Practice</button>
+      <button class="mode-btn" id="fc0-quiz" onclick="setFcMode('quiz')">🧠 Quiz</button>
+    </div>
+    <div id="fc0-practice">
+      <div class="flashcard-wrap" onclick="flipCard()">
+        <div class="flashcard" id="fc0-card">
+          <div class="fc-face fc-front">
+            <div class="fc-emoji" id="fc0-emoji"></div>
+            <div class="fc-word" id="fc0-word"></div>
+            <div class="fc-ipa" id="fc0-ipa"></div>
+            <div class="fc-tap">TAP TO FLIP 👆</div>
+          </div>
+          <div class="fc-face fc-back">
+            <div class="fc-emoji" id="fc0-emoji-b"></div>
+            <div class="fc-def" id="fc0-def"></div>
+            <div class="fc-jp" id="fc0-jp"></div>
+            <button class="fc-jp-btn" id="fc0-jp-btn" onclick="toggleJp(event)">🇯🇵 日本語</button>
+            <div class="fc-sample" id="fc0-sample"></div>
+          </div>
+        </div>
+      </div>
+      <div class="fc-nav">
+        <button onclick="fcPrev()">◀ Prev</button>
+        <span class="fc-counter" id="fc0-counter">1 / 3</span>
+        <button onclick="fcNext()">Next ▶</button>
+      </div>
+    </div>
+    <div id="fc0-quizmode" style="display:none">
+      <div class="quiz-wrap">
+        <div class="fc-emoji" id="fcq-emoji"></div>
+        <div style="font-size:16px;font-weight:800;color:var(--navy)" id="fcq-sentence"></div>
+        <div class="quiz-input-row">
+          <input class="quiz-input" id="fcq-input" placeholder="Type the word…" onkeydown="if(event.key==='Enter')checkFcQuiz()">
+          <button class="quiz-check" onclick="checkFcQuiz()">✓</button>
+        </div>
+        <div class="quiz-fb" id="fcq-fb"></div>
+        <div style="font-size:13px;color:var(--ink-3);font-weight:700">Quiz: <span id="fcq-progress">0 / 3 done</span></div>
+      </div>
+    </div>
+    <div class="done-banner" id="lab-done">🎉 Word Lab complete — all 3 words practiced and quizzed!</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-0" onclick="doRedo(0)">↺ Redo</button>
+    <button class="btn-complete" id="complete-0" onclick="markComplete(0)">Mark Word Lab complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 1 — WARM UP (LP Recycle) ═══ -->
+<div class="tab-content" id="tc1">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🔥 Warm Up — Recycle</div>
+      <div class="section-sub">The book's Recycle warm-up. Say what each word means — then check yourself.</div>
     </div>
     <div class="status-row">
       <div class="count-pill">Right: <span id="wu-count">0</span> / <span id="wu-total">0</span></div>
       <div class="hint" id="wu-hint">One try each — think first!</div>
     </div>
     <div id="wu-list" style="display:flex;flex-direction:column;gap:12px"></div>
-    <div class="tipbox">🧍 <b>who</b> = people · 📦 <b>which</b> = things. That is the whole gate. <span class="jp">人には who、ものには which。</span></div>
+    <div class="tipbox">🧍 <b>who</b> = people · 📦 <b>which</b> = things. <span class="jp">人には who、ものには which。</span></div>
     <div class="done-banner" id="wu-done">🎉 Warmed up! Mark complete below.</div>
   </div>
   <div class="tab-footer">
-    <button class="btn-redo" id="redo-0" onclick="doRedo(0)">↺ Redo</button>
-    <button class="btn-complete" id="complete-0" onclick="markComplete(0)">Mark Warm Up complete ✓</button>
-  </div>
-</div>
-
-<!-- ═══ TAB 1 — WORD LAB ═══ -->
-<div class="tab-content" id="tc1">
-  <div class="tab-body">
-    <div>
-      <div class="section-title">🧪 Word Lab — today's new words</div>
-      <div class="section-sub">Tap each card to open it. <span class="jp">今日の新しい言葉</span></div>
-    </div>
-    <div class="status-row">
-      <div class="count-pill">Opened: <span id="lab-count">0</span> / 6</div>
-      <div class="hint" id="lab-hint">Tap a card to open it.</div>
-    </div>
-    <div class="cardgrid" id="lab-grid"></div>
-    <div class="done-banner" id="lab-done">🎉 Word Lab online! Mark complete below.</div>
-  </div>
-  <div class="tab-footer">
     <button class="btn-redo" id="redo-1" onclick="doRedo(1)">↺ Redo</button>
-    <button class="btn-complete" id="complete-1" onclick="markComplete(1)">Mark Word Lab complete ✓</button>
+    <button class="btn-complete" id="complete-1" onclick="markComplete(1)">Mark Warm Up complete ✓</button>
   </div>
 </div>
 
-<!-- ═══ TAB 2 — THE RULE ═══ -->
+<!-- ═══ TAB 2 — THE RULE (chart + fusion) ═══ -->
 <div class="tab-content" id="tc2">
   <div class="tab-body">
     <div>
       <div class="section-title">📐 The Rule — noun + which + more information</div>
-      <div class="section-sub">Three shapes for a definition. Tap each one to see it.</div>
+      <div class="section-sub">Tap each shape, then fuse two sentences into one.</div>
     </div>
     <div class="status-row">
       <div class="count-pill">Learned: <span id="rule-count">0</span> / 4</div>
       <div class="hint" id="rule-hint">Tap a shape to open it.</div>
     </div>
     <div class="cardgrid" id="rule-grid"></div>
-    <div class="tipbox">📐 <b>Which</b> introduces a clause that gives more information about a <b>thing</b>. It replaces <i>it</i> or <i>them</i>, and it comes at the <b>start</b> of the clause.</div>
-    <div class="done-banner" id="rule-done">🎉 Rule learned! Mark complete below.</div>
+    <div class="section-sub" style="margin-top:4px">⚡ Now fuse them — swap <i>it</i> or <i>them</i> for <b>which</b>:</div>
+    <div class="status-row">
+      <div class="count-pill">Right: <span id="fus-count">0</span> / <span id="fus-total">0</span></div>
+    </div>
+    <div id="fus-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="tipbox">📐 <b>Which</b> replaces <i>it</i> or <i>them</i>, and always comes at the <b>start</b> of the clause.</div>
+    <div class="done-banner" id="rule-done">🎉 Rule learned and fused! Mark complete below.</div>
   </div>
   <div class="tab-footer">
     <button class="btn-redo" id="redo-2" onclick="doRedo(2)">↺ Redo</button>
@@ -231,112 +306,34 @@ body{display:flex;flex-direction:column}
   </div>
 </div>
 
-<!-- ═══ TAB 3 — FUSION CHAMBER ═══ -->
+<!-- ═══ TAB 3 — DETECTIVE (ghost hunt + broken entries) ═══ -->
 <div class="tab-content" id="tc3">
   <div class="tab-body">
     <div>
-      <div class="section-title">⚡ Fusion Chamber — make two sentences into one</div>
-      <div class="section-sub">Swap <i>it</i> or <i>them</i> for <b>which</b>, then join. One try each.</div>
-    </div>
-    <div class="status-row">
-      <div class="count-pill">Right: <span id="fus-count">0</span> / <span id="fus-total">0</span></div>
-      <div class="hint" id="fus-hint">One try each — think first!</div>
-    </div>
-    <div id="fus-list" style="display:flex;flex-direction:column;gap:12px"></div>
-    <div class="done-banner" id="fus-done">⚡ Fusion Chamber online! Mark complete below.</div>
-  </div>
-  <div class="tab-footer">
-    <button class="btn-redo" id="redo-3" onclick="doRedo(3)">↺ Redo</button>
-    <button class="btn-complete" id="complete-3" onclick="markComplete(3)">Mark Fusion complete ✓</button>
-  </div>
-</div>
-
-<!-- ═══ TAB 4 — GHOST HUNT ═══ -->
-<div class="tab-content" id="tc4">
-  <div class="tab-body">
-    <div>
-      <div class="section-title">👻 Ghost Hunt — the Echo Trap</div>
-      <div class="section-sub">The old pronoun came back as a ghost! Tap the word that must <b>GO</b>.</div>
+      <div class="section-title">🕵️ Grammar Detective</div>
+      <div class="section-sub">👻 First bust the ghosts — tap the pronoun that must <b>GO</b>.</div>
     </div>
     <div class="status-row">
       <div class="count-pill">Busted: <span id="ghost-count">0</span> / <span id="ghost-total">0</span></div>
       <div class="hint" id="ghost-hint">Tap the ghost word.</div>
     </div>
     <div id="ghost-list" style="display:flex;flex-direction:column;gap:12px"></div>
-    <div class="tipbox">👻 <b>which</b> already did the pronoun's job. So the old <i>it</i> / <i>them</i> must never come back. <s>which it pulls</s> ❌ → <b>which pulls</b> ✔</div>
-    <div class="done-banner" id="ghost-done">👻💥 All ghosts busted! Mark complete below.</div>
-  </div>
-  <div class="tab-footer">
-    <button class="btn-redo" id="redo-4" onclick="doRedo(4)">↺ Redo</button>
-    <button class="btn-complete" id="complete-4" onclick="markComplete(4)">Mark Ghost Hunt complete ✓</button>
-  </div>
-</div>
-
-<!-- ═══ TAB 5 — WHO/WHICH GATE ═══ -->
-<div class="tab-content" id="tc5">
-  <div class="tab-body">
-    <div>
-      <div class="section-title">🚪 The WHO / WHICH Gate</div>
-      <div class="section-sub">Person or thing? Send each one through the right gate.</div>
-    </div>
-    <div class="status-row">
-      <div class="count-pill">Sorted: <span id="gate-count">0</span> / 8</div>
-      <div class="hint" id="gate-hint">Tap a card to start.</div>
-    </div>
-    <div class="bank" id="gate-bank"></div>
-    <div class="bins g2" id="gate-bins"></div>
-    <div class="tipbox">🧍 <b>who</b> = people (Haaland, Bellingham, Kane, Batman) · 📦 <b>which</b> = things (the Ballon d’Or, the World Cup, gravity, a skateboard)</div>
-    <div class="done-banner" id="gate-done">⚡ Gate powered! Mark complete below.</div>
-  </div>
-  <div class="tab-footer">
-    <button class="btn-redo" id="redo-5" onclick="doRedo(5)">↺ Redo</button>
-    <button class="btn-complete" id="complete-5" onclick="markComplete(5)">Mark The Gate complete ✓</button>
-  </div>
-</div>
-
-<!-- ═══ TAB 6 — SUBSTITUTE ═══ -->
-<div class="tab-content" id="tc6">
-  <div class="tab-body">
-    <div>
-      <div class="section-title">🔁 The Substitute Player — that</div>
-      <div class="section-sub"><b>that</b> can play instead of <b>which</b> — both are correct. But watch for the person trap!</div>
-    </div>
-    <div class="status-row">
-      <div class="count-pill">Right: <span id="sub-count">0</span> / <span id="sub-total">0</span></div>
-      <div class="hint" id="sub-hint">One try each — think first!</div>
-    </div>
-    <div id="sub-list" style="display:flex;flex-direction:column;gap:12px"></div>
-    <div class="tipbox">🔁 <b>that</b> is which's twin on the bench — same team, game still works. But a <b>person</b> always takes <b>who</b>. 👀</div>
-    <div class="done-banner" id="sub-done">🎉 Substitution made! Mark complete below.</div>
-  </div>
-  <div class="tab-footer">
-    <button class="btn-redo" id="redo-6" onclick="doRedo(6)">↺ Redo</button>
-    <button class="btn-complete" id="complete-6" onclick="markComplete(6)">Mark Substitute complete ✓</button>
-  </div>
-</div>
-
-<!-- ═══ TAB 7 — GRAMMAR DETECTIVE ═══ -->
-<div class="tab-content" id="tc7">
-  <div class="tab-body">
-    <div>
-      <div class="section-title">🔍 Grammar Detective</div>
-      <div class="section-sub">Every entry below is broken. Which fix is right? One try each.</div>
-    </div>
+    <div class="section-sub" style="margin-top:4px">🔍 Now fix the broken entries — one try each:</div>
     <div class="status-row">
       <div class="count-pill">Fixed: <span id="det-count">0</span> / <span id="det-total">0</span></div>
-      <div class="hint" id="det-hint">One try each — think first!</div>
     </div>
     <div id="det-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="tipbox">👻 <b>which</b> already did the pronoun's job. <s>which it pulls</s> ❌ → <b>which pulls</b> ✔</div>
     <div class="done-banner" id="det-done">🔍 Every case closed! Mark complete below.</div>
   </div>
   <div class="tab-footer">
-    <button class="btn-redo" id="redo-7" onclick="doRedo(7)">↺ Redo</button>
-    <button class="btn-complete" id="complete-7" onclick="markComplete(7)">Mark Detective complete ✓</button>
+    <button class="btn-redo" id="redo-3" onclick="doRedo(3)">↺ Redo</button>
+    <button class="btn-complete" id="complete-3" onclick="markComplete(3)">Mark Detective complete ✓</button>
   </div>
 </div>
 
-<!-- ═══ TAB 8 — BUILD IT ═══ -->
-<div class="tab-content" id="tc8">
+<!-- ═══ TAB 4 — BUILD IT ═══ -->
+<div class="tab-content" id="tc4">
   <div class="tab-body">
     <div>
       <div class="section-title">🔧 Build It — make the definition</div>
@@ -350,16 +347,33 @@ body{display:flex;flex-direction:column}
     <div class="done-banner" id="bld-done">🔧 All built! Mark complete below.</div>
   </div>
   <div class="tab-footer">
-    <button class="btn-redo" id="redo-8" onclick="doRedo(8)">↺ Redo</button>
-    <button class="btn-complete" id="complete-8" onclick="markComplete(8)">Mark Build It complete ✓</button>
+    <button class="btn-redo" id="redo-4" onclick="doRedo(4)">↺ Redo</button>
+    <button class="btn-complete" id="complete-4" onclick="markComplete(4)">Mark Build It complete ✓</button>
   </div>
 </div>
 
-<!-- ═══ TAB 9 — THE DICTIONARY ═══ -->
-<div class="tab-content" id="tc9">
+<!-- ═══ TAB 5 — SORT (shared classification sorter) ═══ -->
+<div class="tab-content" id="tc5">
   <div class="tab-body">
     <div>
-      <div class="section-title">📖 The Lab Dictionary — write your own</div>
+      <div class="section-title">🗂️ Sort — who or which?</div>
+      <div class="section-sub">Person or thing? Drag each card into the right zone.</div>
+    </div>
+    <div class="tipbox">🧍 <b>who</b> = people (Haaland, Bellingham, Kane, Batman) · 📦 <b>which</b> = things (the Ballon d'Or, the World Cup, gravity, a skateboard)</div>
+    <div id="sort-host"></div>
+    <div class="done-banner" id="sort-done">⚡ Gate powered! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-5" onclick="doRedo(5)">↺ Redo</button>
+    <button class="btn-complete" id="complete-5" onclick="markComplete(5)">Mark Sort complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 6 — PRACTICE (SB p.155 Activity 1) ═══ -->
+<div class="tab-content" id="tc6">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">✏️ Practice — write your definitions</div>
       <div class="section-sub">The book's five items. Each one needs the word <b>which</b>.</div>
     </div>
     <div class="status-row">
@@ -374,12 +388,75 @@ body{display:flex;flex-direction:column}
       <div class="section-sub" style="margin-top:6px">🌟 <b>Challenge</b> — the book's Wrap Up and Extend frames. Optional!</div>
       <div id="dict-bonus-list" style="display:flex;flex-direction:column;gap:12px"></div>
     </div>
-    <div class="tipbox">📐 Remember the shape: <b>a thing</b> + <b>which</b> + more information. And no ghosts — do not put <i>it</i> back in! 👻</div>
-    <div class="done-banner" id="dict-done">📖 Dictionary entry saved! Mark complete below.</div>
+    <div class="done-banner" id="dict-done">📖 All five written! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-6" onclick="doRedo(6)">↺ Redo</button>
+    <button class="btn-complete" id="complete-6" onclick="markComplete(6)">Mark Practice complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 7 — SURVEY ═══ -->
+<div class="tab-content" id="tc7">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📋 Survey — ask three people</div>
+      <div class="section-sub">Ask Dad (or anyone) each question. Write their answer as a definition with <b>which</b>.</div>
+    </div>
+    <div class="tipbox">🗣️ Say it out loud first: <i>"What is a ___?"</i> → <i>"It is a ___ <b>which</b> ___."</i></div>
+    <div class="status-row">
+      <div class="count-pill">Asked: <span id="svy-count">0</span> / <span id="svy-total">0</span></div>
+      <div class="hint" id="svy-hint">Write each answer with <b>which</b>.</div>
+    </div>
+    <div id="svy-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="svy-done">🎉 Survey complete! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-7" onclick="doRedo(7)">↺ Redo</button>
+    <button class="btn-complete" id="complete-7" onclick="markComplete(7)">Mark Survey complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 8 — WORD WEB (shared buildWordWeb) ═══ -->
+<div class="tab-content" id="tc8">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🕸️ Word Web — things you can define</div>
+      <div class="section-sub">Tap each oval to type. Add or remove ovals. What else can you define?</div>
+    </div>
+    <div class="tipbox">💬 For every oval, say it out loud: <i>"A ___ is a ___ <b>which</b> ___."</i></div>
+    <div class="web-host" id="web-host"></div>
+    <div class="done-banner" id="web-done">🕸️ Web filled! Mark complete below.</div>
+  </div>
+  <div class="tab-footer">
+    <button class="btn-redo" id="redo-8" onclick="doRedo(8)">↺ Redo</button>
+    <button class="btn-complete" id="complete-8" onclick="markComplete(8)">Mark Word Web complete ✓</button>
+  </div>
+</div>
+
+<!-- ═══ TAB 9 — GUESS IT (SB p.155 Activity 2 payoff) ═══ -->
+<div class="tab-content" id="tc9">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🎯 Guess It — read the definition, name the thing</div>
+      <div class="section-sub">Like the book's game: read a definition and guess what it is.</div>
+    </div>
+    <div class="status-row">
+      <div class="count-pill">Guessed: <span id="guess-count">0</span> / <span id="guess-total">0</span></div>
+      <div class="hint" id="guess-hint">One try each — think first!</div>
+    </div>
+    <div id="guess-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="section-sub" style="margin-top:4px">🔁 And the substitute — <b>that</b> can play instead of <b>which</b>:</div>
+    <div class="status-row">
+      <div class="count-pill">Right: <span id="sub-count">0</span> / <span id="sub-total">0</span></div>
+    </div>
+    <div id="sub-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="tipbox">🔁 <b>that</b> is which's twin on the bench. But a <b>person</b> always takes <b>who</b>. 👀</div>
+    <div class="done-banner" id="guess-done">🎯 All guessed! Mark complete below.</div>
   </div>
   <div class="tab-footer">
     <button class="btn-redo" id="redo-9" onclick="doRedo(9)">↺ Redo</button>
-    <button class="btn-complete" id="complete-9" onclick="markComplete(9)">Mark Dictionary complete ✓</button>
+    <button class="btn-complete" id="complete-9" onclick="markComplete(9)">Mark Guess It complete ✓</button>
   </div>
 </div>
 
@@ -429,10 +506,11 @@ body{display:flex;flex-direction:column}
 </div>
 
 <script>
+
 const SAVE_PREFIX = 'leea-4-9-grammar-2-';
 const HOMEWORK_ID = 'leo-4-9-grammar-2';
 const TAB_COUNT = 12;
-const TAB_NAMES = ['Warm Up','Word Lab','The Rule','Fusion','Ghost Hunt','The Gate','Substitute','Detective','Build It','Dictionary','Quiz','Dribble!'];
+const TAB_NAMES = ['Word Lab','Warm Up','The Rule','Detective','Build It','Sort','Practice','Survey','Word Web','Guess It','Quiz','Dribble!'];
 const TAB_INIT = {}, TAB_RESET = {}, TAB_RESTORE = {};
 
 function lSave(s,v){
@@ -766,161 +844,185 @@ function refreshBuilder(cfg){
   return solved>=cfg.items.length;
 }
 
-/* ═══ TAB 0 — WARM UP ═══ */
+/* ═══ TAB 0 — WORD LAB (Unit 8 flashcard standard: flip + JP + Practice/Quiz) ═══ */
+const LAB_WORDS=[
+  {word:'definitions',emoji:'📖💬',ipa:'/ˌdefɪˈnɪʃənz/',def:'sentences that tell you what a word means',jp:'定義（ていぎ）',sample:'A dictionary is a book which gives <b>definitions</b> of words.'},
+  {word:'instructions',emoji:'📋✅',ipa:'/ɪnˈstrʌkʃənz/',def:'words that tell you how to do something',jp:'指示（しじ）',sample:'Follow the <b>instructions</b> to play the game.'},
+  {word:'tetherball',emoji:'🥎🪢',ipa:'/ˈteðərbɔːl/',def:'a game which two people play with a ball on a rope',jp:'テザーボール',sample:'<b>Tetherball</b> is a game which you play with a ball on a rope.'}
+];
+let fcIdx=0;
+function setFcMode(m){
+  document.getElementById('fc0-prac').classList.toggle('active',m==='practice');
+  document.getElementById('fc0-quiz').classList.toggle('active',m==='quiz');
+  document.getElementById('fc0-practice').style.display=m==='practice'?'block':'none';
+  document.getElementById('fc0-quizmode').style.display=m==='quiz'?'block':'none';
+  if(m==='quiz')renderFcQuiz();else renderCard();
+}
+function toggleJp(e){
+  e.stopPropagation();
+  const jp=document.getElementById('fc0-jp'),btn=document.getElementById('fc0-jp-btn');
+  const rev=jp.classList.toggle('revealed');
+  btn.textContent=rev?'🇯🇵 隠す':'🇯🇵 日本語';
+}
+function flipCard(){
+  const card=document.getElementById('fc0-card');
+  // A card only counts as studied once its answer side has actually been seen.
+  if(card.classList.toggle('flipped')){
+    const seen=new Set(lLoad('tab-0-seen')||[]);seen.add(fcIdx);lSave('tab-0-seen',Array.from(seen));
+    labRefresh();
+  }
+}
+function renderCard(){
+  const w=LAB_WORDS[fcIdx];
+  document.getElementById('fc0-card').classList.remove('flipped');
+  document.getElementById('fc0-emoji').textContent=w.emoji;
+  document.getElementById('fc0-word').textContent=w.word;
+  document.getElementById('fc0-ipa').textContent=w.ipa;
+  document.getElementById('fc0-emoji-b').textContent=w.emoji;
+  document.getElementById('fc0-def').textContent=w.def;
+  const jp=document.getElementById('fc0-jp');
+  jp.textContent='🇯🇵 '+w.jp;jp.classList.remove('revealed');
+  document.getElementById('fc0-jp-btn').textContent='🇯🇵 日本語';
+  document.getElementById('fc0-sample').innerHTML=w.sample;
+  document.getElementById('fc0-counter').textContent=(fcIdx+1)+' / '+LAB_WORDS.length;
+  labRefresh();
+}
+function fcPrev(){fcIdx=(fcIdx-1+LAB_WORDS.length)%LAB_WORDS.length;renderCard();}
+function fcNext(){fcIdx=(fcIdx+1)%LAB_WORDS.length;renderCard();}
+function fcQuizRemaining(){
+  const done=new Set(lLoad('tab-0-typed')||[]);
+  return LAB_WORDS.map((w,i)=>i).filter(i=>!done.has(i));
+}
+function renderFcQuiz(){
+  const rem=fcQuizRemaining();
+  const done=(lLoad('tab-0-typed')||[]).length;
+  document.getElementById('fcq-progress').textContent=done+' / '+LAB_WORDS.length+' done';
+  const fb=document.getElementById('fcq-fb');
+  if(!rem.length){
+    document.getElementById('fcq-emoji').textContent='🏆';
+    document.getElementById('fcq-sentence').textContent='All 3 typed correctly!';
+    document.getElementById('fcq-input').style.display='none';
+    fb.textContent='';return;
+  }
+  const w=LAB_WORDS[rem[0]];
+  document.getElementById('fcq-emoji').textContent=w.emoji;
+  document.getElementById('fcq-sentence').innerHTML='Type the word that means:<br>“'+w.def+'”';
+  const inp=document.getElementById('fcq-input');
+  inp.style.display='';inp.value='';fb.textContent='';
+}
+function checkFcQuiz(){
+  const rem=fcQuizRemaining();
+  if(!rem.length)return;
+  const i=rem[0],w=LAB_WORDS[i];
+  const inp=document.getElementById('fcq-input'),fb=document.getElementById('fcq-fb');
+  const guess=(inp.value||'').trim().toLowerCase();
+  if(guess===w.word.toLowerCase()){
+    const done=new Set(lLoad('tab-0-typed')||[]);done.add(i);lSave('tab-0-typed',Array.from(done));
+    fb.textContent='✅ Correct!';fb.style.color='var(--green-d)';
+    setTimeout(()=>{renderFcQuiz();labRefresh();},600);
+  }else{
+    fb.textContent='❌ Not yet — look at the emoji '+w.emoji+' and try again.';
+    fb.style.color='var(--red-d)';
+  }
+}
+function labRefresh(){
+  const seen=(lLoad('tab-0-seen')||[]).length, typed=(lLoad('tab-0-typed')||[]).length;
+  document.getElementById('lab-done').classList.toggle('show',seen>=LAB_WORDS.length&&typed>=LAB_WORDS.length);
+}
+TAB_INIT[0]=function(){renderCard();renderFcQuiz();};
+TAB_RESET[0]=function(){
+  fcIdx=0;lDel('tab-0-seen');lDel('tab-0-typed');
+  setFcMode('practice');
+  document.getElementById('fcq-input').style.display='';
+  TAB_INIT[0]._initialized=false;TAB_INIT[0]();TAB_INIT[0]._initialized=true;
+};
+TAB_RESTORE[0]=function(){renderCard();renderFcQuiz();labRefresh();};
+
+/* ═══ TAB 1 — WARM UP (planner p.304 Recycle) ═══ */
 const WU_Q=[
   {q:'<b>connect</b> — which definition is right? 🔗',
    o:['When two things touch each other and stay together, they connect.','When two things move apart, they connect.'],a:0,
-   why:'The LP\u2019s model: when two things touch and stay together, they connect. 🔗'},
+   why:'The planner’s model: when two things touch and stay together, they connect. 🔗'},
   {q:'<b>rub</b> — which definition is right? 🤝',
    o:['When one thing moves against another thing, they rub.','When one thing falls on another thing, they rub.'],a:0,
-   why:'One thing moves against another \u2192 they rub. 🤝'},
-  {q:'<b>skater</b> — which definition is right? \u26f8\ufe0f',
+   why:'One thing moves against another → they rub. 🤝'},
+  {q:'<b>skater</b> — which definition is right? ⛸️',
    o:['A skater is a person who skates.','A skater is a shoe which you wear.'],a:0,
-   why:'A skater is a PERSON \u2192 who, not which. This is the gate again! 🧍'},
+   why:'A skater is a PERSON → who, not which. That is the Sort tab in one line! 🧍'},
   {q:'<b>spin</b> — which definition is right? 🌀',
    o:['When you spin, you turn in a circle.','When you spin, you move in a straight line.'],a:0,
    why:'When you spin, you turn in a circle. 🌀'}
 ];
-const wuCfg={host:'wu-list',items:WU_Q,storeKey:'tab-0-answers',countEl:'wu-count',totalEl:'wu-total'};
+const wuCfg={host:'wu-list',items:WU_Q,storeKey:'tab-1-answers',countEl:'wu-count',totalEl:'wu-total'};
 wuCfg.refresh=function(){
   const r=refreshMcq(wuCfg);
   document.getElementById('wu-hint').textContent=r.answeredAll?'All answered! ✓':'One try each — think first!';
   document.getElementById('wu-done').classList.toggle('show',r.answeredAll);
 };
-TAB_INIT[0]=function(){buildMcq(wuCfg);};
-TAB_RESET[0]=function(){lDel('tab-0-answers');TAB_INIT[0]._initialized=false;TAB_INIT[0]();TAB_INIT[0]._initialized=true;};
-TAB_RESTORE[0]=function(){wuCfg.refresh();};
+TAB_INIT[1]=function(){buildMcq(wuCfg);};
+TAB_RESET[1]=function(){lDel('tab-1-answers');TAB_INIT[1]._initialized=false;TAB_INIT[1]();TAB_INIT[1]._initialized=true;};
+TAB_RESTORE[1]=function(){wuCfg.refresh();};
 
-/* ═══ TAB 1 — WORD LAB ═══ */
-const LAB_CARDS=[
-  {k:'definitions',em:'📖💬',front:'definitions',back:'sentences that tell you what a word means<br><span class="jp">定義（ていぎ）</span>'},
-  {k:'instructions',em:'📋✅',front:'instructions',back:'words that tell you how to do something<br><span class="jp">指示（しじ）</span>'},
-  {k:'tetherball',em:'🥎🪢',front:'tetherball',back:'a game which two people play with a ball on a rope<br><span class="jp">テザーボール</span>'},
-  {k:'gravity',em:'🍎⬇️',front:'gravity',back:'a force which pulls you toward Earth<br><span class="jp">重力（じゅうりょく）</span>'},
-  {k:'friction',em:'🔥🤝',front:'friction',back:'a force which happens when two things rub together<br><span class="jp">摩擦（まさつ）</span>'},
-  {k:'dictionary',em:'📚',front:'dictionary',back:'a book which gives definitions of words<br><span class="jp">辞書（じしょ）</span>'}
-];
-const labCfg={grid:'lab-grid',cards:LAB_CARDS,storeKey:'tab-1-seen',countEl:'lab-count',hintEl:'lab-hint',hintText:'Tap a card to open it.'};
-labCfg.refresh=function(){
-  const all=refreshFlipDeck(labCfg);
-  document.getElementById('lab-done').classList.toggle('show',all);
-};
-TAB_INIT[1]=function(){buildFlipDeck(labCfg);labCfg.refresh();};
-TAB_RESET[1]=function(){lDel('tab-1-seen');TAB_INIT[1]._initialized=false;TAB_INIT[1]();TAB_INIT[1]._initialized=true;};
-TAB_RESTORE[1]=function(){labCfg.refresh();};
-
-/* ═══ TAB 2 — THE RULE ═══ */
+/* ═══ TAB 2 — THE RULE (SB p.155 grammar box + fusion) ═══ */
 const RULE_CARDS=[
-  {k:'r1',em:'📐',front:'which + verb',back:'noun + <b>which</b> + verb + object<br>"Gravity is a force <b>which pulls</b> you toward Earth."'},
-  {k:'r2',em:'📐',front:'which + subject + verb',back:'noun + <b>which</b> + subject + verb<br>"Skates are shoes <b>which you wear</b> to go skating."'},
-  {k:'r3',em:'📐',front:'This is a/an…',back:'This is a/an + noun + <b>which</b> + verb phrase<br>"This is a machine <b>which you can ride</b> in the park."'},
+  {k:'r1',em:'📐',front:'which + verb',back:'noun + <b>which</b> + verb + object<br>“Gravity is a force <b>which pulls</b> you toward Earth.”'},
+  {k:'r2',em:'📐',front:'which + subject + verb',back:'noun + <b>which</b> + subject + verb<br>“Skates are special shoes <b>which you wear</b> when you go ice skating.”'},
+  {k:'r3',em:'📐',front:'This is a/an…',back:'This is a/an + noun + <b>which</b> + verb phrase<br>“This is a machine <b>which you can ride</b> in the park.”'},
   {k:'r4',em:'🔑',front:'The key idea',back:'<b>which</b> replaces <i>it</i> or <i>them</i>, and always comes at the <b>start</b> of the clause.'}
 ];
-const ruleCfg={grid:'rule-grid',cards:RULE_CARDS,storeKey:'tab-2-seen',countEl:'rule-count',hintEl:'rule-hint',hintText:'Tap a shape to open it.'};
-ruleCfg.refresh=function(){
-  const all=refreshFlipDeck(ruleCfg);
-  document.getElementById('rule-done').classList.toggle('show',all);
-};
-TAB_INIT[2]=function(){buildFlipDeck(ruleCfg);ruleCfg.refresh();};
-TAB_RESET[2]=function(){lDel('tab-2-seen');TAB_INIT[2]._initialized=false;TAB_INIT[2]();TAB_INIT[2]._initialized=true;};
-TAB_RESTORE[2]=function(){ruleCfg.refresh();};
-
-/* ═══ TAB 3 — FUSION CHAMBER ═══ */
 const FUS_Q=[
-  {q:'Fuse them: "Gravity is a force. <b>It</b> pulls you toward Earth."',
+  {q:'Fuse them: “Gravity is a force. <b>It</b> pulls you toward Earth.”',
    o:['Gravity is a force which pulls you toward Earth.','Gravity is a force which it pulls you toward Earth.','Gravity is a force who pulls you toward Earth.'],a:0,
    why:'which replaces it — so it does not come back. ⚡'},
-  {q:'Fuse them: "Skates are shoes. You wear <b>them</b> to go skating."',
+  {q:'Fuse them: “Skates are shoes. You wear <b>them</b> to go skating.”',
    o:['Skates are shoes which you wear them to go skating.','Skates are shoes which you wear to go skating.','Skates are shoes who you wear to go skating.'],a:1,
    why:'which replaced them, so them disappears. ⚡'},
-  {q:'Fuse them: "A hat-trick is a prize. <b>It</b> goes to a player who scores three goals."',
+  {q:'Fuse them: “A hat-trick is a prize. <b>It</b> goes to a player who scores three goals.”',
    o:['A hat-trick is a prize which goes to a player who scores three goals.','A hat-trick is a prize it which goes to a player who scores three goals.'],a:0,
    why:'One clean join — no echo. Haaland (Man City) got one this season. ⚡'},
-  {q:'Fuse them: "The Ballon d\u2019Or is a trophy. Lamine Yamal (Barcelona) won <b>it</b> after the World Cup."',
-   o:['The Ballon d\u2019Or is a trophy which Lamine Yamal won it after the World Cup.','The Ballon d\u2019Or is a trophy which Lamine Yamal won after the World Cup.'],a:1,
+  {q:'Fuse them: “The Ballon d’Or is a trophy. Lamine Yamal (Barcelona) won <b>it</b> after the World Cup.”',
+   o:['The Ballon d’Or is a trophy which Lamine Yamal won it after the World Cup.','The Ballon d’Or is a trophy which Lamine Yamal won after the World Cup.'],a:1,
    why:'The it must go — which already did its job. 👻'}
 ];
-const fusCfg={host:'fus-list',items:FUS_Q,storeKey:'tab-3-answers',countEl:'fus-count',totalEl:'fus-total'};
-fusCfg.refresh=function(){
+const ruleCfg={grid:'rule-grid',cards:RULE_CARDS,storeKey:'tab-2-seen',countEl:'rule-count',hintEl:'rule-hint',hintText:'Tap a shape to open it.'};
+const fusCfg={host:'fus-list',items:FUS_Q,storeKey:'tab-2-answers',countEl:'fus-count',totalEl:'fus-total'};
+function ruleRefresh(){
+  const allSeen=refreshFlipDeck(ruleCfg);
   const r=refreshMcq(fusCfg);
-  document.getElementById('fus-hint').textContent=r.answeredAll?'All fused! ✓':'One try each — think first!';
-  document.getElementById('fus-done').classList.toggle('show',r.answeredAll);
-};
-TAB_INIT[3]=function(){buildMcq(fusCfg);};
-TAB_RESET[3]=function(){lDel('tab-3-answers');TAB_INIT[3]._initialized=false;TAB_INIT[3]();TAB_INIT[3]._initialized=true;};
-TAB_RESTORE[3]=function(){fusCfg.refresh();};
+  document.getElementById('rule-done').classList.toggle('show',allSeen&&r.answeredAll);
+}
+ruleCfg.refresh=ruleRefresh;fusCfg.refresh=ruleRefresh;
+TAB_INIT[2]=function(){buildFlipDeck(ruleCfg);buildMcq(fusCfg);ruleRefresh();};
+TAB_RESET[2]=function(){lDel('tab-2-seen');lDel('tab-2-answers');TAB_INIT[2]._initialized=false;TAB_INIT[2]();TAB_INIT[2]._initialized=true;};
+TAB_RESTORE[2]=function(){ruleRefresh();};
 
-/* ═══ TAB 4 — GHOST HUNT ═══ */
+/* ═══ TAB 3 — DETECTIVE (planner p.305 echo trap + broken entries) ═══ */
 const GHOSTS=[
   {words:['Gravity','is','the','force','which','it','pulls','you','toward','Earth','.'],ghost:5},
-  {words:['Skates','are','shoes','which','you','wear','them','when','skating','.'],ghost:6},
+  {words:['Skates','are','special','shoes','which','you','wear','them','to','go','skating','.'],ghost:7},
   {words:['Friction','is','a','force','which','slows','it','things','down','.'],ghost:6},
-  {words:['A','whistle','is','a','tool','which','you','blow','it','to','make','a','sound','.'],ghost:8}
+  {words:['A','skateboard','is','a','machine','which','you','ride','it','on','four','wheels','.'],ghost:8}
 ];
-const ghostCfg={host:'ghost-list',items:GHOSTS,storeKey:'tab-4-busted',countEl:'ghost-count',totalEl:'ghost-total'};
-ghostCfg.refresh=function(){
-  const all=refreshGhost(ghostCfg);
-  document.getElementById('ghost-hint').textContent=all?'All ghosts busted! ✓':'Tap the ghost word.';
-  document.getElementById('ghost-done').classList.toggle('show',all);
-};
-TAB_INIT[4]=function(){buildGhost(ghostCfg);};
-TAB_RESET[4]=function(){lDel('tab-4-busted');TAB_INIT[4]._initialized=false;TAB_INIT[4]();TAB_INIT[4]._initialized=true;};
-TAB_RESTORE[4]=function(){ghostCfg.refresh();};
-
-/* ═══ TAB 5 — WHO / WHICH GATE ═══ */
-const gateCfg={
-  bank:'gate-bank',bins:'gate-bins',storeKey:'tab-5-placed',countEl:'gate-count',hintEl:'gate-hint',
-  cats:[{k:'w',label:'🧍 who<br><small>people</small>'},{k:'c',label:'📦 which<br><small>things</small>'}],
-  words:[
-    {w:'Haaland (Man City) 🧤',cat:'w'},{w:'Bellingham (Real Madrid) ⚽',cat:'w'},{w:'Kane (Bayern) 🇩🇪',cat:'w'},{w:'Batman 🦇',cat:'w'},
-    {w:'the Ballon d\u2019Or 🏆',cat:'c'},{w:'the World Cup 🌍',cat:'c'},{w:'gravity 🍎',cat:'c'},{w:'a skateboard 🛹',cat:'c'}
-  ]
-};
-gateCfg.refresh=function(){
-  const all=refreshSorter(gateCfg);
-  document.getElementById('gate-done').classList.toggle('show',all);
-};
-TAB_INIT[5]=function(){buildSorter(gateCfg);};
-TAB_RESET[5]=function(){lDel('tab-5-placed');TAB_INIT[5]._initialized=false;TAB_INIT[5]();TAB_INIT[5]._initialized=true;};
-TAB_RESTORE[5]=function(){gateCfg.sel=null;gateCfg.refresh();};
-
-/* ═══ TAB 6 — THE SUBSTITUTE ═══ */
-const SUB_Q=[
-  {q:'🏅 "A medal is a prize ___ winners wear."',o:['that','who'],a:0,why:'A prize is a thing, and that can substitute for which. ✔'},
-  {q:'⛺ "A tent is a small house ___ you can carry."',o:['which','who'],a:0,why:'A tent is a thing → which (or that). 📦'},
-  {q:'⛸️ "A skater is a person ___ skates."',o:['which','who'],a:1,why:'The trap! A skater is a PERSON → only who works. 👀'},
-  {q:'Which word can substitute for <b>which</b>? 🔁',o:['what','that'],a:1,why:'that is which’s twin — both are correct for things. 🔁'}
-];
-const subCfg={host:'sub-list',items:SUB_Q,storeKey:'tab-6-answers',countEl:'sub-count',totalEl:'sub-total'};
-subCfg.refresh=function(){
-  const r=refreshMcq(subCfg);
-  document.getElementById('sub-hint').textContent=r.answeredAll?'All answered! ✓':'One try each — think first!';
-  document.getElementById('sub-done').classList.toggle('show',r.answeredAll);
-};
-TAB_INIT[6]=function(){buildMcq(subCfg);};
-TAB_RESET[6]=function(){lDel('tab-6-answers');TAB_INIT[6]._initialized=false;TAB_INIT[6]();TAB_INIT[6]._initialized=true;};
-TAB_RESTORE[6]=function(){subCfg.refresh();};
-
-/* ═══ TAB 7 — GRAMMAR DETECTIVE ═══ */
 const DET_Q=[
-  {q:'❌ "A skateboard is a machine who you can ride."',o:['…a machine which you can ride.','…a machine where you can ride.'],a:0,why:'A skateboard is a thing → which, not who. 🛹'},
-  {q:'❌ "A dictionary is a book which it gives definitions."',o:['…a book which gives definitions.','…a book who gives definitions.'],a:0,why:'The ghost it must go — which already did its job. 👻'},
-  {q:'❌ "Mbappé (Real Madrid) is a striker which scores a lot."',o:['…a striker who scores a lot.','…a striker which scores a lot.'],a:0,why:'A striker is a person → who. 🧍'},
-  {q:'❌ "Tetherball is a game which two people play it."',o:['…a game which two people play.','…a game who two people play.'],a:0,why:'Drop the echoing it. 👻'}
+  {q:'❌ “A skateboard is a machine who you can ride.”',o:['…a machine which you can ride.','…a machine where you can ride.'],a:0,why:'A skateboard is a thing → which, not who. 🛹'},
+  {q:'❌ “A dictionary is a book which it gives definitions.”',o:['…a book which gives definitions.','…a book who gives definitions.'],a:0,why:'The ghost it must go — which already did its job. 👻'},
+  {q:'❌ “Mbappé (Real Madrid) is a striker which scores a lot.”',o:['…a striker who scores a lot.','…a striker which scores a lot.'],a:0,why:'A striker is a person → who. 🧍'},
+  {q:'❌ “Tetherball is a game which two people play it.”',o:['…a game which two people play.','…a game who two people play.'],a:0,why:'Drop the echoing it. 👻'}
 ];
-const detCfg={host:'det-list',items:DET_Q,storeKey:'tab-7-answers',countEl:'det-count',totalEl:'det-total'};
-detCfg.refresh=function(){
+const ghostCfg={host:'ghost-list',items:GHOSTS,storeKey:'tab-3-busted',countEl:'ghost-count',totalEl:'ghost-total'};
+const detCfg={host:'det-list',items:DET_Q,storeKey:'tab-3-answers',countEl:'det-count',totalEl:'det-total'};
+function detRefresh(){
+  const allBusted=refreshGhost(ghostCfg);
   const r=refreshMcq(detCfg);
-  document.getElementById('det-hint').textContent=r.answeredAll?'All cases closed! ✓':'One try each — think first!';
-  document.getElementById('det-done').classList.toggle('show',r.answeredAll);
-};
-TAB_INIT[7]=function(){buildMcq(detCfg);};
-TAB_RESET[7]=function(){lDel('tab-7-answers');TAB_INIT[7]._initialized=false;TAB_INIT[7]();TAB_INIT[7]._initialized=true;};
-TAB_RESTORE[7]=function(){detCfg.refresh();};
+  document.getElementById('ghost-hint').textContent=allBusted?'All ghosts busted! ✓':'Tap the ghost word.';
+  document.getElementById('det-done').classList.toggle('show',allBusted&&r.answeredAll);
+}
+ghostCfg.refresh=detRefresh;detCfg.refresh=detRefresh;
+TAB_INIT[3]=function(){buildGhost(ghostCfg);buildMcq(detCfg);detRefresh();};
+TAB_RESET[3]=function(){lDel('tab-3-busted');lDel('tab-3-answers');TAB_INIT[3]._initialized=false;TAB_INIT[3]();TAB_INIT[3]._initialized=true;};
+TAB_RESTORE[3]=function(){detRefresh();};
 
-/* ═══ TAB 8 — BUILD IT ═══
-   Word banks and answers come from the unit's grammar reference card
-   (ow_l4_u9_g2_definitions_with_which, tab4_master build items). */
+/* ═══ TAB 4 — BUILD IT (grammar.json tab4_master build items) ═══ */
 const BLD_ITEMS=[
   {id:'b1',cue:'重力はあなたを地球の方に引く力です。',
    bank:['a','Gravity','is','force','toward','which','pulls','you','Earth'],
@@ -935,20 +1037,53 @@ const BLD_ITEMS=[
    bank:['a','A','friend','is','person','you','who','helps'],
    correct:['A','friend','is','a','person','who','helps','you']}
 ];
-const bldCfg={host:'bld-list',items:BLD_ITEMS,storeKey:'tab-8-built',countEl:'bld-count',totalEl:'bld-total'};
+const bldCfg={host:'bld-list',items:BLD_ITEMS,storeKey:'tab-4-built',countEl:'bld-count',totalEl:'bld-total'};
 bldCfg.refresh=function(){
   const all=refreshBuilder(bldCfg);
   document.getElementById('bld-hint').textContent=all?'All built! ✓':'Tap the first word.';
   document.getElementById('bld-done').classList.toggle('show',all);
 };
-TAB_INIT[8]=function(){buildBuilder(bldCfg);};
-TAB_RESET[8]=function(){lDel('tab-8-built');TAB_INIT[8]._initialized=false;TAB_INIT[8]();TAB_INIT[8]._initialized=true;};
-TAB_RESTORE[8]=function(){bldCfg.refresh();};
+TAB_INIT[4]=function(){buildBuilder(bldCfg);};
+TAB_RESET[4]=function(){lDel('tab-4-built');TAB_INIT[4]._initialized=false;TAB_INIT[4]();TAB_INIT[4]._initialized=true;};
+TAB_RESTORE[4]=function(){bldCfg.refresh();};
 
-/* ═══ TAB 9 — THE LAB DICTIONARY ═══
-   The five required items are Student Book p.155 Activity 1 verbatim, with the
-   book's own sentence frames. The bonus set is the planner's Wrap Up frames
-   (LP p.305) plus the Extend prompts and the formative check (skater, swing). */
+/* ═══ TAB 5 — SORT (shared classification sorter from /components/charts.js) ═══ */
+const SORT_TILES=[
+  {text:'Haaland (Man City) 🧤',answer:'who'},
+  {text:'Bellingham (Real Madrid) ⚽',answer:'who'},
+  {text:'Kane (Bayern Munich) 🇩🇪',answer:'who'},
+  {text:'Batman 🦇',answer:'who'},
+  {text:'the Ballon d’Or 🏆',answer:'which'},
+  {text:'the World Cup 🌍',answer:'which'},
+  {text:'gravity 🍎',answer:'which'},
+  {text:'a skateboard 🛹',answer:'which'}
+];
+TAB_INIT[5]=function(){
+  const host=document.getElementById('sort-host');
+  if(!host)return;
+  if(typeof window.pickChart!=='function'){
+    host.innerHTML='<div class="tipbox" style="border-left-color:var(--red);background:var(--red-l)">⚠️ Sorter component not loaded. Check /components/charts.js</div>';
+    return;
+  }
+  host.innerHTML=window.pickChart('classification sort',{
+    id:'leo-u9g2-sort',
+    tiles:SORT_TILES,
+    zones:[{id:'who',label:'🧍 who — people'},{id:'which',label:'📦 which — things'}],
+    storageKey:SAVE_PREFIX+'tab-5-sort'
+  });
+};
+TAB_RESET[5]=function(){
+  Object.keys(localStorage).filter(k=>k.indexOf(SAVE_PREFIX+'tab-5-sort')===0).forEach(k=>localStorage.removeItem(k));
+  document.getElementById('sort-done').classList.remove('show');
+  TAB_INIT[5]._initialized=false;TAB_INIT[5]();TAB_INIT[5]._initialized=true;
+};
+TAB_RESTORE[5]=function(){
+  // The shared sorter owns its own state; completion is Leo tapping Mark complete.
+  const host=document.getElementById('sort-host');
+  if(host&&host.querySelectorAll('.dnd-tile,[data-tile]').length===0&&!host.innerHTML.trim())TAB_INIT[5]();
+};
+
+/* ═══ TAB 6 — PRACTICE (Student Book p.155 Activity 1, verbatim) ═══ */
 const DICT_ITEMS=[
   {id:'d1',word:'Bicycle',frame:'This is a machine',hint:'…which you can ride in the park.'},
   {id:'d2',word:'Skateboarding',frame:'It is a hobby',hint:'…which you do on four wheels.'},
@@ -969,20 +1104,18 @@ function dictOk(text){
   return words>=4 && /\bwhich\b|\bwho\b/i.test(text||'');
 }
 function dictSaveSlot(id,text){
-  const all=lLoad('tab-9-defs')||{};
-  all[id]=text;lSave('tab-9-defs',all);
-  // captionKey points at tab-9-caption, so keep a readable joined copy there for review.
-  const joined=DICT_ITEMS.concat(DICT_BONUS)
-    .filter(it=>all[it.id])
-    .map(it=>it.word+': '+all[it.id]).join('\n');
-  lSave('tab-9-caption',joined);
+  const all=lLoad('tab-6-defs')||{};
+  all[id]=text;lSave('tab-6-defs',all);
+  // captionKey points at tab-6-caption, so keep a readable joined copy there for review.
+  const joined=DICT_ITEMS.concat(DICT_BONUS).filter(it=>all[it.id]).map(it=>it.word+': '+all[it.id]).join('\n');
+  lSave('tab-6-caption',joined);
   dictRefresh();
 }
 function dictRenderSet(hostId,items){
   const host=document.getElementById(hostId);
   if(!host)return;
   host.innerHTML='';
-  const all=lLoad('tab-9-defs')||{};
+  const all=lLoad('tab-6-defs')||{};
   items.forEach(it=>{
     const card=document.createElement('div');
     card.className='qcard';card.dataset.id=it.id;
@@ -990,14 +1123,10 @@ function dictRenderSet(hostId,items){
     q.className='q';q.innerHTML=it.word+': <b>'+it.frame+'</b> ______';
     const ta=document.createElement('textarea');
     ta.className='write-box';ta.style.minHeight='62px';
-    ta.placeholder=it.frame+' which…';
-    ta.value=all[it.id]||'';
-    const row=document.createElement('div');
-    row.className='write-row';
-    const btn=document.createElement('button');
-    btn.className='write-save';btn.type='button';
-    const note=document.createElement('span');
-    note.className='hint';
+    ta.placeholder=it.frame+' which…';ta.value=all[it.id]||'';
+    const row=document.createElement('div');row.className='write-row';
+    const btn=document.createElement('button');btn.className='write-save';btn.type='button';
+    const note=document.createElement('span');note.className='hint';
     btn.onclick=function(){
       const text=ta.value.trim();
       if(!dictOk(text)){
@@ -1013,7 +1142,7 @@ function dictRenderSet(hostId,items){
   });
 }
 function dictRefresh(){
-  const all=lLoad('tab-9-defs')||{};
+  const all=lLoad('tab-6-defs')||{};
   let done=0;
   DICT_ITEMS.forEach(it=>{if(dictOk(all[it.id]))done++;});
   DICT_ITEMS.concat(DICT_BONUS).forEach(it=>{
@@ -1035,19 +1164,120 @@ function dictRefresh(){
   if(hint&&allDone)hint.innerHTML='All five written! 🎉 Try the Challenge set below.';
   document.getElementById('dict-done').classList.toggle('show',allDone);
 }
-TAB_INIT[9]=function(){
-  dictRenderSet('dict-list',DICT_ITEMS);
-  dictRenderSet('dict-bonus-list',DICT_BONUS);
-  dictRefresh();
-};
-TAB_RESET[9]=function(){
-  lDel('tab-9-defs');lDel('tab-9-caption');
-  TAB_INIT[9]._initialized=false;TAB_INIT[9]();TAB_INIT[9]._initialized=true;
-};
-TAB_RESTORE[9]=function(){dictRefresh();};
+TAB_INIT[6]=function(){dictRenderSet('dict-list',DICT_ITEMS);dictRenderSet('dict-bonus-list',DICT_BONUS);dictRefresh();};
+TAB_RESET[6]=function(){lDel('tab-6-defs');lDel('tab-6-caption');TAB_INIT[6]._initialized=false;TAB_INIT[6]();TAB_INIT[6]._initialized=true;};
+TAB_RESTORE[6]=function(){dictRefresh();};
 
-/* ═══ TAB 10 — REVIEW QUIZ ═══
-   Questions come from the unit's grammar reference card (tab3_quiz). */
+/* ═══ TAB 7 — SURVEY ═══ */
+const SVY_ITEMS=[
+  {id:'s1',q:'Ask: “What is a bicycle?”'},
+  {id:'s2',q:'Ask: “What is gravity?”'},
+  {id:'s3',q:'Ask: “What is your favorite sport?” — then define it.'}
+];
+function svySave(id,text){
+  const all=lLoad('tab-7-answers')||{};
+  all[id]=text;lSave('tab-7-answers',all);
+  svyRefresh();
+}
+function svyRefresh(){
+  const all=lLoad('tab-7-answers')||{};
+  let done=0;
+  SVY_ITEMS.forEach(it=>{
+    if(dictOk(all[it.id]))done++;
+    const card=document.querySelector('#svy-list .qcard[data-id="'+it.id+'"]');
+    if(!card||!card._btn)return;
+    const saved=dictOk(all[it.id]);
+    card._btn.classList.toggle('saved',saved);
+    card._btn.textContent=saved?'✓ Saved':'💾 Save';
+    if(saved){card._note.textContent='Saved! 🎉';card._note.style.color='var(--green-d)';}
+  });
+  document.getElementById('svy-count').textContent=done;
+  document.getElementById('svy-total').textContent=SVY_ITEMS.length;
+  const all3=done>=SVY_ITEMS.length;
+  document.getElementById('svy-hint').textContent=all3?'All three asked! ✓':'Write each answer with which.';
+  document.getElementById('svy-done').classList.toggle('show',all3);
+}
+TAB_INIT[7]=function(){
+  const host=document.getElementById('svy-list');
+  host.innerHTML='';
+  const all=lLoad('tab-7-answers')||{};
+  SVY_ITEMS.forEach(it=>{
+    const card=document.createElement('div');
+    card.className='qcard';card.dataset.id=it.id;
+    const q=document.createElement('div');q.className='q';q.textContent=it.q;
+    const ta=document.createElement('textarea');
+    ta.className='write-box';ta.style.minHeight='58px';
+    ta.placeholder='It is a … which …';ta.value=all[it.id]||'';
+    const row=document.createElement('div');row.className='write-row';
+    const btn=document.createElement('button');btn.className='write-save';btn.type='button';btn.textContent='💾 Save';
+    const note=document.createElement('span');note.className='hint';
+    btn.onclick=function(){
+      const t=ta.value.trim();
+      if(!dictOk(t)){note.innerHTML='Not yet — at least 4 words and <b>which</b>. ✏️';note.style.color='var(--red-d)';return;}
+      svySave(it.id,t);
+    };
+    row.appendChild(btn);row.appendChild(note);
+    card.appendChild(q);card.appendChild(ta);card.appendChild(row);
+    host.appendChild(card);
+    card._btn=btn;card._note=note;
+  });
+  svyRefresh();
+};
+TAB_RESET[7]=function(){lDel('tab-7-answers');TAB_INIT[7]._initialized=false;TAB_INIT[7]();TAB_INIT[7]._initialized=true;};
+TAB_RESTORE[7]=function(){svyRefresh();};
+
+/* ═══ TAB 8 — WORD WEB (shared buildWordWeb from /components/wordweb.js) ═══ */
+TAB_INIT[8]=function(){
+  const host=document.getElementById('web-host');
+  if(!host)return;
+  if(typeof window.pickChart!=='function'){
+    host.innerHTML='<div class="tipbox" style="border-left-color:var(--red);background:var(--red-l)">⚠️ Word web component not loaded. Check /components/wordweb.js</div>';
+    return;
+  }
+  host.innerHTML=window.pickChart('word web',{
+    id:'leo-u9g2-web',
+    center:'Things I can define',
+    nodes:['a bicycle','gravity','tetherball','',''],
+    storageKey:SAVE_PREFIX+'tab-8-web'
+  });
+};
+TAB_RESET[8]=function(){
+  Object.keys(localStorage).filter(k=>k.indexOf(SAVE_PREFIX+'tab-8-web')===0).forEach(k=>localStorage.removeItem(k));
+  document.getElementById('web-done').classList.remove('show');
+  TAB_INIT[8]._initialized=false;TAB_INIT[8]();TAB_INIT[8]._initialized=true;
+};
+TAB_RESTORE[8]=function(){
+  const host=document.getElementById('web-host');
+  if(host&&!host.innerHTML.trim())TAB_INIT[8]();
+};
+
+/* ═══ TAB 9 — GUESS IT (SB p.155 Activity 2) + the that-substitute ═══ */
+const GUESS_Q=[
+  {q:'“It is a game which two people play with a ball on a rope.” 🥎',o:['tetherball','basketball','tennis'],a:0,why:'Tetherball — today’s new word! 🥎🪢'},
+  {q:'“This is a force which pulls you toward Earth.” 🍎',o:['friction','gravity','direction'],a:1,why:'Gravity pulls you toward the center of the Earth. 🍎'},
+  {q:'“This is a force which happens when two things rub together.” 🔥',o:['gravity','friction','speed'],a:1,why:'Friction — from the Unit 9 reading about skateboards. 🛹'},
+  {q:'“It is a book which gives definitions of words.” 📚',o:['a dictionary','a comic','a map'],a:0,why:'A dictionary gives definitions. The planner even asks for one on the desk! 📚'}
+];
+const SUB_Q=[
+  {q:'🏅 “A medal is a prize ___ winners wear.”',o:['that','who'],a:0,why:'A prize is a thing, and that can substitute for which. ✔'},
+  {q:'⛺ “A tent is a small house ___ you can carry.”',o:['which','who'],a:0,why:'A tent is a thing → which (or that). 📦'},
+  {q:'⛸️ “A skater is a person ___ skates.”',o:['which','who'],a:1,why:'The trap! A skater is a PERSON → only who works. 👀'},
+  {q:'Which word can substitute for <b>which</b>? 🔁',o:['what','that'],a:1,why:'The planner says that can replace which for things. 🔁'}
+];
+const guessCfg={host:'guess-list',items:GUESS_Q,storeKey:'tab-9-guess',countEl:'guess-count',totalEl:'guess-total'};
+const subCfg={host:'sub-list',items:SUB_Q,storeKey:'tab-9-answers',countEl:'sub-count',totalEl:'sub-total'};
+function guessRefresh(){
+  const g=refreshMcq(guessCfg);
+  const s=refreshMcq(subCfg);
+  document.getElementById('guess-hint').textContent=(g.answeredAll&&s.answeredAll)?'All answered! ✓':'One try each — think first!';
+  document.getElementById('guess-done').classList.toggle('show',g.answeredAll&&s.answeredAll);
+}
+guessCfg.refresh=guessRefresh;subCfg.refresh=guessRefresh;
+TAB_INIT[9]=function(){buildMcq(guessCfg);buildMcq(subCfg);guessRefresh();};
+TAB_RESET[9]=function(){lDel('tab-9-guess');lDel('tab-9-answers');TAB_INIT[9]._initialized=false;TAB_INIT[9]();TAB_INIT[9]._initialized=true;};
+TAB_RESTORE[9]=function(){guessRefresh();};
+
+/* ═══ TAB 10 — REVIEW QUIZ (grammar.json tab3_quiz, all 10) ═══ */
 const QUIZ_Q=[
   {q:'Gravity is a force ___ pulls you toward Earth.',o:['who','which','where','when'],a:1,why:'Gravity is a thing, not a person, so which is correct. 📦'},
   {q:'Skates are special shoes ___ you wear when you go ice skating.',o:['who','which','where','when'],a:1,why:'Shoes are things, so which is used, not who. 📦'},
@@ -1072,12 +1302,10 @@ quizCfg.refresh=function(){
     document.getElementById('quiz-msg').textContent=
       pct>=90?'🥇 Dictionary Writer! Outstanding, Leo!':
       pct>=75?'🥈 Great work — just a little polishing.':
-      pct>=60?'🥉 Good job! Replay the Gate and Ghost Hunt.':
+      pct>=60?'🥉 Good job! Replay Sort and Detective.':
       '💪 Every champion trains. Let us do this together.';
     lSave('score',{score:r.right,total:r.total,percent:pct,done:true,timestamp:new Date().toISOString()});
-  }else{
-    box.style.display='none';
-  }
+  }else{box.style.display='none';}
   document.getElementById('quiz-done').classList.toggle('show',r.answeredAll);
 };
 TAB_INIT[10]=function(){buildMcq(quizCfg);};
@@ -1089,8 +1317,8 @@ const DRIB_Q=[
   {q:'The World Cup is a trophy ___ Spain lifted in 2026. 🏆',o:['who','which'],a:1,why:'A trophy is a thing → which. 📦'},
   {q:'Salah (Liverpool) is a player ___ scores the goals. ⚽',o:['who','which'],a:0,why:'Salah is a person → who. 🧍'},
   {q:'Tetherball is a game ___ you play with a ball on a rope. 🥎',o:['who','which'],a:1,why:'A game is a thing → which. 📦'},
-  {q:'Find the ghost: "a tool which you blow ___ to make a sound"',o:['it','(nothing)'],a:1,why:'No echo — which already did the pronoun’s job. 👻'},
-  {q:'Which can substitute for which? 🔁',o:['that','what'],a:0,why:'that is the substitute player. 🔁'},
+  {q:'Find the ghost: “a tool which you blow ___ to make a sound”',o:['it','(nothing)'],a:1,why:'No echo — which already did the pronoun’s job. 👻'},
+  {q:'Which word can substitute for which? 🔁',o:['that','what'],a:0,why:'that is the substitute player. 🔁'},
   {q:'Dembélé (PSG) is a winger ___ runs very fast. 🇫🇷',o:['who','which'],a:0,why:'A winger is a person → who. 🧍'},
   {q:'The book which gives definitions of words is a… 📚',o:['dictionary','whistle'],a:0,why:'A dictionary gives definitions. 📚'},
   {q:'Definitions are sentences ___ tell you what a word means. 📖',o:['who','which'],a:1,why:'Sentences are things → which. 📦'}
@@ -1101,8 +1329,7 @@ dribCfg.refresh=function(){
   const steps=r.right;
   document.getElementById('drib-meter').style.width=Math.round((steps/DRIB_Q.length)*100)+'%';
   document.getElementById('drib-label').textContent=steps+' / '+DRIB_Q.length+' steps';
-  const shift=Math.round((steps/DRIB_Q.length)*40-20);
-  document.getElementById('drib-ball').style.transform='translateX('+shift+'px)';
+  document.getElementById('drib-ball').style.transform='translateX('+Math.round((steps/DRIB_Q.length)*40-20)+'px)';
   document.getElementById('drib-done').classList.toggle('show',r.answeredAll);
 };
 TAB_INIT[11]=function(){buildMcq(dribCfg);};
@@ -1110,10 +1337,7 @@ TAB_RESET[11]=function(){lDel('tab-11-answers');TAB_INIT[11]._initialized=false;
 TAB_RESTORE[11]=function(){dribCfg.refresh();};
 
 /* ═══ boot ═══ */
-(function boot(){
-  refreshProgress();
-  showTab(0);
-})();
+(function boot(){refreshProgress();showTab(0);})();
 </script>
 </body>
 </html>

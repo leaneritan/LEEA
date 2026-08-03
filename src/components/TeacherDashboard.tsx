@@ -26,7 +26,7 @@ import {
   type LessonProgressMap
 } from "@/data/lessonProgress";
 import { getLessonGroups, learnerLessons, lessons, teacherLessons } from "@/data/lessons";
-import { LEVELS, UNIT_TITLES } from "@/data/curriculum";
+import { LEVELS, unitTitlesForLevel } from "@/data/curriculum";
 import {
   createCurrentUnit,
   fallbackCurrentUnit,
@@ -327,7 +327,7 @@ export function TeacherDashboard() {
             Choose a unit
           </span>
           <div aria-label="Unit" className="teacher-unit-chips" role="tablist">
-            {UNIT_TITLES.map((title, index) => {
+            {unitTitlesForLevel(selectedLevel).map((title, index) => {
               const unitNumber = index + 1;
               const isSelected = selectedUnit === unitNumber;
               return (

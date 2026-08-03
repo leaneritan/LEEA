@@ -174,7 +174,7 @@ body{display:flex;flex-direction:column}
   <div class="tab-body">
     <div>
       <div class="section-title">🔥 Warm Up — remember Unit 8?</div>
-      <div class="section-sub">Last unit you used <b>who</b> for people. Today you learn <b>which</b> for things.</div>
+      <div class="section-sub">The book\u2019s Recycle warm-up. Say what each word means \u2014 then check yourself.</div>
     </div>
     <div class="status-row">
       <div class="count-pill">Right: <span id="wu-count">0</span> / <span id="wu-total">0</span></div>
@@ -285,7 +285,7 @@ body{display:flex;flex-direction:column}
     </div>
     <div class="bank" id="gate-bank"></div>
     <div class="bins g2" id="gate-bins"></div>
-    <div class="tipbox">🧍 <b>who</b> = people (a goalkeeper, a referee, a striker, a friend) · 📦 <b>which</b> = things (a whistle, a trophy, gravity, a dictionary)</div>
+    <div class="tipbox">🧍 <b>who</b> = people (Haaland, Bellingham, Kane, Batman) · 📦 <b>which</b> = things (the Ballon d\u2019Or, the World Cup, gravity, a skateboard)</div>
     <div class="done-banner" id="gate-done">⚡ Gate powered! Mark complete below.</div>
   </div>
   <div class="tab-footer">
@@ -360,16 +360,19 @@ body{display:flex;flex-direction:column}
   <div class="tab-body">
     <div>
       <div class="section-title">📖 The Lab Dictionary — write your own</div>
-      <div class="section-sub">Write ONE good definition using <b>which</b>. Use a starter if you want.</div>
+      <div class="section-sub">The book's five items. Each one needs the word <b>which</b>.</div>
     </div>
-    <div class="qcard">
-      <div class="q" id="dict-prompt">📖 Define one of these: <b>a bicycle · a whistle · tetherball · a dictionary · a seesaw</b></div>
-      <div class="write-row" id="dict-starters"></div>
-      <textarea class="write-box" id="dict-text" placeholder="A bicycle is a machine which…"></textarea>
-      <div class="write-row">
-        <button class="write-save" id="dict-save" onclick="dictSave()">💾 Save my definition</button>
-        <span class="hint" id="dict-hint">Use at least 6 words and the word <b>which</b>.</span>
-      </div>
+    <div class="status-row">
+      <div class="count-pill">Written: <span id="dict-count">0</span> / 5</div>
+      <div class="hint" id="dict-hint">Each definition needs <b>which</b> and at least 4 words.</div>
+    </div>
+    <div class="section-sub" style="margin-bottom:-4px">
+      📘 <b>Student Book p.155, Activity 1</b> — write a definition for each item, using <b>which</b>.
+    </div>
+    <div id="dict-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div id="dict-bonus" style="display:none;flex-direction:column;gap:12px">
+      <div class="section-sub" style="margin-top:6px">🌟 <b>Challenge</b> — the book's Wrap Up and Extend frames. Optional!</div>
+      <div id="dict-bonus-list" style="display:flex;flex-direction:column;gap:12px"></div>
     </div>
     <div class="tipbox">📐 Remember the shape: <b>a thing</b> + <b>which</b> + more information. And no ghosts — do not put <i>it</i> back in! 👻</div>
     <div class="done-banner" id="dict-done">📖 Dictionary entry saved! Mark complete below.</div>
@@ -765,10 +768,18 @@ function refreshBuilder(cfg){
 
 /* ═══ TAB 0 — WARM UP ═══ */
 const WU_Q=[
-  {q:'A goalkeeper is a player ___ guards the net. 🧤',o:['who','which'],a:0,why:'A goalkeeper is a person → who. 🧍'},
-  {q:'A whistle is a tool ___ makes a loud sound. 📯',o:['who','which'],a:1,why:'A whistle is a thing → which. 📦'},
-  {q:'A referee is a person ___ makes the rules fair. 🟨',o:['who','which'],a:0,why:'A referee is a person → who. 🧍'},
-  {q:'Gravity is a force ___ pulls things down. 🍎',o:['who','which'],a:1,why:'Gravity is a thing (a force) → which. 📦'}
+  {q:'<b>connect</b> — which definition is right? 🔗',
+   o:['When two things touch each other and stay together, they connect.','When two things move apart, they connect.'],a:0,
+   why:'The LP\u2019s model: when two things touch and stay together, they connect. 🔗'},
+  {q:'<b>rub</b> — which definition is right? 🤝',
+   o:['When one thing moves against another thing, they rub.','When one thing falls on another thing, they rub.'],a:0,
+   why:'One thing moves against another \u2192 they rub. 🤝'},
+  {q:'<b>skater</b> — which definition is right? \u26f8\ufe0f',
+   o:['A skater is a person who skates.','A skater is a shoe which you wear.'],a:0,
+   why:'A skater is a PERSON \u2192 who, not which. This is the gate again! 🧍'},
+  {q:'<b>spin</b> — which definition is right? 🌀',
+   o:['When you spin, you turn in a circle.','When you spin, you move in a straight line.'],a:0,
+   why:'When you spin, you turn in a circle. 🌀'}
 ];
 const wuCfg={host:'wu-list',items:WU_Q,storeKey:'tab-0-answers',countEl:'wu-count',totalEl:'wu-total'};
 wuCfg.refresh=function(){
@@ -822,11 +833,11 @@ const FUS_Q=[
   {q:'Fuse them: "Skates are shoes. You wear <b>them</b> to go skating."',
    o:['Skates are shoes which you wear them to go skating.','Skates are shoes which you wear to go skating.','Skates are shoes who you wear to go skating.'],a:1,
    why:'which replaced them, so them disappears. ⚡'},
-  {q:'Fuse them: "Friction is a force. <b>It</b> happens when two things rub together."',
-   o:['Friction is a force which happens when two things rub together.','Friction is a force it which happens when two things rub together.'],a:0,
-   why:'One clean join — no echo. ⚡'},
-  {q:'Fuse them: "A whistle is a tool. You blow <b>it</b> to make a sound."',
-   o:['A whistle is a tool which you blow it to make a sound.','A whistle is a tool which you blow to make a sound.'],a:1,
+  {q:'Fuse them: "A hat-trick is a prize. <b>It</b> goes to a player who scores three goals."',
+   o:['A hat-trick is a prize which goes to a player who scores three goals.','A hat-trick is a prize it which goes to a player who scores three goals.'],a:0,
+   why:'One clean join — no echo. Haaland (Man City) got one this season. ⚡'},
+  {q:'Fuse them: "The Ballon d\u2019Or is a trophy. Lamine Yamal (Barcelona) won <b>it</b> after the World Cup."',
+   o:['The Ballon d\u2019Or is a trophy which Lamine Yamal won it after the World Cup.','The Ballon d\u2019Or is a trophy which Lamine Yamal won after the World Cup.'],a:1,
    why:'The it must go — which already did its job. 👻'}
 ];
 const fusCfg={host:'fus-list',items:FUS_Q,storeKey:'tab-3-answers',countEl:'fus-count',totalEl:'fus-total'};
@@ -861,8 +872,8 @@ const gateCfg={
   bank:'gate-bank',bins:'gate-bins',storeKey:'tab-5-placed',countEl:'gate-count',hintEl:'gate-hint',
   cats:[{k:'w',label:'🧍 who<br><small>people</small>'},{k:'c',label:'📦 which<br><small>things</small>'}],
   words:[
-    {w:'a goalkeeper 🧤',cat:'w'},{w:'a referee 🟨',cat:'w'},{w:'a striker ⚽',cat:'w'},{w:'a friend 🤝',cat:'w'},
-    {w:'a whistle 📯',cat:'c'},{w:'a trophy 🏆',cat:'c'},{w:'gravity 🍎',cat:'c'},{w:'a dictionary 📚',cat:'c'}
+    {w:'Haaland (Man City) 🧤',cat:'w'},{w:'Bellingham (Real Madrid) ⚽',cat:'w'},{w:'Kane (Bayern) 🇩🇪',cat:'w'},{w:'Batman 🦇',cat:'w'},
+    {w:'the Ballon d\u2019Or 🏆',cat:'c'},{w:'the World Cup 🌍',cat:'c'},{w:'gravity 🍎',cat:'c'},{w:'a skateboard 🛹',cat:'c'}
   ]
 };
 gateCfg.refresh=function(){
@@ -892,9 +903,9 @@ TAB_RESTORE[6]=function(){subCfg.refresh();};
 
 /* ═══ TAB 7 — GRAMMAR DETECTIVE ═══ */
 const DET_Q=[
-  {q:'❌ "A bicycle is a machine who you can ride."',o:['…a machine which you can ride.','…a machine where you can ride.'],a:0,why:'A bicycle is a thing → which, not who. 📦'},
+  {q:'❌ "A skateboard is a machine who you can ride."',o:['…a machine which you can ride.','…a machine where you can ride.'],a:0,why:'A skateboard is a thing → which, not who. 🛹'},
   {q:'❌ "A dictionary is a book which it gives definitions."',o:['…a book which gives definitions.','…a book who gives definitions.'],a:0,why:'The ghost it must go — which already did its job. 👻'},
-  {q:'❌ "An athlete is someone which plays sports well."',o:['…someone who plays sports well.','…someone which plays sports well.'],a:0,why:'An athlete is a person → who. 🧍'},
+  {q:'❌ "Mbappé (Real Madrid) is a striker which scores a lot."',o:['…a striker who scores a lot.','…a striker which scores a lot.'],a:0,why:'A striker is a person → who. 🧍'},
   {q:'❌ "Tetherball is a game which two people play it."',o:['…a game which two people play.','…a game who two people play.'],a:0,why:'Drop the echoing it. 👻'}
 ];
 const detCfg={host:'det-list',items:DET_Q,storeKey:'tab-7-answers',countEl:'det-count',totalEl:'det-total'};
@@ -934,54 +945,104 @@ TAB_INIT[8]=function(){buildBuilder(bldCfg);};
 TAB_RESET[8]=function(){lDel('tab-8-built');TAB_INIT[8]._initialized=false;TAB_INIT[8]();TAB_INIT[8]._initialized=true;};
 TAB_RESTORE[8]=function(){bldCfg.refresh();};
 
-/* ═══ TAB 9 — THE DICTIONARY (write your own) ═══ */
-const DICT_STARTERS=['A bicycle is a machine which…','A whistle is a tool which…','Tetherball is a game which…','A dictionary is a book which…','A seesaw is a toy which…'];
-function dictSave(){
-  const box=document.getElementById('dict-text');
-  const text=(box.value||'').trim();
-  const words=text.split(/\s+/).filter(Boolean).length;
-  const hint=document.getElementById('dict-hint');
-  if(words<6||!/\bwhich\b/i.test(text)){
-    hint.innerHTML='Not yet — use at least <b>6 words</b> and the word <b>which</b>. ✏️';
-    hint.style.color='var(--red-d)';
-    return;
-  }
-  lSave('tab-9-caption',text);
-  hint.innerHTML='Saved! 🎉 You can edit it and save again.';
-  hint.style.color='var(--green-d)';
+/* ═══ TAB 9 — THE LAB DICTIONARY ═══
+   The five required items are Student Book p.155 Activity 1 verbatim, with the
+   book's own sentence frames. The bonus set is the planner's Wrap Up frames
+   (LP p.305) plus the Extend prompts and the formative check (skater, swing). */
+const DICT_ITEMS=[
+  {id:'d1',word:'Bicycle',frame:'This is a machine',hint:'…which you can ride in the park.'},
+  {id:'d2',word:'Skateboarding',frame:'It is a hobby',hint:'…which you do on four wheels.'},
+  {id:'d3',word:'Friction',frame:'This is a force',hint:'…which happens when two things rub.'},
+  {id:'d4',word:'Tetherball',frame:'It is a game',hint:'…which you play with a ball on a rope.'},
+  {id:'d5',word:'Soccer',frame:'This is a sport',hint:'…which Haaland and Salah play.'}
+];
+const DICT_BONUS=[
+  {id:'b1',word:'Lettuce',frame:'Lettuce is a vegetable',hint:'Wrap Up frame'},
+  {id:'b2',word:'Video games',frame:'Video games are games',hint:'Wrap Up frame'},
+  {id:'b3',word:'Horses',frame:'Horses are animals',hint:'Wrap Up frame'},
+  {id:'b4',word:'Basketball',frame:'Basketball is a sport',hint:'Extend'},
+  {id:'b5',word:'Skater',frame:'A skater is a person',hint:'Formative check — careful, a person!'},
+  {id:'b6',word:'Swing',frame:'A swing is a toy',hint:'Formative check'}
+];
+function dictOk(text){
+  const words=(text||'').trim().split(/\s+/).filter(Boolean).length;
+  return words>=4 && /\bwhich\b|\bwho\b/i.test(text||'');
+}
+function dictSaveSlot(id,text){
+  const all=lLoad('tab-9-defs')||{};
+  all[id]=text;lSave('tab-9-defs',all);
+  // captionKey points at tab-9-caption, so keep a readable joined copy there for review.
+  const joined=DICT_ITEMS.concat(DICT_BONUS)
+    .filter(it=>all[it.id])
+    .map(it=>it.word+': '+all[it.id]).join('\n');
+  lSave('tab-9-caption',joined);
   dictRefresh();
 }
+function dictRenderSet(hostId,items){
+  const host=document.getElementById(hostId);
+  if(!host)return;
+  host.innerHTML='';
+  const all=lLoad('tab-9-defs')||{};
+  items.forEach(it=>{
+    const card=document.createElement('div');
+    card.className='qcard';card.dataset.id=it.id;
+    const q=document.createElement('div');
+    q.className='q';q.innerHTML=it.word+': <b>'+it.frame+'</b> ______';
+    const ta=document.createElement('textarea');
+    ta.className='write-box';ta.style.minHeight='62px';
+    ta.placeholder=it.frame+' which…';
+    ta.value=all[it.id]||'';
+    const row=document.createElement('div');
+    row.className='write-row';
+    const btn=document.createElement('button');
+    btn.className='write-save';btn.type='button';
+    const note=document.createElement('span');
+    note.className='hint';
+    btn.onclick=function(){
+      const text=ta.value.trim();
+      if(!dictOk(text)){
+        note.innerHTML='Not yet — at least 4 words and the word <b>which</b>. ✏️';
+        note.style.color='var(--red-d)';return;
+      }
+      dictSaveSlot(it.id,text);
+    };
+    row.appendChild(btn);row.appendChild(note);
+    card.appendChild(q);card.appendChild(ta);card.appendChild(row);
+    host.appendChild(card);
+    card._btn=btn;card._note=note;card._hintText=it.hint;
+  });
+}
 function dictRefresh(){
-  const saved=lLoad('tab-9-caption')||'';
-  const box=document.getElementById('dict-text');
-  if(saved&&!box.value)box.value=saved;
-  const btn=document.getElementById('dict-save');
-  btn.classList.toggle('saved',!!saved);
-  btn.textContent=saved?'✓ Saved — save again':'💾 Save my definition';
-  document.getElementById('dict-done').classList.toggle('show',!!saved);
+  const all=lLoad('tab-9-defs')||{};
+  let done=0;
+  DICT_ITEMS.forEach(it=>{if(dictOk(all[it.id]))done++;});
+  DICT_ITEMS.concat(DICT_BONUS).forEach(it=>{
+    const card=document.querySelector('#dict-list .qcard[data-id="'+it.id+'"]')
+            || document.querySelector('#dict-bonus-list .qcard[data-id="'+it.id+'"]');
+    if(!card||!card._btn)return;
+    const saved=dictOk(all[it.id]);
+    card._btn.classList.toggle('saved',saved);
+    card._btn.textContent=saved?'✓ Saved':'💾 Save';
+    if(saved){card._note.textContent='Saved! 🎉';card._note.style.color='var(--green-d)';}
+    else if(!card._note.textContent){card._note.textContent=card._hintText;card._note.style.color='';}
+  });
+  const cnt=document.getElementById('dict-count');
+  if(cnt)cnt.textContent=done;
+  const allDone=done>=DICT_ITEMS.length;
+  const bonus=document.getElementById('dict-bonus');
+  if(bonus)bonus.style.display=allDone?'flex':'none';
+  const hint=document.getElementById('dict-hint');
+  if(hint&&allDone)hint.innerHTML='All five written! 🎉 Try the Challenge set below.';
+  document.getElementById('dict-done').classList.toggle('show',allDone);
 }
 TAB_INIT[9]=function(){
-  const host=document.getElementById('dict-starters');
-  host.innerHTML='';
-  DICT_STARTERS.forEach(s=>{
-    const b=document.createElement('button');
-    b.type='button';b.className='starter';b.textContent=s;
-    b.onclick=function(){
-      const box=document.getElementById('dict-text');
-      box.value=s.replace('…',' ');box.focus();
-    };
-    host.appendChild(b);
-  });
+  dictRenderSet('dict-list',DICT_ITEMS);
+  dictRenderSet('dict-bonus-list',DICT_BONUS);
   dictRefresh();
 };
 TAB_RESET[9]=function(){
-  lDel('tab-9-caption');
-  const box=document.getElementById('dict-text');
-  if(box)box.value='';
-  const hint=document.getElementById('dict-hint');
-  hint.innerHTML='Use at least 6 words and the word <b>which</b>.';
-  hint.style.color='';
-  dictRefresh();
+  lDel('tab-9-defs');lDel('tab-9-caption');
+  TAB_INIT[9]._initialized=false;TAB_INIT[9]();TAB_INIT[9]._initialized=true;
 };
 TAB_RESTORE[9]=function(){dictRefresh();};
 
@@ -1025,12 +1086,12 @@ TAB_RESTORE[10]=function(){quizCfg.refresh();};
 
 /* ═══ TAB 11 — DRIBBLE! ═══ */
 const DRIB_Q=[
-  {q:'A trophy is a prize ___ the winners lift up. 🏆',o:['who','which'],a:1,why:'A trophy is a thing → which. 📦'},
-  {q:'A striker is a player ___ scores the goals. ⚽',o:['who','which'],a:0,why:'A striker is a person → who. 🧍'},
+  {q:'The World Cup is a trophy ___ Spain lifted in 2026. 🏆',o:['who','which'],a:1,why:'A trophy is a thing → which. 📦'},
+  {q:'Salah (Liverpool) is a player ___ scores the goals. ⚽',o:['who','which'],a:0,why:'Salah is a person → who. 🧍'},
   {q:'Tetherball is a game ___ you play with a ball on a rope. 🥎',o:['who','which'],a:1,why:'A game is a thing → which. 📦'},
   {q:'Find the ghost: "a tool which you blow ___ to make a sound"',o:['it','(nothing)'],a:1,why:'No echo — which already did the pronoun’s job. 👻'},
   {q:'Which can substitute for which? 🔁',o:['that','what'],a:0,why:'that is the substitute player. 🔁'},
-  {q:'A referee is a person ___ makes the rules fair. 🟨',o:['who','which'],a:0,why:'A referee is a person → who. 🧍'},
+  {q:'Dembélé (PSG) is a winger ___ runs very fast. 🇫🇷',o:['who','which'],a:0,why:'A winger is a person → who. 🧍'},
   {q:'The book which gives definitions of words is a… 📚',o:['dictionary','whistle'],a:0,why:'A dictionary gives definitions. 📚'},
   {q:'Definitions are sentences ___ tell you what a word means. 📖',o:['who','which'],a:1,why:'Sentences are things → which. 📦'}
 ];

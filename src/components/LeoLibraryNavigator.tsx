@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { AssignmentMap } from "@/data/assignments";
-import { LEVELS, UNIT_TITLES } from "@/data/curriculum";
+import { LEVELS, UNITS_PER_LEVEL, unitTitlesForLevel } from "@/data/curriculum";
 import {
   fallbackCurrentUnit,
   levelStatusFor,
@@ -15,7 +15,7 @@ import { getLearnerAppProgress, type LearnerAppProgress } from "@/data/learnerPr
 import type { LessonGroup } from "@/data/lessons";
 import { getComponentMeta, type ComponentTone } from "./componentMeta";
 
-const UNIT_NUMBERS = UNIT_TITLES.map((_, index) => index + 1);
+const UNIT_NUMBERS = Array.from({ length: UNITS_PER_LEVEL }, (_, index) => index + 1);
 
 // Canonical 8-lesson spine used whenever a level/unit has no authored lesson
 // content yet (levels 5-6, and every unit outside the live Level 4 · Units
@@ -207,7 +207,7 @@ export function LeoLibraryNavigator({
             Choose a unit
           </span>
           <div aria-label="Unit" className="leo-lib-unit-chips" role="tablist">
-            {UNIT_TITLES.map((title, index) => {
+            {unitTitlesForLevel(selectedLevel).map((title, index) => {
               const unitNumber = index + 1;
               const isSelected = unitNumber === selectedUnit;
               const summary = unitSummaries[index];

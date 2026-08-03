@@ -59,6 +59,17 @@ create table if not exists public.teacher_lesson_progress (
   unique (lesson_id, teacher_id, student_id)
 );
 
+-- Which level/unit Neritan is actively teaching. One row, so the teacher menu
+-- and Leo's library open on the same unit across devices.
+create table if not exists public.teacher_settings (
+  id text primary key,
+  teacher_id text not null default 'neritan',
+  level integer not null,
+  unit integer not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.math_block_progress (
   id text primary key,
   student_id text not null references public.students(id) on delete cascade,

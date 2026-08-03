@@ -6,9 +6,9 @@
 
 export const LEVELS = [1, 2, 3, 4, 5, 6];
 
-// Level 4 is where teaching is actively happening today, with Unit 8 as the
-// current flagship unit. Levels below are already taught end-to-end; levels
-// ahead haven't started yet.
+// Fallback cursor only. The unit actually being taught is now a setting
+// Neritan controls from the teacher menu — see data/currentUnit.ts. These
+// values are what a browser sees before one has ever been chosen.
 export const LIVE_LEVEL = 4;
 export const LIVE_UNIT = 8;
 
@@ -25,10 +25,8 @@ export const UNIT_TITLES = [
   "Our Planet"
 ];
 
-export type LevelStatus = "done" | "current" | "locked";
-
-export function getLevelStatus(level: number): LevelStatus {
-  if (level < LIVE_LEVEL) return "done";
-  if (level > LIVE_LEVEL) return "locked";
-  return "current";
-}
+// Level status now derives from the unit Neritan sets, not from the fallback
+// constants — import `levelStatusFor` from data/currentUnit.ts directly.
+// Deliberately not re-exported here: currentUnit.ts imports the fallbacks from
+// this file, and re-exporting back creates a require cycle that breaks the
+// /leo prerender with "Cannot access 'e' before initialization".

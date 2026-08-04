@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 9 · Reading · Up, Down, and All Around!</title>
+<script src="/components/charts.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+:root{
+  --green:#16A34A; --green-d:#15803d; --green-bg:#f0fdf4;
+  --blue:#0EA5E9; --blue-d:#0369a1; --blue-bg:#e0f2fe;
+  --navy:#0f172a; --orange:#F97316; --orange-bg:#FFF7ED;
+  --amber:#D97706; --amber-bg:#FFFBEB; --yellow:#FDE047;
+  --red:#EF4444; --red-bg:#FEF2F2; --cream:#FFFCEC;
+  --radius:16px;
+}
+.slide-header{height:64px;background:var(--green);display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.75);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.22);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.tr{background:var(--blue);color:#fff}
+.hd-chip.src{background:rgba(0,0,0,.25)}
+.body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.body.center{align-items:center;justify-content:center;text-align:center}
+.body.cream{background:var(--cream)}
+.body.grad-green{background:linear-gradient(135deg,#16A34A,#0e7a37);color:#fff}
+.body.grad-blue{background:linear-gradient(135deg,#0EA5E9,#075985);color:#fff}
+.body.grad-navy{background:linear-gradient(135deg,#0f172a,#1e3a5f);color:#fff}
+.body.grad-forest{background:linear-gradient(180deg,#15803d,#16a34a,#15803d);color:#fff}
+.body.green{background:var(--green);color:#fff}
+.two-col{flex-direction:row;gap:28px}
+.two-col > .col{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0}
+.header-bar{display:flex;align-items:center;gap:14px;padding:12px 26px;border-radius:14px;font-size:28px;font-weight:900;color:#fff}
+.header-bar.green{background:var(--green)} .header-bar.blue{background:var(--blue)} .header-bar.orange{background:var(--orange)} .header-bar.amber{background:var(--amber)} .header-bar.navy{background:var(--navy)} .header-bar.red{background:var(--red)} .header-bar.yellow{background:var(--yellow);color:var(--navy)}
+.info-box{background:#fff;border-radius:var(--radius);padding:16px 22px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.info-box.tint-green{background:var(--green-bg);border-left:6px solid var(--green)}
+.info-box.tint-blue{background:var(--blue-bg);border-left:6px solid var(--blue)}
+.info-box.tint-orange{background:var(--orange-bg);border-left:6px solid var(--orange)}
+.info-box.tint-amber{background:var(--amber-bg);border-left:6px solid var(--amber)}
+.info-box.tint-red{background:var(--red-bg);border-left:6px solid var(--red)}
+.dialogue-box{background:#fff;border:2px solid var(--green);border-radius:14px;padding:14px 22px;font-size:21px;color:var(--navy);font-weight:600;line-height:1.55}
+.dialogue-box b{color:var(--green-d)}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--green);color:#fff;border:none;border-radius:12px;padding:12px 22px;font-size:18px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s;box-shadow:0 4px 10px rgba(0,0,0,.12)}
+.btn:hover{transform:translateY(-2px)}
+.btn.blue{background:var(--blue)} .btn.orange{background:var(--orange)} .btn.yellow{background:var(--yellow);color:var(--navy)} .btn.red{background:var(--red)} .btn.outline{background:#fff;color:var(--green);border:2px solid var(--green)}
+.btn.done{background:#9ca3af;cursor:default}
+.hidden{display:none !important}
+.fade-in{animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.shake{animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pulse-yellow{animation:pulseY 1.4s ease infinite}
+@keyframes pulseY{0%,100%{box-shadow:0 0 0 0 rgba(253,224,71,.55)}50%{box-shadow:0 0 0 14px rgba(253,224,71,0)}}
+.pbar{width:100%;background:#e5e7eb;border-radius:99px;height:9px;overflow:hidden;margin-top:auto}
+.pbar-fill{height:100%;background:var(--green);border-radius:99px}
+
+/* SPINE FLOWCHART */
+.flow-board{background:linear-gradient(180deg,#0f172a,#1e3a5f);border:3px solid var(--green);border-radius:16px;padding:18px 22px;color:#fff;position:relative}
+.flow-title{font-size:18px;font-weight:900;color:var(--yellow);margin-bottom:10px;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center}
+.flow-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.flow-slot{background:rgba(255,255,255,.08);border:2px dashed rgba(255,255,255,.4);border-radius:12px;padding:12px 10px;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;font-size:13px;color:rgba(255,255,255,.65);font-weight:700;transition:all .4s}
+.flow-slot.filled{background:#fff;color:var(--navy);border-color:var(--green);border-style:solid}
+.flow-slot .num{font-size:30px;font-weight:900;color:var(--yellow);line-height:1}
+.flow-slot.filled .num{color:var(--green-d)}
+.flow-slot .em{font-size:28px;line-height:1}
+.flow-slot .cap{font-size:13px;font-weight:700;line-height:1.4}
+.flow-arrow{position:absolute;color:rgba(255,255,255,.4);font-size:18px}
+
+/* PASSAGE BLOCK */
+.passage{background:#fff;border:3px solid var(--green);border-radius:16px;padding:24px 30px;font-size:21px;color:var(--navy);line-height:1.7;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.passage.title{font-size:38px;font-weight:900;color:var(--green-d);text-align:center;letter-spacing:1px;border-bottom:2px solid var(--green-bg);padding-bottom:12px;margin-bottom:14px}
+.passage .tag{background:var(--yellow);color:var(--navy);padding:1px 8px;border-radius:6px;font-weight:800;cursor:pointer;border:2px solid var(--amber);font-size:19px}
+.passage .tag:hover{background:var(--amber);color:#fff}
+.passage .tag.popped{background:var(--green);color:#fff;border-color:var(--green-d)}
+.gloss-pop{position:absolute;background:#fff;border:3px solid var(--green);border-radius:12px;padding:10px 14px;font-size:16px;font-weight:700;color:var(--navy);box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:50;max-width:260px}
+.gloss-pop .gp-em{font-size:24px}
+.gloss-pop .gp-jp{font-size:14px;color:#6b7280;font-style:italic;margin-top:4px}
+
+/* MINI-GAMES */
+.mg-card{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 18px;font-size:18px;color:var(--navy);font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+.mg-card:hover{border-color:var(--green);transform:translateY(-2px)}
+.mg-card.correct{background:var(--green);color:#fff;border-color:var(--green-d)}
+.mg-card.wrong{background:var(--red);color:#fff;border-color:#b91c1c}
+.mg-card.placed{opacity:.5;cursor:default}
+.mg-score{background:var(--navy);color:#fff;border-radius:10px;padding:10px 16px;font-size:17px;font-weight:800;text-align:center}
+.mg-win{background:var(--green);color:#fff;border-radius:10px;padding:10px 16px;font-size:17px;font-weight:800;text-align:center;animation:fadeIn .5s}
+
+/* SEQUENCE MINI-GAME (s5) */
+.seq-stage{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;background:var(--cream);border:2px solid var(--amber);border-radius:14px;padding:18px}
+.seq-slot{display:inline-flex;align-items:center;justify-content:center;min-width:160px;height:50px;border:3px dashed var(--amber);border-radius:10px;font-size:18px;color:var(--amber);font-weight:800;background:#fff}
+.seq-slot.filled{background:var(--amber);color:#fff;border-style:solid}
+.seq-chip{background:#fff;border:2px solid var(--blue);border-radius:99px;padding:8px 16px;font-size:17px;font-weight:700;color:var(--blue-d);cursor:pointer;font-family:'Outfit',sans-serif}
+.seq-chip:hover{background:var(--blue);color:#fff}
+.seq-chip.placed{opacity:.35;cursor:default}
+
+/* COMPASS (s6 + s29) */
+.compass-wrap{position:relative;width:280px;height:280px;background:radial-gradient(circle,#fffbeb,#fde68a);border-radius:50%;border:4px solid var(--amber);box-shadow:0 6px 18px rgba(0,0,0,.18);margin:0 auto;display:flex;align-items:center;justify-content:center}
+.compass-N,.compass-E,.compass-S,.compass-W{position:absolute;font-size:24px;font-weight:900;color:var(--navy);cursor:pointer;padding:6px 14px;border-radius:8px;transition:all .2s;background:#fff;border:2px solid var(--amber)}
+.compass-N{top:8px;left:50%;transform:translateX(-50%)}
+.compass-E{right:8px;top:50%;transform:translateY(-50%)}
+.compass-S{bottom:8px;left:50%;transform:translateX(-50%)}
+.compass-W{left:8px;top:50%;transform:translateY(-50%)}
+.compass-N:hover,.compass-E:hover,.compass-S:hover,.compass-W:hover{background:var(--green);color:#fff;border-color:var(--green-d);transform:translateX(-50%) scale(1.1)}
+.compass-E:hover,.compass-W:hover{transform:translateY(-50%) scale(1.1)}
+.compass-needle{font-size:80px;color:var(--red);transform-origin:center;transition:transform .8s ease-out}
+
+/* SHIP (s9 — sinking) */
+.ship-stage{background:linear-gradient(180deg,#dbeafe 0%,#dbeafe 60%,#0EA5E9 60%,#0369a1 100%);border-radius:18px;padding:20px;height:220px;position:relative;overflow:hidden;cursor:pointer}
+.ship-emoji{position:absolute;left:50%;top:30%;transform:translateX(-50%) rotate(0deg);font-size:80px;transition:all 2s ease-in}
+.ship-emoji.sinking{top:70%;transform:translateX(-50%) rotate(-30deg)}
+.ship-help{position:absolute;top:18px;right:20px;background:#fff;border:2px solid var(--red);border-radius:10px;padding:8px 14px;font-size:14px;font-weight:800;color:var(--red);opacity:0;transition:opacity .4s}
+.ship-help.show{opacity:1}
+
+/* CHIPS / SLOTS */
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{background:#fff;border:2px solid var(--blue);border-radius:99px;padding:8px 16px;font-size:17px;font-weight:700;color:var(--blue-d);cursor:pointer;font-family:'Outfit',sans-serif}
+.chip:hover{background:var(--blue);color:#fff}
+.chip.placed{opacity:.35;cursor:default}
+.chip.sel{background:var(--orange);color:#fff;border-color:var(--orange)}
+
+/* RECRUIT TOAST (flowchart unlock) */
+.unlock-toast{background:var(--green);color:#fff;border-radius:12px;padding:10px 18px;font-size:18px;font-weight:800;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;opacity:0;transform:translateY(8px);transition:all .4s;border:3px solid var(--yellow)}
+.unlock-toast.show{opacity:1;transform:translateY(0)}
+
+/* QUIZ */
+.quiz-block{background:#fff;border-radius:14px;padding:14px 22px;box-shadow:0 3px 10px rgba(0,0,0,.06)}
+.quiz-block .q{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.quiz-opt{font-size:18px;padding:8px 14px;background:#fff;border:2px solid #e5e7eb;border-radius:10px;cursor:pointer;font-weight:700;color:var(--navy);font-family:'Outfit',sans-serif;margin:2px;display:inline-block}
+.quiz-opt:hover{border-color:var(--green)}
+.quiz-opt.correct{background:var(--green);color:#fff;border-color:var(--green-d)}
+.quiz-opt.wrong{background:var(--red);color:#fff;border-color:#b91c1c}
+
+/* GLOSS CARDS (vocab refresh) */
+.gloss-card{background:#fff;border:2px solid var(--blue);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px}
+.gloss-card .em{font-size:42px}
+.gloss-card .word{font-size:22px;font-weight:900;color:var(--blue-d)}
+.gloss-card .def{font-size:17px;color:var(--navy);font-weight:600;margin-top:2px}
+.gloss-card .jp{font-size:14px;color:#6b7280;font-style:italic;margin-top:2px}
+
+/* COMPREHENSION REVEAL */
+.comp-reveal{background:var(--green-bg);border:2px solid var(--green);border-radius:14px;padding:14px 22px;font-size:20px;color:var(--navy);font-weight:600;line-height:1.6;display:none}
+.comp-reveal.show{display:block;animation:fadeIn .4s}
+
+/* MATCH / LABEL (Apply Activity 3) */
+.label-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.label-photo{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.label-photo:hover{border-color:var(--green);transform:translateY(-2px)}
+.label-photo.labeled{background:var(--green-bg);border-color:var(--green)}
+.label-photo .ph-em{font-size:48px;line-height:1}
+.label-photo .ph-letter{font-size:16px;font-weight:900;color:var(--green-d);margin-top:6px}
+.label-photo .ph-name{font-size:14px;color:var(--navy);font-weight:600;margin-top:2px}
+
+/* TREASURE PAYOFF (s42) */
+.cache-scene{background:linear-gradient(180deg,#a16207,#78350f);border-radius:18px;padding:24px;color:#fff;text-align:center;position:relative;overflow:hidden}
+.cache-box{font-size:140px;line-height:1;animation:bounce-once 1.2s ease}
+@keyframes bounce-once{0%{transform:scale(.7) translateY(20px);opacity:0}60%{transform:scale(1.1) translateY(-8px);opacity:1}100%{transform:scale(1) translateY(0)}}
+
+/* NAV BAR */
+#nav-bar{position:absolute;bottom:0;left:0;width:1920px;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn{background:rgba(22,163,74,.25)!important;color:#4ade80!important}
+#unit-label{color:#4ade80;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+#tn-panel{position:absolute;right:-460px;top:0;width:440px;height:1028px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#4ade80;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+.done-card{background:#fff;border-radius:24px;padding:60px 80px;text-align:center;max-width:900px;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.done-card h2{font-size:48px;color:var(--green-d);margin-bottom:18px}
+.done-card p{font-size:22px;color:#374151;margin-bottom:30px;line-height:1.6}
+.done-card .donebtn{font-size:28px;padding:20px 60px;border-radius:16px}
+
+/* ═══ U9 FORCE MAP (the spine) ═══ */
+.force-map{background:#fff;border:3px solid var(--green);border-radius:18px;padding:18px 22px;display:flex;flex-direction:column;gap:12px}
+.force-map .fm-title{font-size:22px;font-weight:900;color:var(--green-d);letter-spacing:1px;text-align:center}
+.fm-track{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.fm-slot{background:#f9fafb;border:3px dashed #d1d5db;border-radius:14px;padding:12px 10px;text-align:center;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:all .35s}
+.fm-slot .fm-em{font-size:44px;line-height:1;filter:grayscale(1);opacity:.35;transition:all .35s}
+.fm-slot .fm-stage{font-size:17px;font-weight:900;color:#9ca3af;letter-spacing:.5px}
+.fm-slot .fm-force{font-size:19px;font-weight:900;color:#9ca3af;min-height:24px}
+.fm-slot .fm-effect{font-size:15px;color:#9ca3af;font-weight:600;line-height:1.35;min-height:20px}
+.fm-slot.filled{background:var(--green-bg);border-style:solid;border-color:var(--green);animation:fmPop .5s ease}
+.fm-slot.filled .fm-em{filter:none;opacity:1}
+.fm-slot.filled .fm-stage{color:var(--green-d)}
+.fm-slot.filled .fm-force{color:var(--green-d)}
+.fm-slot.filled .fm-effect{color:var(--navy)}
+@keyframes fmPop{from{transform:scale(.85);opacity:.4}to{transform:scale(1);opacity:1}}
+
+/* U9 mini-game bits */
+.bar-rig{background:#fff;border:3px solid var(--amber);border-radius:16px;padding:20px;text-align:center;position:relative;min-height:230px}
+.bar-seat{font-size:96px;line-height:1}
+.safety-bar{width:260px;height:22px;background:var(--amber);border-radius:11px;margin:10px auto;transition:transform .6s ease}
+.safety-bar.down{transform:translateY(58px)}
+.hill{width:100%;height:150px;background:linear-gradient(to top right,transparent 49.5%,var(--green) 50%);border-radius:12px;transition:transform .4s ease;transform-origin:bottom left}
+.loop-ring{width:170px;height:170px;border:12px solid var(--blue);border-radius:50%;margin:0 auto;position:relative}
+.loop-car{position:absolute;font-size:34px;top:-24px;left:50%;transform:translateX(-50%);transition:transform .1s linear}
+.brake-track{height:26px;background:#e5e7eb;border-radius:13px;position:relative;overflow:visible}
+.brake-car{position:absolute;top:-24px;font-size:38px;transition:left .8s ease}
+.brake-body{position:absolute;top:-24px;font-size:30px;transition:left 1.4s ease}
+.force-tag{display:inline-block;background:var(--blue-bg);border:2px solid var(--blue);color:var(--blue-d);border-radius:99px;padding:5px 16px;font-size:18px;font-weight:800;margin:3px}
+
+/* signal-word tap */
+.sig-line{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 18px;font-size:21px;color:var(--navy);font-weight:600;line-height:1.6}
+.sig-w{cursor:pointer;padding:2px 5px;border-radius:6px;transition:all .15s}
+.sig-w:hover{background:#f3f4f6}
+.sig-w.hit{background:var(--yellow);font-weight:900}
+.sig-w.miss{background:var(--red);color:#fff}
+
+/* cause→effect pair rows */
+.ce-row{display:flex;align-items:center;gap:14px;background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 18px}
+.ce-cause{flex:1;font-size:20px;font-weight:800;color:var(--amber);text-align:right}
+.ce-arrow{font-size:26px;color:#9ca3af}
+.ce-effect{flex:1.4;font-size:20px;font-weight:700;color:var(--navy)}
+.ce-row.revealed{border-color:var(--green);background:var(--green-bg)}
+</style>
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<!-- s1 TITLE -->
+
+<!-- s1 -->
+<div class="slide" id="s1" data-notes="<strong>Title.</strong> Reading: Up, Down, and All Around! Today&apos;s spine = building the FORCE MAP of a roller-coaster ride. Five slots fill across the deck: safety bar → steep hill → loop the loop → brakes → every day. Payoff on s42: the whole ride replayed with every force captioned.">
+  <div class="body grad-green center">
+    <div style="font-size:120px;line-height:1">🎢</div>
+    <h1 style="font-size:76px;font-weight:900;margin:10px 0">Up, Down, and All Around!</h1>
+    <p style="font-size:32px;opacity:.9;font-weight:600">Unit 9 · Reading · Student Book pp.156–157 · TR 9.8</p>
+    <div style="margin-top:26px;display:flex;gap:14px">
+      <span class="force-tag" style="background:rgba(255,255,255,.2);border-color:#fff;color:#fff">🍎 gravity</span>
+      <span class="force-tag" style="background:rgba(255,255,255,.2);border-color:#fff;color:#fff">🔄 centripetal force</span>
+      <span class="force-tag" style="background:rgba(255,255,255,.2);border-color:#fff;color:#fff">🔥 friction</span>
+      <span class="force-tag" style="background:rgba(255,255,255,.2);border-color:#fff;color:#fff">🛑 inertia</span>
+    </div>
+  </div>
+</div>
+
+<!-- s2 -->
+<div class="slide" id="s2" data-notes="<strong>Today&apos;s Goal (LP p.306).</strong> Both objectives verbatim from the LP. Today&apos;s strategy is Understand Cause and Effect — signal words because / why / as a result. Academic word: describe. Five content words pre-taught before the passage so there is no ambush.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Today’s Goal</span><div class="hd-chip src">LP p.306</div></div>
+  <div class="body">
+    <div class="header-bar green">🎯 Students will…</div>
+    <div class="info-box tint-green" style="font-size:30px;font-weight:700;color:var(--navy);line-height:1.6">
+      • understand the effects of force on roller coasters and bicycles.<br>
+      • describe a roller-coaster ride.
+    </div>
+    <div class="two-col" style="display:flex;gap:24px;margin-top:6px">
+      <div class="col">
+        <div class="header-bar blue">🎯 Reading Strategy</div>
+        <div class="info-box tint-blue" style="font-size:26px;font-weight:700">Understand Cause and Effect<br>
+          <span style="font-size:20px;font-weight:600;color:#374151">A <b>cause</b> tells WHY. An <b>effect</b> is WHAT HAPPENS.</span></div>
+      </div>
+      <div class="col">
+        <div class="header-bar amber">📚 Words we teach first</div>
+        <div class="info-box tint-amber" style="font-size:22px;font-weight:700;line-height:1.7">
+          🗣️ describe &nbsp; 🦺 safety bar &nbsp; ⛰️ steep<br>
+          🔄 centripetal force &nbsp; 🛑 inertia &nbsp; ✨ experience</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- s3 -->
+<div class="slide" id="s3" data-notes="<strong>Spine launch — THE FORCE MAP.</strong> The five-slot track starts empty and stays on screen through the whole reading. Each paragraph pair Leo reads + answers fills slots. A slot only opens when he names the force AND its effect — so cause-and-effect is the tool that moves the car. Payoff at s42.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Our Mission</span></div>
+  <div class="body">
+    <div class="header-bar navy">🎢 Today we build the FORCE MAP of a roller-coaster ride</div>
+    <div class="info-box tint-blue" style="font-size:24px;font-weight:700">
+      Every slot needs two things: <b>which force</b> is working, and <b>what it makes happen</b>.
+      That is a <b>cause</b> and an <b>effect</b>. Read → answer → the car moves one slot further.
+    </div>
+    <div class="force-map" id="fm-s3">
+  <div class="fm-title">🎢 THE FORCE MAP OF THE RIDE</div>
+  <div class="fm-track">
+    <div class="fm-slot">
+      <div class="fm-em">🦺</div>
+      <div class="fm-stage">1 · SAFETY BAR</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+    <div class="fm-slot">
+      <div class="fm-em">⛰️</div>
+      <div class="fm-stage">2 · STEEP HILL</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+    <div class="fm-slot">
+      <div class="fm-em">➰</div>
+      <div class="fm-stage">3 · LOOP THE LOOP</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+    <div class="fm-slot">
+      <div class="fm-em">🛑</div>
+      <div class="fm-stage">4 · BRAKES</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+    <div class="fm-slot">
+      <div class="fm-em">🌍</div>
+      <div class="fm-stage">5 · EVERY DAY</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+
+<!-- s4 -->
+<div class="slide" id="s4" data-notes="<strong>Warm Up force mime (LP p.306).</strong> Dad and Leo act out each force with their bodies before any reading. Push down = gravity. Swing your arm in a circle = centripetal force. Rub your hands = friction. Stop suddenly and let your upper body keep going = inertia. Bridge: &quot;Every one of those made something happen. That is cause and effect.&quot;">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Warm Up</span><div class="hd-chip src">LP p.306</div></div>
+  <div class="body">
+    <div class="header-bar orange">🎭 Act it out — feel the force first, name it second</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px">
+      <div class="info-box tint-green" style="text-align:center"><div style="font-size:64px">🍎</div>
+        <div style="font-size:24px;font-weight:900;color:var(--green-d)">gravity</div>
+        <div style="font-size:19px;font-weight:600;margin-top:6px">Drop your arms. What pulled them down?</div></div>
+      <div class="info-box tint-blue" style="text-align:center"><div style="font-size:64px">🔄</div>
+        <div style="font-size:24px;font-weight:900;color:var(--blue-d)">centripetal force</div>
+        <div style="font-size:19px;font-weight:600;margin-top:6px">Swing your arm in a big circle. Feel the pull inward.</div></div>
+      <div class="info-box tint-red" style="text-align:center"><div style="font-size:64px">🔥</div>
+        <div style="font-size:24px;font-weight:900;color:var(--red)">friction</div>
+        <div style="font-size:19px;font-weight:600;margin-top:6px">Rub your hands together fast. Warm? That is friction.</div></div>
+      <div class="info-box tint-amber" style="text-align:center"><div style="font-size:64px">🛑</div>
+        <div style="font-size:24px;font-weight:900;color:var(--amber)">inertia</div>
+        <div style="font-size:19px;font-weight:600;margin-top:6px">Walk, then stop hard. Your body wanted to keep going.</div></div>
+    </div>
+    <div class="dialogue-box" style="font-size:24px">💬 <b>Dad:</b> “Every one of those forces <b>made something happen</b>.
+      The force is the <b>cause</b>. What happened is the <b>effect</b>. Today we read about a ride that is full of both.”</div>
+  </div>
+</div>
+
+<!-- s5 -->
+<div class="slide" id="s5" data-notes="<strong>Academic word: describe 🗣️📝.</strong> Embodied mini-game — Leo describes the ride photo and the word performs itself. Tap each chip to add it to the description; the sentence builds live. Any order works: the point is that describing = saying what it is like.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Academic Word</span><div class="hd-chip tr">describe</div></div>
+  <div class="body">
+    <div class="header-bar blue">🗣️📝 describe — to say what something is like or what is happening</div>
+    <div class="info-box" style="text-align:center;font-size:26px;font-weight:700">
+      Look at the ride. Tap words to <b>describe</b> it — the word does its own job.</div>
+    <div style="display:flex;gap:24px;align-items:center">
+      <div style="font-size:150px;flex-shrink:0">🎢</div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <button class="btn outline" onclick="descAdd(this,'fast')">fast</button>
+          <button class="btn outline" onclick="descAdd(this,'very high')">very high</button>
+          <button class="btn outline" onclick="descAdd(this,'steep')">steep</button>
+          <button class="btn outline" onclick="descAdd(this,'exciting')">exciting</button>
+          <button class="btn outline" onclick="descAdd(this,'a little scary')">a little scary</button>
+          <button class="btn outline" onclick="descAdd(this,'upside down')">upside down</button>
+        </div>
+        <div class="info-box tint-blue" style="font-size:28px;font-weight:800;min-height:90px" id="desc-out">The roller coaster is…</div>
+        <div style="font-size:21px;font-weight:700;color:var(--green-d);min-height:28px" id="desc-fb"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- s6 -->
+<div class="slide" id="s6" data-notes="<strong>safety bar 🦺 mini-game.</strong> The car will not start until the bar is down. Tap PULL DOWN THE BAR — the bar animates into place and the ride button unlocks. This pre-loads ¶1 (&quot;Sit in the car and pull down the safety bar&quot;) AND ¶4 (&quot;the safety bars keep you in place&quot;), which is Force Map slot 1.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Content Word</span><div class="hd-chip tr">blocks ¶1</div></div>
+  <div class="body">
+    <div class="header-bar amber">🦺 safety bar — the bar that holds you in your seat</div>
+    <div class="two-col" style="display:flex;gap:26px">
+      <div class="col">
+        <div class="bar-rig">
+          <div class="bar-seat">🧒</div>
+          <div class="safety-bar" id="sbar"></div>
+          <div style="font-size:20px;font-weight:700;color:#6b7280;margin-top:52px" id="sbar-msg">The ride cannot start yet…</div>
+        </div>
+      </div>
+      <div class="col" style="justify-content:center">
+        <button class="btn amber" style="background:var(--amber);font-size:26px;padding:18px 34px" onclick="pullBar()">⬇️ Pull down the safety bar</button>
+        <button class="btn done" id="ride-btn" style="font-size:26px;padding:18px 34px" disabled onclick="rideStart()">🎢 Start the ride</button>
+        <div class="info-box tint-amber" style="font-size:22px;font-weight:700;min-height:80px" id="sbar-out">
+          💬 Why does a roller coaster have one? Ask Leo before you tap.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- s7 -->
+<div class="slide" id="s7" data-notes="<strong>steep ⛰️ mini-game.</strong> Tap STEEPER until the hill is steep enough for the car to launch. A gentle slope will not do it. The word is felt, not defined — and it pre-loads ¶2 (&quot;First you go up a steep hill&quot;).">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Content Word</span><div class="hd-chip tr">blocks ¶2</div></div>
+  <div class="body">
+    <div class="header-bar green">⛰️ steep — going up or down very sharply, not gently</div>
+    <div class="info-box" style="font-size:24px;font-weight:700;text-align:center">Make the hill steep enough for the roller coaster to really drop.</div>
+    <div style="background:#fff;border:3px solid var(--green);border-radius:16px;padding:22px">
+      <div class="hill" id="hill"></div>
+    </div>
+    <div style="display:flex;gap:14px;align-items:center">
+      <button class="btn" style="font-size:24px" onclick="steeper()">↗️ Steeper</button>
+      <button class="btn outline" style="font-size:24px" onclick="steepReset()">↺ Reset</button>
+      <div class="info-box tint-green" style="flex:1;font-size:23px;font-weight:800" id="steep-msg">Not steep enough — the car would just stop.</div>
+    </div>
+  </div>
+</div>
+
+<!-- s8 -->
+<div class="slide" id="s8" data-notes="<strong>centripetal force 🔄 mini-game.</strong> Tap HOLD to keep the car going around the loop. Let go and it flies off. That IS centripetal force — the force that keeps something moving in a circle. Pre-loads ¶3 and Force Map slot 3.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Content Word</span><div class="hd-chip tr">blocks ¶3</div></div>
+  <div class="body">
+    <div class="header-bar blue">🔄 centripetal force — the force that keeps something moving in a circle</div>
+    <div class="two-col" style="display:flex;gap:26px;align-items:center">
+      <div class="col" style="align-items:center">
+        <div class="loop-ring"><div class="loop-car" id="loop-car">🚗</div></div>
+      </div>
+      <div class="col">
+        <button class="btn blue" style="font-size:26px;padding:18px 34px" onclick="loopHold()">🔄 Hold the car in the circle</button>
+        <button class="btn red" style="font-size:26px;padding:18px 34px" onclick="loopRelease()">❌ Let go</button>
+        <div class="info-box tint-blue" style="font-size:23px;font-weight:800;min-height:100px" id="loop-msg">
+          Tap <b>Hold</b> and watch. Then tap <b>Let go</b> and watch what happens.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- s9 -->
+<div class="slide" id="s9" data-notes="<strong>inertia 🛑 mini-game.</strong> Tap BRAKE HARD. The car stops — but the body keeps sliding forward. That gap is inertia, and it is exactly why the safety bar from s6 matters. Pre-loads ¶4 and Force Map slot 4.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Content Word</span><div class="hd-chip tr">blocks ¶4</div></div>
+  <div class="body">
+    <div class="header-bar amber">🛑 inertia — a moving body wants to keep moving</div>
+    <div class="info-box" style="font-size:24px;font-weight:700;text-align:center">Watch closely: the <b>car</b> stops. Does the <b>body</b> stop at the same time?</div>
+    <div style="background:#fff;border:3px solid var(--amber);border-radius:16px;padding:40px 26px">
+      <div class="brake-track">
+        <div class="brake-car" id="brake-car" style="left:2%">🚗</div>
+        <div class="brake-body" id="brake-body" style="left:3%">🧒</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:14px;align-items:center">
+      <button class="btn" style="background:var(--amber);font-size:24px" onclick="brakeGo()">▶️ Go</button>
+      <button class="btn red" style="font-size:24px" onclick="brakeStop()">🛑 Brake hard!</button>
+      <div class="info-box tint-amber" style="flex:1;font-size:23px;font-weight:800" id="brake-msg">Tap Go, then Brake hard.</div>
+    </div>
+  </div>
+</div>
+
+<!-- s10 -->
+<div class="slide" id="s10" data-notes="<strong>experience ✨ gloss card.</strong> This one is guessable from context, so it gets a card not a mini-game (per the vocab plan). Both senses matter: to feel/live through something, and the thing itself. It carries ¶5 and ¶6.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Content Word</span><div class="hd-chip tr">¶5–¶6</div></div>
+  <div class="body center">
+    <div class="header-bar navy" style="align-self:stretch">✨ experience</div>
+    <div class="gloss-card" style="max-width:1300px;font-size:26px">
+      <div class="em" style="font-size:80px">✨</div>
+      <div>
+        <div class="word" style="font-size:34px">experience</div>
+        <div class="def" style="font-size:25px">to feel something or live through it — <i>we <b>experience</b> forces every day</i></div>
+        <div class="jp" style="font-size:20px">経験（けいけん）する</div>
+      </div>
+    </div>
+    <div class="info-box tint-green" style="max-width:1300px;font-size:24px;font-weight:700;margin-top:18px">
+      💬 <b>Ask Leo:</b> “Name one force you have <b>experienced</b> today — before we even opened the book.”</div>
+  </div>
+</div>
+
+<!-- s11 -->
+<div class="slide" id="s11" data-notes="<strong>Present (LP p.306).</strong> Turn to page 156. Point out the title, the photos of the ride, and the loop. Visual orientation before predicting.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Present</span><div class="hd-chip src">SB p.156</div></div>
+  <div class="body center">
+    <div class="header-bar green" style="align-self:stretch">📖 Open your book to page 156</div>
+    <div style="font-size:130px">📖🎢</div>
+    <div class="info-box tint-green" style="max-width:1400px;font-size:26px;font-weight:700;line-height:1.7">
+      Look at the <b>title</b>. Look at the <b>photos</b>. Look at the big <b>circle</b> in the picture.<br>
+      What do you already know just from looking?</div>
+  </div>
+</div>
+
+<!-- s12 -->
+<div class="slide" id="s12" data-notes="<strong>Predict (LP: &quot;What do you think this reading is going to be about?&quot;).</strong> Tap a chip to vote. Every vote leads to the same payoff — this is a text about the FORCES that make a roller coaster work. Reveal below.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Predict</span><div class="hd-chip src">LP p.306</div></div>
+  <div class="body">
+    <div class="header-bar blue">🤔 What do you think this reading is going to be about?</div>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:10px">
+      <button class="btn outline" style="font-size:24px" onclick="predict()">How to build a roller coaster</button>
+      <button class="btn outline" style="font-size:24px" onclick="predict()">Why a roller coaster is scary</button>
+      <button class="btn outline" style="font-size:24px" onclick="predict()">The forces on a roller coaster</button>
+      <button class="btn outline" style="font-size:24px" onclick="predict()">The world’s biggest ride</button>
+    </div>
+    <div class="comp-reveal" id="predict-out" style="font-size:26px;margin-top:16px">
+      🎯 This reading is about the <b>forces</b> on a roller coaster — and on a bicycle.
+      Gravity, centripetal force, friction and inertia. Every one of them <b>causes</b> something to happen to your body.</div>
+  </div>
+</div>
+
+<!-- s13 -->
+<div class="slide" id="s13" data-notes="<strong>Purpose (LP p.306).</strong> &quot;As we read, we will find the force at each part of the ride and what it makes happen.&quot; Show the Force Map again so Leo knows exactly what he is filling in.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Our Purpose for Reading</span></div>
+  <div class="body">
+    <div class="header-bar navy">🎯 As we read, we fill the Force Map — one part of the ride at a time</div>
+    <div class="force-map" id="fm-s13">
+  <div class="fm-title">🎢 THE FORCE MAP OF THE RIDE</div>
+  <div class="fm-track">
+    <div class="fm-slot">
+      <div class="fm-em">🦺</div>
+      <div class="fm-stage">1 · SAFETY BAR</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+    <div class="fm-slot">
+      <div class="fm-em">⛰️</div>
+      <div class="fm-stage">2 · STEEP HILL</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+    <div class="fm-slot">
+      <div class="fm-em">➰</div>
+      <div class="fm-stage">3 · LOOP THE LOOP</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+    <div class="fm-slot">
+      <div class="fm-em">🛑</div>
+      <div class="fm-stage">4 · BRAKES</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+    <div class="fm-slot">
+      <div class="fm-em">🌍</div>
+      <div class="fm-stage">5 · EVERY DAY</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+  </div>
+</div>
+    <div class="dialogue-box" style="font-size:24px">💬 <b>Dad:</b> “For each slot you need <b>two</b> answers:
+      which <b>force</b> is working — and <b>what it makes happen</b>. Cause, then effect.”</div>
+  </div>
+</div>
+
+<!-- s14 -->
+<div class="slide" id="s14" data-notes="<strong>Read Together ¶1 — verbatim from TR 9.8.</strong> Read aloud with Leo first, then let him read it alone. The safety bar callback to s6 is deliberate.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Read Together ¶1</span><div class="hd-chip tr">TR 9.8</div></div>
+  <div class="body">
+    <div class="header-bar green">📖 Up, Down, and All Around! — paragraph 1</div>
+    <div class="info-box" style="font-size:32px;line-height:1.75;font-weight:600;color:var(--navy)">
+      You are going on a roller-coaster ride. Sit in the car and pull down the
+      <span class="tag" onclick="popGloss(this,'safetybar')">safety bar</span>. Are you ready? Let’s go!</div>
+    <div class="info-box tint-amber" style="font-size:23px;font-weight:700">
+      🦺 That is the very bar we pulled down on slide 6. Ask: “What would happen <b>without</b> it?”</div>
+  </div>
+</div>
+
+<!-- s15 -->
+<div class="slide" id="s15" data-notes="<strong>Read Together ¶2 — verbatim.</strong> This is the gravity paragraph. Note the cause-effect chain: gravity pulls you down → the coaster moves fast → you feel very light. Point at each arrow as you read.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Read Together ¶2</span><div class="hd-chip tr">TR 9.8</div></div>
+  <div class="body">
+    <div class="header-bar green">📖 paragraph 2</div>
+    <div class="info-box" style="font-size:32px;line-height:1.75;font-weight:600;color:var(--navy)">
+      First you go up a <span class="tag" onclick="popGloss(this,'steep')">steep</span> hill. The roller coaster goes slow.
+      Next gravity pulls you down the hill. The roller coaster moves fast. You feel very light!</div>
+    <div class="info-box tint-green" style="font-size:24px;font-weight:700">
+      🔗 Follow the chain: <b>gravity pulls you down</b> → <b>the coaster moves fast</b> → <b>you feel very light</b>.
+      One cause, then effect after effect.</div>
+  </div>
+</div>
+
+<!-- s16 -->
+<div class="slide" id="s16" data-notes="<strong>¶1–¶2 audio (TR 9.8).</strong> Play the track if available. Leo reads along, then reads on his own. Reference for pronunciation of centripetal and inertia later.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Listen and Read Along</span><div class="hd-chip tr">TR 9.8</div></div>
+  <div class="body center">
+    <div style="font-size:130px">🎧</div>
+    <div class="header-bar blue" style="align-self:stretch">TR 9.8 · Listen to paragraphs 1 and 2, then read them aloud</div>
+    <div class="info-box tint-blue" style="max-width:1400px;font-size:25px;font-weight:700;line-height:1.7">
+      1️⃣ Listen. &nbsp; 2️⃣ Read along with the audio. &nbsp; 3️⃣ Read it on your own.</div>
+  </div>
+</div>
+
+<!-- s17 -->
+<div class="slide" id="s17" data-notes="<strong>¶1–¶2 comprehension check (LP p.306, verbatim).</strong> &quot;What force pulls a roller coaster down a hill?&quot; Answer: gravity. A correct answer unlocks Force Map slots 1 and 2.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Check ¶1–¶2</span><div class="hd-chip src">LP p.306</div></div>
+  <div class="body">
+    <div class="header-bar orange">❓ What force pulls a roller coaster down a hill?</div>
+    <div style="display:flex;gap:16px;justify-content:center;margin:20px 0">
+      <button class="quiz-opt" style="font-size:28px;padding:18px 40px" onclick="compAns(this,true,'c1')">gravity</button>
+      <button class="quiz-opt" style="font-size:28px;padding:18px 40px" onclick="compAns(this,false,'c1')">friction</button>
+      <button class="quiz-opt" style="font-size:28px;padding:18px 40px" onclick="compAns(this,false,'c1')">inertia</button>
+    </div>
+    <div class="comp-reveal" id="c1-out" style="font-size:27px">
+      ✅ <b>gravity</b>. Gravity is the <b>cause</b>; going fast down the hill is the <b>effect</b>.</div>
+    <div class="unlock-toast" id="c1-toast">🔓 Force Map slots 1 and 2 unlocked!</div>
+  </div>
+</div>
+
+<!-- s18 -->
+<div class="slide" id="s18" data-notes="<strong>¶1–¶2 → Force Map slots 1 and 2 fill.</strong> Safety bar and steep hill are now captioned with their force and effect. Leo SEES the map growing — that is the point of keeping it on screen.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Force Map</span><div class="hd-chip src">2 / 5</div></div>
+  <div class="body">
+    <div class="header-bar green">✅ Two slots down — the car is moving</div>
+    <div class="force-map" id="fm-s18">
+  <div class="fm-title">🎢 THE FORCE MAP OF THE RIDE</div>
+  <div class="fm-track">
+    <div class="fm-slot filled">
+      <div class="fm-em">🦺</div>
+      <div class="fm-stage">1 · SAFETY BAR</div>
+      <div class="fm-force">safety bar</div>
+      <div class="fm-effect">keeps you in your seat</div>
+    </div>
+    <div class="fm-slot filled">
+      <div class="fm-em">⛰️</div>
+      <div class="fm-stage">2 · STEEP HILL</div>
+      <div class="fm-force">gravity</div>
+      <div class="fm-effect">pulls you down → you go fast</div>
+    </div>
+    <div class="fm-slot">
+      <div class="fm-em">➰</div>
+      <div class="fm-stage">3 · LOOP THE LOOP</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+    <div class="fm-slot">
+      <div class="fm-em">🛑</div>
+      <div class="fm-stage">4 · BRAKES</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+    <div class="fm-slot">
+      <div class="fm-em">🌍</div>
+      <div class="fm-stage">5 · EVERY DAY</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+  </div>
+</div>
+    <div class="info-box tint-green" style="font-size:24px;font-weight:700">
+      Say it as a full cause and effect: “<b>Because</b> gravity pulls the car down the steep hill, the coaster moves fast.”</div>
+  </div>
+</div>
+
+<!-- s19 -->
+<div class="slide" id="s19" data-notes="<strong>Read Together ¶3 — verbatim.</strong> The longest and richest paragraph. The loop-the-loop and upside-down tags are tap-to-gloss. Do not rush the question &quot;So why don&apos;t you fall out of your seat?&quot; — let Leo guess before the sentence answers it.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Read Together ¶3</span><div class="hd-chip tr">TR 9.8</div></div>
+  <div class="body">
+    <div class="header-bar green">📖 paragraph 3</div>
+    <div class="info-box" style="font-size:27px;line-height:1.7;font-weight:600;color:var(--navy)">
+      A big circle, known as the “<span class="tag" onclick="popGloss(this,'loop')">loop the loop</span>,” is many people’s favorite.
+      When you go fast up the circle, you feel heavy. Gravity is pulling you down. When you reach the top, you are high in the sky.
+      And you’re hanging <span class="tag" onclick="popGloss(this,'upside')">upside down</span>! So why don’t you fall out of your seat?
+      Your body wants to fly off, but the speed of the car and a force called <b>centripetal force</b> keep you moving in a circle,
+      and keep you in your seat!</div>
+    <div class="info-box tint-blue" style="font-size:23px;font-weight:700">
+      🔄 Stop at “So why don’t you fall out of your seat?” and let Leo answer <b>before</b> you read on.</div>
+  </div>
+</div>
+
+<!-- s20 -->
+<div class="slide" id="s20" data-notes="<strong>Read Together ¶4 — verbatim.</strong> Friction stops the car; inertia keeps the body going; the safety bar catches it. This is exactly the s9 mini-game in words. Make the callback out loud.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Read Together ¶4</span><div class="hd-chip tr">TR 9.8</div></div>
+  <div class="body">
+    <div class="header-bar green">📖 paragraph 4</div>
+    <div class="info-box" style="font-size:32px;line-height:1.75;font-weight:600;color:var(--navy)">
+      The roller coaster uses friction to stop. If it stops quickly, your body wants to continue moving.
+      That is called <b>inertia</b>. But the safety bars keep you in place!</div>
+    <div class="info-box tint-amber" style="font-size:24px;font-weight:700">
+      🛑 That is our slide 9 exactly: the car stopped, the body kept sliding. Now it has a name — <b>inertia</b>.
+      And <b>now</b> we know why the safety bar mattered.</div>
+  </div>
+</div>
+
+<!-- s21 -->
+<div class="slide" id="s21" data-notes="<strong>¶3–¶4 comprehension check (LP p.306, verbatim).</strong> &quot;What force keeps people in their seats when the roller coaster is upside down?&quot; Answer: centripetal force. Unlocks Force Map slots 3 and 4.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Check ¶3–¶4</span><div class="hd-chip src">LP p.306</div></div>
+  <div class="body">
+    <div class="header-bar orange">❓ What force keeps people in their seats when the roller coaster is upside down?</div>
+    <div style="display:flex;gap:16px;justify-content:center;margin:20px 0">
+      <button class="quiz-opt" style="font-size:26px;padding:18px 34px" onclick="compAns(this,false,'c2')">friction</button>
+      <button class="quiz-opt" style="font-size:26px;padding:18px 34px" onclick="compAns(this,true,'c2')">centripetal force</button>
+      <button class="quiz-opt" style="font-size:26px;padding:18px 34px" onclick="compAns(this,false,'c2')">gravity</button>
+    </div>
+    <div class="comp-reveal" id="c2-out" style="font-size:27px">
+      ✅ <b>centripetal force</b> — with the speed of the car it keeps you moving in a circle, so you stay in your seat.</div>
+    <div class="unlock-toast" id="c2-toast">🔓 Force Map slots 3 and 4 unlocked!</div>
+  </div>
+</div>
+
+<!-- s22 -->
+<div class="slide" id="s22" data-notes="<strong>¶3–¶4 → Force Map slots 3 and 4 fill.</strong> Loop the loop and brakes are captioned. Only the last slot is left.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Force Map</span><div class="hd-chip src">4 / 5</div></div>
+  <div class="body">
+    <div class="header-bar green">✅ Four slots down — one to go</div>
+    <div class="force-map" id="fm-s22">
+  <div class="fm-title">🎢 THE FORCE MAP OF THE RIDE</div>
+  <div class="fm-track">
+    <div class="fm-slot filled">
+      <div class="fm-em">🦺</div>
+      <div class="fm-stage">1 · SAFETY BAR</div>
+      <div class="fm-force">safety bar</div>
+      <div class="fm-effect">keeps you in your seat</div>
+    </div>
+    <div class="fm-slot filled">
+      <div class="fm-em">⛰️</div>
+      <div class="fm-stage">2 · STEEP HILL</div>
+      <div class="fm-force">gravity</div>
+      <div class="fm-effect">pulls you down → you go fast</div>
+    </div>
+    <div class="fm-slot filled">
+      <div class="fm-em">➰</div>
+      <div class="fm-stage">3 · LOOP THE LOOP</div>
+      <div class="fm-force">centripetal force</div>
+      <div class="fm-effect">keeps you moving in a circle</div>
+    </div>
+    <div class="fm-slot filled">
+      <div class="fm-em">🛑</div>
+      <div class="fm-stage">4 · BRAKES</div>
+      <div class="fm-force">friction + inertia</div>
+      <div class="fm-effect">the car slows, your body keeps going</div>
+    </div>
+    <div class="fm-slot">
+      <div class="fm-em">🌍</div>
+      <div class="fm-stage">5 · EVERY DAY</div>
+      <div class="fm-force">?</div>
+      <div class="fm-effect">—</div>
+    </div>
+  </div>
+</div>
+    <div class="info-box tint-blue" style="font-size:24px;font-weight:700">
+      Notice slot 4 needs <b>two</b> forces: friction stops the car, and inertia is why <i>you</i> keep going.</div>
+  </div>
+</div>
+
+<!-- s23 -->
+<div class="slide" id="s23" data-notes="<strong>Read Together ¶5 — verbatim.</strong> The paragraph that moves the forces off the ride and onto a bicycle — this is what makes Activity 3 possible. Note the explicit signal word <b>because</b> in the second sentence: point at it.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Read Together ¶5</span><div class="hd-chip tr">TR 9.8</div></div>
+  <div class="body">
+    <div class="header-bar green">📖 paragraph 5</div>
+    <div class="info-box" style="font-size:26px;line-height:1.7;font-weight:600;color:var(--navy)">
+      Not everyone loves roller coasters. They make some people feel <span class="tag" onclick="popGloss(this,'dizzy')">dizzy</span>
+      or sick <b style="background:var(--yellow);padding:2px 6px;border-radius:6px">because</b> the forces change.
+      In fact, we <b>experience</b> forces like friction, centripetal force, and gravity every day.
+      For example, you feel gravity when you jump with your bike and come down. You feel centripetal force when you turn,
+      and you feel friction when you use the <span class="tag" onclick="popGloss(this,'brakes')">brakes</span> to stop the bike.</div>
+    <div class="info-box tint-green" style="font-size:24px;font-weight:700">
+      🎯 There is our first signal word in the wild: <b>because</b>. It points backwards at the <b>cause</b>.</div>
+  </div>
+</div>
+
+<!-- s24 -->
+<div class="slide" id="s24" data-notes="<strong>Read Together ¶6 — verbatim.</strong> The closing question, straight to Leo. Let him actually answer it — it is the same choice Activity 3 will make him think about.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Read Together ¶6</span><div class="hd-chip tr">TR 9.8</div></div>
+  <div class="body center">
+    <div class="header-bar green" style="align-self:stretch">📖 paragraph 6</div>
+    <div class="info-box" style="font-size:36px;line-height:1.75;font-weight:600;color:var(--navy);max-width:1500px">
+      How do you want to <b>experience</b> the forces? Do you want to ride your bicycle or a roller coaster?</div>
+    <div class="dialogue-box" style="font-size:26px;max-width:1500px">💬 <b>Ask Leo:</b> “Bike or roller coaster? And <b>why</b>?”
+      — listen for a <b>because</b> in his answer.</div>
+  </div>
+</div>
+
+<!-- s25 -->
+<div class="slide" id="s25" data-notes="<strong>¶5–¶6 comprehension check (LP p.306, verbatim).</strong> &quot;What force do you feel when you use brakes to stop a bike?&quot; Answer: friction. Unlocks the last Force Map slot.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Check ¶5–¶6</span><div class="hd-chip src">LP p.306</div></div>
+  <div class="body">
+    <div class="header-bar orange">❓ What force do you feel when you use brakes to stop a bike?</div>
+    <div style="display:flex;gap:16px;justify-content:center;margin:20px 0">
+      <button class="quiz-opt" style="font-size:26px;padding:18px 34px" onclick="compAns(this,false,'c3')">inertia</button>
+      <button class="quiz-opt" style="font-size:26px;padding:18px 34px" onclick="compAns(this,false,'c3')">centripetal force</button>
+      <button class="quiz-opt" style="font-size:26px;padding:18px 34px" onclick="compAns(this,true,'c3')">friction</button>
+    </div>
+    <div class="comp-reveal" id="c3-out" style="font-size:27px">
+      ✅ <b>friction</b> — the same force the roller coaster uses to stop. Same force, different ride.</div>
+    <div class="unlock-toast" id="c3-toast">🔓 Final Force Map slot unlocked!</div>
+  </div>
+</div>
+
+<!-- s26 -->
+<div class="slide" id="s26" data-notes="<strong>FORCE MAP COMPLETE.</strong> All five slots captioned. Have Leo read the whole map out loud as five cause-and-effect sentences before moving on — that rehearsal is what makes Activity 3 easy.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Force Map</span><div class="hd-chip src">5 / 5 ✓</div></div>
+  <div class="body">
+    <div class="header-bar green">🎉 The Force Map is complete!</div>
+    <div class="force-map" id="fm-s26">
+  <div class="fm-title">🎢 THE FORCE MAP OF THE RIDE</div>
+  <div class="fm-track">
+    <div class="fm-slot filled">
+      <div class="fm-em">🦺</div>
+      <div class="fm-stage">1 · SAFETY BAR</div>
+      <div class="fm-force">safety bar</div>
+      <div class="fm-effect">keeps you in your seat</div>
+    </div>
+    <div class="fm-slot filled">
+      <div class="fm-em">⛰️</div>
+      <div class="fm-stage">2 · STEEP HILL</div>
+      <div class="fm-force">gravity</div>
+      <div class="fm-effect">pulls you down → you go fast</div>
+    </div>
+    <div class="fm-slot filled">
+      <div class="fm-em">➰</div>
+      <div class="fm-stage">3 · LOOP THE LOOP</div>
+      <div class="fm-force">centripetal force</div>
+      <div class="fm-effect">keeps you moving in a circle</div>
+    </div>
+    <div class="fm-slot filled">
+      <div class="fm-em">🛑</div>
+      <div class="fm-stage">4 · BRAKES</div>
+      <div class="fm-force">friction + inertia</div>
+      <div class="fm-effect">the car slows, your body keeps going</div>
+    </div>
+    <div class="fm-slot filled">
+      <div class="fm-em">🌍</div>
+      <div class="fm-stage">5 · EVERY DAY</div>
+      <div class="fm-force">all four forces</div>
+      <div class="fm-effect">you feel them on your bike too</div>
+    </div>
+  </div>
+</div>
+    <div class="dialogue-box" style="font-size:25px">💬 <b>Now read the whole ride back</b> — five sentences,
+      each one with a <b>because</b> or an <b>as a result</b> in it.</div>
+  </div>
+</div>
+
+<!-- s27 -->
+<div class="slide" id="s27" data-notes="<strong>Weird But True (SB p.157, verbatim).</strong> Russians invented the roller coaster; the cars were made of ice; straw on the seats kept passengers warm. Ask the cause-and-effect question: why straw? Because ice is freezing — as a result they needed something warm.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Weird but True</span><div class="hd-chip src">SB p.157</div></div>
+  <div class="body center">
+    <div class="header-bar yellow" style="align-self:stretch">😲 Weird but True!</div>
+    <div style="font-size:110px">🧊🎢</div>
+    <div class="info-box tint-amber" style="max-width:1500px;font-size:30px;font-weight:700;line-height:1.7">
+      Russians invented the roller coaster. They made the “cars” from ice.
+      And they put straw on the seats to keep the passengers warm.</div>
+    <button class="btn yellow" style="font-size:24px;margin-top:14px" onclick="show('wbt-out')">🤔 Why straw?</button>
+    <div class="comp-reveal" id="wbt-out" style="font-size:26px;max-width:1500px;margin-top:12px">
+      <b>Because</b> the cars were made of ice, the seats were freezing. <b>As a result</b>, they needed straw to keep people warm.
+      Cause → effect, 400 years ago.</div>
+  </div>
+</div>
+
+<!-- s28 -->
+<div class="slide" id="s28" data-notes="<strong>Reading Strategy — Understand Cause and Effect (LP p.309, Be The Expert).</strong> The LP names exactly three signal words: because, why, as a result. Teach those three and no others — sequence words belong to Unit 8 and must not reappear here.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Reading Strategy</span><div class="hd-chip src">LP p.309</div></div>
+  <div class="body">
+    <div class="header-bar blue">🎯 Understand Cause and Effect</div>
+    <div class="two-col" style="display:flex;gap:26px">
+      <div class="col">
+        <div class="info-box tint-amber" style="font-size:28px;font-weight:800;text-align:center">
+          <div style="font-size:56px">❓</div>CAUSE<div style="font-size:22px;font-weight:600;margin-top:8px">tells you <b>WHY</b> it happened<br>— and it comes first</div></div>
+      </div>
+      <div class="col" style="justify-content:center;align-items:center"><div style="font-size:64px;color:#9ca3af">➡️</div></div>
+      <div class="col">
+        <div class="info-box tint-green" style="font-size:28px;font-weight:800;text-align:center">
+          <div style="font-size:56px">❗</div>EFFECT<div style="font-size:22px;font-weight:600;margin-top:8px">is <b>WHAT HAPPENS</b><br>— and it comes after</div></div>
+      </div>
+    </div>
+    <div class="header-bar amber" style="margin-top:8px">🔎 Three signal words point them out</div>
+    <div style="display:flex;gap:18px;justify-content:center">
+      <span class="force-tag" style="font-size:28px;padding:12px 34px">because</span>
+      <span class="force-tag" style="font-size:28px;padding:12px 34px">why</span>
+      <span class="force-tag" style="font-size:28px;padding:12px 34px">as a result</span>
+    </div>
+  </div>
+</div>
+
+<!-- s29 -->
+<div class="slide" id="s29" data-notes="<strong>Signal-word tap exercise.</strong> Five sentences — two from the passage, three soccer-themed for Leo. He taps the signal word in each. Multi-word phrases (&quot;as a result&quot;) count when he taps either real word. Active practice before Activity 2.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Practice the Strategy</span></div>
+  <div class="body">
+    <div class="header-bar amber">👉 Tap the signal word in each sentence</div>
+    <div style="display:flex;flex-direction:column;gap:12px" id="sig-wrap"></div>
+    <div class="info-box tint-green" style="font-size:24px;font-weight:800;min-height:44px" id="sig-score">0 / 5 found</div>
+  </div>
+</div>
+
+<!-- s30 -->
+<div class="slide" id="s30" data-notes="<strong>Activity 1 question 1 (LP p.307, verbatim).</strong> What is the first thing you do when you sit in a roller coaster? Answer is in ¶1. Let Leo find it in the book before you reveal.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Activity 1 · Question 1 of 4</span><div class="hd-chip src">SB p.157</div></div>
+  <div class="body center">
+    <div class="header-bar orange" style="align-self:stretch">❓ What is the first thing you do when you sit in a roller coaster?</div>
+    <div style="font-size:96px">📖</div>
+    <button class="btn" style="font-size:26px;padding:18px 40px" onclick="show('a2-0')">👁️ Show the answer</button>
+    <div class="comp-reveal" id="a2-0" style="font-size:34px;max-width:1500px;margin-top:16px">✅ You pull down the safety bar.
+      <div style="font-size:22px;color:#6b7280;font-weight:600;margin-top:10px">Find it in ¶1.</div></div>
+  </div>
+</div>
+
+<!-- s31 -->
+<div class="slide" id="s31" data-notes="<strong>Activity 1 question 2 (LP p.307, verbatim).</strong> How do you feel when you go fast down the hill? Answer is in ¶2. Let Leo find it in the book before you reveal.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Activity 1 · Question 2 of 4</span><div class="hd-chip src">SB p.157</div></div>
+  <div class="body center">
+    <div class="header-bar orange" style="align-self:stretch">❓ How do you feel when you go fast down the hill?</div>
+    <div style="font-size:96px">📖</div>
+    <button class="btn" style="font-size:26px;padding:18px 40px" onclick="show('a2-1')">👁️ Show the answer</button>
+    <div class="comp-reveal" id="a2-1" style="font-size:34px;max-width:1500px;margin-top:16px">✅ You feel very light.
+      <div style="font-size:22px;color:#6b7280;font-weight:600;margin-top:10px">Find it in ¶2.</div></div>
+  </div>
+</div>
+
+<!-- s32 -->
+<div class="slide" id="s32" data-notes="<strong>Activity 1 question 3 (LP p.307, verbatim).</strong> How do you feel when you go fast up the loop the loop? Answer is in ¶3. Let Leo find it in the book before you reveal.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Activity 1 · Question 3 of 4</span><div class="hd-chip src">SB p.157</div></div>
+  <div class="body center">
+    <div class="header-bar orange" style="align-self:stretch">❓ How do you feel when you go fast up the loop the loop?</div>
+    <div style="font-size:96px">📖</div>
+    <button class="btn" style="font-size:26px;padding:18px 40px" onclick="show('a2-2')">👁️ Show the answer</button>
+    <div class="comp-reveal" id="a2-2" style="font-size:34px;max-width:1500px;margin-top:16px">✅ You feel heavy.
+      <div style="font-size:22px;color:#6b7280;font-weight:600;margin-top:10px">Find it in ¶3.</div></div>
+  </div>
+</div>
+
+<!-- s33 -->
+<div class="slide" id="s33" data-notes="<strong>Activity 1 question 4 (LP p.307, verbatim).</strong> Why do some people feel dizzy or sick on roller coasters? Answer is in ¶5. Let Leo find it in the book before you reveal.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Activity 1 · Question 4 of 4</span><div class="hd-chip src">SB p.157</div></div>
+  <div class="body center">
+    <div class="header-bar orange" style="align-self:stretch">❓ Why do some people feel dizzy or sick on roller coasters?</div>
+    <div style="font-size:96px">📖</div>
+    <button class="btn" style="font-size:26px;padding:18px 40px" onclick="show('a2-3')">👁️ Show the answer</button>
+    <div class="comp-reveal" id="a2-3" style="font-size:34px;max-width:1500px;margin-top:16px">✅ The forces change.
+      <div style="font-size:22px;color:#6b7280;font-weight:600;margin-top:10px">Find it in ¶5.</div></div>
+  </div>
+</div>
+
+<!-- s34 -->
+<div class="slide" id="s34" data-notes="<strong>Activity 2 — the force chart (LP p.307).</strong> Tap a force chip, then tap the cell where you feel it. Two columns: roller coaster and bicycle. The LP answer key is enforced — wrong drops shake. This is the same information as the Force Map, now sorted by force instead of by ride.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Activity 2 · Force Chart</span><div class="hd-chip src">SB p.157</div></div>
+  <div class="body">
+    <div class="header-bar green">🔀 When do you feel each force? Tap a force, then tap where you feel it.</div>
+    <div id="fchart-host" style="flex:1"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center" id="fchip-bank"></div>
+    <div class="info-box tint-green" style="font-size:23px;font-weight:800;min-height:42px" id="fchart-msg">0 / 8 placed</div>
+  </div>
+</div>
+
+<!-- s35 -->
+<div class="slide" id="s35" data-notes="<strong>Activity 2 answer key (LP p.307, verbatim).</strong> Displayed as the canonical chart. If Leo got a cell wrong, walk back to the paragraph that says it.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Activity 2 · Answer Key</span><div class="hd-chip src">LP p.307</div></div>
+  <div class="body">
+    <div class="header-bar navy">✅ The complete force chart</div>
+    <div id="fchart-key" style="flex:1"></div>
+  </div>
+</div>
+
+<!-- s36 -->
+<div class="slide" id="s36" data-notes="<strong>Extend — cause and effect chart (LP p.309, verbatim).</strong> Four causes, four effects. Tap CAUSE → EFFECT reveals one row at a time so Leo says the effect before he sees it. This is the LP&apos;s own graphic organizer for the strategy.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Extend · Cause → Effect</span><div class="hd-chip src">LP p.309</div></div>
+  <div class="body">
+    <div class="header-bar amber">🔗 Each force is a CAUSE. What is the EFFECT?</div>
+    <div style="display:flex;flex-direction:column;gap:12px" id="ce-wrap"></div>
+    <div class="dialogue-box" style="font-size:23px">💬 Have Leo say the effect out loud <b>before</b> you tap each row.</div>
+  </div>
+</div>
+
+<!-- s37 -->
+<div class="slide" id="s37" data-notes="<strong>Be The Expert (LP p.309).</strong> The teacher-facing note: cause and effect is not always signposted. Sometimes the order alone carries it — as in ¶4, &quot;If it stops quickly, your body wants to continue moving.&quot; No signal word at all.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Be the Expert</span><div class="hd-chip src">LP p.309</div></div>
+  <div class="body">
+    <div class="header-bar navy">🎓 One more thing about cause and effect</div>
+    <div class="info-box tint-blue" style="font-size:27px;font-weight:700;line-height:1.7">
+      Sometimes there is <b>no signal word at all</b> — the order of the sentence does the work.</div>
+    <div class="info-box" style="font-size:30px;line-height:1.7;font-weight:600;color:var(--navy)">
+      “If it stops quickly, <span style="color:var(--amber);font-weight:900">your body wants to continue moving</span>.”</div>
+    <div class="two-col" style="display:flex;gap:24px">
+      <div class="col"><div class="info-box tint-amber" style="font-size:24px;font-weight:800">CAUSE<br>
+        <span style="font-weight:600">the coaster stops quickly</span></div></div>
+      <div class="col"><div class="info-box tint-green" style="font-size:24px;font-weight:800">EFFECT<br>
+        <span style="font-weight:600">your body keeps moving — inertia</span></div></div>
+    </div>
+    <div class="dialogue-box" style="font-size:23px">💬 Ask: “Where is the <b>because</b> in that sentence?” — there isn’t one. And it still works.</div>
+  </div>
+</div>
+
+<!-- s38 -->
+<div class="slide" id="s38" data-notes="<strong>Wrap Up Activity 4 dialogue (SB p.157, verbatim).</strong> Leo describes a ride using the academic word from s5. Model both LP exchanges, then let him do it about a ride he chooses. Listen for a force word in his answer.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Wrap Up · Describe the ride</span><div class="hd-chip src">SB p.157</div></div>
+  <div class="body">
+    <div class="header-bar green">🗣️ Now <b>describe</b> a roller-coaster ride</div>
+    <div class="dialogue-box" style="font-size:28px">
+      👤 <b>“What happens first?”</b><br>
+      🧒 “You go straight toward the sky, but then you turn!”</div>
+    <div class="dialogue-box" style="font-size:28px">
+      👤 <b>“What does the roller coaster look like?”</b><br>
+      🧒 “It looks like a spaceship!”</div>
+    <div class="info-box tint-blue" style="font-size:24px;font-weight:700">
+      🎯 Now Leo’s turn — his own ride, his own words. Push for one <b>force</b> word and one <b>because</b>.</div>
+  </div>
+</div>
+
+<!-- s39 -->
+<div class="slide" id="s39" data-notes="<strong>Recap (LP p.309).</strong> Three tap-to-reveal questions covering the whole lesson: the strategy, the four forces, and the signal words.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Recap</span></div>
+  <div class="body">
+    <div class="header-bar navy">🔁 What did we learn today?</div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div><button class="btn outline" style="font-size:23px" onclick="show('r1')">What was today’s reading strategy?</button>
+        <div class="comp-reveal" id="r1" style="font-size:24px;margin-top:8px">Understand <b>cause and effect</b> — the cause tells why, the effect is what happens.</div></div>
+      <div><button class="btn outline" style="font-size:23px" onclick="show('r2')">Name the four forces on a roller coaster.</button>
+        <div class="comp-reveal" id="r2" style="font-size:24px;margin-top:8px">🍎 gravity · 🔄 centripetal force · 🔥 friction · 🛑 inertia</div></div>
+      <div><button class="btn outline" style="font-size:23px" onclick="show('r3')">Which three words point at cause and effect?</button>
+        <div class="comp-reveal" id="r3" style="font-size:24px;margin-top:8px"><b>because</b> · <b>why</b> · <b>as a result</b></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- s40 -->
+<div class="slide" id="s40" data-notes="<strong>Formative check (LP p.309).</strong> The LP&apos;s own assessment: &quot;use gravity, centripetal force, inertia, and friction to describe a roller-coaster ride.&quot; Tap each force in the order you would meet it on the ride. This is the Force Map from memory.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Formative Check</span><div class="hd-chip src">LP p.309</div></div>
+  <div class="body">
+    <div class="header-bar orange">🎯 Describe the ride — tap the forces in the order you meet them</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center" id="fm-bank">
+      <button class="btn outline" style="font-size:24px" data-pos="2" onclick="fmPick(this)">🍎 gravity — down the hill</button>
+      <button class="btn outline" style="font-size:24px" data-pos="4" onclick="fmPick(this)">🛑 inertia — your body keeps going</button>
+      <button class="btn outline" style="font-size:24px" data-pos="1" onclick="fmPick(this)">🦺 safety bar — before you start</button>
+      <button class="btn outline" style="font-size:24px" data-pos="3" onclick="fmPick(this)">🔄 centripetal force — the loop</button>
+      <button class="btn outline" style="font-size:24px" data-pos="5" onclick="fmPick(this)">🔥 friction — the brakes</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:10px">
+      <div class="fm-slot" id="fmq-1"><div class="fm-stage">1</div></div>
+      <div class="fm-slot" id="fmq-2"><div class="fm-stage">2</div></div>
+      <div class="fm-slot" id="fmq-3"><div class="fm-stage">3</div></div>
+      <div class="fm-slot" id="fmq-4"><div class="fm-stage">4</div></div>
+      <div class="fm-slot" id="fmq-5"><div class="fm-stage">5</div></div>
+    </div>
+    <div class="info-box tint-green" style="font-size:24px;font-weight:800;min-height:44px" id="fmq-msg">Tap them in ride order.</div>
+  </div>
+</div>
+
+<!-- s41 -->
+<div class="slide" id="s41" data-notes="<strong>Leo’s app handoff.</strong> The 11-module learner app covers the same ground plus the Workbook skateboard reading. Leo does it on his own after this lesson — do not walk him through it here.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Leo’s Turn</span></div>
+  <div class="body center">
+    <div style="font-size:120px">📱</div>
+    <div class="header-bar blue" style="align-self:stretch">🎮 Leo’s Reading App — 11 modules</div>
+    <div class="two-col" style="display:flex;gap:26px;max-width:1500px">
+      <div class="col"><div class="info-box tint-green" style="font-size:22px;font-weight:700;text-align:left">
+        📘 <b>Student Book</b> · 6 modules<br>
+        <span style="font-size:19px;font-weight:600">Vocab · Read (paragraph-gated) · Strategy · Questions · Force Chart · Quiz</span></div></div>
+      <div class="col"><div class="info-box tint-blue" style="font-size:22px;font-weight:700;text-align:left">
+        📒 <b>Workbook</b> · 5 modules<br>
+        <span style="font-size:19px;font-weight:600">The Science of Skateboarding — Vocab · Read · True/False · Cause &amp; Effect · Quiz</span></div></div>
+    </div>
+    <div class="info-box tint-amber" style="max-width:1500px;font-size:23px;font-weight:700;margin-top:12px">
+      🎯 The workbook reading is about <b>skateboards</b>, not roller coasters — but it teaches the
+      <b>same strategy</b>. Its Activity 4 is a cause-and-effect chart too.</div>
+  </div>
+</div>
+
+<!-- s42 -->
+<div class="slide" id="s42" data-notes="<strong>⭐ PAYOFF — the whole ride, captioned.</strong> The spine resolves: the complete Force Map replayed with every force and effect named. This IS the LP formative task made visible. Have Leo narrate the whole ride from left to right.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">The Complete Ride</span><div class="hd-chip src">5 / 5 ✓</div></div>
+  <div class="body grad-green">
+    <div style="text-align:center;font-size:44px;font-weight:900;margin-bottom:4px">🎉 The Complete Force Map</div>
+    <div style="text-align:center;font-size:24px;opacity:.9;font-weight:600;margin-bottom:12px">
+      Every part of the ride, every force, every effect — narrate it from start to finish.</div>
+    <div class="force-map" id="fm-s42">
+  <div class="fm-title">🎢 UP, DOWN, AND ALL AROUND!</div>
+  <div class="fm-track">
+    <div class="fm-slot filled">
+      <div class="fm-em">🦺</div>
+      <div class="fm-stage">1 · SAFETY BAR</div>
+      <div class="fm-force">safety bar</div>
+      <div class="fm-effect">keeps you in your seat</div>
+    </div>
+    <div class="fm-slot filled">
+      <div class="fm-em">⛰️</div>
+      <div class="fm-stage">2 · STEEP HILL</div>
+      <div class="fm-force">gravity</div>
+      <div class="fm-effect">pulls you down → you go fast</div>
+    </div>
+    <div class="fm-slot filled">
+      <div class="fm-em">➰</div>
+      <div class="fm-stage">3 · LOOP THE LOOP</div>
+      <div class="fm-force">centripetal force</div>
+      <div class="fm-effect">keeps you moving in a circle</div>
+    </div>
+    <div class="fm-slot filled">
+      <div class="fm-em">🛑</div>
+      <div class="fm-stage">4 · BRAKES</div>
+      <div class="fm-force">friction + inertia</div>
+      <div class="fm-effect">the car slows, your body keeps going</div>
+    </div>
+    <div class="fm-slot filled">
+      <div class="fm-em">🌍</div>
+      <div class="fm-stage">5 · EVERY DAY</div>
+      <div class="fm-force">all four forces</div>
+      <div class="fm-effect">you feel them on your bike too</div>
+    </div>
+  </div>
+</div>
+    <div style="background:rgba(255,255,255,.16);border-radius:14px;padding:16px 24px;font-size:25px;font-weight:700;margin-top:12px;text-align:center">
+      “I pull down the safety bar. <b>Because</b> gravity pulls me down the steep hill, I go fast.
+      Centripetal force keeps me in my seat in the loop. The brakes use friction, and <b>as a result</b> the car stops —
+      but inertia keeps my body going. And I feel all of it on my bike too.”</div>
+  </div>
+</div>
+
+<!-- s43 -->
+<div class="slide" id="s43" data-notes="<strong>Where this sits in Unit 9.</strong> Reading follows Grammar 2 and feeds Writing. The forces vocabulary carries into the unit project.">
+<div class="slide-header"><span class="hd-unit">Unit 9 · The Science of Fun</span><span class="hd-sep">›</span><span class="hd-section">Unit 9 Progress</span></div>
+  <div class="body center">
+    <div class="header-bar navy" style="align-self:stretch">📍 Unit 9 · The Science of Fun</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:1600px;margin-top:20px">
+      <span class="force-tag" style="font-size:22px;opacity:.5">Opener</span>
+      <span class="force-tag" style="font-size:22px;opacity:.5">Vocabulary 1</span>
+      <span class="force-tag" style="font-size:22px;opacity:.5">Grammar 1</span>
+      <span class="force-tag" style="font-size:22px;opacity:.5">Song</span>
+      <span class="force-tag" style="font-size:22px;opacity:.5">Vocabulary 2</span>
+      <span class="force-tag" style="font-size:22px;opacity:.5">Grammar 2</span>
+      <span class="force-tag" style="font-size:26px;background:var(--green);color:#fff;border-color:var(--green-d)">📖 Reading ← today</span>
+      <span class="force-tag" style="font-size:22px;opacity:.5">Writing</span>
+      <span class="force-tag" style="font-size:22px;opacity:.5">Mission</span>
+      <span class="force-tag" style="font-size:22px;opacity:.5">Project</span>
+    </div>
+    <div class="info-box tint-green" style="max-width:1400px;font-size:24px;font-weight:700;margin-top:26px">
+      The four force words carry straight into Writing and the unit Project. Keep the Force Map handy.</div>
+  </div>
+</div>
+
+<!-- s44 -->
+<div class="slide" id="s44" data-notes="<strong>Mark Done.</strong> Click to record lesson done in leea.lessonProgress.v1 (teacher mode for ow-l4-u9-reading).">
+  <div class="body grad-navy center">
+    <div class="done-card">
+      <div style="font-size:80px">🎓</div>
+      <h2>Reading Complete!</h2>
+      <p>Unit 9 · Up, Down, and All Around! · Force Map filled, all four forces named, cause and effect learned.<br>Click below to mark this lesson done for Leo.</p>
+      <button id="markBtn" class="btn green" style="font-size:28px;padding:20px 60px;border-radius:16px" onclick="markDone()">✅ Mark Lesson Done</button>
+      <div id="markStatus" style="margin-top:18px;font-size:20px;font-weight:700;color:var(--green-d);min-height:30px"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end #deck -->
+
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 44</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes</button>
+  <span id="unit-label">UNIT 9 · READING</span>
+</div>
+
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+</div><!-- end #scaler -->
+
+<script>
+var LESSON_ID = "ow-l4-u9-reading";
+
+function scale(){
+  var s = Math.min(window.innerWidth/1920, window.innerHeight/1080);
+  document.getElementById("scaler").style.transform = "scale(" + s + ")";
+}
+window.addEventListener("resize", scale);
+
+var slides = document.querySelectorAll(".slide");
+var total = slides.length;
+var cur = 0;
+function goTo(i){
+  if (i < 0 || i >= total) return;
+  slides[cur].classList.remove("active");
+  cur = i;
+  slides[cur].classList.add("active");
+  try { document.getElementById("slide-counter").textContent = (cur+1) + " / " + total; } catch(e){}
+  updateNotes();
+}
+function updateNotes(){
+  var notes = slides[cur].getAttribute("data-notes") || "<em>No notes for this slide.</em>";
+  try { document.getElementById("tn-content").innerHTML = notes; } catch(e){}
+}
+function toggleNotes(){
+  try { document.getElementById("tn-panel").classList.toggle("open"); } catch(e){}
+}
+document.addEventListener("keydown", function(e){
+  if (e.key === "ArrowRight" || e.key === " ") goTo(cur+1);
+  else if (e.key === "ArrowLeft") goTo(cur-1);
+  else if (e.key === "n" || e.key === "N") toggleNotes();
+});
+
+/* generic tap-to-reveal used by several slides */
+function show(id){
+  try { document.getElementById(id).classList.add("show"); } catch(e){}
+}
+
+/* ── GLOSS POPUPS (¶1, ¶2, ¶3, ¶5) ── */
+var GLOSS = {
+  safetybar: { em: "🦺", word: "safety bar", def: "the bar that comes down and holds you in your seat.", jp: "安全バー" },
+  steep:     { em: "⛰️", word: "steep",      def: "going up or down very sharply, not gently.", jp: "急な" },
+  loop:      { em: "➰", word: "loop the loop",     def: "the big circle the roller coaster goes all the way around.", jp: "宙返り（ちゅうがえり）" },
+  upside:    { em: "🙃", word: "upside down", def: "with your head below your feet.", jp: "逆さま" },
+  dizzy:     { em: "😵", word: "dizzy",       def: "feeling like the room is spinning around you.", jp: "めまいがする" },
+  brakes:    { em: "🛑", word: "brakes",      def: "the part you press to slow down or stop.", jp: "ブレーキ" }
+};
+function popGloss(el, key){
+  el.classList.toggle("popped");
+  var existing = document.querySelector(".gloss-pop");
+  if (existing){ existing.remove(); if (existing.dataset.k === key) return; }
+  var g = GLOSS[key];
+  if (!g) return;
+  var pop = document.createElement("div");
+  pop.className = "gloss-pop";
+  pop.dataset.k = key;
+  pop.innerHTML = "<div><span class=\"gp-em\">" + g.em + "</span> <strong>" + g.word + "</strong></div>"
+    + "<div style=\"font-size:14px;color:#374151;margin-top:4px\">" + g.def + "</div>"
+    + "<div class=\"gp-jp\">" + g.jp + "</div>";
+  var rect = el.getBoundingClientRect();
+  var scalerRect = document.getElementById("scaler").getBoundingClientRect();
+  var sc = scalerRect.width / 1920;
+  pop.style.left = ((rect.left - scalerRect.left) / sc) + "px";
+  pop.style.top = ((rect.bottom - scalerRect.top) / sc + 8) + "px";
+  document.getElementById("scaler").appendChild(pop);
+  setTimeout(function(){ if (pop.parentNode) pop.remove(); el.classList.remove("popped"); }, 4500);
+}
+
+/* ── s5 describe mini-game ── */
+var descParts = [];
+function descAdd(btn, word){
+  if (btn.classList.contains("done")) return;
+  btn.classList.add("done");
+  descParts.push(word);
+  var out = document.getElementById("desc-out");
+  var txt = descParts.length === 1 ? descParts[0]
+    : descParts.slice(0, -1).join(", ") + " and " + descParts[descParts.length - 1];
+  out.innerHTML = "The roller coaster is <b>" + txt + "</b>.";
+  if (descParts.length >= 3){
+    document.getElementById("desc-fb").innerHTML =
+      "🌟 That is what <b>describe</b> means — you just said what the ride is like.";
+  }
+}
+
+/* ── s6 safety bar ── */
+function pullBar(){
+  document.getElementById("sbar").classList.add("down");
+  document.getElementById("sbar-msg").innerHTML = "✅ Bar down. Now you are held in your seat.";
+  var b = document.getElementById("ride-btn");
+  b.disabled = false;
+  b.classList.remove("done");
+  b.classList.add("green");
+  b.style.background = "var(--green)";
+  b.style.cursor = "pointer";
+}
+function rideStart(){
+  document.getElementById("sbar-out").innerHTML =
+    "🎢 Off you go! The <b>safety bar</b> is the reason your body stays in the seat "
+    + "when the ride goes upside down and when it stops hard.";
+}
+
+/* ── s7 steep ── */
+var steepLevel = 0;
+function steeper(){
+  if (steepLevel >= 3) return;
+  steepLevel++;
+  var hill = document.getElementById("hill");
+  hill.style.transform = "scaleY(" + (1 + steepLevel * 0.55) + ")";
+  var msg = document.getElementById("steep-msg");
+  if (steepLevel === 1) msg.innerHTML = "A bit better — still too gentle.";
+  else if (steepLevel === 2) msg.innerHTML = "Almost! One more.";
+  else msg.innerHTML = "🌟 Now THAT is <b>steep</b> — the car will really drop.";
+}
+function steepReset(){
+  steepLevel = 0;
+  document.getElementById("hill").style.transform = "scaleY(1)";
+  document.getElementById("steep-msg").innerHTML = "Not steep enough — the car would just stop.";
+}
+
+/* ── s8 centripetal loop ── */
+var loopTimer = null, loopAngle = 0;
+function loopHold(){
+  if (loopTimer) return;
+  var car = document.getElementById("loop-car");
+  car.style.transform = "";
+  loopTimer = setInterval(function(){
+    loopAngle = (loopAngle + 6) % 360;
+    car.style.transform = "rotate(" + loopAngle + "deg) translateY(85px) rotate(" + (-loopAngle) + "deg)";
+  }, 30);
+  document.getElementById("loop-msg").innerHTML =
+    "🔄 <b>Centripetal force</b> is holding the car in the circle. That is why you do not fall out.";
+}
+function loopRelease(){
+  if (loopTimer){ clearInterval(loopTimer); loopTimer = null; }
+  var car = document.getElementById("loop-car");
+  car.style.transition = "transform .8s ease-out";
+  car.style.transform = "translate(220px,-120px) rotate(40deg)";
+  document.getElementById("loop-msg").innerHTML =
+    "❌ Let go and the car flies straight off. Your body always <b>wants</b> to fly off — "
+    + "centripetal force is what stops it.";
+  setTimeout(function(){ car.style.transition = "transform .1s linear"; }, 900);
+}
+
+/* ── s9 inertia ── */
+function brakeGo(){
+  var car = document.getElementById("brake-car"), body = document.getElementById("brake-body");
+  car.style.left = "70%"; body.style.left = "71%";
+  document.getElementById("brake-msg").innerHTML = "Rolling… now brake!";
+}
+function brakeStop(){
+  var car = document.getElementById("brake-car"), body = document.getElementById("brake-body");
+  car.style.left = "70%";
+  body.style.left = "88%";
+  document.getElementById("brake-msg").innerHTML =
+    "🛑 The car stopped — but the body kept going. That is <b>inertia</b>. "
+    + "Now you see why the safety bar matters.";
+}
+
+/* ── s12 predict ── */
+function predict(){ show("predict-out"); }
+
+/* ── s17 / s21 / s25 comprehension checks ── */
+function compAns(btn, correct, key){
+  if (btn.dataset.locked) return;
+  var parent = btn.parentNode;
+  Array.prototype.forEach.call(parent.querySelectorAll(".quiz-opt"), function(o){ o.dataset.locked = "1"; });
+  if (correct){
+    btn.classList.add("correct");
+    show(key + "-out");
+    var t = document.getElementById(key + "-toast");
+    if (t) setTimeout(function(){ t.classList.add("show"); }, 400);
+  } else {
+    btn.classList.add("wrong");
+    Array.prototype.forEach.call(parent.querySelectorAll(".quiz-opt"), function(o){
+      if (o !== btn) o.dataset.locked = "";
+    });
+    btn.dataset.locked = "1";
+  }
+}
+
+/* ── s29 signal-word tap ── */
+var SIG = [
+  { text: "Some people feel sick because the forces change.", sig: "because" },
+  { text: "That is why the safety bar keeps you in place.", sig: "why" },
+  { text: "Haaland hit the brakes, and as a result his bike slowed down.", sig: "as a result" },
+  { text: "Salah turned fast, and because of centripetal force he leaned in.", sig: "because" },
+  { text: "The car stopped quickly. As a result, your body kept moving.", sig: "as a result" }
+];
+var sigFound = {};
+/* A signal may be a phrase ("as a result"), so a tap is checked against the
+   phrase's own word list — not a substring test, which would let "cause" pass
+   for "because". One-letter words ("a") are never tappable targets. */
+function sigWords(sig){
+  return sig.toLowerCase().split(/\s+/).filter(function(w){ return w.length > 1; });
+}
+function isSigWord(sig, token){
+  var clean = token.replace(/[.,!?;:"]/g, "").toLowerCase();
+  return clean.length > 1 && sigWords(sig).indexOf(clean) !== -1;
+}
+function buildSig(){
+  var wrap = document.getElementById("sig-wrap");
+  if (!wrap || wrap.dataset.built) return;
+  wrap.dataset.built = "1";
+  SIG.forEach(function(s, si){
+    var row = document.createElement("div");
+    row.className = "sig-line";
+    row.dataset.s = si;
+    s.text.split(/(\s+)/).forEach(function(tok){
+      if (!tok.trim()){ row.appendChild(document.createTextNode(tok)); return; }
+      var w = document.createElement("span");
+      w.className = "sig-w";
+      w.textContent = tok;
+      w.onclick = function(){
+        if (isSigWord(s.sig, tok)){
+          sigFound[si] = true;
+          Array.prototype.forEach.call(row.querySelectorAll(".sig-w"), function(x){
+            if (isSigWord(s.sig, x.textContent)) x.classList.add("hit");
+          });
+          sigScore();
+        } else {
+          w.classList.add("miss");
+          setTimeout(function(){ w.classList.remove("miss"); }, 400);
+        }
+      };
+      row.appendChild(w);
+    });
+    wrap.appendChild(row);
+  });
+}
+function sigScore(){
+  var n = Object.keys(sigFound).length;
+  var el = document.getElementById("sig-score");
+  el.innerHTML = n + " / " + SIG.length + " found"
+    + (n === SIG.length ? " — 🌟 every signal word spotted!" : "");
+}
+
+/* ── s34 / s35 force chart (LP p.307 answer key, verbatim) ── */
+var FORCE_ROWS = [
+  { force: "🍎 Gravity",            coaster: "all the time",                       bike: "all the time" },
+  { force: "🔄 Centripetal force",  coaster: "when you go around in a circle",     bike: "when you turn" },
+  { force: "🔥 Friction",           coaster: "when the roller coaster brakes",     bike: "when you brake" },
+  { force: "🛑 Inertia",            coaster: "when the roller coaster stops quickly", bike: "when you brake quickly" }
+];
+function mountChart(hostId, config){
+  try {
+    var host = document.getElementById(hostId);
+    if (!host || typeof window.pickChart !== "function") return;
+    host.innerHTML = window.pickChart("3-column chart", config);
+  } catch(e){ console.warn("mountChart", hostId, e); }
+}
+/* The shared chart component's reveal mode turns EVERY cell into a slot, which
+   would leave all four force rows unlabelled — Leo could only guess which row
+   is gravity. So s34 renders its own grid with the force column fixed as the
+   anchor and only the two "when" columns droppable. The answer key on s35 has
+   no such constraint and uses the shared component in display mode. */
+var fcSel = null, fcPlaced = 0;
+function buildForceChart(){
+  var host = document.getElementById("fchart-host");
+  if (!host || host.dataset.built) return;
+  host.dataset.built = "1";
+
+  var html = '<div style="background:#fff;border:3px solid #d1d5db;border-radius:14px;overflow:hidden">'
+    + '<table style="width:100%;border-collapse:collapse;table-layout:fixed">'
+    + '<thead><tr>'
+    + '<th style="background:#374151;color:#fff;padding:14px 18px;font-size:20px;text-align:left;width:26%">Force</th>'
+    + '<th style="background:#374151;color:#fff;padding:14px 18px;font-size:20px;text-align:left">Roller coaster</th>'
+    + '<th style="background:#374151;color:#fff;padding:14px 18px;font-size:20px;text-align:left">Bicycle</th>'
+    + '</tr></thead><tbody>';
+  FORCE_ROWS.forEach(function(r, ri){
+    html += '<tr>'
+      + '<td style="padding:16px 18px;font-size:22px;font-weight:900;color:#15803d;border-top:1px solid #e5e7eb;background:#f0fdf4">' + r.force + '</td>'
+      + '<td style="padding:12px 14px;border-top:1px solid #e5e7eb"><div class="fcz" data-k="' + ri + '_c" data-v="' + r.coaster + '"></div></td>'
+      + '<td style="padding:12px 14px;border-top:1px solid #e5e7eb"><div class="fcz" data-k="' + ri + '_b" data-v="' + r.bike + '"></div></td>'
+      + '</tr>';
+  });
+  html += '</tbody></table></div>';
+  host.innerHTML = html;
+
+  // zone styling + click-to-drop
+  Array.prototype.forEach.call(host.querySelectorAll(".fcz"), function(z){
+    z.style.cssText = "min-height:58px;display:flex;align-items:center;justify-content:center;"
+      + "border:2px dashed #d1d5db;border-radius:10px;color:#9ca3af;font-size:18px;font-style:italic;"
+      + "padding:8px 12px;text-align:center;cursor:pointer";
+    z.textContent = "tap a chip below";
+    z.onclick = function(){ fcDrop(z); };
+  });
+
+  // chip bank — the "when" phrases only
+  var bank = document.getElementById("fchip-bank");
+  bank.innerHTML = "";
+  var chips = [];
+  FORCE_ROWS.forEach(function(r, ri){
+    chips.push({ k: ri + "_c", v: r.coaster });
+    chips.push({ k: ri + "_b", v: r.bike });
+  });
+  // fixed shuffle so the bank is not in answer order
+  chips.sort(function(a, b){ return a.v.length - b.v.length || a.k.localeCompare(b.k); });
+  chips.forEach(function(c){
+    var b = document.createElement("button");
+    b.className = "btn outline";
+    b.style.fontSize = "19px";
+    b.dataset.k = c.k;
+    b.textContent = c.v;
+    b.onclick = function(){
+      if (b.classList.contains("placed")) return;
+      Array.prototype.forEach.call(bank.querySelectorAll("button"), function(x){
+        x.style.background = ""; x.style.color = "";
+      });
+      if (fcSel === b){ fcSel = null; return; }
+      fcSel = b;
+      b.style.background = "var(--green)";
+      b.style.color = "#fff";
+    };
+    bank.appendChild(b);
+  });
+}
+function fcDrop(zone){
+  if (!fcSel || zone.dataset.filled) return;
+  // Gravity's two cells both read "all the time", so match on the expected
+  // text rather than the slot key — either identical chip is correct.
+  if (fcSel.textContent !== zone.dataset.v){
+    zone.classList.add("shake");
+    setTimeout(function(){ zone.classList.remove("shake"); }, 400);
+    document.getElementById("fchart-msg").innerHTML =
+      "❌ Not that one — which force does “" + fcSel.textContent + "” belong to?";
+    return;
+  }
+  zone.dataset.filled = "1";
+  zone.textContent = fcSel.textContent;
+  zone.style.cssText += ";border-style:solid;border-color:var(--green);background:var(--green-bg);"
+    + "color:var(--navy);font-style:normal;font-weight:700";
+  fcSel.classList.add("placed");
+  fcSel.style.background = "";
+  fcSel.style.color = "";
+  fcSel.style.opacity = ".35";
+  fcSel.style.pointerEvents = "none";
+  fcSel = null;
+  fcPlaced++;
+  document.getElementById("fchart-msg").innerHTML = fcPlaced >= 8
+    ? "🌟 8 / 8 — the whole force chart is filled. Same forces, two different rides."
+    : fcPlaced + " / 8 placed";
+}
+function buildForceKey(){
+  var host = document.getElementById("fchart-key");
+  if (!host || host.dataset.built) return;
+  host.dataset.built = "1";
+  mountChart("fchart-key", {
+    id: "fcc-forces-key", mode: "display",
+    columns: ["Force", "Roller coaster", "Bicycle"],
+    rows: FORCE_ROWS.map(function(r){ return [r.force, r.coaster, r.bike]; })
+  });
+}
+
+/* ── s36 Extend cause/effect chart (LP p.309, verbatim) ── */
+var CE = [
+  { cause: "🍎 gravity",           effect: "you go down" },
+  { cause: "🔄 centripetal force", effect: "you go in a circle" },
+  { cause: "🛑 inertia",           effect: "you keep moving when what you are riding stops" },
+  { cause: "🔥 friction",          effect: "you slow down" }
+];
+function buildCE(){
+  var wrap = document.getElementById("ce-wrap");
+  if (!wrap || wrap.dataset.built) return;
+  wrap.dataset.built = "1";
+  CE.forEach(function(p){
+    var row = document.createElement("div");
+    row.className = "ce-row";
+    row.innerHTML = '<div class="ce-cause">' + p.cause + '</div>'
+      + '<div class="ce-arrow">➡️</div>'
+      + '<div class="ce-effect" style="color:#9ca3af">tap to reveal the effect</div>';
+    row.onclick = function(){
+      row.classList.add("revealed");
+      row.querySelector(".ce-effect").style.color = "";
+      row.querySelector(".ce-effect").textContent = p.effect;
+    };
+    wrap.appendChild(row);
+  });
+}
+
+/* ── s40 formative: order the forces ── */
+var fmNext = 1;
+function fmPick(btn){
+  if (btn.classList.contains("done")) return;
+  var pos = parseInt(btn.dataset.pos, 10);
+  if (pos === fmNext){
+    var slot = document.getElementById("fmq-" + fmNext);
+    if (slot){
+      slot.classList.add("filled");
+      slot.innerHTML = '<div class="fm-stage">' + fmNext + '</div><div class="fm-force">' + btn.textContent + '</div>';
+    }
+    btn.classList.add("done");
+    btn.style.background = "#9ca3af";
+    btn.style.color = "#fff";
+    fmNext++;
+    document.getElementById("fmq-msg").innerHTML = fmNext > 5
+      ? "🌟 Perfect — that is the whole ride, in order, with every force named."
+      : "✅ Correct. Now find force number " + fmNext + ".";
+  } else {
+    btn.classList.add("shake");
+    setTimeout(function(){ btn.classList.remove("shake"); }, 400);
+    document.getElementById("fmq-msg").innerHTML =
+      "❌ Not yet — what happens at step " + fmNext + " of the ride?";
+  }
+}
+
+/* ── Mark Done ── */
+function markDone(){
+  try {
+    var key = "leea.lessonProgress.v1";
+    var raw = localStorage.getItem(key);
+    var data = raw ? JSON.parse(raw) : {};
+    data[LESSON_ID] = { mode: "teacher", completedAt: new Date().toISOString() };
+    localStorage.setItem(key, JSON.stringify(data));
+    var b = document.getElementById("markBtn");
+    b.style.background = "#9ca3af";
+    b.style.cursor = "default";
+    b.textContent = "✓ Done — Saved!";
+    b.disabled = true;
+    document.getElementById("markStatus").textContent = "Saved · " + new Date().toLocaleString();
+  } catch (e){
+    try { document.getElementById("markStatus").textContent = "Could not save: " + e.message; } catch(_){}
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  scale();
+  slides[0].classList.add("active");
+  updateNotes();
+  try { document.getElementById("slide-counter").textContent = "1 / " + total; } catch(e){}
+  // Interactive hosts are built once up front so a slide is ready the moment it shows.
+  buildSig();
+  buildForceChart();
+  buildForceKey();
+  buildCE();
+});
+</script>
+
+</body>
+</html>

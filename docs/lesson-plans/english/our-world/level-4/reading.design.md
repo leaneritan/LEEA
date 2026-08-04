@@ -209,6 +209,28 @@ before commit.
 - [x] Sources read — planner pp.306–309, SB pp.156–157, WB AK p.112
 - [x] WB-only words added to `vocabulary.json` + `vocabulary-index.json`, validated
 - [x] Design doc (this file)
-- [ ] Teacher slideshow — `public/lessons/ow-l4-u9-reading.html`
-- [ ] Leo app — `public/learn/ow-l4-u9-reading.html`
-- [ ] Lesson records + `src/data/lessons.ts`
+- [x] Teacher slideshow — `public/lessons/ow-l4-u9-reading.html` · 44 slides
+- [x] Leo app — `public/learn/ow-l4-u9-reading.html` · 11 modules
+- [x] Lesson records + `src/data/lessons.ts`
+
+### Build notes
+
+**Force chart (s34) does not use the shared chart component.** `pickChart`'s
+reveal mode turns *every* cell into a drop slot, which would leave the four force
+rows unlabelled — Leo could only guess which blank row was gravity. s34 therefore
+renders its own grid with the force column fixed as the anchor and only the two
+"when" columns droppable. The s35 answer key has no such constraint and *does*
+use the shared component in display mode.
+
+Chip matching on that grid compares the **expected text**, not the slot key,
+because gravity's two cells both read "all the time" — key matching would have
+rejected an identical, equally correct chip.
+
+**Signal words are matched against the phrase's own word list**, not by
+substring. A substring test would accept "cause" for "because"; it also has to
+handle the two-word phrase "as a result", where tapping either *as* or *result*
+counts and the one-letter *a* never does. The same helper is used in both the
+deck (s29) and the Leo app's Strategy tab.
+
+**Weird but True** (SB p.157) is the earned payoff on the app's Read tab — it
+appears only once all three comprehension gates are passed.

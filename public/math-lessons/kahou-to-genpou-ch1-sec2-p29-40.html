@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>加法と減法 ｜ 1章2節 p.29-40</title>
+<style>
+  :root{
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Meiryo",sans-serif;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP","MS Mincho",serif;
+  }
+  /* ---- 説明編：黒板 ---- */
+  .theme-setsumei{
+    --ink:#22312C; --ink-soft:#5C6E67; --paper:#E8EDE9; --card:#FFFFFF;
+    --accent:#9C6B15; --accent-bg:#FAF2E2; --deep:#2F4739; --deep-fg:#F2F5EE;
+    --ok:#3D7A5A; --ok-bg:#E7F1EB; --no:#A64B3C; --no-bg:#F9EDEA; --line:#D3DCD6;
+  }
+  /* ---- テスト編：赤ペン ---- */
+  .theme-test{
+    --ink:#1F2328; --ink-soft:#63696F; --paper:#F4F3EF; --card:#FFFFFF;
+    --accent:#C62828; --accent-bg:#FBEDEC; --deep:#1F2328; --deep-fg:#FFFFFF;
+    --ok:#2F6F4E; --ok-bg:#E8F1EC; --no:#C62828; --no-bg:#FBEDEC; --line:#DEDCD4;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--gothic);font-size:17px;line-height:1.9;-webkit-text-size-adjust:100%;
+       background:var(--paper);color:var(--ink);transition:background .3s}
+  .wrap{max-width:660px;margin:0 auto;padding:18px 15px 70px}
+
+  header.top{background:var(--deep);color:var(--deep-fg);border-radius:13px;
+             padding:16px 18px 0;margin-bottom:16px;transition:background .3s}
+  header.top .eyebrow{font-size:11.5px;letter-spacing:.2em;opacity:.68;margin:0 0 3px}
+  header.top h1{font-size:24px;font-weight:800;margin:0;letter-spacing:.03em}
+  header.top .sub{font-size:13.5px;opacity:.68;margin:3px 0 0}
+  .bar{display:flex;gap:4px;margin-top:12px}
+  .bar i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.22);transition:background .25s}
+  .bar i.hit{background:#8FC5A5} .bar i.miss{background:#C58C82} .bar i.now{background:#fff}
+
+  /* ---- tabs ---- */
+  .tabs{display:flex;gap:6px;margin:14px -18px 0;padding:0 18px;border-top:1px solid rgba(255,255,255,.14)}
+  .tabs button{flex:1;background:none;border:none;color:inherit;opacity:.55;
+    font-family:inherit;font-size:14.5px;font-weight:700;padding:12px 4px 11px;
+    cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.04em}
+  .tabs button:hover{opacity:.85}
+  .tabs button.on{opacity:1;border-bottom-color:currentColor}
+  .tabs .badge{display:inline-block;font-size:11px;font-weight:700;margin-left:6px;
+    padding:1px 7px;border-radius:20px;background:rgba(255,255,255,.16)}
+  .tabs .badge.done{background:#8FC5A5;color:#1B2E24}
+
+  .card{background:var(--card);border-radius:13px;padding:21px 19px;
+        box-shadow:0 1px 2px rgba(0,0,0,.05),0 8px 20px rgba(0,0,0,.07)}
+  .screen{animation:rise .3s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+  .tag{display:inline-block;font-size:12px;letter-spacing:.12em;font-weight:700;
+       padding:3px 11px;border-radius:20px;background:var(--accent-bg);color:var(--accent);margin-bottom:8px}
+  .sec{display:inline-block;font-size:12px;letter-spacing:.06em;color:var(--ink-soft);
+       margin:0 0 8px 9px;font-weight:700}
+  .pg{display:inline-block;font-size:11.5px;letter-spacing:.06em;font-weight:700;
+      padding:2px 9px;border-radius:6px;background:var(--deep);color:var(--deep-fg);
+      margin:0 0 8px 8px;vertical-align:2px}
+  h2{font-size:21px;font-weight:800;margin:0 0 12px;letter-spacing:.02em}
+  p{margin:0 0 13px}
+  .lead{color:var(--ink-soft);font-size:15.5px}
+  .prompt{font-size:12.5px;letter-spacing:.1em;color:var(--accent);font-weight:700;margin:18px 0 4px}
+
+  .m{font-family:var(--mincho);font-size:27px;text-align:center;margin:14px 0;letter-spacing:.04em}
+  .m.sm{font-size:21px;line-height:1.8}
+  .quote{background:rgba(0,0,0,.02);border:1px dashed var(--line);border-radius:10px;
+         padding:12px 14px;margin:12px 0;font-size:15.5px}
+  .quote .src{display:block;font-size:11.5px;letter-spacing:.1em;color:var(--accent);
+              font-weight:700;margin-bottom:4px}
+  .prob{background:rgba(0,0,0,.02);border:1px solid var(--line);border-radius:11px;
+        padding:13px 15px;margin:12px 0;font-size:16px;line-height:1.95}
+
+  /* ---- 数直線（東西の移動） ---- */
+  .nl{margin:16px 0 6px}
+  .nl svg{display:block;width:100%;height:auto}
+  .nl .cap{font-size:13px;color:var(--ink-soft);text-align:center;margin:4px 0 0}
+
+  /* ---- 数の石垣 ---- */
+  .wall{margin:16px 0 6px;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .wall .wrow{display:flex;gap:6px}
+  .wall .cell{width:56px;height:40px;border:1.5px solid var(--line);border-radius:7px;
+    background:#fff;display:flex;align-items:center;justify-content:center;
+    font-family:var(--mincho);font-size:19px}
+  .wall .cell.q{border-style:dashed;border-color:var(--accent);color:var(--accent);font-weight:700}
+
+  .choices{display:grid;gap:9px;margin-top:8px}
+  .choice{text-align:left;padding:12px 15px;border-radius:10px;border:1.5px solid var(--line);
+          background:#fff;color:var(--ink);font-size:15.5px;line-height:1.7;
+          transition:border-color .15s,background .15s;font-family:inherit;cursor:pointer}
+  .choice.mid{text-align:center;font-family:var(--mincho);font-size:19px}
+  .choice:hover:not(:disabled){border-color:var(--accent)}
+  .choice:disabled{cursor:default;opacity:.82}
+  .choice.ok{border-color:var(--ok);background:var(--ok-bg);font-weight:700}
+  .choice.no{border-color:var(--no);background:var(--no-bg)}
+  .choice.reveal{border-color:var(--ok);background:var(--ok-bg)}
+
+  .ord{display:grid;gap:8px;margin-top:8px}
+  .ord .item{text-align:left;padding:11px 14px;border-radius:10px;border:1.5px solid var(--line);
+             background:#fff;color:var(--ink);font-size:15.5px;line-height:1.7;
+             position:relative;font-family:inherit;cursor:pointer}
+  .ord .item:hover:not(:disabled){border-color:var(--accent)}
+  .ord .item.placed{border-color:var(--ok);background:var(--ok-bg);opacity:.9;cursor:default}
+  .ord .item.placed .rank{position:absolute;left:-9px;top:-9px;width:22px;height:22px;border-radius:50%;
+    background:var(--ok);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .ord .item.shake{animation:shake .32s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .ordcap{font-size:13.5px;color:var(--ink-soft);margin:8px 0 0;text-align:center}
+
+  textarea{width:100%;min-height:110px;font-family:var(--gothic);font-size:16px;line-height:1.8;
+    padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);resize:vertical}
+  textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  textarea:disabled{background:rgba(0,0,0,.03);color:var(--ink-soft)}
+  .cnt{font-size:12.5px;color:var(--ink-soft);text-align:right;margin:4px 0 0}
+
+  .board{background:var(--deep);color:var(--deep-fg);border-radius:12px;padding:16px 18px;margin-top:16px;
+         display:none;box-shadow:inset 0 0 40px rgba(0,0,0,.22)}
+  .board.show{display:block;animation:rise .35s ease both}
+  .board .who{font-size:11.5px;letter-spacing:.16em;opacity:.7;font-weight:700;margin:0 0 6px}
+  .board .say{font-family:var(--mincho);font-size:18px;line-height:1.95;margin:0}
+  .board .say em{font-style:normal;border-bottom:1.5px solid rgba(255,255,255,.45);padding-bottom:1px}
+
+  .selfcheck{background:var(--accent-bg);border-radius:11px;padding:14px 16px;margin-top:14px;display:none}
+  .selfcheck.show{display:block;animation:rise .3s ease both}
+  .selfcheck .t{font-size:12.5px;letter-spacing:.1em;font-weight:700;color:var(--accent);margin:0 0 8px}
+  .selfcheck label{display:flex;gap:10px;align-items:flex-start;font-size:15.5px;
+                   line-height:1.7;margin-bottom:7px;cursor:pointer}
+  .selfcheck input{width:19px;height:19px;margin-top:5px;flex-shrink:0;accent-color:var(--ok)}
+  .selfcheck .hintline{font-size:14px;color:var(--ink-soft);margin:8px 0 0}
+
+  .row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .row .pre{font-family:var(--mincho);font-size:22px}
+  .row .unit{font-size:15px;color:var(--ink-soft)}
+  input[type=text]{font-family:var(--mincho);font-size:22px;width:120px;padding:8px 10px;
+    border:1.5px solid var(--line);border-radius:10px;text-align:center;color:var(--ink);background:#fff}
+  input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  input[type=text]:disabled{background:rgba(0,0,0,.03)}
+
+  .btn{padding:11px 20px;border-radius:10px;border:none;background:var(--ink);color:#fff;
+       font-weight:700;font-family:inherit;font-size:16px;cursor:pointer}
+  .btn:hover:not(:disabled){opacity:.88}
+  .btn:disabled{opacity:.4;cursor:default}
+  .btn.accent{background:var(--accent)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .helprow{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+  .btn.tiny{padding:7px 14px;font-size:13.5px;background:#fff;color:var(--ink-soft);
+            border:1.5px solid var(--line);font-weight:700}
+  .btn.tiny:hover:not(:disabled){color:var(--accent);border-color:var(--accent)}
+  .btn.tiny[hidden]{display:none}
+  .usedmark{font-size:12.5px;color:var(--ink-soft);margin:10px 0 0;text-align:right}
+
+  .fb{margin-top:13px;padding:12px 14px;border-radius:10px;font-size:15px;display:none}
+  .fb.show{display:block;animation:rise .22s ease both}
+  .fb.hint{background:var(--accent-bg);border:1px solid var(--line)}
+  .fb.wrong{background:var(--no-bg);border:1px solid var(--line)}
+  .fb.right{background:var(--ok-bg);border:1px solid var(--line)}
+  .fb b{display:block;margin-bottom:2px}
+  .fb .work{font-family:var(--mincho);font-size:16.5px;display:block;margin-top:4px;line-height:1.75}
+
+  .nav{margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .stepno{font-size:12.5px;color:var(--ink-soft);letter-spacing:.08em}
+
+  .big{font-size:42px;font-weight:800;text-align:center;margin:6px 0 0}
+  .big small{font-size:18px;color:var(--ink-soft);font-weight:400}
+  table{width:100%;border-collapse:collapse;margin:16px 0 6px;font-size:15px}
+  th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+  th{font-size:12.5px;letter-spacing:.08em;color:var(--ink-soft);font-weight:700}
+  td.s{text-align:right;font-family:var(--mincho);font-size:18px;white-space:nowrap}
+  .pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .pill.good{background:var(--ok-bg);color:var(--ok)}
+  .pill.watch{background:var(--no-bg);color:var(--no)}
+  .note{border-left:3px solid var(--accent);background:var(--accent-bg);
+        padding:11px 13px;border-radius:0 8px 8px 0;font-size:15px;margin:14px 0}
+  ul.rev,ul.tips{padding-left:1.15em;margin:6px 0 0;font-size:15px}
+  ul.rev li,ul.tips li{margin-bottom:5px}
+
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (max-width:420px){body{font-size:16px}header.top h1{font-size:21px}.m{font-size:23px}
+    .wall .cell{width:48px;height:36px;font-size:17px}}
+</style>
+</head>
+<body>
+<div class="wrap theme-setsumei" id="root">
+
+<header class="top">
+  <p class="eyebrow">1章 正負の数 ／ 2節 加法と減法</p>
+  <h1>加法と減法</h1>
+  <p class="sub">教科書 p.29〜40　加法・減法・項・混じった計算</p>
+  <div class="bar" id="bar"></div>
+  <nav class="tabs">
+    <button data-tab="setsumei" class="on">説明編<span class="badge" id="b-setsumei">9問</span></button>
+    <button data-tab="test">テスト編<span class="badge" id="b-test">16問</span></button>
+  </nav>
+</header>
+
+<main id="stage"></main>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* 東西の移動を表す数直線。moves は [開始位置, 長さ] の配列。 */
+  function walk(moves, cap){
+    var W=560, H=0, unit=26, cx=W/2, base=0, i, m, y, x1, x2, arrows="";
+    H = 46 + moves.length*22;
+    base = H - 20;
+    var axis='<line x1="14" y1="'+base+'" x2="'+(W-14)+'" y2="'+base+'" stroke="currentColor" stroke-width="1.6"/>';
+    for(i=-9;i<=9;i++){
+      axis+='<line x1="'+(cx+i*unit)+'" y1="'+(base-4)+'" x2="'+(cx+i*unit)+'" y2="'+(base+4)+'" stroke="currentColor" stroke-width="1"/>';
+    }
+    axis+='<circle cx="'+cx+'" cy="'+base+'" r="3.2" fill="currentColor"/>'+
+          '<text x="16" y="'+(base+19)+'" font-size="12" fill="currentColor" opacity=".65">西</text>'+
+          '<text x="'+(W-26)+'" y="'+(base+19)+'" font-size="12" fill="currentColor" opacity=".65">東</text>'+
+          '<text x="'+(cx-4)+'" y="'+(base+19)+'" font-size="12" fill="currentColor" opacity=".65">A</text>';
+    for(i=0;i<moves.length;i++){
+      m=moves[i]; y=base-16-i*22;
+      x1=cx+m[0]*unit; x2=cx+(m[0]+m[1])*unit;
+      var col = m[1]<0 ? "#A64B3C" : "#3D7A5A";
+      var tip = m[1]<0 ? 6 : -6;
+      arrows+='<line x1="'+x1+'" y1="'+y+'" x2="'+x2+'" y2="'+y+'" stroke="'+col+'" stroke-width="2.4"/>'+
+              '<path d="M'+x2+' '+y+' l'+tip+' -4 l0 8 z" fill="'+col+'"/>'+
+              '<line x1="'+x1+'" y1="'+y+'" x2="'+x1+'" y2="'+base+'" stroke="'+col+'" stroke-width="1" stroke-dasharray="2 3" opacity=".5"/>'+
+              '<text x="'+((x1+x2)/2)+'" y="'+(y-6)+'" font-size="13" text-anchor="middle" fill="'+col+'">'+
+              (m[1]<0?"−":"＋")+Math.abs(m[1])+'</text>';
+    }
+    return '<div class="nl"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+cap+'">'+
+           axis+arrows+'</svg><p class="cap">'+cap+'</p></div>';
+  }
+
+  /* 数の石垣。rows は下から上へ。null は空らん。 */
+  function wall(rows){
+    var out='<div class="wall">', i, j, r;
+    for(i=rows.length-1;i>=0;i--){
+      r=rows[i]; out+='<div class="wrow">';
+      for(j=0;j<r.length;j++){
+        out += r[j]===null ? '<span class="cell q">?</span>'
+                           : '<span class="cell">'+r[j]+'</span>';
+      }
+      out+='</div>';
+    }
+    return out+'</div>';
+  }
+
+  /* ================= 説明編 ================= */
+  var STEPS = [
+
+  /* 1 — p.29〜30 : addition is two moves in a row */
+  { kind:"choice", tag:"はじめに", sec:"1 加法", pg:"p.29〜30",
+    title:"たし算は「2回続けて動く」こと",
+    lead:'教科書 p.29。東西にのびる道を地点 A から歩く場面で、（＋3）＋□ を考える。東への移動を正の数、西への移動を負の数で表す。',
+    body:'<div class="quote"><span class="src">教科書 p.30</span>'+
+         '前ページの <b>Q</b> のたし算は、2回続けて移動したときの結果を求める計算、すなわち'+
+         '（1回目の移動）＋（2回目の移動）を表していると考える。</div>'+
+         walk([[0,3],[3,-5]],"東へ3m、続けて西へ5m。（＋3）＋（−5）")+
+         '<div class="m sm">（＋3）＋（−5） ＝ −2</div>',
+    prompt:"（＋3）＋（−5）が −2 になるのはなぜ？",
+    opts:[
+      "3 より 5 のほうが大きいので、答えにマイナスをつけるから。",
+      "東へ3m 歩いてから西へ5m 歩くと、<b>結果として</b> A から西へ2m の地点にいるから。",
+      "たし算では、いつも大きいほうの数から小さいほうの数をひくから。",
+      "＋ と − をたすと、答えはいつも − になるから。"],
+    ans:1,
+    hint:"（＋3）＋（−5）は「1回目の移動」＋「2回目の移動」。東へ3m、次に西へ5m。歩き終わったとき、Aからどちら向きに何m のところにいる？",
+    work:'加法とは <b>2回続けて動いた結果</b>を求める計算。答えの符号は「最後にどちら側にいるか」で決まる。<br>'+
+         '1番と4番はたまたま答えが合うだけで、（＋5）＋（−3）＝＋2 のように＋になる場合を説明できない。'+
+         '3番も、（−4）＋（−6）＝−10 のような同符号のときには成り立たない。<br>'+
+         '<b>結果の位置で考える</b>——これが 2節 のすべての土台になる。' },
+
+  /* 2 — p.31 : why subtract absolute values when signs differ */
+  { kind:"choice", tag:"きまりの意味", sec:"1 加法", pg:"p.31",
+    title:"たし算なのに、なぜ「ひく」のか",
+    lead:'教科書 p.31 のきまり②。異符号の2つの数の和は、絶対値の大きいほうから小さいほうをひき、絶対値の大きいほうの符号をつける。たし算なのにひき算が出てくる。',
+    body:walk([[0,9],[9,-4]],"東へ9m、続けて西へ4m。（＋9）＋（−4）")+
+         '<div class="m sm">（＋9）＋（−4） ＝ ＋（9−4） ＝ ＋5</div>',
+    prompt:"たし算なのに 9−4 とひき算をするのは、なぜ？",
+    opts:[
+      "たし算とひき算はもともと同じ計算だから。",
+      "符号がちがうときは、たし算がひき算に変わるという決まりだから。",
+      "東へ9m と西へ4m は<b>向きが反対</b>なので打ち消し合い、残りが 9−4 の分だけになるから。",
+      "大きい数から小さい数をひく、というのが計算のきまりだから。"],
+    ans:2,
+    hint:"同符号のとき、（−4）＋（−6）は 4＋6 とたした。異符号のときだけ ひき算になる。2つの移動の何がちがう？",
+    work:'ちがいは <b>向き</b> ひとつ。<br>'+
+         '同符号 … 同じ向きに続けて進むので、進んだ分が積み上がる → 絶対値を<b>たす</b>。<br>'+
+         '異符号 … 反対向きに進むので、行った分と戻った分が<b>打ち消し合う</b> → 絶対値を<b>ひく</b>。'+
+         'そして多く進んだほうの向きが残るので、絶対値の大きいほうの符号がつく。<br>'+
+         '打ち消し合ってちょうど 0 になるのが、（−5）＋（＋5）＝0 の場合。絶対値が等しいときだけ起こる。' },
+
+  /* 3 — p.31 : write — the two rules are one idea */
+  { kind:"write", tag:"説明してみよう", sec:"1 加法", pg:"p.31",
+    title:"同符号と異符号で、なぜやり方がちがうのか",
+    lead:'加法のきまりは①と②の2つある。丸暗記すると、テストでどちらを使うかまよう。ひとつの考え方から説明できるようにしよう。',
+    body:'<div class="quote"><span class="src">教科書 p.31　正負の数の加法</span>'+
+         '① 同符号の2つの数の和 … 絶対値の和に共通の符号をつける。<br>'+
+         '② 異符号の2つの数の和 … 絶対値の大きいほうから小さいほうをひき、絶対値の大きいほうの符号をつける。'+
+         '絶対値が等しければ、和は 0 である。</div>',
+    prompt:"①と②が、じつは同じ考え方から出てくることを説明しよう。",
+    ph:"例：どちらも東西の移動で考えると…／同じ向きのときは…",
+    model:'どちらも <em>2回続けて動いた結果はどこか</em> を求めているだけ。<br>'+
+          '同じ向きに2回進めば、進んだ分は<em>積み上がる</em>。だから絶対値をたし、向きは変わらないので共通の符号がつく。<br>'+
+          '反対向きに進めば、行った分と戻った分が<em>打ち消し合う</em>。だから絶対値をひき、'+
+          '多く進んだほうの向きが残るので、絶対値の大きいほうの符号がつく。<br>'+
+          'ちょうど同じだけ行って戻れば出発点にもどるので、和は 0 になる。<br>'+
+          '①と②は別々のきまりではなく、<em>向きが同じか反対か</em>のちがいだけ。'+
+          'まよったら数直線で2回動かしてみれば、どちらか思い出せる。',
+    checks:["どちらも「2回動いた結果」だと書けた",
+            "同じ向きだから積み上がる（たす）、と書けた",
+            "反対向きだから打ち消し合う（ひく）、と書けた"] },
+
+  /* 4 — p.34 : subtraction as filling a blank */
+  { kind:"choice", tag:"見方を変える", sec:"2 減法", pg:"p.34",
+    title:"ひき算を「□をうめる問題」に置きかえる",
+    lead:'教科書 p.34。小学校で学んだように、ひき算 5−3 は □＋3＝5 の □ にあてはまる数を求める計算で、加法をもとにして考えることができる。',
+    body:'<div class="quote"><span class="src">教科書 p.34</span>'+
+         'ひき算（＋5）−（＋3）は、□＋（＋3）＝＋5 の □ にあてはまる数を求める計算である。</div>'+
+         walk([[0,2],[2,3]],"□ だけ動いてから、さらに東へ3m。結果は東へ5m")+
+         '<div class="m sm">（＋5）−（＋3） ＝ （＋5）＋（−3） ＝ ＋2</div>',
+    prompt:"ひき算をこう見ると、何がうれしい？",
+    opts:[
+      "ひき算を<b>たし算の問題に置きかえられる</b>ので、覚えたばかりの加法のきまりがそのまま使えるから。",
+      "ひき算よりたし算のほうが答えが大きくなるから。",
+      "□ を使うと、答えが必ず正の数になるから。",
+      "とくに意味はなく、書き方を変えただけだから。"],
+    ans:0,
+    hint:"1 加法 では、正負の数のたし算のきまりをつくった。減法のきまりを一からつくり直さずにすむには、どうすればいい？",
+    work:'<b>新しい計算を、知っている計算に置きかえる。</b> これは数学でくり返し出てくるやり方。<br>'+
+         '減法のきまりを一からつくらなくても、□＋（＋3）＝＋5 と書きかえた瞬間、'+
+         'あとは加法の話になる。だから 2節 では 加法 → 減法 の順に学んでいる。<br>'+
+         'この置きかえは 3章 の方程式でもそのまま使う。'+
+         '「わからないものを □ とおいて、知っている計算にもどす」——覚えておこう。' },
+
+  /* 5 — p.35 : order — the minus-minus case */
+  { kind:"order", tag:"組み立てる", sec:"2 減法", pg:"p.35",
+    title:"なぜ（＋2）−（−3）は ＋5 になるのか",
+    lead:'2節でいちばんまちがえやすいところ。ひき算なのに答えが大きくなる。その筋道を、順に並べよう。',
+    body:walk([[0,2]],"2回動いた結果が、東へ2m の地点。2回目の移動は −3 だった")+
+         '<div class="m sm">□＋（−3）＝＋2　の □ は？<br>（＋2）−（−3） ＝ ？</div>',
+    prompt:"説明の順になるように、正しい順にタップしよう。",
+    items:[
+      "（＋2）−（−3）は、□＋（−3）＝＋2 の □ を求める計算である。",
+      "□ の地点から西へ3m 進んで、東へ2m の地点に着けばよい。",
+      "そうなる □ は、東へ2m の地点から、さらに東へ3m 進んだ地点である。",
+      "つまり □ ＝（＋2）＋（＋3）＝＋5 で、−3 をひくことは ＋3 を加えることと同じである。"],
+    hint:"まず「□をうめる問題」に直すところから。次に、□ からどう動けば ＋2 に着くかを考える。最後に □ の位置を式で表す。",
+    work:'<b>−3 をひく＝逆向きに同じだけ動く＝＋3 を加える。</b><br>'+
+         '西へ3m 進んで東へ2m の地点に着いたのだから、出発点はそこより東になければならない。'+
+         'だから答えは ＋2 より大きくなる。<br>'+
+         'ひき算だから小さくなる、というのは <b>正の数をひくとき</b> だけの話。'+
+         '負の数をひけば大きくなる。まよったら、この「□をうめる」に戻ればいい。' },
+
+  /* 6 — p.35 : write — the sign-error root */
+  { kind:"write", tag:"教えてみよう", sec:"2 減法", pg:"p.35",
+    title:"同じ「3をひく」なのに、結果が反対になる",
+    lead:'教科書 p.35 のきまり。正の数、負の数をひくことは、その数の符号を変えて加えることと同じである。ここを言えると、符号のミスがぐっと減る。',
+    body:'<div class="m sm">（＋2）−（＋3） ＝ （＋2）＋（−3） ＝ −1<br>'+
+         '（＋2）−（−3） ＝ （＋2）＋（＋3） ＝ ＋5</div>',
+    prompt:"どちらも「3をひく」なのに、なぜ結果が反対向きになるのか説明しよう。",
+    ph:"例：ひくというのは逆向きに動くことなので…／＋3 の逆向きは…",
+    model:'<em>ひく＝その移動を逆向きにする</em>、と考えるとよい。<br>'+
+          '＋3 をひく … ＋3 は東へ3m の移動。その逆向きは西へ3m、つまり −3 を加えること。だから小さくなる。<br>'+
+          '−3 をひく … −3 は西へ3m の移動。その逆向きは東へ3m、つまり ＋3 を加えること。だから大きくなる。<br>'+
+          'どちらも「逆向きにする」という同じ操作をしている。'+
+          'ちがうのは <em>もとの移動の向き</em> だから、逆にした結果も反対になる。<br>'+
+          '「ひき算だから小さくなる」は、<em>正の数をひくときだけ</em>成り立つ話。'+
+          '負の数をひけば大きくなる。ここを取りちがえると、符号のミスがずっと続く。',
+    checks:["ひくことを「逆向きの移動」として書けた",
+            "＋3 をひくと小さくなる理由を書けた",
+            "−3 をひくと大きくなる理由を書けた"] },
+
+  /* 7 — p.37 : what a 項 is */
+  { kind:"choice", tag:"ことばの意味", sec:"3 加法と減法の混じった計算", pg:"p.37",
+    title:"項とは何か",
+    lead:'教科書 p.37。4−7＋9−5 を加法だけの式になおすと、4つの数の和になる。この4つの数を、この式の 項 という。',
+    body:'<div class="quote"><span class="src">教科書 p.37</span>'+
+         '4−7＋9−5<br>'+
+         '＝（＋4）−（＋7）＋（＋9）−（＋5）<br>'+
+         '＝（＋4）＋（−7）＋（＋9）＋（−5）<br>'+
+         'となるから、4−7＋9−5 は、＋4、−7、＋9、−5 の 4つの数の和を表している。</div>',
+    prompt:"4−7＋9−5 の項は、どれ？",
+    opts:[
+      "4、7、9、5 の4つ。",
+      "＋4、−7、＋9、−5 の4つ。<b>符号までふくめて</b>1つの項。",
+      "−7 と −5 の2つ。ひき算のところだけが項。",
+      "4−7 と 9−5 の2つ。"],
+    ans:1,
+    hint:"項は、式を加法だけになおしたときに「たされている数」。（＋4）＋（−7）＋（＋9）＋（−5）で、たされているのは何と何？",
+    work:'<b>符号は数の一部。</b> −7 の − は「ひく」という記号ではなく、−7 という数についている符号。<br>'+
+         '1番のように符号を切りはなして 7 とだけ見てしまうと、'+
+         'あとで項を入れかえたときに符号を置き去りにして計算をまちがえる。<br>'+
+         '<b>項をいうときは、必ず符号をつけて言う。</b>'+
+         'ただし式のはじめの項の ＋ は省略するので、4−7＋9−5 の最初の項は ＋4。' },
+
+  /* 8 — p.38 : why terms may be reordered */
+  { kind:"choice", tag:"くふうの理由", sec:"3 加法と減法の混じった計算", pg:"p.38",
+    title:"なぜ項を入れかえてよいのか",
+    lead:'教科書 p.38。4−7＋9−5 は、項の和を表しているとみれば、順序を変えて計算できる。でも、ひき算は順序を変えられないはずでは？',
+    body:'<div class="m sm">4−7＋9−5<br>＝ 4＋9−7−5<br>＝ 13−12 ＝ 1</div>',
+    prompt:"項を入れかえて計算してよいのは、なぜ？",
+    opts:[
+      "式を見やすくするための書きかえなので、多少答えが変わってもよいから。",
+      "ひき算も、順序を変えてよい計算だから。",
+      "この式は <b>項の和</b> とみることができ、加法には交換法則・結合法則が成り立つから。",
+      "正の数を先に書く、という決まりがあるから。"],
+    ans:2,
+    hint:"4−7＋9−5 を加法だけの式になおすと（＋4）＋（−7）＋（＋9）＋（−5）。これは何算だけでできている式？",
+    work:'<b>ひき算の順序を変えたのではない。</b> いったん <b>加法だけの式になおしてから</b> 並べかえている。<br>'+
+         '減法に交換法則は成り立たない。5−3＝2 だが 3−5＝−2 で、答えがちがう。'+
+         'だから「ひき算も入れかえてよい」と覚えると、いつか必ずまちがえる。<br>'+
+         '正しい手順は 2段階。①式を項の和とみる（符号を数につける）→ ②加法の交換法則・結合法則で並べかえる。'+
+         '①を飛ばして符号だけ動かすのが、いちばんよくある失敗。' },
+
+  /* 9 — reflection */
+  { kind:"write", tag:"ふり返り", sec:"2節 加法と減法", pg:"p.29〜40",
+    title:"今日のふり返り",
+    lead:'2節 でやったことは、加法・減法・項の3つ。この3つがどうつながっているかを、自分のことばでまとめよう。',
+    body:'',
+    prompt:"加法・減法・項のつながりを書こう。",
+    ph:"例：加法は2回動いた結果で…／減法は…／項とみると…",
+    model:'<b>加法</b>… 2回続けて動いた結果を求める計算。同じ向きなら積み上がり、反対向きなら打ち消し合う。<br>'+
+          '<b>減法</b>… □をうめる問題に置きかえると、加法にもどせる。'+
+          '<em>その数の符号を変えて加える</em> のと同じ。<br>'+
+          '<b>項</b>… 式を加法だけになおしたときに、たされている数（符号つき）。<br><br>'+
+          'この3つは1本につながっている。<em>減法を加法になおせる</em>から、'+
+          'どんな式も加法だけの式にできる。加法だけの式にできるから、'+
+          '式全体を <em>項の和</em> とみることができる。項の和とみられるから、'+
+          '交換法則・結合法則で <em>並べかえてくふうできる</em>。<br>'+
+          'つまり、すべては「減法を加法になおす」から始まっている。'+
+          'この1手を確実にやることが、符号のミスを減らすいちばんの近道。'+
+          '3節 の乗法・除法でも、まず符号を決めてから計算する、という同じ順序で考えていく。',
+    checks:["減法は符号を変えて加えることだ、と書けた",
+            "だから式を加法だけ（項の和）にできる、と書けた",
+            "項の和とみるとくふうして計算できる、と書けた"] }
+  ];
+
+  /* ================= テスト編 ================= */
+  var Q = [
+
+  { cat:"加法", pg:"p.31 問1", type:"num", pre:"答えは",
+    body:'<div class="m">（−5）＋（−8）</div>',
+    prompt:"同符号の数の加法。答えは？", ans:-13,
+    hint:"どちらも西向きの移動。西へ5m、続けて西へ8m 進んだら、Aからどれだけ西？",
+    work:"−13<br><br>"+
+         "<b>同符号なので、絶対値の和 5＋8＝13 に共通の符号 − をつける。</b><br><br>"+
+         "西へ5m、さらに西へ8m。同じ向きに進み続けたので、"+
+         "進んだ分は積み上がって13m。向きは西のままなので −13。<br><br>"+
+         "<b>ここで 5−8＝−3 としないこと。</b> ひき算になるのは符号がちがうときだけ。" },
+
+  { cat:"加法", pg:"p.31 問2", type:"num", pre:"答えは",
+    body:'<div class="m">（＋7）＋（−9）</div>',
+    prompt:"異符号の数の加法。答えは？", ans:-2,
+    hint:"東へ7m 進んでから、西へ9m 戻る。行った分より戻った分のほうが多い。最後はどちら側？",
+    work:"−2<br><br>"+
+         "<b>異符号なので、絶対値の大きいほうから小さいほうをひく。</b> 9−7＝2。<br>"+
+         "絶対値が大きいのは −9 のほうなので、その符号をつけて −2。<br><br>"+
+         "東へ7m 行って西へ9m 戻ると、7m 分は打ち消し合い、"+
+         "残り2m だけ西へ行きすぎる。だから −2。<br><br>"+
+         "<b>符号は「多く進んだほうの向き」</b>と覚えるとよい。" },
+
+  { cat:"加法", pg:"p.32 問3", type:"choice",
+    body:'<div class="m">（−4）＋（＋4）</div>',
+    prompt:"答えは？",
+    opts:["0","＋8","−8","＋4"],
+    ans:0,
+    hint:"西へ4m 行ってから、東へ4m 戻る。最後はどこにいる？",
+    work:"<b>0</b><br><br>"+
+         "絶対値が等しい異符号の2つの数の和は 0。"+
+         "西へ4m 進んでから東へ4m 戻れば、ちょうど出発点 A にもどる。<br><br>"+
+         "<b>0 には符号をつけない。</b> ＋0 とも −0 とも書かない。"+
+         "0 は正でも負でもない数だった（p.22）。<br><br>"+
+         "この「打ち消し合って 0 になる組」は、"+
+         "いくつかの数をたすときのくふうにそのまま使える。" },
+
+  { cat:"加法", pg:"p.32 問3", type:"num", pre:"答えは",
+    body:'<div class="m">（＋24）＋（−36）</div>',
+    prompt:"答えは？", ans:-12,
+    hint:"異符号なので、絶対値の大きいほうから小さいほうをひく。36 と 24、大きいのはどちら？",
+    work:"−12<br><br>"+
+         "36−24＝12。絶対値が大きいのは −36 のほうなので、符号は −。よって −12。<br><br>"+
+         "<b>数が大きくなっても、やることは同じ。</b>"+
+         "①符号がちがう → ひく　②絶対値の大きいほうの符号をつける、の2手順。<br><br>"+
+         "<b>手順を先に、計算をあとに。</b> 符号を決めてから数を計算すると、けたが増えてもまよわない。" },
+
+  { cat:"加法", pg:"p.32 問4", type:"num", pre:"答えは",
+    body:'<div class="m">（＋4.8）＋（−5.2）</div>',
+    prompt:"小数の加法。答えは？", ans:-0.4,
+    hint:"小数でもきまりは同じ。5.2−4.8 を計算して、絶対値の大きいほうの符号をつけよう。",
+    work:"−0.4<br><br>"+
+         "5.2−4.8＝0.4。絶対値が大きいのは −5.2 なので、−0.4。<br><br>"+
+         "<b>小数だからといって、別のきまりがあるわけではない。</b>"+
+         "整数のときとまったく同じ2手順で計算できる。<br><br>"+
+         "<b>答えが1より小さくなっても気にしないこと。</b>"+
+         "−0.4 は、Aから西へ 0.4m の地点。ちゃんと数直線の上にある数。" },
+
+  { cat:"加法", pg:"p.32 問4", type:"choice",
+    body:'<div class="m sm">（−1/5）＋（−3/5）</div>',
+    prompt:"分数の加法。答えは？",
+    opts:["−4/5","−4/10","＋4/5","−2/5"],
+    ans:0,
+    hint:"同符号なので絶対値をたす。1/5＋3/5 は、分母をたすのだったか、分子をたすのだったか。",
+    work:"<b>−4/5</b><br><br>"+
+         "同符号なので絶対値の和に共通の符号をつける。"+
+         "1/5＋3/5＝4/5 なので、−4/5。<br><br>"+
+         "<b>−4/10 は分母までたしてしまった答え。</b>"+
+         "分母が同じ分数のたし算では、分母はそのままで分子だけをたす。"+
+         "小学校で学んだこのきまりは、負の数になっても変わらない。<br><br>"+
+         "正負の数の計算では、<b>符号の処理</b> と <b>もとの計算</b> は別の作業。"+
+         "先に符号を決めて、あとは小学校どおりに計算すればよい。" },
+
+  { cat:"加法のくふう", pg:"p.33 問5", type:"num", pre:"答えは",
+    body:'<div class="m sm">（＋5）＋（−9）＋（−7）＋（＋6）</div>',
+    prompt:"くふうして計算しよう。答えは？", ans:-5,
+    hint:"正の数どうし、負の数どうしをまとめてみよう。（＋5）＋（＋6）と、（−9）＋（−7）。",
+    work:"−5<br><br>"+
+         "<b>同符号どうしを集めるのがくふうのコツ。</b><br>"+
+         "（＋5）＋（＋6）＝＋11、（−9）＋（−7）＝−16。<br>"+
+         "そして（＋11）＋（−16）＝−5。<br><br>"+
+         "順番を変えてよいのは、加法に <b>交換法則・結合法則</b> が成り立つから。"+
+         "a＋b＝b＋a、(a＋b)＋c＝a＋(b＋c)。<br><br>"+
+         "<b>前から順に計算しても答えは同じ</b>だが、"+
+         "異符号のたし算を3回くり返すことになり、そのぶん符号をまちがえやすい。" },
+
+  { cat:"加法のくふう", pg:"p.33 例4", type:"choice",
+    body:'<div class="m sm">（＋6）＋（−18）＋（−6）</div>',
+    prompt:"いちばんくふうがきいているのは、どの順に計算したとき？",
+    opts:[
+      "（＋6）＋（−6）を先に計算して 0 にする。",
+      "前から順に、（＋6）＋（−18）から計算する。",
+      "（−18）＋（−6）を先に計算する。",
+      "どの順でも手間は変わらない。"],
+    ans:0,
+    hint:"3つの数をよく見よう。打ち消し合って 0 になる組はないだろうか。",
+    work:"<b>（＋6）＋（−6）を先に。</b><br><br>"+
+         "（＋6）＋（−6）＝0 なので、残りは 0＋（−18）＝−18。"+
+         "異符号のたし算を1回もせずに答えが出る。<br><br>"+
+         "3番も同符号どうしでまとめていて悪くはないが、"+
+         "そのあと（＋6）＋（−24）という異符号のたし算が残る。<br><br>"+
+         "<b>くふうの手がかりは2つ。</b>"+
+         "①打ち消し合って 0 になる組をさがす　②同符号どうしを集める。"+
+         "①が使えるときは①が最優先。" },
+
+  { cat:"減法", pg:"p.36 問1", type:"num", pre:"答えは",
+    body:'<div class="m">（−6）−（−2）</div>',
+    prompt:"答えは？", ans:-4,
+    hint:"−2 をひくことは、＋2 を加えること。（−6）＋（＋2）を計算しよう。",
+    work:"−4<br><br>"+
+         "（−6）−（−2）＝（−6）＋（＋2）＝−4。<br><br>"+
+         "<b>まず符号を変えて加法になおす。</b> ひいている数 −2 の符号を変えて ＋2 にする。<br><br>"+
+         "<b>ここで −8 としてしまう人が多い。</b>"+
+         "「マイナスとマイナスでマイナス」と思い込むと −6−2＝−8 になってしまう。"+
+         "そうではなく、<b>ひく数の符号を変えてから</b>たす。<br>"+
+         "西へ6m の地点から「西へ2m の移動」を取り消すのだから、2m 東へもどる。" },
+
+  { cat:"減法", pg:"p.36 問1", type:"num", pre:"答えは",
+    body:'<div class="m">（＋8）−（−4）</div>',
+    prompt:"答えは？", ans:12,
+    hint:"−4 をひくことは、＋4 を加えること。ひき算なのに、大きくなる場合がある。",
+    work:"＋12<br><br>"+
+         "（＋8）−（−4）＝（＋8）＋（＋4）＝＋12。<br><br>"+
+         "<b>ひき算なのに大きくなった。</b> これは正しい。"+
+         "「ひき算だから小さくなる」は、正の数をひくときだけの話だった。<br><br>"+
+         "負の数をひく＝西向きの移動を取り消す＝東へ進む、ということ。"+
+         "だから結果は大きくなる。<br><br>"+
+         "<b>4 や −12 と答えたなら、符号を変える一手を飛ばしている。</b>"+
+         "（＋8）−（−4）を（＋8）＋（−4）としてしまうミス。かっこの前の − と、"+
+         "かっこの中の − は別のもの。" },
+
+  { cat:"減法", pg:"p.36 例2", type:"choice",
+    body:'<div class="m sm">0−（＋6）＝−6　　0−（−6）＝＋6</div>',
+    prompt:"0 からある数をひくと、何が起こる？",
+    opts:[
+      "答えはいつも 0 になる。",
+      "その数の符号だけが変わる。",
+      "その数がそのまま答えになる。",
+      "答えはいつも負の数になる。"],
+    ans:1,
+    hint:"0−（＋6）は −6、0−（−6）は ＋6。もとの数と答えをくらべて、変わったのは何？",
+    work:"<b>符号が変わる。</b><br><br>"+
+         "0−（＋6）＝0＋(−6)＝−6、0−（−6）＝0＋(＋6)＝＋6。"+
+         "どちらも絶対値は 6 のままで、符号だけが反対になっている。<br><br>"+
+         "<b>0 からひく</b> と <b>0 をひく</b> は別物なので注意。<br>"+
+         "0−（−3）＝＋3　… 符号が変わる<br>"+
+         "（−3）−0 ＝−3　… はじめの数のまま<br><br>"+
+         "どちらも「符号を変えて加える」で機械的に処理できる。"+
+         "0＋（＋3）＝＋3、（−3）＋0＝−3。きまりは1つしかない。" },
+
+  { cat:"減法", pg:"p.36 問3", type:"num", pre:"答えは",
+    body:'<div class="m">（−3）−（−1.2）</div>',
+    prompt:"小数の減法。答えは？", ans:-1.8,
+    hint:"まず（−3）＋（＋1.2）になおす。異符号なので、絶対値の大きいほうから小さいほうをひく。",
+    work:"−1.8<br><br>"+
+         "（−3）−（−1.2）＝（−3）＋（＋1.2）。<br>"+
+         "異符号なので 3−1.2＝1.8。絶対値が大きいのは −3 なので、−1.8。<br><br>"+
+         "<b>−4.2 と答えたなら、符号を変えずにたしてしまっている。</b>"+
+         "（−3）＋（−1.2）を計算したことになる。<br><br>"+
+         "<b>小数でも手順は変わらない。</b>"+
+         "①ひき算を加法になおす　②加法のきまりで計算する。"+
+         "この2手順を、どんな数でも同じようにふむこと。" },
+
+  { cat:"項と混じった計算", pg:"p.37 問2", type:"choice",
+    body:'<div class="m">−6＋2−7</div>',
+    prompt:"この式の項をすべていうと？",
+    opts:["−6、＋2、−7","6、2、7","−6 と −7","＋2 だけ"],
+    ans:0,
+    hint:"加法だけの式になおすと（−6）＋（＋2）＋（−7）。たされている数は何と何と何？",
+    work:"<b>−6、＋2、−7</b><br><br>"+
+         "−6＋2−7＝（−6）＋（＋2）＋（−7）なので、項は −6、＋2、−7 の3つ。<br><br>"+
+         "<b>項は符号つきで答える。</b> 6、2、7 と答えると、"+
+         "符号という大事な情報が落ちてしまう。<br><br>"+
+         "式のはじめの項の ＋ は省略できるが、この式の最初の項は −6 なので "+
+         "− は省略できない。<b>− は絶対に省略しない。</b>" },
+
+  { cat:"項と混じった計算", pg:"p.38 問4", type:"num", pre:"答えは",
+    body:'<div class="m">6−8＋7−3</div>',
+    prompt:"くふうして計算しよう。答えは？", ans:2,
+    hint:"項は ＋6、−8、＋7、−3。正の項どうし、負の項どうしをまとめてみよう。",
+    work:"2<br><br>"+
+         "項は ＋6、−8、＋7、−3。並べかえて 6＋7−8−3＝13−11＝2。<br><br>"+
+         "<b>正の項の和と負の項の和を出して、最後に1回だけ引き算する。</b>"+
+         "これがいちばんミスの少ない手順。<br><br>"+
+         "<b>並べかえるときは符号ごと動かす。</b>"+
+         "−8 を動かすときは − もいっしょに連れていく。"+
+         "数字だけ動かして符号を置き去りにするのが、よくある失敗。<br><br>"+
+         "答えが正の数のときは ＋ を省略してよい（p.38 注意）。" },
+
+  { cat:"項と混じった計算", pg:"p.39 問5", type:"num", pre:"答えは",
+    body:'<div class="m sm">15−（−32）＋（−19）−36</div>',
+    prompt:"答えは？", ans:-8,
+    hint:"まずかっこをはずして項だけの式にしよう。−（−32）は ＋32、＋（−19）は −19 になる。",
+    work:"−8<br><br>"+
+         "15−（−32）＋（−19）−36 ＝ 15＋32−19−36。<br>"+
+         "項は ＋15、＋32、−19、−36。<br>"+
+         "正の項 15＋32＝47、負の項 19＋36＝55。よって 47−55＝−8。<br><br>"+
+         "<b>かっこをはずすところが山場。</b><br>"+
+         "−（−32）… ひく＋負 → ＋32<br>"+
+         "＋（−19）… たす＋負 → −19<br><br>"+
+         "<b>いちどに全部やろうとしないこと。</b>"+
+         "①かっこをはずす　②項を並べかえる　③計算する、と3段階に分けて書けば、"+
+         "けたが大きくても落ち着いて処理できる。" },
+
+  { cat:"項と混じった計算", pg:"p.40 数学のまど", type:"num", pre:"いちばん上は",
+    body:'<div class="prob">となり合う □ の中の数の和が、その上の □ に入ります。</div>'+
+         wall([[5,"−6",4],[null,null],[null]]),
+    prompt:"いちばん上の □ に入る数は？", ans:-3,
+    hint:"まず2段目の2つを求めよう。左は 5＋（−6）、右は（−6）＋4。それができたら、その2つをたす。",
+    work:"−3<br><br>"+
+         "2段目 … 5＋（−6）＝−1、（−6）＋4＝−2。<br>"+
+         "いちばん上 … （−1）＋（−2）＝−3。<br><br>"+
+         "<b>下から順に積み上げる。</b> いきなり上を求めようとせず、"+
+         "求まるところから1つずつうめていく。<br><br>"+
+         "<b>石垣は、逆向きにも解ける。</b>"+
+         "上と片方の下がわかっていれば、もう片方は減法で求まる。"+
+         "たとえば上が 3、左下が −5 なら、右下は 3−（−5）＝8。<br>"+
+         "<b>この「わからないところを求める」考え方が、3章 の方程式につながっていく。</b>" }
+  ];
+
+  /* ================= shared engine ================= */
+  var CATS = ["加法","加法のくふう","減法","項と混じった計算"];
+  var BACK = {
+    "加法":"p.30〜32　正負の数の加法のきまり・0との加法・小数と分数",
+    "加法のくふう":"p.33　加法の交換法則と結合法則",
+    "減法":"p.34〜36　減法は符号を変えて加える",
+    "項と混じった計算":"p.37〜39　項・かっこのはずし方・並べかえ"
+  };
+
+  var mode = "setsumei";
+  var S = {                       // per-tab state, kept when switching
+    setsumei:{ i:0, tries:0, done:false,
+      res: STEPS.map(function(s){ return s.kind==="write"
+              ? {kind:"write", checks:0, of:s.checks.length, wrote:false}
+              : {kind:"auto", first:null}; }) },
+    test:{ i:0, tries:0, done:false, first:new Array(Q.length).fill(null),
+           help:new Array(Q.length).fill(0) }   /* 0=自力 1=ヒント 2=答えを見た */
+  };
+
+  var root=document.getElementById("root"), stage=document.getElementById("stage"),
+      bar=document.getElementById("bar");
+
+  function norm(s){
+    return String(s).trim()
+      .replace(/[０-９]/g,function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); })
+      .replace(/[−ー－‐‑–—―ｰ]/g,"-")
+      .replace(/＋/g,"+").replace(/／/g,"/").replace(/．/g,".")
+      .replace(/[,，\s]/g,"").replace(/^\+/,"");
+  }
+  function val(s){
+    if(/^-?\d+(\.\d+)?$/.test(s)) return Number(s);
+    var m=s.match(/^(-?\d+)\/(\d+)$/);
+    return m ? Number(m[1])/Number(m[2]) : NaN;
+  }
+  function fmt(n){ return String(n).replace("-","−"); }
+
+  function paintBar(){
+    var n = (mode==="setsumei") ? STEPS.length : Q.length;
+    while(bar.children.length < n+1) bar.appendChild(document.createElement("i"));
+    while(bar.children.length > n+1) bar.removeChild(bar.lastChild);
+    var st=S[mode], b=bar.children;
+    for(var k=0;k<n;k++){
+      var cls="";
+      if(k===st.i && !st.done) cls="now";
+      else if(mode==="setsumei"){
+        var r=st.res[k];
+        cls = r.kind==="auto" ? (r.first===true?"hit":r.first===false?"miss":"")
+                              : (r.wrote ? (r.checks>0?"hit":"miss") : "");
+      } else {
+        cls = st.first[k]===true?"hit":st.first[k]===false?"miss":"";
+      }
+      b[k].className=cls;
+    }
+    b[n].className = st.done ? "now" : "";
+    // tab badges
+    var sDone=S.setsumei.res.filter(function(r){
+          return r.kind==="auto" ? r.first!==null : r.wrote; }).length;
+    var tDone=S.test.first.filter(function(v){ return v!==null; }).length;
+    var bs=document.getElementById("b-setsumei"), bt=document.getElementById("b-test");
+    bs.textContent = sDone ? sDone+"/"+STEPS.length : STEPS.length+"問";
+    bt.textContent = tDone ? tDone+"/"+Q.length : Q.length+"問";
+    bs.className = "badge"+(sDone===STEPS.length?" done":"");
+    bt.className = "badge"+(tDone===Q.length?" done":"");
+  }
+
+  function shuffled(n){
+    var a=[],k,j,t; for(k=0;k<n;k++) a.push(k);
+    for(k=a.length-1;k>0;k--){ j=Math.floor(Math.random()*(k+1)); t=a[k];a[k]=a[j];a[j]=t; }
+    return a;
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    if(S[mode].done){ report(); return; }
+    return (mode==="setsumei") ? renderStep() : renderQ();
+  }
+
+  function renderStep(){
+    var st=S.setsumei, s=STEPS[st.i]; st.tries=0;
+    var mid;
+    if(s.kind==="choice"){
+      mid='<p class="prompt">'+s.prompt+'</p><div class="choices" id="opts">'+
+          s.opts.map(function(o,k){ return '<button class="choice" data-k="'+k+'">'+o+'</button>'; }).join("")+
+          '</div><div class="fb" id="fb"></div>';
+    } else if(s.kind==="order"){
+      mid='<p class="prompt">'+s.prompt+'</p><div class="ord" id="ord">'+
+          shuffled(s.items.length).map(function(k){
+            return '<button class="item" data-k="'+k+'"><span class="rank"></span>'+s.items[k]+'</button>'; }).join("")+
+          '</div><p class="ordcap" id="ordcap">0 / '+s.items.length+' 並んだ</p><div class="fb" id="fb"></div>';
+    } else {
+      mid='<p class="prompt">'+s.prompt+'</p>'+
+          '<textarea id="ta" placeholder="'+s.ph+'"></textarea><p class="cnt" id="cnt">0 文字</p>'+
+          '<p style="text-align:right;margin:0"><button class="btn accent" id="send">書けた。先生の説明を見る</button></p>'+
+          '<div class="board" id="board"><p class="who">先生の説明</p><p class="say">'+s.model+'</p></div>'+
+          '<div class="selfcheck" id="sc"><p class="t">自分の説明とくらべよう</p>'+
+          s.checks.map(function(c,k){ return '<label><input type="checkbox" data-c="'+k+'"><span>'+c+'</span></label>'; }).join("")+
+          '<p class="hintline">できていなかったところは、いま書きたして直してみよう。</p></div>';
+    }
+    stage.innerHTML='<section class="screen"><div class="card">'+
+      '<span class="tag">'+s.tag+'</span><span class="sec">'+s.sec+'</span><span class="pg">'+s.pg+'</span>'+
+      '<h2>'+s.title+'</h2><p class="lead">'+s.lead+'</p>'+s.body+mid+
+      '<div class="nav"><span class="stepno">'+(st.i+1)+' / '+STEPS.length+'</span>'+
+      '<button class="btn" id="next" disabled>'+(st.i===STEPS.length-1?"けっかを見る →":"次へ →")+'</button></div>'+
+      '</div></section>';
+    wireStep();
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function wireStep(){
+    var st=S.setsumei, s=STEPS[st.i];
+    if(s.kind==="choice"){
+      var opts=document.getElementById("opts");
+      Array.prototype.forEach.call(opts.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return;
+          var ok=Number(b.getAttribute("data-k"))===s.ans, fb=document.getElementById("fb");
+          st.tries++;
+          if(ok){
+            if(st.res[st.i].first===null) st.res[st.i].first=(st.tries===1);
+            b.classList.add("ok");
+            fb.className="fb show right"; fb.innerHTML="<b>そのとおり。</b>"+s.work;
+            lockChoices();
+          } else {
+            st.res[st.i].first=false; b.classList.add("no");
+            if(st.tries===1){ fb.className="fb show hint"; fb.innerHTML="<b>もう一度考えよう</b>"+s.hint; }
+            else{ fb.className="fb show wrong";
+                  fb.innerHTML="<b>答えは「"+s.opts[s.ans].replace(/<[^>]+>/g,"")+"」</b>"+s.work;
+                  opts.children[s.ans].classList.add("reveal"); lockChoices(); }
+            paintBar();
+          }
+        });
+      });
+    } else if(s.kind==="order"){
+      var placed=0, ord=document.getElementById("ord");
+      Array.prototype.forEach.call(ord.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return;
+          if(Number(b.getAttribute("data-k"))===placed){
+            b.disabled=true; b.classList.add("placed");
+            b.querySelector(".rank").textContent=++placed;
+            document.getElementById("ordcap").textContent=placed+" / "+s.items.length+" 並んだ";
+            if(placed===s.items.length){
+              if(st.res[st.i].first===null) st.res[st.i].first=(st.tries===0);
+              var fb=document.getElementById("fb");
+              fb.className="fb show right"; fb.innerHTML="<b>きれいにつながった。</b>"+s.work;
+              document.getElementById("next").disabled=false; paintBar();
+            }
+          } else {
+            st.tries++; st.res[st.i].first=false;
+            b.classList.add("shake"); setTimeout(function(){ b.classList.remove("shake"); },340);
+            var fb2=document.getElementById("fb");
+            fb2.className="fb show hint"; fb2.innerHTML="<b>その順番ではないみたい</b>"+s.hint;
+            paintBar();
+          }
+        });
+      });
+    } else {
+      var ta=document.getElementById("ta"), send=document.getElementById("send");
+      ta.addEventListener("input",function(){
+        document.getElementById("cnt").textContent=ta.value.trim().length+" 文字"; });
+      send.addEventListener("click",function(){
+        if(ta.disabled) return;
+        if(ta.value.trim().length<10){
+          document.getElementById("cnt").textContent="もう少し書いてみよう（10文字以上）"; ta.focus(); return; }
+        st.res[st.i].wrote=true; ta.disabled=true; send.disabled=true;
+        document.getElementById("board").classList.add("show");
+        var sc=document.getElementById("sc"); sc.classList.add("show");
+        document.getElementById("next").disabled=false;
+        Array.prototype.forEach.call(sc.querySelectorAll("input"),function(cb){
+          cb.addEventListener("change",function(){
+            st.res[st.i].checks=sc.querySelectorAll("input:checked").length; paintBar(); });
+        });
+        paintBar();
+      });
+      ta.focus();
+    }
+    document.getElementById("next").addEventListener("click",function(){
+      if(this.disabled) return;
+      if(st.i===STEPS.length-1){ st.done=true; report(); return; }
+      st.i++; renderStep();
+    });
+  }
+
+  function lockChoices(){
+    var opts=document.getElementById("opts");
+    Array.prototype.forEach.call(opts.children,function(b){ b.disabled=true; });
+    document.getElementById("next").disabled=false; paintBar();
+  }
+
+  function renderQ(){
+    var st=S.test, q=Q[st.i]; st.tries=0;
+    var input = q.type==="choice"
+      ? '<div class="choices" id="opts">'+
+        q.opts.map(function(o,k){ return '<button class="choice'+(o.length<12?" mid":"")+'" data-k="'+k+'">'+o+'</button>'; }).join("")+'</div>'
+      : '<div class="row"><span class="pre">'+q.pre+'</span>'+
+        '<input type="text" id="ans" autocomplete="off" aria-label="答え">'+
+        (q.unit?'<span class="unit">'+q.unit+'</span>':'')+
+        '<button class="btn accent" id="check">たしかめる</button></div>';
+    stage.innerHTML='<section class="screen"><div class="card">'+
+      '<span class="tag">第 '+(st.i+1)+' 問</span><span class="pg">'+q.pg+'</span>'+
+      q.body+'<p class="prompt">'+q.prompt+'</p>'+input+
+      '<div class="helprow">'+
+        '<button class="btn tiny" id="hintbtn">ヒントを見る</button>'+
+        '<button class="btn tiny" id="showbtn" hidden>答えを見る</button>'+
+      '</div>'+
+      '<div class="fb" id="fb"></div>'+
+      '<div class="nav"><span class="stepno">'+(st.i+1)+' / '+Q.length+'</span>'+
+      '<button class="btn" id="next" disabled>'+(st.i===Q.length-1?"けっかを見る →":"次へ →")+'</button></div>'+
+      '</div></section>';
+
+    if(q.type==="choice"){
+      var opts=document.getElementById("opts");
+      Array.prototype.forEach.call(opts.children,function(b){
+        b.addEventListener("click",function(){
+          if(b.disabled) return; judgeQ(Number(b.getAttribute("data-k"))===q.ans,b); });
+      });
+    } else {
+      var inp=document.getElementById("ans");
+      var go=function(){
+        if(inp.disabled) return;
+        var raw=norm(inp.value), fb=document.getElementById("fb");
+        if(raw===""){ fb.className="fb show hint"; fb.innerHTML="<b>答えを入れてね</b>数字を入力してから、たしかめるを押そう。"; return; }
+        var v=val(raw);
+        if(isNaN(v)){ fb.className="fb show hint"; fb.innerHTML="<b>数字で答えよう</b>マイナスは − でも - でも入力できるよ。"; return; }
+        judgeQ(Math.abs(v-q.ans)<1e-9,null);
+      };
+      document.getElementById("check").addEventListener("click",go);
+      inp.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); go(); } });
+      inp.focus();
+    }
+    var hintbtn=document.getElementById("hintbtn"), showbtn=document.getElementById("showbtn");
+    hintbtn.addEventListener("click",function(){
+      if(hintbtn.disabled) return;
+      if(st.help[st.i]<1) st.help[st.i]=1;
+      if(st.first[st.i]===null) st.first[st.i]=false;   // no longer counts as 自力
+      var fb=document.getElementById("fb");
+      fb.className="fb show hint"; fb.innerHTML="<b>ヒント</b>"+q.hint;
+      hintbtn.disabled=true; showbtn.hidden=false;
+      paintBar();
+    });
+    showbtn.addEventListener("click",function(){
+      if(showbtn.disabled) return;
+      st.help[st.i]=2; st.first[st.i]=false;
+      var fb=document.getElementById("fb");
+      fb.className="fb show wrong";
+      fb.innerHTML="<b>答えは "+(q.type==="choice"?"「"+q.opts[q.ans]+"」":fmt(q.ans))+
+                   "</b><span class='work'>"+q.work+"</span>";
+      var opts=document.getElementById("opts");
+      if(opts) opts.children[q.ans].classList.add("reveal");
+      lockQ();
+      var m=document.createElement("p");
+      m.className="usedmark"; m.textContent="この問題は、あとでもう一度といてみよう。";
+      fb.parentNode.insertBefore(m, fb.nextSibling);
+      paintBar();
+    });
+
+    document.getElementById("next").addEventListener("click",function(){
+      if(this.disabled) return;
+      if(st.i===Q.length-1){ st.done=true; report(); return; }
+      st.i++; renderQ();
+    });
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function judgeQ(ok,btn){
+    var st=S.test, q=Q[st.i], fb=document.getElementById("fb");
+    st.tries++;
+    if(ok){
+      if(st.first[st.i]===null) st.first[st.i]=(st.tries===1 && st.help[st.i]===0);
+      if(btn) btn.classList.add("ok");
+      fb.className="fb show right";
+      fb.innerHTML="<b>"+(st.help[st.i]>0?"よくできました。":"せいかい！")+
+                   "</b><span class='work'>"+q.work+"</span>";
+      lockQ(); paintBar(); return;
+    }
+    st.first[st.i]=false;
+    if(btn) btn.classList.add("no");
+    if(st.tries===1){
+      if(st.help[st.i]<1) st.help[st.i]=1;
+      fb.className="fb show hint"; fb.innerHTML="<b>おしい。ヒント</b>"+q.hint;
+      var hb=document.getElementById("hintbtn"), sb=document.getElementById("showbtn");
+      if(hb) hb.disabled=true; if(sb) sb.hidden=false;
+    }
+    else{
+      fb.className="fb show wrong";
+      fb.innerHTML="<b>答えは "+(q.type==="choice"?"「"+q.opts[q.ans]+"」":fmt(q.ans))+"</b><span class='work'>"+q.work+"</span>";
+      var opts=document.getElementById("opts");
+      if(opts) opts.children[q.ans].classList.add("reveal");
+      st.help[st.i]=2;
+      lockQ();
+    }
+    paintBar();
+  }
+
+  function lockQ(){
+    var opts=document.getElementById("opts");
+    if(opts) Array.prototype.forEach.call(opts.children,function(b){ b.disabled=true; });
+    var inp=document.getElementById("ans");
+    if(inp){ inp.disabled=true; document.getElementById("check").disabled=true; }
+    var hb=document.getElementById("hintbtn"), sb=document.getElementById("showbtn");
+    if(hb) hb.disabled=true;
+    if(sb) sb.disabled=true;
+    document.getElementById("next").disabled=false;
+  }
+
+  /* ---------- reports ---------- */
+  function report(){
+    if(mode==="setsumei"){
+      var st=S.setsumei;
+      var autos=st.res.filter(function(r){ return r.kind==="auto"; });
+      var autoOk=autos.filter(function(r){ return r.first===true; }).length;
+      var writes=st.res.filter(function(r){ return r.kind==="write"; });
+      var wrote=writes.filter(function(r){ return r.wrote; }).length;
+      var checks=writes.reduce(function(a,r){ return a+r.checks; },0);
+      var of=writes.reduce(function(a,r){ return a+r.of; },0);
+      var advice = (autoOk===autos.length && checks>=of-1)
+        ? "符号がなぜそうなるかを、自分の言葉で言えている。テスト編に進んで、計算でも同じようにできるか確かめよう。"
+        : (autoOk<autos.length
+          ? "「どの説明がよいか」を見分けるところをもう一度。きまりをくり返すだけの説明と、東西の移動で理由を示す説明のちがいに注目しよう。"
+          : "書くところをよくがんばった。チェックが入らなかった項目をつけ足して書きなおすと、説明がぐっとよくなる。");
+      stage.innerHTML='<section class="screen"><div class="card">'+
+        '<span class="tag">けっか</span><h2>説明編のふり返り</h2>'+
+        '<p class="big">'+autoOk+' <small>/ '+autos.length+'</small></p>'+
+        '<p class="lead" style="text-align:center;margin-top:0">見きわめ問題</p>'+
+        '<table><tbody><tr><td>説明を書いた回数</td><td class="s">'+wrote+' / '+writes.length+'</td></tr>'+
+        '<tr><td>自己チェックがついた数</td><td class="s">'+checks+' / '+of+'</td></tr></tbody></table>'+
+        '<div class="note">'+advice+'</div>'+
+        '<p class="lead" style="margin:16px 0 2px"><b>符号でまよったときの3つの戻り道</b></p>'+
+        '<ul class="tips"><li><b>東西の移動にもどる。</b>　2回続けて動いたら、最後はどちら側？</li>'+
+        '<li><b>ひき算は、まず符号を変えて加法になおす。</b>　この1手を飛ばさない。</li>'+
+        '<li><b>項は符号ごと動かす。</b>　数字だけ動かして符号を置き去りにしない。</li></ul>'+
+        '<div class="note" style="border-color:var(--ok);background:var(--ok-bg)">'+
+        'おうちの人へ：計算があっていても、「なぜその符号になるの？」と一度だけ聞いてみてください。'+
+        '答えられれば定着しています。答えられないまま合っている場合は、'+
+        'あとで数が大きくなったときにくずれます。</div>'+
+        '<div class="nav" style="justify-content:center;gap:10px">'+
+        '<button class="btn ghost" id="again">もう一度</button>'+
+        '<button class="btn accent" id="goto-test">テスト編へ →</button></div>'+
+        '</div></section>';
+      document.getElementById("goto-test").addEventListener("click",function(){ switchTo("test"); });
+    } else {
+      var t=S.test, rows="", weak=[];
+      var solo=0, hinted=0, shown=0;
+      for(var k=0;k<Q.length;k++){
+        if(t.help[k]===2) shown++;
+        else if(t.first[k]===true) solo++;
+        else hinted++;
+      }
+      var n=solo;
+      CATS.forEach(function(c){
+        var idx=Q.map(function(q,k){ return q.cat===c?k:-1; }).filter(function(k){ return k>=0; });
+        var got=idx.filter(function(k){ return t.first[k]===true; }).length;
+        var sh =idx.filter(function(k){ return t.help[k]===2; }).length;
+        if(got<idx.length) weak.push(c);
+        var label = got===idx.length ? "OK" : (sh ? "要復習" : "あと少し");
+        var pill  = got===idx.length ? "good" : "watch";
+        rows+="<tr><td>"+c+"</td><td class='s'>"+got+" / "+idx.length+"</td>"+
+          "<td style='text-align:right'><span class='pill "+pill+"'>"+label+"</span></td></tr>";
+      });
+      stage.innerHTML='<section class="screen"><div class="card">'+
+        '<span class="tag">けっか</span><h2>テスト編の結果</h2>'+
+        '<p class="big">'+n+' <small>/ '+Q.length+'</small></p>'+
+        '<p class="lead" style="text-align:center;margin-top:0">自力で正解した数</p>'+
+        '<table><tbody>'+
+          '<tr><td>自力で正解</td><td class="s">'+solo+' 問</td></tr>'+
+          '<tr><td>ヒントを見て正解</td><td class="s">'+hinted+' 問</td></tr>'+
+          '<tr><td>答えを見た</td><td class="s">'+shown+' 問</td></tr>'+
+        '</tbody></table>'+
+        '<table><thead><tr><th>種類</th><th style="text-align:right">自力正答</th><th></th></tr></thead>'+
+        '<tbody>'+rows+'</tbody></table>'+
+        '<div class="note">'+(
+          solo===Q.length
+          ? "全問を自力で正解。2節 は身についている。次は p.41 の乗法と除法へ。"
+          : shown===0
+          ? "答えを見ずに、最後まで自分で解けた。ヒントが必要だった問題をもう一度といてみよう。"
+          : shown<=2
+          ? "ほとんど自分で解けている。答えを見た問題だけ、教科書のページにもどって確かめよう。"
+          : "答えを見た問題が多い。まず教科書の該当ページを読みなおしてから、もう一度このテストをやってみよう。"
+        )+'</div>'+
+        '<div class="note" style="border-color:var(--ok);background:var(--ok-bg)">'+
+        'おうちの人へ：まちがいが <b>減法</b> に集まっているなら、'+
+        '「符号を変えて加法になおす」の1手が抜けています。'+
+        '<b>項と混じった計算</b> に集まっているなら、並べかえるときに符号を置き去りにしています。'+
+        'どちらも計算量ではなく、手順をひとつ飛ばしているだけなので、そこだけ直せば一気に安定します。</div>'+
+        (weak.length ? '<p class="lead" style="margin:14px 0 2px"><b>もどるページ</b></p><ul class="rev">'+
+          weak.map(function(c){ return "<li><b>"+c+"</b>　"+BACK[c]+"</li>"; }).join("")+'</ul>' : '')+
+        '<div class="nav" style="justify-content:center;gap:10px">'+
+        '<button class="btn ghost" id="again">もう一度</button>'+
+        '<button class="btn accent" id="goto-setsumei">説明編へ →</button></div>'+
+        '</div></section>';
+      document.getElementById("goto-setsumei").addEventListener("click",function(){ switchTo("setsumei"); });
+    }
+    document.getElementById("again").addEventListener("click",function(){
+      if(mode==="setsumei"){
+        S.setsumei={ i:0, tries:0, done:false, res: STEPS.map(function(s){
+          return s.kind==="write" ? {kind:"write",checks:0,of:s.checks.length,wrote:false}
+                                  : {kind:"auto",first:null}; }) };
+      } else {
+        S.test={ i:0, tries:0, done:false, first:new Array(Q.length).fill(null),
+                 help:new Array(Q.length).fill(0) };
+      }
+      render();
+    });
+    paintBar(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  /* ---------- tabs ---------- */
+  function switchTo(m){
+    mode=m;
+    root.className="wrap theme-"+m;
+    Array.prototype.forEach.call(document.querySelectorAll(".tabs button"),function(b){
+      b.classList.toggle("on", b.getAttribute("data-tab")===m); });
+    render();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".tabs button"),function(b){
+    b.addEventListener("click",function(){ switchTo(b.getAttribute("data-tab")); });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

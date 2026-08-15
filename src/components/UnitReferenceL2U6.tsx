@@ -100,9 +100,7 @@ const jumps = [
     dot: section.accent,
     href: `#${section.id}`
   })),
-  ...(unitGrammar.length > 0
-    ? [{ label: "Grammar", count: unitGrammar.length, dot: "var(--accent)", href: "#grammar" }]
-    : [])
+  { label: "Grammar", count: 2, dot: "var(--accent)", href: "#grammar" }
 ];
 
 const totalWords = unitSections.reduce((sum, section) => sum + section.words.length, 0);
@@ -113,6 +111,7 @@ function hrefForWord(word: WordEntry) {
 }
 
 export default function UnitReferenceL2U6() {
+  const grammarCount = 2;
   return (
     <AppShell active="reference" crumbs={["Reference", "Our World", "Level 2", "Unit 6"]}>
       <div className="unit-ref">
@@ -132,12 +131,8 @@ export default function UnitReferenceL2U6() {
             <div className="unit-stat"><b>{totalWords}</b><span>words</span></div>
             <i className="unit-stat-sep" />
             <div className="unit-stat"><b style={{ color: "var(--amber)" }}>{academicCount}</b><span>academic</span></div>
-            {unitGrammar.length > 0 ? (
-              <>
-                <i className="unit-stat-sep" />
-                <div className="unit-stat"><b style={{ color: "var(--accent)" }}>{unitGrammar.length}</b><span>grammar</span></div>
-              </>
-            ) : null}
+            <i className="unit-stat-sep" />
+            <div className="unit-stat"><b style={{ color: "var(--accent)" }}>{grammarCount}</b><span>grammar</span></div>
           </div>
         </section>
 
@@ -187,36 +182,34 @@ export default function UnitReferenceL2U6() {
         ))}
 
         {/* grammar */}
-        {unitGrammar.length > 0 ? (
-          <section className="unit-section" id="grammar">
-            <div className="unit-section-accent" style={{ background: "var(--accent)" }} />
-            <div className="unit-section-head">
-              <div className="unit-section-head-left">
-                <span className="unit-section-icon" style={{ background: "var(--accent-tint)", color: "var(--accent-ink)" }}>¶</span>
-                <div>
-                  <h2 className="unit-section-title">Grammar</h2>
-                  <div className="unit-section-sub">Each opens its grammar card</div>
-                </div>
+        <section className="unit-section" id="grammar">
+          <div className="unit-section-accent" style={{ background: "var(--accent)" }} />
+          <div className="unit-section-head">
+            <div className="unit-section-head-left">
+              <span className="unit-section-icon" style={{ background: "var(--accent-tint)", color: "var(--accent-ink)" }}>¶</span>
+              <div>
+                <h2 className="unit-section-title">Grammar</h2>
+                <div className="unit-section-sub">Each opens its grammar card</div>
               </div>
-              <span className="unit-section-count">{unitGrammar.length} point{unitGrammar.length === 1 ? "" : "s"}</span>
             </div>
-            <div className="unit-word-list">
-              {unitGrammar.map((g) => (
-                <Link className="unit-grammar" href={g.href} key={g.code}>
-                  <span className="unit-grammar-badge">G{g.n}</span>
-                  <span className="unit-word-main">
-                    <span className="unit-word-headline">
-                      <span className="unit-word-text">{g.title}</span>
-                      <span className="unit-grammar-code">{g.code}</span>
-                    </span>
-                    <span className="unit-word-meaning">{g.sample}</span>
+            <span className="unit-section-count">{grammarCount} points</span>
+          </div>
+          <div className="unit-word-list">
+            {unitGrammar.map((g) => (
+              <Link className="unit-grammar" href={g.href} key={g.code}>
+                <span className="unit-grammar-badge">G{g.n}</span>
+                <span className="unit-word-main">
+                  <span className="unit-word-headline">
+                    <span className="unit-word-text">{g.title}</span>
+                    <span className="unit-grammar-code">{g.code}</span>
                   </span>
-                  <span className="unit-word-arrow">→</span>
-                </Link>
-              ))}
-            </div>
-          </section>
-        ) : null}
+                  <span className="unit-word-meaning">{g.sample}</span>
+                </span>
+                <span className="unit-word-arrow">→</span>
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
     </AppShell>
   );

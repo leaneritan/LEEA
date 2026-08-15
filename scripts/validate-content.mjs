@@ -55,6 +55,7 @@ const unitGrammarPaths = [
   "content/subjects/english/courses/our-world/level-2/unit-9/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-8/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-7/grammar.json",
+  "content/subjects/english/courses/our-world/level-2/unit-6/grammar.json",
   "content/subjects/english/courses/our-world/level-3/unit-1/grammar.json",
   "content/subjects/english/courses/our-world/level-3/unit-2/grammar.json",
   "content/subjects/english/courses/our-world/level-3/unit-3/grammar.json",

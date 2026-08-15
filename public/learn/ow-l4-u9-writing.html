@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 9 · Writing — Cause &amp; Effect | Leo's App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap"></noscript>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../../../lib/leea-cloud-config.js"></script>
+<script src="../../../../lib/leea-cloud.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* UNIT 9 · FORCE LAB */
+  --u9:#DC2626;--u9d:#991B1B;--u9l:#FEF2F2;
+  --ac:#F59E0B;--acd:#B45309;--acl:#FFFBEB;
+  --ca:#2563EB;--cad:#1D4ED8;--cal:#EFF6FF;   /* CAUSE = blue  */
+  --ef:#16A34A;--efd:#15803D;--efl:#F0FDF4;   /* EFFECT = green */
+  --pu:#7C3AED;--pul:#F5F3FF;
+  --rd:#DC2626;--rdl:#FEE2E2;
+  --ink:#111111;--ink2:#374151;--ink3:#6B7280;
+  --paper:#FAFAF7;--surf:#FFFFFF;--bdr:#E5E7EB;
+  --fn:'Nunito',sans-serif;--fnh:'Oswald',sans-serif;
+}
+body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+.app-hdr{background:var(--ink);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.hdr-badge{background:var(--ac);color:var(--ink);font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;padding:2px 7px;border-radius:2px}
+.hdr-title{font-family:var(--fnh);font-size:.85rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hdr-unit{font-size:.7rem;font-weight:700;color:var(--u9)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--u9),var(--u9d));padding:20px 16px 16px;text-align:center}
+.hero-kick{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.72);margin-bottom:6px}
+.hero-title{font-family:var(--fnh);font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hero-title span{color:var(--ac)}
+.hero-sub{font-size:.78rem;color:rgba(255,255,255,.88);font-weight:600;margin-top:4px}
+.hero-em{font-size:1.3rem;margin-top:8px}
+.prog-wrap{background:rgba(0,0,0,.15);height:4px}
+.prog-fill{height:100%;background:var(--ac);transition:width .5s;width:0%}
+.hw-banner{background:var(--cal);border-bottom:2px solid var(--ca);padding:8px 16px;font-size:.8rem;font-weight:700;color:var(--cad);display:none;align-items:center;gap:8px}
+
+/* HOME */
+.home{max-width:680px;margin:0 auto;padding:16px 14px 80px}
+.sec-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--ink3);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mod-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px 13px 11px;cursor:pointer;transition:all .2s}
+.mod-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.1)}
+.mod-card.ow:hover{border-color:var(--u9)}
+.mod-card.wb:hover{border-color:var(--ca)}
+.mod-card.quiz:hover{border-color:var(--acd)}
+.mod-icon{font-size:1.5rem;margin-bottom:5px}
+.mod-name{font-weight:800;font-size:.82rem;color:var(--ink);margin-bottom:2px}
+.mod-desc{font-size:.7rem;color:var(--ink3);font-weight:600;line-height:1.4}
+.mod-badge{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;margin-top:7px;display:inline-block}
+.badge-new{background:var(--paper);color:var(--ink3);border:1px solid var(--bdr)}
+.badge-done{background:#D1FAE5;color:var(--ef)}
+.badge-prog{background:var(--acl);color:var(--acd)}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;overflow-y:auto}
+.modal.open{display:block}
+.mbox{background:var(--surf);min-height:100vh;display:flex;flex-direction:column;max-width:680px;margin:0 auto}
+.mhd{padding:13px 14px;display:flex;align-items:center;gap:10px;color:#fff;position:sticky;top:0;z-index:20;flex-shrink:0}
+.mhd.u9{background:var(--u9)}.mhd.ca{background:var(--ca)}.mhd.ef{background:var(--ef)}.mhd.dk{background:var(--ink)}
+.mhd-title{font-weight:900;font-size:1rem;flex:1;letter-spacing:.3px;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.mhd-num{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:1px;opacity:.75}
+.mhd-close{background:rgba(255,255,255,.18);border:none;color:#fff;font-size:1rem;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;margin-left:8px;line-height:1}
+.mhd-close:hover{background:rgba(255,255,255,.35)}
+.mbody{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--paper);overflow:auto}
+
+/* ── STICKY CONNECTOR BANK (outside any section container) ── */
+.bank{position:sticky;top:0;z-index:10;background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:8px 10px;box-shadow:0 3px 10px rgba(0,0,0,.07)}
+.bank-title{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:2px;color:var(--ink3);margin-bottom:6px}
+.bank-row{display:flex;flex-wrap:wrap;gap:5px}
+.bchip{border-radius:20px;padding:3px 11px;font-size:.75rem;font-weight:800;border:2px solid;cursor:pointer;transition:all .15s;background:#fff}
+.bchip.ca{border-color:var(--ca);color:var(--cad)}
+.bchip.ca:hover{background:var(--ca);color:#fff}
+.bchip.ef{border-color:var(--ef);color:var(--efd)}
+.bchip.ef:hover{background:var(--ef);color:#fff}
+
+/* ── CONNECTOR METER (the live one) ── */
+.meter{background:var(--ink);border-radius:4px;padding:9px 11px}
+.meter-title{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:2px;color:var(--ac);margin-bottom:7px;display:flex;justify-content:space-between}
+.meter-row{display:flex;flex-wrap:wrap;gap:5px}
+.mchip{border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:800;background:#2A2A2A;color:#6B7280;border:2px solid #374151;transition:all .25s}
+.mchip.lit{background:var(--ef);color:#fff;border-color:#4ADE80;transform:scale(1.06)}
+.mchip.lit.ca{background:var(--ca);border-color:#93C5FD}
+.meter-msg{font-size:.7rem;font-weight:700;color:#9CA3AF;margin-top:7px}
+.meter-msg.win{color:#4ADE80}
+
+/* COMPONENTS */
+.dad-card{background:#D1FAE5;border:2px solid #A7F3D0;border-radius:4px;padding:11px 13px;font-size:.82rem;font-weight:700;color:#065F46;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.dad-icon{font-size:1.1rem;flex-shrink:0}
+.ex-box{background:var(--cal);border:2px solid #BFDBFE;border-left:4px solid var(--ca);border-radius:0 4px 4px 0;padding:9px 12px;font-size:.8rem;font-weight:600;color:var(--cad);line-height:1.6}
+.ex-lbl{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:2px;color:var(--ca);margin-bottom:3px}
+.sec-title{font-weight:900;font-size:.92rem;color:var(--ink);margin-bottom:5px}
+.tag{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:2px;padding:2px 6px;border-radius:2px;display:inline-block;margin-bottom:5px}
+.tag.u9{background:var(--u9l);color:var(--u9d)}
+.tag.ca{background:var(--cal);color:var(--cad)}
+.divider{height:1px;background:var(--bdr);margin:4px 0}
+
+.sent-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:12px}
+.sent-text{font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:9px;line-height:1.5;font-style:italic}
+.fo-btns{display:flex;gap:8px}
+.fo-btn{flex:1;padding:9px 6px;border:2px solid var(--bdr);border-radius:4px;font-family:var(--fn);font-size:.82rem;font-weight:800;cursor:pointer;transition:all .2s;text-align:center}
+.fo-btn.cause{background:var(--cal);color:var(--cad);border-color:var(--ca)}
+.fo-btn.effect{background:var(--efl);color:var(--efd);border-color:var(--ef)}
+.fo-btn:disabled{opacity:.55;cursor:not-allowed}
+.fo-btn.ans-ok{background:#D1FAE5;border-color:var(--ef);color:var(--ef)}
+.fo-btn.ans-bad{background:var(--rdl);border-color:var(--rd);color:var(--rd);animation:shake .3s}
+.fo-fb{font-size:.75rem;font-weight:700;margin-top:7px;padding:5px 9px;border-radius:4px;display:none}
+.fo-fb.show{display:block}
+.fo-fb.ok{background:#D1FAE5;color:#065F46}
+.fo-fb.bad{background:var(--rdl);color:var(--rd)}
+
+.mcq-sentence{background:var(--paper);border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-style:italic;font-weight:700;font-size:.86rem;margin-bottom:9px;line-height:1.5}
+.mcq-opts{display:flex;flex-direction:column;gap:7px}
+.mcq-opt{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.82rem;font-weight:700;cursor:pointer;text-align:left;transition:all .2s}
+.mcq-opt:hover:not(:disabled){background:var(--paper);border-color:var(--u9)}
+.mcq-opt.ok{background:#D1FAE5;border-color:var(--ef);color:var(--ef)}
+.mcq-opt.bad{background:var(--rdl);border-color:var(--rd);color:var(--rd);animation:shake .3s}
+.mcq-opt:disabled{cursor:not-allowed}
+.mcq-fb{font-size:.75rem;font-weight:700;padding:7px 11px;border-radius:4px;margin-top:7px;display:none;line-height:1.45}
+.mcq-fb.show{display:block}
+.mcq-fb.ok{background:#D1FAE5;color:#065F46}
+.mcq-fb.bad{background:var(--rdl);color:var(--rd)}
+
+/* CAUSE-EFFECT CHART */
+.chart-wrap{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;overflow:visible}
+.chart-cols{display:grid;grid-template-columns:1fr 34px 1fr}
+.chart-hd{padding:9px 6px;font-family:var(--fnh);font-size:.66rem;font-weight:700;letter-spacing:1px;color:#fff;text-align:center}
+.chart-hd.ca{background:var(--ca)}.chart-hd.ef{background:var(--ef)}.chart-hd.mid{background:var(--ink)}
+.chart-cell{padding:9px 11px;border-top:1px solid var(--bdr);font-size:.8rem;font-weight:600;min-height:58px;color:var(--ink2);line-height:1.5;display:flex;align-items:center}
+.chart-cell.pre{background:var(--paper);font-style:italic}
+.chart-cell.mid{justify-content:center;background:#F8FAFC;color:var(--ink3);font-size:1rem;padding:0}
+.chart-ta{width:100%;border:none;background:#FFFBEB;font-family:var(--fn);font-size:.8rem;font-weight:600;color:var(--ink);resize:none;outline:none;min-height:58px;padding:9px 11px;line-height:1.5;border-top:1px solid var(--bdr)}
+.chart-ta:focus{background:#FEF3C7}
+
+.text-inp{width:100%;border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--ink);background:var(--surf);outline:none}
+.text-inp:focus{border-color:var(--u9)}
+.write-ta{width:100%;border:2px solid var(--bdr);border-radius:4px;padding:11px 13px;font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--ink);background:var(--surf);resize:none;outline:none;min-height:130px;line-height:1.75}
+.write-ta:focus{border-color:var(--u9)}
+.wc{font-size:.72rem;font-weight:700;color:var(--ink3);text-align:right;margin-top:3px}
+.wc.met{color:var(--ef)}
+.inv-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.inv-label{font-weight:800;font-size:.85rem;color:var(--ink2);white-space:nowrap}
+.inv-inp{flex:1;min-width:150px;border:2px solid var(--u9);border-radius:4px;padding:7px 11px;font-family:var(--fn);font-size:.85rem;font-weight:700;color:var(--ink);outline:none}
+.sugg-row{display:flex;flex-wrap:wrap;gap:6px}
+.sugg{background:var(--ac);border:2px solid var(--acd);border-radius:20px;padding:5px 12px;font-family:var(--fn);font-size:.75rem;font-weight:800;cursor:pointer;color:var(--ink);transition:all .15s}
+.sugg:hover{background:var(--acd);color:#fff}
+
+.check-list{display:flex;flex-direction:column;gap:9px}
+.check-item{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:11px 13px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s;font-size:.85rem;font-weight:700}
+.check-item:hover{background:var(--paper)}
+.check-item.ticked{background:#D1FAE5;border-color:var(--ef);color:#065F46}
+.chk{width:26px;height:26px;border:2px solid var(--bdr);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.check-item.ticked .chk{background:var(--ef);border-color:var(--ef);color:#fff}
+.all-done{background:var(--ef);color:#fff;border-radius:4px;padding:10px 14px;text-align:center;font-weight:800;font-size:.86rem;display:none}
+.all-done.show{display:block}
+
+.mword{cursor:pointer;padding:1px 2px;border-radius:3px;transition:all .12s;display:inline-block}
+.mword:hover:not(.locked){background:#FEF3C7}
+.mword.picked{background:#FDE68A;border-bottom:3px solid var(--acd);font-weight:800}
+.mword.ok{background:#BBF7D0;border-bottom:3px solid var(--ef);color:#065F46;font-weight:800}
+.mword.bad{background:var(--rdl);border-bottom:3px solid var(--rd);color:var(--rd);font-weight:800}
+.mword.miss{background:#FED7AA;border-bottom:3px dashed var(--acd);color:var(--acd);font-weight:800}
+.mword.locked{cursor:default}
+.hl-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:.68rem;font-weight:700}
+.hl-legend span{padding:2px 8px;border-radius:20px}
+.read-box{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px;font-size:.8rem;font-weight:600;line-height:1.9;color:var(--ink2)}
+.hl-ca{background:#BFDBFE;border-radius:2px;padding:0 3px;font-weight:800;color:var(--cad)}
+.hl-ef{background:#BBF7D0;border-radius:2px;padding:0 3px;font-weight:800;color:var(--efd)}
+
+.topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.topic-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:11px;cursor:pointer;transition:all .2s;text-align:center;font-size:.8rem;font-weight:700}
+.topic-card:hover{border-color:var(--ca);background:var(--cal)}
+.topic-card.picked{border-color:var(--ca);background:var(--ca);color:#fff}
+
+
+.phrase-sel{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:10px 13px;font-size:.82rem;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .2s;line-height:1.5}
+.phrase-sel:hover:not(:disabled){border-color:var(--u9);background:var(--u9l)}
+.phrase-sel.picked{border-color:var(--u9);background:var(--u9l);color:var(--u9d)}
+.phrase-sel.ok{border-color:var(--ef);background:#D1FAE5;color:#065F46}
+.phrase-sel.bad{border-color:var(--rd);background:var(--rdl);color:var(--rd)}
+.phrase-sel.miss{border-color:var(--ac);background:var(--acl);color:var(--acd)}
+.phrase-sel:disabled{cursor:not-allowed}
+.phrase-select-grid{display:flex;flex-direction:column;gap:7px}
+.check-ans-btn{background:var(--u9);color:#fff;border:none;border-radius:4px;padding:9px 20px;font-family:var(--fn);font-size:.82rem;font-weight:800;cursor:pointer;align-self:flex-start}
+.check-ans-btn:hover{background:var(--u9d)}
+.ref-card{background:var(--cal);border:2px solid #BFDBFE;border-radius:4px;padding:10px 13px;font-size:.78rem;font-weight:600;color:var(--cad);line-height:1.6}
+.ref-card-title{font-family:var(--fnh);font-size:.58rem;font-weight:700;letter-spacing:2px;color:var(--ca);margin-bottom:5px}
+.steps-list{display:flex;flex-direction:column;gap:8px}
+.step-item{background:var(--surf);border:2px solid var(--bdr);border-left:4px solid var(--u9);border-radius:0 4px 4px 0;padding:9px 12px;font-size:.82rem;font-weight:700;color:var(--ink2);line-height:1.45}
+.step-item.ca{border-left-color:var(--ca)}
+.step-item.ef{border-left-color:var(--ef)}
+.save-ind{font-size:.68rem;font-weight:700;color:var(--ef);text-align:right;height:14px;opacity:0;transition:opacity .5s}
+.save-ind.show{opacity:1}
+.score-mini{font-size:.78rem;font-weight:800;color:var(--u9);text-align:right}
+
+
+/* ── WORD MAP (real radiating map) ── */
+.wmap{position:relative;display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"a b" "c c" "d e";gap:8px;background:var(--surf);border:2px solid var(--bdr);border-radius:6px;padding:10px}
+.wmap-lines{position:absolute;inset:10px;width:calc(100% - 20px);height:calc(100% - 20px);pointer-events:none;z-index:0}
+.wmap-lines line{stroke:#CBD5E1;stroke-width:2.5;stroke-dasharray:5 4}
+.wnode{position:relative;z-index:1;background:var(--surf);border:2px solid var(--u9);border-radius:14px;padding:7px 9px;min-height:74px;display:flex;flex-direction:column;justify-content:center}
+#m6-wmap .wnode{min-height:56px;align-items:center;text-align:center}
+#m6-wmap .wnode-lbl{margin-bottom:0;font-size:.72rem;letter-spacing:.4px;justify-content:center}
+#m6-wmap .wnode.filled{transform:scale(1.03)}
+.wnode.a{grid-area:a}.wnode.b{grid-area:b}.wnode.d{grid-area:d}.wnode.e{grid-area:e}
+.wnode-lbl{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1.2px;color:var(--u9d);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.wnode-body{font-size:.75rem;font-weight:600;color:var(--ink2);line-height:1.4;flex:1}
+.wnode-body.empty{color:#B9C0CB;font-style:italic}
+.wnode.filled{border-color:var(--ef);background:var(--efl)}
+.wnode.filled .wnode-lbl{color:var(--efd)}
+.wnode.filled .wnode-body{color:#065F46;font-weight:700}
+.wcentre{grid-area:c;position:relative;z-index:1;background:var(--u9);color:#fff;border-radius:999px;padding:10px;text-align:center;font-weight:900;font-size:.92rem;justify-self:center;min-width:56%;box-shadow:0 3px 10px rgba(220,38,38,.28)}
+.map-ta{width:100%;border:none;background:transparent;font-family:var(--fn);font-size:.75rem;font-weight:600;color:var(--ink);resize:none;outline:none;min-height:48px;line-height:1.4;flex:1}
+.map-ta::placeholder{color:#B9C0CB;font-style:italic}
+
+/* QUIZ */
+.qz-prog{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.qz-num{font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--ink3)}
+.qz-sc{font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--u9)}
+.qz-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px}
+.qz-q{font-size:.88rem;font-weight:800;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.result-box{text-align:center;padding:20px 10px}
+.result-score{font-family:var(--fnh);font-size:2.8rem;font-weight:700;color:var(--u9);line-height:1}
+.result-msg{font-size:.95rem;font-weight:800;color:var(--ink);margin-top:8px}
+.result-detail{font-size:.78rem;font-weight:600;color:var(--ink3);margin-top:4px}
+.result-bullets{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+.result-bullet{border:1px solid var(--bdr);border-radius:4px;padding:7px 12px;font-size:.78rem;font-weight:700;text-align:left}
+.result-bullet.ok{background:#D1FAE5;border-color:var(--ef);color:#065F46}
+.result-bullet.bad{background:var(--rdl);border-color:var(--rd);color:var(--rd)}
+
+/* BOTTOM BUTTONS */
+.btn-row-bottom{display:flex;justify-content:space-between;align-items:stretch;gap:14px;margin-top:20px}
+.complete-btn{flex:1;padding:18px 20px;background:#16A34A;border:3px solid #15803D;border-radius:4px;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;color:#fff;transition:all .2s;text-align:center}
+.complete-btn:hover{background:#15803D;border-color:#14532D}
+.complete-btn.confirmed{background:#D1FAE5;border-color:#16A34A;color:#16A34A;cursor:default;pointer-events:none;opacity:.85}
+.reset-btn{pointer-events:auto !important;opacity:1 !important;flex:0 0 110px;padding:18px 14px;background:#fff;border:3px solid #DC2626;border-radius:4px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer;color:#DC2626;transition:all .2s;text-align:center;white-space:nowrap}
+.reset-btn:hover{background:#DC2626;color:#fff}
+
+/* REVIEW */
+.review-screen{display:none;min-height:100vh;background:var(--paper)}
+.review-screen.show{display:block}
+.rv-hdr{background:var(--u9d);padding:14px 16px;color:#fff}
+.rv-title{font-family:var(--fnh);font-size:.95rem;font-weight:700;letter-spacing:1px}
+.rv-sub{font-size:.72rem;color:rgba(255,255,255,.75);font-weight:600;margin-top:2px}
+.rv-body{padding:14px;max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.rv-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px}
+.rv-lbl{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;color:var(--ink3);margin-bottom:8px}
+.rv-val{font-size:.85rem;font-weight:700;color:var(--ink);line-height:1.6;white-space:pre-wrap}
+.rv-score-big{font-family:var(--fnh);font-size:2.5rem;font-weight:700;color:var(--u9)}
+.rv-not-started{text-align:center;padding:40px 20px;font-size:.9rem;font-weight:700;color:var(--ink3)}
+
+/* FX */
+.goal-anim{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:3.5rem;z-index:1000;pointer-events:none;transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.goal-anim.show{transform:translate(-50%,-50%) scale(1)}
+.cp{position:fixed;width:9px;height:9px;border-radius:2px;pointer-events:none;animation:cf 1.5s linear forwards;z-index:999}
+@keyframes cf{0%{transform:translateY(-10px) rotate(0)}100%{transform:translateY(100vh) rotate(720deg) translateX(var(--drift));opacity:0}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-5px)}50%{transform:translateX(5px)}}
+</style>
+</head>
+<body>
+
+<!-- REVIEW SCREEN -->
+<div class="review-screen" id="reviewScreen">
+  <div class="rv-hdr">
+    <div class="rv-title">📋 Review Mode — Leo's Writing Work</div>
+    <div class="rv-sub">Unit 9 · Cause and Effect Writing</div>
+  </div>
+  <div class="rv-body" id="reviewBody"></div>
+</div>
+
+<div class="goal-anim" id="goalAnim">⚽ GOAL!</div>
+
+<div id="appRoot">
+
+<div class="app-hdr">
+  <div class="hdr-left">
+    <div class="hdr-badge">LEEA</div>
+    <div class="hdr-title">LEO'S WRITING</div>
+  </div>
+  <div class="hdr-unit">UNIT 9 ⚡</div>
+</div>
+
+<div id="hwBanner" class="hw-banner"></div>
+
+<div class="hero">
+  <div class="hero-kick">OUR WORLD · LEVEL 4 · UNIT 9 · THE SCIENCE OF FUN</div>
+  <div class="hero-title">✍️ Writing: <span>Cause &amp; Effect</span></div>
+  <div class="hero-sub">Do ALL modules — Student Book then Workbook!</div>
+  <div class="hero-em">🔵 ➡️ 🟢 ⚽ 🎢</div>
+</div>
+<div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
+
+<div class="home">
+  <div class="sec-lbl">📘 STUDENT BOOK p. 158</div>
+  <div class="mod-grid">
+    <div class="mod-card ow" data-open="m0" style="grid-column:1/-1">
+      <div class="mod-icon">🖍️</div><div class="mod-name">Read &amp; Underline</div>
+      <div class="mod-desc">SB Activity 1 — tap every cause &amp; effect word you find</div>
+      <div class="mod-badge badge-new" id="badge-m0">SB ACT 1</div>
+    </div>
+    <div class="mod-card ow" data-open="m1">
+      <div class="mod-icon">🔵</div><div class="mod-name">Cause or Effect?</div>
+      <div class="mod-desc">Is it WHY it happened, or WHAT happened?</div>
+      <div class="mod-badge badge-new" id="badge-m1">NOT STARTED</div>
+    </div>
+    <div class="mod-card ow" data-open="m2">
+      <div class="mod-icon">🔗</div><div class="mod-name">Connector Lab</div>
+      <div class="mod-desc">because · as · so · so that · as a result</div>
+      <div class="mod-badge badge-new" id="badge-m2">NOT STARTED</div>
+    </div>
+    <div class="mod-card ow" data-open="m3">
+      <div class="mod-icon">📊</div><div class="mod-name">My Chart</div>
+      <div class="mod-desc">Plan 3 causes and 3 effects about your game</div>
+      <div class="mod-badge badge-new" id="badge-m3">NOT STARTED</div>
+    </div>
+    <div class="mod-card ow" data-open="m4">
+      <div class="mod-icon">✏️</div><div class="mod-name">Write!</div>
+      <div class="mod-desc">3 paragraphs — light up all 5 connectors</div>
+      <div class="mod-badge badge-new" id="badge-m4">NOT STARTED</div>
+    </div>
+    <div class="mod-card ow" data-open="m5" style="grid-column:1/-1">
+      <div class="mod-icon">✅</div><div class="mod-name">Edit Checklist</div>
+      <div class="mod-desc">Check your writing — including a / an / the</div>
+      <div class="mod-badge badge-new" id="badge-m5">NOT STARTED</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">📓 WORKBOOK pp. 114–115</div>
+  <div class="mod-grid">
+    <div class="mod-card wb" data-open="m6">
+      <div class="mod-icon">🔍</div><div class="mod-name">Analyse the Model</div>
+      <div class="mod-desc">How Isabelle planned "Tetherball"</div>
+      <div class="mod-badge badge-new" id="badge-m6">WB ACT 1</div>
+    </div>
+    <div class="mod-card wb" data-open="m7">
+      <div class="mod-icon">🗺️</div><div class="mod-name">My Word Map</div>
+      <div class="mod-desc">Plan a 2nd game with a word map</div>
+      <div class="mod-badge badge-new" id="badge-m7">WB ACT 2</div>
+    </div>
+    <div class="mod-card wb" data-open="m8">
+      <div class="mod-icon">🔗</div><div class="mod-name">4 Sentences</div>
+      <div class="mod-desc">Write 4 cause &amp; effect sentences</div>
+      <div class="mod-badge badge-new" id="badge-m8">WB ACT 3</div>
+    </div>
+    <div class="mod-card wb" data-open="m9">
+      <div class="mod-icon">🌍</div><div class="mod-name">Free Writing</div>
+      <div class="mod-desc">Pick a topic — 2 or 3 paragraphs</div>
+      <div class="mod-badge badge-new" id="badge-m9">WB ACT 4</div>
+    </div>
+    <div class="mod-card quiz" data-open="m10" style="grid-column:1/-1">
+      <div class="mod-icon">⚽</div><div class="mod-name">Can Leo Score?</div>
+      <div class="mod-desc">8 questions — need 80% to score the goal!</div>
+      <div class="mod-badge badge-new" id="badge-m10">FINAL QUIZ</div>
+    </div>
+  </div>
+</div>
+</div><!-- /appRoot -->
+
+<!-- ══════ M0 · READ & UNDERLINE (SB Act 1) ══════ -->
+<div class="modal" id="m0"><div class="mbox">
+<div class="mhd u9"><div class="mhd-title">🖍️ Read &amp; Underline</div><div class="mhd-num">1 / 11 · SB p.158</div><button class="mhd-close" data-close="m0" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Student Book Activity 1. Read Isabelle's writing about tetherball. <strong>How does she show cause and effect?</strong> Tap every word or phrase that connects a cause to an effect — there are <strong>9</strong> to find!</div></div>
+  <div class="bank">
+    <div class="bank-title">YOU ARE LOOKING FOR WORDS LIKE THESE</div>
+    <div class="bank-row">
+      <span class="bchip ca">because</span><span class="bchip ca">as</span>
+      <span class="bchip ef">so</span><span class="bchip ef">so that</span><span class="bchip ef">as a result</span>
+    </div>
+  </div>
+  <div class="read-box" id="m0-model"></div>
+  <div class="score-mini" id="m0-count">Underlined: 0 · find 9 in total</div>
+  <button class="check-ans-btn" data-checkmodel="1">Check my underlining ✅</button>
+  <div class="mcq-fb" id="m0-fb"></div>
+  <div class="hl-legend" id="m0-legend" style="display:none">
+    <span style="background:#BBF7D0;color:#065F46">🟢 you found it</span>
+    <span style="background:#FED7AA;color:var(--acd)">🟠 you missed it</span>
+    <span style="background:var(--rdl);color:var(--rd)">🔴 not a connector</span>
+  </div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m0" data-complete="m0">Mark Read &amp; Underline complete ✓</button>
+    <button class="reset-btn" data-reset="m0">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ══════ M1 · CAUSE OR EFFECT ══════ -->
+<div class="modal" id="m1"><div class="mbox">
+<div class="mhd u9"><div class="mhd-title">🔵 Cause or Effect?</div><div class="mhd-num">2 / 11</div><button class="mhd-close" data-close="m1" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: A <strong>cause</strong> is WHY something happens. An <strong>effect</strong> is WHAT happens. Read each part and tap the right button!</div></div>
+  <div class="ex-box"><div class="ex-lbl">EXAMPLE</div>
+    "I practise shooting every day" → 🔵 <strong>CAUSE</strong> (this is what I DO)<br>
+    "I score more goals in matches" → 🟢 <strong>EFFECT</strong> (this is what HAPPENS)</div>
+  <div id="m1-questions"></div>
+  <div class="score-mini" id="m1-score" style="display:none"></div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m1" data-complete="m1">Mark Cause or Effect complete ✓</button>
+    <button class="reset-btn" data-reset="m1">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ══════ M2 · CONNECTOR LAB ══════ -->
+<div class="modal" id="m2"><div class="mbox">
+<div class="mhd u9"><div class="mhd-title">🔗 Connector Lab</div><div class="mhd-num">3 / 11</div><button class="mhd-close" data-close="m2" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Choose the best connecting word. Ask yourself: does the gap need a REASON (why) or a RESULT (what happened)?</div></div>
+  <div class="bank">
+    <div class="bank-title">🔵 CAUSE WORDS · 🟢 EFFECT WORDS</div>
+    <div class="bank-row">
+      <span class="bchip ca">because</span><span class="bchip ca">as</span>
+      <span class="bchip ef">so</span><span class="bchip ef">so that</span><span class="bchip ef">as a result</span>
+    </div>
+  </div>
+  <div id="m2-questions"></div>
+  <div class="score-mini" id="m2-score" style="display:none"></div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m2" data-complete="m2">Mark Connector Lab complete ✓</button>
+    <button class="reset-btn" data-reset="m2">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ══════ M3 · MY CHART ══════ -->
+<div class="modal" id="m3"><div class="mbox">
+<div class="mhd u9"><div class="mhd-title">📊 My Chart</div><div class="mhd-num">4 / 11</div><button class="mhd-close" data-close="m3" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Choose a game you know well. Write what you DO on the left (cause) and what HAPPENS on the right (effect). This chart is your plan!</div></div>
+  <div class="ex-box"><div class="ex-lbl">DAD'S EXAMPLE — soccer ⚽</div>
+    <strong>Cause:</strong> "The goalkeeper dives to the left."<br>
+    <strong>Effect:</strong> "He saves the penalty."</div>
+  <div class="inv-wrap">
+    <span class="inv-label">My game:</span>
+    <input class="inv-inp" type="text" id="m3-game" placeholder="Type your game..." data-save="m3">
+  </div>
+  <div class="sugg-row">
+    <button class="sugg" data-setgame="m3-game" data-text="⚽ Soccer">⚽ Soccer</button>
+    <button class="sugg" data-setgame="m3-game" data-text="🏀 Basketball">🏀 Basketball</button>
+    <button class="sugg" data-setgame="m3-game" data-text="🎮 Video games">🎮 Video games</button>
+    <button class="sugg" data-setgame="m3-game" data-text="🛹 Skateboarding">🛹 Skateboarding</button>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-cols">
+      <div class="chart-hd ca">🔵 CAUSE — what I do</div><div class="chart-hd mid">➡</div><div class="chart-hd ef">🟢 EFFECT — what happens</div>
+    </div>
+    <div class="chart-cols">
+      <textarea class="chart-ta" id="m3-c1" placeholder="Cause 1..." data-save="m3"></textarea>
+      <div class="chart-cell mid">➡</div>
+      <textarea class="chart-ta" id="m3-e1" placeholder="Effect 1..." data-save="m3"></textarea>
+    </div>
+    <div class="chart-cols">
+      <textarea class="chart-ta" id="m3-c2" placeholder="Cause 2..." data-save="m3"></textarea>
+      <div class="chart-cell mid">➡</div>
+      <textarea class="chart-ta" id="m3-e2" placeholder="Effect 2..." data-save="m3"></textarea>
+    </div>
+    <div class="chart-cols">
+      <textarea class="chart-ta" id="m3-c3" placeholder="Cause 3..." data-save="m3"></textarea>
+      <div class="chart-cell mid">➡</div>
+      <textarea class="chart-ta" id="m3-e3" placeholder="Effect 3..." data-save="m3"></textarea>
+    </div>
+  </div>
+  <div class="save-ind" id="m3-saved">✅ Saved!</div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m3" data-complete="m3">Mark My Chart complete ✓</button>
+    <button class="reset-btn" data-reset="m3">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ══════ M4 · WRITE ══════ -->
+<div class="modal" id="m4"><div class="mbox">
+<div class="mhd u9"><div class="mhd-title">✏️ Write!</div><div class="mhd-num">5 / 11</div><button class="mhd-close" data-close="m4" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="bank">
+    <div class="bank-title">TAP TO ADD A CONNECTOR</div>
+    <div class="bank-row">
+      <button class="bchip ca" data-ta="m4-p1" data-text="Because ">Because</button>
+      <button class="bchip ca" data-ta="m4-p1" data-text="As ">As</button>
+      <button class="bchip ef" data-ta="m4-p1" data-text=", so ">, so</button>
+      <button class="bchip ef" data-ta="m4-p1" data-text=" so that ">so that</button>
+      <button class="bchip ef" data-ta="m4-p1" data-text="As a result, ">As a result,</button>
+    </div>
+  </div>
+  <div class="meter">
+    <div class="meter-title"><span>⚡ CONNECTOR METER</span><span id="m4-meter-count">0 / 5</span></div>
+    <div class="meter-row" data-meter="m4">
+      <span class="mchip ca" data-w="because">because</span><span class="mchip ca" data-w="as">as</span>
+      <span class="mchip" data-w="so">so</span><span class="mchip" data-w="so that">so that</span><span class="mchip" data-w="as a result">as a result</span>
+    </div>
+    <div class="meter-msg" id="m4-meter-msg">Use each one at least once to light them all up!</div>
+  </div>
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Use your chart from Module 3! Paragraph 1 = the game. Paragraph 2 = how you play. Paragraph 3 = what happened when you played.</div></div>
+  <div id="m4-plan-ref"></div>
+  <div class="steps-list">
+    <div class="step-item">1️⃣ What is the game? How did you learn it?</div>
+    <div class="step-item ca">2️⃣ How do you play? Use <em>because</em> / <em>as</em> / <em>so that</em>.</div>
+    <div class="step-item ef">3️⃣ What happened last time? Use <em>so</em> / <em>as a result</em>.</div>
+  </div>
+  <div class="sec-title">Paragraph 1</div>
+  <textarea class="write-ta" id="m4-p1" placeholder="What is the game? How did you learn it?" data-write="m4"></textarea>
+  <div class="sec-title">Paragraph 2</div>
+  <textarea class="write-ta" id="m4-p2" placeholder="How do you play it?" data-write="m4"></textarea>
+  <div class="sec-title">Paragraph 3</div>
+  <textarea class="write-ta" id="m4-p3" placeholder="What happened when you played?" data-write="m4"></textarea>
+  <div class="wc" id="m4-wc">Words: 0 · aim for 90–140 words</div>
+  <div class="save-ind" id="m4-saved">✅ Saved!</div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m4" data-complete="m4">Mark Writing complete ✓</button>
+    <button class="reset-btn" data-reset="m4">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ══════ M5 · EDIT CHECKLIST ══════ -->
+<div class="modal" id="m5"><div class="mbox">
+<div class="mhd ef"><div class="mhd-title">✅ Edit Checklist</div><div class="mhd-num">6 / 11</div><button class="mhd-close" data-close="m5" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Read your writing from Module 4. Tick each box only when you can POINT to it in your own writing.</div></div>
+  <div class="ex-box"><div class="ex-lbl">WRITING SUPPORT — a / an / the</div>
+    ✅ <strong>First</strong> time you mention a thing → <strong>a</strong> or <strong>an</strong><br>
+    "Leo has <strong>a</strong> new ball."<br>
+    ✅ <strong>Every time after that</strong> → <strong>the</strong><br>
+    "<strong>The</strong> ball is black and white."</div>
+  <div class="check-list">
+    <div class="check-item" data-tick="0"><div class="chk"></div><span>My writing describes a game or an activity.</span></div>
+    <div class="check-item" data-tick="1"><div class="chk"></div><span>My writing clearly shows causes and effects.</span></div>
+    <div class="check-item" data-tick="2"><div class="chk"></div><span>I used words that connect causes and effects.</span></div>
+    <div class="check-item" data-tick="3"><div class="chk"></div><span>I used <strong>a</strong>, <strong>an</strong> and <strong>the</strong> correctly.</span></div>
+  </div>
+  <div class="all-done" id="m5-done">🎉 All four checked! Your writing is ready to share! ✅</div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m5" data-complete="m5">Mark Edit Checklist complete ✓</button>
+    <button class="reset-btn" data-reset="m5">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ══════ M6 · ANALYSE THE MODEL (WB Act 1) ══════ -->
+<div class="modal" id="m6"><div class="mbox">
+<div class="mhd ca"><div class="mhd-title">🔍 Analyse the Model</div><div class="mhd-num">7 / 11 · WB p.114</div><button class="mhd-close" data-close="m6" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: This is Workbook Activity 1. Read how Isabelle PLANNED her writing — then do the three steps below.</div></div>
+  <div class="steps-list">
+    <div class="step-item">1️⃣ She chose a game with lots of movement: <strong>tetherball</strong> 🎾</div>
+    <div class="step-item ca">2️⃣ She made a <strong>word map</strong> (match the sentences below!)</div>
+    <div class="step-item ef">3️⃣ She made a <strong>cause and effect chart</strong></div>
+    <div class="step-item">4️⃣ She chose her connecting words (find them below!)</div>
+    <div class="step-item">5️⃣ She wrote her first version — a <strong>draft</strong>.</div>
+  </div>
+  <div class="dad-card" style="background:var(--acl);border-color:#FDE68A;color:#78350F"><div class="dad-icon">🖍️</div><div>Tap the connecting words here too — this is the same text as Module 1, so your underlining is shared.</div></div>
+  <div class="read-box" id="m6-model"></div>
+  <div class="score-mini" id="m6-count">Underlined: 0 · find 9 in total</div>
+  <button class="check-ans-btn" data-checkmodel="1">Check my underlining ✅</button>
+  <div class="mcq-fb" id="m6-fb"></div>
+  <div class="sec-title">Step 2: Which part of her word map? 🗺️</div>
+  <div class="ex-box" style="margin-bottom:4px"><div class="ex-lbl">ISABELLE'S WORD MAP</div>
+    This is her finished map — <strong>tetherball</strong> in the middle with four parts around it. Match each sentence below to the right part.</div>
+  <div class="wmap" id="m6-wmap">
+    <svg class="wmap-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <line x1="26" y1="20" x2="50" y2="50"></line><line x1="74" y1="20" x2="50" y2="50"></line>
+      <line x1="26" y1="80" x2="50" y2="50"></line><line x1="74" y1="80" x2="50" y2="50"></line>
+    </svg>
+    <div class="wnode a" data-part="the rules"><div class="wnode-lbl">📏 the rules</div></div>
+    <div class="wnode b" data-part="what players do"><div class="wnode-lbl">🏃 what players do</div></div>
+    <div class="wcentre">🎾 tetherball</div>
+    <div class="wnode d" data-part="movements"><div class="wnode-lbl">💫 movements</div></div>
+    <div class="wnode e" data-part="opinion"><div class="wnode-lbl">💭 opinion</div></div>
+  </div>
+  <div id="m6-map"></div>
+
+  <div class="sec-title" style="margin-top:6px">Step 3: Complete her cause &amp; effect chart 📊</div>
+  <div class="chart-wrap">
+    <div class="chart-cols">
+      <div class="chart-hd ca">🔵 CAUSE</div><div class="chart-hd mid">➡</div><div class="chart-hd ef">🟢 EFFECT</div>
+    </div>
+    <div class="chart-cols">
+      <div class="chart-cell pre">The rope is connected to a pole.</div><div class="chart-cell mid">➡</div>
+      <textarea class="chart-ta" id="m6-a" placeholder="What can't the ball do? Find it in the text..." data-save="m6"></textarea>
+    </div>
+    <div class="chart-cols">
+      <textarea class="chart-ta" id="m6-b" placeholder="What do you do to the ball?" data-save="m6"></textarea>
+      <div class="chart-cell mid">➡</div><div class="chart-cell pre">It turns around the pole.</div>
+    </div>
+    <div class="chart-cols">
+      <div class="chart-cell pre">When he hit the ball, it went fast and high.</div><div class="chart-cell mid">➡</div>
+      <textarea class="chart-ta" id="m6-c" placeholder="So what happened? (hint: every game...)" data-save="m6"></textarea>
+    </div>
+  </div>
+
+  <div class="sec-title" style="margin-top:6px">Step 4: Find her 5 connecting words 🔍</div>
+  <div class="dad-card" style="background:#FEF9C3;border-color:var(--acd)"><div class="dad-icon">💡</div><div style="color:#713F12">Tap the <strong>5</strong> words she used to connect causes and effects.</div></div>
+  <div class="phrase-select-grid" id="m6-phrases">
+    <button class="phrase-sel" data-p6="0" data-correct="true">because</button>
+    <button class="phrase-sel" data-p6="1" data-correct="false">but</button>
+    <button class="phrase-sel" data-p6="2" data-correct="true">as</button>
+    <button class="phrase-sel" data-p6="3" data-correct="true">so</button>
+    <button class="phrase-sel" data-p6="4" data-correct="false">and</button>
+    <button class="phrase-sel" data-p6="5" data-correct="true">so that</button>
+    <button class="phrase-sel" data-p6="6" data-correct="true">as a result</button>
+    <button class="phrase-sel" data-p6="7" data-correct="false">then</button>
+  </div>
+  <button class="check-ans-btn" id="m6-check-btn" data-check6="1">Check my answers ✅</button>
+  <div class="mcq-fb" id="m6-phrase-fb"></div>
+  <div class="save-ind" id="m6-saved">✅ Saved!</div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m6" data-complete="m6">Mark Analyse the Model complete ✓</button>
+    <button class="reset-btn" data-reset="m6">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ══════ M7 · MY WORD MAP (WB Act 2) ══════ -->
+<div class="modal" id="m7"><div class="mbox">
+<div class="mhd ca"><div class="mhd-title">🗺️ My Word Map</div><div class="mhd-num">8 / 11 · WB p.115</div><button class="mhd-close" data-close="m7" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Workbook Activity 2. Choose a <strong>different</strong> game from Module 3. ✏️ <strong>Tap inside each of the four boxes and type</strong> — just short notes, not full sentences!</div></div>
+  <div class="ex-box"><div class="ex-lbl">ISABELLE'S MAP — tetherball 🎾</div>
+    <strong>the rules:</strong> not many rules · <strong>what players do:</strong> two people, one hits right, one hits left<br>
+    <strong>movements:</strong> hit the ball so it turns around the pole · <strong>opinion:</strong> looks easy, but it isn't</div>
+  <div class="inv-wrap">
+    <span class="inv-label">My 2nd game:</span>
+    <input class="inv-inp" type="text" id="m7-game" placeholder="Different from Module 3..." data-save="m7">
+  </div>
+  <div class="sugg-row">
+    <button class="sugg" data-setgame="m7-game" data-text="🏓 Table tennis">🏓 Table tennis</button>
+    <button class="sugg" data-setgame="m7-game" data-text="🎢 Roller coaster">🎢 Roller coaster</button>
+    <button class="sugg" data-setgame="m7-game" data-text="🏊 Swimming">🏊 Swimming</button>
+    <button class="sugg" data-setgame="m7-game" data-text="🛝 Playground">🛝 Playground</button>
+    <button class="sugg" data-setgame="m7-game" data-text="🥋 Karate">🥋 Karate</button>
+  </div>
+  <div class="wmap">
+    <svg class="wmap-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <line x1="26" y1="20" x2="50" y2="50"></line><line x1="74" y1="20" x2="50" y2="50"></line>
+      <line x1="26" y1="80" x2="50" y2="50"></line><line x1="74" y1="80" x2="50" y2="50"></line>
+    </svg>
+    <div class="wnode a"><div class="wnode-lbl">📏 THE RULES</div><textarea class="map-ta" id="m7-rules" placeholder="How many players? What can you do?" data-save="m7"></textarea></div>
+    <div class="wnode b"><div class="wnode-lbl">🏃 WHAT PLAYERS DO</div><textarea class="map-ta" id="m7-players" placeholder="Who does what?" data-save="m7"></textarea></div>
+    <div class="wcentre" id="m7-centre">my game</div>
+    <div class="wnode d"><div class="wnode-lbl">💫 MOVEMENTS</div><textarea class="map-ta" id="m7-moves" placeholder="push, pull, spin, slide…" data-save="m7"></textarea></div>
+    <div class="wnode e"><div class="wnode-lbl">💭 MY OPINION</div><textarea class="map-ta" id="m7-opinion" placeholder="Is it easy? Is it fun?" data-save="m7"></textarea></div>
+  </div>
+  <div class="save-ind" id="m7-saved">✅ Saved!</div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m7" data-complete="m7">Mark My Word Map complete ✓</button>
+    <button class="reset-btn" data-reset="m7">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ══════ M8 · 4 SENTENCES (WB Act 3) ══════ -->
+<div class="modal" id="m8"><div class="mbox">
+<div class="mhd ca"><div class="mhd-title">🔗 4 Sentences</div><div class="mhd-num">9 / 11 · WB p.115</div><button class="mhd-close" data-close="m8" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="meter">
+    <div class="meter-title"><span>⚡ CONNECTOR METER</span><span id="m8-meter-count">0 / 5</span></div>
+    <div class="meter-row" data-meter="m8">
+      <span class="mchip ca" data-w="because">because</span><span class="mchip ca" data-w="as">as</span>
+      <span class="mchip" data-w="so">so</span><span class="mchip" data-w="so that">so that</span><span class="mchip" data-w="as a result">as a result</span>
+    </div>
+    <div class="meter-msg" id="m8-meter-msg">4 sentences, 5 words — one sentence can use two!</div>
+  </div>
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Workbook Activity 3. Write 4 cause and effect sentences about your game from Module 7. Try to use a different connector each time!</div></div>
+  <div class="ex-box"><div class="ex-lbl">SAMPLE ANSWER — number 1 🎢</div>
+    "When you go on a roller coaster, you have to use a safety bar <strong>so that</strong> you don't fall out."<br>
+    <span style="font-size:.72rem;color:var(--ink3)">↑ This is just an example of the right shape. Write your <strong>own</strong> four sentences!</span></div>
+  <div id="m8-map-ref"></div>
+  <div class="sec-title">Sentence 1</div>
+  <textarea class="write-ta" id="m8-s1" style="min-height:70px" placeholder="Use because..." data-write="m8"></textarea>
+  <div class="sec-title">Sentence 2</div>
+  <textarea class="write-ta" id="m8-s2" style="min-height:70px" placeholder="Use as..." data-write="m8"></textarea>
+  <div class="sec-title">Sentence 3</div>
+  <textarea class="write-ta" id="m8-s3" style="min-height:70px" placeholder="Use so or so that..." data-write="m8"></textarea>
+  <div class="sec-title">Sentence 4</div>
+  <textarea class="write-ta" id="m8-s4" style="min-height:70px" placeholder="Use as a result..." data-write="m8"></textarea>
+  <div class="wc" id="m8-wc">Words: 0</div>
+  <div class="divider"></div>
+  <div class="dad-card" style="background:var(--acl);border-color:#FDE68A;color:#78350F"><div class="dad-icon">📓</div><div>Now the workbook says: <strong>write your paragraph in your notebook.</strong> Join your 4 sentences into one paragraph — write it on paper, then type it here too.</div></div>
+  <button class="check-ans-btn" data-joinm8="1" style="background:var(--ac);color:#3F2D00">⬇ Copy my 4 sentences down</button>
+  <textarea class="write-ta" id="m8-para" style="min-height:110px" placeholder="Join your sentences into one paragraph..." data-write="m8"></textarea>
+  <div class="save-ind" id="m8-saved">✅ Saved!</div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m8" data-complete="m8">Mark 4 Sentences complete ✓</button>
+    <button class="reset-btn" data-reset="m8">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ══════ M9 · FREE WRITING (WB Act 4) ══════ -->
+<div class="modal" id="m9"><div class="mbox">
+<div class="mhd ca"><div class="mhd-title">🌍 Free Writing</div><div class="mhd-num">10 / 11 · WB p.115</div><button class="mhd-close" data-close="m9" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="bank">
+    <div class="bank-title">TAP TO ADD A CONNECTOR</div>
+    <div class="bank-row">
+      <button class="bchip ca" data-ta="m9-ta" data-text="Because ">Because</button>
+      <button class="bchip ca" data-ta="m9-ta" data-text="As ">As</button>
+      <button class="bchip ef" data-ta="m9-ta" data-text=", so ">, so</button>
+      <button class="bchip ef" data-ta="m9-ta" data-text=" so that ">so that</button>
+      <button class="bchip ef" data-ta="m9-ta" data-text="As a result, ">As a result,</button>
+    </div>
+  </div>
+  <div class="meter">
+    <div class="meter-title"><span>⚡ CONNECTOR METER</span><span id="m9-meter-count">0 / 5</span></div>
+    <div class="meter-row" data-meter="m9">
+      <span class="mchip ca" data-w="because">because</span><span class="mchip ca" data-w="as">as</span>
+      <span class="mchip" data-w="so">so</span><span class="mchip" data-w="so that">so that</span><span class="mchip" data-w="as a result">as a result</span>
+    </div>
+    <div class="meter-msg" id="m9-meter-msg">Light up all five for a perfect score!</div>
+  </div>
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Workbook Activity 4. Pick ONE topic and write 2 or 3 paragraphs of cause and effect. Plan first — what causes what?</div></div>
+  <div class="sec-title">Pick your topic:</div>
+  <div class="topic-grid" id="m9-topics">
+    <div class="topic-card" data-topic="🧰 First-aid kits" data-tip="Why do people carry them? What happens if you don't have one?">🧰 First-aid kits</div>
+    <div class="topic-card" data-topic="⚽ Hobbies and sports" data-tip="Why do you play? What happens to your body and your mood?">⚽ Hobbies and sports</div>
+    <div class="topic-card" data-topic="🌊 Ocean pollution" data-tip="What causes it? What effect does it have on animals?">🌊 Ocean pollution</div>
+  </div>
+  <div class="ex-box" id="m9-tip" style="display:none"><div class="ex-lbl">TIP</div><span id="m9-tip-text"></span></div>
+  <textarea class="write-ta" id="m9-ta" style="min-height:180px" placeholder="Write 2–3 paragraphs here..." data-write="m9"></textarea>
+  <div class="wc" id="m9-wc">Words: 0 · Aim for 80–130 words</div>
+  <div class="save-ind" id="m9-saved">✅ Saved!</div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m9" data-complete="m9">Mark Free Writing complete ✓</button>
+    <button class="reset-btn" data-reset="m9">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- ══════ M10 · CAN LEO SCORE ══════ -->
+<div class="modal" id="m10"><div class="mbox">
+<div class="mhd dk"><div class="mhd-title">⚽ Can Leo Score?</div><div class="mhd-num">11 / 11</div><button class="mhd-close" data-close="m10" title="Just close">✕</button></div>
+<div class="mbody" id="m10-body">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: 8 questions! You need 7/8 (80%) to score the goal! ⚽ Good luck!</div></div>
+  <div id="m10-quiz"></div>
+  <div id="m10-result" style="display:none"></div>
+</div></div></div>
+
+<script>
+/* ═══════════ LEEA SAVE STANDARD ═══════════ */
+const SAVE_PREFIX = '4-9-writing-';
+const HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-9-writing';
+const isReview    = new URLSearchParams(location.search).get('review') === '1';
+
+function lSave(key, val){
+  try{ localStorage.setItem('leea-' + key, JSON.stringify(val)); }catch(e){}
+  try{
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && LEEA_CLOUD.enabled){
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val);
+    }
+  }catch(e){}
+}
+function lLoad(key, fallback){
+  if (fallback === undefined) fallback = null;
+  try{ const v = localStorage.getItem('leea-' + key); return v !== null ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
+}
+async function restoreProgressFromCloud(){
+  try{
+    if (typeof LEEA_CLOUD === 'undefined' || !LEEA_CLOUD || !LEEA_CLOUD.enabled) return;
+    const rows = await LEEA_CLOUD.fetchProgress(HOMEWORK_ID);
+    if (!rows) return;
+    rows.forEach(function(row){
+      try{ localStorage.setItem('leea-' + row.storage_key, JSON.stringify(row.value)); }catch(e){}
+    });
+  }catch(e){ console.warn('cloud restore', e); }
+}
+function saveScore(score, total, done, extra){
+  const pct = Math.round(score / total * 100);
+  const data = Object.assign({ score:score, total:total, percent:pct, done:done, timestamp:new Date().toISOString() }, extra || {});
+  lSave(SAVE_PREFIX + 'score', data);
+  lSave(HOMEWORK_ID + '-score', data);
+  if (done){ lSave(SAVE_PREFIX + 'done', true); lSave(HOMEWORK_ID + '-done', true); }
+}
+
+const MOD_NAMES = {
+  m0:'Read & Underline', m1:'Cause or Effect', m2:'Connector Lab', m3:'My Chart', m4:'Writing', m5:'Edit Checklist',
+  m6:'Analyse the Model', m7:'My Word Map', m8:'4 Sentences', m9:'Free Writing', m10:'Can Leo Score'
+};
+const WB_LABELS = { m0:'SB ACT 1', m6:'WB ACT 1', m7:'WB ACT 2', m8:'WB ACT 3', m9:'WB ACT 4', m10:'FINAL QUIZ' };
+
+/* ═══════════ CONNECTOR METER ═══════════ */
+const CONNECTORS = ['because','as','so','so that','as a result'];
+function detectConnectors(text){
+  const found = {};
+  const t = ' ' + (text || '').toLowerCase().replace(/[.,!?;:]/g, ' ').replace(/\s+/g, ' ') + ' ';
+  found['as a result'] = t.indexOf(' as a result ') !== -1;
+  found['so that']     = t.indexOf(' so that ')     !== -1;
+  found['because']     = t.indexOf(' because ')     !== -1;
+  // plain "so" must not be the "so" inside "so that"
+  found['so'] = / so (?!that )/.test(t);
+  // plain "as" must not be the "as" inside "as a result"
+  found['as'] = / as (?!a result )/.test(t);
+  return found;
+}
+function updateMeter(mod, text){
+  try{
+    const row = document.querySelector('[data-meter="' + mod + '"]');
+    if (!row) return 0;
+    const found = detectConnectors(text);
+    let n = 0;
+    CONNECTORS.forEach(function(w){
+      const chip = row.querySelector('[data-w="' + w + '"]');
+      if (!chip) return;
+      const lit = !!found[w];
+      chip.classList.toggle('lit', lit);
+      if (lit) n++;
+    });
+    const cnt = document.getElementById(mod + '-meter-count');
+    if (cnt) cnt.textContent = n + ' / 5';
+    const msg = document.getElementById(mod + '-meter-msg');
+    if (msg){
+      msg.classList.toggle('win', n === 5);
+      if (n === 5)      msg.textContent = '🏆 All five connectors used — brilliant writing!';
+      else if (n >= 3)  msg.textContent = '💪 ' + n + ' of 5. Which ones are still dark?';
+      else if (n >= 1)  msg.textContent = '⚡ ' + n + ' lit up. Keep going!';
+      else              msg.textContent = 'Use each one at least once to light them all up!';
+    }
+    return n;
+  }catch(e){ console.warn('updateMeter', e); return 0; }
+}
+
+/* ═══════════ BADGES ═══════════ */
+function updateBadge(id, state){
+  try{
+    const el = document.getElementById('badge-' + id);
+    if (!el) return;
+    el.className = 'mod-badge ' + (state === 'done' ? 'badge-done' : state === 'prog' ? 'badge-prog' : 'badge-new');
+    el.textContent = state === 'done' ? '✅ DONE' : state === 'prog' ? '▶ IN PROGRESS' : (WB_LABELS[id] || 'NOT STARTED');
+    const pf = document.getElementById('progFill');
+    if (pf){
+      const done = Object.keys(MOD_NAMES).filter(function(m){
+        const b = document.getElementById('badge-' + m);
+        return b && b.classList && b.classList.contains('badge-done');
+      }).length;
+      pf.style.width = (done / Object.keys(MOD_NAMES).length * 100) + '%';
+    }
+  }catch(e){ console.warn('updateBadge', e); }
+}
+function showSaveInd(id){
+  try{
+    const el = document.getElementById(id + '-saved');
+    if (!el) return;
+    el.classList.add('show');
+    setTimeout(function(){ el.classList.remove('show'); }, 1600);
+  }catch(e){}
+}
+function countWords(t){ return (t || '').trim().split(/\s+/).filter(function(w){ return w.length > 0; }).length; }
+
+/* ═══════════ MODALS ═══════════ */
+function openModal(id){
+  try{
+    const m = document.getElementById(id);
+    if (!m) return;
+    m.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (id === 'm0'){ renderModel('m0-model'); }
+    if (id === 'm6'){ renderModel('m6-model'); }
+    if (id === 'm4'){ loadM4PlanRef(); updateMeter('m4', m4Text()); }
+    if (id === 'm8'){ loadM8MapRef(); updateMeter('m8', m8Text()); }
+    if (id === 'm9'){ updateMeter('m9', (document.getElementById('m9-ta') || {}).value || ''); }
+    if (id === 'm10' && !m10Started) initM10();
+  }catch(e){ console.warn('openModal', e); }
+}
+function closeModal(id){
+  try{
+    const m = document.getElementById(id);
+    if (m) m.classList.remove('open');
+    document.body.style.overflow = '';
+  }catch(e){}
+}
+function markComplete(id){
+  try{
+    const name = MOD_NAMES[id] || id;
+    lSave(SAVE_PREFIX + id + '-complete', { name:name, timestamp:new Date().toISOString(), done:true });
+    lSave(SAVE_PREFIX + id + '-done', true);
+    lSave(HOMEWORK_ID + '-' + id + '-done', true);
+    updateBadge(id, 'done');
+    const btn = document.getElementById('cbtn-' + id);
+    if (btn){ btn.classList.add('confirmed'); btn.textContent = '✅ ' + name + ' complete'; }
+    setTimeout(function(){ closeModal(id); }, 400);
+  }catch(e){ console.warn('markComplete', e); }
+}
+
+
+/* ═══════════ SHARED MODEL TEXT · TAP TO UNDERLINE (SB Act 1) ═══════════ */
+/* Segments: c=true means it is a cause/effect connector. Text is word-for-word SB p.158. */
+const MODEL_SEGS = [
+  { p:1, t:'Last week I learned how to play tetherball with my brother. My brother plays a lot,' },
+  { p:1, t:'so', c:1 },
+  { p:1, t:'he taught me. We went to the park' },
+  { p:1, t:'because', c:1 },
+  { p:1, t:"there's a new tetherball court there." },
+
+  { p:2, t:'As', c:1 },
+  { p:2, t:"there aren't many rules, it's easy to start playing tetherball. Two people play the game. One person hits the ball to the right. The other person hits it to the left." },
+  { p:2, t:'Because', c:1 },
+  { p:2, t:"the rope is connected to a pole, the ball can't fly away. You hit the ball" },
+  { p:2, t:'so that', c:1 },
+  { p:2, t:"it turns around the pole. Tetherball looks easy. But it isn't." },
+
+  { p:3, t:'Last week I hit the ball, it flew around in a big circle.' },
+  { p:3, t:'As a result,', c:1 },
+  { p:3, t:'it was easy for my brother to hit it. Then he hit the ball. It went fast and very high' },
+  { p:3, t:'so that', c:1 },
+  { p:3, t:"I couldn't hit it." },
+  { p:3, t:'So', c:1 },
+  { p:3, t:'he won every game.' },
+  { p:3, t:'Because', c:1 },
+  { p:3, t:"I want to win next time, I'm going to practice a lot from now on!" }
+];
+/* Build the token list once: connector phrases stay whole, other text splits into words. */
+const MODEL_TOKENS = (function(){
+  const out = [];
+  MODEL_SEGS.forEach(function(seg){
+    if (seg.c) out.push({ p:seg.p, t:seg.t, c:true });
+    else seg.t.split(/\s+/).filter(Boolean).forEach(function(word){ out.push({ p:seg.p, t:word, c:false }); });
+  });
+  return out;
+})();
+const MODEL_TARGET = MODEL_TOKENS.filter(function(t){ return t.c; }).length;
+
+let mdlPicked  = [];
+let mdlChecked = false;
+
+function renderModel(hostId){
+  try{
+    const host = document.getElementById(hostId);
+    if (!host) return;
+    let html = '<strong>📖 Isabelle&rsquo;s writing — &ldquo;Tetherball&rdquo;</strong><br><br>';
+    let para = 0;
+    MODEL_TOKENS.forEach(function(tok, i){
+      if (tok.p !== para){ if (para) html += '<br><br>'; para = tok.p; }
+      let cls = 'mword';
+      if (mdlChecked){
+        cls += ' locked';
+        const picked = mdlPicked.indexOf(i) !== -1;
+        if (picked && tok.c) cls += ' ok';
+        else if (picked && !tok.c) cls += ' bad';
+        else if (!picked && tok.c) cls += ' miss';
+      } else if (mdlPicked.indexOf(i) !== -1) cls += ' picked';
+      html += '<span class="' + cls + '" data-mw="' + i + '">' + tok.t + '</span> ';
+    });
+    host.innerHTML = html;
+    updateModelCount();
+  }catch(e){ console.warn('renderModel', e); }
+}
+function updateModelCount(){
+  try{
+    ['m0','m6'].forEach(function(m){
+      const el = document.getElementById(m + '-count');
+      if (el) el.textContent = 'Underlined: ' + mdlPicked.length + ' · find ' + MODEL_TARGET + ' in total';
+    });
+  }catch(e){}
+}
+function pickModelWord(i){
+  try{
+    if (mdlChecked) return;
+    const at = mdlPicked.indexOf(i);
+    if (at !== -1) mdlPicked.splice(at, 1); else mdlPicked.push(i);
+    lSave(SAVE_PREFIX + 'model-picked', mdlPicked);
+    ['m0-model','m6-model'].forEach(function(hostId){
+      const host = document.getElementById(hostId);
+      if (!host) return;
+      const span = host.querySelector('[data-mw="' + i + '"]');
+      if (span) span.classList.toggle('picked', mdlPicked.indexOf(i) !== -1);
+    });
+    updateModelCount();
+    updateBadge('m0', 'prog');
+  }catch(e){ console.warn('pickModelWord', e); }
+}
+function checkModel(){
+  try{
+    mdlChecked = true;
+    lSave(SAVE_PREFIX + 'model-checked', true);
+    let found = 0, wrong = 0;
+    MODEL_TOKENS.forEach(function(tok, i){
+      const picked = mdlPicked.indexOf(i) !== -1;
+      if (picked && tok.c) found++;
+      if (picked && !tok.c) wrong++;
+    });
+    lSave(SAVE_PREFIX + 'model-score', { score:found, total:MODEL_TARGET, wrong:wrong });
+    renderModel('m0-model'); renderModel('m6-model');
+    ['m0','m6'].forEach(function(m){
+      const fb = document.getElementById(m + '-fb');
+      if (!fb) return;
+      fb.className = 'mcq-fb show ' + (found === MODEL_TARGET && !wrong ? 'ok' : 'bad');
+      fb.textContent = (found === MODEL_TARGET && !wrong)
+        ? '🎉 Perfect! All ' + MODEL_TARGET + ' connectors found: so, because, As, Because, so that, As a result, so that, So, Because.'
+        : 'You found ' + found + ' of ' + MODEL_TARGET + (wrong ? ', and underlined ' + wrong + (wrong > 1 ? ' words that are not connectors' : ' word that is not a connector') : '') + '. Orange = missed, red = not a connector.';
+      const lg = document.getElementById(m + '-legend');
+      if (lg) lg.style.display = 'flex';
+    });
+    updateBadge('m0', found >= 7 && wrong <= 2 ? 'done' : 'prog');
+    if (found === MODEL_TARGET && !wrong) launchConfetti();
+  }catch(e){ console.warn('checkModel', e); }
+}
+function loadModel(){
+  try{
+    mdlPicked  = lLoad(SAVE_PREFIX + 'model-picked', []) || [];
+    mdlChecked = lLoad(SAVE_PREFIX + 'model-checked', false);
+    renderModel('m0-model'); renderModel('m6-model');
+    if (mdlChecked){
+      const s = lLoad(SAVE_PREFIX + 'model-score', null);
+      if (s){
+        ['m0','m6'].forEach(function(m){
+          const fb = document.getElementById(m + '-fb');
+          if (fb){
+            fb.className = 'mcq-fb show ' + (s.score === MODEL_TARGET && !s.wrong ? 'ok' : 'bad');
+            fb.textContent = 'You found ' + s.score + ' of ' + s.total + '. Orange = missed, red = not a connector.';
+          }
+          const lg = document.getElementById(m + '-legend');
+          if (lg) lg.style.display = 'flex';
+        });
+      }
+    }
+  }catch(e){ console.warn('loadModel', e); }
+}
+
+/* ═══════════ M1 · CAUSE OR EFFECT ═══════════ */
+const m1Data = [
+  { s:'"Arsenal practised every single day."', a:'cause', why:'This is something they DO. It is the reason.' },
+  { s:'"They won the Premier League in 2026."', a:'effect', why:'This is what HAPPENED because of the practice.' },
+  { s:'"The rope is connected to a pole."', a:'cause', why:'This is the reason — it is why the next thing happens.' },
+  { s:'"The ball can\'t fly away."', a:'effect', why:'This is the result of the rope being connected.' },
+  { s:'"I spin around very fast."', a:'cause', why:'This is the action you DO first.' },
+  { s:'"I get dizzy."', a:'effect', why:'This is what happens to you afterwards.' }
+];
+function initM1(){
+  try{
+    const box = document.getElementById('m1-questions');
+    if (!box) return;
+    box.innerHTML = '';
+    m1Data.forEach(function(item, i){
+      const d = document.createElement('div');
+      d.className = 'sent-card';
+      d.id = 'm1-q' + i;
+      d.innerHTML =
+        '<div class="sent-text">' + item.s + '</div>' +
+        '<div class="fo-btns">' +
+          '<button class="fo-btn cause" data-m1="' + i + '" data-ans="cause">🔵 CAUSE</button>' +
+          '<button class="fo-btn effect" data-m1="' + i + '" data-ans="effect">🟢 EFFECT</button>' +
+        '</div><div class="fo-fb" id="m1-fb' + i + '"></div>';
+      box.appendChild(d);
+    });
+    const saved = lLoad(SAVE_PREFIX + 'm1-answers', null);
+    if (saved) saved.forEach(function(a, i){ if (a) markM1(i, a); });
+    const sc = lLoad(SAVE_PREFIX + 'm1-score', null);
+    if (sc) showM1Score(sc.score);
+  }catch(e){ console.warn('initM1', e); }
+}
+function markM1(i, choice){
+  try{
+    const card = document.getElementById('m1-q' + i);
+    if (!card) return;
+    const correct = m1Data[i].a;
+    const ok = choice === correct;
+    card.querySelectorAll('.fo-btn').forEach(function(b){
+      b.disabled = true;
+      const val = b.getAttribute('data-ans');
+      if (val === choice) b.classList.add(ok ? 'ans-ok' : 'ans-bad');
+      if (!ok && val === correct) b.classList.add('ans-ok');
+    });
+    const fb = document.getElementById('m1-fb' + i);
+    if (fb){
+      fb.className = 'fo-fb show ' + (ok ? 'ok' : 'bad');
+      fb.textContent = (ok ? '✅ Correct! ' : '❌ It is a ' + correct.toUpperCase() + '. ') + m1Data[i].why;
+    }
+  }catch(e){ console.warn('markM1', e); }
+}
+function answerM1(i, choice){
+  try{
+    const answers = lLoad(SAVE_PREFIX + 'm1-answers', new Array(6).fill(null));
+    if (answers[i]) return;
+    answers[i] = choice;
+    lSave(SAVE_PREFIX + 'm1-answers', answers);
+    markM1(i, choice);
+    const done = answers.filter(function(a){ return a !== null; }).length;
+    if (done === m1Data.length){
+      const score = answers.filter(function(a, j){ return a === m1Data[j].a; }).length;
+      lSave(SAVE_PREFIX + 'm1-score', { score:score, total:6 });
+      showM1Score(score);
+      updateBadge('m1', score >= 5 ? 'done' : 'prog');
+      if (score === 6) launchConfetti();
+    } else updateBadge('m1', 'prog');
+  }catch(e){ console.warn('answerM1', e); }
+}
+function showM1Score(score){
+  const el = document.getElementById('m1-score');
+  if (el){ el.style.display = 'block'; el.textContent = 'Score: ' + score + '/6 ⚽'; }
+}
+
+/* ═══════════ M2 · CONNECTOR LAB ═══════════ */
+const m2Data = [
+  { s:'Haaland practises shooting every day, ______ he scored 27 goals last season. ⚽',
+    opts:['because','so','so that'], correct:1,
+    fb:'"so" introduces the RESULT. The goals happened because of the practice.' },
+  { s:'______ the rope is connected to a pole, the ball can\'t fly away. 🎾',
+    opts:['So','Because','As a result'], correct:1,
+    fb:'"Because" introduces the REASON. It tells us why the ball stays.' },
+  { s:'You hit the ball ______ it turns around the pole.',
+    opts:['so that','because','as'], correct:0,
+    fb:'"so that" shows your GOAL — the effect you WANT to happen.' },
+  { s:'I spun around very fast. ______, I got dizzy. 💫',
+    opts:['Because','As a result','So that'], correct:1,
+    fb:'"As a result" starts a NEW sentence and shows what happened. Full stop before, comma after.' },
+  { s:'______ there aren\'t many rules, the game is easy to start.',
+    opts:['So','As','As a result'], correct:1,
+    fb:'"As" does the same job as "because" — it gives the reason.' }
+];
+function initM2(){
+  try{
+    const box = document.getElementById('m2-questions');
+    if (!box) return;
+    box.innerHTML = '';
+    m2Data.forEach(function(item, i){
+      const d = document.createElement('div');
+      d.className = 'sent-card';
+      d.innerHTML =
+        '<div class="tag u9">QUESTION ' + (i + 1) + '</div>' +
+        '<div class="mcq-sentence">' + item.s + '</div>' +
+        '<div class="mcq-opts" id="m2-opts' + i + '">' +
+          item.opts.map(function(o, j){
+            return '<button class="mcq-opt" data-m2="' + i + '" data-j="' + j + '">' +
+              String.fromCharCode(65 + j) + ') "' + o + '"</button>';
+          }).join('') +
+        '</div><div class="mcq-fb" id="m2-fb' + i + '"></div>';
+      box.appendChild(d);
+    });
+    const saved = lLoad(SAVE_PREFIX + 'm2-answers', null);
+    if (saved) saved.forEach(function(a, i){ if (a !== null && a !== undefined) markM2(i, a); });
+    const sc = lLoad(SAVE_PREFIX + 'm2-score', null);
+    if (sc) showM2Score(sc.score);
+  }catch(e){ console.warn('initM2', e); }
+}
+function markM2(i, choice){
+  try{
+    const box = document.getElementById('m2-opts' + i);
+    if (!box) return;
+    const correct = m2Data[i].correct;
+    const ok = choice === correct;
+    const opts = box.querySelectorAll('.mcq-opt');
+    opts.forEach(function(o){ o.disabled = true; });
+    if (opts[choice]) opts[choice].classList.add(ok ? 'ok' : 'bad');
+    if (!ok && opts[correct]) opts[correct].classList.add('ok');
+    const fb = document.getElementById('m2-fb' + i);
+    if (fb){
+      fb.className = 'mcq-fb show ' + (ok ? 'ok' : 'bad');
+      fb.textContent = (ok ? '✅ ' : '❌ Not quite — the right answer is highlighted. ') + m2Data[i].fb;
+    }
+  }catch(e){ console.warn('markM2', e); }
+}
+function answerM2(i, choice){
+  try{
+    const answers = lLoad(SAVE_PREFIX + 'm2-answers', new Array(5).fill(null));
+    if (answers[i] !== null && answers[i] !== undefined) return;
+    answers[i] = choice;
+    lSave(SAVE_PREFIX + 'm2-answers', answers);
+    markM2(i, choice);
+    const done = answers.filter(function(a){ return a !== null && a !== undefined; }).length;
+    if (done === m2Data.length){
+      const score = answers.filter(function(a, j){ return a === m2Data[j].correct; }).length;
+      lSave(SAVE_PREFIX + 'm2-score', { score:score, total:5 });
+      showM2Score(score);
+      updateBadge('m2', score >= 4 ? 'done' : 'prog');
+      if (score === 5) launchConfetti();
+    } else updateBadge('m2', 'prog');
+  }catch(e){ console.warn('answerM2', e); }
+}
+function showM2Score(score){
+  const el = document.getElementById('m2-score');
+  if (el){ el.style.display = 'block'; el.textContent = 'Score: ' + score + '/5 ⚽'; }
+}
+
+/* ═══════════ M3 · MY CHART ═══════════ */
+const M3_FIELDS = ['m3-game','m3-c1','m3-c2','m3-c3','m3-e1','m3-e2','m3-e3'];
+function m3Save(){
+  try{
+    M3_FIELDS.forEach(function(id){
+      const el = document.getElementById(id);
+      if (el) lSave(SAVE_PREFIX + id, el.value);
+    });
+    showSaveInd('m3');
+    const g = (document.getElementById('m3-game') || {}).value || '';
+    const c1 = (document.getElementById('m3-c1') || {}).value || '';
+    const e1 = (document.getElementById('m3-e1') || {}).value || '';
+    if (g.trim() && c1.trim() && e1.trim()) updateBadge('m3', 'done');
+    else if (g.trim() || c1.trim() || e1.trim()) updateBadge('m3', 'prog');
+  }catch(e){ console.warn('m3Save', e); }
+}
+function loadM3(){
+  try{ M3_FIELDS.forEach(function(id){ const el = document.getElementById(id); if (el) el.value = lLoad(SAVE_PREFIX + id, ''); }); }
+  catch(e){}
+}
+function loadM4PlanRef(){
+  try{
+    const ref = document.getElementById('m4-plan-ref');
+    if (!ref) return;
+    const g = lLoad(SAVE_PREFIX + 'm3-game', '');
+    const rows = [];
+    for (let i = 1; i <= 3; i++){
+      const c = lLoad(SAVE_PREFIX + 'm3-c' + i, '');
+      const e = lLoad(SAVE_PREFIX + 'm3-e' + i, '');
+      if (c || e) rows.push('<div class="chart-cols"><div class="chart-cell">' + (c || '…') +
+        '</div><div class="chart-cell mid">➡</div><div class="chart-cell">' + (e || '…') + '</div></div>');
+    }
+    if (g || rows.length){
+      ref.innerHTML = '<div class="ref-card-title">📊 YOUR PLAN FROM MODULE 3</div>' +
+        '<div style="font-size:.8rem;font-weight:800;color:var(--ink2);margin-bottom:6px">Game: <strong style="color:var(--u9)">' + (g || '?') + '</strong></div>' +
+        '<div class="chart-wrap"><div class="chart-cols"><div class="chart-hd ca">🔵 CAUSE</div><div class="chart-hd mid">➡</div><div class="chart-hd ef">🟢 EFFECT</div></div>' +
+        (rows.length ? rows.join('') : '<div class="chart-cols"><div class="chart-cell" style="color:var(--ink3);font-style:italic">Nothing yet</div><div class="chart-cell mid">➡</div><div class="chart-cell" style="color:var(--ink3);font-style:italic">Nothing yet</div></div>') +
+        '</div>';
+    } else {
+      ref.innerHTML = '<div class="ex-box"><div class="ex-lbl">TIP</div>Do Module 3 first — your chart will appear here to copy from!</div>';
+    }
+  }catch(e){ console.warn('loadM4PlanRef', e); }
+}
+
+/* ═══════════ M4 · WRITE ═══════════ */
+function m4Text(){
+  return ['m4-p1','m4-p2','m4-p3'].map(function(id){
+    const el = document.getElementById(id); return el ? el.value : '';
+  }).join(' \n');
+}
+function m4Update(){
+  try{
+    const txt = m4Text();
+    const w = countWords(txt);
+    const wc = document.getElementById('m4-wc');
+    if (wc){ wc.textContent = 'Words: ' + w + ' · aim for 90–140 words'; wc.className = 'wc' + (w >= 90 ? ' met' : ''); }
+    ['m4-p1','m4-p2','m4-p3'].forEach(function(id){
+      const el = document.getElementById(id);
+      if (el) lSave(SAVE_PREFIX + id, el.value);
+    });
+    const lit = updateMeter('m4', txt);
+    lSave(SAVE_PREFIX + 'm4-connectors', lit);
+    showSaveInd('m4');
+    updateBadge('m4', w >= 60 ? 'done' : w > 0 ? 'prog' : 'new');
+  }catch(e){ console.warn('m4Update', e); }
+}
+function loadM4(){
+  try{
+    ['m4-p1','m4-p2','m4-p3'].forEach(function(id){
+      const el = document.getElementById(id); if (el) el.value = lLoad(SAVE_PREFIX + id, '');
+    });
+    const w = countWords(m4Text());
+    const wc = document.getElementById('m4-wc');
+    if (wc){ wc.textContent = 'Words: ' + w + ' · aim for 90–140 words'; wc.className = 'wc' + (w >= 90 ? ' met' : ''); }
+    updateMeter('m4', m4Text());
+  }catch(e){}
+}
+
+/* ═══════════ M5 · CHECKLIST ═══════════ */
+function toggleTick(el){
+  try{
+    const on = el.classList.toggle('ticked');
+    const bx = el.querySelector('.chk');
+    if (bx) bx.textContent = on ? '✅' : '';
+    const list = Array.prototype.map.call(document.querySelectorAll('[data-tick]'), function(x){
+      return x.classList.contains('ticked');
+    });
+    lSave(SAVE_PREFIX + 'checklist', list);
+    const all = list.length > 0 && list.every(Boolean);
+    const done = document.getElementById('m5-done');
+    if (done) done.className = 'all-done' + (all ? ' show' : '');
+    updateBadge('m5', all ? 'done' : list.some(Boolean) ? 'prog' : 'new');
+    if (all) launchConfetti();
+  }catch(e){ console.warn('toggleTick', e); }
+}
+function loadM5(){
+  try{
+    const list = lLoad(SAVE_PREFIX + 'checklist', [false,false,false,false]);
+    document.querySelectorAll('[data-tick]').forEach(function(el, i){
+      const on = !!list[i];
+      el.classList.toggle('ticked', on);
+      const bx = el.querySelector('.chk');
+      if (bx) bx.textContent = on ? '✅' : '';
+    });
+    const all = list.length > 0 && list.every(Boolean);
+    const done = document.getElementById('m5-done');
+    if (done) done.className = 'all-done' + (all ? ' show' : '');
+  }catch(e){}
+}
+
+/* ═══════════ M6 · ANALYSE THE MODEL ═══════════ */
+const m6MapData = [
+  { s:'"Two people play the game. One person hits the ball to the right."', a:'what players do' },
+  { s:'"You hit the ball so that it turns around the pole."',               a:'movements' },
+  { s:'"Tetherball looks easy. But it isn\'t."',                            a:'opinion' }
+];
+const M6_PARTS = ['the rules','what players do','movements','opinion'];
+function initM6Map(){
+  try{
+    const box = document.getElementById('m6-map');
+    if (!box) return;
+    box.innerHTML = '';
+    m6MapData.forEach(function(item, i){
+      const d = document.createElement('div');
+      d.className = 'sent-card';
+      d.innerHTML =
+        '<div class="sent-text">' + item.s + '</div>' +
+        '<div class="mcq-opts" id="m6-map-opts' + i + '">' +
+          M6_PARTS.map(function(p, j){
+            return '<button class="mcq-opt" data-m6map="' + i + '" data-j="' + j + '">' + p + '</button>';
+          }).join('') +
+        '</div><div class="mcq-fb" id="m6-map-fb' + i + '"></div>';
+      box.appendChild(d);
+    });
+    const saved = lLoad(SAVE_PREFIX + 'm6-map', null);
+    if (saved) saved.forEach(function(a, i){ if (a !== null && a !== undefined) markM6Map(i, a); });
+  }catch(e){ console.warn('initM6Map', e); }
+}
+function fillM6Node(part){
+  try{
+    const node = document.querySelector('#m6-wmap .wnode[data-part="' + part + '"]');
+    if (node) node.classList.add('filled');
+  }catch(e){ console.warn('fillM6Node', e); }
+}
+function markM6Map(i, j){
+  try{
+    const box = document.getElementById('m6-map-opts' + i);
+    if (!box) return;
+    const correctIdx = M6_PARTS.indexOf(m6MapData[i].a);
+    const ok = j === correctIdx;
+    const opts = box.querySelectorAll('.mcq-opt');
+    opts.forEach(function(o){ o.disabled = true; });
+    if (opts[j]) opts[j].classList.add(ok ? 'ok' : 'bad');
+    if (!ok && opts[correctIdx]) opts[correctIdx].classList.add('ok');
+    const fb = document.getElementById('m6-map-fb' + i);
+    if (fb){
+      fb.className = 'mcq-fb show ' + (ok ? 'ok' : 'bad');
+      fb.textContent = ok ? '✅ Yes — this belongs to "' + m6MapData[i].a + '". It is lit up on the map!'
+                          : '❌ This one belongs to "' + m6MapData[i].a + '" — see it light up on the map.';
+    }
+    fillM6Node(m6MapData[i].a);
+  }catch(e){ console.warn('markM6Map', e); }
+}
+function answerM6Map(i, j){
+  try{
+    const saved = lLoad(SAVE_PREFIX + 'm6-map', new Array(3).fill(null));
+    if (saved[i] !== null && saved[i] !== undefined) return;
+    saved[i] = j;
+    lSave(SAVE_PREFIX + 'm6-map', saved);
+    markM6Map(i, j);
+    updateBadge('m6', 'prog');
+  }catch(e){}
+}
+function m6Save(){
+  try{
+    ['m6-a','m6-b','m6-c'].forEach(function(id){
+      const el = document.getElementById(id); if (el) lSave(SAVE_PREFIX + id, el.value);
+    });
+    showSaveInd('m6');
+    updateBadge('m6', 'prog');
+  }catch(e){}
+}
+let m6Picked = [];
+function loadM6(){
+  try{
+    ['m6-a','m6-b','m6-c'].forEach(function(id){
+      const el = document.getElementById(id); if (el) el.value = lLoad(SAVE_PREFIX + id, '');
+    });
+    m6Picked = lLoad(SAVE_PREFIX + 'm6-picked', []) || [];
+    const checked = lLoad(SAVE_PREFIX + 'm6-checked', false);
+    if (checked) paintM6Result();
+    else document.querySelectorAll('#m6-phrases .phrase-sel').forEach(function(el){
+      const i = parseInt(el.getAttribute('data-p6'), 10);
+      el.classList.toggle('picked', m6Picked.indexOf(i) !== -1);
+    });
+  }catch(e){}
+}
+function m6Pick(el){
+  try{
+    if (lLoad(SAVE_PREFIX + 'm6-checked', false)) return;
+    const i = parseInt(el.getAttribute('data-p6'), 10);
+    const at = m6Picked.indexOf(i);
+    if (at !== -1){ m6Picked.splice(at, 1); el.classList.remove('picked'); }
+    else if (m6Picked.length < 5){ m6Picked.push(i); el.classList.add('picked'); }
+    lSave(SAVE_PREFIX + 'm6-picked', m6Picked);
+  }catch(e){}
+}
+function paintM6Result(){
+  try{
+    let score = 0;
+    document.querySelectorAll('#m6-phrases .phrase-sel').forEach(function(el){
+      const i = parseInt(el.getAttribute('data-p6'), 10);
+      const isCorrect = el.getAttribute('data-correct') === 'true';
+      const picked = m6Picked.indexOf(i) !== -1;
+      el.disabled = true;
+      el.classList.remove('picked');
+      if (picked && isCorrect){ el.classList.add('ok'); score++; }
+      else if (picked && !isCorrect) el.classList.add('bad');
+      else if (!picked && isCorrect) el.classList.add('miss');
+    });
+    const fb = document.getElementById('m6-phrase-fb');
+    if (fb){
+      fb.className = 'mcq-fb show ' + (score === 5 ? 'ok' : 'bad');
+      fb.textContent = score === 5
+        ? '🎉 Perfect! All five: because, as, so, so that, as a result.'
+        : score + '/5 correct. The missing ones are now marked in orange. "but", "and" and "then" join ideas, but they do not show cause or effect.';
+    }
+    return score;
+  }catch(e){ return 0; }
+}
+function m6Check(){
+  try{
+    const score = paintM6Result();
+    lSave(SAVE_PREFIX + 'm6-checked', true);
+    lSave(SAVE_PREFIX + 'm6-score', { score:score, total:5 });
+    updateBadge('m6', score >= 4 ? 'done' : 'prog');
+    if (score === 5) launchConfetti();
+  }catch(e){ console.warn('m6Check', e); }
+}
+
+/* ═══════════ M7 · WORD MAP ═══════════ */
+const M7_FIELDS = ['m7-game','m7-rules','m7-players','m7-moves','m7-opinion'];
+function m7Save(){
+  try{
+    M7_FIELDS.forEach(function(id){
+      const el = document.getElementById(id); if (el) lSave(SAVE_PREFIX + id, el.value);
+    });
+    const g = (document.getElementById('m7-game') || {}).value || '';
+    const c = document.getElementById('m7-centre');
+    if (c) c.textContent = g.trim() || 'my game';
+    showSaveInd('m7');
+    const filled = ['m7-rules','m7-players','m7-moves','m7-opinion'].filter(function(id){
+      const el = document.getElementById(id); return el && el.value.trim();
+    }).length;
+    if (g.trim() && filled >= 3) updateBadge('m7', 'done');
+    else if (g.trim() || filled) updateBadge('m7', 'prog');
+  }catch(e){ console.warn('m7Save', e); }
+}
+function loadM7(){
+  try{
+    M7_FIELDS.forEach(function(id){ const el = document.getElementById(id); if (el) el.value = lLoad(SAVE_PREFIX + id, ''); });
+    const g = lLoad(SAVE_PREFIX + 'm7-game', '');
+    const c = document.getElementById('m7-centre');
+    if (c) c.textContent = (g || '').trim() || 'my game';
+  }catch(e){}
+}
+function loadM8MapRef(){
+  try{
+    const ref = document.getElementById('m8-map-ref');
+    if (!ref) return;
+    const g = lLoad(SAVE_PREFIX + 'm7-game', '');
+    const moves = lLoad(SAVE_PREFIX + 'm7-moves', '');
+    const rules = lLoad(SAVE_PREFIX + 'm7-rules', '');
+    if (g || moves || rules){
+      ref.innerHTML = '<div class="ref-card"><div class="ref-card-title">🗺️ YOUR WORD MAP (MODULE 7)</div>' +
+        '<strong>Game:</strong> ' + (g || '?') + '<br>' +
+        '<strong>Rules:</strong> ' + (rules || '…') + '<br>' +
+        '<strong>Movements:</strong> ' + (moves || '…') + '</div>';
+    } else {
+      ref.innerHTML = '<div class="ex-box"><div class="ex-lbl">TIP</div>Do Module 7 first — your word map will appear here!</div>';
+    }
+  }catch(e){}
+}
+
+/* ═══════════ M8 · 4 SENTENCES ═══════════ */
+const M8_FIELDS = ['m8-s1','m8-s2','m8-s3','m8-s4','m8-para'];
+function m8Text(){
+  return M8_FIELDS.map(function(id){
+    const el = document.getElementById(id); return el ? el.value : '';
+  }).join(' \n');
+}
+function m8Update(){
+  try{
+    M8_FIELDS.forEach(function(id){
+      const el = document.getElementById(id); if (el) lSave(SAVE_PREFIX + id, el.value);
+    });
+    const txt = m8Text();
+    const w = countWords(txt);
+    const wc = document.getElementById('m8-wc');
+    if (wc) wc.textContent = 'Words: ' + w;
+    const lit = updateMeter('m8', txt);
+    lSave(SAVE_PREFIX + 'm8-connectors', lit);
+    showSaveInd('m8');
+    const filled = ['m8-s1','m8-s2','m8-s3','m8-s4'].filter(function(id){
+      const el = document.getElementById(id); return el && el.value.trim();
+    }).length;
+    updateBadge('m8', filled === 4 ? 'done' : filled ? 'prog' : 'new');
+  }catch(e){ console.warn('m8Update', e); }
+}
+function loadM8(){
+  try{
+    M8_FIELDS.forEach(function(id){
+      const el = document.getElementById(id); if (el) el.value = lLoad(SAVE_PREFIX + id, '');
+    });
+    const wc = document.getElementById('m8-wc');
+    if (wc) wc.textContent = 'Words: ' + countWords(m8Text());
+    updateMeter('m8', m8Text());
+  }catch(e){}
+}
+
+function joinM8(){
+  try{
+    const para = document.getElementById('m8-para');
+    if (!para) return;
+    const parts = ['m8-s1','m8-s2','m8-s3','m8-s4'].map(function(id){
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
+    }).filter(Boolean);
+    if (!parts.length) return;
+    para.value = parts.join(' ');
+    para.dispatchEvent(new Event('input', { bubbles:true }));
+    para.focus();
+  }catch(e){ console.warn('joinM8', e); }
+}
+
+/* ═══════════ M9 · FREE WRITING ═══════════ */
+function m9Pick(card){
+  try{
+    document.querySelectorAll('#m9-topics .topic-card').forEach(function(c){ c.classList.remove('picked'); });
+    card.classList.add('picked');
+    lSave(SAVE_PREFIX + 'm9-topic', card.getAttribute('data-topic'));
+    const tip = document.getElementById('m9-tip');
+    const tt = document.getElementById('m9-tip-text');
+    if (tip && tt){ tip.style.display = 'block'; tt.textContent = card.getAttribute('data-tip') || ''; }
+    updateBadge('m9', 'prog');
+  }catch(e){}
+}
+function m9Update(){
+  try{
+    const el = document.getElementById('m9-ta');
+    const txt = el ? el.value : '';
+    const w = countWords(txt);
+    const wc = document.getElementById('m9-wc');
+    if (wc){ wc.textContent = 'Words: ' + w + ' · Aim for 80–130 words'; wc.className = 'wc' + (w >= 80 ? ' met' : ''); }
+    lSave(SAVE_PREFIX + 'm9-ta', txt);
+    const lit = updateMeter('m9', txt);
+    lSave(SAVE_PREFIX + 'm9-connectors', lit);
+    showSaveInd('m9');
+    updateBadge('m9', w >= 60 ? 'done' : w > 0 ? 'prog' : 'new');
+  }catch(e){ console.warn('m9Update', e); }
+}
+function loadM9(){
+  try{
+    const el = document.getElementById('m9-ta');
+    if (el) el.value = lLoad(SAVE_PREFIX + 'm9-ta', '');
+    const saved = lLoad(SAVE_PREFIX + 'm9-topic', null);
+    if (saved){
+      document.querySelectorAll('#m9-topics .topic-card').forEach(function(c){
+        if (c.getAttribute('data-topic') === saved){
+          c.classList.add('picked');
+          const tip = document.getElementById('m9-tip');
+          const tt = document.getElementById('m9-tip-text');
+          if (tip && tt){ tip.style.display = 'block'; tt.textContent = c.getAttribute('data-tip') || ''; }
+        }
+      });
+    }
+    const w = countWords(el ? el.value : '');
+    const wc = document.getElementById('m9-wc');
+    if (wc){ wc.textContent = 'Words: ' + w + ' · Aim for 80–130 words'; wc.className = 'wc' + (w >= 80 ? ' met' : ''); }
+    updateMeter('m9', el ? el.value : '');
+  }catch(e){}
+}
+
+/* ═══════════ M10 · CAN LEO SCORE ═══════════ */
+const m10Qs = [
+  { type:'ce', q:'Is this a CAUSE or an EFFECT?', s:'"Barcelona won La Liga for the 29th time in 2026." 🏆',
+    a:'effect', fb:'EFFECT — this is what HAPPENED at the end of the season.' },
+  { type:'ce', q:'Is this a CAUSE or an EFFECT?', s:'"The grass on the pitch was very wet." 🌧️',
+    a:'cause', fb:'CAUSE — this is the reason. Something else happens because of it.' },
+  { type:'mcq', q:'Choose the best connector:', s:'Mbappé scored 25 goals in La Liga, ______ he won the top scorer prize. ⚽',
+    opts:['because','so','so that'], correct:1, fb:'"so" shows the RESULT of scoring all those goals.' },
+  { type:'mcq', q:'Choose the best connector:', s:'You wear a safety bar ______ you don\'t fall out of the roller coaster. 🎢',
+    opts:['so that','as a result','because'], correct:0, fb:'"so that" shows your GOAL — the reason you wear it.' },
+  { type:'tf', q:'True or False?', s:'"As" and "because" both introduce a cause.',
+    a:true, fb:'TRUE — they do the same job. "As" often starts the sentence.' },
+  { type:'tf', q:'True or False?', s:'"As a result" goes in the middle of a sentence with no full stop before it.',
+    a:false, fb:'FALSE — it starts a NEW sentence. Full stop before, comma after: "…fast. As a result, I got dizzy."' },
+  { type:'mcq', q:'Which article is correct?', s:'Leo has ______ new soccer ball. ______ ball is black and white.',
+    opts:['the … A','a … The','an … A'], correct:1, fb:'First mention takes "a". Second mention takes "The" — now we know which ball.' },
+  { type:'tf', q:'True or False?', s:'In cause and effect writing, you describe actions and tell why they happened.',
+    a:true, fb:'TRUE — that is exactly what cause and effect writing does!' }
+];
+let m10Started = false, m10Idx = 0, m10Score = 0, m10Wrong = [], m10Start = null;
+
+function initM10(){
+  m10Started = true; m10Idx = 0; m10Score = 0; m10Wrong = []; m10Start = Date.now();
+  const r = document.getElementById('m10-result');
+  if (r){ r.style.display = 'none'; r.innerHTML = ''; }
+  renderM10();
+}
+function renderM10(){
+  try{
+    const box = document.getElementById('m10-quiz');
+    if (!box) return;
+    if (m10Idx >= m10Qs.length){ showM10Result(); return; }
+    const q = m10Qs[m10Idx];
+    const pct = Math.round(m10Idx / m10Qs.length * 100);
+    let h = '<div class="qz-prog"><span class="qz-num">Question ' + (m10Idx + 1) + ' of ' + m10Qs.length +
+            '</span><span class="qz-sc">Score: ' + m10Score + ' ⚽</span></div>' +
+            '<div style="background:var(--bdr);height:4px;border-radius:2px;margin-bottom:12px">' +
+            '<div style="background:var(--u9);height:4px;border-radius:2px;width:' + pct + '%;transition:width .4s"></div></div>' +
+            '<div class="qz-card"><div class="tag u9">' +
+            (q.type === 'ce' ? 'CAUSE OR EFFECT' : q.type === 'tf' ? 'TRUE OR FALSE' : 'CHOOSE') + '</div>' +
+            '<div class="qz-q">' + q.q + '</div><div class="mcq-sentence">' + q.s + '</div>';
+    if (q.type === 'ce'){
+      h += '<div class="fo-btns"><button class="fo-btn cause" data-m10="cause">🔵 CAUSE</button>' +
+           '<button class="fo-btn effect" data-m10="effect">🟢 EFFECT</button></div>';
+    } else if (q.type === 'tf'){
+      h += '<div class="fo-btns"><button class="fo-btn effect" data-m10="true">✅ TRUE</button>' +
+           '<button class="fo-btn" data-m10="false" style="background:var(--rdl);color:var(--rd);border-color:var(--rd)">❌ FALSE</button></div>';
+    } else {
+      h += '<div class="mcq-opts">' + q.opts.map(function(o, i){
+        return '<button class="mcq-opt" data-m10="' + i + '">' + String.fromCharCode(65 + i) + ') "' + o + '"</button>';
+      }).join('') + '</div>';
+    }
+    h += '<div class="mcq-fb" id="m10-fb"></div></div>';
+    box.innerHTML = h;
+  }catch(e){ console.warn('renderM10', e); }
+}
+function ansM10(raw){
+  try{
+    const q = m10Qs[m10Idx];
+    let choice = raw, ok = false;
+    if (q.type === 'mcq'){ choice = parseInt(raw, 10); ok = choice === q.correct; }
+    else if (q.type === 'tf'){ choice = (raw === 'true'); ok = choice === q.a; }
+    else { ok = choice === q.a; }
+
+    document.querySelectorAll('#m10-quiz .fo-btn, #m10-quiz .mcq-opt').forEach(function(b){ b.disabled = true; });
+    if (q.type === 'mcq'){
+      const opts = document.querySelectorAll('#m10-quiz .mcq-opt');
+      if (opts[choice]) opts[choice].classList.add(ok ? 'ok' : 'bad');
+      if (!ok && opts[q.correct]) opts[q.correct].classList.add('ok');
+    } else {
+      document.querySelectorAll('#m10-quiz .fo-btn').forEach(function(b){
+        const v = b.getAttribute('data-m10');
+        const bv = (q.type === 'tf') ? (v === 'true') : v;
+        if (bv === choice) b.classList.add(ok ? 'ans-ok' : 'ans-bad');
+        if (!ok && bv === q.a) b.classList.add('ans-ok');
+      });
+    }
+    const fb = document.getElementById('m10-fb');
+    if (fb){
+      fb.className = 'mcq-fb show ' + (ok ? 'ok' : 'bad');
+      fb.textContent = (ok ? '⚽ GOAL! ' : '❌ Not quite. ') + q.fb;
+    }
+    if (ok){ m10Score++; showGoalAnim(); }
+    else {
+      const chosenLabel = q.type === 'mcq' ? q.opts[choice] : String(choice);
+      const correctLabel = q.type === 'mcq' ? q.opts[q.correct] : String(q.a);
+      m10Wrong.push({ question:'Q' + (m10Idx + 1), prompt:q.s, chosen:chosenLabel, correct:correctLabel });
+    }
+    setTimeout(function(){ m10Idx++; renderM10(); }, 1700);
+  }catch(e){ console.warn('ansM10', e); }
+}
+function showM10Result(){
+  try{
+    const box = document.getElementById('m10-quiz');
+    if (box) box.innerHTML = '';
+    const pct = Math.round(m10Score / m10Qs.length * 100);
+    const pass = pct >= 80;
+    const time = Math.round((Date.now() - m10Start) / 1000) + 's';
+    saveScore(m10Score, m10Qs.length, pass, { wrongQuestions:m10Wrong, timeSpent:time });
+    updateBadge('m10', pass ? 'done' : 'prog');
+    const res = document.getElementById('m10-result');
+    if (!res) return;
+    res.style.display = 'block';
+    const wrongIds = m10Wrong.map(function(w){ return w.question; });
+    res.innerHTML =
+      '<div class="result-box"><div style="font-size:3rem">' + (pass ? '🏆' : '💪') + '</div>' +
+      '<div class="result-score">' + m10Score + '/' + m10Qs.length + '</div>' +
+      '<div style="font-family:var(--fnh);font-size:1.1rem;font-weight:700;color:' + (pass ? 'var(--ef)' : 'var(--rd)') + '">' +
+        pct + '% — ' + (pass ? '⚽ GOAL! You passed!' : 'Keep trying!') + '</div>' +
+      '<div class="result-msg">' + (pass ? '🎉 Amazing, Leo! You are a real Cause &amp; Effect writer!' : '📚 Great effort! Review the modules and try again!') + '</div>' +
+      '<div class="result-detail">Time: ' + time + '</div>' +
+      '<div class="result-bullets">' + m10Qs.map(function(q, i){
+        const bad = wrongIds.indexOf('Q' + (i + 1)) !== -1;
+        return '<div class="result-bullet ' + (bad ? 'bad' : 'ok') + '">' + (bad ? '❌' : '✅') + ' Q' + (i + 1) + ': ' + q.s.substring(0, 46) + '…</div>';
+      }).join('') + '</div>' +
+      (pass ? '' : '<button class="check-ans-btn" style="margin:16px auto 0;display:block" data-retry10="1">🔄 Try Again</button>') +
+      '</div>' +
+      '<div class="btn-row-bottom"><button class="complete-btn" id="cbtn-m10" data-complete="m10">Mark Can Leo Score complete ✓</button>' +
+      '<button class="reset-btn" data-reset="m10">↺ Redo</button></div>';
+    if (pass) launchConfetti();
+  }catch(e){ console.warn('showM10Result', e); }
+}
+
+/* ═══════════ FX ═══════════ */
+function showGoalAnim(){
+  try{
+    const el = document.getElementById('goalAnim');
+    if (!el) return;
+    el.classList.add('show');
+    setTimeout(function(){ el.classList.remove('show'); }, 900);
+  }catch(e){}
+}
+function launchConfetti(){
+  try{
+    const colors = ['#DC2626','#F59E0B','#2563EB','#16A34A','#7C3AED','#EC4899'];
+    for (let i = 0; i < 46; i++){
+      const p = document.createElement('div');
+      p.className = 'cp';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.top = '-10px';
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
+      p.style.setProperty('--drift', ((Math.random() - 0.5) * 200) + 'px');
+      p.style.animationDuration = (1.2 + Math.random() * 1.5) + 's';
+      p.style.animationDelay = Math.random() * 0.5 + 's';
+      p.style.width = p.style.height = (7 + Math.random() * 8) + 'px';
+      document.body.appendChild(p);
+      setTimeout(function(){ p.remove(); }, 2500);
+    }
+  }catch(e){}
+}
+
+/* ═══════════ INSERT STARTER (no escaped apostrophes) ═══════════ */
+function insertStarterData(btn){
+  try{
+    const ta = document.getElementById(btn.getAttribute('data-ta'));
+    const text = btn.getAttribute('data-text') || '';
+    if (!ta) return;
+    const pos = ta.selectionStart !== undefined ? ta.selectionStart : ta.value.length;
+    ta.value = ta.value.slice(0, pos) + text + ta.value.slice(pos);
+    try{ ta.selectionStart = ta.selectionEnd = pos + text.length; }catch(e){}
+    ta.focus();
+    const owner = ta.getAttribute('data-write');
+    if (owner === 'm4') m4Update();
+    else if (owner === 'm8') m8Update();
+    else if (owner === 'm9') m9Update();
+  }catch(e){ console.warn('insertStarterData', e); }
+}
+
+/* ═══════════ RESET (two-tap, no confirm) ═══════════ */
+function resetModule(id, btn){
+  try{
+    if (btn && !btn.dataset.armed){
+      btn.dataset.armed = '1';
+      btn.textContent = 'Sure? ↺';
+      btn.style.background = '#DC2626';
+      btn.style.color = '#fff';
+      setTimeout(function(){
+        if (btn && btn.dataset.armed){
+          delete btn.dataset.armed;
+          btn.textContent = '↺ Redo';
+          btn.style.background = '';
+          btn.style.color = '';
+        }
+      }, 3000);
+      return;
+    }
+    if (btn){
+      delete btn.dataset.armed;
+      btn.textContent = '↺ Redo';
+      btn.style.background = '';
+      btn.style.color = '';
+    }
+    const prefix = 'leea-' + SAVE_PREFIX;
+    Object.keys(localStorage).filter(function(k){
+      return k.indexOf(prefix + id + '-') === 0 || k === prefix + id + '-done';
+    }).forEach(function(k){ localStorage.removeItem(k); });
+    localStorage.removeItem('leea-' + HOMEWORK_ID + '-' + id + '-done');
+    if (id === 'm5') localStorage.removeItem('leea-' + SAVE_PREFIX + 'checklist');
+    if (id === 'm10'){ localStorage.removeItem('leea-' + SAVE_PREFIX + 'score'); localStorage.removeItem('leea-' + HOMEWORK_ID + '-score'); }
+    [SAVE_PREFIX + id + '-complete', SAVE_PREFIX + id + '-done', HOMEWORK_ID + '-' + id + '-done'].forEach(function(k){
+      try{ if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && LEEA_CLOUD.enabled && LEEA_CLOUD.deleteProgress) LEEA_CLOUD.deleteProgress(HOMEWORK_ID, k); }catch(e){}
+    });
+    updateBadge(id, 'new');
+    const cb = document.getElementById('cbtn-' + id);
+    if (cb){ cb.classList.remove('confirmed'); cb.textContent = 'Mark ' + (MOD_NAMES[id] || id) + ' complete ✓'; }
+
+    if (id === 'm0'){
+      ['model-picked','model-checked','model-score'].forEach(function(k){ localStorage.removeItem('leea-' + SAVE_PREFIX + k); });
+      mdlPicked = []; mdlChecked = false;
+      renderModel('m0-model'); renderModel('m6-model');
+      ['m0','m6'].forEach(function(m){
+        const fb = document.getElementById(m + '-fb'); if (fb){ fb.className = 'mcq-fb'; fb.textContent = ''; }
+        const lg = document.getElementById(m + '-legend'); if (lg) lg.style.display = 'none';
+      });
+    }
+    else if (id === 'm1') initM1();
+    else if (id === 'm2') initM2();
+    else if (id === 'm3'){ M3_FIELDS.forEach(function(k){ const el = document.getElementById(k); if (el) el.value = ''; }); }
+    else if (id === 'm4'){ ['m4-p1','m4-p2','m4-p3'].forEach(function(k){ const el = document.getElementById(k); if (el) el.value = ''; }); loadM4(); }
+    else if (id === 'm5'){
+      document.querySelectorAll('[data-tick]').forEach(function(el){ el.classList.remove('ticked'); const b = el.querySelector('.chk'); if (b) b.textContent = ''; });
+      const d = document.getElementById('m5-done'); if (d) d.className = 'all-done';
+    }
+    else if (id === 'm6'){
+      ['m6-a','m6-b','m6-c'].forEach(function(k){ const el = document.getElementById(k); if (el) el.value = ''; });
+      m6Picked = [];
+      document.querySelectorAll('#m6-phrases .phrase-sel').forEach(function(el){ el.className = 'phrase-sel'; el.disabled = false; });
+      const fb = document.getElementById('m6-phrase-fb'); if (fb){ fb.className = 'mcq-fb'; fb.textContent = ''; }
+      document.querySelectorAll('#m6-wmap .wnode').forEach(function(n){ n.classList.remove('filled'); });
+      initM6Map();
+    }
+    else if (id === 'm7'){ M7_FIELDS.forEach(function(k){ const el = document.getElementById(k); if (el) el.value = ''; }); loadM7(); }
+    else if (id === 'm8'){ M8_FIELDS.forEach(function(k){ const el = document.getElementById(k); if (el) el.value = ''; }); loadM8(); }
+    else if (id === 'm9'){
+      const ta = document.getElementById('m9-ta'); if (ta) ta.value = '';
+      document.querySelectorAll('#m9-topics .topic-card').forEach(function(c){ c.classList.remove('picked'); });
+      const tip = document.getElementById('m9-tip'); if (tip) tip.style.display = 'none';
+      loadM9();
+    }
+    else if (id === 'm10'){
+      m10Started = false;
+      const q = document.getElementById('m10-quiz'); if (q) q.innerHTML = '';
+      const r = document.getElementById('m10-result'); if (r){ r.style.display = 'none'; r.innerHTML = ''; }
+    }
+  }catch(e){ console.warn('resetModule', e); }
+}
+
+/* ═══════════ REVIEW MODE ═══════════ */
+function initReviewMode(){
+  try{
+    const root = document.getElementById('appRoot');
+    if (root) root.style.display = 'none';
+    const rs = document.getElementById('reviewScreen');
+    if (rs) rs.classList.add('show');
+    const body = document.getElementById('reviewBody');
+    if (!body) return;
+
+    const completed = Object.keys(MOD_NAMES).filter(function(id){
+      const d = lLoad(SAVE_PREFIX + id + '-complete', null);
+      return d && d.timestamp;
+    });
+    const scoreData = lLoad(SAVE_PREFIX + 'score', null);
+    const m4 = ['m4-p1','m4-p2','m4-p3'].map(function(k){ return lLoad(SAVE_PREFIX + k, ''); });
+    const m8 = ['m8-s1','m8-s2','m8-s3','m8-s4'].map(function(k){ return lLoad(SAVE_PREFIX + k, ''); });
+    const m8para = lLoad(SAVE_PREFIX + 'm8-para', '');
+    const m9 = lLoad(SAVE_PREFIX + 'm9-ta', '');
+    const m3g = lLoad(SAVE_PREFIX + 'm3-game', '');
+    const m7g = lLoad(SAVE_PREFIX + 'm7-game', '');
+
+    const m3cells = ['m3-c1','m3-c2','m3-c3','m3-e1','m3-e2','m3-e3'].map(function(k){ return lLoad(SAVE_PREFIX + k, ''); }).join('');
+    const m7cells = ['m7-rules','m7-players','m7-moves','m7-opinion'].map(function(k){ return lLoad(SAVE_PREFIX + k, ''); }).join('');
+    const m6cells = ['m6-a','m6-b','m6-c'].map(function(k){ return lLoad(SAVE_PREFIX + k, ''); }).join('');
+    const subScores = ['m1','m2','m6'].some(function(k){ return lLoad(SAVE_PREFIX + k + '-score', null); }) || !!lLoad(SAVE_PREFIX + 'model-score', null);
+    const checklist = lLoad(SAVE_PREFIX + 'checklist', null);
+    const anyTick = checklist && checklist.some(Boolean);
+
+    const hasAnything = completed.length || scoreData || subScores || anyTick ||
+      m4.join('').trim() || m8.join('').trim() || m8para.trim() || m9.trim() ||
+      m3g.trim() || m7g.trim() || m3cells.trim() || m7cells.trim() || m6cells.trim() ||
+      lLoad(SAVE_PREFIX + 'm9-topic', '');
+
+    if (!hasAnything){
+      body.innerHTML = '<div class="rv-not-started">📋 Work not started yet.</div>';
+      return;
+    }
+    let h = '';
+    if (completed.length){
+      h += '<div class="rv-card"><div class="rv-lbl">COMPLETED MODULES — ' + completed.length + ' / ' + Object.keys(MOD_NAMES).length + '</div><div class="rv-val" style="font-size:.82rem;line-height:1.9">' +
+        completed.map(function(id){
+          const d = lLoad(SAVE_PREFIX + id + '-complete', null);
+          return '✅ ' + MOD_NAMES[id] + (d && d.timestamp ? ' · ' + new Date(d.timestamp).toLocaleString() : '');
+        }).join('\n') + '</div></div>';
+    }
+    if (scoreData){
+      h += '<div class="rv-card"><div class="rv-lbl">FINAL QUIZ — CAN LEO SCORE?</div>' +
+        '<div class="rv-score-big">' + scoreData.score + '/' + scoreData.total + ' — ' + scoreData.percent + '% ' + (scoreData.done ? '✅ PASS' : '❌ Retry') + '</div>' +
+        '<div class="rv-val" style="margin-top:4px;font-size:.75rem;color:var(--ink3)">Submitted: ' + new Date(scoreData.timestamp).toLocaleString() + '</div>' +
+        (scoreData.wrongQuestions && scoreData.wrongQuestions.length
+          ? '<div class="rv-val" style="margin-top:8px;color:var(--rd);font-size:.78rem">' +
+            scoreData.wrongQuestions.map(function(w){
+              return '❌ ' + w.question + ' — chose "' + w.chosen + '", answer was "' + w.correct + '"';
+            }).join('\n') + '</div>'
+          : '') + '</div>';
+    }
+    const mdl = lLoad(SAVE_PREFIX + 'model-score', null);
+    if (mdl) h += '<div class="rv-card"><div class="rv-lbl">READ &amp; UNDERLINE — SB ACTIVITY 1</div><div class="rv-val">Found ' + mdl.score + '/' + mdl.total + ' connectors' + (mdl.wrong ? ' · ' + mdl.wrong + ' extra word(s) underlined' : '') + '</div></div>';
+    [['m1',6],['m2',5],['m6',5]].forEach(function(pair){
+      const s = lLoad(SAVE_PREFIX + pair[0] + '-score', null);
+      if (s) h += '<div class="rv-card"><div class="rv-lbl">' + MOD_NAMES[pair[0]].toUpperCase() + '</div><div class="rv-val">Score: ' + s.score + '/' + (s.total || pair[1]) + '</div></div>';
+    });
+    if (m3g.trim() || m3cells.trim()){
+      let rows = m3g ? 'Game: ' + m3g : '';
+      for (let i = 1; i <= 3; i++){
+        const c = lLoad(SAVE_PREFIX + 'm3-c' + i, ''), e = lLoad(SAVE_PREFIX + 'm3-e' + i, '');
+        if (c || e) rows += '\n' + i + '. ' + (c || '…') + '  ➡  ' + (e || '…');
+      }
+      h += '<div class="rv-card"><div class="rv-lbl">MODULE 3 — CAUSE &amp; EFFECT CHART</div><div class="rv-val">' + rows.trim() + '</div></div>';
+    }
+    if (m4.join('').trim()){
+      const lit = lLoad(SAVE_PREFIX + 'm4-connectors', 0);
+      h += '<div class="rv-card"><div class="rv-lbl">MODULE 4 — LEO\'S WRITING · connectors used: ' + lit + '/5</div><div class="rv-val">' + m4.filter(Boolean).join('\n\n') + '</div></div>';
+    }
+    if (checklist) h += '<div class="rv-card"><div class="rv-lbl">MODULE 5 — EDIT CHECKLIST</div><div class="rv-val">' + checklist.filter(Boolean).length + '/4 items ticked</div></div>';
+    if (m7g.trim() || m7cells.trim()){
+      h += '<div class="rv-card"><div class="rv-lbl">MODULE 7 — WORD MAP</div><div class="rv-val">Game: ' + m7g +
+        '\nRules: ' + lLoad(SAVE_PREFIX + 'm7-rules','…') + '\nPlayers: ' + lLoad(SAVE_PREFIX + 'm7-players','…') +
+        '\nMovements: ' + lLoad(SAVE_PREFIX + 'm7-moves','…') + '\nOpinion: ' + lLoad(SAVE_PREFIX + 'm7-opinion','…') + '</div></div>';
+    }
+    if (m8.join('').trim() || m8para.trim()){
+      const lit8 = lLoad(SAVE_PREFIX + 'm8-connectors', 0);
+      h += '<div class="rv-card"><div class="rv-lbl">MODULE 8 — SENTENCES &amp; PARAGRAPH · connectors used: ' + lit8 + '/5</div><div class="rv-val">' +
+        m8.map(function(s, i){ return s ? (i + 1) + '. ' + s : ''; }).filter(Boolean).join('\n') +
+        (m8para.trim() ? '\n\n📓 PARAGRAPH:\n' + m8para : '') + '</div></div>';
+    }
+    if (m9){
+      const lit9 = lLoad(SAVE_PREFIX + 'm9-connectors', 0);
+      h += '<div class="rv-card"><div class="rv-lbl">MODULE 9 — FREE WRITING · ' + (lLoad(SAVE_PREFIX + 'm9-topic','') || 'no topic') + ' · connectors: ' + lit9 + '/5</div><div class="rv-val">' + m9 + '</div></div>';
+    }
+    if (!scoreData) h += '<div class="rv-card" style="border-color:var(--u9)"><div class="rv-lbl">STATUS</div><div class="rv-val" style="color:var(--u9)">In progress — final quiz not completed yet.</div></div>';
+    body.innerHTML = h;
+  }catch(e){ console.warn('initReviewMode', e); }
+}
+
+/* ═══════════ DELEGATED CLICK HANDLER ═══════════ */
+document.addEventListener('click', function(ev){
+  try{
+    const t = ev.target.closest('[data-open],[data-close],[data-complete],[data-reset],[data-m1],[data-m2],[data-m6map],[data-p6],[data-check6],[data-mw],[data-checkmodel],[data-joinm8],[data-m10],[data-retry10],[data-ta],[data-setgame],[data-tick],[data-topic]');
+    if (!t) return;
+    if (t.hasAttribute('data-open'))     { openModal(t.getAttribute('data-open')); return; }
+    if (t.hasAttribute('data-close'))    { closeModal(t.getAttribute('data-close')); return; }
+    if (t.hasAttribute('data-complete')) { markComplete(t.getAttribute('data-complete')); return; }
+    if (t.hasAttribute('data-reset'))    { resetModule(t.getAttribute('data-reset'), t); return; }
+    if (t.hasAttribute('data-m1'))       { answerM1(parseInt(t.getAttribute('data-m1'), 10), t.getAttribute('data-ans')); return; }
+    if (t.hasAttribute('data-m2'))       { answerM2(parseInt(t.getAttribute('data-m2'), 10), parseInt(t.getAttribute('data-j'), 10)); return; }
+    if (t.hasAttribute('data-m6map'))    { answerM6Map(parseInt(t.getAttribute('data-m6map'), 10), parseInt(t.getAttribute('data-j'), 10)); return; }
+    if (t.hasAttribute('data-p6'))       { m6Pick(t); return; }
+    if (t.hasAttribute('data-check6'))   { m6Check(); return; }
+    if (t.hasAttribute('data-mw'))       { pickModelWord(parseInt(t.getAttribute('data-mw'), 10)); return; }
+    if (t.hasAttribute('data-checkmodel')){ checkModel(); return; }
+    if (t.hasAttribute('data-joinm8'))   { joinM8(); return; }
+    if (t.hasAttribute('data-retry10'))  { initM10(); return; }
+    if (t.hasAttribute('data-m10'))      { ansM10(t.getAttribute('data-m10')); return; }
+    if (t.hasAttribute('data-ta'))       { insertStarterData(t); return; }
+    if (t.hasAttribute('data-setgame'))  {
+      const el = document.getElementById(t.getAttribute('data-setgame'));
+      if (el){ el.value = t.getAttribute('data-text') || ''; el.getAttribute('data-save') === 'm7' ? m7Save() : m3Save(); }
+      return;
+    }
+    if (t.hasAttribute('data-tick'))     { toggleTick(t); return; }
+    if (t.hasAttribute('data-topic'))    { m9Pick(t); return; }
+  }catch(e){ console.warn('click', e); }
+});
+
+/* ═══════════ DELEGATED INPUT HANDLER ═══════════ */
+document.addEventListener('input', function(ev){
+  try{
+    const el = ev.target;
+    const w = el.getAttribute && el.getAttribute('data-write');
+    if (w === 'm4'){ m4Update(); return; }
+    if (w === 'm8'){ m8Update(); return; }
+    if (w === 'm9'){ m9Update(); return; }
+    const s = el.getAttribute && el.getAttribute('data-save');
+    if (s === 'm3'){ m3Save(); return; }
+    if (s === 'm6'){ m6Save(); return; }
+    if (s === 'm7'){ m7Save(); return; }
+  }catch(e){ console.warn('input', e); }
+});
+
+/* ═══════════ HOMEWORK BANNER ═══════════ */
+function initHWBanner(){
+  try{
+    if (HOMEWORK_ID === 'leo-4-9-writing') return;
+    const b = document.getElementById('hwBanner');
+    if (!b) return;
+    b.style.display = 'flex';
+    b.textContent = '📚 Homework assigned · Unit 9 Writing · Cause and Effect';
+  }catch(e){}
+}
+
+/* ═══════════ INIT ═══════════ */
+window.addEventListener('DOMContentLoaded', async function(){
+  await restoreProgressFromCloud();
+  if (isReview){ initReviewMode(); return; }
+
+  initHWBanner();
+  loadModel(); initM1(); initM2(); initM6Map();
+  loadM3(); loadM4(); loadM5(); loadM6(); loadM7(); loadM8(); loadM9();
+
+  try{
+    const m0s = lLoad(SAVE_PREFIX + 'model-score', null); if (m0s) updateBadge('m0', m0s.score >= 7 && m0s.wrong <= 2 ? 'done' : 'prog');
+    const m1s = lLoad(SAVE_PREFIX + 'm1-score', null); if (m1s) updateBadge('m1', m1s.score >= 5 ? 'done' : 'prog');
+    const m2s = lLoad(SAVE_PREFIX + 'm2-score', null); if (m2s) updateBadge('m2', m2s.score >= 4 ? 'done' : 'prog');
+    const m6s = lLoad(SAVE_PREFIX + 'm6-score', null); if (m6s) updateBadge('m6', m6s.score >= 4 ? 'done' : 'prog');
+    const m10s = lLoad(SAVE_PREFIX + 'score', null);   if (m10s) updateBadge('m10', m10s.done ? 'done' : 'prog');
+    m3Save(); m7Save();
+    const cl = lLoad(SAVE_PREFIX + 'checklist', null);
+    if (cl) updateBadge('m5', cl.every(Boolean) ? 'done' : cl.some(Boolean) ? 'prog' : 'new');
+  }catch(e){ console.warn('badge restore', e); }
+
+  Object.keys(MOD_NAMES).forEach(function(id){
+    try{
+      const d = lLoad(SAVE_PREFIX + id + '-complete', null);
+      const btn = document.getElementById('cbtn-' + id);
+      if (d && d.timestamp){
+        updateBadge(id, 'done');
+        if (btn){ btn.classList.add('confirmed'); btn.textContent = '✅ ' + MOD_NAMES[id] + ' complete'; }
+      }
+    }catch(e){}
+  });
+});
+</script>
+</body>
+</html>

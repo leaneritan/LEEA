@@ -14,6 +14,8 @@ import unit9Grammar2 from "../../content/subjects/english/courses/our-world/leve
 import unit9Grammar2Learner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/grammar2.learner.json";
 import unit9Reading from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/reading.teacher.json";
 import unit9ReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/reading.learner.json";
+import unit9Writing from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/writing.teacher.json";
+import unit9WritingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/writing.learner.json";
 import unit8Opener from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.teacher.json";
 import unit8OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.learner.json";
 import unit8Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab1.teacher.json";
@@ -104,6 +106,8 @@ export const lessons: Lesson[] = [
   unit9Grammar2Learner as Lesson,
   unit9Reading as Lesson,
   unit9ReadingLearner as Lesson,
+  unit9Writing as Lesson,
+  unit9WritingLearner as Lesson,
   unit8Opener as Lesson,
   unit8OpenerLearner as Lesson,
   unit8Vocab1 as Lesson,

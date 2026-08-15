@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 9 · Writing — Cause and Effect | LEEA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"></noscript>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../lib/leea-cloud-config.js"></script>
+<script src="../../lib/leea-cloud.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* ── UNIT 9 · FORCE LAB PALETTE ── */
+  --u9:#DC2626;      --u9d:#991B1B;    --u9l:#FEF2F2;   --u9ll:#FFF5F5;
+  --acc:#F59E0B;     --accd:#B45309;   --accl:#FFFBEB;
+  --gn:#16A34A;      --gnd:#15803D;    --gnl:#F0FDF4;
+  --bl:#2563EB;      --bld:#1D4ED8;    --bll:#EFF6FF;
+  --pu:#7C3AED;      --pul:#F5F3FF;
+  --tl:#0D9488;      --tll:#F0FDFA;
+  --rd:#DC2626;      --rdl:#FEE2E2;
+  --ink:#0F172A;     --ink2:#334155;   --ink3:#64748B;   --ink4:#94A3B8;
+  --paper:#FFFDF8;   --surf:#FFFFFF;   --bdr:#E2E8F0;    --bdr2:#CBD5E1;
+  --fn:'Outfit',system-ui,sans-serif;
+}
+html,body{height:100%;background:#0B0F1A;overflow:hidden;font-family:var(--fn)}
+
+/* ══ DECK STAGE (1920×1080 fixed coordinate space) ══ */
+#deckWrap{position:fixed;inset:0;overflow:hidden;background:#0B0F1A}
+#deck{position:absolute;top:0;left:0;width:1920px;height:1080px;flex:0 0 auto;transform-origin:top left;background:var(--paper);overflow:hidden;will-change:transform}
+
+/* ══ SLIDES ══ */
+.slide{position:absolute;inset:0;padding:96px 110px 130px;display:none;flex-direction:column;justify-content:center}
+.slide.on{display:flex}
+.slide.top{justify-content:flex-start;padding-top:120px}
+
+/* ══ STAGE BADGE (injected by <deck-stage>) ══ */
+deck-stage{position:absolute;top:38px;left:110px;display:flex;align-items:center;gap:12px;z-index:5}
+.sb{font-size:19px;font-weight:800;letter-spacing:3.2px;text-transform:uppercase;padding:8px 20px;border-radius:6px;border:2px solid}
+.sb.warmup{background:var(--accl);color:var(--accd);border-color:#FCD34D}
+.sb.present{background:var(--bll);color:var(--bld);border-color:#BFDBFE}
+.sb.practice{background:var(--pul);color:var(--pu);border-color:#DDD6FE}
+.sb.apply{background:var(--gnl);color:var(--gnd);border-color:#BBF7D0}
+.sb.recap{background:var(--tll);color:var(--tl);border-color:#99F6E4}
+.sb.wrapup{background:#F1F5F9;color:var(--ink2);border-color:var(--bdr2)}
+.sb.vocab{background:var(--u9l);color:var(--u9d);border-color:#FECACA}
+.sb.expert{background:#FDF4FF;color:#A21CAF;border-color:#F5D0FE}
+.sb-sub{font-size:18px;font-weight:600;color:var(--ink4);letter-spacing:.6px}
+
+/* ══ TYPOGRAPHY ══ */
+h1.big{font-size:104px;font-weight:900;line-height:1.02;letter-spacing:-2.5px;color:var(--ink)}
+h2.hd{font-size:70px;font-weight:900;line-height:1.06;letter-spacing:-1.6px;color:var(--ink);margin-bottom:34px}
+h3.sub{font-size:44px;font-weight:800;color:var(--ink);line-height:1.18;margin-bottom:24px}
+p.lead{font-size:38px;font-weight:500;color:var(--ink2);line-height:1.5}
+.kick{font-size:22px;font-weight:800;letter-spacing:5px;text-transform:uppercase;color:var(--u9);margin-bottom:20px}
+.jp{font-size:27px;font-weight:600;color:var(--ink3);line-height:1.5}
+.hl{color:var(--u9)}
+.hl2{color:var(--acc)}
+.hlbl{color:var(--bl)}
+.hlgn{color:var(--gn)}
+
+/* ══ LAYOUT HELPERS ══ */
+.row{display:flex;gap:30px;align-items:stretch;justify-content:center}
+.col{display:flex;flex-direction:column;gap:24px;justify-content:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-content:center}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-content:center}
+.center{text-align:center;align-items:center}
+.mt{margin-top:32px}
+
+/* ══ CARDS ══ */
+.card{background:var(--surf);border:3px solid var(--bdr);border-radius:20px;padding:32px 36px}
+.card.u9{border-color:#FECACA;background:var(--u9l)}
+.card.acc{border-color:#FDE68A;background:var(--accl)}
+.card.bl{border-color:#BFDBFE;background:var(--bll)}
+.card.gn{border-color:#BBF7D0;background:var(--gnl)}
+.card.pu{border-color:#DDD6FE;background:var(--pul)}
+.card-lbl{font-size:20px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+
+/* ══ WORD CARD (vocab reveal prize) ══ */
+.wordcard{background:linear-gradient(155deg,#fff,#FFF7F7);border:5px solid var(--u9);border-radius:28px;padding:44px 54px;text-align:center;box-shadow:0 22px 60px rgba(220,38,38,.16)}
+.wordcard .emo{font-size:104px;line-height:1}
+.wordcard .w{font-size:82px;font-weight:900;color:var(--u9d);letter-spacing:-1.4px;margin-top:8px}
+.wordcard .pos{font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--ink4);margin-top:6px}
+.wordcard .def{font-size:34px;font-weight:600;color:var(--ink2);margin-top:20px;line-height:1.4}
+.wordcard .ex{font-size:30px;font-weight:600;color:var(--u9);font-style:italic;margin-top:16px}
+.wordcard .jpx{font-size:26px;font-weight:600;color:var(--ink3);margin-top:14px}
+
+/* ══ BUTTONS / OPTIONS ══ */
+.opt{background:var(--surf);border:4px solid var(--bdr2);border-radius:18px;padding:26px 32px;font-family:var(--fn);font-size:36px;font-weight:700;color:var(--ink);cursor:pointer;text-align:left;transition:all .18s;line-height:1.3}
+.opt:hover:not(.locked){border-color:var(--u9);background:var(--u9ll);transform:translateY(-3px)}
+.opt.ok{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+.opt.bad{border-color:var(--rd);background:var(--rdl);color:var(--rd);animation:shk .32s}
+.opt.locked{cursor:default}
+.opt .ltr{display:inline-block;min-width:52px;font-weight:900;color:var(--ink4)}
+.opt.confirmed{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+.done-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+
+.fb{font-size:32px;font-weight:700;padding:22px 30px;border-radius:16px;margin-top:24px;display:none;line-height:1.4}
+.fb.show{display:block}
+.fb.ok{background:var(--gnl);border:3px solid #BBF7D0;color:var(--gnd)}
+.fb.bad{background:var(--rdl);border:3px solid #FECACA;color:var(--rd)}
+
+.btn{background:var(--u9);color:#fff;border:none;border-radius:16px;padding:22px 44px;font-family:var(--fn);font-size:32px;font-weight:800;cursor:pointer;transition:all .18s}
+.btn:hover{background:var(--u9d);transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--u9);border:4px solid var(--u9)}
+.btn.acc{background:var(--acc);color:#3F2D00}
+.btn.acc:hover{background:var(--accd);color:#fff}
+
+/* ══ REVEAL ══ */
+.hide{display:none}
+.reveal{animation:pop .34s cubic-bezier(.22,1,.36,1)}
+@keyframes pop{0%{opacity:0;transform:scale(.9) translateY(18px)}100%{opacity:1;transform:none}}
+@keyframes shk{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-9px)}50%{transform:translateX(9px)}}
+
+/* ══ TAP TILE ══ */
+.tile{background:var(--surf);border:4px dashed var(--bdr2);border-radius:20px;padding:34px 30px;text-align:center;cursor:pointer;transition:all .2s;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.tile:hover{border-color:var(--acc);background:var(--accl);transform:translateY(-4px)}
+.tile.open{border-style:solid;border-color:var(--gn);background:var(--gnl);cursor:default}
+.tile .t-emo{font-size:60px;line-height:1}
+.tile .t-q{font-size:32px;font-weight:800;color:var(--ink2)}
+.tile .t-a{font-size:34px;font-weight:800;color:var(--gnd);line-height:1.3}
+
+/* ══ CAUSE/EFFECT CHART ══ */
+.ce{display:grid;grid-template-columns:1fr 120px 1fr;gap:0;border:4px solid var(--ink);border-radius:20px;overflow:hidden;background:var(--surf)}
+.ce-hd{padding:20px;font-size:28px;font-weight:900;letter-spacing:3px;text-transform:uppercase;text-align:center;color:#fff}
+.ce-hd.c{background:var(--bl)}
+.ce-hd.arrow{background:var(--ink);color:#fff;font-size:34px}
+.ce-hd.e{background:var(--gn)}
+.ce-cell{padding:24px 26px;border-top:3px solid var(--bdr);font-size:31px;font-weight:600;color:var(--ink2);line-height:1.35;display:flex;align-items:center;min-height:104px}
+.ce-cell.mid{justify-content:center;font-size:40px;color:var(--ink4);background:#F8FAFC}
+.ce-cell.blank{background:#FFFBEB;color:var(--ink4);font-style:italic}
+.ce-cell.fill{background:var(--gnl);color:var(--gnd);font-weight:800}
+
+/* ══ MODEL TEXT ══ */
+.model{background:var(--surf);border:4px solid var(--bdr);border-left:14px solid var(--acc);border-radius:0 20px 20px 0;padding:34px 40px;font-size:33px;font-weight:500;color:var(--ink2);line-height:1.62}
+.model .cw{background:#DBEAFE;border-bottom:5px solid var(--bl);border-radius:5px;padding:0 6px;font-weight:800;color:var(--bld)}
+.model .ew{background:#DCFCE7;border-bottom:5px solid var(--gn);border-radius:5px;padding:0 6px;font-weight:800;color:var(--gnd)}
+.model .pn{font-size:22px;font-weight:800;letter-spacing:2px;color:var(--ink4);display:block;margin-bottom:8px}
+
+/* ══ CHIPS ══ */
+.chips{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.chip{background:var(--surf);border:4px solid var(--bdr2);border-radius:999px;padding:16px 34px;font-size:32px;font-weight:800;color:var(--ink2)}
+.chip.c{border-color:var(--bl);background:var(--bll);color:var(--bld)}
+.chip.e{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+
+/* ══ WORD MAP ══ */
+.map{position:relative;height:430px}
+.node{position:absolute;background:var(--surf);border:4px solid var(--u9);border-radius:999px;padding:18px 34px;font-size:30px;font-weight:800;color:var(--u9d);white-space:nowrap}
+.node.mid{background:var(--u9);color:#fff;font-size:38px;padding:24px 46px}
+.mapline{position:absolute;background:var(--bdr2);height:4px;transform-origin:left center}
+
+/* ══ PROGRESS / NAV / NOTES (absolute inside #deck) ══ */
+#prog{position:absolute;left:0;right:0;bottom:0;height:9px;background:#F1F5F9;z-index:20}
+#progFill{height:100%;background:linear-gradient(90deg,var(--u9),var(--acc));width:0;transition:width .35s}
+#nav{position:absolute;right:44px;bottom:36px;display:flex;align-items:center;gap:14px;z-index:22}
+.nb{width:74px;height:74px;border-radius:50%;border:4px solid var(--bdr2);background:var(--surf);font-size:32px;font-weight:900;color:var(--ink2);cursor:pointer;transition:all .18s}
+.nb:hover{border-color:var(--u9);color:var(--u9)}
+#counter{font-size:26px;font-weight:800;color:var(--ink3);min-width:130px;text-align:center;letter-spacing:1px}
+.tn-btn{position:absolute;left:44px;bottom:36px;width:74px;height:74px;border-radius:50%;border:4px solid var(--bdr2);background:var(--surf);font-size:32px;cursor:pointer;z-index:22;transition:all .18s}
+.tn-btn:hover{border-color:var(--acc);background:var(--accl)}
+.fs-btn{left:134px}
+.tn-btn.act{background:var(--acc);border-color:var(--accd)}
+.tn-panel{position:absolute;left:0;right:0;bottom:0;max-height:430px;overflow-y:auto;background:rgba(15,23,42,.97);color:#E2E8F0;padding:38px 110px 60px;z-index:21;display:none;border-top:6px solid var(--acc)}
+.tn-panel.open{display:block}
+.tn-panel h4{font-size:24px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:16px}
+.tn-panel p{font-size:27px;line-height:1.55;font-weight:500;margin-bottom:12px}
+.tn-panel em{color:#FDE68A;font-style:italic}
+.tn-panel .say{color:#BBF7D0;font-weight:700}
+#badge{position:absolute;right:44px;top:38px;font-size:20px;font-weight:800;letter-spacing:3px;color:var(--ink4);z-index:5}
+
+/* ══ SCOREBOARD / MISC ══ */
+.stepbar{display:flex;gap:14px;justify-content:center;margin-bottom:26px}
+.step{width:60px;height:12px;border-radius:999px;background:var(--bdr)}
+.step.on{background:var(--u9)}
+.big-emo{font-size:150px;line-height:1}
+.mid-emo{font-size:92px;line-height:1}
+.list{display:flex;flex-direction:column;gap:20px}
+.li{display:flex;gap:20px;align-items:flex-start;font-size:34px;font-weight:600;color:var(--ink2);line-height:1.35}
+.li .n{flex:0 0 54px;height:54px;border-radius:50%;background:var(--u9);color:#fff;font-size:28px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.li .n.gn{background:var(--gn)}
+.li .n.bl{background:var(--bl)}
+.frame{background:var(--accl);border:4px dashed var(--acc);border-radius:20px;padding:28px 34px;font-size:34px;font-weight:700;color:var(--accd);line-height:1.5}
+.tick{display:flex;align-items:center;gap:22px;background:var(--surf);border:4px solid var(--bdr);border-radius:18px;padding:22px 30px;font-size:32px;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .18s}
+.tick:hover{border-color:var(--gn)}
+.tick.on{background:var(--gnl);border-color:var(--gn);color:var(--gnd)}
+.tick .bx{flex:0 0 48px;height:48px;border:4px solid var(--bdr2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:30px}
+.tick.on .bx{background:var(--gn);border-color:var(--gn);color:#fff}
+.dad{background:var(--gnl);border:4px solid #BBF7D0;border-radius:18px;padding:24px 30px;font-size:30px;font-weight:700;color:var(--gnd);line-height:1.45}
+table.share{width:100%;border-collapse:collapse;border:4px solid var(--ink);border-radius:16px;overflow:hidden}
+table.share th{background:var(--ink);color:#fff;font-size:28px;font-weight:800;letter-spacing:2px;padding:18px;text-transform:uppercase}
+table.share td{border:3px solid var(--bdr);padding:22px;font-size:30px;font-weight:600;color:var(--ink2)}
+</style>
+</head>
+<body>
+<div id="deckWrap"><div id="deck">
+
+<div id="badge">LEEA · L4 · U9 · WRITING</div>
+
+<!-- ══════════ 1 · TITLE ══════════ -->
+<section class="slide center" data-stage="Writing" data-stagetone="vocab">
+  <div class="col center">
+    <div class="big-emo">✍️⚡</div>
+    <div class="kick">Our World 2E · Level 4 · Unit 9 · The Science of Fun</div>
+    <h1 class="big">Cause and <span class="hl">Effect</span><br>Writing</h1>
+    <p class="lead mt">Student's Book p. 158 · Workbook pp. 114–115</p>
+  </div>
+</section>
+
+<!-- ══════════ 2 · GOALS ══════════ -->
+<section class="slide top" data-stage="Writing" data-stagetone="vocab">
+  <h2 class="hd">In this lesson, I will&hellip;</h2>
+  <div class="list">
+    <div class="li"><div class="n">1</div><div>read and study a <strong>writing model</strong> about a game.</div></div>
+    <div class="li"><div class="n">2</div><div>write a paragraph of <strong class="hl">cause and effect</strong> about a game I love.</div></div>
+    <div class="li"><div class="n">3</div><div>use <strong class="hlbl">because</strong> and <strong class="hlbl">as</strong> to show a <strong class="hlbl">cause</strong>.</div></div>
+    <div class="li"><div class="n">4</div><div>use <strong class="hlgn">so</strong>, <strong class="hlgn">so that</strong> and <strong class="hlgn">as a result</strong> to show an <strong class="hlgn">effect</strong>.</div></div>
+    <div class="li"><div class="n">5</div><div>check my writing and <strong>share</strong> it.</div></div>
+  </div>
+  <div class="frame mt">⚽ Leo&rsquo;s writing topic: <strong>a game you love</strong> &mdash; and we both know which one that is.</div>
+</section>
+
+<!-- ══════════ 3 · RELATED VOCAB INTRO ══════════ -->
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <div class="col center">
+    <div class="kick">Warm the engine</div>
+    <h2 class="hd">5 action words<br>for the <span class="hl">Force Lab</span></h2>
+    <div class="chips mt">
+      <span class="chip">🏀 bounce</span><span class="chip">🧤 dive</span><span class="chip">🛝 slide</span>
+      <span class="chip">🔁 practice</span><span class="chip">💫 dizzy</span>
+    </div>
+    <p class="lead mt">Every word has a game. Win the game &rarr; win the word card.</p>
+  </div>
+</section>
+
+<!-- ══════════ 4 · BOUNCE · GAME ══════════ -->
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <h3 class="sub">🏀 Bounce Counter &mdash; tap the ball!</h3>
+  <div class="row" style="align-items:center;gap:60px">
+    <div class="col center" style="flex:0 0 520px">
+      <div class="tile" id="bounceBtn" data-act="count" data-key="bounce" data-max="5" style="min-height:300px;width:100%">
+        <div class="t-emo" id="bounceEmo">🏀</div>
+        <div class="t-q">Tap me!</div>
+      </div>
+      <div style="font-size:56px;font-weight:900;color:var(--u9)" id="bounceOut">0</div>
+    </div>
+    <div class="col" style="flex:1">
+      <div class="card acc"><div class="card-lbl">The ball hits the floor &mdash; and comes back up</div>
+        <p class="lead">Down &rarr; up. Down &rarr; up. Down &rarr; up.<br>What is the ball doing?</p></div>
+      <div class="grid2" id="q-bounce">
+        <button class="opt" data-act="opt" data-g="bounce" data-c="0" data-fb="That means to move very fast without touching the ground again.">rolling</button>
+        <button class="opt" data-act="opt" data-g="bounce" data-c="1" data-fb="Yes! To bounce is to hit a surface and jump back up again.">bouncing</button>
+        <button class="opt" data-act="opt" data-g="bounce" data-c="0" data-fb="That is when something falls and stays down.">dropping</button>
+        <button class="opt" data-act="opt" data-g="bounce" data-c="0" data-fb="That is turning around and around.">spinning</button>
+      </div>
+      <div class="fb" id="fb-bounce"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 5 · BOUNCE · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <div class="wordcard">
+    <div class="emo">🏀</div>
+    <div class="w">bounce</div>
+    <div class="pos">verb</div>
+    <div class="def">to hit a surface and move back up again</div>
+    <div class="ex">&ldquo;The more air the ball has inside it, the higher it bounces.&rdquo;</div>
+    <div class="jpx">はずむ・バウンドする</div>
+  </div>
+</section>
+
+<!-- ══════════ 6 · DIVE · GAME ══════════ -->
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <h3 class="sub">🧤 Penalty Shootout &mdash; which way does the keeper go?</h3>
+  <p class="lead" style="margin-bottom:26px">The striker shoots to the keeper&rsquo;s <strong>left</strong>. The keeper jumps sideways through the air to stop it. What does the keeper do?</p>
+  <div class="grid3" id="q-dive">
+    <button class="opt center" data-act="opt" data-g="dive" data-c="0" data-fb="To lean is to bend your body to one side &mdash; the keeper does much more than lean here.">He leans.</button>
+    <button class="opt center" data-act="opt" data-g="dive" data-c="1" data-fb="Correct! To dive is to jump forward or sideways through the air, usually head first.">He dives.</button>
+    <button class="opt center" data-act="opt" data-g="dive" data-c="0" data-fb="To balance is to stay steady and not fall over.">He balances.</button>
+  </div>
+  <div class="fb" id="fb-dive"></div>
+</section>
+
+<!-- ══════════ 7 · DIVE · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <div class="wordcard">
+    <div class="emo">🧤</div>
+    <div class="w">dive</div>
+    <div class="pos">verb</div>
+    <div class="def">to jump through the air, head or hands first</div>
+    <div class="ex">&ldquo;The goalkeeper dives to the left, so the ball does not go in.&rdquo;</div>
+    <div class="jpx">飛(と)び込(こ)む・ダイビングする</div>
+  </div>
+</section>
+
+<!-- ══════════ 8 · SLIDE · GAME ══════════ -->
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <h3 class="sub">🛝 Friction Lab &mdash; tap each surface</h3>
+  <p class="lead" style="margin-bottom:24px">A player runs, then goes down and moves along the ground to reach the ball. On which surface does he go the <strong>furthest</strong>?</p>
+  <div class="grid3">
+    <div class="tile" data-act="tap" data-a="Very short &mdash; lots of friction!"><div class="t-emo">🟫</div><div class="t-q">dry sand</div></div>
+    <div class="tile" data-act="tap" data-a="Long! Wet grass = less friction."><div class="t-emo">🟩</div><div class="t-q">wet grass</div></div>
+    <div class="tile" data-act="tap" data-a="Short &mdash; rubber grips and stops you."><div class="t-emo">⬛</div><div class="t-q">rubber mat</div></div>
+  </div>
+  <div class="card bl mt"><div class="card-lbl">So what is he doing?</div>
+    <div class="grid3" id="q-slide" style="margin-top:10px">
+      <button class="opt center" data-act="opt" data-g="slide" data-c="0" data-fb="To rub is to push two things together, but he is moving a long way here.">rubbing</button>
+      <button class="opt center" data-act="opt" data-g="slide" data-c="1" data-fb="Yes! To slide is to move smoothly along a surface.">sliding</button>
+      <button class="opt center" data-act="opt" data-g="slide" data-c="0" data-fb="To connect is to join two things together.">connecting</button>
+    </div>
+    <div class="fb" id="fb-slide"></div>
+  </div>
+</section>
+
+<!-- ══════════ 9 · SLIDE · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <div class="wordcard">
+    <div class="emo">🛝</div>
+    <div class="w">slide</div>
+    <div class="pos">verb</div>
+    <div class="def">to move smoothly along a surface</div>
+    <div class="ex">&ldquo;As the grass is wet, the player slides a long way.&rdquo;</div>
+    <div class="jpx">すべる</div>
+  </div>
+</section>
+
+<!-- ══════════ 10 · PRACTICE · GAME ══════════ -->
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <h3 class="sub">🔁 Training Week &mdash; tap all five days</h3>
+  <p class="lead" style="margin-bottom:26px">Leo does the same thing again and again, every day, to get better.</p>
+  <div class="grid3" style="grid-template-columns:repeat(5,1fr)">
+    <div class="tile" data-act="tap" data-count="practice" data-a="⚽ 100 shots"><div class="t-emo">1️⃣</div><div class="t-q">Mon</div></div>
+    <div class="tile" data-act="tap" data-count="practice" data-a="⚽ 100 shots"><div class="t-emo">2️⃣</div><div class="t-q">Tue</div></div>
+    <div class="tile" data-act="tap" data-count="practice" data-a="⚽ 100 shots"><div class="t-emo">3️⃣</div><div class="t-q">Wed</div></div>
+    <div class="tile" data-act="tap" data-count="practice" data-a="⚽ 100 shots"><div class="t-emo">4️⃣</div><div class="t-q">Thu</div></div>
+    <div class="tile" data-act="tap" data-count="practice" data-a="⚽ 100 shots"><div class="t-emo">5️⃣</div><div class="t-q">Fri</div></div>
+  </div>
+  <div class="hide mt" id="practiceReveal">
+    <div class="card gn"><p class="lead center">500 shots in one week. On Saturday, Leo scores. 🥅<br><strong class="hlgn">Because he practices a lot, he gets better.</strong></p></div>
+  </div>
+</section>
+
+<!-- ══════════ 11 · PRACTICE · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <div class="wordcard">
+    <div class="emo">🔁</div>
+    <div class="w">practice</div>
+    <div class="pos">verb / noun</div>
+    <div class="def">to do something again and again to get better at it</div>
+    <div class="ex">&ldquo;The more you practice, the better you play.&rdquo;</div>
+    <div class="jpx">練習(れんしゅう)する</div>
+  </div>
+</section>
+
+<!-- ══════════ 12 · DIZZY · GAME ══════════ -->
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <h3 class="sub">💫 Spin-o-meter &mdash; tap to spin three times</h3>
+  <div class="row" style="align-items:center;gap:60px">
+    <div class="col center" style="flex:0 0 520px">
+      <div class="tile" data-act="count" data-key="dizzy" data-max="3" style="min-height:300px;width:100%">
+        <div class="t-emo" id="dizzyEmo">🎠</div>
+        <div class="t-q">Spin!</div>
+      </div>
+      <div style="font-size:56px;font-weight:900;color:var(--u9)" id="dizzyOut">0</div>
+    </div>
+    <div class="col" style="flex:1">
+      <div class="card acc"><p class="lead">You spin around very fast on the merry-go-round. Then you stop&hellip; but the room keeps moving!</p></div>
+      <div class="grid2" id="q-dizzy">
+        <button class="opt" data-act="opt" data-g="dizzy" data-c="0" data-fb="Not quite &mdash; that means you have lots of energy.">I feel strong.</button>
+        <button class="opt" data-act="opt" data-g="dizzy" data-c="1" data-fb="Right! When you are dizzy, everything seems to turn and you cannot balance well.">I feel dizzy.</button>
+      </div>
+      <div class="fb" id="fb-dizzy"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 13 · DIZZY · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <div class="wordcard">
+    <div class="emo">💫</div>
+    <div class="w">dizzy</div>
+    <div class="pos">adjective</div>
+    <div class="def">feeling like everything is turning around you</div>
+    <div class="ex">&ldquo;I spin around very fast. As a result, I get dizzy.&rdquo;</div>
+    <div class="jpx">めまいがする・目(め)が回(まわ)る</div>
+  </div>
+</section>
+
+<!-- ══════════ 14 · ACADEMIC LANGUAGE INTRO ══════════ -->
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+  <div class="col center">
+    <div class="kick">The words teachers use</div>
+    <h2 class="hd">3 <span class="hl">academic</span> words</h2>
+    <div class="chips mt">
+      <span class="chip">🔗 cause and effect</span><span class="chip">🕵️ critical thinking</span><span class="chip">🖼️ description</span>
+    </div>
+    <p class="lead mt">These are the words <em>about</em> writing. Learn them and you understand the task.</p>
+  </div>
+</section>
+
+<!-- ══════════ 15 · CAUSE AND EFFECT · GAME ══════════ -->
+<section class="slide top" data-stage="Academic Language" data-stagetone="expert">
+  <h3 class="sub">🔗 Domino Chain &mdash; tap the dominoes from left to right</h3>
+  <div class="grid3" style="grid-template-columns:repeat(4,1fr)">
+    <div class="tile" data-act="tap" data-a="This is the CAUSE."><div class="t-emo">👆</div><div class="t-q">I push the first domino.</div></div>
+    <div class="tile" data-act="tap" data-a="Effect 1"><div class="t-emo">🁫</div><div class="t-q">It falls.</div></div>
+    <div class="tile" data-act="tap" data-a="Effect 2"><div class="t-emo">🁫</div><div class="t-q">It hits the next one.</div></div>
+    <div class="tile" data-act="tap" data-a="This is the EFFECT."><div class="t-emo">🎉</div><div class="t-q">They all fall down!</div></div>
+  </div>
+  <div class="card bl mt"><div class="card-lbl">Now finish the rule</div>
+    <p class="lead" style="margin-bottom:20px">A <strong>cause</strong> is what you DO. An <strong>effect</strong> is&hellip;</p>
+    <div class="grid2" id="q-cae">
+      <button class="opt" data-act="opt" data-g="cae" data-c="0" data-fb="Close, but that is the cause &mdash; the first thing, the thing you do.">the first thing you do.</button>
+      <button class="opt" data-act="opt" data-g="cae" data-c="1" data-fb="Exactly! The effect is what happens because of the cause.">what happens because of it.</button>
+    </div>
+    <div class="fb" id="fb-cae"></div>
+  </div>
+</section>
+
+<!-- ══════════ 16 · CAUSE AND EFFECT · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+  <div class="wordcard">
+    <div class="emo">🔗</div>
+    <div class="w">cause and effect</div>
+    <div class="pos">academic phrase</div>
+    <div class="def">a <strong>cause</strong> is why something happens &middot;<br>an <strong>effect</strong> is what happens</div>
+    <div class="ex">&ldquo;I kick the ball. <span style="color:var(--gn)">As a result</span>, it goes into the goal.&rdquo;</div>
+    <div class="jpx">原因(げんいん)と結果(けっか)</div>
+  </div>
+</section>
+
+<!-- ══════════ 17 · CRITICAL THINKING · GAME ══════════ -->
+<section class="slide top" data-stage="Academic Language" data-stagetone="expert">
+  <h3 class="sub">🕵️ Detective Test &mdash; which question is critical thinking?</h3>
+  <div class="card u9" style="margin-bottom:26px"><p class="lead">🧪 <strong>The clue:</strong> A skater spins with her arms out. She pulls her arms in&hellip; and spins much faster.</p></div>
+  <div class="col" id="q-crit">
+    <button class="opt" data-act="opt" data-g="crit" data-c="0" data-fb="That question only asks for a name. A detective wants more than a name.">What is her name?</button>
+    <button class="opt" data-act="opt" data-g="crit" data-c="0" data-fb="Useful, but you can just look and see the answer. No thinking needed.">What colour are her skates?</button>
+    <button class="opt" data-act="opt" data-g="crit" data-c="1" data-fb="That is critical thinking! You ask WHY, look for reasons, and work out the answer yourself.">Why does she spin faster when she pulls her arms in?</button>
+  </div>
+  <div class="fb" id="fb-crit"></div>
+</section>
+
+<!-- ══════════ 18 · CRITICAL THINKING · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+  <div class="wordcard">
+    <div class="emo">🕵️</div>
+    <div class="w">critical thinking</div>
+    <div class="pos">academic phrase</div>
+    <div class="def">asking <strong>why</strong>, looking for reasons,<br>and working out the answer yourself</div>
+    <div class="ex">&ldquo;Good writers use critical thinking to explain why things happen.&rdquo;</div>
+    <div class="jpx">批判的(ひはんてき)思考(しこう)</div>
+  </div>
+</section>
+
+<!-- ══════════ 19 · DESCRIPTION · GAME ══════════ -->
+<section class="slide top" data-stage="Academic Language" data-stagetone="expert">
+  <h3 class="sub">🖼️ Guess From the Description</h3>
+  <p class="lead" style="margin-bottom:24px">Tap each clue, then choose the object.</p>
+  <div class="grid3">
+    <div class="tile" data-act="tap" data-a="It is round."><div class="t-emo">1️⃣</div><div class="t-q">Clue 1</div></div>
+    <div class="tile" data-act="tap" data-a="It bounces."><div class="t-emo">2️⃣</div><div class="t-q">Clue 2</div></div>
+    <div class="tile" data-act="tap" data-a="You kick it, and it is black and white."><div class="t-emo">3️⃣</div><div class="t-q">Clue 3</div></div>
+  </div>
+  <div class="card gn mt"><div class="card-lbl">Those three clues together are a description. What is it?</div>
+    <div class="grid3" style="margin-top:10px" id="q-desc">
+      <button class="opt center" data-act="opt" data-g="desc" data-c="0" data-fb="A balloon does not really bounce, and you do not kick it.">a balloon</button>
+      <button class="opt center" data-act="opt" data-g="desc" data-c="1" data-fb="Yes! A description tells you what something is like, so you can picture it.">a soccer ball</button>
+      <button class="opt center" data-act="opt" data-g="desc" data-c="0" data-fb="A swing is not round and it does not bounce.">a swing</button>
+    </div>
+    <div class="fb" id="fb-desc"></div>
+  </div>
+</section>
+
+<!-- ══════════ 20 · DESCRIPTION · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+  <div class="wordcard">
+    <div class="emo">🖼️</div>
+    <div class="w">description</div>
+    <div class="pos">noun</div>
+    <div class="def">words that tell you what something is like,<br>so you can picture it in your head</div>
+    <div class="ex">&ldquo;Isabelle writes a description of tetherball, so we can see the game.&rdquo;</div>
+    <div class="jpx">説明(せつめい)・描写(びょうしゃ)</div>
+  </div>
+</section>
+
+<!-- ══════════ 21 · CONTENT VOCABULARY INTRO ══════════ -->
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <div class="col center">
+    <div class="kick">The 5 connecting words of this lesson</div>
+    <h2 class="hd">Cause words &amp; <span class="hl">Effect</span> words</h2>
+    <div class="row mt" style="gap:50px">
+      <div class="card bl" style="flex:1"><div class="card-lbl" style="color:var(--bld)">➡️ These show a CAUSE (why)</div>
+        <div class="chips" style="justify-content:flex-start"><span class="chip c">because</span><span class="chip c">as</span></div></div>
+      <div class="card gn" style="flex:1"><div class="card-lbl" style="color:var(--gnd)">✅ These show an EFFECT (what happens)</div>
+        <div class="chips" style="justify-content:flex-start"><span class="chip e">so</span><span class="chip e">so that</span><span class="chip e">as a result</span></div></div>
+    </div>
+    <p class="lead mt">Five words. Five games. Let&rsquo;s go. ⚡</p>
+  </div>
+</section>
+
+<!-- ══════════ 22 · BECAUSE · GAME ══════════ -->
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <h3 class="sub">❓ The Why Machine &mdash; feed it a reason</h3>
+  <div class="card u9" style="margin-bottom:26px"><p class="lead center" style="font-size:42px">&ldquo;Leo went to the park <span class="hl">_______</span> there is a new soccer pitch there.&rdquo;</p></div>
+  <p class="lead" style="margin-bottom:20px">The machine wants the <strong class="hlbl">reason</strong>. Which word opens the reason?</p>
+  <div class="grid2" id="q-because">
+    <button class="opt" data-act="opt" data-g="because" data-c="1" data-fb="Correct. Because always introduces the cause &mdash; the reason why.">because</button>
+    <button class="opt" data-act="opt" data-g="because" data-c="0" data-fb="So introduces the effect, not the reason. Wrong end of the sentence!">so</button>
+    <button class="opt" data-act="opt" data-g="because" data-c="0" data-fb="As a result also introduces an effect, not a reason.">as a result</button>
+    <button class="opt" data-act="opt" data-g="because" data-c="0" data-fb="So that tells us the purpose or goal, not the reason it already exists.">so that</button>
+  </div>
+  <div class="fb" id="fb-because"></div>
+</section>
+
+<!-- ══════════ 23 · BECAUSE · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <div class="wordcard" style="border-color:var(--bl);box-shadow:0 22px 60px rgba(37,99,235,.16)">
+    <div class="emo">❓</div>
+    <div class="w" style="color:var(--bld)">because</div>
+    <div class="pos">cause word</div>
+    <div class="def">introduces the <strong>reason why</strong> something happens</div>
+    <div class="ex" style="color:var(--bl)">&ldquo;We went to the park <strong>because</strong> there&rsquo;s a new tetherball court there.&rdquo;</div>
+    <div class="jpx">〜だから・〜なので</div>
+  </div>
+</section>
+
+<!-- ══════════ 24 · AS · GAME ══════════ -->
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <h3 class="sub">🔄 The Swap Test &mdash; can you change the word?</h3>
+  <p class="lead" style="margin-bottom:24px">Tap each sentence to swap <strong class="hlbl">because</strong> for <strong class="hlbl">as</strong>. Does the meaning change?</p>
+  <div class="col">
+    <div class="tile" data-act="tap" data-a="As there aren't many rules, it's easy to start playing. ✅ Same meaning!" style="min-height:120px"><div class="t-q">Because there aren&rsquo;t many rules, it&rsquo;s easy to start playing.</div></div>
+    <div class="tile" data-act="tap" data-a="As the grass is wet, the player slides a long way. ✅ Same meaning!" style="min-height:120px"><div class="t-q">Because the grass is wet, the player slides a long way.</div></div>
+  </div>
+  <div class="card bl mt"><div class="card-lbl">So what is &lsquo;as&rsquo;?</div>
+    <div class="grid2" style="margin-top:10px" id="q-as">
+      <button class="opt" data-act="opt" data-g="as" data-c="1" data-fb="Right. As means the same as because &mdash; it gives the reason. It often starts the sentence.">Another way to say &lsquo;because&rsquo;</button>
+      <button class="opt" data-act="opt" data-g="as" data-c="0" data-fb="No &mdash; the effect words are so, so that and as a result.">Another way to say &lsquo;so&rsquo;</button>
+    </div>
+    <div class="fb" id="fb-as"></div>
+  </div>
+</section>
+
+<!-- ══════════ 25 · AS · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <div class="wordcard" style="border-color:var(--bl);box-shadow:0 22px 60px rgba(37,99,235,.16)">
+    <div class="emo">🔄</div>
+    <div class="w" style="color:var(--bld)">as</div>
+    <div class="pos">cause word</div>
+    <div class="def">the same job as <strong>because</strong> &mdash; it gives the reason</div>
+    <div class="ex" style="color:var(--bl)">&ldquo;<strong>As</strong> there aren&rsquo;t many rules, it&rsquo;s easy to start playing tetherball.&rdquo;</div>
+    <div class="jpx">〜なので（because と同(おな)じ）</div>
+  </div>
+</section>
+
+<!-- ══════════ 26 · SO · GAME ══════════ -->
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <h3 class="sub">➡️ Arrow Launcher &mdash; where does the arrow point?</h3>
+  <div class="ce" style="margin-bottom:28px">
+    <div class="ce-hd c">Cause</div><div class="ce-hd arrow">➡️</div><div class="ce-hd e">Effect</div>
+    <div class="ce-cell">My brother plays a lot,</div><div class="ce-cell mid">so</div><div class="ce-cell fill">he taught me.</div>
+  </div>
+  <p class="lead" style="margin-bottom:20px">Now you try. Which half comes <strong class="hlgn">after</strong> the word <strong>so</strong>?</p>
+  <div class="card acc" style="margin-bottom:22px"><p class="lead center" style="font-size:40px">&ldquo;The rain was very heavy, <strong class="hlgn">so</strong> _______&rdquo;</p></div>
+  <div class="grid2" id="q-so">
+    <button class="opt" data-act="opt" data-g="so" data-c="0" data-fb="That is another cause. After so we need the result, not a second reason.">the players wanted to win.</button>
+    <button class="opt" data-act="opt" data-g="so" data-c="1" data-fb="Yes! After so comes the effect &mdash; what happened because of the rain.">the match was cancelled.</button>
+  </div>
+  <div class="fb" id="fb-so"></div>
+</section>
+
+<!-- ══════════ 27 · SO · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+    <div class="emo">➡️</div>
+    <div class="w" style="color:var(--gnd)">so</div>
+    <div class="pos">effect word</div>
+    <div class="def">shows the <strong>result</strong> &mdash; what happened next</div>
+    <div class="ex" style="color:var(--gn)">&ldquo;My brother plays a lot, <strong>so</strong> he taught me.&rdquo;</div>
+    <div class="jpx">〜だから・それで</div>
+  </div>
+</section>
+
+<!-- ══════════ 28 · SO THAT · GAME ══════════ -->
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <h3 class="sub">🎯 Purpose Target &mdash; so vs. so that</h3>
+  <div class="row" style="gap:30px;margin-bottom:26px">
+    <div class="card gn" style="flex:1"><div class="card-lbl" style="color:var(--gnd)">so = what happened</div><p class="lead">&ldquo;He hit the ball hard, <strong>so</strong> it went over the fence.&rdquo;<br><span class="jp">Result. It already happened.</span></p></div>
+    <div class="card pu" style="flex:1"><div class="card-lbl" style="color:var(--pu)">so that = the goal you want</div><p class="lead">&ldquo;You hit the ball <strong>so that</strong> it turns around the pole.&rdquo;<br><span class="jp">Purpose. That is WHY you do it.</span></p></div>
+  </div>
+  <p class="lead" style="margin-bottom:18px">Choose the sentence that shows a <strong>goal</strong>, not just a result:</p>
+  <div class="col" id="q-sothat">
+    <button class="opt" data-act="opt" data-g="sothat" data-c="0" data-fb="This is a result that already happened. Use so for this one.">She practised every day, so she got much better.</button>
+    <button class="opt" data-act="opt" data-g="sothat" data-c="1" data-fb="Correct! She wears the gloves for a reason &mdash; that is her goal. So that shows purpose.">She wears gloves so that her hands do not get cold.</button>
+  </div>
+  <div class="fb" id="fb-sothat"></div>
+</section>
+
+<!-- ══════════ 29 · SO THAT · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <div class="wordcard" style="border-color:var(--pu);box-shadow:0 22px 60px rgba(124,58,237,.16)">
+    <div class="emo">🎯</div>
+    <div class="w" style="color:var(--pu)">so that</div>
+    <div class="pos">effect word &middot; purpose</div>
+    <div class="def">shows the <strong>goal</strong> &mdash; the effect you WANT to happen</div>
+    <div class="ex" style="color:var(--pu)">&ldquo;You hit the ball <strong>so that</strong> it turns around the pole.&rdquo;</div>
+    <div class="jpx">〜するように・〜するために</div>
+  </div>
+</section>
+
+<!-- ══════════ 30 · AS A RESULT · GAME ══════════ -->
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <h3 class="sub">🏁 Full Stop Finder &mdash; where does it go?</h3>
+  <div class="card acc" style="margin-bottom:26px"><p class="lead">⚠️ <strong>as a result</strong> is special. It starts a <strong>brand new sentence</strong>, and it takes a comma after it.</p></div>
+  <p class="lead" style="margin-bottom:20px">Which one is written correctly?</p>
+  <div class="col" id="q-asaresult">
+    <button class="opt" data-act="opt" data-g="asaresult" data-c="0" data-fb="Not quite &mdash; there is no full stop before it and no comma after it.">I spin around fast as a result I get dizzy.</button>
+    <button class="opt" data-act="opt" data-g="asaresult" data-c="1" data-fb="Perfect. Full stop, capital A, then a comma: I spin around fast. As a result, I get dizzy.">I spin around fast. As a result, I get dizzy.</button>
+    <button class="opt" data-act="opt" data-g="asaresult" data-c="0" data-fb="The comma is in the wrong place. It goes after the whole phrase.">I spin around fast. As, a result I get dizzy.</button>
+  </div>
+  <div class="fb" id="fb-asaresult"></div>
+</section>
+
+<!-- ══════════ 31 · AS A RESULT · WORD CARD ══════════ -->
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+    <div class="emo">🏁</div>
+    <div class="w" style="color:var(--gnd)">as a result</div>
+    <div class="pos">effect phrase</div>
+    <div class="def">starts a new sentence and shows<br>what happened <strong>because of</strong> the last sentence</div>
+    <div class="ex" style="color:var(--gn)">&ldquo;I hit the ball in a big circle. <strong>As a result,</strong> it was easy for my brother to hit it.&rdquo;</div>
+    <div class="jpx">その結果(けっか)</div>
+  </div>
+</section>
+
+<!-- ══════════ 32 · WARM UP ══════════ -->
+<section class="slide top" data-stage="Warm Up" data-stagetone="warmup">
+  <h2 class="hd">🏀 One sentence on the board&hellip;</h2>
+  <div class="card u9" style="margin-bottom:30px"><p class="lead center" style="font-size:46px">&ldquo;My team practices a lot before our basketball game.&rdquo;</p></div>
+  <h3 class="sub">What <span class="hl">effect</span> will this practice have? Tap to find out.</h3>
+  <div class="grid3">
+    <div class="tile" data-act="tap" data-a="The team will get better."><div class="t-emo">📈</div><div class="t-q">Effect 1?</div></div>
+    <div class="tile" data-act="tap" data-a="They'll win the game."><div class="t-emo">🏆</div><div class="t-q">Effect 2?</div></div>
+    <div class="tile" data-act="tap" data-a="The players will feel confident."><div class="t-emo">💪</div><div class="t-q">Effect 3?</div></div>
+  </div>
+</section>
+
+<!-- ══════════ 33 · WARM UP · THE RULE ══════════ -->
+<section class="slide center" data-stage="Warm Up" data-stagetone="warmup">
+  <div class="col center" style="width:100%">
+    <h2 class="hd">Remember the two halves</h2>
+    <div class="row" style="gap:40px;width:100%">
+      <div class="card bl" style="flex:1;text-align:center"><div class="mid-emo">👟</div>
+        <h3 class="sub" style="color:var(--bld);margin-top:14px">CAUSE</h3>
+        <p class="lead">something you <strong>do</strong></p>
+        <p class="jp" style="margin-top:12px">My team practices a lot.</p></div>
+      <div class="col center" style="flex:0 0 120px;justify-content:center"><div style="font-size:80px">➡️</div></div>
+      <div class="card gn" style="flex:1;text-align:center"><div class="mid-emo">🏆</div>
+        <h3 class="sub" style="color:var(--gnd);margin-top:14px">EFFECT</h3>
+        <p class="lead">what <strong>happens</strong> because of it</p>
+        <p class="jp" style="margin-top:12px">They win the game.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 34 · PRESENT · CHART ROW 1 ══════════ -->
+<section class="slide top" data-stage="Present" data-stagetone="present">
+  <h2 class="hd">🧪 Fill the Force Lab chart</h2>
+  <div class="ce">
+    <div class="ce-hd c">Cause</div><div class="ce-hd arrow">➡️</div><div class="ce-hd e">Effect</div>
+    <div class="ce-cell">I spin around very fast.</div><div class="ce-cell mid">➡️</div>
+    <div class="ce-cell blank" data-act="tap" data-a="I get dizzy." style="cursor:pointer">tap to reveal&hellip;</div>
+  </div>
+  <p class="lead mt center">The cause is written. <strong class="hlgn">You</strong> find the effect.</p>
+</section>
+
+<!-- ══════════ 35 · PRESENT · CHART ROW 2 (missing cause) ══════════ -->
+<section class="slide top" data-stage="Present" data-stagetone="present">
+  <h2 class="hd">Now the other way round 🔄</h2>
+  <div class="ce">
+    <div class="ce-hd c">Cause</div><div class="ce-hd arrow">➡️</div><div class="ce-hd e">Effect</div>
+    <div class="ce-cell blank" data-act="tap" data-a="I lose my balance." style="cursor:pointer">tap to reveal&hellip;</div>
+    <div class="ce-cell mid">➡️</div><div class="ce-cell">I fall over.</div>
+    <div class="ce-cell">I pushed my brother on the swing.</div><div class="ce-cell mid">➡️</div>
+    <div class="ce-cell blank" data-act="tap" data-a="He went higher and higher." style="cursor:pointer">tap to reveal&hellip;</div>
+  </div>
+  <div class="dad mt">💬 Dad asks: <em>Why do you fall over?</em> That question finds the <strong>cause</strong>.</div>
+</section>
+
+<!-- ══════════ 36 · PRESENT · CONNECT THEM ══════════ -->
+<section class="slide top" data-stage="Present" data-stagetone="present">
+  <h2 class="hd">Now <span class="hl">connect</span> the two halves</h2>
+  <div class="chips" style="margin-bottom:32px">
+    <span class="chip e">so</span><span class="chip e">so that</span><span class="chip e">as a result</span>
+  </div>
+  <div class="card acc" style="margin-bottom:26px"><div class="card-lbl">Dad&rsquo;s model</div>
+    <p class="lead" style="font-size:42px">I spin around very fast on the merry-go-round.<br><strong class="hlgn">As a result,</strong> I get dizzy. 💫</p></div>
+  <h3 class="sub">Your turn &mdash; choose the best connector:</h3>
+  <div class="card u9" style="margin-bottom:20px"><p class="lead center" style="font-size:40px">&ldquo;I pushed my brother on the swing, ______ he went higher and higher.&rdquo;</p></div>
+  <div class="grid3" id="q-connect">
+    <button class="opt center" data-act="opt" data-g="connect" data-c="1" data-fb="Yes. One sentence, comma, then so + the effect. Simple and correct.">so</button>
+    <button class="opt center" data-act="opt" data-g="connect" data-c="0" data-fb="That would mean it was your goal. You did not push him in order to make him go higher &mdash; it just happened.">so that</button>
+    <button class="opt center" data-act="opt" data-g="connect" data-c="0" data-fb="This one needs a full stop first: '...on the swing. As a result, he went higher.'">as a result</button>
+  </div>
+  <div class="fb" id="fb-connect"></div>
+</section>
+
+<!-- ══════════ 37 · READ THE MODEL · MEET ISABELLE ══════════ -->
+<section class="slide top" data-stage="Read the Model" data-stagetone="present">
+  <h2 class="hd">📖 Open your book &mdash; page 158</h2>
+  <div class="row" style="gap:36px">
+    <div class="card bl" style="flex:1"><div class="card-lbl" style="color:var(--bld)">The writer</div>
+      <p class="lead"><strong>Isabelle</strong> wrote about a game she learned last week: <strong>tetherball</strong>.</p></div>
+    <div class="card acc" style="flex:1.3"><div class="card-lbl">What is tetherball? 🎾</div>
+      <p class="lead">A ball on a <strong>rope</strong>. The rope is tied to a tall <strong>pole</strong>. Two players hit the ball in opposite directions to wind the rope around the pole.</p></div>
+  </div>
+  <div class="card gn mt"><div class="card-lbl" style="color:var(--gnd)">Your job while we read</div>
+    <p class="lead">🔵 Find the <strong class="hlbl">cause words</strong>. 🟢 Find the <strong class="hlgn">effect words</strong>. Underline all of them.</p></div>
+</section>
+
+<!-- ══════════ 38 · MODEL PARAGRAPH 1 ══════════ -->
+<section class="slide top" data-stage="Read the Model" data-stagetone="present">
+  <h3 class="sub">Paragraph 1 &mdash; How she started playing</h3>
+  <div class="model">
+    <span class="pn">PARAGRAPH 1</span>
+    Last week I learned how to play tetherball with my brother. My brother plays a lot, <span class="ew">so</span> he taught me. We went to the park <span class="cw">because</span> there&rsquo;s a new tetherball court there.
+  </div>
+  <div class="row mt" style="gap:26px">
+    <div class="card bl" style="flex:1"><p class="lead"><strong class="hlbl">because</strong> &rarr; the reason they went to the park</p></div>
+    <div class="card gn" style="flex:1"><p class="lead"><strong class="hlgn">so</strong> &rarr; the result of her brother playing a lot</p></div>
+  </div>
+  <p class="lead mt center">Found: <strong>2</strong> connectors 🔍</p>
+</section>
+
+<!-- ══════════ 39 · MODEL PARAGRAPH 2 ══════════ -->
+<section class="slide top" data-stage="Read the Model" data-stagetone="present">
+  <h3 class="sub">Paragraph 2 &mdash; How you play the game</h3>
+  <div class="model">
+    <span class="pn">PARAGRAPH 2</span>
+    <span class="cw">As</span> there aren&rsquo;t many rules, it&rsquo;s easy to start playing tetherball. Two people play the game. One person hits the ball to the right. The other person hits it to the left. <span class="cw">Because</span> the rope is connected to a pole, the ball can&rsquo;t fly away. You hit the ball <span class="ew">so that</span> it turns around the pole. Tetherball looks easy. But it isn&rsquo;t.
+  </div>
+  <div class="row mt" style="gap:22px">
+    <div class="card bl" style="flex:1"><p class="lead"><strong class="hlbl">As</strong> &rarr; starts the sentence with the reason</p></div>
+    <div class="card bl" style="flex:1"><p class="lead"><strong class="hlbl">Because</strong> &rarr; the reason the ball can&rsquo;t fly away</p></div>
+    <div class="card pu" style="flex:1"><p class="lead"><strong style="color:var(--pu)">so that</strong> &rarr; your goal when you hit it</p></div>
+  </div>
+  <p class="lead mt center">Found: <strong>3</strong> more 🔍 &nbsp;(total 5)</p>
+</section>
+
+<!-- ══════════ 40 · MODEL PARAGRAPH 3 ══════════ -->
+<section class="slide top" data-stage="Read the Model" data-stagetone="present">
+  <h3 class="sub">Paragraph 3 &mdash; What happened when she played</h3>
+  <div class="model">
+    <span class="pn">PARAGRAPH 3</span>
+    Last week I hit the ball, it flew around in a big circle. <span class="ew">As a result,</span> it was easy for my brother to hit it. Then he hit the ball. It went fast and very high <span class="ew">so that</span> I couldn&rsquo;t hit it. <span class="ew">So</span> he won every game. <span class="cw">Because</span> I want to win next time, I&rsquo;m going to practice a lot from now on!
+  </div>
+  <p class="lead mt center">Found: <strong>4</strong> more 🔍 &nbsp;&mdash; <strong class="hl">9 connectors altogether!</strong></p>
+  <div class="dad mt">💬 Notice the last sentence: she ends with a <strong>cause</strong>, not an effect. That is allowed! The cause can come first.</div>
+</section>
+
+<!-- ══════════ 41 · MODEL · COUNT THEM ══════════ -->
+<section class="slide top" data-stage="Practice" data-stagetone="practice">
+  <h2 class="hd">🔍 All 9 &mdash; sorted</h2>
+  <div class="row" style="gap:40px">
+    <div class="card bl" style="flex:1"><div class="card-lbl" style="color:var(--bld)">Cause words &mdash; 4 found</div>
+      <div class="chips" style="justify-content:flex-start"><span class="chip c">because</span><span class="chip c">As</span><span class="chip c">Because</span><span class="chip c">Because</span></div></div>
+    <div class="card gn" style="flex:1"><div class="card-lbl" style="color:var(--gnd)">Effect words &mdash; 5 found</div>
+      <div class="chips" style="justify-content:flex-start"><span class="chip e">so</span><span class="chip e">so that</span><span class="chip e">As a result</span><span class="chip e">so that</span><span class="chip e">So</span></div></div>
+  </div>
+  <div class="card acc mt"><p class="lead">✏️ <strong>Workbook p. 114, step 4 asks:</strong> which words did she use to connect cause and effect?<br>Answer: <strong>so &middot; because &middot; as &middot; so that &middot; as a result</strong> &mdash; all five!</p></div>
+</section>
+
+<!-- ══════════ 42 · WB · WORD MAP ══════════ -->
+<section class="slide top" data-stage="Practice" data-stagetone="practice">
+  <h2 class="hd">🗺️ How Isabelle planned it &mdash; her word map</h2>
+  <div class="row" style="gap:36px;align-items:center">
+    <div class="map" style="flex:0 0 720px">
+      <div class="node mid" style="left:250px;top:190px">tetherball</div>
+      <div class="node" style="left:280px;top:40px">the rules</div>
+      <div class="node" style="left:520px;top:130px">what players do</div>
+      <div class="node" style="left:290px;top:330px">movements</div>
+      <div class="node" style="left:20px;top:130px">opinion</div>
+    </div>
+    <div class="col" style="flex:1">
+      <p class="lead" style="margin-bottom:14px">Which part of the map does each sentence belong to? Tap to check.</p>
+      <div class="tile" data-act="tap" data-a="→ what players do" style="min-height:110px"><div class="t-q">&ldquo;Two people play the game. One person hits the ball to the right.&rdquo;</div></div>
+      <div class="tile" data-act="tap" data-a="→ movements" style="min-height:110px"><div class="t-q">&ldquo;You hit the ball so that it turns around the pole.&rdquo;</div></div>
+      <div class="tile" data-act="tap" data-a="→ opinion" style="min-height:110px"><div class="t-q">&ldquo;Tetherball looks easy. But it isn&rsquo;t.&rdquo;</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 43 · WB · HER CAUSE & EFFECT CHART ══════════ -->
+<section class="slide top" data-stage="Practice" data-stagetone="practice">
+  <h2 class="hd">📊 Then she built a cause &amp; effect chart</h2>
+  <div class="ce">
+    <div class="ce-hd c">Cause</div><div class="ce-hd arrow">➡️</div><div class="ce-hd e">Effect</div>
+    <div class="ce-cell">The rope is connected to a pole.</div><div class="ce-cell mid">➡️</div><div class="ce-cell">The ball doesn&rsquo;t fly away.</div>
+    <div class="ce-cell">You hit the ball.</div><div class="ce-cell mid">➡️</div><div class="ce-cell">It turns around the pole.</div>
+    <div class="ce-cell">When I hit the ball, it flew around in a big circle.</div><div class="ce-cell mid">➡️</div><div class="ce-cell">It was easy for my brother to hit it!</div>
+    <div class="ce-cell">When he hit the ball, it went fast and high.</div><div class="ce-cell mid">➡️</div><div class="ce-cell">He won every game!</div>
+  </div>
+  <div class="dad mt">💬 The chart came <strong>first</strong>. The paragraphs came after. That is the secret &mdash; plan, then write.</div>
+</section>
+
+<!-- ══════════ 44 · PLAN · CHOOSE YOUR GAME ══════════ -->
+<section class="slide top" data-stage="Plan" data-stagetone="apply">
+  <h2 class="hd">📝 Step 1 &mdash; Choose <span class="hl">your</span> game</h2>
+  <p class="lead" style="margin-bottom:28px">Pick a sport or activity you enjoy <strong>and know well</strong>. Then think of the actions you do.</p>
+  <div class="chips" style="margin-bottom:30px">
+    <span class="chip">⚽ soccer</span><span class="chip">🏀 basketball</span><span class="chip">🛹 skateboarding</span><span class="chip">🎮 video games</span><span class="chip">🏊 swimming</span>
+  </div>
+  <div class="card gn"><div class="card-lbl" style="color:var(--gnd)">Action words for your chart</div>
+    <div class="chips" style="justify-content:flex-start"><span class="chip">kick</span><span class="chip">slide</span><span class="chip">dive</span><span class="chip">bounce</span><span class="chip">practice</span><span class="chip">push</span><span class="chip">pull</span><span class="chip">balance</span><span class="chip">spin</span></div></div>
+  <div class="frame mt">⚽ Leo&rsquo;s choice: <strong>soccer</strong>. These actions are your <strong class="hlbl">causes</strong>. What happens next are your <strong class="hlgn">effects</strong>.</div>
+</section>
+
+<!-- ══════════ 45 · PLAN · MODEL THE CHART ══════════ -->
+<section class="slide top" data-stage="Plan" data-stagetone="apply">
+  <h2 class="hd">📝 Step 2 &mdash; Build your chart</h2>
+  <div class="card acc" style="margin-bottom:24px"><p class="lead">📘 The book&rsquo;s model row: <strong>I swing the bat.</strong> ➡️ <strong>I hit the ball.</strong></p></div>
+  <h3 class="sub">Now Leo&rsquo;s soccer version &mdash; tap each effect:</h3>
+  <div class="ce">
+    <div class="ce-hd c">Cause &mdash; what I do</div><div class="ce-hd arrow">➡️</div><div class="ce-hd e">Effect &mdash; what happens</div>
+    <div class="ce-cell">I practise shooting every day.</div><div class="ce-cell mid">➡️</div>
+    <div class="ce-cell blank" data-act="tap" data-a="I score more goals in matches." style="cursor:pointer">tap&hellip;</div>
+    <div class="ce-cell">The goalkeeper dives to the left.</div><div class="ce-cell mid">➡️</div>
+    <div class="ce-cell blank" data-act="tap" data-a="He saves the penalty." style="cursor:pointer">tap&hellip;</div>
+    <div class="ce-cell">The grass is wet.</div><div class="ce-cell mid">➡️</div>
+    <div class="ce-cell blank" data-act="tap" data-a="The ball slides faster along the ground." style="cursor:pointer">tap&hellip;</div>
+  </div>
+  <p class="lead mt center">Three causes. Three effects. That is your whole plan. ✅</p>
+</section>
+
+<!-- ══════════ 46 · PLAN · EXPAND / CONNECT ══════════ -->
+<section class="slide top" data-stage="Plan" data-stagetone="apply">
+  <h2 class="hd">🔗 Expand &mdash; connect them into sentences</h2>
+  <div class="row" style="gap:30px;margin-bottom:30px">
+    <div class="card bl" style="flex:1"><div class="card-lbl" style="color:var(--bld)">EFFECT column words</div>
+      <div class="chips" style="justify-content:flex-start"><span class="chip e">so</span><span class="chip e">so that</span><span class="chip e">as a result</span></div></div>
+    <div class="card gn" style="flex:1"><div class="card-lbl" style="color:var(--gnd)">CAUSE column words</div>
+      <div class="chips" style="justify-content:flex-start"><span class="chip c">because</span><span class="chip c">as</span><span class="chip c">why</span></div></div>
+  </div>
+  <div class="list">
+    <div class="li"><div class="n bl">1</div><div><strong class="hlbl">Because</strong> I practise shooting every day, I score more goals in matches.</div></div>
+    <div class="li"><div class="n gn">2</div><div>The goalkeeper dives to the left, <strong class="hlgn">so</strong> he saves the penalty.</div></div>
+    <div class="li"><div class="n gn">3</div><div>The grass is wet. <strong class="hlgn">As a result,</strong> the ball slides faster along the ground.</div></div>
+  </div>
+  <div class="dad mt">💬 Same three rows &mdash; now they are real sentences. Nothing new to invent!</div>
+</section>
+
+<!-- ══════════ 47 · BE THE EXPERT · ARTICLES INTRO ══════════ -->
+<section class="slide center" data-stage="Be the Expert" data-stagetone="expert">
+  <div class="col center">
+    <div class="kick">Writing Support</div>
+    <h2 class="hd">a &middot; an &middot; <span class="hl">the</span></h2>
+    <p class="lead">Japanese has no articles &mdash; so these three tiny words are the easiest ones to forget. 🇯🇵</p>
+    <div class="row mt" style="gap:30px;width:100%">
+      <div class="card bl" style="flex:1;text-align:center"><h3 class="sub" style="color:var(--bld)">a / an</h3><p class="lead"><strong>any one</strong> of a group</p><p class="jp">Tetherball is <strong>a</strong> sport.</p></div>
+      <div class="card gn" style="flex:1;text-align:center"><h3 class="sub" style="color:var(--gnd)">the</h3><p class="lead"><strong>this exact one</strong></p><p class="jp"><strong>The</strong> sport is really fun.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 48 · BE THE EXPERT · THE RULE ══════════ -->
+<section class="slide top" data-stage="Be the Expert" data-stagetone="expert">
+  <h2 class="hd">The golden rule: <span class="hl">first time</span> vs <span class="hl">next time</span></h2>
+  <div class="model" style="border-left-color:var(--bl)">
+    <span class="pn">FIRST MENTION &rarr; a / an</span>
+    Tetherball is <span class="cw">a</span> sport. People hit <span class="cw">a</span> ball that&rsquo;s connected to <span class="cw">a</span> pole.
+  </div>
+  <div class="model mt" style="border-left-color:var(--gn)">
+    <span class="pn">LATER MENTIONS &rarr; the</span>
+    <span class="ew">The</span> sport is really fun. To play, you make <span class="ew">the</span> ball swing around <span class="ew">the</span> pole.
+  </div>
+  <div class="dad mt">💬 Same ball. Same pole. But the <strong>second</strong> time we already know which one &mdash; so we say <strong>the</strong>.</div>
+</section>
+
+<!-- ══════════ 49 · BE THE EXPERT · ARTICLE GAME ══════════ -->
+<section class="slide top" data-stage="Be the Expert" data-stagetone="expert">
+  <h3 class="sub">🎯 Article Check &mdash; fill both gaps</h3>
+  <div class="card u9" style="margin-bottom:28px"><p class="lead" style="font-size:40px">&ldquo;Leo has ____ new soccer ball. ____ ball is black and white.&rdquo;</p></div>
+  <div class="grid3" id="q-art">
+    <button class="opt center" data-act="opt" data-g="art" data-c="0" data-fb="The first time we meet the ball, we do not use 'the' yet &mdash; we have not met it before.">the &hellip; A</button>
+    <button class="opt center" data-act="opt" data-g="art" data-c="1" data-fb="Perfect. First mention takes 'a'. Second mention takes 'The' because now we know exactly which ball.">a &hellip; The</button>
+    <button class="opt center" data-act="opt" data-g="art" data-c="0" data-fb="Two 'a's means two different balls. But it is the same ball both times!">a &hellip; A</button>
+  </div>
+  <div class="fb" id="fb-art"></div>
+  <div class="dad mt">💬 Japanese would say ボール both times. English changes the little word. Watch for it in your writing!</div>
+</section>
+
+<!-- ══════════ 50 · WRITE ══════════ -->
+<section class="slide top" data-stage="Write" data-stagetone="apply">
+  <h2 class="hd">✍️ Now write &mdash; use your chart</h2>
+  <div class="list">
+    <div class="li"><div class="n">1</div><div><strong>Say what the game is</strong> and how you learned it.</div></div>
+    <div class="li"><div class="n">2</div><div><strong>Describe how you play it</strong> &mdash; the rules, what players do, the movements.</div></div>
+    <div class="li"><div class="n">3</div><div><strong>Tell what happened</strong> when you played &mdash; causes and effects.</div></div>
+    <div class="li"><div class="n gn">4</div><div><strong>Add your opinion.</strong> Is it easy? Is it fun? Will you practise?</div></div>
+  </div>
+  <div class="card acc mt"><div class="card-lbl">Sentence starters</div>
+    <div class="chips" style="justify-content:flex-start">
+      <span class="chip">Last week I&hellip;</span><span class="chip c">Because&hellip;</span><span class="chip c">As&hellip;</span>
+      <span class="chip e">&hellip;, so&hellip;</span><span class="chip e">&hellip;so that&hellip;</span><span class="chip e">As a result,&hellip;</span>
+      <span class="chip">I&rsquo;m going to practise&hellip;</span></div></div>
+</section>
+
+<!-- ══════════ 51 · WRITE · MODEL FRAME ══════════ -->
+<section class="slide top" data-stage="Write" data-stagetone="apply">
+  <h3 class="sub">⚽ Dad&rsquo;s model &mdash; the same shape, but soccer</h3>
+  <div class="model">
+    Last season I learned how to take penalties with my friend. He practises a lot, <span class="ew">so</span> he taught me. We went to the park <span class="cw">because</span> there&rsquo;s a new goal there.
+    <br><br>
+    <span class="cw">As</span> there aren&rsquo;t many rules, penalties are easy to start. One player shoots. The other player is the goalkeeper. <span class="cw">Because</span> the goal is very big, you should shoot into a corner. You look one way <span class="ew">so that</span> the keeper dives the wrong way. Penalties look easy. But they aren&rsquo;t.
+    <br><br>
+    Last week I shot straight down the middle. <span class="ew">As a result,</span> it was easy for my friend to save it. <span class="ew">So</span> he won every game. <span class="cw">Because</span> I want to win next time, I&rsquo;m going to practise a lot from now on!
+  </div>
+  <div class="dad mt">💬 Count them: 9 connectors, exactly like Isabelle. Copy the <strong>shape</strong>, not the words.</div>
+</section>
+
+<!-- ══════════ 52 · EDIT ══════════ -->
+<section class="slide top" data-stage="Edit" data-stagetone="recap">
+  <h2 class="hd">✅ Edit &mdash; check before you share</h2>
+  <div class="list">
+    <div class="tick" data-act="tick"><div class="bx"></div><span>My writing describes a game or an activity.</span></div>
+    <div class="tick" data-act="tick"><div class="bx"></div><span>My writing clearly shows causes and effects.</span></div>
+    <div class="tick" data-act="tick"><div class="bx"></div><span>I used words that connect causes and effects.</span></div>
+    <div class="tick" data-act="tick"><div class="bx"></div><span>I used <strong>a</strong>, <strong>an</strong> and <strong>the</strong> correctly.</span></div>
+  </div>
+  <div class="hide mt" id="editDone"><div class="card gn"><p class="lead center">🎉 All four checked. Your writing is ready to share!</p></div></div>
+</section>
+
+<!-- ══════════ 53 · SHARE ══════════ -->
+<section class="slide top" data-stage="Share" data-stagetone="wrapup">
+  <h2 class="hd">🗣️ Share &mdash; read it to Dad twice</h2>
+  <div class="row" style="gap:30px;margin-bottom:28px">
+    <div class="card bl" style="flex:1"><div class="card-lbl" style="color:var(--bld)">1st reading</div><p class="lead">What is the writing <strong>about</strong>?</p></div>
+    <div class="card gn" style="flex:1"><div class="card-lbl" style="color:var(--gnd)">2nd reading</div><p class="lead">Find the <strong>causes and effects</strong>.</p></div>
+  </div>
+  <div class="card acc"><div class="card-lbl">Feedback sentence frames</div>
+    <div class="list" style="gap:14px;margin-top:10px">
+      <div class="li"><div class="n">💡</div><div>Something I think is interesting is&hellip;</div></div>
+      <div class="li"><div class="n">❓</div><div>One thing that I am confused about is&hellip;</div></div>
+      <div class="li"><div class="n">🔗</div><div>A cause and effect that you described well is&hellip;</div></div>
+      <div class="li"><div class="n">🙋</div><div>A question I have is&hellip;</div></div>
+    </div></div>
+  <p class="lead mt center">📝 The writer <strong>takes notes</strong> &mdash; then uses them to make the writing better.</p>
+</section>
+
+<!-- ══════════ 54 · RECAP ══════════ -->
+<section class="slide top" data-stage="Recap" data-stagetone="recap">
+  <h2 class="hd">🔁 Recap &mdash; tap each one</h2>
+  <div class="grid3">
+    <div class="tile" data-act="tap" data-a="because · as"><div class="t-emo">🔵</div><div class="t-q">Which words show a CAUSE?</div></div>
+    <div class="tile" data-act="tap" data-a="so · so that · as a result"><div class="t-emo">🟢</div><div class="t-q">Which words show an EFFECT?</div></div>
+    <div class="tile" data-act="tap" data-a="It shows the goal you want."><div class="t-emo">🎯</div><div class="t-q">What is special about &lsquo;so that&rsquo;?</div></div>
+    <div class="tile" data-act="tap" data-a="Full stop before it, comma after it."><div class="t-emo">🏁</div><div class="t-q">How do we punctuate &lsquo;as a result&rsquo;?</div></div>
+    <div class="tile" data-act="tap" data-a="a / an — the first time only."><div class="t-emo">1️⃣</div><div class="t-q">First time you mention a thing?</div></div>
+    <div class="tile" data-act="tap" data-a="the — every time after that."><div class="t-emo">2️⃣</div><div class="t-q">Every time after that?</div></div>
+  </div>
+</section>
+
+<!-- ══════════ 55 · FORMATIVE ASSESSMENT ══════════ -->
+<section class="slide top" data-stage="Formative Assessment" data-stagetone="recap">
+  <h2 class="hd">✔️ Can Leo&hellip;</h2>
+  <div class="list">
+    <div class="li"><div class="n gn">✓</div><div>&hellip;write a paragraph that describes a game and how to play it?</div></div>
+    <div class="li"><div class="n gn">✓</div><div>&hellip;show clear causes and effects in the writing?</div></div>
+    <div class="li"><div class="n gn">✓</div><div>&hellip;connect them with <em>because, as, so, so that, as a result</em>?</div></div>
+    <div class="li"><div class="n gn">✓</div><div>&hellip;use <em>a, an</em> and <em>the</em> correctly?</div></div>
+  </div>
+  <div class="card u9 mt"><div class="card-lbl">Quick check questions</div>
+    <p class="lead">&ldquo;Why do you practise a lot?&rdquo; &middot; &ldquo;What happens when the grass is wet?&rdquo; &middot; &ldquo;Say that again using <em>as a result</em>.&rdquo;</p></div>
+</section>
+
+<!-- ══════════ 56 · WRAP UP ══════════ -->
+<section class="slide center" data-stage="Wrap Up" data-stagetone="wrapup">
+  <div class="col center">
+    <div class="big-emo">✍️⚽</div>
+    <h2 class="hd">Great work, Leo!</h2>
+    <p class="lead">You planned it, you wrote it, you shared it.</p>
+    <div class="card acc mt" style="max-width:1100px"><div class="card-lbl">Homework</div>
+      <p class="lead">📓 Workbook <strong>pp. 114&ndash;115</strong> &mdash; and open the <strong>Writing app</strong> to build your own chart and write.</p></div>
+    <div class="chips mt"><span class="chip c">because</span><span class="chip c">as</span><span class="chip e">so</span><span class="chip e">so that</span><span class="chip e">as a result</span></div>
+    <div class="done-row mt">
+      <button class="opt center" id="doneBtn" data-act="done">✅ Mark this lesson done</button>
+      <button class="opt center" id="redoBtn" data-act="redo">↺ Redo</button>
+    </div>
+    <p class="lead" id="doneMsg" style="margin-top:18px"></p>
+  </div>
+</section>
+
+<!-- ══════════ CHROME ══════════ -->
+<div id="prog"><div id="progFill"></div></div>
+<button class="tn-btn" data-act="notes" title="Teacher notes (N)">📋</button>
+<button class="tn-btn fs-btn" data-act="full" title="Fullscreen (F)">⛶</button>
+<div class="tn-panel" id="tnPanel"></div>
+<div id="nav">
+  <button class="nb" data-act="nav" data-dir="-1">‹</button>
+  <div id="counter">1 / 56</div>
+  <button class="nb" data-act="nav" data-dir="1">›</button>
+</div>
+
+</div></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ═══════ LEEA SAVE STANDARD ═══════ */
+var SAVE_PREFIX = '4-9-writing-slides-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-9-writing-slides';
+/* Must match the `id` in lessons/writing.teacher.json — the teacher dashboard
+   reads leea.lessonProgress.v1 keyed by that lesson id. */
+var LESSON_ID = 'ow-l4-u9-writing';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+
+function lSave(key, val){
+  try{ localStorage.setItem('leea-' + key, JSON.stringify(val)); }catch(e){}
+  try{
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && LEEA_CLOUD.enabled){
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val);
+    }
+  }catch(e){}
+}
+function lLoad(key, fb){
+  try{ var v = localStorage.getItem('leea-' + key); return v !== null ? JSON.parse(v) : fb; }
+  catch(e){ return fb; }
+}
+function lRemove(key){
+  try{ localStorage.removeItem('leea-' + key); }catch(e){}
+}
+
+/* ═══════ MARK DONE ═══════ */
+function writeLessonProgress(){
+  try{
+    var store = {};
+    var raw = localStorage.getItem(PROGRESS_KEY);
+    if(raw){ store = JSON.parse(raw) || {}; }
+    var now = new Date().toISOString();
+    store[LESSON_ID] = {
+      lessonId: LESSON_ID,
+      teacherId: 'neritan',
+      studentId: 'leo',
+      status: 'done',
+      completedAt: now,
+      updatedAt: now
+    };
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+  }catch(e){ console.warn('writeLessonProgress', e); }
+}
+function clearLessonProgress(){
+  try{
+    var raw = localStorage.getItem(PROGRESS_KEY);
+    if(!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+  }catch(e){ console.warn('clearLessonProgress', e); }
+}
+function paintDone(saved){
+  var btn = document.getElementById('doneBtn');
+  if(!btn) return;
+  if(saved){ btn.classList.add('confirmed'); btn.style.pointerEvents = 'none'; btn.textContent = '✅ Saved!'; }
+  else { btn.classList.remove('confirmed'); btn.style.pointerEvents = 'auto'; btn.textContent = '✅ Mark this lesson done'; }
+}
+function markDone(){
+  try{
+    writeLessonProgress();
+    lSave(SAVE_PREFIX + 'done', true);
+    paintDone(true);
+    var msg = document.getElementById('doneMsg');
+    if(msg) msg.textContent = 'Saved. Great writing today, Leo. ✍️';
+  }catch(e){ console.warn('markDone', e); }
+}
+/* Two-tap so a stray tap on the last slide can't wipe the lesson record. */
+var redoArmed = false, redoTimer = null;
+function handleRedo(){
+  try{
+    var btn = document.getElementById('redoBtn');
+    var msg = document.getElementById('doneMsg');
+    if(!redoArmed){
+      redoArmed = true;
+      if(btn) btn.textContent = '↺ Tap again to clear';
+      if(msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+      if(redoTimer) clearTimeout(redoTimer);
+      redoTimer = setTimeout(function(){
+        redoArmed = false;
+        if(btn) btn.textContent = '↺ Redo';
+        if(msg) msg.textContent = '';
+      }, 4000);
+      return;
+    }
+    redoArmed = false;
+    if(redoTimer) clearTimeout(redoTimer);
+    clearLessonProgress();
+    lRemove(SAVE_PREFIX + 'done');
+    paintDone(false);
+    if(btn) btn.textContent = '↺ Redo';
+    if(msg) msg.textContent = 'Cleared. Ready to write again.';
+  }catch(e){ console.warn('handleRedo', e); }
+}
+
+/* ═══════ <deck-stage> WEB COMPONENT ═══════ */
+class DeckStage extends HTMLElement{
+  connectedCallback(){
+    try{
+      var stage = this.getAttribute('stage') || '';
+      var tone  = this.getAttribute('tone')  || 'wrapup';
+      var sub   = this.getAttribute('sub')   || '';
+      this.innerHTML = '<span class="sb ' + tone + '">' + stage + '</span>' +
+                       (sub ? '<span class="sb-sub">' + sub + '</span>' : '');
+    }catch(e){ console.warn('deck-stage', e); }
+  }
+}
+try{ customElements.define('deck-stage', DeckStage); }catch(e){}
+
+/* ═══════ TEACHER NOTES (per slide) ═══════ */
+var NOTES = {
+0:{h:'Open the lesson',b:'<p><span class="say">Say</span> <em>Today you\'ll write paragraphs of cause and effect.</em> Hold up the Student\'s Book at p. 158 so Leo sees the tetherball photo before anything else.</p><p>Writing type: <strong>Cause and Effect Writing</strong>. Resources: two-column chart graphic organiser, Workbook pp. 114&ndash;115.</p>'},
+1:{h:'Set the objectives',b:'<p>Read all five aloud. Objectives from the LP: analyse a writing model &middot; write a paragraph of cause and effect about a game or activity &middot; evaluate the writing.</p><p><span class="say">Ask</span> <em>Which game will you choose?</em> Let him answer now &mdash; he will need it at the Plan stage.</p>'},
+2:{h:'Related Vocabulary &mdash; why these five',b:'<p>The LP Plan stage tells the teacher to guide students toward action words: <em>kick, slide, dive, bounce, practice</em>. Leo needs them <strong>before</strong> he builds his chart, not during.</p><p>Full game for each &mdash; these are related vocabulary, so they get proper games, not a quick-tap grid.</p>'},
+3:{h:'bounce &mdash; Bounce Counter',b:'<p>Let Leo tap the ball five times and count aloud in English. Then the question.</p><p><span class="say">Ask</span> <em>Down and up. Down and up. What is the ball doing?</em></p>'},
+4:{h:'bounce &mdash; word card',b:'<p>Read the example aloud. It recycles the Unit 9 Grammar 1 double comparative (<em>The more air&hellip;, the higher&hellip;</em>) &mdash; point that out.</p>'},
+5:{h:'dive &mdash; Penalty Shootout',b:'<p>Act it out. Stand up, lean left, then <strong>dive</strong> left. Leo copies you. Physical first, word second.</p><p>Contrast with <em>lean</em> and <em>balance</em> from Vocabulary 2 &mdash; both already known.</p>'},
+6:{h:'dive &mdash; word card',b:'<p>The example sentence already contains <em>so</em>. Do not explain it yet &mdash; just let him hear it.</p>'},
+7:{h:'slide &mdash; Friction Lab',b:'<p>Tap all three surfaces first, then answer. This recycles <strong>friction</strong> from Vocabulary 1.</p><p><span class="say">Ask</span> <em>Why does he slide further on wet grass?</em> (less friction) &mdash; that is critical thinking, which we meet in two slides.</p>'},
+8:{h:'slide &mdash; word card',b:'<p>The example uses <em>As</em> at the start of the sentence. Flag it lightly: <em>We will learn that word properly soon.</em></p>'},
+9:{h:'practice &mdash; Training Week',b:'<p>Tap all five days. The reveal appears only after the fifth tap.</p><p>The reveal sentence is a full cause-and-effect sentence with <em>Because</em>. This is the first real preview of the target language.</p>'},
+10:{h:'practice &mdash; word card',b:'<p>Double comparative again. <span class="say">Ask</span> <em>The more you practise, the &hellip;?</em> and let Leo finish it.</p>'},
+11:{h:'dizzy &mdash; Spin-o-meter',b:'<p>Three taps. If safe, actually spin him around three times &mdash; the LP models exactly this with the merry-go-round.</p>'},
+12:{h:'dizzy &mdash; word card',b:'<p>This example is the LP\'s own model sentence: <em>I spin around very fast on the merry-go-round. As a result, I get dizzy.</em> It returns at the Present stage.</p>'},
+13:{h:'Academic Language',b:'<p>LP Academic Language for this lesson: <strong>cause and effect, critical thinking, description</strong>. Full games for all three &mdash; academic language is never a quick refresh.</p>'},
+14:{h:'cause and effect &mdash; Domino Chain',b:'<p>Tap the four dominoes left to right. If you have real dominoes or books, do it physically first.</p><p>Key idea: one cause can start a long chain of effects.</p>'},
+15:{h:'cause and effect &mdash; word card',b:'<p>Japanese 原因と結果 is a close match, so let Leo say it in Japanese first, then in English.</p>'},
+16:{h:'critical thinking &mdash; Detective Test',b:'<p>The skater example is from Unit 9\'s own content. The point is that a critical-thinking question asks <strong>why</strong> and cannot be answered just by looking.</p>'},
+17:{h:'critical thinking &mdash; word card',b:'<p><span class="say">Say</span> <em>Every time you write "because", you are doing critical thinking.</em></p>'},
+18:{h:'description &mdash; Guess From the Description',b:'<p>Tap clues one at a time. Do not let him guess until all three are open &mdash; that is the point: a description is several details together.</p>'},
+19:{h:'description &mdash; word card',b:'<p>Link forward: paragraph 2 of Isabelle\'s model is pure description. He will recognise it.</p>'},
+20:{h:'Content Vocabulary &mdash; the five connectors',b:'<p>This is the heart of the lesson. Two cause words, three effect words.</p><p><span class="say">Say</span> <em>Blue words tell us WHY. Green words tell us WHAT HAPPENED.</em> Keep that colour code all lesson.</p>'},
+21:{h:'because &mdash; The Why Machine',b:'<p>Only <em>because</em> works. Take the wrong answers seriously &mdash; each feedback line explains which end of the sentence that word belongs to.</p>'},
+22:{h:'because &mdash; word card',b:'<p>The example is taken word-for-word from the Student\'s Book model. He will meet it again on the model slide.</p>'},
+23:{h:'as &mdash; The Swap Test',b:'<p>Tap each sentence to see the <em>as</em> version. Meaning does not change.</p><p><span class="say">Point out</span> that <em>as</em> usually starts the sentence, and then you need a comma in the middle.</p>'},
+24:{h:'as &mdash; word card',b:'<p>Straight from the model, paragraph 2. Japanese learners often overuse <em>because</em>; <em>as</em> gives variety.</p>'},
+25:{h:'so &mdash; Arrow Launcher',b:'<p>The filled chart row is from the model. Then the rain question.</p><p><span class="say">Ask</span> <em>Which half comes after "so" &mdash; the reason or the result?</em> (result)</p>'},
+26:{h:'so &mdash; word card',b:'<p>Note the comma <strong>before</strong> so. Worth writing on paper.</p>'},
+27:{h:'so that &mdash; Purpose Target',b:'<p>This is the hardest of the five. <em>so</em> = it happened. <em>so that</em> = I wanted it to happen.</p><p>Test question for Leo: <em>Did you plan it?</em> If yes &rarr; so that.</p>'},
+28:{h:'so that &mdash; word card',b:'<p>Japanese 〜ように maps very neatly here. Use the Japanese to lock the meaning, then drop it.</p>'},
+29:{h:'as a result &mdash; Full Stop Finder',b:'<p>Punctuation focus. Full stop before, capital A, comma after the whole phrase.</p><p>This is the most common written error &mdash; catch it now, not at the Edit stage.</p>'},
+30:{h:'as a result &mdash; word card',b:'<p>Example is from paragraph 3 of the model.</p>'},
+31:{h:'Warm Up',b:'<p>LP Warm Up. Write the basketball sentence on real paper or a whiteboard as well as showing the slide.</p><p><span class="say">Ask</span> <em>What effect will this practice have on my team?</em> Collect Leo\'s own answers <strong>before</strong> tapping the tiles.</p>'},
+32:{h:'Warm Up &mdash; the rule',b:'<p><span class="say">Say</span> <em>A cause is something you do. An effect is what happens because of what you do.</em></p><p>Point at the basketball sentence: <em>That\'s the cause.</em> Then at his answers: <em>These are the effects.</em></p>'},
+33:{h:'Present &mdash; chart row 1',b:'<p>LP Present stage. Draw the same two-column chart on paper so Leo writes as well as taps.</p><p>Cause given, effect missing. Let him guess before revealing.</p>'},
+34:{h:'Present &mdash; rows 2 and 3',b:'<p>Row 2 reverses the task: the effect is given, the cause is missing. <span class="say">Ask</span> <em>Why do you fall over?</em></p><p>Row 3 goes back to cause &rarr; effect. Alternating keeps him thinking rather than pattern-matching.</p>'},
+35:{h:'Present &mdash; connect them',b:'<p>The LP asks you to model: <em>I spin around very fast on the merry-go-round. As a result, I get dizzy.</em></p><p>Then the swing question. If he picks <em>so that</em>, ask <em>Did you push him in order to make him go higher, or did it just happen?</em></p>'},
+36:{h:'Read the Model &mdash; set up',b:'<p>LP step 1. Open books to p. 158. Read the model aloud once yourself, then have Leo read it alone.</p><p>He should <strong>underline</strong> in the book while the slides show the same text highlighted.</p>'},
+37:{h:'Model paragraph 1',b:'<p>Two connectors: <em>so</em> (effect), <em>because</em> (cause).</p><p><span class="say">Ask</span> <em>Why did they go to the park?</em> and <em>Why did her brother teach her?</em></p>'},
+38:{h:'Model paragraph 2',b:'<p>Three connectors. This paragraph is the <strong>description</strong> &mdash; the rules, what players do, the movements. Link back to the academic word.</p>'},
+39:{h:'Model paragraph 3',b:'<p>Four connectors. This is the story of what happened when she played.</p><p>Note the ending: <em>Because I want to win next time&hellip;</em> &mdash; cause first, effect second. Both orders are correct.</p>'},
+40:{h:'All nine, sorted',b:'<p>This answers Workbook p. 114 step 4.</p><p><span class="say">Ask</span> <em>Which one appeared most?</em> (because &mdash; three times) <em>Could she have used "as" instead?</em> (yes)</p>'},
+41:{h:'Workbook p. 114 &mdash; the word map',b:'<p>Activity 1, step 2. Answers: sentence 1 &rarr; what players do &middot; sentence 2 &rarr; movements &middot; sentence 3 &rarr; opinion.</p><p>Have Leo write the answers into the Workbook while the slide is open.</p>'},
+42:{h:'Workbook p. 114 &mdash; her cause and effect chart',b:'<p>Activity 1, step 3. This is exactly the chart printed in the Workbook.</p><p>Big idea to say out loud: <strong>the chart came before the paragraphs</strong>. That is the whole method.</p>'},
+43:{h:'Plan &mdash; choose a game',b:'<p>LP Plan step. <span class="say">Say</span> <em>Choose a sport or an activity that you enjoy and you know well.</em></p><p>Leo will choose soccer. That is fine &mdash; it means he knows enough detail to write three real causes.</p>'},
+44:{h:'Plan &mdash; build the chart',b:'<p>The book models <em>I swing the bat &rarr; I hit the ball</em>. The slide then does the same in soccer.</p><p>Give him a blank two-column chart on paper. He must write <strong>three</strong> of his own rows &mdash; the slide rows are examples only.</p>'},
+45:{h:'Plan &mdash; Expand',b:'<p>LP Expand step. Same three rows, now joined into sentences.</p><p>Insist on <strong>variety</strong>: at least one <em>because/as</em>, one <em>so</em>, one <em>as a result</em>. Do not let him use <em>so</em> three times.</p>'},
+46:{h:'Be the Expert &mdash; Writing Support',b:'<p>LP Writing Support: indefinite and definite articles.</p><p>This is the single biggest L1 interference point in the lesson &mdash; Japanese has no article system, so Leo must add information his first language never marks.</p>'},
+47:{h:'Articles &mdash; the golden rule',b:'<p>Both example passages are the LP\'s own. First mention &rarr; a/an. Later mentions &rarr; the.</p><p><span class="say">Ask</span> <em>Is it the same ball in both sentences?</em> (yes) <em>So why did the word change?</em></p>'},
+48:{h:'Articles &mdash; check',b:'<p>Answer: <strong>a &hellip; The</strong>.</p><p>Then have Leo find one <em>a</em> and one <em>the</em> in his own writing and say why each one is right.</p>'},
+49:{h:'Write',b:'<p>LP Write step. <span class="say">Say</span> <em>Now use your chart to write about your sport or activity.</em></p><p>Remind him to include details and opinions, not only causes and effects. Aim for three short paragraphs.</p>'},
+50:{h:'Write &mdash; the model shape',b:'<p>Show this only if he is stuck. It follows Isabelle\'s structure exactly, with soccer content and the same nine connectors.</p><p><span class="say">Warn</span> <em>Copy the shape, not the words.</em></p>'},
+51:{h:'Edit',b:'<p>LP Edit checklist, all four items. Tap each one only when he can point to it in his own writing.</p><p>The fourth item is the articles check &mdash; the one he will most want to skip.</p>'},
+52:{h:'Share',b:'<p>LP Share step. Read twice: first for meaning, then for causes and effects.</p><p>Use the four sentence frames exactly. Leo takes notes while you give feedback, then revises.</p>'},
+53:{h:'Recap',b:'<p>Recap comes before Wrap Up. Six quick checks &mdash; do not reveal until he has answered aloud.</p>'},
+54:{h:'Formative Assessment',b:'<p>LP formative assessment for Writing. If any answer is shaky, the fix is usually the Plan stage, not the Write stage &mdash; go back to the chart.</p>'},
+55:{h:'Wrap Up',b:'<p>Homework: Workbook pp. 114&ndash;115 plus the Writing app.</p><p>Finish by having him read his own writing aloud one last time. End on the writing, not on the checklist.</p>'}
+};
+
+/* ═══════ DECK STATE ═══════ */
+var deck    = document.getElementById('deck');
+var slides  = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+var total   = slides.length;
+var idx     = 0;
+var notesOpen = false;
+
+/* Inject stage badges from data-stage / data-stagetone */
+try{
+  slides.forEach(function(s, i){
+    var st = s.getAttribute('data-stage');
+    if(!st) return;
+    var el = document.createElement('deck-stage');
+    el.setAttribute('stage', st);
+    el.setAttribute('tone', s.getAttribute('data-stagetone') || 'wrapup');
+    el.setAttribute('sub', (i + 1) + ' of ' + total);
+    s.insertBefore(el, s.firstChild);
+  });
+}catch(e){ console.warn('badge inject', e); }
+
+function render(){
+  try{
+    slides.forEach(function(s, i){ s.classList.toggle('on', i === idx); });
+    var c = document.getElementById('counter');
+    if(c) c.textContent = (idx + 1) + ' / ' + total;
+    var pf = document.getElementById('progFill');
+    if(pf) pf.style.width = ((idx + 1) / total * 100) + '%';
+    paintNotes();
+    lSave(SAVE_PREFIX + 'slide', idx);
+  }catch(e){ console.warn('render', e); }
+}
+
+function paintNotes(){
+  try{
+    var p = document.getElementById('tnPanel');
+    if(!p) return;
+    var n = NOTES[idx];
+    p.innerHTML = n ? ('<h4>' + n.h + '</h4>' + n.b)
+                    : '<h4>Teacher notes</h4><p>No notes for this slide.</p>';
+  }catch(e){ console.warn('paintNotes', e); }
+}
+
+function go(d){
+  var n = idx + d;
+  if(n < 0 || n >= total) return;
+  idx = n;
+  render();
+}
+
+/* ═══════ SCALING ═══════ */
+function fit(){
+  try{
+    var vw = window.innerWidth  || document.documentElement.clientWidth;
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var s  = Math.min(vw / 1920, vh / 1080);
+    var ox = Math.max(0, (vw - 1920 * s) / 2);
+    var oy = Math.max(0, (vh - 1080 * s) / 2);
+    deck.style.transform = 'translate(' + ox + 'px,' + oy + 'px) scale(' + s + ')';
+  }catch(e){ console.warn('fit', e); }
+}
+window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', function(){ setTimeout(fit, 120); });
+if(window.visualViewport){ window.visualViewport.addEventListener('resize', fit); }
+
+/* ═══════ SINGLE DELEGATED CLICK HANDLER ═══════ */
+document.addEventListener('click', function(ev){
+  try{
+    var t = ev.target.closest('[data-act]');
+    if(!t) return;
+    var act = t.getAttribute('data-act');
+
+    if(act === 'nav'){ go(parseInt(t.getAttribute('data-dir'), 10)); return; }
+
+    if(act === 'done'){ markDone(); return; }
+    if(act === 'redo'){ handleRedo(); return; }
+
+    if(act === 'notes'){
+      notesOpen = !notesOpen;
+      var p = document.getElementById('tnPanel');
+      if(p) p.classList.toggle('open', notesOpen);
+      t.classList.toggle('act', notesOpen);
+      return;
+    }
+
+    if(act === 'full'){ toggleFull(); return; }
+
+    if(act === 'tap'){
+      if(t.classList.contains('open')) return;
+      t.classList.add('open', 'reveal');
+      var ans = t.getAttribute('data-a') || '';
+      if(t.classList.contains('ce-cell')){
+        t.classList.remove('blank');
+        t.classList.add('fill');
+        t.textContent = ans;
+      } else {
+        var q = t.querySelector('.t-q');
+        var out = document.createElement('div');
+        out.className = 't-a';
+        out.innerHTML = ans;
+        if(q && q.parentNode === t) t.appendChild(out); else t.appendChild(out);
+      }
+      var ck = t.getAttribute('data-count');
+      if(ck) checkGroupDone(ck);
+      return;
+    }
+
+    if(act === 'count'){
+      var key = t.getAttribute('data-key');
+      var max = parseInt(t.getAttribute('data-max'), 10) || 3;
+      var cur = (parseInt(t.getAttribute('data-n'), 10) || 0) + 1;
+      if(cur > max) return;
+      t.setAttribute('data-n', cur);
+      var out2 = document.getElementById(key + 'Out');
+      if(out2) out2.textContent = cur;
+      var emo = document.getElementById(key + 'Emo');
+      if(emo){ emo.classList.remove('reveal'); void emo.offsetWidth; emo.classList.add('reveal'); }
+      if(cur >= max) t.classList.add('open');
+      return;
+    }
+
+    if(act === 'opt'){
+      var g = t.getAttribute('data-g');
+      var box = document.getElementById('q-' + g);
+      if(!box || box.getAttribute('data-locked') === '1') return;
+      box.setAttribute('data-locked', '1');
+      var ok = t.getAttribute('data-c') === '1';
+      Array.prototype.forEach.call(box.querySelectorAll('.opt'), function(o){
+        o.classList.add('locked');
+        if(o.getAttribute('data-c') === '1') o.classList.add('ok');
+      });
+      if(!ok) t.classList.add('bad');
+      var fb = document.getElementById('fb-' + g);
+      if(fb){
+        fb.className = 'fb show ' + (ok ? 'ok' : 'bad');
+        fb.innerHTML = (ok ? '✅ ' : '💡 ') + (t.getAttribute('data-fb') || '');
+      }
+      lSave(SAVE_PREFIX + 'q-' + g, { correct: ok, ts: new Date().toISOString() });
+      return;
+    }
+
+    if(act === 'tick'){
+      t.classList.toggle('on');
+      var bx = t.querySelector('.bx');
+      if(bx) bx.textContent = t.classList.contains('on') ? '✓' : '';
+      var all = Array.prototype.slice.call(document.querySelectorAll('[data-act="tick"]'));
+      var done = all.filter(function(x){ return x.classList.contains('on'); }).length;
+      var ed = document.getElementById('editDone');
+      if(ed) ed.classList.toggle('hide', done !== all.length);
+      lSave(SAVE_PREFIX + 'edit-checklist', done);
+      return;
+    }
+  }catch(e){ console.warn('click handler', e); }
+});
+
+function checkGroupDone(key){
+  try{
+    var all = Array.prototype.slice.call(document.querySelectorAll('[data-count="' + key + '"]'));
+    if(!all.length) return;
+    var open = all.filter(function(x){ return x.classList.contains('open'); }).length;
+    if(open === all.length){
+      var r = document.getElementById(key + 'Reveal');
+      if(r){ r.classList.remove('hide'); r.classList.add('reveal'); }
+    }
+  }catch(e){ console.warn('checkGroupDone', e); }
+}
+
+function toggleFull(){
+  try{
+    var el = document.documentElement;
+    if(!document.fullscreenElement){
+      if(el.requestFullscreen) el.requestFullscreen();
+      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } else {
+      if(document.exitFullscreen) document.exitFullscreen();
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+    setTimeout(fit, 150);
+  }catch(e){ console.warn('toggleFull', e); }
+}
+document.addEventListener('fullscreenchange', function(){ setTimeout(fit, 120); });
+
+/* ═══════ KEYBOARD ═══════ */
+document.addEventListener('keydown', function(e){
+  try{
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); go(1); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+    else if(e.key === 'f' || e.key === 'F'){ toggleFull(); }
+    else if(e.key === 'n' || e.key === 'N'){
+      var b = document.querySelector('[data-act="notes"]');
+      if(b) b.click();
+    }
+  }catch(err){ console.warn('key', err); }
+});
+
+/* ═══════ INIT ═══════ */
+function restore(){ paintDone(lLoad(SAVE_PREFIX + 'done', false) === true); }
+document.addEventListener('DOMContentLoaded', function(){ fit(); render(); restore(); });
+fit();
+render();
+restore();
+
+})();
+</script>
+</body>
+</html>

@@ -235,9 +235,13 @@ Every module — including the ones whose completion is fully automatic (quiz pa
 
 Checkpoint review apps appear after three-unit bands (`1-3`, `4-6`, `7-9`). They should mix vocabulary, grammar, listening/reading comprehension, and a final quiz from the previous three units. Use teacher component `review` and learner component `review-app`. Suggested IDs: `ow-l4-r7-9-review` and `ow-l4-r7-9-review-app`.
 
+The Units 7-9 teacher deck is built: `public/lessons/ow-l4-r7-9-review.html` (28 slides — unit sweeps for inventions/hobbies/forces, the band's four grammar points, SB Activities 1-6, self-check, Recap, Formative Assessment), registered from `content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/review.teacher.json`. The Leo app is still to build.
+
 ### extra-reading (TO LOCK)
 
 Extra Reading apps appear beside checkpoint reviews after the same three-unit bands. They should focus on extended reading, comprehension checks, new glossary/support words, and a short response. Use teacher component `extra-reading` and learner component `extra-reading-app`. Suggested IDs: `ow-l4-er7-9-extra-reading` and `ow-l4-er7-9-extra-reading-app`.
+
+The Units 7-9 teacher deck is built: `public/lessons/ow-l4-er7-9-extra-reading.html` (40 slides — Leonardo da Vinci, SB pp.164-165: 4 academic words, 5 content words, text features and biography elements, the timeline, Activities 2-4, Share, Recap, Formative Assessment), registered from `content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/extra-reading.teacher.json`. The Leo app is still to build.
 
 ## Reading vocab and grammar from the unit JSON
 

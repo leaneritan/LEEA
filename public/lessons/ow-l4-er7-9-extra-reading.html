@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Extended Reading · Leonardo da Vinci | LEEA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"></noscript>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../lib/leea-cloud-config.js"></script>
+<script src="../../lib/leea-cloud.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* ── UNIT 9 · FORCE LAB PALETTE ── */
+  --u9:#92400E;      --u9d:#78350F;    --u9l:#FDF6EC;   --u9ll:#FFFBF3;
+  --acc:#F59E0B;     --accd:#B45309;   --accl:#FFFBEB;
+  --gn:#16A34A;      --gnd:#15803D;    --gnl:#F0FDF4;
+  --bl:#2563EB;      --bld:#1D4ED8;    --bll:#EFF6FF;
+  --pu:#7C3AED;      --pul:#F5F3FF;
+  --tl:#0D9488;      --tll:#F0FDFA;
+  --rd:#DC2626;      --rdl:#FEE2E2;
+  --ink:#0F172A;     --ink2:#334155;   --ink3:#64748B;   --ink4:#94A3B8;
+  --paper:#FDF9F0;   --surf:#FFFFFF;   --bdr:#E2E8F0;    --bdr2:#CBD5E1;
+  --fn:'Outfit',system-ui,sans-serif;
+}
+html,body{height:100%;background:#0B0F1A;overflow:hidden;font-family:var(--fn)}
+
+/* ══ DECK STAGE (1920×1080 fixed coordinate space) ══ */
+#deckWrap{position:fixed;inset:0;overflow:hidden;background:#0B0F1A}
+#deck{position:absolute;top:0;left:0;width:1920px;height:1080px;flex:0 0 auto;transform-origin:top left;background:var(--paper);overflow:hidden;will-change:transform}
+
+/* ══ SLIDES ══ */
+.slide{position:absolute;inset:0;padding:96px 110px 130px;display:none;flex-direction:column;justify-content:center}
+.slide.on{display:flex}
+.slide.top{justify-content:flex-start;padding-top:120px}
+
+/* ══ STAGE BADGE (injected by <deck-stage>) ══ */
+deck-stage{position:absolute;top:38px;left:110px;display:flex;align-items:center;gap:12px;z-index:5}
+.sb{font-size:19px;font-weight:800;letter-spacing:3.2px;text-transform:uppercase;padding:8px 20px;border-radius:6px;border:2px solid}
+.sb.warmup{background:var(--accl);color:var(--accd);border-color:#FCD34D}
+.sb.present{background:var(--bll);color:var(--bld);border-color:#BFDBFE}
+.sb.practice{background:var(--pul);color:var(--pu);border-color:#DDD6FE}
+.sb.apply{background:var(--gnl);color:var(--gnd);border-color:#BBF7D0}
+.sb.recap{background:var(--tll);color:var(--tl);border-color:#99F6E4}
+.sb.wrapup{background:#F1F5F9;color:var(--ink2);border-color:var(--bdr2)}
+.sb.vocab{background:var(--u9l);color:var(--u9d);border-color:#FECACA}
+.sb.expert{background:#FDF4FF;color:#A21CAF;border-color:#F5D0FE}
+.sb-sub{font-size:18px;font-weight:600;color:var(--ink4);letter-spacing:.6px}
+
+/* ══ TYPOGRAPHY ══ */
+h1.big{font-size:104px;font-weight:900;line-height:1.02;letter-spacing:-2.5px;color:var(--ink)}
+h2.hd{font-size:70px;font-weight:900;line-height:1.06;letter-spacing:-1.6px;color:var(--ink);margin-bottom:34px}
+h3.sub{font-size:44px;font-weight:800;color:var(--ink);line-height:1.18;margin-bottom:24px}
+p.lead{font-size:38px;font-weight:500;color:var(--ink2);line-height:1.5}
+.kick{font-size:22px;font-weight:800;letter-spacing:5px;text-transform:uppercase;color:var(--u9);margin-bottom:20px}
+.jp{font-size:27px;font-weight:600;color:var(--ink3);line-height:1.5}
+.hl{color:var(--u9)}
+.hl2{color:var(--acc)}
+.hlbl{color:var(--bl)}
+.hlgn{color:var(--gn)}
+
+/* ══ LAYOUT HELPERS ══ */
+.row{display:flex;gap:30px;align-items:stretch;justify-content:center}
+.col{display:flex;flex-direction:column;gap:24px;justify-content:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-content:center}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-content:center}
+.center{text-align:center;align-items:center}
+.mt{margin-top:32px}
+
+/* ══ CARDS ══ */
+.card{background:var(--surf);border:3px solid var(--bdr);border-radius:20px;padding:32px 36px}
+.card.u9{border-color:#FECACA;background:var(--u9l)}
+.card.acc{border-color:#FDE68A;background:var(--accl)}
+.card.bl{border-color:#BFDBFE;background:var(--bll)}
+.card.gn{border-color:#BBF7D0;background:var(--gnl)}
+.card.pu{border-color:#DDD6FE;background:var(--pul)}
+.card-lbl{font-size:20px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+
+/* ══ WORD CARD (vocab reveal prize) ══ */
+.wordcard{background:linear-gradient(155deg,#fff,#FFF7F7);border:5px solid var(--u9);border-radius:28px;padding:44px 54px;text-align:center;box-shadow:0 22px 60px rgba(146,64,14,.18)}
+.wordcard .emo{font-size:104px;line-height:1}
+.wordcard .w{font-size:82px;font-weight:900;color:var(--u9d);letter-spacing:-1.4px;margin-top:8px}
+.wordcard .pos{font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--ink4);margin-top:6px}
+.wordcard .def{font-size:34px;font-weight:600;color:var(--ink2);margin-top:20px;line-height:1.4}
+.wordcard .ex{font-size:30px;font-weight:600;color:var(--u9);font-style:italic;margin-top:16px}
+.wordcard .jpx{font-size:26px;font-weight:600;color:var(--ink3);margin-top:14px}
+
+/* ══ BUTTONS / OPTIONS ══ */
+.opt{background:var(--surf);border:4px solid var(--bdr2);border-radius:18px;padding:26px 32px;font-family:var(--fn);font-size:36px;font-weight:700;color:var(--ink);cursor:pointer;text-align:left;transition:all .18s;line-height:1.3}
+.opt:hover:not(.locked){border-color:var(--u9);background:var(--u9ll);transform:translateY(-3px)}
+.opt.ok{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+.opt.bad{border-color:var(--rd);background:var(--rdl);color:var(--rd);animation:shk .32s}
+.opt.locked{cursor:default}
+.opt .ltr{display:inline-block;min-width:52px;font-weight:900;color:var(--ink4)}
+.opt.confirmed{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+.done-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+
+.fb{font-size:32px;font-weight:700;padding:22px 30px;border-radius:16px;margin-top:24px;display:none;line-height:1.4}
+.fb.show{display:block}
+.fb.ok{background:var(--gnl);border:3px solid #BBF7D0;color:var(--gnd)}
+.fb.bad{background:var(--rdl);border:3px solid #FECACA;color:var(--rd)}
+
+.btn{background:var(--u9);color:#fff;border:none;border-radius:16px;padding:22px 44px;font-family:var(--fn);font-size:32px;font-weight:800;cursor:pointer;transition:all .18s}
+.btn:hover{background:var(--u9d);transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--u9);border:4px solid var(--u9)}
+.btn.acc{background:var(--acc);color:#3F2D00}
+.btn.acc:hover{background:var(--accd);color:#fff}
+
+/* ══ REVEAL ══ */
+.hide{display:none}
+.reveal{animation:pop .34s cubic-bezier(.22,1,.36,1)}
+@keyframes pop{0%{opacity:0;transform:scale(.9) translateY(18px)}100%{opacity:1;transform:none}}
+@keyframes shk{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-9px)}50%{transform:translateX(9px)}}
+
+/* ══ TAP TILE ══ */
+.tile{background:var(--surf);border:4px dashed var(--bdr2);border-radius:20px;padding:34px 30px;text-align:center;cursor:pointer;transition:all .2s;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.tile:hover{border-color:var(--acc);background:var(--accl);transform:translateY(-4px)}
+.tile.open{border-style:solid;border-color:var(--gn);background:var(--gnl);cursor:default}
+.tile .t-emo{font-size:60px;line-height:1}
+.tile .t-q{font-size:32px;font-weight:800;color:var(--ink2)}
+.tile .t-a{font-size:34px;font-weight:800;color:var(--gnd);line-height:1.3}
+
+/* ══ CAUSE/EFFECT CHART ══ */
+.ce{display:grid;grid-template-columns:1fr 120px 1fr;gap:0;border:4px solid var(--ink);border-radius:20px;overflow:hidden;background:var(--surf)}
+.ce-hd{padding:20px;font-size:28px;font-weight:900;letter-spacing:3px;text-transform:uppercase;text-align:center;color:#fff}
+.ce-hd.c{background:var(--bl)}
+.ce-hd.arrow{background:var(--ink);color:#fff;font-size:34px}
+.ce-hd.e{background:var(--gn)}
+.ce-cell{padding:24px 26px;border-top:3px solid var(--bdr);font-size:31px;font-weight:600;color:var(--ink2);line-height:1.35;display:flex;align-items:center;min-height:104px}
+.ce-cell.mid{justify-content:center;font-size:40px;color:var(--ink4);background:#F8FAFC}
+.ce-cell.blank{background:#FFFBEB;color:var(--ink4);font-style:italic}
+.ce-cell.fill{background:var(--gnl);color:var(--gnd);font-weight:800}
+
+/* ══ MODEL TEXT ══ */
+.model{background:var(--surf);border:4px solid var(--bdr);border-left:14px solid var(--acc);border-radius:0 20px 20px 0;padding:34px 40px;font-size:33px;font-weight:500;color:var(--ink2);line-height:1.62}
+.model .cw{background:#DBEAFE;border-bottom:5px solid var(--bl);border-radius:5px;padding:0 6px;font-weight:800;color:var(--bld)}
+.model .ew{background:#DCFCE7;border-bottom:5px solid var(--gn);border-radius:5px;padding:0 6px;font-weight:800;color:var(--gnd)}
+.model .pn{font-size:22px;font-weight:800;letter-spacing:2px;color:var(--ink4);display:block;margin-bottom:8px}
+
+/* ══ CHIPS ══ */
+.chips{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.chip{background:var(--surf);border:4px solid var(--bdr2);border-radius:999px;padding:16px 34px;font-size:32px;font-weight:800;color:var(--ink2)}
+.chip.c{border-color:var(--bl);background:var(--bll);color:var(--bld)}
+.chip.e{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+
+/* ══ WORD MAP ══ */
+.map{position:relative;height:430px}
+.node{position:absolute;background:var(--surf);border:4px solid var(--u9);border-radius:999px;padding:18px 34px;font-size:30px;font-weight:800;color:var(--u9d);white-space:nowrap}
+.node.mid{background:var(--u9);color:#fff;font-size:38px;padding:24px 46px}
+.mapline{position:absolute;background:var(--bdr2);height:4px;transform-origin:left center}
+
+/* ══ PROGRESS / NAV / NOTES (absolute inside #deck) ══ */
+#prog{position:absolute;left:0;right:0;bottom:0;height:9px;background:#F1F5F9;z-index:20}
+#progFill{height:100%;background:linear-gradient(90deg,var(--u9),var(--acc));width:0;transition:width .35s}
+#nav{position:absolute;right:44px;bottom:36px;display:flex;align-items:center;gap:14px;z-index:22}
+.nb{width:74px;height:74px;border-radius:50%;border:4px solid var(--bdr2);background:var(--surf);font-size:32px;font-weight:900;color:var(--ink2);cursor:pointer;transition:all .18s}
+.nb:hover{border-color:var(--u9);color:var(--u9)}
+#counter{font-size:26px;font-weight:800;color:var(--ink3);min-width:130px;text-align:center;letter-spacing:1px}
+.tn-btn{position:absolute;left:44px;bottom:36px;width:74px;height:74px;border-radius:50%;border:4px solid var(--bdr2);background:var(--surf);font-size:32px;cursor:pointer;z-index:22;transition:all .18s}
+.tn-btn:hover{border-color:var(--acc);background:var(--accl)}
+.fs-btn{left:134px}
+.tn-btn.act{background:var(--acc);border-color:var(--accd)}
+.tn-panel{position:absolute;left:0;right:0;bottom:0;max-height:430px;overflow-y:auto;background:rgba(15,23,42,.97);color:#E2E8F0;padding:38px 110px 60px;z-index:21;display:none;border-top:6px solid var(--acc)}
+.tn-panel.open{display:block}
+.tn-panel h4{font-size:24px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:16px}
+.tn-panel p{font-size:27px;line-height:1.55;font-weight:500;margin-bottom:12px}
+.tn-panel em{color:#FDE68A;font-style:italic}
+.tn-panel .say{color:#BBF7D0;font-weight:700}
+#badge{position:absolute;right:44px;top:38px;font-size:20px;font-weight:800;letter-spacing:3px;color:var(--ink4);z-index:5}
+
+/* ══ SCOREBOARD / MISC ══ */
+.stepbar{display:flex;gap:14px;justify-content:center;margin-bottom:26px}
+.step{width:60px;height:12px;border-radius:999px;background:var(--bdr)}
+.step.on{background:var(--u9)}
+.big-emo{font-size:150px;line-height:1}
+.mid-emo{font-size:92px;line-height:1}
+.list{display:flex;flex-direction:column;gap:20px}
+.li{display:flex;gap:20px;align-items:flex-start;font-size:34px;font-weight:600;color:var(--ink2);line-height:1.35}
+.li .n{flex:0 0 54px;height:54px;border-radius:50%;background:var(--u9);color:#fff;font-size:28px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.li .n.gn{background:var(--gn)}
+.li .n.bl{background:var(--bl)}
+.frame{background:var(--accl);border:4px dashed var(--acc);border-radius:20px;padding:28px 34px;font-size:34px;font-weight:700;color:var(--accd);line-height:1.5}
+.tick{display:flex;align-items:center;gap:22px;background:var(--surf);border:4px solid var(--bdr);border-radius:18px;padding:22px 30px;font-size:32px;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .18s}
+.tick:hover{border-color:var(--gn)}
+.tick.on{background:var(--gnl);border-color:var(--gn);color:var(--gnd)}
+.tick .bx{flex:0 0 48px;height:48px;border:4px solid var(--bdr2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:30px}
+.tick.on .bx{background:var(--gn);border-color:var(--gn);color:#fff}
+.dad{background:var(--gnl);border:4px solid #BBF7D0;border-radius:18px;padding:24px 30px;font-size:30px;font-weight:700;color:var(--gnd);line-height:1.45}
+table.share{width:100%;border-collapse:collapse;border:4px solid var(--ink);border-radius:16px;overflow:hidden}
+table.share th{background:var(--ink);color:#fff;font-size:28px;font-weight:800;letter-spacing:2px;padding:18px;text-transform:uppercase}
+table.share td{border:3px solid var(--bdr);padding:22px;font-size:30px;font-weight:600;color:var(--ink2)}
+</style>
+</head>
+<body>
+<div id="deckWrap"><div id="deck">
+<div id="badge">LEEA · L4 · EXTENDED READING</div>
+<section class="slide center" data-stage="Extended Reading" data-stagetone="vocab">
+<div class="col center">
+ <div class="big-emo">🪶🕊️</div>
+ <div class="kick">Our World 2E · Level 4 · Student&rsquo;s Book pp. 164&ndash;165</div>
+ <h1 class="big">Leonardo<br><span class="hl">da Vinci</span></h1>
+ <p class="lead mt">The Greatest Inventor in History? &nbsp;·&nbsp; TR 9.11</p></div>
+</section>
+<section class="slide top" data-stage="Extended Reading" data-stagetone="expert">
+<h3 class="sub">📜 What kind of reading is this?</h3>
+<p class="lead" style="margin-bottom:24px">A reading about the life of a <strong>real person</strong> has a special name.</p>
+
+<div class="grid3" id="q-biography"><button class="opt center" data-act="opt" data-g="biography" data-c="0" data-fb="Folktales are old made-up stories. Leonardo really lived.">a folktale</button><button class="opt center" data-act="opt" data-g="biography" data-c="1" data-fb="Correct! A biography tells the life of a real person.">a biography</button><button class="opt center" data-act="opt" data-g="biography" data-c="0" data-fb="Close — there are opinions in it — but the text type is a biography.">a fact and opinion text</button></div>
+<div class="fb" id="fb-biography"></div>
+</section>
+<section class="slide top" data-stage="Extended Reading" data-stagetone="vocab">
+<h2 class="hd">In this lesson, I will&hellip;</h2>
+<div class="list"><div class="li"><div class="n">1</div><div>identify <strong>text features</strong> &mdash; the parts that help me understand.</div></div><div class="li"><div class="n bl">2</div><div>identify the elements of a <strong>biography</strong>.</div></div><div class="li"><div class="n gn">3</div><div>read a timeline and use it to answer questions.</div></div><div class="li"><div class="n">4</div><div>choose a way to <strong>express myself</strong> about Leonardo.</div></div></div>
+<div class="frame mt">🎯 This is a reading lesson about <strong>how a page is built</strong>, not only about what it says.</div>
+</section>
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+<div class="col center">
+ <div class="kick">The words this lesson runs on</div>
+ <h2 class="hd">4 <span class="hl">academic</span> words</h2>
+ <div class="chips mt"><span class="chip">✏️ design</span><span class="chip">🏷️ label</span><span class="chip">📏 range</span><span class="chip">🏗️ structure</span></div>
+ <p class="lead mt">All four describe Leonardo &mdash; and all four describe this page.</p></div>
+</section>
+<section class="slide top" data-stage="Academic Language" data-stagetone="expert">
+<h3 class="sub">✏️ Design &mdash; noun or verb?</h3>
+<p class="lead" style="margin-bottom:24px"><strong>Design</strong> works two ways. Which sentence uses it as a <strong>verb</strong> (an action)?</p>
+
+<div class="grid2" id="q-design"><button class="opt center" data-act="opt" data-g="design" data-c="0" data-fb="Here design is a thing — a noun. Look for the action version.">Leonardo made a design for a flying machine.</button><button class="opt center" data-act="opt" data-g="design" data-c="1" data-fb="Correct — to design is the action of planning and drawing something new.">Leonardo wanted to design a machine that could fly.</button></div>
+<div class="fb" id="fb-design"></div>
+</section>
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(146,64,14,.18)">
+  <div class="emo">✏️</div>
+  <div class="w" style="color:var(--u9d)">design</div>
+  <div class="pos">noun / verb</div>
+  <div class="def">to plan and draw something new &mdash; or the plan itself</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;He made a design for a flying machine.&rdquo;</div>
+  <div class="jpx">設計(せっけい)する・デザイン</div>
+</div>
+</section>
+<section class="slide top" data-stage="Academic Language" data-stagetone="expert">
+<h3 class="sub">🏷️ Label It</h3>
+<p class="lead" style="margin-bottom:24px">Leonardo wrote small notes next to each part of his drawings. Those notes are <strong>labels</strong>. Why label a drawing?</p>
+
+<div class="grid3" id="q-label"><button class="opt center" data-act="opt" data-g="label" data-c="0" data-fb="Labels are about meaning, not decoration.">To make it look more colourful.</button><button class="opt center" data-act="opt" data-g="label" data-c="1" data-fb="Exactly. A label names a part so anyone can understand the drawing.">To name each part so the reader knows what it is.</button><button class="opt center" data-act="opt" data-g="label" data-c="0" data-fb="Size is not what a label does.">To make the drawing bigger.</button></div>
+<div class="fb" id="fb-label"></div>
+</section>
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(146,64,14,.18)">
+  <div class="emo">🏷️</div>
+  <div class="w" style="color:var(--u9d)">label</div>
+  <div class="pos">noun / verb</div>
+  <div class="def">a small piece of writing that names a part &mdash; or to add one</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;Label the parts of your invention.&rdquo;</div>
+  <div class="jpx">ラベル・名前(なまえ)をつける</div>
+</div>
+</section>
+<section class="slide top" data-stage="Academic Language" data-stagetone="expert">
+<h3 class="sub">📏 A Huge Range</h3>
+<p class="lead" style="margin-bottom:24px">Leonardo designed a huge <strong>range</strong> of inventions. What does range mean here?</p>
+<div class="grid3"><div class="tile" data-act="tap" data-a="flight"><div class="t-emo">🚁</div><div class="t-q">a helicopter</div></div><div class="tile" data-act="tap" data-a="flight"><div class="t-emo">🪂</div><div class="t-q">a parachute</div></div><div class="tile" data-act="tap" data-a="engineering"><div class="t-emo">🗺️</div><div class="t-q">maps</div></div><div class="tile" data-act="tap" data-a="art"><div class="t-emo">🎨</div><div class="t-q">paintings</div></div></div>
+<div class="grid3" id="q-range"><button class="opt center" data-act="opt" data-g="range" data-c="0" data-fb="Range is about variety, not repetition.">One invention, repeated many times.</button><button class="opt center" data-act="opt" data-g="range" data-c="1" data-fb="Yes — a range means lots of different types, not lots of the same thing.">Many different kinds of invention.</button><button class="opt center" data-act="opt" data-g="range" data-c="0" data-fb="Range says nothing about cost.">Very expensive inventions.</button></div>
+<div class="fb" id="fb-range"></div>
+</section>
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(146,64,14,.18)">
+  <div class="emo">📏</div>
+  <div class="w" style="color:var(--u9d)">range</div>
+  <div class="pos">noun</div>
+  <div class="def">a lot of different kinds of something</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;He designed a huge range of inventions.&rdquo;</div>
+  <div class="jpx">範囲(はんい)・さまざまな種類(しゅるい)</div>
+</div>
+</section>
+<section class="slide top" data-stage="Academic Language" data-stagetone="expert">
+<h3 class="sub">🏗️ Structure &mdash; how it is built</h3>
+<p class="lead" style="margin-bottom:24px">Leonardo studied the <strong>structure</strong> of birds&rsquo; wings. What does that mean?</p>
+
+<div class="col" id="q-structure"><button class="opt" data-act="opt" data-g="structure" data-c="0" data-fb="Colour is on the surface. Structure is underneath.">The colour of the wings.</button><button class="opt" data-act="opt" data-g="structure" data-c="1" data-fb="Correct. Structure is the way something is put together.">How the wings are built &mdash; the parts and how they join.</button><button class="opt" data-act="opt" data-g="structure" data-c="0" data-fb="That is movement — the reading mentions that separately.">How fast the wings move.</button></div>
+<div class="fb" id="fb-structure"></div>
+</section>
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(146,64,14,.18)">
+  <div class="emo">🏗️</div>
+  <div class="w" style="color:var(--u9d)">structure</div>
+  <div class="pos">noun</div>
+  <div class="def">the way something is built &mdash; its parts and how they join</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;He studied the shape, structure, and movement of wings.&rdquo;</div>
+  <div class="jpx">構造(こうぞう)</div>
+</div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="col center">
+ <div class="kick">Words from the reading itself</div>
+ <h2 class="hd">5 <span class="hl">content</span> words</h2>
+ <div class="chips mt"><span class="chip">🤩 fascinated</span><span class="chip">🛩️ glider</span><span class="chip">💚 kindness</span><span class="chip">🕊️ release</span><span class="chip">🥗 vegetarian</span></div>
+ <p class="lead mt">Learn these five and the reading opens up.</p></div>
+</section>
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+<h3 class="sub">🤩 How Interested?</h3>
+<p class="lead" style="margin-bottom:24px">Leonardo was <strong>fascinated</strong> by the flight of birds. How interested was he?</p>
+<div class="card acc" style="margin-bottom:22px"><p class="lead">😐 interested &nbsp;&rarr;&nbsp; 🙂 very interested &nbsp;&rarr;&nbsp; 🤩 <strong>fascinated</strong></p></div>
+<div class="col" id="q-fascinated"><button class="opt" data-act="opt" data-g="fascinated" data-c="0" data-fb="Fascinated is much stronger than that.">A little bit interested.</button><button class="opt" data-act="opt" data-g="fascinated" data-c="1" data-fb="Yes! Fascinated means extremely interested — it fills your mind.">So interested he could not stop thinking about it.</button><button class="opt" data-act="opt" data-g="fascinated" data-c="0" data-fb="The opposite — he spent years on it.">Not interested at all.</button></div>
+<div class="fb" id="fb-fascinated"></div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(146,64,14,.18)">
+  <div class="emo">🤩</div>
+  <div class="w" style="color:var(--u9d)">fascinated</div>
+  <div class="pos">adjective</div>
+  <div class="def">extremely interested in something</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;He was fascinated by the flight of birds.&rdquo;</div>
+  <div class="jpx">魅了(みりょう)された・夢中(むちゅう)になった</div>
+</div>
+</section>
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+<h3 class="sub">🛩️ Engine or No Engine?</h3>
+<p class="lead" style="margin-bottom:24px">Leonardo drew a design for a <strong>glider</strong>. What is a glider?</p>
+
+<div class="col" id="q-glider"><button class="opt" data-act="opt" data-g="glider" data-c="0" data-fb="That is a plane. A glider has no engine at all.">An aircraft with a big engine.</button><button class="opt" data-act="opt" data-g="glider" data-c="1" data-fb="Correct — and Leonardo&#x27;s glider design was actually built and flown recently!">An aircraft with no engine that rides the air.</button><button class="opt" data-act="opt" data-g="glider" data-c="0" data-fb="A glider flies.">A kind of boat.</button></div>
+<div class="fb" id="fb-glider"></div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(146,64,14,.18)">
+  <div class="emo">🛩️</div>
+  <div class="w" style="color:var(--u9d)">glider</div>
+  <div class="pos">noun</div>
+  <div class="def">an aircraft with no engine that rides on the air</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;His glider design was simpler than the flying machine.&rdquo;</div>
+  <div class="jpx">グライダー・滑空機(かっくうき)</div>
+</div>
+</section>
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+<h3 class="sub">💚 Kindness Test</h3>
+<p class="lead" style="margin-bottom:24px">The reading says Leonardo&rsquo;s <strong>kindness</strong> to animals was well known. Which action shows kindness?</p>
+
+<div class="col" id="q-kindness"><button class="opt" data-act="opt" data-g="kindness" data-c="1" data-fb="Yes — kindness is caring about others and acting on it.">Buying caged birds and setting them free.</button><button class="opt" data-act="opt" data-g="kindness" data-c="0" data-fb="That is not unkind, but it is not what Leonardo did.">Buying caged birds to keep as pets.</button><button class="opt" data-act="opt" data-g="kindness" data-c="0" data-fb="Kindness means doing something, not nothing.">Ignoring the birds completely.</button></div>
+<div class="fb" id="fb-kindness"></div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(146,64,14,.18)">
+  <div class="emo">💚</div>
+  <div class="w" style="color:var(--u9d)">kindness</div>
+  <div class="pos">noun</div>
+  <div class="def">caring about others and doing something good for them</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;His kindness to animals was well known.&rdquo;</div>
+  <div class="jpx">優(やさ)しさ・親切(しんせつ)</div>
+</div>
+</section>
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+<h3 class="sub">🕊️ Set Them Free</h3>
+<p class="lead" style="margin-bottom:24px">At the market, Leonardo bought caged birds and <strong>released</strong> them. What did he do?</p>
+
+<div class="grid3" id="q-release"><button class="opt center" data-act="opt" data-g="release" data-c="0" data-fb="The opposite — the surprise is that he let them go.">He kept them in the cage.</button><button class="opt center" data-act="opt" data-g="release" data-c="1" data-fb="Correct. To release something is to set it free.">He let them go free.</button><button class="opt center" data-act="opt" data-g="release" data-c="0" data-fb="He did not sell them. He opened the cages.">He sold them to someone else.</button></div>
+<div class="fb" id="fb-release"></div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(146,64,14,.18)">
+  <div class="emo">🕊️</div>
+  <div class="w" style="color:var(--u9d)">release</div>
+  <div class="pos">verb</div>
+  <div class="def">to set something free</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;He bought the birds so he could release them.&rdquo;</div>
+  <div class="jpx">放(はな)す・自由(じゆう)にする</div>
+</div>
+</section>
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+<h3 class="sub">🥗 What&rsquo;s on the Plate?</h3>
+<p class="lead" style="margin-bottom:24px">Leonardo was a <strong>vegetarian</strong>. What does that mean?</p>
+
+<div class="grid3" id="q-vegetarian"><button class="opt center" data-act="opt" data-g="vegetarian" data-c="0" data-fb="The opposite!">He ate only meat.</button><button class="opt center" data-act="opt" data-g="vegetarian" data-c="1" data-fb="Correct — and for his time, that was very unusual.">He did not eat meat.</button><button class="opt center" data-act="opt" data-g="vegetarian" data-c="0" data-fb="A vegetarian eats a lot of things — just not meat.">He ate only bread.</button></div>
+<div class="fb" id="fb-vegetarian"></div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(146,64,14,.18)">
+  <div class="emo">🥗</div>
+  <div class="w" style="color:var(--u9d)">vegetarian</div>
+  <div class="pos">noun / adjective</div>
+  <div class="def">a person who does not eat meat</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;Leonardo was a vegetarian.&rdquo;</div>
+  <div class="jpx">ベジタリアン・菜食主義者(さいしょくしゅぎしゃ)</div>
+</div>
+</section>
+<section class="slide top" data-stage="Present" data-stagetone="present">
+<h2 class="hd">🎧 Read together <span class="jp">TR 9.11</span></h2>
+<div class="card acc" style="margin-bottom:26px"><p class="lead">Play the audio. Leo <strong>follows along in the book</strong> with his finger. Do not stop for questions on the first pass.</p></div>
+<h3 class="sub">Then check &mdash; tap after he answers:</h3>
+<div class="grid3"><div class="tile" data-act="tap" data-a="To study them, and then release them."><div class="t-emo">🕊️</div><div class="t-q">Why did Leonardo buy the birds?</div></div><div class="tile" data-act="tap" data-a="He was fascinated by flight."><div class="t-emo">🐦</div><div class="t-q">Why was he so interested in birds?</div></div><div class="tile" data-act="tap" data-a="His paintings and his visionary inventions."><div class="t-emo">🎨</div><div class="t-q">What is Leonardo best known for?</div></div></div>
+</section>
+<section class="slide top" data-stage="Present" data-stagetone="practice">
+<h2 class="hd">🕊️ The market &mdash; what surprised everyone</h2>
+<div class="list"><div class="li"><div class="n">1</div><div>At the market, people bought caged birds &mdash; to eat, or to keep as pets. 🏪</div></div><div class="li"><div class="n bl">2</div><div>Leonardo bought them too. Everyone assumed the same reason.</div></div><div class="li"><div class="n gn">3</div><div>Instead, he opened the cages and let them <strong>fly away</strong>. 🕊️</div></div><div class="li"><div class="n">4</div><div>But first he studied their wings &mdash; shape, structure, movement. ✏️</div></div></div>
+<div class="dad mt">💬 Activity 3 asks <em>why were people surprised?</em> The answer is in steps 1 and 3 &mdash; he did the opposite of what everyone expected.</div>
+</section>
+<section class="slide top" data-stage="Present" data-stagetone="practice">
+<h2 class="hd">✈️ His flight designs &mdash; tap each one</h2>
+<div class="grid3"><div class="tile" data-act="tap" data-a="Huge wings on a wooden frame. The pilot lies inside and flaps them!"><div class="t-emo">🦅</div><div class="t-q">the flying machine</div></div><div class="tile" data-act="tap" data-a="Much simpler — and people recently built it and flew it successfully."><div class="t-emo">🛩️</div><div class="t-q">the glider</div></div><div class="tile" data-act="tap" data-a="He drew a design for one, centuries before any were built."><div class="t-emo">🚁</div><div class="t-q">the helicopter</div></div><div class="tile" data-act="tap" data-a="Another of his flight designs."><div class="t-emo">🪂</div><div class="t-q">the parachute</div></div></div>
+<div class="frame mt">📏 Four different flight designs, from one man, 500 years ago. That is what <strong>range</strong> means. 📏</div>
+</section>
+<section class="slide top" data-stage="Be the Expert" data-stagetone="expert">
+<h2 class="hd">🔎 Be the Expert &mdash; <span class="hl">Text Features</span></h2>
+<p class="lead" style="margin-bottom:22px">Text features are the parts of a page that help you <strong>understand</strong> it.</p>
+<div class="grid2">
+ <div class="card bl"><div class="card-lbl" style="color:var(--bld)">🅱️ PRINT</div><p class="lead">bold, <em>italics</em>, underlining &mdash; they make you notice important words.</p></div>
+ <div class="card gn"><div class="card-lbl" style="color:var(--gnd)">🖼️ GRAPHICS</div><p class="lead">photos, drawings, maps &mdash; they help you picture the information.</p></div>
+ <div class="card acc"><div class="card-lbl">📊 INFORMATIONAL</div><p class="lead">timelines, captions, bullet points &mdash; they help you understand new information.</p></div>
+ <div class="card pu"><div class="card-lbl" style="color:var(--pu)">🗂️ ORGANIZATION</div><p class="lead">title, subtitle, headings, glossaries &mdash; they help you find things and connect ideas.</p></div>
+</div>
+</section>
+<section class="slide top" data-stage="Practice" data-stagetone="practice">
+<h2 class="hd">🔍 Find them on pages 164&ndash;165</h2>
+<div class="grid3"><div class="tile" data-act="tap" data-a="Organization — it helps you find and connect ideas."><div class="t-emo">🗂️</div><div class="t-q">Which feature is the title?</div></div><div class="tile" data-act="tap" data-a="Mona Lisa and The Last Supper — the painting names."><div class="t-emo">🅱️</div><div class="t-q">Where is italic print?</div></div><div class="tile" data-act="tap" data-a="The drawings."><div class="t-emo">🖼️</div><div class="t-q">Which feature helps you visualise?</div></div><div class="tile" data-act="tap" data-a="A timeline — informational."><div class="t-emo">📊</div><div class="t-q">What runs across the bottom?</div></div><div class="tile" data-act="tap" data-a="It invites you to have your own opinion."><div class="t-emo">❓</div><div class="t-q">Why a question in the subtitle?</div></div><div class="tile" data-act="tap" data-a="The title."><div class="t-emo">🎯</div><div class="t-q">So which helps with organization?</div></div></div>
+<div class="dad mt">💬 LP: <em>Focus on the design of page 164 and the diagram across the bottom. What do you see?</em></div>
+</section>
+<section class="slide top" data-stage="Be the Expert" data-stagetone="expert">
+<h2 class="hd">👤 Be the Expert &mdash; <span class="hl">Elements of a Biography</span></h2>
+<div class="card acc" style="margin-bottom:24px"><p class="lead" style="font-size:40px">A <strong>biography</strong> tells the life of a <strong>real person</strong>.</p></div>
+<div class="list"><div class="li"><div class="n bl">1</div><div><strong>Factual information</strong> &mdash; place and date of birth. 📍</div></div><div class="li"><div class="n bl">2</div><div><strong>Places and events</strong> that changed the person&rsquo;s life. 🗺️</div></div><div class="li"><div class="n gn">3</div><div><strong>Achievements</strong> &mdash; what they did that mattered. 🏆</div></div></div>
+<div class="frame mt">🎯 Formative check: can Leo give <strong>five facts</strong> about Leonardo&rsquo;s life? Use the text and the timeline.</div>
+</section>
+<section class="slide top" data-stage="Practice" data-stagetone="practice">
+<h2 class="hd">📅 The timeline &mdash; part 1 <span class="jp">(chronological = by date)</span></h2>
+<div class="list"><div class="li"><div class="n">1452</div><div>Leonardo da Vinci is <strong>born</strong> in Anchiano, Italy. 🇮🇹</div></div><div class="li"><div class="n bl">1467</div><div>Young Leonardo goes to <strong>Florence</strong> to study with the artist Andrea del Verrocchio. 🎨</div></div><div class="li"><div class="n bl">1482</div><div>He goes to <strong>Milan</strong> to work for the city&rsquo;s duke as a painter and engineer. 🏛️</div></div><div class="li"><div class="n gn">1500</div><div>He returns to Florence and studies <strong>mathematics</strong>. ➗</div></div></div>
+<div class="dad mt">💬 LP: <em>The information in a timeline is organized chronologically, that is, by date.</em></div>
+</section>
+<section class="slide top" data-stage="Practice" data-stagetone="practice">
+<h2 class="hd">📅 The timeline &mdash; part 2</h2>
+<div class="list"><div class="li"><div class="n">1502</div><div>He works for Cesare Borgia as an architect, map-maker and engineer. 🗺️</div></div><div class="li"><div class="n bl">1503</div><div>He begins his most famous painting, <em>Mona Lisa</em>. 🖼️</div></div><div class="li"><div class="n bl">1503<br>&ndash;1513</div><div>He studies <strong>flight</strong>, the human body, and rocks and plants. 🕊️</div></div><div class="li"><div class="n gn">1516<br>&ndash;1519</div><div>He moves to <strong>France</strong>. He dies there. 🇫🇷</div></div></div>
+<div class="card acc mt"><p class="lead">🧮 So Leonardo lived from <strong>1452</strong> to <strong>1519</strong>. How old was he? Work it out! (67)</p></div>
+</section>
+<section class="slide top" data-stage="Activity 2 · Read" data-stagetone="practice">
+<h2 class="hd">✏️ Complete the sentences</h2>
+<div class="bank" style="position:static;margin-bottom:22px"><div class="bank-title">WORD BOX</div>
+ <div class="bank-row"><span class="bchip ca">1519</span><span class="bchip ca">flying</span><span class="bchip ef">helicopter</span><span class="bchip ef">paintings</span><span class="bchip ef">released</span></div></div>
+<div class="grid3" style="grid-template-columns:repeat(1,1fr)"><div class="tile" data-act="tap" data-a="released 🕊️"><div class="t-emo">1️⃣</div><div class="t-q">Leonardo bought birds at the market and ______ them.</div></div><div class="tile" data-act="tap" data-a="flying ✈️"><div class="t-emo">2️⃣</div><div class="t-q">He studied the birds&rsquo; wings so he could design a ______ machine.</div></div><div class="tile" data-act="tap" data-a="helicopter 🚁"><div class="t-emo">3️⃣</div><div class="t-q">Leonardo also designed a ______ and a parachute.</div></div><div class="tile" data-act="tap" data-a="paintings 🖼️"><div class="t-emo">5️⃣</div><div class="t-q"><em>Mona Lisa</em> is one of the most famous ______ in the world.</div></div><div class="tile" data-act="tap" data-a="1519 📅"><div class="t-emo">6️⃣</div><div class="t-q">Leonardo lived from 1452 to ______.</div></div></div>
+<div class="dad mt">💬 Item 4 is in Leo&rsquo;s book &mdash; check it there and answer it together.</div>
+</section>
+<section class="slide top" data-stage="Activity 3 · Discuss" data-stagetone="practice">
+<h2 class="hd">💬 Answer the questions &mdash; discuss first, write after</h2>
+<div class="list"><div class="li"><div class="n bl">1</div><div>Why were people <strong>surprised</strong> when Leonardo released the birds he had bought?</div></div><div class="li"><div class="n gn">2</div><div>Which of Leonardo&rsquo;s inventions is the most important, <strong>in your opinion</strong>?</div></div><div class="li"><div class="n">3</div><div>Leonardo&rsquo;s inventions were probably not made in his lifetime. <strong>Why not?</strong></div></div></div>
+<div class="row mt" style="gap:26px">
+ <div class="card bl" style="flex:1"><div class="card-lbl" style="color:var(--bld)">Q2 is an opinion</div><p class="lead">There is no right answer &mdash; but you must give a <strong>reason</strong>. Use <em>because</em>. 💭</p></div>
+ <div class="card acc" style="flex:1"><div class="card-lbl">Q3 is a thinking question</div><p class="lead">Think about what was <strong>not invented yet</strong> in 1500. ⚙️</p></div>
+</div>
+</section>
+<section class="slide top" data-stage="Activity 4 · Express yourself" data-stagetone="apply">
+<h2 class="hd">🎨 Express yourself &mdash; choose <span class="hl">one</span></h2>
+<div class="row" style="gap:24px">
+ <div class="card bl" style="flex:1"><div class="mid-emo center">✏️</div><div class="card-lbl mt" style="color:var(--bld)">CHOICE 1 · Draw</div>
+  <p class="lead">Choose an invention of your <strong>own</strong>. Draw it in Leonardo&rsquo;s style. <strong>Add labels.</strong></p></div>
+ <div class="card gn" style="flex:1"><div class="mid-emo center">🎭</div><div class="card-lbl mt" style="color:var(--gnd)">CHOICE 2 · Write a play</div>
+  <p class="lead">Imagine the market scene when Leonardo buys the birds. What do people say? What happens next?</p></div>
+ <div class="card acc" style="flex:1"><div class="mid-emo center">📊</div><div class="card-lbl mt">CHOICE 3 · Make a poster</div>
+  <p class="lead">Leonardo&rsquo;s inventions <strong>next to</strong> the modern versions. Label the similarities and differences.</p></div>
+</div>
+<div class="dad mt">💬 All three are in the book. Let Leo pick &mdash; the choice is part of the activity.</div>
+</section>
+<section class="slide top" data-stage="Prepare" data-stagetone="apply">
+<h2 class="hd">🛠️ Prepare &mdash; how to do each one well</h2>
+<div class="list"><div class="li"><div class="n bl">✏️</div><div><strong>Drawing:</strong> study Leonardo&rsquo;s style for a few minutes first. Name your invention. Label the parts.</div></div><div class="li"><div class="n gn">🎭</div><div><strong>Play:</strong> use a screenplay plan. Aim for 5&ndash;10 minutes. Write it, then rehearse it.</div></div><div class="li"><div class="n">📊</div><div><strong>Poster:</strong> organise it as a <strong>T-chart</strong> &mdash; then and now. Labels must give real detail.</div></div></div>
+<div class="frame mt">🖍️ Leonardo drew in brown ink on cream paper, with notes crammed around the edges. Copy the <strong>look</strong>. ✒️</div>
+</section>
+<section class="slide top" data-stage="Share" data-stagetone="wrapup">
+<h2 class="hd">🗣️ Share &mdash; give real feedback</h2>
+<div class="card acc" style="margin-bottom:24px"><p class="lead">Show your work. Then use these four sentences &mdash; write them where you can both see them.</p></div>
+<div class="list"><div class="li"><div class="n bl">💡</div><div>One thing that was interesting about your work was&hellip;</div></div><div class="li"><div class="n gn">👍</div><div>I liked the way you showed&hellip; with&hellip;</div></div><div class="li"><div class="n">❓</div><div>One thing I don&rsquo;t understand about&hellip; is&hellip;</div></div><div class="li"><div class="n">➕</div><div>One thing I would add to your work is&hellip;</div></div></div>
+<div class="dad mt">💬 Take turns. Dad shares something too &mdash; and gets the same four sentences back.</div>
+</section>
+<section class="slide top" data-stage="Extend" data-stagetone="expert">
+<h2 class="hd">⚽ &ldquo;The greatest ever?&rdquo; &mdash; the same argument</h2>
+<div class="card u9" style="margin-bottom:24px"><p class="lead">The subtitle asks <em>The Greatest Inventor in History?</em> &mdash; with a <strong>question mark</strong>. People argue about &ldquo;the greatest&rdquo; in every subject. ⚽</p></div>
+<div class="grid3"><div class="tile" data-act="tap" data-a="Not one invention — a huge RANGE of them."><div class="t-emo">📏</div><div class="t-q">Leonardo&rsquo;s case</div></div><div class="tile" data-act="tap" data-a="Is the greatest the one with most goals, or most trophies?"><div class="t-emo">🏆</div><div class="t-q">A soccer argument</div></div><div class="tile" data-act="tap" data-a="Haaland took the Golden Boot with 27; Arsenal won the league."><div class="t-emo">⚽</div><div class="t-q">A 2025–26 fact</div></div></div>
+<div class="frame mt">💭 So: is &ldquo;greatest&rdquo; a <strong>fact</strong> or an <strong>opinion</strong>? (Unit 7! 💡)</div>
+</section>
+<section class="slide top" data-stage="Recap" data-stagetone="recap">
+<h2 class="hd">🔁 Recap &mdash; tap each one</h2>
+<div class="grid3"><div class="tile" data-act="tap" data-a="The life story of a real person."><div class="t-emo">📜</div><div class="t-q">What is a biography?</div></div><div class="tile" data-act="tap" data-a="Print · Graphics · Informational · Organization"><div class="t-emo">🔎</div><div class="t-q">Name the 4 text feature types.</div></div><div class="tile" data-act="tap" data-a="Events in date order — chronologically."><div class="t-emo">📊</div><div class="t-q">What does a timeline show?</div></div><div class="tile" data-act="tap" data-a="He released them."><div class="t-emo">🕊️</div><div class="t-q">What did Leonardo do with the birds?</div></div><div class="tile" data-act="tap" data-a="Many different kinds."><div class="t-emo">📏</div><div class="t-q">What does 'a range' mean?</div></div><div class="tile" data-act="tap" data-a="1452 to 1519."><div class="t-emo">📅</div><div class="t-q">When did he live?</div></div></div>
+</section>
+<section class="slide top" data-stage="Formative Assessment" data-stagetone="recap">
+<h2 class="hd">✔️ Can Leo&hellip;</h2>
+<div class="list"><div class="li"><div class="n gn">✓</div><div>&hellip;identify the text features in this reading? <span class='jp'>(title, italic print, drawings, timeline)</span></div></div><div class="li"><div class="n gn">✓</div><div>&hellip;say which feature helps visualise? <span class='jp'>(the drawings)</span></div></div><div class="li"><div class="n gn">✓</div><div>&hellip;say which helps with organization? <span class='jp'>(the title)</span></div></div><div class="li"><div class="n gn">✓</div><div>&hellip;give <strong>five facts</strong> about Leonardo&rsquo;s life?</div></div></div>
+<div class="card u9 mt"><div class="card-lbl">Quick check</div><p class="lead">&ldquo;Tell me five facts about Leonardo. Use the text <em>and</em> the timeline.&rdquo;</p></div>
+</section>
+<section class="slide center" data-stage="Wrap Up" data-stagetone="wrapup">
+<div class="col center">
+ <div class="big-emo">🪶✈️</div>
+ <h2 class="hd">One man. A whole range.</h2>
+ <p class="lead">Artist, musician, architect, engineer, scientist, inventor &mdash; and a man who set birds free. 🕊️</p>
+ <div class="card acc mt" style="max-width:1200px"><div class="card-lbl">Still to come in this section</div>
+  <p class="lead">🗣️ <strong>Let&rsquo;s Talk</strong> &mdash; &ldquo;Wow, that&rsquo;s cool!&rdquo; and &ldquo;What does that mean?&rdquo; (pp. 166&ndash;167)</p></div>
+ <div class="chips mt"><span class="chip">✏️ design</span><span class="chip">🏷️ label</span><span class="chip">📏 range</span><span class="chip">🏗️ structure</span><span class="chip">🤩 fascinated</span><span class="chip">🛩️ glider</span></div>
+ <div class="done-row mt">
+  <button class="opt center" id="doneBtn" data-act="done">✅ Mark this lesson done</button>
+  <button class="opt center" id="redoBtn" data-act="redo">↺ Redo</button>
+ </div>
+ <p class="lead" id="doneMsg" style="margin-top:18px"></p>
+</div>
+</section>
+
+<div id="prog"><div id="progFill"></div></div>
+<button class="tn-btn" data-act="notes" title="Teacher notes (N)">📋</button>
+<button class="tn-btn fs-btn" data-act="full" title="Fullscreen (F)">⛶</button>
+<div class="tn-panel" id="tnPanel"></div>
+<div id="nav">
+  <button class="nb" data-act="nav" data-dir="-1">‹</button>
+  <div id="counter">1 / 40</div>
+  <button class="nb" data-act="nav" data-dir="1">›</button>
+</div>
+</div></div>
+<script>
+(function(){
+"use strict";
+
+/* ═══════ LEEA SAVE STANDARD ═══════ */
+var SAVE_PREFIX = '4-er7-9-extra-reading-slides-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-er7-9-extra-reading-slides';
+/* Must match the `id` in checkpoint-7-9/lessons/extra-reading.teacher.json — the teacher dashboard
+   reads leea.lessonProgress.v1 keyed by that lesson id. */
+var LESSON_ID = 'ow-l4-er7-9-extra-reading';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+
+function lSave(key, val){
+  try{ localStorage.setItem('leea-' + key, JSON.stringify(val)); }catch(e){}
+  try{
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && LEEA_CLOUD.enabled){
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val);
+    }
+  }catch(e){}
+}
+function lLoad(key, fb){
+  try{ var v = localStorage.getItem('leea-' + key); return v !== null ? JSON.parse(v) : fb; }
+  catch(e){ return fb; }
+}
+function lRemove(key){
+  try{ localStorage.removeItem('leea-' + key); }catch(e){}
+}
+
+/* ═══════ MARK DONE ═══════ */
+function writeLessonProgress(){
+  try{
+    var store = {};
+    var raw = localStorage.getItem(PROGRESS_KEY);
+    if(raw){ store = JSON.parse(raw) || {}; }
+    var now = new Date().toISOString();
+    store[LESSON_ID] = {
+      lessonId: LESSON_ID,
+      teacherId: 'neritan',
+      studentId: 'leo',
+      status: 'done',
+      completedAt: now,
+      updatedAt: now
+    };
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+  }catch(e){ console.warn('writeLessonProgress', e); }
+}
+function clearLessonProgress(){
+  try{
+    var raw = localStorage.getItem(PROGRESS_KEY);
+    if(!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+  }catch(e){ console.warn('clearLessonProgress', e); }
+}
+function paintDone(saved){
+  var btn = document.getElementById('doneBtn');
+  if(!btn) return;
+  if(saved){ btn.classList.add('confirmed'); btn.style.pointerEvents = 'none'; btn.textContent = '✅ Saved!'; }
+  else { btn.classList.remove('confirmed'); btn.style.pointerEvents = 'auto'; btn.textContent = '✅ Mark this lesson done'; }
+}
+function markDone(){
+  try{
+    writeLessonProgress();
+    lSave(SAVE_PREFIX + 'done', true);
+    paintDone(true);
+    var msg = document.getElementById('doneMsg');
+    if(msg) msg.textContent = 'Saved. Great extended reading, Leo. 🪶';
+  }catch(e){ console.warn('markDone', e); }
+}
+/* Two-tap so a stray tap on the last slide can't wipe the lesson record. */
+var redoArmed = false, redoTimer = null;
+function handleRedo(){
+  try{
+    var btn = document.getElementById('redoBtn');
+    var msg = document.getElementById('doneMsg');
+    if(!redoArmed){
+      redoArmed = true;
+      if(btn) btn.textContent = '↺ Tap again to clear';
+      if(msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+      if(redoTimer) clearTimeout(redoTimer);
+      redoTimer = setTimeout(function(){
+        redoArmed = false;
+        if(btn) btn.textContent = '↺ Redo';
+        if(msg) msg.textContent = '';
+      }, 4000);
+      return;
+    }
+    redoArmed = false;
+    if(redoTimer) clearTimeout(redoTimer);
+    clearLessonProgress();
+    lRemove(SAVE_PREFIX + 'done');
+    paintDone(false);
+    if(btn) btn.textContent = '↺ Redo';
+    if(msg) msg.textContent = 'Cleared. Ready to read again.';
+  }catch(e){ console.warn('handleRedo', e); }
+}
+
+/* ═══════ <deck-stage> WEB COMPONENT ═══════ */
+class DeckStage extends HTMLElement{
+  connectedCallback(){
+    try{
+      var stage = this.getAttribute('stage') || '';
+      var tone  = this.getAttribute('tone')  || 'wrapup';
+      var sub   = this.getAttribute('sub')   || '';
+      this.innerHTML = '<span class="sb ' + tone + '">' + stage + '</span>' +
+                       (sub ? '<span class="sb-sub">' + sub + '</span>' : '');
+    }catch(e){ console.warn('deck-stage', e); }
+  }
+}
+try{ customElements.define('deck-stage', DeckStage); }catch(e){}
+
+/* ═══════ TEACHER NOTES (per slide) ═══════ */
+var NOTES = {
+0:{h:'Open the Extended Reading',b:'<p>Open at pp. 164&ndash;165 and have Leo read the <strong>title and the subtitle</strong> aloud before anything else.</p><p><span class=\'say\'>Say</span> <em>Leonardo da Vinci was a real person. The reading is about his life.</em> Note the subtitle is a <strong>question</strong>, not a statement &mdash; the book is inviting him to disagree.</p>'},
+1:{h:'Text type &mdash; biography',b:'<p>LP: <span class=\'say\'>Say</span> <em>This type of reading is called a biography.</em></p><p>Compare with the Unit 9 Reader if you did it: <em>The Tug-of-War</em> was a folktale &mdash; made up, very old, animals talk. This is the opposite kind of text.</p>'},
+2:{h:'Objectives',b:'<p>LP objectives: identify text features · identify elements of a biography. The other two are the activities that carry them.</p><p>Objective 1 is unusual and worth naming: today Leo studies the <em>design</em> of the page, not just the words on it.</p>'},
+3:{h:'Academic Language',b:'<p>LP Academic Language: design, label, range, structure. Four terms, four full games.</p><p>Neat coincidence worth pointing out: these are the words for what Leonardo <em>did</em> and for what the book&rsquo;s designers did.</p>'},
+4:{h:'design &mdash; noun or verb',b:'<p>Both forms appear in the reading, so the double use is worth ten seconds.</p><p>Test: if you can put <em>to</em> in front of it, it is the verb.</p>'},
+5:{h:'design &mdash; word card',b:'<p>Central word of the whole lesson. Everything Leonardo is famous for started as a design.</p>'},
+6:{h:'label &mdash; Label It',b:'<p>Leo needs this word for Activity 4 &mdash; two of the three choices ask him to add labels.</p><p>Have him label something on the spot: a drawing of a bicycle, three parts, in English.</p>'},
+7:{h:'label &mdash; word card',b:'<p>Also a text feature. It comes back on the Text Features slide.</p>'},
+8:{h:'range &mdash; A Huge Range',b:'<p>Tap all four tiles first &mdash; the variety <em>is</em> the definition.</p><p>This word carries the reading&rsquo;s main argument: Leonardo counts as one of the greatest because of the sheer range, not one single invention.</p>'},
+9:{h:'range &mdash; word card',b:'<p>Contrast with <em>a lot</em>: a lot is quantity, a range is variety. Leo should hear the difference.</p>'},
+10:{h:'structure &mdash; how it is built',b:'<p>The reading says he studied wing <em>shape, structure and movement</em> &mdash; three different things. Worth separating all three.</p><p>Structure also describes this lesson: a text has a structure too.</p>'},
+11:{h:'structure &mdash; word card',b:'<p>Last of the four. Run a quick recall of all four before moving to content vocabulary.</p>'},
+12:{h:'Content Vocabulary',b:'<p>LP Content Vocabulary: fascinated, glider, kindness, release, vegetarian. Pre-teach all five <strong>before</strong> playing TR 9.11 &mdash; the LP Teaching Tip from the Review page applies here too.</p>'},
+13:{h:'fascinated &mdash; How Interested?',b:'<p>Teach it as the top of a scale. Leo can place his own interests on it &mdash; soccer is probably at the fascinated end.</p><p>LP comprehension question: <em>Why was he very interested in birds?</em> (He was fascinated by flight.)</p>'},
+14:{h:'fascinated &mdash; word card',b:'<p>Ask what Leo is fascinated by. Whatever he says, that is the right answer.</p>'},
+15:{h:'glider &mdash; Engine or No Engine?',b:'<p>Glossary-level fact worth telling: people have recently built Leonardo&rsquo;s glider design and flown it successfully, with one small change.</p><p>Let that land. He designed something over 500 years ago that actually works.</p>'},
+16:{h:'glider &mdash; word card',b:'<p>Simpler than the flapping-wing machine &mdash; and that is exactly why it worked.</p>'},
+17:{h:'kindness &mdash; Kindness Test',b:'<p>Note the word family: kind &rarr; kindness. The <em>-ness</em> ending turns an adjective into a noun.</p><p>This links to the Unit 9 Values work if you have done it.</p>'},
+18:{h:'kindness &mdash; word card',b:'<p>kind + ness. Compare: happy &rarr; happiness, dark &rarr; darkness.</p>'},
+19:{h:'release &mdash; Set Them Free',b:'<p>LP comprehension question: <em>Why would Leonardo buy the birds at the market?</em> (to study and then release them)</p><p>This is Activity 2, item 1 &mdash; the answer is <strong>released</strong>. Flag the past-tense form now.</p>'},
+20:{h:'release &mdash; word card',b:'<p>release &rarr; released. Needed for Activity 2.</p>'},
+21:{h:'vegetarian &mdash; What\'s on the Plate?',b:'<p>Connect it to the birds: both come from the same fact about him &mdash; he did not want to harm animals.</p><p>Ask whether Leo knows any vegetarians. It is a very ordinary word now and was a strange one then.</p>'},
+22:{h:'vegetarian &mdash; word card',b:'<p>Last of the five. Now play TR 9.11.</p>'},
+23:{h:'Present &mdash; read together',b:'<p>LP: play TR 9.11 and have students follow along, then check comprehension with these three questions. They are the LP&rsquo;s own, verbatim.</p><p>Read once for the whole thing. Understanding comes on the second read &mdash; that is the Teaching Tip from p. 321.</p>'},
+24:{h:'The bird market',b:'<p>The reading&rsquo;s opening scene, in summary form. Read the actual paragraphs from the book &mdash; these steps are only the shape of it.</p><p>Two motives at once, and that is the interesting part: kindness <em>and</em> scientific study. Ask Leo which he thinks came first.</p>'},
+25:{h:'Flight designs',b:'<p>All four are named in the reading. The glider is the one to dwell on &mdash; it was actually built and flown in modern times with one small change.</p><p><span class=\'say\'>Ask</span> <em>Which of these would you have wanted to try?</em> The flying machine needed a very brave pilot.</p>'},
+26:{h:'Be the Expert &mdash; Text Features',b:'<p>The LP&rsquo;s four categories, verbatim. This is objective 1 of the lesson.</p><p>Point at each one on the actual page as you read the card. The abstraction only lands if he can see the example.</p>'},
+27:{h:'Practice &mdash; text feature hunt',b:'<p>These are the Formative Assessment questions from the LP, turned into a hunt: text features in this reading are the <strong>title, italic print, drawings and a timeline</strong>. Drawings help visualise; the title helps with organization.</p><p>Leo should point at each one in the book before you tap.</p>'},
+28:{h:'Be the Expert &mdash; Elements of a Biography',b:'<p>LP wording, verbatim. This is objective 2.</p><p>The five-facts check is the LP&rsquo;s own assessment. Do it out loud &mdash; he should be able to source each fact from either the text or the timeline.</p>'},
+29:{h:'Timeline &mdash; part 1',b:'<p>Have Leo read the entries aloud from the book. The timeline is a text feature <em>and</em> the answer key for Activity 2.</p><p>Teach <em>chronologically</em> as the LP does &mdash; it simply means in date order.</p>'},
+30:{h:'Timeline &mdash; part 2',b:'<p>The subtraction is worth doing &mdash; it is Activity 2, item 6, and it makes the dates real rather than decorative.</p><p>Note he began the <em>Mona Lisa</em> in 1503 and was still studying flight for the next ten years. He never did one thing at a time.</p>'},
+31:{h:'Activity 2 &mdash; complete the sentences',b:'<p>LP: the timeline will help with this activity. Have Leo complete it independently, replaying TR 9.11 if needed.</p><p><strong>Honest note:</strong> item 4 was not legible in my source, so I have not put an answer on the slide. Read it from the printed page and do it together &mdash; I would rather leave a gap than invent one.</p>'},
+32:{h:'Activity 3 &mdash; discuss',b:'<p>LP: discuss each question <strong>first</strong>, take notes, then each write their own answer. If stuck, reread the text.</p><p>Q3 is the hardest and the best. The materials, engines and tools did not exist yet &mdash; he was, as the reading puts it, centuries ahead of his time. Let Leo reach that himself.</p><p>Q2 recycles the Unit 7 fact-and-opinion writing directly.</p>'},
+33:{h:'Activity 4 &mdash; Express yourself',b:'<p>The three choices, verbatim from the SB.</p><p>Choice 2 needs the LP&rsquo;s <strong>screenplay</strong> graphic organiser and a group; at home, a two-hander between you and Leo works fine. Choice 3 is easiest to do well alone.</p>'},
+34:{h:'Prepare',b:'<p>The LP&rsquo;s three preparation steps, one per choice.</p><p>The T-chart suggestion for the poster is the LP&rsquo;s own and makes comparison far easier. Reminder from the LP: labels should give <em>detailed</em> information.</p>'},
+35:{h:'Share',b:'<p>The LP&rsquo;s four feedback frames, verbatim. Write them on paper for reference, as the LP instructs.</p><p>Frames 3 and 4 are the useful ones and the ones children skip. Model them yourself first so Leo hears that they are not rude.</p>'},
+36:{h:'Extend &mdash; the greatest ever?',b:'<p>The closing question ties this reading straight back to Unit 7 fact-and-opinion writing: &lsquo;greatest&rsquo; can never be a fact, however many numbers you bring.</p><p>Stats are 2025&ndash;26. Let Leo argue &mdash; then ask him for the <em>evidence</em> behind his claim.</p>'},
+37:{h:'Recap',b:'<p>Recap before Wrap Up. Answers aloud first.</p>'},
+38:{h:'Formative Assessment',b:'<p>The LP&rsquo;s formative assessment, verbatim, with its own bracketed answers.</p><p>If the five facts come only from the timeline, ask for two more from the paragraphs &mdash; that is the real test of the reading.</p>'},
+39:{h:'Wrap Up',b:'<p>Finish on the list of what he was &mdash; the range is the whole argument of the reading.</p><p>If Leo picked the drawing or poster in Activity 4, put it on the wall. Leonardo&rsquo;s notebooks survived 500 years; his can survive the week.</p>'}
+};
+
+/* ═══════ DECK STATE ═══════ */
+var deck    = document.getElementById('deck');
+var slides  = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+var total   = slides.length;
+var idx     = 0;
+var notesOpen = false;
+
+/* Inject stage badges from data-stage / data-stagetone */
+try{
+  slides.forEach(function(s, i){
+    var st = s.getAttribute('data-stage');
+    if(!st) return;
+    var el = document.createElement('deck-stage');
+    el.setAttribute('stage', st);
+    el.setAttribute('tone', s.getAttribute('data-stagetone') || 'wrapup');
+    el.setAttribute('sub', (i + 1) + ' of ' + total);
+    s.insertBefore(el, s.firstChild);
+  });
+}catch(e){ console.warn('badge inject', e); }
+
+function render(){
+  try{
+    slides.forEach(function(s, i){ s.classList.toggle('on', i === idx); });
+    var c = document.getElementById('counter');
+    if(c) c.textContent = (idx + 1) + ' / ' + total;
+    var pf = document.getElementById('progFill');
+    if(pf) pf.style.width = ((idx + 1) / total * 100) + '%';
+    paintNotes();
+    lSave(SAVE_PREFIX + 'slide', idx);
+  }catch(e){ console.warn('render', e); }
+}
+
+function paintNotes(){
+  try{
+    var p = document.getElementById('tnPanel');
+    if(!p) return;
+    var n = NOTES[idx];
+    p.innerHTML = n ? ('<h4>' + n.h + '</h4>' + n.b)
+                    : '<h4>Teacher notes</h4><p>No notes for this slide.</p>';
+  }catch(e){ console.warn('paintNotes', e); }
+}
+
+function go(d){
+  var n = idx + d;
+  if(n < 0 || n >= total) return;
+  idx = n;
+  render();
+}
+
+/* ═══════ SCALING ═══════ */
+function fit(){
+  try{
+    var vw = window.innerWidth  || document.documentElement.clientWidth;
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var s  = Math.min(vw / 1920, vh / 1080);
+    var ox = Math.max(0, (vw - 1920 * s) / 2);
+    var oy = Math.max(0, (vh - 1080 * s) / 2);
+    deck.style.transform = 'translate(' + ox + 'px,' + oy + 'px) scale(' + s + ')';
+  }catch(e){ console.warn('fit', e); }
+}
+window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', function(){ setTimeout(fit, 120); });
+if(window.visualViewport){ window.visualViewport.addEventListener('resize', fit); }
+
+/* ═══════ SINGLE DELEGATED CLICK HANDLER ═══════ */
+document.addEventListener('click', function(ev){
+  try{
+    var t = ev.target.closest('[data-act]');
+    if(!t) return;
+    var act = t.getAttribute('data-act');
+
+    if(act === 'nav'){ go(parseInt(t.getAttribute('data-dir'), 10)); return; }
+    if(act === 'done'){ markDone(); return; }
+    if(act === 'redo'){ handleRedo(); return; }
+
+    if(act === 'notes'){
+      notesOpen = !notesOpen;
+      var p = document.getElementById('tnPanel');
+      if(p) p.classList.toggle('open', notesOpen);
+      t.classList.toggle('act', notesOpen);
+      return;
+    }
+
+    if(act === 'full'){ toggleFull(); return; }
+
+    if(act === 'tap'){
+      if(t.classList.contains('open')) return;
+      t.classList.add('open', 'reveal');
+      var ans = t.getAttribute('data-a') || '';
+      if(t.classList.contains('ce-cell')){
+        t.classList.remove('blank');
+        t.classList.add('fill');
+        t.textContent = ans;
+      } else {
+        var q = t.querySelector('.t-q');
+        var out = document.createElement('div');
+        out.className = 't-a';
+        out.innerHTML = ans;
+        if(q && q.parentNode === t) t.appendChild(out); else t.appendChild(out);
+      }
+      var ck = t.getAttribute('data-count');
+      if(ck) checkGroupDone(ck);
+      return;
+    }
+
+    if(act === 'count'){
+      var key = t.getAttribute('data-key');
+      var max = parseInt(t.getAttribute('data-max'), 10) || 3;
+      var cur = (parseInt(t.getAttribute('data-n'), 10) || 0) + 1;
+      if(cur > max) return;
+      t.setAttribute('data-n', cur);
+      var out2 = document.getElementById(key + 'Out');
+      if(out2) out2.textContent = cur;
+      var emo = document.getElementById(key + 'Emo');
+      if(emo){ emo.classList.remove('reveal'); void emo.offsetWidth; emo.classList.add('reveal'); }
+      if(cur >= max) t.classList.add('open');
+      return;
+    }
+
+    if(act === 'opt'){
+      var g = t.getAttribute('data-g');
+      var box = document.getElementById('q-' + g);
+      if(!box || box.getAttribute('data-locked') === '1') return;
+      box.setAttribute('data-locked', '1');
+      var ok = t.getAttribute('data-c') === '1';
+      Array.prototype.forEach.call(box.querySelectorAll('.opt'), function(o){
+        o.classList.add('locked');
+        if(o.getAttribute('data-c') === '1') o.classList.add('ok');
+      });
+      if(!ok) t.classList.add('bad');
+      var fb = document.getElementById('fb-' + g);
+      if(fb){
+        fb.className = 'fb show ' + (ok ? 'ok' : 'bad');
+        fb.innerHTML = (ok ? '✅ ' : '💡 ') + (t.getAttribute('data-fb') || '');
+      }
+      lSave(SAVE_PREFIX + 'q-' + g, { correct: ok, ts: new Date().toISOString() });
+      return;
+    }
+
+    if(act === 'tick'){
+      t.classList.toggle('on');
+      var bx = t.querySelector('.bx');
+      if(bx) bx.textContent = t.classList.contains('on') ? '✓' : '';
+      var all = Array.prototype.slice.call(document.querySelectorAll('[data-act="tick"]'));
+      var done = all.filter(function(x){ return x.classList.contains('on'); }).length;
+      var ed = document.getElementById('editDone');
+      if(ed) ed.classList.toggle('hide', done !== all.length);
+      lSave(SAVE_PREFIX + 'edit-checklist', done);
+      return;
+    }
+  }catch(e){ console.warn('click handler', e); }
+});
+
+function checkGroupDone(key){
+  try{
+    var all = Array.prototype.slice.call(document.querySelectorAll('[data-count="' + key + '"]'));
+    if(!all.length) return;
+    var open = all.filter(function(x){ return x.classList.contains('open'); }).length;
+    if(open === all.length){
+      var r = document.getElementById(key + 'Reveal');
+      if(r){ r.classList.remove('hide'); r.classList.add('reveal'); }
+    }
+  }catch(e){ console.warn('checkGroupDone', e); }
+}
+
+function toggleFull(){
+  try{
+    var el = document.documentElement;
+    if(!document.fullscreenElement){
+      if(el.requestFullscreen) el.requestFullscreen();
+      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } else {
+      if(document.exitFullscreen) document.exitFullscreen();
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+    setTimeout(fit, 150);
+  }catch(e){ console.warn('toggleFull', e); }
+}
+document.addEventListener('fullscreenchange', function(){ setTimeout(fit, 120); });
+
+/* ═══════ KEYBOARD ═══════ */
+document.addEventListener('keydown', function(e){
+  try{
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); go(1); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+    else if(e.key === 'f' || e.key === 'F'){ toggleFull(); }
+    else if(e.key === 'n' || e.key === 'N'){
+      var b = document.querySelector('[data-act="notes"]');
+      if(b) b.click();
+    }
+  }catch(err){ console.warn('key', err); }
+});
+
+/* ═══════ INIT ═══════ */
+function restore(){ paintDone(lLoad(SAVE_PREFIX + 'done', false) === true); }
+document.addEventListener('DOMContentLoaded', function(){ fit(); render(); restore(); });
+fit();
+render();
+restore();
+
+})();
+</script>
+</body>
+</html>

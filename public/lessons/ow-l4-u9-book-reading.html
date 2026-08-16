@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 9 Reader · The Tug-of-War — Book Reading | LEEA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"></noscript>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../lib/leea-cloud-config.js"></script>
+<script src="../../lib/leea-cloud.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* ── UNIT 9 · FORCE LAB PALETTE ── */
+  --u9:#DC2626;      --u9d:#991B1B;    --u9l:#FEF2F2;   --u9ll:#FFF5F5;
+  --acc:#F59E0B;     --accd:#B45309;   --accl:#FFFBEB;
+  --gn:#16A34A;      --gnd:#15803D;    --gnl:#F0FDF4;
+  --bl:#2563EB;      --bld:#1D4ED8;    --bll:#EFF6FF;
+  --pu:#7C3AED;      --pul:#F5F3FF;
+  --tl:#0D9488;      --tll:#F0FDFA;
+  --rd:#DC2626;      --rdl:#FEE2E2;
+  --ink:#0F172A;     --ink2:#334155;   --ink3:#64748B;   --ink4:#94A3B8;
+  --paper:#FFFDF8;   --surf:#FFFFFF;   --bdr:#E2E8F0;    --bdr2:#CBD5E1;
+  --fn:'Outfit',system-ui,sans-serif;
+}
+html,body{height:100%;background:#0B0F1A;overflow:hidden;font-family:var(--fn)}
+
+/* ══ DECK STAGE (1920×1080 fixed coordinate space) ══ */
+#deckWrap{position:fixed;inset:0;overflow:hidden;background:#0B0F1A}
+#deck{position:absolute;top:0;left:0;width:1920px;height:1080px;flex:0 0 auto;transform-origin:top left;background:var(--paper);overflow:hidden;will-change:transform}
+
+/* ══ SLIDES ══ */
+.slide{position:absolute;inset:0;padding:96px 110px 130px;display:none;flex-direction:column;justify-content:center}
+.slide.on{display:flex}
+.slide.top{justify-content:flex-start;padding-top:120px}
+
+/* ══ STAGE BADGE (injected by <deck-stage>) ══ */
+deck-stage{position:absolute;top:38px;left:110px;display:flex;align-items:center;gap:12px;z-index:5}
+.sb{font-size:19px;font-weight:800;letter-spacing:3.2px;text-transform:uppercase;padding:8px 20px;border-radius:6px;border:2px solid}
+.sb.warmup{background:var(--accl);color:var(--accd);border-color:#FCD34D}
+.sb.present{background:var(--bll);color:var(--bld);border-color:#BFDBFE}
+.sb.practice{background:var(--pul);color:var(--pu);border-color:#DDD6FE}
+.sb.apply{background:var(--gnl);color:var(--gnd);border-color:#BBF7D0}
+.sb.recap{background:var(--tll);color:var(--tl);border-color:#99F6E4}
+.sb.wrapup{background:#F1F5F9;color:var(--ink2);border-color:var(--bdr2)}
+.sb.vocab{background:var(--u9l);color:var(--u9d);border-color:#FECACA}
+.sb.expert{background:#FDF4FF;color:#A21CAF;border-color:#F5D0FE}
+.sb-sub{font-size:18px;font-weight:600;color:var(--ink4);letter-spacing:.6px}
+
+/* ══ TYPOGRAPHY ══ */
+h1.big{font-size:104px;font-weight:900;line-height:1.02;letter-spacing:-2.5px;color:var(--ink)}
+h2.hd{font-size:70px;font-weight:900;line-height:1.06;letter-spacing:-1.6px;color:var(--ink);margin-bottom:34px}
+h3.sub{font-size:44px;font-weight:800;color:var(--ink);line-height:1.18;margin-bottom:24px}
+p.lead{font-size:38px;font-weight:500;color:var(--ink2);line-height:1.5}
+.kick{font-size:22px;font-weight:800;letter-spacing:5px;text-transform:uppercase;color:var(--u9);margin-bottom:20px}
+.jp{font-size:27px;font-weight:600;color:var(--ink3);line-height:1.5}
+.hl{color:var(--u9)}
+.hl2{color:var(--acc)}
+.hlbl{color:var(--bl)}
+.hlgn{color:var(--gn)}
+
+/* ══ LAYOUT HELPERS ══ */
+.row{display:flex;gap:30px;align-items:stretch;justify-content:center}
+.col{display:flex;flex-direction:column;gap:24px;justify-content:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-content:center}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-content:center}
+.center{text-align:center;align-items:center}
+.mt{margin-top:32px}
+
+/* ══ CARDS ══ */
+.card{background:var(--surf);border:3px solid var(--bdr);border-radius:20px;padding:32px 36px}
+.card.u9{border-color:#FECACA;background:var(--u9l)}
+.card.acc{border-color:#FDE68A;background:var(--accl)}
+.card.bl{border-color:#BFDBFE;background:var(--bll)}
+.card.gn{border-color:#BBF7D0;background:var(--gnl)}
+.card.pu{border-color:#DDD6FE;background:var(--pul)}
+.card-lbl{font-size:20px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+
+/* ══ WORD CARD (vocab reveal prize) ══ */
+.wordcard{background:linear-gradient(155deg,#fff,#FFF7F7);border:5px solid var(--u9);border-radius:28px;padding:44px 54px;text-align:center;box-shadow:0 22px 60px rgba(220,38,38,.16)}
+.wordcard .emo{font-size:104px;line-height:1}
+.wordcard .w{font-size:82px;font-weight:900;color:var(--u9d);letter-spacing:-1.4px;margin-top:8px}
+.wordcard .pos{font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--ink4);margin-top:6px}
+.wordcard .def{font-size:34px;font-weight:600;color:var(--ink2);margin-top:20px;line-height:1.4}
+.wordcard .ex{font-size:30px;font-weight:600;color:var(--u9);font-style:italic;margin-top:16px}
+.wordcard .jpx{font-size:26px;font-weight:600;color:var(--ink3);margin-top:14px}
+
+/* ══ BUTTONS / OPTIONS ══ */
+.opt{background:var(--surf);border:4px solid var(--bdr2);border-radius:18px;padding:26px 32px;font-family:var(--fn);font-size:36px;font-weight:700;color:var(--ink);cursor:pointer;text-align:left;transition:all .18s;line-height:1.3}
+.opt:hover:not(.locked){border-color:var(--u9);background:var(--u9ll);transform:translateY(-3px)}
+.opt.ok{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+.opt.bad{border-color:var(--rd);background:var(--rdl);color:var(--rd);animation:shk .32s}
+.opt.locked{cursor:default}
+.opt .ltr{display:inline-block;min-width:52px;font-weight:900;color:var(--ink4)}
+.opt.confirmed{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+.done-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+
+.fb{font-size:32px;font-weight:700;padding:22px 30px;border-radius:16px;margin-top:24px;display:none;line-height:1.4}
+.fb.show{display:block}
+.fb.ok{background:var(--gnl);border:3px solid #BBF7D0;color:var(--gnd)}
+.fb.bad{background:var(--rdl);border:3px solid #FECACA;color:var(--rd)}
+
+.btn{background:var(--u9);color:#fff;border:none;border-radius:16px;padding:22px 44px;font-family:var(--fn);font-size:32px;font-weight:800;cursor:pointer;transition:all .18s}
+.btn:hover{background:var(--u9d);transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--u9);border:4px solid var(--u9)}
+.btn.acc{background:var(--acc);color:#3F2D00}
+.btn.acc:hover{background:var(--accd);color:#fff}
+
+/* ══ REVEAL ══ */
+.hide{display:none}
+.reveal{animation:pop .34s cubic-bezier(.22,1,.36,1)}
+@keyframes pop{0%{opacity:0;transform:scale(.9) translateY(18px)}100%{opacity:1;transform:none}}
+@keyframes shk{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-9px)}50%{transform:translateX(9px)}}
+
+/* ══ TAP TILE ══ */
+.tile{background:var(--surf);border:4px dashed var(--bdr2);border-radius:20px;padding:34px 30px;text-align:center;cursor:pointer;transition:all .2s;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.tile:hover{border-color:var(--acc);background:var(--accl);transform:translateY(-4px)}
+.tile.open{border-style:solid;border-color:var(--gn);background:var(--gnl);cursor:default}
+.tile .t-emo{font-size:60px;line-height:1}
+.tile .t-q{font-size:32px;font-weight:800;color:var(--ink2)}
+.tile .t-a{font-size:34px;font-weight:800;color:var(--gnd);line-height:1.3}
+
+/* ══ CAUSE/EFFECT CHART ══ */
+.ce{display:grid;grid-template-columns:1fr 120px 1fr;gap:0;border:4px solid var(--ink);border-radius:20px;overflow:hidden;background:var(--surf)}
+.ce-hd{padding:20px;font-size:28px;font-weight:900;letter-spacing:3px;text-transform:uppercase;text-align:center;color:#fff}
+.ce-hd.c{background:var(--bl)}
+.ce-hd.arrow{background:var(--ink);color:#fff;font-size:34px}
+.ce-hd.e{background:var(--gn)}
+.ce-cell{padding:24px 26px;border-top:3px solid var(--bdr);font-size:31px;font-weight:600;color:var(--ink2);line-height:1.35;display:flex;align-items:center;min-height:104px}
+.ce-cell.mid{justify-content:center;font-size:40px;color:var(--ink4);background:#F8FAFC}
+.ce-cell.blank{background:#FFFBEB;color:var(--ink4);font-style:italic}
+.ce-cell.fill{background:var(--gnl);color:var(--gnd);font-weight:800}
+
+/* ══ MODEL TEXT ══ */
+.model{background:var(--surf);border:4px solid var(--bdr);border-left:14px solid var(--acc);border-radius:0 20px 20px 0;padding:34px 40px;font-size:33px;font-weight:500;color:var(--ink2);line-height:1.62}
+.model .cw{background:#DBEAFE;border-bottom:5px solid var(--bl);border-radius:5px;padding:0 6px;font-weight:800;color:var(--bld)}
+.model .ew{background:#DCFCE7;border-bottom:5px solid var(--gn);border-radius:5px;padding:0 6px;font-weight:800;color:var(--gnd)}
+.model .pn{font-size:22px;font-weight:800;letter-spacing:2px;color:var(--ink4);display:block;margin-bottom:8px}
+
+/* ══ CHIPS ══ */
+.chips{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.chip{background:var(--surf);border:4px solid var(--bdr2);border-radius:999px;padding:16px 34px;font-size:32px;font-weight:800;color:var(--ink2)}
+.chip.c{border-color:var(--bl);background:var(--bll);color:var(--bld)}
+.chip.e{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+
+/* ══ WORD MAP ══ */
+.map{position:relative;height:430px}
+.node{position:absolute;background:var(--surf);border:4px solid var(--u9);border-radius:999px;padding:18px 34px;font-size:30px;font-weight:800;color:var(--u9d);white-space:nowrap}
+.node.mid{background:var(--u9);color:#fff;font-size:38px;padding:24px 46px}
+.mapline{position:absolute;background:var(--bdr2);height:4px;transform-origin:left center}
+
+/* ══ PROGRESS / NAV / NOTES (absolute inside #deck) ══ */
+#prog{position:absolute;left:0;right:0;bottom:0;height:9px;background:#F1F5F9;z-index:20}
+#progFill{height:100%;background:linear-gradient(90deg,var(--u9),var(--acc));width:0;transition:width .35s}
+#nav{position:absolute;right:44px;bottom:36px;display:flex;align-items:center;gap:14px;z-index:22}
+.nb{width:74px;height:74px;border-radius:50%;border:4px solid var(--bdr2);background:var(--surf);font-size:32px;font-weight:900;color:var(--ink2);cursor:pointer;transition:all .18s}
+.nb:hover{border-color:var(--u9);color:var(--u9)}
+#counter{font-size:26px;font-weight:800;color:var(--ink3);min-width:130px;text-align:center;letter-spacing:1px}
+.tn-btn{position:absolute;left:44px;bottom:36px;width:74px;height:74px;border-radius:50%;border:4px solid var(--bdr2);background:var(--surf);font-size:32px;cursor:pointer;z-index:22;transition:all .18s}
+.tn-btn:hover{border-color:var(--acc);background:var(--accl)}
+.fs-btn{left:134px}
+.tn-btn.act{background:var(--acc);border-color:var(--accd)}
+.tn-panel{position:absolute;left:0;right:0;bottom:0;max-height:430px;overflow-y:auto;background:rgba(15,23,42,.97);color:#E2E8F0;padding:38px 110px 60px;z-index:21;display:none;border-top:6px solid var(--acc)}
+.tn-panel.open{display:block}
+.tn-panel h4{font-size:24px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:16px}
+.tn-panel p{font-size:27px;line-height:1.55;font-weight:500;margin-bottom:12px}
+.tn-panel em{color:#FDE68A;font-style:italic}
+.tn-panel .say{color:#BBF7D0;font-weight:700}
+#badge{position:absolute;right:44px;top:38px;font-size:20px;font-weight:800;letter-spacing:3px;color:var(--ink4);z-index:5}
+
+/* ══ SCOREBOARD / MISC ══ */
+.stepbar{display:flex;gap:14px;justify-content:center;margin-bottom:26px}
+.step{width:60px;height:12px;border-radius:999px;background:var(--bdr)}
+.step.on{background:var(--u9)}
+.big-emo{font-size:150px;line-height:1}
+.mid-emo{font-size:92px;line-height:1}
+.list{display:flex;flex-direction:column;gap:20px}
+.li{display:flex;gap:20px;align-items:flex-start;font-size:34px;font-weight:600;color:var(--ink2);line-height:1.35}
+.li .n{flex:0 0 54px;height:54px;border-radius:50%;background:var(--u9);color:#fff;font-size:28px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.li .n.gn{background:var(--gn)}
+.li .n.bl{background:var(--bl)}
+.frame{background:var(--accl);border:4px dashed var(--acc);border-radius:20px;padding:28px 34px;font-size:34px;font-weight:700;color:var(--accd);line-height:1.5}
+.tick{display:flex;align-items:center;gap:22px;background:var(--surf);border:4px solid var(--bdr);border-radius:18px;padding:22px 30px;font-size:32px;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .18s}
+.tick:hover{border-color:var(--gn)}
+.tick.on{background:var(--gnl);border-color:var(--gn);color:var(--gnd)}
+.tick .bx{flex:0 0 48px;height:48px;border:4px solid var(--bdr2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:30px}
+.tick.on .bx{background:var(--gn);border-color:var(--gn);color:#fff}
+.dad{background:var(--gnl);border:4px solid #BBF7D0;border-radius:18px;padding:24px 30px;font-size:30px;font-weight:700;color:var(--gnd);line-height:1.45}
+table.share{width:100%;border-collapse:collapse;border:4px solid var(--ink);border-radius:16px;overflow:hidden}
+table.share th{background:var(--ink);color:#fff;font-size:28px;font-weight:800;letter-spacing:2px;padding:18px;text-transform:uppercase}
+table.share td{border:3px solid var(--bdr);padding:22px;font-size:30px;font-weight:600;color:var(--ink2)}
+</style>
+</head>
+<body>
+<div id="deckWrap"><div id="deck">
+<div id="badge">LEEA · L4 · U9 · BOOK READING</div>
+<section class="slide center" data-stage="Book Reading" data-stagetone="vocab">
+<div class="col center">
+ <div class="big-emo">🐢🐘🦛</div>
+ <div class="kick">Our World 2E · Level 4 · Unit 9 Reader</div>
+ <h1 class="big">The <span class="hl">Tug-of-War</span></h1>
+ <p class="lead mt">A Folktale from Africa &middot; Retold by Leo Fletcher</p></div>
+</section>
+<section class="slide top" data-stage="Book Reading" data-stagetone="vocab">
+<h2 class="hd">📖 What is this story about?</h2>
+<div class="model" style="border-left-color:var(--acc)">
+ One morning, the animals in the jungle have an <strong>argument</strong>. Some say Elephant is the strongest animal in the jungle. Others say Hippo is the strongest. When Turtle says that <em>he</em> is the strongest, the other animals laugh at him.
+ <br><br><strong class="hl">Can Turtle prove that he is right?</strong> 🐢
+</div>
+<div class="row mt" style="gap:26px">
+ <div class="card bl" style="flex:1"><div class="mid-emo center">🐘</div><p class="lead center mt">Elephant<br><span class="jp">huge and heavy</span></p></div>
+ <div class="card bl" style="flex:1"><div class="mid-emo center">🦛</div><p class="lead center mt">Hippo<br><span class="jp">huge and heavy</span></p></div>
+ <div class="card gn" style="flex:1"><div class="mid-emo center">🐢</div><p class="lead center mt">Turtle<br><span class="jp">small&hellip; and clever?</span></p></div>
+</div>
+</section>
+<section class="slide top" data-stage="Book Reading" data-stagetone="expert">
+<h3 class="sub">📜 What kind of story is a folktale?</h3>
+<p class="lead" style="margin-bottom:24px">A <strong>folktale</strong> is a very old story. Nobody knows who first told it &mdash; it was passed from person to person for hundreds of years before anyone wrote it down.</p>
+
+<div class="col" id="q-folktale"><button class="opt" data-act="opt" data-g="folktale" data-c="0" data-fb="No — folktales are old, and usually not true. Often the animals talk!">A true story about real people from last year.</button><button class="opt" data-act="opt" data-g="folktale" data-c="1" data-fb="Yes. This one comes from Africa and was told long before it was written down.">An old story passed down by people telling it aloud.</button><button class="opt" data-act="opt" data-g="folktale" data-c="0" data-fb="That would just be a new story. Folktales are handed down over a very long time.">A story someone invented last week.</button></div>
+<div class="fb" id="fb-folktale"></div>
+</section>
+<section class="slide top" data-stage="Be the Expert" data-stagetone="expert">
+<h2 class="hd">🦊 Be the Expert &mdash; a <span class="hl">trickster</span> tale</h2>
+<div class="card acc" style="margin-bottom:26px"><p class="lead">This folktale is a special kind called a <strong>trickster tale</strong>. In a trickster tale, a <strong>big</strong> person or animal is tricked by a <strong class="hl">smaller, smarter</strong> one.</p></div>
+<div class="row" style="gap:26px">
+ <div class="card gn" style="flex:1"><div class="card-lbl" style="color:var(--gnd)">🧠 The trickster</div><p class="lead">Small. Clever. Usually wins.</p></div>
+ <div class="card bl" style="flex:1"><div class="card-lbl" style="color:var(--bld)">💪 The tricked</div><p class="lead">Big. Strong. Often does not even realise what happened!</p></div>
+</div>
+<div class="dad mt">💬 Keep this in your head while you read. Who do you think the trickster is going to be? 🐢</div>
+</section>
+<section class="slide top" data-stage="Book Reading" data-stagetone="expert">
+<h2 class="hd">🌍 Where does this story come from?</h2>
+<div class="row" style="gap:30px;align-items:center">
+ <div class="col center" style="flex:0 0 520px"><div style="font-size:190px;line-height:1">🌍</div>
+  <h3 class="sub center" style="margin-top:14px">Africa</h3></div>
+ <div class="col" style="flex:1">
+<div class="grid3" style="grid-template-columns:repeat(1,1fr)"><div class="tile" data-act="tap" data-a="Japan — in Asia"><div class="t-emo">🇯🇵</div><div class="t-q">Where we are</div></div><div class="tile" data-act="tap" data-a="Africa"><div class="t-emo">🌍</div><div class="t-q">Where the story is from</div></div><div class="tile" data-act="tap" data-a="elephants, hippos, turtles"><div class="t-emo">🐘🦛</div><div class="t-q">Animals that live there</div></div></div>
+ </div></div>
+<div class="dad mt">💬 LP resource: a <strong>world map</strong>. Find Africa together, then find Japan. Trace the distance with a finger.</div>
+</section>
+<section class="slide center" data-stage="Reading Strategy" data-stagetone="expert">
+<div class="col center">
+ <div class="kick">Reading Strategy</div>
+ <h2 class="hd">🔮 Make <span class="hl">Predictions</span></h2>
+ <div class="card acc mt" style="max-width:1400px"><p class="lead" style="font-size:40px">Making a prediction means making a <strong>guess about what will happen</strong> in the story.</p></div>
+ <div class="frame mt">⚠️ A prediction is <strong>not</strong> the answer. You are allowed to be wrong &mdash; that is the whole point.</div></div>
+</section>
+<section class="slide top" data-stage="Reading Strategy" data-stagetone="expert">
+<h2 class="hd">🔍 Where do you find <span class="hl">clues</span>?</h2>
+<div class="grid3"><div class="tile" data-act="tap" data-a="What you already knew BEFORE you started reading."><div class="t-emo">🧠</div><div class="t-q">Clue place 1</div></div><div class="tile" data-act="tap" data-a="What you have already read in the story."><div class="t-emo">📖</div><div class="t-q">Clue place 2</div></div><div class="tile" data-act="tap" data-a="What you can see in the pictures."><div class="t-emo">🖼️</div><div class="t-q">Clue place 3</div></div></div>
+<div class="card bl mt"><div class="card-lbl" style="color:var(--bld)">And one more</div>
+ <p class="lead">🎭 Think about what the <strong>characters are like</strong>. A clever character will do clever things. A proud character will not want to lose.</p></div>
+</section>
+<section class="slide top" data-stage="Reading Strategy" data-stagetone="practice">
+<h2 class="hd">📋 Your prediction chart</h2>
+<div class="ce" style="grid-template-columns:1fr 1fr">
+ <div class="ce-hd c">What I predict</div><div class="ce-hd e">Was I correct?</div>
+ <div class="ce-cell blank" data-act="tap" data-a="e.g. I think Elephant will win because he is the biggest." style="cursor:pointer">tap for an example&hellip;</div>
+ <div class="ce-cell blank" data-act="tap" data-a="Write yes or no here AFTER you read." style="cursor:pointer">tap&hellip;</div>
+ <div class="ce-cell">p. 5</div><div class="ce-cell">&nbsp;</div>
+ <div class="ce-cell">p. 7</div><div class="ce-cell">&nbsp;</div>
+ <div class="ce-cell">p. 10</div><div class="ce-cell">&nbsp;</div>
+</div>
+<div class="dad mt">💬 Draw these two columns on paper. Leo writes <strong>What I predict</strong> at the top of the first and <strong>Was I correct?</strong> at the top of the second.</div>
+</section>
+<section class="slide top" data-stage="Before You Read" data-stagetone="warmup">
+<h2 class="hd">🪢 Have you ever played tug-of-war?</h2>
+<div class="grid3"><div class="tile" data-act="tap" data-a="Two teams pull on opposite ends of one rope."><div class="t-emo">👥</div><div class="t-q">How is it played?</div></div><div class="tile" data-act="tap" data-a="You pull the other team across the line."><div class="t-emo">🏆</div><div class="t-q">How do you win?</div></div><div class="tile" data-act="tap" data-a="They lean back and pull — backward!"><div class="t-emo">💪</div><div class="t-q">How do players move?</div></div></div>
+<div class="card acc mt"><div class="card-lbl">🎬 Act it out</div>
+ <p class="lead">Get a towel. One end each. Pull! Now say it in English: <em>I&rsquo;m pulling. I&rsquo;m leaning backward. You&rsquo;re stronger than me!</em></p></div>
+</section>
+<section class="slide center" data-stage="Before You Read" data-stagetone="warmup">
+<div class="col center">
+ <div class="kick">Prediction #1 &mdash; before you open the book</div>
+ <h2 class="hd">Look at the <span class="hl">cover</span>.<br>What do you think this story will be about?</h2>
+ <div class="row mt" style="gap:26px;width:100%">
+  <div class="card bl" style="flex:1"><div class="card-lbl">Clues on the cover</div><p class="lead">The title 🪢 &middot; the animals 🐢🐘 &middot; the picture</p></div>
+  <div class="card gn" style="flex:1"><div class="card-lbl">Your guess</div><p class="lead">Say it out loud. Then write it in column 1. ✏️</p></div>
+ </div>
+ <div class="frame mt">Your guess is a <strong>prediction</strong>. 🔮</div></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="col center">
+ <div class="kick">Reader p. 16</div>
+ <h2 class="hd">📗 The <span class="hlgn">Glossary</span> &mdash; 12 words</h2>
+ <div class="chips mt" style="max-width:1500px">
+  <span class="chip">🤝 agreed</span><span class="chip">😠 argument</span><span class="chip">💬 conversation</span><span class="chip">🤩 excited</span>
+  <span class="chip">➕ joined</span><span class="chip">🌴 jungle</span><span class="chip">😬 nervous</span><span class="chip">💥 snap</span>
+  <span class="chip">🪢 tugged</span><span class="chip">🪢 tug-of-war</span><span class="chip">🌿 vine</span><span class="chip">💧 watering hole</span></div>
+ <p class="lead mt">Every word has its own game. Win the game &rarr; win the word card. 📗</p></div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="vocab">
+<h3 class="sub">🤝 Same Thought?</h3>
+<p class="lead" style="margin-bottom:24px">Two animals both say: <em>&ldquo;Elephant is the strongest!&rdquo;</em> They <strong>agreed</strong>. What does that mean?</p>
+
+<div class="grid2" id="q-agreed"><button class="opt center" data-act="opt" data-g="agreed" data-c="1" data-fb="Yes! When you agree, you think the same thing as someone else.">They thought the SAME thing.</button><button class="opt center" data-act="opt" data-g="agreed" data-c="0" data-fb="That is when people disagree — and that is how an argument starts.">They thought DIFFERENT things.</button></div>
+<div class="fb" id="fb-agreed"></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+  <div class="emo">🤝</div>
+  <div class="w" style="color:var(--gnd)">agreed</div>
+  <div class="pos">verb (past)</div>
+  <div class="def">thought the same thing as someone else</div>
+  <div class="ex" style="color:var(--gn)">&ldquo;They agreed that Hippo was strong.&rdquo;</div>
+  <div class="jpx">同意(どうい)した</div>
+</div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="vocab">
+<h3 class="sub">😠 Words or Fists?</h3>
+<p class="lead" style="margin-bottom:24px">The animals have an <strong>argument</strong>. Which picture is an argument?</p>
+
+<div class="grid3" id="q-argument"><button class="opt center" data-act="opt" data-g="argument" data-c="0" data-fb="That is a fight with bodies. An argument is a fight with WORDS.">Two animals hitting each other. 👊</button><button class="opt center" data-act="opt" data-g="argument" data-c="1" data-fb="Correct! An argument is a fight with words, when people do not agree.">Two animals shouting different opinions. 🗣️</button><button class="opt center" data-act="opt" data-g="argument" data-c="0" data-fb="No disagreement there at all!">Two animals sleeping quietly. 😴</button></div>
+<div class="fb" id="fb-argument"></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+  <div class="emo">😠</div>
+  <div class="w" style="color:var(--gnd)">argument</div>
+  <div class="pos">noun</div>
+  <div class="def">a fight with words when people do not agree</div>
+  <div class="ex" style="color:var(--gn)">&ldquo;One morning, the animals have an argument.&rdquo;</div>
+  <div class="jpx">口論(こうろん)・言(い)い争(あらそ)い</div>
+</div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="vocab">
+<h3 class="sub">💬 Talk Meter</h3>
+<p class="lead" style="margin-bottom:24px">A <strong>conversation</strong> is simply <em>a talk</em>. Which one is a conversation?</p>
+
+<div class="grid3" id="q-conversation"><button class="opt center" data-act="opt" data-g="conversation" data-c="0" data-fb="A conversation needs at least two — someone has to answer.">One animal talking to nobody.</button><button class="opt center" data-act="opt" data-g="conversation" data-c="1" data-fb="Yes. A conversation is a talk between people.">Two animals talking to each other.</button><button class="opt center" data-act="opt" data-g="conversation" data-c="0" data-fb="No talking at all there.">An animal reading quietly.</button></div>
+<div class="fb" id="fb-conversation"></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+  <div class="emo">💬</div>
+  <div class="w" style="color:var(--gnd)">conversation</div>
+  <div class="pos">noun</div>
+  <div class="def">a talk</div>
+  <div class="ex" style="color:var(--gn)">&ldquo;Turtle had a conversation with Elephant.&rdquo;</div>
+  <div class="jpx">会話(かいわ)</div>
+</div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="vocab">
+<h3 class="sub">🤩 The Feeling Dial</h3>
+<p class="lead" style="margin-bottom:24px"><strong>Excited</strong> means filled with a strong feeling. When would you feel excited?</p>
+
+<div class="grid3" id="q-excited"><button class="opt center" data-act="opt" data-g="excited" data-c="0" data-fb="That is just waiting. No strong feeling there.">Waiting for a boring bus. 🚌</button><button class="opt center" data-act="opt" data-g="excited" data-c="1" data-fb="Yes! Filled with a strong feeling — you can hardly keep still.">Two minutes before the big match starts! ⚽</button><button class="opt center" data-act="opt" data-g="excited" data-c="0" data-fb="Not many people get excited about that.">Doing the washing up. 🧽</button></div>
+<div class="fb" id="fb-excited"></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+  <div class="emo">🤩</div>
+  <div class="w" style="color:var(--gnd)">excited</div>
+  <div class="pos">adjective</div>
+  <div class="def">filled with a strong feeling</div>
+  <div class="ex" style="color:var(--gn)">&ldquo;All the animals were excited about the contest.&rdquo;</div>
+  <div class="jpx">わくわくした・興奮(こうふん)した</div>
+</div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="vocab">
+<h3 class="sub">➕ The Team Grows</h3>
+<p class="lead" style="margin-bottom:24px">More and more animals <strong>joined</strong> the game. Tap to watch, then choose.</p>
+<div class="grid3"><div class="tile" data-act="tap" data-a="joined — now 1 animal"><div class="t-emo">🐒</div><div class="t-q">Monkey</div></div><div class="tile" data-act="tap" data-a="joined — now 2 animals"><div class="t-emo">🦓</div><div class="t-q">Zebra</div></div><div class="tile" data-act="tap" data-a="joined — now 3 animals!"><div class="t-emo">🦁</div><div class="t-q">Lion</div></div></div>
+<div class="grid2" id="q-joined"><button class="opt center" data-act="opt" data-g="joined" data-c="0" data-fb="Opposite! To join is to come INTO something, not leave it.">They left the game.</button><button class="opt center" data-act="opt" data-g="joined" data-c="1" data-fb="Correct — to join is to become a part of something.">They became a part of the game.</button></div>
+<div class="fb" id="fb-joined"></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+  <div class="emo">➕</div>
+  <div class="w" style="color:var(--gnd)">joined</div>
+  <div class="pos">verb (past)</div>
+  <div class="def">became a part of</div>
+  <div class="ex" style="color:var(--gn)">&ldquo;More animals joined the tug-of-war.&rdquo;</div>
+  <div class="jpx">加(くわ)わった・参加(さんか)した</div>
+</div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="vocab">
+<h3 class="sub">🌴 Where Am I?</h3>
+<p class="lead" style="margin-bottom:24px">The story happens in the <strong>jungle</strong>. Which place is a jungle?</p>
+
+<div class="grid3" id="q-jungle"><button class="opt center" data-act="opt" data-g="jungle" data-c="0" data-fb="That is the Arctic — far too cold for a jungle.">A cold place with snow and ice. ❄️</button><button class="opt center" data-act="opt" data-g="jungle" data-c="1" data-fb="Yes! A jungle is a hot area with many trees and plants.">A hot place with many trees and plants. 🌴</button><button class="opt center" data-act="opt" data-g="jungle" data-c="0" data-fb="That is a desert — jungles are full of plants.">A dry place with sand and no plants. 🏜️</button></div>
+<div class="fb" id="fb-jungle"></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+  <div class="emo">🌴</div>
+  <div class="w" style="color:var(--gnd)">jungle</div>
+  <div class="pos">noun</div>
+  <div class="def">a hot area with many trees and plants</div>
+  <div class="ex" style="color:var(--gn)">&ldquo;The animals in the jungle have an argument.&rdquo;</div>
+  <div class="jpx">ジャングル・密林(みつりん)</div>
+</div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="vocab">
+<h3 class="sub">😬 Butterflies Detector</h3>
+<p class="lead" style="margin-bottom:24px"><strong>Nervous</strong> means worried that something bad is going to happen. Who feels nervous?</p>
+<div class="card acc" style="margin-bottom:22px"><p class="lead">🤩 <strong>excited</strong> = a strong feeling &nbsp;&middot;&nbsp; 😬 <strong>nervous</strong> = a worried feeling.<br>Sometimes you feel <strong>both at once</strong> &mdash; like before a big game.</p></div>
+<div class="grid3" id="q-nervous"><button class="opt center" data-act="opt" data-g="nervous" data-c="1" data-fb="Yes — he is worried he might miss. That is nervous.">Leo, about to take a penalty in a big match. ⚽</button><button class="opt center" data-act="opt" data-g="nervous" data-c="0" data-fb="Nothing bad is about to happen there!">Leo, eating his favourite dinner. 🍜</button><button class="opt center" data-act="opt" data-g="nervous" data-c="0" data-fb="No worry at all.">Leo, asleep in bed. 😴</button></div>
+<div class="fb" id="fb-nervous"></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+  <div class="emo">😬</div>
+  <div class="w" style="color:var(--gnd)">nervous</div>
+  <div class="pos">adjective</div>
+  <div class="def">worried that something bad is going to happen</div>
+  <div class="ex" style="color:var(--gn)">&ldquo;Turtle was small, but he did not look nervous.&rdquo;</div>
+  <div class="jpx">緊張(きんちょう)した・不安(ふあん)な</div>
+</div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="vocab">
+<h3 class="sub">💥 Sound Lab &mdash; which sound is a snap?</h3>
+<p class="lead" style="margin-bottom:24px"><strong>Snap</strong> means to break suddenly with a sharp, cracking sound. Tap each one, then choose.</p>
+<div class="grid3"><div class="tile" data-act="tap" data-a="CRACK! — that is a snap 💥"><div class="t-emo">🥖</div><div class="t-q">a dry stick</div></div><div class="tile" data-act="tap" data-a="it just bends — no snap"><div class="t-emo">🍜</div><div class="t-q">a wet noodle</div></div><div class="tile" data-act="tap" data-a="SNAP! 💥"><div class="t-emo">🪢</div><div class="t-q">a rope pulled too hard</div></div></div>
+<div class="grid2" id="q-snap"><button class="opt center" data-act="opt" data-g="snap" data-c="0" data-fb="Bending slowly is not snapping — a snap is sudden.">A slow, quiet bend. 〰️</button><button class="opt center" data-act="opt" data-g="snap" data-c="1" data-fb="Yes! Sharp, sudden, and loud. That is a snap.">A sudden CRACK! 💥</button></div>
+<div class="fb" id="fb-snap"></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+  <div class="emo">💥</div>
+  <div class="w" style="color:var(--gnd)">snap</div>
+  <div class="pos">verb</div>
+  <div class="def">to break suddenly with a sharp, cracking sound</div>
+  <div class="ex" style="color:var(--gn)">&ldquo;The vine began to snap!&rdquo;</div>
+  <div class="jpx">ポキッと折(お)れる・切(き)れる</div>
+</div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="vocab">
+<h3 class="sub">🪢 Pull, Pulled &mdash; Tug, ______?</h3>
+<p class="lead" style="margin-bottom:24px"><strong>Tugged</strong> simply means <em>pulled</em>. Which sentence uses it correctly?</p>
+<div class="card bl" style="margin-bottom:22px"><p class="lead">🔁 Unit 9 words you already know: <strong>push</strong> &harr; <strong>pull</strong>. &nbsp;<strong>Tug</strong> is a strong, sudden pull. &nbsp;<strong>Tugged</strong> is the past.</p></div>
+<div class="grid2" id="q-tugged"><button class="opt center" data-act="opt" data-g="tugged" data-c="1" data-fb="Correct — tugged means pulled, often hard and suddenly.">&ldquo;He tugged the rope as hard as he could.&rdquo;</button><button class="opt center" data-act="opt" data-g="tugged" data-c="0" data-fb="You cannot tug something away from you — that is a push or a kick.">&ldquo;He tugged the ball into the goal with his foot.&rdquo;</button></div>
+<div class="fb" id="fb-tugged"></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+  <div class="emo">🪢</div>
+  <div class="w" style="color:var(--gnd)">tugged</div>
+  <div class="pos">verb (past)</div>
+  <div class="def">pulled</div>
+  <div class="ex" style="color:var(--gn)">&ldquo;Elephant tugged, and Hippo tugged back.&rdquo;</div>
+  <div class="jpx">引(ひ)っぱった</div>
+</div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="vocab">
+<h3 class="sub">🪢 Rope Rules</h3>
+<p class="lead" style="margin-bottom:24px">In a game of <strong>tug-of-war</strong>, how do the two teams stand?</p>
+
+<div class="col" id="q-tow"><button class="opt" data-act="opt" data-g="tow" data-c="0" data-fb="Then nothing would happen — they would all move together!">Both teams pull on the SAME end.</button><button class="opt" data-act="opt" data-g="tow" data-c="1" data-fb="Yes. Two teams, opposite ends, each trying to move the other.">Each team pulls on OPPOSITE ends of one rope.</button><button class="opt" data-act="opt" data-g="tow" data-c="0" data-fb="No — in tug-of-war both teams pull at the same time.">They take turns pulling one at a time.</button></div>
+<div class="fb" id="fb-tow"></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+  <div class="emo">🪢</div>
+  <div class="w" style="color:var(--gnd)">tug-of-war</div>
+  <div class="pos">noun</div>
+  <div class="def">a game in which two teams pull on opposite ends of a rope to try to move each other</div>
+  <div class="ex" style="color:var(--gn)">&ldquo;Turtle wanted a tug-of-war.&rdquo;</div>
+  <div class="jpx">綱引(つなひ)き</div>
+</div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="vocab">
+<h3 class="sub">🌿 Rope or Plant?</h3>
+<p class="lead" style="margin-bottom:24px">Turtle needs something long and strong. He uses a <strong>vine</strong>. What is a vine?</p>
+
+<div class="col" id="q-vine"><button class="opt" data-act="opt" data-g="vine" data-c="0" data-fb="Close in shape, but a vine is not made — it grows.">A rope made in a factory.</button><button class="opt" data-act="opt" data-g="vine" data-c="1" data-fb="Yes! It grows in the jungle and is long and strong, like a rope.">A long part of a plant that looks like a rope.</button><button class="opt" data-act="opt" data-g="vine" data-c="0" data-fb="It is a plant, not an animal.">A kind of animal that lives in trees.</button></div>
+<div class="fb" id="fb-vine"></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+  <div class="emo">🌿</div>
+  <div class="w" style="color:var(--gnd)">vine</div>
+  <div class="pos">noun</div>
+  <div class="def">a long part of some plants that looks like a rope</div>
+  <div class="ex" style="color:var(--gn)">&ldquo;Turtle found a long, strong vine.&rdquo;</div>
+  <div class="jpx">つる・つた</div>
+</div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="vocab">
+<h3 class="sub">💧 Meeting Point</h3>
+<p class="lead" style="margin-bottom:24px">A <strong>watering hole</strong> is a hole with water in it. Who goes there?</p>
+
+<div class="col" id="q-watering"><button class="opt" data-act="opt" data-g="watering" data-c="0" data-fb="Not in this story — a watering hole is for wild animals.">People, to go swimming.</button><button class="opt" data-act="opt" data-g="watering" data-c="1" data-fb="Yes. In a hot jungle it is where all the animals meet.">Wild animals, to drink. 🐘🦛🦓</button><button class="opt" data-act="opt" data-g="watering" data-c="0" data-fb="It is one of the busiest places in the jungle!">Nobody — it is always empty.</button></div>
+<div class="fb" id="fb-watering"></div>
+</section>
+<section class="slide center" data-stage="Glossary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--gn);box-shadow:0 22px 60px rgba(22,163,74,.16)">
+  <div class="emo">💧</div>
+  <div class="w" style="color:var(--gnd)">watering hole</div>
+  <div class="pos">noun phrase</div>
+  <div class="def">a hole with water in it where wild animals go to drink</div>
+  <div class="ex" style="color:var(--gn)">&ldquo;All the animals met at the watering hole.&rdquo;</div>
+  <div class="jpx">水飲(みずの)み場(ば)</div>
+</div>
+</section>
+<section class="slide top" data-stage="Glossary" data-stagetone="practice">
+<h2 class="hd">📗 Glossary check &mdash; tap for the word</h2>
+<div class="grid3"><div class="tile" data-act="tap" data-a="conversation"><div class="t-emo">💬</div><div class="t-q">a talk</div></div><div class="tile" data-act="tap" data-a="argument"><div class="t-emo">😠</div><div class="t-q">a fight with words</div></div><div class="tile" data-act="tap" data-a="agreed"><div class="t-emo">🤝</div><div class="t-q">thought the same thing</div></div><div class="tile" data-act="tap" data-a="joined"><div class="t-emo">➕</div><div class="t-q">became a part of</div></div><div class="tile" data-act="tap" data-a="nervous"><div class="t-emo">😬</div><div class="t-q">worried something bad will happen</div></div><div class="tile" data-act="tap" data-a="excited"><div class="t-emo">🤩</div><div class="t-q">filled with a strong feeling</div></div></div>
+<div class="mt"></div>
+<div class="grid3"><div class="tile" data-act="tap" data-a="jungle"><div class="t-emo">🌴</div><div class="t-q">a hot place with many trees</div></div><div class="tile" data-act="tap" data-a="watering hole"><div class="t-emo">💧</div><div class="t-q">where wild animals drink</div></div><div class="tile" data-act="tap" data-a="vine"><div class="t-emo">🌿</div><div class="t-q">a plant that looks like a rope</div></div><div class="tile" data-act="tap" data-a="snap"><div class="t-emo">💥</div><div class="t-q">to break with a sharp crack</div></div><div class="tile" data-act="tap" data-a="tugged"><div class="t-emo">🪢</div><div class="t-q">pulled</div></div><div class="tile" data-act="tap" data-a="tug-of-war"><div class="t-emo">🪢</div><div class="t-q">two teams, one rope</div></div></div>
+</section>
+<section class="slide top" data-stage="Book Reading" data-stagetone="practice">
+<h2 class="hd">🔁 Unit 9 words inside this story</h2>
+<div class="chips" style="margin-bottom:26px">
+ <span class="chip">push</span><span class="chip">pull</span><span class="chip">forward</span><span class="chip">backward</span>
+ <span class="chip">a force</span><span class="chip">fall over</span><span class="chip">a swing</span><span class="chip">balance</span><span class="chip">happen</span></div>
+<div class="row" style="gap:26px">
+ <div class="card bl" style="flex:1"><div class="card-lbl" style="color:var(--bld)">Watch for these</div><p class="lead">A tug-of-war is <strong>pull</strong>, <strong>backward</strong> and <strong>balance</strong> &mdash; the whole unit in one game!</p></div>
+ <div class="card gn" style="flex:1"><div class="card-lbl" style="color:var(--gnd)">Predict with them</div><p class="lead">Who will <strong>fall over</strong> first? What will <strong>happen</strong> to the vine?</p></div>
+</div>
+</section>
+<section class="slide center" data-stage="While You Read" data-stagetone="practice">
+<div class="col center">
+ <div class="kick">Stop at page 5 · Prediction #2</div>
+ <h2 class="hd">How will Turtle <span class="hl">prove</span><br>he is stronger?</h2>
+ <div class="row mt" style="gap:26px;width:100%">
+  <div class="card bl" style="flex:1"><div class="card-lbl">Think about</div><p class="lead">Turtle is small. He cannot win by being strong. So what CAN he do? 🧠</p></div>
+  <div class="card gn" style="flex:1"><div class="card-lbl">Write it</div><p class="lead">Column 1 of your chart. Do not rub it out later! ✏️</p></div>
+ </div>
+ <div class="frame mt">Remember: he is the <strong>trickster</strong>. Tricksters use their heads. 🦊</div></div>
+</section>
+<section class="slide center" data-stage="While You Read" data-stagetone="practice">
+<div class="col center">
+ <div class="kick">Stop at page 7 · Prediction #3</div>
+ <h2 class="hd">Who will win &mdash;<br><span class="hlbl">Elephant</span> or <span class="hl">Hippo</span>? <span class="hl2">Why?</span></h2>
+ <div class="row mt" style="gap:26px;width:100%">
+  <div class="card bl" style="flex:1"><div class="mid-emo center">🐘</div><p class="lead center mt">Elephant</p></div>
+  <div class="card u9" style="flex:1"><div class="mid-emo center">🦛</div><p class="lead center mt">Hippo</p></div>
+  <div class="card gn" style="flex:1"><div class="mid-emo center">🤔</div><p class="lead center mt">&hellip;or neither?</p></div>
+ </div>
+ <div class="frame mt">The LP asks <strong>why</strong>, not just who. Give a reason! Use <em>because</em>. 🔵</div></div>
+</section>
+<section class="slide center" data-stage="While You Read" data-stagetone="practice">
+<div class="col center">
+ <div class="kick">Stop at page 10 · Prediction #4</div>
+ <h2 class="hd">Will the animals find out<br>about <span class="hl">Turtle&rsquo;s trick</span>? Why or why not?</h2>
+ <div class="row mt" style="gap:26px;width:100%">
+  <div class="card gn" style="flex:1"><div class="card-lbl" style="color:var(--gnd)">Yes, because&hellip;</div><p class="lead">Someone might see. Someone might tell.</p></div>
+  <div class="card bl" style="flex:1"><div class="card-lbl" style="color:var(--bld)">No, because&hellip;</div><p class="lead">In trickster tales, the big animals often never realise. 🦊</p></div>
+ </div>
+ <div class="frame mt">Use what you learned about <strong>trickster tales</strong> as your clue. 🔍</div></div>
+</section>
+<section class="slide top" data-stage="After You Read" data-stagetone="practice">
+<h2 class="hd">✅ After you read &mdash; check your chart</h2>
+<div class="ce" style="grid-template-columns:1fr 1fr">
+ <div class="ce-hd c">What I predict</div><div class="ce-hd e">Was I correct?</div>
+ <div class="ce-cell">Your guess for p. 5</div><div class="ce-cell blank" data-act="tap" data-a="yes / no — and if no, what really happened" style="cursor:pointer">tap&hellip;</div>
+ <div class="ce-cell">Your guess for p. 7</div><div class="ce-cell blank" data-act="tap" data-a="yes / no — and if no, what really happened" style="cursor:pointer">tap&hellip;</div>
+ <div class="ce-cell">Your guess for p. 10</div><div class="ce-cell blank" data-act="tap" data-a="yes / no — and if no, what really happened" style="cursor:pointer">tap&hellip;</div>
+</div>
+<div class="dad mt">💬 For every <strong>no</strong>, write what actually happened. A wrong prediction is not a mistake &mdash; it is how readers think.</div>
+</section>
+<section class="slide top" data-stage="After You Read" data-stagetone="practice">
+<h3 class="sub">🦊 So who was the trickster?</h3>
+<p class="lead" style="margin-bottom:24px">Now that you have read it &mdash; who tricked whom?</p>
+
+<div class="col" id="q-trickster"><button class="opt" data-act="opt" data-g="trickster" data-c="0" data-fb="Elephant is one of the big animals. In a trickster tale, the big ones get tricked.">Elephant tricked Hippo and Turtle.</button><button class="opt" data-act="opt" data-g="trickster" data-c="1" data-fb="Exactly! The small, clever one wins — and the big ones may never even know.">Turtle tricked Hippo and Elephant.</button><button class="opt" data-act="opt" data-g="trickster" data-c="0" data-fb="Look again at how Turtle set up the two ends of that vine!">Nobody tricked anybody.</button></div>
+<div class="fb" id="fb-trickster"></div>
+</section>
+<section class="slide top" data-stage="Extend" data-stagetone="expert">
+<h2 class="hd">📐 Unit 9 grammar in the story &mdash; <span class="hl">the more&hellip; the more&hellip;</span></h2>
+<div class="card acc" style="margin-bottom:26px"><p class="lead center" style="font-size:40px">&ldquo;<strong>The harder</strong> Elephant pulled, <strong>the harder</strong> Hippo pulled back.&rdquo;</p></div>
+<h3 class="sub">Your turn &mdash; finish these about the story:</h3>
+<div class="grid3"><div class="tile" data-act="tap" data-a="the stronger he is!"><div class="t-emo">🐘</div><div class="t-q">The bigger the animal,</div></div><div class="tile" data-act="tap" data-a="the tighter the vine became."><div class="t-emo">🪢</div><div class="t-q">The harder they tugged,</div></div><div class="tile" data-act="tap" data-a="the less he needs to be strong."><div class="t-emo">🐢</div><div class="t-q">The cleverer the animal,</div></div></div>
+</section>
+<section class="slide top" data-stage="Extend" data-stagetone="expert">
+<h3 class="sub">📐 Defining with <span class='hl'>which</span></h3>
+<p class="lead" style="margin-bottom:24px">Unit 9 Grammar 2. Which sentence correctly defines a <strong>vine</strong>?</p>
+
+<div class="col" id="q-which"><button class="opt" data-act="opt" data-g="which" data-c="1" data-fb="Perfect — &lt;em&gt;which&lt;/em&gt; tells us exactly which kind of plant we mean.">A vine is a plant which grows long and looks like a rope.</button><button class="opt" data-act="opt" data-g="which" data-c="0" data-fb="&lt;em&gt;Who&lt;/em&gt; is for people. For a thing or a plant, use &lt;em&gt;which&lt;/em&gt;.">A vine is a plant who grows long and looks like a rope.</button><button class="opt" data-act="opt" data-g="which" data-c="0" data-fb="One subject only — &lt;em&gt;which&lt;/em&gt; already does that job, so drop the &lt;em&gt;it&lt;/em&gt;.">A vine is a plant which it grows long and looks like a rope.</button></div>
+<div class="fb" id="fb-which"></div>
+</section>
+<section class="slide top" data-stage="Extend" data-stagetone="expert">
+<h2 class="hd">⚽ Turtle&rsquo;s trick on a soccer pitch</h2>
+<div class="card u9" style="margin-bottom:24px"><p class="lead">Turtle could not win by being <strong>bigger</strong>. So he won by being <strong class="hl">cleverer</strong>. Does that happen in soccer?</p></div>
+<div class="grid3"><div class="tile" data-act="tap" data-a="Lamine Yamal is not the biggest — he beats defenders with quick feet, not strength."><div class="t-emo">🧠</div><div class="t-q">A small player</div></div><div class="tile" data-act="tap" data-a="Barcelona won La Liga 2025–26 — their 29th title."><div class="t-emo">🪢</div><div class="t-q">Two big teams pulling</div></div><div class="tile" data-act="tap" data-a="A tiny player who thinks faster can beat a huge one who does not."><div class="t-emo">🐢</div><div class="t-q">The Turtle move</div></div></div>
+<div class="dad mt">💬 Ask: <em>Is being clever a kind of strength?</em> 🤔</div>
+</section>
+<section class="slide top" data-stage="Recap" data-stagetone="recap">
+<h2 class="hd">🔁 Recap &mdash; tap each one</h2>
+<div class="grid3"><div class="tile" data-act="tap" data-a="A very old story passed down by people telling it."><div class="t-emo">📜</div><div class="t-q">What is a folktale?</div></div><div class="tile" data-act="tap" data-a="A big animal is tricked by a smaller, cleverer one."><div class="t-emo">🦊</div><div class="t-q">What is a trickster tale?</div></div><div class="tile" data-act="tap" data-a="A guess about what will happen — before you know."><div class="t-emo">🔮</div><div class="t-q">What is a prediction?</div></div><div class="tile" data-act="tap" data-a="What you knew, what you read, and the pictures."><div class="t-emo">🔍</div><div class="t-q">Where do you find clues?</div></div><div class="tile" data-act="tap" data-a="Turtle — he tricked Hippo and Elephant."><div class="t-emo">🐢</div><div class="t-q">Who was the trickster?</div></div><div class="tile" data-act="tap" data-a="Twelve, on page 16."><div class="t-emo">📗</div><div class="t-q">How many glossary words?</div></div></div>
+</section>
+<section class="slide top" data-stage="Formative Assessment" data-stagetone="recap">
+<h2 class="hd">✔️ Can Leo&hellip;</h2>
+<div class="list"><div class="li"><div class="n gn">✓</div><div>&hellip;make a prediction and give a reason for it?</div></div><div class="li"><div class="n gn">✓</div><div>&hellip;check his predictions afterwards and say what really happened?</div></div><div class="li"><div class="n gn">✓</div><div>&hellip;explain what a trickster tale is?</div></div><div class="li"><div class="n gn">✓</div><div>&hellip;use the glossary words to retell part of the story?</div></div><div class="li"><div class="n gn">✓</div><div>&hellip;define a word using <em>which</em>?</div></div></div>
+<div class="card u9 mt"><div class="card-lbl">Quick check</div><p class="lead">&ldquo;Tell me the story in five sentences &mdash; use <em>tugged</em>, <em>vine</em> and <em>snap</em>.&rdquo;</p></div>
+</section>
+<section class="slide center" data-stage="Wrap Up" data-stagetone="wrapup">
+<div class="col center">
+ <div class="big-emo">🐢🪢</div>
+ <h2 class="hd">Great reading, Leo!</h2>
+ <p class="lead">You predicted. You read. You checked. That is what good readers do every time.</p>
+ <div class="card acc mt" style="max-width:1200px"><div class="card-lbl">Try this next</div>
+  <p class="lead">📖 Next time you read <strong>anything</strong> &mdash; a book, a comic, a match report &mdash; stop halfway and predict. Then check. 🔮</p></div>
+ <div class="chips mt"><span class="chip">🐢 trickster</span><span class="chip">🪢 tug-of-war</span><span class="chip">🌿 vine</span><span class="chip">💥 snap</span><span class="chip">🔮 predict</span></div>
+ <div class="done-row mt">
+  <button class="opt center" id="doneBtn" data-act="done">✅ Mark this lesson done</button>
+  <button class="opt center" id="redoBtn" data-act="redo">↺ Redo</button>
+ </div>
+ <p class="lead" id="doneMsg" style="margin-top:18px"></p>
+</div>
+</section>
+
+<div id="prog"><div id="progFill"></div></div>
+<button class="tn-btn" data-act="notes" title="Teacher notes (N)">📋</button>
+<button class="tn-btn fs-btn" data-act="full" title="Fullscreen (F)">⛶</button>
+<div class="tn-panel" id="tnPanel"></div>
+<div id="nav">
+  <button class="nb" data-act="nav" data-dir="-1">‹</button>
+  <div id="counter">1 / 48</div>
+  <button class="nb" data-act="nav" data-dir="1">›</button>
+</div>
+</div></div>
+<script>
+(function(){
+"use strict";
+
+/* ═══════ LEEA SAVE STANDARD ═══════ */
+var SAVE_PREFIX = '4-9-book-reading-slides-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-9-book-reading-slides';
+/* Must match the `id` in lessons/book-reading.teacher.json — the teacher dashboard
+   reads leea.lessonProgress.v1 keyed by that lesson id. */
+var LESSON_ID = 'ow-l4-u9-book-reading';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+
+function lSave(key, val){
+  try{ localStorage.setItem('leea-' + key, JSON.stringify(val)); }catch(e){}
+  try{
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && LEEA_CLOUD.enabled){
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val);
+    }
+  }catch(e){}
+}
+function lLoad(key, fb){
+  try{ var v = localStorage.getItem('leea-' + key); return v !== null ? JSON.parse(v) : fb; }
+  catch(e){ return fb; }
+}
+function lRemove(key){
+  try{ localStorage.removeItem('leea-' + key); }catch(e){}
+}
+
+/* ═══════ MARK DONE ═══════ */
+function writeLessonProgress(){
+  try{
+    var store = {};
+    var raw = localStorage.getItem(PROGRESS_KEY);
+    if(raw){ store = JSON.parse(raw) || {}; }
+    var now = new Date().toISOString();
+    store[LESSON_ID] = {
+      lessonId: LESSON_ID,
+      teacherId: 'neritan',
+      studentId: 'leo',
+      status: 'done',
+      completedAt: now,
+      updatedAt: now
+    };
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+  }catch(e){ console.warn('writeLessonProgress', e); }
+}
+function clearLessonProgress(){
+  try{
+    var raw = localStorage.getItem(PROGRESS_KEY);
+    if(!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+  }catch(e){ console.warn('clearLessonProgress', e); }
+}
+function paintDone(saved){
+  var btn = document.getElementById('doneBtn');
+  if(!btn) return;
+  if(saved){ btn.classList.add('confirmed'); btn.style.pointerEvents = 'none'; btn.textContent = '✅ Saved!'; }
+  else { btn.classList.remove('confirmed'); btn.style.pointerEvents = 'auto'; btn.textContent = '✅ Mark this lesson done'; }
+}
+function markDone(){
+  try{
+    writeLessonProgress();
+    lSave(SAVE_PREFIX + 'done', true);
+    paintDone(true);
+    var msg = document.getElementById('doneMsg');
+    if(msg) msg.textContent = 'Saved. Great reading today, Leo. 📖';
+  }catch(e){ console.warn('markDone', e); }
+}
+/* Two-tap so a stray tap on the last slide can't wipe the lesson record. */
+var redoArmed = false, redoTimer = null;
+function handleRedo(){
+  try{
+    var btn = document.getElementById('redoBtn');
+    var msg = document.getElementById('doneMsg');
+    if(!redoArmed){
+      redoArmed = true;
+      if(btn) btn.textContent = '↺ Tap again to clear';
+      if(msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+      if(redoTimer) clearTimeout(redoTimer);
+      redoTimer = setTimeout(function(){
+        redoArmed = false;
+        if(btn) btn.textContent = '↺ Redo';
+        if(msg) msg.textContent = '';
+      }, 4000);
+      return;
+    }
+    redoArmed = false;
+    if(redoTimer) clearTimeout(redoTimer);
+    clearLessonProgress();
+    lRemove(SAVE_PREFIX + 'done');
+    paintDone(false);
+    if(btn) btn.textContent = '↺ Redo';
+    if(msg) msg.textContent = 'Cleared. Ready to read again.';
+  }catch(e){ console.warn('handleRedo', e); }
+}
+
+/* ═══════ <deck-stage> WEB COMPONENT ═══════ */
+class DeckStage extends HTMLElement{
+  connectedCallback(){
+    try{
+      var stage = this.getAttribute('stage') || '';
+      var tone  = this.getAttribute('tone')  || 'wrapup';
+      var sub   = this.getAttribute('sub')   || '';
+      this.innerHTML = '<span class="sb ' + tone + '">' + stage + '</span>' +
+                       (sub ? '<span class="sb-sub">' + sub + '</span>' : '');
+    }catch(e){ console.warn('deck-stage', e); }
+  }
+}
+try{ customElements.define('deck-stage', DeckStage); }catch(e){}
+
+/* ═══════ TEACHER NOTES (per slide) ═══════ */
+var NOTES = {
+0:{h:'Open the Reader',b:'<p>Hold up the actual reader. Do not open it yet &mdash; the cover is the first prediction clue.</p><p>Resources for this lesson: Video Sc. 10 · two-column chart · world map. The story itself is read from the book; these slides support the reading, they do not replace it.</p>'},
+1:{h:'The blurb',b:'<p>Read the blurb aloud, then stop on the question. Do not answer it.</p><p><span class=\'say\'>Ask</span> <em>Look at the three animals. Who do you think will win?</em> Almost every child says Elephant or Hippo. Write his answer down &mdash; it is prediction number one.</p>'},
+2:{h:'Text Type &mdash; folktale',b:'<p>LP Text Type: <strong>folktale</strong>.</p><p>Ask Leo whether he knows any Japanese folktales &mdash; 桃太郎, 浦島太郎. Same idea, different country. That link makes the genre instantly familiar.</p>'},
+3:{h:'Be the Expert &mdash; Text Background',b:'<p>LP: in trickster tales one person or animal is tricked by a smaller, smarter one. In this African folktale the large animals are often not very smart and may not even realise they have been tricked.</p><p>The LP asks students to identify the trickster (Turtle) and who is tricked (Hippo and Elephant) &mdash; but only <strong>after</strong> reading. Do not give it away now.</p>'},
+4:{h:'World map',b:'<p>LP Resources names a world map for this reader. Use a real one or a globe if you have it.</p><p>Worth saying: this story travelled from Africa, into English, and now into a Japanese boy&rsquo;s living room. Folktales move.</p>'},
+5:{h:'Reading Strategy &mdash; Make Predictions',b:'<p>LP: <span class=\'say\'>Say</span> <em>When you make a prediction, you make a guess about what is going to happen. You look for clues that help you make a good guess.</em></p><p>Leo met <em>predict</em> in the Project lesson. Say so &mdash; same word, same skill, different subject.</p>'},
+6:{h:'Where to look for clues',b:'<p>LP: tell students to look for clues in as many places as they can &mdash; prior knowledge, what they have read, and the pictures.</p><p>The character card is the LP&rsquo;s extra note: when predicting what happens next, students need to think about the characters&rsquo; personalities. It is the most useful one for this particular story.</p>'},
+7:{h:'The two-column chart',b:'<p>LP Resources: two-column chart. Headings verbatim &mdash; <em>What I predict</em> and <em>Was I correct?</em></p><p>Three prediction stops: pages 5, 7 and 10. Rule the paper before you start reading, not during.</p>'},
+8:{h:'Before You Read &mdash; activate prior knowledge',b:'<p>LP questions, verbatim: have you ever played a game called tug-of-war? How is it played? How does a person or team win? How do players move?</p><p><strong>Actually do it.</strong> The LP says act it out if necessary &mdash; with one child at home it is not optional, it is the best two minutes of the lesson. It also recycles <em>pull</em>, <em>backward</em> and <em>lean</em> physically.</p>'},
+9:{h:'Cover prediction',b:'<p>LP: <em>look at the picture on the cover of this reader. Ask What do you think this story will be about? Your guess is a prediction.</em></p><p>Name it explicitly afterwards &mdash; &lsquo;that was a prediction&rsquo; &mdash; so the label sticks to the action he just did.</p>'},
+10:{h:'Glossary &mdash; 12 words',b:'<p>These are the twelve words printed in the reader&rsquo;s own glossary on p. 16.</p><p>Do not try to do all twelve in one sitting. Six before reading, six after, works well &mdash; or split across two days.</p>'},
+11:{h:'agreed &mdash; Same Thought?',b:'<p>Glossary definition: <em>thought the same thing as someone else</em>.</p><p>Teach <em>agreed</em> and <em>argument</em> as a pair &mdash; the second happens when the first fails. That is literally how the story opens.</p>'},
+12:{h:'agreed &mdash; word card',b:'<p>Past tense. The base form <em>agree</em> is worth writing next to it.</p>'},
+13:{h:'argument &mdash; Words or Fists?',b:'<p>Glossary definition: <em>a fight with words when people do not agree</em>.</p><p>Important for Leo: in English an argument is normally verbal, not physical. The story&rsquo;s whole plot starts with one.</p>'},
+14:{h:'argument &mdash; word card',b:'<p>This is the first sentence of the story. He will meet it on page one.</p>'},
+15:{h:'conversation &mdash; Talk Meter',b:'<p>Glossary definition: <em>a talk</em>. The shortest definition on the page &mdash; so spend the time on the contrast with <em>argument</em> instead.</p><p>A conversation is calm; an argument is not.</p>'},
+16:{h:'conversation &mdash; word card',b:'<p>Turtle&rsquo;s two separate conversations are how the trick works. Flag that lightly now; it pays off later.</p>'},
+17:{h:'excited &mdash; The Feeling Dial',b:'<p>Glossary definition: <em>filled with a strong feeling</em>.</p><p>Note it is not automatically a happy word &mdash; it means the feeling is <strong>strong</strong>. Pair it with <em>nervous</em> two words later; the animals feel both.</p>'},
+18:{h:'excited &mdash; word card',b:'<p>Ask Leo for one thing that excites him. He will say soccer. Take it.</p>'},
+19:{h:'joined &mdash; The Team Grows',b:'<p>Glossary definition: <em>became a part of</em>.</p><p>Tap the three tiles in order so the idea of a group growing is visible, not just stated.</p>'},
+20:{h:'joined &mdash; word card',b:'<p>Past tense again. Base form: <em>join</em>.</p>'},
+21:{h:'jungle &mdash; Where Am I?',b:'<p>Glossary definition: <em>a hot area with many trees and plants</em>.</p><p>Connect to the world map slide: hot, green, and in this story, African.</p>'},
+22:{h:'jungle &mdash; word card',b:'<p>Straight from the first line of the story.</p>'},
+23:{h:'nervous &mdash; Butterflies Detector',b:'<p>Glossary definition: <em>worried that something bad is going to happen</em>.</p><p>The excited/nervous contrast is the most useful emotional pair in this glossary, and Leo has felt both before a match. Use that.</p>'},
+24:{h:'nervous &mdash; word card',b:'<p>Character clue: a small animal facing a huge one and <em>not</em> looking nervous tells you he has a plan.</p>'},
+25:{h:'snap &mdash; Sound Lab',b:'<p>Glossary definition: <em>to break suddenly with a sharp, cracking sound</em>.</p><p>Do it for real: snap a dry spaghetti strand or a twig. The sound teaches this word far better than the definition does.</p><p>Then look at the third tile again &mdash; a rope snapping. Keep that in mind while reading.</p>'},
+26:{h:'snap &mdash; word card',b:'<p>Onomatopoeic in both languages &mdash; English <em>snap</em>, Japanese ポキッ. Nice bridge.</p>'},
+27:{h:'tugged &mdash; Pull, Pulled, Tugged',b:'<p>Glossary definition: <em>pulled</em>.</p><p>This word is a direct recycle of Vocabulary 1 <em>pull</em>. Say it plainly: tug is just a strong pull, and it is where the game gets its name.</p>'},
+28:{h:'tugged &mdash; word card',b:'<p>tug &rarr; tugged. Double the g. Worth writing out.</p>'},
+29:{h:'tug-of-war &mdash; Rope Rules',b:'<p>Glossary definition: <em>a game in which two teams pull on opposite ends of a rope to try to move each other</em>.</p><p>He has just played it with a towel, so this should be quick. The word <em>opposite</em> is the one to stress &mdash; the whole trick depends on it.</p>'},
+30:{h:'tug-of-war &mdash; word card',b:'<p>Japanese 綱引き is exactly the same game &mdash; he will know it from sports day.</p>'},
+31:{h:'vine &mdash; Rope or Plant?',b:'<p>Glossary definition: <em>a long part of some plants that looks like a rope</em>.</p><p><span class=\'say\'>Ask</span> <em>Why does a story set in the jungle use a vine instead of a rope?</em> Because there are no shops in the jungle. Good small piece of story logic.</p>'},
+32:{h:'vine &mdash; word card',b:'<p>This is the object the whole plot turns on. Give it a moment.</p>'},
+33:{h:'watering hole &mdash; Meeting Point',b:'<p>Glossary definition: <em>a hole with water in it where wild animals go to drink</em>.</p><p>Useful setting detail: it explains how animals who would not normally meet end up in the same place having an argument.</p>'},
+34:{h:'watering hole &mdash; word card',b:'<p>Last of the twelve. Run the glossary recap next.</p>'},
+35:{h:'Glossary check',b:'<p>Definition first, word second &mdash; the reverse of the word cards. Harder, and a better test.</p><p>Cover the tiles and see how many he can produce before tapping.</p>'},
+36:{h:'Recycled unit vocabulary',b:'<p>LP Vocabulary line for this reader, verbatim: push, pull, forward, backward, a force, fall over, a swing, balance, happen.</p><p>Every one of them was taught in Unit 9. This is why the reader was chosen &mdash; point that out to Leo, it makes the book feel earned.</p>'},
+37:{h:'While You Read &mdash; stop 1 (p. 5)',b:'<p>LP prediction stop, verbatim: <em>How will Turtle prove he is stronger?</em></p><p>Stop reading and write before continuing. The temptation is to read on &mdash; do not. Prediction only works if it is committed to paper first.</p>'},
+38:{h:'While You Read &mdash; stop 2 (p. 7)',b:'<p>LP prediction stop, verbatim: <em>Who will win, Elephant or Hippo? Why?</em></p><p>The <em>why</em> is the important half and the easiest to skip. Insist on a <em>because</em> sentence &mdash; it recycles the Writing lesson directly.</p><p>The third card is deliberate: some children spot that neither of them wins.</p>'},
+39:{h:'While You Read &mdash; stop 3 (p. 10)',b:'<p>LP prediction stop, verbatim: <em>Will the animals find out about Turtle&rsquo;s trick? Why or why not?</em></p><p>This is the one where prior knowledge does real work &mdash; the Text Background slide told him large animals in trickster tales often never realise. A good reader uses that.</p>'},
+40:{h:'After You Read',b:'<p>LP: fill the second column with yes and no answers; for <em>no</em>, write what actually happened.</p><p>Say the last line out loud to Leo. If he thinks wrong predictions are failures he will stop making brave ones, and the strategy dies.</p>'},
+41:{h:'The trickster &mdash; reveal',b:'<p>LP asks students to identify the trickster (<strong>Turtle</strong>) and who is tricked (<strong>Hippo and Elephant</strong>). This is the after-reading question, now safe to answer.</p><p>Follow up: <em>Was Turtle really the strongest? Was he telling the truth?</em> That is a genuinely interesting moral question, and there is no single right answer.</p>'},
+42:{h:'Extend &mdash; double comparatives',b:'<p>LP grammar line for this reader: show cause and effect with <strong>double comparatives</strong>. This is Unit 9 Grammar 1.</p><p>Have Leo say each full sentence aloud after tapping. The third one is the story&rsquo;s moral in grammar form.</p>'},
+43:{h:'Extend &mdash; relative clauses with which',b:'<p>LP grammar line: use <strong>defining relative clauses with which</strong>. This is Unit 9 Grammar 2, and it is also the second LP &lsquo;Now I Can&rsquo; question.</p><p>Now ask him to define <em>tug-of-war</em> and <em>watering hole</em> the same way. The glossary definitions are already almost in that shape.</p>'},
+44:{h:'Extend &mdash; soccer transfer',b:'<p>Ties the trickster idea to something Leo already believes: small clever players beat big slow ones.</p><p>Stats are 2025&ndash;26. The closing question is the story&rsquo;s theme, asked in his own language.</p>'},
+45:{h:'Recap',b:'<p>Recap before Wrap Up. Let him answer aloud first.</p>'},
+46:{h:'Formative Assessment',b:'<p>The retell is the real test. Five sentences with three target words forces both the vocabulary and the story order.</p><p>If the predictions were guesses without reasons, do one more stop-and-predict on any book this week.</p>'},
+47:{h:'Wrap Up',b:'<p>Video Sc. 10 goes with this reader if you want to finish with it.</p><p>The transfer line matters most: predicting is not a school exercise, it is what he should do with every story from now on.</p>'}
+};
+
+/* ═══════ DECK STATE ═══════ */
+var deck    = document.getElementById('deck');
+var slides  = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+var total   = slides.length;
+var idx     = 0;
+var notesOpen = false;
+
+/* Inject stage badges from data-stage / data-stagetone */
+try{
+  slides.forEach(function(s, i){
+    var st = s.getAttribute('data-stage');
+    if(!st) return;
+    var el = document.createElement('deck-stage');
+    el.setAttribute('stage', st);
+    el.setAttribute('tone', s.getAttribute('data-stagetone') || 'wrapup');
+    el.setAttribute('sub', (i + 1) + ' of ' + total);
+    s.insertBefore(el, s.firstChild);
+  });
+}catch(e){ console.warn('badge inject', e); }
+
+function render(){
+  try{
+    slides.forEach(function(s, i){ s.classList.toggle('on', i === idx); });
+    var c = document.getElementById('counter');
+    if(c) c.textContent = (idx + 1) + ' / ' + total;
+    var pf = document.getElementById('progFill');
+    if(pf) pf.style.width = ((idx + 1) / total * 100) + '%';
+    paintNotes();
+    lSave(SAVE_PREFIX + 'slide', idx);
+  }catch(e){ console.warn('render', e); }
+}
+
+function paintNotes(){
+  try{
+    var p = document.getElementById('tnPanel');
+    if(!p) return;
+    var n = NOTES[idx];
+    p.innerHTML = n ? ('<h4>' + n.h + '</h4>' + n.b)
+                    : '<h4>Teacher notes</h4><p>No notes for this slide.</p>';
+  }catch(e){ console.warn('paintNotes', e); }
+}
+
+function changeSlide(d){
+  var n = idx + d;
+  if(n < 0 || n >= total) return;
+  idx = n;
+  render();
+}
+
+/* ═══════ SCALING ═══════ */
+function fit(){
+  try{
+    var vw = window.innerWidth  || document.documentElement.clientWidth;
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var s  = Math.min(vw / 1920, vh / 1080);
+    var ox = Math.max(0, (vw - 1920 * s) / 2);
+    var oy = Math.max(0, (vh - 1080 * s) / 2);
+    deck.style.transform = 'translate(' + ox + 'px,' + oy + 'px) scale(' + s + ')';
+  }catch(e){ console.warn('fit', e); }
+}
+window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', function(){ setTimeout(fit, 120); });
+if(window.visualViewport){ window.visualViewport.addEventListener('resize', fit); }
+
+/* ═══════ SINGLE DELEGATED CLICK HANDLER ═══════ */
+document.addEventListener('click', function(ev){
+  try{
+    var t = ev.target.closest('[data-act]');
+    if(!t) return;
+    var act = t.getAttribute('data-act');
+
+    if(act === 'nav'){ changeSlide(parseInt(t.getAttribute('data-dir'), 10)); return; }
+    if(act === 'done'){ markDone(); return; }
+    if(act === 'redo'){ handleRedo(); return; }
+
+    if(act === 'notes'){
+      notesOpen = !notesOpen;
+      var p = document.getElementById('tnPanel');
+      if(p) p.classList.toggle('open', notesOpen);
+      t.classList.toggle('act', notesOpen);
+      return;
+    }
+
+    if(act === 'full'){ toggleFull(); return; }
+
+    if(act === 'tap'){
+      if(t.classList.contains('open')) return;
+      t.classList.add('open', 'reveal');
+      var ans = t.getAttribute('data-a') || '';
+      if(t.classList.contains('ce-cell')){
+        t.classList.remove('blank');
+        t.classList.add('fill');
+        t.textContent = ans;
+      } else {
+        var q = t.querySelector('.t-q');
+        var out = document.createElement('div');
+        out.className = 't-a';
+        out.innerHTML = ans;
+        if(q && q.parentNode === t) t.appendChild(out); else t.appendChild(out);
+      }
+      var ck = t.getAttribute('data-count');
+      if(ck) checkGroupDone(ck);
+      return;
+    }
+
+    if(act === 'count'){
+      var key = t.getAttribute('data-key');
+      var max = parseInt(t.getAttribute('data-max'), 10) || 3;
+      var cur = (parseInt(t.getAttribute('data-n'), 10) || 0) + 1;
+      if(cur > max) return;
+      t.setAttribute('data-n', cur);
+      var out2 = document.getElementById(key + 'Out');
+      if(out2) out2.textContent = cur;
+      var emo = document.getElementById(key + 'Emo');
+      if(emo){ emo.classList.remove('reveal'); void emo.offsetWidth; emo.classList.add('reveal'); }
+      if(cur >= max) t.classList.add('open');
+      return;
+    }
+
+    if(act === 'opt'){
+      var g = t.getAttribute('data-g');
+      var box = document.getElementById('q-' + g);
+      if(!box || box.getAttribute('data-locked') === '1') return;
+      box.setAttribute('data-locked', '1');
+      var ok = t.getAttribute('data-c') === '1';
+      Array.prototype.forEach.call(box.querySelectorAll('.opt'), function(o){
+        o.classList.add('locked');
+        if(o.getAttribute('data-c') === '1') o.classList.add('ok');
+      });
+      if(!ok) t.classList.add('bad');
+      var fb = document.getElementById('fb-' + g);
+      if(fb){
+        fb.className = 'fb show ' + (ok ? 'ok' : 'bad');
+        fb.innerHTML = (ok ? '✅ ' : '💡 ') + (t.getAttribute('data-fb') || '');
+      }
+      lSave(SAVE_PREFIX + 'q-' + g, { correct: ok, ts: new Date().toISOString() });
+      return;
+    }
+
+    if(act === 'tick'){
+      t.classList.toggle('on');
+      var bx = t.querySelector('.bx');
+      if(bx) bx.textContent = t.classList.contains('on') ? '✓' : '';
+      var all = Array.prototype.slice.call(document.querySelectorAll('[data-act="tick"]'));
+      var done = all.filter(function(x){ return x.classList.contains('on'); }).length;
+      var ed = document.getElementById('editDone');
+      if(ed) ed.classList.toggle('hide', done !== all.length);
+      lSave(SAVE_PREFIX + 'edit-checklist', done);
+      return;
+    }
+  }catch(e){ console.warn('click handler', e); }
+});
+
+function checkGroupDone(key){
+  try{
+    var all = Array.prototype.slice.call(document.querySelectorAll('[data-count="' + key + '"]'));
+    if(!all.length) return;
+    var open = all.filter(function(x){ return x.classList.contains('open'); }).length;
+    if(open === all.length){
+      var r = document.getElementById(key + 'Reveal');
+      if(r){ r.classList.remove('hide'); r.classList.add('reveal'); }
+    }
+  }catch(e){ console.warn('checkGroupDone', e); }
+}
+
+function toggleFull(){
+  try{
+    var el = document.documentElement;
+    if(!document.fullscreenElement){
+      if(el.requestFullscreen) el.requestFullscreen();
+      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } else {
+      if(document.exitFullscreen) document.exitFullscreen();
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+    setTimeout(fit, 150);
+  }catch(e){ console.warn('toggleFull', e); }
+}
+document.addEventListener('fullscreenchange', function(){ setTimeout(fit, 120); });
+
+/* ═══════ KEYBOARD ═══════ */
+document.addEventListener('keydown', function(e){
+  try{
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); changeSlide(1); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); changeSlide(-1); }
+    else if(e.key === 'f' || e.key === 'F'){ toggleFull(); }
+    else if(e.key === 'n' || e.key === 'N'){
+      var b = document.querySelector('[data-act="notes"]');
+      if(b) b.click();
+    }
+  }catch(err){ console.warn('key', err); }
+});
+
+/* ═══════ INIT ═══════ */
+function restore(){ paintDone(lLoad(SAVE_PREFIX + 'done', false) === true); }
+document.addEventListener('DOMContentLoaded', function(){ fit(); render(); restore(); });
+fit();
+render();
+restore();
+
+})();
+</script>
+</body>
+</html>

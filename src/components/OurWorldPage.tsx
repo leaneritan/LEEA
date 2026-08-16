@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { readLessonProgress, syncLessonProgressWithCloud, type LessonProgressMap } from "@/data/lessonProgress";
-import { teacherLessons } from "@/data/lessons";
+import { isCheckpointComponent, teacherLessons } from "@/data/lessons";
 import { LEVELS, UNITS_PER_LEVEL, unitTitle } from "@/data/curriculum";
 import {
   fallbackCurrentUnit,
@@ -20,6 +20,9 @@ type SequenceItem = {
   state: "planned" | "active" | "locked";
   lessonCount: number;
   taught: number;
+  /** Set on a built checkpoint row so it opens its deck directly — checkpoints
+      have no unit page of their own to land on. */
+  lessonId?: string;
 };
 
 // The sequence used to be a hardcoded Level 4 list, so the level buttons had
@@ -31,7 +34,9 @@ function buildSequence(level: number, cursor: CurrentUnit, progress: LessonProgr
   const items: SequenceItem[] = [];
 
   for (let unit = 1; unit <= UNITS_PER_LEVEL; unit++) {
-    const unitLessons = teacherLessons.filter((lesson) => lesson.level === level && lesson.unit === unit);
+    const unitLessons = teacherLessons.filter(
+      (lesson) => lesson.level === level && lesson.unit === unit && !isCheckpointComponent(lesson.component)
+    );
     const taught = unitLessons.filter((lesson) => progress[lesson.id]?.status === "done").length;
 
     const state: SequenceItem["state"] = unitLessons.length
@@ -50,26 +55,39 @@ function buildSequence(level: number, cursor: CurrentUnit, progress: LessonProgr
       taught
     });
 
-    // Checkpoints land after each three-unit band.
+    // Checkpoints land after each three-unit band. Their lesson records carry
+    // the band's last unit number, so they are found from this unit but counted
+    // separately from it.
     if (unit % 3 === 0) {
       const band = `${unit - 2}–${unit}`;
       const bandLocked = level > cursor.level || (level === cursor.level && unit > cursor.unit);
-      items.push({
-        kind: "review",
-        title: `Review · Units ${band}`,
-        subtitle: "Mixed quiz, grammar and reading from this band.",
-        state: bandLocked ? "locked" : "planned",
-        lessonCount: 0,
-        taught: 0
-      });
-      items.push({
-        kind: "reading",
-        title: `Extra Reading ${unit / 3}`,
-        subtitle: "Extra reading to stretch a little further.",
-        state: bandLocked ? "locked" : "planned",
-        lessonCount: 0,
-        taught: 0
-      });
+      const checkpointItem = (kind: "review" | "reading", component: string, title: string, subtitle: string) => {
+        const built = teacherLessons.filter(
+          (lesson) => lesson.level === level && lesson.unit === unit && lesson.component === component
+        );
+        const taughtCount = built.filter((lesson) => progress[lesson.id]?.status === "done").length;
+        return {
+          kind,
+          title,
+          subtitle: built.length ? built[0].title : subtitle,
+          state: built.length ? ("active" as const) : bandLocked ? ("locked" as const) : ("planned" as const),
+          lessonCount: built.length,
+          taught: taughtCount,
+          lessonId: built[0]?.id
+        };
+      };
+
+      items.push(
+        checkpointItem("review", "review", `Review · Units ${band}`, "Mixed quiz, grammar and reading from this band.")
+      );
+      items.push(
+        checkpointItem(
+          "reading",
+          "extra-reading",
+          `Extra Reading ${unit / 3}`,
+          "Extra reading to stretch a little further."
+        )
+      );
     }
   }
 
@@ -121,6 +139,10 @@ export function OurWorldPage() {
     [selectedLevel]
   );
   const levelTaught = levelLessons.filter((lesson) => progress[lesson.id]?.status === "done").length;
+  // Checkpoint decks are built band by band, so the header can only claim they
+  // are all still planned while this level really has none.
+  const levelCheckpoints = levelLessons.filter((lesson) => isCheckpointComponent(lesson.component)).length;
+  const checkpointNote = levelCheckpoints ? `${levelCheckpoints} checkpoint lessons built` : "checkpoints planned";
   const currentUnitLessons = teacherLessons.filter(
     (lesson) => lesson.level === currentUnit.level && lesson.unit === currentUnit.unit
   );
@@ -171,7 +193,7 @@ export function OurWorldPage() {
           <h2>Level {selectedLevel} · {UNITS_PER_LEVEL} units</h2>
           <span>
             {levelLessons.length
-              ? `${levelTaught} of ${levelLessons.length} lessons taught · checkpoints planned`
+              ? `${levelTaught} of ${levelLessons.length} lessons taught · ${checkpointNote}`
               : "No lessons built for this level yet · checkpoints planned"}
           </span>
         </header>
@@ -205,10 +227,13 @@ function SequenceRow({ item, level }: { item: SequenceItem; level: number }) {
     </>
   );
 
-  // Only units that actually have authored lessons are navigable.
-  const href = item.kind === "unit" && item.number != null && item.lessonCount > 0
-    ? `/english/our-world/level-${level}/unit-${item.number}`
-    : null;
+  // Only units that actually have authored lessons are navigable; a built
+  // checkpoint opens its own deck.
+  const href = item.lessonId
+    ? `/lessons/${item.lessonId}`
+    : item.kind === "unit" && item.number != null && item.lessonCount > 0
+      ? `/english/our-world/level-${level}/unit-${item.number}`
+      : null;
 
   return href
     ? <Link className="ow-sequence-row active" href={href}>{content}</Link>

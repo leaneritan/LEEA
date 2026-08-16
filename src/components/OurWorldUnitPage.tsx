@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getLearnerAppProgress, syncLearnerProgressWithCloud } from "@/data/learnerProgress";
-import { getLessonGroups } from "@/data/lessons";
+import { getLessonGroups, isCheckpointComponent } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
 
@@ -107,14 +107,23 @@ export function OurWorldUnitPage({ unit }: { unit: number }) {
 
   progressVersion;
 
-  const teacherLessons = group?.lessons.filter((lesson) => lesson.mode === "teacher") ?? [];
+  // Checkpoint lessons carry the band's last unit number so the teacher menu can
+  // find them, but they are not lessons of this unit — the Our World course map
+  // lists them on their own checkpoint rows after the unit.
+  const teacherLessons =
+    group?.lessons.filter((lesson) => lesson.mode === "teacher" && !isCheckpointComponent(lesson.component)) ?? [];
   const lessonRows = teacherLessons.map((teacher) => {
     const learner = group ? getLearnerForTeacher(teacher, group.lessons) : undefined;
     return { teacher, learner, state: getLessonState(teacher, learner) };
   });
   const completedCount = lessonRows.filter((row) => row.state.className === "is-done").length;
   const nextRow = lessonRows.find((row) => row.state.className === "is-active") ?? lessonRows.find((row) => row.state.className === "is-ready");
-  const nextCopy = nextRow ? lessonCopy[nextRow.teacher.component] ?? nextRow.teacher : null;
+  // lessonCopy holds Unit 8's short titles only, so it can be applied to Unit 8
+  // rows alone — the row list below already guards this. Without the same guard
+  // here, the Continue card on the Unit 9 page announced "Unit 8 Opener".
+  const nextCopy = nextRow
+    ? (nextRow.teacher.unit === 8 ? lessonCopy[nextRow.teacher.component] : undefined) ?? nextRow.teacher
+    : null;
 
   return (
     <section className="ow-unit-page">

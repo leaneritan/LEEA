@@ -267,7 +267,24 @@ m5 reads m4's saved chart to label its "which one will you share?" chips, so the
 
 The middle four modules take their shape from what the unit's project actually produces. A report project uses Choose & Research → Write Your Report → Present & Rubric → Now I Can (Unit 8). A make-it project uses Predict & Prepare → Build It → Share & Rubric → Now I Can (Unit 9): pick one of the LP's candidate answers before building, order the LP's build steps, then explain the result and check it against the prediction. Keep the 8-module count, the Vocab Foundations pair, the final quiz, and the footer contract in both cases — see `docs/design-decisions.md` for why Unit 9 diverges.
 
-### review (TO LOCK)
+### review (LOCKED — Level 4 band 7-9)
+
+8-module modal home grid, checkpoint-purple. Built example: `public/learn/ow-l4-r7-9-review.html`.
+
+| # | Module | What Leo does | Completion |
+|---|---|---|---|
+| m1 | 🎓 Academic Language | Flashcards + 10Q quiz on the words the review itself uses (define, match, describe, evaluate…) | Quiz pass (70%) |
+| m2 | 💡 Unit A Sweep | 6 cards + 12Q for the band's first unit | Quiz pass (75%) |
+| m3 | 🎨 Unit B Sweep | 6 cards + 12Q for the second unit | Quiz pass (75%) |
+| m4 | ⚡ Unit C Sweep | 6 cards + 12Q for the third unit | Quiz pass (75%) |
+| m5 | 📐 Grammar Round-Up | One gated MCQ per grammar point in the band, plus a chip builder for the trickiest pattern | Manual Mark Complete |
+| m6 | 🎧 Listen & Speak | The SB listening activities as MCQs; passing them opens the speaking activity's tap-to-reveal prompts | Manual Mark Complete |
+| m7 | ✏️ Define It | The word-box matching game gates the writing half: pick a list, write definitions, then self-rate the guessing game | Manual Mark Complete |
+| m8 | ⚽ Can Leo Score? | 10Q mixed final across all three units | Score ≥8/10 |
+
+**One sweep module per unit in the band, not one giant vocabulary module.** Three 12-question sweeps keep each sitting short, and the per-sweep scores are the diagnostic — Neritan's review page shows them side by side, so a weak unit is obvious before the test. m1-m4 share one flashcard/quiz engine keyed by module number (`DECKS`, `fcMode`/`fcRender`/`fcQAns`) rather than four near-identical copies.
+
+### review — original brief
 
 Checkpoint review apps appear after three-unit bands (`1-3`, `4-6`, `7-9`). They should mix vocabulary, grammar, listening/reading comprehension, and a final quiz from the previous three units. Use teacher component `review` and learner component `review-app`. Suggested IDs: `ow-l4-r7-9-review` and `ow-l4-r7-9-review-app`.
 

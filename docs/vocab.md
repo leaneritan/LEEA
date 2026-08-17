@@ -144,7 +144,7 @@ Field notes:
 - `id` uses the `global_` prefix — the same word reused in another unit becomes a second `sources[]` entry on the same card, never a duplicate card
 - `normalizedWord` is lowercase, no punctuation, multi-word phrases joined by spaces (`take photos`)
 - `displayEmoji` is a plain string, usually one emoji, occasionally two when that genuinely helps a learner picture the word (`"🔋⚡"`)
-- For mission/value/project/reader words, omit `lessonId` (no teacher lesson exists) and use `component: "mission" | "value" | "project" | "reader"`
+- For mission/value/project/reader words, use `component: "mission" | "value" | "project" | "reader"`. Omit `lessonId` while no teacher lesson exists for that component; once one does, set it (and `lessonStatus: "live"`) so the card's related-lesson button opens the deck — see the `OW4-U9-MI` / `OW4-U9-PJ` cards in Unit 9
 
 ### Required fields — the word card breaks visibly if any of these are missing
 
@@ -272,7 +272,7 @@ Our World uses a different end-of-unit pattern by level band:
 |---|---|
 | Value + Project | Mission + Let's Talk + Project |
 
-Use `MI` only when the planner page literally says MISSION; use `VL` only when it says VALUE — never invent a Mission tag for a Level 1-3 unit. For mission/value/project/reader/let's-talk sources, omit `lessonId` and use the matching `component` string.
+Use `MI` only when the planner page literally says MISSION; use `VL` only when it says VALUE — never invent a Mission tag for a Level 1-3 unit. For mission/value/project/reader/let's-talk sources, use the matching `component` string, and include `lessonId` only once that component has a teacher lesson.
 
 Always put the source tag in both `sources[].tag` and `tags[]` — search uses both.
 

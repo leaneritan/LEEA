@@ -4,12 +4,19 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { isMultiEmoji } from "@/components/reference/emoji-utils";
 import { allGrammar } from "@/components/reference/ref-data";
+import {
+  unit9AcademicCards,
+  unit9GlossaryCards,
+  unit9Vocab1Cards,
+  unit9Vocab2Cards
+} from "@/data/reference";
+import type { VocabularyItem } from "@/data/types";
 
 /* ============================================================
    Unit Reference page — Our World · Level 4 · Unit 9
-   Renders inside <AppShell active="reference">. Data is local
-   for now, sourced from the unit's own vocabulary.json / grammar.json
-   (see the header comment on each section below).
+   Renders inside <AppShell active="reference">. Word sets and
+   grammar are both derived from the unit's own vocabulary.json /
+   grammar.json, so this page cannot drift from the cards it links to.
    ============================================================ */
 
 type Pos = "noun" | "verb" | "adjective" | "adverb";
@@ -57,85 +64,47 @@ function normalizePos(raw: string): Pos {
   return "noun";
 }
 
-function word(emoji: string, text: string, pos: string, meaning: string, href: string, academic = false): Word {
-  return { emoji, word: text, pos: normalizePos(pos), meaning, academic: academic || undefined, href };
+/* Word sets are derived from the unit's own vocabulary.json (via reference.ts),
+   the same way the grammar list below is derived from grammar.json. They used to
+   be hand-copied arrays, which had already drifted: the six Reading-workbook
+   words were missing, and every new word had to be typed out twice. Deriving
+   them means the emoji, part of speech and meaning shown here always match the
+   card the link opens. Section titles/colors stay local — those are page design,
+   not content. */
+function toWords(items: VocabularyItem[], academic = false): Word[] {
+  return items.map((item) => ({
+    // reference.ts already maps the JSON's displayEmoji onto emoji.
+    emoji: item.emoji,
+    word: item.word,
+    pos: normalizePos(item.partOfSpeech ?? item.pos ?? "noun"),
+    meaning: item.meaning,
+    academic: academic || undefined,
+    href: academic ? `/reference/academic/${item.id}` : `/reference/word/${item.id}`
+  }));
 }
 
-/* Source: content/subjects/english/courses/our-world/level-4/unit-9/vocabulary.json
-   (vocab1WordIds / vocab2WordIds / academicWordIds / contentWordIds + relatedWordIds) */
 const unitSections: Section[] = [
   {
     id: "vocab1", title: "Vocabulary 1", sub: "Core unit words", icon: "①",
-    accent: "var(--good)", tint: "var(--good-tint)", count: 15,
-    words: [
-      word("💪⚡", "a force", "noun", "a push or a pull that can move something", "/reference/word/global_force"),
-      word("❓➡️", "happen", "verb", "to take place; to occur", "/reference/word/global_happen"),
-      word("👉💥", "push", "verb", "to press something away from you to make it move", "/reference/word/global_push"),
-      word("🤚⬅️", "pull", "verb", "to move something toward you using force", "/reference/word/global_pull"),
-      word("🛝", "a swing", "noun", "a seat that hangs from ropes or chains and moves back and forth", "/reference/word/global_swing_toy"),
-      word("⛸️", "a skater", "noun", "a person who moves on skates", "/reference/word/global_skater"),
-      word("⏩", "forward", "adverb", "toward the front; in the direction ahead of you", "/reference/word/global_forward"),
-      word("⏪", "backward", "adverb", "toward the back; in the direction behind you", "/reference/word/global_backward"),
-      word("🌀", "spin", "verb", "to turn around and around quickly in a circle", "/reference/word/global_spin"),
-      word("💥⬇️", "fall over", "verb", "to lose your balance and drop down", "/reference/word/global_fall_over"),
-      word("⚖️", "balance", "noun/verb", "the ability to stay steady and not fall over", "/reference/word/global_balance"),
-      word("⬇️", "down", "adverb", "toward a lower place; from a higher position to a lower one", "/reference/word/global_down"),
-      word("🔗", "connect", "verb", "to join two things together", "/reference/word/global_connect"),
-      word("🤲💫", "rub", "verb", "to move one thing back and forth against another", "/reference/word/global_rub"),
-      word("🤚🔥", "friction", "noun", "the force created when two things rub together", "/reference/word/global_friction")
-    ]
+    accent: "var(--good)", tint: "var(--good-tint)",
+    words: toWords(unit9Vocab1Cards)
   },
   {
     id: "vocab2", title: "Vocabulary 2", sub: "Direction & force words", icon: "②",
-    accent: "#2f9c8e", tint: "#e6f4f1", count: 5,
-    words: [
-      word("🚶‍♂️↗️", "away from", "preposition", "moving in the opposite direction from something or someone", "/reference/word/global_away_from"),
-      word("🧭", "direction", "noun", "the way something moves or points", "/reference/word/global_direction"),
-      word("🚶‍♂️↘️", "toward", "preposition", "moving in the direction of something or someone", "/reference/word/global_toward"),
-      word("🚵", "lean", "verb", "to bend your body to one side", "/reference/word/global_lean"),
-      word("🌍⬇️", "gravity", "noun", "the force that pulls things down toward the Earth", "/reference/word/global_gravity")
-    ]
+    accent: "#2f9c8e", tint: "#e6f4f1",
+    words: toWords(unit9Vocab2Cards)
   },
   {
     id: "academic", title: "Academic", sub: "Thinking & study language", icon: "★",
-    accent: "var(--amber)", tint: "var(--amber-panel)", count: 5,
-    words: [
-      word("🗣️📝", "describe", "verb", "to say or write what a person, place, or thing is like", "/reference/academic/global_describe", true),
-      word("🧩✅", "match", "verb", "to find two things that go together or are the same", "/reference/academic/global_match", true),
-      word("📖🔎", "definitions", "noun", "sentences that explain what a word means", "/reference/academic/global_definitions", true),
-      word("📋➡️", "instructions", "noun", "steps that tell you how to do something", "/reference/academic/global_instructions", true),
-      word("📋", "description", "noun", "words that tell what something is like", "/reference/academic/global_description", true)
-    ]
+    accent: "var(--amber)", tint: "var(--amber-panel)",
+    words: toWords(unit9AcademicCards, true)
   },
   {
     id: "glossary", title: "Glossary", sub: "Reading & topic terms", icon: "📖",
-    accent: "var(--muted-2)", tint: "#f0f1ec", count: 22,
-    words: [
-      word("🏃", "an athlete", "noun", "a person who is skilled at sports and physical activities", "/reference/word/global_athlete"),
-      word("🤸‍♀️⬆️", "jump", "verb", "to push yourself off the ground into the air", "/reference/word/global_jump"),
-      word("⛷️", "a skier", "noun", "a person who moves on skis over snow", "/reference/word/global_skier"),
-      word("🎠", "merry-go-round", "noun", "a round platform with seats that turns around and around for fun", "/reference/word/global_merry_go_round"),
-      word("⬆️⬇️", "seesaw", "noun", "a long board that goes up and down when two people sit on each end", "/reference/word/global_seesaw"),
-      word("🛹", "skateboarder", "noun", "a person who rides a skateboard", "/reference/word/global_skateboarder"),
-      word("🎾🔗", "tetherball", "noun", "a game where you hit a ball tied to a pole with a rope", "/reference/word/global_tetherball"),
-      word("🔒🎢", "safety bar", "noun", "a bar you hold and pull down to stay safe in a moving ride", "/reference/word/global_safety_bar"),
-      word("⛰️", "steep", "adjective", "rising or falling very sharply, like a hill", "/reference/word/global_steep"),
-      word("🎡🔄", "centripetal force", "noun", "the force that keeps something moving in a circle", "/reference/word/global_centripetal_force"),
-      word("➡️🛑", "inertia", "noun", "the tendency of something moving to keep moving", "/reference/word/global_inertia"),
-      word("🙌🎢", "experience", "verb", "something that happens to you that you feel or notice", "/reference/word/global_experience"),
-      word("⛸️✨", "figure skating", "noun", "a sport where skaters move and spin on ice in patterns", "/reference/word/global_figure_skating"),
-      word("⛷️🕺", "freestyle skiing", "noun", "a sport where skiers do jumps and tricks in the air", "/reference/word/global_freestyle_skiing"),
-      word("🧊⛸️", "ice rink", "noun", "a flat, icy surface where people skate", "/reference/word/global_ice_rink"),
-      word("🌀↩️", "twist", "verb", "to turn your body or an object around quickly", "/reference/word/global_twist"),
-      word("🌐🔄", "gyroscope", "noun", "a spinning device with rings that can move in many directions", "/reference/word/global_gyroscope"),
-      word("🧍‍♂️✔️", "independently", "adverb", "without help from anyone or anything else", "/reference/word/global_independently"),
-      word("🤢🎢", "motion sickness", "noun", "a feeling of sickness caused by spinning or moving quickly", "/reference/word/global_motion_sickness"),
-      word("🏗️", "structure", "noun", "something that is built with connected parts", "/reference/word/global_structure"),
-      word("🏃‍♂️💨", "motion", "noun", "the act of moving or changing position", "/reference/word/global_motion"),
-      word("🎢🎡", "theme park", "noun", "a large park with rides and games for fun", "/reference/word/global_theme_park")
-    ]
+    accent: "var(--muted-2)", tint: "#f0f1ec",
+    words: toWords(unit9GlossaryCards)
   }
-];
+].map((section) => ({ ...section, count: section.words.length }));
 
 /* Source: content/subjects/english/courses/our-world/level-4/unit-9/grammar.json —
    derived from allGrammar (reference-shapes.ts) so this list can never drift
@@ -151,13 +120,15 @@ const unitGrammar = unitGrammarEntries.map((g, idx) => ({
   href: `/reference/grammar/${g.grammarId}`
 }));
 
+const sectionDots: Record<string, string> = {
+  vocab1: "var(--good)", vocab2: "#2f9c8e", academic: "var(--amber)", glossary: "var(--muted-2)"
+};
 const jumps = [
-  { label: "Vocabulary 1", count: 15, dot: "var(--good)", href: "#vocab1" },
-  { label: "Vocabulary 2", count: 5, dot: "#2f9c8e", href: "#vocab2" },
-  { label: "Academic", count: 5, dot: "var(--amber)", href: "#academic" },
-  { label: "Glossary", count: 22, dot: "var(--muted-2)", href: "#glossary" },
+  ...unitSections.map((s) => ({ label: s.title, count: s.count, dot: sectionDots[s.id], href: `#${s.id}` })),
   { label: "Grammar", count: unitGrammar.length, dot: "var(--accent)", href: "#grammar" }
 ];
+const totalWords = unitSections.reduce((sum, s) => sum + s.count, 0);
+const academicCount = unitSections.find((s) => s.id === "academic")?.count ?? 0;
 
 export default function UnitReference9() {
   return (
@@ -177,9 +148,9 @@ export default function UnitReference9() {
             </div>
           </div>
           <div className="unit-hero-stats">
-            <div className="unit-stat"><b>47</b><span>words</span></div>
+            <div className="unit-stat"><b>{totalWords}</b><span>words</span></div>
             <i className="unit-stat-sep" />
-            <div className="unit-stat"><b style={{ color: "var(--amber)" }}>5</b><span>academic</span></div>
+            <div className="unit-stat"><b style={{ color: "var(--amber)" }}>{academicCount}</b><span>academic</span></div>
             <i className="unit-stat-sep" />
             <div className="unit-stat"><b style={{ color: "var(--accent)" }}>{unitGrammar.length}</b><span>grammar</span></div>
           </div>

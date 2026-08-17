@@ -473,9 +473,11 @@ Build priority: grammar-1 → grammar-2 → reading → writing.
 | grammar-2 | `public/lessons/ow-l4-u9-grammar-2.html` | `public/learn/ow-l4-u9-grammar-2.html` | built |
 | reading | `public/lessons/ow-l4-u9-reading.html` | `public/learn/ow-l4-u9-reading.html` | built |
 | writing | `public/lessons/ow-l4-u9-writing.html` | `public/learn/ow-l4-u9-writing.html` | built |
-| mission | `public/lessons/ow-l4-u9-mission.html` | not yet built | teacher-only |
-| project | `public/lessons/ow-l4-u9-project.html` | not yet built | teacher-only |
+| mission | `public/lessons/ow-l4-u9-mission.html` | `public/learn/ow-l4-u9-mission.html` | `live` (6-module) |
+| project | `public/lessons/ow-l4-u9-project.html` | `public/learn/ow-l4-u9-project.html` | `live` (8-module) |
 | book-reading | `public/lessons/ow-l4-u9-book-reading.html` | not yet built | teacher-only |
+
+The Unit 9 Project app keeps the locked 8-module project skeleton but fits it to a make-it project rather than a report project: m4 Choose &amp; Research becomes **Predict &amp; Prepare** (pick one of the three children's answers from the LP, sort need-vs-do, write a prediction before building), m5 Write Your Report becomes **Build It** (order the six LP steps, then the step-4 upside-down trap that is where thaumatropes actually fail), and m6 becomes **Share &amp; Rubric** (explain with because/so/the more… the more…, reveal the real answer and check it against the prediction from m4, then rate the four LP project-check criteria). The Unit 8 report-style wording does not fit a project whose output is a spinning toy plus an explanation.
 
 ### Units 7-9 checkpoint band
 

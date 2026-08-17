@@ -17,7 +17,9 @@ import unit9ReadingLearner from "../../content/subjects/english/courses/our-worl
 import unit9Writing from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/writing.teacher.json";
 import unit9WritingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/writing.learner.json";
 import unit9Mission from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/mission.teacher.json";
+import unit9MissionLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/mission-app.learner.json";
 import unit9Project from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/project.teacher.json";
+import unit9ProjectLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/project-app.learner.json";
 import unit9BookReading from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/book-reading.teacher.json";
 // Checkpoint lessons belong to the Units 7-9 band, not to Unit 9 — they live in
 // their own `checkpoint-7-9/` folder and carry `unit: 9` only so the teacher menu
@@ -117,7 +119,9 @@ export const lessons: Lesson[] = [
   unit9Writing as Lesson,
   unit9WritingLearner as Lesson,
   unit9Mission as Lesson,
+  unit9MissionLearner as Lesson,
   unit9Project as Lesson,
+  unit9ProjectLearner as Lesson,
   unit9BookReading as Lesson,
   checkpoint79Review as Lesson,
   checkpoint79ExtraReading as Lesson,

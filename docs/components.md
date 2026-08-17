@@ -231,6 +231,27 @@ Source JSON shape — `content/subjects/english/courses/our-world/level-4/unit-8
 
 Every module — including the ones whose completion is fully automatic (quiz pass, word count, filled-field thresholds) — has a visible footer: a "Mark [Module] complete ✓" button disabled until that module's own criteria are met, and a two-tap-armed "↺ Redo" that clears that module's saved keys and resets its DOM. m13 additionally restores its saved result (pass/fail screen) on modal reopen instead of restarting the quiz, per rule 3. When rebuilding this app for a future unit's writing lesson, copy the module list and the footer pattern exactly — data and content vocabulary/theme swap only.
 
+### mission (LOCKED — Unit 8 + Unit 9 Mission)
+
+6-module modal home grid, mission-green hero. Module list and storage contract live in `.claude/commands/mission-app.md`; built examples are `public/learn/ow-l4-u8-mission.html` and `public/learn/ow-l4-u9-mission.html`.
+
+| # | Module | What Leo does | Completion |
+|---|---|---|---|
+| m1 | 🎓 Academic Language | Flashcards + quiz on the Mission page's academic words | Quiz pass (70%) |
+| m2 | 🌟 Mission Words | Flashcards + quiz, ≥2 questions per word | Quiz pass (75%) |
+| m3 | 💎 Be the Expert | Tap-to-reveal facts → True/False → 4Q quiz, each stage gated on the one before | 3/4 on the quiz |
+| m4 | 🧠 Think | Rate the LP's reasons 1-5, chip-build an answer per LP question, fill the LP's three-column chart | Manual Mark Complete |
+| m5 | 🗣️ Pair & Share | Frame builder, evaluate each plan, partner notes, author's-chair write-up | Manual Mark Complete |
+| m6 | ⚽ Can Leo Score? | 8Q mixed final quiz | Score ≥6/8 |
+
+m5 reads m4's saved chart to label its "which one will you share?" chips, so the two modules stay one continuous task rather than two disconnected forms.
+
+### project (LOCKED — Unit 8 + Unit 9 Project)
+
+8-module modal home grid, project-blue hero. Module list and storage contract live in `.claude/commands/project-app.md`; built examples are `public/learn/ow-l4-u8-project.html` (report-style project) and `public/learn/ow-l4-u9-project.html` (make-it project).
+
+The middle four modules take their shape from what the unit's project actually produces. A report project uses Choose & Research → Write Your Report → Present & Rubric → Now I Can (Unit 8). A make-it project uses Predict & Prepare → Build It → Share & Rubric → Now I Can (Unit 9): pick one of the LP's candidate answers before building, order the LP's build steps, then explain the result and check it against the prediction. Keep the 8-module count, the Vocab Foundations pair, the final quiz, and the footer contract in both cases — see `docs/design-decisions.md` for why Unit 9 diverges.
+
 ### review (TO LOCK)
 
 Checkpoint review apps appear after three-unit bands (`1-3`, `4-6`, `7-9`). They should mix vocabulary, grammar, listening/reading comprehension, and a final quiz from the previous three units. Use teacher component `review` and learner component `review-app`. Suggested IDs: `ow-l4-r7-9-review` and `ow-l4-r7-9-review-app`.

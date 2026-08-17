@@ -25,7 +25,7 @@ import {
   syncLessonProgressWithCloud,
   type LessonProgressMap
 } from "@/data/lessonProgress";
-import { getLessonGroups, learnerLessons, lessons, teacherLessons } from "@/data/lessons";
+import { getLessonGroups, isCheckpointComponent, learnerLessons, lessons, teacherLessons } from "@/data/lessons";
 import { LEVELS, unitTitlesForLevel } from "@/data/curriculum";
 import {
   createCurrentUnit,
@@ -63,6 +63,10 @@ function getMockUnitStatuses(level: number, unit: number, cursor: CurrentUnit): 
   return SPINE_LESSONS.map(() => (unit < cursor.unit ? "taught" : "todo"));
 }
 
+// Checkpoint material sits after each three-unit band, not inside the last unit
+// of the band. A checkpoint lesson record carries the band's last unit number so
+// it can be found here; the roster below filters these components out so a
+// checkpoint never renders as an ordinary unit lesson.
 const checkpointComponents = [
   {
     component: "review",
@@ -75,6 +79,7 @@ const checkpointComponents = [
     subtitle: "Extended comprehension & vocabulary practice."
   }
 ];
+
 
 const shortLessonCopy: Record<string, { label: string; title: string; subtitle: string }> = {
   opener: { label: "Opener", title: "Unit 8 Opener", subtitle: "Hobbies, interests, and the Arctic photo." },
@@ -213,9 +218,20 @@ export function TeacherDashboard() {
   );
   const trainingGroundTaught = trainingGroundTeacherLessons.filter((lesson) => progress[lesson.id]?.status === "done").length;
   const selectedTeacherLessons = useMemo(
-    () => selectedUnitGroup?.lessons.filter((lesson) => lesson.mode === "teacher") ?? [],
+    () =>
+      selectedUnitGroup?.lessons.filter(
+        (lesson) => lesson.mode === "teacher" && !isCheckpointComponent(lesson.component)
+      ) ?? [],
     [selectedUnitGroup]
   );
+  // Real checkpoint decks, keyed by component, for the band row below the roster.
+  const selectedCheckpointLessons = useMemo(() => {
+    const map = new Map<string, Lesson>();
+    for (const lesson of selectedUnitGroup?.lessons ?? []) {
+      if (lesson.mode === "teacher" && isCheckpointComponent(lesson.component)) map.set(lesson.component, lesson);
+    }
+    return map;
+  }, [selectedUnitGroup]);
   const isLiveUnit = selectedTeacherLessons.length > 0;
   const selectedDoneCount = useMemo(
     () => getDoneLessonCount(selectedTeacherLessons.map((lesson) => lesson.id), progress),
@@ -407,9 +423,29 @@ export function TeacherDashboard() {
             {selectedUnit % 3 === 0 ? (
               <div className="teacher-checkpoint-rows">
                 <div className="teacher-checkpoint-label">Checkpoint after Units {selectedUnit - 2}–{selectedUnit}</div>
-                {checkpointComponents.map((checkpoint) => (
-                  <CheckpointRow checkpoint={checkpoint} key={checkpoint.component} unitBand={{ start: selectedUnit - 2, end: selectedUnit }} />
-                ))}
+                {checkpointComponents.map((checkpoint) => {
+                  const built = selectedCheckpointLessons.get(checkpoint.component);
+                  if (built) {
+                    const learnerCounterpart = selectedUnitGroup?.lessons.find(
+                      (item) => item.mode === "learner" && item.component === `${built.component}-app`
+                    );
+                    return (
+                      <TeacherLessonRow
+                        assignment={learnerCounterpart ? assignments[learnerCounterpart.id] : undefined}
+                        key={built.id}
+                        learner={learnerCounterpart}
+                        lesson={built}
+                        progress={progress[built.id]}
+                        setLessonDone={setLessonDone}
+                        assignLesson={assignLesson}
+                        unassignLesson={unassignLesson}
+                      />
+                    );
+                  }
+                  return (
+                    <CheckpointRow checkpoint={checkpoint} key={checkpoint.component} unitBand={{ start: selectedUnit - 2, end: selectedUnit }} />
+                  );
+                })}
               </div>
             ) : null}
           </div>

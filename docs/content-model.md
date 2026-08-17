@@ -221,6 +221,8 @@ Level 4
 
 Treat these as checkpoint lessons, not as sub-lessons of Unit 3, 6, or 9. They use normal teacher/learner lesson records so assignment, review, and future Supabase sync work the same way as unit lessons. Components are `review` / `review-app` and `extra-reading` / `extra-reading-app`. Source tags use band notation such as `OW4-R7-9` and `OW4-ER7-9`.
 
+Their lesson records live beside the units, in `level-<n>/checkpoint-<start>-<end>/lessons/` — for example `content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/review.teacher.json`. Each record carries `unit: <band end>` (9 for the 7-9 band) purely so the teacher menu and course map can find it from the last unit of the band; both surfaces then split it back out with `isCheckpointComponent()` from `src/data/lessons.ts` so a checkpoint never counts as one of that unit's teaching components. A new checkpoint folder must also be listed in `lessonsDirs` in `scripts/validate-content.mjs`, or its records will silently skip validation.
+
 Reference also exposes:
 
 ```text

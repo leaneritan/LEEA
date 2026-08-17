@@ -16,6 +16,14 @@ import unit9Reading from "../../content/subjects/english/courses/our-world/level
 import unit9ReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/reading.learner.json";
 import unit9Writing from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/writing.teacher.json";
 import unit9WritingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/writing.learner.json";
+import unit9Mission from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/mission.teacher.json";
+import unit9Project from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/project.teacher.json";
+import unit9BookReading from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/book-reading.teacher.json";
+// Checkpoint lessons belong to the Units 7-9 band, not to Unit 9 — they live in
+// their own `checkpoint-7-9/` folder and carry `unit: 9` only so the teacher menu
+// can show them under the last unit of their band.
+import checkpoint79Review from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/review.teacher.json";
+import checkpoint79ExtraReading from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/extra-reading.teacher.json";
 import unit8Opener from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.teacher.json";
 import unit8OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.learner.json";
 import unit8Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab1.teacher.json";
@@ -108,6 +116,11 @@ export const lessons: Lesson[] = [
   unit9ReadingLearner as Lesson,
   unit9Writing as Lesson,
   unit9WritingLearner as Lesson,
+  unit9Mission as Lesson,
+  unit9Project as Lesson,
+  unit9BookReading as Lesson,
+  checkpoint79Review as Lesson,
+  checkpoint79ExtraReading as Lesson,
   unit8Opener as Lesson,
   unit8OpenerLearner as Lesson,
   unit8Vocab1 as Lesson,
@@ -152,6 +165,16 @@ export type LessonGroup = {
   unit?: number;
   lessons: Lesson[];
 };
+
+// Components that belong to a three-unit checkpoint band rather than to a unit.
+// Their lesson records carry the band's last unit number (3, 6, 9) so they can be
+// found from that unit, but every surface must show them as checkpoint material,
+// never as an ordinary lesson of that unit.
+export const CHECKPOINT_COMPONENTS = ["review", "extra-reading"];
+
+export function isCheckpointComponent(component: string) {
+  return CHECKPOINT_COMPONENTS.includes(component.replace(/-app$/, ""));
+}
 
 export function getLessonById(id: string) {
   return lessons.find((lesson) => lesson.id === id);

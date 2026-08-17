@@ -42,6 +42,8 @@ Checkpoint lessons belong to the band, not to the last unit in the band. Use ban
 REGISTER
 17. Add teacher + learner JSON entries under
     content/subjects/english/courses/<course>/level-<n>/unit-<n>/lessons/
+    (checkpoint lessons go under level-<n>/checkpoint-<start>-<end>/lessons/ instead,
+     and that folder must be added to lessonsDirs in scripts/validate-content.mjs)
 18. Name them `<component>.teacher.json` and `<component>.learner.json`
 19. Import them in `src/data/lessons.ts`
 20. Run npm run validate:content (final)
@@ -72,8 +74,8 @@ Each step becomes its own skill so a unit can be built one chunk at a time. Most
 /grammar-app           steps 12,14 BUILT (.claude/commands/grammar-app.md; handles grammar-1 and grammar-2)
 /reading-app           step 15     BUILT (.claude/commands/reading-app.md; teacher slideshow + Leo app with SB/WB landing-screen mode pattern)
 /writing-app           step 16     BUILT (.claude/commands/writing-app.md; teacher slideshow + 13-module Leo app, see docs/components.md)
-/review-app            checkpoint  planned (teacher review + Leo review app)
-/extra-reading-app     checkpoint  planned (teacher extra reading + Leo extra-reading app)
+/review-app            checkpoint  planned (Level 4 band 7-9 teacher deck is hand-built; Leo review app still to build)
+/extra-reading-app     checkpoint  planned (Level 4 band 7-9 teacher deck is hand-built; Leo extra-reading app still to build)
 ```
 
 Also built beyond the original numbered pipeline: `/mission-app`, `/project-app`, `/reader-app` (`.claude/commands/mission-app.md`, `project-app.md`, `reader-app.md`) — see `docs/components.md` for each component's locked module structure.

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 9 · Project — Make a Thaumatrope | LEEA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"></noscript>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../lib/leea-cloud-config.js"></script>
+<script src="../../lib/leea-cloud.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* ── UNIT 9 · FORCE LAB PALETTE ── */
+  --u9:#DC2626;      --u9d:#991B1B;    --u9l:#FEF2F2;   --u9ll:#FFF5F5;
+  --acc:#F59E0B;     --accd:#B45309;   --accl:#FFFBEB;
+  --gn:#16A34A;      --gnd:#15803D;    --gnl:#F0FDF4;
+  --bl:#2563EB;      --bld:#1D4ED8;    --bll:#EFF6FF;
+  --pu:#7C3AED;      --pul:#F5F3FF;
+  --tl:#0D9488;      --tll:#F0FDFA;
+  --rd:#DC2626;      --rdl:#FEE2E2;
+  --ink:#0F172A;     --ink2:#334155;   --ink3:#64748B;   --ink4:#94A3B8;
+  --paper:#FFFDF8;   --surf:#FFFFFF;   --bdr:#E2E8F0;    --bdr2:#CBD5E1;
+  --fn:'Outfit',system-ui,sans-serif;
+}
+html,body{height:100%;background:#0B0F1A;overflow:hidden;font-family:var(--fn)}
+
+/* ══ DECK STAGE (1920×1080 fixed coordinate space) ══ */
+#deckWrap{position:fixed;inset:0;overflow:hidden;background:#0B0F1A}
+#deck{position:absolute;top:0;left:0;width:1920px;height:1080px;flex:0 0 auto;transform-origin:top left;background:var(--paper);overflow:hidden;will-change:transform}
+
+/* ══ SLIDES ══ */
+.slide{position:absolute;inset:0;padding:96px 110px 130px;display:none;flex-direction:column;justify-content:center}
+.slide.on{display:flex}
+.slide.top{justify-content:flex-start;padding-top:120px}
+
+/* ══ STAGE BADGE (injected by <deck-stage>) ══ */
+deck-stage{position:absolute;top:38px;left:110px;display:flex;align-items:center;gap:12px;z-index:5}
+.sb{font-size:19px;font-weight:800;letter-spacing:3.2px;text-transform:uppercase;padding:8px 20px;border-radius:6px;border:2px solid}
+.sb.warmup{background:var(--accl);color:var(--accd);border-color:#FCD34D}
+.sb.present{background:var(--bll);color:var(--bld);border-color:#BFDBFE}
+.sb.practice{background:var(--pul);color:var(--pu);border-color:#DDD6FE}
+.sb.apply{background:var(--gnl);color:var(--gnd);border-color:#BBF7D0}
+.sb.recap{background:var(--tll);color:var(--tl);border-color:#99F6E4}
+.sb.wrapup{background:#F1F5F9;color:var(--ink2);border-color:var(--bdr2)}
+.sb.vocab{background:var(--u9l);color:var(--u9d);border-color:#FECACA}
+.sb.expert{background:#FDF4FF;color:#A21CAF;border-color:#F5D0FE}
+.sb-sub{font-size:18px;font-weight:600;color:var(--ink4);letter-spacing:.6px}
+
+/* ══ TYPOGRAPHY ══ */
+h1.big{font-size:104px;font-weight:900;line-height:1.02;letter-spacing:-2.5px;color:var(--ink)}
+h2.hd{font-size:70px;font-weight:900;line-height:1.06;letter-spacing:-1.6px;color:var(--ink);margin-bottom:34px}
+h3.sub{font-size:44px;font-weight:800;color:var(--ink);line-height:1.18;margin-bottom:24px}
+p.lead{font-size:38px;font-weight:500;color:var(--ink2);line-height:1.5}
+.kick{font-size:22px;font-weight:800;letter-spacing:5px;text-transform:uppercase;color:var(--u9);margin-bottom:20px}
+.jp{font-size:27px;font-weight:600;color:var(--ink3);line-height:1.5}
+.hl{color:var(--u9)}
+.hl2{color:var(--acc)}
+.hlbl{color:var(--bl)}
+.hlgn{color:var(--gn)}
+
+/* ══ LAYOUT HELPERS ══ */
+.row{display:flex;gap:30px;align-items:stretch;justify-content:center}
+.col{display:flex;flex-direction:column;gap:24px;justify-content:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-content:center}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-content:center}
+.center{text-align:center;align-items:center}
+.mt{margin-top:32px}
+
+/* ══ CARDS ══ */
+.card{background:var(--surf);border:3px solid var(--bdr);border-radius:20px;padding:32px 36px}
+.card.u9{border-color:#FECACA;background:var(--u9l)}
+.card.acc{border-color:#FDE68A;background:var(--accl)}
+.card.bl{border-color:#BFDBFE;background:var(--bll)}
+.card.gn{border-color:#BBF7D0;background:var(--gnl)}
+.card.pu{border-color:#DDD6FE;background:var(--pul)}
+.card-lbl{font-size:20px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+
+/* ══ WORD CARD (vocab reveal prize) ══ */
+.wordcard{background:linear-gradient(155deg,#fff,#FFF7F7);border:5px solid var(--u9);border-radius:28px;padding:44px 54px;text-align:center;box-shadow:0 22px 60px rgba(220,38,38,.16)}
+.wordcard .emo{font-size:104px;line-height:1}
+.wordcard .w{font-size:82px;font-weight:900;color:var(--u9d);letter-spacing:-1.4px;margin-top:8px}
+.wordcard .pos{font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--ink4);margin-top:6px}
+.wordcard .def{font-size:34px;font-weight:600;color:var(--ink2);margin-top:20px;line-height:1.4}
+.wordcard .ex{font-size:30px;font-weight:600;color:var(--u9);font-style:italic;margin-top:16px}
+.wordcard .jpx{font-size:26px;font-weight:600;color:var(--ink3);margin-top:14px}
+
+/* ══ BUTTONS / OPTIONS ══ */
+.opt{background:var(--surf);border:4px solid var(--bdr2);border-radius:18px;padding:26px 32px;font-family:var(--fn);font-size:36px;font-weight:700;color:var(--ink);cursor:pointer;text-align:left;transition:all .18s;line-height:1.3}
+.opt:hover:not(.locked){border-color:var(--u9);background:var(--u9ll);transform:translateY(-3px)}
+.opt.ok{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+.opt.bad{border-color:var(--rd);background:var(--rdl);color:var(--rd);animation:shk .32s}
+.opt.locked{cursor:default}
+.opt .ltr{display:inline-block;min-width:52px;font-weight:900;color:var(--ink4)}
+.opt.confirmed{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+.done-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+
+.fb{font-size:32px;font-weight:700;padding:22px 30px;border-radius:16px;margin-top:24px;display:none;line-height:1.4}
+.fb.show{display:block}
+.fb.ok{background:var(--gnl);border:3px solid #BBF7D0;color:var(--gnd)}
+.fb.bad{background:var(--rdl);border:3px solid #FECACA;color:var(--rd)}
+
+.btn{background:var(--u9);color:#fff;border:none;border-radius:16px;padding:22px 44px;font-family:var(--fn);font-size:32px;font-weight:800;cursor:pointer;transition:all .18s}
+.btn:hover{background:var(--u9d);transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--u9);border:4px solid var(--u9)}
+.btn.acc{background:var(--acc);color:#3F2D00}
+.btn.acc:hover{background:var(--accd);color:#fff}
+
+/* ══ REVEAL ══ */
+.hide{display:none}
+.reveal{animation:pop .34s cubic-bezier(.22,1,.36,1)}
+@keyframes pop{0%{opacity:0;transform:scale(.9) translateY(18px)}100%{opacity:1;transform:none}}
+@keyframes shk{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-9px)}50%{transform:translateX(9px)}}
+
+/* ══ TAP TILE ══ */
+.tile{background:var(--surf);border:4px dashed var(--bdr2);border-radius:20px;padding:34px 30px;text-align:center;cursor:pointer;transition:all .2s;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.tile:hover{border-color:var(--acc);background:var(--accl);transform:translateY(-4px)}
+.tile.open{border-style:solid;border-color:var(--gn);background:var(--gnl);cursor:default}
+.tile .t-emo{font-size:60px;line-height:1}
+.tile .t-q{font-size:32px;font-weight:800;color:var(--ink2)}
+.tile .t-a{font-size:34px;font-weight:800;color:var(--gnd);line-height:1.3}
+
+/* ══ CAUSE/EFFECT CHART ══ */
+.ce{display:grid;grid-template-columns:1fr 120px 1fr;gap:0;border:4px solid var(--ink);border-radius:20px;overflow:hidden;background:var(--surf)}
+.ce-hd{padding:20px;font-size:28px;font-weight:900;letter-spacing:3px;text-transform:uppercase;text-align:center;color:#fff}
+.ce-hd.c{background:var(--bl)}
+.ce-hd.arrow{background:var(--ink);color:#fff;font-size:34px}
+.ce-hd.e{background:var(--gn)}
+.ce-cell{padding:24px 26px;border-top:3px solid var(--bdr);font-size:31px;font-weight:600;color:var(--ink2);line-height:1.35;display:flex;align-items:center;min-height:104px}
+.ce-cell.mid{justify-content:center;font-size:40px;color:var(--ink4);background:#F8FAFC}
+.ce-cell.blank{background:#FFFBEB;color:var(--ink4);font-style:italic}
+.ce-cell.fill{background:var(--gnl);color:var(--gnd);font-weight:800}
+
+/* ══ MODEL TEXT ══ */
+.model{background:var(--surf);border:4px solid var(--bdr);border-left:14px solid var(--acc);border-radius:0 20px 20px 0;padding:34px 40px;font-size:33px;font-weight:500;color:var(--ink2);line-height:1.62}
+.model .cw{background:#DBEAFE;border-bottom:5px solid var(--bl);border-radius:5px;padding:0 6px;font-weight:800;color:var(--bld)}
+.model .ew{background:#DCFCE7;border-bottom:5px solid var(--gn);border-radius:5px;padding:0 6px;font-weight:800;color:var(--gnd)}
+.model .pn{font-size:22px;font-weight:800;letter-spacing:2px;color:var(--ink4);display:block;margin-bottom:8px}
+
+/* ══ CHIPS ══ */
+.chips{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.chip{background:var(--surf);border:4px solid var(--bdr2);border-radius:999px;padding:16px 34px;font-size:32px;font-weight:800;color:var(--ink2)}
+.chip.c{border-color:var(--bl);background:var(--bll);color:var(--bld)}
+.chip.e{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+
+/* ══ WORD MAP ══ */
+.map{position:relative;height:430px}
+.node{position:absolute;background:var(--surf);border:4px solid var(--u9);border-radius:999px;padding:18px 34px;font-size:30px;font-weight:800;color:var(--u9d);white-space:nowrap}
+.node.mid{background:var(--u9);color:#fff;font-size:38px;padding:24px 46px}
+.mapline{position:absolute;background:var(--bdr2);height:4px;transform-origin:left center}
+
+/* ══ PROGRESS / NAV / NOTES (absolute inside #deck) ══ */
+#prog{position:absolute;left:0;right:0;bottom:0;height:9px;background:#F1F5F9;z-index:20}
+#progFill{height:100%;background:linear-gradient(90deg,var(--u9),var(--acc));width:0;transition:width .35s}
+#nav{position:absolute;right:44px;bottom:36px;display:flex;align-items:center;gap:14px;z-index:22}
+.nb{width:74px;height:74px;border-radius:50%;border:4px solid var(--bdr2);background:var(--surf);font-size:32px;font-weight:900;color:var(--ink2);cursor:pointer;transition:all .18s}
+.nb:hover{border-color:var(--u9);color:var(--u9)}
+#counter{font-size:26px;font-weight:800;color:var(--ink3);min-width:130px;text-align:center;letter-spacing:1px}
+.tn-btn{position:absolute;left:44px;bottom:36px;width:74px;height:74px;border-radius:50%;border:4px solid var(--bdr2);background:var(--surf);font-size:32px;cursor:pointer;z-index:22;transition:all .18s}
+.tn-btn:hover{border-color:var(--acc);background:var(--accl)}
+.fs-btn{left:134px}
+.tn-btn.act{background:var(--acc);border-color:var(--accd)}
+.tn-panel{position:absolute;left:0;right:0;bottom:0;max-height:430px;overflow-y:auto;background:rgba(15,23,42,.97);color:#E2E8F0;padding:38px 110px 60px;z-index:21;display:none;border-top:6px solid var(--acc)}
+.tn-panel.open{display:block}
+.tn-panel h4{font-size:24px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:16px}
+.tn-panel p{font-size:27px;line-height:1.55;font-weight:500;margin-bottom:12px}
+.tn-panel em{color:#FDE68A;font-style:italic}
+.tn-panel .say{color:#BBF7D0;font-weight:700}
+#badge{position:absolute;right:44px;top:38px;font-size:20px;font-weight:800;letter-spacing:3px;color:var(--ink4);z-index:5}
+
+/* ══ SCOREBOARD / MISC ══ */
+.stepbar{display:flex;gap:14px;justify-content:center;margin-bottom:26px}
+.step{width:60px;height:12px;border-radius:999px;background:var(--bdr)}
+.step.on{background:var(--u9)}
+.big-emo{font-size:150px;line-height:1}
+.mid-emo{font-size:92px;line-height:1}
+.list{display:flex;flex-direction:column;gap:20px}
+.li{display:flex;gap:20px;align-items:flex-start;font-size:34px;font-weight:600;color:var(--ink2);line-height:1.35}
+.li .n{flex:0 0 54px;height:54px;border-radius:50%;background:var(--u9);color:#fff;font-size:28px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.li .n.gn{background:var(--gn)}
+.li .n.bl{background:var(--bl)}
+.frame{background:var(--accl);border:4px dashed var(--acc);border-radius:20px;padding:28px 34px;font-size:34px;font-weight:700;color:var(--accd);line-height:1.5}
+.tick{display:flex;align-items:center;gap:22px;background:var(--surf);border:4px solid var(--bdr);border-radius:18px;padding:22px 30px;font-size:32px;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .18s}
+.tick:hover{border-color:var(--gn)}
+.tick.on{background:var(--gnl);border-color:var(--gn);color:var(--gnd)}
+.tick .bx{flex:0 0 48px;height:48px;border:4px solid var(--bdr2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:30px}
+.tick.on .bx{background:var(--gn);border-color:var(--gn);color:#fff}
+.dad{background:var(--gnl);border:4px solid #BBF7D0;border-radius:18px;padding:24px 30px;font-size:30px;font-weight:700;color:var(--gnd);line-height:1.45}
+table.share{width:100%;border-collapse:collapse;border:4px solid var(--ink);border-radius:16px;overflow:hidden}
+table.share th{background:var(--ink);color:#fff;font-size:28px;font-weight:800;letter-spacing:2px;padding:18px;text-transform:uppercase}
+table.share td{border:3px solid var(--bdr);padding:22px;font-size:30px;font-weight:600;color:var(--ink2)}
+</style>
+</head>
+<body>
+<div id="deckWrap"><div id="deck">
+<div id="badge">LEEA · L4 · U9 · PROJECT</div>
+<section class="slide center" data-stage="Project" data-stagetone="vocab">
+<div class="col center">
+ <div class="big-emo">🌀🐠</div>
+ <div class="kick">Our World 2E · Level 4 · Unit 9 · The Science of Fun</div>
+ <h1 class="big">Make a<br><span class="hl">thaumatrope</span></h1>
+ <p class="lead mt">Project · Student&rsquo;s Book p. 160 · Workbook pp. 116&ndash;117</p></div>
+</section>
+<section class="slide top" data-stage="Project" data-stagetone="vocab">
+<h2 class="hd">In this Project, I will&hellip;</h2>
+<div class="list"><div class="li"><div class="n">1</div><div><strong>make</strong> a thaumatrope.</div></div><div class="li"><div class="n bl">2</div><div><strong>support</strong> my partner while we build.</div></div><div class="li"><div class="n gn">3</div><div><strong>share</strong> my ideas about how it works.</div></div><div class="li"><div class="n">4</div><div>finish the <strong>Unit 9 quiz</strong>.</div></div></div>
+<div class="frame mt">🔮 The most important part is not the toy. It is <strong>predicting why it works</strong> &mdash; before you know.</div>
+</section>
+<section class="slide top" data-stage="Project" data-stagetone="vocab">
+<h2 class="hd">🧰 Get everything ready first</h2>
+<div class="grid3">
+ <div class="tile" data-act="tap" data-a="Two circles, exactly the same size."><div class="t-emo">📇</div><div class="t-q">cardstock or cardboard</div></div>
+ <div class="tile" data-act="tap" data-a="For cutting the circles."><div class="t-emo">✂️</div><div class="t-q">scissors</div></div>
+ <div class="tile" data-act="tap" data-a="For the two drawings."><div class="t-emo">🖍️</div><div class="t-q">markers or pencils</div></div>
+ <div class="tile" data-act="tap" data-a="To stick the circles back to back."><div class="t-emo">🧴</div><div class="t-q">glue</div></div>
+ <div class="tile" data-act="tap" data-a="To spin it — one on each side."><div class="t-emo">➰</div><div class="t-q">string or rubber bands</div></div>
+ <div class="tile" data-act="tap" data-a="Ask Dad to help with the holes."><div class="t-emo">🕳️</div><div class="t-q">something to make holes</div></div>
+</div>
+<div class="dad mt">💬 Tap each one and check it is actually on the table. Nothing worse than stopping at step 5.</div>
+</section>
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+<div class="col center">
+ <div class="kick">Words you need for the steps</div>
+ <h2 class="hd">3 words first</h2>
+ <div class="chips mt"><span class="chip">🙃 upside down</span><span class="chip">🔗 attach</span><span class="chip">🔀 combine</span></div>
+ <p class="lead mt">Without these three, the instructions will not make sense.</p></div>
+</section>
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="vocab">
+<h3 class="sub">🙃 Flip Test</h3>
+<p class="lead" style="margin-bottom:24px">Step 4 says the picture on the back should be <strong>upside down</strong>. Which one is upside down?</p>
+<div class="card acc" style="margin-bottom:22px"><p class="lead">Why does it matter? When you flip the card over to spin it, the back picture turns the right way up again. Draw it normally and it will appear <strong>upside down</strong> when it spins!</p></div>
+<div class="grid2" id="q-upside"><button class="opt center" data-act="opt" data-g="upside" data-c="0" data-fb="That is the right way up — the same way you drew it.">🐠 &nbsp;the fish swimming normally</button><button class="opt center" data-act="opt" data-g="upside" data-c="1" data-fb="Yes! Upside down means turned over — what was at the top is now at the bottego.">🙃 &nbsp;the fish turned over, head at the bottom</button></div>
+<div class="fb" id="fb-upside"></div>
+</section>
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(220,38,38,.16)">
+  <div class="emo">🙃</div>
+  <div class="w" style="color:var(--u9d)">upside down</div>
+  <div class="pos">phrase</div>
+  <div class="def">turned over, so the top is now at the bottom</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;The picture on the back should be upside down.&rdquo;</div>
+  <div class="jpx">逆(さか)さま・上下(じょうげ)逆(ぎゃく)</div>
+</div>
+</section>
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="vocab">
+<h3 class="sub">🔗 Attach It</h3>
+<p class="lead" style="margin-bottom:24px">Step 5: make holes on each side, then <strong>attach</strong> the string. What does attach mean?</p>
+
+<div class="grid3" id="q-attach"><button class="opt center" data-act="opt" data-g="attach" data-c="0" data-fb="That is the opposite — that would be to remove it.">take something off</button><button class="opt center" data-act="opt" data-g="attach" data-c="1" data-fb="Correct. You attach the string to the circle so they are joined together.">join one thing to another</button><button class="opt center" data-act="opt" data-g="attach" data-c="0" data-fb="Drawing was steps 2 and 3. Step 5 is about joining.">draw something on it</button></div>
+<div class="fb" id="fb-attach"></div>
+</section>
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(220,38,38,.16)">
+  <div class="emo">🔗</div>
+  <div class="w" style="color:var(--u9d)">attach</div>
+  <div class="pos">verb</div>
+  <div class="def">to join one thing to another</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;Attach string or a rubber band to each side.&rdquo;</div>
+  <div class="jpx">取(と)り付(つ)ける・つなぐ</div>
+</div>
+</section>
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="vocab">
+<h3 class="sub">🔀 Two Into One</h3>
+<p class="lead" style="margin-bottom:24px">When the thaumatrope spins fast, the two pictures seem to <strong>combine</strong>. That means&hellip;</p>
+<div class="grid3"><div class="tile" data-act="tap" data-a="a fish"><div class="t-emo">🐠</div><div class="t-q">picture 1</div></div><div class="tile" data-act="tap" data-a="a fish tank"><div class="t-emo">🪟</div><div class="t-q">picture 2</div></div><div class="tile" data-act="tap" data-a="a fish IN the tank!"><div class="t-emo">🐠🪟</div><div class="t-q">spun fast</div></div></div>
+<div class="grid2" id="q-combine"><button class="opt center" data-act="opt" data-g="combine" data-c="0" data-fb="That is what really happens — but it is not what your eyes SEE.">they swap places one at a time.</button><button class="opt center" data-act="opt" data-g="combine" data-c="1" data-fb="Yes! Combine means two things joining to become one.">they join together and look like one picture.</button></div>
+<div class="fb" id="fb-combine"></div>
+</section>
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(220,38,38,.16)">
+  <div class="emo">🔀</div>
+  <div class="w" style="color:var(--u9d)">combine</div>
+  <div class="pos">verb</div>
+  <div class="def">to join together and become one</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;The two images seem to combine.&rdquo;</div>
+  <div class="jpx">組(く)み合(あ)わさる・一(ひと)つになる</div>
+</div>
+</section>
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+<div class="col center">
+ <div class="kick">The academic word for this lesson</div>
+ <h2 class="hd">🔎 research</h2>
+ <p class="lead mt">The Lesson Planner names exactly one &mdash; and this is it.</p>
+ <div class="frame mt" style="max-width:1200px">You already did research in the Mission: you picked three things you wanted to understand better.</div></div>
+</section>
+<section class="slide top" data-stage="Academic Language" data-stagetone="expert">
+<h3 class="sub">🔎 Is That Research?</h3>
+<p class="lead" style="margin-bottom:24px">You want to know why the thaumatrope works. Which one counts as <strong>research</strong>?</p>
+
+<div class="col" id="q-research"><button class="opt" data-act="opt" data-g="research" data-c="0" data-fb="A guess is a good start — but research means going and finding out.">Guessing once and never checking.</button><button class="opt" data-act="opt" data-g="research" data-c="1" data-fb="Yes. Research is looking carefully for information to answer a question.">Trying it, watching closely, and looking it up.</button><button class="opt" data-act="opt" data-g="research" data-c="0" data-fb="Closer, but research means you do the finding out yourself.">Asking someone to just tell you the answer.</button></div>
+<div class="fb" id="fb-research"></div>
+</section>
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+<div class="wordcard" style="border-color:var(--acc);box-shadow:0 22px 60px rgba(245,158,11,.16)">
+  <div class="emo">🔎</div>
+  <div class="w" style="color:var(--accd)">research</div>
+  <div class="pos">noun / verb</div>
+  <div class="def">looking carefully for information to answer a question</div>
+  <div class="ex" style="color:var(--acc)">&ldquo;I did some research to find out why it works.&rdquo;</div>
+  <div class="jpx">調査(ちょうさ)・調(しら)べる</div>
+</div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="col center">
+ <div class="kick">The project itself</div>
+ <h2 class="hd">The <span class="hl">3 key words</span></h2>
+ <div class="chips mt"><span class="chip">🌀 thaumatrope</span><span class="chip">👁️ optical illusion</span><span class="chip">🔮 predict</span></div>
+ <p class="lead mt">What you are making · what it does · what you must do first.</p></div>
+</section>
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+<h3 class="sub">🌀 Say It, Then Guess It</h3>
+<p class="lead" style="margin-bottom:24px"><strong>THAW &middot; muh &middot; trope</strong> 🔊 &nbsp; Say it three times. Now &mdash; what do you think it is?</p>
+
+<div class="col" id="q-thaum"><button class="opt" data-act="opt" data-g="thaum" data-c="0" data-fb="Good guess from the sound, but no — this one you hold and spin.">a kind of telescope</button><button class="opt" data-act="opt" data-g="thaum" data-c="1" data-fb="Correct! A thaumatrope is a spinning toy that creates an optical illusion.">a spinning toy that tricks your eyes</button><button class="opt" data-act="opt" data-g="thaum" data-c="0" data-fb="That would be a thermometer — and a thermal image, from the Mission lesson!">a machine that measures heat</button></div>
+<div class="fb" id="fb-thaum"></div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(220,38,38,.16)">
+  <div class="emo">🌀</div>
+  <div class="w" style="color:var(--u9d)">thaumatrope</div>
+  <div class="pos">noun</div>
+  <div class="def">a spinning toy that makes two pictures look like one</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;I made a thaumatrope with a fish and a fish tank.&rdquo;</div>
+  <div class="jpx">ソーマトロープ（回転(かいてん)する絵(え)のおもちゃ)</div>
+</div>
+</section>
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+<h3 class="sub">👁️ Trick the Eyes</h3>
+<p class="lead" style="margin-bottom:24px">An <strong>optical illusion</strong> is a trick on the eyes. Which one is an optical illusion?</p>
+<div class="card bl" style="margin-bottom:22px"><p class="lead">👁️ Your eyes are brilliant &mdash; but they can be fooled. That is not a fault. It is exactly what makes films and cartoons possible.</p></div>
+<div class="grid2" id="q-illusion"><button class="opt center" data-act="opt" data-g="illusion" data-c="0" data-fb="Nothing tricky there — the fish really is in the tank.">A photo of a real fish in a real tank.</button><button class="opt center" data-act="opt" data-g="illusion" data-c="1" data-fb="Yes! Your eyes tell you something that is not really there. That is an optical illusion.">Two separate pictures that LOOK like one when spun.</button></div>
+<div class="fb" id="fb-illusion"></div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(220,38,38,.16)">
+  <div class="emo">👁️</div>
+  <div class="w" style="color:var(--u9d)">optical illusion</div>
+  <div class="pos">noun phrase</div>
+  <div class="def">a trick on the eyes &mdash; you see something that is not really there</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;A thaumatrope creates an optical illusion.&rdquo;</div>
+  <div class="jpx">目(め)の錯覚(さっかく)</div>
+</div>
+</section>
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+<h3 class="sub">🔮 Predict First</h3>
+<p class="lead" style="margin-bottom:24px">Before you build anything, you <strong>predict</strong>. What is a prediction?</p>
+<div class="frame" style="margin-bottom:22px">⚠️ There are <strong>no right or wrong answers</strong> when you predict. Guessing wrong is not failing.</div>
+<div class="col" id="q-predict"><button class="opt" data-act="opt" data-g="predict" data-c="0" data-fb="No — and this matters. A prediction can be wrong and still be useful.">The right answer.</button><button class="opt" data-act="opt" data-g="predict" data-c="1" data-fb="Exactly. You guess before you know, then you find out if you were right.">Your best guess about what will happen.</button><button class="opt" data-act="opt" data-g="predict" data-c="0" data-fb="That is the result. A prediction comes BEFORE.">What happened after you finished.</button></div>
+<div class="fb" id="fb-predict"></div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(220,38,38,.16)">
+  <div class="emo">🔮</div>
+  <div class="w" style="color:var(--u9d)">predict</div>
+  <div class="pos">verb</div>
+  <div class="def">to say what you think will happen, before it happens</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;Can you predict how the thaumatrope works?&rdquo;</div>
+  <div class="jpx">予想(よそう)する</div>
+</div>
+</section>
+<section class="slide top" data-stage="Prepare" data-stagetone="warmup">
+<h2 class="hd">🔮 Prepare &mdash; look at the photos, don&rsquo;t read yet</h2>
+<div class="card acc" style="margin-bottom:26px"><p class="lead center" style="font-size:42px">Look at the six pictures on page 160.<br><strong>How do you think it works? How does it trick the eyes?</strong></p></div>
+<div class="row" style="gap:26px">
+ <div class="card bl" style="flex:1"><div class="card-lbl">Your job right now</div><p class="lead">Guess from the <strong>pictures only</strong>. Do not read the words yet.</p></div>
+ <div class="card gn" style="flex:1"><div class="card-lbl">Remember</div><p class="lead">No right or wrong answers. Just think about <strong class="hlgn">causes and effects</strong>.</p></div>
+</div>
+<div class="dad mt">💬 Write Leo&rsquo;s prediction on paper now. You will come back to it at the Share stage and check.</div>
+</section>
+<section class="slide top" data-stage="Prepare" data-stagetone="warmup">
+<h2 class="hd">📝 Three ideas &mdash; which do you think is right?</h2>
+<div class="card u9" style="margin-bottom:24px"><p class="lead center" style="font-size:40px"><strong>Why do you think this happens?</strong></p></div>
+<div class="grid3"><div class="tile" data-act="tap" data-a="&amp;ldquo;The images spin too fast.&amp;rdquo;"><div class="t-emo">⚡</div><div class="t-q">Idea 1</div></div><div class="tile" data-act="tap" data-a="&amp;ldquo;One image gets on top of the other.&amp;rdquo;"><div class="t-emo">📚</div><div class="t-q">Idea 2</div></div><div class="tile" data-act="tap" data-a="&amp;ldquo;The eyes can&amp;rsquo;t change images fast enough.&amp;rdquo;"><div class="t-emo">👁️</div><div class="t-q">Idea 3</div></div></div>
+<div class="dad mt">💬 These are three real answers other children gave. Which is closest? Do not say yet &mdash; build it first!</div>
+</section>
+<section class="slide top" data-stage="Prepare" data-stagetone="present">
+<h2 class="hd">🛠️ Build it &mdash; steps 1 and 2</h2>
+<div class="list"><div class="li"><div class="n">1</div><div>Cut out <strong>two circles</strong> of cardstock or cardboard. Make them the <strong class='hl'>same size</strong>.</div></div><div class="li"><div class="n bl">2</div><div>Draw an object, person, or animal in the <strong>middle of one circle</strong>.</div></div></div>
+<div class="row mt" style="gap:26px">
+ <div class="card acc" style="flex:1"><div class="card-lbl">💡 Draw around a cup or a roll of tape</div><p class="lead">Two circles the same size &mdash; if they do not match, it will wobble.</p></div>
+ <div class="card gn" style="flex:1"><div class="card-lbl">⚽ Leo&rsquo;s idea?</div><p class="lead">A soccer ball on circle one &hellip; and a goal on circle two? 🥅</p></div>
+</div>
+</section>
+<section class="slide top" data-stage="Prepare" data-stagetone="present">
+<h2 class="hd">🛠️ Steps 3 and 4 &mdash; the tricky one</h2>
+<div class="list"><div class="li"><div class="n bl">3</div><div>Draw a <strong>&ldquo;home&rdquo;</strong> for the object, person, or animal on the other circle.</div></div><div class="li"><div class="n">4</div><div>Stick or glue the two circles together. The picture on the back must be <strong class='hl'>upside down</strong>. 🙃</div></div></div>
+<div class="card u9 mt"><div class="card-lbl">⚠️ Step 4 is where thaumatropes go wrong</div>
+ <p class="lead">Flip the back circle over <strong>before</strong> you glue. If it is the right way up now, it will be upside down when it spins.</p></div>
+<div class="dad mt">💬 Check the flip together before any glue touches anything.</div>
+</section>
+<section class="slide top" data-stage="Prepare" data-stagetone="present">
+<h2 class="hd">🛠️ Steps 5 and 6 &mdash; the moment of truth</h2>
+<div class="list"><div class="li"><div class="n">5</div><div>Make <strong>holes on each side</strong>. Attach string or a rubber band. 🔗</div></div><div class="li"><div class="n gn">6</div><div><strong>Spin the circles fast</strong> and watch the two pictures turn into one! 🌀</div></div></div>
+<div class="card acc mt"><div class="card-lbl">🔮 Now &mdash; before you spin</div>
+ <p class="lead center" style="font-size:40px">Read your prediction out loud one more time.</p></div>
+<div class="dad mt">💬 Then twist the string tight and let go. 🎉</div>
+</section>
+<section class="slide top" data-stage="Be the Expert" data-stagetone="expert">
+<h2 class="hd">🤝 Be the Expert &mdash; Teaching Tip</h2>
+<div class="row" style="gap:30px">
+ <div class="card gn" style="flex:1"><div class="mid-emo center">🗣️</div><p class="lead mt center">Working side by side, you each make your own &mdash; but you <strong>help each other</strong>.</p></div>
+ <div class="card bl" style="flex:1.2"><div class="card-lbl">Ask for help in English</div>
+  <div class="chips" style="justify-content:flex-start">
+   <span class="chip">Can you help me, please?</span><span class="chip">Could you hold this?</span>
+   <span class="chip">Like this?</span><span class="chip">Here you are.</span><span class="chip">Thank you!</span></div></div>
+</div>
+<div class="dad mt">💬 LP: encourage English for asking and offering help &mdash; and polite language and gestures throughout.</div>
+</section>
+<section class="slide top" data-stage="Share" data-stagetone="practice">
+<h2 class="hd">🗣️ Share &mdash; now answer the question</h2>
+<div class="card u9" style="margin-bottom:24px"><p class="lead center" style="font-size:40px"><strong>Why do you think this happens?</strong></p></div>
+<h3 class="sub">Which idea was closest? Use unit words to explain.</h3>
+<div class="chips" style="margin-bottom:24px">
+ <span class="chip c">because</span><span class="chip e">so</span><span class="chip">cause</span><span class="chip">effect</span>
+ <span class="chip">spin</span><span class="chip">fast</span><span class="chip">the more&hellip; the more&hellip;</span></div>
+<div class="frame">💬 Try: &ldquo;<strong>The more</strong> I spin it, <strong>the more</strong> it looks like one picture, <strong>because</strong>&hellip;&rdquo;</div>
+</section>
+<section class="slide top" data-stage="Share" data-stagetone="apply">
+<h2 class="hd">👁️ The real answer</h2>
+<div class="card gn" style="margin-bottom:24px"><p class="lead" style="font-size:40px">Your eyes <strong>hold on to a picture</strong> for a split second after it has gone.</p></div>
+<div class="list"><div class="li"><div class="n bl">1</div><div>The fish disappears as the card turns&hellip;</div></div><div class="li"><div class="n bl">2</div><div>&hellip;but it is <strong>still in your eye</strong> for a moment.</div></div><div class="li"><div class="n gn">3</div><div>The tank appears while the fish is still there.</div></div><div class="li"><div class="n gn">4</div><div>So the two pictures seem to <strong class='hlgn'>combine</strong>. 🐠🪟</div></div></div>
+<div class="dad mt">💬 So which child was right? <em>&ldquo;The eyes can&rsquo;t change images fast enough.&rdquo;</em> &mdash; idea 3. 🎉</div>
+</section>
+<section class="slide top" data-stage="Be the Expert" data-stagetone="expert">
+<h2 class="hd">🎬 Why this little toy matters</h2>
+<div class="row" style="gap:26px">
+ <div class="card acc" style="flex:1"><div class="mid-emo center">🌀</div><p class="lead mt">A spinning card with two pictures.</p></div>
+ <div class="col center" style="flex:0 0 90px;justify-content:center"><div style="font-size:64px">➡️</div></div>
+ <div class="card bl" style="flex:1"><div class="mid-emo center">🎞️</div><p class="lead mt">A film is just pictures shown very fast &mdash; your eyes combine them into movement.</p></div>
+ <div class="col center" style="flex:0 0 90px;justify-content:center"><div style="font-size:64px">➡️</div></div>
+ <div class="card gn" style="flex:1"><div class="mid-emo center">🦇</div><p class="lead mt">Every film Leo loves works on the <strong>same trick</strong> as his cardboard circle.</p></div>
+</div>
+<div class="dad mt">💬 Ask: <em>If your eyes could change pictures faster, would films still work?</em> 🤔</div>
+</section>
+<section class="slide top" data-stage="Extend" data-stagetone="apply">
+<h2 class="hd">⚽ Now I Can &mdash; forces every day</h2>
+<div class="card u9" style="margin-bottom:22px"><p class="lead">LP asks: <strong>What actions do you do every day that use force?</strong></p></div>
+<div class="grid3"><div class="tile" data-act="tap" data-a="You PUSH the ball with your foot."><div class="t-emo">🦵</div><div class="t-q">Kicking a ball</div></div><div class="tile" data-act="tap" data-a="She PULLS the ball into her body."><div class="t-emo">🧤</div><div class="t-q">A goalkeeper saving</div></div><div class="tile" data-act="tap" data-a="You twist — then the string PULLS it back!"><div class="t-emo">🌀</div><div class="t-q">Spinning your thaumatrope</div></div></div>
+<div class="dad mt">💬 In 2025&ndash;26, Erling Haaland scored 27 Premier League goals and David Raya kept 19 clean sheets as Arsenal took the title. Every goal was a push; every save was a pull.</div>
+</section>
+<section class="slide top" data-stage="Review" data-stagetone="recap">
+<h2 class="hd">✅ Now I Can&hellip;</h2>
+<div class="grid3"><div class="tile" data-act="tap" data-a="push, pull, kick, throw, twist, spin"><div class="t-emo">💪</div><div class="t-q">Actions that use force?</div></div><div class="tile" data-act="tap" data-a="A bicycle is a machine which you ride using your legs."><div class="t-emo">🚲</div><div class="t-q">Define bicycle with <em>which</em>?</div></div><div class="tile" data-act="tap" data-a="gravity, friction, centripetal force"><div class="t-emo">🎢</div><div class="t-q">Forces on a roller coaster?</div></div></div>
+<div class="frame mt">🎯 These are the three Unit 9 questions from the Lesson Planner. If Leo can answer all three, the unit has landed.</div>
+</section>
+<section class="slide top" data-stage="Modify" data-stagetone="wrapup">
+<h2 class="hd">🔧 Modify &mdash; if it is not working</h2>
+<div class="row" style="gap:26px">
+ <div class="card acc" style="flex:1"><div class="card-lbl">Simpler version</div>
+  <p class="lead">Cut <strong>one</strong> circle only. Draw one picture on each <strong>side</strong>. Same effect, half the work.</p></div>
+ <div class="card bl" style="flex:1"><div class="card-lbl">If it will not spin</div>
+  <p class="lead">Rubber bands beat string. Twist them tight, then pull outwards on both sides.</p></div>
+ <div class="card gn" style="flex:1"><div class="card-lbl">If the pictures do not line up</div>
+  <p class="lead">Both drawings must be in the <strong>middle</strong>, and the back one <strong>upside down</strong>. 🙃</p></div>
+</div>
+</section>
+<section class="slide top" data-stage="Review" data-stagetone="recap">
+<h2 class="hd">📋 Project check</h2>
+<div class="list">
+ <div class="tick" data-act="tick"><div class="bx"></div><span>The thaumatrope was finished successfully.</span></div>
+ <div class="tick" data-act="tick"><div class="bx"></div><span>Leo supported his partner while building.</span></div>
+ <div class="tick" data-act="tick"><div class="bx"></div><span>Leo communicated in English.</span></div>
+ <div class="tick" data-act="tick"><div class="bx"></div><span>Leo used unit vocabulary to explain the project.</span></div>
+</div>
+<div class="hide mt" id="editDone"><div class="card gn"><p class="lead center">🎉 All four. Project complete!</p></div></div>
+</section>
+<section class="slide top" data-stage="Formative Assessment" data-stagetone="recap">
+<h2 class="hd">✔️ Assessment</h2>
+<div class="list"><div class="li"><div class="n">1</div><div><strong>Unit 9 Quiz</strong> &mdash; about 15&ndash;20 minutes.</div></div><div class="li"><div class="n bl">2</div><div><strong>Units 7&ndash;9 Mastery Test</strong> &mdash; about 20&ndash;30 minutes.</div></div><div class="li"><div class="n gn">3</div><div><strong>Units 1&ndash;9 Final Test</strong> &mdash; about 30&ndash;35 minutes.</div></div></div>
+<div class="card acc mt"><div class="card-lbl">Also</div><p class="lead">📓 Workbook pp. 116&ndash;117 &middot; Activity Worksheet 9.4 &middot; Online Practice</p></div>
+</section>
+<section class="slide center" data-stage="Wrap Up" data-stagetone="wrapup">
+<div class="col center">
+ <div class="big-emo">🌀🎉</div>
+ <h2 class="hd">You built it &mdash; and you explained it!</h2>
+ <p class="lead">You predicted first. Then you found out why. That is the whole Mission, in a piece of cardboard.</p>
+ <div class="chips mt"><span class="chip">🌀 thaumatrope</span><span class="chip">👁️ optical illusion</span><span class="chip">🔮 predict</span><span class="chip">🔎 research</span><span class="chip">🔀 combine</span></div>
+ <div class="frame mt" style="max-width:1100px">📺 Show it to someone tonight. Ask <strong>them</strong> to predict &mdash; then explain it, in English.</div>
+ <div class="done-row mt">
+  <button class="opt center" id="doneBtn" data-act="done">✅ Mark this lesson done</button>
+  <button class="opt center" id="redoBtn" data-act="redo">↺ Redo</button>
+ </div>
+ <p class="lead" id="doneMsg" style="margin-top:18px"></p>
+</div>
+</section>
+
+<div id="prog"><div id="progFill"></div></div>
+<button class="tn-btn" data-act="notes" title="Teacher notes (N)">📋</button>
+<button class="tn-btn fs-btn" data-act="full" title="Fullscreen (F)">⛶</button>
+<div class="tn-panel" id="tnPanel"></div>
+<div id="nav">
+  <button class="nb" data-act="nav" data-dir="-1">‹</button>
+  <div id="counter">1 / 35</div>
+  <button class="nb" data-act="nav" data-dir="1">›</button>
+</div>
+</div></div>
+<script>
+(function(){
+"use strict";
+
+/* ═══════ LEEA SAVE STANDARD ═══════ */
+var SAVE_PREFIX = '4-9-project-slides-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-9-project-slides';
+/* Must match the `id` in lessons/project.teacher.json — the teacher dashboard
+   reads leea.lessonProgress.v1 keyed by that lesson id. */
+var LESSON_ID = 'ow-l4-u9-project';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+
+function lSave(key, val){
+  try{ localStorage.setItem('leea-' + key, JSON.stringify(val)); }catch(e){}
+  try{
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && LEEA_CLOUD.enabled){
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val);
+    }
+  }catch(e){}
+}
+function lLoad(key, fb){
+  try{ var v = localStorage.getItem('leea-' + key); return v !== null ? JSON.parse(v) : fb; }
+  catch(e){ return fb; }
+}
+function lRemove(key){
+  try{ localStorage.removeItem('leea-' + key); }catch(e){}
+}
+
+/* ═══════ MARK DONE ═══════ */
+function writeLessonProgress(){
+  try{
+    var store = {};
+    var raw = localStorage.getItem(PROGRESS_KEY);
+    if(raw){ store = JSON.parse(raw) || {}; }
+    var now = new Date().toISOString();
+    store[LESSON_ID] = {
+      lessonId: LESSON_ID,
+      teacherId: 'neritan',
+      studentId: 'leo',
+      status: 'done',
+      completedAt: now,
+      updatedAt: now
+    };
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+  }catch(e){ console.warn('writeLessonProgress', e); }
+}
+function clearLessonProgress(){
+  try{
+    var raw = localStorage.getItem(PROGRESS_KEY);
+    if(!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+  }catch(e){ console.warn('clearLessonProgress', e); }
+}
+function paintDone(saved){
+  var btn = document.getElementById('doneBtn');
+  if(!btn) return;
+  if(saved){ btn.classList.add('confirmed'); btn.style.pointerEvents = 'none'; btn.textContent = '✅ Saved!'; }
+  else { btn.classList.remove('confirmed'); btn.style.pointerEvents = 'auto'; btn.textContent = '✅ Mark this lesson done'; }
+}
+function markDone(){
+  try{
+    writeLessonProgress();
+    lSave(SAVE_PREFIX + 'done', true);
+    paintDone(true);
+    var msg = document.getElementById('doneMsg');
+    if(msg) msg.textContent = 'Saved. Great building today, Leo. 🌀';
+  }catch(e){ console.warn('markDone', e); }
+}
+/* Two-tap so a stray tap on the last slide can't wipe the lesson record. */
+var redoArmed = false, redoTimer = null;
+function handleRedo(){
+  try{
+    var btn = document.getElementById('redoBtn');
+    var msg = document.getElementById('doneMsg');
+    if(!redoArmed){
+      redoArmed = true;
+      if(btn) btn.textContent = '↺ Tap again to clear';
+      if(msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+      if(redoTimer) clearTimeout(redoTimer);
+      redoTimer = setTimeout(function(){
+        redoArmed = false;
+        if(btn) btn.textContent = '↺ Redo';
+        if(msg) msg.textContent = '';
+      }, 4000);
+      return;
+    }
+    redoArmed = false;
+    if(redoTimer) clearTimeout(redoTimer);
+    clearLessonProgress();
+    lRemove(SAVE_PREFIX + 'done');
+    paintDone(false);
+    if(btn) btn.textContent = '↺ Redo';
+    if(msg) msg.textContent = 'Cleared. Ready to build again.';
+  }catch(e){ console.warn('handleRedo', e); }
+}
+
+/* ═══════ <deck-stage> WEB COMPONENT ═══════ */
+class DeckStage extends HTMLElement{
+  connectedCallback(){
+    try{
+      var stage = this.getAttribute('stage') || '';
+      var tone  = this.getAttribute('tone')  || 'wrapup';
+      var sub   = this.getAttribute('sub')   || '';
+      this.innerHTML = '<span class="sb ' + tone + '">' + stage + '</span>' +
+                       (sub ? '<span class="sb-sub">' + sub + '</span>' : '');
+    }catch(e){ console.warn('deck-stage', e); }
+  }
+}
+try{ customElements.define('deck-stage', DeckStage); }catch(e){}
+
+/* ═══════ TEACHER NOTES (per slide) ═══════ */
+var NOTES = {
+0:{h:'Open the Project',b:'<p>Say the word slowly and let Leo try it: <strong>THAW-muh-trope</strong>.</p><p><span class=\'say\'>Ask</span> <em>Do you know what that is?</em> Wait for an answer before explaining anything — the not-knowing is the hook.</p>'},
+1:{h:'Set the objectives',b:'<p>LP objectives verbatim: make a thaumatrope · provide support in a small group · share ideas with a group · complete the Unit 9 quiz.</p><p>Objective 2 is normally group work. At home, you and Leo are the group — you build one each and help each other.</p>'},
+2:{h:'Materials',b:'<p>LP materials list, verbatim, plus a hole-punch which step 5 needs.</p><p>Do this check <strong>before</strong> starting. The build loses all its momentum if you break off to hunt for glue.</p>'},
+3:{h:'Related Vocabulary',b:'<p>Chosen because each one is load-bearing: <em>upside down</em> is step 4, <em>attach</em> is step 5, and <em>combine</em> is the answer to the whole puzzle.</p>'},
+4:{h:'upside down &mdash; Flip Test',b:'<p>This is the single step most likely to go wrong, and you only find out at the very end.</p><p>Demonstrate with a real card before Leo draws anything: hold it up, flip it left-to-right, and show what happens to the back image.</p>'},
+5:{h:'upside down &mdash; word card',b:'<p>Straight from step 4. Read the step aloud again now that he has the word.</p>'},
+6:{h:'attach &mdash; Attach It',b:'<p>One hole on each side, string or a rubber band through each. This is what he will hold and twist.</p><p>Rubber bands are easier for small hands and spin back faster than string.</p>'},
+7:{h:'attach &mdash; word card',b:'<p>Note the link back to Vocabulary 1: <em>connect</em>. Attach and connect are close cousins.</p>'},
+8:{h:'combine &mdash; Two Into One',b:'<p>Tap the three tiles left to right — that sequence is the whole project in miniature.</p><p>The wrong answer here is interesting, not stupid: the pictures really do alternate. Say so. The eyes are what combine them.</p>'},
+9:{h:'combine &mdash; word card',b:'<p>This word is the LP&rsquo;s own wording in the explanation. Leo will hear it again at the Share stage.</p>'},
+10:{h:'Academic Language',b:'<p>LP Academic Language line for Project: <strong>research</strong>. One word, so one game — no padding.</p>'},
+11:{h:'research &mdash; Is That Research?',b:'<p>Tie it back one slide: a guess is a prediction, and checking the guess is research. The project needs both.</p>'},
+12:{h:'research &mdash; word card',b:'<p>After the project, if Leo is still curious, do five minutes of real research together on persistence of vision. That closes the loop.</p>'},
+13:{h:'Content Vocabulary',b:'<p>All three come from the LP Prepare script. Full games each — these are brand new for Leo.</p>'},
+14:{h:'thaumatrope &mdash; Say It, Then Guess It',b:'<p>LP: <span class=\'say\'>Say</span> <em>A thaumatrope is a spinning toy that creates an optical illusion.</em></p><p>Let Leo mangle the pronunciation happily. Long strange words are fun at this age — do not over-correct.</p>'},
+15:{h:'thaumatrope &mdash; word card',b:'<p>The word is Greek: roughly &lsquo;wonder-turner&rsquo;. Worth mentioning — it makes the name feel earned.</p>'},
+16:{h:'optical illusion &mdash; Trick the Eyes',b:'<p>LP: <span class=\'say\'>Say</span> <em>An optical illusion is a trick on the eyes.</em></p><p>Frame it positively — the eye is not broken, it is doing something clever that can be exploited.</p>'},
+17:{h:'optical illusion &mdash; word card',b:'<p>If Leo enjoys this, there are plenty more optical illusions to try later. Good rainy-day follow-up.</p>'},
+18:{h:'predict &mdash; Predict First',b:'<p>LP is explicit: <em>There are no right or wrong answers at this point.</em> Say that to Leo out loud before he guesses.</p><p>This is also the Unit 9 Reader strategy — Make Predictions. Same skill, different lesson.</p>'},
+19:{h:'predict &mdash; word card',b:'<p>Keep this card in mind — the Book Reading lesson leans on the same word.</p>'},
+20:{h:'Prepare &mdash; predict from the pictures',b:'<p>LP: <span class=\'say\'>Say</span> <em>Look at the photos of the steps on page 160. Who can predict how the thaumatrope works? How does it trick the eyes?</em></p><p><strong>Write the prediction down.</strong> Unwritten predictions get quietly revised later — and then the reveal loses all its power.</p>'},
+21:{h:'Prepare &mdash; the board question',b:'<p>These three ideas are printed in the LP as typical student responses. Write the question on paper and keep it visible through the whole build.</p><p>Idea 3 is closest to the truth, but <strong>do not confirm it now.</strong> The reveal belongs at the Share stage, after he has spun the thing.</p>'},
+22:{h:'Steps 1 and 2',b:'<p>Read each step aloud and pause. LP: pause after each one to explain unknown or difficult vocabulary.</p><p>Keep the drawing small and central — near the edge it blurs instead of combining.</p>'},
+23:{h:'Steps 3 and 4',b:'<p>The &lsquo;home&rsquo; is the second half of the pair: fish &rarr; tank, ball &rarr; goal, bird &rarr; cage.</p><p>Physically rehearse the flip with both circles held up to the light before gluing. This one step decides whether the project works.</p>'},
+24:{h:'Steps 5 and 6',b:'<p>Holes go directly opposite each other or it will not spin evenly. Do the holes yourself if the card is thick.</p><p>Have him re-read his written prediction <strong>immediately before</strong> the first spin. That is the whole emotional payoff of the lesson.</p>'},
+25:{h:'Be the Expert &mdash; Teaching Tip',b:'<p>LP Teaching Tip: students work individually but support one another, using English to ask for and give help, politely.</p><p>At home this is the easiest place for both of you to slip into Japanese. Pin the phrase chips up where he can see them.</p>'},
+26:{h:'Share &mdash; explain it',b:'<p>LP: have students use unit vocabulary — <em>cause, effect, spin, fast, the more, because</em>.</p><p>That sentence frame recycles Grammar 1 (double comparatives) and the Writing connectives at the same time. Push him to complete it aloud.</p>'},
+27:{h:'Share &mdash; the explanation',b:'<p>LP wording: our eyes hold an image for a split second after it is gone, so the images seem to combine.</p><p>Go back to Leo&rsquo;s written prediction now and compare. If he was wrong, celebrate it properly — a wrong prediction that gets tested is exactly what science is.</p>'},
+28:{h:'Our World in Context',b:'<p>The LP does not print an Our World in Context box for this Project — this slide is built from the LP&rsquo;s own explanation of persistence of vision, extended to film. Flagging that so it is not mistaken for book content.</p><p>The closing question is genuinely hard and has a real answer: no, they would not. Let him sit with it.</p>'},
+29:{h:'Extend &mdash; Now I Can (forces)',b:'<p>First of the three LP &lsquo;Now I Can&rsquo; questions, answered through soccer and through the toy he just built.</p><p>Stats are 2025&ndash;26. The third tile matters most — his own project is a force machine.</p>'},
+30:{h:'Now I Can',b:'<p>The three LP questions, verbatim. Question 2 checks Grammar 2 (defining relative clauses with <em>which</em>); question 3 checks the Reading.</p><p>Any wobble here tells you which component to revisit before the quiz.</p>'},
+31:{h:'Modify',b:'<p>LP Modify: to simplify, cut only one circle and draw one image on each side.</p><p>The other two cards are the two real-world failures. Fix and re-spin rather than restart — the point is that it works, not that it was hard.</p>'},
+32:{h:'Project Rubric',b:'<p>The LP&rsquo;s own four-point rubric, verbatim. Tick with Leo watching, and say why each one passes.</p><p>Item 4 is the language one — if he explained it only in Japanese, tick nothing and try the sentence frame again.</p>'},
+33:{h:'Assessment',b:'<p>All three assessments and their timings come straight from the LP.</p><p>Unit 9 is the last unit of the level — so the Units 1&ndash;9 Final Test is in play too. Space them out; do not run all three in one sitting.</p>'},
+34:{h:'Wrap Up',b:'<p>Explaining it to a third person is the strongest possible consolidation — he has to hold the whole causal chain to do it.</p><p>Next up is the Unit 9 Reader: <em>The Tug-of-War</em>, where the strategy is Make Predictions all over again.</p>'}
+};
+
+/* ═══════ DECK STATE ═══════ */
+var deck    = document.getElementById('deck');
+var slides  = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+var total   = slides.length;
+var idx     = 0;
+var notesOpen = false;
+
+/* Inject stage badges from data-stage / data-stagetone */
+try{
+  slides.forEach(function(s, i){
+    var st = s.getAttribute('data-stage');
+    if(!st) return;
+    var el = document.createElement('deck-stage');
+    el.setAttribute('stage', st);
+    el.setAttribute('tone', s.getAttribute('data-stagetone') || 'wrapup');
+    el.setAttribute('sub', (i + 1) + ' of ' + total);
+    s.insertBefore(el, s.firstChild);
+  });
+}catch(e){ console.warn('badge inject', e); }
+
+function render(){
+  try{
+    slides.forEach(function(s, i){ s.classList.toggle('on', i === idx); });
+    var c = document.getElementById('counter');
+    if(c) c.textContent = (idx + 1) + ' / ' + total;
+    var pf = document.getElementById('progFill');
+    if(pf) pf.style.width = ((idx + 1) / total * 100) + '%';
+    paintNotes();
+    lSave(SAVE_PREFIX + 'slide', idx);
+  }catch(e){ console.warn('render', e); }
+}
+
+function paintNotes(){
+  try{
+    var p = document.getElementById('tnPanel');
+    if(!p) return;
+    var n = NOTES[idx];
+    p.innerHTML = n ? ('<h4>' + n.h + '</h4>' + n.b)
+                    : '<h4>Teacher notes</h4><p>No notes for this slide.</p>';
+  }catch(e){ console.warn('paintNotes', e); }
+}
+
+function go(d){
+  var n = idx + d;
+  if(n < 0 || n >= total) return;
+  idx = n;
+  render();
+}
+
+/* ═══════ SCALING ═══════ */
+function fit(){
+  try{
+    var vw = window.innerWidth  || document.documentElement.clientWidth;
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var s  = Math.min(vw / 1920, vh / 1080);
+    var ox = Math.max(0, (vw - 1920 * s) / 2);
+    var oy = Math.max(0, (vh - 1080 * s) / 2);
+    deck.style.transform = 'translate(' + ox + 'px,' + oy + 'px) scale(' + s + ')';
+  }catch(e){ console.warn('fit', e); }
+}
+window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', function(){ setTimeout(fit, 120); });
+if(window.visualViewport){ window.visualViewport.addEventListener('resize', fit); }
+
+/* ═══════ SINGLE DELEGATED CLICK HANDLER ═══════ */
+document.addEventListener('click', function(ev){
+  try{
+    var t = ev.target.closest('[data-act]');
+    if(!t) return;
+    var act = t.getAttribute('data-act');
+
+    if(act === 'nav'){ go(parseInt(t.getAttribute('data-dir'), 10)); return; }
+    if(act === 'done'){ markDone(); return; }
+    if(act === 'redo'){ handleRedo(); return; }
+
+    if(act === 'notes'){
+      notesOpen = !notesOpen;
+      var p = document.getElementById('tnPanel');
+      if(p) p.classList.toggle('open', notesOpen);
+      t.classList.toggle('act', notesOpen);
+      return;
+    }
+
+    if(act === 'full'){ toggleFull(); return; }
+
+    if(act === 'tap'){
+      if(t.classList.contains('open')) return;
+      t.classList.add('open', 'reveal');
+      var ans = t.getAttribute('data-a') || '';
+      if(t.classList.contains('ce-cell')){
+        t.classList.remove('blank');
+        t.classList.add('fill');
+        t.textContent = ans;
+      } else {
+        var q = t.querySelector('.t-q');
+        var out = document.createElement('div');
+        out.className = 't-a';
+        out.innerHTML = ans;
+        if(q && q.parentNode === t) t.appendChild(out); else t.appendChild(out);
+      }
+      var ck = t.getAttribute('data-count');
+      if(ck) checkGroupDone(ck);
+      return;
+    }
+
+    if(act === 'count'){
+      var key = t.getAttribute('data-key');
+      var max = parseInt(t.getAttribute('data-max'), 10) || 3;
+      var cur = (parseInt(t.getAttribute('data-n'), 10) || 0) + 1;
+      if(cur > max) return;
+      t.setAttribute('data-n', cur);
+      var out2 = document.getElementById(key + 'Out');
+      if(out2) out2.textContent = cur;
+      var emo = document.getElementById(key + 'Emo');
+      if(emo){ emo.classList.remove('reveal'); void emo.offsetWidth; emo.classList.add('reveal'); }
+      if(cur >= max) t.classList.add('open');
+      return;
+    }
+
+    if(act === 'opt'){
+      var g = t.getAttribute('data-g');
+      var box = document.getElementById('q-' + g);
+      if(!box || box.getAttribute('data-locked') === '1') return;
+      box.setAttribute('data-locked', '1');
+      var ok = t.getAttribute('data-c') === '1';
+      Array.prototype.forEach.call(box.querySelectorAll('.opt'), function(o){
+        o.classList.add('locked');
+        if(o.getAttribute('data-c') === '1') o.classList.add('ok');
+      });
+      if(!ok) t.classList.add('bad');
+      var fb = document.getElementById('fb-' + g);
+      if(fb){
+        fb.className = 'fb show ' + (ok ? 'ok' : 'bad');
+        fb.innerHTML = (ok ? '✅ ' : '💡 ') + (t.getAttribute('data-fb') || '');
+      }
+      lSave(SAVE_PREFIX + 'q-' + g, { correct: ok, ts: new Date().toISOString() });
+      return;
+    }
+
+    if(act === 'tick'){
+      t.classList.toggle('on');
+      var bx = t.querySelector('.bx');
+      if(bx) bx.textContent = t.classList.contains('on') ? '✓' : '';
+      var all = Array.prototype.slice.call(document.querySelectorAll('[data-act="tick"]'));
+      var done = all.filter(function(x){ return x.classList.contains('on'); }).length;
+      var ed = document.getElementById('editDone');
+      if(ed) ed.classList.toggle('hide', done !== all.length);
+      lSave(SAVE_PREFIX + 'edit-checklist', done);
+      return;
+    }
+  }catch(e){ console.warn('click handler', e); }
+});
+
+function checkGroupDone(key){
+  try{
+    var all = Array.prototype.slice.call(document.querySelectorAll('[data-count="' + key + '"]'));
+    if(!all.length) return;
+    var open = all.filter(function(x){ return x.classList.contains('open'); }).length;
+    if(open === all.length){
+      var r = document.getElementById(key + 'Reveal');
+      if(r){ r.classList.remove('hide'); r.classList.add('reveal'); }
+    }
+  }catch(e){ console.warn('checkGroupDone', e); }
+}
+
+function toggleFull(){
+  try{
+    var el = document.documentElement;
+    if(!document.fullscreenElement){
+      if(el.requestFullscreen) el.requestFullscreen();
+      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } else {
+      if(document.exitFullscreen) document.exitFullscreen();
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+    setTimeout(fit, 150);
+  }catch(e){ console.warn('toggleFull', e); }
+}
+document.addEventListener('fullscreenchange', function(){ setTimeout(fit, 120); });
+
+/* ═══════ KEYBOARD ═══════ */
+document.addEventListener('keydown', function(e){
+  try{
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); go(1); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+    else if(e.key === 'f' || e.key === 'F'){ toggleFull(); }
+    else if(e.key === 'n' || e.key === 'N'){
+      var b = document.querySelector('[data-act="notes"]');
+      if(b) b.click();
+    }
+  }catch(err){ console.warn('key', err); }
+});
+
+/* ═══════ INIT ═══════ */
+function restore(){ paintDone(lLoad(SAVE_PREFIX + 'done', false) === true); }
+document.addEventListener('DOMContentLoaded', function(){ fit(); render(); restore(); });
+fit();
+render();
+restore();
+
+})();
+</script>
+</body>
+</html>

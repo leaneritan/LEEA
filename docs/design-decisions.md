@@ -468,7 +468,23 @@ Build priority: grammar-1 → grammar-2 → reading → writing.
 | opener | `public/lessons/ow-l4-u9-opener.html` | `public/learn/ow-l4-u9-opener.html` | `assigned` (auto-seeds) |
 | vocab-1 | `public/lessons/ow-l4-u9-vocab-1.html` | `public/learn/ow-l4-u9-vocab-1.html` | `live` |
 | song | `public/lessons/ow-l4-u9-song.html` | `public/learn/ow-l4-u9-song.html` | `draft` |
-| grammar-1 | `public/lessons/ow-l4-u9-grammar-1.html` | not yet built | teacher-only |
+| grammar-1 | `public/lessons/ow-l4-u9-grammar-1.html` | `public/learn/ow-l4-u9-grammar-1.html` | built |
+| vocab-2 | `public/lessons/ow-l4-u9-vocab-2.html` | `public/learn/ow-l4-u9-vocab-2.html` | built |
+| grammar-2 | `public/lessons/ow-l4-u9-grammar-2.html` | `public/learn/ow-l4-u9-grammar-2.html` | built |
+| reading | `public/lessons/ow-l4-u9-reading.html` | `public/learn/ow-l4-u9-reading.html` | built |
+| writing | `public/lessons/ow-l4-u9-writing.html` | `public/learn/ow-l4-u9-writing.html` | built |
+| mission | `public/lessons/ow-l4-u9-mission.html` | not yet built | teacher-only |
+| project | `public/lessons/ow-l4-u9-project.html` | not yet built | teacher-only |
+| book-reading | `public/lessons/ow-l4-u9-book-reading.html` | not yet built | teacher-only |
+
+### Units 7-9 checkpoint band
+
+| Component | Teacher lesson | Leo app | Leo status |
+|---|---|---|---|
+| review | `public/lessons/ow-l4-r7-9-review.html` | not yet built | teacher-only |
+| extra-reading | `public/lessons/ow-l4-er7-9-extra-reading.html` | not yet built | teacher-only |
+
+Their lesson records live in `content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/`, not in `unit-9/lessons/`, because a checkpoint belongs to the band rather than to the last unit of the band. They still carry `unit: 9` so the teacher menu can show them under Unit 9 — the roster filters them out with `isCheckpointComponent()` and renders them in the "Checkpoint after Units 7–9" band instead, and the Our World course map counts them on the checkpoint rows rather than in the unit's component count.
 
 Song vocabulary (push, pull, spin, a force, down, gravity) was already scanned into `content/subjects/english/courses/our-world/level-4/unit-9/vocabulary.json` as part of Vocabulary 1/2, so no new vocabulary entries were needed to build the song lesson pair.
 

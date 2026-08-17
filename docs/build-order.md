@@ -74,7 +74,7 @@ Each step becomes its own skill so a unit can be built one chunk at a time. Most
 /grammar-app           steps 12,14 BUILT (.claude/commands/grammar-app.md; handles grammar-1 and grammar-2)
 /reading-app           step 15     BUILT (.claude/commands/reading-app.md; teacher slideshow + Leo app with SB/WB landing-screen mode pattern)
 /writing-app           step 16     BUILT (.claude/commands/writing-app.md; teacher slideshow + 13-module Leo app, see docs/components.md)
-/review-app            checkpoint  planned (Level 4 band 7-9 teacher deck is hand-built; Leo review app still to build)
+/review-app            checkpoint  pattern locked by Level 4 band 7-9 (teacher deck + 8-module Leo app); skill itself still to write
 /extra-reading-app     checkpoint  planned (Level 4 band 7-9 teacher deck is hand-built; Leo extra-reading app still to build)
 ```
 

@@ -483,7 +483,7 @@ The Unit 9 Project app keeps the locked 8-module project skeleton but fits it to
 
 | Component | Teacher lesson | Leo app | Leo status |
 |---|---|---|---|
-| review | `public/lessons/ow-l4-r7-9-review.html` | not yet built | teacher-only |
+| review | `public/lessons/ow-l4-r7-9-review.html` | `public/learn/ow-l4-r7-9-review.html` | `live` (8-module) |
 | extra-reading | `public/lessons/ow-l4-er7-9-extra-reading.html` | not yet built | teacher-only |
 
 Their lesson records live in `content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/`, not in `unit-9/lessons/`, because a checkpoint belongs to the band rather than to the last unit of the band. They still carry `unit: 9` so the teacher menu can show them under Unit 9 — the roster filters them out with `isCheckpointComponent()` and renders them in the "Checkpoint after Units 7–9" band instead, and the Our World course map counts them on the checkpoint rows rather than in the unit's component count.

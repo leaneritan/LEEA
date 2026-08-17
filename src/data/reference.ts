@@ -465,6 +465,28 @@ export const unit8GlossaryItems = vocabularyItems.filter(
     item.sources.some((source) => source.course === "our-world" && source.level === 4 && source.unit === 8)
 );
 
+/* Section membership on the Unit 9 reference page comes from the unit's own ID
+   lists, not from the merged card type. A word can be taught in one role here
+   and a different one in another level (e.g. `connect` is Vocabulary 1 in this
+   unit but an academic card in Level 3, and the merge keeps the academic type),
+   so filtering by type alone silently moves words between sections. */
+function unit9ItemsFor(ids: string[]): VocabularyItem[] {
+  const byId = new Map(vocabularyItems.map((item) => [item.id, item]));
+  const seen = new Set<string>();
+  return ids
+    .filter((id) => !seen.has(id) && (seen.add(id), true))
+    .map((id) => byId.get(id))
+    .filter((item): item is VocabularyItem => Boolean(item));
+}
+
+export const unit9Vocab1Cards = unit9ItemsFor(unit9Vocabulary.vocab1WordIds);
+export const unit9Vocab2Cards = unit9ItemsFor(unit9Vocabulary.vocab2WordIds);
+export const unit9AcademicCards = unit9ItemsFor(unit9Vocabulary.academicWordIds);
+export const unit9GlossaryCards = unit9ItemsFor([
+  ...unit9Vocabulary.contentWordIds,
+  ...unit9Vocabulary.relatedWordIds
+]);
+
 export const unit9Vocab1Items = vocabularyItems.filter(
   (item) => item.type === "vocabulary" && item.sources.some((source) => source.tag === "OW4-U9-V1")
 );

@@ -251,6 +251,9 @@ When a unit adds word-like reference objects, the data change is not complete un
 - `content/subjects/english/reference/vocabulary-index.json` includes the IDs
 - `src/data/reference.ts` exposes any needed source-tree filters
 - the Reference source tree lists the cards under real sections, not placeholder links
+- the unit's own Reference page shows them
+
+That last point used to mean hand-copying every word into `UnitReference<N>.tsx`, which drifted — Unit 9's page was missing six words and showed counts that no longer matched. Unit 9 now derives its four word sections from the unit JSON through `unit9Vocab1Cards` / `unit9Vocab2Cards` / `unit9AcademicCards` / `unit9GlossaryCards` in `src/data/reference.ts`, with the section headings, jump-bar counts and hero stats all computed from those lists. Section membership follows the unit's **own ID lists** (`vocab1WordIds`, `academicWordIds`, …), not the merged card type: a word can be Vocabulary 1 here and an academic card in another level, and the cross-unit merge keeps the academic type. Filtering by type alone silently moves words between sections. Do the same when adding words to any other unit page.
 
 Grammar includes all grammar-point reference objects.
 

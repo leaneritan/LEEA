@@ -231,6 +231,21 @@ Source JSON shape — `content/subjects/english/courses/our-world/level-4/unit-8
 
 Every module — including the ones whose completion is fully automatic (quiz pass, word count, filled-field thresholds) — has a visible footer: a "Mark [Module] complete ✓" button disabled until that module's own criteria are met, and a two-tap-armed "↺ Redo" that clears that module's saved keys and resets its DOM. m13 additionally restores its saved result (pass/fail screen) on modal reopen instead of restarting the quiz, per rule 3. When rebuilding this app for a future unit's writing lesson, copy the module list and the footer pattern exactly — data and content vocabulary/theme swap only.
 
+### book-reading (LOCKED — Unit 8 + Unit 9 Book Reading)
+
+6-module modal home grid over the component's own phases. Built examples: `public/learn/ow-l4-u8-book-reading.html` and `public/learn/ow-l4-u9-book-reading.html` (the Unit 9 build follows the current shell and the four universal app rules; Unit 8's predates them).
+
+| # | Module | What Leo does | Completion |
+|---|---|---|---|
+| m1 | 🎓 Academic Language | Flashcards + quiz, led by the reader's own strategy word (`predict` for Unit 9) | Quiz pass (70%) |
+| m2 | 🌟 Story Words | Flashcards + quiz over the reader's glossary page, 2 questions per word | Quiz pass (75%) |
+| m3 | 🔮 Before You Read | What a prediction is and where the clues are, as gated MCQs — then the cover prediction | Manual Mark Complete |
+| m4 | 📖 While You Read | One row per LP stop. **The "what actually happened" reveal stays disabled until Leo has written his prediction**, then he marks it correct or not | Manual Mark Complete |
+| m5 | ✅ After You Read | The filled chart (read from m3 + m4), who-tricked-whom, event ordering, then the unit grammar found inside the story | Manual Mark Complete |
+| m6 | ⚽ Can Leo Score? | 8Q mixed final quiz | Score ≥6/8 |
+
+The gate in m4 is the point of the component: a prediction Leo can peek at first is not a prediction. m5 reads m3/m4 storage so the chart is filled in from his own words rather than retyped.
+
 ### mission (LOCKED — Unit 8 + Unit 9 Mission)
 
 6-module modal home grid, mission-green hero. Module list and storage contract live in `.claude/commands/mission-app.md`; built examples are `public/learn/ow-l4-u8-mission.html` and `public/learn/ow-l4-u9-mission.html`.

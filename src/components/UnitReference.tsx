@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { allGrammar } from "@/components/reference/ref-data";
 
 /* ============================================================
    Unit Reference page — Our World · Level 4 · Unit 8
@@ -149,18 +150,25 @@ const unitSections: Section[] = [
   }
 ];
 
-/* Source: content/subjects/english/courses/our-world/level-4/unit-8/grammar.json */
-const unitGrammar = [
-  { n: "1", title: "Describing people with who", code: "OW4-U8-G1", sample: "The boy who gave me this controller lives across the street.", href: "/reference/grammar/ow_l4_u8_g1_who_clauses" },
-  { n: "2", title: "Direct and indirect objects", code: "OW4-U8-G2", sample: "Sara gave me the pencil.", href: "/reference/grammar/ow_l4_u8_g2_direct_indirect_objects" }
-];
+/* Derived from content/subjects/english/courses/our-world/level-4/unit-8/grammar.json
+   so this list can't drift from the real grammar data. */
+const unitGrammarEntries = allGrammar
+  .filter((g) => g.course === "our-world" && g.level === 4 && g.unit === 8)
+  .sort((a, b) => a.tag.localeCompare(b.tag));
+const unitGrammar = unitGrammarEntries.map((g, idx) => ({
+  n: String(idx + 1),
+  title: g.title,
+  code: g.tag,
+  sample: g.chartAndSamples.samples[0]?.en ?? "",
+  href: `/reference/grammar/${g.grammarId}`
+}));
 
 const jumps = [
   { label: "Vocabulary 1", count: 14, dot: "var(--good)", href: "#vocab1" },
   { label: "Vocabulary 2", count: 5, dot: "#2f9c8e", href: "#vocab2" },
   { label: "Academic", count: 10, dot: "var(--amber)", href: "#academic" },
   { label: "Glossary", count: 21, dot: "var(--muted-2)", href: "#glossary" },
-  { label: "Grammar", count: 2, dot: "var(--accent)", href: "#grammar" }
+  { label: "Grammar", count: unitGrammar.length, dot: "var(--accent)", href: "#grammar" }
 ];
 
 function dotStyle(state: WordState) {
@@ -257,7 +265,7 @@ export default function UnitReference() {
                 <div className="unit-section-sub">Each opens its grammar card</div>
               </div>
             </div>
-            <span className="unit-section-count">2 points</span>
+            <span className="unit-section-count">{unitGrammar.length} point{unitGrammar.length === 1 ? "" : "s"}</span>
           </div>
           <div className="unit-word-list">
             {unitGrammar.map((g) => (

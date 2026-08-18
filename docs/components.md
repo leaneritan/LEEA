@@ -290,7 +290,24 @@ Checkpoint review apps appear after three-unit bands (`1-3`, `4-6`, `7-9`). They
 
 The Units 7-9 teacher deck is built: `public/lessons/ow-l4-r7-9-review.html` (28 slides — unit sweeps for inventions/hobbies/forces, the band's four grammar points, SB Activities 1-6, self-check, Recap, Formative Assessment), registered from `content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/review.teacher.json`. The Leo app is still to build.
 
-### extra-reading (TO LOCK)
+### extra-reading (LOCKED — Level 4 band 7-9)
+
+8-module modal home grid, reading amber-brown. Built example: `public/learn/ow-l4-er7-9-extra-reading.html`. It shares the Review app's flashcard/quiz engine (`DECKS` keyed by module number).
+
+| # | Module | What Leo does | Completion |
+|---|---|---|---|
+| m1 | 🎓 Academic Language | Flashcards + quiz on the page's academic words | Quiz pass (70%) |
+| m2 | 🌟 Reading Words | Flashcards + quiz on the words from the text, 2 per word | Quiz pass (75%) |
+| m3 | 🕊️ Read Together | Order the key scene, then comprehension questions, then tap-to-reveal on the sub-topic set | Manual Mark Complete |
+| m4 | 🔎 Text Features | Match the four feature types to what they do, find them on the real page, then the biography elements + five facts | Manual Mark Complete |
+| m5 | 📅 The Timeline | Tap the dated events into chronological order — the year stays hidden until placed — then answer questions off the finished timeline | All timeline questions right |
+| m6 | ✏️ Complete & Discuss | The SB gap-fill as tap-a-word-then-tap-the-gap (a wrong word is refused), then the discussion questions | Manual Mark Complete |
+| m7 | 🎨 Express Yourself | Choose one of the SB's three options; choosing reveals the prep tips for that one and the four Share feedback frames | Manual Mark Complete |
+| m8 | ⚽ Can Leo Score? | 10Q across reading, words, features and timeline | Score ≥8/10 |
+
+**Each stage gates the next.** The comprehension questions only appear once the scene is in order; the biography half only appears once the features are found. An extra reading is a whole page of new text, and the gates stop it becoming a wall of boxes to fill in any order.
+
+### extra-reading — original brief
 
 Extra Reading apps appear beside checkpoint reviews after the same three-unit bands. They should focus on extended reading, comprehension checks, new glossary/support words, and a short response. Use teacher component `extra-reading` and learner component `extra-reading-app`. Suggested IDs: `ow-l4-er7-9-extra-reading` and `ow-l4-er7-9-extra-reading-app`.
 

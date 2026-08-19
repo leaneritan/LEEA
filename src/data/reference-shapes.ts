@@ -352,6 +352,19 @@ function classifyTopic(tags: string[]): string {
 /* Deterministic (SSR-safe) shuffle for a sentence-build word bank. Seeded by
    grammarId + question index so the order is stable across server render and
    client hydration, but differs from the already-solved `correct` order. */
+/* Fill-in-the-blank stems are authored as [before, after] with the blank
+   implied between them. Joining them with a plain space renders the item as a
+   complete sentence with an invisible double space, so the learner can't see
+   what they're filling in — join with a visible blank instead. */
+function joinStem(stem: string[]): string {
+  const before = (stem[0] ?? "").replace(/\s+$/u, "");
+  const after = (stem[1] ?? "").replace(/^\s+/u, "");
+  const head = before ? `${before} ____` : "____";
+  if (!after) return head;
+  // Don't push trailing punctuation away from the blank.
+  return /^[.,?!;:]/u.test(after) ? `${head}${after}` : `${head} ${after}`;
+}
+
 function shuffledBank(bank: string[], correct: string[], seed: string): string[] {
   if (bank.length < 2) return bank;
 
@@ -437,7 +450,7 @@ export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
     },
 
     quiz: (point.tab3_quiz ?? []).map((question) => ({
-      prompt: question.stem.join(" "),
+      prompt: joinStem(question.stem),
       options: question.answers,
       correctIndex: question.correct,
       explanationEN: question.explanation.body,
@@ -457,7 +470,7 @@ export function toGrammarEntry(point: GrammarPoint): GrammarEntry {
       }
       return {
         kind: "mcq" as const,
-        prompt: question.stem.join(" "),
+        prompt: joinStem(question.stem),
         options: question.answers,
         correctIndex: question.correct,
         explanationEN: question.explanation.body,

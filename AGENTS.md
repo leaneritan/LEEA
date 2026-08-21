@@ -39,64 +39,57 @@ LEEA
   - Reference
 - Math
   - 中1数学ヘルパー (新編 新しい数学1) — see `docs/math-interactivity.md`
-- Geography (社会)
-  - 地理的分野 — 世界のすがた / 日本のすがた / 人々の生活と環境 / 世界の諸地域
-  - 歴史的分野 — 歴史へのとびら → 現代の日本
+- Geography (社会) — interactive maps, 地理 and 歴史
 - Science
   - planned later
 ```
 
+### Subjects other than English
+
+**English is the only taught subject.** It has teacher decks, an assignment loop, a reference layer and a course spine because Neritan teaches it. Every other subject — Math, Geography, Science later — exists to *support Leo working on his own*.
+
+So do not mirror the English structure into them. No teacher slides, no assign/review loop, no 章/節 navigation built to match Our World's course/level/unit. Give each one the smallest shape that lets Leo get to the thing and use it. Geography learned this the hard way: it shipped with a full 11-chapter 社会 spine, chapter pages and a 分野 switch, and all of it was scaffolding around three maps.
+
 ### Geography
 
-Geography is Leo's 社会 course — **地理的分野 and 歴史的分野** — and it is **map-first**: there is no block-by-block textbook spine like Math has. The course is three layers of data, all under `content/subjects/geography/`:
+One page, one map, a button row to switch. That is the whole model.
 
-- `curriculum.ts` — the 章 / 節 spine for both 分野, and the single source of truth for **placement**: a map belongs to a 節 because that 節 lists its id in `mapIds`.
-- `maps.ts` — the map registry (title, Japanese title, summary, layer chips, `buildStatus`, `embedPath`). It deliberately does **not** store its own 章/節, so a map only ever moves in one place. Use `getGeographyPlacementByMapId`.
-- `types.ts` — the shared shapes.
+- `content/subjects/geography/maps.ts` — a flat registry. Each map has an id, a `field` (`geography` / `history`, used only to label and order buttons), titles, a summary and `buildStatus`. There is no chapter spine and no placement data.
+- `/geography` opens the first live map; `/geography/<mapId>` opens a named one. `/geography/map/<mapId>` permanently redirects to the short form — it only exists to carry links made while Geography briefly had chapter pages.
+- The page chrome is deliberately one thin bar: current map, the switcher, progress, fullscreen. The map iframe gets everything else.
 
-Chapter colours, counts, progress denominators, filter chips and status pills all derive from that data at runtime. Never hardcode a chapter, a 節, or a number of maps into a component.
-
-**SOURCE NOTE:** Leo's 社会 textbooks are not scanned into this repo yet. The spine follows the standard 中学校社会 structure plus the one real anchor we have (the 古代文明マップ header reads 第2章 古代 ／ 第1節). Treat chapter titles and 節 names as a scaffold to be corrected against the real book when it is scanned — per golden rule 2, source scan comes before lesson generation.
-
-Routes:
-
-```text
-/geography                 course home — 分野 switch, chapter cards, Continue
-/geography/[chapterId]     one 章 — its 節 and their maps
-/geography/map/[mapId]     one map, embedded in the LEEA shell
-```
-
-Chapter ids must never be `map`, which is a sibling route segment.
+`sourceLabel` is optional and must only be set from something real — the 古代文明マップ carries 第2章 古代 ／ 第1節 because its own header says so. Do not invent a textbook reference to fill the field.
 
 **Adding a map**
 
-1. Drop the standalone HTML at `public/geography/<id>.html`.
-2. Build it on the shared base: `<script src="/components/world-map.js">` then `buildWorldMap({ svg, lon, lat, scale, graticule })`. Do not re-draw coastlines by hand — the shared component owns the world outline and the projection, and returns `px(lon, lat)` for placing markers.
-3. Add the progress bridge (below).
-4. Register it in `maps.ts` with `buildStatus: "live"` and `embedPath`.
-5. Add its id to the owning 節's `mapIds` in `curriculum.ts`.
+1. Drop the standalone HTML at `public/geography/<id>.html`, built on the shared components.
+2. Add an entry to `geographyMaps` with `buildStatus: "live"` and `embedPath`.
 
-Register a map with `buildStatus: "planned"` and no `embedPath` to show it as upcoming; the viewer renders a "map file needed" card instead of a broken frame. `getUnplacedGeographyMaps` surfaces any map no 節 claims, so a forgotten `mapIds` entry is visible on the course home rather than silently dropped.
+Register with `buildStatus: "planned"` and no `embedPath` to show it as upcoming; the page renders a "map file needed" card instead of a broken frame.
 
-**The shared country layer** — `public/components/world-countries.js` exposes `window.buildCountryLayer(base, options)`, plus `WORLD_COUNTRIES`, `WORLD_COUNTRY_BY_ID` (ISO numeric), `WORLD_COUNTRY_BY_CCA3` and `countryName(cca3)`. Pass it the object `buildWorldMap` returned and it draws all 177 countries as individual clickable paths, already re-projected onto that map's window:
+**Map layout** — maps run inside an iframe with limited height, so each one is a full-height flex column: a single-line header (eyebrow, title and lede on one row), a one-row control bar, then the map filling the rest. A world map is wide, so its drawn size is set by available *width*, not height — reclaim space from the side panel before adding height, and expect leftover height to show as sea.
+
+**The shared base map** — `public/components/world-map.js` exposes `window.buildWorldMap`, following the same `window.build*` convention as `public/components/*`. Its coastline is Natural Earth 1:110m land (public domain) by way of the `world-atlas` package (ISC), converted once by `scripts/build-world-map-path.mjs` into a flat SVG path baked into the file. There is no runtime geodata dependency and `world-atlas` is not a package.json dependency. The path is baked in the projection lon0 = -20, lat1 = 62, scale = 8 — `buildWorldMap` re-projects it onto whatever window a map asks for, so the same outline serves an Afro-Eurasia crop and a whole-world view. It covers the full globe including Antarctica, New Zealand and Patagonia.
+
+**The shared country layer** — `public/components/world-countries.js` exposes `window.buildCountryLayer(base, options)`, plus `WORLD_COUNTRIES`, `WORLD_COUNTRY_BY_ID` (ISO numeric), `WORLD_COUNTRY_BY_CCA3` and `countryName(cca3)`. Pass it the object `buildWorldMap` returned and it draws all 177 countries as individually clickable paths, already re-projected:
 
 ```js
 const layer = buildCountryLayer(base, {
-  className: "country",              // class on each path
+  className: "country",
   onPick: function (country) {},     // omit for a static outline layer
   fill: function (country) {}        // optional per-country colour
 });
 ```
 
-It appends to the svg, so move the group if it must sit under something (`svg.insertBefore(layer.group, markers)`). Note that an SVG `fill` **attribute** loses to any CSS rule matching the path, which is why `options.fill` and the 州 colouring both set an inline style instead.
+It appends to the svg, so move the group if it must sit under something (`svg.insertBefore(layer.group, markers)`). An SVG `fill` **attribute** loses to any CSS rule matching the path, which is why `options.fill` and per-country colouring both set an inline style.
 
 Each record carries `d`, `en`, `jp`, `cap` (capital, in Latin script — the source has no Japanese capitals and transliterating ~180 by hand would be guesswork), `shu` (州), `sub`, `area`, `lat`/`lon` and `nb` (neighbours as cca3 codes). Resolve neighbours with `countryName`, not the by-cca3 map: microstates like Andorra and Monaco have facts but no polygon at 110m, so they are nameable but not drawable. Three areas (N. Cyprus, Somaliland, Kosovo) have geometry but no ISO code and are flagged `noFacts` — drawn so the map has no holes, with no fact card invented for them.
 
-Regenerate with `node scripts/build-country-data.mjs` (add `--res 50m` for finer borders, ~6x larger). **Data provenance:** borders are Natural Earth 1:110m admin-0 (public domain) via `world-atlas` (ISC); facts are the `world-countries` package, licensed **ODbL 1.0**, which is share-alike and requires attribution — the generated file carries the notice and only the fields the maps use are copied. Neither package is a package.json dependency. Keep that notice on any redistribution.
+Regenerate with `node scripts/build-country-data.mjs` (add `--res 50m` for finer borders, ~6x larger). **Data provenance:** borders are Natural Earth 1:110m admin-0 (public domain) via `world-atlas` (ISC); facts are the `world-countries` package, licensed **ODbL 1.0**, which is share-alike and requires attribution — the generated file carries the notice and only the fields the maps use are copied. Keep that notice on any redistribution.
 
-**The shared base map** — `public/components/world-map.js` exposes `window.buildWorldMap`, following the same `window.build*` convention as `public/components/*`. Its coastline is Natural Earth 1:110m land (public domain) by way of the `world-atlas` package (ISC), converted once by `scripts/build-world-map-path.mjs` into a flat SVG path baked into the file. There is no runtime geodata dependency and `world-atlas` is not a package.json dependency; re-run the script only to change resolution. The path is baked in the projection lon0 = -20, lat1 = 62, scale = 8 — `buildWorldMap` re-projects it onto whatever window a map asks for, so the same outline serves an Afro-Eurasia crop and a whole-world view. It covers the full globe including Antarctica, New Zealand and Patagonia.
+**Antimeridian** — both generators share `scripts/lib/topojson-to-path.mjs`. Rings that wrap past ±180° (Russia, Fiji, Antarctica) must be split at the crossing or they draw as a straight streak across the map, and rings Natural Earth already split on ±180 must not be interpolated across or they produce NaN coordinates. `ringsToPath` asserts every point is finite and on the globe, and fails the build rather than writing a broken path — a NaN renders as nothing, so it is invisible in the generator's output.
 
-**Progress** — Geography maps are **not** learner apps: they have no assignment record and are not in `src/data/lessons.ts` (the `Lesson` type is `subject: "english"`). Progress lives in `src/data/geographyProgress.ts`, local-first and Supabase-shaped exactly like `mathProgress.ts`, in the `geography_map_progress` table. A map is `explored` once every marker has been opened and `done` once its quiz is finished; `saveGeographyMapProgress` never downgrades what Leo has earned (best quiz score wins, `exploredCount` only grows, `done` stays done).
+**Progress** — Geography maps are **not** learner apps: they have no assignment record and are not in `src/data/lessons.ts` (the `Lesson` type is `subject: "english"`). Progress lives in `src/data/geographyProgress.ts`, local-first and Supabase-shaped like `mathProgress.ts`, in the `geography_map_progress` table, keyed by map id. A map is `explored` once every marker has been opened and `done` once its quiz is finished; `saveGeographyMapProgress` never downgrades what Leo has earned (best quiz score wins, `exploredCount` only grows, `done` stays done).
 
 Maps **report, they never store.** An embedded map posts up
 
@@ -108,7 +101,7 @@ window.parent.postMessage({
 
 and `GeographyMapView` is the only writer, so everything reaches Supabase by one path. Guard every report with `if (window.parent === window) return;` so the map still works opened standalone.
 
-Main navigation and headings stay English. Japanese belongs inside the map, in the card's `jpTitle` / `jpShortTitle` / `jpSummary` / layer chips, and in 章 / 節 names.
+Main navigation and headings stay English. Japanese belongs inside the map and in the card's `jpTitle` / `jpShortTitle`.
 
 Our World has six levels. First build target:
 

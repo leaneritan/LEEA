@@ -7,14 +7,17 @@ import { reportCloudSyncFailure, reportCloudSyncSuccess } from "@/lib/syncStatus
 //
 // A map counts as "explored" once Leo has opened every marker on it, and as
 // "done" once he has finished its quiz. Both signals come from the embedded
-// map through the postMessage bridge in GeographyMapFrame — maps never write
+// map through the postMessage bridge in GeographyMapView — maps never write
 // to localStorage themselves, so this file is the only writer.
+//
+// Records are keyed by map id alone. They used to carry the 節 they sat in,
+// back when Geography had a chapter spine; that spine is gone, and a map is
+// the only thing progress was ever really about.
 
 export type GeographyMapProgressStatus = "not-done" | "explored" | "done";
 
 export type GeographyMapProgressRecord = {
   studentId: "leo";
-  sectionId: string;
   mapId: string;
   status: GeographyMapProgressStatus;
   quizScore: { correct: number; total: number } | null;
@@ -24,7 +27,7 @@ export type GeographyMapProgressRecord = {
   updatedAt: string;
 };
 
-/** Keyed by `${sectionId}::${mapId}`. */
+/** Keyed by map id. */
 export type GeographyProgressMap = Record<string, GeographyMapProgressRecord>;
 
 export const geographyProgressStorageKey = "leea.geographyProgress.v1";
@@ -32,7 +35,6 @@ export const geographyProgressStorageKey = "leea.geographyProgress.v1";
 type GeographyMapProgressRow = {
   id: string;
   student_id: "leo";
-  section_id: string;
   map_id: string;
   status: GeographyMapProgressStatus;
   quiz_score: { correct: number; total: number } | null;
@@ -41,12 +43,7 @@ type GeographyMapProgressRow = {
   updated_at: string;
 };
 
-export function geographyProgressKey(sectionId: string, mapId: string) {
-  return `${sectionId}::${mapId}`;
-}
-
 export function createGeographyMapProgressRecord(
-  sectionId: string,
   mapId: string,
   status: GeographyMapProgressStatus,
   quizScore: { correct: number; total: number } | null = null,
@@ -56,7 +53,6 @@ export function createGeographyMapProgressRecord(
 
   return {
     studentId: "leo",
-    sectionId,
     mapId,
     status,
     quizScore,
@@ -66,31 +62,12 @@ export function createGeographyMapProgressRecord(
   };
 }
 
-export function getGeographyMapRecord(sectionId: string, mapId: string, progress: GeographyProgressMap) {
-  return progress[geographyProgressKey(sectionId, mapId)] ?? null;
+export function getGeographyMapRecord(mapId: string, progress: GeographyProgressMap) {
+  return progress[mapId] ?? null;
 }
 
-export function isGeographyMapDone(sectionId: string, mapId: string, progress: GeographyProgressMap) {
-  return getGeographyMapRecord(sectionId, mapId, progress)?.status === "done";
-}
-
-/**
- * Percent of a chapter's maps Leo has finished. Only 節 that actually have a
- * built map count toward the denominator — a chapter of planned 節 reads 0%
- * rather than pretending to be complete.
- */
-export function getChapterCompletionPercent(
-  sections: Array<{ id: string; mapIds: string[] }>,
-  progress: GeographyProgressMap,
-  isReady: (mapId: string) => boolean
-) {
-  const pairs = sections.flatMap((section) =>
-    section.mapIds.filter(isReady).map((mapId) => ({ sectionId: section.id, mapId }))
-  );
-  if (pairs.length === 0) return { percent: 0, done: 0, total: 0 };
-
-  const done = pairs.filter((pair) => isGeographyMapDone(pair.sectionId, pair.mapId, progress)).length;
-  return { percent: Math.round((done / pairs.length) * 100), done, total: pairs.length };
+export function isGeographyMapDone(mapId: string, progress: GeographyProgressMap) {
+  return getGeographyMapRecord(mapId, progress)?.status === "done";
 }
 
 export function readGeographyProgress(): GeographyProgressMap {
@@ -115,14 +92,14 @@ export async function syncGeographyProgressWithCloud(current: GeographyProgressM
   try {
     const { data, error } = await supabase
       .from("geography_map_progress")
-      .select("id, student_id, section_id, map_id, status, quiz_score, explored_count, completed_at, updated_at")
+      .select("id, student_id, map_id, status, quiz_score, explored_count, completed_at, updated_at")
       .eq("student_id", "leo");
 
     if (error) throw error;
     reportCloudSyncSuccess();
 
     const cloud = ((data ?? []) as GeographyMapProgressRow[]).reduce<GeographyProgressMap>((next, row) => {
-      next[geographyProgressKey(row.section_id, row.map_id)] = fromGeographyProgressRow(row);
+      next[row.map_id] = fromGeographyProgressRow(row);
       return next;
     }, {});
 
@@ -165,10 +142,9 @@ export async function syncGeographyProgressWithCloud(current: GeographyProgressM
  */
 export async function saveGeographyMapProgress(incoming: GeographyMapProgressRecord) {
   const current = readGeographyProgress();
-  const key = geographyProgressKey(incoming.sectionId, incoming.mapId);
-  const record = mergeGeographyRecords(current[key], incoming);
+  const record = mergeGeographyRecords(current[incoming.mapId], incoming);
 
-  writeGeographyProgress({ ...current, [key]: record });
+  writeGeographyProgress({ ...current, [incoming.mapId]: record });
   await upsertGeographyProgressRecords([record]);
   return record;
 }
@@ -207,7 +183,7 @@ async function upsertGeographyProgressRecords(records: GeographyMapProgressRecor
   try {
     const { error } = await supabase
       .from("geography_map_progress")
-      .upsert(records.map(toGeographyProgressRow), { onConflict: "student_id,section_id,map_id" });
+      .upsert(records.map(toGeographyProgressRow), { onConflict: "student_id,map_id" });
 
     if (error) throw error;
     reportCloudSyncSuccess();
@@ -220,7 +196,6 @@ async function upsertGeographyProgressRecords(records: GeographyMapProgressRecor
 function fromGeographyProgressRow(row: GeographyMapProgressRow): GeographyMapProgressRecord {
   return {
     studentId: "leo",
-    sectionId: row.section_id,
     mapId: row.map_id,
     status: row.status,
     quizScore: row.quiz_score,
@@ -232,9 +207,8 @@ function fromGeographyProgressRow(row: GeographyMapProgressRow): GeographyMapPro
 
 function toGeographyProgressRow(record: GeographyMapProgressRecord): GeographyMapProgressRow {
   return {
-    id: `geography-progress-${record.studentId}-${record.sectionId}-${record.mapId}`,
+    id: `geography-progress-${record.studentId}-${record.mapId}`,
     student_id: record.studentId,
-    section_id: record.sectionId,
     map_id: record.mapId,
     status: record.status,
     quiz_score: record.quizScore,

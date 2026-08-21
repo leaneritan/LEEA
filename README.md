@@ -31,8 +31,7 @@ LEEA
 - Math
   - 中1数学ヘルパー
 - Geography (社会)
-  - 地理的分野
-  - 歴史的分野
+  - interactive maps (地理 · 歴史)
 - Science
   - planned later
 ```
@@ -134,7 +133,7 @@ Implemented first:
 - Our World Level 4 Unit 8 Grammar 1 and 2 data
 - named starter dashboard variables
 - Supabase client placeholder
-- Geography subject as a real 社会 course: a 章/節 spine for 地理的分野 and 歴史的分野, chapter pages, and per-map progress
+- Geography as a single map page — all maps in one place, switched with a button, with per-map progress
 - three interactive maps on shared map components — 古代文明マップ (歴史 第2章), 世界のすがた (地理 第1章 1節) and 世界の国々 (地理 第1章 2節)
 - shared country borders + facts layer (Natural Earth / world-countries), baked at build time — no runtime geodata dependency
 
@@ -155,8 +154,7 @@ Current app routes:
 /reference/vocabulary/[wordId]
 /reference/grammar/[grammarId]
 /geography
-/geography/[chapterId]
-/geography/map/[mapId]
+/geography/[mapId]
 ```
 
 ## Validation

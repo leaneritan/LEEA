@@ -86,7 +86,6 @@ create table if not exists public.math_block_progress (
 create table if not exists public.geography_map_progress (
   id text primary key,
   student_id text not null references public.students(id) on delete cascade,
-  section_id text not null,
   map_id text not null,
   status text not null check (status in ('not-done', 'explored', 'done')),
   quiz_score jsonb,
@@ -94,7 +93,7 @@ create table if not exists public.geography_map_progress (
   completed_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique (student_id, section_id, map_id)
+  unique (student_id, map_id)
 );
 
 create table if not exists public.reference_confidence (

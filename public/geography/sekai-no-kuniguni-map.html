@@ -17,17 +17,17 @@
   html,body{margin:0;padding:0}
   body{
     background:radial-gradient(1200px 600px at 20% -10%, #16273A 0%, transparent 60%),var(--night);
-    color:var(--ink);font-family:var(--gothic);-webkit-font-smoothing:antialiased;padding:20px 20px 48px;
+    color:var(--ink);font-family:var(--gothic);-webkit-font-smoothing:antialiased;padding:10px 12px 12px;
   }
   .shell{max-width:1480px;margin:0 auto}
 
-  header{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}
-  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--muted);text-transform:uppercase}
-  h1{font-family:var(--mincho);font-weight:600;font-size:clamp(22px,3.4vw,34px);margin:6px 0 4px;letter-spacing:.04em}
+  header{display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px}
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+  h1{font-family:var(--mincho);font-weight:600;font-size:clamp(16px,2.1vw,21px);margin:0;letter-spacing:.04em;flex:none}
   h1 .sub{color:var(--jade)}
-  .lede{color:var(--muted);font-size:13px;line-height:1.7;max-width:62ch}
+  .lede{color:var(--muted);font-size:12px;line-height:1.5;margin:0;flex:1 1 280px;min-width:0}
 
-  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0 12px}
+  .bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 8px}
   .chip{
     font-family:var(--gothic);font-size:13px;color:var(--ink);background:var(--panel);
     border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;
@@ -41,22 +41,22 @@
   .chip.s3{color:#D07CC8} .chip.s4{color:#FF6B57} .chip.s5{color:#A8D26D}
   .spacer{flex:1}
   .btn{
-    font-family:var(--gothic);font-size:13px;font-weight:700;letter-spacing:.06em;
-    background:var(--jade);color:#04211B;border:none;border-radius:999px;padding:9px 20px;cursor:pointer;transition:.15s;
+    font-family:var(--gothic);font-size:12px;font-weight:700;letter-spacing:.04em;
+    background:var(--jade);color:#04211B;border:none;border-radius:999px;padding:7px 16px;cursor:pointer;transition:.15s;white-space:nowrap;
   }
   .btn:hover{filter:brightness(1.08)}
   .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-  .search{
+  .search{flex:0 1 104px;min-width:80px;
     font-family:var(--gothic);font-size:13px;background:var(--panel2);color:var(--ink);
-    border:1px solid var(--line);border-radius:999px;padding:8px 16px;width:210px;
+    border:1px solid var(--line);border-radius:999px;padding:7px 14px;width:100%;
   }
   .search::placeholder{color:#5F7285}
   .search:focus{outline:none;border-color:var(--sky)}
 
-  .grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 296px;gap:12px}
   .mapcard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;overflow:hidden}
   .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  svg.map{display:block;width:100%;height:auto;background:var(--sea);min-width:760px}
+  svg.map{display:block;width:100%;height:auto;background:var(--sea);min-width:640px}
   .grat{stroke:#22384D;stroke-width:.6;fill:none}
   .land{fill:#1E3348;stroke:none}
   .country{fill:#C7B48F;stroke:#6E6244;stroke-width:.5;transition:fill .12s}
@@ -69,7 +69,7 @@
   .keydot:hover{fill:#FFD37A}
   .swipe{font-size:11px;color:var(--muted);text-align:center;padding:6px 0 10px;border-top:1px solid var(--line)}
 
-  aside{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-height:460px}
+  aside{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
   aside .empty{color:var(--muted);font-size:13px;line-height:1.9;text-align:center;padding:80px 10px}
   aside .empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:8px}
   .cat{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px;color:var(--ochre)}
@@ -98,6 +98,30 @@
   .score{font-family:var(--mincho);font-size:34px;text-align:center;margin:18px 0 6px}
 
   @media (max-width:1080px){ .grid{grid-template-columns:1fr} aside{min-height:0} }
+
+  /* Fill the frame. The svg scales by width alone, so without an explicit
+     height the map leaves the bottom of a tall viewport empty. preserveAspect-
+     Ratio="xMidYMid meet" then fits it to whichever axis runs out first. */
+  html,body{height:100%}
+  body{display:flex;flex-direction:column;overflow:hidden}
+  .shell{flex:1;display:flex;flex-direction:column;min-height:0;width:100%}
+  .grid{flex:1;min-height:0;align-items:stretch}
+  .mapcard{display:flex;flex-direction:column;min-height:0}
+  .scroller{flex:1;min-height:0;display:flex}
+  svg.map{height:100%;flex:1}
+  aside{overflow-y:auto;min-height:0}
+
+  @media (max-width:1080px){
+    /* Stacked on a narrow screen: let the page scroll normally again. */
+    html,body{height:auto}
+    body{display:block;overflow:auto}
+    .shell{display:block}
+    .grid{display:block}
+    .mapcard{display:block;margin-bottom:16px}
+    .scroller{display:block}
+    svg.map{height:auto}
+    aside{overflow:visible}
+  }
 </style>
 <script src="/components/world-map.js"></script>
 <script src="/components/world-countries.js"></script>
@@ -118,9 +142,9 @@
   <button class="chip shu s3" data-shu="北アメリカ州" data-on="true"><span class="dot"></span>北アメリカ州</button>
   <button class="chip shu s4" data-shu="南アメリカ州" data-on="true"><span class="dot"></span>南アメリカ州</button>
   <button class="chip shu s5" data-shu="オセアニア州" data-on="true"><span class="dot"></span>オセアニア州</button>
-  <button class="chip" id="shuColourBtn" data-on="false">州で色分け</button>
+  <button class="chip" id="shuColourBtn" data-on="false">色分け</button>
   <span class="spacer"></span>
-  <input class="search" id="search" type="search" placeholder="国名で検索（日本語・英語）" aria-label="国名で検索">
+  <input class="search" id="search" type="search" placeholder="国名で検索" aria-label="国名で検索">
   <button class="btn" id="quizBtn">クイズに挑戦</button>
 </div>
 

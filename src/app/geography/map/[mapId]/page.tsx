@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { GeographyMapView } from "@/components/geography/GeographyMapView";
-import { geographyMaps, getGeographyMapById } from "../../../../content/subjects/geography/maps";
+import { geographyMaps, getGeographyMapById } from "../../../../../content/subjects/geography/maps";
 
 export function generateStaticParams() {
   return geographyMaps.map((map) => ({ mapId: map.id }));

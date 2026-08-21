@@ -1,34 +1,24 @@
-// Registry for Geography maps — standalone, interactive HTML atlases Leo can
-// explore on his own. Geography is a map-first subject: there is no textbook
-// chapter/section spine like Math has, so everything on /geography derives
-// from this list at runtime (topics, topic colours, counts, badge numbers).
-// Never hardcode a fixed number of maps or topics in the UI.
+// Registry of Geography maps — standalone, interactive HTML atlases.
 //
-// To add a map: drop the standalone HTML at public/geography/<id>.html, then
-// append an entry below with `embedPath` set. Leave `embedPath` off while the
-// map is still being built — the viewer shows a "coming soon" card instead of
-// a broken frame.
+// Placement is NOT stored here. A map belongs to a 節 because that 節 lists
+// its id in `mapIds` (see curriculum.ts), so there is exactly one place to
+// edit when a map moves. Use `getGeographyPlacementByMapId` to look up a
+// map's 章 / 節.
+//
+// To add a map:
+//   1. Drop the standalone HTML at public/geography/<id>.html.
+//   2. Add an entry below with buildStatus "live" and embedPath set.
+//   3. Add its id to the owning 節's `mapIds` in curriculum.ts.
+// Register a map with buildStatus "planned" (no embedPath) to show it in the
+// course as upcoming work — the viewer then shows a "map file needed" card
+// instead of a broken frame.
 
-export type GeographyMapStatus = "todo" | "now" | "done";
+import { geographyChapters } from "./curriculum";
 
-export type GeographyPaletteEntry = { color: string; tint: string; dark: string };
-
-// Topic colours cycle through this palette in first-seen order.
-export const geographyPalette: GeographyPaletteEntry[] = [
-  { color: "#c08b3a", tint: "#f8efdc", dark: "#8a5f1d" },
-  { color: "#3aa6a0", tint: "#e2f2f1", dark: "#20736e" },
-  { color: "#4d7fc0", tint: "#e5edf8", dark: "#31578c" },
-  { color: "#a2628f", tint: "#f5e9f1", dark: "#7a4269" },
-  { color: "#6aa564", tint: "#e8f1e6", dark: "#47793f" },
-  { color: "#c9604f", tint: "#f8e5e1", dark: "#9c3f30" }
-];
+export type GeographyMapBuildStatus = "planned" | "live";
 
 export type GeographyMap = {
   id: string;
-  /** Topic group shown on /geography. New topics appear automatically. */
-  topic: string;
-  /** English label for the topic group — main navigation stays English. */
-  topicLabel: string;
   title: string;
   /** Japanese title, shown as learning content under the English title. */
   jpTitle: string;
@@ -43,8 +33,12 @@ export type GeographyMap = {
   jpSummary: string;
   /** Layers/filters the map offers, used as chips on the card. */
   layers: string[];
-  status: GeographyMapStatus;
-  order?: number;
+  buildStatus: GeographyMapBuildStatus;
+  /**
+   * How many quiz questions the map's quiz has, when it has one. Used to show
+   * a real score out of a real total without the app having to guess.
+   */
+  quizTotal?: number;
   /** Set only once the standalone HTML exists at public/geography/<id>.html. */
   embedPath?: string;
 };
@@ -52,8 +46,6 @@ export type GeographyMap = {
 export const geographyMaps: GeographyMap[] = [
   {
     id: "kodai-bunmei-map",
-    topic: "古代文明",
-    topicLabel: "Ancient Civilizations",
     title: "Ancient Civilizations Map",
     jpTitle: "古代文明マップ — 文明はどこで生まれた？",
     jpShortTitle: "古代文明マップ",
@@ -65,9 +57,40 @@ export const geographyMaps: GeographyMap[] = [
     jpSummary:
       "スライダーを動かすと、その年までに生まれた文明があらわれます。地図の印をクリックすると、くわしい内容が出てきます。",
     layers: ["四大文明", "ギリシャ・ローマ", "三大宗教", "日本列島", "シルクロード", "今の国境"],
-    status: "now",
-    order: 1,
+    buildStatus: "live",
+    quizTotal: 10,
     embedPath: "/geography/kodai-bunmei-map.html"
+  },
+  {
+    id: "sekai-no-sugata-map",
+    title: "The Shape of the World",
+    jpTitle: "世界のすがた — 六大陸と三大洋",
+    jpShortTitle: "世界のすがた",
+    sourceLabel: "地理 第1章 ／ 第1節",
+    kind: "Interactive map",
+    meta: "6 continents · 3 oceans · 10 quiz questions",
+    summary:
+      "Name the six continents and three oceans, switch on the equator, the tropics and the grid, and read any point's latitude and longitude straight off the map.",
+    jpSummary:
+      "六大陸と三大洋をおぼえよう。赤道や回帰線、緯線・経線を表示して、地図の上の点の緯度・経度を読みとろう。",
+    layers: ["六大陸", "三大洋", "赤道・回帰線", "緯線・経線", "州の区分"],
+    buildStatus: "live",
+    quizTotal: 10,
+    embedPath: "/geography/sekai-no-sugata-map.html"
+  },
+  {
+    id: "kikoutai-map",
+    title: "World Climate Zones",
+    jpTitle: "気候帯マップ — 世界の気候と暮らし",
+    jpShortTitle: "気候帯マップ",
+    sourceLabel: "地理 第3章 ／ 第1節",
+    kind: "Interactive map",
+    meta: "5 climate zones",
+    summary:
+      "Shade the world by climate zone, from 熱帯 to 寒帯, and see how the bands follow latitude — and where they don't.",
+    jpSummary: "世界を気候帯でぬり分けて、緯度とのつながりを見てみよう。",
+    layers: ["熱帯", "乾燥帯", "温帯", "亜寒帯", "寒帯"],
+    buildStatus: "planned"
   }
 ];
 
@@ -75,26 +98,20 @@ export function getGeographyMapById(id: string) {
   return geographyMaps.find((map) => map.id === id);
 }
 
-export type GeographyMapGroup = {
-  topic: string;
-  topicLabel: string;
-  palette: GeographyPaletteEntry;
-  maps: GeographyMap[];
-};
+export function getGeographyMapsByIds(ids: string[]) {
+  return ids.map((id) => getGeographyMapById(id)).filter((map): map is GeographyMap => Boolean(map));
+}
 
-/** Groups maps by topic, in first-seen order, giving each topic a cycling palette colour. */
-export function groupGeographyMapsByTopic(maps: GeographyMap[]): GeographyMapGroup[] {
-  const topics: string[] = [];
-  maps.forEach((map) => {
-    if (!topics.includes(map.topic)) topics.push(map.topic);
-  });
-  return topics.map((topic, index) => ({
-    topic,
-    topicLabel: maps.find((map) => map.topic === topic)?.topicLabel ?? topic,
-    palette: geographyPalette[index % geographyPalette.length],
-    maps: maps
-      .filter((map) => map.topic === topic)
-      .slice()
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-  }));
+export function isGeographyMapReady(map: GeographyMap) {
+  return map.buildStatus === "live" && Boolean(map.embedPath);
+}
+
+/**
+ * Maps that exist in this registry but that no 節 claims. Should always be
+ * empty — the course home surfaces any stragglers rather than dropping them
+ * silently, so a missing `mapIds` entry is visible instead of invisible.
+ */
+export function getUnplacedGeographyMaps() {
+  const placed = new Set(geographyChapters.flatMap((chapter) => chapter.sections.flatMap((section) => section.mapIds)));
+  return geographyMaps.filter((map) => !placed.has(map.id));
 }

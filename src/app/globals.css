@@ -521,9 +521,10 @@ mark {
 .sidebar-subjects a:hover { background: var(--bg); color: var(--ink); }
 .sidebar-subjects a.active { background: var(--accent-tint); color: var(--accent-ink); }
 .sidebar-subjects .disabled { color: #aeb6ad; cursor: default; }
-.dot-english, .dot-math, .dot-disabled { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.dot-english, .dot-math, .dot-geography, .dot-disabled { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .dot-english { background: var(--good-soft); }
 .dot-math { background: #c9804f; }
+.dot-geography { background: #3aa6a0; }
 .dot-disabled { background: #dfe2da; }
 
 .sidebar-collapsed .sidebar-subjects { align-items: center; }
@@ -531,7 +532,7 @@ mark {
 .sidebar-collapsed .sidebar-subjects-title { display: none; }
 .sidebar-collapsed .sidebar-subjects a,
 .sidebar-collapsed .sidebar-subjects .disabled { padding: 8px; gap: 0; font-size: 0; }
-.sidebar-collapsed .dot-english, .sidebar-collapsed .dot-disabled { width: 10px; height: 10px; }
+.sidebar-collapsed .dot-english, .sidebar-collapsed .dot-math, .sidebar-collapsed .dot-geography, .sidebar-collapsed .dot-disabled { width: 10px; height: 10px; }
 
 /* footer progress card → ring when collapsed */
 .sidebar-progress {
@@ -8060,4 +8061,71 @@ a.math-block-page:hover { text-decoration: underline; }
 .teacher-current-unit-set:hover {
   background: #eef2ff;
   border-color: #a5b4fc;
+}
+
+/* ============================================================
+   Geography — map library (/geography) and single-map viewer
+   (/geography/[mapId]). Topic accent colours come from the
+   registry palette in content/subjects/geography/maps.ts and
+   arrive as inline styles, so one component set serves every
+   topic that gets added later.
+   ============================================================ */
+.geo-hub { display: grid; gap: 26px; }
+
+.geo-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.geo-stat { display: grid; gap: 3px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); padding: 16px 18px; }
+.geo-stat > span { color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.geo-stat > strong { color: var(--ink); font-size: 30px; letter-spacing: -.02em; }
+.geo-stat > small { color: var(--body-2); font-size: 12px; }
+
+.geo-group { display: grid; gap: 14px; }
+.geo-group-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.geo-group-dot { width: 12px; height: 12px; border-radius: 4px; flex: none; }
+.geo-group-head h2 { color: var(--ink); font-size: 22px; letter-spacing: -.01em; }
+.geo-group-jp { color: var(--body-2); font-family: var(--font-jp); font-size: 14px; }
+.geo-group-count { margin-left: auto; color: var(--muted); font-size: 12px; font-weight: 800; }
+
+.geo-map-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 16px; }
+.geo-map-card { display: grid; grid-template-columns: minmax(190px, 36%) 1fr; overflow: hidden; border: 1px solid var(--border); border-radius: 22px; background: var(--surface); color: inherit; text-decoration: none; transition: .2s ease; }
+a.geo-map-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(45, 67, 86, .09); }
+.geo-map-card--planned { opacity: .62; }
+
+.geo-map-visual { display: flex; flex-direction: column; justify-content: space-between; gap: 14px; color: #f4ede0; padding: 20px; }
+.geo-map-visual > span { color: #f0c987; font-family: var(--font-jp); font-size: 11px; font-weight: 800; letter-spacing: .08em; }
+.geo-map-visual > strong { font-family: var(--font-jp-display); font-size: 20px; line-height: 1.35; line-break: strict; }
+.geo-map-visual > small { color: #cfd8de; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+
+.geo-map-copy { display: flex; flex-direction: column; gap: 8px; padding: 22px; }
+.geo-map-status { align-self: flex-start; border-radius: 999px; padding: 5px 12px; font-size: 11px; font-weight: 900; }
+.geo-map-copy h3 { color: var(--ink); font-size: 22px; letter-spacing: -.01em; }
+.geo-map-copy p { color: var(--body-2); font-size: 14px; line-height: 1.55; }
+.geo-map-jp-title { color: var(--body); font-family: var(--font-jp); font-size: 14px; font-weight: 700; }
+.geo-map-jp { color: var(--muted-2); font-family: var(--font-jp); font-size: 13px; }
+.geo-map-layers { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.geo-map-layers span { border: 1px solid var(--border); border-radius: 999px; background: var(--surface-muted); color: var(--body-2); padding: 4px 10px; font-family: var(--font-jp); font-size: 11px; font-weight: 700; }
+.geo-map-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 12px; }
+.geo-map-foot small { color: var(--muted); font-size: 12px; font-weight: 700; }
+.geo-map-foot b { color: var(--accent-ink); font-size: 13px; font-weight: 900; }
+
+.geo-empty { display: grid; gap: 6px; border: 1px dashed var(--border); border-radius: 18px; background: var(--surface-muted); padding: 26px; text-align: center; }
+.geo-empty strong { color: var(--ink); font-size: 16px; }
+.geo-empty span { color: var(--body-2); font-size: 13px; }
+
+/* ---- single map viewer ---- */
+.geo-map-page { display: grid; gap: 16px; }
+.geo-map-bar { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.geo-map-bar h1 { color: var(--ink); font-size: clamp(26px, 3.4vw, 36px); letter-spacing: -.02em; }
+.geo-map-bar nav { display: flex; gap: 8px; flex-wrap: wrap; }
+.geo-map-frame { width: 100%; height: calc(100vh - 220px); min-height: 620px; border: 1px solid var(--border); border-radius: 18px; background: #0b1420; display: block; }
+.geo-map-missing { display: grid; gap: 8px; border: 1px dashed var(--border); border-radius: 18px; background: var(--surface-muted); padding: 30px; text-align: center; }
+.geo-map-missing h2 { color: var(--ink); font-size: 18px; }
+.geo-map-missing p { color: var(--body-2); font-size: 13px; }
+
+@media (max-width: 900px) {
+  .geo-stats { grid-template-columns: 1fr; }
+  .geo-map-grid { grid-template-columns: 1fr; }
+  .geo-map-card { grid-template-columns: 1fr; }
+  .geo-map-visual { flex-direction: row; align-items: center; justify-content: flex-start; gap: 12px; flex-wrap: wrap; }
+  .geo-map-visual > strong { font-size: 20px; }
+  .geo-map-frame { height: calc(100vh - 180px); min-height: 520px; }
 }

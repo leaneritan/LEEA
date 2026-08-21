@@ -30,6 +30,7 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { decodeArcs, geometryRings, ringsToPath } from "./lib/topojson-to-path.mjs";
 
 const BAKED_LON0 = -20;
 const BAKED_LAT1 = 62;
@@ -100,44 +101,18 @@ function fetchPackage(spec) {
 
 /** Decodes quantized TopoJSON into one SVG path per country, in baked pixel space. */
 function topoToCountryPaths(topo) {
-  const { scale, translate } = topo.transform;
-
-  const arcs = topo.arcs.map((arc) => {
-    let x = 0;
-    let y = 0;
-    return arc.map(([dx, dy]) => {
-      x += dx;
-      y += dy;
-      return [x * scale[0] + translate[0], y * scale[1] + translate[1]];
-    });
-  });
-
-  function ringPoints(indices) {
-    const points = [];
-    for (const index of indices) {
-      const arc = index < 0 ? arcs[~index].slice().reverse() : arcs[index];
-      for (let i = points.length ? 1 : 0; i < arc.length; i++) points.push(arc[i]);
-    }
-    return points;
-  }
+  const arcs = decodeArcs(topo);
 
   const project = ([lon, lat]) => [
     ((lon - BAKED_LON0) * BAKED_SCALE).toFixed(1),
     ((BAKED_LAT1 - lat) * BAKED_SCALE).toFixed(1)
   ];
 
-  return topo.objects.countries.geometries.map((geometry) => {
-    const polygons = geometry.type === "MultiPolygon" ? geometry.arcs : [geometry.arcs];
-    let d = "";
-    for (const polygon of polygons) {
-      for (const ring of polygon) {
-        const points = ringPoints(ring);
-        if (points.length < 3) continue;
-        d += `M${points.map((point) => project(point).join(",")).join("L")}Z`;
-      }
-    }
-    return { id: geometry.id ? String(geometry.id) : null, name: geometry.properties?.name ?? "", d };
-  });
+  return topo.objects.countries.geometries.map((geometry) => ({
+    id: geometry.id ? String(geometry.id) : null,
+    name: geometry.properties?.name ?? "",
+    d: ringsToPath(geometryRings(geometry, arcs), project)
+  }));
 }
 
 /**

@@ -24,6 +24,7 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { decodeArcs, geometryRings, ringsToPath } from "./lib/topojson-to-path.mjs";
 
 const BAKED_LON0 = -20;
 const BAKED_LAT1 = 62;
@@ -58,28 +59,7 @@ try {
 
 /** Decodes quantized TopoJSON and projects it into the baked pixel space. */
 function topoToPath(topo) {
-  const { scale, translate } = topo.transform;
-
-  const arcs = topo.arcs.map((arc) => {
-    let x = 0;
-    let y = 0;
-    return arc.map(([dx, dy]) => {
-      x += dx;
-      y += dy;
-      return [x * scale[0] + translate[0], y * scale[1] + translate[1]];
-    });
-  });
-
-  // Arcs share their endpoints, so every arc after the first in a ring drops
-  // its leading point to avoid a duplicated vertex.
-  function ringPoints(indices) {
-    const points = [];
-    for (const index of indices) {
-      const arc = index < 0 ? arcs[~index].slice().reverse() : arcs[index];
-      for (let i = points.length ? 1 : 0; i < arc.length; i++) points.push(arc[i]);
-    }
-    return points;
-  }
+  const arcs = decodeArcs(topo);
 
   const project = ([lon, lat]) => [
     ((lon - BAKED_LON0) * BAKED_SCALE).toFixed(1),
@@ -88,17 +68,6 @@ function topoToPath(topo) {
 
   const collection = topo.objects.land;
   const geometries = collection.type === "GeometryCollection" ? collection.geometries : [collection];
-  const polygons = geometries.flatMap((geometry) =>
-    geometry.type === "MultiPolygon" ? geometry.arcs : [geometry.arcs]
-  );
 
-  let d = "";
-  for (const polygon of polygons) {
-    for (const ring of polygon) {
-      const points = ringPoints(ring);
-      if (points.length < 3) continue;
-      d += `M${points.map((point) => project(point).join(",")).join("L")}Z`;
-    }
-  }
-  return d;
+  return geometries.map((geometry) => ringsToPath(geometryRings(geometry, arcs), project)).join("");
 }

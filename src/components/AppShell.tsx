@@ -14,7 +14,7 @@ import { useKnownWordIds } from "@/components/useKnownWordIds";
 import { allWords } from "@/components/reference/ref-data";
 import { CloudSyncBadge } from "@/components/CloudSyncBadge";
 
-type NavKey = "home" | "teacher" | "progress" | "english" | "math" | "assignments" | "reference" | "search";
+type NavKey = "home" | "teacher" | "progress" | "english" | "math" | "geography" | "assignments" | "reference" | "search";
 
 const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNode }> = [
   { key: "home", label: "Home", href: "/", icon: <Home size={20} strokeWidth={2} /> },
@@ -124,6 +124,7 @@ export function AppShell({
           <span className="sidebar-subjects-title">Subjects</span>
           <Link className={active === "english" ? "active" : ""} data-tooltip="English" href="/english"><i className="dot-english" />English</Link>
           <Link className={active === "math" ? "active" : ""} data-tooltip="Math" href="/math"><i className="dot-math" />Math</Link>
+          <Link className={active === "geography" ? "active" : ""} data-tooltip="Geography" href="/geography"><i className="dot-geography" />Geography</Link>
           <span className="disabled" data-tooltip="Science"><i className="dot-disabled" />Science</span>
         </div>
 
@@ -246,6 +247,7 @@ function getCrumbHref(crumb: string, pathname: string) {
   if (crumb === "Progress") return "/teacher/progress";
   if (crumb === "Leo") return "/leo";
   if (crumb === "English") return "/english";
+  if (crumb === "Geography") return "/geography";
   if (crumb === "Our World") return "/english/our-world";
   if (crumb === "Unit 8") return "/english/our-world/level-4/unit-8";
   if (crumb === "Reference") return "/reference";

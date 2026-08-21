@@ -39,9 +39,22 @@ LEEA
   - Reference
 - Math
   - 中1数学ヘルパー (新編 新しい数学1) — see `docs/math-interactivity.md`
+- Geography
+  - Maps (interactive standalone atlases)
 - Science
   - planned later
 ```
+
+### Geography
+
+Geography is a **map-first subject**: there is no textbook chapter/section spine like Math has. Everything on `/geography` derives at runtime from the registry in `content/subjects/geography/maps.ts` — topic groups, topic colours, counts, and status chips. Never hardcode a fixed number of maps or topics into the UI.
+
+To add a map:
+
+1. Drop the standalone, self-contained HTML at `public/geography/<id>.html`.
+2. Append an entry to `geographyMaps` with `embedPath: "/geography/<id>.html"`. Leave `embedPath` off while the map is still being built — the viewer shows a "map file needed" card instead of a broken frame.
+
+The map library lives at `/geography` and a single map opens at `/geography/[mapId]`, both inside the normal `AppShell` (sidebar, breadcrumbs, English-only chrome). The map itself is embedded in an `<iframe>` and keeps its own look; Japanese belongs inside the map and in the card's `jpTitle` / `jpSummary` / layer chips, never in the navigation. Geography maps are **not** learner apps: they carry no assignment/progress keys and are not registered in `src/data/lessons.ts`. If a map ever needs Leo progress, give it a `mode: "learner"` lesson record and the `getLearnerAppProgress` source shape instead of inventing a second progress path.
 
 Our World has six levels. First build target:
 

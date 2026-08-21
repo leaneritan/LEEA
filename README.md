@@ -29,7 +29,9 @@ LEEA
     - glossary/support words
     - grammar
 - Math
-  - planned later
+  - 中1数学ヘルパー
+- Geography
+  - Maps
 - Science
   - planned later
 ```
@@ -131,6 +133,7 @@ Implemented first:
 - Our World Level 4 Unit 8 Grammar 1 and 2 data
 - named starter dashboard variables
 - Supabase client placeholder
+- Geography subject with an interactive map library (`/geography`) and the 古代文明マップ ancient-civilizations map
 
 Prototype:
 
@@ -148,6 +151,8 @@ Current app routes:
 /teacher/review/[lessonId]
 /reference/vocabulary/[wordId]
 /reference/grammar/[grammarId]
+/geography
+/geography/[mapId]
 ```
 
 ## Validation

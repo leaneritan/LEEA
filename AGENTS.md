@@ -78,6 +78,22 @@ Chapter ids must never be `map`, which is a sibling route segment.
 
 Register a map with `buildStatus: "planned"` and no `embedPath` to show it as upcoming; the viewer renders a "map file needed" card instead of a broken frame. `getUnplacedGeographyMaps` surfaces any map no 節 claims, so a forgotten `mapIds` entry is visible on the course home rather than silently dropped.
 
+**The shared country layer** — `public/components/world-countries.js` exposes `window.buildCountryLayer(base, options)`, plus `WORLD_COUNTRIES`, `WORLD_COUNTRY_BY_ID` (ISO numeric), `WORLD_COUNTRY_BY_CCA3` and `countryName(cca3)`. Pass it the object `buildWorldMap` returned and it draws all 177 countries as individual clickable paths, already re-projected onto that map's window:
+
+```js
+const layer = buildCountryLayer(base, {
+  className: "country",              // class on each path
+  onPick: function (country) {},     // omit for a static outline layer
+  fill: function (country) {}        // optional per-country colour
+});
+```
+
+It appends to the svg, so move the group if it must sit under something (`svg.insertBefore(layer.group, markers)`). Note that an SVG `fill` **attribute** loses to any CSS rule matching the path, which is why `options.fill` and the 州 colouring both set an inline style instead.
+
+Each record carries `d`, `en`, `jp`, `cap` (capital, in Latin script — the source has no Japanese capitals and transliterating ~180 by hand would be guesswork), `shu` (州), `sub`, `area`, `lat`/`lon` and `nb` (neighbours as cca3 codes). Resolve neighbours with `countryName`, not the by-cca3 map: microstates like Andorra and Monaco have facts but no polygon at 110m, so they are nameable but not drawable. Three areas (N. Cyprus, Somaliland, Kosovo) have geometry but no ISO code and are flagged `noFacts` — drawn so the map has no holes, with no fact card invented for them.
+
+Regenerate with `node scripts/build-country-data.mjs` (add `--res 50m` for finer borders, ~6x larger). **Data provenance:** borders are Natural Earth 1:110m admin-0 (public domain) via `world-atlas` (ISC); facts are the `world-countries` package, licensed **ODbL 1.0**, which is share-alike and requires attribution — the generated file carries the notice and only the fields the maps use are copied. Neither package is a package.json dependency. Keep that notice on any redistribution.
+
 **The shared base map** — `public/components/world-map.js` exposes `window.buildWorldMap`, following the same `window.build*` convention as `public/components/*`. Its coastline is Natural Earth 1:110m land (public domain) by way of the `world-atlas` package (ISC), converted once by `scripts/build-world-map-path.mjs` into a flat SVG path baked into the file. There is no runtime geodata dependency and `world-atlas` is not a package.json dependency; re-run the script only to change resolution. The path is baked in the projection lon0 = -20, lat1 = 62, scale = 8 — `buildWorldMap` re-projects it onto whatever window a map asks for, so the same outline serves an Afro-Eurasia crop and a whole-world view. It covers the full globe including Antarctica, New Zealand and Patagonia.
 
 **Progress** — Geography maps are **not** learner apps: they have no assignment record and are not in `src/data/lessons.ts` (the `Lesson` type is `subject: "english"`). Progress lives in `src/data/geographyProgress.ts`, local-first and Supabase-shaped exactly like `mathProgress.ts`, in the `geography_map_progress` table. A map is `explored` once every marker has been opened and `done` once its quiz is finished; `saveGeographyMapProgress` never downgrades what Leo has earned (best quiz score wins, `exploredCount` only grows, `done` stays done).

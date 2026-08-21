@@ -40,7 +40,7 @@ export const geographyChapters: GeographyChapterMeta[] = [
     dark: "#20736e",
     sections: [
       { id: "geo-g1-1", chapterId: "g1", number: 1, name: "1節 地球のすがた", status: "now", mapIds: ["sekai-no-sugata-map"] },
-      { id: "geo-g1-2", chapterId: "g1", number: 2, name: "2節 世界の国々", status: "todo", mapIds: [] },
+      { id: "geo-g1-2", chapterId: "g1", number: 2, name: "2節 世界の国々", status: "now", mapIds: ["sekai-no-kuniguni-map"] },
       { id: "geo-g1-3", chapterId: "g1", number: 3, name: "3節 緯度と経度・時差", status: "todo", mapIds: [] }
     ]
   },

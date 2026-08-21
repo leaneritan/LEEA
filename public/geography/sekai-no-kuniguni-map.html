@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>世界の国々｜地理 探検</title>
+<style>
+  :root{
+    --night:#0B1420; --panel:#122132; --panel2:#0F1B29; --sea:#16293C;
+    --ink:#F4EDE0; --muted:#8FA2B4; --line:#25384C;
+    --ochre:#EFB13C; --jade:#48C3A9; --plum:#D07CC8; --vermilion:#FF6B57; --sky:#6FB3E0;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Noto Serif JP",serif;
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",sans-serif;
+    --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 20% -10%, #16273A 0%, transparent 60%),var(--night);
+    color:var(--ink);font-family:var(--gothic);-webkit-font-smoothing:antialiased;padding:20px 20px 48px;
+  }
+  .shell{max-width:1480px;margin:0 auto}
+
+  header{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--muted);text-transform:uppercase}
+  h1{font-family:var(--mincho);font-weight:600;font-size:clamp(22px,3.4vw,34px);margin:6px 0 4px;letter-spacing:.04em}
+  h1 .sub{color:var(--jade)}
+  .lede{color:var(--muted);font-size:13px;line-height:1.7;max-width:62ch}
+
+  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0 12px}
+  .chip{
+    font-family:var(--gothic);font-size:13px;color:var(--ink);background:var(--panel);
+    border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;
+    transition:.15s;display:inline-flex;align-items:center;gap:7px;
+  }
+  .chip:hover{border-color:#3D5771}
+  .chip .dot{width:9px;height:9px;border-radius:50%;background:currentColor}
+  .chip[data-on="true"]{background:#1B2E43;border-color:#3F6182}
+  .chip[data-on="false"]{opacity:.42}
+  .chip.s0{color:#EFB13C} .chip.s1{color:#6FB3E0} .chip.s2{color:#48C3A9}
+  .chip.s3{color:#D07CC8} .chip.s4{color:#FF6B57} .chip.s5{color:#A8D26D}
+  .spacer{flex:1}
+  .btn{
+    font-family:var(--gothic);font-size:13px;font-weight:700;letter-spacing:.06em;
+    background:var(--jade);color:#04211B;border:none;border-radius:999px;padding:9px 20px;cursor:pointer;transition:.15s;
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .search{
+    font-family:var(--gothic);font-size:13px;background:var(--panel2);color:var(--ink);
+    border:1px solid var(--line);border-radius:999px;padding:8px 16px;width:210px;
+  }
+  .search::placeholder{color:#5F7285}
+  .search:focus{outline:none;border-color:var(--sky)}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+  .mapcard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  svg.map{display:block;width:100%;height:auto;background:var(--sea);min-width:760px}
+  .grat{stroke:#22384D;stroke-width:.6;fill:none}
+  .land{fill:#1E3348;stroke:none}
+  .country{fill:#C7B48F;stroke:#6E6244;stroke-width:.5;transition:fill .12s}
+  .country:hover{fill:#E4D5B4}
+  .country[data-dim="true"]{fill:#4A5A63;stroke:#3C4A52}
+  .country[data-sel="true"]{fill:#EFB13C;stroke:#7A5410;stroke-width:1.1}
+  .country[data-hit="true"]{fill:#48C3A9;stroke:#1D6B5C}
+  .country[data-key="true"]{stroke:#8A7648;stroke-width:.9}
+  .keydot{fill:#EFB13C;cursor:pointer}
+  .keydot:hover{fill:#FFD37A}
+  .swipe{font-size:11px;color:var(--muted);text-align:center;padding:6px 0 10px;border-top:1px solid var(--line)}
+
+  aside{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-height:460px}
+  aside .empty{color:var(--muted);font-size:13px;line-height:1.9;text-align:center;padding:80px 10px}
+  aside .empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:8px}
+  .cat{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px;color:var(--ochre)}
+  aside h2{font-family:var(--mincho);font-size:26px;margin:0 0 2px;letter-spacing:.03em}
+  .enname{color:var(--muted);font-size:13px;margin-bottom:14px;font-family:var(--mono)}
+  .facts{display:grid;gap:0;margin:0 0 14px;border-top:1px solid var(--line)}
+  .fact{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .fact span{color:var(--muted)}
+  .fact b{font-weight:700;text-align:right}
+  .nbtitle{font-size:12px;color:var(--muted);margin-bottom:8px}
+  .nb{display:flex;flex-wrap:wrap;gap:6px}
+  .nb button{
+    font-family:var(--gothic);font-size:12px;background:#0C1826;color:var(--ink);
+    border:1px solid var(--line);border-radius:6px;padding:5px 9px;cursor:pointer;transition:.15s;
+  }
+  .nb button:hover{border-color:var(--sky);color:var(--sky)}
+  .nb .none{color:var(--muted);font-size:12px}
+
+  .qmeta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:12px}
+  .qtext{font-size:15px;line-height:1.8;margin-bottom:6px}
+  .qbig{font-family:var(--mincho);font-size:30px;margin:6px 0 10px}
+  .qhint{color:var(--muted);font-size:12px}
+  .feedback{margin-top:14px;font-size:13px;line-height:1.8;padding:12px;border-radius:8px}
+  .feedback.ok{background:#102E28;color:#8FE3CE;border:1px solid #1E5C4E}
+  .feedback.ng{background:#31191C;color:#F0A6A6;border:1px solid #6B2B31}
+  .score{font-family:var(--mincho);font-size:34px;text-align:center;margin:18px 0 6px}
+
+  @media (max-width:1080px){ .grid{grid-template-columns:1fr} aside{min-height:0} }
+</style>
+<script src="/components/world-map.js"></script>
+<script src="/components/world-countries.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<header>
+  <div class="eyebrow">地理 第1章 ／ 第2節</div>
+  <h1>世界の国々 <span class="sub">— 国の名前と位置</span></h1>
+  <p class="lede">国をクリックすると、日本語名・英語名・首都・州・面積・となりの国が出てきます。州のチップでしぼりこんだり、名前で検索したりできます。★のついた国は、まず覚えたい国だよ。</p>
+</header>
+
+<div class="bar" id="filters">
+  <button class="chip shu s0" data-shu="アジア州" data-on="true"><span class="dot"></span>アジア州</button>
+  <button class="chip shu s1" data-shu="ヨーロッパ州" data-on="true"><span class="dot"></span>ヨーロッパ州</button>
+  <button class="chip shu s2" data-shu="アフリカ州" data-on="true"><span class="dot"></span>アフリカ州</button>
+  <button class="chip shu s3" data-shu="北アメリカ州" data-on="true"><span class="dot"></span>北アメリカ州</button>
+  <button class="chip shu s4" data-shu="南アメリカ州" data-on="true"><span class="dot"></span>南アメリカ州</button>
+  <button class="chip shu s5" data-shu="オセアニア州" data-on="true"><span class="dot"></span>オセアニア州</button>
+  <button class="chip" id="shuColourBtn" data-on="false">州で色分け</button>
+  <span class="spacer"></span>
+  <input class="search" id="search" type="search" placeholder="国名で検索（日本語・英語）" aria-label="国名で検索">
+  <button class="btn" id="quizBtn">クイズに挑戦</button>
+</div>
+
+<div class="grid">
+  <div class="mapcard">
+    <div class="scroller">
+      <svg class="map" preserveAspectRatio="xMidYMid meet" role="img" aria-label="世界の国々の地図"></svg>
+    </div>
+    <div class="swipe">← 地図は横にスクロールできます →</div>
+  </div>
+
+  <aside id="panel">
+    <div class="empty"><b>国をクリック</b>名前・首都・州・面積・となりの国が分かるよ。</div>
+  </aside>
+</div>
+</div>
+
+<script>
+/* ---------- base map + country layer (shared components) ---------- */
+const BASE=buildWorldMap({
+  svg:document.querySelector("svg.map"),
+  // Antarctica has no countries, so this window stops short of it — a standard
+  // political-map crop rather than the full globe used by 世界のすがた.
+  lon:[-180,180], lat:[-58,84], scale:3,
+  graticule:{lon:30,lat:30}
+});
+
+/* まず覚えたい国 — the 中1 core set. Progress and the quiz both key off this
+   list rather than all 177 countries, so "explored" means something. */
+const KEY=["JPN","CHN","KOR","IND","THA","SAU","IDN",
+           "GBR","FRA","DEU","ITA","ESP","RUS",
+           "EGY","ZAF","KEN","NGA",
+           "USA","CAN","MEX",
+           "BRA","ARG","PER",
+           "AUS","NZL"];
+const KEYSET=new Set(KEY);
+
+const SHU=["アジア州","ヨーロッパ州","アフリカ州","北アメリカ州","南アメリカ州","オセアニア州"];
+// Same order as the filter chips, so a chip's dot is the colour that 州's
+// countries take when 州で色分け is on.
+const SHU_COLOUR={"アジア州":"#EFB13C","ヨーロッパ州":"#6FB3E0","アフリカ州":"#48C3A9",
+                  "北アメリカ州":"#D07CC8","南アメリカ州":"#FF6B57","オセアニア州":"#A8D26D"};
+
+/* ---------- state ---------- */
+let selected=null, shuOn={}, query="", quiz=null, colourByShu=false;
+SHU.forEach(s=>shuOn[s]=1);
+
+const layer=buildCountryLayer(BASE,{onPick:(country)=>pick(country)});
+const paths=layer.paths;
+
+// ★ marks on the core countries, drawn in the same transformed space as the
+// country paths so they line up without re-projecting by hand.
+const starGroup=BASE.el("g",{transform:BASE.landPath.parentNode.getAttribute("transform")});
+WORLD_COUNTRIES.forEach(c=>{
+  if(!c.cca3||!KEYSET.has(c.cca3)||c.lat==null) return;
+  // Baked projection, matching the group transform above.
+  const[x,y]=[(c.lon+20)*8,(62-c.lat)*8];
+  const star=BASE.el("circle",{class:"keydot",cx:x,cy:y,r:9});
+  star.setAttribute("data-cca3",c.cca3);
+  // The star doubles as a hit target. A country's polygon can be hard to hit —
+  // an archipelago like 日本 or a small country like 韓国 is a few pixels wide
+  // at this scale — so the core countries always have something big to click.
+  star.addEventListener("click",()=>pick(c));
+  starGroup.appendChild(star);
+});
+BASE.svg.appendChild(starGroup);
+
+function matches(country){
+  if(!query) return true;
+  const q=query.toLowerCase();
+  return (country.jp||"").toLowerCase().includes(q)||(country.en||"").toLowerCase().includes(q);
+}
+
+function visible(country){
+  if(country.noFacts) return true;
+  // A 州 with no chip (南極) has no filter to switch on, so it must not be
+  // permanently dimmed by one that does not exist.
+  if((country.shu in shuOn)&&!shuOn[country.shu]) return false;
+  return matches(country);
+}
+
+function render(){
+  WORLD_COUNTRIES.forEach(c=>{
+    const node=c.id?paths[c.id]:null;
+    if(!node) return;
+    const on=visible(c);
+    node.setAttribute("data-dim",String(!on));
+    node.setAttribute("data-sel",String(selected===c.id));
+    node.setAttribute("data-key",String(Boolean(c.cca3&&KEYSET.has(c.cca3))));
+    node.removeAttribute("data-hit");
+    // An SVG fill *attribute* loses to the .country CSS rule, so the 州 colour
+    // has to be an inline style. The selected country is left uncoloured so the
+    // selection highlight in CSS still shows through.
+    const wantShuFill=colourByShu&&on&&selected!==c.id&&SHU_COLOUR[c.shu];
+    node.style.fill=wantShuFill?SHU_COLOUR[c.shu]:"";
+  });
+  starGroup.style.display=quiz?"none":"";
+}
+
+/* ---------- panel ---------- */
+function fmtArea(area){
+  if(!area) return "—";
+  return area.toLocaleString("ja-JP")+" km²";
+}
+
+function pick(country){
+  if(quiz){answer(country);return;}
+  selected=country.id; render();
+  leeaOpen(country);
+
+  const panel=document.getElementById("panel");
+  if(country.noFacts){
+    panel.innerHTML='<div class="cat">地域</div><h2>'+country.en+'</h2>'+
+      '<div class="enname">'+country.en+'</div>'+
+      '<p style="color:var(--muted);font-size:13px;line-height:1.9">この地域は、この地図が使っているデータに国としての情報がありません。</p>';
+    return;
+  }
+
+  const neighbours=(country.nb||[]).map(code=>{
+    const name=countryName(code);
+    return name?{code:code,jp:name.jp}:null;
+  }).filter(Boolean);
+
+  panel.innerHTML=
+    '<div class="cat">'+country.shu+(KEYSET.has(country.cca3)?' ・ まず覚えたい国 ★':'')+'</div>'+
+    '<h2>'+country.jp+'</h2>'+
+    '<div class="enname">'+country.en+'</div>'+
+    '<div class="facts">'+
+      '<div class="fact"><span>首都</span><b>'+(country.cap||"—")+'</b></div>'+
+      '<div class="fact"><span>州</span><b>'+country.shu+'</b></div>'+
+      '<div class="fact"><span>面積</span><b>'+fmtArea(country.area)+'</b></div>'+
+      '<div class="fact"><span>となりの国</span><b>'+(neighbours.length?neighbours.length+" か国":"なし（海に囲まれている）")+'</b></div>'+
+    '</div>'+
+    '<div class="nbtitle">となりの国</div>'+
+    '<div class="nb" id="nb"></div>';
+
+  const nb=document.getElementById("nb");
+  if(!neighbours.length){
+    const none=document.createElement("span");
+    none.className="none";
+    none.textContent="陸でとなり合う国はありません。";
+    nb.appendChild(none);
+  } else {
+    neighbours.forEach(n=>{
+      const button=document.createElement("button");
+      button.type="button";
+      button.textContent=n.jp;
+      button.addEventListener("click",()=>{
+        const target=WORLD_COUNTRY_BY_CCA3[n.code];
+        if(target) pick(target);
+      });
+      nb.appendChild(button);
+    });
+  }
+}
+
+function resetPanel(){
+  selected=null; render();
+  document.getElementById("panel").innerHTML=
+    '<div class="empty"><b>国をクリック</b>名前・首都・州・面積・となりの国が分かるよ。</div>';
+}
+
+/* ---------- filters + search ---------- */
+document.querySelectorAll("#filters .chip.shu").forEach(chip=>{
+  chip.addEventListener("click",()=>{
+    const key=chip.dataset.shu;
+    shuOn[key]=shuOn[key]?0:1;
+    chip.dataset.on=String(Boolean(shuOn[key]));
+    render();
+  });
+});
+
+document.getElementById("shuColourBtn").addEventListener("click",(event)=>{
+  colourByShu=!colourByShu;
+  event.currentTarget.dataset.on=String(colourByShu);
+  render();
+});
+
+document.getElementById("search").addEventListener("input",(event)=>{
+  query=event.target.value.trim();
+  render();
+});
+
+/* ---------- quiz ---------- */
+const quizBtn=document.getElementById("quizBtn");
+quizBtn.addEventListener("click",()=>{ if(quiz) endQuiz(); else startQuiz(); });
+
+function startQuiz(){
+  SHU.forEach(s=>shuOn[s]=1);
+  document.querySelectorAll("#filters .chip.shu").forEach(chip=>chip.dataset.on="true");
+  query=""; document.getElementById("search").value="";
+
+  const pool=KEY.slice().sort(()=>Math.random()-.5).slice(0,10);
+  quiz={pool:pool,i:0,score:0,locked:false};
+  quizBtn.textContent="クイズをやめる";
+  selected=null; render(); askQ();
+}
+
+function endQuiz(){ quiz=null; quizBtn.textContent="クイズに挑戦"; resetPanel(); }
+
+function askQ(){
+  const country=WORLD_COUNTRY_BY_CCA3[quiz.pool[quiz.i]];
+  document.getElementById("panel").innerHTML=
+    '<div class="qmeta"><span>第 '+(quiz.i+1)+' 問 / '+quiz.pool.length+'</span><span>正解 '+quiz.score+'</span></div>'+
+    '<div class="cat" style="color:var(--jade)">国あてクイズ</div>'+
+    '<div class="qtext">この国はどこ？</div>'+
+    '<div class="qbig">'+country.jp+'</div>'+
+    '<div class="qhint">ヒント：'+country.shu+' ／ 首都 '+(country.cap||"—")+'</div>';
+}
+
+function answer(picked){
+  if(quiz.locked||picked.noFacts) return;
+  quiz.locked=true;
+  const target=WORLD_COUNTRY_BY_CCA3[quiz.pool[quiz.i]];
+  const correct=picked.cca3===target.cca3;
+  if(correct) quiz.score++;
+
+  render();
+  if(paths[target.id]) paths[target.id].setAttribute("data-hit","true");
+  if(!correct&&paths[picked.id]) paths[picked.id].setAttribute("data-sel","true");
+
+  const panel=document.getElementById("panel");
+  panel.innerHTML=
+    '<div class="qmeta"><span>第 '+(quiz.i+1)+' 問 / '+quiz.pool.length+'</span><span>正解 '+quiz.score+'</span></div>'+
+    '<div class="qbig">'+target.jp+'</div>'+
+    '<div class="feedback '+(correct?"ok":"ng")+'">'+
+      (correct?'正解！ ':'おしい。えらんだのは「'+picked.jp+'」。<br>')+
+      target.jp+' は '+target.shu+'、首都は '+(target.cap||"—")+'。'+
+    '</div>';
+
+  const next=document.createElement("button");
+  next.className="btn"; next.style.cssText="margin:18px auto 0;display:block";
+  next.textContent=quiz.i<quiz.pool.length-1?"次の問題へ":"結果を見る";
+  next.addEventListener("click",()=>{
+    if(quiz.i<quiz.pool.length-1){quiz.i++;quiz.locked=false;selected=null;render();askQ();}
+    else showScore();
+  });
+  panel.appendChild(next);
+}
+
+function showScore(){
+  leeaReport({correct:quiz.score,total:quiz.pool.length});
+  const panel=document.getElementById("panel");
+  const msg=quiz.score>=9?"かんぺき！ 世界地図マスター":quiz.score>=7?"よくできました！":quiz.score>=4?"あと少し。地図をもう一度見てみよう":"もう一度、地図を調べてみよう";
+  panel.innerHTML='<div class="cat">けっか</div><div class="score">'+quiz.score+' / '+quiz.pool.length+'</div>'+
+    '<div class="qhint" style="text-align:center;font-size:14px">'+msg+'</div>';
+  const again=document.createElement("button");
+  again.className="btn"; again.style.cssText="margin:18px auto 0;display:block";
+  again.textContent="もう一度"; again.addEventListener("click",startQuiz);
+  panel.appendChild(again);
+  const back=document.createElement("button");
+  back.className="btn ghost"; back.style.cssText="margin:10px auto 0;display:block";
+  back.textContent="地図にもどる"; back.addEventListener("click",endQuiz);
+  panel.appendChild(back);
+}
+
+/* ---------- LEEA progress bridge ----------
+   "Explored" is measured against the まず覚えたい国 set, not all 177 countries,
+   so the milestone is reachable and meaningful. Report, never store. */
+const LEEA_MAP_ID="sekai-no-kuniguni-map";
+const leeaOpened=new Set();
+function leeaOpen(country){
+  if(country.cca3&&KEYSET.has(country.cca3)){
+    leeaOpened.add(country.cca3);
+    leeaReport();
+  }
+}
+function leeaReport(quizResult){
+  if(window.parent===window) return;
+  try{
+    window.parent.postMessage({
+      type:"LEEA_GEO_PROGRESS",
+      mapId:LEEA_MAP_ID,
+      explored:leeaOpened.size,
+      exploredTotal:KEY.length,
+      quiz:quizResult||undefined
+    },window.location.origin);
+  }catch(e){/* never let reporting break the map */}
+}
+
+render();
+</script>
+</body>
+</html>

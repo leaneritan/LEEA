@@ -74,6 +74,7 @@
   svg.map.coordmode{cursor:crosshair}
   .grat{stroke:#20374C;stroke-width:.6;fill:none}
   .land{fill:var(--land);stroke:var(--coast);stroke-width:.7;stroke-linejoin:round}
+  .borderline{fill:none;stroke:#94835C;stroke-width:.55}
 
   .special{stroke-width:1.1;fill:none}
   .equator{stroke:var(--vermilion);stroke-dasharray:none}
@@ -117,6 +118,7 @@
   @media (max-width:1080px){ .grid{grid-template-columns:1fr} aside{min-height:0} }
 </style>
 <script src="/components/world-map.js"></script>
+<script src="/components/world-countries.js"></script>
 </head>
 <body>
 <div class="shell">
@@ -133,6 +135,7 @@
   <button class="chip c3" data-layer="lines" data-on="true"><span class="dot"></span>赤道・回帰線</button>
   <button class="chip c4" data-layer="grid" data-on="false"><span class="dot"></span>緯線・経線</button>
   <button class="chip c5" data-layer="shu" data-on="false"><span class="dot"></span>州の区分</button>
+  <button class="chip" data-layer="borders" data-on="false"><span class="dot"></span>今の国境</button>
   <span class="spacer"></span>
   <button class="btn coord" id="coordBtn" data-on="false">座標を読む</button>
   <button class="btn" id="quizBtn">クイズに挑戦</button>
@@ -317,6 +320,15 @@ SHU.forEach(([lon,lat,name])=>{
   shuLayer.appendChild(t);
 });
 
+// 今の国境 — the same shared country data the 世界の国々 map uses, drawn as
+// outlines only so the land fill still shows through. Static: this map is
+// about continents and oceans, so the borders are context, not a target.
+const borderLayer=buildCountryLayer(BASE,{layerClass:"border-layer",className:"borderline"});
+borderLayer.group.style.display="none";
+// buildCountryLayer appends to the svg, which would put the borders above the
+// markers; SVG paints in document order, so move it back under them.
+BASE.svg.insertBefore(borderLayer.group,document.getElementById("markers"));
+
 // markers
 const layer=document.getElementById("markers");
 const nodes={};
@@ -337,7 +349,7 @@ DATA.forEach(d=>{
 });
 
 /* ---------- state ---------- */
-let selected=null, layers={cont:1,ocean:1,lines:1,grid:0,shu:0}, quiz=null, coordMode=false;
+let selected=null, layers={cont:1,ocean:1,lines:1,grid:0,shu:0,borders:0}, quiz=null, coordMode=false;
 
 function render(){
   DATA.forEach(d=>{
@@ -348,6 +360,7 @@ function render(){
   document.getElementById("lineLayer").style.display=layers.lines?"":"none";
   document.getElementById("gridLayer").style.display=layers.grid?"":"none";
   document.getElementById("shuLayer").style.display=layers.shu?"":"none";
+  borderLayer.group.style.display=layers.borders?"":"none";
 }
 
 function pick(id){

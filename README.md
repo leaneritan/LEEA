@@ -135,7 +135,8 @@ Implemented first:
 - named starter dashboard variables
 - Supabase client placeholder
 - Geography subject as a real 社会 course: a 章/節 spine for 地理的分野 and 歴史的分野, chapter pages, and per-map progress
-- two interactive maps built on a shared world-map component — 古代文明マップ (第2章 古代) and 世界のすがた (地理 第1章)
+- three interactive maps on shared map components — 古代文明マップ (歴史 第2章), 世界のすがた (地理 第1章 1節) and 世界の国々 (地理 第1章 2節)
+- shared country borders + facts layer (Natural Earth / world-countries), baked at build time — no runtime geodata dependency
 
 Prototype:
 

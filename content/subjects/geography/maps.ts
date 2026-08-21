@@ -79,6 +79,23 @@ export const geographyMaps: GeographyMap[] = [
     embedPath: "/geography/sekai-no-sugata-map.html"
   },
   {
+    id: "sekai-no-kuniguni-map",
+    title: "Countries of the World",
+    jpTitle: "世界の国々 — 国の名前と位置",
+    jpShortTitle: "世界の国々",
+    sourceLabel: "地理 第1章 ／ 第2節",
+    kind: "Interactive map",
+    meta: "177 countries · 25 to learn first · 10 quiz questions",
+    summary:
+      "Click any country for its Japanese and English name, capital, 州, area and land neighbours — then jump straight to a neighbour. Filter by 州, search by name, and test yourself on the 25 countries worth learning first.",
+    jpSummary:
+      "国をクリックすると、日本語名・英語名・首都・州・面積・となりの国が分かります。州でしぼりこんだり、名前で検索したりできます。",
+    layers: ["アジア州", "ヨーロッパ州", "アフリカ州", "北アメリカ州", "南アメリカ州", "オセアニア州"],
+    buildStatus: "live",
+    quizTotal: 10,
+    embedPath: "/geography/sekai-no-kuniguni-map.html"
+  },
+  {
     id: "kikoutai-map",
     title: "World Climate Zones",
     jpTitle: "気候帯マップ — 世界の気候と暮らし",

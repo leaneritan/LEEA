@@ -162,6 +162,19 @@
     svg.map{height:auto}
     aside{overflow:visible}
   }
+
+  /* zoom + panel controls, overlaid on the map corner */
+  .worldmap-zoom{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:4px;z-index:5}
+  .worldmap-zoom button{
+    width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--gothic);font-size:15px;line-height:1;
+    background:#122132ee;color:var(--ink);border:1px solid var(--line);border-radius:8px;
+    cursor:pointer;transition:.15s;padding:0;
+  }
+  .worldmap-zoom button:hover:not(:disabled){border-color:#3F6182;background:#1B2E43}
+  .worldmap-zoom button:disabled{opacity:.35;cursor:default}
+  .grid.panel-hidden{grid-template-columns:minmax(0,1fr)}
+  .grid.panel-hidden aside{display:none}
 </style>
 <script src="/components/world-map.js"></script>
 </head>
@@ -201,7 +214,7 @@
         <g id="markers"></g>
       </svg>
     </div>
-    <div class="swipe">← 地図は横にスクロールできます →</div>
+    <div class="swipe">ホイールかピンチで拡大・縮小、ドラッグで移動。右下の ⤾ で全体表示にもどります。</div>
     <div class="ruler">
       <div class="rulertop">
         <div class="year" id="yearOut">紀元前4000年</div>
@@ -453,6 +466,7 @@ function leeaReport(quizResult){
 
 function pick(id){
   if(quiz){answer(id);return;}
+  showPanel();
   selected=id; render();
   leeaOpened.add(id); leeaReport();
   const d=DATA.find(x=>x.id===id);
@@ -502,6 +516,7 @@ const quizBtn=document.getElementById("quizBtn");
 quizBtn.addEventListener("click",()=>{quiz?endQuiz():startQuiz();});
 
 function startQuiz(){
+  showPanel();
   quiz={order:QUIZ.map((q,i)=>i).sort(()=>Math.random()-.5),i:0,score:0,locked:false};
   quizBtn.textContent="クイズをやめる"; quizBtn.classList.add("ghost");
   year=800; slider.value=800;
@@ -579,6 +594,31 @@ pick=function(id){
 
 render();
 centreMap();
+
+/* ---------- zoom + collapsible panel (shared behaviour) ---------- */
+enableZoom(BASE);
+
+// The panel toggle joins the zoom cluster rather than the control bar, which
+// is already full. Collapsing it hands the whole width to the map — a world
+// map is width-limited, so this is what actually makes it bigger.
+const grid=document.querySelector(".grid");
+const panelToggle=document.createElement("button");
+panelToggle.type="button";
+document.querySelector(".worldmap-zoom").appendChild(panelToggle);
+
+function setPanelHidden(hidden){
+  grid.classList.toggle("panel-hidden",hidden);
+  panelToggle.textContent=hidden?"\u25c2":"\u25b8";
+  panelToggle.title=hidden?"パネルを開く":"パネルを閉じる";
+  panelToggle.setAttribute("aria-label",panelToggle.title);
+  panelToggle.setAttribute("aria-expanded",String(!hidden));
+}
+panelToggle.addEventListener("click",()=>setPanelHidden(!grid.classList.contains("panel-hidden")));
+setPanelHidden(false);
+
+/** Anything that writes the panel opens it first — otherwise a click on the
+    map would look like it did nothing while the panel was collapsed. */
+function showPanel(){ if(grid.classList.contains("panel-hidden")) setPanelHidden(false); }
 </script>
 </body>
 </html>

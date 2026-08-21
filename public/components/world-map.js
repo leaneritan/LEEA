@@ -136,6 +136,203 @@
     };
   }
 
+
+  /**
+   * Adds zoom and pan to a map built by buildWorldMap.
+   *
+   *   enableZoom(base)                       // wheel, drag, pinch, + overlay buttons
+   *   enableZoom(base, { max: 12 })
+   *
+   * Works by moving the svg's viewBox, so everything drawn on the map — land,
+   * markers, labels — scales together and stays in register. The home view is
+   * whatever buildWorldMap set, and zooming out never goes past it, so the map
+   * cannot be lost off screen.
+   *
+   * Returns { zoomIn, zoomOut, reset, isZoomed }.
+   */
+  function enableZoom(base, options) {
+    options = options || {};
+    var svg = base.svg;
+    var maxZoom = options.max || 10;
+    var home = { x: 0, y: 0, w: base.width, h: base.height };
+    var view = { x: home.x, y: home.y, w: home.w, h: home.h };
+
+    // A drag that ends on a country must not also count as a click on it, so
+    // the pointer distance is tracked and a click is swallowed in the capture
+    // phase — before it can reach whatever handler the map attached.
+    var DRAG_SLOP = 4;
+    var pointers = new Map();
+    var dragged = false;
+    var lastPinchDistance = 0;
+
+    function apply() {
+      svg.setAttribute("viewBox", view.x + " " + view.y + " " + view.w + " " + view.h);
+      svg.style.cursor = isZoomed() ? "grab" : "";
+      if (resetButton) resetButton.disabled = !isZoomed();
+    }
+
+    function isZoomed() {
+      return view.w < home.w - 0.5;
+    }
+
+    function clampView() {
+      // Never wider than home, and never panned past its edges.
+      view.w = Math.min(view.w, home.w);
+      view.h = Math.min(view.h, home.h);
+      view.x = Math.max(home.x, Math.min(view.x, home.x + home.w - view.w));
+      view.y = Math.max(home.y, Math.min(view.y, home.y + home.h - view.h));
+    }
+
+    /** Client pixel -> current svg user units. */
+    function toSvg(clientX, clientY) {
+      var ctm = svg.getScreenCTM();
+      if (!ctm) return null;
+      var point = svg.createSVGPoint();
+      point.x = clientX;
+      point.y = clientY;
+      return point.matrixTransform(ctm.inverse());
+    }
+
+    /** Scales about a fixed point so the spot under the cursor stays put. */
+    function zoomAt(factor, clientX, clientY) {
+      var anchor = clientX == null ? null : toSvg(clientX, clientY);
+      var nextW = view.w / factor;
+      var nextH = view.h / factor;
+
+      // Clamp to the zoom range before working out the offset.
+      var minW = home.w / maxZoom;
+      if (nextW < minW) { nextH *= minW / nextW; nextW = minW; }
+      if (nextW > home.w) { nextH *= home.w / nextW; nextW = home.w; }
+
+      if (anchor) {
+        var ratioX = (anchor.x - view.x) / view.w;
+        var ratioY = (anchor.y - view.y) / view.h;
+        view.x = anchor.x - ratioX * nextW;
+        view.y = anchor.y - ratioY * nextH;
+      } else {
+        view.x += (view.w - nextW) / 2;
+        view.y += (view.h - nextH) / 2;
+      }
+
+      view.w = nextW;
+      view.h = nextH;
+      clampView();
+      apply();
+    }
+
+    function reset() {
+      view = { x: home.x, y: home.y, w: home.w, h: home.h };
+      apply();
+    }
+
+    svg.addEventListener("wheel", function (event) {
+      event.preventDefault();
+      zoomAt(event.deltaY < 0 ? 1.16 : 1 / 1.16, event.clientX, event.clientY);
+    }, { passive: false });
+
+    svg.addEventListener("pointerdown", function (event) {
+      pointers.set(event.pointerId, {
+        x: event.clientX, y: event.clientY,
+        startX: event.clientX, startY: event.clientY,
+        captured: false
+      });
+      if (pointers.size === 1) dragged = false;
+    });
+
+    svg.addEventListener("pointermove", function (event) {
+      var pointer = pointers.get(event.pointerId);
+      if (!pointer) return;
+
+      if (pointers.size === 2) {
+        // Pinch: scale by how the gap between the two pointers changed.
+        pointer.x = event.clientX;
+        pointer.y = event.clientY;
+        var both = Array.from(pointers.values());
+        var distance = Math.hypot(both[0].x - both[1].x, both[0].y - both[1].y);
+        if (lastPinchDistance > 0 && distance > 0) {
+          zoomAt(distance / lastPinchDistance, (both[0].x + both[1].x) / 2, (both[0].y + both[1].y) / 2);
+        }
+        lastPinchDistance = distance;
+        dragged = true;
+        event.preventDefault();
+        return;
+      }
+
+      if (pointers.size !== 1 || !isZoomed()) return;
+
+      // Capture is taken only once the pointer has really travelled. Capturing
+      // on pointerdown would retarget the following click to the svg, and the
+      // map's own handlers on countries and markers would never fire.
+      if (!pointer.captured) {
+        if (Math.hypot(event.clientX - pointer.startX, event.clientY - pointer.startY) <= DRAG_SLOP) return;
+        pointer.captured = true;
+        dragged = true;
+        svg.setPointerCapture(event.pointerId);
+        svg.style.cursor = "grabbing";
+      }
+
+      var box = svg.getBoundingClientRect();
+      var scaleX = view.w / box.width;
+      var scaleY = view.h / box.height;
+      view.x -= (event.clientX - pointer.x) * scaleX;
+      view.y -= (event.clientY - pointer.y) * scaleY;
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+
+      clampView();
+      apply();
+      event.preventDefault();
+    });
+
+    function endPointer(event) {
+      var pointer = pointers.get(event.pointerId);
+      if (pointer && pointer.captured && svg.hasPointerCapture(event.pointerId)) {
+        svg.releasePointerCapture(event.pointerId);
+      }
+      pointers.delete(event.pointerId);
+      if (pointers.size < 2) lastPinchDistance = 0;
+      if (pointers.size === 0) svg.style.cursor = isZoomed() ? "grab" : "";
+    }
+    svg.addEventListener("pointerup", endPointer);
+    svg.addEventListener("pointercancel", endPointer);
+
+    svg.addEventListener("click", function (event) {
+      if (!dragged) return;
+      dragged = false;
+      event.stopPropagation();
+      event.preventDefault();
+    }, true);
+
+    // Overlay controls, so no map has to find room for them in its own bar.
+    var host = svg.parentNode;
+    if (host && getComputedStyle(host).position === "static") host.style.position = "relative";
+
+    var controls = document.createElement("div");
+    controls.className = "worldmap-zoom";
+    var resetButton = null;
+
+    function button(label, title, onClick) {
+      var node = document.createElement("button");
+      node.type = "button";
+      node.textContent = label;
+      node.title = title;
+      node.setAttribute("aria-label", title);
+      node.addEventListener("click", onClick);
+      controls.appendChild(node);
+      return node;
+    }
+
+    button("+", "拡大", function () { zoomAt(1.5); });
+    button("−", "縮小", function () { zoomAt(1 / 1.5); });
+    resetButton = button("⤾", "全体表示にもどす", reset);
+
+    if (host) host.appendChild(controls);
+    apply();
+
+    return { zoomIn: function () { zoomAt(1.5); }, zoomOut: function () { zoomAt(1 / 1.5); }, reset: reset, isZoomed: isZoomed };
+  }
+
   window.buildWorldMap = buildWorldMap;
+  window.enableZoom = enableZoom;
   window.WORLD_LAND_PATH = WORLD_LAND_PATH;
 })();

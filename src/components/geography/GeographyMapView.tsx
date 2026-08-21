@@ -3,8 +3,12 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import type { GeographyMap } from "../../../content/subjects/geography/maps";
-import { getGeographyPlacementByMapId } from "../../../content/subjects/geography/curriculum";
+import {
+  geographyFieldLabels,
+  geographyMaps,
+  isGeographyMapReady,
+  type GeographyMap
+} from "../../../content/subjects/geography/maps";
 import {
   createGeographyMapProgressRecord,
   getGeographyMapRecord,
@@ -12,7 +16,8 @@ import {
   saveGeographyMapProgress,
   syncGeographyProgressWithCloud,
   type GeographyMapProgressRecord,
-  type GeographyMapProgressStatus
+  type GeographyMapProgressStatus,
+  type GeographyProgressMap
 } from "@/data/geographyProgress";
 
 /**
@@ -23,25 +28,25 @@ import {
 type GeographyMapMessage = {
   type: "LEEA_GEO_PROGRESS";
   mapId?: string;
-  /** How many distinct markers Leo has opened. */
   explored?: number;
-  /** How many markers the map has in total. */
   exploredTotal?: number;
   quiz?: { correct: number; total: number };
 };
 
+const STATUS_LABEL: Record<GeographyMapProgressStatus, string> = {
+  "not-done": "Not started",
+  explored: "Explored",
+  done: "Finished"
+};
+
 export function GeographyMapView({ map }: { map: GeographyMap }) {
-  const placement = getGeographyPlacementByMapId(map.id);
-  const sectionId = placement?.section.id ?? "unfiled";
-  const [record, setRecord] = useState<GeographyMapProgressRecord | null>(null);
+  const [progress, setProgress] = useState<GeographyProgressMap>({});
 
   useEffect(() => {
     const local = readGeographyProgress();
-    setRecord(getGeographyMapRecord(sectionId, map.id, local));
-    void syncGeographyProgressWithCloud(local).then((merged) => {
-      setRecord(getGeographyMapRecord(sectionId, map.id, merged));
-    });
-  }, [map.id, sectionId]);
+    setProgress(local);
+    void syncGeographyProgressWithCloud(local).then(setProgress);
+  }, []);
 
   const handleMessage = useCallback(
     async (event: MessageEvent) => {
@@ -58,11 +63,11 @@ export function GeographyMapView({ map }: { map: GeographyMap }) {
       else if (exploredTotal > 0 && explored >= exploredTotal) status = "explored";
 
       const saved = await saveGeographyMapProgress(
-        createGeographyMapProgressRecord(sectionId, map.id, status, message.quiz ?? null, explored)
+        createGeographyMapProgressRecord(map.id, status, message.quiz ?? null, explored)
       );
-      setRecord(saved);
+      setProgress((current) => ({ ...current, [saved.mapId]: saved }));
     },
-    [map.id, sectionId]
+    [map.id]
   );
 
   useEffect(() => {
@@ -73,60 +78,64 @@ export function GeographyMapView({ map }: { map: GeographyMap }) {
     return () => window.removeEventListener("message", listener);
   }, [handleMessage]);
 
-  const statusLabel =
-    record?.status === "done" ? "Finished" : record?.status === "explored" ? "Explored" : "Not started";
+  const record: GeographyMapProgressRecord | null = getGeographyMapRecord(map.id, progress);
+  const status = record?.status ?? "not-done";
 
   return (
-    <section className="geo-map-page">
-      <header className="geo-map-bar">
-        <div>
-          <span className="eyebrow">
-            {placement
-              ? `${placement.chapter.num} ${placement.chapter.title} - ${placement.section.name}`
-              : map.sourceLabel}
-          </span>
-          <h1>{map.title}</h1>
-          <p className="geo-map-jp-title">{map.jpTitle}</p>
+    <section className="geo-page">
+      <div className="geo-bar">
+        <div className="geo-bar-title">
+          <strong>{map.jpShortTitle}</strong>
+          <small>{map.title}{map.sourceLabel ? ` · ${map.sourceLabel}` : ""}</small>
         </div>
-        <nav aria-label="Map actions">
-          {placement ? (
-            <Link className="ghost-button" href={`/geography/${placement.chapter.id}`}>
-              {placement.chapter.num}
-            </Link>
+
+        <nav className="geo-switch" aria-label="Maps">
+          {geographyMaps.map((entry) => {
+            const ready = isGeographyMapReady(entry);
+            const entryStatus = getGeographyMapRecord(entry.id, progress)?.status ?? "not-done";
+            const className = [
+              "geo-switch-btn",
+              entry.id === map.id ? "geo-switch-btn--active" : "",
+              ready ? "" : "geo-switch-btn--planned",
+              entryStatus === "done" ? "geo-switch-btn--done" : ""
+            ]
+              .filter(Boolean)
+              .join(" ");
+
+            return (
+              <Link
+                aria-current={entry.id === map.id ? "page" : undefined}
+                className={className}
+                href={`/geography/${entry.id}`}
+                key={entry.id}
+                title={`${entry.title} — ${geographyFieldLabels[entry.field].jp}`}
+              >
+                {entry.jpShortTitle}
+                {entryStatus === "done" ? <i aria-hidden>✓</i> : null}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="geo-bar-end">
+          <span className={`geo-pill geo-pill--${status}`}>{STATUS_LABEL[status]}</span>
+          {record?.quizScore ? (
+            <small>{record.quizScore.correct}/{record.quizScore.total}</small>
           ) : null}
-          <Link className="ghost-button" href="/geography">
-            All Maps
-          </Link>
           {map.embedPath ? (
-            <a className="ghost-button" href={map.embedPath} rel="noreferrer" target="_blank">
-              Open Fullscreen
-              <ExternalLink size={16} />
+            <a className="geo-fullscreen" href={map.embedPath} rel="noreferrer" target="_blank" title="Open fullscreen">
+              <ExternalLink size={15} />
             </a>
           ) : null}
-        </nav>
-      </header>
-
-      <div className="geo-progress-strip">
-        <span className={`geo-progress-pill geo-progress-pill--${record?.status ?? "not-done"}`}>{statusLabel}</span>
-        <small>
-          {record?.exploredCount
-            ? `${record.exploredCount} place${record.exploredCount === 1 ? "" : "s"} opened`
-            : "Open every marker, then try the quiz."}
-        </small>
-        {record?.quizScore ? (
-          <strong>
-            Best quiz {record.quizScore.correct}/{record.quizScore.total}
-          </strong>
-        ) : map.quizTotal ? (
-          <strong className="geo-progress-muted">Quiz: {map.quizTotal} questions</strong>
-        ) : null}
+        </div>
       </div>
 
       {map.embedPath ? (
         <iframe className="geo-map-frame" src={map.embedPath} title={map.title} />
       ) : (
         <div className="geo-map-missing">
-          <h2>Map file needed</h2>
+          <h2>{map.jpShortTitle} — map file needed</h2>
+          <p>{map.summary}</p>
           <p>
             Add the standalone HTML at <code>public/geography/{map.id}.html</code>, then set{" "}
             <code>embedPath</code> and <code>buildStatus: &quot;live&quot;</code> on this map.

@@ -1,23 +1,12 @@
-import { notFound } from "next/navigation";
-import { AppShell } from "@/components/AppShell";
-import { GeographyMapView } from "@/components/geography/GeographyMapView";
-import { geographyMaps, getGeographyMapById } from "../../../../../content/subjects/geography/maps";
+import { permanentRedirect } from "next/navigation";
 
-export function generateStaticParams() {
-  return geographyMaps.map((map) => ({ mapId: map.id }));
-}
-
-export default async function GeographyMapPage({ params }: { params: Promise<{ mapId: string }> }) {
+/**
+ * Maps briefly lived at /geography/map/<id> while Geography had chapter pages
+ * competing for the /geography/<id> segment. The chapters are gone, so the
+ * short URL is the real one again and this only exists to carry over links
+ * made while the longer form was live.
+ */
+export default async function LegacyGeographyMapPage({ params }: { params: Promise<{ mapId: string }> }) {
   const { mapId } = await params;
-  const map = getGeographyMapById(mapId);
-
-  if (!map) {
-    notFound();
-  }
-
-  return (
-    <AppShell active="geography" crumbs={["Home", "Geography", map.title]}>
-      <GeographyMapView map={map} />
-    </AppShell>
-  );
+  permanentRedirect(`/geography/${mapId}`);
 }

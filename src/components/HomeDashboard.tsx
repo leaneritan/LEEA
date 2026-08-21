@@ -8,7 +8,6 @@ import { getDoneLessonCount, readLessonProgress, syncLessonProgressWithCloud, ty
 import { learnerLessons, teacherLessons } from "@/data/lessons";
 import { allGrammar, allWords } from "@/components/reference/ref-data";
 import { geographyMaps, isGeographyMapReady } from "../../content/subjects/geography/maps";
-import { geographyChapters } from "../../content/subjects/geography/curriculum";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
 import { useKnownWordIds } from "./useKnownWordIds";
@@ -79,7 +78,7 @@ export function HomeDashboard() {
         <div className="design-subject-grid">
           <Link className="subject-card active" href="/english"><div><span>Active</span><b>📖</b></div><h3>English</h3><p>Our World, Joyful Work &amp; Training Ground.</p><footer><span>3 courses</span><span>L4 · U8</span></footer></Link>
           <Link className="subject-card active" href="/math"><div><span>Active</span><b>🔢</b></div><h3>Math</h3><p>新しい数学1 — 中1・8章, with an AI tutor chat.</p><footer><span>8 chapters</span><span>1章 2節</span></footer></Link>
-          <Link className="subject-card active" href="/geography"><div><span>Active</span><b>🗺️</b></div><h3>Geography</h3><p>社会 through maps Leo can move — 地理 &amp; 歴史.</p><footer><span>{geographyMaps.filter(isGeographyMapReady).length} maps</span><span>{geographyChapters.length} chapters</span></footer></Link>
+          <Link className="subject-card active" href="/geography"><div><span>Active</span><b>🗺️</b></div><h3>Geography</h3><p>Interactive maps for Leo — 地理 &amp; 歴史.</p><footer><span>{geographyMaps.filter(isGeographyMapReady).length} maps</span><span>地理 · 歴史</span></footer></Link>
           <article className="subject-card planned"><div><span>Soon</span><b>🔬</b></div><h3>Science</h3><p>Inquiry, experiments &amp; the natural world.</p><footer><span>Planned</span></footer></article>
           <article className="subject-card planned"><div><span>Soon</span><b>🏛️</b></div><h3>History</h3><p>People, places &amp; the story of the world.</p><footer><span>Planned</span></footer></article>
         </div>

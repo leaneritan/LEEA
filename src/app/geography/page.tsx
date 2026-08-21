@@ -1,10 +1,13 @@
 import { AppShell } from "@/components/AppShell";
-import { GeographyCourseHome } from "@/components/geography/GeographyCourseHome";
+import { GeographyMapView } from "@/components/geography/GeographyMapView";
+import { getDefaultGeographyMap } from "../../../content/subjects/geography/maps";
 
 export default function GeographyPage() {
+  const map = getDefaultGeographyMap();
+
   return (
     <AppShell active="geography" crumbs={["Home", "Geography"]}>
-      <GeographyCourseHome />
+      <GeographyMapView map={map} />
     </AppShell>
   );
 }

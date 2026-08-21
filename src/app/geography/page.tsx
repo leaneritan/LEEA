@@ -1,10 +1,10 @@
 import { AppShell } from "@/components/AppShell";
-import { GeographyHome } from "@/components/geography/GeographyHome";
+import { GeographyCourseHome } from "@/components/geography/GeographyCourseHome";
 
 export default function GeographyPage() {
   return (
     <AppShell active="geography" crumbs={["Home", "Geography"]}>
-      <GeographyHome />
+      <GeographyCourseHome />
     </AppShell>
   );
 }

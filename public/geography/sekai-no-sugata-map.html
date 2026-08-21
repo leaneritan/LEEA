@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>世界のすがた｜地理 探検</title>
+<style>
+  :root{
+    --night:#0B1420;
+    --panel:#122132;
+    --panel2:#0F1B29;
+    --sea:#16293C;
+    --land:#C7B48F;
+    --coast:#7E7156;
+    --ink:#F4EDE0;
+    --muted:#8FA2B4;
+    --line:#25384C;
+    --ochre:#EFB13C;
+    --jade:#48C3A9;
+    --plum:#D07CC8;
+    --vermilion:#FF6B57;
+    --sky:#6FB3E0;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Noto Serif JP",serif;
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",sans-serif;
+    --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 20% -10%, #16273A 0%, transparent 60%),
+      var(--night);
+    color:var(--ink);
+    font-family:var(--gothic);
+    -webkit-font-smoothing:antialiased;
+    padding:20px 20px 48px;
+  }
+  .shell{max-width:1480px;margin:0 auto}
+
+  header{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--muted);text-transform:uppercase}
+  h1{font-family:var(--mincho);font-weight:600;font-size:clamp(22px,3.4vw,34px);margin:6px 0 4px;letter-spacing:.04em}
+  h1 .sub{color:var(--jade)}
+  .lede{color:var(--muted);font-size:13px;line-height:1.7;max-width:62ch}
+
+  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0 12px}
+  .chip{
+    font-family:var(--gothic);font-size:13px;color:var(--ink);
+    background:var(--panel);border:1px solid var(--line);border-radius:999px;
+    padding:7px 14px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:7px;
+  }
+  .chip:hover{border-color:#3D5771}
+  .chip .dot{width:9px;height:9px;border-radius:50%;background:currentColor}
+  .chip[data-on="true"]{background:#1B2E43;border-color:#3F6182}
+  .chip[data-on="false"]{opacity:.42}
+  .chip.c1{color:var(--ochre)} .chip.c2{color:var(--jade)}
+  .chip.c3{color:var(--vermilion)} .chip.c4{color:var(--sky)} .chip.c5{color:var(--plum)}
+  .spacer{flex:1}
+  .btn{
+    font-family:var(--gothic);font-size:13px;font-weight:700;letter-spacing:.06em;
+    background:var(--jade);color:#04211B;border:none;border-radius:999px;
+    padding:9px 20px;cursor:pointer;transition:.15s;
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .btn.coord{background:var(--panel);color:var(--ink);border:1px solid var(--line)}
+  .btn.coord[data-on="true"]{background:var(--sky);color:#052034;border-color:var(--sky)}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+
+  .mapcard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  svg.map{display:block;width:100%;height:auto;background:var(--sea);min-width:720px}
+  svg.map.coordmode{cursor:crosshair}
+  .grat{stroke:#20374C;stroke-width:.6;fill:none}
+  .land{fill:var(--land);stroke:var(--coast);stroke-width:.7;stroke-linejoin:round}
+
+  .special{stroke-width:1.1;fill:none}
+  .equator{stroke:var(--vermilion);stroke-dasharray:none}
+  .tropic{stroke:var(--ochre);stroke-dasharray:7 5}
+  .polar{stroke:var(--sky);stroke-dasharray:3 5}
+  .meridian{stroke:var(--plum);stroke-dasharray:7 5}
+  .linelabel{font-family:var(--gothic);font-size:9px;fill:var(--muted)}
+
+  .clabel{font-family:var(--gothic);font-size:12px;font-weight:700;fill:#3D3524;paint-order:stroke;stroke:#EFE4CB;stroke-width:3.2;stroke-linejoin:round;cursor:pointer}
+  .olabel{font-family:var(--gothic);font-size:11px;font-weight:700;fill:#BFE0F2;cursor:pointer}
+  .shulabel{font-family:var(--gothic);font-size:10px;font-weight:700;fill:#6B5B36;letter-spacing:.08em}
+  .hit{cursor:pointer}
+  .hit circle{transition:.15s}
+  .hit[data-sel="true"] .ring{stroke-width:2.4}
+
+  .coordpin{fill:none;stroke:var(--sky);stroke-width:1.4}
+  .coordtext{font-family:var(--mono);font-size:10px;fill:#DDEFFA;paint-order:stroke;stroke:#0B1420;stroke-width:3;stroke-linejoin:round}
+
+  .swipe{font-size:11px;color:var(--muted);text-align:center;padding:6px 0 10px;border-top:1px solid var(--line)}
+
+  aside{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-height:420px}
+  aside .empty{color:var(--muted);font-size:13px;line-height:1.9;text-align:center;padding:70px 10px}
+  aside .empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:8px}
+  .cat{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
+  aside h2{font-family:var(--mincho);font-size:22px;margin:0 0 4px;letter-spacing:.03em}
+  .place{color:var(--muted);font-size:12px;margin-bottom:12px}
+  .rank{display:inline-block;background:#1B2E43;border:1px solid #3F6182;border-radius:999px;font-size:11px;padding:3px 10px;margin-bottom:12px}
+  aside ul{margin:0;padding-left:18px}
+  aside li{font-size:13px;line-height:1.85;margin-bottom:8px}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+  .tag{font-size:11px;background:#0C1826;border:1px solid var(--line);border-radius:6px;padding:4px 8px;color:var(--muted)}
+
+  .qmeta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:12px}
+  .qtext{font-size:15px;line-height:1.8;margin-bottom:14px}
+  .qhint{color:var(--muted);font-size:12px}
+  .feedback{margin-top:14px;font-size:13px;line-height:1.8;padding:12px;border-radius:8px}
+  .feedback.ok{background:#102E28;color:#8FE3CE;border:1px solid #1E5C4E}
+  .feedback.ng{background:#31191C;color:#F0A6A6;border:1px solid #6B2B31}
+  .score{font-family:var(--mincho);font-size:34px;text-align:center;margin:18px 0 6px}
+
+  @media (max-width:1080px){ .grid{grid-template-columns:1fr} aside{min-height:0} }
+</style>
+<script src="/components/world-map.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<header>
+  <div class="eyebrow">地理 第1章 ／ 第1節</div>
+  <h1>世界のすがた <span class="sub">— 六大陸と三大洋</span></h1>
+  <p class="lede">大陸や海洋の名前をクリックすると、くわしい内容が出てきます。「座標を読む」をオンにして地図をクリックすると、その地点の緯度と経度が分かります。</p>
+</header>
+
+<div class="bar" id="filters">
+  <button class="chip c1" data-layer="cont" data-on="true"><span class="dot"></span>六大陸</button>
+  <button class="chip c2" data-layer="ocean" data-on="true"><span class="dot"></span>三大洋</button>
+  <button class="chip c3" data-layer="lines" data-on="true"><span class="dot"></span>赤道・回帰線</button>
+  <button class="chip c4" data-layer="grid" data-on="false"><span class="dot"></span>緯線・経線</button>
+  <button class="chip c5" data-layer="shu" data-on="false"><span class="dot"></span>州の区分</button>
+  <span class="spacer"></span>
+  <button class="btn coord" id="coordBtn" data-on="false">座標を読む</button>
+  <button class="btn" id="quizBtn">クイズに挑戦</button>
+</div>
+
+<div class="grid">
+  <div class="mapcard">
+    <div class="scroller">
+      <svg class="map" preserveAspectRatio="xMidYMid meet" role="img" aria-label="世界のすがたの地図">
+        <!-- graticule + land are injected by buildWorldMap (/components/world-map.js) -->
+        <g id="gridLayer" style="display:none"></g>
+        <g id="lineLayer"></g>
+        <g id="shuLayer" style="display:none"></g>
+        <g id="markers"></g>
+        <g id="coordLayer"></g>
+      </svg>
+    </div>
+    <div class="swipe">← 地図は横にスクロールできます →</div>
+  </div>
+
+  <aside id="panel">
+    <div class="empty"><b>大陸や海洋をクリック</b>六大陸と三大洋の名前と特ちょうを調べよう。</div>
+  </aside>
+</div>
+</div>
+
+<script>
+/* ---------- projection + base map (shared: /components/world-map.js) ---------- */
+const BASE=buildWorldMap({
+  svg:document.querySelector("svg.map"),
+  lon:[-180,180], lat:[-86,84], scale:3,
+  graticule:null
+});
+const px=BASE.px, el=BASE.el;
+
+/* ---------- content ---------- */
+const CONTINENTS=[
+ {id:"eurasia",name:"ユーラシア大陸",lon:88,lat:52,rank:"面積 1位",
+  place:"アジアとヨーロッパを合わせた大陸",
+  facts:["六大陸のうち、最も大きい大陸。",
+         "ウラル山脈を境に、西側をヨーロッパ、東側をアジアとよび分ける。",
+         "日本はこの大陸の東のはしに、島国として位置している。",
+         "世界でいちばん高いエベレスト山（ヒマラヤ山脈）がある。"],
+  tags:["最大の大陸","ウラル山脈","ヒマラヤ山脈"]},
+
+ {id:"africa",name:"アフリカ大陸",lon:20,lat:2,rank:"面積 2位",
+  place:"赤道が大陸の中央を通る",
+  facts:["赤道が中央を通り、南北にほぼ同じ広がりをもつ。",
+         "北部には世界最大のサハラ砂漠が広がる。",
+         "赤道付近には熱帯雨林、そのまわりにサバナが広がる。",
+         "ナイル川は世界有数の長さをもつ川。"],
+  tags:["サハラ砂漠","赤道","ナイル川"]},
+
+ {id:"namerica",name:"北アメリカ大陸",lon:-100,lat:45,rank:"面積 3位",
+  place:"パナマ地峡で南アメリカとつながる",
+  facts:["西部にロッキー山脈が南北に走る。",
+         "パナマ地峡で南アメリカ大陸とつながっている。",
+         "北のほうは寒帯・亜寒帯、南のほうは温帯や乾燥帯と、気候の幅が広い。"],
+  tags:["ロッキー山脈","パナマ地峡"]},
+
+ {id:"samerica",name:"南アメリカ大陸",lon:-60,lat:-14,rank:"面積 4位",
+  place:"アンデス山脈とアマゾン川",
+  facts:["西部にアンデス山脈が南北に長く連なる。",
+         "赤道付近には、流域面積が世界最大のアマゾン川が流れる。",
+         "アマゾン川の流域には広大な熱帯雨林が広がる。"],
+  tags:["アンデス山脈","アマゾン川","熱帯雨林"]},
+
+ {id:"antarctica",name:"南極大陸",lon:10,lat:-78,rank:"面積 5位",
+  place:"厚い氷におおわれた大陸",
+  facts:["大陸のほとんどが厚い氷でおおわれている。",
+         "南極条約により、どこの国の領土でもないと決められている。",
+         "各国の観測基地があり、日本も昭和基地で観測を続けている。",
+         "地図では横に大きく引きのばされて見えるが、実際の形は丸みをおびている。"],
+  tags:["南極条約","昭和基地","氷床"]},
+
+ {id:"australia",name:"オーストラリア大陸",lon:134,lat:-25,rank:"面積 6位",
+  place:"六大陸で最も小さい大陸",
+  facts:["六大陸のうち、最も小さい大陸。",
+         "大陸の大部分が乾燥帯で、内陸には砂漠が広がる。",
+         "まわりの島々とあわせてオセアニア州とよばれる。"],
+  tags:["最小の大陸","乾燥帯","オセアニア州"]}
+];
+
+const OCEANS=[
+ {id:"pacific",name:"太平洋",lon:-150,lat:5,rank:"面積 1位",
+  place:"アジア・オセアニアと南北アメリカの間",
+  facts:["三大洋のうち、最も広い海洋。",
+         "日本の東に広がり、まわりには火山や地震が多い地域がある。",
+         "赤道をはさんで南北に大きく広がっている。"],
+  tags:["最大の海洋","日本の東"]},
+
+ {id:"atlantic",name:"大西洋",lon:-30,lat:12,rank:"面積 2位",
+  place:"ヨーロッパ・アフリカと南北アメリカの間",
+  facts:["三大洋のうち、二番目に広い海洋。",
+         "ヨーロッパ・アフリカ大陸と、南北アメリカ大陸の間に広がる。",
+         "S字のような形をしている。"],
+  tags:["ヨーロッパの西","S字"]},
+
+ {id:"indian",name:"インド洋",lon:76,lat:-28,rank:"面積 3位",
+  place:"アフリカ・アジア・オーストラリアに囲まれる",
+  facts:["三大洋のうち、三番目に広い海洋。",
+         "アフリカ大陸、ユーラシア大陸、オーストラリア大陸に囲まれている。",
+         "大部分が南半球にある。"],
+  tags:["南半球","インドの南"]}
+];
+
+const DATA=CONTINENTS.concat(OCEANS);
+const KIND={};
+CONTINENTS.forEach(c=>KIND[c.id]="cont");
+OCEANS.forEach(o=>KIND[o.id]="ocean");
+
+const SHU=[
+ [95,45,"アジア州"],[14,52,"ヨーロッパ州"],[22,-8,"アフリカ州"],
+ [-100,52,"北アメリカ州"],[-60,-24,"南アメリカ州"],[145,-32,"オセアニア州"]
+];
+
+const LINES=[
+ {lat:0,cls:"equator",label:"赤道 0°"},
+ {lat:23.4,cls:"tropic",label:"北回帰線 23.4°N"},
+ {lat:-23.4,cls:"tropic",label:"南回帰線 23.4°S"},
+ {lat:66.6,cls:"polar",label:"北極圏 66.6°N"},
+ {lat:-66.6,cls:"polar",label:"南極圏 66.6°S"}
+];
+
+const QUIZ=[
+ {q:"六大陸のうち、いちばん大きい大陸はどこ？",a:"eurasia"},
+ {q:"赤道が中央を通り、北部にサハラ砂漠が広がる大陸はどこ？",a:"africa"},
+ {q:"六大陸のうち、いちばん小さい大陸はどこ？",a:"australia"},
+ {q:"厚い氷におおわれ、どこの国の領土でもない大陸はどこ？",a:"antarctica"},
+ {q:"アンデス山脈とアマゾン川がある大陸はどこ？",a:"samerica"},
+ {q:"ロッキー山脈が南北に走り、パナマ地峡でとなりの大陸とつながる大陸はどこ？",a:"namerica"},
+ {q:"三大洋のうち、いちばん広い海洋はどこ？",a:"pacific"},
+ {q:"ヨーロッパ・アフリカ大陸と、南北アメリカ大陸の間に広がる海洋はどこ？",a:"atlantic"},
+ {q:"アフリカ・ユーラシア・オーストラリアの三つの大陸に囲まれた海洋はどこ？",a:"indian"},
+ {q:"日本が位置している大陸はどこ？",a:"eurasia"}
+];
+
+/* ---------- build layers ---------- */
+// 緯線・経線 (30° grid), drawn on demand
+const gridLayer=document.getElementById("gridLayer");
+for(let lon=-180;lon<=180;lon+=30){
+  const[a,b]=px(lon,84),[c,d]=px(lon,-86);
+  gridLayer.appendChild(el("line",{class:"grat",x1:a,y1:b,x2:c,y2:d}));
+  // Sit the 経度 labels just under the top edge — on the equator they collided
+  // with the 赤道 line and its label.
+  const t=el("text",{class:"linelabel",x:a+3,y:px(lon,78)[1]});
+  t.textContent=(lon===0?"0°":Math.abs(lon)+"°"+(lon>0?"E":"W"));
+  gridLayer.appendChild(t);
+}
+for(let lat=-60;lat<=80;lat+=30){
+  const[a,b]=px(-180,lat),[c,d]=px(180,lat);
+  gridLayer.appendChild(el("line",{class:"grat",x1:a,y1:b,x2:c,y2:d}));
+  const t=el("text",{class:"linelabel",x:4,y:b-3});
+  t.textContent=(lat===0?"0°":Math.abs(lat)+"°"+(lat>0?"N":"S"));
+  gridLayer.appendChild(t);
+}
+
+// 赤道・回帰線・極圏
+const lineLayer=document.getElementById("lineLayer");
+LINES.forEach(line=>{
+  const[a,b]=px(-180,line.lat),[c,d]=px(180,line.lat);
+  lineLayer.appendChild(el("line",{class:"special "+line.cls,x1:a,y1:b,x2:c,y2:d}));
+  const t=el("text",{class:"linelabel",x:c-4,y:d-4});
+  t.setAttribute("text-anchor","end");
+  t.textContent=line.label;
+  lineLayer.appendChild(t);
+});
+// 本初子午線
+const[mx,my]=px(0,84),[mx2,my2]=px(0,-86);
+lineLayer.appendChild(el("line",{class:"special meridian",x1:mx,y1:my,x2:mx2,y2:my2}));
+const mlab=el("text",{class:"linelabel",x:mx+4,y:my+12});
+mlab.textContent="本初子午線 0°";
+lineLayer.appendChild(mlab);
+
+// 州の区分
+const shuLayer=document.getElementById("shuLayer");
+SHU.forEach(([lon,lat,name])=>{
+  const[x,y]=px(lon,lat);
+  const t=el("text",{class:"shulabel",x:x,y:y});
+  t.setAttribute("text-anchor","middle");
+  t.textContent=name;
+  shuLayer.appendChild(t);
+});
+
+// markers
+const layer=document.getElementById("markers");
+const nodes={};
+DATA.forEach(d=>{
+  const[x,y]=px(d.lon,d.lat);
+  const g=el("g",{class:"hit","data-id":d.id,"data-kind":KIND[d.id]});
+  const isOcean=KIND[d.id]==="ocean";
+  g.appendChild(el("circle",{class:"ring",cx:x,cy:y,r:5,fill:"none",
+    stroke:isOcean?"#6FB3E0":"#EFB13C","stroke-width":1.4}));
+  g.appendChild(el("circle",{cx:x,cy:y,r:2,fill:isOcean?"#6FB3E0":"#EFB13C"}));
+  const t=el("text",{class:isOcean?"olabel":"clabel",x:x,y:y-9});
+  t.setAttribute("text-anchor","middle");
+  t.textContent=d.name;
+  g.appendChild(t);
+  g.addEventListener("click",()=>pick(d.id));
+  layer.appendChild(g);
+  nodes[d.id]=g;
+});
+
+/* ---------- state ---------- */
+let selected=null, layers={cont:1,ocean:1,lines:1,grid:0,shu:0}, quiz=null, coordMode=false;
+
+function render(){
+  DATA.forEach(d=>{
+    const on=layers[KIND[d.id]];
+    nodes[d.id].style.display=on?"":"none";
+    nodes[d.id].setAttribute("data-sel",String(selected===d.id));
+  });
+  document.getElementById("lineLayer").style.display=layers.lines?"":"none";
+  document.getElementById("gridLayer").style.display=layers.grid?"":"none";
+  document.getElementById("shuLayer").style.display=layers.shu?"":"none";
+}
+
+function pick(id){
+  if(quiz){answer(id);return;}
+  selected=id; render();
+  leeaOpened.add(id); leeaReport();
+  const d=DATA.find(x=>x.id===id);
+  document.getElementById("panel").innerHTML=
+    '<div class="cat" style="color:'+(KIND[id]==="ocean"?"var(--sky)":"var(--ochre)")+'">'+
+      (KIND[id]==="ocean"?"三大洋":"六大陸")+'</div>'+
+    '<h2>'+d.name+'</h2>'+
+    '<div class="place">'+d.place+'</div>'+
+    '<div class="rank">'+d.rank+'</div>'+
+    '<ul>'+d.facts.map(f=>'<li>'+f+'</li>').join('')+'</ul>'+
+    '<div class="tags">'+d.tags.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div>';
+}
+
+function resetPanel(){
+  selected=null; render();
+  document.getElementById("panel").innerHTML=
+    '<div class="empty"><b>大陸や海洋をクリック</b>六大陸と三大洋の名前と特ちょうを調べよう。</div>';
+}
+
+/* ---------- layer chips ---------- */
+document.querySelectorAll("#filters .chip").forEach(chip=>{
+  chip.addEventListener("click",()=>{
+    const key=chip.dataset.layer;
+    layers[key]=layers[key]?0:1;
+    chip.dataset.on=String(Boolean(layers[key]));
+    render();
+  });
+});
+
+/* ---------- 座標を読む ---------- */
+const svg=document.querySelector("svg.map");
+const coordLayer=document.getElementById("coordLayer");
+const coordBtn=document.getElementById("coordBtn");
+
+coordBtn.addEventListener("click",()=>{
+  coordMode=!coordMode;
+  coordBtn.dataset.on=String(coordMode);
+  svg.classList.toggle("coordmode",coordMode);
+  if(!coordMode) coordLayer.innerHTML="";
+});
+
+function fmtLat(lat){
+  const v=Math.abs(lat).toFixed(1);
+  if(Math.abs(lat)<0.05) return "緯度 0°（赤道）";
+  return "緯度 "+v+"° "+(lat>0?"北緯":"南緯");
+}
+function fmtLon(lon){
+  const v=Math.abs(lon).toFixed(1);
+  if(Math.abs(lon)<0.05) return "経度 0°（本初子午線）";
+  return "経度 "+v+"° "+(lon>0?"東経":"西経");
+}
+
+svg.addEventListener("click",(event)=>{
+  if(!coordMode||quiz) return;
+  const ctm=svg.getScreenCTM();
+  if(!ctm) return;
+  const point=svg.createSVGPoint();
+  point.x=event.clientX; point.y=event.clientY;
+  const local=point.matrixTransform(ctm.inverse());
+  // inverse of BASE.px for this window
+  const lon=local.x/3-180;
+  const lat=84-local.y/3;
+  if(lon<-180||lon>180||lat<-86||lat>84) return;
+
+  coordLayer.innerHTML="";
+  coordLayer.appendChild(el("circle",{class:"coordpin",cx:local.x,cy:local.y,r:6}));
+  coordLayer.appendChild(el("line",{class:"coordpin",x1:local.x-10,y1:local.y,x2:local.x+10,y2:local.y}));
+  coordLayer.appendChild(el("line",{class:"coordpin",x1:local.x,y1:local.y-10,x2:local.x,y2:local.y+10}));
+  const t=el("text",{class:"coordtext",x:local.x+12,y:local.y-8});
+  t.textContent=fmtLat(lat)+" ／ "+fmtLon(lon);
+  coordLayer.appendChild(t);
+
+  document.getElementById("panel").innerHTML=
+    '<div class="cat" style="color:var(--sky)">座標を読む</div>'+
+    '<h2>'+fmtLat(lat)+'</h2>'+
+    '<h2>'+fmtLon(lon)+'</h2>'+
+    '<div class="place">赤道より北が北緯、南が南緯。本初子午線より東が東経、西が西経。</div>'+
+    '<ul><li>緯度は赤道（0°）から南北にそれぞれ90°まで。</li>'+
+    '<li>経度は本初子午線（0°）から東西にそれぞれ180°まで。</li>'+
+    '<li>地図の上のどの点も、この二つの数字の組み合わせで表せる。</li></ul>';
+});
+
+/* ---------- quiz ---------- */
+const quizBtn=document.getElementById("quizBtn");
+quizBtn.addEventListener("click",()=>{ if(quiz) endQuiz(); else startQuiz(); });
+
+function startQuiz(){
+  if(coordMode){ coordMode=false; coordBtn.dataset.on="false"; svg.classList.remove("coordmode"); coordLayer.innerHTML=""; }
+  layers.cont=1; layers.ocean=1;
+  document.querySelectorAll("#filters .chip").forEach(chip=>{
+    if(chip.dataset.layer==="cont"||chip.dataset.layer==="ocean") chip.dataset.on="true";
+  });
+  quiz={order:QUIZ.map((q,i)=>i).sort(()=>Math.random()-.5),i:0,score:0,locked:false};
+  quizBtn.textContent="クイズをやめる";
+  selected=null; render(); askQ();
+}
+
+function endQuiz(){
+  quiz=null;
+  quizBtn.textContent="クイズに挑戦";
+  resetPanel();
+}
+
+function askQ(){
+  const q=QUIZ[quiz.order[quiz.i]];
+  document.getElementById("panel").innerHTML=
+    '<div class="qmeta"><span>第 '+(quiz.i+1)+' 問 / '+QUIZ.length+'</span><span>正解 '+quiz.score+'</span></div>'+
+    '<div class="cat" style="color:var(--jade)">クイズ</div>'+
+    '<div class="qtext">'+q.q+'</div>'+
+    '<div class="qhint">地図の名前をクリックして答えよう</div>';
+}
+
+function answer(id){
+  if(quiz.locked) return;
+  quiz.locked=true;
+  const q=QUIZ[quiz.order[quiz.i]];
+  const correct=id===q.a;
+  if(correct) quiz.score++;
+  const right=DATA.find(x=>x.id===q.a);
+  const chosen=DATA.find(x=>x.id===id);
+  selected=id; render();
+
+  const p=document.getElementById("panel");
+  p.innerHTML=
+    '<div class="qmeta"><span>第 '+(quiz.i+1)+' 問 / '+QUIZ.length+'</span><span>正解 '+quiz.score+'</span></div>'+
+    '<div class="qtext">'+q.q+'</div>'+
+    '<div class="feedback '+(correct?"ok":"ng")+'">'+
+      (correct?"正解！ ":"おしい。 ")+
+      (correct?"":"えらんだのは「"+chosen.name+"」。正解は ")+
+      '<b>'+right.name+'</b>'+(correct?"":"")+'<br>'+right.facts[0]+
+    '</div>';
+
+  const next=document.createElement("button");
+  next.className="btn"; next.style.cssText="margin:18px auto 0;display:block";
+  next.textContent=quiz.i<QUIZ.length-1?"次の問題へ":"結果を見る";
+  next.addEventListener("click",()=>{
+    if(quiz.i<QUIZ.length-1){quiz.i++;quiz.locked=false;selected=null;render();askQ();}
+    else showScore();
+  });
+  p.appendChild(next);
+}
+
+function showScore(){
+  leeaReport({correct:quiz.score,total:QUIZ.length});
+  const p=document.getElementById("panel");
+  const msg=quiz.score>=9?"かんぺき！ 世界地図マスター":quiz.score>=7?"よくできました！":quiz.score>=4?"あと少し。地図をもう一度見てみよう":"もう一度、地図を調べてみよう";
+  p.innerHTML='<div class="cat">けっか</div><div class="score">'+quiz.score+' / '+QUIZ.length+'</div>'+
+    '<div class="place" style="text-align:center;font-size:14px">'+msg+'</div>';
+  const again=document.createElement("button");
+  again.className="btn"; again.style.cssText="margin:18px auto 0;display:block";
+  again.textContent="もう一度";
+  again.addEventListener("click",startQuiz);
+  p.appendChild(again);
+  const back=document.createElement("button");
+  back.className="btn ghost"; back.style.cssText="margin:10px auto 0;display:block";
+  back.textContent="地図にもどる";
+  back.addEventListener("click",endQuiz);
+  p.appendChild(back);
+}
+
+/* ---------- LEEA progress bridge ----------
+   Same contract as the other Geography maps: report, never store. Opened
+   standalone (no parent frame) every call is a no-op. */
+const LEEA_MAP_ID="sekai-no-sugata-map";
+const leeaOpened=new Set();
+function leeaReport(quizResult){
+  if(window.parent===window) return;
+  try{
+    window.parent.postMessage({
+      type:"LEEA_GEO_PROGRESS",
+      mapId:LEEA_MAP_ID,
+      explored:leeaOpened.size,
+      exploredTotal:DATA.length,
+      quiz:quizResult||undefined
+    },window.location.origin);
+  }catch(e){/* never let reporting break the map */}
+}
+
+render();
+</script>
+</body>
+</html>

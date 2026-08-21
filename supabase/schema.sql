@@ -83,6 +83,20 @@ create table if not exists public.math_block_progress (
   unique (student_id, section_id, block_id)
 );
 
+create table if not exists public.geography_map_progress (
+  id text primary key,
+  student_id text not null references public.students(id) on delete cascade,
+  section_id text not null,
+  map_id text not null,
+  status text not null check (status in ('not-done', 'explored', 'done')),
+  quiz_score jsonb,
+  explored_count integer not null default 0,
+  completed_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (student_id, section_id, map_id)
+);
+
 create table if not exists public.reference_confidence (
   id text primary key,
   student_id text not null references public.students(id) on delete cascade,
@@ -117,6 +131,9 @@ create index if not exists reference_confidence_student_confidence_idx
 create index if not exists math_block_progress_student_status_idx
   on public.math_block_progress (student_id, status, updated_at desc);
 
+create index if not exists geography_map_progress_student_status_idx
+  on public.geography_map_progress (student_id, status, updated_at desc);
+
 -- Expose only the app state tables to the browser anon role.
 -- Row Level Security policies below still decide which rows the browser can read/write.
 grant usage on schema public to anon;
@@ -126,6 +143,7 @@ grant select, insert, update, delete on public.learner_progress to anon;
 grant select, insert, update, delete on public.teacher_lesson_progress to anon;
 grant select, insert, update, delete on public.reference_confidence to anon;
 grant select, insert, update, delete on public.math_block_progress to anon;
+grant select, insert, update, delete on public.geography_map_progress to anon;
 
 -- Keep updated_at fresh on row changes.
 create or replace function public.set_updated_at()
@@ -168,6 +186,11 @@ create trigger set_math_block_progress_updated_at
 before update on public.math_block_progress
 for each row execute function public.set_updated_at();
 
+drop trigger if exists set_geography_map_progress_updated_at on public.geography_map_progress;
+create trigger set_geography_map_progress_updated_at
+before update on public.geography_map_progress
+for each row execute function public.set_updated_at();
+
 -- Row Level Security is enabled from the start.
 -- The first app wiring uses the public anon key with fixed family IDs.
 -- Tighten these policies when auth is added.
@@ -177,6 +200,7 @@ alter table public.learner_progress enable row level security;
 alter table public.teacher_lesson_progress enable row level security;
 alter table public.reference_confidence enable row level security;
 alter table public.math_block_progress enable row level security;
+alter table public.geography_map_progress enable row level security;
 
 drop policy if exists "family can read students" on public.students;
 create policy "family can read students"
@@ -235,5 +259,16 @@ using (student_id = 'leo');
 drop policy if exists "family can write math block progress" on public.math_block_progress;
 create policy "family can write math block progress"
 on public.math_block_progress for all
+using (student_id = 'leo')
+with check (student_id = 'leo');
+
+drop policy if exists "family can read geography map progress" on public.geography_map_progress;
+create policy "family can read geography map progress"
+on public.geography_map_progress for select
+using (student_id = 'leo');
+
+drop policy if exists "family can write geography map progress" on public.geography_map_progress;
+create policy "family can write geography map progress"
+on public.geography_map_progress for all
 using (student_id = 'leo')
 with check (student_id = 'leo');

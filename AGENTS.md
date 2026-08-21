@@ -39,22 +39,60 @@ LEEA
   - Reference
 - Math
   - 中1数学ヘルパー (新編 新しい数学1) — see `docs/math-interactivity.md`
-- Geography
-  - Maps (interactive standalone atlases)
+- Geography (社会)
+  - 地理的分野 — 世界のすがた / 日本のすがた / 人々の生活と環境 / 世界の諸地域
+  - 歴史的分野 — 歴史へのとびら → 現代の日本
 - Science
   - planned later
 ```
 
 ### Geography
 
-Geography is a **map-first subject**: there is no textbook chapter/section spine like Math has. Everything on `/geography` derives at runtime from the registry in `content/subjects/geography/maps.ts` — topic groups, topic colours, counts, and status chips. Never hardcode a fixed number of maps or topics into the UI.
+Geography is Leo's 社会 course — **地理的分野 and 歴史的分野** — and it is **map-first**: there is no block-by-block textbook spine like Math has. The course is three layers of data, all under `content/subjects/geography/`:
 
-To add a map:
+- `curriculum.ts` — the 章 / 節 spine for both 分野, and the single source of truth for **placement**: a map belongs to a 節 because that 節 lists its id in `mapIds`.
+- `maps.ts` — the map registry (title, Japanese title, summary, layer chips, `buildStatus`, `embedPath`). It deliberately does **not** store its own 章/節, so a map only ever moves in one place. Use `getGeographyPlacementByMapId`.
+- `types.ts` — the shared shapes.
 
-1. Drop the standalone, self-contained HTML at `public/geography/<id>.html`.
-2. Append an entry to `geographyMaps` with `embedPath: "/geography/<id>.html"`. Leave `embedPath` off while the map is still being built — the viewer shows a "map file needed" card instead of a broken frame.
+Chapter colours, counts, progress denominators, filter chips and status pills all derive from that data at runtime. Never hardcode a chapter, a 節, or a number of maps into a component.
 
-The map library lives at `/geography` and a single map opens at `/geography/[mapId]`, both inside the normal `AppShell` (sidebar, breadcrumbs, English-only chrome). The map itself is embedded in an `<iframe>` and keeps its own look; Japanese belongs inside the map and in the card's `jpTitle` / `jpSummary` / layer chips, never in the navigation. Geography maps are **not** learner apps: they carry no assignment/progress keys and are not registered in `src/data/lessons.ts`. If a map ever needs Leo progress, give it a `mode: "learner"` lesson record and the `getLearnerAppProgress` source shape instead of inventing a second progress path.
+**SOURCE NOTE:** Leo's 社会 textbooks are not scanned into this repo yet. The spine follows the standard 中学校社会 structure plus the one real anchor we have (the 古代文明マップ header reads 第2章 古代 ／ 第1節). Treat chapter titles and 節 names as a scaffold to be corrected against the real book when it is scanned — per golden rule 2, source scan comes before lesson generation.
+
+Routes:
+
+```text
+/geography                 course home — 分野 switch, chapter cards, Continue
+/geography/[chapterId]     one 章 — its 節 and their maps
+/geography/map/[mapId]     one map, embedded in the LEEA shell
+```
+
+Chapter ids must never be `map`, which is a sibling route segment.
+
+**Adding a map**
+
+1. Drop the standalone HTML at `public/geography/<id>.html`.
+2. Build it on the shared base: `<script src="/components/world-map.js">` then `buildWorldMap({ svg, lon, lat, scale, graticule })`. Do not re-draw coastlines by hand — the shared component owns the world outline and the projection, and returns `px(lon, lat)` for placing markers.
+3. Add the progress bridge (below).
+4. Register it in `maps.ts` with `buildStatus: "live"` and `embedPath`.
+5. Add its id to the owning 節's `mapIds` in `curriculum.ts`.
+
+Register a map with `buildStatus: "planned"` and no `embedPath` to show it as upcoming; the viewer renders a "map file needed" card instead of a broken frame. `getUnplacedGeographyMaps` surfaces any map no 節 claims, so a forgotten `mapIds` entry is visible on the course home rather than silently dropped.
+
+**The shared base map** — `public/components/world-map.js` exposes `window.buildWorldMap`, following the same `window.build*` convention as `public/components/*`. Its coastline is Natural Earth 1:110m land (public domain) by way of the `world-atlas` package (ISC), converted once by `scripts/build-world-map-path.mjs` into a flat SVG path baked into the file. There is no runtime geodata dependency and `world-atlas` is not a package.json dependency; re-run the script only to change resolution. The path is baked in the projection lon0 = -20, lat1 = 62, scale = 8 — `buildWorldMap` re-projects it onto whatever window a map asks for, so the same outline serves an Afro-Eurasia crop and a whole-world view. It covers the full globe including Antarctica, New Zealand and Patagonia.
+
+**Progress** — Geography maps are **not** learner apps: they have no assignment record and are not in `src/data/lessons.ts` (the `Lesson` type is `subject: "english"`). Progress lives in `src/data/geographyProgress.ts`, local-first and Supabase-shaped exactly like `mathProgress.ts`, in the `geography_map_progress` table. A map is `explored` once every marker has been opened and `done` once its quiz is finished; `saveGeographyMapProgress` never downgrades what Leo has earned (best quiz score wins, `exploredCount` only grows, `done` stays done).
+
+Maps **report, they never store.** An embedded map posts up
+
+```js
+window.parent.postMessage({
+  type: "LEEA_GEO_PROGRESS", mapId, explored, exploredTotal, quiz: {correct, total}
+}, window.location.origin);
+```
+
+and `GeographyMapView` is the only writer, so everything reaches Supabase by one path. Guard every report with `if (window.parent === window) return;` so the map still works opened standalone.
+
+Main navigation and headings stay English. Japanese belongs inside the map, in the card's `jpTitle` / `jpShortTitle` / `jpSummary` / layer chips, and in 章 / 節 names.
 
 Our World has six levels. First build target:
 

@@ -126,10 +126,10 @@ async function upsertAssignmentRecords(records: AssignmentRecord[]) {
       .from("assignments")
       .upsert(records.map(toAssignmentRow), { onConflict: "lesson_id,student_id" });
     if (error) throw error;
-    reportCloudSyncSuccess();
+    reportCloudSyncSuccess("assignments");
   } catch (error) {
     console.warn("LEEA Supabase assignment upsert failed", error);
-    reportCloudSyncFailure();
+    reportCloudSyncFailure("assignments", error);
   }
 }
 
@@ -142,10 +142,10 @@ async function deleteAssignmentRecord(lessonId: string) {
       .eq("lesson_id", lessonId)
       .eq("student_id", "leo");
     if (error) throw error;
-    reportCloudSyncSuccess();
+    reportCloudSyncSuccess("assignments");
   } catch (error) {
     console.warn("LEEA Supabase assignment delete failed", error);
-    reportCloudSyncFailure();
+    reportCloudSyncFailure("assignments", error);
   }
 }
 
@@ -183,7 +183,7 @@ export async function readAssignmentsFromCloud(learnerItems: Lesson[]): Promise<
       .eq("student_id", "leo");
 
     if (error) throw error;
-    reportCloudSyncSuccess();
+    reportCloudSyncSuccess("assignments");
 
     const cloudMap = (data ?? []).reduce<AssignmentMap>((next, row) => {
       const record = toAssignmentRecord(row as AssignmentRow);
@@ -198,7 +198,7 @@ export async function readAssignmentsFromCloud(learnerItems: Lesson[]): Promise<
     return merged;
   } catch (error) {
     console.warn("LEEA Supabase assignment read failed; using local assignments", error);
-    reportCloudSyncFailure();
+    reportCloudSyncFailure("assignments", error);
     return localSeeded;
   }
 }

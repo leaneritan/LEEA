@@ -153,7 +153,7 @@ export async function syncGeographyProgressWithCloud(current: GeographyProgressM
       .eq("student_id", "leo");
 
     if (error) throw error;
-    reportCloudSyncSuccess();
+    reportCloudSyncSuccess("geography");
 
     const cloud = ((data ?? []) as GeographyMapProgressRow[]).reduce<GeographyProgressMap>((next, row) => {
       next[row.map_id] = fromGeographyProgressRow(row);
@@ -187,7 +187,7 @@ export async function syncGeographyProgressWithCloud(current: GeographyProgressM
     return merged;
   } catch (error) {
     console.warn("LEEA Supabase geography progress sync failed", error);
-    reportCloudSyncFailure();
+    reportCloudSyncFailure("geography", error);
     return current;
   }
 }
@@ -244,10 +244,10 @@ async function upsertGeographyProgressRecords(records: GeographyMapProgressRecor
       .upsert(records.map(toGeographyProgressRow), { onConflict: "student_id,map_id" });
 
     if (error) throw error;
-    reportCloudSyncSuccess();
+    reportCloudSyncSuccess("geography");
   } catch (error) {
     console.warn("LEEA Supabase geography progress save failed", error);
-    reportCloudSyncFailure();
+    reportCloudSyncFailure("geography", error);
   }
 }
 

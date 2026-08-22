@@ -88,7 +88,7 @@ export async function syncMathProgressWithCloud(current: MathBlockProgressMap): 
       .eq("student_id", "leo");
 
     if (error) throw error;
-    reportCloudSyncSuccess();
+    reportCloudSyncSuccess("math");
 
     const cloud = ((data ?? []) as MathBlockProgressRow[]).reduce<MathBlockProgressMap>((next, row) => {
       next[progressKey(row.section_id, row.block_id)] = fromMathProgressRow(row);
@@ -122,7 +122,7 @@ export async function syncMathProgressWithCloud(current: MathBlockProgressMap): 
     return merged;
   } catch (error) {
     console.warn("LEEA Supabase math progress sync failed", error);
-    reportCloudSyncFailure();
+    reportCloudSyncFailure("math", error);
     return current;
   }
 }
@@ -141,10 +141,10 @@ async function upsertMathProgressRecords(records: MathBlockProgressRecord[]) {
       .upsert(records.map(toMathProgressRow), { onConflict: "student_id,section_id,block_id" });
 
     if (error) throw error;
-    reportCloudSyncSuccess();
+    reportCloudSyncSuccess("math");
   } catch (error) {
     console.warn("LEEA Supabase math progress save failed", error);
-    reportCloudSyncFailure();
+    reportCloudSyncFailure("math", error);
   }
 }
 

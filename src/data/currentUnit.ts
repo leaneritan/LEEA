@@ -77,10 +77,10 @@ export async function saveCurrentUnit(value: CurrentUnit) {
         { onConflict: "id" }
       );
     if (error) throw error;
-    reportCloudSyncSuccess();
+    reportCloudSyncSuccess("current-unit");
   } catch (error) {
     console.warn("LEEA Supabase current unit save failed", error);
-    reportCloudSyncFailure();
+    reportCloudSyncFailure("current-unit", error);
   }
 }
 
@@ -95,7 +95,7 @@ export async function syncCurrentUnitWithCloud(current: CurrentUnit): Promise<Cu
       .maybeSingle();
 
     if (error) throw error;
-    reportCloudSyncSuccess();
+    reportCloudSyncSuccess("current-unit");
 
     const row = data as CurrentUnitRow | null;
     if (!row) {
@@ -117,7 +117,7 @@ export async function syncCurrentUnitWithCloud(current: CurrentUnit): Promise<Cu
     return current;
   } catch (error) {
     console.warn("LEEA Supabase current unit sync failed", error);
-    reportCloudSyncFailure();
+    reportCloudSyncFailure("current-unit", error);
     return current;
   }
 }

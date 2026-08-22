@@ -73,6 +73,19 @@ export const geographyMaps: GeographyMap[] = [
     embedPath: "/geography/sekai-no-kuniguni-map.html"
   },
   {
+    id: "jisa-map",
+    field: "geography",
+    title: "Time Zones",
+    jpTitle: "時差マップ — 経度と時間のかんけい",
+    jpShortTitle: "時差マップ",
+    meta: "13 cities · 15° = 1 hour · 10 quiz questions",
+    summary:
+      "Move the slider to set the time in Japan and watch every city's clock move with it. Click a city for its 標準時子午線 and the arithmetic behind the time difference.",
+    buildStatus: "live",
+    quizTotal: 10,
+    embedPath: "/geography/jisa-map.html"
+  },
+  {
     id: "kikoutai-map",
     field: "geography",
     title: "World Climate Zones",

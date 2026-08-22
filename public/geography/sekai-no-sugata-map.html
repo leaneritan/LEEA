@@ -153,8 +153,18 @@
   .worldmap-zoom button:disabled{opacity:.35;cursor:default}
   .grid.panel-hidden{grid-template-columns:minmax(0,1fr)}
   .grid.panel-hidden aside{display:none}
+
+  /* 苦手 — items Leo keeps missing, so weak-spot practice is visible and not
+     just an invisible weighting of the next quiz. */
+  .weakbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;
+    background:#31191C;border:1px solid #6B2B31;border-radius:10px;padding:6px 10px}
+  .weakbar b{color:#F0A6A6;font-size:11px;letter-spacing:.06em}
+  .weakbar span{font-family:var(--gothic);font-size:11px;color:#F4EDE0;
+    background:#0C1826;border:1px solid var(--line);border-radius:5px;padding:3px 7px}
+  .weakbar.empty{display:none}
 </style>
 <script src="/components/world-map.js"></script>
+<script src="/components/geo-progress.js"></script>
 <script src="/components/world-countries.js"></script>
 </head>
 <body>
@@ -178,6 +188,7 @@
   <button class="btn" id="quizBtn">クイズに挑戦</button>
 </div>
 
+<div class="weakbar empty" id="weakbar"></div>
 <div class="grid">
   <div class="mapcard">
     <div class="scroller">
@@ -201,6 +212,8 @@
 
 <script>
 /* ---------- projection + base map (shared: /components/world-map.js) ---------- */
+const GEO=leeaGeoProgress({mapId:"sekai-no-sugata-map",exploredTotal:9});
+
 const BASE=buildWorldMap({
   svg:document.querySelector("svg.map"),
   lon:[-180,180], lat:[-86,84], scale:3,
@@ -404,7 +417,7 @@ function pick(id){
   if(quiz){answer(id);return;}
   showPanel();
   selected=id; render();
-  leeaOpened.add(id); leeaReport();
+  GEO.open(id);
   const d=DATA.find(x=>x.id===id);
   document.getElementById("panel").innerHTML=
     '<div class="cat" style="color:'+(KIND[id]==="ocean"?"var(--sky)":"var(--ochre)")+'">'+
@@ -497,7 +510,8 @@ function startQuiz(){
   document.querySelectorAll("#filters .chip").forEach(chip=>{
     if(chip.dataset.layer==="cont"||chip.dataset.layer==="ocean") chip.dataset.on="true";
   });
-  quiz={order:QUIZ.map((q,i)=>i).sort(()=>Math.random()-.5),i:0,score:0,locked:false};
+  const order=GEO.pickQuiz(QUIZ.map((q,i)=>String(i)),QUIZ.length).map(Number);
+  quiz={order:order,i:0,score:0,locked:false};
   quizBtn.textContent="クイズをやめる";
   selected=null; render(); askQ();
 }
@@ -523,6 +537,7 @@ function answer(id){
   const q=QUIZ[quiz.order[quiz.i]];
   const correct=id===q.a;
   if(correct) quiz.score++;
+  GEO.answered(String(quiz.order[quiz.i]),correct);
   const right=DATA.find(x=>x.id===q.a);
   const chosen=DATA.find(x=>x.id===id);
   selected=id; render();
@@ -548,7 +563,7 @@ function answer(id){
 }
 
 function showScore(){
-  leeaReport({correct:quiz.score,total:QUIZ.length});
+  GEO.finishQuiz(quiz.score,QUIZ.length);
   const p=document.getElementById("panel");
   const msg=quiz.score>=9?"かんぺき！ 世界地図マスター":quiz.score>=7?"よくできました！":quiz.score>=4?"あと少し。地図をもう一度見てみよう":"もう一度、地図を調べてみよう";
   p.innerHTML='<div class="cat">けっか</div><div class="score">'+quiz.score+' / '+QUIZ.length+'</div>'+
@@ -565,22 +580,22 @@ function showScore(){
   p.appendChild(back);
 }
 
-/* ---------- LEEA progress bridge ----------
-   Same contract as the other Geography maps: report, never store. Opened
-   standalone (no parent frame) every call is a no-op. */
-const LEEA_MAP_ID="sekai-no-sugata-map";
-const leeaOpened=new Set();
-function leeaReport(quizResult){
-  if(window.parent===window) return;
-  try{
-    window.parent.postMessage({
-      type:"LEEA_GEO_PROGRESS",
-      mapId:LEEA_MAP_ID,
-      explored:leeaOpened.size,
-      exploredTotal:DATA.length,
-      quiz:quizResult||undefined
-    },window.location.origin);
-  }catch(e){/* never let reporting break the map */}
+
+/* ---------- 苦手リスト ----------
+   The app sends stored per-item stats down when the map is ready, so the weak
+   list is visible to Leo rather than only steering the next quiz silently. */
+GEO.onState(()=>{
+  const bar=document.getElementById("weakbar");
+  const ids=GEO.weakIds();
+  if(!ids.length){ bar.className="weakbar empty"; bar.innerHTML=""; return; }
+  bar.className="weakbar";
+  bar.innerHTML='<b>にがて</b>'+ids.map(id=>'<span>'+weakLabel(id)+'</span>').join('');
+});
+
+function weakLabel(id){
+  const q=QUIZ[Number(id)];
+  const d=q&&DATA.find(x=>x.id===q.a);
+  return d?d.name:String(id);
 }
 
 render();

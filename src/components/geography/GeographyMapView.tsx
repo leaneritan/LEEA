@@ -10,11 +10,14 @@ import {
   type GeographyMap
 } from "../../../content/subjects/geography/maps";
 import {
+  applyItemResults,
   createGeographyMapProgressRecord,
   getGeographyMapRecord,
+  getWeakItemIds,
   readGeographyProgress,
   saveGeographyMapProgress,
   syncGeographyProgressWithCloud,
+  type GeographyItemResult,
   type GeographyMapProgressRecord,
   type GeographyMapProgressStatus,
   type GeographyProgressMap
@@ -26,11 +29,13 @@ import {
  * progress always goes through the same merge + Supabase path.
  */
 type GeographyMapMessage = {
-  type: "LEEA_GEO_PROGRESS";
+  type: "LEEA_GEO_PROGRESS" | "LEEA_GEO_READY";
   mapId?: string;
   explored?: number;
   exploredTotal?: number;
   quiz?: { correct: number; total: number };
+  /** One entry per answer in a finished quiz run. */
+  items?: GeographyItemResult[];
 };
 
 const STATUS_LABEL: Record<GeographyMapProgressStatus, string> = {
@@ -48,12 +53,32 @@ export function GeographyMapView({ map }: { map: GeographyMap }) {
     void syncGeographyProgressWithCloud(local).then(setProgress);
   }, []);
 
+  /** Sends what we already know about this map down to the embedded map. */
+  const sendState = useCallback(
+    (target: MessageEventSource | null) => {
+      const stored = getGeographyMapRecord(map.id, readGeographyProgress());
+      (target as Window | null)?.postMessage(
+        { type: "LEEA_GEO_STATE", mapId: map.id, items: stored?.items ?? {} },
+        window.location.origin
+      );
+    },
+    [map.id]
+  );
+
   const handleMessage = useCallback(
     async (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
       const message = event.data as GeographyMapMessage | undefined;
-      if (!message || message.type !== "LEEA_GEO_PROGRESS") return;
+      if (!message) return;
       if (message.mapId && message.mapId !== map.id) return;
+
+      // A map announces itself once it is ready to receive stored stats.
+      if (message.type === "LEEA_GEO_READY") {
+        sendState(event.source);
+        return;
+      }
+
+      if (message.type !== "LEEA_GEO_PROGRESS") return;
 
       const explored = Number.isFinite(message.explored) ? Number(message.explored) : 0;
       const exploredTotal = Number.isFinite(message.exploredTotal) ? Number(message.exploredTotal) : 0;
@@ -62,12 +87,20 @@ export function GeographyMapView({ map }: { map: GeographyMap }) {
       if (message.quiz) status = "done";
       else if (exploredTotal > 0 && explored >= exploredTotal) status = "explored";
 
+      // Fold this run's answers onto the history rather than replacing it.
+      const previous = getGeographyMapRecord(map.id, readGeographyProgress());
+      const items = Array.isArray(message.items)
+        ? applyItemResults(previous?.items, message.items)
+        : previous?.items ?? {};
+
       const saved = await saveGeographyMapProgress(
-        createGeographyMapProgressRecord(map.id, status, message.quiz ?? null, explored)
+        createGeographyMapProgressRecord(map.id, status, message.quiz ?? null, explored, items)
       );
       setProgress((current) => ({ ...current, [saved.mapId]: saved }));
+      // The map asked for weighting help; give it the updated picture.
+      sendState(event.source);
     },
-    [map.id]
+    [map.id, sendState]
   );
 
   useEffect(() => {
@@ -80,6 +113,7 @@ export function GeographyMapView({ map }: { map: GeographyMap }) {
 
   const record: GeographyMapProgressRecord | null = getGeographyMapRecord(map.id, progress);
   const status = record?.status ?? "not-done";
+  const weakCount = getWeakItemIds(record?.items).length;
 
   return (
     <section className="geo-page">
@@ -121,6 +155,11 @@ export function GeographyMapView({ map }: { map: GeographyMap }) {
           <span className={`geo-pill geo-pill--${status}`}>{STATUS_LABEL[status]}</span>
           {record?.quizScore ? (
             <small>{record.quizScore.correct}/{record.quizScore.total}</small>
+          ) : null}
+          {weakCount > 0 ? (
+            <span className="geo-weak" title="つぎのクイズで出やすくなります">
+              苦手 {weakCount}
+            </span>
           ) : null}
           {map.embedPath ? (
             <a className="geo-fullscreen" href={map.embedPath} rel="noreferrer" target="_blank" title="Open fullscreen">

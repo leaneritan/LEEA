@@ -134,7 +134,8 @@ Implemented first:
 - named starter dashboard variables
 - Supabase client placeholder
 - Geography as a single map page — all maps in one place, switched with a button, with per-map progress
-- three interactive maps on shared map components — 古代文明マップ (歴史 第2章), 世界のすがた (地理 第1章 1節) and 世界の国々 (地理 第1章 2節)
+- four interactive maps on shared components — 世界のすがた, 世界の国々, 時差マップ and 古代文明マップ
+- weak-spot practice: quizzes lean on the places Leo keeps missing, with a 苦手 list on every map
 - shared country borders + facts layer (Natural Earth / world-countries), baked at build time — no runtime geodata dependency
 
 Prototype:

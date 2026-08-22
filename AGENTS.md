@@ -95,15 +95,23 @@ Regenerate with `node scripts/build-country-data.mjs` (add `--res 50m` for finer
 
 **Progress** — Geography maps are **not** learner apps: they have no assignment record and are not in `src/data/lessons.ts` (the `Lesson` type is `subject: "english"`). Progress lives in `src/data/geographyProgress.ts`, local-first and Supabase-shaped like `mathProgress.ts`, in the `geography_map_progress` table, keyed by map id. A map is `explored` once every marker has been opened and `done` once its quiz is finished; `saveGeographyMapProgress` never downgrades what Leo has earned (best quiz score wins, `exploredCount` only grows, `done` stays done).
 
-Maps **report, they never store.** An embedded map posts up
+**Maps report, they never store.** `public/components/geo-progress.js` is the bridge every map uses — do not hand-roll another one:
 
 ```js
-window.parent.postMessage({
-  type: "LEEA_GEO_PROGRESS", mapId, explored, exploredTotal, quiz: {correct, total}
-}, window.location.origin);
+const GEO = leeaGeoProgress({ mapId: "sekai-no-kuniguni-map", exploredTotal: 25 });
+GEO.open("BRA");                  // Leo looked at something
+const pool = GEO.pickQuiz(ids, 10);  // weighted toward what he keeps missing
+GEO.answered("BRA", correct);     // one answer, held until the run ends
+GEO.finishQuiz(score, total);     // sends the run up
+GEO.onState(() => { /* stored stats arrived */ });
+GEO.weakIds();                    // for the 苦手 list
 ```
 
-and `GeographyMapView` is the only writer, so everything reaches Supabase by one path. Guard every report with `if (window.parent === window) return;` so the map still works opened standalone.
+`GeographyMapView` is the only writer, so everything reaches Supabase by one path. Every call is a no-op when the map is opened standalone (`window.parent === window`).
+
+**Weak-spot practice** — the bridge is two-way. A map posts `LEEA_GEO_READY` on start; the app replies with `LEEA_GEO_STATE` carrying the per-item history it already holds. Each quiz answer is recorded per item (`asked`, `correct`, `lastCorrect`) in the record's `items` map and the table's `items` jsonb column, accumulated by `applyItemResults` rather than overwritten. `pickQuiz` then weights selection: never asked outranks known, and a fresh miss outranks both — measured at roughly 1.5x the draws for weak items. Keep it visible, not just a silent weighting: every map shows a 苦手 bar, and the app bar shows a 苦手 count. This is the same idea as Reference's I Know / I Don't Know for English words.
+
+Item ids are whatever the map already uses to identify an answer — cca3 for countries, marker ids for continents and cities, question indices where a map has no natural id. They only have to be stable within that map.
 
 Main navigation and headings stay English. Japanese belongs inside the map and in the card's `jpTitle` / `jpShortTitle`.
 

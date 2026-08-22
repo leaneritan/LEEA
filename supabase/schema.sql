@@ -90,6 +90,9 @@ create table if not exists public.geography_map_progress (
   status text not null check (status in ('not-done', 'explored', 'done')),
   quiz_score jsonb,
   explored_count integer not null default 0,
+  -- Per-item quiz history: { "<itemId>": { asked, correct, lastCorrect, updatedAt } }.
+  -- Drives weak-spot practice, so a quiz can lean on what Leo keeps missing.
+  items jsonb not null default '{}'::jsonb,
   completed_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),

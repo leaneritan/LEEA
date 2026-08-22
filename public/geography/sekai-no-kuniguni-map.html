@@ -135,8 +135,18 @@
   .worldmap-zoom button:disabled{opacity:.35;cursor:default}
   .grid.panel-hidden{grid-template-columns:minmax(0,1fr)}
   .grid.panel-hidden aside{display:none}
+
+  /* 苦手 — items Leo keeps missing, so weak-spot practice is visible and not
+     just an invisible weighting of the next quiz. */
+  .weakbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;
+    background:#31191C;border:1px solid #6B2B31;border-radius:10px;padding:6px 10px}
+  .weakbar b{color:#F0A6A6;font-size:11px;letter-spacing:.06em}
+  .weakbar span{font-family:var(--gothic);font-size:11px;color:#F4EDE0;
+    background:#0C1826;border:1px solid var(--line);border-radius:5px;padding:3px 7px}
+  .weakbar.empty{display:none}
 </style>
 <script src="/components/world-map.js"></script>
+<script src="/components/geo-progress.js"></script>
 <script src="/components/world-countries.js"></script>
 </head>
 <body>
@@ -161,6 +171,7 @@
   <button class="btn" id="quizBtn">クイズに挑戦</button>
 </div>
 
+<div class="weakbar empty" id="weakbar"></div>
 <div class="grid">
   <div class="mapcard">
     <div class="scroller">
@@ -177,6 +188,8 @@
 
 <script>
 /* ---------- base map + country layer (shared components) ---------- */
+const GEO=leeaGeoProgress({mapId:"sekai-no-kuniguni-map",exploredTotal:25});
+
 const BASE=buildWorldMap({
   svg:document.querySelector("svg.map"),
   // Antarctica has no countries, so this window stops short of it — a standard
@@ -267,7 +280,7 @@ function pick(country){
   if(quiz){answer(country);return;}
   showPanel();
   selected=country.id; render();
-  leeaOpen(country);
+  if(country.cca3&&KEYSET.has(country.cca3)) GEO.open(country.cca3);
 
   const panel=document.getElementById("panel");
   if(country.noFacts){
@@ -352,7 +365,8 @@ function startQuiz(){
   document.querySelectorAll("#filters .chip.shu").forEach(chip=>chip.dataset.on="true");
   query=""; document.getElementById("search").value="";
 
-  const pool=KEY.slice().sort(()=>Math.random()-.5).slice(0,10);
+  // Weighted toward the countries Leo keeps missing.
+  const pool=GEO.pickQuiz(KEY,10);
   quiz={pool:pool,i:0,score:0,locked:false};
   quizBtn.textContent="クイズをやめる";
   selected=null; render(); askQ();
@@ -376,6 +390,7 @@ function answer(picked){
   const target=WORLD_COUNTRY_BY_CCA3[quiz.pool[quiz.i]];
   const correct=picked.cca3===target.cca3;
   if(correct) quiz.score++;
+  GEO.answered(target.cca3,correct);
 
   render();
   if(paths[target.id]) paths[target.id].setAttribute("data-hit","true");
@@ -401,7 +416,7 @@ function answer(picked){
 }
 
 function showScore(){
-  leeaReport({correct:quiz.score,total:quiz.pool.length});
+  GEO.finishQuiz(quiz.score,quiz.pool.length);
   const panel=document.getElementById("panel");
   const msg=quiz.score>=9?"かんぺき！ 世界地図マスター":quiz.score>=7?"よくできました！":quiz.score>=4?"あと少し。地図をもう一度見てみよう":"もう一度、地図を調べてみよう";
   panel.innerHTML='<div class="cat">けっか</div><div class="score">'+quiz.score+' / '+quiz.pool.length+'</div>'+
@@ -416,28 +431,21 @@ function showScore(){
   panel.appendChild(back);
 }
 
-/* ---------- LEEA progress bridge ----------
-   "Explored" is measured against the まず覚えたい国 set, not all 177 countries,
-   so the milestone is reachable and meaningful. Report, never store. */
-const LEEA_MAP_ID="sekai-no-kuniguni-map";
-const leeaOpened=new Set();
-function leeaOpen(country){
-  if(country.cca3&&KEYSET.has(country.cca3)){
-    leeaOpened.add(country.cca3);
-    leeaReport();
-  }
-}
-function leeaReport(quizResult){
-  if(window.parent===window) return;
-  try{
-    window.parent.postMessage({
-      type:"LEEA_GEO_PROGRESS",
-      mapId:LEEA_MAP_ID,
-      explored:leeaOpened.size,
-      exploredTotal:KEY.length,
-      quiz:quizResult||undefined
-    },window.location.origin);
-  }catch(e){/* never let reporting break the map */}
+
+/* ---------- 苦手リスト ----------
+   The app sends stored per-item stats down when the map is ready, so the weak
+   list is visible to Leo rather than only steering the next quiz silently. */
+GEO.onState(()=>{
+  const bar=document.getElementById("weakbar");
+  const ids=GEO.weakIds();
+  if(!ids.length){ bar.className="weakbar empty"; bar.innerHTML=""; return; }
+  bar.className="weakbar";
+  bar.innerHTML='<b>にがて</b>'+ids.map(id=>'<span>'+weakLabel(id)+'</span>').join('');
+});
+
+function weakLabel(code){
+  const name=countryName(code);
+  return name?name.jp:code;
 }
 
 render();

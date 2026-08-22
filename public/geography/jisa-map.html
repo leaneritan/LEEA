@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>時差マップ｜地理 探検</title>
+<style>
+  :root{
+    --night:#0B1420; --panel:#122132; --panel2:#0F1B29; --sea:#16293C;
+    --ink:#F4EDE0; --muted:#8FA2B4; --line:#25384C;
+    --ochre:#EFB13C; --jade:#48C3A9; --plum:#D07CC8; --vermilion:#FF6B57; --sky:#6FB3E0;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Noto Serif JP",serif;
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",sans-serif;
+    --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 20% -10%, #16273A 0%, transparent 60%),var(--night);
+    color:var(--ink);font-family:var(--gothic);-webkit-font-smoothing:antialiased;padding:10px 12px 12px;
+  }
+  .shell{max-width:1480px;margin:0 auto}
+
+  header{display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px}
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+  h1{font-family:var(--mincho);font-weight:600;font-size:clamp(16px,2.1vw,21px);margin:0;letter-spacing:.04em;flex:none}
+  h1 .sub{color:var(--sky)}
+  .lede{color:var(--muted);font-size:12px;line-height:1.5;margin:0;flex:1 1 280px;min-width:0}
+
+  .bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 8px}
+  .chip{
+    font-family:var(--gothic);font-size:11px;color:var(--ink);background:var(--panel);
+    border:1px solid var(--line);border-radius:999px;padding:5px 10px;cursor:pointer;
+    transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+  }
+  .chip:hover{border-color:#3D5771}
+  .chip .dot{width:9px;height:9px;border-radius:50%;background:currentColor}
+  .chip[data-on="true"]{background:#1B2E43;border-color:#3F6182}
+  .chip[data-on="false"]{opacity:.42}
+  .chip.c1{color:var(--sky)} .chip.c2{color:var(--vermilion)} .chip.c3{color:var(--plum)} .chip.c4{color:var(--ochre)}
+  .spacer{flex:1}
+  .btn{
+    font-family:var(--gothic);font-size:12px;font-weight:700;letter-spacing:.04em;
+    background:var(--sky);color:#052034;border:none;border-radius:999px;padding:7px 16px;cursor:pointer;transition:.15s;white-space:nowrap;
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+
+  .clockbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--panel2);
+    border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:0 0 8px}
+  .clockbar label{font-size:11px;color:var(--muted);white-space:nowrap}
+  .clockbar .jptime{font-family:var(--mincho);font-size:20px;color:var(--ochre);min-width:112px}
+  .clockbar input[type=range]{flex:1;min-width:160px;accent-color:var(--ochre)}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 296px;gap:12px}
+  .mapcard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  svg.map{display:block;width:100%;height:auto;background:var(--sea);min-width:640px}
+  .grat{stroke:#20374C;stroke-width:.6;fill:none}
+  .land{fill:#C7B48F;stroke:#7E7156;stroke-width:.7;stroke-linejoin:round}
+
+  .zoneband{fill:#6FB3E0;opacity:.07}
+  .zoneband.alt{opacity:.14}
+  .zoneline{stroke:#2E4A63;stroke-width:.5;fill:none}
+  .zonelabel{font-family:var(--mono);font-size:8px;fill:#7E93A6}
+  .special{stroke-width:1.2;fill:none}
+  .meridian{stroke:var(--plum);stroke-dasharray:7 5}
+  .dateline{stroke:var(--vermilion);stroke-dasharray:4 4}
+  .jstline{stroke:var(--ochre)}
+  .linelabel{font-family:var(--gothic);font-size:9px;fill:var(--muted)}
+
+  .city{cursor:pointer}
+  .city circle{transition:.15s}
+  .citylabel{font-family:var(--gothic);font-size:10px;font-weight:700;fill:#EFE4CB;
+    paint-order:stroke;stroke:#0B1420;stroke-width:3;stroke-linejoin:round;pointer-events:none}
+  .citytime{font-family:var(--mono);font-size:9px;fill:#9FE0C8;
+    paint-order:stroke;stroke:#0B1420;stroke-width:3;stroke-linejoin:round;pointer-events:none}
+  .city[data-sel="true"] .ring{stroke-width:2.6}
+  .city[data-hit="true"] .ring{stroke:#48C3A9;stroke-width:2.6}
+
+  .swipe{font-size:11px;color:var(--muted);text-align:center;padding:6px 0 10px;border-top:1px solid var(--line)}
+
+  aside{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+  aside .empty{color:var(--muted);font-size:13px;line-height:1.9;text-align:center;padding:70px 10px}
+  aside .empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:8px}
+  .cat{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px;color:var(--sky)}
+  aside h2{font-family:var(--mincho);font-size:24px;margin:0 0 2px;letter-spacing:.03em}
+  .enname{color:var(--muted);font-size:12px;margin-bottom:12px;font-family:var(--mono)}
+  .bigtime{font-family:var(--mincho);font-size:34px;color:var(--jade);margin:6px 0 2px}
+  .daynote{font-size:12px;color:var(--ochre);margin-bottom:12px}
+  .facts{display:grid;border-top:1px solid var(--line);margin-bottom:12px}
+  .fact{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .fact span{color:var(--muted)}
+  .fact b{text-align:right}
+  .how{font-size:12px;line-height:1.9;color:var(--muted);background:#0C1826;border:1px solid var(--line);border-radius:8px;padding:10px}
+  .how code{font-family:var(--mono);color:var(--ink)}
+
+  .qmeta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:12px}
+  .qtext{font-size:15px;line-height:1.8;margin-bottom:6px}
+  .qbig{font-family:var(--mincho);font-size:26px;margin:6px 0 10px;color:var(--ochre)}
+  .qhint{color:var(--muted);font-size:12px}
+  .feedback{margin-top:14px;font-size:13px;line-height:1.8;padding:12px;border-radius:8px}
+  .feedback.ok{background:#102E28;color:#8FE3CE;border:1px solid #1E5C4E}
+  .feedback.ng{background:#31191C;color:#F0A6A6;border:1px solid #6B2B31}
+  .score{font-family:var(--mincho);font-size:34px;text-align:center;margin:18px 0 6px}
+
+  .weakbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;
+    background:#31191C;border:1px solid #6B2B31;border-radius:10px;padding:6px 10px}
+  .weakbar b{color:#F0A6A6;font-size:11px;letter-spacing:.06em}
+  .weakbar span{font-family:var(--gothic);font-size:11px;color:#F4EDE0;
+    background:#0C1826;border:1px solid var(--line);border-radius:5px;padding:3px 7px}
+  .weakbar.empty{display:none}
+
+  .worldmap-zoom{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:4px;z-index:5}
+  .worldmap-zoom button{
+    width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--gothic);font-size:15px;line-height:1;
+    background:#122132ee;color:var(--ink);border:1px solid var(--line);border-radius:8px;
+    cursor:pointer;transition:.15s;padding:0;
+  }
+  .worldmap-zoom button:hover:not(:disabled){border-color:#3F6182;background:#1B2E43}
+  .worldmap-zoom button:disabled{opacity:.35;cursor:default}
+  .grid.panel-hidden{grid-template-columns:minmax(0,1fr)}
+  .grid.panel-hidden aside{display:none}
+
+  html,body{height:100%}
+  body{display:flex;flex-direction:column;overflow:hidden}
+  .shell{flex:1;display:flex;flex-direction:column;min-height:0;width:100%}
+  .grid{flex:1;min-height:0;align-items:stretch}
+  .mapcard{display:flex;flex-direction:column;min-height:0}
+  .scroller{flex:1;min-height:0;display:flex}
+  svg.map{height:100%;flex:1}
+  aside{overflow-y:auto;min-height:0}
+
+  @media (max-width:1080px){
+    html,body{height:auto}
+    body{display:block;overflow:auto}
+    .shell{display:block}
+    .grid{display:block;grid-template-columns:1fr}
+    .mapcard{display:block;margin-bottom:16px}
+    .scroller{display:block}
+    svg.map{height:auto}
+    aside{overflow:visible}
+  }
+</style>
+<script src="/components/world-map.js"></script>
+<script src="/components/geo-progress.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<header>
+  <div class="eyebrow">地理 ／ 時差</div>
+  <h1>時差マップ <span class="sub">— 経度と時間のかんけい</span></h1>
+  <p class="lede">スライダーで日本の時刻を動かすと、世界の都市の時刻がいっしょに変わります。都市や地図をクリックすると、時差の計算のしかたが出てきます。</p>
+</header>
+
+<div class="bar" id="filters">
+  <button class="chip c1" data-layer="bands" data-on="true"><span class="dot"></span>時間帯（15度ごと）</button>
+  <button class="chip c3" data-layer="prime" data-on="true"><span class="dot"></span>本初子午線 0°</button>
+  <button class="chip c4" data-layer="jst" data-on="true"><span class="dot"></span>日本の標準時子午線 135°E</button>
+  <button class="chip c2" data-layer="dateline" data-on="true"><span class="dot"></span>日付変更線 180°</button>
+  <span class="spacer"></span>
+  <button class="btn" id="quizBtn">クイズに挑戦</button>
+</div>
+
+<div class="clockbar">
+  <label for="jpclock">日本の時刻</label>
+  <div class="jptime" id="jpTimeOut">午前 0 時</div>
+  <input type="range" id="jpclock" min="0" max="23" step="1" value="12" aria-label="日本の時刻">
+</div>
+
+<div class="weakbar empty" id="weakbar"></div>
+
+<div class="grid">
+  <div class="mapcard">
+    <div class="scroller">
+      <svg class="map" preserveAspectRatio="xMidYMid meet" role="img" aria-label="時差の地図">
+        <g id="bandLayer"></g>
+        <g id="lineLayer"></g>
+        <g id="cities"></g>
+      </svg>
+    </div>
+    <div class="swipe">ホイールかピンチで拡大・縮小、ドラッグで移動。右下の ⤾ で全体表示にもどります。</div>
+  </div>
+
+  <aside id="panel">
+    <div class="empty"><b>都市をクリック</b>日本との時差と、その計算のしかたが分かるよ。</div>
+  </aside>
+</div>
+</div>
+
+<script>
+const GEO=leeaGeoProgress({mapId:"jisa-map",exploredTotal:12});
+
+const BASE=buildWorldMap({
+  svg:document.querySelector("svg.map"),
+  lon:[-180,180], lat:[-58,80], scale:3,
+  graticule:null
+});
+const px=BASE.px, el=BASE.el;
+
+/* ---------- content ----------
+   標準時 (standard time) only — サマータイム is noted where a city uses it but
+   never calculated, the way 中1 textbooks treat it. Japan is UTC+9, its
+   標準時子午線 東経135度 through 明石. */
+const JAPAN_OFFSET=9;
+
+const CITIES=[
+ {id:"tokyo",   name:"東京",         en:"Tokyo",        country:"日本",       lon:139.7, lat:35.7, offset:9,    meridian:"東経135度"},
+ {id:"beijing", name:"北京",         en:"Beijing",      country:"中国",       lon:116.4, lat:39.9, offset:8,    meridian:"東経120度"},
+ {id:"bangkok", name:"バンコク",     en:"Bangkok",      country:"タイ",       lon:100.5, lat:13.8, offset:7,    meridian:"東経105度"},
+ {id:"delhi",   name:"デリー",       en:"Delhi",        country:"インド",     lon:77.2,  lat:28.6, offset:5.5,  meridian:"東経82.5度", note:"インドは30分きざみの標準時"},
+ {id:"dubai",   name:"ドバイ",       en:"Dubai",        country:"アラブ首長国連邦", lon:55.3, lat:25.2, offset:4, meridian:"東経60度"},
+ {id:"moscow",  name:"モスクワ",     en:"Moscow",       country:"ロシア",     lon:37.6,  lat:55.8, offset:3,    meridian:"東経45度"},
+ {id:"cairo",   name:"カイロ",       en:"Cairo",        country:"エジプト",   lon:31.2,  lat:30.0, offset:2,    meridian:"東経30度"},
+ {id:"paris",   name:"パリ",         en:"Paris",        country:"フランス",   lon:2.3,   lat:48.9, offset:1,    meridian:"東経15度", note:"夏はサマータイムを使う"},
+ {id:"london",  name:"ロンドン",     en:"London",       country:"イギリス",   lon:-0.1,  lat:51.5, offset:0,    meridian:"本初子午線 0度", note:"夏はサマータイムを使う"},
+ {id:"rio",     name:"リオデジャネイロ", en:"Rio de Janeiro", country:"ブラジル", lon:-43.2, lat:-22.9, offset:-3, meridian:"西経45度"},
+ {id:"newyork", name:"ニューヨーク", en:"New York",     country:"アメリカ",   lon:-74.0, lat:40.7, offset:-5,   meridian:"西経75度", note:"夏はサマータイムを使う"},
+ {id:"losangeles",name:"ロサンゼルス",en:"Los Angeles",  country:"アメリカ",   lon:-118.2,lat:34.1, offset:-8,   meridian:"西経120度", note:"夏はサマータイムを使う"},
+ {id:"sydney",  name:"シドニー",     en:"Sydney",       country:"オーストラリア", lon:151.2, lat:-33.9, offset:10, meridian:"東経150度", note:"夏はサマータイムを使う"}
+];
+
+/* ---------- build layers ---------- */
+// 15° hour bands
+const bandLayer=document.getElementById("bandLayer");
+for(let lon=-180;lon<180;lon+=15){
+  const[x1,y1]=px(lon,80),[x2,y2]=px(lon+15,-58);
+  const band=el("rect",{class:"zoneband"+(((lon+180)/15)%2?" alt":""),x:x1,y:y1,width:x2-x1,height:y2-y1});
+  bandLayer.appendChild(band);
+  bandLayer.appendChild(el("line",{class:"zoneline",x1:x1,y1:y1,x2:x1,y2:y2}));
+  // the offset a 15° band corresponds to, e.g. +9 for the band around 135°E
+  const centre=lon+7.5;
+  const offset=Math.round(centre/15);
+  const t=el("text",{class:"zonelabel",x:(x1+x2)/2,y:y1+11});
+  t.setAttribute("text-anchor","middle");
+  t.textContent=(offset>0?"+":"")+offset;
+  bandLayer.appendChild(t);
+}
+
+// meridians of note
+const lineLayer=document.getElementById("lineLayer");
+function meridian(lon,cls,label,anchor){
+  const[x1,y1]=px(lon,80),[x2,y2]=px(lon,-58);
+  const line=el("line",{class:"special "+cls,x1:x1,y1:y1,x2:x2,y2:y2});
+  line.setAttribute("data-line",cls);
+  lineLayer.appendChild(line);
+  const t=el("text",{class:"linelabel",x:x1+(anchor==="end"?-4:4),y:y2-6});
+  t.setAttribute("text-anchor",anchor||"start");
+  t.setAttribute("data-line",cls);
+  t.textContent=label;
+  lineLayer.appendChild(t);
+}
+meridian(0,"meridian","本初子午線 0°");
+meridian(135,"jstline","日本の標準時子午線 135°E");
+meridian(180,"dateline","日付変更線 180°","end");
+
+// cities
+const cityLayer=document.getElementById("cities");
+const nodes={};
+CITIES.forEach(c=>{
+  const[x,y]=px(c.lon,c.lat);
+  const g=el("g",{class:"city","data-id":c.id});
+  // A generous invisible target: the visible dot is r=5, which is a hard thing
+  // to hit on a world map, especially on a tablet.
+  g.appendChild(el("circle",{cx:x,cy:y,r:13,fill:"transparent"}));
+  g.appendChild(el("circle",{class:"ring",cx:x,cy:y,r:5,fill:"none",stroke:c.id==="tokyo"?"#EFB13C":"#6FB3E0","stroke-width":1.4}));
+  g.appendChild(el("circle",{cx:x,cy:y,r:2,fill:c.id==="tokyo"?"#EFB13C":"#6FB3E0"}));
+  const label=el("text",{class:"citylabel",x:x,y:y-9});
+  label.setAttribute("text-anchor","middle");
+  label.textContent=c.name;
+  g.appendChild(label);
+  const time=el("text",{class:"citytime",x:x,y:y+15});
+  time.setAttribute("text-anchor","middle");
+  g.appendChild(time);
+  g.addEventListener("click",()=>pick(c.id));
+  cityLayer.appendChild(g);
+  nodes[c.id]={group:g,time:time};
+});
+
+/* ---------- state ---------- */
+let selected=null, layers={bands:1,prime:1,jst:1,dateline:1}, quiz=null, japanHour=12;
+
+function fmtHour(hour,half){
+  const h=((hour%24)+24)%24;
+  const suffix=half?"時30分":"時";
+  if(h===0) return "午前 0"+suffix;
+  if(h<12) return "午前 "+h+suffix;
+  if(h===12) return "午後 0"+suffix;
+  return "午後 "+(h-12)+suffix;
+}
+
+/** Local time in a city when it is japanHour in Japan. Returns hour and day shift. */
+function localTime(city){
+  const raw=japanHour-JAPAN_OFFSET+city.offset;
+  const half=Math.abs(raw%1)===0.5;
+  const whole=Math.floor(raw);
+  const hour=((whole%24)+24)%24;
+  const dayShift=Math.floor(whole/24);
+  return {hour:hour,half:half,dayShift:dayShift};
+}
+
+function dayLabel(shift){
+  if(shift<0) return "前日";
+  if(shift>0) return "翌日";
+  return "同じ日";
+}
+
+function render(){
+  document.getElementById("bandLayer").style.display=layers.bands?"":"none";
+  lineLayer.querySelectorAll('[data-line="meridian"]').forEach(n=>n.style.display=layers.prime?"":"none");
+  lineLayer.querySelectorAll('[data-line="jstline"]').forEach(n=>n.style.display=layers.jst?"":"none");
+  lineLayer.querySelectorAll('[data-line="dateline"]').forEach(n=>n.style.display=layers.dateline?"":"none");
+
+  CITIES.forEach(c=>{
+    const node=nodes[c.id];
+    node.group.setAttribute("data-sel",String(selected===c.id));
+    const t=localTime(c);
+    node.time.textContent=quiz?"":(t.hour+(t.half?":30":"時"));
+  });
+
+  document.getElementById("jpTimeOut").textContent=fmtHour(japanHour,false);
+}
+
+/* ---------- panel ---------- */
+function pick(id){
+  if(quiz){answer(id);return;}
+  showPanel();
+  selected=id; render();
+  GEO.open(id);
+
+  const c=CITIES.find(x=>x.id===id);
+  const t=localTime(c);
+  const diff=Math.abs(JAPAN_OFFSET-c.offset);
+  const ahead=c.offset>JAPAN_OFFSET;
+  const same=c.offset===JAPAN_OFFSET;
+
+  document.getElementById("panel").innerHTML=
+    '<div class="cat">'+c.country+'</div>'+
+    '<h2>'+c.name+'</h2>'+
+    '<div class="enname">'+c.en+'</div>'+
+    '<div class="bigtime">'+fmtHour(t.hour,t.half)+'</div>'+
+    '<div class="daynote">日本が '+fmtHour(japanHour,false)+' のとき ／ '+dayLabel(t.dayShift)+'</div>'+
+    '<div class="facts">'+
+      '<div class="fact"><span>標準時子午線</span><b>'+c.meridian+'</b></div>'+
+      '<div class="fact"><span>世界標準時との差</span><b>'+(c.offset>=0?"+":"")+c.offset+' 時間</b></div>'+
+      '<div class="fact"><span>日本との時差</span><b>'+(same?"なし":diff+' 時間 '+(ahead?"進んでいる":"おくれている"))+'</b></div>'+
+    '</div>'+
+    '<div class="how">経度が <code>15度</code> ちがうと時刻は <code>1時間</code> ちがう。<br>'+
+      '日本の標準時子午線は <code>東経135度</code>、'+c.name+' は <code>'+c.meridian+'</code>。<br>'+
+      (same?'同じ標準時なので時差はないよ。':'経度の差 ÷ 15 = <code>'+diff+' 時間</code> の時差になる。')+
+      (c.note?'<br><br>※ '+c.note:'')+'</div>';
+}
+
+function resetPanel(){
+  selected=null; render();
+  document.getElementById("panel").innerHTML=
+    '<div class="empty"><b>都市をクリック</b>日本との時差と、その計算のしかたが分かるよ。</div>';
+}
+
+/* ---------- controls ---------- */
+document.querySelectorAll("#filters .chip").forEach(chip=>{
+  chip.addEventListener("click",()=>{
+    const key=chip.dataset.layer;
+    layers[key]=layers[key]?0:1;
+    chip.dataset.on=String(Boolean(layers[key]));
+    render();
+  });
+});
+
+document.getElementById("jpclock").addEventListener("input",(event)=>{
+  japanHour=Number(event.target.value);
+  render();
+  if(selected&&!quiz) pick(selected);
+});
+
+/* ---------- quiz ----------
+   Whole-hour cities only, and never 東京 — "what time is it in Japan when it
+   is 12 in Japan" teaches nothing. */
+const QUIZ_POOL=CITIES.filter(c=>c.id!=="tokyo"&&c.offset%1===0).map(c=>c.id);
+
+const quizBtn=document.getElementById("quizBtn");
+quizBtn.addEventListener("click",()=>{ if(quiz) endQuiz(); else startQuiz(); });
+
+function startQuiz(){
+  showPanel();
+  const pool=GEO.pickQuiz(QUIZ_POOL,Math.min(10,QUIZ_POOL.length));
+  quiz={pool:pool,i:0,score:0,locked:false,hour:12};
+  quizBtn.textContent="クイズをやめる";
+  selected=null; render(); askQ();
+}
+
+function endQuiz(){ quiz=null; quizBtn.textContent="クイズに挑戦"; render(); resetPanel(); }
+
+function askQ(){
+  const city=CITIES.find(c=>c.id===quiz.pool[quiz.i]);
+  // A fresh Japan time each question, so the answer cannot be memorised.
+  quiz.hour=Math.floor(Math.random()*24);
+  japanHour=quiz.hour;
+  document.getElementById("jpclock").value=String(japanHour);
+  render();
+  const t=localTime(city);
+  document.getElementById("panel").innerHTML=
+    '<div class="qmeta"><span>第 '+(quiz.i+1)+' 問 / '+quiz.pool.length+'</span><span>正解 '+quiz.score+'</span></div>'+
+    '<div class="cat" style="color:var(--jade)">時差クイズ</div>'+
+    '<div class="qtext">日本が <b>'+fmtHour(japanHour,false)+'</b> のとき、<br>この時刻の都市はどこ？</div>'+
+    '<div class="qbig">'+fmtHour(t.hour,t.half)+'</div>'+
+    '<div class="qhint">地図の都市をクリックして答えよう</div>';
+}
+
+function answer(id){
+  if(quiz.locked) return;
+  quiz.locked=true;
+  const target=CITIES.find(c=>c.id===quiz.pool[quiz.i]);
+  const picked=CITIES.find(c=>c.id===id);
+  const correct=id===target.id;
+  if(correct) quiz.score++;
+  GEO.answered(target.id,correct);
+
+  selected=id; render();
+  nodes[target.id].group.setAttribute("data-hit","true");
+
+  const diff=Math.abs(JAPAN_OFFSET-target.offset);
+  const panel=document.getElementById("panel");
+  panel.innerHTML=
+    '<div class="qmeta"><span>第 '+(quiz.i+1)+' 問 / '+quiz.pool.length+'</span><span>正解 '+quiz.score+'</span></div>'+
+    '<div class="qbig">'+target.name+'</div>'+
+    '<div class="feedback '+(correct?"ok":"ng")+'">'+
+      (correct?"正解！ ":"おしい。えらんだのは「"+picked.name+"」。<br>")+
+      target.name+' の標準時子午線は '+target.meridian+'。日本との時差は '+diff+' 時間。'+
+    '</div>';
+
+  const next=document.createElement("button");
+  next.className="btn"; next.style.cssText="margin:18px auto 0;display:block";
+  next.textContent=quiz.i<quiz.pool.length-1?"次の問題へ":"結果を見る";
+  next.addEventListener("click",()=>{
+    nodes[target.id].group.removeAttribute("data-hit");
+    if(quiz.i<quiz.pool.length-1){quiz.i++;quiz.locked=false;selected=null;render();askQ();}
+    else showScore();
+  });
+  panel.appendChild(next);
+}
+
+function showScore(){
+  GEO.finishQuiz(quiz.score,quiz.pool.length);
+  const panel=document.getElementById("panel");
+  const msg=quiz.score>=9?"かんぺき！ 時差マスター":quiz.score>=7?"よくできました！":quiz.score>=4?"あと少し。15度＝1時間を思い出そう":"もう一度、地図を見てみよう";
+  panel.innerHTML='<div class="cat">けっか</div><div class="score">'+quiz.score+' / '+quiz.pool.length+'</div>'+
+    '<div class="qhint" style="text-align:center;font-size:14px">'+msg+'</div>';
+  const again=document.createElement("button");
+  again.className="btn"; again.style.cssText="margin:18px auto 0;display:block";
+  again.textContent="もう一度"; again.addEventListener("click",startQuiz);
+  panel.appendChild(again);
+  const back=document.createElement("button");
+  back.className="btn ghost"; back.style.cssText="margin:10px auto 0;display:block";
+  back.textContent="地図にもどる"; back.addEventListener("click",endQuiz);
+  panel.appendChild(back);
+}
+
+/* ---------- zoom + collapsible panel (shared behaviour) ---------- */
+enableZoom(BASE);
+
+const grid=document.querySelector(".grid");
+const panelToggle=document.createElement("button");
+panelToggle.type="button";
+document.querySelector(".worldmap-zoom").appendChild(panelToggle);
+
+function setPanelHidden(hidden){
+  grid.classList.toggle("panel-hidden",hidden);
+  panelToggle.textContent=hidden?"◂":"▸";
+  panelToggle.title=hidden?"パネルを開く":"パネルを閉じる";
+  panelToggle.setAttribute("aria-label",panelToggle.title);
+  panelToggle.setAttribute("aria-expanded",String(!hidden));
+}
+panelToggle.addEventListener("click",()=>setPanelHidden(!grid.classList.contains("panel-hidden")));
+setPanelHidden(false);
+
+function showPanel(){ if(grid.classList.contains("panel-hidden")) setPanelHidden(false); }
+
+/* ---------- 苦手リスト ---------- */
+GEO.onState(()=>{
+  const bar=document.getElementById("weakbar");
+  const ids=GEO.weakIds();
+  if(!ids.length){ bar.className="weakbar empty"; bar.innerHTML=""; return; }
+  bar.className="weakbar";
+  bar.innerHTML='<b>にがて</b>'+ids.map(id=>'<span>'+weakLabel(id)+'</span>').join('');
+});
+
+function weakLabel(id){
+  const c=CITIES.find(x=>x.id===id);
+  return c?c.name:String(id);
+}
+
+render();
+</script>
+</body>
+</html>

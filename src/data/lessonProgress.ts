@@ -70,7 +70,7 @@ export async function syncLessonProgressWithCloud(current: LessonProgressMap): P
       .eq("teacher_id", "neritan");
 
     if (error) throw error;
-    reportCloudSyncSuccess();
+    reportCloudSyncSuccess("teacher-lessons");
 
     const cloud = ((data ?? []) as LessonProgressRow[]).reduce<LessonProgressMap>((next, row) => {
       next[row.lesson_id] = fromLessonProgressRow(row);
@@ -104,7 +104,7 @@ export async function syncLessonProgressWithCloud(current: LessonProgressMap): P
     return merged;
   } catch (error) {
     console.warn("LEEA Supabase teacher lesson progress sync failed", error);
-    reportCloudSyncFailure();
+    reportCloudSyncFailure("teacher-lessons", error);
     return current;
   }
 }
@@ -123,10 +123,10 @@ async function upsertLessonProgressRecords(records: LessonProgressRecord[]) {
       .upsert(records.map(toLessonProgressRow), { onConflict: "lesson_id,teacher_id,student_id" });
 
     if (error) throw error;
-    reportCloudSyncSuccess();
+    reportCloudSyncSuccess("teacher-lessons");
   } catch (error) {
     console.warn("LEEA Supabase teacher lesson progress save failed", error);
-    reportCloudSyncFailure();
+    reportCloudSyncFailure("teacher-lessons", error);
   }
 }
 

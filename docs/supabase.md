@@ -18,6 +18,8 @@ LEEA uses Git for curriculum source and Supabase for shared live state.
 - Quiz scores, module completion, captions, and done state
 - Neritan teacher lesson `Mark Done` state
 - Reference `I know it` / `Review later` confidence
+- Math block progress (`math_block_progress`)
+- Geography map progress, including per-item weak-spot history (`geography_map_progress`)
 
 ## Environment variables
 
@@ -49,11 +51,15 @@ supabase/schema.sql
 
 The schema creates:
 
-- `students`
-- `assignments`
-- `learner_progress`
-- `teacher_lesson_progress`
-- `reference_confidence`
+| table | holds |
+| --- | --- |
+| `students` | the family's fixed student rows |
+| `assignments` | Neritan → Leo assignments |
+| `learner_progress` | Leo's own app completion |
+| `teacher_lesson_progress` | Neritan's manual Mark Done checklist |
+| `reference_confidence` | Reference I Know / I Don't Know |
+| `math_block_progress` | Math 節 block completion |
+| `geography_map_progress` | Geography map status, quiz score, and per-item weak-spot history |
 
 It also inserts the first student row:
 
@@ -61,6 +67,46 @@ It also inserts the first student row:
 id = leo
 display_name = Leo
 ```
+
+**Keep this list in step with `supabase/schema.sql`.** A table that exists in the file but not in the project fails silently — see below.
+
+## Re-running the schema does not migrate anything
+
+`supabase/schema.sql` is written with `create table if not exists`. That makes it safe to re-run, but it also means:
+
+- a table added to the file **after** the schema was last applied **is** created on the next run
+- a **column** added to a table that already exists is **not** — `if not exists` skips the whole statement, so the table keeps its old shape forever
+
+So re-running the file is not a migration. Changing an existing table needs an explicit `alter table`, applied on its own.
+
+### What went wrong once
+
+The schema was applied when it had only the five English tables. `math_block_progress` and `geography_map_progress` were added to the file later, in the PRs that built those subjects, and nobody re-ran it. For months the app happily wrote Math and Geography progress, every write failed, and each one fell back to localStorage exactly as designed — so nothing errored, nothing looked broken, and all of that progress lived on whichever browser Leo happened to use.
+
+It surfaced only when someone thought to compare the file against the live project:
+
+```sql
+select
+  to_regclass('public.math_block_progress')::text as math_table,
+  to_regclass('public.geography_map_progress')::text as geography_table;
+```
+
+Both came back `null`.
+
+**The "Not synced" badge does not distinguish these cases.** `CloudSyncBadge` shows the same thing whether Supabase is unconfigured or a single table is missing, so it cannot tell you that four out of six tables are syncing fine.
+
+**Whenever you add a table or column to `supabase/schema.sql`, apply it to the live project in the same change, and verify it landed.** Checking is quick:
+
+```sql
+-- every table the app expects, and whether it is really there
+select c.relname, c.relrowsecurity as rls,
+       (select count(*) from pg_policy p where p.polrelid = c.oid) as policies
+from pg_class c join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public' and c.relkind = 'r'
+order by c.relname;
+```
+
+If the Supabase MCP server is connected, `apply_migration` handles the DDL and `execute_sql` handles the verification. A round trip wrapped in `begin; … rollback;` proves the app's exact row shape inserts and reads back without leaving test data behind.
 
 ## Rollout order
 
@@ -70,7 +116,9 @@ display_name = Leo
 4. Wire learner progress second.
 5. Wire teacher lesson progress.
 6. Wire reference confidence.
-7. Add auth later, after the family flow works across devices.
+7. Wire math block progress.
+8. Wire geography map progress.
+9. Add auth later, after the family flow works across devices.
 
 ## `learner_progress` and `teacher_lesson_progress` are two different tables — never assume one implies the other
 

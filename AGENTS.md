@@ -26,6 +26,7 @@ Do not shorten the product heading to "Leo's Elite Academy".
 9. **Do, not reveal.** Leo should choose, build, sort, fix, type, speak, answer, or complete.
 10. **Keep it maintainable by one parent plus AI.** Avoid architecture that becomes another job.
 11. **Validate content before delivery.** Run `npm run validate:content` after reference data changes, before typecheck/build/PR.
+11a. **A schema change is not done until it is applied.** Adding a table or column to `supabase/schema.sql` changes a file, nothing else — the live project is untouched until someone runs it. Every cloud write falls back to localStorage on failure, so a missing table looks exactly like everything working. Apply and verify in the same change; see `docs/supabase.md`.
 12. **Math lessons must be interactive, not digitized text.** Take as long as needed to build a math lesson correctly, but never skip the interactive widget for a シミュレーション-tagged (or otherwise hands-on) activity — a static re-typing of the textbook page has no value over the physical book. See `docs/math-interactivity.md` for the standard and the precedent widgets to match.
 
 ## Subject Structure

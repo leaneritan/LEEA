@@ -1,109 +1,40 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  applyPracticeResult,
+  createReferenceConfidenceRecord,
+  getWeakWordIds,
+  readReferenceConfidence,
+  referenceConfidenceStorageKey,
+  saveReferenceConfidence,
+  saveReferenceConfidenceBatch,
+  syncReferenceConfidenceWithCloud,
+  type ReferenceConfidenceMap,
+  type ReferenceConfidenceRecord
+} from "@/data/referenceConfidence";
 
-export type ReferenceConfidence = "new" | "learning" | "known" | "needs-review";
+export type { ReferenceConfidence, ReferenceConfidenceMap, ReferenceConfidenceRecord } from "@/data/referenceConfidence";
+export { referenceConfidenceStorageKey } from "@/data/referenceConfidence";
 
-export type ReferenceConfidenceRecord = {
-  id: string;
-  studentId: "leo";
-  wordId: string;
-  knows: boolean;
-  confidence: ReferenceConfidence;
-  sourceContext: string | null;
-  markedKnownAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type ReferenceConfidenceMap = Record<string, ReferenceConfidenceRecord>;
-
-export const referenceConfidenceStorageKey = "leea.referenceConfidence.v1";
 const legacyKnownWordStorageKey = "leea.reference.knownWords.v1";
-const defaultStudentId = "leo";
 
-function createReferenceConfidenceRecord(wordId: string, knows: boolean, current?: ReferenceConfidenceRecord): ReferenceConfidenceRecord {
-  const now = new Date().toISOString();
-
-  return {
-    id: current?.id ?? `reference-confidence-${defaultStudentId}-${wordId}`,
-    studentId: defaultStudentId,
-    wordId,
-    knows,
-    confidence: knows ? "known" : "learning",
-    sourceContext: current?.sourceContext ?? null,
-    markedKnownAt: knows ? current?.markedKnownAt ?? now : null,
-    createdAt: current?.createdAt ?? now,
-    updatedAt: now
-  };
-}
-
-function normalizeReferenceConfidenceMap(value: unknown): ReferenceConfidenceMap {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-
-  return Object.entries(value).reduce<ReferenceConfidenceMap>((next, [wordId, record]) => {
-    if (!record || typeof record !== "object" || Array.isArray(record)) return next;
-    const maybeRecord = record as Partial<ReferenceConfidenceRecord>;
-    const resolvedWordId = typeof maybeRecord.wordId === "string" ? maybeRecord.wordId : wordId;
-    const knows = Boolean(maybeRecord.knows || maybeRecord.confidence === "known");
-    next[resolvedWordId] = {
-      id: typeof maybeRecord.id === "string" ? maybeRecord.id : `reference-confidence-${defaultStudentId}-${resolvedWordId}`,
-      studentId: maybeRecord.studentId === "leo" ? maybeRecord.studentId : defaultStudentId,
-      wordId: resolvedWordId,
-      knows,
-      confidence: isReferenceConfidence(maybeRecord.confidence) ? maybeRecord.confidence : knows ? "known" : "learning",
-      sourceContext: typeof maybeRecord.sourceContext === "string" ? maybeRecord.sourceContext : null,
-      markedKnownAt: typeof maybeRecord.markedKnownAt === "string" ? maybeRecord.markedKnownAt : null,
-      createdAt: typeof maybeRecord.createdAt === "string" ? maybeRecord.createdAt : new Date().toISOString(),
-      updatedAt: typeof maybeRecord.updatedAt === "string" ? maybeRecord.updatedAt : new Date().toISOString()
-    };
-    return next;
-  }, {});
-}
-
-function isReferenceConfidence(value: unknown): value is ReferenceConfidence {
-  return value === "new" || value === "learning" || value === "known" || value === "needs-review";
-}
-
-function readReferenceConfidenceMap() {
-  if (typeof window === "undefined") return {};
-
-  try {
-    const saved = window.localStorage.getItem(referenceConfidenceStorageKey);
-    if (saved) return normalizeReferenceConfidenceMap(JSON.parse(saved));
-
-    const legacySaved = window.localStorage.getItem(legacyKnownWordStorageKey);
-    const legacyParsed = legacySaved ? JSON.parse(legacySaved) : [];
-    if (!Array.isArray(legacyParsed)) return {};
-
-    const migrated = legacyParsed
-      .filter((id): id is string => typeof id === "string")
-      .reduce<ReferenceConfidenceMap>((next, wordId) => {
-        next[wordId] = createReferenceConfidenceRecord(wordId, true);
-        return next;
-      }, {});
-
-    if (Object.keys(migrated).length) writeReferenceConfidenceMap(migrated);
-    return migrated;
-  } catch {
-    return {};
-  }
-}
-
-function writeReferenceConfidenceMap(records: ReferenceConfidenceMap) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(referenceConfidenceStorageKey, JSON.stringify(records));
-}
-
+/**
+ * Leo's per-word memory. Reads and writes go through src/data/referenceConfidence.ts,
+ * which is also what finally pushes these records to Supabase — for a long time
+ * they only ever existed in one browser's localStorage.
+ */
 export function useKnownWordIds() {
   const [confidenceRecords, setConfidenceRecords] = useState<ReferenceConfidenceMap>({});
 
   useEffect(() => {
-    setConfidenceRecords(readReferenceConfidenceMap());
+    const local = readReferenceConfidence();
+    setConfidenceRecords(local);
+    void syncReferenceConfidenceWithCloud(local).then(setConfidenceRecords);
 
     const handleStorage = (event: StorageEvent) => {
       if (event.key === referenceConfidenceStorageKey || event.key === legacyKnownWordStorageKey) {
-        setConfidenceRecords(readReferenceConfidenceMap());
+        setConfidenceRecords(readReferenceConfidence());
       }
     };
 
@@ -119,17 +50,34 @@ export function useKnownWordIds() {
     [confidenceRecords]
   );
   const knownWordSet = useMemo(() => new Set(knownWordIds), [knownWordIds]);
+  const weakWordIds = useMemo(() => getWeakWordIds(confidenceRecords), [confidenceRecords]);
 
   const setWordKnown = useCallback((wordId: string, known: boolean) => {
     setConfidenceRecords((current) => {
-      const next = {
-        ...current,
-        [wordId]: createReferenceConfidenceRecord(wordId, known, current[wordId])
-      };
-      writeReferenceConfidenceMap(next);
+      const record = createReferenceConfidenceRecord(wordId, known, current[wordId]);
+      void saveReferenceConfidence(record);
+      return { ...current, [wordId]: record };
+    });
+  }, []);
+
+  /** Records a finished practice session in one write rather than one per answer. */
+  const recordPracticeResults = useCallback((results: Array<{ wordId: string; correct: boolean }>) => {
+    if (!results.length) return;
+
+    setConfidenceRecords((current) => {
+      const next = { ...current };
+      const saved: ReferenceConfidenceRecord[] = [];
+
+      for (const result of results) {
+        const record = applyPracticeResult(result.wordId, result.correct, next[result.wordId]);
+        next[result.wordId] = record;
+        saved.push(record);
+      }
+
+      void saveReferenceConfidenceBatch(saved);
       return next;
     });
   }, []);
 
-  return { confidenceRecords, knownWordIds, knownWordSet, setWordKnown };
+  return { confidenceRecords, knownWordIds, knownWordSet, weakWordIds, setWordKnown, recordPracticeResults };
 }

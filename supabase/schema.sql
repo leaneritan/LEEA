@@ -107,6 +107,11 @@ create table if not exists public.reference_confidence (
   confidence text not null check (confidence in ('new', 'learning', 'known', 'needs-review')),
   source_context text,
   marked_known_at timestamptz,
+  -- Practice history, so a drill can lean on the words Leo keeps missing.
+  asked integer not null default 0,
+  correct integer not null default 0,
+  last_correct boolean,
+  last_practiced_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (student_id, word_id)

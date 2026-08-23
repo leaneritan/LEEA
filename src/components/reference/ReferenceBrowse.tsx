@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, ChevronRight, Search } from "lucide-react";
+import { ChevronDown, ChevronRight, Dumbbell, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useJapanesePreference } from "@/components/AppShell";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
@@ -153,6 +153,7 @@ export function ReferenceBrowse() {
         {/* Practice leans on the words Leo keeps missing — see
             src/data/referenceConfidence.ts for the weighting. */}
         <Link className="refv2-practice-link" href="/reference/practice">
+          <Dumbbell size={15} strokeWidth={2.6} />
           Practice
           {weakWordIds.length ? <b>{weakWordIds.length}</b> : null}
         </Link>

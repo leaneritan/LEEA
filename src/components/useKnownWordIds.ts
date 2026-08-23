@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   applyPracticeResult,
   createReferenceConfidenceRecord,
@@ -27,20 +27,30 @@ const legacyKnownWordStorageKey = "leea.reference.knownWords.v1";
 export function useKnownWordIds() {
   const [confidenceRecords, setConfidenceRecords] = useState<ReferenceConfidenceMap>({});
 
+  // A mirror of the records, so a save can read the current ones without doing
+  // its work inside a state updater. Practice now saves on every answer rather
+  // than once per session, and a updater React is free to call more than once is
+  // the wrong place to be firing writes from.
+  const recordsRef = useRef<ReferenceConfidenceMap>({});
+  const applyRecords = useCallback((records: ReferenceConfidenceMap) => {
+    recordsRef.current = records;
+    setConfidenceRecords(records);
+  }, []);
+
   useEffect(() => {
     const local = readReferenceConfidence();
-    setConfidenceRecords(local);
-    void syncReferenceConfidenceWithCloud(local).then(setConfidenceRecords);
+    applyRecords(local);
+    void syncReferenceConfidenceWithCloud(local).then(applyRecords);
 
     const handleStorage = (event: StorageEvent) => {
       if (event.key === referenceConfidenceStorageKey || event.key === legacyKnownWordStorageKey) {
-        setConfidenceRecords(readReferenceConfidence());
+        applyRecords(readReferenceConfidence());
       }
     };
 
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, []);
+  }, [applyRecords]);
 
   const knownWordIds = useMemo(
     () =>
@@ -52,20 +62,21 @@ export function useKnownWordIds() {
   const knownWordSet = useMemo(() => new Set(knownWordIds), [knownWordIds]);
   const weakWordIds = useMemo(() => getWeakWordIds(confidenceRecords), [confidenceRecords]);
 
-  const setWordKnown = useCallback((wordId: string, known: boolean) => {
-    setConfidenceRecords((current) => {
-      const record = createReferenceConfidenceRecord(wordId, known, current[wordId]);
+  const setWordKnown = useCallback(
+    (wordId: string, known: boolean) => {
+      const record = createReferenceConfidenceRecord(wordId, known, recordsRef.current[wordId]);
+      applyRecords({ ...recordsRef.current, [wordId]: record });
       void saveReferenceConfidence(record);
-      return { ...current, [wordId]: record };
-    });
-  }, []);
+    },
+    [applyRecords]
+  );
 
-  /** Records a finished practice session in one write rather than one per answer. */
-  const recordPracticeResults = useCallback((results: Array<{ wordId: string; correct: boolean }>) => {
-    if (!results.length) return;
+  /** Records practice answers — one per answer as they are given, so an abandoned round still counts. */
+  const recordPracticeResults = useCallback(
+    (results: Array<{ wordId: string; correct: boolean }>) => {
+      if (!results.length) return;
 
-    setConfidenceRecords((current) => {
-      const next = { ...current };
+      const next = { ...recordsRef.current };
       const saved: ReferenceConfidenceRecord[] = [];
 
       for (const result of results) {
@@ -74,10 +85,11 @@ export function useKnownWordIds() {
         saved.push(record);
       }
 
+      applyRecords(next);
       void saveReferenceConfidenceBatch(saved);
-      return next;
-    });
-  }, []);
+    },
+    [applyRecords]
+  );
 
   return { confidenceRecords, knownWordIds, knownWordSet, weakWordIds, setWordKnown, recordPracticeResults };
 }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { BarChart3, BookOpen, CheckSquare, ChevronLeft, ChevronRight, GraduationCap, Home, Library, Search } from "lucide-react";
+import { BarChart3, BookOpen, CheckSquare, ChevronLeft, ChevronRight, Dumbbell, GraduationCap, Home, Library, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { CSSProperties, ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -14,7 +14,7 @@ import { useKnownWordIds } from "@/components/useKnownWordIds";
 import { allWords } from "@/components/reference/ref-data";
 import { CloudSyncBadge } from "@/components/CloudSyncBadge";
 
-type NavKey = "home" | "teacher" | "progress" | "english" | "math" | "geography" | "assignments" | "reference" | "search";
+type NavKey = "home" | "teacher" | "progress" | "english" | "math" | "geography" | "assignments" | "reference" | "search" | "practice";
 
 const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNode }> = [
   { key: "home", label: "Home", href: "/", icon: <Home size={20} strokeWidth={2} /> },
@@ -47,7 +47,7 @@ export function AppShell({
   const [streakDays, setStreakDays] = useState(0);
   const pathname = usePathname();
   const { knownWordSet } = useKnownWordIds();
-  const isReferenceContext = active === "reference" || active === "search";
+  const isReferenceContext = active === "reference" || active === "search" || active === "practice";
   const knownWordCount = knownWordSet.size;
   const reviewWordCount = Math.max(0, allWords.length - knownWordCount);
 
@@ -119,6 +119,15 @@ export function AppShell({
             </Link>
           ))}
         </nav>
+
+        {isReferenceContext ? (
+          <div className="sidebar-subjects sidebar-reference">
+            <span className="sidebar-subjects-title">Reference</span>
+            <Link className={active === "reference" ? "active" : ""} data-tooltip="Browse" href="/reference"><Library size={16} strokeWidth={2.4} />Browse</Link>
+            <Link className={active === "search" ? "active" : ""} data-tooltip="Search" href="/reference/search"><Search size={16} strokeWidth={2.4} />Search</Link>
+            <Link className={active === "practice" ? "active" : ""} data-tooltip="Practice" href="/reference/practice"><Dumbbell size={16} strokeWidth={2.4} />Practice</Link>
+          </div>
+        ) : null}
 
         <div className="sidebar-subjects">
           <span className="sidebar-subjects-title">Subjects</span>

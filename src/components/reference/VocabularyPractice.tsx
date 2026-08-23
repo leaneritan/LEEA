@@ -103,19 +103,23 @@ export function VocabularyPractice() {
   const finished = Boolean(questions && index >= questions.length);
   const score = answers.filter((answer) => answer.correct).length;
 
+  // Each answer is saved the moment it is given, not at the end of the round.
+  // Saving the whole session on the final click meant a round left half-finished
+  // — a tab closed, a tap on Back, anything Leo actually does — threw away every
+  // answer, from localStorage as well as the cloud. Nine right and one distraction
+  // recorded nothing at all. A round is worth what he answered, not what he finished.
   function choose(option: WordEntry) {
     if (!current || picked) return;
+    const correct = option.id === current.answer.id;
     setPicked(option);
-    setAnswers((list) => [...list, { wordId: current.wordId, correct: option.id === current.answer.id }]);
+    setAnswers((list) => [...list, { wordId: current.wordId, correct }]);
+    recordPracticeResults([{ wordId: current.wordId, correct }]);
   }
 
   function next() {
     if (!questions) return;
-    const nextIndex = index + 1;
     setPicked(null);
-    setIndex(nextIndex);
-    // Save the whole session in one write once the last question is answered.
-    if (nextIndex >= questions.length) recordPracticeResults(answers);
+    setIndex(index + 1);
   }
 
   if (!questions) {

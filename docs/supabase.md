@@ -108,6 +108,27 @@ order by c.relname;
 
 If the Supabase MCP server is connected, `apply_migration` handles the DDL and `execute_sql` handles the verification. A round trip wrapped in `begin; … rollback;` proves the app's exact row shape inserts and reads back without leaving test data behind.
 
+## Applied migrations
+
+`supabase/schema.sql` is the shape the app expects; this is the log of changes applied to the live project *after* the initial run, because `create table if not exists` will not apply them for you.
+
+| Migration | What it changed |
+| --- | --- |
+| (missing tables) | Created `math_block_progress` and `geography_map_progress`, which had been in the file but never applied — see below. |
+| (geography items) | Added `items jsonb` to `geography_map_progress` for per-item weak-spot history. |
+| `add_reference_confidence_practice_history` | Added `asked`, `correct`, `last_correct`, `last_practiced_at` to `reference_confidence` for the vocabulary practice drill. |
+
+`list_migrations` on the live project is the authoritative list; add a row here whenever you apply one.
+
+The last one is the `alter table` the section above warns about: `reference_confidence` already existed, so re-running the schema file would have skipped the new columns silently and every practice write would have failed on an unknown column.
+
+```sql
+-- confirm the practice columns are really there
+select column_name from information_schema.columns
+where table_schema = 'public' and table_name = 'reference_confidence'
+order by ordinal_position;
+```
+
 ## Rollout order
 
 1. Add schema and docs.

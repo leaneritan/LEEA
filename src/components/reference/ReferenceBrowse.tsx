@@ -95,7 +95,7 @@ export function ReferenceBrowse() {
   const [level, setLevel] = useState<ScopeLevel>(currentFocus.level);
   const [scopeOpen, setScopeOpen] = useState(true);
 
-  const { knownWordSet } = useKnownWordIds();
+  const { knownWordSet, weakWordIds } = useKnownWordIds();
   const jp = useJapanesePreference();
 
   const hasLevels = course === "our-world";
@@ -146,8 +146,16 @@ export function ReferenceBrowse() {
   return (
     <div className="refv2-shell ref-browse-design">
       <div className="refv2-head">
-        <div className="refv2-eyebrow">Reference Library</div>
-        <h1 className="refv2-h1">{tabLabel}</h1>
+        <div>
+          <div className="refv2-eyebrow">Reference Library</div>
+          <h1 className="refv2-h1">{tabLabel}</h1>
+        </div>
+        {/* Practice leans on the words Leo keeps missing — see
+            src/data/referenceConfidence.ts for the weighting. */}
+        <Link className="refv2-practice-link" href="/reference/practice">
+          Practice
+          {weakWordIds.length ? <b>{weakWordIds.length}</b> : null}
+        </Link>
       </div>
 
       <div className="refv2-scope">

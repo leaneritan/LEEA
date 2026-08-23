@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { mathBooksByGrade } from "../../../content/subjects/math/curriculum";
 import { mathGrades, type MathGrade } from "../../../content/subjects/math/grades";
+import type { MathExtraLessonSummary } from "../../../content/subjects/math/loadSection";
 import type { MathChapterMeta } from "../../../content/subjects/math/types";
 import { readMathProgress, syncMathProgressWithCloud, type MathBlockProgressMap } from "../../data/mathProgress";
 
 const STATUS_LABEL: Record<string, string> = { done: "完了", now: "学習中", todo: "未学習" };
 
-export function CurriculumHome({ extraLessonCounts = {} }: { extraLessonCounts?: Record<string, number> }) {
+export function CurriculumHome({ extraLessons = {} }: { extraLessons?: Record<string, MathExtraLessonSummary[]> }) {
   const [progress, setProgress] = useState<MathBlockProgressMap>({});
   const [grade, setGrade] = useState<MathGrade>("g1");
   const chapters = mathBooksByGrade[grade];
@@ -114,7 +115,7 @@ export function CurriculumHome({ extraLessonCounts = {} }: { extraLessonCounts?:
             const pct = Math.round((done / chapter.sections.length) * 100);
             const isOpen = !!open[chapter.id];
             const chapterExtraLessonCount = chapter.sections.reduce(
-              (sum, s) => sum + (extraLessonCounts[s.id] ?? 0),
+              (sum, s) => sum + (extraLessons[s.id]?.length ?? 0),
               0
             );
 
@@ -156,8 +157,8 @@ export function CurriculumHome({ extraLessonCounts = {} }: { extraLessonCounts?:
                     {chapter.sections.map((section) => (
                       <SectionRow
                         chapter={chapter}
-                        extraLessonCount={extraLessonCounts[section.id] ?? 0}
                         key={section.id}
+                        lessons={extraLessons[section.id] ?? []}
                         section={section}
                       />
                     ))}
@@ -180,11 +181,11 @@ export function CurriculumHome({ extraLessonCounts = {} }: { extraLessonCounts?:
 
 function SectionRow({
   chapter,
-  extraLessonCount,
+  lessons,
   section
 }: {
   chapter: MathChapterMeta;
-  extraLessonCount: number;
+  lessons: MathExtraLessonSummary[];
   section: MathChapterMeta["sections"][number];
 }) {
   const dotStyle =
@@ -209,9 +210,9 @@ function SectionRow({
         <span className="math-section-name">{section.name}</span>
         <span className="math-section-pages">{section.pages}</span>
         <span className="math-section-end">
-          {extraLessonCount > 0 ? (
+          {lessons.length > 0 ? (
             <span className="math-section-extra-badge" title="この節のおまけレッスン">
-              📘 {extraLessonCount}
+              📘 {lessons.length}
             </span>
           ) : null}
           <span className="math-section-status" style={statusStyle}>
@@ -229,6 +230,24 @@ function SectionRow({
         >
           📘 デジタル教科書
         </a>
+      ) : null}
+      {lessons.length > 0 ? (
+        <div className="math-section-lessons">
+          {lessons.map((lesson) => (
+            <a
+              className="math-section-lesson"
+              href={lesson.href}
+              key={lesson.blockId}
+              rel="noopener noreferrer"
+              target="_blank"
+              title={lesson.label}
+            >
+              <span className="math-section-lesson-icon">{lesson.label.split(" ")[0]}</span>
+              <span className="math-section-lesson-title">{lesson.heading}</span>
+              {lesson.page ? <span className="math-section-lesson-page">p.{lesson.page}</span> : null}
+            </a>
+          ))}
+        </div>
       ) : null}
     </div>
   );

@@ -9,6 +9,7 @@ import {
   type SpecialLessonStatus
 } from "../../../content/subjects/math/specialLessons";
 import { MathTopbarHome } from "./MathTopbarHome";
+import { mathChapters } from "../../../content/subjects/math/curriculum";
 
 type GradeFilter = "all" | MathGrade;
 
@@ -114,6 +115,14 @@ export function FreeLessonsHome() {
                           <span>{lesson.kind}</span>
                           <span className="math-speciallesson-row-meta-sep">・</span>
                           <span>{lesson.meta}</span>
+                          {/* Most 特訓レッスン sit outside the textbook; say so when
+                              one is also reachable from a 節, so the two routes to
+                              it read as the same lesson. */}
+                          {sectionLabels(lesson.sections).map((label) => (
+                            <span className="math-speciallesson-row-where" key={label}>
+                              {label}
+                            </span>
+                          ))}
                         </span>
                       </span>
                       <span className="math-speciallesson-row-end">
@@ -144,4 +153,16 @@ export function FreeLessonsHome() {
       </div>
     </div>
   );
+}
+
+/** Human labels for the sections that also link a lesson, e.g. "3章 2節". */
+function sectionLabels(sectionIds: string[] | undefined) {
+  if (!sectionIds?.length) return [];
+  const labels: string[] = [];
+  for (const chapter of mathChapters) {
+    for (const section of chapter.sections) {
+      if (sectionIds.includes(section.id)) labels.push(`${chapter.num}章 ${section.number}節にもあります`);
+    }
+  }
+  return labels;
 }

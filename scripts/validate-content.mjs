@@ -532,6 +532,87 @@ for (const dir of ["public/lessons", "public/learn"]) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// 特訓レッスン: the registry and the section links must agree.
+//
+// These are two lists describing the same lessons, kept in step by hand, and
+// they drifted: two lessons were linked from a 節 with a ✏️ 特訓レッスン button
+// but missing from specialLessons.ts, so they existed inside a section while
+// the 特訓レッスン list — the only page showing what practice exists at all —
+// did not know about them.
+// ---------------------------------------------------------------------------
+const specialLessonsSource = fs.readFileSync(
+  path.join(root, "content/subjects/math/specialLessons.ts"),
+  "utf-8"
+);
+
+const registeredLessons = new Map();
+for (const block of specialLessonsSource.split(/\n\s*\{\s*\n/).slice(1)) {
+  const id = block.match(/id:\s*"([^"]+)"/)?.[1];
+  if (!id) continue;
+  registeredLessons.set(id, {
+    embedPath: block.match(/embedPath:\s*"([^"]+)"/)?.[1],
+    sections: [...block.matchAll(/"(math-[\w-]+)"/g)].map((m) => m[1])
+  });
+}
+
+const mathSectionDir = path.join(root, "content/subjects/math/chapters");
+const specialLinks = new Map();
+if (fs.existsSync(mathSectionDir)) {
+  for (const chapter of fs.readdirSync(mathSectionDir)) {
+    const sectionsDir = path.join(mathSectionDir, chapter, "sections");
+    if (!fs.existsSync(sectionsDir)) continue;
+    for (const file of fs.readdirSync(sectionsDir).filter((f) => f.endsWith(".json"))) {
+      const section = JSON.parse(fs.readFileSync(path.join(sectionsDir, file), "utf-8"));
+      for (const block of section.blocks ?? []) {
+        if (block.type !== "lesson-link") continue;
+
+        const target = path.join(root, "public", block.href.replace(/^\//, ""));
+        if (!fs.existsSync(target)) {
+          fail(`${section.id}: lesson-link ${block.id} points at ${block.href}, which does not exist.`);
+        }
+
+        // Only the 特訓レッスン-labelled links belong in the registry; the
+        // 説明モード ones are textbook companions, not standalone practice.
+        if (!block.label.includes("特訓レッスン")) continue;
+        const slug = block.href.split("/").pop().replace(/\.html$/, "");
+        specialLinks.set(slug, section.id);
+      }
+    }
+  }
+}
+
+for (const [slug, sectionId] of specialLinks) {
+  const entry = registeredLessons.get(slug);
+  if (!entry) {
+    fail(
+      `${sectionId} links "${slug}" as a 特訓レッスン, but there is no entry with that id in content/subjects/math/specialLessons.ts — so it never appears on /math/free. Add one, with sections: ["${sectionId}"].`
+    );
+    continue;
+  }
+  if (!entry.sections.includes(sectionId)) {
+    fail(
+      `specialLessons.ts entry "${slug}" does not list ${sectionId} in its sections, but that section links it. Add it so the two stay in step.`
+    );
+  }
+}
+
+for (const [id, entry] of registeredLessons) {
+  if (entry.embedPath) {
+    const target = path.join(root, "public", entry.embedPath.replace(/^\//, ""));
+    if (!fs.existsSync(target)) {
+      fail(`specialLessons.ts entry "${id}" has embedPath ${entry.embedPath}, but that file does not exist.`);
+    }
+  }
+  for (const sectionId of entry.sections) {
+    if (specialLinks.get(id) !== sectionId) {
+      fail(
+        `specialLessons.ts entry "${id}" claims to appear in ${sectionId}, but that section has no 特訓レッスン link to it.`
+      );
+    }
+  }
+}
+
 if (errors.length) {
   console.error(`Content validation failed with ${errors.length} issue(s):`);
   for (const error of errors) console.error(`- ${error}`);

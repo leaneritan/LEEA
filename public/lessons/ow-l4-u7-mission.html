@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 7 · Mission · Solve Problems with Imagination</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0b1220}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:absolute;top:0;left:0}
+#deck{width:1920px;height:1080px;position:relative}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FFFDF5;overflow:hidden}
+.slide.active{display:flex}
+:root{
+  --red:#DC2626; --red-d:#991B1B; --red-bg:#FEF2F2;
+  --yellow:#FACC15; --yellow-d:#CA8A04; --yellow-bg:#FEFCE8;
+  --amber:#F59E0B; --amber-d:#B45309; --amber-bg:#FFFBEB;
+  --navy:#0f172a; --navy-2:#1e293b;
+  --green:#16A34A; --green-d:#15803d; --green-bg:#F0FDF4;
+  --blue:#2563EB; --blue-d:#1D4ED8; --blue-bg:#EFF6FF;
+  --cream:#FFFDF5; --ink:#1f2937;
+}
+/* ---------- header ---------- */
+.slide-header{height:64px;background:var(--red);display:flex;align-items:center;padding:0 44px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.8);font-size:17px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.45);font-size:20px}
+.hd-section{color:#fff;font-size:23px;font-weight:800}
+.hd-chip{background:rgba(255,255,255,.22);color:#fff;padding:5px 18px;border-radius:20px;font-size:17px;font-weight:800;margin-left:auto}
+.hd-chip.src{background:rgba(0,0,0,.28)}
+.hd-chip.tr{background:var(--yellow);color:var(--navy)}
+/* ---------- body ---------- */
+.body{flex:1;padding:30px 60px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.body.center{align-items:center;justify-content:center;text-align:center}
+.body.grad-lab{background:radial-gradient(circle at 30% 20%,#1e293b,#0b1220);color:#fff}
+.header-bar.yellow{border-color:var(--yellow)}
+/* ---------- buttons / options ---------- */
+.btn{border:none;border-radius:14px;font-family:'Outfit',sans-serif;font-weight:800;cursor:pointer;transition:transform .12s, box-shadow .12s}
+.btn:hover{transform:translateY(-2px)}
+.btn.red{background:var(--red);color:#fff}
+.btn.yellow{background:var(--yellow);color:var(--navy)}
+.btn.dark{background:var(--navy-2);color:#fff}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;font-size:23px;font-weight:700;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.opt:hover{border-color:var(--amber);transform:translateX(4px)}
+.opt.good{background:var(--green-bg);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-bg);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default;opacity:.85}
+.opt:disabled:hover{transform:none}
+0%,100%{transform:translateX(0)}
+25%{transform:translateX(-8px)}
+75%{transform:translateX(8px)}
+.on-correct.show{display:block;animation:pop .4s}
+0%{transform:scale(.85);opacity:0}
+100%{transform:scale(1);opacity:1}
+/* ---------- chips ---------- */
+.chip{display:inline-block;background:#fff;border:3px solid var(--amber);border-radius:12px;padding:10px 20px;font-size:24px;font-weight:800;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;margin:4px}
+.chip:hover{background:var(--amber-bg);transform:translateY(-2px)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.err{animation:shake .35s;border-color:var(--red)}
+.build-line{min-height:74px;background:#fff;border:3px dashed #cbd5e1;border-radius:14px;padding:12px 18px;font-size:27px;font-weight:800;color:var(--navy);display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.build-line.done{border-style:solid;border-color:var(--green);background:var(--green-bg)}
+.bpart{background:var(--yellow-bg);border:2px solid var(--yellow);border-radius:8px;padding:4px 12px}
+/* ---------- stations ---------- */
+.station-board{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.station{width:220px;background:rgba(255,255,255,.07);border:3px solid rgba(255,255,255,.18);border-radius:16px;padding:14px;text-align:center;transition:all .4s}
+.station .st-ico{font-size:44px;filter:grayscale(1);opacity:.45;transition:all .4s}
+.station .st-name{font-size:17px;font-weight:800;color:rgba(255,255,255,.55);margin-top:6px}
+.station.on{border-color:var(--yellow);background:rgba(250,204,21,.14);box-shadow:0 0 26px rgba(250,204,21,.35)}
+.station.on .st-ico{filter:none;opacity:1}
+.station.on .st-name{color:var(--yellow)}
+.mitem.sel{border-color:var(--blue);background:var(--blue-bg)}
+.mitem.lock{border-color:var(--green);background:var(--green-bg);color:var(--green-d);pointer-events:none}
+.mitem.err{animation:shake .35s;border-color:var(--red)}
+.card3d.flipped .c3-inner{transform:rotateY(180deg)}
+.gapbtn.good{border-style:solid;border-color:var(--green);background:var(--green-bg);color:var(--green-d)}
+.gapbtn.bad{animation:shake .35s;border-color:var(--red)}
+.bulb.on{filter:none;opacity:1;text-shadow:0 0 22px rgba(250,204,21,.8)}
+/* ---------- bottom bar ---------- */
+#bar{position:absolute;left:0;bottom:0;width:1920px;height:52px;background:var(--navy);display:flex;align-items:center;padding:0 24px;gap:18px;z-index:50}
+#bar button{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:10px;padding:7px 18px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif}
+#bar button:hover{background:rgba(255,255,255,.25)}
+#counter{color:rgba(255,255,255,.7);font-size:16px;font-weight:800;margin-left:auto}
+#minist{display:flex;gap:7px}
+.mdot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.18);transition:all .3s}
+.mdot.on{background:var(--yellow);box-shadow:0 0 8px rgba(250,204,21,.8)}
+#pwrap{position:absolute;left:0;top:0;width:100%;height:6px;background:rgba(255,255,255,.12)}
+#pfill{height:100%;width:0;background:var(--yellow);transition:width .3s}
+#notesPanel{position:absolute;right:24px;bottom:64px;width:640px;max-height:520px;overflow:auto;background:#fff;border:3px solid var(--yellow);border-radius:16px;padding:20px 24px;font-size:19px;color:var(--ink);line-height:1.5;display:none;z-index:60;box-shadow:0 16px 44px rgba(0,0,0,.35)}
+#notesPanel.show{display:block}
+#notesPanel b{color:var(--red-d)}
+.confetti{position:absolute;font-size:34px;animation:fall 3.2s linear infinite}
+0%{transform:translateY(-80px) rotate(0)}
+100%{transform:translateY(1150px) rotate(540deg)}
+/* ================= UNIT 7 GRAMMAR 1 — TIME MACHINE COMPONENTS ================= */
+:root{ --purple:#7C3AED; --purple-d:#5B21B6; --purple-bg:#F5F3FF; --ink-2:#475569; --ink-3:#94a3b8; }
+.slide-header{background:var(--purple)}
+.body.grad-lab{background:linear-gradient(140deg,var(--purple-d),var(--purple))}
+.callout{background:var(--purple-bg);border:3px solid var(--purple);border-radius:16px;padding:16px 26px;font-size:25px;font-weight:600;color:var(--ink);line-height:1.4;text-align:center}
+/* goal grid */
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.goal-card{background:#fff;border:3px solid #e2e8f0;border-radius:18px;padding:22px 26px;display:flex;flex-direction:column;gap:6px}
+.gc-ico{font-size:44px}
+.gc-h{font-size:20px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--purple)}
+.gc-t{font-size:26px;font-weight:600;color:var(--ink);line-height:1.35}
+/* flip cards */
+.flip-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.flipcard{width:340px;height:230px;perspective:1000px;cursor:pointer}
+.flipcard.wide{width:100%;max-width:1400px;height:150px}
+.fc-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flipcard.flipped .fc-in{transform:rotateY(180deg)}
+.fc-f,.fc-b{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-weight:700;line-height:1.35}
+.fc-f{background:#fff;border:3px solid var(--purple);font-size:34px;color:var(--ink)}
+.fc-b{background:var(--purple);color:#fff;font-size:27px;transform:rotateY(180deg)}
+.flipcard.wide .fc-f{font-size:30px}
+.flipcard.wide .fc-b{font-size:28px}
+/* question line + options */
+.q-line{font-size:40px;font-weight:800;text-align:center;color:var(--ink)}
+.opt-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.opt-col{display:flex;flex-direction:column;gap:14px}
+.opt.sm{font-size:24px;padding:12px 26px}
+.opt.good{background:var(--green);border-color:var(--green);color:#fff}
+.opt.bad{background:var(--red-bg);border-color:var(--red);color:var(--red-d)}
+/* word lab */
+.wl-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.wl-chip{background:#fff;border:3px solid var(--purple);border-radius:999px;padding:12px 28px;font-size:26px;font-weight:800;color:var(--purple-d)}
+/* word split */
+.word-split{display:flex;gap:32px;height:100%}
+.ws-left{width:38%;background:var(--purple-bg);border:3px solid var(--purple);border-radius:20px;padding:26px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.ws-emoji{font-size:88px;line-height:1}
+.ws-word{font-size:44px;font-weight:900;color:var(--purple-d)}
+.ws-ipa{font-size:24px;color:var(--ink-2);font-weight:600}
+.ws-jp{font-size:26px;font-weight:700;color:var(--ink)}
+.ws-def{font-size:24px;color:var(--ink-2);line-height:1.4;margin-top:8px}
+.ws-right{flex:1;display:flex;flex-direction:column;gap:14px}
+.game-head{font-size:28px;font-weight:800;color:var(--purple-d)}
+/* then / now */
+.then-now{display:flex;align-items:center;gap:20px;justify-content:center}
+.tn-card{width:320px;height:200px;perspective:1000px;cursor:pointer}
+.tn-card .fc-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.tn-card.flipped .fc-in{transform:rotateY(180deg)}
+.tn-arrow{font-size:52px;color:var(--purple)}
+/* match */
+.match-wrap{display:flex;gap:60px;justify-content:center}
+.match-col{display:flex;flex-direction:column;gap:14px;width:520px}
+.mtile{background:#fff;border:3px solid #cbd5e1;border-radius:14px;padding:16px 20px;font-size:24px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);text-align:left}
+.mtile:hover{border-color:var(--purple)}
+.mtile.sel{border-color:var(--purple);background:var(--purple-bg)}
+.mtile.lock{background:var(--green);border-color:var(--green);color:#fff;pointer-events:none}
+.mtile.err{background:var(--red-bg);border-color:var(--red)}
+/* done flag */
+.done-flag{display:none;margin:20px auto 0;background:var(--yellow);border:3px solid var(--yellow-d);border-radius:16px;padding:14px 34px;font-size:26px;font-weight:800;color:#4a3800;cursor:pointer;text-align:center;max-width:900px}
+.done-flag.show{display:block}
+.done-flag.lit{background:var(--green);border-color:var(--green-d);color:#fff;cursor:default}
+/* grammar box */
+.gbox{background:#fff;border:4px solid var(--purple);border-radius:22px;padding:30px 36px}
+.gbox-title{font-size:34px;font-weight:900;color:var(--purple-d);margin-bottom:20px;display:flex;align-items:center}
+.gbox-tr{background:var(--purple);color:#fff;border-radius:999px;padding:5px 18px;font-size:20px;margin-left:14px}
+.gbox-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.gbox-cell{background:var(--purple-bg);border-radius:14px;padding:22px 24px;font-size:29px;font-weight:600;color:var(--ink);line-height:1.35}
+/* pattern strip + builders */
+.pattern-strip{background:var(--navy);color:#fff;border-radius:16px;padding:18px 30px;font-size:32px;font-weight:800;text-align:center}
+.build-line{min-height:86px;background:#fff;border:3px dashed var(--purple);border-radius:16px;display:flex;align-items:center;gap:10px;padding:14px 22px;flex-wrap:wrap;margin:14px 0}
+.build-line.done{border-style:solid;background:var(--green-bg);border-color:var(--green)}
+.bpart{font-size:30px;font-weight:800;color:var(--ink)}
+.chip-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+/* two panel */
+.two-panel{display:flex;gap:28px}
+.panel-card{flex:1;background:#fff;border:3px solid var(--purple);border-radius:20px;padding:26px}
+.pc-h{font-size:32px;font-weight:900;color:var(--purple-d);margin-bottom:10px}
+.pc-t{font-size:25px;color:var(--ink-2);line-height:1.4;margin-bottom:14px}
+.pc-ex{background:var(--purple-bg);border-radius:12px;padding:18px;font-size:27px;font-weight:700;line-height:1.4;color:var(--ink)}
+/* detective */
+.det-row{background:#fff;border:3px solid #e2e8f0;border-radius:16px;padding:18px 24px;margin-bottom:16px}
+.det-bad{font-size:28px;font-weight:700;color:var(--red-d);margin-bottom:12px}
+/* rules board */
+.rules-board{display:flex;flex-direction:column;gap:14px}
+.rule-line{display:flex;align-items:flex-start;gap:18px;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:16px 22px}
+.rl-n{width:44px;height:44px;flex-shrink:0;border-radius:50%;background:var(--purple);color:#fff;font-size:24px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.rl-t{font-size:25px;color:var(--ink);line-height:1.4}
+/* practice */
+.prac-item{display:flex;gap:18px;align-items:center;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;margin-bottom:12px}
+.pi-n{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:var(--purple);color:#fff;font-size:23px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.pi-s{font-size:26px;color:var(--ink);line-height:1.4}
+.gap{display:inline-block;min-width:230px;border-bottom:4px solid var(--purple);color:var(--purple-d);font-weight:800;text-align:center;cursor:pointer}
+.gap.filled{border-bottom-style:solid;color:var(--green-d)}
+/* true / false rows */
+.tf-row{display:flex;align-items:center;gap:22px;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;margin-bottom:12px}
+.tf-s{flex:1;font-size:25px;color:var(--ink);line-height:1.35}
+/* dialogue */
+.dialogue{display:flex;flex-direction:column;gap:18px;width:100%;max-width:1300px}
+.bubble{max-width:76%;border-radius:22px;padding:22px 28px;font-size:29px;font-weight:600;line-height:1.35}
+.bubble.left{background:var(--purple-bg);border:3px solid var(--purple);align-self:flex-start}
+.bubble.right{background:var(--yellow-bg);border:3px solid var(--amber);align-self:flex-end}
+/* quiz */
+.quiz-meter-wrap{height:20px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-bottom:12px}
+.quiz-meter{height:100%;width:0;background:var(--green);transition:width .3s}
+.quiz-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.quiz-q{background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:16px 20px}
+.qq-t{font-size:24px;font-weight:700;color:var(--ink);margin-bottom:12px;line-height:1.3}
+/* celebrate */
+.check-list{display:flex;flex-direction:column;gap:10px}
+.ck{background:rgba(255,255,255,.15);border-radius:12px;padding:12px 26px;font-size:26px;font-weight:700;color:#fff}
+</style>
+</head>
+<body>
+<div id="scaler"><div id="deck">
+
+<!-- ============ 1 · TITLE ============ -->
+<div class="slide" data-notes="<b>The Unit 7 Mission.</b> Use your imagination and creativity to solve problems. Two objectives: share ideas, and evaluate ideas. Six stations light as you go. LP p.253.">
+  <div class="body grad-lab center" style="gap:20px">
+    <div style="font-size:96px">💭🎨</div>
+    <div style="font-size:50px;font-weight:900;color:#fff;text-align:center;line-height:1.15">Use your imagination<br>and creativity<br>to solve problems.</div>
+    <div style="font-size:28px;color:rgba(255,255,255,.9);font-weight:700">Unit 7 · Mission</div>
+    <div class="station-board" data-stboard></div>
+    <button class="btn yellow" style="font-size:24px;padding:14px 40px" onclick="changeSlide(1)">Accept the mission ▶</button>
+  </div>
+</div>
+
+<!-- ============ 2 · GOALS ============ -->
+<div class="slide" data-notes="<b>Today&#39;s goals (LP p.253).</b> Two objectives: share ideas and evaluate ideas. Content vocabulary: curiosity, typical. Resources: Video Sc. 9 and the Mission Poster.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Mission — Today's Goals</span><span class="hd-chip src">📖 LP p.253</span></div>
+  <div class="body">
+    <div class="goal-grid">
+      <div class="goal-card"><div class="gc-ico">🗣️</div><div class="gc-h">Objective 1</div><div class="gc-t"><b>Share</b> ideas.</div></div>
+      <div class="goal-card"><div class="gc-ico">⚖️</div><div class="gc-h">Objective 2</div><div class="gc-t"><b>Evaluate</b> ideas.</div></div>
+      <div class="goal-card"><div class="gc-ico">📚</div><div class="gc-h">Content words</div><div class="gc-t">curiosity 🔍 · typical 🔁</div></div>
+      <div class="goal-card"><div class="gc-ico">🎬</div><div class="gc-h">Resources</div><div class="gc-t">Video Sc. 9 · Mission Poster</div></div>
+    </div>
+    <div class="callout" style="margin-top:22px">💡 Inventors need <b>imagination</b> and <b>creativity</b>. Today Leo uses both on a real problem.</div>
+  </div>
+</div>
+
+<!-- ============ 3 · WORD LAB ============ -->
+<div class="slide" data-notes="<b>Word Lab — Station ①.</b> Two content words from the planner. Curiosity is the word in the Explorer&#39;s quote; typical is the word in the first Think question.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Word Lab — curiosity 🔍 · typical 🔁</span><span class="hd-chip tr">⚡ Power Station ①</span></div>
+  <div class="body">
+    <div class="two-panel">
+      <div class="panel-card">
+        <div class="pc-h">🔍 curiosity</div>
+        <div class="pc-t">The feeling of <b>wanting to know more</b> about something.</div>
+        <div class="pc-ex">"Science is entirely based on <b>curiosity</b>." — Aydogan Ozcan</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">🔁 typical</div>
+        <div class="pc-t"><b>Usual</b> — the kind of thing that happens often.</div>
+        <div class="pc-ex">"What are some <b>typical</b> problems in your daily life?"</div>
+      </div>
+    </div>
+    <div class="game-head" style="margin-top:22px">🎮 Which one is a TYPICAL problem?</div>
+    <div class="opt-row">
+      <button class="opt" onclick="pick(this)" data-ok="1">My bag is too heavy every single day.</button>
+      <button class="opt" onclick="pick(this)">A meteor landed in my garden.</button>
+      <button class="opt" onclick="pick(this)">I met a talking sheep.</button>
+    </div>
+    <div class="done-flag show" id="wl-done" onclick="powerStation(0)">⚡ Both words learned — tap to power Station ①.</div>
+  </div>
+</div>
+
+<!-- ============ 4 · BE THE EXPERT — THE PHOTO ============ -->
+<div class="slide" data-notes="<b>Be the Expert — About the Photo (LP p.253).</b> The photo shows the Faroe Islands, 18 volcanic islands in the Northeast Atlantic. The sheep carries a solar-powered camera programmed to take a photo every minute — the Sheep View 360 project. Its purpose was to map the islands for Google Street View. It worked.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Be the Expert — Sheep View 360 🐑📷</span><span class="hd-chip src">📖 LP p.253 · Book p.127</span></div>
+  <div class="body two-col" style="display:flex;gap:28px">
+    <div style="flex:1">
+      <div class="wl-chip" style="display:block;text-align:center;font-size:110px;padding:40px;border-radius:22px">🐑📷</div>
+      <div class="callout" style="margin-top:18px">🇫🇴 The Faroe Islands · Northeast Atlantic Ocean</div>
+    </div>
+    <div style="flex:1.4;display:flex;flex-direction:column;gap:12px">
+      <div class="rule-line"><span class="rl-n">1</span><span class="rl-t">The Faroe Islands are a group of <b>18 volcanic islands</b>.</span></div>
+      <div class="rule-line"><span class="rl-n">2</span><span class="rl-t">The sheep carries a <b>solar-powered camera</b>, taking a photo <b>every minute</b>.</span></div>
+      <div class="rule-line"><span class="rl-n">3</span><span class="rl-t">The project is called <b>Sheep View 360</b>.</span></div>
+      <div class="rule-line"><span class="rl-n">4</span><span class="rl-t">Its purpose: map the islands so they appear on <b>Google Street View</b>.</span></div>
+      <div class="rule-line"><span class="rl-n">5</span><span class="rl-t">It <b>worked</b> — the islands are on street-view maps online today.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 5 · A PROBLEM AND A SOLUTION ============ -->
+<div class="slide" data-notes="<b>Connect it to the unit.</b> Sheep View is the Unit 7 idea in one photo: a problem, then a solution built with imagination and creativity. Ask Leo to name the problem and the solution before you reveal.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Problem → Solution 🔗</span><span class="hd-chip">the unit in one photo</span></div>
+  <div class="body center" style="gap:24px">
+    <div class="flip-row">
+      <div class="flipcard" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">❓ What was the PROBLEM?</div><div class="fc-b">Nobody had mapped the Faroe Islands. They were not on street-view maps.</div></div></div>
+      <div class="flipcard" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">✅ What was the SOLUTION?</div><div class="fc-b">Put solar-powered cameras on the <b>sheep</b> — they already walk everywhere!</div></div></div>
+      <div class="flipcard" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">💭 Where did it come from?</div><div class="fc-b"><b>Imagination and creativity</b> — exactly the Unit 7 mission.</div></div></div>
+    </div>
+    <div class="callout">🐑 Nobody <i>gave</i> them a mapping car. They used what they already had, in a new way.</div>
+  </div>
+</div>
+
+<!-- ============ 6 · MEET THE EXPLORER ============ -->
+<div class="slide" data-notes="<b>Meet the Explorer (LP p.253).</b> Aydogan Ozcan is an electrical engineer and a National Geographic Explorer. His team at UCLA invented a way to turn cell phones into microscopes — carried to remote areas so doctors can diagnose malaria and other deadly diseases. Read his quote aloud together.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Meet the Explorer — Aydogan Ozcan 🔬</span><span class="hd-chip tr">⚡ Power Station ②</span></div>
+  <div class="body">
+    <div class="gbox">
+      <div class="gbox-title">"Science is entirely based on curiosity."</div>
+      <div style="font-size:26px;line-height:1.55;color:var(--ink)">"In science, it's always a long train of ideas. Many succeed, but in between you often <b>fail</b>… science is entirely based on <b>curiosity</b>."<br><span style="font-size:22px;color:var(--ink-2)">— Aydogan Ozcan, Electrical Engineer, National Geographic Explorer</span></div>
+    </div>
+    <div class="two-panel" style="margin-top:20px">
+      <div class="panel-card">
+        <div class="pc-h">📱→🔬 What he invented</div>
+        <div class="pc-ex">His team at UCLA invented a way to turn <b>cell phones into microscopes</b>.</div>
+        <div class="pc-t">It can be carried to the most remote areas, so doctors can diagnose malaria and other deadly diseases there.</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">💡 What he believes</div>
+        <div class="pc-ex">The future is not only new technology — it is <b>using the technology we already have in new ways</b>.</div>
+        <div class="pc-t">"That's what will transform global health care in powerful, practical ways we've never before imagined."</div>
+      </div>
+    </div>
+    <div class="done-flag show" id="ex-done" onclick="powerStation(1)">⚡ Quote read together — tap to power Station ②.</div>
+  </div>
+</div>
+
+<!-- ============ 7 · THINK ============ -->
+<div class="slide" data-notes="<b>Think (LP p.253).</b> Remind Leo that inventors need imagination and creativity. Ask each question and let him answer fully before you move on. Write his answers down — the Pair step uses them.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Think — Problems Around Us 💭</span><span class="hd-chip tr">⚡ Power Station ③</span></div>
+  <div class="body center" style="gap:22px">
+    <div class="pattern-strip" style="font-size:34px">What are some <b style="color:var(--yellow)">typical</b> problems in your daily life?</div>
+    <div class="flip-row" style="flex-direction:column;gap:14px;width:100%">
+      <div class="flipcard wide" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">❓ What things cause problems today?</div><div class="fc-b">Heavy bags · forgetting things · rain · flat batteries · traffic · litter…</div></div></div>
+      <div class="flipcard wide" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">❓ What are solutions for those problems?</div><div class="fc-b">Every solution starts as an <b>idea</b>. Then someone builds it.</div></div></div>
+      <div class="flipcard wide" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">❓ Would it be easy or difficult to solve them?</div><div class="fc-b">Some are easy. Some took inventors <b>years</b> — and many failures first.</div></div></div>
+    </div>
+    <div class="callout">✍️ Write Leo's answers down. The Pair step builds straight on them.</div>
+    <div class="done-flag show" id="th-done" onclick="powerStation(2)">⚡ All three answered — tap to power Station ③.</div>
+  </div>
+</div>
+
+<!-- ============ 8 · CAN YOU SOLVE IT? ============ -->
+<div class="slide" data-notes="<b>Think, part 2 (Book p.127).</b> Can you solve any of them with an invention? Note any useful or fun ideas — fun counts. This is the creative half; do not judge the ideas yet.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Can You Solve It With an Invention? 💡</span><span class="hd-chip src">📗 Book p.127</span></div>
+  <div class="body">
+    <div class="callout" style="margin-bottom:18px">💡 Note down <b>any useful or fun idea</b>. Fun counts! Right now we are being <b>creative</b>, not careful.</div>
+    <div class="cmd-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+      <div class="rule-line"><span class="rl-n">🎒</span><span class="rl-t">Heavy bag → an invention that…</span></div>
+      <div class="rule-line"><span class="rl-n">🕐</span><span class="rl-t">Forgetting things → an invention that…</span></div>
+      <div class="rule-line"><span class="rl-n">🌧️</span><span class="rl-t">Getting wet → an invention that…</span></div>
+      <div class="rule-line"><span class="rl-n">🔋</span><span class="rl-t">Flat battery → an invention that…</span></div>
+    </div>
+    <div class="callout" style="margin-top:20px">🐑 Remember Sheep View: the best ideas often use something that is <b>already there</b>.</div>
+  </div>
+</div>
+
+<!-- ============ 9 · PAIR ============ -->
+<div class="slide" data-notes="<b>Pair (LP p.253).</b> Talk about a problem you or someone you know solved using an invention. Use the four questions. Dad goes first with a real story from his own life — that makes Leo&#39;s turn much easier.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Pair — Tell a Real Story 🗣️</span><span class="hd-chip tr">⚡ Power Station ④</span></div>
+  <div class="body center" style="gap:22px">
+    <div style="font-size:30px;font-weight:700;text-align:center;max-width:1300px">Talk about a problem <b>you</b> — or someone you know — solved using an invention.</div>
+    <div class="rules-board" style="width:100%">
+      <div class="rule-line"><span class="rl-n">1</span><span class="rl-t">What was the <b>problem</b>? Was it easy or difficult?</span></div>
+      <div class="rule-line"><span class="rl-n">2</span><span class="rl-t">How did you <b>solve</b> the problem?</span></div>
+      <div class="rule-line"><span class="rl-n">3</span><span class="rl-t">What was the <b>invention</b>?</span></div>
+      <div class="rule-line"><span class="rl-n">4</span><span class="rl-t">Would you create the <b>same invention again</b>? Why or why not?</span></div>
+    </div>
+    <div class="callout">👨 <b>Dad goes first.</b> A real story from your own life makes Leo's turn much easier.</div>
+    <div class="done-flag show" id="pr-done" onclick="powerStation(3)">⚡ Both told a story — tap to power Station ④.</div>
+  </div>
+</div>
+
+<!-- ============ 10 · SHARE ============ -->
+<div class="slide" data-notes="<b>Share (LP p.253).</b> Share the problems and inventions. Listen carefully and decide which one you liked best — and WHY. The why is the evaluate objective, and it needs a reason.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Share — Which One Was Best? ⚖️</span><span class="hd-chip tr">⚡ Power Station ⑤</span></div>
+  <div class="body center" style="gap:24px">
+    <div class="pattern-strip" style="font-size:34px">In my <b style="color:var(--yellow)">opinion</b>, ______ is best, <b style="color:var(--yellow)">because</b> ______ .</div>
+    <div class="two-panel" style="width:100%">
+      <div class="panel-card">
+        <div class="pc-h">👂 Listen carefully</div>
+        <div class="pc-ex">Which invention did you like best? Why?</div>
+        <div class="pc-t">This is the <b>evaluate</b> objective — and it always needs a <b>reason</b>.</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">⚖️ Evaluate, don't just like</div>
+        <div class="pc-ex">Would it really solve the problem?<br>Could other people use it?<br>Is it useful, or just fun?</div>
+      </div>
+    </div>
+    <div class="done-flag show" id="sh-done" onclick="powerStation(4)">⚡ Both evaluated — tap to power Station ⑤.</div>
+  </div>
+</div>
+
+<!-- ============ 11 · QUIZ ============ -->
+<div class="slide" data-notes="<b>Quick review quiz.</b> Six questions on the mission and the Explorer.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Quick Review Quiz</span><span class="hd-chip tr">⚡ Power Station ⑥</span></div>
+  <div class="body">
+    <div class="quiz-meter-wrap"><div class="quiz-meter" id="quizMeter"></div></div>
+    <div style="text-align:center;font-size:26px;font-weight:800;margin-bottom:10px">Score: <span id="quizScore">0/6</span></div>
+    <div class="quiz-grid">
+      <div class="quiz-q" data-quiz="1"><div class="qq-t">1. The Unit 7 mission is to…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">use imagination and creativity to solve problems</button><button class="opt sm" onclick="pick(this);quizScore()">build the tallest tower</button></div></div>
+      <div class="quiz-q" data-quiz="2"><div class="qq-t">2. <b>Curiosity</b> means…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">wanting to know more</button><button class="opt sm" onclick="pick(this);quizScore()">being tired</button></div></div>
+      <div class="quiz-q" data-quiz="3"><div class="qq-t">3. <b>Typical</b> means…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">usual, happens often</button><button class="opt sm" onclick="pick(this);quizScore()">very rare</button></div></div>
+      <div class="quiz-q" data-quiz="4"><div class="qq-t">4. What is the sheep carrying?</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">a solar-powered camera</button><button class="opt sm" onclick="pick(this);quizScore()">a backpack</button></div></div>
+      <div class="quiz-q" data-quiz="5"><div class="qq-t">5. Ozcan's team turned cell phones into…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">microscopes</button><button class="opt sm" onclick="pick(this);quizScore()">telescopes</button></div></div>
+      <div class="quiz-q" data-quiz="6"><div class="qq-t">6. To <b>evaluate</b> an idea means to…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">decide carefully if it will work</button><button class="opt sm" onclick="pick(this);quizScore()">say you like it</button></div></div>
+    </div>
+    <div class="done-flag show" id="qz-done" onclick="powerStation(5)">⚡ Quiz done — tap to power Station ⑥.</div>
+  </div>
+</div>
+
+<!-- ============ 12 · CELEBRATE ============ -->
+<div class="slide" id="celebSlide" data-notes="<b>Celebrate.</b> Ask Leo which invention idea he would actually build if he could. Then tap Mark Done.">
+  <div class="body grad-lab center" style="gap:20px">
+    <div style="font-size:96px">🏆</div>
+    <div style="font-size:54px;font-weight:900;color:#fff;text-align:center">Mission Complete!</div>
+    <div class="station-board" data-stboard></div>
+    <div class="check-list">
+      <div class="ck">✅ You found typical problems in daily life</div>
+      <div class="ck">✅ You invented solutions with imagination</div>
+      <div class="ck">✅ You <b>shared</b> your ideas</div>
+      <div class="ck">✅ You <b>evaluated</b> ideas with a reason</div>
+      <div class="ck">✅ You met Aydogan Ozcan and Sheep View 360 🐑</div>
+    </div>
+    <button class="btn yellow" id="done-btn" style="font-size:26px;padding:16px 46px">✓ Mark Done</button>
+  </div>
+</div>
+
+<!-- ============ BOTTOM BAR ============ -->
+<div id="bar">
+  <div id="pwrap"><div id="pfill"></div></div>
+  <button onclick="changeSlide(-1)">◀ Back</button>
+  <button onclick="changeSlide(1)">Next ▶</button>
+  <div id="minist"></div>
+  <button onclick="toggleNotes()">📝 Notes (N)</button>
+  <div id="counter">1 / 40</div>
+</div>
+<div id="notesPanel"></div>
+
+</div></div>
+
+
+<script>
+/* ================= CORE ================= */
+var slides=[], cur=0, TOTAL=0;
+var stations=[
+  {ico:'🧪',name:'① Word Lab',on:false},
+  {ico:'🔬',name:'② The Explorer',on:false},
+  {ico:'💭',name:'③ Think',on:false},
+  {ico:'🗣️',name:'④ Pair',on:false},
+  {ico:'⚖️',name:'⑤ Share',on:false},
+  {ico:'🧠',name:'⑥ Quiz',on:false}
+];
+
+function scale(){
+  try {
+    var s=Math.min(window.innerWidth/1920, window.innerHeight/1080);
+    var sc=document.getElementById('scaler');
+    sc.style.transform='scale('+s+')';
+    sc.style.left=((window.innerWidth-1920*s)/2)+'px';
+    sc.style.top=((window.innerHeight-1080*s)/2)+'px';
+  } catch(e){}
+}
+
+function renderStations(){
+  try {
+    document.querySelectorAll('[data-stboard]').forEach(function(b){
+      b.innerHTML=stations.map(function(st){
+        return '<div class="station'+(st.on?' on':'')+'"><div class="st-ico">'+st.ico+'</div><div class="st-name">'+st.name+'</div></div>';
+      }).join('');
+    });
+    var mini=document.getElementById('minist');
+    if(mini) mini.innerHTML=stations.map(function(st){return '<div class="mdot'+(st.on?' on':'')+'"></div>';}).join('');
+  } catch(e){}
+}
+
+function powerStation(i){
+  try {
+    if(stations[i].on) return;
+    stations[i].on=true;
+    renderStations();
+    var flags=document.querySelectorAll('.done-flag');
+    flags.forEach(function(f){
+      if(f.getAttribute('onclick')==='powerStation('+i+')'){
+        f.classList.add('lit');
+        f.textContent='⚡ Station powered up!';
+      }
+    });
+  } catch(e){}
+}
+
+function changeSlide(dir){ try{ goTo(cur+dir); }catch(e){} }
+function goTo(i){
+  try {
+    if(i<0||i>=TOTAL) return;
+    slides[cur].classList.remove('active');
+    cur=i;
+    slides[cur].classList.add('active');
+    var ctr=document.getElementById('counter');
+    if(ctr) ctr.textContent=(cur+1)+' / '+TOTAL;
+    var pf=document.getElementById('pfill');
+    if(pf) pf.style.width=((cur+1)/TOTAL*100)+'%';
+    var np=document.getElementById('notesPanel');
+    if(np && np.classList.contains('open')) np.innerHTML=slides[cur].dataset.notes||'<i>No notes for this slide.</i>';
+  } catch(e){}
+}
+function toggleNotes(){
+  try {
+    var np=document.getElementById('notesPanel');
+    np.classList.toggle('open');
+    if(np.classList.contains('open')) np.innerHTML=slides[cur].dataset.notes||'<i>No notes for this slide.</i>';
+  } catch(e){}
+}
+
+/* ================= PICK (MCQ) =================
+   Any .opt inside an .opt-row / .opt-col group. data-ok="1" is correct. */
+function pick(btn){
+  try {
+    var group=btn.closest('.opt-row')||btn.closest('.opt-col');
+    if(!group||group.dataset.solved) return;
+    if(btn.dataset.ok==='1'){
+      group.dataset.solved='1';
+      btn.classList.add('good');
+      group.querySelectorAll('.opt').forEach(function(o){o.disabled=true;});
+      var q=btn.closest('[data-quiz]');
+      if(q) q.dataset.solved='1';
+    } else {
+      btn.classList.add('bad');
+      setTimeout(function(){btn.classList.remove('bad');},400);
+    }
+  } catch(e){}
+}
+
+/* ================= FLIP CARD ================= */
+function flipCard(card,ev){
+  try {
+    if(ev && ev.target.closest('.opt')) return;
+    card.classList.toggle('flipped');
+  } catch(e){}
+}
+
+/* ================= MATCH =================
+   Left column tiles come first in .match-wrap; pairs share data-k. */
+var msel={};
+function mtap(btn,gameId,doneId){
+  try {
+    if(btn.classList.contains('lock')) return;
+    var wrap=btn.closest('.match-wrap');
+    var cols=wrap.querySelectorAll('.match-col');
+    var isLeft=(btn.closest('.match-col')===cols[0]);
+    var st=msel[gameId]||(msel[gameId]={left:null,done:0});
+    if(isLeft){
+      cols[0].querySelectorAll('.mtile').forEach(function(x){ if(!x.classList.contains('lock')) x.classList.remove('sel'); });
+      btn.classList.add('sel'); st.left=btn;
+    } else {
+      if(!st.left){ btn.classList.add('err'); setTimeout(function(){btn.classList.remove('err');},380); return; }
+      if(st.left.dataset.k===btn.dataset.k){
+        st.left.classList.remove('sel'); st.left.classList.add('lock'); btn.classList.add('lock');
+        st.left=null; st.done++;
+        if(st.done>=cols[0].querySelectorAll('.mtile').length){
+          var d=document.getElementById(doneId);
+          if(d) d.classList.add('show');
+        }
+      } else {
+        btn.classList.add('err');
+        setTimeout(function(){btn.classList.remove('err');},380);
+      }
+    }
+  } catch(e){}
+}
+
+/* ================= CHIP BUILDERS =================
+   Chips carry data-b (line id) and data-idx (position). Tap in order. */
+var builds={};
+function chiptap(chip){
+  try {
+    var b=chip.dataset.b;
+    var line=document.querySelector('[data-build="'+b+'"]');
+    if(!line||line.classList.contains('done')) return;
+    var st=builds[b]||(builds[b]={next:0});
+    var idx=parseInt(chip.dataset.idx,10);
+    if(idx===st.next){
+      chip.classList.add('used');
+      var span=document.createElement('span');
+      span.className='bpart';
+      span.innerHTML=chip.innerHTML;
+      line.appendChild(span);
+      st.next++;
+      var need=parseInt(line.dataset.need,10);
+      if(st.next>=need){
+        line.classList.add('done');
+        var flag=line.parentElement.querySelector('.done-flag');
+        if(flag) flag.classList.add('show');
+      }
+    } else {
+      chip.classList.add('err');
+      setTimeout(function(){chip.classList.remove('err');},380);
+    }
+  } catch(e){}
+}
+
+/* ================= GAP FILL =================
+   Tap a .gap to reveal its data-a answer. */
+function gaptap(g){
+  try {
+    if(g.classList.contains('filled')) return;
+    g.textContent=g.dataset.a;
+    g.classList.add('filled');
+  } catch(e){}
+}
+
+/* ================= QUIZ SCORE ================= */
+function quizScore(){
+  try {
+    var groups=document.querySelectorAll('[data-quiz]');
+    var s=0;
+    groups.forEach(function(g){ if(g.dataset.solved) s++; });
+    var qm=document.getElementById('quizMeter');
+    if(qm) qm.style.width=(s/6*100)+'%';
+    var qs=document.getElementById('quizScore');
+    if(qs) qs.textContent=s+'/6';
+  } catch(e){}
+}
+
+/* ================= CELEBRATION CONFETTI ================= */
+function confetti(){
+  try {
+    var host=document.getElementById('celebSlide');
+    if(!host||host.dataset.conf) return;
+    host.dataset.conf='1';
+    var moji=['⚡','🎉','💡','🕰️','⭐','🏆'];
+    for(var i=0;i<18;i++){
+      var s=document.createElement('div');
+      s.className='confetti';
+      s.textContent=moji[i%moji.length];
+      s.style.left=(Math.random()*100)+'%';
+      s.style.animationDelay=(Math.random()*2)+'s';
+      host.appendChild(s);
+    }
+  } catch(e){}
+}
+
+/* init + Mark Done (matches LessonProgressRecord shape read by the dashboard) */
+document.addEventListener('DOMContentLoaded',function(){
+  try {
+    slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    TOTAL=slides.length;
+    slides[0].classList.add('active');
+    var ctr=document.getElementById('counter');
+    if(ctr) ctr.textContent='1 / '+TOTAL;
+    var pf=document.getElementById('pfill');
+    if(pf) pf.style.width=(1/TOTAL*100)+'%';
+    renderStations();
+    scale();
+    var celebIdx=slides.length-1;
+    setInterval(function(){ if(cur===celebIdx){confetti();} },800);
+  } catch(e){}
+
+  try {
+    var doneBtn=document.getElementById('done-btn');
+    if(doneBtn){
+      doneBtn.addEventListener('click', function () {
+        try {
+          var key = 'leea.lessonProgress.v1';
+          var raw = localStorage.getItem(key);
+          var progress = raw ? JSON.parse(raw) : {};
+          var now = new Date().toISOString();
+          progress['ow-l4-u7-mission'] = {
+            lessonId: 'ow-l4-u7-mission',
+            teacherId: 'neritan',
+            studentId: 'leo',
+            status: 'done',
+            completedAt: now,
+            updatedAt: now
+          };
+          localStorage.setItem(key, JSON.stringify(progress));
+          doneBtn.textContent = '✓ Marked Done';
+          doneBtn.disabled = true;
+        } catch (e) {}
+      });
+    }
+  } catch(e){}
+});
+window.addEventListener('resize',scale);
+document.addEventListener('keydown',function(e){
+  try {
+    if(e.key==='ArrowRight'){changeSlide(1);}
+    else if(e.key==='ArrowLeft'){changeSlide(-1);}
+    else if(e.key==='n'||e.key==='N'){toggleNotes();}
+  } catch(err){}
+});
+</script>
+</body>
+</html>

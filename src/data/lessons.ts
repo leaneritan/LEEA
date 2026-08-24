@@ -14,6 +14,8 @@ import unit7Reading from "../../content/subjects/english/courses/our-world/level
 import unit7ReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/reading.learner.json";
 import unit7Writing from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/writing.teacher.json";
 import unit7WritingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/writing.learner.json";
+import unit7Mission from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/mission.teacher.json";
+import unit7MissionLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/mission-app.learner.json";
 import unit9Opener from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/opener.teacher.json";
 import unit9OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/opener.learner.json";
 import unit9Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/vocab1.teacher.json";
@@ -133,6 +135,8 @@ export const lessons: Lesson[] = [
   unit7ReadingLearner as Lesson,
   unit7Writing as Lesson,
   unit7WritingLearner as Lesson,
+  unit7Mission as Lesson,
+  unit7MissionLearner as Lesson,
   unit9Opener as Lesson,
   unit9OpenerLearner as Lesson,
   unit9Vocab1 as Lesson,

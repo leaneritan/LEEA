@@ -14,6 +14,7 @@ import {
   syncMathProgressWithCloud,
   type MathBlockProgressMap
 } from "../../data/mathProgress";
+import { MathTopbarHome } from "./MathTopbarHome";
 import { ChatPanel } from "./ChatPanel";
 import { SectionBlockList } from "./SectionBlockList";
 
@@ -45,6 +46,7 @@ export function SectionView({ chapter, section }: { chapter: MathChapterMeta; se
     <div className="math-scope" style={{ "--m-accent": chapter.color, "--m-tint": chapter.tint, "--m-dark": chapter.dark } as React.CSSProperties}>
       <div className="math-topbar">
         <div className="math-topbar-inner">
+          <MathTopbarHome />
           <Link className="math-topbar-brand" href="/math">
             ← 数学の学び
           </Link>

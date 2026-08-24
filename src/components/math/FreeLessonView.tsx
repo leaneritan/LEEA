@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { SpecialLesson } from "../../../content/subjects/math/specialLessons";
+import { MathTopbarHome } from "./MathTopbarHome";
 
 const ACCENT = { "--m-accent": "#7a5aa6", "--m-tint": "#efe7f7", "--m-dark": "#5b3f86" } as React.CSSProperties;
 
@@ -8,6 +9,7 @@ export function FreeLessonView({ lesson }: { lesson: SpecialLesson }) {
     <div className="math-scope" style={ACCENT}>
       <div className="math-topbar">
         <div className="math-topbar-inner">
+          <MathTopbarHome />
           <Link className="math-topbar-brand" href="/math">
             ← 数学の学び
           </Link>

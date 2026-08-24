@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 7 · Project — Design a Superpower App</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pj:#0369A1;--pjl:#E0F2FE;--pjd:#0C4A6E;
+  --bl:#3B82F6;--bld:#1D4ED8;--bll:#EFF6FF;
+  --ye:#FDE047;--yed:#EAB308;
+  --gn:#16A34A;--gnl:#F0FDF4;
+  --rd:#DC2626;--rdl:#FEE2E2;
+  --am:#D97706;--aml:#FFFBEB;
+  --pu:#7C3AED;--pul:#F5F3FF;
+  --ink:#111111;--ink2:#374151;--ink3:#6B7280;
+  --paper:#FAFAF7;--surf:#FFFFFF;--bdr:#E5E7EB;
+  --fn:'Nunito',sans-serif;--fnh:'Oswald',sans-serif;
+}
+body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+.app-hdr{background:var(--ink);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.hdr-badge{background:var(--ye);color:var(--ink);font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;padding:2px 7px;border-radius:2px}
+.hdr-title{font-family:var(--fnh);font-size:.85rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hdr-unit{font-size:.7rem;font-weight:700;color:#38BDF8}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0C4A6E,#0369A1);padding:20px 16px 16px;text-align:center}
+.hero-kick{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.7);margin-bottom:6px}
+.hero-title{font-family:var(--fnh);font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hero-title span{color:var(--ye)}
+.hero-sub{font-size:.78rem;color:rgba(255,255,255,.85);font-weight:600;margin-top:4px}
+.hero-em{font-size:1.3rem;margin-top:8px}
+.prog-wrap{background:rgba(0,0,0,.15);height:4px}
+.prog-fill{height:100%;background:var(--ye);transition:width .5s;width:0%}
+
+/* HW BANNER */
+.hw-banner{background:var(--bll);border-bottom:2px solid var(--bl);padding:8px 16px;font-size:.8rem;font-weight:700;color:var(--bld);display:none;align-items:center;gap:8px}
+
+/* HOME */
+.home{max-width:680px;margin:0 auto;padding:16px 14px 80px}
+.sec-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--ink3);margin-bottom:10px;margin-top:20px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mod-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px 13px 11px;cursor:pointer;transition:all .2s;position:relative}
+.mod-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.1)}
+.mod-card.pj:hover{border-color:var(--pj)}
+.mod-card.quiz:hover{border-color:var(--yed)}
+.mod-card.always{border-color:#D8B4FE;background:linear-gradient(180deg,#fff,#FAF5FF)}
+.mod-card.always:hover{border-color:var(--pu)}
+.mod-icon{font-size:1.5rem;margin-bottom:5px}
+.mod-name{font-weight:800;font-size:.82rem;color:var(--ink);margin-bottom:2px}
+.mod-desc{font-size:.7rem;color:var(--ink3);font-weight:600;line-height:1.4}
+.mod-badge{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;margin-top:7px;display:inline-block}
+.badge-new{background:var(--paper);color:var(--ink3);border:1px solid var(--bdr)}
+.badge-done{background:#D1FAE5;color:var(--gn)}
+.badge-prog{background:var(--pjl);color:var(--pj)}
+.mod-tag{position:absolute;top:6px;right:6px;font-family:var(--fnh);font-size:.5rem;font-weight:700;letter-spacing:1px;color:var(--pu);background:var(--pul);padding:2px 6px;border-radius:2px}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;overflow-y:auto}
+.modal.open{display:block}
+.mbox{background:var(--surf);min-height:100vh;display:flex;flex-direction:column;max-width:680px;margin:0 auto}
+.mhd{padding:13px 14px;display:flex;align-items:center;gap:10px;color:#fff;position:sticky;top:0;z-index:10;flex-shrink:0}
+.mhd.pj{background:var(--pj)}.mhd.bl{background:var(--bl)}.mhd.gn{background:var(--gn)}.mhd.dk{background:var(--ink)}.mhd.ye{background:var(--yed)}.mhd.pu{background:var(--pu)}.mhd.am{background:var(--am)}
+.mbk{background:rgba(255,255,255,.15);border:none;color:#fff;font-family:var(--fn);font-size:.72rem;font-weight:800;padding:5px 11px;border-radius:20px;cursor:pointer;flex-shrink:0}
+.mhd-title{font-weight:900;font-size:1rem;flex:1;letter-spacing:.3px;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.mhd-num{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:1px;opacity:.7}
+.mhd-close{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mbody{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
+
+/* SHARED */
+.dad-card{background:#D1FAE5;border:2px solid #A7F3D0;border-radius:4px;padding:11px 13px;font-size:.82rem;font-weight:700;color:#065F46;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.dad-icon{font-size:1.1rem;flex-shrink:0}
+.info-card{background:var(--bll);border:2px solid #BFDBFE;border-radius:4px;padding:10px 12px;font-size:.78rem;font-weight:600;color:var(--bld);line-height:1.5}
+.warn-card{background:var(--aml);border:2px solid #FCD34D;border-radius:4px;padding:10px 12px;font-size:.78rem;font-weight:600;color:var(--am);line-height:1.5}
+.success-card{background:#D1FAE5;border:2px solid #6EE7B7;border-radius:4px;padding:11px 13px;font-size:.85rem;font-weight:700;color:#065F46;line-height:1.5}
+.section-h{font-family:var(--fnh);font-size:.75rem;font-weight:700;letter-spacing:2px;color:var(--ink);margin-top:6px;display:flex;align-items:center;gap:6px}
+.section-h::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.section-sub{font-size:.78rem;color:var(--ink3);font-weight:600;line-height:1.5;margin-top:-4px}
+
+/* FLASHCARD */
+.flashcard-wrap{perspective:1000px;min-height:240px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:240px;position:relative;transform-style:preserve-3d;transition:transform .5s ease}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;width:100%;min-height:240px;backface-visibility:hidden;border-radius:6px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;border:2px solid var(--bdr);background:var(--surf)}
+.fc-back{transform:rotateY(180deg);border-color:var(--pu);background:var(--pul)}
+.fc-emoji{font-size:2.5rem;line-height:1}
+.fc-word{font-family:var(--fnh);font-size:1.4rem;font-weight:700;color:var(--ink);letter-spacing:.5px}
+.fc-pos{font-size:.7rem;font-weight:700;color:var(--ink3);letter-spacing:1px;text-transform:uppercase}
+.fc-tap{font-size:.65rem;color:var(--ink3);font-weight:600;font-style:italic;margin-top:4px}
+.fc-def{font-size:.95rem;font-weight:700;color:var(--ink);line-height:1.4}
+.fc-sample{font-size:.82rem;font-weight:600;color:var(--ink2);line-height:1.55;font-style:italic}
+.fc-jp{font-size:.85rem;color:var(--ink3);font-weight:600;display:none;font-family:'Hiragino Sans','Yu Gothic',sans-serif}
+.fc-jp.revealed{display:block;color:var(--pu)}
+.fc-jp-btn{background:none;border:1px dashed #d1d5db;border-radius:20px;padding:3px 12px;font-size:.68rem;font-weight:700;color:var(--ink3);cursor:pointer;font-family:var(--fn);margin-top:4px;transition:all .2s}
+.fc-jp-btn:hover{border-color:var(--pu);color:var(--pu)}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px}
+.fc-nav button{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:7px 14px;font-family:var(--fn);font-size:.78rem;font-weight:700;color:var(--ink2);cursor:pointer}
+.fc-nav button:hover{border-color:var(--pu);color:var(--pu)}
+.fc-counter{font-family:var(--fnh);font-size:.7rem;font-weight:700;color:var(--ink3);letter-spacing:1px}
+.mode-row{display:flex;gap:6px;margin-bottom:10px}
+.mode-btn{flex:1;background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:7px 8px;font-family:var(--fn);font-size:.74rem;font-weight:800;color:var(--ink3);cursor:pointer;transition:all .2s}
+.mode-btn.active{background:var(--pu);color:#fff;border-color:var(--pu)}
+
+/* QUIZ */
+.qz-prog{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.qz-num{font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--ink3)}
+.qz-sc{font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--pj)}
+.qz-bar{background:var(--bdr);height:4px;border-radius:2px;margin-bottom:12px;overflow:hidden}
+.qz-bar-fill{background:var(--pj);height:4px;border-radius:2px;width:0;transition:width .4s}
+.qz-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px}
+.qz-q{font-size:.88rem;font-weight:800;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.qz-tag{display:inline-block;font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1.5px;padding:2px 7px;border-radius:2px;margin-bottom:7px}
+.qz-tag.pj{background:var(--pjl);color:var(--pj)}
+.qz-tag.pu{background:var(--pul);color:var(--pu)}
+.qz-tag.gn{background:#D1FAE5;color:#065F46}
+.qz-res{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:18px;text-align:center}
+.qz-trophy{font-size:3rem;line-height:1;margin-bottom:6px}
+.qz-score-big{font-family:var(--fnh);font-size:1.8rem;font-weight:700;color:var(--ink);letter-spacing:1px}
+.qz-msg{font-size:.85rem;font-weight:700;color:var(--ink2);margin-top:6px;line-height:1.5}
+.qz-retry{background:var(--bl);color:#fff;border:none;border-radius:4px;padding:9px 18px;font-family:var(--fn);font-size:.82rem;font-weight:800;cursor:pointer;margin-top:12px}
+.qz-pass{background:var(--gn) !important}
+
+/* MCQ */
+.mcq-opts{display:flex;flex-direction:column;gap:7px}
+.mcq-opt{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.82rem;font-weight:700;cursor:pointer;text-align:left;transition:all .2s}
+.mcq-opt:hover:not(:disabled){background:var(--paper);border-color:var(--pj)}
+.mcq-opt.ok{background:#D1FAE5;border-color:var(--gn);color:var(--gn)}
+.mcq-opt.bad{background:var(--rdl);border-color:var(--rd);color:var(--rd);animation:shake .3s}
+.mcq-opt:disabled{cursor:not-allowed}
+.mcq-fb{font-size:.75rem;font-weight:700;padding:7px 11px;border-radius:4px;margin-top:7px;display:none;line-height:1.45}
+.mcq-fb.show{display:block}
+.mcq-fb.ok{background:#D1FAE5;color:#065F46}
+.mcq-fb.bad{background:var(--rdl);color:var(--rd)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* TRUE/FALSE */
+.fo-btns{display:flex;gap:8px}
+.fo-btn{flex:1;padding:9px 6px;border:2px solid var(--bdr);border-radius:4px;font-family:var(--fn);font-size:.82rem;font-weight:800;cursor:pointer;transition:all .2s;text-align:center;background:#fff}
+.fo-btn:hover:not(:disabled){background:var(--paper)}
+.fo-btn:disabled{opacity:.5;cursor:not-allowed}
+.fo-btn.ans-ok{background:#D1FAE5;border-color:var(--gn);color:var(--gn)}
+.fo-btn.ans-bad{background:var(--rdl);border-color:var(--rd);color:var(--rd);animation:shake .3s}
+.fo-fb{font-size:.75rem;font-weight:700;margin-top:7px;padding:5px 9px;border-radius:4px;display:none}
+.fo-fb.show{display:block}
+.fo-fb.ok{background:#D1FAE5;color:#065F46}
+.fo-fb.bad{background:var(--rdl);color:var(--rd)}
+
+/* INPUTS */
+.text-inp{width:100%;border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--ink);background:var(--surf);outline:none;transition:border-color .2s}
+.text-inp:focus{border-color:var(--pj)}
+.text-ta{width:100%;border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--ink);background:var(--surf);outline:none;resize:vertical;min-height:110px;line-height:1.55}
+.text-ta:focus{border-color:var(--pj)}
+.wc{font-size:.7rem;font-weight:700;color:var(--ink3);margin-top:4px}
+.wc.ok{color:var(--gn)}
+
+/* IDEA CHIPS */
+.hobby-chips{display:flex;flex-wrap:wrap;gap:6px}
+.hobby-chip{background:var(--surf);border:2px solid var(--bdr);border-radius:20px;padding:6px 12px;font-family:var(--fn);font-size:.76rem;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .2s;text-align:left}
+.hobby-chip:hover{border-color:var(--pj);color:var(--pj)}
+.hobby-chip.selected{background:var(--pjl);border-color:var(--pj);color:var(--pjd)}
+
+/* SORT GAME */
+.sort-bank{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.sort-item{background:var(--surf);border:2px solid var(--bdr);border-radius:20px;padding:6px 12px;font-size:.76rem;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .15s}
+.sort-item:hover{border-color:var(--pj)}
+.sort-item.placed{display:none}
+.sort-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sort-col{background:var(--surf);border:2px dashed var(--bdr);border-radius:4px;padding:9px;min-height:96px}
+.sort-col-h{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:1.5px;color:var(--ink3);margin-bottom:6px}
+.sort-drop{display:flex;flex-wrap:wrap;gap:5px}
+.sort-chip{border-radius:20px;padding:4px 10px;font-size:.72rem;font-weight:700;cursor:pointer}
+.sort-chip.ok{background:#D1FAE5;color:#065F46;border:1px solid var(--gn)}
+.sort-chip.bad{background:var(--rdl);color:var(--rd);border:1px solid var(--rd);animation:shake .3s}
+
+/* STEP ORDER */
+.step-list{display:flex;flex-direction:column;gap:7px}
+.step-item{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;transition:all .15s}
+.step-item:hover{border-color:var(--pj)}
+.step-slot{font-family:var(--fnh);font-size:.85rem;font-weight:700;color:#fff;background:var(--ink3);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-item.ok .step-slot{background:var(--gn)}
+.step-item.ok{border-color:var(--gn);background:var(--gnl)}
+.step-item.bad{border-color:var(--rd);background:var(--rdl);animation:shake .3s}
+.step-text{font-size:.8rem;font-weight:700;color:var(--ink);line-height:1.45}
+
+/* STAR RATING */
+.star-row{display:flex;flex-direction:column;gap:8px}
+.star-item{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:10px 12px}
+.star-label{font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:6px;line-height:1.4}
+.star-btns{display:flex;gap:6px}
+.star-btn{width:36px;height:36px;border:2px solid var(--bdr);border-radius:4px;background:#fff;font-size:1.1rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.star-btn:hover{border-color:var(--pj)}
+.star-btn.active{border-color:var(--pj);background:var(--pjl)}
+.star-fb{font-size:.72rem;font-weight:600;color:var(--ink3);margin-top:4px;font-style:italic;min-height:16px}
+
+/* CONFIDENCE */
+.conf-row{display:flex;flex-direction:column;gap:8px}
+.conf-item{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:10px 12px}
+.conf-label{font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:6px;line-height:1.4}
+.conf-btns{display:flex;gap:6px}
+.conf-btn{padding:6px 14px;border:2px solid var(--bdr);border-radius:20px;background:#fff;font-size:.85rem;cursor:pointer;transition:all .15s;font-family:var(--fn);font-weight:700}
+.conf-btn:hover{border-color:var(--pj)}
+.conf-btn.active{border-color:var(--pj);background:var(--pjl)}
+
+/* FACT CARD */
+.fact-cards{display:flex;flex-direction:column;gap:7px}
+.fact-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:10px 12px;cursor:pointer;transition:all .2s}
+.fact-card:hover{border-color:var(--pj)}
+.fact-card.revealed{border-color:var(--gn);background:var(--gnl)}
+.fact-num{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:1px;color:var(--ink3);margin-bottom:3px}
+.fact-text{font-size:.82rem;font-weight:700;color:var(--ink);line-height:1.5}
+
+/* CHIP BUILDER */
+.chip-builder{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.chip-builder .chip{background:var(--surf);border:2px solid var(--bdr);border-radius:20px;padding:5px 11px;font-family:var(--fn);font-size:.76rem;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .15s}
+.chip-builder .chip:hover{border-color:var(--pj);color:var(--pj)}
+.chip-builder .chip.used{opacity:.4;cursor:not-allowed}
+.built-sentence{background:var(--pjl);border:2px solid #7DD3FC;border-radius:4px;padding:9px 12px;font-size:.85rem;font-weight:700;color:var(--pjd);min-height:42px;line-height:1.55;margin-bottom:6px;position:relative}
+.built-sentence .clear-btn{position:absolute;top:4px;right:6px;background:none;border:none;font-size:.8rem;cursor:pointer;color:var(--ink3)}
+
+/* WORD BANK */
+.word-bank{background:var(--aml);border:2px solid #FCD34D;border-radius:4px;padding:9px 11px}
+.wb-title{font-family:var(--fnh);font-size:.58rem;font-weight:700;letter-spacing:2px;color:var(--am);margin-bottom:6px}
+.wb-chips{display:flex;flex-wrap:wrap;gap:5px}
+.wb-chip{background:#fff;border:1px solid #FCD34D;border-radius:20px;padding:3px 10px;font-size:.75rem;font-weight:700;color:var(--am)}
+
+/* MOD FOOT */
+.mod-foot{display:flex;gap:8px;padding:12px 14px;border-top:2px solid var(--bdr);background:var(--surf);margin-top:auto}
+.redo-btn{flex:1;background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px;font-family:var(--fn);font-size:.8rem;font-weight:800;color:var(--ink3);cursor:pointer;transition:all .15s}
+.redo-btn:hover{border-color:var(--rd);color:var(--rd)}
+.redo-btn.armed{background:var(--rdl);border-color:var(--rd);color:var(--rd)}
+.done-btn{flex:1;background:var(--pj);border:2px solid var(--pj);border-radius:4px;padding:9px;font-family:var(--fn);font-size:.8rem;font-weight:800;color:#fff;cursor:pointer}
+.done-btn:hover{background:var(--pjd)}
+
+/* REVIEW MODE */
+.rv-screen{display:none;max-width:680px;margin:0 auto;padding:18px 14px 80px}
+.rv-screen.show{display:block}
+.rv-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px;margin-bottom:11px}
+.rv-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:2px;color:var(--ink3);margin-bottom:4px}
+.rv-val{font-size:.95rem;font-weight:800;color:var(--ink);line-height:1.45}
+.rv-text{font-size:.82rem;font-weight:600;color:var(--ink2);line-height:1.55;white-space:pre-wrap}
+.rv-not-started{background:var(--paper);border:2px dashed var(--bdr);border-radius:4px;padding:24px;text-align:center;font-weight:700;color:var(--ink3);font-size:.85rem}
+
+.save-ind{display:none;background:var(--gn);color:#fff;font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:20px;align-self:flex-start;font-family:var(--fnh);letter-spacing:1px}
+.save-ind.show{display:inline-block;animation:popOut 2s ease-in}
+@keyframes popOut{0%{opacity:0;transform:translateY(-4px)}15%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0}}
+
+@media (max-width:480px){
+  .mod-grid{grid-template-columns:1fr}
+  .sort-cols{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="app-hdr">
+  <div class="hdr-left">
+    <span class="hdr-badge">LEEA</span>
+    <span class="hdr-title">LEO</span>
+    <span class="hdr-unit">· U9 PROJECT</span>
+  </div>
+  <button class="mbk" onclick="location.href='/'" title="Back to home">← Home</button>
+</header>
+
+<div class="hero">
+  <div class="hero-kick">OUR WORLD · LEVEL 4 · UNIT 9</div>
+  <div class="hero-title">🌀 Project: <span>Design a Superpower App</span></div>
+  <div class="hero-sub">Predict it. Build it. Explain why it works.</div>
+  <div class="hero-em">🎴 🤝 🔮 🛠️ ⚽</div>
+</div>
+<div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
+<div id="hwBanner" class="hw-banner"></div>
+
+<!-- HOME GRID -->
+<div id="appRoot">
+<div class="home">
+
+  <div class="sec-lbl">🎴 VOCAB FOUNDATIONS</div>
+  <div class="mod-grid">
+    <div class="mod-card always" onclick="openModal('m1')">
+      <div class="mod-tag">ALWAYS</div>
+      <div class="mod-icon">🎓</div>
+      <div class="mod-name">Academic Language</div>
+      <div class="mod-desc">6 flashcards + 10Q quiz</div>
+      <div class="mod-badge badge-new" id="badge-m1">START HERE</div>
+    </div>
+    <div class="mod-card always" onclick="openModal('m2')">
+      <div class="mod-tag">ALWAYS</div>
+      <div class="mod-icon">🌟</div>
+      <div class="mod-name">Project Words</div>
+      <div class="mod-desc">6 flashcards + 12Q quiz</div>
+      <div class="mod-badge badge-new" id="badge-m2">START HERE</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">🤝 EXPLORE</div>
+  <div class="mod-grid">
+    <div class="mod-card pj" onclick="openModal('m3')" style="grid-column:1/-1">
+      <div class="mod-icon">🤝</div>
+      <div class="mod-name">Be the Expert</div>
+      <div class="mod-desc">Helping in English + how your eyes are tricked · facts, True/False, 4Q quiz</div>
+      <div class="mod-badge badge-new" id="badge-m3">NOT STARTED</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">🔮 PREPARE &amp; BUILD</div>
+  <div class="mod-grid">
+    <div class="mod-card pj" onclick="openModal('m4')">
+      <div class="mod-icon">🔮</div>
+      <div class="mod-name">Predict &amp; Prepare</div>
+      <div class="mod-desc">Pick an idea + sort what you need</div>
+      <div class="mod-badge badge-new" id="badge-m4">NOT STARTED</div>
+    </div>
+    <div class="mod-card pj" onclick="openModal('m5')">
+      <div class="mod-icon">🛠️</div>
+      <div class="mod-name">Build It</div>
+      <div class="mod-desc">Order the 6 steps + the flip trap</div>
+      <div class="mod-badge badge-new" id="badge-m5">NOT STARTED</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">🗣️ SHARE &amp; REVIEW</div>
+  <div class="mod-grid">
+    <div class="mod-card pj" onclick="openModal('m6')">
+      <div class="mod-icon">🗣️</div>
+      <div class="mod-name">Share &amp; Rubric</div>
+      <div class="mod-desc">Explain why + rate your project</div>
+      <div class="mod-badge badge-new" id="badge-m6">NOT STARTED</div>
+    </div>
+    <div class="mod-card pj" onclick="openModal('m7')">
+      <div class="mod-icon">🏆</div>
+      <div class="mod-name">Now I Can</div>
+      <div class="mod-desc">The 3 Unit 7 questions</div>
+      <div class="mod-badge badge-new" id="badge-m7">NOT STARTED</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">⚽ FINAL</div>
+  <div class="mod-grid">
+    <div class="mod-card quiz" onclick="openModal('m8')" style="grid-column:1/-1">
+      <div class="mod-icon">⚽</div>
+      <div class="mod-name">Can Leo Score?</div>
+      <div class="mod-desc">8 questions — need 6/8 (75%)</div>
+      <div class="mod-badge badge-new" id="badge-m8">FINAL QUIZ</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- REVIEW MODE -->
+<div id="reviewScreen" class="rv-screen">
+  <header class="app-hdr" style="position:static;margin:-18px -14px 14px"><div class="hdr-left"><span class="hdr-badge">LEEA</span><span class="hdr-title">REVIEW · NERITAN</span></div></header>
+  <div id="reviewBody"></div>
+</div>
+
+<!-- MODAL M1 — Academic Language -->
+<div class="modal" id="m1"><div class="mbox">
+<div class="mhd pu"><div class="mhd-title">🎓 Academic Language</div><div class="mhd-num">1 / 8</div><button class="mhd-close" onclick="closeModal('m1')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: The Lesson Planner names one academic word for this project — <b>research</b>. Here it is with the other Unit 7 study words. Flip them all, then the quiz — 7/10 to pass.</div></div>
+  <div class="mode-row">
+    <button class="mode-btn active" id="m1-mode-fc" onclick="m1Mode('fc')">🎴 Flashcards</button>
+    <button class="mode-btn" id="m1-mode-qz" onclick="m1Mode('qz')">📝 Quiz</button>
+  </div>
+  <div id="m1-fc">
+    <div class="flashcard-wrap" onclick="m1Flip()">
+      <div class="flashcard" id="m1-card">
+        <div class="fc-face fc-front">
+          <div class="fc-emoji" id="m1-fc-em"></div>
+          <div class="fc-word" id="m1-fc-w"></div>
+          <div class="fc-pos" id="m1-fc-pos">academic</div>
+          <div class="fc-tap">tap to flip</div>
+        </div>
+        <div class="fc-face fc-back">
+          <div class="fc-def" id="m1-fc-d"></div>
+          <div class="fc-sample" id="m1-fc-s"></div>
+          <button class="fc-jp-btn" onclick="event.stopPropagation();m1ShowJp()">🇯🇵 日本語</button>
+          <div class="fc-jp" id="m1-fc-jp"></div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav"><button onclick="m1Prev()">◀ Prev</button><div class="fc-counter" id="m1-fc-c">1 / 6</div><button onclick="m1Next()">Next ▶</button></div>
+  </div>
+  <div id="m1-qz" style="display:none">
+    <div class="qz-prog"><span class="qz-num" id="m1-qz-num">Question 1 of 10</span><span class="qz-sc" id="m1-qz-sc">Score: 0</span></div>
+    <div class="qz-bar"><div class="qz-bar-fill" id="m1-qz-bar"></div></div>
+    <div id="m1-qz-host"></div>
+    <div id="m1-qz-result" style="display:none"></div>
+  </div>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(1)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(1)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- MODAL M2 — Project Words -->
+<div class="modal" id="m2"><div class="mbox">
+<div class="mhd pu"><div class="mhd-title">🌟 Project Words</div><div class="mhd-num">2 / 8</div><button class="mhd-close" onclick="closeModal('m2')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Without these 6 words the instructions will not make sense. Flip the cards, then a 12-question quiz (2 per word). Need 9/12 to pass.</div></div>
+  <div class="mode-row">
+    <button class="mode-btn active" id="m2-mode-fc" onclick="m2Mode('fc')">🎴 Flashcards</button>
+    <button class="mode-btn" id="m2-mode-qz" onclick="m2Mode('qz')">📝 Quiz</button>
+  </div>
+  <div id="m2-fc">
+    <div class="flashcard-wrap" onclick="m2Flip()">
+      <div class="flashcard" id="m2-card">
+        <div class="fc-face fc-front">
+          <div class="fc-emoji" id="m2-fc-em"></div>
+          <div class="fc-word" id="m2-fc-w"></div>
+          <div class="fc-pos" id="m2-fc-pos">project word</div>
+          <div class="fc-tap">tap to flip</div>
+        </div>
+        <div class="fc-face fc-back">
+          <div class="fc-def" id="m2-fc-d"></div>
+          <div class="fc-sample" id="m2-fc-s"></div>
+          <button class="fc-jp-btn" onclick="event.stopPropagation();m2ShowJp()">🇯🇵 日本語</button>
+          <div class="fc-jp" id="m2-fc-jp"></div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav"><button onclick="m2Prev()">◀ Prev</button><div class="fc-counter" id="m2-fc-c">1 / 6</div><button onclick="m2Next()">Next ▶</button></div>
+  </div>
+  <div id="m2-qz" style="display:none">
+    <div class="qz-prog"><span class="qz-num" id="m2-qz-num">Question 1 of 12</span><span class="qz-sc" id="m2-qz-sc">Score: 0</span></div>
+    <div class="qz-bar"><div class="qz-bar-fill" id="m2-qz-bar"></div></div>
+    <div id="m2-qz-host"></div>
+    <div id="m2-qz-result" style="display:none"></div>
+  </div>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(2)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(2)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- MODAL M3 — Be the Expert -->
+<div class="modal" id="m3"><div class="mbox">
+<div class="mhd gn"><div class="mhd-title">🤝 Be the Expert</div><div class="mhd-num">3 / 8</div><button class="mhd-close" onclick="closeModal('m3')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Two expert things here — how to ask for help in English while you build, and the real reason your eyes are tricked. Tap every fact, then True/False, then the quiz.</div></div>
+
+  <div class="section-h">🔎 Facts — tap to reveal</div>
+  <div class="fact-cards" id="m3-facts">
+    <div class="fact-card" onclick="m3RevealFact(0)"><div class="fact-num">FACT 1</div><div class="fact-text">Tap to discover...</div></div>
+    <div class="fact-card" onclick="m3RevealFact(1)"><div class="fact-num">FACT 2</div><div class="fact-text">Tap to discover...</div></div>
+    <div class="fact-card" onclick="m3RevealFact(2)"><div class="fact-num">FACT 3</div><div class="fact-text">Tap to discover...</div></div>
+    <div class="fact-card" onclick="m3RevealFact(3)"><div class="fact-num">FACT 4</div><div class="fact-text">Tap to discover...</div></div>
+    <div class="fact-card" onclick="m3RevealFact(4)"><div class="fact-num">FACT 5</div><div class="fact-text">Tap to discover...</div></div>
+    <div class="fact-card" onclick="m3RevealFact(5)"><div class="fact-num">FACT 6</div><div class="fact-text">Tap to discover...</div></div>
+    <div class="fact-card" onclick="m3RevealFact(6)"><div class="fact-num">FACT 7</div><div class="fact-text">Tap to discover...</div></div>
+    <div class="fact-card" onclick="m3RevealFact(7)"><div class="fact-num">FACT 8</div><div class="fact-text">Tap to discover...</div></div>
+  </div>
+
+  <div id="m3-tf-section" style="display:none">
+    <div class="section-h">✅ True or False?</div>
+    <div id="m3-tf-host"></div>
+  </div>
+
+  <div id="m3-quiz-section" style="display:none">
+    <div class="section-h">🎯 4-Question Quiz</div>
+    <div id="m3-quiz-host"></div>
+  </div>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(3)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(3)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- MODAL M4 — Predict & Prepare -->
+<div class="modal" id="m4"><div class="mbox">
+<div class="mhd am"><div class="mhd-title">🔮 Predict &amp; Prepare</div><div class="mhd-num">4 / 8</div><button class="mhd-close" onclick="closeModal('m4')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Predict FIRST — before you build, before you read. There are no wrong answers when you predict. Guessing wrong is not failing.</div></div>
+
+  <div class="section-h">📝 Three real answers — which is closest?</div>
+  <div class="section-sub">Three children gave these answers. Pick the one you think is right. You will find out at the Share stage.</div>
+  <div class="hobby-chips" id="m4-idea-chips"></div>
+  <div class="warn-card" id="m4-idea-note" style="display:none"></div>
+
+  <div class="section-h">🧰 Sort it — need or do?</div>
+  <div class="section-sub">Tap an item, then tap the column it belongs in.</div>
+  <div class="sort-bank" id="m4-sort-bank"></div>
+  <div class="sort-cols">
+    <div class="sort-col" onclick="m4Drop('need')"><div class="sort-col-h">🧰 THINGS I NEED</div><div class="sort-drop" id="m4-col-need"></div></div>
+    <div class="sort-col" onclick="m4Drop('do')"><div class="sort-col-h">🖐️ THINGS I DO</div><div class="sort-drop" id="m4-col-do"></div></div>
+  </div>
+
+  <div class="section-h">🔮 My prediction</div>
+  <div class="info-card" style="margin-bottom:4px">How do you think it works? How does it trick the eyes? Write it BEFORE you build.</div>
+  <textarea class="text-ta" id="m4-pred" placeholder="I think it works because..." oninput="m4SaveAll()"></textarea>
+  <span class="save-ind" id="m4-saved">SAVED</span>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(4)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(4)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- MODAL M5 — Build It -->
+<div class="modal" id="m5"><div class="mbox">
+<div class="mhd pj"><div class="mhd-title">🛠️ Build It</div><div class="mhd-num">5 / 8</div><button class="mhd-close" onclick="closeModal('m5')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Six steps, in the right order. Tap them 1 → 6. Get one wrong and it shakes — try again.</div></div>
+
+  <div class="section-h">🔢 Put the 6 steps in order</div>
+  <div class="section-sub">Tap the step you think comes next.</div>
+  <div class="step-list" id="m5-steps"></div>
+
+  <div id="m5-trap-section" style="display:none">
+    <div class="section-h">⚠️ The step that goes wrong</div>
+    <div class="section-sub">Step 4 is where superpower apps fail. Get this right and yours will work.</div>
+    <div id="m5-trap-host"></div>
+  </div>
+
+  <div id="m5-check-section" style="display:none">
+    <div class="section-h">🔧 If it is not working</div>
+    <div class="fact-cards" id="m5-fix"></div>
+    <div class="section-h">✅ My build</div>
+    <div class="info-card" style="margin-bottom:4px">What did you draw on each circle? What happened when you spun it?</div>
+    <textarea class="text-ta" id="m5-build" placeholder="On circle one I drew... On circle two I drew... When I spun it..." oninput="m5SaveAll()"></textarea>
+    <span class="save-ind" id="m5-saved">SAVED</span>
+  </div>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(5)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(5)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- MODAL M6 — Share & Rubric -->
+<div class="modal" id="m6"><div class="mbox">
+<div class="mhd bl"><div class="mhd-title">🗣️ Share &amp; Rubric</div><div class="mhd-num">6 / 8</div><button class="mhd-close" onclick="closeModal('m6')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Now answer the big question — why do you think this happens? Use the unit words. Then check your prediction against the real answer.</div></div>
+
+  <div class="word-bank">
+    <div class="wb-title">USE THESE WORDS</div>
+    <div class="wb-chips"><span class="wb-chip">because</span><span class="wb-chip">so</span><span class="wb-chip">cause</span><span class="wb-chip">effect</span><span class="wb-chip">spin fast</span><span class="wb-chip">the more… the more…</span></div>
+  </div>
+
+  <div class="section-h">🧩 Build your explanation</div>
+  <div class="section-sub">Try: "The more I spin it, the more it looks like one picture, because …"</div>
+  <div class="built-sentence" id="m6-built-1"><button class="clear-btn" onclick="m6ClearChips()">✕</button></div>
+  <div class="chip-builder" id="m6-chips-1"></div>
+
+  <div class="section-h">✍️ Say it in your own words</div>
+  <textarea class="text-ta" id="m6-explain" placeholder="Why do you think this happens?" oninput="m6SaveAll()"></textarea>
+
+  <div class="section-h">👁️ The real answer</div>
+  <button class="qz-retry" id="m6-reveal-btn" onclick="m6Reveal()" style="margin-top:0">Show me the real answer</button>
+  <div id="m6-answer" style="display:none"></div>
+
+  <div class="section-h">📋 Project check — rate yourself 1-3</div>
+  <div class="star-row" id="m6-ratings"></div>
+  <span class="save-ind" id="m6-saved">SAVED</span>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(6)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(6)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- MODAL M7 — Now I Can -->
+<div class="modal" id="m7"><div class="mbox">
+<div class="mhd ye"><div class="mhd-title">🏆 Now I Can</div><div class="mhd-num">7 / 8</div><button class="mhd-close" onclick="closeModal('m7')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: Three questions close Unit 7. Answer all three, then tell me honestly how confident you feel.</div></div>
+
+  <div class="section-h">🎯 The three Unit 7 questions</div>
+  <div id="m7-quiz-host"></div>
+
+  <div class="section-h">💪 Actions I do every day that use force</div>
+  <div class="section-sub">Kicking a ball is a push. A goalkeeper saving is a pull. Name three of your own.</div>
+  <input class="text-inp" id="m7-f1" placeholder="1." oninput="m7SaveAll()">
+  <input class="text-inp" id="m7-f2" placeholder="2." oninput="m7SaveAll()" style="margin-top:6px">
+  <input class="text-inp" id="m7-f3" placeholder="3." oninput="m7SaveAll()" style="margin-top:6px">
+
+  <div class="section-h">🎚️ How confident do you feel?</div>
+  <div class="conf-row" id="m7-conf"></div>
+  <span class="save-ind" id="m7-saved">SAVED</span>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(7)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(7)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- MODAL M8 — Can Leo Score? -->
+<div class="modal" id="m8"><div class="mbox">
+<div class="mhd dk"><div class="mhd-title">⚽ Can Leo Score?</div><div class="mhd-num">8 / 8 · FINAL QUIZ</div><button class="mhd-close" onclick="closeModal('m8')">✕</button></div>
+<div class="mbody">
+  <div class="dad-card"><div class="dad-icon">💬</div><div>Dad: 8 questions! You need 6/8 (75%) to score the goal. Good luck!</div></div>
+  <div id="m8-quiz"></div>
+  <div id="m8-result" style="display:none"></div>
+</div>
+<div class="mod-foot">
+  <button class="redo-btn" onclick="redoM(8)">↺ Redo</button>
+  <button class="done-btn" onclick="doneM(8)">✅ Mark Complete</button>
+</div>
+</div></div>
+
+<!-- SCRIPT -->
+<script>
+var SP = 'leea-4-7-project-';
+var HW_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-7-project';
+var REVIEW = new URLSearchParams(location.search).get('review') === '1';
+var MC = 8;
+
+function lSave(k, v) { try { localStorage.setItem(SP + k, JSON.stringify(v)); } catch(e) {} }
+function lLoad(k, fb) { try { var v = localStorage.getItem(SP + k); return v !== null ? JSON.parse(v) : (fb === undefined ? null : fb); } catch(e) { return fb === undefined ? null : fb; } }
+
+function saveScore(score, total, done, extra) {
+  var data = { score:score, total:total, pct:Math.round(score/total*100), done:done, timestamp:new Date().toISOString() };
+  if (extra) for (var x in extra) data[x] = extra[x];
+  lSave('score', data);
+  try { localStorage.setItem(HW_ID + '-score', JSON.stringify(data)); if (done) localStorage.setItem(HW_ID + '-done', JSON.stringify(true)); } catch(e) {}
+}
+
+// ═══ MODAL + BADGE ═══
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+  var fn = window['restore_' + id];
+  if (typeof fn === 'function') fn();
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+  updateProgress();
+}
+function updateBadge(id, state) {
+  var el = document.getElementById('badge-' + id);
+  if (!el) return;
+  var labels = {m1:'START HERE',m2:'START HERE',m3:'NOT STARTED',m4:'NOT STARTED',m5:'NOT STARTED',m6:'NOT STARTED',m7:'NOT STARTED',m8:'FINAL QUIZ'};
+  el.className = 'mod-badge ' + (state === 'done' ? 'badge-done' : state === 'prog' ? 'badge-prog' : 'badge-new');
+  el.textContent = state === 'done' ? '✅ DONE' : state === 'prog' ? '▶ IN PROGRESS' : (labels[id] || 'NOT STARTED');
+  lSave(id + '-state', state);
+}
+function getBadge(id) { return lLoad(id + '-state', 'new'); }
+function setDone(id) { updateBadge(id, 'done'); lSave(id + '-done', true); updateProgress(); }
+function setProg(id) { if (getBadge(id) !== 'done') updateBadge(id, 'prog'); }
+function updateProgress() {
+  var pf = document.getElementById('progFill');
+  if (!pf) return;
+  var done = 0;
+  for (var i = 1; i <= MC; i++) if (getBadge('m' + i) === 'done') done++;
+  pf.style.width = (done / MC * 100) + '%';
+}
+function showSaveInd(id) {
+  var el = document.getElementById(id + '-saved');
+  if (!el) return;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2000);
+}
+
+// ═══ REDO (two-tap armed) + DONE ═══
+var redoTimers = {};
+function redoM(n) {
+  var btn = document.querySelector('#m' + n + ' .redo-btn');
+  if (btn.classList.contains('armed')) {
+    clearTimeout(redoTimers[n]);
+    btn.classList.remove('armed');
+    btn.textContent = '↺ Redo';
+    clearModuleState(n);
+    var fn = window['init_m' + n];
+    if (typeof fn === 'function') fn();
+    var rfn = window['restore_m' + n];
+    if (typeof rfn === 'function') rfn();
+    updateBadge('m' + n, 'new');
+  } else {
+    btn.classList.add('armed');
+    btn.textContent = 'Tap again to reset';
+    redoTimers[n] = setTimeout(function() { btn.classList.remove('armed'); btn.textContent = '↺ Redo'; }, 3000);
+  }
+}
+function clearModuleState(n) {
+  var keys = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k && k.indexOf(SP + 'm' + n) === 0) keys.push(k);
+  }
+  keys.forEach(function(k) { localStorage.removeItem(k); });
+  if (n === 8) { try { localStorage.removeItem(SP + 'score'); } catch(e) {} }
+  lSave('m' + n + '-done', false);
+  lSave('m' + n + '-state', 'new');
+}
+function doneM(n) { setDone('m' + n); closeModal('m' + n); }
+
+// ═══ UTILITY ═══
+function esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ═══ M1 — ACADEMIC LANGUAGE ═══
+/* research is the Project page's own academic word (LP p.160). The rest are the
+   Unit 7 academic cards already in vocabulary.json — same wording and Japanese. */
+var ACAD = [
+  {id:'design',emoji:'📐',word:'design',pos:'verb / noun',def:'to plan and draw how something will look and work',sample:'Design an app to help you achieve your superpower.',jp:'デザインする・設計（せっけい）する'},
+  {id:'share',emoji:'🗣️',word:'share',pos:'verb',def:'to tell your idea to someone — and listen to theirs',sample:'Share your ideas in a small group.',jp:'共有（きょうゆう）する'},
+  {id:'improve',emoji:'📈',word:'improve',pos:'verb',def:'to make something better than it was',sample:'Ask your friends how you can improve your ideas.',jp:'改善（かいぜん）する・よくする'},
+  {id:'feedback',emoji:'💬',word:'feedback',pos:'noun',def:'helpful comments that tell you what works and what to change',sample:'Give positive feedback, politely.',jp:'フィードバック・助言（じょげん）'},
+  {id:'present',emoji:'🎤',word:'present',pos:'verb',def:'to show and explain your work to other people',sample:'Present your finished app design to the class.',jp:'発表（はっぴょう）する'},
+  {id:'sketch',emoji:'✏️',word:'sketch',pos:'verb / noun',def:'to draw quickly, without all the details',sample:'Sketch out your ideas in 3-4 pictures.',jp:'スケッチする・下書（したが）きする'}
+];
+
+var M1_QUIZ = [
+  {q:'To plan and draw how something will look and work:',a:'design',d:['share','present']},
+  {q:'デザインする in English:',a:'design',d:['sketch','improve']},
+  {q:'To tell your idea to someone and listen to theirs:',a:'share',d:['present','improve']},
+  {q:'To make something better than it was:',a:'improve',d:['design','feedback']},
+  {q:'改善（かいぜん）する in English:',a:'improve',d:['present','sketch']},
+  {q:'Helpful comments about what works and what to change:',a:'feedback',d:['design','sketch']},
+  {q:'To show and explain your work to other people:',a:'present',d:['share','improve']},
+  {q:'発表（はっぴょう）する in English:',a:'present',d:['design','feedback']},
+  {q:'To draw quickly, without all the details:',a:'sketch',d:['design','present']},
+  {q:'A friend says "I like it, but I don\'t understand how it works." That is…',a:'feedback',d:['a sketch','a design']}
+];
+
+var m1Idx = 0, m1Flipped = false;
+function m1Mode(m) {
+  document.getElementById('m1-mode-fc').classList.toggle('active', m === 'fc');
+  document.getElementById('m1-mode-qz').classList.toggle('active', m === 'qz');
+  document.getElementById('m1-fc').style.display = m === 'fc' ? 'block' : 'none';
+  document.getElementById('m1-qz').style.display = m === 'qz' ? 'block' : 'none';
+  if (m === 'qz') m1QuizInit();
+  setProg('m1');
+}
+function m1Render() {
+  var c = ACAD[m1Idx];
+  document.getElementById('m1-fc-em').textContent = c.emoji;
+  document.getElementById('m1-fc-w').textContent = c.word;
+  document.getElementById('m1-fc-pos').textContent = c.pos;
+  document.getElementById('m1-fc-d').textContent = c.def;
+  document.getElementById('m1-fc-s').innerHTML = '<i>' + esc(c.sample) + '</i>';
+  document.getElementById('m1-fc-jp').textContent = c.jp;
+  document.getElementById('m1-fc-jp').classList.remove('revealed');
+  document.getElementById('m1-fc-c').textContent = (m1Idx+1) + ' / ' + ACAD.length;
+  document.getElementById('m1-card').classList.remove('flipped');
+  m1Flipped = false;
+}
+function m1Flip() { m1Flipped = !m1Flipped; document.getElementById('m1-card').classList.toggle('flipped', m1Flipped); }
+function m1ShowJp() { document.getElementById('m1-fc-jp').classList.add('revealed'); }
+function m1Prev() { m1Idx = (m1Idx - 1 + ACAD.length) % ACAD.length; m1Render(); }
+function m1Next() { m1Idx = (m1Idx + 1) % ACAD.length; m1Render(); }
+
+var m1QIdx = 0, m1QScore = 0;
+function m1QuizInit() {
+  if (lLoad('m1-quiz-done')) { m1QShowResult(lLoad('m1-quiz-score', 0)); return; }
+  m1QIdx = 0; m1QScore = 0;
+  document.getElementById('m1-qz-result').style.display = 'none';
+  m1QRender();
+}
+function m1QRender() {
+  var q = M1_QUIZ[m1QIdx];
+  var opts = [q.a].concat(q.d).sort(function() { return Math.random() - 0.5; });
+  document.getElementById('m1-qz-num').textContent = 'Question ' + (m1QIdx+1) + ' of ' + M1_QUIZ.length;
+  document.getElementById('m1-qz-sc').textContent = 'Score: ' + m1QScore;
+  document.getElementById('m1-qz-bar').style.width = (m1QIdx / M1_QUIZ.length * 100) + '%';
+  var h = '<div class="qz-card"><div class="qz-tag pu">ACADEMIC</div><div class="qz-q">' + esc(q.q) + '</div><div class="mcq-opts">';
+  opts.forEach(function(o) { h += '<button class="mcq-opt" data-opt="' + esc(o) + '" onclick="m1QAns(this)">' + esc(o) + '</button>'; });
+  h += '</div><div class="mcq-fb" id="m1-qfb"></div></div>';
+  document.getElementById('m1-qz-host').innerHTML = h;
+}
+function m1QAns(btn) {
+  var q = M1_QUIZ[m1QIdx];
+  var ok = btn.dataset.opt === q.a;
+  document.querySelectorAll('#m1-qz-host .mcq-opt').forEach(function(b) { b.disabled = true; });
+  if (ok) { btn.classList.add('ok'); m1QScore++; document.getElementById('m1-qfb').className = 'mcq-fb show ok'; document.getElementById('m1-qfb').textContent = '✓ Correct!'; }
+  else { btn.classList.add('bad'); document.querySelectorAll('#m1-qz-host .mcq-opt').forEach(function(b) { if (b.dataset.opt === q.a) b.classList.add('ok'); }); document.getElementById('m1-qfb').className = 'mcq-fb show bad'; document.getElementById('m1-qfb').textContent = '✕ Correct: ' + q.a; }
+  document.getElementById('m1-qz-sc').textContent = 'Score: ' + m1QScore;
+  setTimeout(function() { m1QIdx++; if (m1QIdx >= M1_QUIZ.length) m1QShowResult(m1QScore); else m1QRender(); }, 1300);
+}
+function m1QShowResult(score) {
+  var pass = score >= 7;
+  document.getElementById('m1-qz-host').innerHTML = '';
+  document.getElementById('m1-qz-bar').style.width = '100%';
+  document.getElementById('m1-qz-num').textContent = 'Quiz complete';
+  document.getElementById('m1-qz-sc').textContent = 'Final: ' + score + ' / 10';
+  document.getElementById('m1-qz-result').style.display = 'block';
+  document.getElementById('m1-qz-result').innerHTML = '<div class="qz-res"><div class="qz-trophy">' + (pass ? '🏆' : '📚') + '</div><div class="qz-score-big">' + score + ' / 10</div><div class="qz-msg">' + (pass ? 'Academic language mastered!' : 'Flip the cards again, then retry.') + '</div><button class="qz-retry' + (pass ? ' qz-pass' : '') + '" onclick="m1QRetry()">' + (pass ? 'Retry' : 'Try Again') + '</button></div>';
+  lSave('m1-quiz-score', score);
+  lSave('m1-quiz-done', true);
+  if (pass) setDone('m1');
+}
+function m1QRetry() { lSave('m1-quiz-done', false); m1QuizInit(); }
+function restore_m1() { m1Render(); }
+function init_m1() { m1Idx = 0; m1QIdx = 0; m1QScore = 0; m1Mode('fc'); }
+
+// ═══ M2 — PROJECT WORDS ═══
+var PROJ = [
+  {id:'simple',emoji:'👌',word:'simple',pos:'adjective',def:'easy to understand or do — not complicated',sample:'Keep your app simple so everyone understands it.',jp:'簡単（かんたん）な・シンプルな'},
+  {id:'materials',emoji:'🧰',word:'materials',pos:'noun',def:'the things you use to make something',sample:'Materials: scissors, glue, construction paper, markers.',jp:'材料（ざいりょう）'},
+  {id:'recycle',emoji:'♻️',word:'recycle',pos:'verb',def:'to use something again instead of throwing it away',sample:'You can recycle old boxes as materials.',jp:'リサイクルする・再利用（さいりよう）する'},
+  {id:'ghost',emoji:'👻',word:'a ghost',pos:'noun',def:'the spirit of a dead person that some people believe they can see',sample:'A superpower app that shows you a ghost!',jp:'おばけ・幽霊（ゆうれい）'},
+  {id:'vacuum',emoji:'🧹',word:'a vacuum',pos:'noun',def:'a machine that sucks up dirt to clean the floor',sample:'My app turns on the vacuum so my room gets clean.',jp:'掃除機（そうじき）'},
+  {id:'superpower',emoji:'🦸',word:'a superpower',pos:'noun',def:'a special ability that ordinary people do not have',sample:'Choose your own superpower — something that makes life better.',jp:'超能力（ちょうのうりょく）'}
+];
+
+var M2_QUIZ = [
+  {q:'Easy to understand or do — not complicated:',a:'simple',d:['materials','recycle']},
+  {q:'簡単（かんたん）な in English:',a:'simple',d:['recycle','a ghost']},
+  {q:'The things you use to make something:',a:'materials',d:['simple','a vacuum']},
+  {q:'材料（ざいりょう） in English:',a:'materials',d:['recycle','a superpower']},
+  {q:'To use something again instead of throwing it away:',a:'recycle',d:['materials','simple']},
+  {q:'リサイクルする in English:',a:'recycle',d:['a vacuum','a ghost']},
+  {q:'A machine that sucks up dirt to clean the floor:',a:'a vacuum',d:['a ghost','materials']},
+  {q:'掃除機（そうじき） in English:',a:'a vacuum',d:['a superpower','recycle']},
+  {q:'A special ability ordinary people do not have:',a:'a superpower',d:['a ghost','simple']},
+  {q:'超能力（ちょうのうりょく） in English:',a:'a superpower',d:['materials','a vacuum']},
+  {q:'The spirit of a dead person some people believe they can see:',a:'a ghost',d:['a vacuum','a superpower']},
+  {q:'おばけ in English:',a:'a ghost',d:['a vacuum','simple']}
+];
+
+var m2Idx = 0, m2Flipped = false;
+function m2Mode(m) {
+  document.getElementById('m2-mode-fc').classList.toggle('active', m === 'fc');
+  document.getElementById('m2-mode-qz').classList.toggle('active', m === 'qz');
+  document.getElementById('m2-fc').style.display = m === 'fc' ? 'block' : 'none';
+  document.getElementById('m2-qz').style.display = m === 'qz' ? 'block' : 'none';
+  if (m === 'qz') m2QuizInit();
+  setProg('m2');
+}
+function m2Render() {
+  var c = PROJ[m2Idx];
+  document.getElementById('m2-fc-em').textContent = c.emoji;
+  document.getElementById('m2-fc-w').textContent = c.word;
+  document.getElementById('m2-fc-pos').textContent = c.pos;
+  document.getElementById('m2-fc-d').textContent = c.def;
+  document.getElementById('m2-fc-s').innerHTML = '<i>&ldquo;' + esc(c.sample) + '&rdquo;</i>';
+  document.getElementById('m2-fc-jp').textContent = c.jp;
+  document.getElementById('m2-fc-jp').classList.remove('revealed');
+  document.getElementById('m2-fc-c').textContent = (m2Idx+1) + ' / ' + PROJ.length;
+  document.getElementById('m2-card').classList.remove('flipped');
+  m2Flipped = false;
+}
+function m2Flip() { m2Flipped = !m2Flipped; document.getElementById('m2-card').classList.toggle('flipped', m2Flipped); }
+function m2ShowJp() { document.getElementById('m2-fc-jp').classList.add('revealed'); }
+function m2Prev() { m2Idx = (m2Idx - 1 + PROJ.length) % PROJ.length; m2Render(); }
+function m2Next() { m2Idx = (m2Idx + 1) % PROJ.length; m2Render(); }
+
+var m2QIdx = 0, m2QScore = 0;
+function m2QuizInit() {
+  if (lLoad('m2-quiz-done')) { m2QShowResult(lLoad('m2-quiz-score', 0)); return; }
+  m2QIdx = 0; m2QScore = 0;
+  document.getElementById('m2-qz-result').style.display = 'none';
+  m2QRender();
+}
+function m2QRender() {
+  var q = M2_QUIZ[m2QIdx];
+  var opts = [q.a].concat(q.d).sort(function() { return Math.random() - 0.5; });
+  document.getElementById('m2-qz-num').textContent = 'Question ' + (m2QIdx+1) + ' of ' + M2_QUIZ.length;
+  document.getElementById('m2-qz-sc').textContent = 'Score: ' + m2QScore;
+  document.getElementById('m2-qz-bar').style.width = (m2QIdx / M2_QUIZ.length * 100) + '%';
+  var h = '<div class="qz-card"><div class="qz-tag gn">PROJECT WORD</div><div class="qz-q">' + esc(q.q) + '</div><div class="mcq-opts">';
+  opts.forEach(function(o) { h += '<button class="mcq-opt" data-opt="' + esc(o) + '" onclick="m2QAns(this)">' + esc(o) + '</button>'; });
+  h += '</div><div class="mcq-fb" id="m2-qfb"></div></div>';
+  document.getElementById('m2-qz-host').innerHTML = h;
+}
+function m2QAns(btn) {
+  var q = M2_QUIZ[m2QIdx];
+  var ok = btn.dataset.opt === q.a;
+  document.querySelectorAll('#m2-qz-host .mcq-opt').forEach(function(b) { b.disabled = true; });
+  if (ok) { btn.classList.add('ok'); m2QScore++; document.getElementById('m2-qfb').className = 'mcq-fb show ok'; document.getElementById('m2-qfb').textContent = '✓ Correct!'; }
+  else { btn.classList.add('bad'); document.querySelectorAll('#m2-qz-host .mcq-opt').forEach(function(b) { if (b.dataset.opt === q.a) b.classList.add('ok'); }); document.getElementById('m2-qfb').className = 'mcq-fb show bad'; document.getElementById('m2-qfb').textContent = '✕ Correct: ' + q.a; }
+  document.getElementById('m2-qz-sc').textContent = 'Score: ' + m2QScore;
+  setTimeout(function() { m2QIdx++; if (m2QIdx >= M2_QUIZ.length) m2QShowResult(m2QScore); else m2QRender(); }, 1200);
+}
+function m2QShowResult(score) {
+  var pass = score >= 9;
+  document.getElementById('m2-qz-host').innerHTML = '';
+  document.getElementById('m2-qz-bar').style.width = '100%';
+  document.getElementById('m2-qz-num').textContent = 'Quiz complete';
+  document.getElementById('m2-qz-sc').textContent = 'Final: ' + score + ' / 12';
+  document.getElementById('m2-qz-result').style.display = 'block';
+  document.getElementById('m2-qz-result').innerHTML = '<div class="qz-res"><div class="qz-trophy">' + (pass ? '🏆' : '📚') + '</div><div class="qz-score-big">' + score + ' / 12</div><div class="qz-msg">' + (pass ? 'Project words mastered!' : 'Flip the cards again, then retry.') + '</div><button class="qz-retry' + (pass ? ' qz-pass' : '') + '" onclick="m2QRetry()">' + (pass ? 'Retry' : 'Try Again') + '</button></div>';
+  lSave('m2-quiz-score', score);
+  lSave('m2-quiz-done', true);
+  if (pass) setDone('m2');
+}
+function m2QRetry() { lSave('m2-quiz-done', false); m2QuizInit(); }
+function restore_m2() { m2Render(); }
+function init_m2() { m2Idx = 0; m2QIdx = 0; m2QScore = 0; m2Mode('fc'); }
+
+// ═══ M3 — BE THE EXPERT ═══
+var EXP_FACTS = [
+  'The Student Book model is <b>Superfood Man</b>. 🦸🥗',
+  '"My superhero is Superfood Man. I <b>didn\'t use to</b> eat breakfast, but now I do!"',
+  '"Superfood Man <b>reminds me</b> to eat a healthy breakfast every morning. He\'s great!"',
+  'Notice the grammar: the model uses <b>didn\'t use to … but now</b> — straight from Grammar 1.',
+  'Your app must be the <b>solution to a problem</b> — that is the Unit 7 idea again.',
+  'When you give feedback, be <b>positive and polite</b>. Do not try to change someone\'s idea completely — help it work better.',
+  'When you <b>receive</b> feedback, take it positively, use it, and thank the person for it.',
+  'Useful materials: scissors, glue, construction paper, markers — and <b>recycled</b> materials. ♻️'
+];
+
+var EXP_TF = [
+  {q:'The model superhero is called Superfood Man.',ans:true},
+  {q:'The model uses "didn\'t use to … but now" — Unit 7 grammar.',ans:true},
+  {q:'Your app can be about anything, even if it solves no problem.',ans:false},
+  {q:'When giving feedback you should change your friend\'s idea completely.',ans:false},
+  {q:'You should thank the person who gives you feedback.',ans:true},
+  {q:'You can use recycled materials to build your design.',ans:true}
+];
+
+var EXP_MCQ = [
+  {q:'What must your superpower app be?',opts:['The solution to a problem','The most expensive app','A copy of a real app'],ans:0},
+  {q:'How many pictures should you sketch?',opts:['3-4','12','1'],ans:0},
+  {q:'What does Superfood Man remind the writer to do?',opts:['Eat a healthy breakfast every morning','Do homework','Go to bed early'],ans:0},
+  {q:'Good feedback should…',opts:['help the idea work better','replace the idea completely','say nothing at all'],ans:0}
+];
+
+var m3FactsRevealed = 0, m3TfDone = {}, m3McqDone = {}, m3McqScore = 0;
+function m3RevealFact(i) {
+  var cards = document.querySelectorAll('#m3-facts .fact-card');
+  if (cards[i].classList.contains('revealed')) return;
+  cards[i].classList.add('revealed');
+  cards[i].querySelector('.fact-text').textContent = EXP_FACTS[i];
+  m3FactsRevealed++;
+  setProg('m3');
+  if (m3FactsRevealed >= EXP_FACTS.length) {
+    document.getElementById('m3-tf-section').style.display = 'block';
+    m3BuildTf();
+  }
+}
+function m3BuildTf() {
+  var h = '';
+  EXP_TF.forEach(function(tf, i) {
+    h += '<div class="qz-card" style="margin-bottom:8px"><div class="qz-q">' + esc(tf.q) + '</div>' +
+      '<div class="fo-btns" id="m3-tf-' + i + '"><button class="fo-btn" onclick="m3TfAns(' + i + ',true,this)">True</button><button class="fo-btn" onclick="m3TfAns(' + i + ',false,this)">False</button></div>' +
+      '<div class="fo-fb" id="m3-tf-fb-' + i + '"></div></div>';
+  });
+  document.getElementById('m3-tf-host').innerHTML = h;
+}
+function m3TfAns(i, choice, btn) {
+  if (m3TfDone[i]) return;
+  m3TfDone[i] = true;
+  var ok = choice === EXP_TF[i].ans;
+  document.querySelectorAll('#m3-tf-' + i + ' .fo-btn').forEach(function(b) { b.disabled = true; });
+  btn.classList.add(ok ? 'ans-ok' : 'ans-bad');
+  var fb = document.getElementById('m3-tf-fb-' + i);
+  fb.className = 'fo-fb show ' + (ok ? 'ok' : 'bad');
+  fb.textContent = ok ? '✓ Correct!' : '✕ The answer is ' + (EXP_TF[i].ans ? 'True' : 'False');
+  if (Object.keys(m3TfDone).length >= EXP_TF.length) {
+    document.getElementById('m3-quiz-section').style.display = 'block';
+    m3BuildMcq();
+  }
+}
+function m3BuildMcq() {
+  var h = '';
+  EXP_MCQ.forEach(function(q, i) {
+    h += '<div class="qz-card" style="margin-bottom:8px"><div class="qz-q">' + esc(q.q) + '</div><div class="mcq-opts" id="m3-mcq-' + i + '">';
+    q.opts.forEach(function(o, j) { h += '<button class="mcq-opt" onclick="m3McqAns(' + i + ',' + j + ',this)">' + esc(o) + '</button>'; });
+    h += '</div><div class="mcq-fb" id="m3-mcq-fb-' + i + '"></div></div>';
+  });
+  document.getElementById('m3-quiz-host').innerHTML = h;
+}
+function m3McqAns(i, choice, btn) {
+  if (m3McqDone[i]) return;
+  m3McqDone[i] = true;
+  var q = EXP_MCQ[i];
+  var ok = choice === q.ans;
+  if (ok) m3McqScore++;
+  document.querySelectorAll('#m3-mcq-' + i + ' .mcq-opt').forEach(function(b) { b.disabled = true; });
+  if (ok) { btn.classList.add('ok'); }
+  else { btn.classList.add('bad'); document.querySelectorAll('#m3-mcq-' + i + ' .mcq-opt')[q.ans].classList.add('ok'); }
+  var fb = document.getElementById('m3-mcq-fb-' + i);
+  fb.className = 'mcq-fb show ' + (ok ? 'ok' : 'bad');
+  fb.textContent = ok ? '✓ Correct!' : '✕ Correct: ' + q.opts[q.ans];
+  if (Object.keys(m3McqDone).length >= EXP_MCQ.length) {
+    lSave('m3-quiz-score', m3McqScore);
+    lSave('m3-done-auto', true);
+    if (m3McqScore >= 3) setDone('m3'); else setProg('m3');
+  }
+}
+function restore_m3() {
+  if (lLoad('m3-done-auto')) {
+    var cards = document.querySelectorAll('#m3-facts .fact-card');
+    EXP_FACTS.forEach(function(f, i) {
+      cards[i].classList.add('revealed');
+      cards[i].querySelector('.fact-text').textContent = f;
+    });
+    m3FactsRevealed = EXP_FACTS.length;
+    m3TfDone = {}; m3McqDone = {}; m3McqScore = 0;
+    document.getElementById('m3-tf-section').style.display = 'block';
+    m3BuildTf();
+    document.getElementById('m3-quiz-section').style.display = 'block';
+    m3BuildMcq();
+  }
+}
+function init_m3() {
+  m3FactsRevealed = 0; m3TfDone = {}; m3McqDone = {}; m3McqScore = 0;
+  var cards = document.querySelectorAll('#m3-facts .fact-card');
+  cards.forEach(function(c) { c.classList.remove('revealed'); c.querySelector('.fact-text').textContent = 'Tap to discover...'; });
+  document.getElementById('m3-tf-section').style.display = 'none';
+  document.getElementById('m3-quiz-section').style.display = 'none';
+  document.getElementById('m3-tf-host').innerHTML = '';
+  document.getElementById('m3-quiz-host').innerHTML = '';
+  lSave('m3-done-auto', false);
+}
+
+// ═══ M4 — PREDICT & PREPARE ═══
+var M4_IDEAS = [
+  '🧹 Problem 1 — "It takes a long time to do my chores."',
+  '🛏️ Problem 2 — "My room isn\'t clean."',
+  '⏰ Problem 3 — "I am often late to school."'
+];
+var M4_SORT = [
+  {t:'scissors',c:'need'},
+  {t:'glue',c:'need'},
+  {t:'construction paper',c:'need'},
+  {t:'markers',c:'need'},
+  {t:'recycled materials ♻️',c:'need'},
+  {t:'choose your superpower',c:'do'},
+  {t:'choose a problem to solve',c:'do'},
+  {t:'sketch 3-4 pictures',c:'do'},
+  {t:'share your ideas in a group',c:'do'},
+  {t:'improve your design',c:'do'},
+  {t:'present it to the class',c:'do'}
+];
+var m4Idea = null, m4Sorted = {}, m4Sel = null;
+
+function m4BuildIdeaChips() {
+  var h = '';
+  M4_IDEAS.forEach(function(idea, i) {
+    h += '<button class="hobby-chip' + (m4Idea === i ? ' selected' : '') + '" onclick="m4PickIdea(' + i + ')" style="width:100%">' + esc(idea) + '</button>';
+  });
+  document.getElementById('m4-idea-chips').innerHTML = h;
+  var note = document.getElementById('m4-idea-note');
+  if (m4Idea === null) { note.style.display = 'none'; return; }
+  note.style.display = 'block';
+  note.innerHTML = '🔒 Prediction locked in. No peeking — you check it in <b>Share &amp; Rubric</b> after you have built it.';
+}
+function m4PickIdea(i) {
+  m4Idea = i;
+  lSave('m4-idea', i);
+  m4BuildIdeaChips();
+  setProg('m4');
+}
+
+function m4BuildSort() {
+  var bank = '';
+  M4_SORT.forEach(function(item, i) {
+    if (m4Sorted[i]) return;
+    bank += '<span class="sort-item' + (m4Sel === i ? ' placed' : '') + '" onclick="m4Select(' + i + ')" style="' + (m4Sel === i ? 'border-color:var(--pj);background:var(--pjl)' : '') + '">' + esc(item.t) + '</span>';
+  });
+  document.getElementById('m4-sort-bank').innerHTML = bank || '<span style="font-size:.76rem;font-weight:700;color:var(--gn)">✓ All sorted!</span>';
+  ['need','do'].forEach(function(col) {
+    var h = '';
+    M4_SORT.forEach(function(item, i) {
+      if (m4Sorted[i] !== col) return;
+      var ok = item.c === col;
+      h += '<span class="sort-chip ' + (ok ? 'ok' : 'bad') + '">' + esc(item.t) + (ok ? ' ✓' : ' ✕') + '</span>';
+    });
+    document.getElementById('m4-col-' + col).innerHTML = h;
+  });
+}
+function m4Select(i) {
+  m4Sel = (m4Sel === i) ? null : i;
+  m4BuildSort();
+}
+function m4Drop(col) {
+  if (m4Sel === null) return;
+  var item = M4_SORT[m4Sel];
+  if (item.c !== col) {
+    // wrong column — show it briefly, then send it back to the bank
+    m4Sorted[m4Sel] = col;
+    m4BuildSort();
+    var idx = m4Sel;
+    m4Sel = null;
+    setTimeout(function() { delete m4Sorted[idx]; m4BuildSort(); }, 900);
+    return;
+  }
+  m4Sorted[m4Sel] = col;
+  m4Sel = null;
+  lSave('m4-sorted', m4Sorted);
+  m4BuildSort();
+  setProg('m4');
+}
+
+function m4SaveAll() {
+  lSave('m4-pred', document.getElementById('m4-pred').value);
+  setProg('m4');
+  showSaveInd('m4');
+}
+function restore_m4() {
+  var saved = lLoad('m4-idea', null);
+  m4Idea = (saved === null || saved === undefined) ? null : saved;
+  m4BuildIdeaChips();
+  m4Sorted = lLoad('m4-sorted', {}) || {};
+  m4Sel = null;
+  m4BuildSort();
+  document.getElementById('m4-pred').value = lLoad('m4-pred', '') || '';
+}
+function init_m4() {
+  m4Idea = null; m4Sorted = {}; m4Sel = null;
+  m4BuildIdeaChips();
+  m4BuildSort();
+  document.getElementById('m4-pred').value = '';
+}
+
+// ═══ M5 — BUILD IT ═══
+var M5_STEPS = [
+  'Choose your own <b>superpower</b> — something that makes life better.',
+  'Choose the <b>problem</b> your app will solve. Use the list, or think of your own.',
+  '<b>Sketch</b> out your ideas for the app in <b>3-4 pictures</b>. How will it work? Will it sound an alarm? Will it send you a message?',
+  '<b>Share</b> your ideas in a small group. Ask how you can <b>improve</b> them.',
+  'Use the feedback to make your design better, then draw the finished app.',
+  '<b>Present</b> your finished app design to the class.'
+];
+var M5_TRAP = {
+  q: 'This is where superpower apps go wrong. What must your app always be?',
+  opts: ['The most colourful drawing','The solution to a real problem','The same as a friend\'s app'],
+  ans: 1,
+  why: 'The planner is clear: "The app should be the solution to a problem." A pretty app that solves nothing is not finished. 🎯'
+};
+var M5_FIX = [
+  'Stuck for a problem? Start from your day: chores, a messy room, being late, forgetting things.',
+  'Stuck on how it works? Pick one: it sounds an alarm ⏰, it sends a message 💬, or it shows you a picture 🖼️.',
+  'Keep it <b>simple</b>. A simple app you can explain beats a complicated one you cannot.'
+];
+var m5Order = [], m5Next = 0, m5TrapDone = false;
+
+function m5BuildSteps() {
+  // shuffled display order, fixed per module init so it does not jump around
+  var h = '';
+  m5Order.forEach(function(stepIdx) {
+    var placed = stepIdx < m5Next;
+    h += '<div class="step-item' + (placed ? ' ok' : '') + '" id="m5-step-' + stepIdx + '" onclick="m5Tap(' + stepIdx + ')">' +
+      '<div class="step-slot">' + (placed ? (stepIdx + 1) : '?') + '</div>' +
+      '<div class="step-text">' + esc(M5_STEPS[stepIdx]) + '</div></div>';
+  });
+  document.getElementById('m5-steps').innerHTML = h;
+}
+function m5Tap(stepIdx) {
+  if (stepIdx < m5Next) return;
+  var el = document.getElementById('m5-step-' + stepIdx);
+  if (stepIdx !== m5Next) {
+    el.classList.add('bad');
+    setTimeout(function() { el.classList.remove('bad'); }, 400);
+    return;
+  }
+  m5Next++;
+  lSave('m5-next', m5Next);
+  m5BuildSteps();
+  setProg('m5');
+  if (m5Next >= M5_STEPS.length) m5ShowTrap();
+}
+function m5ShowTrap() {
+  document.getElementById('m5-trap-section').style.display = 'block';
+  if (m5TrapDone) { m5RenderTrapAnswered(); return; }
+  var h = '<div class="qz-card"><div class="qz-q">' + esc(M5_TRAP.q) + '</div><div class="mcq-opts" id="m5-trap-opts">';
+  M5_TRAP.opts.forEach(function(o, i) { h += '<button class="mcq-opt" onclick="m5TrapAns(' + i + ',this)">' + esc(o) + '</button>'; });
+  h += '</div><div class="mcq-fb" id="m5-trap-fb"></div></div>';
+  document.getElementById('m5-trap-host').innerHTML = h;
+}
+function m5RenderTrapAnswered() {
+  var h = '<div class="qz-card"><div class="qz-q">' + esc(M5_TRAP.q) + '</div><div class="mcq-opts">';
+  M5_TRAP.opts.forEach(function(o, i) { h += '<button class="mcq-opt' + (i === M5_TRAP.ans ? ' ok' : '') + '" disabled>' + esc(o) + '</button>'; });
+  h += '</div><div class="mcq-fb show ok">' + esc(M5_TRAP.why) + '</div></div>';
+  document.getElementById('m5-trap-host').innerHTML = h;
+  m5ShowFix();
+}
+function m5TrapAns(choice, btn) {
+  if (m5TrapDone) return;
+  var ok = choice === M5_TRAP.ans;
+  document.querySelectorAll('#m5-trap-opts .mcq-opt').forEach(function(b) { b.disabled = true; });
+  var fb = document.getElementById('m5-trap-fb');
+  if (ok) {
+    btn.classList.add('ok');
+    fb.className = 'mcq-fb show ok';
+    fb.textContent = '✓ ' + M5_TRAP.why;
+    m5TrapDone = true;
+    lSave('m5-trap', true);
+    m5ShowFix();
+  } else {
+    btn.classList.add('bad');
+    fb.className = 'mcq-fb show bad';
+    fb.textContent = '✕ Not quite — try again.';
+    setTimeout(function() { m5ShowTrap(); }, 1200);
+  }
+}
+function m5ShowFix() {
+  document.getElementById('m5-check-section').style.display = 'block';
+  var h = '';
+  M5_FIX.forEach(function(f, i) {
+    h += '<div class="fact-card revealed"><div class="fact-num">FIX ' + (i+1) + '</div><div class="fact-text">' + esc(f) + '</div></div>';
+  });
+  document.getElementById('m5-fix').innerHTML = h;
+}
+function m5SaveAll() {
+  lSave('m5-build', document.getElementById('m5-build').value);
+  setProg('m5');
+  showSaveInd('m5');
+}
+function restore_m5() {
+  if (!m5Order.length) m5Shuffle();
+  m5Next = lLoad('m5-next', 0) || 0;
+  m5TrapDone = lLoad('m5-trap', false) === true;
+  m5BuildSteps();
+  if (m5Next >= M5_STEPS.length) m5ShowTrap();
+  document.getElementById('m5-build').value = lLoad('m5-build', '') || '';
+}
+function m5Shuffle() {
+  m5Order = M5_STEPS.map(function(_, i) { return i; }).sort(function() { return Math.random() - 0.5; });
+}
+function init_m5() {
+  m5Shuffle();
+  m5Next = 0; m5TrapDone = false;
+  m5BuildSteps();
+  document.getElementById('m5-trap-section').style.display = 'none';
+  document.getElementById('m5-check-section').style.display = 'none';
+  document.getElementById('m5-trap-host').innerHTML = '';
+  document.getElementById('m5-build').value = '';
+}
+
+// ═══ M6 — SHARE & RUBRIC ═══
+var M6_BANK = ['My','app','solves','the','problem','of','I','used','to','but','now','it','reminds','me','to','it','is','simple','and','useful'];
+var M6_CRITERIA = [
+  'I sketched out ideas for a superpower app.',
+  'I exchanged ideas to improve my work — and my partner\'s.',
+  'I explained how my app solves a problem.',
+  'I presented my finished design.'
+];
+var M6_FB = {1:'Worth another go — try it again together.',2:'Good. One more round and this is solid.',3:'Excellent — that is exactly it.'};
+var m6Built = [], m6Ratings = {}, m6Revealed = false;
+
+function m6InitChipBuilder() {
+  var el = document.getElementById('m6-chips-1');
+  var h = '';
+  M6_BANK.forEach(function(w, i) {
+    var used = m6Built.indexOf(i) >= 0;
+    h += '<span class="chip' + (used ? ' used' : '') + '" onclick="m6TapChip(' + i + ')">' + esc(w) + '</span>';
+  });
+  el.innerHTML = h;
+  m6RenderBuilt();
+}
+function m6TapChip(idx) {
+  if (m6Built.indexOf(idx) >= 0) return;
+  m6Built.push(idx);
+  m6InitChipBuilder();
+  lSave('m6-built', m6Built);
+  setProg('m6');
+}
+function m6RenderBuilt() {
+  var txt = m6Built.map(function(i) { return M6_BANK[i]; }).join(' ');
+  var el = document.getElementById('m6-built-1');
+  el.innerHTML = (esc(txt) || '<span style="color:var(--ink3);font-style:italic">Tap words below to build...</span>') + '<button class="clear-btn" onclick="m6ClearChips()">✕</button>';
+}
+function m6ClearChips() {
+  m6Built = [];
+  m6InitChipBuilder();
+  lSave('m6-built', m6Built);
+}
+
+function m6Reveal() {
+  m6Revealed = true;
+  lSave('m6-revealed', true);
+  var pick = lLoad('m4-idea', null);
+  var el = document.getElementById('m6-answer');
+  el.style.display = 'block';
+  var yours = '';
+  if (pick === 2) yours = '<div class="success-card" style="margin-top:8px">🎉 You picked Idea 3 in Predict &amp; Prepare — that is the one. Well predicted!</div>';
+  else if (pick !== null && pick !== undefined) yours = '<div class="warn-card" style="margin-top:8px">You picked Idea ' + (pick + 1) + '. The closest answer was Idea 3 — and predicting wrong is not failing. That is how science works. 🔮</div>';
+  el.innerHTML = '<div class="info-card"><b>Your eyes hold on to a picture for a split second after it has gone.</b><br>' +
+    '1. The fish disappears as the card turns…<br>2. …but it is still in your eye for a moment.<br>3. The tank appears while the fish is still there.<br>4. So the two pictures seem to <b>combine</b>. 🐠🪟<br><br>' +
+    'The closest answer was Idea 3: “The eyes can’t change images fast enough.”</div>' + yours;
+  document.getElementById('m6-reveal-btn').style.display = 'none';
+  setProg('m6');
+}
+
+function m6BuildRatings() {
+  var h = '';
+  M6_CRITERIA.forEach(function(c, i) {
+    var val = m6Ratings[i] || 0;
+    h += '<div class="star-item"><div class="star-label">' + esc(c) + '</div><div class="star-btns">';
+    for (var s = 1; s <= 3; s++) {
+      h += '<button class="star-btn' + (val >= s ? ' active' : '') + '" onclick="m6Rate(' + i + ',' + s + ')">⭐</button>';
+    }
+    h += '</div><div class="star-fb">' + (val ? esc(M6_FB[val]) : '') + '</div></div>';
+  });
+  document.getElementById('m6-ratings').innerHTML = h;
+}
+function m6Rate(i, val) {
+  m6Ratings[i] = val;
+  lSave('m6-ratings', m6Ratings);
+  m6BuildRatings();
+  setProg('m6');
+}
+function m6SaveAll() {
+  lSave('m6-explain', document.getElementById('m6-explain').value);
+  setProg('m6');
+  showSaveInd('m6');
+}
+function restore_m6() {
+  m6Built = lLoad('m6-built', []) || [];
+  if (!Array.isArray(m6Built)) m6Built = [];
+  m6InitChipBuilder();
+  document.getElementById('m6-explain').value = lLoad('m6-explain', '') || '';
+  m6Ratings = lLoad('m6-ratings', {}) || {};
+  m6BuildRatings();
+  if (lLoad('m6-revealed', false) === true) m6Reveal();
+}
+function init_m6() {
+  m6Built = []; m6Ratings = {}; m6Revealed = false;
+  m6InitChipBuilder();
+  document.getElementById('m6-explain').value = '';
+  m6BuildRatings();
+  document.getElementById('m6-answer').style.display = 'none';
+  document.getElementById('m6-answer').innerHTML = '';
+  document.getElementById('m6-reveal-btn').style.display = 'inline-block';
+}
+
+// ═══ M7 — NOW I CAN ═══
+var M7_QUIZ = [
+  {q:'💡 Name two inventions you learned about in this unit.',opts:['the wheel and the battery','the sun and the moon','a tree and a rock'],ans:0},
+  {q:'🕰️ "People ___ travel across the sea in boats."',opts:['used to','use to','using to'],ans:0},
+  {q:'🪀 How do you use a hula hoop?',opts:['Put it on the ground, lift it to your waist, and move your waist','Lift it to your head and stand still','Put it in your backpack'],ans:0},
+  {q:'📋 Which one is a FACT?',opts:['The wheel is more than 5,000 years old.','The wheel is the best invention ever.'],ans:0},
+  {q:'💬 Which one is an OPINION?',opts:['Sticky notes are a great invention.','Spencer Silver invented the glue in 1970.'],ans:0}
+];
+var M7_CONF = [
+  'I can talk about inventions.',
+  'I can talk about past habits.',
+  'I can describe how to use an invention.',
+  'I can write facts and opinions about a favorite invention.'
+];
+var m7Done = {}, m7Score = 0, m7Conf = {};
+
+function m7BuildQuiz() {
+  var h = '';
+  M7_QUIZ.forEach(function(q, i) {
+    h += '<div class="qz-card" style="margin-bottom:8px"><div class="qz-q">' + esc(q.q) + '</div><div class="mcq-opts" id="m7-q-' + i + '">';
+    q.opts.forEach(function(o, j) { h += '<button class="mcq-opt" onclick="m7Ans(' + i + ',' + j + ',this)">' + esc(o) + '</button>'; });
+    h += '</div><div class="mcq-fb" id="m7-fb-' + i + '"></div></div>';
+  });
+  document.getElementById('m7-quiz-host').innerHTML = h;
+}
+function m7Ans(i, choice, btn) {
+  if (m7Done[i]) return;
+  m7Done[i] = true;
+  var q = M7_QUIZ[i];
+  var ok = choice === q.ans;
+  if (ok) m7Score++;
+  document.querySelectorAll('#m7-q-' + i + ' .mcq-opt').forEach(function(b) { b.disabled = true; });
+  if (ok) btn.classList.add('ok');
+  else { btn.classList.add('bad'); document.querySelectorAll('#m7-q-' + i + ' .mcq-opt')[q.ans].classList.add('ok'); }
+  var fb = document.getElementById('m7-fb-' + i);
+  fb.className = 'mcq-fb show ' + (ok ? 'ok' : 'bad');
+  fb.textContent = ok ? '✓ Correct!' : '✕ Correct: ' + q.opts[q.ans];
+  lSave('m7-score', m7Score);
+  lSave('m7-answered', Object.keys(m7Done).length);
+  setProg('m7');
+}
+function m7BuildConf() {
+  var h = '';
+  M7_CONF.forEach(function(c, i) {
+    var val = m7Conf[i] || '';
+    h += '<div class="conf-item"><div class="conf-label">' + esc(c) + '</div><div class="conf-btns">' +
+      '<button class="conf-btn' + (val === 'yes' ? ' active' : '') + '" onclick="m7SetConf(' + i + ',&quot;yes&quot;)">😀 Yes</button>' +
+      '<button class="conf-btn' + (val === 'ok' ? ' active' : '') + '" onclick="m7SetConf(' + i + ',&quot;ok&quot;)">🙂 Nearly</button>' +
+      '<button class="conf-btn' + (val === 'no' ? ' active' : '') + '" onclick="m7SetConf(' + i + ',&quot;no&quot;)">🤔 Not yet</button>' +
+      '</div></div>';
+  });
+  document.getElementById('m7-conf').innerHTML = h;
+}
+function m7SetConf(i, val) {
+  m7Conf[i] = val;
+  lSave('m7-conf', m7Conf);
+  m7BuildConf();
+  setProg('m7');
+}
+function m7SaveAll() {
+  lSave('m7-forces', {
+    f1: document.getElementById('m7-f1').value,
+    f2: document.getElementById('m7-f2').value,
+    f3: document.getElementById('m7-f3').value
+  });
+  setProg('m7');
+  showSaveInd('m7');
+}
+function restore_m7() {
+  m7BuildQuiz();
+  m7Done = {}; m7Score = 0;
+  var f = lLoad('m7-forces', {}) || {};
+  document.getElementById('m7-f1').value = f.f1 || '';
+  document.getElementById('m7-f2').value = f.f2 || '';
+  document.getElementById('m7-f3').value = f.f3 || '';
+  m7Conf = lLoad('m7-conf', {}) || {};
+  m7BuildConf();
+}
+function init_m7() {
+  m7Done = {}; m7Score = 0; m7Conf = {};
+  m7BuildQuiz();
+  document.getElementById('m7-f1').value = '';
+  document.getElementById('m7-f2').value = '';
+  document.getElementById('m7-f3').value = '';
+  m7BuildConf();
+}
+
+// ═══ M8 — FINAL QUIZ ═══
+var M8_QUIZ = [
+  {q:'What is the Unit 7 project?',opts:['Design a superpower app','Make a superpower app','Build a bridge'],ans:0},
+  {q:'Your app must be…',opts:['the solution to a problem','the biggest app','free'],ans:0},
+  {q:'How many pictures do you sketch?',opts:['3-4','10','1'],ans:0},
+  {q:'What does <b>simple</b> mean?',opts:['easy to understand or do','very expensive','very large'],ans:0},
+  {q:'What are <b>materials</b>?',opts:['the things you use to make something','the people who help you','the rules'],ans:0},
+  {q:'What does <b>recycle</b> mean?',opts:['use something again instead of throwing it away','throw it away','buy a new one'],ans:0},
+  {q:'What is a <b>vacuum</b>?',opts:['a machine that sucks up dirt','a kind of ghost','a paper app'],ans:0},
+  {q:'After sketching, what do you do next?',opts:['share your ideas and ask how to improve them','present immediately','stop'],ans:0},
+  {q:'Good feedback…',opts:['helps the idea work better','changes it completely','says nothing'],ans:0},
+  {q:'The model superhero in the book is…',opts:['Superfood Man','Sheep View','Braille Boy'],ans:0}
+];
+
+var m8Started = false, m8Idx = 0, m8Score = 0;
+function initM8() {
+  m8Started = true;
+  m8Idx = 0; m8Score = 0;
+  document.getElementById('m8-result').style.display = 'none';
+  renderM8();
+}
+function renderM8() {
+  var host = document.getElementById('m8-quiz');
+  if (m8Idx >= M8_QUIZ.length) return showM8Result();
+  var q = M8_QUIZ[m8Idx];
+  var pct = Math.round(m8Idx / M8_QUIZ.length * 100);
+  var h = '<div class="qz-prog"><span class="qz-num">Question ' + (m8Idx+1) + ' of ' + M8_QUIZ.length + '</span><span class="qz-sc">Score: ' + m8Score + ' ⚽</span></div>' +
+    '<div class="qz-bar"><div class="qz-bar-fill" style="width:' + pct + '%"></div></div>' +
+    '<div class="qz-card"><div class="qz-tag pj">' + q.tag + '</div><div class="qz-q">' + esc(q.q) + '</div><div class="mcq-opts">';
+  q.opts.forEach(function(o, i) { h += '<button class="mcq-opt" onclick="ansM8(' + i + ')">' + String.fromCharCode(65+i) + ') ' + esc(o) + '</button>'; });
+  h += '</div><div class="mcq-fb" id="m8-fb"></div></div>';
+  host.innerHTML = h;
+}
+function ansM8(choice) {
+  var q = M8_QUIZ[m8Idx];
+  var ok = choice === q.ans;
+  document.querySelectorAll('#m8-quiz .mcq-opt').forEach(function(b) { b.disabled = true; });
+  var fb = document.getElementById('m8-fb');
+  if (ok) {
+    m8Score++;
+    document.querySelectorAll('#m8-quiz .mcq-opt')[choice].classList.add('ok');
+    fb.className = 'mcq-fb show ok'; fb.textContent = '✓ Correct!';
+  } else {
+    document.querySelectorAll('#m8-quiz .mcq-opt')[choice].classList.add('bad');
+    document.querySelectorAll('#m8-quiz .mcq-opt')[q.ans].classList.add('ok');
+    fb.className = 'mcq-fb show bad';
+    fb.textContent = '✕ Correct: ' + q.opts[q.ans];
+  }
+  setTimeout(function() { m8Idx++; if (m8Idx >= M8_QUIZ.length) showM8Result(); else renderM8(); }, 1400);
+}
+function showM8Result() {
+  var host = document.getElementById('m8-quiz');
+  var res = document.getElementById('m8-result');
+  host.innerHTML = '';
+  res.style.display = 'block';
+  var pass = m8Score >= 6;
+  var pct = Math.round(m8Score / M8_QUIZ.length * 100);
+  res.innerHTML = '<div class="qz-res"><div class="qz-trophy">' + (pass ? '⚽🏆' : '⚽') + '</div>' +
+    '<div class="qz-score-big">' + m8Score + ' / ' + M8_QUIZ.length + '</div>' +
+    '<div class="qz-msg">' + (pass ? '🎉 GOAL! You scored ' + pct + '% — well above 75%!' : 'Almost! ' + pct + '% — you need 75% to score. Try the modules again, then come back.') + '</div>' +
+    (pass ? '' : '<button class="qz-retry" onclick="initM8()">🔄 Try Again</button>') +
+    '</div>';
+  saveScore(m8Score, M8_QUIZ.length, pass, {quiz:'final'});
+  lSave('m8-quiz-score', m8Score);
+  if (pass) setDone('m8');
+  m8Started = false;
+}
+function restore_m8() {
+  var saved = lLoad('score');
+  if (saved && saved.quiz === 'final') {
+    m8Score = saved.score;
+    m8Idx = M8_QUIZ.length;
+    showM8Result();
+  } else if (!m8Started) {
+    initM8();
+  }
+}
+function init_m8() { m8Started = false; m8Idx = 0; m8Score = 0; }
+
+// ═══ REVIEW MODE ═══
+function initReviewMode() {
+  document.getElementById('appRoot').style.display = 'none';
+  var rs = document.getElementById('reviewScreen');
+  rs.classList.add('show');
+  var body = document.getElementById('reviewBody');
+  var scoreData = lLoad('score');
+  var pred = lLoad('m4-pred', '') || '';
+  var idea = lLoad('m4-idea', null);
+  var build = lLoad('m5-build', '') || '';
+  var explain = lLoad('m6-explain', '') || '';
+  var ratings = lLoad('m6-ratings', {}) || {};
+  var forces = lLoad('m7-forces', {}) || {};
+  var conf = lLoad('m7-conf', {}) || {};
+
+  if (!scoreData && !pred && !build && !explain && !forces.f1) {
+    body.innerHTML = '<div class="rv-not-started">📋 Work not started yet.</div>';
+    return;
+  }
+  var html = '';
+  if (scoreData) {
+    html += '<div class="rv-card" style="border-color:' + (scoreData.done ? 'var(--gn)' : 'var(--pj)') + '"><div class="rv-lbl">FINAL QUIZ</div>' +
+      '<div class="rv-val" style="color:' + (scoreData.done ? 'var(--gn)' : 'var(--pj)') + '">' + scoreData.score + '/' + scoreData.total + ' · ' + scoreData.pct + '% ' + (scoreData.done ? '✅ PASSED' : 'IN PROGRESS') + '</div></div>';
+  }
+  if (idea !== null && idea !== undefined) {
+    html += '<div class="rv-card"><div class="rv-lbl">PREDICTION PICKED</div><div class="rv-val">' + esc(M4_IDEAS[idea]) + (idea === 2 ? ' ✅ correct' : ' — closest was Idea 3') + '</div></div>';
+  }
+  if (pred) html += '<div class="rv-card"><div class="rv-lbl">LEO’S PREDICTION</div><div class="rv-text">' + esc(pred) + '</div></div>';
+  if (build) html += '<div class="rv-card"><div class="rv-lbl">THE BUILD</div><div class="rv-text">' + esc(build) + '</div></div>';
+  if (explain) html += '<div class="rv-card"><div class="rv-lbl">WHY IT HAPPENS — LEO’S WORDS</div><div class="rv-text">' + esc(explain) + '</div></div>';
+  var ratingsTxt = '';
+  M6_CRITERIA.forEach(function(c, i) { if (ratings[i]) ratingsTxt += ratings[i] + '/3 — ' + c + '\n'; });
+  if (ratingsTxt) html += '<div class="rv-card"><div class="rv-lbl">PROJECT CHECK</div><div class="rv-text">' + esc(ratingsTxt) + '</div></div>';
+  if (forces.f1 || forces.f2 || forces.f3) {
+    html += '<div class="rv-card"><div class="rv-lbl">EVERYDAY FORCES</div><div class="rv-text">' + esc([forces.f1, forces.f2, forces.f3].filter(Boolean).join('\n')) + '</div></div>';
+  }
+  var confTxt = '';
+  var confLabel = {yes:'😀 Yes', ok:'🙂 Nearly', no:'🤔 Not yet'};
+  M7_CONF.forEach(function(c, i) { if (conf[i]) confTxt += (confLabel[conf[i]] || conf[i]) + ' — ' + c + '\n'; });
+  if (confTxt) html += '<div class="rv-card"><div class="rv-lbl">NOW I CAN — CONFIDENCE</div><div class="rv-text">' + esc(confTxt) + '</div></div>';
+  body.innerHTML = html || '<div class="rv-not-started">📋 No content yet.</div>';
+}
+
+// ═══ HW BANNER ═══
+function maybeShowHwBanner() {
+  if (!new URLSearchParams(location.search).get('hw')) return;
+  var b = document.getElementById('hwBanner');
+  b.style.display = 'flex';
+  b.innerHTML = '🎯 Homework mode — your progress will be saved to Neritan.';
+}
+
+// ═══ BOOT ═══
+window.addEventListener('DOMContentLoaded', function() {
+  if (REVIEW) { initReviewMode(); return; }
+  maybeShowHwBanner();
+  for (var i = 1; i <= MC; i++) {
+    var s = getBadge('m' + i);
+    if (s && s !== 'new') updateBadge('m' + i, s);
+  }
+  updateProgress();
+  m1Render();
+  m2Render();
+});
+</script>
+</body>
+</html>

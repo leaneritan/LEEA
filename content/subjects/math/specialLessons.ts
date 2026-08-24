@@ -33,6 +33,14 @@ export type SpecialLesson = {
   order?: number;
   /** Set only once the lesson's standalone HTML exists at public/math-lessons/<id>.html. */
   embedPath?: string;
+  /**
+   * Section ids that also link this lesson inline, if any. A 特訓レッスン sits
+   * outside the textbook flow by definition, so most have none — but two of
+   * them are reached from a 節 as well, and were missing from this list
+   * entirely until that was noticed. scripts/validate-content.mjs now checks
+   * the two directions agree.
+   */
+  sections?: string[];
 };
 
 // 中1の特訓レッスン。中2・中3は grade: "g2" / "g3" の行を足すだけで表示される。
@@ -92,6 +100,31 @@ export const specialLessons: SpecialLesson[] = [
     kind: "かいせつ＋問題",
     meta: "全 6 問",
     status: "todo"
+  },
+  // These two were built as section links and never registered here, so they
+  // existed inside a 節 but were missing from the 特訓レッスン list — the only
+  // page that shows what practice exists at all.
+  {
+    id: "risshiki-training-ch3-sec2",
+    grade: "g1",
+    topic: "文章題",
+    title: "立式トレーニング — 式をつくるところだけ —",
+    kind: "れんしゅう",
+    meta: "全 14 ステージ",
+    status: "todo",
+    embedPath: "/math-lessons/risshiki-training-ch3-sec2.html",
+    sections: ["math-3-2"]
+  },
+  {
+    id: "kigou-training-ch1",
+    grade: "g1",
+    topic: "計算の基礎",
+    title: "符号のトレーニング — 正負の数 総ざらい —",
+    kind: "ドリル",
+    meta: "全 20 問",
+    status: "todo",
+    embedPath: "/math-lessons/kigou-training-ch1.html",
+    sections: ["math-1-3"]
   }
 ];
 

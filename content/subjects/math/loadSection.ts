@@ -53,3 +53,25 @@ export function loadMathExtraLessons(): Record<string, MathExtraLessonSummary[]>
   }
   return lessons;
 }
+
+/**
+ * Server-only: how many tickable problems each authored section holds, keyed by
+ * section id. The home page needs to say how far through a section Leo is, and
+ * the JSON content only exists on the server — but the progress map is keyed
+ * `<sectionId>::<blockId>` and only practice and quickcheck blocks are ever
+ * ticked, so a count is enough for the client to work out the rest.
+ */
+export function loadMathPracticeCounts(): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const chapter of mathChapters) {
+    for (const section of chapter.sections) {
+      const full = loadMathSection(chapter.id, section.number);
+      if (!full) continue;
+      const total = full.blocks.filter(
+        (block) => block.type === "practice" || block.type === "quickcheck"
+      ).length;
+      if (total > 0) counts[section.id] = total;
+    }
+  }
+  return counts;
+}

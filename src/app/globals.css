@@ -7115,9 +7115,66 @@ h3 {
   border-left: 1px solid var(--m-accent); padding-left: 7px;
 }
 
+/* ---- Math on a phone ----
+   The whole math scope was laid out as single non-wrapping flex rows sized for
+   a desktop. At 390px every one of them collapsed the same way: the fixed-width
+   end blocks (a 110px progress track, a 64px label, the badges) took more than
+   the row had, the flexible title beside them was squeezed to literally 0px
+   wide, and Japanese text with nowhere to go wrapped one character per line —
+   a chapter row 450px tall. The page also overflowed to 406px.
+
+   Rows wrap here rather than shrink, and the decorations that cost the most
+   width for the least meaning (the progress bars) step aside. */
 @media (max-width: 640px) {
   .math-section-lessons { padding-left: 16px; }
   .math-section-lesson { font-size: 12px; }
+
+  /* Top bars: let the breadcrumb wrap instead of crushing its own text. */
+  .math-topbar-inner,
+  .math-home-topbar-inner { flex-wrap: wrap; gap: 8px; padding: 10px 14px; }
+  .math-topbar-brand,
+  .math-home-topbar-inner > a:first-child { flex: none; }
+  .math-topbar-section { flex: 1 1 100%; min-width: 0; font-size: 12.5px; }
+  .math-topbar-sep,
+  .math-topbar-chevron { display: none; }
+  .math-topbar-progress { margin-left: auto; }
+  .math-topbar-progress .math-progress-track { width: 68px; }
+  .math-home-book-label { display: none; }
+  .math-home-student { margin-left: auto; }
+
+  /* Chapter row: the title gets the width; the progress bar gives way. */
+  .math-chapter-row { flex-wrap: wrap; gap: 10px 12px; padding: 13px 15px; }
+  .math-chapter-badge { width: 36px; height: 36px; border-radius: 11px; font-size: 16px; }
+  .math-chapter-titles { flex: 1 1 0; min-width: 0; }
+  .math-chapter-title { font-size: 15px; }
+  .math-chapter-subtitle { font-size: 11.5px; }
+  .math-chapter-end { flex: none; gap: 8px; margin-left: auto; }
+  .math-chapter-end .math-progress-track { display: none; }
+  .math-chapter-progress-label { min-width: 0; font-size: 11.5px; }
+
+  /* Section row: the row takes the full line so the ✓ and the section name stay
+     together, and the page range and chips wrap underneath rather than pushing
+     the name onto a line of its own. */
+  .math-section-list { padding: 0 6px 6px; }
+  .math-section-row { flex: 1 1 100%; flex-wrap: wrap; gap: 4px 10px; padding: 8px 9px; }
+  .math-section-dot { flex: none; }
+  .math-section-name { flex: 1 1 auto; min-width: 0; font-size: 13.5px; }
+  .math-section-pages { flex: none; margin-left: 32px; font-size: 11px; }
+  .math-section-end { flex: none; margin-left: auto; }
+  .math-companion-link { margin-left: 32px; }
+
+  /* Stats card: three stat blocks beside a greeting do not fit one line. */
+  .math-stats-card { flex-wrap: wrap; gap: 14px; }
+  .math-stats-card > div:first-child { flex: 1 1 100%; }
+  .math-stat-block { flex: 1 1 0; min-width: 0; text-align: center; }
+}
+
+/* Below ~360px even the trimmed end block leaves the chapter title barely 60px,
+   which wraps a title like 0章 算数から数学へ over four lines. Give the title the
+   whole row and let the badge, count and chevron sit underneath it. */
+@media (max-width: 360px) {
+  .math-chapter-end { flex: 1 1 100%; margin-left: 0; justify-content: flex-end; }
+  .math-section-end { flex: 1 1 100%; margin-left: 0; justify-content: flex-end; }
 }
 
 /* ---- digital companion link (textbook publisher's digital edition) ---- */

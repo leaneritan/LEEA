@@ -8,6 +8,8 @@ import unit7Grammar1 from "../../content/subjects/english/courses/our-world/leve
 import unit7Grammar1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/grammar1.learner.json";
 import unit7Vocab2 from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/vocab2.teacher.json";
 import unit7Vocab2Learner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/vocab2.learner.json";
+import unit7Grammar2 from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/grammar2.teacher.json";
+import unit7Grammar2Learner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/grammar2.learner.json";
 import unit9Opener from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/opener.teacher.json";
 import unit9OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/opener.learner.json";
 import unit9Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/vocab1.teacher.json";
@@ -121,6 +123,8 @@ export const lessons: Lesson[] = [
   unit7Grammar1Learner as Lesson,
   unit7Vocab2 as Lesson,
   unit7Vocab2Learner as Lesson,
+  unit7Grammar2 as Lesson,
+  unit7Grammar2Learner as Lesson,
   unit9Opener as Lesson,
   unit9OpenerLearner as Lesson,
   unit9Vocab1 as Lesson,

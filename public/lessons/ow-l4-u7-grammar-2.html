@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 7 · Grammar 2 · You for General Statements</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0b1220}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:absolute;top:0;left:0}
+#deck{width:1920px;height:1080px;position:relative}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FFFDF5;overflow:hidden}
+.slide.active{display:flex}
+:root{
+  --red:#DC2626; --red-d:#991B1B; --red-bg:#FEF2F2;
+  --yellow:#FACC15; --yellow-d:#CA8A04; --yellow-bg:#FEFCE8;
+  --amber:#F59E0B; --amber-d:#B45309; --amber-bg:#FFFBEB;
+  --navy:#0f172a; --navy-2:#1e293b;
+  --green:#16A34A; --green-d:#15803d; --green-bg:#F0FDF4;
+  --blue:#2563EB; --blue-d:#1D4ED8; --blue-bg:#EFF6FF;
+  --cream:#FFFDF5; --ink:#1f2937;
+}
+/* ---------- header ---------- */
+.slide-header{height:64px;background:var(--red);display:flex;align-items:center;padding:0 44px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.8);font-size:17px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.45);font-size:20px}
+.hd-section{color:#fff;font-size:23px;font-weight:800}
+.hd-chip{background:rgba(255,255,255,.22);color:#fff;padding:5px 18px;border-radius:20px;font-size:17px;font-weight:800;margin-left:auto}
+.hd-chip.src{background:rgba(0,0,0,.28)}
+.hd-chip.tr{background:var(--yellow);color:var(--navy)}
+/* ---------- body ---------- */
+.body{flex:1;padding:30px 60px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.body.center{align-items:center;justify-content:center;text-align:center}
+.body.grad-lab{background:radial-gradient(circle at 30% 20%,#1e293b,#0b1220);color:#fff}
+.header-bar.yellow{border-color:var(--yellow)}
+/* ---------- buttons / options ---------- */
+.btn{border:none;border-radius:14px;font-family:'Outfit',sans-serif;font-weight:800;cursor:pointer;transition:transform .12s, box-shadow .12s}
+.btn:hover{transform:translateY(-2px)}
+.btn.red{background:var(--red);color:#fff}
+.btn.yellow{background:var(--yellow);color:var(--navy)}
+.btn.dark{background:var(--navy-2);color:#fff}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;font-size:23px;font-weight:700;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.opt:hover{border-color:var(--amber);transform:translateX(4px)}
+.opt.good{background:var(--green-bg);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-bg);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default;opacity:.85}
+.opt:disabled:hover{transform:none}
+0%,100%{transform:translateX(0)}
+25%{transform:translateX(-8px)}
+75%{transform:translateX(8px)}
+.on-correct.show{display:block;animation:pop .4s}
+0%{transform:scale(.85);opacity:0}
+100%{transform:scale(1);opacity:1}
+/* ---------- chips ---------- */
+.chip{display:inline-block;background:#fff;border:3px solid var(--amber);border-radius:12px;padding:10px 20px;font-size:24px;font-weight:800;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;margin:4px}
+.chip:hover{background:var(--amber-bg);transform:translateY(-2px)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.err{animation:shake .35s;border-color:var(--red)}
+.build-line{min-height:74px;background:#fff;border:3px dashed #cbd5e1;border-radius:14px;padding:12px 18px;font-size:27px;font-weight:800;color:var(--navy);display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.build-line.done{border-style:solid;border-color:var(--green);background:var(--green-bg)}
+.bpart{background:var(--yellow-bg);border:2px solid var(--yellow);border-radius:8px;padding:4px 12px}
+/* ---------- stations ---------- */
+.station-board{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.station{width:220px;background:rgba(255,255,255,.07);border:3px solid rgba(255,255,255,.18);border-radius:16px;padding:14px;text-align:center;transition:all .4s}
+.station .st-ico{font-size:44px;filter:grayscale(1);opacity:.45;transition:all .4s}
+.station .st-name{font-size:17px;font-weight:800;color:rgba(255,255,255,.55);margin-top:6px}
+.station.on{border-color:var(--yellow);background:rgba(250,204,21,.14);box-shadow:0 0 26px rgba(250,204,21,.35)}
+.station.on .st-ico{filter:none;opacity:1}
+.station.on .st-name{color:var(--yellow)}
+.mitem.sel{border-color:var(--blue);background:var(--blue-bg)}
+.mitem.lock{border-color:var(--green);background:var(--green-bg);color:var(--green-d);pointer-events:none}
+.mitem.err{animation:shake .35s;border-color:var(--red)}
+.card3d.flipped .c3-inner{transform:rotateY(180deg)}
+.gapbtn.good{border-style:solid;border-color:var(--green);background:var(--green-bg);color:var(--green-d)}
+.gapbtn.bad{animation:shake .35s;border-color:var(--red)}
+.bulb.on{filter:none;opacity:1;text-shadow:0 0 22px rgba(250,204,21,.8)}
+/* ---------- bottom bar ---------- */
+#bar{position:absolute;left:0;bottom:0;width:1920px;height:52px;background:var(--navy);display:flex;align-items:center;padding:0 24px;gap:18px;z-index:50}
+#bar button{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:10px;padding:7px 18px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif}
+#bar button:hover{background:rgba(255,255,255,.25)}
+#counter{color:rgba(255,255,255,.7);font-size:16px;font-weight:800;margin-left:auto}
+#minist{display:flex;gap:7px}
+.mdot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.18);transition:all .3s}
+.mdot.on{background:var(--yellow);box-shadow:0 0 8px rgba(250,204,21,.8)}
+#pwrap{position:absolute;left:0;top:0;width:100%;height:6px;background:rgba(255,255,255,.12)}
+#pfill{height:100%;width:0;background:var(--yellow);transition:width .3s}
+#notesPanel{position:absolute;right:24px;bottom:64px;width:640px;max-height:520px;overflow:auto;background:#fff;border:3px solid var(--yellow);border-radius:16px;padding:20px 24px;font-size:19px;color:var(--ink);line-height:1.5;display:none;z-index:60;box-shadow:0 16px 44px rgba(0,0,0,.35)}
+#notesPanel.show{display:block}
+#notesPanel b{color:var(--red-d)}
+.confetti{position:absolute;font-size:34px;animation:fall 3.2s linear infinite}
+0%{transform:translateY(-80px) rotate(0)}
+100%{transform:translateY(1150px) rotate(540deg)}
+/* ================= UNIT 7 GRAMMAR 1 — TIME MACHINE COMPONENTS ================= */
+:root{ --purple:#7C3AED; --purple-d:#5B21B6; --purple-bg:#F5F3FF; --ink-2:#475569; --ink-3:#94a3b8; }
+.slide-header{background:var(--purple)}
+.body.grad-lab{background:linear-gradient(140deg,var(--purple-d),var(--purple))}
+.callout{background:var(--purple-bg);border:3px solid var(--purple);border-radius:16px;padding:16px 26px;font-size:25px;font-weight:600;color:var(--ink);line-height:1.4;text-align:center}
+/* goal grid */
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.goal-card{background:#fff;border:3px solid #e2e8f0;border-radius:18px;padding:22px 26px;display:flex;flex-direction:column;gap:6px}
+.gc-ico{font-size:44px}
+.gc-h{font-size:20px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--purple)}
+.gc-t{font-size:26px;font-weight:600;color:var(--ink);line-height:1.35}
+/* flip cards */
+.flip-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.flipcard{width:340px;height:230px;perspective:1000px;cursor:pointer}
+.flipcard.wide{width:100%;max-width:1400px;height:150px}
+.fc-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flipcard.flipped .fc-in{transform:rotateY(180deg)}
+.fc-f,.fc-b{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-weight:700;line-height:1.35}
+.fc-f{background:#fff;border:3px solid var(--purple);font-size:34px;color:var(--ink)}
+.fc-b{background:var(--purple);color:#fff;font-size:27px;transform:rotateY(180deg)}
+.flipcard.wide .fc-f{font-size:30px}
+.flipcard.wide .fc-b{font-size:28px}
+/* question line + options */
+.q-line{font-size:40px;font-weight:800;text-align:center;color:var(--ink)}
+.opt-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.opt-col{display:flex;flex-direction:column;gap:14px}
+.opt.sm{font-size:24px;padding:12px 26px}
+.opt.good{background:var(--green);border-color:var(--green);color:#fff}
+.opt.bad{background:var(--red-bg);border-color:var(--red);color:var(--red-d)}
+/* word lab */
+.wl-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.wl-chip{background:#fff;border:3px solid var(--purple);border-radius:999px;padding:12px 28px;font-size:26px;font-weight:800;color:var(--purple-d)}
+/* word split */
+.word-split{display:flex;gap:32px;height:100%}
+.ws-left{width:38%;background:var(--purple-bg);border:3px solid var(--purple);border-radius:20px;padding:26px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.ws-emoji{font-size:88px;line-height:1}
+.ws-word{font-size:44px;font-weight:900;color:var(--purple-d)}
+.ws-ipa{font-size:24px;color:var(--ink-2);font-weight:600}
+.ws-jp{font-size:26px;font-weight:700;color:var(--ink)}
+.ws-def{font-size:24px;color:var(--ink-2);line-height:1.4;margin-top:8px}
+.ws-right{flex:1;display:flex;flex-direction:column;gap:14px}
+.game-head{font-size:28px;font-weight:800;color:var(--purple-d)}
+/* then / now */
+.then-now{display:flex;align-items:center;gap:20px;justify-content:center}
+.tn-card{width:320px;height:200px;perspective:1000px;cursor:pointer}
+.tn-card .fc-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.tn-card.flipped .fc-in{transform:rotateY(180deg)}
+.tn-arrow{font-size:52px;color:var(--purple)}
+/* match */
+.match-wrap{display:flex;gap:60px;justify-content:center}
+.match-col{display:flex;flex-direction:column;gap:14px;width:520px}
+.mtile{background:#fff;border:3px solid #cbd5e1;border-radius:14px;padding:16px 20px;font-size:24px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);text-align:left}
+.mtile:hover{border-color:var(--purple)}
+.mtile.sel{border-color:var(--purple);background:var(--purple-bg)}
+.mtile.lock{background:var(--green);border-color:var(--green);color:#fff;pointer-events:none}
+.mtile.err{background:var(--red-bg);border-color:var(--red)}
+/* done flag */
+.done-flag{display:none;margin:20px auto 0;background:var(--yellow);border:3px solid var(--yellow-d);border-radius:16px;padding:14px 34px;font-size:26px;font-weight:800;color:#4a3800;cursor:pointer;text-align:center;max-width:900px}
+.done-flag.show{display:block}
+.done-flag.lit{background:var(--green);border-color:var(--green-d);color:#fff;cursor:default}
+/* grammar box */
+.gbox{background:#fff;border:4px solid var(--purple);border-radius:22px;padding:30px 36px}
+.gbox-title{font-size:34px;font-weight:900;color:var(--purple-d);margin-bottom:20px;display:flex;align-items:center}
+.gbox-tr{background:var(--purple);color:#fff;border-radius:999px;padding:5px 18px;font-size:20px;margin-left:14px}
+.gbox-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.gbox-cell{background:var(--purple-bg);border-radius:14px;padding:22px 24px;font-size:29px;font-weight:600;color:var(--ink);line-height:1.35}
+/* pattern strip + builders */
+.pattern-strip{background:var(--navy);color:#fff;border-radius:16px;padding:18px 30px;font-size:32px;font-weight:800;text-align:center}
+.build-line{min-height:86px;background:#fff;border:3px dashed var(--purple);border-radius:16px;display:flex;align-items:center;gap:10px;padding:14px 22px;flex-wrap:wrap;margin:14px 0}
+.build-line.done{border-style:solid;background:var(--green-bg);border-color:var(--green)}
+.bpart{font-size:30px;font-weight:800;color:var(--ink)}
+.chip-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+/* two panel */
+.two-panel{display:flex;gap:28px}
+.panel-card{flex:1;background:#fff;border:3px solid var(--purple);border-radius:20px;padding:26px}
+.pc-h{font-size:32px;font-weight:900;color:var(--purple-d);margin-bottom:10px}
+.pc-t{font-size:25px;color:var(--ink-2);line-height:1.4;margin-bottom:14px}
+.pc-ex{background:var(--purple-bg);border-radius:12px;padding:18px;font-size:27px;font-weight:700;line-height:1.4;color:var(--ink)}
+/* detective */
+.det-row{background:#fff;border:3px solid #e2e8f0;border-radius:16px;padding:18px 24px;margin-bottom:16px}
+.det-bad{font-size:28px;font-weight:700;color:var(--red-d);margin-bottom:12px}
+/* rules board */
+.rules-board{display:flex;flex-direction:column;gap:14px}
+.rule-line{display:flex;align-items:flex-start;gap:18px;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:16px 22px}
+.rl-n{width:44px;height:44px;flex-shrink:0;border-radius:50%;background:var(--purple);color:#fff;font-size:24px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.rl-t{font-size:25px;color:var(--ink);line-height:1.4}
+/* practice */
+.prac-item{display:flex;gap:18px;align-items:center;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;margin-bottom:12px}
+.pi-n{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:var(--purple);color:#fff;font-size:23px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.pi-s{font-size:26px;color:var(--ink);line-height:1.4}
+.gap{display:inline-block;min-width:230px;border-bottom:4px solid var(--purple);color:var(--purple-d);font-weight:800;text-align:center;cursor:pointer}
+.gap.filled{border-bottom-style:solid;color:var(--green-d)}
+/* true / false rows */
+.tf-row{display:flex;align-items:center;gap:22px;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;margin-bottom:12px}
+.tf-s{flex:1;font-size:25px;color:var(--ink);line-height:1.35}
+/* dialogue */
+.dialogue{display:flex;flex-direction:column;gap:18px;width:100%;max-width:1300px}
+.bubble{max-width:76%;border-radius:22px;padding:22px 28px;font-size:29px;font-weight:600;line-height:1.35}
+.bubble.left{background:var(--purple-bg);border:3px solid var(--purple);align-self:flex-start}
+.bubble.right{background:var(--yellow-bg);border:3px solid var(--amber);align-self:flex-end}
+/* quiz */
+.quiz-meter-wrap{height:20px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-bottom:12px}
+.quiz-meter{height:100%;width:0;background:var(--green);transition:width .3s}
+.quiz-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.quiz-q{background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:16px 20px}
+.qq-t{font-size:24px;font-weight:700;color:var(--ink);margin-bottom:12px;line-height:1.3}
+/* celebrate */
+.check-list{display:flex;flex-direction:column;gap:10px}
+.ck{background:rgba(255,255,255,.15);border-radius:12px;padding:12px 26px;font-size:26px;font-weight:700;color:#fff}
+</style>
+</head>
+<body>
+<div id="scaler"><div id="deck">
+
+<!-- ============ 1 · TITLE ============ -->
+<div class="slide" data-notes="<b>Welcome to the Invention Guide.</b> Today Leo learns the <i>general you</i> — the you that means everybody. Six stations are dark; each big activity lights one. Read the three sentences aloud once, no rules yet. LP p.244.">
+  <div class="body grad-lab center" style="gap:20px">
+    <div style="font-size:96px">🌐🔧</div>
+    <div style="font-size:60px;font-weight:900;color:#fff;text-align:center;line-height:1.1">The Invention Guide</div>
+    <div style="font-size:30px;color:rgba(255,255,255,.9);font-weight:700">Unit 7 · Grammar 2 · you for general statements</div>
+    <div style="background:rgba(255,255,255,.12);border:2px solid var(--yellow);border-radius:14px;padding:14px 28px;font-size:25px;font-weight:800;color:#fff;text-align:center;line-height:1.5">
+      You need to have creativity to invent things.<br>
+      What do <span style="color:var(--yellow)">you</span> do with this invention?
+    </div>
+    <div class="station-board" data-stboard></div>
+    <div style="font-size:22px;color:rgba(255,255,255,.85);font-weight:600">Power up all <b style="color:var(--yellow)">6 stations</b> to finish the guide! ⚡</div>
+    <button class="btn yellow" style="font-size:24px;padding:14px 40px" onclick="changeSlide(1)">Open the guide ▶</button>
+  </div>
+</div>
+
+<!-- ============ 2 · GOAL ============ -->
+<div class="slide" data-notes="<b>Today&#39;s goals (LP p.244).</b> Two objectives: generalize using you, and ask and answer questions about how and why you use inventions. Academic language: generalize, specific. Content vocabulary: backpack, knife. Resources: TR 7.8, Video Sc. 6, Worksheet 7.3, Workbook p.87, Grammar Workbook pp.32-33. Material: coins for the board game.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Grammar 2 — Today's Goals</span><span class="hd-chip src">📖 LP p.244</span></div>
+  <div class="body">
+    <div class="goal-grid">
+      <div class="goal-card"><div class="gc-ico">🌐</div><div class="gc-h">Objective 1</div><div class="gc-t"><b>Generalize</b> using <b>you</b>.</div></div>
+      <div class="goal-card"><div class="gc-ico">❓</div><div class="gc-h">Objective 2</div><div class="gc-t">Ask and answer questions about <b>how</b> and <b>why</b> you use inventions.</div></div>
+      <div class="goal-card"><div class="gc-ico">🎓</div><div class="gc-h">Academic words</div><div class="gc-t">generalize · specific</div></div>
+      <div class="goal-card"><div class="gc-ico">📚</div><div class="gc-h">Content words</div><div class="gc-t">a backpack 🎒 · a knife 🔪</div></div>
+    </div>
+    <div class="callout" style="margin-top:22px">💡 <b>Big idea:</b> <b>you</b> does not always mean <i>you, Leo</i>. Very often it means <b>people in general</b>.</div>
+  </div>
+</div>
+
+<!-- ============ 3 · WARM UP — THE NORMAL YOU ============ -->
+<div class="slide" data-notes="<b>Warm Up (LP p.244).</b> Say: We use the word you when we talk to one person or to more than one person. Point at Leo: &quot;Leo, you&#39;re wearing a blue shirt. When I talk to Leo, I call him you.&quot; Then have him stand: &quot;You&#39;re standing. You&#39;re at your desk.&quot; Say: This is the way we usually use you. But today we&#39;re going to learn another way.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — The you we already know</span><span class="hd-chip src">📖 LP p.244</span></div>
+  <div class="body center" style="gap:24px">
+    <div class="two-panel">
+      <div class="panel-card">
+        <div class="pc-h">🙋 One person</div>
+        <div class="pc-ex">"Leo, <b>you</b> are wearing a blue shirt."<br>"<b>You</b> are standing at your desk."</div>
+        <div class="pc-t">I am talking <b>just to Leo</b>.</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">🙋🙋 More than one person</div>
+        <div class="pc-ex">"<b>You</b> are all students."<br>"<b>You</b> are standing next to your desks."</div>
+        <div class="pc-t">I am talking to <b>this group</b> of people.</div>
+      </div>
+    </div>
+    <div class="callout">👀 That is the way we <i>usually</i> use <b>you</b>. But today we learn <b>another way</b>…</div>
+  </div>
+</div>
+
+<!-- ============ 4 · PRESENT — THE GENERAL YOU ============ -->
+<div class="slide" data-notes="<b>Present (LP p.244).</b> Gesture widely. Say: We can use the word you to talk about people in general. Write on the board and say: You need to work hard in school. Then say: I&#39;m not talking to one student. I&#39;m talking to all of you. I&#39;m talking about students IN GENERAL. Tap the card to see the swap test.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Present — The GENERAL you 🌐</span><span class="hd-chip src">📖 LP p.244</span></div>
+  <div class="body center" style="gap:22px">
+    <div class="pattern-strip" style="font-size:38px">You need to work hard in school.</div>
+    <div style="font-size:28px;font-weight:700;text-align:center;color:var(--ink-2)">Is Dad talking to Leo? Tap to find out.</div>
+    <div class="flip-row">
+      <div class="flipcard wide" onclick="flipCard(this,event)"><div class="fc-in">
+        <div class="fc-f">🤔 Who is "you" here?</div>
+        <div class="fc-b">🌐 <b>Everybody!</b> Swap it: "<b>People</b> need to work hard in school." Still true → it is the <b>general you</b>.</div>
+      </div></div>
+    </div>
+    <div class="callout">🔑 <b>The swap test:</b> if you can put <b>people</b> in place of <b>you</b> and the sentence still makes sense, it is the <b>general you</b>.</div>
+  </div>
+</div>
+
+<!-- ============ 5 · WORD LAB INTRO ============ -->
+<div class="slide" data-notes="<b>Word Lab — Station ①.</b> Five words today. The two academic words (generalize, specific) get full games — they always do. Then the two content words from the planner (knife, backpack) and invention itself.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">The Word Lab</span><span class="hd-chip">Station ① 🧪</span></div>
+  <div class="body center" style="gap:18px">
+    <div style="font-size:56px">🧪</div>
+    <div style="font-size:44px;font-weight:900">Station ① — The Word Lab</div>
+    <div style="font-size:26px;color:var(--ink-2);text-align:center;max-width:1100px">Five words we need today. Each one has a game. Finish all five to power up the first station.</div>
+    <div class="wl-row">
+      <div class="wl-chip">🌐 generalize</div>
+      <div class="wl-chip">🎯 specific</div>
+      <div class="wl-chip">🔪 a knife</div>
+      <div class="wl-chip">🎒 a backpack</div>
+      <div class="wl-chip">💡⚙️ an invention</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 6 · WORD: generalize ============ -->
+<div class="slide" data-notes="<b>Word 1 — generalize 🌐 (academic).</b> To generalize = to say something about a whole group, not just one person. The general you is exactly how we generalize in English.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Word Lab — generalize 🌐</span><span class="hd-chip">Word 1 of 5 · Academic</span></div>
+  <div class="body">
+    <div class="word-split">
+      <div class="ws-left">
+        <div class="ws-emoji">🌐</div>
+        <div class="ws-word">generalize</div>
+        <div class="ws-ipa">/ˈdʒɛnərəlaɪz/ · Verb</div>
+        <div class="ws-jp">一般化（いっぱんか）する</div>
+        <div class="ws-def">To say something about a <b>whole group</b>, not just one person.</div>
+      </div>
+      <div class="ws-right">
+        <div class="game-head">🎮 Which sentence generalizes?</div>
+        <div class="opt-col">
+          <button class="opt" onclick="pick(this)" data-ok="1">You write with a pencil.</button>
+          <button class="opt" onclick="pick(this)">Leo, write your name with this pencil.</button>
+          <button class="opt" onclick="pick(this)">Dad wrote one word yesterday.</button>
+        </div>
+        <div class="callout" style="margin-top:16px">🌐 "You write with a pencil" = <b>everybody</b> writes with a pencil. That is generalizing.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 7 · WORD: specific ============ -->
+<div class="slide" data-notes="<b>Word 2 — specific 🎯 (academic).</b> The opposite of general. When you name one person or one thing, you are being specific. Point at one object in the room to make it concrete.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Word Lab — specific 🎯</span><span class="hd-chip">Word 2 of 5 · Academic</span></div>
+  <div class="body">
+    <div class="word-split">
+      <div class="ws-left">
+        <div class="ws-emoji">🎯</div>
+        <div class="ws-word">specific</div>
+        <div class="ws-ipa">/spəˈsɪfɪk/ · Adjective</div>
+        <div class="ws-jp">特定（とくてい）の</div>
+        <div class="ws-def">About <b>one particular</b> person or thing — the opposite of general.</div>
+      </div>
+      <div class="ws-right">
+        <div class="game-head">🎮 Which one is specific?</div>
+        <div class="opt-col">
+          <button class="opt" onclick="pick(this)" data-ok="1">Leo, can you help me fix my bike?</button>
+          <button class="opt" onclick="pick(this)">You should always try again if you fail.</button>
+          <button class="opt" onclick="pick(this)">You need creativity to invent things.</button>
+        </div>
+        <div class="callout" style="margin-top:16px">🎯 Naming <b>Leo</b> makes it specific. The other two are true for <b>everybody</b>.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 8 · WORD: a knife ============ -->
+<div class="slide" data-notes="<b>Word 3 — a knife 🔪 (content vocabulary, LP p.244).</b> A knife is the planner&#39;s own Item 1 in Activity 1. Ask: What do you do with a knife? (You cut meat with it.)">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Word Lab — a knife 🔪</span><span class="hd-chip">Word 3 of 5 · Content</span></div>
+  <div class="body">
+    <div class="word-split">
+      <div class="ws-left">
+        <div class="ws-emoji">🔪</div>
+        <div class="ws-word">a knife</div>
+        <div class="ws-ipa">/naɪf/ · Noun</div>
+        <div class="ws-jp">ナイフ・包丁（ほうちょう）</div>
+        <div class="ws-def">A tool with a <b>sharp blade</b> that you cut things with.</div>
+      </div>
+      <div class="ws-right">
+        <div class="game-head">🎮 What do you do with a knife?</div>
+        <div class="opt-col">
+          <button class="opt" onclick="pick(this)" data-ok="1">You cut meat with it.</button>
+          <button class="opt" onclick="pick(this)">You make calls with it.</button>
+          <button class="opt" onclick="pick(this)">You carry things in it.</button>
+        </div>
+        <div class="callout" style="margin-top:16px">🔪 Both clues from the book: "<b>You cut meat with it. You hold it in your hand.</b>"</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 9 · WORD: a backpack ============ -->
+<div class="slide" data-notes="<b>Word 4 — a backpack 🎒 (content vocabulary, LP p.244).</b> Activity 1 Item 3. Ask: What do you do with a backpack? (You carry things in it. You put it on your back.) Hold up a real backpack if one is handy.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Word Lab — a backpack 🎒</span><span class="hd-chip">Word 4 of 5 · Content</span></div>
+  <div class="body">
+    <div class="word-split">
+      <div class="ws-left">
+        <div class="ws-emoji">🎒</div>
+        <div class="ws-word">a backpack</div>
+        <div class="ws-ipa">/ˈbækpæk/ · Noun</div>
+        <div class="ws-jp">リュックサック</div>
+        <div class="ws-def">A bag you carry <b>on your back</b>.</div>
+      </div>
+      <div class="ws-right">
+        <div class="game-head">🎮 Build the clue — tap in order</div>
+        <div class="build-line" data-build="bp" data-need="3"></div>
+        <div class="chip-row">
+          <button class="chip" data-b="bp" data-idx="2" onclick="chiptap(this)">in it.</button>
+          <button class="chip" data-b="bp" data-idx="0" onclick="chiptap(this)">You</button>
+          <button class="chip" data-b="bp" data-idx="1" onclick="chiptap(this)">carry things</button>
+        </div>
+        <div class="callout" style="margin-top:16px">🎒 "<b>You carry things in it. You put it on your back.</b>" — the book's own clues.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 10 · WORD: an invention ============ -->
+<div class="slide" data-notes="<b>Word 5 — an invention 💡⚙️.</b> The unit word, back again. Today we ask questions about inventions: What do you do with it? How do you use it? Why do you need it?">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Word Lab — an invention 💡⚙️</span><span class="hd-chip">Word 5 of 5</span></div>
+  <div class="body">
+    <div class="word-split">
+      <div class="ws-left">
+        <div class="ws-emoji">💡⚙️</div>
+        <div class="ws-word">an invention</div>
+        <div class="ws-ipa">/ɪnˈvɛnʃən/ · Noun</div>
+        <div class="ws-jp">発明（はつめい）</div>
+        <div class="ws-def">A new thing that someone has made for the <b>first time</b>.</div>
+      </div>
+      <div class="ws-right">
+        <div class="game-head">🎮 Which question uses the general you correctly?</div>
+        <div class="opt-col">
+          <button class="opt" onclick="pick(this)" data-ok="1">How do you use it?</button>
+          <button class="opt" onclick="pick(this)">How you use it?</button>
+          <button class="opt" onclick="pick(this)">How does you use it?</button>
+        </div>
+        <div class="callout" style="margin-top:16px">❓ Three questions to keep: <b>What do you do with it? · How do you use it? · Why do you need it?</b></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 11 · WORD LAB FINAL CHECK ============ -->
+<div class="slide" data-notes="<b>Word Lab — final check.</b> Match each word to its meaning. All five matched lights Station ①.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Word Lab — Final Check</span><span class="hd-chip tr">⚡ Power Station ①</span></div>
+  <div class="body">
+    <div style="font-size:28px;font-weight:700;text-align:center;margin-bottom:14px">Tap a word, then tap its meaning.</div>
+    <div class="match-wrap" data-game="wl">
+      <div class="match-col">
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="a">🌐 generalize</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="b">🎯 specific</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="c">🔪 a knife</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="d">🎒 a backpack</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="e">💡⚙️ an invention</button>
+      </div>
+      <div class="match-col">
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="d">a bag you carry on your back</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="a">to talk about a whole group</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="e">a new thing made for the first time</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="b">about one particular thing</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="c">a tool with a sharp blade</button>
+      </div>
+    </div>
+    <div class="done-flag" id="wl-done" onclick="powerStation(0)">⚡ Station ① is live! Tap to power up.</div>
+  </div>
+</div>
+
+<!-- ============ 12 · THE GRAMMAR BOX ============ -->
+<div class="slide" data-notes="<b>The Grammar Box — TR 7.8 (SB p.123).</b> The one allowed reveal. Play TR 7.8 and have Leo read each sentence aloud. Explain that in every one of these, you means people in general — not one particular person. Then power Station ②.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">The Grammar Box</span><span class="hd-chip tr">🔊 TR 7.8 · SB p.123</span></div>
+  <div class="body">
+    <div class="gbox">
+      <div class="gbox-title">You for general statements &nbsp;<span class="gbox-tr">TR: 7.8</span></div>
+      <div class="gbox-grid">
+        <div class="gbox-cell"><b>You</b> need to have creativity to invent things.</div>
+        <div class="gbox-cell"><b>You</b> should always try again if <b>you</b> fail.</div>
+        <div class="gbox-cell">What do <b>you</b> do with this invention?</div>
+        <div class="gbox-cell">Do <b>you</b> play with it?</div>
+      </div>
+    </div>
+    <div class="done-flag show" id="gb-done" onclick="powerStation(1)">⚡ Play TR 7.8, read all four aloud — then tap to power Station ②.</div>
+  </div>
+</div>
+
+<!-- ============ 13 · PATTERN 1 — GENERAL STATEMENT ============ -->
+<div class="slide" data-notes="<b>Pattern 1 — the general statement.</b> You + verb, true for people in general. Often with a modal: should, need to, have to, must. Build it with the chips.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Pattern 1 — You + verb</span><span class="hd-chip tr">⚡ Power Station ③</span></div>
+  <div class="body">
+    <div class="pattern-strip"><b style="color:var(--purple)">You</b> &nbsp;+&nbsp; (should / need to / have to) &nbsp;+&nbsp; <b>verb</b></div>
+    <div style="font-size:26px;text-align:center;color:var(--ink-2);margin:10px 0 6px">Tap the chips in order:</div>
+    <div class="build-line" data-build="p1" data-need="4"></div>
+    <div class="chip-row">
+      <button class="chip" data-b="p1" data-idx="3" onclick="chiptap(this)">to invent things.</button>
+      <button class="chip" data-b="p1" data-idx="0" onclick="chiptap(this)">You</button>
+      <button class="chip" data-b="p1" data-idx="2" onclick="chiptap(this)">have creativity</button>
+      <button class="chip" data-b="p1" data-idx="1" onclick="chiptap(this)">need to</button>
+    </div>
+    <div class="done-flag" id="p1-done" onclick="powerStation(2)">⚡ Station ③ ready — tap to power up.</div>
+  </div>
+</div>
+
+<!-- ============ 14 · PATTERN 2 — THE QUESTION ============ -->
+<div class="slide" data-notes="<b>Pattern 2 — the question.</b> What / How + do you + verb? Note the do — &quot;How you use it?&quot; is the classic mistake. These three questions drive the whole Apply game.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Pattern 2 — What / How do you …?</span><span class="hd-chip tr">⚡ Power Station ④</span></div>
+  <div class="body">
+    <div class="pattern-strip">What / How &nbsp;+&nbsp; <b style="color:var(--purple)">do you</b> &nbsp;+&nbsp; <b>verb</b> &nbsp;?</div>
+    <div style="font-size:26px;text-align:center;color:var(--ink-2);margin:10px 0 6px">Tap the chips in order:</div>
+    <div class="build-line" data-build="p2" data-need="4"></div>
+    <div class="chip-row">
+      <button class="chip" data-b="p2" data-idx="1" onclick="chiptap(this)">do you</button>
+      <button class="chip" data-b="p2" data-idx="3" onclick="chiptap(this)">with this invention?</button>
+      <button class="chip" data-b="p2" data-idx="0" onclick="chiptap(this)">What</button>
+      <button class="chip" data-b="p2" data-idx="2" onclick="chiptap(this)">do</button>
+    </div>
+    <div class="callout" style="margin-top:16px">⚠️ Don't drop the <b>do</b>. "How <b>do</b> you use it?" — never "How you use it?"</div>
+    <div class="done-flag" id="p2-done" onclick="powerStation(3)">⚡ Station ④ ready — tap to power up.</div>
+  </div>
+</div>
+
+<!-- ============ 15 · GRAMMAR IN DEPTH ============ -->
+<div class="slide" data-notes="<b>Grammar in Depth (Be the Expert, LP p.245).</b> In English, you often refers to a specific person (Marc, where are you from?) or a group (You are good students). As an IMPERSONAL pronoun, you refers to people in general. We use it to ask for information, explain how to do something, and make general statements.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Grammar in Depth — Three Jobs for "you"</span><span class="hd-chip src">📖 LP p.245 · Be the Expert</span></div>
+  <div class="body">
+    <div class="two-panel">
+      <div class="panel-card">
+        <div class="pc-h">🙋 <b>Specific</b> you</div>
+        <div class="pc-t">One person, or one group you are speaking to.</div>
+        <div class="pc-ex">Marc, where are <b>you</b> from?<br><b>You</b> are good students.</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">🌐 <b>Impersonal</b> you</div>
+        <div class="pc-t">People in general. Used to ask for information, to explain how to do something, and to make general statements.</div>
+        <div class="pc-ex">How do <b>you</b> play this game?<br>First, <b>you</b> install it on your phone.<br><b>You</b> should eat breakfast every morning.</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:22px">🔄 "How do <b>you</b> play this game?" = "How do <b>people</b> play this game?" — same meaning.</div>
+  </div>
+</div>
+
+<!-- ============ 16 · GRAMMAR DETECTIVE ============ -->
+<div class="slide" data-notes="<b>Grammar Detective.</b> Three broken sentences — the dropped do, the wrong verb form, and the wrong pronoun for a plural thing (crayons → them).">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Grammar Detective 🕵️</span><span class="hd-chip">3 broken sentences</span></div>
+  <div class="body">
+    <div class="det-row">
+      <div class="det-bad">❌ "How <b>you</b> use it?"</div>
+      <div class="opt-row">
+        <button class="opt" onclick="pick(this)" data-ok="1">How do you use it?</button>
+        <button class="opt" onclick="pick(this)">How does you use it?</button>
+      </div>
+    </div>
+    <div class="det-row">
+      <div class="det-bad">❌ "You <b>needs</b> to have creativity to invent things."</div>
+      <div class="opt-row">
+        <button class="opt" onclick="pick(this)" data-ok="1">You need to have creativity to invent things.</button>
+        <button class="opt" onclick="pick(this)">You needing to have creativity to invent things.</button>
+      </div>
+    </div>
+    <div class="det-row">
+      <div class="det-bad">❌ "You color pictures with <b>it</b>." (about crayons)</div>
+      <div class="opt-row">
+        <button class="opt" onclick="pick(this)" data-ok="1">You color pictures with them.</button>
+        <button class="opt" onclick="pick(this)">You colors pictures with them.</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 17 · RULES BOARD ============ -->
+<div class="slide" data-notes="<b>Rules board.</b> Leave this up while Leo writes his Activity 1 clues.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Invention Guide — Rules Board</span><span class="hd-chip">📋 summary</span></div>
+  <div class="body">
+    <div class="rules-board">
+      <div class="rule-line"><span class="rl-n">1</span><span class="rl-t">The <b>general you</b> = people in general, not one person.</span></div>
+      <div class="rule-line"><span class="rl-n">2</span><span class="rl-t"><b>The swap test:</b> if <b>people</b> fits in place of <b>you</b>, it is the general you.</span></div>
+      <div class="rule-line"><span class="rl-n">3</span><span class="rl-t">Questions keep the <b>do</b>: <i>What <b>do</b> you do with it? How <b>do</b> you use it?</i></span></div>
+      <div class="rule-line"><span class="rl-n">4</span><span class="rl-t">After <b>you</b>, the verb has <b>no -s</b>: <i>you need</i>, not <i>you needs</i>.</span></div>
+      <div class="rule-line"><span class="rl-n">5</span><span class="rl-t">One thing → <b>it</b>. More than one thing → <b>them</b>. <i>You color pictures with <b>them</b>.</i></span></div>
+      <div class="rule-line"><span class="rl-n">6</span><span class="rl-t">Start every clue with <b>You</b>.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 18 · PRACTICE — ACTIVITY 1 ============ -->
+<div class="slide" data-notes="<b>Practice — Activity 1 (SB p.123).</b> Say: Write clues about each invention. Start with the word you. Read Item 1 aloud, point at the words in parentheses. Ask What do you do with a knife? (You cut meat with it.) Tap each blank to reveal the book&#39;s answer only AFTER Leo has tried it.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Practice — Write the Clues</span><span class="hd-chip src">📗 SB p.123 · Act 1</span></div>
+  <div class="body">
+    <div class="prac-item"><div class="pi-n">1</div><div class="pi-s">🔪 <b>knife</b> (cut meat) → <span class="gap" data-a="You cut meat with it." onclick="gaptap(this)">______</span></div></div>
+    <div class="prac-item"><div class="pi-n">2</div><div class="pi-s">📡 <b>microwave</b> (cook food) → <span class="gap" data-a="You cook food in it quickly." onclick="gaptap(this)">______</span></div></div>
+    <div class="prac-item"><div class="pi-n">3</div><div class="pi-s">🎒 <b>backpack</b> (carry things) → <span class="gap" data-a="You carry things in it." onclick="gaptap(this)">______</span></div></div>
+    <div class="prac-item"><div class="pi-n">4</div><div class="pi-s">📱 <b>cell phone</b> (make calls) → <span class="gap" data-a="You make calls with it." onclick="gaptap(this)">______</span></div></div>
+    <div class="prac-item"><div class="pi-n">5</div><div class="pi-s">✂️ <b>scissors</b> (cut paper) → <span class="gap" data-a="You cut paper with it." onclick="gaptap(this)">______</span></div></div>
+    <div class="prac-item"><div class="pi-n">6</div><div class="pi-s">🖍️ <b>crayons</b> (color pictures) → <span class="gap" data-a="You color pictures with them." onclick="gaptap(this)">______</span></div></div>
+    <div class="callout" style="margin-top:14px">✍️ Every clue starts with <b>You</b>. Item 6 needs <b>them</b> — crayons are plural!</div>
+  </div>
+</div>
+
+<!-- ============ 19 · APPLY — THE BOARD GAME ============ -->
+<div class="slide" data-notes="<b>Apply — Activity 2 (SB p.123).</b> Cut out the game board in the back of the book. Flip a coin: heads = 1 space, tails = 2 spaces. Land on an invention and ask about it. Model the dialogue first, then play. Use the three prompt questions on screen. Coins are in the Materials list.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Apply — Play the Game</span><span class="hd-chip src">📗 SB p.123 · Act 2</span></div>
+  <div class="body center" style="gap:22px">
+    <div class="dialogue">
+      <div class="bubble left">What's this?</div>
+      <div class="bubble right">It's an umbrella. ☂️</div>
+      <div class="bubble left">How do <b>you</b> use it?</div>
+      <div class="bubble right"><b>You</b> put it over your head when it's raining.</div>
+    </div>
+    <div class="two-panel" style="width:100%">
+      <div class="panel-card">
+        <div class="pc-h">🪙 How to play</div>
+        <div class="pc-ex">Heads = <b>1 space</b><br>Tails = <b>2 spaces</b></div>
+        <div class="pc-t">Cut out the board at the back of the book. Take turns.</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">❓ Ask these</div>
+        <div class="pc-ex">What do <b>you</b> do with it?<br>How do <b>you</b> use it?<br>Why do <b>you</b> need it?</div>
+        <div class="pc-t">Answer in <b>complete sentences</b>, always starting with <b>You</b>.</div>
+      </div>
+    </div>
+    <div class="done-flag show" id="ap-done" onclick="powerStation(4)">⚡ Played a full round — tap to power Station ⑤.</div>
+  </div>
+</div>
+
+<!-- ============ 20 · EXTEND ============ -->
+<div class="slide" data-notes="<b>Extend (LP p.245).</b> Write the four tasks on the board: clean your room, win a video game, take care of a pet, perform in a school concert. Leo writes four sentences about doing the task, using you. Model: &quot;You need to walk your dog twice a day. You should play with your dog every day.&quot; Then he reads them aloud.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Extend — How Do You Do It?</span><span class="hd-chip src">📖 LP p.245</span></div>
+  <div class="body center" style="gap:22px">
+    <div class="pattern-strip" style="font-size:36px">You <b style="color:var(--purple)">need to</b> ______ . &nbsp;|&nbsp; You <b style="color:var(--purple)">should</b> ______ .</div>
+    <div class="wl-row">
+      <div class="wl-chip">🧹 clean your room</div>
+      <div class="wl-chip">🎮 win a video game</div>
+      <div class="wl-chip">🐕 take care of a pet</div>
+      <div class="wl-chip">🎤 perform in a concert</div>
+    </div>
+    <div style="font-size:28px;font-weight:700;text-align:center;max-width:1300px">Pick one. Write <b>four sentences</b> about how you do it — every sentence starts with <b>You</b>.</div>
+    <div class="callout">🐕 Model: "<b>You need to</b> walk your dog twice a day. <b>You should</b> play with your dog every day."</div>
+  </div>
+</div>
+
+<!-- ============ 21 · SOCCER ROUND ============ -->
+<div class="slide" data-notes="<b>Soccer round ⚽.</b> Free extension — pure fun, all general you. Answer each one, then power Station ⑥.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Soccer Round ⚽</span><span class="hd-chip tr">⚡ Power Station ⑥</span></div>
+  <div class="body">
+    <div class="tf-row"><div class="tf-s">⚽ "How ______ you use a soccer goal?"</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">do</button><button class="opt sm" onclick="pick(this)">does</button></div></div>
+    <div class="tf-row"><div class="tf-s">🧤 "You ______ gloves to catch the ball in goal."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">wear</button><button class="opt sm" onclick="pick(this)">wears</button></div></div>
+    <div class="tf-row"><div class="tf-s">🏆 "What do you do with a trophy?"</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">You lift it over your head.</button><button class="opt sm" onclick="pick(this)">You cut paper with it.</button></div></div>
+    <div class="tf-row"><div class="tf-s">🙋 "Leo, are you coming to the match?" — this you is…</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">specific</button><button class="opt sm" onclick="pick(this)">general</button></div></div>
+    <div class="done-flag" id="sc-done" onclick="powerStation(5)">⚡ Station ⑥ ready — tap to power up.</div>
+  </div>
+</div>
+
+<!-- ============ 22 · WRAP UP ============ -->
+<div class="slide" data-notes="<b>Wrap Up (LP p.245).</b> Write TV, airplane, clock and guitar on the board. Ask Leo a question such as &quot;How do you use a bicycle?&quot; He answers (&quot;You sit on the seat and move your feet on the pedals&quot;), then he asks you about another invention. Keep going until all four are used.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — Ask Me Back 🔄</span><span class="hd-chip src">📖 LP p.245</span></div>
+  <div class="body center" style="gap:24px">
+    <div class="wl-row">
+      <div class="wl-chip">📺 TV</div>
+      <div class="wl-chip">✈️ airplane</div>
+      <div class="wl-chip">🕐 clock</div>
+      <div class="wl-chip">🎸 guitar</div>
+    </div>
+    <div style="font-size:32px;font-weight:800;text-align:center">Dad asks: <b>"How do you use a bicycle?"</b></div>
+    <div style="font-size:28px;text-align:center;color:var(--ink-2);max-width:1200px">Leo answers in a full sentence — "<b>You</b> sit on the seat and move your feet on the pedals." — then <b>Leo asks Dad</b> about another invention.</div>
+    <div class="callout">🔁 Keep swapping until all four inventions on screen have been used.</div>
+  </div>
+</div>
+
+<!-- ============ 23 · QUICK REVIEW QUIZ ============ -->
+<div class="slide" data-notes="<b>Quick review quiz.</b> Six questions. Anything Leo misses, reteach from the Rules Board (slide 17).">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Quick Review Quiz</span><span class="hd-chip">6 questions ⚡</span></div>
+  <div class="body">
+    <div class="quiz-meter-wrap"><div class="quiz-meter" id="quizMeter"></div></div>
+    <div style="text-align:center;font-size:26px;font-weight:800;margin-bottom:10px">Score: <span id="quizScore">0/6</span></div>
+    <div class="quiz-grid">
+      <div class="quiz-q" data-quiz="1"><div class="qq-t">1. The <b>general you</b> means…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">people in general</button><button class="opt sm" onclick="pick(this);quizScore()">one person</button></div></div>
+      <div class="quiz-q" data-quiz="2"><div class="qq-t">2. Which question is right?</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">How do you use it?</button><button class="opt sm" onclick="pick(this);quizScore()">How you use it?</button></div></div>
+      <div class="quiz-q" data-quiz="3"><div class="qq-t">3. "Leo, can you help me?" — this you is…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">specific</button><button class="opt sm" onclick="pick(this);quizScore()">general</button></div></div>
+      <div class="quiz-q" data-quiz="4"><div class="qq-t">4. 🔪 "You ___ meat with it."</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">cut</button><button class="opt sm" onclick="pick(this);quizScore()">cuts</button></div></div>
+      <div class="quiz-q" data-quiz="5"><div class="qq-t">5. 🖍️ "You color pictures with ___."</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">them</button><button class="opt sm" onclick="pick(this);quizScore()">it</button></div></div>
+      <div class="quiz-q" data-quiz="6"><div class="qq-t">6. The swap test: replace <b>you</b> with…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">people</button><button class="opt sm" onclick="pick(this);quizScore()">yesterday</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 24 · FORMATIVE ASSESSMENT ============ -->
+<div class="slide" data-notes="<b>Formative assessment (LP p.245).</b> Can Leo generalize with you? Ask questions about how objects are used — What do you do with a kite? What do you do with scissors? Then hold up photos of familiar inventions (a pencil sharpener, a stapler, a pen) and ask how and why you use them.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span><span class="hd-chip src">📖 LP p.245</span></div>
+  <div class="body">
+    <div class="tf-row"><div class="tf-s">Can Leo <b>generalize with you</b>? ("What do you do with a kite?")</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">Can Leo answer "What do you do with scissors?" in a full sentence?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">Can Leo <b>ask</b> how and why you use an invention?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">Can Leo tell the <b>general</b> you from the <b>specific</b> you?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">Does Leo keep the <b>do</b> in his questions?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+  </div>
+</div>
+
+<!-- ============ 25 · CELEBRATE + MARK DONE ============ -->
+<div class="slide" id="celebSlide" data-notes="<b>Celebrate.</b> All six stations lit. Ask Leo for one last general-you sentence about any invention in the room, then tap Mark Done. High five.">
+  <div class="body grad-lab center" style="gap:20px">
+    <div style="font-size:96px">🏆</div>
+    <div style="font-size:58px;font-weight:900;color:#fff;text-align:center">Guide Complete!</div>
+    <div class="station-board" data-stboard></div>
+    <div class="check-list">
+      <div class="ck">✅ The general <b>you</b> = people in general</div>
+      <div class="ck">✅ The swap test: you → people</div>
+      <div class="ck">✅ What do you do with it? · How do you use it?</div>
+      <div class="ck">✅ Six invention clues written</div>
+      <div class="ck">✅ You played the board game and asked back!</div>
+    </div>
+    <button class="btn yellow" id="done-btn" style="font-size:26px;padding:16px 46px">✓ Mark Done</button>
+  </div>
+</div>
+
+<!-- ============ BOTTOM BAR ============ -->
+<div id="bar">
+  <div id="pwrap"><div id="pfill"></div></div>
+  <button onclick="changeSlide(-1)">◀ Back</button>
+  <button onclick="changeSlide(1)">Next ▶</button>
+  <div id="minist"></div>
+  <button onclick="toggleNotes()">📝 Notes (N)</button>
+  <div id="counter">1 / 40</div>
+</div>
+<div id="notesPanel"></div>
+
+</div></div>
+
+
+<script>
+/* ================= CORE ================= */
+var slides=[], cur=0, TOTAL=0;
+var stations=[
+  {ico:'🧪',name:'① Word Lab',on:false},
+  {ico:'📦',name:'② Grammar Box',on:false},
+  {ico:'🌐',name:'③ General you',on:false},
+  {ico:'❓',name:'④ Questions',on:false},
+  {ico:'🎲',name:'⑤ Board Game',on:false},
+  {ico:'⚽',name:'⑥ Soccer',on:false}
+];
+
+function scale(){
+  try {
+    var s=Math.min(window.innerWidth/1920, window.innerHeight/1080);
+    var sc=document.getElementById('scaler');
+    sc.style.transform='scale('+s+')';
+    sc.style.left=((window.innerWidth-1920*s)/2)+'px';
+    sc.style.top=((window.innerHeight-1080*s)/2)+'px';
+  } catch(e){}
+}
+
+function renderStations(){
+  try {
+    document.querySelectorAll('[data-stboard]').forEach(function(b){
+      b.innerHTML=stations.map(function(st){
+        return '<div class="station'+(st.on?' on':'')+'"><div class="st-ico">'+st.ico+'</div><div class="st-name">'+st.name+'</div></div>';
+      }).join('');
+    });
+    var mini=document.getElementById('minist');
+    if(mini) mini.innerHTML=stations.map(function(st){return '<div class="mdot'+(st.on?' on':'')+'"></div>';}).join('');
+  } catch(e){}
+}
+
+function powerStation(i){
+  try {
+    if(stations[i].on) return;
+    stations[i].on=true;
+    renderStations();
+    var flags=document.querySelectorAll('.done-flag');
+    flags.forEach(function(f){
+      if(f.getAttribute('onclick')==='powerStation('+i+')'){
+        f.classList.add('lit');
+        f.textContent='⚡ Station powered up!';
+      }
+    });
+  } catch(e){}
+}
+
+function changeSlide(dir){ try{ goTo(cur+dir); }catch(e){} }
+function goTo(i){
+  try {
+    if(i<0||i>=TOTAL) return;
+    slides[cur].classList.remove('active');
+    cur=i;
+    slides[cur].classList.add('active');
+    var ctr=document.getElementById('counter');
+    if(ctr) ctr.textContent=(cur+1)+' / '+TOTAL;
+    var pf=document.getElementById('pfill');
+    if(pf) pf.style.width=((cur+1)/TOTAL*100)+'%';
+    var np=document.getElementById('notesPanel');
+    if(np && np.classList.contains('open')) np.innerHTML=slides[cur].dataset.notes||'<i>No notes for this slide.</i>';
+  } catch(e){}
+}
+function toggleNotes(){
+  try {
+    var np=document.getElementById('notesPanel');
+    np.classList.toggle('open');
+    if(np.classList.contains('open')) np.innerHTML=slides[cur].dataset.notes||'<i>No notes for this slide.</i>';
+  } catch(e){}
+}
+
+/* ================= PICK (MCQ) =================
+   Any .opt inside an .opt-row / .opt-col group. data-ok="1" is correct. */
+function pick(btn){
+  try {
+    var group=btn.closest('.opt-row')||btn.closest('.opt-col');
+    if(!group||group.dataset.solved) return;
+    if(btn.dataset.ok==='1'){
+      group.dataset.solved='1';
+      btn.classList.add('good');
+      group.querySelectorAll('.opt').forEach(function(o){o.disabled=true;});
+      var q=btn.closest('[data-quiz]');
+      if(q) q.dataset.solved='1';
+    } else {
+      btn.classList.add('bad');
+      setTimeout(function(){btn.classList.remove('bad');},400);
+    }
+  } catch(e){}
+}
+
+/* ================= FLIP CARD ================= */
+function flipCard(card,ev){
+  try {
+    if(ev && ev.target.closest('.opt')) return;
+    card.classList.toggle('flipped');
+  } catch(e){}
+}
+
+/* ================= MATCH =================
+   Left column tiles come first in .match-wrap; pairs share data-k. */
+var msel={};
+function mtap(btn,gameId,doneId){
+  try {
+    if(btn.classList.contains('lock')) return;
+    var wrap=btn.closest('.match-wrap');
+    var cols=wrap.querySelectorAll('.match-col');
+    var isLeft=(btn.closest('.match-col')===cols[0]);
+    var st=msel[gameId]||(msel[gameId]={left:null,done:0});
+    if(isLeft){
+      cols[0].querySelectorAll('.mtile').forEach(function(x){ if(!x.classList.contains('lock')) x.classList.remove('sel'); });
+      btn.classList.add('sel'); st.left=btn;
+    } else {
+      if(!st.left){ btn.classList.add('err'); setTimeout(function(){btn.classList.remove('err');},380); return; }
+      if(st.left.dataset.k===btn.dataset.k){
+        st.left.classList.remove('sel'); st.left.classList.add('lock'); btn.classList.add('lock');
+        st.left=null; st.done++;
+        if(st.done>=cols[0].querySelectorAll('.mtile').length){
+          var d=document.getElementById(doneId);
+          if(d) d.classList.add('show');
+        }
+      } else {
+        btn.classList.add('err');
+        setTimeout(function(){btn.classList.remove('err');},380);
+      }
+    }
+  } catch(e){}
+}
+
+/* ================= CHIP BUILDERS =================
+   Chips carry data-b (line id) and data-idx (position). Tap in order. */
+var builds={};
+function chiptap(chip){
+  try {
+    var b=chip.dataset.b;
+    var line=document.querySelector('[data-build="'+b+'"]');
+    if(!line||line.classList.contains('done')) return;
+    var st=builds[b]||(builds[b]={next:0});
+    var idx=parseInt(chip.dataset.idx,10);
+    if(idx===st.next){
+      chip.classList.add('used');
+      var span=document.createElement('span');
+      span.className='bpart';
+      span.innerHTML=chip.innerHTML;
+      line.appendChild(span);
+      st.next++;
+      var need=parseInt(line.dataset.need,10);
+      if(st.next>=need){
+        line.classList.add('done');
+        var flag=line.parentElement.querySelector('.done-flag');
+        if(flag) flag.classList.add('show');
+      }
+    } else {
+      chip.classList.add('err');
+      setTimeout(function(){chip.classList.remove('err');},380);
+    }
+  } catch(e){}
+}
+
+/* ================= GAP FILL =================
+   Tap a .gap to reveal its data-a answer. */
+function gaptap(g){
+  try {
+    if(g.classList.contains('filled')) return;
+    g.textContent=g.dataset.a;
+    g.classList.add('filled');
+  } catch(e){}
+}
+
+/* ================= QUIZ SCORE ================= */
+function quizScore(){
+  try {
+    var groups=document.querySelectorAll('[data-quiz]');
+    var s=0;
+    groups.forEach(function(g){ if(g.dataset.solved) s++; });
+    var qm=document.getElementById('quizMeter');
+    if(qm) qm.style.width=(s/6*100)+'%';
+    var qs=document.getElementById('quizScore');
+    if(qs) qs.textContent=s+'/6';
+  } catch(e){}
+}
+
+/* ================= CELEBRATION CONFETTI ================= */
+function confetti(){
+  try {
+    var host=document.getElementById('celebSlide');
+    if(!host||host.dataset.conf) return;
+    host.dataset.conf='1';
+    var moji=['⚡','🎉','💡','🕰️','⭐','🏆'];
+    for(var i=0;i<18;i++){
+      var s=document.createElement('div');
+      s.className='confetti';
+      s.textContent=moji[i%moji.length];
+      s.style.left=(Math.random()*100)+'%';
+      s.style.animationDelay=(Math.random()*2)+'s';
+      host.appendChild(s);
+    }
+  } catch(e){}
+}
+
+/* init + Mark Done (matches LessonProgressRecord shape read by the dashboard) */
+document.addEventListener('DOMContentLoaded',function(){
+  try {
+    slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    TOTAL=slides.length;
+    slides[0].classList.add('active');
+    var ctr=document.getElementById('counter');
+    if(ctr) ctr.textContent='1 / '+TOTAL;
+    var pf=document.getElementById('pfill');
+    if(pf) pf.style.width=(1/TOTAL*100)+'%';
+    renderStations();
+    scale();
+    var celebIdx=slides.length-1;
+    setInterval(function(){ if(cur===celebIdx){confetti();} },800);
+  } catch(e){}
+
+  try {
+    var doneBtn=document.getElementById('done-btn');
+    if(doneBtn){
+      doneBtn.addEventListener('click', function () {
+        try {
+          var key = 'leea.lessonProgress.v1';
+          var raw = localStorage.getItem(key);
+          var progress = raw ? JSON.parse(raw) : {};
+          var now = new Date().toISOString();
+          progress['ow-l4-u7-grammar-2'] = {
+            lessonId: 'ow-l4-u7-grammar-2',
+            teacherId: 'neritan',
+            studentId: 'leo',
+            status: 'done',
+            completedAt: now,
+            updatedAt: now
+          };
+          localStorage.setItem(key, JSON.stringify(progress));
+          doneBtn.textContent = '✓ Marked Done';
+          doneBtn.disabled = true;
+        } catch (e) {}
+      });
+    }
+  } catch(e){}
+});
+window.addEventListener('resize',scale);
+document.addEventListener('keydown',function(e){
+  try {
+    if(e.key==='ArrowRight'){changeSlide(1);}
+    else if(e.key==='ArrowLeft'){changeSlide(-1);}
+    else if(e.key==='n'||e.key==='N'){toggleNotes();}
+  } catch(err){}
+});
+</script>
+</body>
+</html>

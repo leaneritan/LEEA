@@ -164,6 +164,12 @@ Leo's page must feel like Leo's, not a smaller copy of the teacher dashboard. Th
 
 Use `getComponentMeta(component)` from `src/components/componentMeta.ts` as the single source of truth for emoji/label/tone. The Leo hero, Home's `NextCard`, and any future surface that names a lesson must read from it — do not duplicate the emoji/label/tone map. Home's `.next-card` carries the same per-component tone as the Leo hero through `--next-accent` and `--next-accent-deep` so the path from Home → Leo's view stays visually unbroken.
 
+**Home shows one thing per subject.** `src/components/AcrossSubjects.tsx` renders the "Across subjects" row: the most useful next step in English, Math and Geography, each linking straight to it. Every subject already tracked what Leo was struggling with and kept it behind its own front door, so answering "what should I do now?" meant opening three of them.
+
+The ranking within each subject is the same idea everywhere: **something he got wrong beats something unfinished, which beats something untouched.** English leads on weak words from `getWeakWordIds`, Math on a 節 already started over one never opened, Geography on a map with 苦手 items over one merely unfinished. When a subject has nothing outstanding the row says so and is styled as a win (`.is-clear`), never as another task.
+
+Math's share needs the section JSON, which is server-only, so `loadMathPracticeCounts()` passes down how many tickable problems each section holds and the client counts done records by their `<sectionId>::<blockId>` keys. Add a subject here whenever one starts tracking weak spots.
+
 **Every standalone math lesson needs a way back.** The lessons under `public/math-lessons/` open in a new tab from a section page or the curriculum home, and for a long time not one of them linked back into LEEA — thirteen files, zero exits, so the only way out was the browser's own controls. `public/components/math-lesson-home.js` is the shared fix: it self-installs a fixed `← 3章1節へ` button and needs one `<script src="/components/math-lesson-home.js" defer></script>` in the lesson's `<head>` and no call. Add that line to every new lesson.
 
 Where it points is read from the lesson's own filename, so name new lessons `<topic>-ch<N>-sec<M>-p<pages>.html` and the button routes back to that section for free; a name without `-chN-secM` falls back to `/math`. It hides itself inside an iframe, because the app's own viewer already has a back link in its topbar and a second one pointing out of the frame would be worse than none.

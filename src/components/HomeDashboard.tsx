@@ -11,8 +11,9 @@ import { geographyMaps, isGeographyMapReady } from "../../content/subjects/geogr
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
 import { useKnownWordIds } from "./useKnownWordIds";
+import { AcrossSubjects } from "./AcrossSubjects";
 
-export function HomeDashboard() {
+export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?: Record<string, number> }) {
   const [progress, setProgress] = useState<LessonProgressMap>({});
   const [assignments, setAssignments] = useState<AssignmentMap>({});
   const [progressVersion, setProgressVersion] = useState(0);
@@ -60,6 +61,8 @@ export function HomeDashboard() {
         </div>
         <NextCard nextItem={nextItem} progress={progress} />
       </section>
+
+      <AcrossSubjects mathPracticeCounts={mathPracticeCounts} />
 
       <section className="design-home-role-links">
         <Link href="/leo"><span className="role-link-icon">♙</span><div><small>Learner</small><h2>Leo&apos;s homework</h2><p>{openAssignmentCount} waiting · practice &amp; review</p></div><b>→</b></Link>

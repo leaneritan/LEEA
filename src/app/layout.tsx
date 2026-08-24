@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Albert_Sans, Anton, Bricolage_Grotesque, Noto_Sans_JP, Zen_Maru_Gothic } from "next/font/google";
+import { NewVersionPrompt } from "@/components/NewVersionPrompt";
 import "./globals.css";
 
 const albertSans = Albert_Sans({
@@ -42,7 +43,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${albertSans.variable} ${bricolageGrotesque.variable} ${notoSansJp.variable} ${anton.variable} ${zenMaruGothic.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <NewVersionPrompt />
+      </body>
     </html>
   );
 }

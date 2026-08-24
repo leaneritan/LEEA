@@ -145,30 +145,34 @@ Reference: `public/learn/ow-l4-u8-song.html`
 
 Note the non-numeric `ma` module and the non-default `scoreKey: m6-score`. Set `moduleKeys` explicitly in the lesson JSON for this component.
 
-### grammar-1 (TO LOCK — build first, then update this section)
+### grammar-1 (LOCKED)
 
-Target shape (informed by the Unit 7 Grammar 2 sample upload and grammar reference):
+Reference: `public/learn/ow-l4-u9-grammar-1.html`, `public/learn/ow-l4-u8-grammar-1.html`, `public/learn/ow-l4-u7-grammar-1.html`.
 
-- Related Vocabulary (flashcards + quick check)
-- Academic Language
-- Content Vocabulary
-- Warm Up
-- Present (grammar box — reads from `grammar.json` chart)
-- Grammar in Depth (rules + pattern from `tab2_levelup`)
-- Practice 1
-- Practice 2
-- Recap
-- Apply
-- Extend
-- Wrap Up
-- Formative Assessment
-- Themed final game (varies per unit theme)
+12 tabs, numeric IDs, `moduleKeyFormat: tab-{i}-done`, `scoreKey: score` (Tab 10):
 
-Module count and exact module IDs to be locked when the first grammar-1 Leo app is built. Update this section then.
+| # | Tab | What Leo does |
+|---|---|---|
+| 0 | 🧪 Word Lab | Flashcards for the lesson's words — Practice + Quiz dual mode |
+| 1 | 🔥 Warm Up | 8 quick MCQ items on the target pattern |
+| 2 | 📐 The Rule | 6 checks on the form itself (affirmative / negative / question) |
+| 3 | 🕵️ Detective | 6 broken sentences — pick the fixed version |
+| 4 | 🔧 Build It | 6 chip-order sentence builds |
+| 5 | 🗂️ Sort | `pickChart('classification sort')` — correct vs broken, 12 chips |
+| 6 | ✏️ Practice | 8 MCQ items, several taken verbatim from the Student Book activity |
+| 7 | 📋 Survey | 6 open sentence stems Leo completes about himself |
+| 8 | 🕸️ Word Web | `pickChart('word web')` — Leo types his own examples |
+| 9 | 🎯 Guess End | 3 themed rounds (unit topic · soccer · movies), clue → pick the ending |
+| 10 | 📝 Quiz | Scored 10-item MCQ — writes `score` |
+| 11 | ⚽ Dribble! | Soccer MCQ with a goal counter |
+
+Tab 0 is the only flashcard tab and follows the PR #77 dual-mode rule. Tab 10 is the only tab that writes `score`.
+
+The teacher deck is hand-authored per unit around a unit-themed frame (Unit 9 "Force Lab", Unit 7 "Time Machine"): title → goal → warm up → recycle the song → word lab (one slide per word + a match check) → the grammar box (the one allowed reveal, marked with its TR code) → one slide per form pattern → grammar in depth → detective → rules board → the Student Book practice activities → apply/extend → Be the Expert → quiz → formative assessment → celebrate + Mark Done. A station board tracks progress across the deck.
 
 ### grammar-2 (TO LOCK)
 
-Same shape as grammar-1. Different chart data and different theme. To be locked after grammar-1 is locked.
+Same shape as grammar-1. Different chart data and different theme. To be locked after the first grammar-2 Leo app is built.
 
 ### reading (LOCKED — Unit 8 Reading)
 

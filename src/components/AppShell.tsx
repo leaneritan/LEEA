@@ -192,13 +192,20 @@ export function AppShell({
             <CloudSyncBadge />
             {active === "assignments" ? <span className="leo-top-greeting">Hi, Leo!</span> : (
               <>
-                <Link className="top-search" href="/reference/search"><Search size={16} />Search words &amp; grammar</Link>
+                {/* The labels are spans so a phone can drop them: the search box
+                    alone is 230px wide, which is most of a 390px viewport. */}
+                <Link className="top-search" href="/reference/search" title="Search words & grammar">
+                  <Search size={16} />
+                  <span className="top-search-label">Search words &amp; grammar</span>
+                </Link>
                 <button
                   className={japaneseOn ? "jp-toggle active" : "jp-toggle"}
                   onClick={() => setJapaneseOn((current) => !current)}
+                  title={`Japanese ${japaneseOn ? "ON" : "OFF"}`}
                   type="button"
                 >
-                  Japanese {japaneseOn ? "ON" : "OFF"}
+                  <span className="jp-toggle-long">Japanese {japaneseOn ? "ON" : "OFF"}</span>
+                  <span className="jp-toggle-short">JP {japaneseOn ? "ON" : "OFF"}</span>
                 </button>
               </>
             )}

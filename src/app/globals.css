@@ -645,6 +645,7 @@ mark {
   border-radius: 999px; padding: 8px 14px; font-size: 12px; font-weight: 800;
   cursor: pointer; display: flex; align-items: center; gap: 7px;
 }
+.jp-toggle-short { display: none; }
 .jp-toggle.active { color: var(--accent-ink); }
 .jp-toggle.active::before {
   content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
@@ -682,6 +683,29 @@ mark {
     color: var(--body-2); text-decoration: none; font-size: 10px; font-weight: 700;
   }
   .mobile-nav a.active { color: var(--accent-ink); }
+
+  /* The topbar was built for a desktop and never given a phone size, so every
+     page in the shell overflowed to 506px against a 390px viewport — the search
+     box alone reserves 230px of it. The controls keep working; only their
+     labels go. */
+  .topbar { height: auto; min-height: 56px; padding: 8px 14px; gap: 10px; }
+  /* Two crumbs squeezed into the space left over read "R... > B...", which
+     tells nobody anything. Show the page you are on and drop the trail. */
+  .crumbs { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; }
+  .crumbs > span:not(:last-child) { display: none; }
+  .crumbs > span { min-width: 0; }
+  .crumb-button { overflow: hidden; text-overflow: ellipsis; font-size: 15px; font-weight: 700; }
+  .top-actions { flex: none; gap: 8px; }
+  .top-search { min-width: 0; padding: 9px; border-radius: 50%; }
+  .top-search-label { display: none; }
+  .jp-toggle { padding: 8px 11px; gap: 5px; font-size: 11.5px; }
+  .jp-toggle-long { display: none; }
+  .jp-toggle-short { display: inline; }
+  .profile-avatar { width: 32px; height: 32px; font-size: 13px; }
+  /* A failing source can name several tables; let it wrap rather than push. */
+  .cloud-sync-badge { min-width: 0; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .leo-top-greeting { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .content { padding-left: 14px; padding-right: 14px; }
 }
 
 .home-pill,
@@ -8304,4 +8328,82 @@ a.math-block-page:hover { text-decoration: underline; }
 
 @media (max-width: 620px) {
   .vp-options { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   Phone layout for the app shell pages
+   ------------------------------------------------------------
+   These live at the end of the file on purpose. The older mobile
+   blocks near the top (max-width 900px / 600px) are overridden by
+   the component styles further down — same specificity, later wins
+   — which is why /leo kept its two-column hero at 390px however
+   many times the rule was written up there.
+
+   Standalone lesson HTML under public/ is out of scope; this is the
+   shell: Home, Leo, Neritan, Reference, Practice and the subject
+   pages.
+   ============================================================ */
+
+/* A page-level grid sizes its column to the widest child unless told
+   otherwise, and grid items default to min-width:auto — so one item
+   that will not shrink drags the whole page wider than the viewport.
+   That is what pushed every Teacher page out to 418px. */
+.teacher-page,
+.leo-page,
+.stack { grid-template-columns: minmax(0, 1fr); }
+
+/* The sidebar stays on screen down to 760px, so between there and about 900px
+   a tablet still carries 252px of chrome plus a content area laid out for a
+   desktop — which is why the home page overflowed to 836px at 768px wide.
+   Layout collapses therefore start at 900px, not at the phone breakpoint. */
+@media (max-width: 900px) {
+  /* Leo's hero: one column, and the headline stops being a billboard. */
+  .leo-design-hero { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 22px; }
+  .leo-pick-card { padding: 18px; }
+  .leo-pick-title { flex-wrap: wrap; }
+  .leo-homework-row,
+  .leo-world-grid,
+  .leo-mini-stats { grid-template-columns: minmax(0, 1fr); }
+
+  /* Teacher. */
+  .teacher-hero p { max-width: none; }
+  .teacher-design-next,
+  .teacher-design-stats,
+  .teacher-table-head,
+  .teacher-table-row { grid-template-columns: minmax(0, 1fr); }
+  .teacher-unit-chip { min-width: 0; flex: 1 1 140px; }
+  .teacher-unit-chips,
+  .teacher-navigator-levels { gap: 8px; }
+
+  /* Home. */
+  .design-home-hero { grid-template-columns: minmax(0, 1fr); }
+  .design-home-role-links { grid-template-columns: minmax(0, 1fr); }
+  .design-home-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .design-subject-grid { grid-template-columns: minmax(0, 1fr); }
+  .across-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 760px) {
+  .leo-design-copy h1 { font-size: 31px; }
+  .teacher-design-hero h1 { font-size: 29px; }
+  .design-home-copy h1 { font-size: 34px; }
+  .design-subjects > header h2,
+  .across-subjects > header h2 { font-size: 24px; }
+
+  /* Long words in a heading have nowhere to break on a narrow screen. */
+  .content h1,
+  .content h2 { overflow-wrap: anywhere; }
+}
+
+/* Small phones. A 320px viewport leaves about 292px of content once the shell
+   has its padding, which is narrower than a couple of rows were built to go. */
+@media (max-width: 400px) {
+  /* The course pill carries a title and a long "6 levels · 24 of 53 units
+     imported" caption on one unbreakable line. */
+  .refv2-course-pill { flex-wrap: wrap; min-width: 0; }
+  .refv2-course-pill-meta { flex: 1 1 100%; min-width: 0; }
+  /* The pronunciation row put the play button, the IPA and its US marker on a
+     single line; the marker was the piece that fell off the edge. */
+  .rcardv2-hero-pron { flex-wrap: wrap; min-width: 0; }
+  .rcardv2-ipa { min-width: 0; overflow-wrap: anywhere; }
 }

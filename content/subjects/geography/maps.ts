@@ -92,8 +92,11 @@ export const geographyMaps: GeographyMap[] = [
     jpTitle: "気候帯マップ — 世界の気候と暮らし",
     jpShortTitle: "気候帯マップ",
     meta: "5 climate zones",
+    sourceLabel: "Köppen-Geiger（ウィーン大学）",
     summary: "Shade the world by climate zone, from 熱帯 to 寒帯, and see how the bands follow latitude — and where they don't.",
-    buildStatus: "planned"
+    buildStatus: "live",
+    quizTotal: 8,
+    embedPath: "/geography/kikoutai-map.html"
   },
   {
     id: "kodai-bunmei-map",

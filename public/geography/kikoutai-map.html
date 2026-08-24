@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>気候帯マップ｜地理 探検</title>
+<style>
+  :root{
+    --night:#0B1420; --panel:#122132; --panel2:#0F1B29; --sea:#16293C;
+    --ink:#F4EDE0; --muted:#8FA2B4; --line:#25384C;
+    --ochre:#EFB13C; --jade:#48C3A9; --plum:#D07CC8; --vermilion:#FF6B57; --sky:#6FB3E0;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Noto Serif JP",serif;
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",sans-serif;
+    --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 20% -10%, #16273A 0%, transparent 60%),var(--night);
+    color:var(--ink);font-family:var(--gothic);-webkit-font-smoothing:antialiased;padding:10px 12px 12px;
+  }
+  .shell{max-width:1480px;margin:0 auto}
+
+  header{display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px}
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+  h1{font-family:var(--mincho);font-weight:600;font-size:clamp(16px,2.1vw,21px);margin:0;letter-spacing:.04em;flex:none}
+  h1 .sub{color:var(--sky)}
+  .lede{color:var(--muted);font-size:12px;line-height:1.5;margin:0;flex:1 1 280px;min-width:0}
+
+  .bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 8px}
+  .chip{
+    font-family:var(--gothic);font-size:11px;color:var(--ink);background:var(--panel);
+    border:1px solid var(--line);border-radius:999px;padding:5px 10px;cursor:pointer;
+    transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+  }
+  .chip:hover{border-color:#3D5771}
+  .chip .dot{width:9px;height:9px;border-radius:50%;background:currentColor}
+  .chip[data-on="true"]{background:#1B2E43;border-color:#3F6182}
+  .chip[data-on="false"]{opacity:.42}
+  .chip.c1{color:var(--sky)} .chip.c2{color:var(--vermilion)} .chip.c3{color:var(--plum)} .chip.c4{color:var(--ochre)}
+  .spacer{flex:1}
+  .btn{
+    font-family:var(--gothic);font-size:12px;font-weight:700;letter-spacing:.04em;
+    background:var(--sky);color:#052034;border:none;border-radius:999px;padding:7px 16px;cursor:pointer;transition:.15s;white-space:nowrap;
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+
+  .clockbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--panel2);
+    border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:0 0 8px}
+  .clockbar label{font-size:11px;color:var(--muted);white-space:nowrap}
+  .clockbar .jptime{font-family:var(--mincho);font-size:20px;color:var(--ochre);min-width:112px}
+  .clockbar input[type=range]{flex:1;min-width:160px;accent-color:var(--ochre)}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 296px;gap:12px}
+  .mapcard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  svg.map{display:block;width:100%;height:auto;background:var(--sea);min-width:640px}
+  .grat{stroke:#20374C;stroke-width:.6;fill:none}
+  .land{fill:#C7B48F;stroke:#7E7156;stroke-width:.7;stroke-linejoin:round}
+
+  .zoneband{fill:#6FB3E0;opacity:.07}
+  .zoneband.alt{opacity:.14}
+  .zoneline{stroke:#2E4A63;stroke-width:.5;fill:none}
+  .zonelabel{font-family:var(--mono);font-size:8px;fill:#7E93A6}
+  .special{stroke-width:1.2;fill:none}
+  .meridian{stroke:var(--plum);stroke-dasharray:7 5}
+  .dateline{stroke:var(--vermilion);stroke-dasharray:4 4}
+  .jstline{stroke:var(--ochre)}
+  .linelabel{font-family:var(--gothic);font-size:9px;fill:var(--muted)}
+
+  .city{cursor:pointer}
+  .city circle{transition:.15s}
+  .citylabel{font-family:var(--gothic);font-size:10px;font-weight:700;fill:#EFE4CB;
+    paint-order:stroke;stroke:#0B1420;stroke-width:3;stroke-linejoin:round;pointer-events:none}
+  .citytime{font-family:var(--mono);font-size:9px;fill:#9FE0C8;
+    paint-order:stroke;stroke:#0B1420;stroke-width:3;stroke-linejoin:round;pointer-events:none}
+  .city[data-sel="true"] .ring{stroke-width:2.6}
+  .city[data-hit="true"] .ring{stroke:#48C3A9;stroke-width:2.6}
+
+  .swipe{font-size:11px;color:var(--muted);text-align:center;padding:6px 0 10px;border-top:1px solid var(--line)}
+
+  aside{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+  aside .empty{color:var(--muted);font-size:13px;line-height:1.9;text-align:center;padding:70px 10px}
+  aside .empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:8px}
+  .cat{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px;color:var(--sky)}
+  aside h2{font-family:var(--mincho);font-size:24px;margin:0 0 2px;letter-spacing:.03em}
+  .enname{color:var(--muted);font-size:12px;margin-bottom:12px;font-family:var(--mono)}
+  .bigtime{font-family:var(--mincho);font-size:34px;color:var(--jade);margin:6px 0 2px}
+  .daynote{font-size:12px;color:var(--ochre);margin-bottom:12px}
+  .facts{display:grid;border-top:1px solid var(--line);margin-bottom:12px}
+  .fact{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .fact span{color:var(--muted)}
+  .fact b{text-align:right}
+  .how{font-size:12px;line-height:1.9;color:var(--muted);background:#0C1826;border:1px solid var(--line);border-radius:8px;padding:10px}
+  .how code{font-family:var(--mono);color:var(--ink)}
+
+  .qmeta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:12px}
+  .qtext{font-size:15px;line-height:1.8;margin-bottom:6px}
+  .qbig{font-family:var(--mincho);font-size:26px;margin:6px 0 10px;color:var(--ochre)}
+  .qhint{color:var(--muted);font-size:12px}
+  .feedback{margin-top:14px;font-size:13px;line-height:1.8;padding:12px;border-radius:8px}
+  .feedback.ok{background:#102E28;color:#8FE3CE;border:1px solid #1E5C4E}
+  .feedback.ng{background:#31191C;color:#F0A6A6;border:1px solid #6B2B31}
+  .score{font-family:var(--mincho);font-size:34px;text-align:center;margin:18px 0 6px}
+
+  .weakbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;
+    background:#31191C;border:1px solid #6B2B31;border-radius:10px;padding:6px 10px}
+  .weakbar b{color:#F0A6A6;font-size:11px;letter-spacing:.06em}
+  .weakbar span{font-family:var(--gothic);font-size:11px;color:#F4EDE0;
+    background:#0C1826;border:1px solid var(--line);border-radius:5px;padding:3px 7px}
+  .weakbar.empty{display:none}
+
+  .worldmap-zoom{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:4px;z-index:5}
+  .worldmap-zoom button{
+    width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--gothic);font-size:15px;line-height:1;
+    background:#122132ee;color:var(--ink);border:1px solid var(--line);border-radius:8px;
+    cursor:pointer;transition:.15s;padding:0;
+  }
+  .worldmap-zoom button:hover:not(:disabled){border-color:#3F6182;background:#1B2E43}
+  .worldmap-zoom button:disabled{opacity:.35;cursor:default}
+  .grid.panel-hidden{grid-template-columns:minmax(0,1fr)}
+  .grid.panel-hidden aside{display:none}
+
+  html,body{height:100%}
+  body{display:flex;flex-direction:column;overflow:hidden}
+  .shell{flex:1;display:flex;flex-direction:column;min-height:0;width:100%}
+  .grid{flex:1;min-height:0;align-items:stretch}
+  .mapcard{display:flex;flex-direction:column;min-height:0}
+  .scroller{flex:1;min-height:0;display:flex}
+  svg.map{height:100%;flex:1}
+  aside{overflow-y:auto;min-height:0}
+
+  @media (max-width:1080px){
+    html,body{height:auto}
+    body{display:block;overflow:auto}
+    .shell{display:block}
+    .grid{display:block;grid-template-columns:1fr}
+    .mapcard{display:block;margin-bottom:16px}
+    .scroller{display:block}
+    svg.map{height:auto}
+    aside{overflow:visible}
+  }
+</style>
+<style>
+  /* 気候帯マップ only. The five bands need their own chip colours, and the
+     legend doubles as the filter, so it carries a swatch rather than a dot. */
+  .chip.z-tropical{color:#E8776F} .chip.z-arid{color:#E7B45B}
+  .chip.z-temperate{color:#7BC076} .chip.z-continental{color:#6E9FD8}
+  .chip.z-polar{color:#B4B4CC}
+  .chip .sw{width:11px;height:11px;border-radius:3px;background:currentColor;flex:none}
+
+  .climate-layer rect{shape-rendering:crispEdges}
+  .climate-layer{opacity:.86}
+  .cityDot{cursor:pointer}
+  .cityDot circle{stroke:#0B1420;stroke-width:1.4}
+  .cityHit{fill:transparent;cursor:pointer}
+  .cityLabel{font-size:9.5px;fill:#F4EDE0;paint-order:stroke;stroke:#0B1420;stroke-width:2.6px;
+             stroke-linejoin:round;pointer-events:none;font-family:var(--gothic)}
+
+  .zoneRow{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--line)}
+  .zoneRow:last-child{border-bottom:0}
+  .zoneRow .sw{width:13px;height:13px;border-radius:4px;flex:none}
+  .zoneRow b{font-size:12.5px;font-weight:600}
+  .zoneRow small{margin-left:auto;color:var(--muted);font-family:var(--mono);font-size:10.5px}
+
+  .kop{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+       border:1px solid var(--line);border-radius:5px;padding:1px 7px;color:var(--muted);margin-left:6px}
+  .latnote{margin-top:10px;padding:9px 11px;border-radius:9px;background:#12222F;
+           border:1px solid var(--line);color:var(--muted);font-size:11.5px;line-height:1.6}
+</style>
+<script src="/components/world-map.js"></script>
+<script src="/components/world-climate.js"></script>
+<script src="/components/geo-progress.js"></script>
+</head>
+<body>
+<div class="shell">
+
+<header>
+  <div class="eyebrow">地理 ／ 気候</div>
+  <h1>気候帯マップ <span class="sub">— 世界の気候と暮らし</span></h1>
+  <p class="lede">世界を5つの気候帯で色分けした地図です。帯をクリックするとその気候だけが残ります。地図や都市をクリックすると、そこがどの気候帯で、くわしくは何気候なのかが分かります。</p>
+</header>
+
+<div class="bar" id="filters"></div>
+
+<div class="weakbar empty" id="weakbar"></div>
+
+<div class="grid">
+  <div class="mapcard">
+    <div class="scroller">
+      <svg class="map" preserveAspectRatio="xMidYMid meet" role="img" aria-label="世界の気候帯の地図"></svg>
+    </div>
+    <div class="swipe">ホイールかピンチで拡大・縮小、ドラッグで移動。右下の ⤾ で全体表示にもどります。</div>
+  </div>
+
+  <aside id="panel">
+    <div class="empty"><b>地図をクリック</b>その場所の気候帯と、くわしい気候の名前が出ます。</div>
+  </aside>
+</div>
+</div>
+
+<script>
+/* ------------------------------------------------------------------
+   気候帯マップ
+
+   Every climate on this page comes from the Köppen-Geiger dataset baked
+   into /components/world-climate.js — nothing here asserts a climate of
+   its own. The cities carry only a name and a coordinate; what climate
+   each one has is looked up, so the map cannot disagree with its source.
+   ------------------------------------------------------------------ */
+const GEO = leeaGeoProgress({ mapId: "kikoutai-map", exploredTotal: 22 });
+
+const BASE = buildWorldMap({
+  svg: document.querySelector("svg.map"),
+  // The baked coastline runs -85.61 to 83.65; the Köppen grid goes further south
+  // than that, so anything below the coastline would draw as a grey bar with no
+  // land under it. Match the window to the land.
+  lon: [-180, 180], lat: [-85.6, 83.7], scale: 2.7,
+  graticule: null
+});
+
+/* Name and position only. The climate is read from the data at runtime. */
+const CITIES = [
+  { id: "singapore", jp: "シンガポール", lat: 1.35, lon: 103.82 },
+  { id: "bangkok", jp: "バンコク", lat: 13.75, lon: 100.52 },
+  { id: "manaus", jp: "マナオス", lat: -3.12, lon: -60.02 },
+  { id: "nairobi", jp: "ナイロビ", lat: -1.29, lon: 36.82 },
+  { id: "cairo", jp: "カイロ", lat: 30.04, lon: 31.24 },
+  { id: "riyadh", jp: "リヤド", lat: 24.71, lon: 46.68 },
+  { id: "alice", jp: "アリススプリングス", lat: -23.70, lon: 133.88 },
+  { id: "ulaanbaatar", jp: "ウランバートル", lat: 47.89, lon: 106.91 },
+  { id: "tokyo", jp: "東京", lat: 35.68, lon: 139.69 },
+  { id: "rome", jp: "ローマ", lat: 41.90, lon: 12.50 },
+  { id: "london", jp: "ロンドン", lat: 51.51, lon: -0.13 },
+  { id: "buenosaires", jp: "ブエノスアイレス", lat: -34.60, lon: -58.38 },
+  { id: "perth", jp: "パース", lat: -31.95, lon: 115.86 },
+  { id: "shanghai", jp: "上海", lat: 31.23, lon: 121.47 },
+  { id: "moscow", jp: "モスクワ", lat: 55.75, lon: 37.62 },
+  { id: "yakutsk", jp: "ヤクーツク", lat: 62.03, lon: 129.68 },
+  { id: "winnipeg", jp: "ウィニペグ", lat: 49.90, lon: -97.14 },
+  { id: "helsinki", jp: "ヘルシンキ", lat: 60.17, lon: 24.94 },
+  { id: "reykjavik", jp: "レイキャビク", lat: 64.15, lon: -21.94 },
+  { id: "utqiagvik", jp: "バロー", lat: 71.29, lon: -156.79 },
+  { id: "nuuk", jp: "ヌーク", lat: 64.18, lon: -51.69 },
+  { id: "syowa", jp: "昭和基地", lat: -69.00, lon: 39.58 }
+];
+
+CITIES.forEach(function (city) {
+  var found = climateAt(city.lon, city.lat);
+  if (!found) throw new Error("no climate data at " + city.jp);
+  city.code = found.code;
+  city.climate = found.jp;
+  city.zone = found.zone;
+});
+
+const NS = "http://www.w3.org/2000/svg";
+const panel = document.getElementById("panel");
+const weakbar = document.getElementById("weakbar");
+let activeZone = null, quiz = null, selected = null;
+
+/* ---------- climate layer ---------- */
+const LAYER = buildClimateLayer(BASE, {
+  onPick: function (hit) {
+    if (quiz) return;
+    showClimate(hit, null);
+  }
+});
+
+/* ---------- legend, which is also the filter ---------- */
+const filters = document.getElementById("filters");
+CLIMATE_ZONES.forEach(function (zone) {
+  var chip = document.createElement("button");
+  chip.className = "chip z-" + zone.id;
+  chip.dataset.zone = zone.id;
+  chip.dataset.on = "true";
+  chip.innerHTML = '<span class="sw"></span>' + zone.jp;
+  chip.addEventListener("click", function () {
+    activeZone = activeZone === zone.id ? null : zone.id;
+    LAYER.highlightZone(activeZone);
+    [].forEach.call(filters.querySelectorAll(".chip[data-zone]"), function (el) {
+      el.dataset.on = !activeZone || el.dataset.zone === activeZone ? "true" : "false";
+    });
+    renderCities();
+  });
+  filters.appendChild(chip);
+});
+const spacer = document.createElement("span");
+spacer.className = "spacer";
+filters.appendChild(spacer);
+const quizBtn = document.createElement("button");
+quizBtn.className = "btn";
+quizBtn.id = "quizBtn";
+quizBtn.textContent = "クイズに挑戦";
+filters.appendChild(quizBtn);
+
+/* ---------- cities ---------- */
+const cityGroup = document.createElementNS(NS, "g");
+// base.el is an element factory, not a container; maps append to the svg,
+// which already has the base group painted behind them.
+BASE.svg.appendChild(cityGroup);
+
+function renderCities() {
+  cityGroup.textContent = "";
+  CITIES.forEach(function (city) {
+    var dim = activeZone && city.zone.id !== activeZone;
+    var xy = BASE.px(city.lon, city.lat);
+    var g = document.createElementNS(NS, "g");
+    g.setAttribute("class", "cityDot");
+    g.style.opacity = dim ? "0.2" : "1";
+
+    // An invisible disc so a 4px dot is still tappable — the same fix the
+    // other maps needed for small islands.
+    var hit = document.createElementNS(NS, "circle");
+    hit.setAttribute("class", "cityHit");
+    hit.setAttribute("cx", xy[0]); hit.setAttribute("cy", xy[1]); hit.setAttribute("r", 12);
+
+    var dot = document.createElementNS(NS, "circle");
+    dot.setAttribute("cx", xy[0]); dot.setAttribute("cy", xy[1]); dot.setAttribute("r", 4.2);
+    dot.style.fill = city.zone.color;
+
+    var label = document.createElementNS(NS, "text");
+    label.setAttribute("class", "cityLabel");
+    label.setAttribute("x", xy[0] + 7); label.setAttribute("y", xy[1] + 3.4);
+    label.textContent = city.jp;
+
+    if (GEO.isWeak(city.id)) {
+      var ring = document.createElementNS(NS, "circle");
+      ring.setAttribute("cx", xy[0]); ring.setAttribute("cy", xy[1]); ring.setAttribute("r", 8);
+      ring.setAttribute("fill", "none");
+      ring.setAttribute("stroke", "#F0A6A6");
+      ring.setAttribute("stroke-width", "1.6");
+      g.appendChild(ring);
+    }
+
+    g.appendChild(hit); g.appendChild(dot); g.appendChild(label);
+    g.addEventListener("click", function (event) {
+      event.stopPropagation();
+      if (quiz) { answer(city.id); return; }
+      selected = city.id;
+      GEO.open(city.id);
+      showClimate({ code: city.code, jp: city.climate, zone: city.zone }, city);
+    });
+    cityGroup.appendChild(g);
+  });
+}
+
+/* ---------- panel ---------- */
+function showClimate(hit, city) {
+  var zone = hit.zone;
+  var where = '<span class="kop">' + hit.code + '</span>';
+  panel.innerHTML =
+    '<div class="zoneRow"><span class="sw" style="background:' + zone.color + '"></span>' +
+      '<b>' + zone.jp + '</b><small>' + zone.en + '</small></div>' +
+    '<h2 style="font-size:15px;margin:12px 0 2px">' + (city ? city.jp : "この場所") + '</h2>' +
+    '<div style="color:var(--muted);font-size:12.5px">' + hit.jp + where + '</div>' +
+    (city ? '<div style="color:var(--muted);font-size:11.5px;margin-top:8px">緯度 ' +
+      Math.abs(city.lat).toFixed(1) + '° ' + (city.lat >= 0 ? "北" : "南") + '</div>' : "") +
+    '<div class="latnote">' + latitudeNote(zone, city) + '</div>';
+}
+
+/* The point of the map: the bands follow latitude, except where they do not. */
+function latitudeNote(zone, city) {
+  if (!city) return "気候帯は、おおよそ緯度にそって帯のようにならんでいます。";
+  var abs = Math.abs(city.lat);
+  if (zone.id === "tropical") return "赤道に近いほど気温が高く、熱帯は赤道をはさんだ帯になります。";
+  if (zone.id === "polar") return "極に近いほど気温が低く、寒帯は南極・北極のまわりに広がります。";
+  if (zone.id === "arid") return "乾燥帯は緯度20〜30度あたりに多く、大陸の内陸にも広がります。緯度だけでは決まりません。";
+  if (zone.id === "continental") return "亜寒帯は北半球の高緯度に広がります。南半球の同じ緯度には陸地がほとんどありません。";
+  return abs < 45
+    ? "温帯は中緯度に広がります。同じ緯度でも、海に近いか内陸かで気候はちがってきます。"
+    : "高緯度でも、暖流と偏西風のおかげで温帯になる地域があります。";
+}
+
+function resetPanel() {
+  panel.innerHTML = '<div class="empty"><b>地図をクリック</b>その場所の気候帯と、くわしい気候の名前が出ます。</div>';
+}
+
+/* ---------- quiz ---------- */
+quizBtn.addEventListener("click", function () { if (quiz) endQuiz(); else startQuiz(); });
+
+function startQuiz() {
+  var pool = GEO.pickQuiz(CITIES.map(function (c) { return c.id; }), 8);
+  quiz = { pool: pool, i: 0, score: 0, locked: false };
+  quizBtn.textContent = "クイズをやめる";
+  activeZone = null;
+  LAYER.highlightZone(null);
+  [].forEach.call(filters.querySelectorAll(".chip[data-zone]"), function (el) { el.dataset.on = "true"; });
+  renderCities();
+  askQuestion();
+}
+
+function endQuiz() {
+  quiz = null;
+  quizBtn.textContent = "クイズに挑戦";
+  renderCities();
+  resetPanel();
+}
+
+function askQuestion() {
+  var city = CITIES.find(function (c) { return c.id === quiz.pool[quiz.i]; });
+  quiz.locked = false;
+  panel.innerHTML =
+    '<div class="qmeta"><span>第 ' + (quiz.i + 1) + ' 問 / ' + quiz.pool.length + '</span>' +
+    '<span>正解 ' + quiz.score + '</span></div>' +
+    '<h2 style="font-size:15px;margin:10px 0 4px">' + city.jp + ' は何気候帯？</h2>' +
+    '<div style="color:var(--muted);font-size:12px;margin-bottom:10px">下からえらんでね。</div>' +
+    CLIMATE_ZONES.map(function (z) {
+      return '<button class="btn ghost" style="display:block;width:100%;text-align:left;margin-bottom:6px" data-pick="' + z.id + '">' +
+        '<span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:' + z.color +
+        ';margin-right:8px;vertical-align:-1px"></span>' + z.jp + '</button>';
+    }).join("");
+  [].forEach.call(panel.querySelectorAll("[data-pick]"), function (btn) {
+    btn.addEventListener("click", function () { answer(city.id, btn.dataset.pick); });
+  });
+}
+
+function answer(cityId, pickedZone) {
+  if (!quiz || quiz.locked) return;
+  var city = CITIES.find(function (c) { return c.id === quiz.pool[quiz.i]; });
+  if (cityId !== city.id && !pickedZone) return;
+  quiz.locked = true;
+  var correct = pickedZone === city.zone.id;
+  if (correct) quiz.score++;
+  GEO.answered(city.id, correct);
+
+  panel.innerHTML =
+    '<div class="qmeta"><span>第 ' + (quiz.i + 1) + ' 問 / ' + quiz.pool.length + '</span>' +
+    '<span>正解 ' + quiz.score + '</span></div>' +
+    '<div style="margin:10px 0 6px;font-size:14px;font-weight:600;color:' +
+      (correct ? "#7BC076" : "#F0A6A6") + '">' + (correct ? "せいかい！" : "おしい！") + '</div>' +
+    '<div class="zoneRow"><span class="sw" style="background:' + city.zone.color + '"></span>' +
+      '<b>' + city.jp + ' は ' + city.zone.jp + '</b></div>' +
+    '<div style="color:var(--muted);font-size:12.5px;margin-top:8px">' + city.climate +
+      '<span class="kop">' + city.code + '</span></div>' +
+    '<div class="latnote">' + latitudeNote(city.zone, city) + '</div>' +
+    '<button class="btn" id="nextQ" style="width:100%;margin-top:12px">' +
+      (quiz.i < quiz.pool.length - 1 ? "次の問題へ" : "結果を見る") + '</button>';
+
+  document.getElementById("nextQ").addEventListener("click", function () {
+    if (quiz.i < quiz.pool.length - 1) { quiz.i++; askQuestion(); }
+    else finish();
+  });
+  renderCities();
+}
+
+function finish() {
+  var total = quiz.pool.length, score = quiz.score;
+  GEO.finishQuiz(score, total);
+  panel.innerHTML =
+    '<h2 style="font-size:15px;margin:6px 0 4px">結果</h2>' +
+    '<div style="font-size:26px;font-weight:700;margin:6px 0">' + score + ' / ' + total + '</div>' +
+    '<div style="color:var(--muted);font-size:12.5px">' +
+      (score === total ? "全部せいかい！" : "まちがえた都市は、次のクイズで出やすくなるよ。") + '</div>' +
+    '<button class="btn" id="againQ" style="width:100%;margin-top:12px">もう一度</button>';
+  document.getElementById("againQ").addEventListener("click", startQuiz);
+  quiz = null;
+  quizBtn.textContent = "クイズに挑戦";
+  renderCities();
+}
+
+/* ---------- weak spots ---------- */
+GEO.onState(function () {
+  var weak = GEO.weakIds();
+  if (!weak.length) { weakbar.className = "weakbar empty"; weakbar.textContent = ""; return; }
+  weakbar.className = "weakbar";
+  weakbar.innerHTML = "<b>苦手</b>" + weak.map(function (id) {
+    var city = CITIES.find(function (c) { return c.id === id; });
+    return "<span>" + (city ? city.jp : id) + "</span>";
+  }).join("");
+  renderCities();
+});
+
+renderCities();
+enableZoom(BASE);
+
+</script>
+</body>
+</html>

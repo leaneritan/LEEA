@@ -8,6 +8,7 @@ import {
   groupSpecialLessonsByTopic,
   type SpecialLessonStatus
 } from "../../../content/subjects/math/specialLessons";
+import { MathTopbarHome } from "./MathTopbarHome";
 
 type GradeFilter = "all" | MathGrade;
 
@@ -35,6 +36,7 @@ export function FreeLessonsHome() {
     <div className="math-scope">
       <div className="math-topbar">
         <div className="math-home-topbar-inner">
+          <MathTopbarHome />
           <Link className="math-topbar-brand" href="/math">
             ← 数学の学び
           </Link>

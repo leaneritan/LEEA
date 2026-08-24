@@ -7,6 +7,7 @@ import { mathGrades, type MathGrade } from "../../../content/subjects/math/grade
 import type { MathExtraLessonSummary } from "../../../content/subjects/math/loadSection";
 import type { MathChapterMeta } from "../../../content/subjects/math/types";
 import { readMathProgress, syncMathProgressWithCloud, type MathBlockProgressMap } from "../../data/mathProgress";
+import { MathTopbarHome } from "./MathTopbarHome";
 
 const STATUS_LABEL: Record<string, string> = { done: "完了", now: "学習中", todo: "未学習" };
 
@@ -50,9 +51,8 @@ export function CurriculumHome({ extraLessons = {} }: { extraLessons?: Record<st
     <div className="math-scope">
       <div className="math-topbar">
         <div className="math-home-topbar-inner">
-          <Link className="math-topbar-brand" href="/">
-            ← 数学の学び
-          </Link>
+          <MathTopbarHome />
+          <span className="math-topbar-brand">数学の学び</span>
           <span className="math-grade-switch math-grade-switch--home">
             {mathGrades.map((g) => (
               <button

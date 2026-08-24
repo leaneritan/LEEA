@@ -445,6 +445,15 @@ Examples:
 - Junior High: word order, grammar, translation, self-expression, test practice
 - Training Ground: focused skill drills for weak points
 
+### Unit 7 current build status
+
+| Component | Teacher lesson | Leo app | Leo status |
+|---|---|---|---|
+| opener | `public/lessons/ow-l4-u7-opener.html` | `public/learn/ow-l4-u7-opener.html` | `live` |
+| vocab-1 | `public/lessons/ow-l4-u7-vocab-1.html` | `public/learn/ow-l4-u7-vocab-1.html` | `live` (13-tab) |
+
+Build priority: song → grammar-1 → vocab-2 → grammar-2 → reading → writing → mission → project.
+
 ### Unit 8 current build status
 
 | Component | Teacher lesson | Leo app | Leo status |

@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 7 · Vocabulary 1 · Good Idea!</title>
+<script src="/components/charts.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+
+/* HEADER */
+.slide-header{height:64px;background:#7C3AED;display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.65);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.2);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.ac{background:rgba(14,165,233,.4)}
+
+/* TWO-COLUMN VOCAB LAYOUT */
+.vocab-body{flex:1;display:flex;min-height:0}
+.word-panel{width:40%;padding:30px 34px;display:flex;flex-direction:column;border-right:2px solid #e5e7eb;background:#fff}
+.game-panel{width:60%;padding:22px 32px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;overflow:hidden}
+
+/* TAGS */
+.vtag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;width:fit-content}
+.vtag.v1{background:#ede9fe;color:#5b21b6}
+.vtag.ac{background:#e0f2fe;color:#0369a1}
+.vtag.rel{background:#f3f4f6;color:#6b7280}
+
+/* WORD PANEL */
+.word-emoji{font-size:130px;line-height:1;margin-bottom:12px;cursor:pointer;transition:transform .25s}
+.word-emoji:active{transform:scale(1.15)}
+.word-main{font-size:70px;font-weight:800;color:#111;line-height:1.05;margin-bottom:8px}
+.word-ipa{font-size:21px;color:#6b7280}
+.word-syl{font-size:18px;color:#9ca3af;letter-spacing:1px}
+.word-pos{font-size:19px;color:#7C3AED;font-weight:700;margin-bottom:14px}
+.word-def{font-size:21px;color:#374151;line-height:1.45;margin-bottom:8px}
+.word-jp{font-size:18px;color:#6b7280;line-height:1.45}
+.dad-say{background:#f5f3ff;border-left:4px solid #7C3AED;padding:13px 16px;border-radius:0 12px 12px 0;font-size:18px;color:#374151;line-height:1.5;margin-top:auto}
+.dad-say b{color:#5b21b6}
+.how-box{background:#fff;border:2px dashed #ddd6fe;border-radius:12px;padding:10px 16px;font-size:16px;color:#4b5563;line-height:1.5;width:100%}
+.how-box b{color:#5b21b6}
+.how-box li{margin-left:18px}
+
+/* MINI-GAME SHELL (shared class names across LEEA vocab decks) */
+.mg-wrap{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;flex:1;min-height:0}
+.mg-head{font-size:20px;font-weight:700;color:#374151;text-align:center;background:#f9fafb;border:2px solid #e5e7eb;border-radius:12px;padding:10px 20px;width:100%;flex-shrink:0}
+.mg-head b{color:#5b21b6}
+.mg-stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0;overflow:hidden}
+.mg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;width:100%}
+.mg-grid.c4{grid-template-columns:repeat(4,1fr)}
+.mg-grid.c3{grid-template-columns:repeat(3,1fr)}
+.mg-tile{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 6px;font-size:38px;cursor:pointer;transition:all .15s;text-align:center}
+.mg-tile:hover{transform:translateY(-3px);border-color:#7C3AED}
+.mg-tile .mg-label{display:block;font-size:14px;font-weight:700;color:#4b5563;margin-top:4px;min-height:18px}
+.mg-tile.hit{background:#f5f3ff;border-color:#7C3AED;cursor:default}
+.mg-tile.miss{background:#fef2f2;border-color:#ef4444;animation:mgShake .3s ease}
+@keyframes mgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.mg-btn{background:#7C3AED;color:#fff;border:none;border-radius:12px;padding:13px 30px;font-size:20px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.mg-btn:hover{background:#5b21b6;transform:scale(1.04)}
+.mg-btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+.mg-opt{padding:12px 22px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:19px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left}
+.mg-opt:hover{border-color:#7C3AED}
+.mg-opt.ok{background:#f5f3ff;border-color:#7C3AED;color:#5b21b6;pointer-events:none}
+.mg-opt.no{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+.mg-score{font-size:20px;font-weight:800;color:#5b21b6;background:#ede9fe;border-radius:20px;padding:6px 22px}
+.mg-miss{font-size:17px;font-weight:700;color:#ef4444;min-height:22px}
+.mg-win{background:#7C3AED;color:#fff;border-radius:14px;padding:12px 24px;font-size:20px;font-weight:800;text-align:center;opacity:0;transform:translateY(10px);transition:all .35s;width:100%}
+.mg-win.show{opacity:1;transform:translateY(0)}
+.mg-source{font-size:14px;color:#9ca3af;font-weight:600;letter-spacing:.4px}
+.mg-bar{width:100%;height:22px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.mg-bar > div{height:100%;background:linear-gradient(90deg,#a78bfa,#7C3AED);width:0%;transition:width .2s;border-radius:99px}
+.mg-track{position:relative;width:100%;height:96px;background:linear-gradient(180deg,#ede9fe,#faf5ff);border-radius:16px;overflow:hidden;border:2px solid #ddd6fe}
+.mg-runner{position:absolute;bottom:16px;font-size:46px;transition:left .25s}
+.mg-flag{position:absolute;bottom:14px;right:2%;font-size:40px}
+.mg-spin{display:inline-block;transition:transform .3s ease}
+.mg-flip{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.mg-flip:hover{border-color:#7C3AED;transform:translateY(-3px)}
+.mg-flip.open{background:#f5f3ff;border-color:#7C3AED;cursor:default}
+.mg-flip .mf-front{font-size:40px}
+.mg-flip .mf-back{display:none;font-size:15px;font-weight:700;color:#5b21b6;line-height:1.35}
+.mg-flip.open .mf-back{display:block}
+.mg-pair{display:flex;gap:26px;width:100%;justify-content:center}
+.mg-col{display:flex;flex-direction:column;gap:10px;flex:1;max-width:340px}
+.mg-pbtn{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:17px;font-weight:700;color:#374151;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left;line-height:1.3}
+.mg-pbtn:hover{border-color:#7C3AED}
+.mg-pbtn.sel{border-color:#7C3AED;background:#f5f3ff}
+.mg-pbtn.done{border-color:#10b981;background:#ecfdf5;color:#047857;pointer-events:none}
+.mg-pbtn.bad{border-color:#ef4444;background:#fef2f2;animation:mgShake .3s}
+.mg-battery{width:220px;height:110px;border:6px solid #374151;border-radius:14px;position:relative;display:flex;align-items:center;padding:8px}
+.mg-battery::after{content:'';position:absolute;right:-20px;top:32px;width:16px;height:40px;background:#374151;border-radius:0 6px 6px 0}
+.mg-battery > div{height:100%;background:linear-gradient(90deg,#a3e635,#16a34a);border-radius:6px;width:0%;transition:width .2s}
+.mg-lamp{font-size:44px;filter:grayscale(1);opacity:.4;transition:all .25s}
+.mg-lamp.on{filter:none;opacity:1;transform:scale(1.1)}
+
+/* NAV BAR */
+#nav-bar{position:fixed;bottom:0;left:0;right:0;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px;transition:background .2s}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn.active,#fs-btn.active{background:rgba(124,58,237,.35)!important;color:#c4b5fd!important}
+#unit-label{color:#c4b5fd;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+
+/* TEACHER NOTES PANEL */
+#tn-panel{position:fixed;right:-460px;top:0;bottom:52px;width:440px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#c4b5fd;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-panel ul{padding-left:18px;margin-bottom:8px}
+#tn-panel .tn-lbl{color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+
+/* CONTENT SLIDES */
+.content-body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:18px;min-height:0;overflow:hidden}
+.slide-h1{font-size:40px;font-weight:800;color:#111}
+.slide-h2{font-size:25px;font-weight:600;color:#374151}
+.src-pill{display:inline-block;background:#f3f4f6;color:#6b7280;border-radius:20px;padding:6px 18px;font-size:15px;font-weight:700;letter-spacing:.4px;width:fit-content}
+
+/* READING */
+.reading-block{background:#fff;border-radius:16px;padding:26px 36px;font-size:23px;line-height:1.7;color:#1f2937;box-shadow:0 4px 16px rgba(0,0,0,.05);border-left:6px solid #7C3AED}
+.reading-block b{color:#5b21b6;font-weight:700}
+.tap-word{background:#ede9fe;color:#5b21b6;border:none;border-radius:6px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.tap-word.done{background:#7C3AED;color:#fff}
+
+/* OBJECTIVES */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:10px}
+.obj-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;display:flex;align-items:flex-start;gap:16px}
+.obj-icon{font-size:34px;flex-shrink:0}
+.obj-text{font-size:19px;color:#374151;line-height:1.4;font-weight:500}
+.obj-text b{color:#7C3AED}
+
+/* FORMATIVE ASSESSMENT */
+.assess-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px}
+.assess-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;cursor:pointer;transition:all .2s}
+.assess-card:hover{border-color:#7C3AED}
+.assess-card.yes{border-color:#7C3AED;background:#f5f3ff}
+.assess-q{font-size:19px;color:#374151;font-weight:600;margin-bottom:10px}
+
+/* BE THE EXPERT */
+.bte-header{background:#7C3AED;color:#fff;border-radius:12px 12px 0 0;padding:13px 26px;font-size:19px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bte-body{background:#fff;border:2px solid #7C3AED;border-radius:0 0 16px 16px;padding:24px;font-size:19px;color:#374151;line-height:1.6}
+.bte-body b{color:#5b21b6}
+
+/* CHIPS / TASK CARDS */
+.chips-row{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:#ede9fe;color:#5b21b6;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.chip.used{background:#7C3AED;color:#fff}
+.task-card{background:#fff;border-radius:16px;padding:20px 28px;border:2px solid #e5e7eb;font-size:21px;color:#374151;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card b{color:#7C3AED}
+.q-item{background:#fff;border-radius:12px;padding:16px 22px;border:2px solid #e5e7eb;font-size:19px;color:#374151;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .2s}
+.q-item:hover{border-color:#7C3AED}
+.q-item.done{border-color:#10b981;background:#ecfdf5}
+.q-num{background:#7C3AED;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;margin-top:2px}
+.q-ans{max-height:0;overflow:hidden;transition:max-height .3s ease;color:#5b21b6;font-weight:700}
+.q-item.done .q-ans{max-height:120px;margin-top:6px}
+
+/* DIALOGUE */
+.chat-row{display:flex;align-items:flex-end;gap:14px}
+.chat-row.right{flex-direction:row-reverse}
+.chat-ava{font-size:50px;line-height:1}
+.bub{max-width:62%;padding:18px 28px;border-radius:26px;font-size:26px;font-weight:600;line-height:1.35}
+.bub.q{background:#fff;border:2px solid #e5e7eb;border-bottom-left-radius:6px;color:#374151}
+.bub.a{background:#7C3AED;color:#fff;border-bottom-right-radius:6px}
+
+/* LISTEN HERO */
+.listen-hero{background:linear-gradient(135deg,#4c1d95,#7C3AED);border-radius:20px;padding:24px 36px;display:flex;align-items:center;gap:28px;color:#fff}
+.listen-hero .lh-emoji{font-size:64px;line-height:1;animation:lhPulse 1.6s ease-in-out infinite}
+@keyframes lhPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.listen-hero .lh-text{font-size:25px;font-weight:700;flex:1}
+.listen-hero .lh-tr{background:rgba(255,255,255,.2);border-radius:20px;padding:9px 22px;font-size:21px;font-weight:800;white-space:nowrap}
+
+/* TITLE / GREAT JOB */
+.title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#4c1d95 0%,#7C3AED 50%,#a78bfa 100%);color:#fff;gap:22px;padding:40px}
+.great-job-slide{background:linear-gradient(135deg,#4c1d95,#7C3AED,#a78bfa);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:18px;height:100%;padding:40px}
+
+/* MARK DONE */
+.done-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+.btn-done{background:#16A34A;color:#fff;border:none;border-radius:14px;padding:18px 46px;font-size:26px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-done:hover{background:#15803d}
+.btn-done.confirmed{background:#9ca3af;pointer-events:none}
+.btn-clear{background:#fff;color:#ef4444;border:2px solid #ef4444;border-radius:14px;padding:14px 30px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+#doneMsg{font-size:20px;color:#4b5563;font-weight:600;min-height:28px}
+
+/* VOCAB REVIEW */
+.vr-tabs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;flex-shrink:0}
+.vr-tab{padding:7px 14px;border:2px solid #e5e7eb;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s;white-space:nowrap}
+.vr-tab:hover{border-color:#7C3AED;color:#7C3AED}
+.vr-tab.active{background:#7C3AED;color:#fff;border-color:#7C3AED}
+.vr-tab.done{background:#ede9fe;border-color:#7C3AED;color:#5b21b6}
+.vr-tab.done.active{background:#7C3AED;color:#fff}
+.vr-body{flex:1;display:flex;min-height:0}
+.vr-left{width:26%;padding:18px;border-right:2px solid #e5e7eb;display:flex;flex-direction:column;gap:8px;background:#fafaf7}
+.vr-right{flex:1;padding:18px 24px;display:flex;flex-direction:column;gap:12px}
+.vr-emoji{font-size:80px;line-height:1}
+.vr-word{font-size:42px;font-weight:800;color:#111;line-height:1.1}
+.vr-ipa{font-size:16px;color:#6b7280}
+.vr-pos{font-size:15px;color:#7C3AED;font-weight:700}
+.vr-mark{background:#7C3AED;color:#fff;border:none;border-radius:10px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;margin-top:auto;transition:all .2s}
+.vr-mark.done{background:#9ca3af;cursor:not-allowed}
+</style>
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<!-- SLIDE 1: TITLE -->
+<div class="slide active" id="s1">
+  <div class="title-bg">
+    <div style="font-size:22px;font-weight:700;letter-spacing:3px;opacity:.75;text-transform:uppercase">Our World · Level 4 · Unit 7</div>
+    <div style="font-size:78px;font-weight:900;text-align:center;line-height:1.1">Good Idea!</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;font-size:30px;font-weight:700">💡 Vocabulary 1 — Inventions</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:1300px">
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">💡⚙️ an invention</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">❓ a problem</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">✅ a solution</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🎡 a wheel</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">⚡ electricity</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🛠️ useful</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🔋 a battery</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">💭 imagination</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🎨 creativity</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">💡 an idea</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🔬 invent</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">💪 try</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">❌ fail</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🏆 succeed</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2: OBJECTIVES -->
+<div class="slide" id="s2">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1 — Objectives</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 In This Lesson</div>
+    <div class="obj-grid">
+      <div class="obj-card"><div class="obj-icon">📚</div><div class="obj-text"><b>Students will</b> identify and use words related to <b>inventions</b>.</div></div>
+      <div class="obj-card"><div class="obj-icon">🗣️</div><div class="obj-text"><b>Students will</b> tell how inventions are <b>useful</b>.</div></div>
+      <div class="obj-card"><div class="obj-icon">💡</div><div class="obj-text"><b>Today's Words:</b> 14 target words — an invention, a problem, a solution, a wheel, electricity, useful, a battery, imagination, creativity, an idea, invent, try, fail, succeed</div></div>
+      <div class="obj-card"><div class="obj-icon">🧩</div><div class="obj-text"><b>Strategy:</b> the suffix <b>-ful</b> — "full of" (use → useful)</div></div>
+    </div>
+    <div class="task-card"><b>Resources:</b> TR 7.1–7.2 · Video Sc. 2–3 · Graphic Organizers: Three-column chart, Word web · Activity Worksheet 7.1 · Workbook pp. 82–83 · Materials: cell phone, scissors</div>
+    <span class="src-pill">Lesson Planner p. 232</span>
+  </div>
+</div>
+
+<!-- SLIDE 3: ACADEMIC LANGUAGE -->
+<div class="slide" id="s3">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Academic Language</span><span class="hd-chip ac">Always first</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎓 Words we use to talk <i>about</i> the lesson</div>
+    <div class="slide-h2">Tap each card to hear how we use it today. <b id="ac-score" style="color:#5b21b6">0 / 7 tapped</b></div>
+    <div class="mg-grid c4" id="ac-grid" style="grid-template-columns:repeat(4,1fr);gap:16px"></div>
+    <div class="mg-win" id="ac-win">🎉 All 7 academic words reviewed — now we can talk about facts, opinions and charts!</div>
+    <span class="src-pill">Reference · Unit 7 academic word cards</span>
+  </div>
+</div>
+
+<!-- SLIDE 4: CONTENT VOCABULARY -->
+<div class="slide" id="s4">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Content Vocabulary</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔎 Two words from the reading</div>
+    <div class="obj-grid">
+      <div class="obj-card"><div class="obj-icon">🌈</div><div class="obj-text"><b>imagine</b> /ɪˈmædʒɪn/ — to make a picture of something in your mind.<br>"Now we <b>can't imagine</b> our lives without batteries."</div></div>
+      <div class="obj-card"><div class="obj-icon">👥</div><div class="obj-text"><b>public</b> /ˈpʌblɪk/ — open for everyone to see or use.<br>"Santos-Dumont had the world's first <b>public</b> flight in 1906."</div></div>
+    </div>
+    <div class="task-card">💬 Ask Leo: "Can you <b>imagine</b> a world with no electricity? What would be hard?"</div>
+    <span class="src-pill">Lesson Planner p. 232 · Content Vocabulary</span>
+  </div>
+</div>
+
+<!-- ══ PER-WORD PRESENT SLIDES (s5–s18) ══ -->
+
+<!-- SLIDE 5: an invention -->
+<div class="slide" id="s5">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">1 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">💡⚙️</div>
+      <div class="word-main">an invention</div>
+      <div class="word-ipa">/ɪnˈvɛnʃən/</div>
+      <div class="word-syl">in·ven·tion</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a new thing that someone has made for the first time</div>
+      <div class="word-jp">🇯🇵 発明（はつめい）— だれかが新しく作り出したもの。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Iron Man builds a flying suit — that suit is his <b>invention</b>. Nobody made one before him."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🔎 <b>Invention Hunt!</b> Tap the 6 things people <b>invented</b>. Leave nature alone.</div>
+        <div class="mg-stage"><div class="mg-grid" id="g-invention-grid"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-invention-score">0 / 6</span><span class="mg-miss" id="g-invention-miss"></span></div>
+        <div class="mg-win" id="g-invention-win">🎉 All 6 found! Every one was made by a person for the first time.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"The wheel is a very old <b>invention</b>."</li><li>An <b>invention</b> is a thing; to <b>invent</b> is the action.</li></ul></div>
+        <span class="mg-source">Student Book p. 116 · TR 7.1</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: a problem -->
+<div class="slide" id="s6">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">2 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">❓</div>
+      <div class="word-main">a problem</div>
+      <div class="word-ipa">/ˈprɒbləm/</div>
+      <div class="word-syl">prob·lem</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">something that is wrong and needs to be fixed</div>
+      <div class="word-jp">🇯🇵 問題（もんだい）— うまくいっていなくて、なおさなくてはいけないこと。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Five thousand years ago people could not move heavy things. That was a <b>problem</b>."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🕵️ <b>Spot the Problem!</b> Read each scene and choose what the problem is. 3 rounds.</div>
+        <div class="mg-stage" id="g-problem-stage"></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-problem-score">0 / 3</span><span class="mg-miss" id="g-problem-miss"></span></div>
+        <div class="mg-win" id="g-problem-win">🎉 3 / 3! You can spot a problem — now find the solution.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"I have a <b>problem</b>. My invention isn't working."</li><li>A <b>problem</b> comes first; a <b>solution</b> comes after.</li></ul></div>
+        <span class="mg-source">Student Book p. 116 · TR 7.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: a solution -->
+<div class="slide" id="s7">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">3 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">✅</div>
+      <div class="word-main">a solution</div>
+      <div class="word-ipa">/səˈluːʃən/</div>
+      <div class="word-syl">so·lu·tion</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a way to fix a problem</div>
+      <div class="word-jp">🇯🇵 解決策（かいけつさく）— 問題をなおす方法。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Then someone found a <b>solution</b> — the wheel. It changed our lives."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🔗 <b>Fix It!</b> Tap a problem, then tap its solution. Match all 4.</div>
+        <div class="mg-stage"><div class="mg-pair" id="g-solution-pair"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-solution-score">0 / 4</span><span class="mg-miss" id="g-solution-miss"></span></div>
+        <div class="mg-win" id="g-solution-win">🎉 4 / 4 solved! Every invention is a solution to a problem.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"Do you know a good <b>solution</b>?"</li><li>Say: <i>a solution <b>to</b> a problem</i>.</li></ul></div>
+        <span class="mg-source">Student Book p. 116 · TR 7.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8: a wheel -->
+<div class="slide" id="s8">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">4 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🎡</div>
+      <div class="word-main">a wheel</div>
+      <div class="word-ipa">/wiːl/</div>
+      <div class="word-syl">wheel</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a round object that turns and helps things move</div>
+      <div class="word-jp">🇯🇵 車輪（しゃりん）— 回って動くまるい部品。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Before the <b>wheel</b>, people had to push or pull things along the ground."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🛒 <b>Roll the Cart!</b> Tap ROLL 12 times — watch the <b>wheel</b> turn and the cart move.</div>
+        <div class="mg-stage">
+          <div style="font-size:74px" id="g-wheel-icon"><span class="mg-spin" id="g-wheel-spin">🎡</span></div>
+          <div class="mg-track"><span class="mg-runner" id="g-wheel-cart" style="left:2%">🛒</span><span class="mg-flag">🚩</span></div>
+          <button class="mg-btn" id="g-wheel-btn" onclick="wheelRoll()">🎡 ROLL!</button>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-wheel-score">0 / 12</span></div>
+        <div class="mg-win" id="g-wheel-win">🎉 You made it! Wheels turn so heavy things can move.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"<b>Wheels</b> are the most famous invention."</li><li>A bike and the team bus to a <b>Ligue 1</b> away game both move on <b>wheels</b>.</li></ul></div>
+        <span class="mg-source">Student Book p. 116 · TR 7.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 9: electricity -->
+<div class="slide" id="s9">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">5 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">⚡</div>
+      <div class="word-main">electricity</div>
+      <div class="word-ipa">/ɪˌlɛkˈtrɪsəti/</div>
+      <div class="word-syl">e·lec·tric·i·ty</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a kind of energy that powers lights and machines</div>
+      <div class="word-jp">🇯🇵 電気（でんき）— あかりや機械を動かすエネルギー。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "<b>Electricity</b> is <u>not</u> an invention. It was already in nature — in lightning. Scientists worked out how to use it."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">💡 <b>Power Up the Stadium!</b> It is a <b>Champions League</b> night. Tap only the things that need <b>electricity</b>. 6 to find.</div>
+        <div class="mg-stage">
+          <div style="display:flex;gap:14px" id="g-elec-lamps"></div>
+          <div class="mg-grid" id="g-elec-grid"></div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-elec-score">0 / 6</span><span class="mg-miss" id="g-elec-miss"></span></div>
+        <div class="mg-win" id="g-elec-win">🎉 Floodlights on! Kick-off can start.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"Did you know that <b>electricity</b> is not an invention?"</li><li>No <i>a/an</i> — we just say <b>electricity</b>.</li></ul></div>
+        <span class="mg-source">Student Book p. 116 · TR 7.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10: useful -->
+<div class="slide" id="s10">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">6 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🛠️</div>
+      <div class="word-main">useful</div>
+      <div class="word-ipa">/ˈjuːsfəl/</div>
+      <div class="word-syl">use·ful</div>
+      <div class="word-pos">Adjective</div>
+      <div class="word-def">helpful for doing something</div>
+      <div class="word-jp">🇯🇵 役（やく）に立（た）つ — 何かをするときに助けになる、便利な。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "use + <b>-ful</b> = <b>useful</b>. The suffix -ful means <i>full of</i>. Beauty → beautiful. Colour → colourful."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🎒 <b>What's Useful Here?</b> Pick the <b>useful</b> thing for each situation. 3 rounds.</div>
+        <div class="mg-stage" id="g-useful-stage"></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-useful-score">0 / 3</span><span class="mg-miss" id="g-useful-miss"></span></div>
+        <div class="mg-win" id="g-useful-win">🎉 3 / 3! Useful means it helps you do something.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"Umbrellas are <b>useful</b> in the rain."</li><li><b>-ful</b> turns a noun into an adjective: use → useful. Floodlights are <b>useful</b> at a <b>World Cup</b> night match.</li></ul></div>
+        <span class="mg-source">Student Book p. 117 · Be the Expert (Vocabulary Strategy)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 11: a battery -->
+<div class="slide" id="s11">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">7 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🔋</div>
+      <div class="word-main">a battery</div>
+      <div class="word-ipa">/ˈbætəri/</div>
+      <div class="word-syl">bat·ter·y</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">an object that stores electricity to power devices</div>
+      <div class="word-jp">🇯🇵 電池（でんち）— 電気をためて、機械を動かすためのもの。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "A <b>battery</b> is an invention that makes things work when there is no electricity in the wall."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🔌 <b>Charge It!</b> Tap CHARGE 10 times to fill the <b>battery</b> and switch the phone on.</div>
+        <div class="mg-stage">
+          <div class="mg-battery"><div id="g-batt-fill"></div></div>
+          <div style="font-size:60px;filter:grayscale(1);opacity:.4;transition:all .3s" id="g-batt-phone">📱</div>
+          <button class="mg-btn" id="g-batt-btn" onclick="battCharge()">⚡ CHARGE!</button>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-batt-score">0 %</span></div>
+        <div class="mg-win" id="g-batt-win">🎉 100%! The phone works — because the battery stores electricity.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"My cell phone needs a new <b>battery</b>."</li><li>One battery, two <b>batteries</b> (y → ies). The ref’s watch in a <b>Bundesliga</b> match runs on one.</li></ul></div>
+        <span class="mg-source">Student Book p. 116 · TR 7.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 12: imagination -->
+<div class="slide" id="s12">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">8 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">💭</div>
+      <div class="word-main">imagination</div>
+      <div class="word-ipa">/ɪˌmædʒɪˈneɪʃən/</div>
+      <div class="word-syl">i·mag·i·na·tion</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">the ability to picture things in your mind</div>
+      <div class="word-jp">🇯🇵 想像力（そうぞうりょく）— 頭の中でいろいろなものを思いうかべる力。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Point at your head. Inventors use their <b>imagination</b> to make an idea real."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🧠 <b>Picture It!</b> Close your eyes, listen, then tap what you imagined. 4 rounds.</div>
+        <div class="mg-stage" id="g-imag-stage"></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-imag-score">0 / 4</span><span class="mg-miss" id="g-imag-miss"></span></div>
+        <div class="mg-win" id="g-imag-win">🎉 4 / 4! That picture in your head is your imagination.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"She has a lot of <b>imagination</b>."</li><li>Verb: <b>imagine</b>. Noun: <b>imagination</b>.</li></ul></div>
+        <span class="mg-source">Student Book p. 116 · TR 7.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 13: creativity -->
+<div class="slide" id="s13">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">9 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🎨</div>
+      <div class="word-main">creativity</div>
+      <div class="word-ipa">/ˌkriːeɪˈtɪvəti/</div>
+      <div class="word-syl">cre·a·tiv·i·ty</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">the ability to make or think of new ideas</div>
+      <div class="word-jp">🇯🇵 創造性（そうぞうせい）— 新しいものを作ったり考えたりする力。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Lamine Yamal invents a trick nobody has tried before in <b>La Liga</b>. That is <b>creativity</b>."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">💥 <b>Invention Lab!</b> Tap each blank card to invent something new. Discover all 5.</div>
+        <div class="mg-stage"><div class="mg-grid c3" id="g-creat-grid" style="gap:14px"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-creat-score">0 / 5</span></div>
+        <div class="mg-win" id="g-creat-win">🎉 5 new inventions! That is creativity at work.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"To invent things, you need <b>creativity</b>."</li><li>Person: <i>creative</i>. Thing you have: <b>creativity</b>.</li></ul></div>
+        <span class="mg-source">Student Book p. 116 · TR 7.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 14: an idea -->
+<div class="slide" id="s14">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">10 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">💡</div>
+      <div class="word-main">an idea</div>
+      <div class="word-ipa">/aɪˈdiːə/</div>
+      <div class="word-syl">i·de·a</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a thought or plan that you make up in your mind</div>
+      <div class="word-jp">🇯🇵 アイデア — 頭の中で考えたこと。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "First a person has an <b>idea</b>. Then the idea becomes an invention."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">💡 <b>Light the Bulbs!</b> Tap each dark bulb to reveal a real idea that changed the world. 6 bulbs.</div>
+        <div class="mg-stage"><div class="mg-grid c3" id="g-idea-grid" style="gap:14px"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-idea-score">0 / 6</span></div>
+        <div class="mg-win" id="g-idea-win">🎉 All 6 lit! Every invention started as one small idea.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"That was a good <b>idea</b>!"</li><li>An <b>idea</b> is in your head; an <b>invention</b> is in your hands.</li></ul></div>
+        <span class="mg-source">Student Book p. 116 · TR 7.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 15: invent -->
+<div class="slide" id="s15">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">11 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🔬</div>
+      <div class="word-main">invent</div>
+      <div class="word-ipa">/ɪnˈvɛnt/</div>
+      <div class="word-syl">in·vent</div>
+      <div class="word-pos">Verb</div>
+      <div class="word-def">to make something new for the first time</div>
+      <div class="word-jp">🇯🇵 発明（はつめい）する — 今までにない新しいものを作ること。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Who <b>invented</b> electric lights? An inventor makes something new for the very first time."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🕰️ <b>Who Invented It?</b> Choose the right answer for each invention. 4 rounds.</div>
+        <div class="mg-stage" id="g-invent-stage"></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-invent-score">0 / 4</span><span class="mg-miss" id="g-invent-miss"></span></div>
+        <div class="mg-win" id="g-invent-win">🎉 4 / 4! Real people invented every one of these.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"Who <b>invented</b> electric lights?"</li><li>invent → invent<b>ed</b> (regular past).</li></ul></div>
+        <span class="mg-source">Student Book pp. 116–117 · TR 7.1</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 16: try -->
+<div class="slide" id="s16">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">12 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">💪</div>
+      <div class="word-main">try</div>
+      <div class="word-ipa">/traɪ/</div>
+      <div class="word-syl">try</div>
+      <div class="word-pos">Verb</div>
+      <div class="word-def">to do your best to do something</div>
+      <div class="word-jp">🇯🇵 やってみる — うまくいくようにがんばってみること。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "The Wright brothers <b>tried</b> to fly many times. Haaland <b>tries</b> many shots in one <b>Premier League</b> match."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">⚽ <b>Keep Trying!</b> The keeper saves the first shots. Keep tapping SHOOT until you score 3 goals.</div>
+        <div class="mg-stage">
+          <div style="font-size:64px;display:flex;gap:26px;align-items:center"><span id="g-try-ball">⚽</span><span id="g-try-keeper">🧤</span><span>🥅</span></div>
+          <div style="font-size:19px;font-weight:700;color:#5b21b6;min-height:26px" id="g-try-msg">Tap SHOOT to take your first shot.</div>
+          <button class="mg-btn" id="g-try-btn" onclick="tryShoot()">⚽ SHOOT!</button>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-try-score">Goals 0 / 3</span><span class="mg-miss" id="g-try-miss">Tries: 0</span></div>
+        <div class="mg-win" id="g-try-win">🎉 3 goals! You kept trying — that is exactly what inventors do.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"What are you <b>trying</b> to do?"</li><li>try → tr<b>ied</b> (y → ied).</li></ul></div>
+        <span class="mg-source">Student Book p. 116 · TR 7.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 17: fail -->
+<div class="slide" id="s17">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">13 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">❌</div>
+      <div class="word-main">fail</div>
+      <div class="word-ipa">/feɪl/</div>
+      <div class="word-syl">fail</div>
+      <div class="word-pos">Verb</div>
+      <div class="word-def">to not succeed at something</div>
+      <div class="word-jp">🇯🇵 失敗（しっぱい）する — うまくいかないこと。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Mary Anderson tried to sell her windshield wiper, but she <b>failed</b>. Inventors often fail many times."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🃏 <b>Famous Fails!</b> Tap each card to see what happened <i>after</i> the failure. 5 cards.</div>
+        <div class="mg-stage"><div class="mg-grid c3" id="g-fail-grid" style="gap:14px"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-fail-score">0 / 5</span></div>
+        <div class="mg-win" id="g-fail-win">🎉 All 5 read! Failing is not stopping — it is step one.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"I studied very hard, so I won't <b>fail</b>."</li><li><b>fail</b> ↔ <b>succeed</b> are opposites.</li></ul></div>
+        <span class="mg-source">Student Book p. 117 · TR 7.1</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 18: succeed -->
+<div class="slide" id="s18">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">14 / 14</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🏆</div>
+      <div class="word-main">succeed</div>
+      <div class="word-ipa">/səkˈsiːd/</div>
+      <div class="word-syl">suc·ceed</div>
+      <div class="word-pos">Verb</div>
+      <div class="word-def">to do something well, the way you wanted</div>
+      <div class="word-jp">🇯🇵 成功（せいこう）する — やりたいことがうまくいくこと。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "The Wright brothers finally <b>succeeded</b> in 1903 — after failing many, many times. Bellingham lifts the <b>Champions League</b> trophy after a whole season of trying."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🧗 <b>Climb to Success!</b> Answer 6 questions right to reach the top step.</div>
+        <div class="mg-stage">
+          <div style="display:flex;align-items:flex-end;gap:6px;height:110px" id="g-succ-steps"></div>
+          <div id="g-succ-stage" style="width:100%;display:flex;flex-direction:column;gap:10px;align-items:center"></div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-succ-score">0 / 6</span><span class="mg-miss" id="g-succ-miss"></span></div>
+        <div class="mg-win" id="g-succ-win">🎉 Top of the podium! You succeeded — 6 out of 6.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"The Wright brothers <b>succeeded</b>."</li><li>succeed → succeed<b>ed</b>. Noun: <i>success</i>.</li></ul></div>
+        <span class="mg-source">Student Book p. 117 · TR 7.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 19: VOCABULARY REVIEW -->
+<div class="slide" id="s19">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary Review — all 14</span></div>
+  <div class="content-body" style="padding:24px 40px">
+    <div class="vr-tabs" id="vr-tabs"></div>
+    <div class="vr-body">
+      <div class="vr-left">
+        <div class="vr-emoji" id="vr-emoji">💡⚙️</div>
+        <div class="vr-word" id="vr-word">an invention</div>
+        <div class="vr-ipa" id="vr-ipa"></div>
+        <div class="vr-pos" id="vr-pos"></div>
+        <button class="vr-mark" id="vr-mark" onclick="vrMark()">✓ Leo knows this word</button>
+      </div>
+      <div class="vr-right">
+        <div style="font-size:22px;font-weight:700;color:#374151" id="vr-q"></div>
+        <div style="display:flex;flex-direction:column;gap:10px" id="vr-opts"></div>
+        <div style="font-size:19px;font-weight:700;min-height:26px" id="vr-fb"></div>
+        <div style="font-size:19px;color:#6b7280;line-height:1.5;margin-top:auto" id="vr-jp"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 20: WARM UP — Recycle -->
+<div class="slide" id="s20">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Recycle</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🕰️ Long Ago and Today</div>
+    <div class="slide-h2">Tap a "Long ago" card, then tap what people use <b>today</b>. Matched: <b id="wu-count" style="color:#5b21b6">0 / 4</b></div>
+    <div class="mg-pair" style="max-width:1100px;margin:0 auto"><div class="mg-col" id="wu-left" style="max-width:460px"></div><div class="mg-col" id="wu-right" style="max-width:460px"></div></div>
+    <div class="mg-win" id="wu-win" style="max-width:1100px;margin:0 auto">🎉 Every one of those is an invention. Someone had an idea to make them.</div>
+    <span class="src-pill">Lesson Planner p. 232 · Warm Up (Recycle)</span>
+  </div>
+</div>
+
+<!-- SLIDE 21: PRESENT — Say the words -->
+<div class="slide" id="s21">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Present — Repeat after me</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🗣️ Turn to Student Book pp. 116–117</div>
+    <div class="task-card">Say: <b>"Let's learn some words about inventions. Repeat each word after me."</b> Point to and say each word. Tap a chip once Leo has said it clearly.</div>
+    <div class="chips-row" id="present-chips" style="max-width:1500px"></div>
+    <div class="slide-h2" style="margin-top:4px">Said: <b id="present-count" style="color:#5b21b6">0 / 14</b></div>
+    <div class="mg-win" id="present-win">🎉 All 14 said out loud! Now let's read them in the passage.</div>
+    <span class="src-pill">Lesson Planner p. 232 · Present</span>
+  </div>
+</div>
+
+<!-- SLIDE 22: PRESENT — Word Web -->
+<div class="slide" id="s22">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Present — Word Web</span></div>
+  <div class="content-body" style="padding:20px 40px">
+    <div class="slide-h1">🕸️ What does an inventor need?</div>
+    <div class="slide-h2">Type Leo's answers into the ovals. Say each word aloud as you add it.</div>
+    <div id="web-present" style="flex:1;min-height:0;overflow:auto"></div>
+    <span class="src-pill">Lesson Planner p. 232 · Present · Graphic Organizer: Word web</span>
+  </div>
+</div>
+
+<!-- SLIDE 23: PRACTICE 1 — Listen and Read -->
+<div class="slide" id="s23">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Practice 1 — Listen and Read</span><span class="hd-chip">TR 7.1</span></div>
+  <div class="content-body">
+    <div class="listen-hero">
+      <div class="lh-emoji">🎧</div>
+      <div class="lh-text">"Let's read and listen to information about inventions and solving problems. Read the paragraphs on pages 116 and 117 as you listen."</div>
+      <div class="lh-tr">TR 7.1</div>
+    </div>
+    <div class="slide-h2">🎯 <b>Word Radar:</b> Leo taps each purple word the moment he hears it in the audio. Found: <b id="radar-count" style="color:#5b21b6">0 / 10</b></div>
+    <div class="reading-block" style="font-size:21px;line-height:1.75">
+      Inventions are everywhere. Look around you. What inventions can you see?<br><br>
+      One of the first <button class="tap-word" onclick="radarTap(this)">inventions</button> was the
+      <button class="tap-word" onclick="radarTap(this)">wheel</button>. More than five thousand years ago, it was difficult to move things.
+      People had to push or pull them along the ground. That was a <button class="tap-word" onclick="radarTap(this)">problem</button>.
+      Then someone found a <button class="tap-word" onclick="radarTap(this)">solution</button> — the wheel. It changed our lives.<br><br>
+      <button class="tap-word" onclick="radarTap(this)">Electricity</button> is not an invention. It always existed in nature — in lightning, for example.
+      But scientists discovered it and worked out how to use it. Inventors used
+      <button class="tap-word" onclick="radarTap(this)">imagination</button> and
+      <button class="tap-word" onclick="radarTap(this)">creativity</button> to make new inventions such as electric lights.
+      When <button class="tap-word" onclick="radarTap(this)">batteries</button> were invented, electricity became even more
+      <button class="tap-word" onclick="radarTap(this)">useful</button>. Now we can't <button class="tap-word" onclick="radarTap(this)">imagine</button> our lives
+      without battery-powered inventions such as computers and cell phones.
+    </div>
+    <span class="src-pill">Student Book p. 116 · TR 7.1</span>
+  </div>
+</div>
+
+<!-- SLIDE 24: PRACTICE 1B — Reading part 2 -->
+<div class="slide" id="s24">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Practice 1 — Listen and Read (cont.)</span><span class="hd-chip">TR 7.1</span></div>
+  <div class="content-body">
+    <div class="reading-block" style="font-size:21px;line-height:1.75">
+      Some inventions were invented too soon — years before they became really useful. One example was the windshield wiper.
+      On a snowy day in 1903, <b>Mary Anderson</b> was riding in a streetcar in New York. From time to time, the driver had to open
+      his window to wipe the snow from his windshield by hand. Back at home, Mary Anderson drew her <b>idea</b> for a windshield wiper.
+      She <b>tried</b> to sell her invention, but <b>failed</b>. People thought windshield wipers could distract drivers and cause accidents!
+    </div>
+    <div class="reading-block" style="font-size:21px;line-height:1.75;border-left-color:#a78bfa">
+      Air travel is used by millions of people today. However, there's some discussion about who flew first.
+      The <b>Wright brothers tried</b> to fly many times. They finally <b>succeeded</b> in 1903. But others say Alberto Santos-Dumont flew first.
+      Santos-Dumont had the world's first public flight in 1906 outside of Paris. He flew his plane 220 meters (722 ft.).
+    </div>
+    <div class="task-card">🖼️ <b>About the photo (p. 117):</b> the Wright brothers, Wilbur and Orville, testing a glider at Kitty Hawk, North Carolina, in 1901. A glider flies without a motor. Their glider experiments led to the first airplane.</div>
+    <span class="src-pill">Student Book p. 117 · TR 7.1 · Be the Expert</span>
+  </div>
+</div>
+
+<!-- SLIDE 25: PRACTICE — Discussion Questions -->
+<div class="slide" id="s25">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Practice — Discuss the Reading</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💬 Ask each question. Tap to reveal the answer.</div>
+    <div style="display:flex;flex-direction:column;gap:12px" id="disc-list"></div>
+    <span class="src-pill">Lesson Planner p. 233 · Practice (Discuss)</span>
+  </div>
+</div>
+
+<!-- SLIDE 26: PRACTICE — Three-Column Chart -->
+<div class="slide" id="s26">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Practice — Sort the Words</span></div>
+  <div class="content-body" style="padding:20px 40px">
+    <div class="slide-h1">🧠 "Now sort the words into the right categories."</div>
+    <div id="sort-teacher" style="flex:1;min-height:0"></div>
+    <div class="mg-win" id="sort-teacher-win">🎉 Sorted! Invention · What an inventor does · What an inventor needs.</div>
+    <span class="src-pill">Lesson Planner p. 234 · Practice · Graphic Organizer: Three-column chart</span>
+  </div>
+</div>
+
+<!-- SLIDE 27: PRACTICE 2 — Listen and Repeat -->
+<div class="slide" id="s27">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Practice 2 — Listen and Repeat</span><span class="hd-chip">TR 7.2</span></div>
+  <div class="content-body">
+    <div class="listen-hero">
+      <div class="lh-emoji">🔊</div>
+      <div class="lh-text">"Now we're going to listen to words and sentences with those words. Say each word and sentence aloud after you hear it."</div>
+      <div class="lh-tr">TR 7.2</div>
+    </div>
+    <div class="slide-h2">🎤 <b>Echo Meter:</b> tap a row once Leo has repeated it loudly and clearly. Echoed: <b id="echo-count" style="color:#5b21b6">0 / 14</b></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow:auto;flex:1;min-height:0" id="echo-list"></div>
+    <span class="src-pill">Audio script TR 7.2 · Vocabulary 1 Activity 2</span>
+  </div>
+</div>
+
+<!-- SLIDE 28: PRACTICE — Sentence on the board -->
+<div class="slide" id="s28">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Practice — Build the Sentence</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✍️ Tap the chips in order to build the sentence from the board.</div>
+    <div class="task-card" style="min-height:92px;font-size:28px;font-weight:700;color:#5b21b6" id="build-line">…</div>
+    <div class="chips-row" id="build-chips"></div>
+    <div style="display:flex;gap:14px;align-items:center">
+      <button class="mg-btn" onclick="buildCheck()">✓ Check</button>
+      <button class="mg-btn" style="background:#fff;color:#7C3AED;border:2px solid #7C3AED" onclick="buildReset()">↺ Reset</button>
+      <span style="font-size:20px;font-weight:700;min-height:26px" id="build-fb"></span>
+    </div>
+    <div class="task-card">Then underline <b>invention</b>, <b>useful</b>, <b>solution</b> and <b>problem</b>. Say the sentence aloud, pointing to each word. Have Leo repeat.</div>
+    <span class="src-pill">Lesson Planner p. 234 · Practice</span>
+  </div>
+</div>
+
+<!-- SLIDE 29: APPLY — Model Dialogue -->
+<div class="slide" id="s29">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Apply — Ask and Answer</span><span class="hd-chip">SB p. 117</span></div>
+  <div class="content-body" style="justify-content:center;gap:26px">
+    <div class="slide-h1" style="text-align:center">🗣️ Model the dialogue, then swap roles.</div>
+    <div class="chat-row"><div class="chat-ava">🧑</div><div class="bub q">When did the Wright brothers fly a plane?</div></div>
+    <div class="chat-row right"><div class="chat-ava">🧒</div><div class="bub a">They flew a plane in 1903.</div></div>
+    <div class="task-card" style="max-width:1400px;margin:0 auto">"Think of questions to ask about what you learned. Use the new words to ask and answer questions. Try to use a word from pages 116 and 117 in your answers." Give Leo 5 minutes to review pp. 116–117 and write his questions.</div>
+    <span class="src-pill">Lesson Planner p. 235 · Apply · Student Book p. 117 Activity 3</span>
+  </div>
+</div>
+
+<!-- SLIDE 30: APPLY — Build a question -->
+<div class="slide" id="s30">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Apply — Build a Question</span></div>
+  <div class="content-body">
+    <div class="slide-h1">❓ Tap chips to build a question Leo can ask Dad.</div>
+    <div class="task-card" style="min-height:92px;font-size:28px;font-weight:700;color:#5b21b6" id="qb-line">…</div>
+    <div class="chips-row" id="qb-chips"></div>
+    <div style="display:flex;gap:14px;align-items:center">
+      <button class="mg-btn" style="background:#fff;color:#7C3AED;border:2px solid #7C3AED" onclick="qbReset()">↺ Clear</button>
+      <span style="font-size:19px;color:#6b7280">Sample answers: <i>"What was the solution to that problem?"</i> · <i>"Which invention is the most useful?"</i></span>
+    </div>
+    <span class="src-pill">Lesson Planner p. 235 · Apply</span>
+  </div>
+</div>
+
+<!-- SLIDE 31: EXTEND — Word Web 2 -->
+<div class="slide" id="s31">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Extend — Word Web</span></div>
+  <div class="content-body" style="padding:20px 40px">
+    <div class="slide-h1">🕸️ Which is more useful — <b>batteries</b> or the <b>wheel</b>?</div>
+    <div class="slide-h2">Write your word in the middle. Add things that use it. Then explain why yours is more useful.</div>
+    <div id="web-extend" style="flex:1;min-height:0;overflow:auto"></div>
+    <span class="src-pill">Lesson Planner p. 235 · Extend · Graphic Organizer: Word web</span>
+  </div>
+</div>
+
+<!-- SLIDE 32: EXTEND — Vote -->
+<div class="slide" id="s32">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Extend — Present &amp; Vote</span></div>
+  <div class="content-body" style="justify-content:center;gap:30px">
+    <div class="slide-h1" style="text-align:center">🗳️ Present your word web, then vote.</div>
+    <div style="display:flex;gap:40px;justify-content:center">
+      <div style="background:#fff;border:3px solid #e5e7eb;border-radius:20px;padding:34px 54px;text-align:center;cursor:pointer;transition:all .2s" onclick="voteFor('batt')" id="vote-batt">
+        <div style="font-size:80px">🔋</div><div style="font-size:32px;font-weight:800;color:#111">batteries</div>
+        <div style="font-size:24px;font-weight:800;color:#7C3AED;margin-top:8px" id="vote-batt-n">0 votes</div>
+      </div>
+      <div style="background:#fff;border:3px solid #e5e7eb;border-radius:20px;padding:34px 54px;text-align:center;cursor:pointer;transition:all .2s" onclick="voteFor('wheel')" id="vote-wheel">
+        <div style="font-size:80px">🎡</div><div style="font-size:32px;font-weight:800;color:#111">the wheel</div>
+        <div style="font-size:24px;font-weight:800;color:#7C3AED;margin-top:8px" id="vote-wheel-n">0 votes</div>
+      </div>
+    </div>
+    <div class="task-card" style="max-width:1200px;margin:0 auto;text-align:center">💬 Say <i>"In my <b>opinion</b>, ___ is more <b>useful</b>, because ___."</i> — support your opinion with a <b>fact</b>.</div>
+    <span class="src-pill">Lesson Planner p. 235 · Extend</span>
+  </div>
+</div>
+
+<!-- SLIDE 33: WRAP UP — Act It Out -->
+<div class="slide" id="s33">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — Act It Out</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎭 Act out a word — the other person guesses!</div>
+    <div class="slide-h2">Tap the card to draw a random word. Keep going until every word has been acted. Acted: <b id="act-count" style="color:#5b21b6">0 / 14</b></div>
+    <div style="background:#fff;border:3px solid #7C3AED;border-radius:22px;padding:40px;text-align:center;max-width:760px;margin:0 auto;cursor:pointer" onclick="actDraw()" id="act-card">
+      <div style="font-size:84px" id="act-emoji">🎲</div>
+      <div style="font-size:46px;font-weight:800;color:#5b21b6;margin-top:10px" id="act-word">Tap to draw a word</div>
+    </div>
+    <div class="mg-win" id="act-win" style="max-width:760px;margin:0 auto">🎉 Every word acted out! Great performance.</div>
+    <span class="src-pill">Lesson Planner p. 235 · Wrap Up</span>
+  </div>
+</div>
+
+<!-- SLIDE 34: RECAP -->
+<div class="slide" id="s34">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Recap</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔁 "We learned about inventions."</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+      <div class="q-item" onclick="this.classList.add('done')"><span class="q-num">1</span><div>What words can you use to talk about inventions?<div class="q-ans">useful · idea · problem · solution</div></div></div>
+      <div class="q-item" onclick="this.classList.add('done')"><span class="q-num">2</span><div>What words describe what inventors do?<div class="q-ans">try · fail · succeed · use imagination and creativity</div></div></div>
+      <div class="q-item" onclick="this.classList.add('done')"><span class="q-num">3</span><div>Name some examples of inventions.<div class="q-ans">airplane · battery · car · cell phone · computer · eraser · wheel</div></div></div>
+      <div class="q-item" onclick="this.classList.add('done')"><span class="q-num">4</span><div>Write a sentence about an invention and the problem it solved.<div class="q-ans">Model: "Airplanes help people get quickly from one place to another."</div></div></div>
+    </div>
+    <span class="src-pill">Lesson Planner p. 234 · Wrap Up + Recap</span>
+  </div>
+</div>
+
+<!-- SLIDE 35: BE THE EXPERT — Suffix -ful -->
+<div class="slide" id="s35">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Be the Expert — Vocabulary Strategy</span></div>
+  <div class="content-body">
+    <div class="bte-header">Using the suffix -ful</div>
+    <div class="bte-body">
+      A letter or letters added to the end of a word is called a <b>suffix</b>. When a suffix is added to a word, it forms a new word with a
+      different meaning. A suffix may also change a word's part of speech.<br><br>
+      The suffix <b>-ful</b> means <b>"full of"</b>, or "having the qualities of". Other vocabulary words that contain -ful include
+      <b>beautiful</b>, <b>colorful</b>, and <b>wonderful</b>. Adding the suffix -ful to the words <i>beauty</i>, <i>color</i>, and <i>wonder</i>
+      changes each word from a <b>noun</b> to an <b>adjective</b>.
+    </div>
+    <div class="slide-h2">Tap to build each -ful word: <b id="suffix-count" style="color:#5b21b6">0 / 4</b></div>
+    <div class="chips-row" id="suffix-chips"></div>
+    <span class="src-pill">Lesson Planner p. 233 · Be the Expert</span>
+  </div>
+</div>
+
+<!-- SLIDE 36: BE THE EXPERT — Our World in Context -->
+<div class="slide" id="s36">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Be the Expert — Our World in Context</span></div>
+  <div class="content-body">
+    <div class="bte-header">Electricity around the world</div>
+    <div class="bte-body">
+      Located on the eastern part of the continent of Asia, <b>China</b> has the largest population of any country on Earth.
+      China also uses the greatest amount of <b>electricity</b> per year, as measured in kilowatt-hours.
+      After China, the countries that use the most electricity per year are the <b>United States</b>, <b>India</b>, <b>Japan</b>, and <b>Russia</b>.
+    </div>
+    <div class="slide-h2">🥇 Tap the countries in order, most electricity first: <b id="ctry-count" style="color:#5b21b6">0 / 5</b></div>
+    <div class="chips-row" id="ctry-chips"></div>
+    <div style="font-size:20px;font-weight:700;min-height:28px" id="ctry-fb"></div>
+    <span class="src-pill">Lesson Planner p. 233 · Be the Expert</span>
+  </div>
+</div>
+
+<!-- SLIDE 37: FORMATIVE ASSESSMENT -->
+<div class="slide" id="s37">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✔️ Can Leo…</div>
+    <div class="assess-grid">
+      <div class="assess-card" onclick="this.classList.toggle('yes')">
+        <div class="assess-q">…identify and use words related to inventions?</div>
+        <div style="font-size:17px;color:#7C3AED;font-weight:700">Ask: "What do inventors need?" · "What do inventors do if they fail the first time?"</div>
+      </div>
+      <div class="assess-card" onclick="this.classList.toggle('yes')">
+        <div class="assess-q">…tell how inventions are useful?</div>
+        <div style="font-size:17px;color:#7C3AED;font-weight:700">Ask: "What problems are solved by electricity?" · "What invention is a solution to the problem of not being able to move things?"</div>
+      </div>
+    </div>
+    <div class="task-card">📗 Workbook and Online Practice · Vocabulary 1 · Workbook pp. 82–83 · Activity Worksheet 7.1</div>
+    <span class="src-pill">Lesson Planner p. 235 · Formative Assessment</span>
+  </div>
+</div>
+
+<!-- SLIDE 38: MARK DONE -->
+<div class="slide" id="s38">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Finish the Lesson</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:24px">
+    <div style="font-size:90px">✅</div>
+    <div class="slide-h1" style="text-align:center">Unit 7 · Vocabulary 1 — taught</div>
+    <div class="slide-h2" style="text-align:center;max-width:1000px">Marking this done records it on the teacher dashboard. Leo's own Vocabulary 1 app tracks his 13 modules separately.</div>
+    <div class="done-wrap">
+      <button class="btn-done" id="doneBtn" onclick="markDone()">✅ Mark this lesson done</button>
+      <button class="btn-clear" id="redoBtn" onclick="handleRedo()">↺ Clear saved progress</button>
+      <div id="doneMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 39: GREAT JOB -->
+<div class="slide" id="s39">
+  <div class="great-job-slide">
+    <div style="font-size:96px">🏆</div>
+    <div style="font-size:64px;font-weight:900;text-align:center">Great Job, Leo!</div>
+    <div style="font-size:26px;opacity:.92;text-align:center;max-width:1000px">You learned 14 words about inventions — plus 7 academic words and 2 content words. 💡⚙️⚡</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:1200px">
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">💡⚙️ an invention</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">❓ a problem</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">✅ a solution</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">⚡ electricity</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">💭 imagination</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🏆 succeed</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
+
+<!-- NAV BAR -->
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 39</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="fs-btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+  <span id="unit-label">Unit 7 · Vocabulary 1</span>
+</div>
+
+<!-- TEACHER NOTES PANEL -->
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+<script>
+/* =========================================================
+   LEEA · Our World Level 4 · Unit 7 · Vocabulary 1
+   Teacher slideshow — 39 slides, 1920x1080, purple (L4)
+   ========================================================= */
+
+// ─── MARK DONE STORAGE ─────────────────────────────────────────
+var SAVE_PREFIX = 'leea.l4.u7.vocab1-';
+var HOMEWORK_ID = 'l-4-7-vocab1';
+/* Must match the `id` in lessons/vocab1.teacher.json — the teacher dashboard
+   reads leea.lessonProgress.v1 keyed by that lesson id. */
+var LESSON_ID = 'ow-l4-u7-vocab-1';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+var LESSON_NAME = 'Unit 7 · Vocabulary 1 — Good Idea!';
+
+function lSave(key, value) {
+  try {
+    var k = SAVE_PREFIX + key;
+    window.localStorage.setItem(k, JSON.stringify(value));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, value);
+    }
+  } catch (e) {}
+}
+function lLoad(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(SAVE_PREFIX + key);
+    return raw === null || raw === undefined ? fallback : JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function writeLessonProgress() {
+  try {
+    var store = {};
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (raw) store = JSON.parse(raw) || {};
+    var now = new Date().toISOString();
+    store[LESSON_ID] = { lessonId: LESSON_ID, teacherId: 'neritan', studentId: 'leo',
+                         status: 'done', completedAt: now, updatedAt: now };
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function clearLessonProgress() {
+  try {
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function markDone() {
+  writeLessonProgress();
+  lSave('complete', { name: LESSON_NAME, timestamp: new Date().toISOString(), done: true });
+  lSave('done', true);
+  var btn = document.getElementById('doneBtn');
+  if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+  var msg = document.getElementById('doneMsg');
+  if (msg) msg.textContent = 'Saved. 14 invention words taught. 💡';
+}
+var redoArmed = false, redoTimer = null;
+function handleRedo() {
+  var btn = document.getElementById('redoBtn');
+  var msg = document.getElementById('doneMsg');
+  if (!redoArmed) {
+    redoArmed = true;
+    btn.textContent = '↺ Tap again to clear';
+    if (msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+    if (redoTimer) window.clearTimeout(redoTimer);
+    redoTimer = window.setTimeout(function () {
+      redoArmed = false;
+      btn.textContent = '↺ Clear saved progress';
+      if (msg) msg.textContent = '';
+    }, 3000);
+    return;
+  }
+  redoArmed = false;
+  if (redoTimer) window.clearTimeout(redoTimer);
+  btn.textContent = '↺ Clear saved progress';
+  clearLessonProgress();
+  lSave('complete', null);
+  lSave('done', null);
+  var d = document.getElementById('doneBtn');
+  if (d) { d.classList.remove('confirmed'); d.textContent = '✅ Mark this lesson done'; }
+  if (msg) msg.textContent = 'Cleared.';
+}
+function restoreDoneState() {
+  var c = lLoad('complete', null);
+  if (c && c.done) {
+    var btn = document.getElementById('doneBtn');
+    if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+    var msg = document.getElementById('doneMsg');
+    if (msg) msg.textContent = 'Already marked done.';
+  }
+}
+
+// ─── VOCAB DATA (14 target words, TR 7.2 order) ────────────────
+var vocabWords = [
+  { key:'invention',   word:'an invention', emoji:'💡⚙️', ipa:'/ɪnˈvɛnʃən/',      pos:'noun',      def:'a new thing that someone has made for the first time', jp:'発明（はつめい）— だれかが新しく作り出したもの。',              sent:'The windshield wiper was a useful invention.' },
+  { key:'problem',     word:'a problem',    emoji:'❓',   ipa:'/ˈprɒbləm/',       pos:'noun',      def:'something that is wrong and needs to be fixed',        jp:'問題（もんだい）— うまくいっていなくて、なおさなくてはいけないこと。', sent:"I have a problem. My invention isn't working." },
+  { key:'solution',    word:'a solution',   emoji:'✅',   ipa:'/səˈluːʃən/',      pos:'noun',      def:'a way to fix a problem',                               jp:'解決策（かいけつさく）— 問題をなおす方法。',                    sent:'Do you know a good solution?' },
+  { key:'wheel',       word:'a wheel',      emoji:'🎡',   ipa:'/wiːl/',           pos:'noun',      def:'a round object that turns and helps things move',      jp:'車輪（しゃりん）— 回って動くまるい部品。',                     sent:'Wheels are the most famous invention.' },
+  { key:'electricity', word:'electricity',  emoji:'⚡',   ipa:'/ɪˌlɛkˈtrɪsəti/',  pos:'noun',      def:'a kind of energy that powers lights and machines',     jp:'電気（でんき）— あかりや機械を動かすエネルギー。',               sent:'Did you know that electricity is not an invention?' },
+  { key:'useful',      word:'useful',       emoji:'🛠️',   ipa:'/ˈjuːsfəl/',       pos:'adjective', def:'helpful for doing something',                          jp:'役に立つ — 何かをするときに助けになる、便利な。',                sent:'Umbrellas are useful in the rain.' },
+  { key:'battery',     word:'a battery',    emoji:'🔋',   ipa:'/ˈbætəri/',        pos:'noun',      def:'an object that stores electricity to power devices',   jp:'電池（でんち）— 電気をためて、機械を動かすためのもの。',          sent:'My cell phone needs a new battery.' },
+  { key:'imagination', word:'imagination',  emoji:'💭',   ipa:'/ɪˌmædʒɪˈneɪʃən/', pos:'noun',      def:'the ability to picture things in your mind',           jp:'想像力（そうぞうりょく）— 頭の中でいろいろなものを思いうかべる力。', sent:'My sister writes cool stories. She has a lot of imagination.' },
+  { key:'creativity',  word:'creativity',   emoji:'🎨',   ipa:'/ˌkriːeɪˈtɪvəti/', pos:'noun',      def:'the ability to make or think of new ideas',            jp:'創造性（そうぞうせい）— 新しいものを作ったり考えたりする力。',      sent:'To invent things, you need creativity.' },
+  { key:'idea',        word:'an idea',      emoji:'💡',   ipa:'/aɪˈdiːə/',        pos:'noun',      def:'a thought or plan that you make up in your mind',      jp:'アイデア — 頭の中で考えたこと。',                             sent:'That was a good idea!' },
+  { key:'invent',      word:'invent',       emoji:'🔬',   ipa:'/ɪnˈvɛnt/',        pos:'verb',      def:'to make something new for the first time',             jp:'発明（はつめい）する — 今までにない新しいものを作ること。',        sent:'Who invented electric lights?' },
+  { key:'try',         word:'try',          emoji:'💪',   ipa:'/traɪ/',           pos:'verb',      def:'to do your best to do something',                      jp:'やってみる — うまくいくようにがんばってみること。',              sent:'What are you trying to do?' },
+  { key:'fail',        word:'fail',         emoji:'❌',   ipa:'/feɪl/',           pos:'verb',      def:'to not succeed at something',                          jp:'失敗（しっぱい）する — うまくいかないこと。',                    sent:"I studied very hard, so I won't fail." },
+  { key:'succeed',     word:'succeed',      emoji:'🏆',   ipa:'/səkˈsiːd/',       pos:'verb',      def:'to do something well, the way you wanted',             jp:'成功（せいこう）する — やりたいことがうまくいくこと。',           sent:'The Wright brothers succeeded.' }
+];
+
+// ─── NOTES ─────────────────────────────────────────────────────
+var NOTES = {
+  1: '<p class="tn-lbl">Title</p><p>Show Leo the 14 words. Ask: "Which of these do you already know?"</p>',
+  2: '<p class="tn-lbl">Objectives</p><p>Read both objectives aloud. Materials for later: a cell phone and scissors.</p>',
+  3: '<p class="tn-lbl">Academic Language</p><p>Tap all 7 cards. These are the words we use to <i>talk about</i> the lesson — fact vs opinion matters again in Writing.</p>',
+  4: '<p class="tn-lbl">Content Vocabulary</p><p>imagine and public appear in the reading but are not target words.</p>',
+  5: '<p class="tn-lbl">an invention</p><p>Invention Hunt: 6 human-made things among 6 natural things. Lightning is the tricky one — nature, not an invention.</p>',
+  6: '<p class="tn-lbl">a problem</p><p>Read each scene aloud before Leo chooses. Answers: no way to move it · nothing to see with · the ball is flat.</p>',
+  7: '<p class="tn-lbl">a solution</p><p>Tap a problem then its solution. Say "a solution <b>to</b> a problem" each time.</p>',
+  8: '<p class="tn-lbl">a wheel</p><p>Tap ROLL together and count to 12. Point out the wheel turning as the cart moves.</p>',
+  9: '<p class="tn-lbl">electricity</p><p>Only 6 tiles need electricity. Remind Leo: electricity is NOT an invention — it was discovered.</p>',
+  10:'<p class="tn-lbl">useful</p><p>Say the suffix aloud: use + -ful = useful. Answers: umbrella · flashlight · pump.</p>',
+  11:'<p class="tn-lbl">a battery</p><p>Tap CHARGE 10 times. Show Leo a real cell phone here (Materials list, LP p. 232).</p>',
+  12:'<p class="tn-lbl">imagination</p><p>Read each description with Leo\'s eyes closed first, then let him tap.</p>',
+  13:'<p class="tn-lbl">creativity</p><p>Each blank card invents something new. Ask "Would you buy that?" after each one.</p>',
+  14:'<p class="tn-lbl">an idea</p><p>Six real ideas. Stress the order: idea first, invention second.</p>',
+  15:'<p class="tn-lbl">invent</p><p>Answers: Mary Anderson · the Wright brothers · 1903 · Santos-Dumont (1906, Paris).</p>',
+  16:'<p class="tn-lbl">try</p><p>The first three shots are always saved — that is the point. Keep tapping until 3 goals.</p>',
+  17:'<p class="tn-lbl">fail</p><p>Five real failures that led somewhere. Link back to Mary Anderson on p. 117.</p>',
+  18:'<p class="tn-lbl">succeed</p><p>Six quick questions. Each correct answer climbs one step of the podium.</p>',
+  19:'<p class="tn-lbl">Vocabulary Review</p><p>Quick oral recall of all 14 words before the reading. Mark the ones Leo already knows.</p>',
+  20:'<p class="tn-lbl">Warm Up (Recycle)</p><p>LP p. 232: write Long Ago / Today on the board. Point to candles → electric lights, tell stories → phones and games.</p>',
+  21:'<p class="tn-lbl">Present</p><p>LP p. 232: "Repeat each word after me." Point to and say each word, then tap its chip.</p>',
+  22:'<p class="tn-lbl">Present — Word Web</p><p>What does an inventor need? Type Leo\'s answers straight into the ovals (imagination, creativity, ideas...).</p>',
+  23:'<p class="tn-lbl">Practice — TR 7.1</p><p>Play TR 7.1. Word Radar: Leo taps each purple word the moment he hears it.</p>',
+  24:'<p class="tn-lbl">Practice — TR 7.1 (cont.)</p><p>Paragraphs 3 and 4 plus the Wright brothers photo note.</p>',
+  25:'<p class="tn-lbl">Discuss</p><p>LP p. 233 questions verbatim. Ask each one before tapping to reveal.</p>',
+  26:'<p class="tn-lbl">Three-column chart</p><p>LP p. 234 answer key: Invention (batteries, electricity, wheel) · What an inventor does (fail, invent, succeed, try) · What an inventor needs (creativity, idea, imagination).</p>',
+  27:'<p class="tn-lbl">Practice — TR 7.2</p><p>Play TR 7.2. Leo repeats each word AND its sentence. Tap the row once he has echoed it.</p>',
+  28:'<p class="tn-lbl">Build the Sentence</p><p>LP p. 234: "An invention is a useful solution to a problem." Then underline the four target words.</p>',
+  29:'<p class="tn-lbl">Apply — Model Dialogue</p><p>SB p. 117 Activity 3. Model both parts, then swap roles.</p>',
+  30:'<p class="tn-lbl">Apply — Build a Question</p><p>Leo builds his own question with the chips, then asks Dad. Write the answer down.</p>',
+  31:'<p class="tn-lbl">Extend — Word Web 2</p><p>LP p. 235: batteries OR the wheel in the centre. Add things that use it, then explain why yours is more useful.</p>',
+  32:'<p class="tn-lbl">Extend — Vote</p><p>After presenting, vote. Model "In my opinion… because…" — an opinion supported by a fact.</p>',
+  33:'<p class="tn-lbl">Wrap Up — Act It Out</p><p>LP p. 235: act out a word, the other person guesses. Challenge Leo with the harder nouns (invention, imagination).</p>',
+  34:'<p class="tn-lbl">Recap</p><p>LP p. 234 Recap questions. Tap each to reveal the expected answer.</p>',
+  35:'<p class="tn-lbl">Be the Expert — suffix -ful</p><p>Verbatim from LP p. 233. Build the four -ful words together.</p>',
+  36:'<p class="tn-lbl">Be the Expert — Our World in Context</p><p>Order: China, United States, India, Japan, Russia. Tap them in that order.</p>',
+  37:'<p class="tn-lbl">Formative Assessment</p><p>Tap each card once Leo answers correctly. Then set Workbook pp. 82–83.</p>',
+  38:'<p class="tn-lbl">Mark Done</p><p>Records this lesson on the teacher dashboard. Leo\'s app tracks his own 13 modules separately.</p>',
+  39:'<p class="tn-lbl">Great Job!</p><p>Celebrate. Next up: the Unit 7 Song (TR 7.3, "Inventions").</p>'
+};
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+var TOTAL = 39;
+var cur = 1;
+function goTo(n) {
+  n = Math.max(1, Math.min(TOTAL, n));
+  var old = document.getElementById('s' + cur);
+  if (old) old.classList.remove('active');
+  cur = n;
+  var next = document.getElementById('s' + cur);
+  if (next) next.classList.add('active');
+  document.getElementById('slide-counter').textContent = cur + ' / ' + TOTAL;
+  document.getElementById('tn-content').innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
+  if (SLIDE_INIT[cur]) SLIDE_INIT[cur]();
+}
+document.addEventListener('keydown', function (e) {
+  if (e.target && (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+var notesOpen = false;
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('notes-btn').classList.toggle('active', notesOpen);
+  scale();
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange', function () {
+  var btn = document.getElementById('fs-btn');
+  var active = !!document.fullscreenElement;
+  btn.textContent = active ? '⛶ Exit Full (F)' : '⛶ Fullscreen (F)';
+  btn.classList.toggle('active', active);
+  scale();
+});
+function scale() {
+  var s = document.getElementById('scaler');
+  var availW = window.innerWidth - (notesOpen ? 440 : 0);
+  var availH = window.innerHeight - 52;
+  var r = Math.min(availW / 1920, availH / 1080);
+  s.style.transform = 'scale(' + r + ')';
+  s.style.left = ((availW - 1920 * r) / 2) + 'px';
+  s.style.top = ((availH - 1080 * r) / 2) + 'px';
+  s.style.position = 'fixed';
+}
+window.addEventListener('resize', scale);
+
+function popEmoji(el) {
+  el.style.transform = 'scale(1.2) rotate(-8deg)';
+  setTimeout(function () { el.style.transform = ''; }, 260);
+}
+function shuffled(arr) { return arr.slice().sort(function () { return Math.random() - 0.5; }); }
+
+// ═══ SHARED MINI-GAME ENGINE ═══════════════════════════════════
+// Every game states a goal, keeps a live score, gives wrong-answer
+// feedback, and fires a win message. Reused across the 14 word slides.
+
+/* 1. Catch-the-X grid ---------------------------------------- */
+function buildTapGrid(id, targets, distractors, onWin) {
+  var grid = document.getElementById(id + '-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var hits = 0, misses = 0;
+  var all = shuffled(targets.map(function (t) { return { t: t, ok: true }; })
+    .concat(distractors.map(function (t) { return { t: t, ok: false }; })));
+  all.forEach(function (item) {
+    var tile = document.createElement('div');
+    tile.className = 'mg-tile';
+    tile.innerHTML = item.t.e + '<span class="mg-label">' + item.t.l + '</span>';
+    tile.onclick = function () {
+      if (tile.classList.contains('hit')) return;
+      if (item.ok) {
+        tile.classList.add('hit');
+        hits++;
+        document.getElementById(id + '-score').textContent = hits + ' / ' + targets.length;
+        if (hits >= targets.length) {
+          document.getElementById(id + '-win').classList.add('show');
+          if (onWin) onWin();
+        }
+      } else {
+        misses++;
+        tile.classList.add('miss');
+        document.getElementById(id + '-miss').textContent = '✖ ' + misses + ' miss' + (misses === 1 ? '' : 'es') + ' — that one is not it!';
+        setTimeout(function () { tile.classList.remove('miss'); }, 350);
+      }
+    };
+    grid.appendChild(tile);
+  });
+}
+
+/* 2. Multi-round MCQ ----------------------------------------- */
+function buildMcqRounds(id, rounds, onEach) {
+  var stage = document.getElementById(id + '-stage');
+  if (!stage || stage.dataset.built) return;
+  stage.dataset.built = '1';
+  var idx = 0, score = 0, misses = 0;
+  function render() {
+    if (idx >= rounds.length) {
+      stage.innerHTML = '<div style="font-size:56px">🎉</div>';
+      document.getElementById(id + '-win').classList.add('show');
+      return;
+    }
+    var r = rounds[idx];
+    stage.innerHTML = '<div style="font-size:60px">' + r.emoji + '</div>' +
+      '<div style="font-size:22px;font-weight:700;color:#374151;text-align:center;max-width:640px">' + r.q + '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:620px" id="' + id + '-opts"></div>';
+    var box = document.getElementById(id + '-opts');
+    r.opts.forEach(function (o, oi) {
+      var b = document.createElement('button');
+      b.className = 'mg-opt';
+      b.textContent = String.fromCharCode(65 + oi) + ')  ' + o;
+      b.onclick = function () {
+        if (oi === r.ans) {
+          b.classList.add('ok');
+          score++;
+          document.getElementById(id + '-score').textContent = score + ' / ' + rounds.length;
+          if (onEach) onEach(score);
+          setTimeout(function () { idx++; render(); }, 700);
+        } else {
+          b.classList.add('no');
+          misses++;
+          document.getElementById(id + '-miss').textContent = '✖ Not that one — try again.';
+          setTimeout(function () { b.classList.remove('no'); document.getElementById(id + '-miss').textContent = ''; }, 900);
+        }
+      };
+      box.appendChild(b);
+    });
+  }
+  render();
+}
+
+/* 3. Pair match ---------------------------------------------- */
+function buildPairMatch(id, pairs, onWin) {
+  var wrap = document.getElementById(id + '-pair');
+  if (!wrap || wrap.dataset.built) return;
+  wrap.dataset.built = '1';
+  var sel = null, done = 0, misses = 0;
+  var lCol = document.createElement('div'); lCol.className = 'mg-col';
+  var rCol = document.createElement('div'); rCol.className = 'mg-col';
+  function mk(text, key, side) {
+    var b = document.createElement('button');
+    b.className = 'mg-pbtn';
+    b.textContent = text;
+    b.onclick = function () {
+      if (b.classList.contains('done')) return;
+      if (!sel) { sel = { b: b, key: key, side: side }; b.classList.add('sel'); return; }
+      if (sel.side === side) { sel.b.classList.remove('sel'); sel = { b: b, key: key, side: side }; b.classList.add('sel'); return; }
+      var prev = sel; sel = null;
+      if (prev.key === key) {
+        b.classList.remove('sel'); prev.b.classList.remove('sel');
+        b.classList.add('done'); prev.b.classList.add('done');
+        done++;
+        document.getElementById(id + '-score').textContent = done + ' / ' + pairs.length;
+        if (done >= pairs.length) { document.getElementById(id + '-win').classList.add('show'); if (onWin) onWin(); }
+      } else {
+        misses++;
+        b.classList.add('bad'); prev.b.classList.add('bad');
+        document.getElementById(id + '-miss').textContent = '✖ ' + misses + ' — that solution belongs to another problem.';
+        setTimeout(function () {
+          b.classList.remove('bad', 'sel'); prev.b.classList.remove('bad', 'sel');
+        }, 700);
+      }
+    };
+    return b;
+  }
+  pairs.forEach(function (p) { lCol.appendChild(mk(p.problem, p.key, 'L')); });
+  shuffled(pairs).forEach(function (p) { rCol.appendChild(mk(p.solution, p.key, 'R')); });
+  wrap.appendChild(lCol); wrap.appendChild(rCol);
+}
+
+/* 4. Tap-to-flip discovery cards ------------------------------ */
+function buildFlipCards(id, cards, cols) {
+  var grid = document.getElementById(id + '-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  if (cols) grid.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)';
+  var open = 0;
+  cards.forEach(function (c) {
+    var el = document.createElement('div');
+    el.className = 'mg-flip';
+    el.innerHTML = '<div class="mf-front">' + c.front + '</div><div class="mf-back">' + c.back + '</div>';
+    el.onclick = function () {
+      if (el.classList.contains('open')) return;
+      el.classList.add('open');
+      open++;
+      document.getElementById(id + '-score').textContent = open + ' / ' + cards.length;
+      if (open >= cards.length) document.getElementById(id + '-win').classList.add('show');
+    };
+    grid.appendChild(el);
+  });
+}
+
+// ═══ PER-WORD GAMES ════════════════════════════════════════════
+
+// 1 · an invention — Invention Hunt
+function initInvention() {
+  buildTapGrid('g-invention',
+    [{e:'🎡',l:'wheel'},{e:'🔋',l:'battery'},{e:'📱',l:'cell phone'},{e:'✈️',l:'airplane'},{e:'💡',l:'light bulb'},{e:'💻',l:'computer'}],
+    [{e:'🌩️',l:'lightning'},{e:'🌧️',l:'rain'},{e:'🌳',l:'tree'},{e:'⛰️',l:'mountain'},{e:'☀️',l:'the sun'},{e:'🌊',l:'the sea'}]);
+}
+// 2 · a problem — Spot the Problem
+function initProblem() {
+  buildMcqRounds('g-problem', [
+    { emoji:'🪨', q:'5,000 years ago people had to push or pull heavy stones along the ground. What is the problem?', opts:['They cannot move heavy things easily.','They have too many wheels.','They have too much electricity.'], ans:0 },
+    { emoji:'🌑', q:'It is night. There are no electric lights yet. What is the problem?', opts:['There is nothing to eat.','They cannot see at night.','The wheel is broken.'], ans:1 },
+    { emoji:'⚽', q:'Kick-off is in five minutes and the ball is flat. What is the problem?', opts:['The ball has no air in it.','The stadium is too big.','The kit is the wrong colour.'], ans:0 }
+  ]);
+}
+// 3 · a solution — Fix It!
+function initSolution() {
+  buildPairMatch('g-solution', [
+    { key:'move',  problem:'🪨 We cannot move heavy things.',    solution:'🎡 Put them on wheels.' },
+    { key:'dark',  problem:'🌑 We cannot see at night.',          solution:'💡 Use electric lights.' },
+    { key:'power', problem:'🔌 There is no plug in the park.',     solution:'🔋 Use a battery.' },
+    { key:'snow',  problem:'❄️ Snow covers the windshield.',       solution:'🚗 Fit a windshield wiper.' }
+  ]);
+}
+// 4 · a wheel — Roll the Cart
+var wheelTaps = 0;
+function wheelRoll() {
+  if (wheelTaps >= 12) return;
+  wheelTaps++;
+  document.getElementById('g-wheel-spin').style.transform = 'rotate(' + (wheelTaps * 120) + 'deg)';
+  document.getElementById('g-wheel-cart').style.left = (2 + wheelTaps * 7.2) + '%';
+  document.getElementById('g-wheel-score').textContent = wheelTaps + ' / 12';
+  if (wheelTaps >= 12) {
+    document.getElementById('g-wheel-win').classList.add('show');
+    document.getElementById('g-wheel-btn').disabled = true;
+  }
+}
+function initWheel() { }
+// 5 · electricity — Power Up the Stadium
+function initElectricity() {
+  var lamps = document.getElementById('g-elec-lamps');
+  if (lamps && !lamps.dataset.built) {
+    lamps.dataset.built = '1';
+    for (var i = 0; i < 6; i++) {
+      var s = document.createElement('span');
+      s.className = 'mg-lamp'; s.id = 'g-elec-lamp-' + i; s.textContent = '💡';
+      lamps.appendChild(s);
+    }
+  }
+  var lit = 0;
+  buildTapGrid('g-elec',
+    [{e:'💡',l:'floodlights'},{e:'📱',l:'cell phone'},{e:'💻',l:'computer'},{e:'📺',l:'big screen'},{e:'🧊',l:'refrigerator'},{e:'🚇',l:'train'}],
+    [{e:'⚽',l:'a ball'},{e:'📕',l:'a book'},{e:'🥅',l:'a goal net'},{e:'🧤',l:'gloves'},{e:'🌳',l:'a tree'},{e:'🪨',l:'a stone'}],
+    null);
+  // light one floodlight per correct tap
+  var grid = document.getElementById('g-elec-grid');
+  if (grid && !grid.dataset.lampHook) {
+    grid.dataset.lampHook = '1';
+    grid.addEventListener('click', function () {
+      var hits = grid.querySelectorAll('.mg-tile.hit').length;
+      for (var i = 0; i < hits && i < 6; i++) {
+        var l = document.getElementById('g-elec-lamp-' + i);
+        if (l) l.classList.add('on');
+      }
+    });
+  }
+}
+// 6 · useful — What's Useful Here?
+function initUseful() {
+  buildMcqRounds('g-useful', [
+    { emoji:'🌧️', q:'It is raining hard on the way to the match. Which one is useful?', opts:['☂️ an umbrella','🕯️ a candle','🎡 a wheel'], ans:0 },
+    { emoji:'🌑', q:'The power is out and the room is dark. Which one is useful?', opts:['📕 a book','🔦 a flashlight','🎨 paint'], ans:1 },
+    { emoji:'⚽', q:'The ball is flat five minutes before kick-off. Which one is useful?', opts:['🧤 gloves','🥅 a net','🎈 a pump'], ans:2 }
+  ]);
+}
+// 7 · a battery — Charge It!
+var battPct = 0;
+function battCharge() {
+  if (battPct >= 100) return;
+  battPct += 10;
+  document.getElementById('g-batt-fill').style.width = battPct + '%';
+  document.getElementById('g-batt-score').textContent = battPct + ' %';
+  if (battPct >= 100) {
+    var phone = document.getElementById('g-batt-phone');
+    phone.style.filter = 'none'; phone.style.opacity = '1'; phone.style.transform = 'scale(1.2)';
+    document.getElementById('g-batt-win').classList.add('show');
+    document.getElementById('g-batt-btn').disabled = true;
+  }
+}
+function initBattery() { }
+// 8 · imagination — Picture It!
+function initImagination() {
+  buildMcqRounds('g-imag', [
+    { emoji:'💭', q:'"Imagine a machine with two wheels that you push with your feet." What did you picture?', opts:['🚲 a bicycle','🛩️ a plane','🔋 a battery'], ans:0 },
+    { emoji:'💭', q:'"Imagine a stadium at night with 80,000 people and huge lights." What did you picture?', opts:['📚 a library','🏟️ a football stadium','🏕️ a campsite'], ans:1 },
+    { emoji:'💭', q:'"Imagine a suit that flies and is made of metal." Which movie invention is it?', opts:['🕷️ web-shooters','🦇 the Batmobile','🤖 the Iron Man suit'], ans:2 },
+    { emoji:'💭', q:'"Imagine something small that stores electricity and fits in your hand."', opts:['🔋 a battery','🌳 a tree','🎡 a wheel'], ans:0 }
+  ]);
+}
+// 9 · creativity — Invention Lab
+function initCreativity() {
+  buildFlipCards('g-creat', [
+    { front:'❔', back:'⚽🔋<br>A ball with a battery inside that lights up at night' },
+    { front:'❔', back:'👟🎡<br>Shoes with tiny wheels for getting to school fast' },
+    { front:'❔', back:'☂️💡<br>An umbrella with a light in the handle' },
+    { front:'❔', back:'🎒🔌<br>A backpack that charges your phone as you walk' },
+    { front:'❔', back:'🥅📱<br>A goal that sends the score straight to your phone' }
+  ], 3);
+}
+// 10 · an idea — Light the Bulbs
+function initIdea() {
+  buildFlipCards('g-idea', [
+    { front:'💡', back:'🎡<br>"Roll it instead of dragging it." → the wheel' },
+    { front:'💡', back:'🚗<br>"Wipe the snow without opening the window." → the windshield wiper' },
+    { front:'💡', back:'✈️<br>"Build wings we can steer." → the airplane' },
+    { front:'💡', back:'🔋<br>"Store electricity in a small box." → the battery' },
+    { front:'💡', back:'📱<br>"Put a telephone in your pocket." → the cell phone' },
+    { front:'💡', back:'💻<br>"Make a machine that thinks in numbers." → the computer' }
+  ], 3);
+}
+// 11 · invent — Who Invented It?
+function initInvent() {
+  buildMcqRounds('g-invent', [
+    { emoji:'🚗', q:'Who drew the idea for the windshield wiper in 1903?', opts:['Mary Anderson','Alberto Santos-Dumont','Wilbur Wright'], ans:0 },
+    { emoji:'✈️', q:'Who tried to fly many times and finally succeeded in 1903?', opts:['Mary Anderson','the Wright brothers','Iron Man'], ans:1 },
+    { emoji:'📅', q:'In what year did the Wright brothers fly a plane?', opts:['1906','1972','1903'], ans:2 },
+    { emoji:'🇫🇷', q:'Who had the world’s first public flight, in 1906 outside Paris?', opts:['Alberto Santos-Dumont','Mary Anderson','Orville Wright'], ans:0 }
+  ]);
+}
+// 12 · try — Keep Trying!
+var tryGoals = 0, tryAttempts = 0;
+function tryShoot() {
+  tryAttempts++;
+  var msg = document.getElementById('g-try-msg');
+  var scored = tryAttempts > 3 && Math.random() > 0.35;
+  if (scored) {
+    tryGoals++;
+    msg.textContent = '⚽ GOAL! Attempt ' + tryAttempts + '.';
+    document.getElementById('g-try-keeper').style.transform = 'translateY(-14px) rotate(-25deg)';
+  } else {
+    msg.textContent = '🧤 Saved! Try again — attempt ' + tryAttempts + '.';
+    document.getElementById('g-try-keeper').style.transform = 'scale(1.15)';
+  }
+  setTimeout(function () { document.getElementById('g-try-keeper').style.transform = ''; }, 400);
+  document.getElementById('g-try-score').textContent = 'Goals ' + tryGoals + ' / 3';
+  document.getElementById('g-try-miss').textContent = 'Tries: ' + tryAttempts;
+  if (tryGoals >= 3) {
+    document.getElementById('g-try-win').classList.add('show');
+    document.getElementById('g-try-btn').disabled = true;
+    msg.textContent = 'You tried ' + tryAttempts + ' times and scored 3.';
+  }
+}
+function initTry() { }
+// 13 · fail — Famous Fails
+function initFail() {
+  buildFlipCards('g-fail', [
+    { front:'🚗', back:'Mary Anderson <b>failed</b> to sell her wiper.<br>Today every car has one.' },
+    { front:'✈️', back:'The Wright brothers <b>failed</b> many times.<br>Then they flew in 1903.' },
+    { front:'💡', back:'Early light bulbs burned out fast.<br>Inventors kept <b>trying</b> until one lasted.' },
+    { front:'⚽', back:'A striker misses three shots.<br>The fourth one is a goal.' },
+    { front:'🔋', back:'The first batteries were weak and leaked.<br>Now one fits in your phone.' }
+  ], 3);
+}
+// 14 · succeed — Climb to Success
+function initSucceed() {
+  var steps = document.getElementById('g-succ-steps');
+  if (steps && !steps.dataset.built) {
+    steps.dataset.built = '1';
+    for (var i = 0; i < 6; i++) {
+      var d = document.createElement('div');
+      d.id = 'g-succ-step-' + i;
+      d.style.cssText = 'width:44px;height:' + (24 + i * 14) + 'px;background:#e5e7eb;border-radius:6px 6px 0 0;transition:background .3s';
+      steps.appendChild(d);
+    }
+    var climber = document.createElement('div');
+    climber.id = 'g-succ-climber';
+    climber.style.cssText = 'font-size:36px;align-self:flex-end;margin-left:6px';
+    climber.textContent = '🧗';
+    steps.appendChild(climber);
+  }
+  buildMcqRounds('g-succ', [
+    { emoji:'🏆', q:'Which word means "to do something the way you wanted"?', opts:['succeed','fail','try'], ans:0 },
+    { emoji:'❌', q:'What is the opposite of succeed?', opts:['invent','fail','imagine'], ans:1 },
+    { emoji:'✈️', q:'The Wright brothers succeeded in which year?', opts:['1906','1972','1903'], ans:2 },
+    { emoji:'💪', q:'What do inventors do many times before they succeed?', opts:['They fail.','They stop.','They sleep.'], ans:0 },
+    { emoji:'🧠', q:'What two things do inventors need to succeed?', opts:['wheels and batteries','imagination and creativity','rain and lightning'], ans:1 },
+    { emoji:'✅', q:'An invention is a useful ___ to a problem.', opts:['battery','wheel','solution'], ans:2 }
+  ], function (score) {
+    for (var i = 0; i < score; i++) {
+      var s = document.getElementById('g-succ-step-' + i);
+      if (s) s.style.background = '#7C3AED';
+    }
+    var c = document.getElementById('g-succ-climber');
+    if (c && score >= 6) c.textContent = '🏆';
+  });
+}
+
+// ─── SLIDE 3: ACADEMIC LANGUAGE ────────────────────────────────
+var acWords = [
+  { e:'🌐', w:'generalize', d:'to talk about a whole group, not one thing' },
+  { e:'🎯', w:'specific',   d:'about one particular thing — not general' },
+  { e:'📊', w:'chart',      d:'information in rows, columns or boxes' },
+  { e:'📈', w:'graph',      d:'lines, bars or dots that compare numbers' },
+  { e:'💬', w:'opinion',    d:'what one person thinks — not everyone agrees' },
+  { e:'📋', w:'fact',       d:'true information you can check' },
+  { e:'🤝', w:'support',    d:'give facts that back up your opinion' }
+];
+function initAcademic() {
+  var grid = document.getElementById('ac-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var tapped = 0;
+  acWords.forEach(function (a) {
+    var el = document.createElement('div');
+    el.className = 'mg-flip';
+    el.innerHTML = '<div class="mf-front">' + a.e + '<div style="font-size:19px;font-weight:800;color:#111;margin-top:6px">' + a.w + '</div></div>' +
+                   '<div class="mf-back">' + a.d + '</div>';
+    el.onclick = function () {
+      if (el.classList.contains('open')) return;
+      el.classList.add('open');
+      tapped++;
+      document.getElementById('ac-score').textContent = tapped + ' / 7 tapped';
+      if (tapped >= acWords.length) document.getElementById('ac-win').classList.add('show');
+    };
+    grid.appendChild(el);
+  });
+}
+
+// ─── SLIDE 19: VOCABULARY REVIEW ───────────────────────────────
+var vrIdx = 0;
+var vrKnown = {};
+function initVocabReview() {
+  var tabs = document.getElementById('vr-tabs');
+  if (tabs && !tabs.dataset.built) {
+    tabs.dataset.built = '1';
+    vocabWords.forEach(function (w, i) {
+      var b = document.createElement('button');
+      b.className = 'vr-tab' + (i === 0 ? ' active' : '');
+      b.id = 'vr-tab-' + i;
+      b.textContent = [].concat(Array.from(w.emoji))[0] + ' ' + w.word;
+      b.onclick = function () { vrShow(i); };
+      tabs.appendChild(b);
+    });
+  }
+  vrShow(vrIdx);
+}
+function vrShow(i) {
+  vrIdx = i;
+  var w = vocabWords[i];
+  document.querySelectorAll('.vr-tab').forEach(function (t, ti) { t.classList.toggle('active', ti === i); });
+  document.getElementById('vr-emoji').textContent = w.emoji;
+  document.getElementById('vr-word').textContent = w.word;
+  document.getElementById('vr-ipa').textContent = w.ipa;
+  document.getElementById('vr-pos').textContent = w.pos;
+  document.getElementById('vr-jp').textContent = '🇯🇵 ' + w.jp;
+  document.getElementById('vr-q').textContent = 'What does "' + w.word + '" mean?';
+  document.getElementById('vr-fb').textContent = '';
+  var wrong = vocabWords.filter(function (x) { return x.key !== w.key; });
+  var opts = shuffled([w.def, shuffled(wrong)[0].def, shuffled(wrong)[1].def]);
+  var box = document.getElementById('vr-opts');
+  box.innerHTML = '';
+  opts.forEach(function (o) {
+    var b = document.createElement('button');
+    b.className = 'mg-opt';
+    b.textContent = o;
+    b.onclick = function () {
+      var fb = document.getElementById('vr-fb');
+      if (o === w.def) {
+        b.classList.add('ok');
+        fb.style.color = '#7C3AED'; fb.textContent = '✅ Correct!';
+      } else {
+        b.classList.add('no');
+        fb.style.color = '#ef4444'; fb.textContent = '❌ Not quite — try again.';
+      }
+    };
+    box.appendChild(b);
+  });
+  var mark = document.getElementById('vr-mark');
+  mark.classList.toggle('done', !!vrKnown[w.key]);
+  mark.textContent = vrKnown[w.key] ? '✓ Leo knows this word' : '✓ Leo knows this word';
+  document.getElementById('vr-tab-' + i).classList.toggle('done', !!vrKnown[w.key]);
+}
+function vrMark() {
+  var w = vocabWords[vrIdx];
+  vrKnown[w.key] = true;
+  document.getElementById('vr-tab-' + vrIdx).classList.add('done');
+  document.getElementById('vr-mark').classList.add('done');
+  lSave('known', vrKnown);
+}
+
+// ─── SLIDE 20: WARM UP MATCH ───────────────────────────────────
+var wuPairs = [
+  { key:'light',  old:'🕯️ Long ago: candles at night',        now:'💡 Today: electric lights' },
+  { key:'story',  old:'📖 Long ago: telling stories at night',  now:'📱 Today: phones and video games' },
+  { key:'move',   old:'🐴 Long ago: horses and carts',          now:'🚗 Today: cars with wheels' },
+  { key:'letter', old:'✉️ Long ago: paper letters',             now:'💻 Today: e-mail' }
+];
+function initWarmUp() {
+  var left = document.getElementById('wu-left');
+  var right = document.getElementById('wu-right');
+  if (!left || left.dataset.built) return;
+  left.dataset.built = '1';
+  var sel = null, done = 0;
+  function mk(text, key, side) {
+    var b = document.createElement('button');
+    b.className = 'mg-pbtn';
+    b.textContent = text;
+    b.onclick = function () {
+      if (b.classList.contains('done')) return;
+      if (!sel) { sel = { b: b, key: key, side: side }; b.classList.add('sel'); return; }
+      if (sel.side === side) { sel.b.classList.remove('sel'); sel = { b: b, key: key, side: side }; b.classList.add('sel'); return; }
+      var prev = sel; sel = null;
+      if (prev.key === key) {
+        b.classList.remove('sel'); prev.b.classList.remove('sel');
+        b.classList.add('done'); prev.b.classList.add('done');
+        done++;
+        document.getElementById('wu-count').textContent = done + ' / 4';
+        if (done >= wuPairs.length) document.getElementById('wu-win').classList.add('show');
+      } else {
+        b.classList.add('bad'); prev.b.classList.add('bad');
+        setTimeout(function () { b.classList.remove('bad', 'sel'); prev.b.classList.remove('bad', 'sel'); }, 700);
+      }
+    };
+    return b;
+  }
+  wuPairs.forEach(function (p) { left.appendChild(mk(p.old, p.key, 'L')); });
+  shuffled(wuPairs).forEach(function (p) { right.appendChild(mk(p.now, p.key, 'R')); });
+}
+
+// ─── SLIDE 21: PRESENT CHIPS ───────────────────────────────────
+function initPresentChips() {
+  var row = document.getElementById('present-chips');
+  if (!row || row.dataset.built) return;
+  row.dataset.built = '1';
+  var said = 0;
+  vocabWords.forEach(function (w) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = w.emoji + ' ' + w.word;
+    b.onclick = function () {
+      if (b.classList.contains('used')) return;
+      b.classList.add('used');
+      said++;
+      document.getElementById('present-count').textContent = said + ' / 14';
+      if (said >= vocabWords.length) document.getElementById('present-win').classList.add('show');
+    };
+    row.appendChild(b);
+  });
+}
+
+// ─── SLIDE 22 / 31: WORD WEBS ──────────────────────────────────
+function initPresentWeb() {
+  var el = document.getElementById('web-present');
+  if (!el || typeof pickChart === 'undefined' || el.innerHTML.trim()) return;
+  el.innerHTML = pickChart('word web', {
+    id: 'web-present-svg',
+    center: { text: 'an inventor needs', emoji: '🔬' },
+    centerEditable: false,
+    nodes: [{ text: 'imagination', emoji: '💭' }, { text: 'creativity', emoji: '🎨' }, { text: 'ideas', emoji: '💡' }],
+    addable: true, removable: true, editable: true, maxNodes: 6,
+    storageKey: SAVE_PREFIX + 'web-present',
+    sentenceBuilder: true,
+    sentenceTemplate: 'An inventor needs {node} to make a new invention.'
+  });
+}
+function initExtendWeb() {
+  var el = document.getElementById('web-extend');
+  if (!el || typeof pickChart === 'undefined' || el.innerHTML.trim()) return;
+  el.innerHTML = pickChart('word web', {
+    id: 'web-extend-svg',
+    center: { text: 'batteries', emoji: '🔋' },
+    centerEditable: true,
+    nodes: [{ text: 'cell phones', emoji: '📱' }, { text: 'computers', emoji: '💻' }, { text: 'video games', emoji: '🎮' }],
+    addable: true, removable: true, editable: true, maxNodes: 6,
+    storageKey: SAVE_PREFIX + 'web-extend',
+    sentenceBuilder: true,
+    sentenceTemplate: '{center} are useful because they make {node} work.'
+  });
+}
+
+// ─── SLIDE 23: WORD RADAR ──────────────────────────────────────
+var radarFound = 0;
+function radarTap(btn) {
+  if (btn.classList.contains('done')) return;
+  btn.classList.add('done');
+  radarFound++;
+  document.getElementById('radar-count').textContent = radarFound + ' / 10';
+}
+
+// ─── SLIDE 25: DISCUSSION QUESTIONS ────────────────────────────
+var discQs = [
+  { q:'What problem did people have 5,000 years ago?',                    a:'They couldn’t move things around.' },
+  { q:'What was the solution to this problem?',                            a:'the wheel' },
+  { q:'What are some useful inventions?',                                  a:'batteries, the wheel, computers, cell phones' },
+  { q:'What skills do inventors need to have?',                            a:'imagination and creativity' },
+  { q:'What did the Wright brothers do before they succeeded at flying?',  a:'They failed many times.' }
+];
+function initDiscussion() {
+  var list = document.getElementById('disc-list');
+  if (!list || list.dataset.built) return;
+  list.dataset.built = '1';
+  discQs.forEach(function (d, i) {
+    var el = document.createElement('div');
+    el.className = 'q-item';
+    el.innerHTML = '<span class="q-num">' + (i + 1) + '</span><div>' + d.q + '<div class="q-ans">(' + d.a + ')</div></div>';
+    el.onclick = function () { el.classList.add('done'); };
+    list.appendChild(el);
+  });
+}
+
+// ─── SLIDE 26: THREE-COLUMN SORT ───────────────────────────────
+function initSortTeacher() {
+  var el = document.getElementById('sort-teacher');
+  if (!el || typeof pickChart === 'undefined' || el.innerHTML.trim()) return;
+  el.innerHTML = pickChart('classification sort', {
+    id: 'dnd-teacher7',
+    tiles: [
+      { text:'🔋 batteries',   answer:'invention' },
+      { text:'🎨 creativity',  answer:'needs'     },
+      { text:'⚡ electricity',  answer:'invention' },
+      { text:'❌ fail',         answer:'does'      },
+      { text:'💡 idea',         answer:'needs'     },
+      { text:'💭 imagination',  answer:'needs'     },
+      { text:'🔬 invent',       answer:'does'      },
+      { text:'🏆 succeed',      answer:'does'      },
+      { text:'💪 try',          answer:'does'      },
+      { text:'🎡 wheel',        answer:'invention' }
+    ],
+    zones: [
+      { key:'invention', label:'🔧 Invention',                 color:'#16A34A' },
+      { key:'does',      label:'⚡ What an inventor does',      color:'#1A6BB5' },
+      { key:'needs',     label:'🧠 What an inventor needs',     color:'#7C3AED' }
+    ],
+    onComplete: function () { document.getElementById('sort-teacher-win').classList.add('show'); }
+  });
+}
+
+// ─── SLIDE 27: ECHO METER (TR 7.2 verbatim, TR order) ──────────
+function initEcho() {
+  var list = document.getElementById('echo-list');
+  if (!list || list.dataset.built) return;
+  list.dataset.built = '1';
+  var echoed = 0;
+  vocabWords.forEach(function (w) {
+    var el = document.createElement('div');
+    el.className = 'q-item';
+    el.style.fontSize = '17px';
+    el.innerHTML = '<span style="font-size:26px;flex-shrink:0">' + w.emoji + '</span><div><b style="color:#5b21b6">' + w.word + '</b><div style="color:#4b5563;margin-top:2px">' + w.sent + '</div></div>';
+    el.onclick = function () {
+      if (el.classList.contains('done')) return;
+      el.classList.add('done');
+      echoed++;
+      document.getElementById('echo-count').textContent = echoed + ' / 14';
+    };
+    list.appendChild(el);
+  });
+}
+
+// ─── SLIDE 28: BUILD THE SENTENCE ──────────────────────────────
+var BUILD_TARGET = ['An', 'invention', 'is', 'a', 'useful', 'solution', 'to', 'a', 'problem', '.'];
+var buildPicked = [];
+function initBuild() {
+  var row = document.getElementById('build-chips');
+  if (!row || row.dataset.built) return;
+  row.dataset.built = '1';
+  buildRender();
+}
+function buildRender() {
+  var row = document.getElementById('build-chips');
+  row.innerHTML = '';
+  buildPicked = [];
+  document.getElementById('build-line').textContent = '…';
+  document.getElementById('build-fb').textContent = '';
+  shuffled(BUILD_TARGET).forEach(function (w, i) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = w;
+    b.onclick = function () {
+      if (b.classList.contains('used')) return;
+      b.classList.add('used');
+      buildPicked.push(w);
+      document.getElementById('build-line').textContent = buildPicked.join(' ');
+    };
+    row.appendChild(b);
+  });
+}
+function buildCheck() {
+  var fb = document.getElementById('build-fb');
+  if (buildPicked.join(' ') === BUILD_TARGET.join(' ')) {
+    fb.style.color = '#7C3AED';
+    fb.textContent = '✅ Correct — now underline invention, useful, solution and problem.';
+  } else {
+    fb.style.color = '#ef4444';
+    fb.textContent = '❌ Not yet — read it aloud and try again.';
+  }
+}
+function buildReset() { buildRender(); }
+
+// ─── SLIDE 30: QUESTION BUILDER ────────────────────────────────
+var QB_CHIPS = ['What', 'Which', 'invention', 'problem', 'solution', 'is', 'was', 'the', 'a', 'most', 'useful', 'to', 'that', '?'];
+var qbPicked = [];
+function initQb() {
+  var row = document.getElementById('qb-chips');
+  if (!row || row.dataset.built) return;
+  row.dataset.built = '1';
+  QB_CHIPS.forEach(function (w) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = w;
+    b.onclick = function () { qbPicked.push(w); document.getElementById('qb-line').textContent = qbPicked.join(' '); };
+    row.appendChild(b);
+  });
+}
+function qbReset() { qbPicked = []; document.getElementById('qb-line').textContent = '…'; }
+
+// ─── SLIDE 32: VOTE ────────────────────────────────────────────
+var votes = { batt: 0, wheel: 0 };
+function voteFor(which) {
+  votes[which]++;
+  document.getElementById('vote-' + which + '-n').textContent = votes[which] + ' vote' + (votes[which] === 1 ? '' : 's');
+  var card = document.getElementById('vote-' + which);
+  card.style.borderColor = '#7C3AED';
+  card.style.transform = 'scale(1.04)';
+  setTimeout(function () { card.style.transform = ''; }, 250);
+}
+
+// ─── SLIDE 33: ACT IT OUT ──────────────────────────────────────
+var actLeft = null, actDone = 0;
+function actDraw() {
+  if (actLeft === null) actLeft = vocabWords.slice();
+  if (!actLeft.length) return;
+  var i = Math.floor(Math.random() * actLeft.length);
+  var w = actLeft.splice(i, 1)[0];
+  document.getElementById('act-emoji').textContent = w.emoji;
+  document.getElementById('act-word').textContent = w.word;
+  actDone++;
+  document.getElementById('act-count').textContent = actDone + ' / 14';
+  if (actDone >= vocabWords.length) document.getElementById('act-win').classList.add('show');
+}
+
+// ─── SLIDE 35: SUFFIX -ful ─────────────────────────────────────
+var SUFFIX = [
+  { base:'use',    made:'useful',    note:'noun → adjective' },
+  { base:'beauty', made:'beautiful', note:'y → i + ful' },
+  { base:'color',  made:'colorful',  note:'noun → adjective' },
+  { base:'wonder', made:'wonderful', note:'noun → adjective' }
+];
+function initSuffix() {
+  var row = document.getElementById('suffix-chips');
+  if (!row || row.dataset.built) return;
+  row.dataset.built = '1';
+  var made = 0;
+  SUFFIX.forEach(function (s) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.style.fontSize = '22px';
+    b.textContent = s.base + ' + -ful = ?';
+    b.onclick = function () {
+      if (b.classList.contains('used')) return;
+      b.classList.add('used');
+      b.innerHTML = s.base + ' + -ful = <b>' + s.made + '</b> <span style="opacity:.75;font-size:16px">(' + s.note + ')</span>';
+      made++;
+      document.getElementById('suffix-count').textContent = made + ' / 4';
+    };
+    row.appendChild(b);
+  });
+}
+
+// ─── SLIDE 36: COUNTRY ORDER ───────────────────────────────────
+var CTRY_ORDER = ['🇨🇳 China', '🇺🇸 United States', '🇮🇳 India', '🇯🇵 Japan', '🇷🇺 Russia'];
+var ctryNext = 0;
+function initCountries() {
+  var row = document.getElementById('ctry-chips');
+  if (!row || row.dataset.built) return;
+  row.dataset.built = '1';
+  shuffled(CTRY_ORDER).forEach(function (c) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.style.fontSize = '22px';
+    b.textContent = c;
+    b.onclick = function () {
+      var fb = document.getElementById('ctry-fb');
+      if (c === CTRY_ORDER[ctryNext]) {
+        b.classList.add('used');
+        b.textContent = (ctryNext + 1) + '. ' + c;
+        ctryNext++;
+        document.getElementById('ctry-count').textContent = ctryNext + ' / 5';
+        fb.style.color = '#7C3AED';
+        fb.textContent = ctryNext >= CTRY_ORDER.length ? '🎉 Correct order! China uses the most electricity per year.' : '✅ Correct — keep going.';
+      } else {
+        fb.style.color = '#ef4444';
+        fb.textContent = '❌ Not next — think about which country uses more electricity.';
+      }
+    };
+    row.appendChild(b);
+  });
+}
+
+// ─── SLIDE INIT MAP ────────────────────────────────────────────
+var SLIDE_INIT = {
+  3: initAcademic,
+  5: initInvention, 6: initProblem, 7: initSolution, 8: initWheel, 9: initElectricity,
+  10: initUseful, 11: initBattery, 12: initImagination, 13: initCreativity, 14: initIdea,
+  15: initInvent, 16: initTry, 17: initFail, 18: initSucceed,
+  19: initVocabReview, 20: initWarmUp, 21: initPresentChips, 22: initPresentWeb,
+  25: initDiscussion, 26: initSortTeacher, 27: initEcho, 28: initBuild,
+  30: initQb, 31: initExtendWeb, 35: initSuffix, 36: initCountries,
+  38: restoreDoneState
+};
+
+scale();
+goTo(1);
+</script>
+</body>
+</html>

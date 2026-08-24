@@ -1,5 +1,7 @@
 import unit7Opener from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/opener.teacher.json";
 import unit7OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/opener.learner.json";
+import unit7Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/vocab1.teacher.json";
+import unit7Vocab1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/vocab1.learner.json";
 import unit9Opener from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/opener.teacher.json";
 import unit9OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/opener.learner.json";
 import unit9Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/vocab1.teacher.json";
@@ -105,6 +107,8 @@ function compareLessonOrder(a: Lesson, b: Lesson) {
 export const lessons: Lesson[] = [
   unit7Opener as Lesson,
   unit7OpenerLearner as Lesson,
+  unit7Vocab1 as Lesson,
+  unit7Vocab1Learner as Lesson,
   unit9Opener as Lesson,
   unit9OpenerLearner as Lesson,
   unit9Vocab1 as Lesson,

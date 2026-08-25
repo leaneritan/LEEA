@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 7 · Writing · Fact and Opinion</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0b1220}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:absolute;top:0;left:0}
+#deck{width:1920px;height:1080px;position:relative}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FFFDF5;overflow:hidden}
+.slide.active{display:flex}
+:root{
+  --red:#DC2626; --red-d:#991B1B; --red-bg:#FEF2F2;
+  --yellow:#FACC15; --yellow-d:#CA8A04; --yellow-bg:#FEFCE8;
+  --amber:#F59E0B; --amber-d:#B45309; --amber-bg:#FFFBEB;
+  --navy:#0f172a; --navy-2:#1e293b;
+  --green:#16A34A; --green-d:#15803d; --green-bg:#F0FDF4;
+  --blue:#2563EB; --blue-d:#1D4ED8; --blue-bg:#EFF6FF;
+  --cream:#FFFDF5; --ink:#1f2937;
+}
+/* ---------- header ---------- */
+.slide-header{height:64px;background:var(--red);display:flex;align-items:center;padding:0 44px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.8);font-size:17px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.45);font-size:20px}
+.hd-section{color:#fff;font-size:23px;font-weight:800}
+.hd-chip{background:rgba(255,255,255,.22);color:#fff;padding:5px 18px;border-radius:20px;font-size:17px;font-weight:800;margin-left:auto}
+.hd-chip.src{background:rgba(0,0,0,.28)}
+.hd-chip.tr{background:var(--yellow);color:var(--navy)}
+/* ---------- body ---------- */
+.body{flex:1;padding:30px 60px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.body.center{align-items:center;justify-content:center;text-align:center}
+.body.grad-lab{background:radial-gradient(circle at 30% 20%,#1e293b,#0b1220);color:#fff}
+.header-bar.yellow{border-color:var(--yellow)}
+/* ---------- buttons / options ---------- */
+.btn{border:none;border-radius:14px;font-family:'Outfit',sans-serif;font-weight:800;cursor:pointer;transition:transform .12s, box-shadow .12s}
+.btn:hover{transform:translateY(-2px)}
+.btn.red{background:var(--red);color:#fff}
+.btn.yellow{background:var(--yellow);color:var(--navy)}
+.btn.dark{background:var(--navy-2);color:#fff}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;font-size:23px;font-weight:700;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.opt:hover{border-color:var(--amber);transform:translateX(4px)}
+.opt.good{background:var(--green-bg);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-bg);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default;opacity:.85}
+.opt:disabled:hover{transform:none}
+0%,100%{transform:translateX(0)}
+25%{transform:translateX(-8px)}
+75%{transform:translateX(8px)}
+.on-correct.show{display:block;animation:pop .4s}
+0%{transform:scale(.85);opacity:0}
+100%{transform:scale(1);opacity:1}
+/* ---------- chips ---------- */
+.chip{display:inline-block;background:#fff;border:3px solid var(--amber);border-radius:12px;padding:10px 20px;font-size:24px;font-weight:800;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;margin:4px}
+.chip:hover{background:var(--amber-bg);transform:translateY(-2px)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.err{animation:shake .35s;border-color:var(--red)}
+.build-line{min-height:74px;background:#fff;border:3px dashed #cbd5e1;border-radius:14px;padding:12px 18px;font-size:27px;font-weight:800;color:var(--navy);display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.build-line.done{border-style:solid;border-color:var(--green);background:var(--green-bg)}
+.bpart{background:var(--yellow-bg);border:2px solid var(--yellow);border-radius:8px;padding:4px 12px}
+/* ---------- stations ---------- */
+.station-board{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.station{width:220px;background:rgba(255,255,255,.07);border:3px solid rgba(255,255,255,.18);border-radius:16px;padding:14px;text-align:center;transition:all .4s}
+.station .st-ico{font-size:44px;filter:grayscale(1);opacity:.45;transition:all .4s}
+.station .st-name{font-size:17px;font-weight:800;color:rgba(255,255,255,.55);margin-top:6px}
+.station.on{border-color:var(--yellow);background:rgba(250,204,21,.14);box-shadow:0 0 26px rgba(250,204,21,.35)}
+.station.on .st-ico{filter:none;opacity:1}
+.station.on .st-name{color:var(--yellow)}
+.mitem.sel{border-color:var(--blue);background:var(--blue-bg)}
+.mitem.lock{border-color:var(--green);background:var(--green-bg);color:var(--green-d);pointer-events:none}
+.mitem.err{animation:shake .35s;border-color:var(--red)}
+.card3d.flipped .c3-inner{transform:rotateY(180deg)}
+.gapbtn.good{border-style:solid;border-color:var(--green);background:var(--green-bg);color:var(--green-d)}
+.gapbtn.bad{animation:shake .35s;border-color:var(--red)}
+.bulb.on{filter:none;opacity:1;text-shadow:0 0 22px rgba(250,204,21,.8)}
+/* ---------- bottom bar ---------- */
+#bar{position:absolute;left:0;bottom:0;width:1920px;height:52px;background:var(--navy);display:flex;align-items:center;padding:0 24px;gap:18px;z-index:50}
+#bar button{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:10px;padding:7px 18px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif}
+#bar button:hover{background:rgba(255,255,255,.25)}
+#counter{color:rgba(255,255,255,.7);font-size:16px;font-weight:800;margin-left:auto}
+#minist{display:flex;gap:7px}
+.mdot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.18);transition:all .3s}
+.mdot.on{background:var(--yellow);box-shadow:0 0 8px rgba(250,204,21,.8)}
+#pwrap{position:absolute;left:0;top:0;width:100%;height:6px;background:rgba(255,255,255,.12)}
+#pfill{height:100%;width:0;background:var(--yellow);transition:width .3s}
+#notesPanel{position:absolute;right:24px;bottom:64px;width:640px;max-height:520px;overflow:auto;background:#fff;border:3px solid var(--yellow);border-radius:16px;padding:20px 24px;font-size:19px;color:var(--ink);line-height:1.5;display:none;z-index:60;box-shadow:0 16px 44px rgba(0,0,0,.35)}
+#notesPanel.show{display:block}
+#notesPanel b{color:var(--red-d)}
+.confetti{position:absolute;font-size:34px;animation:fall 3.2s linear infinite}
+0%{transform:translateY(-80px) rotate(0)}
+100%{transform:translateY(1150px) rotate(540deg)}
+/* ================= UNIT 7 GRAMMAR 1 — TIME MACHINE COMPONENTS ================= */
+:root{ --purple:#7C3AED; --purple-d:#5B21B6; --purple-bg:#F5F3FF; --ink-2:#475569; --ink-3:#94a3b8; }
+.slide-header{background:var(--purple)}
+.body.grad-lab{background:linear-gradient(140deg,var(--purple-d),var(--purple))}
+.callout{background:var(--purple-bg);border:3px solid var(--purple);border-radius:16px;padding:16px 26px;font-size:25px;font-weight:600;color:var(--ink);line-height:1.4;text-align:center}
+/* goal grid */
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.goal-card{background:#fff;border:3px solid #e2e8f0;border-radius:18px;padding:22px 26px;display:flex;flex-direction:column;gap:6px}
+.gc-ico{font-size:44px}
+.gc-h{font-size:20px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--purple)}
+.gc-t{font-size:26px;font-weight:600;color:var(--ink);line-height:1.35}
+/* flip cards */
+.flip-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.flipcard{width:340px;height:230px;perspective:1000px;cursor:pointer}
+.flipcard.wide{width:100%;max-width:1400px;height:150px}
+.fc-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flipcard.flipped .fc-in{transform:rotateY(180deg)}
+.fc-f,.fc-b{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-weight:700;line-height:1.35}
+.fc-f{background:#fff;border:3px solid var(--purple);font-size:34px;color:var(--ink)}
+.fc-b{background:var(--purple);color:#fff;font-size:27px;transform:rotateY(180deg)}
+.flipcard.wide .fc-f{font-size:30px}
+.flipcard.wide .fc-b{font-size:28px}
+/* question line + options */
+.q-line{font-size:40px;font-weight:800;text-align:center;color:var(--ink)}
+.opt-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.opt-col{display:flex;flex-direction:column;gap:14px}
+.opt.sm{font-size:24px;padding:12px 26px}
+.opt.good{background:var(--green);border-color:var(--green);color:#fff}
+.opt.bad{background:var(--red-bg);border-color:var(--red);color:var(--red-d)}
+/* word lab */
+.wl-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.wl-chip{background:#fff;border:3px solid var(--purple);border-radius:999px;padding:12px 28px;font-size:26px;font-weight:800;color:var(--purple-d)}
+/* word split */
+.word-split{display:flex;gap:32px;height:100%}
+.ws-left{width:38%;background:var(--purple-bg);border:3px solid var(--purple);border-radius:20px;padding:26px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.ws-emoji{font-size:88px;line-height:1}
+.ws-word{font-size:44px;font-weight:900;color:var(--purple-d)}
+.ws-ipa{font-size:24px;color:var(--ink-2);font-weight:600}
+.ws-jp{font-size:26px;font-weight:700;color:var(--ink)}
+.ws-def{font-size:24px;color:var(--ink-2);line-height:1.4;margin-top:8px}
+.ws-right{flex:1;display:flex;flex-direction:column;gap:14px}
+.game-head{font-size:28px;font-weight:800;color:var(--purple-d)}
+/* then / now */
+.then-now{display:flex;align-items:center;gap:20px;justify-content:center}
+.tn-card{width:320px;height:200px;perspective:1000px;cursor:pointer}
+.tn-card .fc-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.tn-card.flipped .fc-in{transform:rotateY(180deg)}
+.tn-arrow{font-size:52px;color:var(--purple)}
+/* match */
+.match-wrap{display:flex;gap:60px;justify-content:center}
+.match-col{display:flex;flex-direction:column;gap:14px;width:520px}
+.mtile{background:#fff;border:3px solid #cbd5e1;border-radius:14px;padding:16px 20px;font-size:24px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);text-align:left}
+.mtile:hover{border-color:var(--purple)}
+.mtile.sel{border-color:var(--purple);background:var(--purple-bg)}
+.mtile.lock{background:var(--green);border-color:var(--green);color:#fff;pointer-events:none}
+.mtile.err{background:var(--red-bg);border-color:var(--red)}
+/* done flag */
+.done-flag{display:none;margin:20px auto 0;background:var(--yellow);border:3px solid var(--yellow-d);border-radius:16px;padding:14px 34px;font-size:26px;font-weight:800;color:#4a3800;cursor:pointer;text-align:center;max-width:900px}
+.done-flag.show{display:block}
+.done-flag.lit{background:var(--green);border-color:var(--green-d);color:#fff;cursor:default}
+/* grammar box */
+.gbox{background:#fff;border:4px solid var(--purple);border-radius:22px;padding:30px 36px}
+.gbox-title{font-size:34px;font-weight:900;color:var(--purple-d);margin-bottom:20px;display:flex;align-items:center}
+.gbox-tr{background:var(--purple);color:#fff;border-radius:999px;padding:5px 18px;font-size:20px;margin-left:14px}
+.gbox-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.gbox-cell{background:var(--purple-bg);border-radius:14px;padding:22px 24px;font-size:29px;font-weight:600;color:var(--ink);line-height:1.35}
+/* pattern strip + builders */
+.pattern-strip{background:var(--navy);color:#fff;border-radius:16px;padding:18px 30px;font-size:32px;font-weight:800;text-align:center}
+.build-line{min-height:86px;background:#fff;border:3px dashed var(--purple);border-radius:16px;display:flex;align-items:center;gap:10px;padding:14px 22px;flex-wrap:wrap;margin:14px 0}
+.build-line.done{border-style:solid;background:var(--green-bg);border-color:var(--green)}
+.bpart{font-size:30px;font-weight:800;color:var(--ink)}
+.chip-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+/* two panel */
+.two-panel{display:flex;gap:28px}
+.panel-card{flex:1;background:#fff;border:3px solid var(--purple);border-radius:20px;padding:26px}
+.pc-h{font-size:32px;font-weight:900;color:var(--purple-d);margin-bottom:10px}
+.pc-t{font-size:25px;color:var(--ink-2);line-height:1.4;margin-bottom:14px}
+.pc-ex{background:var(--purple-bg);border-radius:12px;padding:18px;font-size:27px;font-weight:700;line-height:1.4;color:var(--ink)}
+/* detective */
+.det-row{background:#fff;border:3px solid #e2e8f0;border-radius:16px;padding:18px 24px;margin-bottom:16px}
+.det-bad{font-size:28px;font-weight:700;color:var(--red-d);margin-bottom:12px}
+/* rules board */
+.rules-board{display:flex;flex-direction:column;gap:14px}
+.rule-line{display:flex;align-items:flex-start;gap:18px;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:16px 22px}
+.rl-n{width:44px;height:44px;flex-shrink:0;border-radius:50%;background:var(--purple);color:#fff;font-size:24px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.rl-t{font-size:25px;color:var(--ink);line-height:1.4}
+/* practice */
+.prac-item{display:flex;gap:18px;align-items:center;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;margin-bottom:12px}
+.pi-n{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:var(--purple);color:#fff;font-size:23px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.pi-s{font-size:26px;color:var(--ink);line-height:1.4}
+.gap{display:inline-block;min-width:230px;border-bottom:4px solid var(--purple);color:var(--purple-d);font-weight:800;text-align:center;cursor:pointer}
+.gap.filled{border-bottom-style:solid;color:var(--green-d)}
+/* true / false rows */
+.tf-row{display:flex;align-items:center;gap:22px;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;margin-bottom:12px}
+.tf-s{flex:1;font-size:25px;color:var(--ink);line-height:1.35}
+/* dialogue */
+.dialogue{display:flex;flex-direction:column;gap:18px;width:100%;max-width:1300px}
+.bubble{max-width:76%;border-radius:22px;padding:22px 28px;font-size:29px;font-weight:600;line-height:1.35}
+.bubble.left{background:var(--purple-bg);border:3px solid var(--purple);align-self:flex-start}
+.bubble.right{background:var(--yellow-bg);border:3px solid var(--amber);align-self:flex-end}
+/* quiz */
+.quiz-meter-wrap{height:20px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-bottom:12px}
+.quiz-meter{height:100%;width:0;background:var(--green);transition:width .3s}
+.quiz-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.quiz-q{background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:16px 20px}
+.qq-t{font-size:24px;font-weight:700;color:var(--ink);margin-bottom:12px;line-height:1.3}
+/* celebrate */
+.check-list{display:flex;flex-direction:column;gap:10px}
+.ck{background:rgba(255,255,255,.15);border-radius:12px;padding:12px 26px;font-size:26px;font-weight:700;color:#fff}
+</style>
+</head>
+<body>
+<div id="scaler"><div id="deck">
+
+<!-- ============ 1 · TITLE ============ -->
+<div class="slide" data-notes="<b>Fact and Opinion Writing.</b> Today Leo writes about an invention: he states an opinion and supports it with facts. Six stations are dark; each big activity lights one. LP p.250.">
+  <div class="body grad-lab center" style="gap:20px">
+    <div style="font-size:96px">💬📋</div>
+    <div style="font-size:56px;font-weight:900;color:#fff;text-align:center;line-height:1.1">Fact &amp; Opinion Writing</div>
+    <div style="font-size:30px;color:rgba(255,255,255,.9);font-weight:700">Unit 7 · Writing · "A Good Idea"</div>
+    <div style="background:rgba(255,255,255,.12);border:2px solid var(--yellow);border-radius:14px;padding:16px 30px;font-size:26px;font-weight:800;color:#fff;text-align:center;line-height:1.5">
+      State your <span style="color:var(--yellow)">opinion</span>.<br>Support it with <span style="color:var(--yellow)">facts</span>.
+    </div>
+    <div class="station-board" data-stboard></div>
+    <div style="font-size:22px;color:rgba(255,255,255,.85);font-weight:600">📗 Book pp. 126-127 &nbsp;|&nbsp; 📓 Workbook pp. 90-91</div>
+    <button class="btn yellow" style="font-size:24px;padding:14px 40px" onclick="changeSlide(1)">Start writing ▶</button>
+  </div>
+</div>
+
+<!-- ============ 2 · GOALS ============ -->
+<div class="slide" data-notes="<b>Today&#39;s goals (LP p.250).</b> Four objectives: analyze a writing model, express opinions in writing, support opinions with facts, and evaluate each other&#39;s writing. Academic language: fact, opinion, support. Graphic organizer: two-column chart.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Writing — Today's Goals</span><span class="hd-chip src">📖 LP p.250</span></div>
+  <div class="body">
+    <div class="goal-grid">
+      <div class="goal-card"><div class="gc-ico">🔍</div><div class="gc-h">Objective 1</div><div class="gc-t"><b>Analyze</b> a writing model.</div></div>
+      <div class="goal-card"><div class="gc-ico">💬</div><div class="gc-h">Objective 2</div><div class="gc-t">Express <b>opinions</b> in writing.</div></div>
+      <div class="goal-card"><div class="gc-ico">📋</div><div class="gc-h">Objective 3</div><div class="gc-t"><b>Support</b> opinions with facts.</div></div>
+      <div class="goal-card"><div class="gc-ico">⚖️</div><div class="gc-h">Objective 4</div><div class="gc-t"><b>Evaluate</b> each other's writing.</div></div>
+    </div>
+    <div class="callout" style="margin-top:22px">📊 Graphic organizer today: a <b>two-column chart</b> — facts on the left, opinions on the right.</div>
+  </div>
+</div>
+
+<!-- ============ 3 · WARM UP — PRETEACH ============ -->
+<div class="slide" data-notes="<b>Warm Up — Preteach (LP p.250).</b> Write both sentences on the board and read them aloud. Point to the first: Is this true? (yes) Something that&#39;s always true is a FACT. Point to the second: Is this true? This is an OPINION — what a person thinks or believes.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Two Sentences</span><span class="hd-chip src">📖 LP p.250</span></div>
+  <div class="body center" style="gap:24px">
+    <div class="two-panel">
+      <div class="panel-card">
+        <div class="pc-h">📋 FACT</div>
+        <div class="pc-ex">"An airplane flies through the air."</div>
+        <div class="pc-t">Is this true? <b>Yes — always.</b> Something that is always true is a <b>fact</b>.</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">💬 OPINION</div>
+        <div class="pc-ex">"An airplane is the most useful invention."</div>
+        <div class="pc-t">Is this true? <b>Some people think so.</b> An opinion is what a person <b>thinks or believes</b>.</div>
+      </div>
+    </div>
+    <div class="game-head">🎮 Another fact about an airplane?</div>
+    <div class="opt-row">
+      <button class="opt" onclick="pick(this)" data-ok="1">It's fast.</button>
+      <button class="opt" onclick="pick(this)">It's the best way to travel.</button>
+      <button class="opt" onclick="pick(this)">Flying is boring.</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 4 · THE TWO-COLUMN CHART ============ -->
+<div class="slide" data-notes="<b>Warm Up — the chart (LP p.250).</b> Draw the two-column chart on the board with the airplane example, then ask Leo for more facts and more opinions about airplanes. Point out that you might not agree with all of the opinions — and that is fine.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Sort Them — Fact or Opinion?</span><span class="hd-chip tr">⚡ Power Station ①</span></div>
+  <div class="body">
+    <div style="font-size:26px;font-weight:700;text-align:center;margin-bottom:12px">Tap a sentence, then tap its column label.</div>
+    <div class="match-wrap" data-game="fo">
+      <div class="match-col">
+        <button class="mtile" onclick="mtap(this,'fo','fo-done')" data-k="a">"An airplane flies through the air."</button>
+        <button class="mtile" onclick="mtap(this,'fo','fo-done')" data-k="b">"An airplane is the most useful invention."</button>
+        <button class="mtile" onclick="mtap(this,'fo','fo-done')" data-k="c">"Airplanes are fast."</button>
+        <button class="mtile" onclick="mtap(this,'fo','fo-done')" data-k="d">"Flying is more fun than driving."</button>
+        <button class="mtile" onclick="mtap(this,'fo','fo-done')" data-k="e">"The Wright brothers flew in 1903."</button>
+      </div>
+      <div class="match-col">
+        <button class="mtile" onclick="mtap(this,'fo','fo-done')" data-k="d">💬 Opinion — what someone thinks</button>
+        <button class="mtile" onclick="mtap(this,'fo','fo-done')" data-k="a">📋 Fact — always true</button>
+        <button class="mtile" onclick="mtap(this,'fo','fo-done')" data-k="e">📋 Fact — a date you can check</button>
+        <button class="mtile" onclick="mtap(this,'fo','fo-done')" data-k="b">💬 Opinion — "most useful" is a judgement</button>
+        <button class="mtile" onclick="mtap(this,'fo','fo-done')" data-k="c">📋 Fact — you can measure it</button>
+      </div>
+    </div>
+    <div class="done-flag" id="fo-done" onclick="powerStation(0)">⚡ All sorted! Tap to power Station ①.</div>
+  </div>
+</div>
+
+<!-- ============ 5 · PRESENT — OPINION PHRASES ============ -->
+<div class="slide" data-notes="<b>Present (LP p.250).</b> Say: Today you&#39;ll write paragraphs of fact and opinion. Write the three phrases on the board. Say: You can use these phrases to write about your opinions.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Present — Words That Show an Opinion</span><span class="hd-chip src">📖 LP p.250</span></div>
+  <div class="body center" style="gap:22px">
+    <div class="pattern-strip" style="font-size:38px">In my opinion, ______ .</div>
+    <div class="pattern-strip" style="font-size:38px">I think ______ .</div>
+    <div class="pattern-strip" style="font-size:38px">I believe ______ .</div>
+    <div class="two-panel" style="width:100%;margin-top:8px">
+      <div class="panel-card">
+        <div class="pc-h">💬 To open an opinion</div>
+        <div class="pc-ex">In my opinion · I think · I believe</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">📋 To give a fact</div>
+        <div class="pc-ex">It's true that… · Many people use… · ___ invented the ___ in ___.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 6 · PAIR TASK ============ -->
+<div class="slide" data-notes="<b>Present — pair task (LP p.250).</b> Assign an invention: electricity, batteries, or cell phones. Leo writes one FACT sentence and one OPINION sentence about it, reads both aloud, and Dad says which is which. Then swap.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Your Turn — One Fact, One Opinion</span><span class="hd-chip src">📖 LP p.250</span></div>
+  <div class="body center" style="gap:24px">
+    <div class="wl-row">
+      <div class="wl-chip">⚡ electricity</div>
+      <div class="wl-chip">🔋 batteries</div>
+      <div class="wl-chip">📱 cell phones</div>
+    </div>
+    <div style="font-size:30px;font-weight:700;text-align:center;max-width:1300px">Pick one. Write <b>one fact</b> sentence and <b>one opinion</b> sentence about it. Read them aloud — Dad guesses which is which.</div>
+    <div class="two-panel" style="width:100%">
+      <div class="panel-card">
+        <div class="pc-h">📋 Fact example</div>
+        <div class="pc-ex">"Batteries store electricity."</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">💬 Opinion example</div>
+        <div class="pc-ex">"I think batteries are the most useful invention in my backpack."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 7 · READ THE MODEL ¶1 ============ -->
+<div class="slide" data-notes="<b>Read the Model — Activity 1 (SB p.126).</b> Read it TWICE. First time for comprehension only. Second time, Leo underlines the facts that support the opinion. Model it: read &quot;they&#39;re easy to use&quot; aloud, then read the next sentence and say &quot;This fact shows that sticky notes are easy to use.&quot;">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Read the Model — "A Good Idea" ¶1</span><span class="hd-chip src">📗 Book p.126 · Act 1</span></div>
+  <div class="body">
+    <div class="gbox">
+      <div class="gbox-title">A Good Idea</div>
+      <div style="font-size:29px;line-height:1.6;color:var(--ink)"><span style="background:#FEF3C7;padding:2px 6px;border-radius:6px"><b>In my opinion, sticky notes are a great invention.</b></span> They're easy to use. You write a note and stick it on your notebook or on your computer. And they come off easily. <span style="background:#FEF3C7;padding:2px 6px;border-radius:6px"><b>I think most people like them</b></span> because they help you to remember things.</div>
+    </div>
+    <div class="game-head" style="margin-top:18px">🎮 Which FACT supports "they're easy to use"?</div>
+    <div class="opt-col">
+      <button class="opt" onclick="pick(this)" data-ok="1">"You write a note and stick it on your notebook or on your computer."</button>
+      <button class="opt" onclick="pick(this)">"Sticky notes are a great invention."</button>
+      <button class="opt" onclick="pick(this)">"I think most people like them."</button>
+    </div>
+    <div class="callout" style="margin-top:16px">🟡 The highlighted parts are <b>opinions</b>. Everything between them is a <b>fact</b> that supports one.</div>
+  </div>
+</div>
+
+<!-- ============ 8 · READ THE MODEL ¶2 ============ -->
+<div class="slide" data-notes="<b>Read the Model ¶2.</b> The whole second paragraph is the history — and it is nearly all facts: two inventors, a date, a name, an accident. Ask Leo to find the one opinion sentence (the first).">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Read the Model — ¶2, the history</span><span class="hd-chip src">📗 Book p.126</span></div>
+  <div class="body">
+    <div class="gbox">
+      <div style="font-size:25px;line-height:1.55;color:var(--ink)"><span style="background:#FEF3C7;padding:2px 6px;border-radius:6px"><b>In my opinion, the story of sticky notes is interesting, too.</b></span> Sticky notes have two inventors. Spencer Silver invented the glue in 1970. It wasn't strong, so he didn't know how to use it. But four years later, Arthur Fry found a use for it. One day, all his notes fell on the floor. He wasn't happy! Then he remembered Silver's glue! He used the glue on small pieces of paper. It worked! You could stick the notes to almost any surface, and it was easy to remove them. Now we have a cool—and useful—invention!</div>
+    </div>
+    <div class="game-head" style="margin-top:16px">🎮 Who invented the glue, and when?</div>
+    <div class="opt-row">
+      <button class="opt" onclick="pick(this)" data-ok="1">Spencer Silver, in 1970</button>
+      <button class="opt" onclick="pick(this)">Arthur Fry, in 1974</button>
+      <button class="opt" onclick="pick(this)">Frank Epperson, in 1905</button>
+    </div>
+    <div class="done-flag show" id="md-done" onclick="powerStation(1)">⚡ Model read twice — tap to power Station ②.</div>
+  </div>
+</div>
+
+<!-- ============ 9 · WHAT MAKES A FACT ============ -->
+<div class="slide" data-notes="<b>What counts as a fact?</b> The planner is specific: a fact is a piece of true information — for example a date, an event, or a name. Point at each one in the model text.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">What Counts as a Fact? 📋</span><span class="hd-chip src">📖 LP p.250</span></div>
+  <div class="body">
+    <div class="rules-board">
+      <div class="rule-line"><span class="rl-n">📅</span><span class="rl-t">A <b>date</b> — "Spencer Silver invented the glue <b>in 1970</b>."</span></div>
+      <div class="rule-line"><span class="rl-n">🎬</span><span class="rl-t">An <b>event</b> — "One day, all his notes <b>fell on the floor</b>."</span></div>
+      <div class="rule-line"><span class="rl-n">🏷️</span><span class="rl-t">A <b>name</b> — "<b>Arthur Fry</b> found a use for it."</span></div>
+      <div class="rule-line"><span class="rl-n">🔢</span><span class="rl-t">A <b>number</b> — "Sticky notes have <b>two</b> inventors."</span></div>
+    </div>
+    <div class="callout" style="margin-top:20px">🔑 An opinion on its own is weak. An opinion <b>plus a fact</b> is convincing.</div>
+  </div>
+</div>
+
+<!-- ============ 10 · PLAN — THE TWO-COLUMN CHART ============ -->
+<div class="slide" data-notes="<b>Plan — Activity 2 (LP p.251).</b> Draw the two-column chart. Model it out loud: &quot;My favorite invention is the television. Many people watch TV news — that&#39;s a fact, so it goes in the first column. Another fact: there are sports shows on TV. Now my opinion: I think television helps you know what is happening in the world.&quot; Then Leo picks his own.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Plan — The Two-Column Chart</span><span class="hd-chip tr">⚡ Power Station ③</span></div>
+  <div class="body">
+    <div class="pattern-strip" style="font-size:32px">My Favorite Invention: <b style="color:var(--yellow)">(Television)</b></div>
+    <div class="two-panel" style="margin-top:18px">
+      <div class="panel-card">
+        <div class="pc-h">📋 Facts</div>
+        <div class="pc-ex">Many people watch TV news.<br><br>There are sports shows on TV.</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">💬 My Opinions</div>
+        <div class="pc-ex">I think television helps you know what is happening in the world.</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:20px">✍️ Now Leo picks <b>his</b> favorite invention and fills his own chart. Invention at the top, facts left, opinions right.</div>
+    <div class="done-flag show" id="pl-done" onclick="powerStation(2)">⚡ Chart planned — tap to power Station ③.</div>
+  </div>
+</div>
+
+<!-- ============ 11 · EXPAND — PHRASE BANK ============ -->
+<div class="slide" data-notes="<b>Expand (LP p.251).</b> Write the phrase bank on the board and have Leo use the phrases to say what is in his chart out loud, before he writes anything. Speaking it first makes the writing far easier.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Say It Before You Write It 🗣️</span><span class="hd-chip src">📖 LP p.251 · Expand</span></div>
+  <div class="body">
+    <div class="two-panel">
+      <div class="panel-card">
+        <div class="pc-h">💬 Opinions</div>
+        <div class="pc-ex">In my opinion…<br>I think…<br>I believe…</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">📋 Facts</div>
+        <div class="pc-ex">It's true that…<br>Many people use (TV) to…<br>___ invented the ___ in ___.</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:22px">🗣️ Leo reads his chart out loud using these phrases — <b>before</b> writing a single word.</div>
+  </div>
+</div>
+
+<!-- ============ 12 · WRITE ============ -->
+<div class="slide" data-notes="<b>Write — Activity 2 (SB p.126).</b> Say: Now write your paragraphs of fact and opinion. Use the information in your chart to make sentences. Remind Leo to use the opinion phrases. Describe the invention, explain how to use it, and say why you like it.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Write! ✍️</span><span class="hd-chip tr">⚡ Power Station ④</span></div>
+  <div class="body center" style="gap:22px">
+    <div class="callout" style="width:100%">📗 <b>Book p.126, Activity 2:</b> "Describe an invention. Explain how to use it and why you like it. Include facts to support your opinion."</div>
+    <div class="rules-board" style="width:100%">
+      <div class="rule-line"><span class="rl-n">1</span><span class="rl-t">Open with your <b>opinion</b>: "In my opinion, ___ is a great invention."</span></div>
+      <div class="rule-line"><span class="rl-n">2</span><span class="rl-t">Give <b>facts</b> from your chart that support it.</span></div>
+      <div class="rule-line"><span class="rl-n">3</span><span class="rl-t">Explain <b>how you use it</b>.</span></div>
+      <div class="rule-line"><span class="rl-n">4</span><span class="rl-t">Finish with <b>why you like it</b>: "I think ___ because ___."</span></div>
+    </div>
+    <div class="done-flag show" id="wr-done" onclick="powerStation(3)">⚡ Draft written — tap to power Station ④.</div>
+  </div>
+</div>
+
+<!-- ============ 13 · EDIT CHECKLIST ============ -->
+<div class="slide" data-notes="<b>Edit (LP p.251).</b> Direct Leo to check his writing against these four points. Tap each one as he confirms it. Anything unticked, he revises now.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Edit — The Four-Point Check ✅</span><span class="hd-chip src">📖 LP p.251</span></div>
+  <div class="body">
+    <div class="tf-row"><div class="tf-s">✔ Does the writing <b>describe an invention and its uses</b>?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Fix it</button></div></div>
+    <div class="tf-row"><div class="tf-s">✔ Does it include <b>why the writer likes</b> the invention?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Fix it</button></div></div>
+    <div class="tf-row"><div class="tf-s">✔ Does it include <b>words for expressing opinions</b>?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Fix it</button></div></div>
+    <div class="tf-row"><div class="tf-s">✔ Does it include <b>facts to support</b> the opinions?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Fix it</button></div></div>
+    <div class="callout" style="margin-top:16px">✏️ Anything you didn't tick — <b>revise it now</b>, before you share.</div>
+  </div>
+</div>
+
+<!-- ============ 14 · BE THE EXPERT — PRONOUNS ============ -->
+<div class="slide" data-notes="<b>Be the Expert — Writing Support (LP p.251).</b> A pronoun takes the place of one or more nouns. The word it replaces is the antecedent. They must agree in number (singular/plural) and gender. Use the planner&#39;s own three examples.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Be the Expert — Pronouns 🔁</span><span class="hd-chip src">📖 LP p.251 · Writing Support</span></div>
+  <div class="body">
+    <div class="callout" style="margin-bottom:18px">🔁 A <b>pronoun</b> takes the place of a noun. The noun it replaces is the <b>antecedent</b>. They must agree in <b>number</b> and <b>gender</b>.</div>
+    <div class="tf-row"><div class="tf-s">Jared found ___ book.</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">his</button><button class="opt sm" onclick="pick(this)">her</button><button class="opt sm" onclick="pick(this)">their</button></div></div>
+    <div class="tf-row"><div class="tf-s">Luisa opened ___ backpack.</div><div class="opt-row"><button class="opt sm" onclick="pick(this)">his</button><button class="opt sm" onclick="pick(this)" data-ok="1">her</button><button class="opt sm" onclick="pick(this)">their</button></div></div>
+    <div class="tf-row"><div class="tf-s">Jared and Luisa rode ___ bikes, and ___ had a lot of fun.</div><div class="opt-row"><button class="opt sm" onclick="pick(this)">his / he</button><button class="opt sm" onclick="pick(this)" data-ok="1">their / they</button><button class="opt sm" onclick="pick(this)">her / she</button></div></div>
+    <div class="callout" style="margin-top:16px">📝 In the model: "Sticky notes have two inventors. <b>They</b>…" — plural noun, plural pronoun. ✔</div>
+  </div>
+</div>
+
+<!-- ============ 15 · SHARE ============ -->
+<div class="slide" data-notes="<b>Share — Activity 3 (SB p.126).</b> Share the writing in a group. Listen and take notes in the chart: Invention · How do we use it? · Why does he/she like it? The book&#39;s own example row is peanut butter.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Share — Listen and Take Notes</span><span class="hd-chip tr">⚡ Power Station ⑤</span></div>
+  <div class="body">
+    <div class="callout" style="margin-bottom:16px">📗 <b>Activity 3:</b> Share your writing. Listen to each other and fill in the chart.</div>
+    <div class="two-panel">
+      <div class="panel-card">
+        <div class="pc-h">📊 The chart</div>
+        <div class="pc-ex" style="font-size:24px">Invention · How do we use it? · Why does he/she like it?</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">🥜 The book's example row</div>
+        <div class="pc-ex" style="font-size:24px"><b>Peanut butter</b> · We eat it. · It's delicious.</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:20px">👂 Dad reads his too. Leo takes notes on <b>Dad's</b> invention — real listening practice.</div>
+    <div class="done-flag show" id="sh-done" onclick="powerStation(4)">⚡ Both shared — tap to power Station ⑤.</div>
+  </div>
+</div>
+
+<!-- ============ 16 · SOCCER ROUND ============ -->
+<div class="slide" data-notes="<b>Soccer round ⚽.</b> One more pass at fact vs opinion, on a topic Leo will argue about happily.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Soccer Round ⚽ — Fact or Opinion?</span><span class="hd-chip tr">⚡ Power Station ⑥</span></div>
+  <div class="body">
+    <div class="tf-row"><div class="tf-s">⚽ "A soccer match has two halves of 45 minutes."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">📋 Fact</button><button class="opt sm" onclick="pick(this)">💬 Opinion</button></div></div>
+    <div class="tf-row"><div class="tf-s">⚽ "Goal-line technology is the best invention in soccer."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)">📋 Fact</button><button class="opt sm" onclick="pick(this)" data-ok="1">💬 Opinion</button></div></div>
+    <div class="tf-row"><div class="tf-s">⚽ "England won the World Cup in 1966."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">📋 Fact</button><button class="opt sm" onclick="pick(this)">💬 Opinion</button></div></div>
+    <div class="tf-row"><div class="tf-s">⚽ "Watching soccer is more fun than playing it."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)">📋 Fact</button><button class="opt sm" onclick="pick(this)" data-ok="1">💬 Opinion</button></div></div>
+    <div class="done-flag" id="sc-done" onclick="powerStation(5)">⚡ Station ⑥ ready — tap to power up.</div>
+  </div>
+</div>
+
+<!-- ============ 17 · QUIZ ============ -->
+<div class="slide" data-notes="<b>Quick review quiz.</b> Six questions on the writing skill itself. Anything missed, go back to the rules on slide 9.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Quick Review Quiz</span><span class="hd-chip">6 questions ⚡</span></div>
+  <div class="body">
+    <div class="quiz-meter-wrap"><div class="quiz-meter" id="quizMeter"></div></div>
+    <div style="text-align:center;font-size:26px;font-weight:800;margin-bottom:10px">Score: <span id="quizScore">0/6</span></div>
+    <div class="quiz-grid">
+      <div class="quiz-q" data-quiz="1"><div class="qq-t">1. A <b>fact</b> is…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">true information you can check</button><button class="opt sm" onclick="pick(this);quizScore()">what you believe</button></div></div>
+      <div class="quiz-q" data-quiz="2"><div class="qq-t">2. An <b>opinion</b> is…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">what you believe to be true</button><button class="opt sm" onclick="pick(this);quizScore()">a date or a name</button></div></div>
+      <div class="quiz-q" data-quiz="3"><div class="qq-t">3. Which opens an opinion?</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">In my opinion</button><button class="opt sm" onclick="pick(this);quizScore()">It's true that</button></div></div>
+      <div class="quiz-q" data-quiz="4"><div class="qq-t">4. Who invented the sticky-note glue?</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">Spencer Silver</button><button class="opt sm" onclick="pick(this);quizScore()">Arthur Fry</button></div></div>
+      <div class="quiz-q" data-quiz="5"><div class="qq-t">5. Every opinion should have…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">a fact supporting it</button><button class="opt sm" onclick="pick(this);quizScore()">a question mark</button></div></div>
+      <div class="quiz-q" data-quiz="6"><div class="qq-t">6. "Jared and Luisa rode ___ bikes."</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">their</button><button class="opt sm" onclick="pick(this);quizScore()">his</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 18 · FORMATIVE ASSESSMENT ============ -->
+<div class="slide" data-notes="<b>Formative assessment.</b> Check against the four objectives. &quot;Not yet&quot; tells us what to redo.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span><span class="hd-chip src">📖 LP p.251</span></div>
+  <div class="body">
+    <div class="tf-row"><div class="tf-s">Can Leo tell a <b>fact</b> from an <b>opinion</b>?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">Can Leo <b>express an opinion</b> in writing with a phrase?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">Can Leo <b>support</b> an opinion with a fact?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">Can Leo fill a <b>two-column chart</b> before writing?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">Can Leo match a <b>pronoun</b> to its noun?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+  </div>
+</div>
+
+<!-- ============ 19 · CELEBRATE ============ -->
+<div class="slide" id="celebSlide" data-notes="<b>Celebrate.</b> Have Leo read his finished paragraphs out loud one last time. Then tap Mark Done.">
+  <div class="body grad-lab center" style="gap:20px">
+    <div style="font-size:96px">🏆</div>
+    <div style="font-size:56px;font-weight:900;color:#fff;text-align:center">You Wrote It!</div>
+    <div class="station-board" data-stboard></div>
+    <div class="check-list">
+      <div class="ck">✅ You know a <b>fact</b> from an <b>opinion</b></div>
+      <div class="ck">✅ You analyzed "A Good Idea"</div>
+      <div class="ck">✅ You planned with a two-column chart</div>
+      <div class="ck">✅ You wrote paragraphs of fact and opinion</div>
+      <div class="ck">✅ You shared them out loud</div>
+    </div>
+    <button class="btn yellow" id="done-btn" style="font-size:26px;padding:16px 46px">✓ Mark Done</button>
+  </div>
+</div>
+
+<!-- ============ BOTTOM BAR ============ -->
+<div id="bar">
+  <div id="pwrap"><div id="pfill"></div></div>
+  <button onclick="changeSlide(-1)">◀ Back</button>
+  <button onclick="changeSlide(1)">Next ▶</button>
+  <div id="minist"></div>
+  <button onclick="toggleNotes()">📝 Notes (N)</button>
+  <div id="counter">1 / 40</div>
+</div>
+<div id="notesPanel"></div>
+
+</div></div>
+
+
+<script>
+/* ================= CORE ================= */
+var slides=[], cur=0, TOTAL=0;
+var stations=[
+  {ico:'⚖️',name:'① Fact or Opinion',on:false},
+  {ico:'📖',name:'② The Model',on:false},
+  {ico:'📊',name:'③ My Chart',on:false},
+  {ico:'✍️',name:'④ Write',on:false},
+  {ico:'🗣️',name:'⑤ Share',on:false},
+  {ico:'⚽',name:'⑥ Soccer',on:false}
+];
+
+function scale(){
+  try {
+    var s=Math.min(window.innerWidth/1920, window.innerHeight/1080);
+    var sc=document.getElementById('scaler');
+    sc.style.transform='scale('+s+')';
+    sc.style.left=((window.innerWidth-1920*s)/2)+'px';
+    sc.style.top=((window.innerHeight-1080*s)/2)+'px';
+  } catch(e){}
+}
+
+function renderStations(){
+  try {
+    document.querySelectorAll('[data-stboard]').forEach(function(b){
+      b.innerHTML=stations.map(function(st){
+        return '<div class="station'+(st.on?' on':'')+'"><div class="st-ico">'+st.ico+'</div><div class="st-name">'+st.name+'</div></div>';
+      }).join('');
+    });
+    var mini=document.getElementById('minist');
+    if(mini) mini.innerHTML=stations.map(function(st){return '<div class="mdot'+(st.on?' on':'')+'"></div>';}).join('');
+  } catch(e){}
+}
+
+function powerStation(i){
+  try {
+    if(stations[i].on) return;
+    stations[i].on=true;
+    renderStations();
+    var flags=document.querySelectorAll('.done-flag');
+    flags.forEach(function(f){
+      if(f.getAttribute('onclick')==='powerStation('+i+')'){
+        f.classList.add('lit');
+        f.textContent='⚡ Station powered up!';
+      }
+    });
+  } catch(e){}
+}
+
+function changeSlide(dir){ try{ goTo(cur+dir); }catch(e){} }
+function goTo(i){
+  try {
+    if(i<0||i>=TOTAL) return;
+    slides[cur].classList.remove('active');
+    cur=i;
+    slides[cur].classList.add('active');
+    var ctr=document.getElementById('counter');
+    if(ctr) ctr.textContent=(cur+1)+' / '+TOTAL;
+    var pf=document.getElementById('pfill');
+    if(pf) pf.style.width=((cur+1)/TOTAL*100)+'%';
+    var np=document.getElementById('notesPanel');
+    if(np && np.classList.contains('open')) np.innerHTML=slides[cur].dataset.notes||'<i>No notes for this slide.</i>';
+  } catch(e){}
+}
+function toggleNotes(){
+  try {
+    var np=document.getElementById('notesPanel');
+    np.classList.toggle('open');
+    if(np.classList.contains('open')) np.innerHTML=slides[cur].dataset.notes||'<i>No notes for this slide.</i>';
+  } catch(e){}
+}
+
+/* ================= PICK (MCQ) =================
+   Any .opt inside an .opt-row / .opt-col group. data-ok="1" is correct. */
+function pick(btn){
+  try {
+    var group=btn.closest('.opt-row')||btn.closest('.opt-col');
+    if(!group||group.dataset.solved) return;
+    if(btn.dataset.ok==='1'){
+      group.dataset.solved='1';
+      btn.classList.add('good');
+      group.querySelectorAll('.opt').forEach(function(o){o.disabled=true;});
+      var q=btn.closest('[data-quiz]');
+      if(q) q.dataset.solved='1';
+    } else {
+      btn.classList.add('bad');
+      setTimeout(function(){btn.classList.remove('bad');},400);
+    }
+  } catch(e){}
+}
+
+/* ================= FLIP CARD ================= */
+function flipCard(card,ev){
+  try {
+    if(ev && ev.target.closest('.opt')) return;
+    card.classList.toggle('flipped');
+  } catch(e){}
+}
+
+/* ================= MATCH =================
+   Left column tiles come first in .match-wrap; pairs share data-k. */
+var msel={};
+function mtap(btn,gameId,doneId){
+  try {
+    if(btn.classList.contains('lock')) return;
+    var wrap=btn.closest('.match-wrap');
+    var cols=wrap.querySelectorAll('.match-col');
+    var isLeft=(btn.closest('.match-col')===cols[0]);
+    var st=msel[gameId]||(msel[gameId]={left:null,done:0});
+    if(isLeft){
+      cols[0].querySelectorAll('.mtile').forEach(function(x){ if(!x.classList.contains('lock')) x.classList.remove('sel'); });
+      btn.classList.add('sel'); st.left=btn;
+    } else {
+      if(!st.left){ btn.classList.add('err'); setTimeout(function(){btn.classList.remove('err');},380); return; }
+      if(st.left.dataset.k===btn.dataset.k){
+        st.left.classList.remove('sel'); st.left.classList.add('lock'); btn.classList.add('lock');
+        st.left=null; st.done++;
+        if(st.done>=cols[0].querySelectorAll('.mtile').length){
+          var d=document.getElementById(doneId);
+          if(d) d.classList.add('show');
+        }
+      } else {
+        btn.classList.add('err');
+        setTimeout(function(){btn.classList.remove('err');},380);
+      }
+    }
+  } catch(e){}
+}
+
+/* ================= CHIP BUILDERS =================
+   Chips carry data-b (line id) and data-idx (position). Tap in order. */
+var builds={};
+function chiptap(chip){
+  try {
+    var b=chip.dataset.b;
+    var line=document.querySelector('[data-build="'+b+'"]');
+    if(!line||line.classList.contains('done')) return;
+    var st=builds[b]||(builds[b]={next:0});
+    var idx=parseInt(chip.dataset.idx,10);
+    if(idx===st.next){
+      chip.classList.add('used');
+      var span=document.createElement('span');
+      span.className='bpart';
+      span.innerHTML=chip.innerHTML;
+      line.appendChild(span);
+      st.next++;
+      var need=parseInt(line.dataset.need,10);
+      if(st.next>=need){
+        line.classList.add('done');
+        var flag=line.parentElement.querySelector('.done-flag');
+        if(flag) flag.classList.add('show');
+      }
+    } else {
+      chip.classList.add('err');
+      setTimeout(function(){chip.classList.remove('err');},380);
+    }
+  } catch(e){}
+}
+
+/* ================= GAP FILL =================
+   Tap a .gap to reveal its data-a answer. */
+function gaptap(g){
+  try {
+    if(g.classList.contains('filled')) return;
+    g.textContent=g.dataset.a;
+    g.classList.add('filled');
+  } catch(e){}
+}
+
+/* ================= QUIZ SCORE ================= */
+function quizScore(){
+  try {
+    var groups=document.querySelectorAll('[data-quiz]');
+    var s=0;
+    groups.forEach(function(g){ if(g.dataset.solved) s++; });
+    var qm=document.getElementById('quizMeter');
+    if(qm) qm.style.width=(s/6*100)+'%';
+    var qs=document.getElementById('quizScore');
+    if(qs) qs.textContent=s+'/6';
+  } catch(e){}
+}
+
+/* ================= CELEBRATION CONFETTI ================= */
+function confetti(){
+  try {
+    var host=document.getElementById('celebSlide');
+    if(!host||host.dataset.conf) return;
+    host.dataset.conf='1';
+    var moji=['⚡','🎉','💡','🕰️','⭐','🏆'];
+    for(var i=0;i<18;i++){
+      var s=document.createElement('div');
+      s.className='confetti';
+      s.textContent=moji[i%moji.length];
+      s.style.left=(Math.random()*100)+'%';
+      s.style.animationDelay=(Math.random()*2)+'s';
+      host.appendChild(s);
+    }
+  } catch(e){}
+}
+
+/* init + Mark Done (matches LessonProgressRecord shape read by the dashboard) */
+document.addEventListener('DOMContentLoaded',function(){
+  try {
+    slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    TOTAL=slides.length;
+    slides[0].classList.add('active');
+    var ctr=document.getElementById('counter');
+    if(ctr) ctr.textContent='1 / '+TOTAL;
+    var pf=document.getElementById('pfill');
+    if(pf) pf.style.width=(1/TOTAL*100)+'%';
+    renderStations();
+    scale();
+    var celebIdx=slides.length-1;
+    setInterval(function(){ if(cur===celebIdx){confetti();} },800);
+  } catch(e){}
+
+  try {
+    var doneBtn=document.getElementById('done-btn');
+    if(doneBtn){
+      doneBtn.addEventListener('click', function () {
+        try {
+          var key = 'leea.lessonProgress.v1';
+          var raw = localStorage.getItem(key);
+          var progress = raw ? JSON.parse(raw) : {};
+          var now = new Date().toISOString();
+          progress['ow-l4-u7-writing'] = {
+            lessonId: 'ow-l4-u7-writing',
+            teacherId: 'neritan',
+            studentId: 'leo',
+            status: 'done',
+            completedAt: now,
+            updatedAt: now
+          };
+          localStorage.setItem(key, JSON.stringify(progress));
+          doneBtn.textContent = '✓ Marked Done';
+          doneBtn.disabled = true;
+        } catch (e) {}
+      });
+    }
+  } catch(e){}
+});
+window.addEventListener('resize',scale);
+document.addEventListener('keydown',function(e){
+  try {
+    if(e.key==='ArrowRight'){changeSlide(1);}
+    else if(e.key==='ArrowLeft'){changeSlide(-1);}
+    else if(e.key==='n'||e.key==='N'){toggleNotes();}
+  } catch(err){}
+});
+</script>
+</body>
+</html>

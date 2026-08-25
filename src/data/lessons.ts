@@ -2,6 +2,22 @@ import unit7Opener from "../../content/subjects/english/courses/our-world/level-
 import unit7OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/opener.learner.json";
 import unit7Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/vocab1.teacher.json";
 import unit7Vocab1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/vocab1.learner.json";
+import unit7Song from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/song.teacher.json";
+import unit7SongLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/song.learner.json";
+import unit7Grammar1 from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/grammar1.teacher.json";
+import unit7Grammar1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/grammar1.learner.json";
+import unit7Vocab2 from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/vocab2.teacher.json";
+import unit7Vocab2Learner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/vocab2.learner.json";
+import unit7Grammar2 from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/grammar2.teacher.json";
+import unit7Grammar2Learner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/grammar2.learner.json";
+import unit7Reading from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/reading.teacher.json";
+import unit7ReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/reading.learner.json";
+import unit7Writing from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/writing.teacher.json";
+import unit7WritingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/writing.learner.json";
+import unit7Mission from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/mission.teacher.json";
+import unit7MissionLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/mission-app.learner.json";
+import unit7Project from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/project.teacher.json";
+import unit7ProjectLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/project-app.learner.json";
 import unit9Opener from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/opener.teacher.json";
 import unit9OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/opener.learner.json";
 import unit9Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/vocab1.teacher.json";
@@ -109,6 +125,22 @@ export const lessons: Lesson[] = [
   unit7OpenerLearner as Lesson,
   unit7Vocab1 as Lesson,
   unit7Vocab1Learner as Lesson,
+  unit7Song as Lesson,
+  unit7SongLearner as Lesson,
+  unit7Grammar1 as Lesson,
+  unit7Grammar1Learner as Lesson,
+  unit7Vocab2 as Lesson,
+  unit7Vocab2Learner as Lesson,
+  unit7Grammar2 as Lesson,
+  unit7Grammar2Learner as Lesson,
+  unit7Reading as Lesson,
+  unit7ReadingLearner as Lesson,
+  unit7Writing as Lesson,
+  unit7WritingLearner as Lesson,
+  unit7Mission as Lesson,
+  unit7MissionLearner as Lesson,
+  unit7Project as Lesson,
+  unit7ProjectLearner as Lesson,
   unit9Opener as Lesson,
   unit9OpenerLearner as Lesson,
   unit9Vocab1 as Lesson,

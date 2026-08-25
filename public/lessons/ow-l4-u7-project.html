@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 7 · Project · Design a Superpower App</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0b1220}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:absolute;top:0;left:0}
+#deck{width:1920px;height:1080px;position:relative}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FFFDF5;overflow:hidden}
+.slide.active{display:flex}
+:root{
+  --red:#DC2626; --red-d:#991B1B; --red-bg:#FEF2F2;
+  --yellow:#FACC15; --yellow-d:#CA8A04; --yellow-bg:#FEFCE8;
+  --amber:#F59E0B; --amber-d:#B45309; --amber-bg:#FFFBEB;
+  --navy:#0f172a; --navy-2:#1e293b;
+  --green:#16A34A; --green-d:#15803d; --green-bg:#F0FDF4;
+  --blue:#2563EB; --blue-d:#1D4ED8; --blue-bg:#EFF6FF;
+  --cream:#FFFDF5; --ink:#1f2937;
+}
+/* ---------- header ---------- */
+.slide-header{height:64px;background:var(--red);display:flex;align-items:center;padding:0 44px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.8);font-size:17px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.45);font-size:20px}
+.hd-section{color:#fff;font-size:23px;font-weight:800}
+.hd-chip{background:rgba(255,255,255,.22);color:#fff;padding:5px 18px;border-radius:20px;font-size:17px;font-weight:800;margin-left:auto}
+.hd-chip.src{background:rgba(0,0,0,.28)}
+.hd-chip.tr{background:var(--yellow);color:var(--navy)}
+/* ---------- body ---------- */
+.body{flex:1;padding:30px 60px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.body.center{align-items:center;justify-content:center;text-align:center}
+.body.grad-lab{background:radial-gradient(circle at 30% 20%,#1e293b,#0b1220);color:#fff}
+.header-bar.yellow{border-color:var(--yellow)}
+/* ---------- buttons / options ---------- */
+.btn{border:none;border-radius:14px;font-family:'Outfit',sans-serif;font-weight:800;cursor:pointer;transition:transform .12s, box-shadow .12s}
+.btn:hover{transform:translateY(-2px)}
+.btn.red{background:var(--red);color:#fff}
+.btn.yellow{background:var(--yellow);color:var(--navy)}
+.btn.dark{background:var(--navy-2);color:#fff}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;font-size:23px;font-weight:700;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.opt:hover{border-color:var(--amber);transform:translateX(4px)}
+.opt.good{background:var(--green-bg);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-bg);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default;opacity:.85}
+.opt:disabled:hover{transform:none}
+0%,100%{transform:translateX(0)}
+25%{transform:translateX(-8px)}
+75%{transform:translateX(8px)}
+.on-correct.show{display:block;animation:pop .4s}
+0%{transform:scale(.85);opacity:0}
+100%{transform:scale(1);opacity:1}
+/* ---------- chips ---------- */
+.chip{display:inline-block;background:#fff;border:3px solid var(--amber);border-radius:12px;padding:10px 20px;font-size:24px;font-weight:800;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;margin:4px}
+.chip:hover{background:var(--amber-bg);transform:translateY(-2px)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.err{animation:shake .35s;border-color:var(--red)}
+.build-line{min-height:74px;background:#fff;border:3px dashed #cbd5e1;border-radius:14px;padding:12px 18px;font-size:27px;font-weight:800;color:var(--navy);display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.build-line.done{border-style:solid;border-color:var(--green);background:var(--green-bg)}
+.bpart{background:var(--yellow-bg);border:2px solid var(--yellow);border-radius:8px;padding:4px 12px}
+/* ---------- stations ---------- */
+.station-board{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.station{width:220px;background:rgba(255,255,255,.07);border:3px solid rgba(255,255,255,.18);border-radius:16px;padding:14px;text-align:center;transition:all .4s}
+.station .st-ico{font-size:44px;filter:grayscale(1);opacity:.45;transition:all .4s}
+.station .st-name{font-size:17px;font-weight:800;color:rgba(255,255,255,.55);margin-top:6px}
+.station.on{border-color:var(--yellow);background:rgba(250,204,21,.14);box-shadow:0 0 26px rgba(250,204,21,.35)}
+.station.on .st-ico{filter:none;opacity:1}
+.station.on .st-name{color:var(--yellow)}
+.mitem.sel{border-color:var(--blue);background:var(--blue-bg)}
+.mitem.lock{border-color:var(--green);background:var(--green-bg);color:var(--green-d);pointer-events:none}
+.mitem.err{animation:shake .35s;border-color:var(--red)}
+.card3d.flipped .c3-inner{transform:rotateY(180deg)}
+.gapbtn.good{border-style:solid;border-color:var(--green);background:var(--green-bg);color:var(--green-d)}
+.gapbtn.bad{animation:shake .35s;border-color:var(--red)}
+.bulb.on{filter:none;opacity:1;text-shadow:0 0 22px rgba(250,204,21,.8)}
+/* ---------- bottom bar ---------- */
+#bar{position:absolute;left:0;bottom:0;width:1920px;height:52px;background:var(--navy);display:flex;align-items:center;padding:0 24px;gap:18px;z-index:50}
+#bar button{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:10px;padding:7px 18px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif}
+#bar button:hover{background:rgba(255,255,255,.25)}
+#counter{color:rgba(255,255,255,.7);font-size:16px;font-weight:800;margin-left:auto}
+#minist{display:flex;gap:7px}
+.mdot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.18);transition:all .3s}
+.mdot.on{background:var(--yellow);box-shadow:0 0 8px rgba(250,204,21,.8)}
+#pwrap{position:absolute;left:0;top:0;width:100%;height:6px;background:rgba(255,255,255,.12)}
+#pfill{height:100%;width:0;background:var(--yellow);transition:width .3s}
+#notesPanel{position:absolute;right:24px;bottom:64px;width:640px;max-height:520px;overflow:auto;background:#fff;border:3px solid var(--yellow);border-radius:16px;padding:20px 24px;font-size:19px;color:var(--ink);line-height:1.5;display:none;z-index:60;box-shadow:0 16px 44px rgba(0,0,0,.35)}
+#notesPanel.show{display:block}
+#notesPanel b{color:var(--red-d)}
+.confetti{position:absolute;font-size:34px;animation:fall 3.2s linear infinite}
+0%{transform:translateY(-80px) rotate(0)}
+100%{transform:translateY(1150px) rotate(540deg)}
+/* ================= UNIT 7 GRAMMAR 1 — TIME MACHINE COMPONENTS ================= */
+:root{ --purple:#7C3AED; --purple-d:#5B21B6; --purple-bg:#F5F3FF; --ink-2:#475569; --ink-3:#94a3b8; }
+.slide-header{background:var(--purple)}
+.body.grad-lab{background:linear-gradient(140deg,var(--purple-d),var(--purple))}
+.callout{background:var(--purple-bg);border:3px solid var(--purple);border-radius:16px;padding:16px 26px;font-size:25px;font-weight:600;color:var(--ink);line-height:1.4;text-align:center}
+/* goal grid */
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.goal-card{background:#fff;border:3px solid #e2e8f0;border-radius:18px;padding:22px 26px;display:flex;flex-direction:column;gap:6px}
+.gc-ico{font-size:44px}
+.gc-h{font-size:20px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--purple)}
+.gc-t{font-size:26px;font-weight:600;color:var(--ink);line-height:1.35}
+/* flip cards */
+.flip-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.flipcard{width:340px;height:230px;perspective:1000px;cursor:pointer}
+.flipcard.wide{width:100%;max-width:1400px;height:150px}
+.fc-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flipcard.flipped .fc-in{transform:rotateY(180deg)}
+.fc-f,.fc-b{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-weight:700;line-height:1.35}
+.fc-f{background:#fff;border:3px solid var(--purple);font-size:34px;color:var(--ink)}
+.fc-b{background:var(--purple);color:#fff;font-size:27px;transform:rotateY(180deg)}
+.flipcard.wide .fc-f{font-size:30px}
+.flipcard.wide .fc-b{font-size:28px}
+/* question line + options */
+.q-line{font-size:40px;font-weight:800;text-align:center;color:var(--ink)}
+.opt-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.opt-col{display:flex;flex-direction:column;gap:14px}
+.opt.sm{font-size:24px;padding:12px 26px}
+.opt.good{background:var(--green);border-color:var(--green);color:#fff}
+.opt.bad{background:var(--red-bg);border-color:var(--red);color:var(--red-d)}
+/* word lab */
+.wl-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.wl-chip{background:#fff;border:3px solid var(--purple);border-radius:999px;padding:12px 28px;font-size:26px;font-weight:800;color:var(--purple-d)}
+/* word split */
+.word-split{display:flex;gap:32px;height:100%}
+.ws-left{width:38%;background:var(--purple-bg);border:3px solid var(--purple);border-radius:20px;padding:26px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.ws-emoji{font-size:88px;line-height:1}
+.ws-word{font-size:44px;font-weight:900;color:var(--purple-d)}
+.ws-ipa{font-size:24px;color:var(--ink-2);font-weight:600}
+.ws-jp{font-size:26px;font-weight:700;color:var(--ink)}
+.ws-def{font-size:24px;color:var(--ink-2);line-height:1.4;margin-top:8px}
+.ws-right{flex:1;display:flex;flex-direction:column;gap:14px}
+.game-head{font-size:28px;font-weight:800;color:var(--purple-d)}
+/* then / now */
+.then-now{display:flex;align-items:center;gap:20px;justify-content:center}
+.tn-card{width:320px;height:200px;perspective:1000px;cursor:pointer}
+.tn-card .fc-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.tn-card.flipped .fc-in{transform:rotateY(180deg)}
+.tn-arrow{font-size:52px;color:var(--purple)}
+/* match */
+.match-wrap{display:flex;gap:60px;justify-content:center}
+.match-col{display:flex;flex-direction:column;gap:14px;width:520px}
+.mtile{background:#fff;border:3px solid #cbd5e1;border-radius:14px;padding:16px 20px;font-size:24px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);text-align:left}
+.mtile:hover{border-color:var(--purple)}
+.mtile.sel{border-color:var(--purple);background:var(--purple-bg)}
+.mtile.lock{background:var(--green);border-color:var(--green);color:#fff;pointer-events:none}
+.mtile.err{background:var(--red-bg);border-color:var(--red)}
+/* done flag */
+.done-flag{display:none;margin:20px auto 0;background:var(--yellow);border:3px solid var(--yellow-d);border-radius:16px;padding:14px 34px;font-size:26px;font-weight:800;color:#4a3800;cursor:pointer;text-align:center;max-width:900px}
+.done-flag.show{display:block}
+.done-flag.lit{background:var(--green);border-color:var(--green-d);color:#fff;cursor:default}
+/* grammar box */
+.gbox{background:#fff;border:4px solid var(--purple);border-radius:22px;padding:30px 36px}
+.gbox-title{font-size:34px;font-weight:900;color:var(--purple-d);margin-bottom:20px;display:flex;align-items:center}
+.gbox-tr{background:var(--purple);color:#fff;border-radius:999px;padding:5px 18px;font-size:20px;margin-left:14px}
+.gbox-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.gbox-cell{background:var(--purple-bg);border-radius:14px;padding:22px 24px;font-size:29px;font-weight:600;color:var(--ink);line-height:1.35}
+/* pattern strip + builders */
+.pattern-strip{background:var(--navy);color:#fff;border-radius:16px;padding:18px 30px;font-size:32px;font-weight:800;text-align:center}
+.build-line{min-height:86px;background:#fff;border:3px dashed var(--purple);border-radius:16px;display:flex;align-items:center;gap:10px;padding:14px 22px;flex-wrap:wrap;margin:14px 0}
+.build-line.done{border-style:solid;background:var(--green-bg);border-color:var(--green)}
+.bpart{font-size:30px;font-weight:800;color:var(--ink)}
+.chip-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+/* two panel */
+.two-panel{display:flex;gap:28px}
+.panel-card{flex:1;background:#fff;border:3px solid var(--purple);border-radius:20px;padding:26px}
+.pc-h{font-size:32px;font-weight:900;color:var(--purple-d);margin-bottom:10px}
+.pc-t{font-size:25px;color:var(--ink-2);line-height:1.4;margin-bottom:14px}
+.pc-ex{background:var(--purple-bg);border-radius:12px;padding:18px;font-size:27px;font-weight:700;line-height:1.4;color:var(--ink)}
+/* detective */
+.det-row{background:#fff;border:3px solid #e2e8f0;border-radius:16px;padding:18px 24px;margin-bottom:16px}
+.det-bad{font-size:28px;font-weight:700;color:var(--red-d);margin-bottom:12px}
+/* rules board */
+.rules-board{display:flex;flex-direction:column;gap:14px}
+.rule-line{display:flex;align-items:flex-start;gap:18px;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:16px 22px}
+.rl-n{width:44px;height:44px;flex-shrink:0;border-radius:50%;background:var(--purple);color:#fff;font-size:24px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.rl-t{font-size:25px;color:var(--ink);line-height:1.4}
+/* practice */
+.prac-item{display:flex;gap:18px;align-items:center;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;margin-bottom:12px}
+.pi-n{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:var(--purple);color:#fff;font-size:23px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.pi-s{font-size:26px;color:var(--ink);line-height:1.4}
+.gap{display:inline-block;min-width:230px;border-bottom:4px solid var(--purple);color:var(--purple-d);font-weight:800;text-align:center;cursor:pointer}
+.gap.filled{border-bottom-style:solid;color:var(--green-d)}
+/* true / false rows */
+.tf-row{display:flex;align-items:center;gap:22px;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;margin-bottom:12px}
+.tf-s{flex:1;font-size:25px;color:var(--ink);line-height:1.35}
+/* dialogue */
+.dialogue{display:flex;flex-direction:column;gap:18px;width:100%;max-width:1300px}
+.bubble{max-width:76%;border-radius:22px;padding:22px 28px;font-size:29px;font-weight:600;line-height:1.35}
+.bubble.left{background:var(--purple-bg);border:3px solid var(--purple);align-self:flex-start}
+.bubble.right{background:var(--yellow-bg);border:3px solid var(--amber);align-self:flex-end}
+/* quiz */
+.quiz-meter-wrap{height:20px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-bottom:12px}
+.quiz-meter{height:100%;width:0;background:var(--green);transition:width .3s}
+.quiz-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.quiz-q{background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:16px 20px}
+.qq-t{font-size:24px;font-weight:700;color:var(--ink);margin-bottom:12px;line-height:1.3}
+/* celebrate */
+.check-list{display:flex;flex-direction:column;gap:10px}
+.ck{background:rgba(255,255,255,.15);border-radius:12px;padding:12px 26px;font-size:26px;font-weight:700;color:#fff}
+</style>
+</head>
+<body>
+<div id="scaler"><div id="deck">
+
+<!-- ============ 1 · TITLE ============ -->
+<div class="slide" data-notes="<b>The Unit 7 Project.</b> Design a superpower app. Three objectives: design an app, share ideas in a small group, and complete the Unit 7 quiz. Materials: scissors, glue, construction paper, markers, recycled materials. LP p.254.">
+  <div class="body grad-lab center" style="gap:20px">
+    <div style="font-size:96px">🦸📱</div>
+    <div style="font-size:56px;font-weight:900;color:#fff;text-align:center;line-height:1.1">Design a<br>Superpower App</div>
+    <div style="font-size:28px;color:rgba(255,255,255,.9);font-weight:700">Unit 7 · Project</div>
+    <div style="background:rgba(255,255,255,.12);border:2px solid var(--yellow);border-radius:14px;padding:14px 28px;font-size:25px;font-weight:800;color:#fff;text-align:center">
+      Choose a superpower. Design an app that gets you there.
+    </div>
+    <div class="station-board" data-stboard></div>
+    <button class="btn yellow" style="font-size:24px;padding:14px 40px" onclick="changeSlide(1)">Start the project ▶</button>
+  </div>
+</div>
+
+<!-- ============ 2 · GOALS + MATERIALS ============ -->
+<div class="slide" data-notes="<b>Today&#39;s goals (LP p.254).</b> Design an app, share ideas in a small group, complete the Unit 7 quiz. Content vocabulary: simple, materials, recycle, ghost, vacuum. Get the materials out now: scissors, glue, construction paper, markers, and anything recycled.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Project — Today's Goals</span><span class="hd-chip src">📖 LP p.254</span></div>
+  <div class="body">
+    <div class="goal-grid">
+      <div class="goal-card"><div class="gc-ico">📐</div><div class="gc-h">Objective 1</div><div class="gc-t"><b>Design</b> an app.</div></div>
+      <div class="goal-card"><div class="gc-ico">🗣️</div><div class="gc-h">Objective 2</div><div class="gc-t"><b>Share</b> ideas in a small group.</div></div>
+      <div class="goal-card"><div class="gc-ico">✅</div><div class="gc-h">Objective 3</div><div class="gc-t">Complete the <b>Unit 7 quiz</b>.</div></div>
+      <div class="goal-card"><div class="gc-ico">🧰</div><div class="gc-h">Materials</div><div class="gc-t">scissors · glue · construction paper · markers · <b>recycled</b> materials ♻️</div></div>
+    </div>
+    <div class="callout" style="margin-top:22px">📚 Content words today: <b>simple</b> · <b>materials</b> · <b>recycle</b> · <b>a ghost</b> · <b>a vacuum</b></div>
+  </div>
+</div>
+
+<!-- ============ 3 · BRAINSTORM — INVENTIONS ============ -->
+<div class="slide" data-notes="<b>Prepare — Brainstorm (LP p.254).</b> Ask: What are some inventions we learned about in this unit? List them on the board. Say: These inventions are useful. They help people solve problems.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Brainstorm — What Did We Learn?</span><span class="hd-chip src">📖 LP p.254</span></div>
+  <div class="body center" style="gap:22px">
+    <div style="font-size:32px;font-weight:800;text-align:center">What are some inventions we learned about in this unit?</div>
+    <div class="wl-row">
+      <div class="wl-chip">🎡 the wheel</div>
+      <div class="wl-chip">🔋 the battery</div>
+      <div class="wl-chip">⚡ electricity</div>
+      <div class="wl-chip">📱 the cell phone</div>
+      <div class="wl-chip">✈️ the airplane</div>
+      <div class="wl-chip">🍦 the Popsicle</div>
+      <div class="wl-chip">🔦 the hollow flashlight</div>
+      <div class="wl-chip">⠿ Braille</div>
+      <div class="wl-chip">🪀 the hula hoop</div>
+      <div class="wl-chip">🗒️ sticky notes</div>
+    </div>
+    <div class="callout">💡 These inventions are <b>useful</b>. They help people <b>solve problems</b>.</div>
+  </div>
+</div>
+
+<!-- ============ 4 · BRAINSTORM — PROBLEMS ============ -->
+<div class="slide" data-notes="<b>Prepare — problems (LP p.254).</b> Ask: What problems do YOU have? Can an invention help? Brainstorm problems from daily life and write them on the board. The planner gives three examples to start with.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Brainstorm — What Problems Do You Have?</span><span class="hd-chip tr">⚡ Power Station ①</span></div>
+  <div class="body">
+    <div class="callout" style="margin-bottom:18px">✍️ Write Leo's problems on the board. Start with the planner's three, then let him add his own.</div>
+    <div class="rules-board">
+      <div class="rule-line"><span class="rl-n">🧹</span><span class="rl-t">"It takes a long time to do my chores."</span></div>
+      <div class="rule-line"><span class="rl-n">🛏️</span><span class="rl-t">"My room isn't clean."</span></div>
+      <div class="rule-line"><span class="rl-n">⏰</span><span class="rl-t">"I am often late to school."</span></div>
+      <div class="rule-line"><span class="rl-n">✏️</span><span class="rl-t">…and Leo's own: ______________________</span></div>
+      <div class="rule-line"><span class="rl-n">✏️</span><span class="rl-t">…and one more: ______________________</span></div>
+    </div>
+    <div class="done-flag show" id="bs-done" onclick="powerStation(0)">⚡ Problem list written — tap to power Station ①.</div>
+  </div>
+</div>
+
+<!-- ============ 5 · WORD LAB ============ -->
+<div class="slide" data-notes="<b>Word Lab — Station ②.</b> Five content words from the planner. Ghost and vacuum come from the Student Book&#39;s own app examples — they are there to spark ideas.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Word Lab — 5 Project Words</span><span class="hd-chip tr">⚡ Power Station ②</span></div>
+  <div class="body">
+    <div style="font-size:26px;font-weight:700;text-align:center;margin-bottom:12px">Tap a word, then tap its meaning.</div>
+    <div class="match-wrap" data-game="wl">
+      <div class="match-col">
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="a">👌 simple</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="b">🧰 materials</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="c">♻️ recycle</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="d">👻 a ghost</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="e">🧹 a vacuum</button>
+      </div>
+      <div class="match-col">
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="c">use it again instead of throwing it away</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="e">a machine that sucks up dirt</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="a">easy to understand or do</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="d">a spirit some people believe they can see</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="b">the things you use to make something</button>
+      </div>
+    </div>
+    <div class="done-flag" id="wl-done" onclick="powerStation(1)">⚡ Station ② is live! Tap to power up.</div>
+  </div>
+</div>
+
+<!-- ============ 6 · THINK LIKE A SUPERHERO ============ -->
+<div class="slide" data-notes="<b>Prepare (LP p.254).</b> Say: Think like a superhero. Today you&#39;re going to design a superpower app that will make your life better. The app should be the SOLUTION TO A PROBLEM. You can use the problems on the board or think of your own.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Think Like a Superhero 🦸</span><span class="hd-chip src">📗 Book p.128</span></div>
+  <div class="body center" style="gap:24px">
+    <div class="pattern-strip" style="font-size:32px">Choose your own <b style="color:var(--yellow)">superpower</b> — something that makes life better.</div>
+    <div class="callout" style="width:100%">🎯 The app must be the <b>solution to a problem</b>. A pretty app that solves nothing is not finished.</div>
+    <div class="two-panel" style="width:100%">
+      <div class="panel-card">
+        <div class="pc-h">🤔 How will it work?</div>
+        <div class="pc-ex">Will it sound an <b>alarm</b>? ⏰<br>Will it send you a <b>message</b>? 💬<br>Will it show you a <b>picture</b>? 🖼️</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">✏️ Sketch it</div>
+        <div class="pc-ex">Sketch out your ideas in <b>3-4 pictures</b>.</div>
+        <div class="pc-t">Quick drawings — not perfect art. The idea matters more than the lines.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 7 · THE MODEL ============ -->
+<div class="slide" data-notes="<b>The model (SB p.129).</b> Read it aloud together and point out the grammar: didn&#39;t use to … but now — straight from Grammar 1. Leo&#39;s own app description should sound like this.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">The Model — Superfood Man 🦸🥗</span><span class="hd-chip src">📗 Book p.129</span></div>
+  <div class="body">
+    <div class="gbox">
+      <div class="gbox-title">Superfood Man</div>
+      <div style="font-size:29px;line-height:1.6;color:var(--ink)">"My superhero is Superfood Man. I <b>didn't use to</b> eat breakfast, <b>but now</b> I do! Superfood Man reminds me to eat a healthy breakfast every morning. He's great!"</div>
+    </div>
+    <div class="callout" style="margin-top:20px">🕰️ Spot the grammar: <b>didn't use to … but now</b>. Grammar 1, out in the wild. Leo's description should use it too.</div>
+    <div class="game-head" style="margin-top:16px">🎮 What problem does Superfood Man solve?</div>
+    <div class="opt-row">
+      <button class="opt" onclick="pick(this)" data-ok="1">The writer didn't use to eat breakfast.</button>
+      <button class="opt" onclick="pick(this)">The writer was late to school.</button>
+      <button class="opt" onclick="pick(this)">The writer's room was messy.</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 8 · SKETCH ============ -->
+<div class="slide" data-notes="<b>Sketch (Book p.128, Activity 2).</b> Give Leo real time here — pencil and paper, three or four frames. Do not rush it and do not correct the drawing. Ask him to talk you through each frame as he draws.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Sketch It — 3 or 4 Pictures ✏️</span><span class="hd-chip tr">⚡ Power Station ③</span></div>
+  <div class="body">
+    <div class="callout" style="margin-bottom:18px">✏️ Real paper, real pencil. Three or four frames. Talk Dad through each one as you draw it.</div>
+    <div class="cmd-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+      <div class="rule-line"><span class="rl-n">1</span><span class="rl-t">The <b>problem</b> — show it happening</span></div>
+      <div class="rule-line"><span class="rl-n">2</span><span class="rl-t">The <b>app screen</b> — what does it look like?</span></div>
+      <div class="rule-line"><span class="rl-n">3</span><span class="rl-t">The app <b>working</b> — alarm? message? picture?</span></div>
+      <div class="rule-line"><span class="rl-n">4</span><span class="rl-t">The <b>problem solved</b> — the happy ending 🎉</span></div>
+    </div>
+    <div class="done-flag show" id="sk-done" onclick="powerStation(2)">⚡ Sketches drawn — tap to power Station ③.</div>
+  </div>
+</div>
+
+<!-- ============ 9 · FEEDBACK FRAMES ============ -->
+<div class="slide" data-notes="<b>Share ideas (LP p.254) + Teaching Tip (LP p.255).</b> Encourage positive feedback with these exact sentence frames. Make sure there is no tension: the person giving feedback should not change the idea completely, only help it work better. The person receiving it should take it positively and be thankful.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Give Feedback — Kindly 💬</span><span class="hd-chip src">📖 LP pp.254-255</span></div>
+  <div class="body">
+    <div class="rules-board">
+      <div class="rule-line"><span class="rl-n">💬</span><span class="rl-t">"Your app looks fun. <b>However</b>, I don't understand how it will…"</span></div>
+      <div class="rule-line"><span class="rl-n">💬</span><span class="rl-t">"I like your sketches, <b>but</b> I would maybe change the colors."</span></div>
+      <div class="rule-line"><span class="rl-n">💬</span><span class="rl-t">"The ideas are great, <b>but</b> I think you don't need that many."</span></div>
+    </div>
+    <div class="two-panel" style="margin-top:20px">
+      <div class="panel-card">
+        <div class="pc-h">🎁 Giving feedback</div>
+        <div class="pc-t">Do <b>not</b> change your partner's idea completely — make it <b>work better</b>. Be respectful.</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">🙏 Receiving feedback</div>
+        <div class="pc-t">Take it <b>positively</b>. Use the ideas to make the project better. <b>Say thank you.</b></div>
+      </div>
+    </div>
+    <div class="done-flag show" id="fb-done" onclick="powerStation(3)">⚡ Feedback exchanged — tap to power Station ④.</div>
+  </div>
+</div>
+
+<!-- ============ 10 · IMPROVE + BUILD ============ -->
+<div class="slide" data-notes="<b>Improve and build (LP p.255).</b> Give Leo time to improve his ideas, then hand over the materials for drawing the finished superpower app. This is the making part — let it take as long as it takes.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Improve, Then Build 🎨</span><span class="hd-chip">🧰 materials time</span></div>
+  <div class="body center" style="gap:24px">
+    <div class="wl-row">
+      <div class="wl-chip">✂️ scissors</div>
+      <div class="wl-chip">🧴 glue</div>
+      <div class="wl-chip">📄 construction paper</div>
+      <div class="wl-chip">🖍️ markers</div>
+      <div class="wl-chip">♻️ recycled materials</div>
+    </div>
+    <div style="font-size:30px;font-weight:700;text-align:center;max-width:1300px">Use the feedback first. <b>Then</b> draw the finished app.</div>
+    <div class="callout">♻️ <b>Recycle</b> where you can — old boxes, packaging, scrap paper. That is part of the unit too.</div>
+  </div>
+</div>
+
+<!-- ============ 11 · SHARE + RUBRIC ============ -->
+<div class="slide" data-notes="<b>Share (LP p.255).</b> Present the finished app. Ask the three discussion questions. Then run the project rubric together — three checks straight from the planner.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Present &amp; Check ✔</span><span class="hd-chip tr">⚡ Power Station ⑤</span></div>
+  <div class="body">
+    <div class="two-panel" style="margin-bottom:18px">
+      <div class="panel-card">
+        <div class="pc-h">❓ Ask about each app</div>
+        <div class="pc-ex">How does the app work?<br>How is the app useful?<br>What problem does the app solve?</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">✔ Project rubric</div>
+        <div class="pc-ex">Did Leo sketch out ideas for a superpower app?<br>Did Leo exchange ideas to improve the work?<br>Did Leo explain how the app solves a problem?</div>
+      </div>
+    </div>
+    <div class="tf-row"><div class="tf-s">✔ Sketched out ideas for a superpower app</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">✔ Exchanged ideas to improve the work</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">✔ Explained how the app solves a problem</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="done-flag show" id="pr-done" onclick="powerStation(4)">⚡ Presented and checked — tap to power Station ⑤.</div>
+  </div>
+</div>
+
+<!-- ============ 12 · NOW I CAN ============ -->
+<div class="slide" data-notes="<b>Now I Can (SB p.129).</b> The four unit statements, verbatim. Ask the planner&#39;s review questions for each one and let Leo answer before he claims it.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Now I Can… 🎓</span><span class="hd-chip src">📗 Book p.129</span></div>
+  <div class="body">
+    <div class="flip-row" style="flex-direction:column;gap:14px">
+      <div class="flipcard wide" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">✅ talk about inventions.</div><div class="fc-b">❓ "What are two inventions you learned about?"</div></div></div>
+      <div class="flipcard wide" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">✅ talk about past habits.</div><div class="fc-b">❓ "What are two things people used to do in the past?"</div></div></div>
+      <div class="flipcard wide" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">✅ describe how to use an invention.</div><div class="fc-b">❓ "How do you use a hula hoop?"</div></div></div>
+      <div class="flipcard wide" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">✅ write facts and opinions about a favorite invention.</div><div class="fc-b">❓ "What is an example of a fact? What is an example of an opinion?"</div></div></div>
+    </div>
+    <div class="callout" style="margin-top:18px">🗣️ Leo answers the question <b>out loud</b> before he ticks the statement.</div>
+  </div>
+</div>
+
+<!-- ============ 13 · UNIT QUIZ ============ -->
+<div class="slide" data-notes="<b>Unit 7 quiz.</b> Six questions across the whole unit — vocabulary, both grammar points, the reading, and the writing skill.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Unit 7 Quiz</span><span class="hd-chip tr">⚡ Power Station ⑥</span></div>
+  <div class="body">
+    <div class="quiz-meter-wrap"><div class="quiz-meter" id="quizMeter"></div></div>
+    <div style="text-align:center;font-size:26px;font-weight:800;margin-bottom:10px">Score: <span id="quizScore">0/6</span></div>
+    <div class="quiz-grid">
+      <div class="quiz-q" data-quiz="1"><div class="qq-t">1. 💡 An <b>invention</b> is…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">a new thing made for the first time</button><button class="opt sm" onclick="pick(this);quizScore()">an old habit</button></div></div>
+      <div class="quiz-q" data-quiz="2"><div class="qq-t">2. 🕰️ "People ___ travel by boat."</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">used to</button><button class="opt sm" onclick="pick(this);quizScore()">use to</button></div></div>
+      <div class="quiz-q" data-quiz="3"><div class="qq-t">3. 🚫 "We ___ have airplanes."</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">didn't use to</button><button class="opt sm" onclick="pick(this);quizScore()">didn't used to</button></div></div>
+      <div class="quiz-q" data-quiz="4"><div class="qq-t">4. 🪀 "___ the hoop to your waist."</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">Lift</button><button class="opt sm" onclick="pick(this);quizScore()">Put</button></div></div>
+      <div class="quiz-q" data-quiz="5"><div class="qq-t">5. 🌐 "How ___ you use it?"</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">do</button><button class="opt sm" onclick="pick(this);quizScore()">does</button></div></div>
+      <div class="quiz-q" data-quiz="6"><div class="qq-t">6. 📋 Which one is a <b>fact</b>?</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">Spencer Silver invented the glue in 1970.</button><button class="opt sm" onclick="pick(this);quizScore()">Sticky notes are a great invention.</button></div></div>
+    </div>
+    <div class="done-flag show" id="qz-done" onclick="powerStation(5)">⚡ Quiz done — tap to power Station ⑥.</div>
+  </div>
+</div>
+
+<!-- ============ 14 · CELEBRATE ============ -->
+<div class="slide" id="celebSlide" data-notes="<b>Celebrate — end of Unit 7.</b> All six stations lit and the whole unit finished. Ask Leo to present his superpower app one last time, in one sentence. Then tap Mark Done.">
+  <div class="body grad-lab center" style="gap:20px">
+    <div style="font-size:96px">🏆</div>
+    <div style="font-size:54px;font-weight:900;color:#fff;text-align:center">Unit 7 Complete!</div>
+    <div class="station-board" data-stboard></div>
+    <div class="check-list">
+      <div class="ck">✅ You designed a superpower app 🦸📱</div>
+      <div class="ck">✅ You shared ideas and gave kind feedback</div>
+      <div class="ck">✅ You explained the problem it solves</div>
+      <div class="ck">✅ You can talk about inventions and past habits</div>
+      <div class="ck">✅ You can write facts and opinions</div>
+    </div>
+    <button class="btn yellow" id="done-btn" style="font-size:26px;padding:16px 46px">✓ Mark Done</button>
+  </div>
+</div>
+
+<!-- ============ BOTTOM BAR ============ -->
+<div id="bar">
+  <div id="pwrap"><div id="pfill"></div></div>
+  <button onclick="changeSlide(-1)">◀ Back</button>
+  <button onclick="changeSlide(1)">Next ▶</button>
+  <div id="minist"></div>
+  <button onclick="toggleNotes()">📝 Notes (N)</button>
+  <div id="counter">1 / 40</div>
+</div>
+<div id="notesPanel"></div>
+
+</div></div>
+
+
+<script>
+/* ================= CORE ================= */
+var slides=[], cur=0, TOTAL=0;
+var stations=[
+  {ico:'💭',name:'① Brainstorm',on:false},
+  {ico:'🧪',name:'② Word Lab',on:false},
+  {ico:'✏️',name:'③ Sketch',on:false},
+  {ico:'💬',name:'④ Feedback',on:false},
+  {ico:'🎤',name:'⑤ Present',on:false},
+  {ico:'🧠',name:'⑥ Unit Quiz',on:false}
+];
+
+function scale(){
+  try {
+    var s=Math.min(window.innerWidth/1920, window.innerHeight/1080);
+    var sc=document.getElementById('scaler');
+    sc.style.transform='scale('+s+')';
+    sc.style.left=((window.innerWidth-1920*s)/2)+'px';
+    sc.style.top=((window.innerHeight-1080*s)/2)+'px';
+  } catch(e){}
+}
+
+function renderStations(){
+  try {
+    document.querySelectorAll('[data-stboard]').forEach(function(b){
+      b.innerHTML=stations.map(function(st){
+        return '<div class="station'+(st.on?' on':'')+'"><div class="st-ico">'+st.ico+'</div><div class="st-name">'+st.name+'</div></div>';
+      }).join('');
+    });
+    var mini=document.getElementById('minist');
+    if(mini) mini.innerHTML=stations.map(function(st){return '<div class="mdot'+(st.on?' on':'')+'"></div>';}).join('');
+  } catch(e){}
+}
+
+function powerStation(i){
+  try {
+    if(stations[i].on) return;
+    stations[i].on=true;
+    renderStations();
+    var flags=document.querySelectorAll('.done-flag');
+    flags.forEach(function(f){
+      if(f.getAttribute('onclick')==='powerStation('+i+')'){
+        f.classList.add('lit');
+        f.textContent='⚡ Station powered up!';
+      }
+    });
+  } catch(e){}
+}
+
+function changeSlide(dir){ try{ goTo(cur+dir); }catch(e){} }
+function goTo(i){
+  try {
+    if(i<0||i>=TOTAL) return;
+    slides[cur].classList.remove('active');
+    cur=i;
+    slides[cur].classList.add('active');
+    var ctr=document.getElementById('counter');
+    if(ctr) ctr.textContent=(cur+1)+' / '+TOTAL;
+    var pf=document.getElementById('pfill');
+    if(pf) pf.style.width=((cur+1)/TOTAL*100)+'%';
+    var np=document.getElementById('notesPanel');
+    if(np && np.classList.contains('open')) np.innerHTML=slides[cur].dataset.notes||'<i>No notes for this slide.</i>';
+  } catch(e){}
+}
+function toggleNotes(){
+  try {
+    var np=document.getElementById('notesPanel');
+    np.classList.toggle('open');
+    if(np.classList.contains('open')) np.innerHTML=slides[cur].dataset.notes||'<i>No notes for this slide.</i>';
+  } catch(e){}
+}
+
+/* ================= PICK (MCQ) =================
+   Any .opt inside an .opt-row / .opt-col group. data-ok="1" is correct. */
+function pick(btn){
+  try {
+    var group=btn.closest('.opt-row')||btn.closest('.opt-col');
+    if(!group||group.dataset.solved) return;
+    if(btn.dataset.ok==='1'){
+      group.dataset.solved='1';
+      btn.classList.add('good');
+      group.querySelectorAll('.opt').forEach(function(o){o.disabled=true;});
+      var q=btn.closest('[data-quiz]');
+      if(q) q.dataset.solved='1';
+    } else {
+      btn.classList.add('bad');
+      setTimeout(function(){btn.classList.remove('bad');},400);
+    }
+  } catch(e){}
+}
+
+/* ================= FLIP CARD ================= */
+function flipCard(card,ev){
+  try {
+    if(ev && ev.target.closest('.opt')) return;
+    card.classList.toggle('flipped');
+  } catch(e){}
+}
+
+/* ================= MATCH =================
+   Left column tiles come first in .match-wrap; pairs share data-k. */
+var msel={};
+function mtap(btn,gameId,doneId){
+  try {
+    if(btn.classList.contains('lock')) return;
+    var wrap=btn.closest('.match-wrap');
+    var cols=wrap.querySelectorAll('.match-col');
+    var isLeft=(btn.closest('.match-col')===cols[0]);
+    var st=msel[gameId]||(msel[gameId]={left:null,done:0});
+    if(isLeft){
+      cols[0].querySelectorAll('.mtile').forEach(function(x){ if(!x.classList.contains('lock')) x.classList.remove('sel'); });
+      btn.classList.add('sel'); st.left=btn;
+    } else {
+      if(!st.left){ btn.classList.add('err'); setTimeout(function(){btn.classList.remove('err');},380); return; }
+      if(st.left.dataset.k===btn.dataset.k){
+        st.left.classList.remove('sel'); st.left.classList.add('lock'); btn.classList.add('lock');
+        st.left=null; st.done++;
+        if(st.done>=cols[0].querySelectorAll('.mtile').length){
+          var d=document.getElementById(doneId);
+          if(d) d.classList.add('show');
+        }
+      } else {
+        btn.classList.add('err');
+        setTimeout(function(){btn.classList.remove('err');},380);
+      }
+    }
+  } catch(e){}
+}
+
+/* ================= CHIP BUILDERS =================
+   Chips carry data-b (line id) and data-idx (position). Tap in order. */
+var builds={};
+function chiptap(chip){
+  try {
+    var b=chip.dataset.b;
+    var line=document.querySelector('[data-build="'+b+'"]');
+    if(!line||line.classList.contains('done')) return;
+    var st=builds[b]||(builds[b]={next:0});
+    var idx=parseInt(chip.dataset.idx,10);
+    if(idx===st.next){
+      chip.classList.add('used');
+      var span=document.createElement('span');
+      span.className='bpart';
+      span.innerHTML=chip.innerHTML;
+      line.appendChild(span);
+      st.next++;
+      var need=parseInt(line.dataset.need,10);
+      if(st.next>=need){
+        line.classList.add('done');
+        var flag=line.parentElement.querySelector('.done-flag');
+        if(flag) flag.classList.add('show');
+      }
+    } else {
+      chip.classList.add('err');
+      setTimeout(function(){chip.classList.remove('err');},380);
+    }
+  } catch(e){}
+}
+
+/* ================= GAP FILL =================
+   Tap a .gap to reveal its data-a answer. */
+function gaptap(g){
+  try {
+    if(g.classList.contains('filled')) return;
+    g.textContent=g.dataset.a;
+    g.classList.add('filled');
+  } catch(e){}
+}
+
+/* ================= QUIZ SCORE ================= */
+function quizScore(){
+  try {
+    var groups=document.querySelectorAll('[data-quiz]');
+    var s=0;
+    groups.forEach(function(g){ if(g.dataset.solved) s++; });
+    var qm=document.getElementById('quizMeter');
+    if(qm) qm.style.width=(s/6*100)+'%';
+    var qs=document.getElementById('quizScore');
+    if(qs) qs.textContent=s+'/6';
+  } catch(e){}
+}
+
+/* ================= CELEBRATION CONFETTI ================= */
+function confetti(){
+  try {
+    var host=document.getElementById('celebSlide');
+    if(!host||host.dataset.conf) return;
+    host.dataset.conf='1';
+    var moji=['⚡','🎉','💡','🕰️','⭐','🏆'];
+    for(var i=0;i<18;i++){
+      var s=document.createElement('div');
+      s.className='confetti';
+      s.textContent=moji[i%moji.length];
+      s.style.left=(Math.random()*100)+'%';
+      s.style.animationDelay=(Math.random()*2)+'s';
+      host.appendChild(s);
+    }
+  } catch(e){}
+}
+
+/* init + Mark Done (matches LessonProgressRecord shape read by the dashboard) */
+document.addEventListener('DOMContentLoaded',function(){
+  try {
+    slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    TOTAL=slides.length;
+    slides[0].classList.add('active');
+    var ctr=document.getElementById('counter');
+    if(ctr) ctr.textContent='1 / '+TOTAL;
+    var pf=document.getElementById('pfill');
+    if(pf) pf.style.width=(1/TOTAL*100)+'%';
+    renderStations();
+    scale();
+    var celebIdx=slides.length-1;
+    setInterval(function(){ if(cur===celebIdx){confetti();} },800);
+  } catch(e){}
+
+  try {
+    var doneBtn=document.getElementById('done-btn');
+    if(doneBtn){
+      doneBtn.addEventListener('click', function () {
+        try {
+          var key = 'leea.lessonProgress.v1';
+          var raw = localStorage.getItem(key);
+          var progress = raw ? JSON.parse(raw) : {};
+          var now = new Date().toISOString();
+          progress['ow-l4-u7-project'] = {
+            lessonId: 'ow-l4-u7-project',
+            teacherId: 'neritan',
+            studentId: 'leo',
+            status: 'done',
+            completedAt: now,
+            updatedAt: now
+          };
+          localStorage.setItem(key, JSON.stringify(progress));
+          doneBtn.textContent = '✓ Marked Done';
+          doneBtn.disabled = true;
+        } catch (e) {}
+      });
+    }
+  } catch(e){}
+});
+window.addEventListener('resize',scale);
+document.addEventListener('keydown',function(e){
+  try {
+    if(e.key==='ArrowRight'){changeSlide(1);}
+    else if(e.key==='ArrowLeft'){changeSlide(-1);}
+    else if(e.key==='n'||e.key==='N'){toggleNotes();}
+  } catch(err){}
+});
+</script>
+</body>
+</html>

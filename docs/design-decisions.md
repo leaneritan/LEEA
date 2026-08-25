@@ -447,12 +447,22 @@ Examples:
 
 ### Unit 7 current build status
 
+Unit 7 ("Good Idea!") is complete — every component has a registered teacher + learner pair.
+
 | Component | Teacher lesson | Leo app | Leo status |
 |---|---|---|---|
 | opener | `public/lessons/ow-l4-u7-opener.html` | `public/learn/ow-l4-u7-opener.html` | `live` |
 | vocab-1 | `public/lessons/ow-l4-u7-vocab-1.html` | `public/learn/ow-l4-u7-vocab-1.html` | `live` (13-tab) |
+| song | `public/lessons/ow-l4-u7-song.html` | `public/learn/ow-l4-u7-song.html` | `live` (7 modules) |
+| grammar-1 | `public/lessons/ow-l4-u7-grammar-1.html` | `public/learn/ow-l4-u7-grammar-1.html` | `live` (12-tab) |
+| vocab-2 | `public/lessons/ow-l4-u7-vocab-2.html` | `public/learn/ow-l4-u7-vocab-2.html` | `live` (13-tab) |
+| grammar-2 | `public/lessons/ow-l4-u7-grammar-2.html` | `public/learn/ow-l4-u7-grammar-2.html` | `live` (12-tab) |
+| reading | `public/lessons/ow-l4-u7-reading.html` | `public/learn/ow-l4-u7-reading.html` | `live` (SB 6 + WB 5) |
+| writing | `public/lessons/ow-l4-u7-writing.html` | `public/learn/ow-l4-u7-writing.html` | `live` (13 modules) |
+| mission | `public/lessons/ow-l4-u7-mission.html` | `public/learn/ow-l4-u7-mission.html` | `live` (6 modules) |
+| project | `public/lessons/ow-l4-u7-project.html` | `public/learn/ow-l4-u7-project.html` | `live` (8 modules) |
 
-Build priority: song → grammar-1 → vocab-2 → grammar-2 → reading → writing → mission → project.
+The Unit 7 teacher decks after vocab-1 share one shell: the 1920×1080 scaler, a six-station progress board that lights as the lesson advances, teacher notes on N, and a Mark Done slide writing `leea.lessonProgress.v1`. Interactions come from a small shared engine — `pick` (MCQ), `flipCard`, `chiptap` (ordered chip builder), `mtap` (two-column match), `gaptap` (reveal), `quizScore`, `powerStation`.
 
 ### Unit 8 current build status
 

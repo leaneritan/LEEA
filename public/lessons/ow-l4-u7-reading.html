@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 7 · Reading · Young and Creative</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0b1220}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:absolute;top:0;left:0}
+#deck{width:1920px;height:1080px;position:relative}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FFFDF5;overflow:hidden}
+.slide.active{display:flex}
+:root{
+  --red:#DC2626; --red-d:#991B1B; --red-bg:#FEF2F2;
+  --yellow:#FACC15; --yellow-d:#CA8A04; --yellow-bg:#FEFCE8;
+  --amber:#F59E0B; --amber-d:#B45309; --amber-bg:#FFFBEB;
+  --navy:#0f172a; --navy-2:#1e293b;
+  --green:#16A34A; --green-d:#15803d; --green-bg:#F0FDF4;
+  --blue:#2563EB; --blue-d:#1D4ED8; --blue-bg:#EFF6FF;
+  --cream:#FFFDF5; --ink:#1f2937;
+}
+/* ---------- header ---------- */
+.slide-header{height:64px;background:var(--red);display:flex;align-items:center;padding:0 44px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.8);font-size:17px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.45);font-size:20px}
+.hd-section{color:#fff;font-size:23px;font-weight:800}
+.hd-chip{background:rgba(255,255,255,.22);color:#fff;padding:5px 18px;border-radius:20px;font-size:17px;font-weight:800;margin-left:auto}
+.hd-chip.src{background:rgba(0,0,0,.28)}
+.hd-chip.tr{background:var(--yellow);color:var(--navy)}
+/* ---------- body ---------- */
+.body{flex:1;padding:30px 60px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.body.center{align-items:center;justify-content:center;text-align:center}
+.body.grad-lab{background:radial-gradient(circle at 30% 20%,#1e293b,#0b1220);color:#fff}
+.header-bar.yellow{border-color:var(--yellow)}
+/* ---------- buttons / options ---------- */
+.btn{border:none;border-radius:14px;font-family:'Outfit',sans-serif;font-weight:800;cursor:pointer;transition:transform .12s, box-shadow .12s}
+.btn:hover{transform:translateY(-2px)}
+.btn.red{background:var(--red);color:#fff}
+.btn.yellow{background:var(--yellow);color:var(--navy)}
+.btn.dark{background:var(--navy-2);color:#fff}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;font-size:23px;font-weight:700;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.opt:hover{border-color:var(--amber);transform:translateX(4px)}
+.opt.good{background:var(--green-bg);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-bg);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default;opacity:.85}
+.opt:disabled:hover{transform:none}
+0%,100%{transform:translateX(0)}
+25%{transform:translateX(-8px)}
+75%{transform:translateX(8px)}
+.on-correct.show{display:block;animation:pop .4s}
+0%{transform:scale(.85);opacity:0}
+100%{transform:scale(1);opacity:1}
+/* ---------- chips ---------- */
+.chip{display:inline-block;background:#fff;border:3px solid var(--amber);border-radius:12px;padding:10px 20px;font-size:24px;font-weight:800;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;margin:4px}
+.chip:hover{background:var(--amber-bg);transform:translateY(-2px)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.err{animation:shake .35s;border-color:var(--red)}
+.build-line{min-height:74px;background:#fff;border:3px dashed #cbd5e1;border-radius:14px;padding:12px 18px;font-size:27px;font-weight:800;color:var(--navy);display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.build-line.done{border-style:solid;border-color:var(--green);background:var(--green-bg)}
+.bpart{background:var(--yellow-bg);border:2px solid var(--yellow);border-radius:8px;padding:4px 12px}
+/* ---------- stations ---------- */
+.station-board{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.station{width:220px;background:rgba(255,255,255,.07);border:3px solid rgba(255,255,255,.18);border-radius:16px;padding:14px;text-align:center;transition:all .4s}
+.station .st-ico{font-size:44px;filter:grayscale(1);opacity:.45;transition:all .4s}
+.station .st-name{font-size:17px;font-weight:800;color:rgba(255,255,255,.55);margin-top:6px}
+.station.on{border-color:var(--yellow);background:rgba(250,204,21,.14);box-shadow:0 0 26px rgba(250,204,21,.35)}
+.station.on .st-ico{filter:none;opacity:1}
+.station.on .st-name{color:var(--yellow)}
+.mitem.sel{border-color:var(--blue);background:var(--blue-bg)}
+.mitem.lock{border-color:var(--green);background:var(--green-bg);color:var(--green-d);pointer-events:none}
+.mitem.err{animation:shake .35s;border-color:var(--red)}
+.card3d.flipped .c3-inner{transform:rotateY(180deg)}
+.gapbtn.good{border-style:solid;border-color:var(--green);background:var(--green-bg);color:var(--green-d)}
+.gapbtn.bad{animation:shake .35s;border-color:var(--red)}
+.bulb.on{filter:none;opacity:1;text-shadow:0 0 22px rgba(250,204,21,.8)}
+/* ---------- bottom bar ---------- */
+#bar{position:absolute;left:0;bottom:0;width:1920px;height:52px;background:var(--navy);display:flex;align-items:center;padding:0 24px;gap:18px;z-index:50}
+#bar button{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:10px;padding:7px 18px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif}
+#bar button:hover{background:rgba(255,255,255,.25)}
+#counter{color:rgba(255,255,255,.7);font-size:16px;font-weight:800;margin-left:auto}
+#minist{display:flex;gap:7px}
+.mdot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.18);transition:all .3s}
+.mdot.on{background:var(--yellow);box-shadow:0 0 8px rgba(250,204,21,.8)}
+#pwrap{position:absolute;left:0;top:0;width:100%;height:6px;background:rgba(255,255,255,.12)}
+#pfill{height:100%;width:0;background:var(--yellow);transition:width .3s}
+#notesPanel{position:absolute;right:24px;bottom:64px;width:640px;max-height:520px;overflow:auto;background:#fff;border:3px solid var(--yellow);border-radius:16px;padding:20px 24px;font-size:19px;color:var(--ink);line-height:1.5;display:none;z-index:60;box-shadow:0 16px 44px rgba(0,0,0,.35)}
+#notesPanel.show{display:block}
+#notesPanel b{color:var(--red-d)}
+.confetti{position:absolute;font-size:34px;animation:fall 3.2s linear infinite}
+0%{transform:translateY(-80px) rotate(0)}
+100%{transform:translateY(1150px) rotate(540deg)}
+/* ================= UNIT 7 GRAMMAR 1 — TIME MACHINE COMPONENTS ================= */
+:root{ --purple:#7C3AED; --purple-d:#5B21B6; --purple-bg:#F5F3FF; --ink-2:#475569; --ink-3:#94a3b8; }
+.slide-header{background:var(--purple)}
+.body.grad-lab{background:linear-gradient(140deg,var(--purple-d),var(--purple))}
+.callout{background:var(--purple-bg);border:3px solid var(--purple);border-radius:16px;padding:16px 26px;font-size:25px;font-weight:600;color:var(--ink);line-height:1.4;text-align:center}
+/* goal grid */
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.goal-card{background:#fff;border:3px solid #e2e8f0;border-radius:18px;padding:22px 26px;display:flex;flex-direction:column;gap:6px}
+.gc-ico{font-size:44px}
+.gc-h{font-size:20px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--purple)}
+.gc-t{font-size:26px;font-weight:600;color:var(--ink);line-height:1.35}
+/* flip cards */
+.flip-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.flipcard{width:340px;height:230px;perspective:1000px;cursor:pointer}
+.flipcard.wide{width:100%;max-width:1400px;height:150px}
+.fc-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flipcard.flipped .fc-in{transform:rotateY(180deg)}
+.fc-f,.fc-b{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-weight:700;line-height:1.35}
+.fc-f{background:#fff;border:3px solid var(--purple);font-size:34px;color:var(--ink)}
+.fc-b{background:var(--purple);color:#fff;font-size:27px;transform:rotateY(180deg)}
+.flipcard.wide .fc-f{font-size:30px}
+.flipcard.wide .fc-b{font-size:28px}
+/* question line + options */
+.q-line{font-size:40px;font-weight:800;text-align:center;color:var(--ink)}
+.opt-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.opt-col{display:flex;flex-direction:column;gap:14px}
+.opt.sm{font-size:24px;padding:12px 26px}
+.opt.good{background:var(--green);border-color:var(--green);color:#fff}
+.opt.bad{background:var(--red-bg);border-color:var(--red);color:var(--red-d)}
+/* word lab */
+.wl-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.wl-chip{background:#fff;border:3px solid var(--purple);border-radius:999px;padding:12px 28px;font-size:26px;font-weight:800;color:var(--purple-d)}
+/* word split */
+.word-split{display:flex;gap:32px;height:100%}
+.ws-left{width:38%;background:var(--purple-bg);border:3px solid var(--purple);border-radius:20px;padding:26px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.ws-emoji{font-size:88px;line-height:1}
+.ws-word{font-size:44px;font-weight:900;color:var(--purple-d)}
+.ws-ipa{font-size:24px;color:var(--ink-2);font-weight:600}
+.ws-jp{font-size:26px;font-weight:700;color:var(--ink)}
+.ws-def{font-size:24px;color:var(--ink-2);line-height:1.4;margin-top:8px}
+.ws-right{flex:1;display:flex;flex-direction:column;gap:14px}
+.game-head{font-size:28px;font-weight:800;color:var(--purple-d)}
+/* then / now */
+.then-now{display:flex;align-items:center;gap:20px;justify-content:center}
+.tn-card{width:320px;height:200px;perspective:1000px;cursor:pointer}
+.tn-card .fc-in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.tn-card.flipped .fc-in{transform:rotateY(180deg)}
+.tn-arrow{font-size:52px;color:var(--purple)}
+/* match */
+.match-wrap{display:flex;gap:60px;justify-content:center}
+.match-col{display:flex;flex-direction:column;gap:14px;width:520px}
+.mtile{background:#fff;border:3px solid #cbd5e1;border-radius:14px;padding:16px 20px;font-size:24px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);text-align:left}
+.mtile:hover{border-color:var(--purple)}
+.mtile.sel{border-color:var(--purple);background:var(--purple-bg)}
+.mtile.lock{background:var(--green);border-color:var(--green);color:#fff;pointer-events:none}
+.mtile.err{background:var(--red-bg);border-color:var(--red)}
+/* done flag */
+.done-flag{display:none;margin:20px auto 0;background:var(--yellow);border:3px solid var(--yellow-d);border-radius:16px;padding:14px 34px;font-size:26px;font-weight:800;color:#4a3800;cursor:pointer;text-align:center;max-width:900px}
+.done-flag.show{display:block}
+.done-flag.lit{background:var(--green);border-color:var(--green-d);color:#fff;cursor:default}
+/* grammar box */
+.gbox{background:#fff;border:4px solid var(--purple);border-radius:22px;padding:30px 36px}
+.gbox-title{font-size:34px;font-weight:900;color:var(--purple-d);margin-bottom:20px;display:flex;align-items:center}
+.gbox-tr{background:var(--purple);color:#fff;border-radius:999px;padding:5px 18px;font-size:20px;margin-left:14px}
+.gbox-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.gbox-cell{background:var(--purple-bg);border-radius:14px;padding:22px 24px;font-size:29px;font-weight:600;color:var(--ink);line-height:1.35}
+/* pattern strip + builders */
+.pattern-strip{background:var(--navy);color:#fff;border-radius:16px;padding:18px 30px;font-size:32px;font-weight:800;text-align:center}
+.build-line{min-height:86px;background:#fff;border:3px dashed var(--purple);border-radius:16px;display:flex;align-items:center;gap:10px;padding:14px 22px;flex-wrap:wrap;margin:14px 0}
+.build-line.done{border-style:solid;background:var(--green-bg);border-color:var(--green)}
+.bpart{font-size:30px;font-weight:800;color:var(--ink)}
+.chip-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+/* two panel */
+.two-panel{display:flex;gap:28px}
+.panel-card{flex:1;background:#fff;border:3px solid var(--purple);border-radius:20px;padding:26px}
+.pc-h{font-size:32px;font-weight:900;color:var(--purple-d);margin-bottom:10px}
+.pc-t{font-size:25px;color:var(--ink-2);line-height:1.4;margin-bottom:14px}
+.pc-ex{background:var(--purple-bg);border-radius:12px;padding:18px;font-size:27px;font-weight:700;line-height:1.4;color:var(--ink)}
+/* detective */
+.det-row{background:#fff;border:3px solid #e2e8f0;border-radius:16px;padding:18px 24px;margin-bottom:16px}
+.det-bad{font-size:28px;font-weight:700;color:var(--red-d);margin-bottom:12px}
+/* rules board */
+.rules-board{display:flex;flex-direction:column;gap:14px}
+.rule-line{display:flex;align-items:flex-start;gap:18px;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:16px 22px}
+.rl-n{width:44px;height:44px;flex-shrink:0;border-radius:50%;background:var(--purple);color:#fff;font-size:24px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.rl-t{font-size:25px;color:var(--ink);line-height:1.4}
+/* practice */
+.prac-item{display:flex;gap:18px;align-items:center;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;margin-bottom:12px}
+.pi-n{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:var(--purple);color:#fff;font-size:23px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.pi-s{font-size:26px;color:var(--ink);line-height:1.4}
+.gap{display:inline-block;min-width:230px;border-bottom:4px solid var(--purple);color:var(--purple-d);font-weight:800;text-align:center;cursor:pointer}
+.gap.filled{border-bottom-style:solid;color:var(--green-d)}
+/* true / false rows */
+.tf-row{display:flex;align-items:center;gap:22px;background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:14px 22px;margin-bottom:12px}
+.tf-s{flex:1;font-size:25px;color:var(--ink);line-height:1.35}
+/* dialogue */
+.dialogue{display:flex;flex-direction:column;gap:18px;width:100%;max-width:1300px}
+.bubble{max-width:76%;border-radius:22px;padding:22px 28px;font-size:29px;font-weight:600;line-height:1.35}
+.bubble.left{background:var(--purple-bg);border:3px solid var(--purple);align-self:flex-start}
+.bubble.right{background:var(--yellow-bg);border:3px solid var(--amber);align-self:flex-end}
+/* quiz */
+.quiz-meter-wrap{height:20px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-bottom:12px}
+.quiz-meter{height:100%;width:0;background:var(--green);transition:width .3s}
+.quiz-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.quiz-q{background:#fff;border:3px solid #e2e8f0;border-radius:14px;padding:16px 20px}
+.qq-t{font-size:24px;font-weight:700;color:var(--ink);margin-bottom:12px;line-height:1.3}
+/* celebrate */
+.check-list{display:flex;flex-direction:column;gap:10px}
+.ck{background:rgba(255,255,255,.15);border-radius:12px;padding:12px 26px;font-size:26px;font-weight:700;color:#fff}
+</style>
+</head>
+<body>
+<div id="scaler"><div id="deck">
+
+<!-- ============ 1 · TITLE ============ -->
+<div class="slide" data-notes="<b>Young and Creative.</b> Today Leo reads about four inventions made by kids and teenagers. Six stations are dark; each big activity lights one. Read the four names aloud once — Angad, Ann, Frank, Louis. LP p.246.">
+  <div class="body grad-lab center" style="gap:20px">
+    <div style="font-size:96px">🧒💡</div>
+    <div style="font-size:58px;font-weight:900;color:#fff;text-align:center;line-height:1.1">YOUNG and Creative</div>
+    <div style="font-size:30px;color:rgba(255,255,255,.9);font-weight:700">Unit 7 · Reading · Student Book pp. 124-125</div>
+    <div style="background:rgba(255,255,255,.12);border:2px solid var(--yellow);border-radius:14px;padding:14px 28px;font-size:25px;font-weight:800;color:#fff;text-align:center;line-height:1.6">
+      🏭 Angad Daryani · 19 &nbsp;|&nbsp; 🔦 Ann Makosinski · 15<br>
+      🍦 Frank Epperson · 11 &nbsp;|&nbsp; ⠿ Louis Braille · 15
+    </div>
+    <div class="station-board" data-stboard></div>
+    <div style="font-size:22px;color:rgba(255,255,255,.85);font-weight:600">🎧 TR 7.9 &nbsp;|&nbsp; 📓 Workbook pp. 88-89</div>
+    <button class="btn yellow" style="font-size:24px;padding:14px 40px" onclick="changeSlide(1)">Start reading ▶</button>
+  </div>
+</div>
+
+<!-- ============ 2 · GOALS ============ -->
+<div class="slide" data-notes="<b>Today&#39;s goals (LP p.246).</b> Three objectives: identify and describe inventions, ask questions about a text, and discuss opinions about inventions. Reading strategy: Ask Questions. Academic language: chart, graph, opinion. Content vocabulary: blind, design, millions, patent.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Reading — Today's Goals</span><span class="hd-chip src">📖 LP p.246</span></div>
+  <div class="body">
+    <div class="goal-grid">
+      <div class="goal-card"><div class="gc-ico">🔎</div><div class="gc-h">Objective 1</div><div class="gc-t">Identify and <b>describe</b> inventions.</div></div>
+      <div class="goal-card"><div class="gc-ico">❓</div><div class="gc-h">Objective 2</div><div class="gc-t"><b>Ask questions</b> about a text.</div></div>
+      <div class="goal-card"><div class="gc-ico">💬</div><div class="gc-h">Objective 3</div><div class="gc-t">Discuss your <b>opinions</b> about inventions.</div></div>
+      <div class="goal-card"><div class="gc-ico">📚</div><div class="gc-h">Content words</div><div class="gc-t">blind · design · millions · patent</div></div>
+    </div>
+    <div class="callout" style="margin-top:22px">🎯 <b>Reading strategy today: Ask Questions.</b> Good readers ask a question <i>before</i>, <i>during</i>, and <i>after</i> reading.</div>
+  </div>
+</div>
+
+<!-- ============ 3 · WARM UP — BUILD BACKGROUND ============ -->
+<div class="slide" data-notes="<b>Warm Up — Build background (LP p.246).</b> Say: Today we&#39;re going to read about young inventors. Remind Leo about Richard Turere and his Lion Lights from the song lesson (pp. 118-119). Ask: Do you have an idea for an invention? Let him tell you about it before you move on.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Remember Richard?</span><span class="hd-chip src">📖 LP p.246</span></div>
+  <div class="body center" style="gap:24px">
+    <div class="two-panel">
+      <div class="panel-card">
+        <div class="pc-h">🦁💡 Richard Turere</div>
+        <div class="pc-t">From the song lesson (pp. 118-119). He was a boy in Kenya when he invented <b>Lion Lights</b>.</div>
+        <div class="pc-ex">His invention solved <b>two problems</b>: lions attacked the livestock, and villagers killed the lions.</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">🧒 Today's readers</div>
+        <div class="pc-t">Four more inventors — and every one of them was a <b>kid or a teenager</b>.</div>
+        <div class="pc-ex">19 · 15 · 11 · 15 years old</div>
+      </div>
+    </div>
+    <div class="callout">💭 Ask Leo: <b>"Do you have an idea for an invention?"</b> Let him talk. Write his idea down — we come back to it at the end.</div>
+  </div>
+</div>
+
+<!-- ============ 4 · WARM UP — LOOK AT THE PICTURES ============ -->
+<div class="slide" data-notes="<b>Warm Up — the pictures (LP p.246).</b> Have Leo open to p. 124 and look at the pictures. Point to the flashlight and ask: How might this flashlight be special? (it doesn&#39;t use batteries) Point to the Popsicle and ask: Do you like these? Explain that the items in the reading were invented by KIDS.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Look at the Pictures</span><span class="hd-chip src">📗 Book p.124</span></div>
+  <div class="body">
+    <div style="font-size:28px;font-weight:700;text-align:center;margin-bottom:16px">Tap each picture to guess before we read.</div>
+    <div class="flip-row">
+      <div class="flipcard" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">🔦 How might this flashlight be special?</div><div class="fc-b">It <b>doesn't use batteries</b> — it runs on the heat of your hand!</div></div></div>
+      <div class="flipcard" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">🍦 Do you like these?</div><div class="fc-b">A <b>Popsicle</b> — and it was invented <b>by accident</b> by an 11-year-old.</div></div></div>
+      <div class="flipcard" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">🏭 What is this tall tower for?</div><div class="fc-b">It <b>cleans polluted air</b> in cities. A 19-year-old built it.</div></div></div>
+    </div>
+    <div class="callout" style="margin-top:20px">🧒 Every single one of these was invented by a <b>kid or a teenager</b>.</div>
+  </div>
+</div>
+
+<!-- ============ 5 · WORD LAB INTRO ============ -->
+<div class="slide" data-notes="<b>Word Lab — Station ①.</b> Four content words (blind, design, millions, patent) and three academic words (chart, graph, opinion). The academic words carry the whole second half of the lesson, so give them full attention.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">The Word Lab</span><span class="hd-chip">Station ① 🧪</span></div>
+  <div class="body center" style="gap:18px">
+    <div style="font-size:56px">🧪</div>
+    <div style="font-size:44px;font-weight:900">Station ① — Words We Need</div>
+    <div class="wl-row">
+      <div class="wl-chip">🦯 blind</div>
+      <div class="wl-chip">📐 a design</div>
+      <div class="wl-chip">🔢 millions</div>
+      <div class="wl-chip">📜 a patent</div>
+    </div>
+    <div class="wl-row" style="margin-top:6px">
+      <div class="wl-chip" style="border-color:#0EA5E9;color:#0369a1">📊 a chart</div>
+      <div class="wl-chip" style="border-color:#0EA5E9;color:#0369a1">📈 a graph</div>
+      <div class="wl-chip" style="border-color:#0EA5E9;color:#0369a1">💬 an opinion</div>
+    </div>
+    <div class="callout" style="margin-top:12px">🔵 The blue ones are <b>academic words</b> — they come back in every subject, not just English.</div>
+  </div>
+</div>
+
+<!-- ============ 6 · WORD: blind / patent ============ -->
+<div class="slide" data-notes="<b>Content words — blind and patent.</b> Blind = not able to see. A patent is a paper that says a certain inventor is responsible for an invention; if you have one, nobody else can take your idea. Both matter for the reading.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Word Lab — blind 🦯 · a patent 📜</span><span class="hd-chip">Content words</span></div>
+  <div class="body">
+    <div class="two-panel">
+      <div class="panel-card">
+        <div class="pc-h">🦯 blind</div>
+        <div class="pc-t">Not able to <b>see</b>.</div>
+        <div class="pc-ex">The accident left Louis Braille <b>blind</b> when he was three.</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">📜 a patent</div>
+        <div class="pc-t">A paper that says a certain inventor is <b>responsible</b> for an invention. If you have one, nobody else can take your idea.</div>
+        <div class="pc-ex">The graph on p. 125 counts <b>patents</b> around the world.</div>
+      </div>
+    </div>
+    <div class="game-head" style="margin-top:22px">🎮 Quick check</div>
+    <div class="opt-row">
+      <button class="opt" onclick="pick(this)" data-ok="1">A patent protects your idea.</button>
+      <button class="opt" onclick="pick(this)">A patent is a kind of tower.</button>
+      <button class="opt" onclick="pick(this)">A patent is a Popsicle.</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 7 · WORD: chart / graph / opinion ============ -->
+<div class="slide" data-notes="<b>Academic words — chart, graph, opinion.</b> A chart organizes information in rows and columns (Activity 3). A graph compares numbers with lines or dots (p. 125). An opinion is what one person thinks — Activity 4 is all opinions. Match them here to power Station ①.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Word Lab — Academic Words</span><span class="hd-chip tr">⚡ Power Station ①</span></div>
+  <div class="body">
+    <div style="font-size:28px;font-weight:700;text-align:center;margin-bottom:14px">Tap a word, then tap its meaning.</div>
+    <div class="match-wrap" data-game="wl">
+      <div class="match-col">
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="a">📊 a chart</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="b">📈 a graph</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="c">💬 an opinion</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="d">📐 a design</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="e">🔢 millions</button>
+      </div>
+      <div class="match-col">
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="c">what one person thinks</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="e">a very large number</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="a">a table with rows and columns</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="d">a drawing that shows how to make something</button>
+        <button class="mtile" onclick="mtap(this,'wl','wl-done')" data-k="b">lines or dots that compare numbers</button>
+      </div>
+    </div>
+    <div class="done-flag" id="wl-done" onclick="powerStation(0)">⚡ Station ① is live! Tap to power up.</div>
+  </div>
+</div>
+
+<!-- ============ 8 · READING STRATEGY — ASK QUESTIONS ============ -->
+<div class="slide" data-notes="<b>Reading Strategy — Ask Questions (LP p.246).</b> Good readers ask questions the whole way through. Before: what will this be about? During: why did that happen? After: what do I still want to know? Model one of each aloud before you play TR 7.9.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Reading Strategy — Ask Questions ❓</span><span class="hd-chip src">📖 LP p.246</span></div>
+  <div class="body center" style="gap:22px">
+    <div class="two-panel" style="width:100%">
+      <div class="panel-card">
+        <div class="pc-h">🤔 Before</div>
+        <div class="pc-ex">"What will this be about?"<br>"Who are these kids?"</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">👀 During</div>
+        <div class="pc-ex">"Why did he invent it?"<br>"What does <i>asthma</i> mean?"</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">💭 After</div>
+        <div class="pc-ex">"Which one was most useful?"<br>"Could I invent something?"</div>
+      </div>
+    </div>
+    <div class="game-head">🎮 Which question word fits?</div>
+    <div class="q-line">______ did Ann come up with the idea for her invention?</div>
+    <div class="opt-row">
+      <button class="opt" onclick="pick(this)" data-ok="1">How</button>
+      <button class="opt" onclick="pick(this)">Where</button>
+      <button class="opt" onclick="pick(this)">Which</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 9 · READ ¶1 ============ -->
+<div class="slide" data-notes="<b>Read ¶1 (TR 7.9).</b> Play TR 7.9 and have Leo read along. Then pause and ask the planner&#39;s question: Why are kids great inventors? (Because they have a lot of creativity and imagination.)">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Listen and Read — ¶1</span><span class="hd-chip tr">🔊 TR 7.9 · Book p.124</span></div>
+  <div class="body">
+    <div class="gbox">
+      <div class="gbox-title">YOUNG and Creative &nbsp;<span class="gbox-tr">TR: 7.9</span></div>
+      <div style="font-size:30px;line-height:1.55;color:var(--ink)">Did you know that a teenager had the first idea for a television? And a six-year-old boy invented the toy truck? Kids and teens are great inventors because they have a lot of <b>creativity</b> and <b>imagination</b>.</div>
+    </div>
+    <div class="game-head" style="margin-top:20px">❓ Why are kids great inventors?</div>
+    <div class="opt-row">
+      <button class="opt" onclick="pick(this)" data-ok="1">Because they have a lot of creativity and imagination.</button>
+      <button class="opt" onclick="pick(this)">Because they are very strong.</button>
+      <button class="opt" onclick="pick(this)">Because they have a lot of money.</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 10 · READ ¶2 — ANGAD ============ -->
+<div class="slide" data-notes="<b>Read ¶2 — Angad Daryani, 2018.</b> Pause at the end and ask: What problem did Angad want to solve with his invention? (air pollution) This is also where the Think Aloud on <i>asthma</i> belongs — see the next slide.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Read — 2018 · Angad Daryani 🏭</span><span class="hd-chip tr">🔊 TR 7.9</span></div>
+  <div class="body">
+    <div class="gbox">
+      <div style="font-size:26px;line-height:1.55;color:var(--ink)"><b>2018:</b> At the age of 19, Angad Daryani invented a <b>solution</b> to the <b>problem</b> of air pollution in cities. Growing up in Mumbai, India, he suffered from asthma caused by the polluted air. Air pollution is a big problem. Three million people die each year. Angad's invention is an air pollution cleaning tower that is 6.1 meters (20 ft.) high. The tower sucks in air and takes out the particles of dust and carbon. The particles are collected and can even be reused. Angad's dream is to build thousands of the towers and improve the quality of air in cities.</div>
+    </div>
+    <div class="game-head" style="margin-top:18px">❓ What problem did Angad want to solve?</div>
+    <div class="opt-row">
+      <button class="opt" onclick="pick(this)" data-ok="1">air pollution in cities</button>
+      <button class="opt" onclick="pick(this)">no electricity at home</button>
+      <button class="opt" onclick="pick(this)">reading for blind children</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 11 · THINK ALOUD ============ -->
+<div class="slide" data-notes="<b>Think Aloud (LP p.246).</b> Model guessing meaning from context, out loud, exactly as the planner scripts it: &quot;I&#39;m not sure what asthma means. The sentence says Angad suffered from asthma. I think it might be a disease. The next sentence says the asthma was caused by the polluted air. I think asthma is when you have trouble breathing when the air is not clean.&quot; Tap the steps as you say them.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Think Aloud — Guess from Context 🧠</span><span class="hd-chip src">📖 LP p.246</span></div>
+  <div class="body">
+    <div class="callout" style="margin-bottom:18px">🗣️ Dad reads each step <b>out loud</b>. This is how a good reader thinks.</div>
+    <div class="rules-board">
+      <div class="rule-line"><span class="rl-n">1</span><span class="rl-t">"I'm not sure what <b>asthma</b> means in the second paragraph."</span></div>
+      <div class="rule-line"><span class="rl-n">2</span><span class="rl-t">"The sentence says that Angad <b>suffered from</b> asthma. I think it might be a <b>disease</b>."</span></div>
+      <div class="rule-line"><span class="rl-n">3</span><span class="rl-t">"The next sentence says the asthma was <b>caused by the polluted air</b>."</span></div>
+      <div class="rule-line"><span class="rl-n">4</span><span class="rl-t">"So I think <b>asthma</b> is when you have trouble breathing when the air is not clean." ✅</span></div>
+    </div>
+    <div class="callout" style="margin-top:18px">🔑 You did not need a dictionary. The <b>words around it</b> told you.</div>
+  </div>
+</div>
+
+<!-- ============ 12 · READ ¶3 — ANN ============ -->
+<div class="slide" data-notes="<b>Read ¶3 — Ann Makosinski, 2013.</b> Pause and ask: How did Ann come up with the idea for her invention? (She heard about a friend in the Philippines who had no electrical light to do homework at night.)">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Read — 2013 · Ann Makosinski 🔦</span><span class="hd-chip tr">🔊 TR 7.9</span></div>
+  <div class="body">
+    <div class="gbox">
+      <div style="font-size:26px;line-height:1.55;color:var(--ink)"><b>2013:</b> Canadian high school student Ann Makosinski was 15 when she invented the "hollow flashlight." The flashlight uses heat from the human body and changes it into light. It doesn't need <b>batteries</b>. Ann thought of the idea when she heard about a friend who lived in the Philippines. Her friend was doing badly in school. She needed to do her homework at night, but there was no electrical light in her home. Ann's flashlight isn't expensive. Ann hopes it will help some of the 1.1 billion people in the world who still have no <b>electricity</b> in their homes.</div>
+    </div>
+    <div class="game-head" style="margin-top:18px">❓ How did Ann come up with the idea?</div>
+    <div class="opt-row">
+      <button class="opt" onclick="pick(this)" data-ok="1">She heard about a friend with no light to do homework.</button>
+      <button class="opt" onclick="pick(this)">She read about it in a book.</button>
+      <button class="opt" onclick="pick(this)">She saw it on television.</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 13 · READ ¶4 — FRANK ============ -->
+<div class="slide" data-notes="<b>Read ¶4 — Frank Epperson, 1905.</b> Pause and ask: How did Frank Epperson invent the Popsicle? (He left a cup of soda with a stick outside on a cold night and forgot it.) The key idea: some inventions happen <i>by accident</i>.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Read — 1905 · Frank Epperson 🍦</span><span class="hd-chip tr">🔊 TR 7.9</span></div>
+  <div class="body">
+    <div class="gbox">
+      <div style="font-size:29px;line-height:1.6;color:var(--ink)"><b>1905:</b> When Frank Epperson was eleven, he left a cup filled with soda and a stick in his yard. That night he forgot about it. It was a very cold night. When he went outside the next morning, he found something amazing: a "Popsicle"!</div>
+    </div>
+    <div class="game-head" style="margin-top:20px">❓ How did Frank invent the Popsicle?</div>
+    <div class="opt-row">
+      <button class="opt" onclick="pick(this)" data-ok="1">By accident — he forgot a cup of soda outside on a cold night.</button>
+      <button class="opt" onclick="pick(this)">He planned it for many years.</button>
+      <button class="opt" onclick="pick(this)">He bought the idea from someone else.</button>
+    </div>
+    <div class="callout" style="margin-top:18px">💡 Not every invention starts with a plan. Some start with a <b>mistake</b>.</div>
+  </div>
+</div>
+
+<!-- ============ 14 · READ ¶5 — LOUIS BRAILLE ============ -->
+<div class="slide" data-notes="<b>Read ¶5 — Louis Braille, 1824.</b> Pause and ask both planner questions: What is Braille? Why was it hard for blind children to read before Braille? (They had to touch raised letters, and it was easy to confuse a Q with an O, an R with a B.)">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Read — 1824 · Louis Braille ⠿</span><span class="hd-chip tr">🔊 TR 7.9</span></div>
+  <div class="body">
+    <div class="gbox">
+      <div style="font-size:27px;line-height:1.55;color:var(--ink)"><b>1824:</b> Louis Braille had an accident when he was three. The accident left him <b>blind</b>. At that time, it was hard for blind children to read. They had to touch raised letters. But it was easy to confuse a Q with an O, an R with a B, and so on. When he was fifteen, Louis invented an alphabet that used <b>raised dots</b>. The Braille alphabet was a big success!</div>
+    </div>
+    <div class="game-head" style="margin-top:18px">❓ Why was it hard for blind children to read before Braille?</div>
+    <div class="opt-row">
+      <button class="opt" onclick="pick(this)" data-ok="1">Raised letters were easy to confuse — Q with O, R with B.</button>
+      <button class="opt" onclick="pick(this)">There were no books at all.</button>
+      <button class="opt" onclick="pick(this)">The books were too heavy.</button>
+    </div>
+    <div class="done-flag show" id="rd-done" onclick="powerStation(1)">⚡ All five paragraphs read — tap to power Station ②.</div>
+  </div>
+</div>
+
+<!-- ============ 15 · PRACTICE — ACTIVITY 2 ============ -->
+<div class="slide" data-notes="<b>Practice — Activity 2 (SB p.125).</b> Say: First read the clue, then write the name of the invention. Do Item 1 together. Point out that there are FIVE items but only FOUR inventions — one gets written twice (the Popsicle). Tap each clue to check.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Practice — Name the Invention</span><span class="hd-chip src">📗 Book p.125 · Act 2</span></div>
+  <div class="body">
+    <div class="prac-item"><div class="pi-n">1</div><div class="pi-s">It's something you eat. → <span class="gap" data-a="Popsicle" onclick="gaptap(this)">______</span></div></div>
+    <div class="prac-item"><div class="pi-n">2</div><div class="pi-s">It can help people who live in big cities. → <span class="gap" data-a="the air pollution cleaning tower" onclick="gaptap(this)">______</span></div></div>
+    <div class="prac-item"><div class="pi-n">3</div><div class="pi-s">It's something a blind person can use to read. → <span class="gap" data-a="Braille" onclick="gaptap(this)">______</span></div></div>
+    <div class="prac-item"><div class="pi-n">4</div><div class="pi-s">It's useful if you don't have electricity. → <span class="gap" data-a="the hollow flashlight" onclick="gaptap(this)">______</span></div></div>
+    <div class="prac-item"><div class="pi-n">5</div><div class="pi-s">It happened by accident. → <span class="gap" data-a="Popsicle" onclick="gaptap(this)">______</span></div></div>
+    <div class="callout" style="margin-top:14px">🔢 Five clues, four inventions — the <b>Popsicle</b> is the answer twice.</div>
+  </div>
+</div>
+
+<!-- ============ 16 · EXPAND — WRITE YOUR OWN CLUE ============ -->
+<div class="slide" data-notes="<b>Expand (LP p.247).</b> Have Leo choose an invention and write a clue for it. Then swap: Dad guesses Leo&#39;s, Leo guesses Dad&#39;s. Keep the clue to one sentence, starting with &quot;It&#39;s…&quot; or &quot;It can…&quot;.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Expand — Write Your Own Clue</span><span class="hd-chip src">📖 LP p.247</span></div>
+  <div class="body center" style="gap:24px">
+    <div class="pattern-strip" style="font-size:36px">It's something you ______ . &nbsp;|&nbsp; It can help people who ______ .</div>
+    <div style="font-size:30px;font-weight:700;text-align:center;max-width:1300px">Leo picks <b>any invention</b> and writes one clue. Dad guesses. Then swap.</div>
+    <div class="wl-row">
+      <div class="wl-chip">🎡 the wheel</div>
+      <div class="wl-chip">📱 the cell phone</div>
+      <div class="wl-chip">✈️ the airplane</div>
+      <div class="wl-chip">🔋 the battery</div>
+      <div class="wl-chip">🪀 the hula hoop</div>
+    </div>
+    <div class="callout">🏆 One point for every clue the other person guesses right. Best of three.</div>
+  </div>
+</div>
+
+<!-- ============ 17 · ACTIVITY 3 — THE INTERVIEW CHART ============ -->
+<div class="slide" data-notes="<b>Activity 3 — the interview chart (SB p.125).</b> Complete the chart with Who / When / What / Why. This is the Interview graphic organizer from the planner&#39;s resource list. Match each inventor to their When and Why. All eight matched lights Station ③.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Activity 3 — Complete the Chart 📊</span><span class="hd-chip tr">⚡ Power Station ③</span></div>
+  <div class="body">
+    <div style="font-size:26px;font-weight:700;text-align:center;margin-bottom:12px">Tap an inventor, then tap the matching fact.</div>
+    <div class="match-wrap" data-game="iv">
+      <div class="match-col">
+        <button class="mtile" onclick="mtap(this,'iv','iv-done')" data-k="a">🏭 Angad · <b>When?</b></button>
+        <button class="mtile" onclick="mtap(this,'iv','iv-done')" data-k="b">🏭 Angad · <b>Why?</b></button>
+        <button class="mtile" onclick="mtap(this,'iv','iv-done')" data-k="c">🔦 Ann · <b>When?</b></button>
+        <button class="mtile" onclick="mtap(this,'iv','iv-done')" data-k="d">🔦 Ann · <b>Why?</b></button>
+        <button class="mtile" onclick="mtap(this,'iv','iv-done')" data-k="e">🍦 Frank · <b>When?</b></button>
+        <button class="mtile" onclick="mtap(this,'iv','iv-done')" data-k="f">⠿ Louis · <b>When?</b></button>
+      </div>
+      <div class="match-col">
+        <button class="mtile" onclick="mtap(this,'iv','iv-done')" data-k="c">in 2013, when she was 15</button>
+        <button class="mtile" onclick="mtap(this,'iv','iv-done')" data-k="f">in 1824, when he was 15</button>
+        <button class="mtile" onclick="mtap(this,'iv','iv-done')" data-k="a">in 2018, when he was 19</button>
+        <button class="mtile" onclick="mtap(this,'iv','iv-done')" data-k="d">Her friend couldn't do her homework.</button>
+        <button class="mtile" onclick="mtap(this,'iv','iv-done')" data-k="e">in 1905, when he was 11</button>
+        <button class="mtile" onclick="mtap(this,'iv','iv-done')" data-k="b">He had asthma caused by air pollution.</button>
+      </div>
+    </div>
+    <div class="done-flag" id="iv-done" onclick="powerStation(2)">⚡ Chart complete! Tap to power Station ③.</div>
+  </div>
+</div>
+
+<!-- ============ 18 · GRAPHIC LITERACY — THE PATENT GRAPH ============ -->
+<div class="slide" data-notes="<b>Graphic literacy (LP p.247).</b> Point out the line graph on p. 125 and read the title aloud. Explain a patent. Then walk the numbers: the numbers on the left and at the bottom give important information; the bottom shows the years. Ask What years does this graph show? (2000-2006) Then: find the year with the most patents (2006).">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Graphic Literacy — Reading a Graph 📈</span><span class="hd-chip src">📖 LP p.247 · Book p.125</span></div>
+  <div class="body">
+    <div class="callout" style="margin-bottom:16px">📜 A <b>patent</b> is a paper that says a certain inventor is responsible for an invention. With a patent, <b>nobody else can take your idea</b>.</div>
+    <div class="two-panel">
+      <div class="panel-card">
+        <div class="pc-h">📈 NUMBER OF PATENT FILINGS AROUND THE WORLD</div>
+        <div class="pc-ex" style="font-family:monospace;font-size:22px;line-height:1.8">1,800,000 ┤&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;●<br>1,600,000 ┤&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;●&nbsp;&nbsp;●<br>1,400,000 ┤&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;●&nbsp;&nbsp;●<br>1,200,000 ┤&nbsp;&nbsp;●&nbsp;&nbsp;●<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─────────────────<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2000 &nbsp;'02 &nbsp;'04 &nbsp;2006</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">❓ Read it together</div>
+        <div class="pc-t">The numbers on the <b>left</b> and at the <b>bottom</b> give important information.</div>
+        <div class="pc-ex">What years does this graph show?<br>→ <b>2000 to 2006</b><br><br>Which year had the most patents?<br>→ <b>2006</b> (the highest dot)</div>
+      </div>
+    </div>
+    <div class="game-head" style="margin-top:18px">🎮 Which year had the MOST patents?</div>
+    <div class="opt-row">
+      <button class="opt" onclick="pick(this)" data-ok="1">2006</button>
+      <button class="opt" onclick="pick(this)">2000</button>
+      <button class="opt" onclick="pick(this)">2003</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 19 · ACTIVITY 4 — DISCUSS OPINIONS ============ -->
+<div class="slide" data-notes="<b>Activity 4 — Discuss (SB p.125).</b> Work in a group of three if you can. Do you have the same opinion? Push Leo to give a REASON every time — an opinion supported by a fact is the whole Unit 7 writing skill coming next.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Discuss — What's Your Opinion? 💬</span><span class="hd-chip src">📗 Book p.125 · Act 4</span></div>
+  <div class="body center" style="gap:24px">
+    <div class="two-panel" style="width:100%">
+      <div class="panel-card">
+        <div class="pc-h">❓ Question 1</div>
+        <div class="pc-ex">Which story was the <b>most interesting</b>? Why?</div>
+      </div>
+      <div class="panel-card">
+        <div class="pc-h">❓ Question 2</div>
+        <div class="pc-ex">Which invention was the <b>most useful</b>? Why?</div>
+      </div>
+    </div>
+    <div class="pattern-strip" style="font-size:34px">In my <b style="color:var(--yellow)">opinion</b>, ______ , <b style="color:var(--yellow)">because</b> ______ .</div>
+    <div class="callout">💬 An <b>opinion</b> is what one person thinks — you and Dad are allowed to disagree! But always give a <b>reason</b>.</div>
+    <div class="done-flag show" id="op-done" onclick="powerStation(3)">⚡ Both questions discussed — tap to power Station ④.</div>
+  </div>
+</div>
+
+<!-- ============ 20 · BE THE EXPERT — TELEVISION ============ -->
+<div class="slide" data-notes="<b>Be the Expert — Our World in Context (LP p.247).</b> Philo T. Farnsworth was only a high-school student when he came up with the basic idea for television. By 1927, aged just 21, he produced the first television. Originally black and white; color arrived in the 1950s. By 2000 there was one television for every four people on Earth.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Be the Expert — The Television 📺</span><span class="hd-chip src">📖 LP p.247 · Our World in Context</span></div>
+  <div class="body two-col" style="display:flex;gap:28px">
+    <div style="flex:1">
+      <div class="wl-chip" style="display:block;text-align:center;font-size:110px;padding:40px;border-radius:22px">📺</div>
+    </div>
+    <div style="flex:1.4;display:flex;flex-direction:column;gap:14px">
+      <div class="rule-line"><span class="rl-n">1</span><span class="rl-t"><b>Philo T. Farnsworth</b> was only a <b>high-school student</b> when he came up with the basic idea for television.</span></div>
+      <div class="rule-line"><span class="rl-n">2</span><span class="rl-t">By <b>1927</b>, when he was just <b>21</b>, he was successful in producing the first television.</span></div>
+      <div class="rule-line"><span class="rl-n">3</span><span class="rl-t">Originally, televisions could show only <b>black and white</b> pictures.</span></div>
+      <div class="rule-line"><span class="rl-n">4</span><span class="rl-t"><b>Color</b> televisions became available in the <b>1950s</b>.</span></div>
+      <div class="rule-line"><span class="rl-n">5</span><span class="rl-t">By the year <b>2000</b>, there were enough televisions for <b>one out of every four people</b> in the world!</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 21 · WORKBOOK — BULLET TRAINS ============ -->
+<div class="slide" data-notes="<b>Workbook pp. 88-89 — Trains Make the World Go Round (TR 7.5 workbook audio).</b> This is the second reading Leo does in his own app. Preview it here so he is not meeting it cold. Note the used to in the last line — Unit 7 grammar showing up in a real text.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Workbook Reading — Bullet Trains 🚄</span><span class="hd-chip src">📓 WB pp.88-89</span></div>
+  <div class="body">
+    <div class="gbox">
+      <div class="gbox-title">Trains Make the World Go Round</div>
+      <div style="font-size:24px;line-height:1.5;color:var(--ink)">Stand back! A famous train is coming into the station! It's called the <b>Shinkansen</b>, although many people call it the <b>bullet train</b> because of its long round nose. These Japanese trains, invented by <b>Hideo Shima</b> in the early 1960s, are amazing. The journey from Tokyo to Nagano <b>used to</b> take three hours. Now it takes <b>79 minutes</b>.</div>
+    </div>
+    <div class="callout" style="margin-top:18px">🕰️ Spot the <b>used to</b>! Unit 7 grammar, out in a real text. And the last line: "most trains are more expensive than they <b>used to</b> be."</div>
+    <div class="done-flag show" id="wb-done" onclick="powerStation(4)">⚡ Previewed the workbook reading — tap to power Station ⑤.</div>
+  </div>
+</div>
+
+<!-- ============ 22 · OPINION vs FACT ============ -->
+<div class="slide" data-notes="<b>Opinion vs fact.</b> The workbook chart on p. 89 pairs each opinion about bullet trains with a supporting fact. This is exactly the skill the Writing lesson needs next, so make it land here.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Opinion 💬 or Fact 📋?</span><span class="hd-chip src">📓 WB p.89</span></div>
+  <div class="body">
+    <div class="tf-row"><div class="tf-s">"The trains travel at around 300 km/h."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">📋 Fact</button><button class="opt sm" onclick="pick(this)">💬 Opinion</button></div></div>
+    <div class="tf-row"><div class="tf-s">"They're comfortable."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)">📋 Fact</button><button class="opt sm" onclick="pick(this)" data-ok="1">💬 Opinion</button></div></div>
+    <div class="tf-row"><div class="tf-s">"The train was only late once — 42 seconds!"</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">📋 Fact</button><button class="opt sm" onclick="pick(this)">💬 Opinion</button></div></div>
+    <div class="tf-row"><div class="tf-s">"There is a lot to see."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)">📋 Fact</button><button class="opt sm" onclick="pick(this)" data-ok="1">💬 Opinion</button></div></div>
+    <div class="tf-row"><div class="tf-s">"They run on electricity."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">📋 Fact</button><button class="opt sm" onclick="pick(this)">💬 Opinion</button></div></div>
+    <div class="callout" style="margin-top:14px">🔑 A <b>fact</b> can be checked. An <b>opinion</b> is what someone thinks — and it needs a fact to support it.</div>
+  </div>
+</div>
+
+<!-- ============ 23 · SOCCER ROUND ============ -->
+<div class="slide" data-notes="<b>Soccer round ⚽.</b> Free extension. Every question is an opinion-or-fact judgement about football — the same skill, a topic Leo will argue about happily.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Soccer Round ⚽ — Opinion or Fact?</span><span class="hd-chip tr">⚡ Power Station ⑥</span></div>
+  <div class="body">
+    <div class="tf-row"><div class="tf-s">⚽ "The World Cup happens every four years."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">📋 Fact</button><button class="opt sm" onclick="pick(this)">💬 Opinion</button></div></div>
+    <div class="tf-row"><div class="tf-s">⚽ "Haaland is the best striker in the world."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)">📋 Fact</button><button class="opt sm" onclick="pick(this)" data-ok="1">💬 Opinion</button></div></div>
+    <div class="tf-row"><div class="tf-s">⚽ "A soccer match has two halves of 45 minutes."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">📋 Fact</button><button class="opt sm" onclick="pick(this)">💬 Opinion</button></div></div>
+    <div class="tf-row"><div class="tf-s">⚽ "Goal-line technology is the most useful invention in soccer."</div><div class="opt-row"><button class="opt sm" onclick="pick(this)">📋 Fact</button><button class="opt sm" onclick="pick(this)" data-ok="1">💬 Opinion</button></div></div>
+    <div class="done-flag" id="sc-done" onclick="powerStation(5)">⚡ Station ⑥ ready — tap to power up.</div>
+  </div>
+</div>
+
+<!-- ============ 24 · QUICK REVIEW QUIZ ============ -->
+<div class="slide" data-notes="<b>Quick review quiz.</b> Six questions straight from the reading. Anything Leo misses, reread that paragraph together on the spot.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Quick Review Quiz</span><span class="hd-chip">6 questions ⚡</span></div>
+  <div class="body">
+    <div class="quiz-meter-wrap"><div class="quiz-meter" id="quizMeter"></div></div>
+    <div style="text-align:center;font-size:26px;font-weight:800;margin-bottom:10px">Score: <span id="quizScore">0/6</span></div>
+    <div class="quiz-grid">
+      <div class="quiz-q" data-quiz="1"><div class="qq-t">1. Why are kids great inventors?</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">creativity + imagination</button><button class="opt sm" onclick="pick(this);quizScore()">they are strong</button></div></div>
+      <div class="quiz-q" data-quiz="2"><div class="qq-t">2. What does Angad's tower clean?</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">polluted air</button><button class="opt sm" onclick="pick(this);quizScore()">dirty water</button></div></div>
+      <div class="quiz-q" data-quiz="3"><div class="qq-t">3. Ann's flashlight runs on…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">body heat</button><button class="opt sm" onclick="pick(this);quizScore()">batteries</button></div></div>
+      <div class="quiz-q" data-quiz="4"><div class="qq-t">4. How old was Frank Epperson?</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">eleven</button><button class="opt sm" onclick="pick(this);quizScore()">fifteen</button></div></div>
+      <div class="quiz-q" data-quiz="5"><div class="qq-t">5. Braille uses…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">raised dots</button><button class="opt sm" onclick="pick(this);quizScore()">raised letters</button></div></div>
+      <div class="quiz-q" data-quiz="6"><div class="qq-t">6. A <b>patent</b> is…</div><div class="opt-row"><button class="opt sm" onclick="pick(this);quizScore()" data-ok="1">a paper protecting an idea</button><button class="opt sm" onclick="pick(this);quizScore()">a kind of graph</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 25 · RECAP ============ -->
+<div class="slide" data-notes="<b>Recap (LP p.247).</b> Say: You learned about some useful inventions created by kids. Point to the flashlight photo on p. 124. Ask: What&#39;s the name of this invention? (hollow flashlight) Why is it useful? (It doesn&#39;t use batteries.) Repeat for Angad&#39;s tower and Louis Braille&#39;s alphabet.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">Recap — Name It, Then Say Why</span><span class="hd-chip src">📖 LP p.247</span></div>
+  <div class="body">
+    <div class="flip-row" style="flex-direction:column;gap:16px">
+      <div class="flipcard wide" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">🔦 What's the name of this invention? Why is it useful?</div><div class="fc-b">The <b>"hollow flashlight"</b> — it <b>doesn't use batteries</b>.</div></div></div>
+      <div class="flipcard wide" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">🏭 And Angad's invention? Why is it useful?</div><div class="fc-b">An <b>air pollution cleaning tower</b> — it takes dust and carbon out of city air.</div></div></div>
+      <div class="flipcard wide" onclick="flipCard(this,event)"><div class="fc-in"><div class="fc-f">⠿ And Louis Braille's? Why is it useful?</div><div class="fc-b">The <b>Braille alphabet</b> — blind people can read it with their fingers.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 26 · FORMATIVE ASSESSMENT ============ -->
+<div class="slide" data-notes="<b>Formative assessment.</b> Honest check against the three objectives. &quot;Not yet&quot; tells us what to reread next time.">
+  <div class="slide-header"><span class="hd-unit">Unit 7</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span><span class="hd-chip src">📖 LP p.247</span></div>
+  <div class="body">
+    <div class="tf-row"><div class="tf-s">Can Leo <b>identify and describe</b> the four inventions in the reading?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">Can Leo <b>ask a question</b> about the text using Who / What / When / Why / How?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">Can Leo give an <b>opinion</b> about an invention and support it with a reason?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">Can Leo guess a new word from <b>context</b> (like asthma)?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+    <div class="tf-row"><div class="tf-s">Can Leo read the <b>line graph</b> and say which year had the most patents?</div><div class="opt-row"><button class="opt sm" onclick="pick(this)" data-ok="1">✓ Yes</button><button class="opt sm" onclick="pick(this)" data-ok="1">Not yet</button></div></div>
+  </div>
+</div>
+
+<!-- ============ 27 · CELEBRATE + MARK DONE ============ -->
+<div class="slide" id="celebSlide" data-notes="<b>Celebrate.</b> Go back to the invention idea Leo told you in the Warm Up. Ask him: could YOU be the next one on this page? Then tap Mark Done.">
+  <div class="body grad-lab center" style="gap:20px">
+    <div style="font-size:96px">🏆</div>
+    <div style="font-size:56px;font-weight:900;color:#fff;text-align:center">You Read It All!</div>
+    <div class="station-board" data-stboard></div>
+    <div class="check-list">
+      <div class="ck">✅ Four young inventors: Angad · Ann · Frank · Louis</div>
+      <div class="ck">✅ You asked questions before, during and after</div>
+      <div class="ck">✅ You guessed <b>asthma</b> from context</div>
+      <div class="ck">✅ You completed the interview chart</div>
+      <div class="ck">✅ You read a real line graph 📈</div>
+    </div>
+    <div class="callout" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.5);color:#fff">💡 Remember your invention idea from the start? Could <b>you</b> be next on this page?</div>
+    <button class="btn yellow" id="done-btn" style="font-size:26px;padding:16px 46px">✓ Mark Done</button>
+  </div>
+</div>
+
+<!-- ============ BOTTOM BAR ============ -->
+<div id="bar">
+  <div id="pwrap"><div id="pfill"></div></div>
+  <button onclick="changeSlide(-1)">◀ Back</button>
+  <button onclick="changeSlide(1)">Next ▶</button>
+  <div id="minist"></div>
+  <button onclick="toggleNotes()">📝 Notes (N)</button>
+  <div id="counter">1 / 40</div>
+</div>
+<div id="notesPanel"></div>
+
+</div></div>
+
+
+<script>
+/* ================= CORE ================= */
+var slides=[], cur=0, TOTAL=0;
+var stations=[
+  {ico:'🧪',name:'① Word Lab',on:false},
+  {ico:'📖',name:'② The Reading',on:false},
+  {ico:'📊',name:'③ Interview Chart',on:false},
+  {ico:'💬',name:'④ Opinions',on:false},
+  {ico:'🚄',name:'⑤ Workbook',on:false},
+  {ico:'⚽',name:'⑥ Soccer',on:false}
+];
+
+function scale(){
+  try {
+    var s=Math.min(window.innerWidth/1920, window.innerHeight/1080);
+    var sc=document.getElementById('scaler');
+    sc.style.transform='scale('+s+')';
+    sc.style.left=((window.innerWidth-1920*s)/2)+'px';
+    sc.style.top=((window.innerHeight-1080*s)/2)+'px';
+  } catch(e){}
+}
+
+function renderStations(){
+  try {
+    document.querySelectorAll('[data-stboard]').forEach(function(b){
+      b.innerHTML=stations.map(function(st){
+        return '<div class="station'+(st.on?' on':'')+'"><div class="st-ico">'+st.ico+'</div><div class="st-name">'+st.name+'</div></div>';
+      }).join('');
+    });
+    var mini=document.getElementById('minist');
+    if(mini) mini.innerHTML=stations.map(function(st){return '<div class="mdot'+(st.on?' on':'')+'"></div>';}).join('');
+  } catch(e){}
+}
+
+function powerStation(i){
+  try {
+    if(stations[i].on) return;
+    stations[i].on=true;
+    renderStations();
+    var flags=document.querySelectorAll('.done-flag');
+    flags.forEach(function(f){
+      if(f.getAttribute('onclick')==='powerStation('+i+')'){
+        f.classList.add('lit');
+        f.textContent='⚡ Station powered up!';
+      }
+    });
+  } catch(e){}
+}
+
+function changeSlide(dir){ try{ goTo(cur+dir); }catch(e){} }
+function goTo(i){
+  try {
+    if(i<0||i>=TOTAL) return;
+    slides[cur].classList.remove('active');
+    cur=i;
+    slides[cur].classList.add('active');
+    var ctr=document.getElementById('counter');
+    if(ctr) ctr.textContent=(cur+1)+' / '+TOTAL;
+    var pf=document.getElementById('pfill');
+    if(pf) pf.style.width=((cur+1)/TOTAL*100)+'%';
+    var np=document.getElementById('notesPanel');
+    if(np && np.classList.contains('open')) np.innerHTML=slides[cur].dataset.notes||'<i>No notes for this slide.</i>';
+  } catch(e){}
+}
+function toggleNotes(){
+  try {
+    var np=document.getElementById('notesPanel');
+    np.classList.toggle('open');
+    if(np.classList.contains('open')) np.innerHTML=slides[cur].dataset.notes||'<i>No notes for this slide.</i>';
+  } catch(e){}
+}
+
+/* ================= PICK (MCQ) =================
+   Any .opt inside an .opt-row / .opt-col group. data-ok="1" is correct. */
+function pick(btn){
+  try {
+    var group=btn.closest('.opt-row')||btn.closest('.opt-col');
+    if(!group||group.dataset.solved) return;
+    if(btn.dataset.ok==='1'){
+      group.dataset.solved='1';
+      btn.classList.add('good');
+      group.querySelectorAll('.opt').forEach(function(o){o.disabled=true;});
+      var q=btn.closest('[data-quiz]');
+      if(q) q.dataset.solved='1';
+    } else {
+      btn.classList.add('bad');
+      setTimeout(function(){btn.classList.remove('bad');},400);
+    }
+  } catch(e){}
+}
+
+/* ================= FLIP CARD ================= */
+function flipCard(card,ev){
+  try {
+    if(ev && ev.target.closest('.opt')) return;
+    card.classList.toggle('flipped');
+  } catch(e){}
+}
+
+/* ================= MATCH =================
+   Left column tiles come first in .match-wrap; pairs share data-k. */
+var msel={};
+function mtap(btn,gameId,doneId){
+  try {
+    if(btn.classList.contains('lock')) return;
+    var wrap=btn.closest('.match-wrap');
+    var cols=wrap.querySelectorAll('.match-col');
+    var isLeft=(btn.closest('.match-col')===cols[0]);
+    var st=msel[gameId]||(msel[gameId]={left:null,done:0});
+    if(isLeft){
+      cols[0].querySelectorAll('.mtile').forEach(function(x){ if(!x.classList.contains('lock')) x.classList.remove('sel'); });
+      btn.classList.add('sel'); st.left=btn;
+    } else {
+      if(!st.left){ btn.classList.add('err'); setTimeout(function(){btn.classList.remove('err');},380); return; }
+      if(st.left.dataset.k===btn.dataset.k){
+        st.left.classList.remove('sel'); st.left.classList.add('lock'); btn.classList.add('lock');
+        st.left=null; st.done++;
+        if(st.done>=cols[0].querySelectorAll('.mtile').length){
+          var d=document.getElementById(doneId);
+          if(d) d.classList.add('show');
+        }
+      } else {
+        btn.classList.add('err');
+        setTimeout(function(){btn.classList.remove('err');},380);
+      }
+    }
+  } catch(e){}
+}
+
+/* ================= CHIP BUILDERS =================
+   Chips carry data-b (line id) and data-idx (position). Tap in order. */
+var builds={};
+function chiptap(chip){
+  try {
+    var b=chip.dataset.b;
+    var line=document.querySelector('[data-build="'+b+'"]');
+    if(!line||line.classList.contains('done')) return;
+    var st=builds[b]||(builds[b]={next:0});
+    var idx=parseInt(chip.dataset.idx,10);
+    if(idx===st.next){
+      chip.classList.add('used');
+      var span=document.createElement('span');
+      span.className='bpart';
+      span.innerHTML=chip.innerHTML;
+      line.appendChild(span);
+      st.next++;
+      var need=parseInt(line.dataset.need,10);
+      if(st.next>=need){
+        line.classList.add('done');
+        var flag=line.parentElement.querySelector('.done-flag');
+        if(flag) flag.classList.add('show');
+      }
+    } else {
+      chip.classList.add('err');
+      setTimeout(function(){chip.classList.remove('err');},380);
+    }
+  } catch(e){}
+}
+
+/* ================= GAP FILL =================
+   Tap a .gap to reveal its data-a answer. */
+function gaptap(g){
+  try {
+    if(g.classList.contains('filled')) return;
+    g.textContent=g.dataset.a;
+    g.classList.add('filled');
+  } catch(e){}
+}
+
+/* ================= QUIZ SCORE ================= */
+function quizScore(){
+  try {
+    var groups=document.querySelectorAll('[data-quiz]');
+    var s=0;
+    groups.forEach(function(g){ if(g.dataset.solved) s++; });
+    var qm=document.getElementById('quizMeter');
+    if(qm) qm.style.width=(s/6*100)+'%';
+    var qs=document.getElementById('quizScore');
+    if(qs) qs.textContent=s+'/6';
+  } catch(e){}
+}
+
+/* ================= CELEBRATION CONFETTI ================= */
+function confetti(){
+  try {
+    var host=document.getElementById('celebSlide');
+    if(!host||host.dataset.conf) return;
+    host.dataset.conf='1';
+    var moji=['⚡','🎉','💡','🕰️','⭐','🏆'];
+    for(var i=0;i<18;i++){
+      var s=document.createElement('div');
+      s.className='confetti';
+      s.textContent=moji[i%moji.length];
+      s.style.left=(Math.random()*100)+'%';
+      s.style.animationDelay=(Math.random()*2)+'s';
+      host.appendChild(s);
+    }
+  } catch(e){}
+}
+
+/* init + Mark Done (matches LessonProgressRecord shape read by the dashboard) */
+document.addEventListener('DOMContentLoaded',function(){
+  try {
+    slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    TOTAL=slides.length;
+    slides[0].classList.add('active');
+    var ctr=document.getElementById('counter');
+    if(ctr) ctr.textContent='1 / '+TOTAL;
+    var pf=document.getElementById('pfill');
+    if(pf) pf.style.width=(1/TOTAL*100)+'%';
+    renderStations();
+    scale();
+    var celebIdx=slides.length-1;
+    setInterval(function(){ if(cur===celebIdx){confetti();} },800);
+  } catch(e){}
+
+  try {
+    var doneBtn=document.getElementById('done-btn');
+    if(doneBtn){
+      doneBtn.addEventListener('click', function () {
+        try {
+          var key = 'leea.lessonProgress.v1';
+          var raw = localStorage.getItem(key);
+          var progress = raw ? JSON.parse(raw) : {};
+          var now = new Date().toISOString();
+          progress['ow-l4-u7-reading'] = {
+            lessonId: 'ow-l4-u7-reading',
+            teacherId: 'neritan',
+            studentId: 'leo',
+            status: 'done',
+            completedAt: now,
+            updatedAt: now
+          };
+          localStorage.setItem(key, JSON.stringify(progress));
+          doneBtn.textContent = '✓ Marked Done';
+          doneBtn.disabled = true;
+        } catch (e) {}
+      });
+    }
+  } catch(e){}
+});
+window.addEventListener('resize',scale);
+document.addEventListener('keydown',function(e){
+  try {
+    if(e.key==='ArrowRight'){changeSlide(1);}
+    else if(e.key==='ArrowLeft'){changeSlide(-1);}
+    else if(e.key==='n'||e.key==='N'){toggleNotes();}
+  } catch(err){}
+});
+</script>
+</body>
+</html>

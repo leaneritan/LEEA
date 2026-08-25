@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leo · Unit 7 Reading — Young and Creative</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap"></noscript>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --blue:#0EA5E9;--blue-d:#0369A1;--blue-l:#E0F2FE;
+  --amber:#D97706;--amber-l:#FFFBEB;
+  --orange:#F97316;--orange-l:#FFF7ED;
+  --yellow:#FDE047;--red:#EF4444;--red-l:#FEF2F2;
+  --paper:#FAFAF7;--ink:#0f172a;--ink-2:#374151;--ink-3:#6B7280;--ink-4:#9CA3AF;--border:#E5E7EB;
+}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink);overflow:hidden}
+body{display:flex;flex-direction:column;height:100vh}
+
+/* HEADER */
+.app-header{background:var(--green);color:#fff;padding:8px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.logo{font-size:22px}
+.title{font-size:14px;font-weight:800}
+.subtitle{font-size:11px;opacity:.9;margin-top:1px}
+.badge-row{margin-left:auto;display:flex;gap:8px;align-items:center}
+.prog-pill{background:rgba(255,255,255,.2);color:#fff;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:800}
+
+/* TABS */
+.tab-nav{display:flex;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex:1;min-width:120px;padding:7px 10px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tab-btn.active{color:var(--green);border-bottom-color:var(--green)}
+.tab-btn .tab-icon{font-size:17px;line-height:1}
+.tab-btn .tab-name{font-size:12px}
+.tab-btn .tab-check{font-size:11px;color:var(--green);opacity:0;height:11px;line-height:1}
+.tab-btn.done .tab-check{opacity:1}
+
+/* TAB CONTENT */
+.tab-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tab-content{display:none;flex:1;flex-direction:column;overflow:hidden}
+.tab-content.active{display:flex}
+.tab-body{flex:1;overflow-y:auto;padding:18px;max-width:840px;width:100%;margin:0 auto}
+.tab-footer{background:#fff;border-top:2px solid var(--border);padding:12px 16px;display:flex;gap:10px;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.btn-redo{flex:0 0 110px;background:#F3F4F6;color:var(--ink-2);border:2px solid var(--border);border-radius:10px;padding:12px;font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-redo:hover{background:#E5E7EB}
+.btn-redo.armed{background:var(--amber);color:#fff;border-color:var(--amber)}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-complete:hover{background:var(--green-d)}
+.btn-complete.done{background:#9CA3AF;cursor:default}
+
+/* SHARED PIECES */
+.section-title{font-size:18px;font-weight:900;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.section-sub{font-size:14px;color:var(--ink-3);margin-bottom:14px;line-height:1.5}
+.dad-hint{background:var(--green-l);border-left:4px solid var(--green);border-radius:0 12px 12px 0;padding:12px 16px;font-size:14px;color:var(--ink);line-height:1.5;margin-bottom:14px}
+.dad-hint b{color:var(--green-d)}
+.card{background:#fff;border:2px solid var(--border);border-radius:14px;padding:16px}
+.done-banner{background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:14px 18px;font-size:15px;font-weight:700;color:var(--green-d);text-align:center;display:none;margin-top:14px}
+.done-banner.show{display:block}
+
+/* READ TAB — passage display */
+.read-meta{background:var(--blue-l);border:2px solid var(--blue);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--blue-d);font-weight:700;margin-bottom:14px}
+.passage-block{background:#fff;border:2px solid var(--green);border-radius:14px;padding:18px 22px;font-size:17px;color:var(--ink);line-height:1.75;margin-bottom:12px}
+.passage-block.locked{opacity:.4;pointer-events:none;border-color:var(--border)}
+.passage-block .ptitle{font-size:30px;font-weight:900;color:var(--green-d);text-align:center;margin-bottom:12px;letter-spacing:1px;border-bottom:2px solid var(--green-l);padding-bottom:10px}
+.passage-block .pheader{font-size:13px;font-weight:900;color:var(--ink-3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.passage-block .tag{background:var(--yellow);color:var(--ink);padding:1px 7px;border-radius:5px;font-weight:800;cursor:pointer;border:2px solid var(--amber)}
+.passage-block .tag:hover{background:var(--amber);color:#fff}
+.passage-block .tag.popped{background:var(--green);color:#fff;border-color:var(--green-d)}
+.gloss-pop{position:fixed;background:#fff;border:3px solid var(--green);border-radius:12px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--ink);box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:50;max-width:260px}
+.gloss-pop .gp-em{font-size:24px}
+.gloss-pop .gp-jp{font-size:12px;color:var(--ink-3);font-style:italic;margin-top:4px}
+
+.comp-q{background:var(--green-l);border:2px dashed var(--green);border-radius:12px;padding:14px 18px;margin-bottom:18px}
+.comp-q .ql{font-size:12px;font-weight:900;color:var(--green-d);letter-spacing:1.5px;margin-bottom:6px}
+.comp-q .qt{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px}
+.comp-opt{display:block;background:#fff;border:2px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;text-align:left;width:100%;margin-bottom:6px;font-family:'Outfit',sans-serif;transition:all .15s}
+.comp-opt:hover{border-color:var(--green)}
+.comp-opt.correct{background:var(--green);color:#fff;border-color:var(--green-d)}
+.comp-opt.wrong{background:var(--red);color:#fff;border-color:var(--red)}
+.unlock-msg{background:var(--amber);color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:800;text-align:center;display:inline-block}
+
+/* STRATEGY TAB */
+.signal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.signal-card{padding:14px 10px;border-radius:12px;text-align:center;font-weight:900;color:#fff;font-size:16px}
+.signal-card.s1{background:var(--yellow);color:var(--ink)}
+.signal-card.s2{background:var(--orange)}
+.signal-card.s3{background:var(--blue)}
+.signal-card.s4{background:var(--blue)}
+.signal-card.s5{background:var(--green)}
+.signal-card.s6{background:var(--amber)}
+.signal-card.s7{background:var(--red)}
+.signal-card .em{font-size:24px;margin-bottom:4px;line-height:1}
+.sig-sentence{background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--ink);line-height:1.6;margin-bottom:8px}
+.sig-pick{display:inline;background:#fff;border:2px dashed var(--green);border-radius:6px;padding:2px 8px;cursor:pointer;font-weight:700;color:var(--green-d);margin:0 2px}
+.sig-pick:hover{background:var(--green-l)}
+.sig-pick.correct{background:var(--green);color:#fff;border-style:solid}
+.sig-pick.wrong{background:var(--red);color:#fff;border-style:solid}
+
+/* ORDER TAB */
+.order-row{background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:10px;cursor:pointer;transition:all .15s}
+.order-row:hover{border-color:var(--green)}
+.order-row .order-num{background:var(--orange);color:#fff;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;flex-shrink:0}
+.order-row .order-num.empty{background:#E5E7EB;color:var(--ink-3)}
+.order-row .order-text{flex:1;font-size:15px;font-weight:700;color:var(--ink)}
+.order-row .order-em{font-size:32px}
+.order-row.correct{border-color:var(--green);background:var(--green-l)}
+.order-actions{display:flex;gap:10px;margin-top:14px;justify-content:center}
+.order-actions .b{padding:10px 22px;border-radius:10px;font-size:14px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;border:none}
+.order-actions .b.check{background:var(--green);color:#fff}
+.order-actions .b.reset{background:#F3F4F6;color:var(--ink-2);border:2px solid var(--border)}
+.order-result{text-align:center;font-size:16px;font-weight:800;color:var(--green-d);margin-top:10px;min-height:24px}
+
+/* LABEL TAB */
+.label-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;justify-content:center;background:#F3F4F6;border-radius:12px;padding:12px}
+.label-chip{background:#fff;border:2px solid var(--blue);border-radius:99px;padding:8px 14px;font-size:14px;font-weight:700;color:var(--blue-d);cursor:pointer;font-family:'Outfit',sans-serif}
+.label-chip:hover{background:var(--blue);color:#fff}
+.label-chip.placed{opacity:.35;cursor:default}
+.label-chip.sel{background:var(--orange);color:#fff;border-color:var(--orange)}
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.photo-cell{background:#fff;border:3px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s}
+.photo-cell:hover{border-color:var(--green)}
+.photo-cell.labeled{background:var(--green-l);border-color:var(--green)}
+.photo-cell.shake{animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.photo-cell .ph-em{font-size:38px;line-height:1}
+.photo-cell .ph-let{font-size:14px;font-weight:900;color:var(--green-d);margin-top:6px}
+.photo-cell .ph-nm{font-size:11px;color:var(--ink-2);font-weight:600;margin-top:2px}
+.find-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.find-opt{background:#fff;border:2px solid var(--border);border-radius:10px;padding:10px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink);font-family:'Outfit',sans-serif}
+.find-opt:hover{border-color:var(--green)}
+.find-opt.correct{background:var(--green);color:#fff;border-color:var(--green-d)}
+.find-opt.wrong{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* QUIZ TAB */
+.quiz-score-pill{background:var(--green);color:#fff;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;display:inline-block;margin-bottom:10px}
+.quiz-prog{display:flex;gap:4px;margin-bottom:14px}
+.qp-dot{flex:1;height:6px;background:var(--border);border-radius:3px}
+.qp-dot.ok{background:var(--green)}
+.qp-dot.bad{background:var(--red)}
+.q-card{background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.q-card .q-prompt{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.q-card .opt{display:block;background:#fff;border:2px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;width:100%;text-align:left;color:var(--ink);margin-bottom:6px;font-family:'Outfit',sans-serif}
+.q-card .opt:hover{border-color:var(--green)}
+.q-card .opt.correct{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.q-card .opt.wrong{background:var(--red-l);border-color:var(--red);color:var(--red)}
+.qfinal{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;border-radius:14px;padding:22px;text-align:center;display:none;margin-top:12px}
+.qfinal.show{display:block}
+.qfinal .em{font-size:48px}
+.qfinal .sc{font-size:38px;font-weight:900;margin:4px 0}
+.qfinal .lb{font-size:12px;opacity:.85;letter-spacing:.3em;font-weight:700}
+
+/* LANDING SCREEN (SB / WB cards) */
+.landing-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:30px;gap:20px;background:linear-gradient(135deg,#F0FDF4,#E0F2FE);overflow-y:auto;flex-wrap:wrap}
+.mode-card{background:#fff;border:3px solid var(--border);border-radius:18px;padding:32px 28px;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s;min-width:280px;max-width:360px;flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.mode-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(0,0,0,.14)}
+.mode-card.sb{border-color:var(--green)}
+.mode-card.sb:hover{background:var(--green-l)}
+.mode-card.wb{border-color:var(--blue)}
+.mode-card.wb:hover{background:var(--blue-l)}
+.mc-icon{font-size:72px;line-height:1}
+.mc-title{font-size:24px;font-weight:900;color:var(--ink)}
+.mode-card.sb .mc-title{color:var(--green-d)}
+.mode-card.wb .mc-title{color:var(--blue-d)}
+.mc-sub{font-size:14px;color:var(--ink-3);line-height:1.5}
+.mc-prog{background:#F3F4F6;color:var(--ink-2);padding:6px 14px;border-radius:99px;font-size:12px;font-weight:800;margin-top:6px}
+.mode-card.sb .mc-prog.has-prog{background:var(--green);color:#fff}
+.mode-card.wb .mc-prog.has-prog{background:var(--blue);color:#fff}
+
+/* MODE BACK BAR */
+.mode-back-bar{background:#fff;border-bottom:1px solid var(--border);padding:5px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.mode-back-bar button{background:none;border:2px solid var(--border);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--ink-2);cursor:pointer;font-family:'Outfit',sans-serif}
+.mode-back-bar button:hover{background:#F3F4F6;border-color:var(--ink-3)}
+.mode-back-bar .mode-label{font-size:13px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:6px}
+.mode-pane{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* FLASHCARDS (Vocab tab — Practice + Quiz mode) */
+.fc-controls{display:flex;gap:8px;background:#F3F4F6;border-radius:12px;padding:4px;margin-bottom:14px}
+.mode-btn{flex:1;background:none;border:none;padding:10px;font-size:14px;font-weight:700;color:var(--ink-3);cursor:pointer;border-radius:8px;font-family:'Outfit',sans-serif;transition:all .15s}
+.mode-btn.active{background:#fff;color:var(--green-d);box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.flashcard-wrap{perspective:1000px;margin-bottom:12px;cursor:pointer}
+.flashcard{position:relative;height:320px;transition:transform .6s;transform-style:preserve-3d}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;background:#fff;border:3px solid var(--green);border-radius:18px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.fc-back{transform:rotateY(180deg);background:linear-gradient(135deg,#F0FDF4,#fff);border-color:var(--green)}
+.fc-emoji{font-size:56px;line-height:1}
+.fc-word{font-size:30px;font-weight:900;color:var(--ink);line-height:1.1}
+.fc-pos{font-size:13px;color:var(--ink-3);font-weight:600;font-style:italic}
+.fc-tap{font-size:12px;color:var(--ink-4);font-weight:600;margin-top:6px}
+.fc-def{font-size:18px;color:var(--ink);font-weight:700;line-height:1.4;max-width:340px}
+.fc-jp{font-size:14px;color:var(--ink-3);font-style:italic;display:none}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:var(--green-l);border:2px solid var(--green-b);color:var(--green-d);padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
+.fc-sample{font-size:14px;color:var(--ink-2);font-style:italic;line-height:1.5;background:var(--green-l);border-radius:10px;padding:10px 14px;max-width:340px}
+.fc-sample b{color:var(--green-d);background:rgba(255,255,255,.6);padding:1px 5px;border-radius:4px}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;padding:0 4px}
+.fc-nav button{background:#fff;border:2px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif}
+.fc-nav button:hover{border-color:var(--green)}
+.fc-counter{font-size:13px;font-weight:800;color:var(--ink-3)}
+
+/* QUIZ mode within Vocab tab */
+.quiz-wrap{background:#fff;border:3px solid var(--blue);border-radius:18px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.quiz-emoji{font-size:64px;line-height:1}
+.quiz-sentence{font-size:18px;font-weight:700;color:var(--ink);line-height:1.5;max-width:380px}
+.quiz-input-row{display:flex;gap:8px;width:100%;max-width:360px}
+.quiz-input{flex:1;border:2px solid var(--border);border-radius:10px;padding:12px 14px;font-size:16px;font-family:'Outfit',sans-serif;color:var(--ink);outline:none}
+.quiz-input:focus{border-color:var(--green)}
+.quiz-input.correct{border-color:var(--green);background:var(--green-l);color:var(--green-d);font-weight:700}
+.quiz-input.wrong{border-color:var(--red);background:var(--red-l);color:var(--red)}
+.quiz-check{background:var(--green);color:#fff;border:none;border-radius:10px;padding:0 20px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif}
+.quiz-fb{font-size:14px;font-weight:700;min-height:18px}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo">🧭</div>
+  <div>
+    <div class="title">Unit 7 · Reading — Young and Creative</div>
+    <div class="subtitle">Good Idea! · Leo&apos;s independent reading app</div>
+  </div>
+  <div class="badge-row">
+    <div class="prog-pill" id="prog-pill">0 / 6 done</div>
+  </div>
+</div>
+
+<!-- ─────────── LANDING SCREEN (pick SB or WB) ─────────── -->
+
+<div class="landing-screen" id="landing">
+  <button class="mode-card sb" onclick="enterMode('sb')">
+    <div class="mc-icon">📘</div>
+    <div class="mc-title">Student Book</div>
+    <div class="mc-sub">Young and Creative — the invention · 6 tabs</div>
+    <div class="mc-prog" id="mc-prog-sb">0 / 6 done</div>
+  </button>
+  <button class="mode-card wb" onclick="enterMode('wb')">
+    <div class="mc-icon">📒</div>
+    <div class="mc-title">Workbook</div>
+    <div class="mc-sub">The Science of Bullet Training · 5 tabs</div>
+    <div class="mc-prog" id="mc-prog-wb">0 / 5 done</div>
+  </button>
+</div>
+
+<!-- ─────────── SB MODE ─────────── -->
+<div class="mode-pane" id="sb-mode" style="display:none">
+  <div class="mode-back-bar">
+    <button onclick="backToLanding()">◀ Back to menu</button>
+    <span class="mode-label">📘 Student Book — Young and Creative</span>
+  </div>
+  <div class="tab-nav" id="tab-nav">
+    <button class="tab-btn" onclick="showTab(5)" id="tb5"><span class="tab-icon">📚</span><span class="tab-name">Vocab</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="showTab(0)" id="tb0"><span class="tab-icon">📖</span><span class="tab-name">Read</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="showTab(1)" id="tb1"><span class="tab-icon">🎯</span><span class="tab-name">Strategy</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="showTab(2)" id="tb2"><span class="tab-icon">❓</span><span class="tab-name">Questions</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="showTab(3)" id="tb3"><span class="tab-icon">🔀</span><span class="tab-name">Forces</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="showTab(4)" id="tb4"><span class="tab-icon">✅</span><span class="tab-name">Quiz</span><span class="tab-check">✓</span></button>
+  </div>
+
+  <!-- TAB 0 — READ -->
+  <div class="tab-content" id="tc0">
+    <div class="tab-body">
+      <div><div class="section-title">📖 Young and Creative</div>
+        <div class="section-sub">📖 SB pp.124-125 · TR 7.9 — read two paragraphs, then answer to unlock the next two.</div></div>
+      <div class="dad-hint">💡 Yellow words are new — tap one to see what it means.</div>
+      <div id="read-host"></div>
+      <div class="done-banner" id="read-done">🎉 Whole ride read! Mark complete below.</div>
+    </div>
+    <div class="tab-footer">
+      <button class="btn-redo" id="redo-0" onclick="doRedo(0)">↺ Redo</button>
+      <button class="btn-complete" id="complete-0" onclick="markComplete(0)">Mark Read complete ✓</button>
+    </div>
+  </div>
+
+  <!-- TAB 1 — STRATEGY -->
+  <div class="tab-content" id="tc1">
+    <div class="tab-body">
+      <div><div class="section-title">🎯 Cause and Effect</div>
+        <div class="section-sub">A <b>cause</b> tells WHY. An <b>effect</b> is WHAT HAPPENS. The cause comes first.</div></div>
+      <div class="dad-hint">🔎 Signal words that point at cause and effect: <b>because</b> · <b>why</b> · <b>as a result</b></div>
+      <div class="section-sub">Tap the signal word in each sentence:</div>
+      <div id="sig-host"></div>
+      <div class="section-sub" style="margin-top:10px">Now match each force to what it makes happen:</div>
+      <div id="ce-host"></div>
+      <div class="done-banner" id="strat-done">🎉 Strategy learned! Mark complete below.</div>
+    </div>
+    <div class="tab-footer">
+      <button class="btn-redo" id="redo-1" onclick="doRedo(1)">↺ Redo</button>
+      <button class="btn-complete" id="complete-1" onclick="markComplete(1)">Mark Strategy complete ✓</button>
+    </div>
+  </div>
+
+  <!-- TAB 2 — QUESTIONS -->
+  <div class="tab-content" id="tc2">
+    <div class="tab-body">
+      <div><div class="section-title">❓ Answer the questions</div>
+        <div class="section-sub">📖 SB p.157 · Activity 1 — one try each.</div></div>
+      <div id="q2-host"></div>
+      <div class="done-banner" id="q2-done">🎉 All four answered! Mark complete below.</div>
+    </div>
+    <div class="tab-footer">
+      <button class="btn-redo" id="redo-2" onclick="doRedo(2)">↺ Redo</button>
+      <button class="btn-complete" id="complete-2" onclick="markComplete(2)">Mark Questions complete ✓</button>
+    </div>
+  </div>
+
+  <!-- TAB 3 — FORCE CHART -->
+  <div class="tab-content" id="tc3">
+    <div class="tab-body">
+      <div><div class="section-title">🔀 When do you feel each force?</div>
+        <div class="section-sub">📖 SB p.157 · Activity 2 — tap a force, then tap when you feel it.</div></div>
+      <div id="fc-host"></div>
+      <div class="done-banner" id="fc-done">🎉 Chart complete! Mark complete below.</div>
+    </div>
+    <div class="tab-footer">
+      <button class="btn-redo" id="redo-3" onclick="doRedo(3)">↺ Redo</button>
+      <button class="btn-complete" id="complete-3" onclick="markComplete(3)">Mark Forces complete ✓</button>
+    </div>
+  </div>
+
+  <!-- TAB 4 — QUIZ -->
+  <div class="tab-content" id="tc4">
+    <div class="tab-body">
+      <div><div class="section-title">✅ Reading Quiz</div>
+        <div class="section-sub">10 questions. One try each.</div></div>
+      <div class="quiz-score-pill" id="sbq-pill">0 / 10</div>
+      <div id="sbq-host"></div>
+      <div class="done-banner" id="sbq-done">🎉 Quiz finished! Mark complete below.</div>
+    </div>
+    <div class="tab-footer">
+      <button class="btn-redo" id="redo-4" onclick="doRedo(4)">↺ Redo</button>
+      <button class="btn-complete" id="complete-4" onclick="markComplete(4)">Mark Quiz complete ✓</button>
+    </div>
+  </div>
+
+  <!-- TAB 5 — VOCAB -->
+  <div class="tab-content" id="tc5">
+    <div class="tab-body">
+      <div><div class="section-title">📚 Reading Words</div>
+        <div class="section-sub">6 words · Practice: tap to flip · Quiz: type the word</div></div>
+      <div class="fc-controls">
+        <button class="mode-btn active" id="sbv-prac" onclick="sbvMode('practice')">📖 Practice</button>
+        <button class="mode-btn" id="sbv-quiz" onclick="sbvMode('quiz')">🧠 Quiz</button>
+      </div>
+      <div id="sbv-practice">
+        <div class="flashcard-wrap" onclick="sbvFlip()">
+          <div class="flashcard" id="sbv-card">
+            <div class="fc-face fc-front">
+              <div class="fc-emoji" id="sbv-emoji"></div>
+              <div class="fc-word" id="sbv-word"></div>
+              <div class="fc-pos" id="sbv-pos"></div>
+              <div class="fc-tap">tap to flip 👆</div>
+            </div>
+            <div class="fc-face fc-back">
+              <div class="fc-emoji" id="sbv-emoji-b"></div>
+              <div class="fc-def" id="sbv-def"></div>
+              <div class="fc-jp" id="sbv-jp"></div>
+              <button class="fc-jp-btn" id="sbv-jp-btn" onclick="sbvToggleJp(event)">🇯🇵 日本語</button>
+              <div class="fc-sample" id="sbv-sample"></div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-nav">
+          <button onclick="sbvPrev()">◀ Prev</button>
+          <span class="fc-counter" id="sbv-counter">1 / 6</span>
+          <button onclick="sbvNext()">Next ▶</button>
+        </div>
+      </div>
+      <div id="sbv-quizmode" style="display:none">
+        <div class="quiz-wrap">
+          <div class="quiz-emoji" id="sbvq-emoji"></div>
+          <div class="quiz-sentence" id="sbvq-sentence"></div>
+          <div class="quiz-input-row">
+            <input class="quiz-input" id="sbvq-input" placeholder="Type the word…" onkeydown="if(event.key==='Enter')sbvCheck()">
+            <button class="quiz-check" onclick="sbvCheck()">✓</button>
+          </div>
+          <div class="quiz-fb" id="sbvq-fb"></div>
+          <div class="quiz-prog" id="sbvq-prog">0 / 6 done</div>
+        </div>
+      </div>
+      <div class="done-banner" id="sbv-done">🎉 All 6 words practiced and typed!</div>
+    </div>
+    <div class="tab-footer">
+      <button class="btn-redo" id="redo-5" onclick="doRedo(5)">↺ Redo</button>
+      <button class="btn-complete" id="complete-5" onclick="markComplete(5)">Mark Vocab complete ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── WB MODE ─────────── -->
+<div class="mode-pane" id="wb-mode" style="display:none">
+  <div class="mode-back-bar">
+    <button onclick="backToLanding()">◀ Back to menu</button>
+    <span class="mode-label">📒 Workbook — The Science of Bullet Training</span>
+  </div>
+  <div class="tab-nav" id="wb-tab-nav">
+    <button class="tab-btn" onclick="wbShowTab(0)" id="wtb0"><span class="tab-icon">📚</span><span class="tab-name">Vocab</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="wbShowTab(1)" id="wtb1"><span class="tab-icon">📖</span><span class="tab-name">Read</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="wbShowTab(2)" id="wtb2"><span class="tab-icon">✅</span><span class="tab-name">T / F</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="wbShowTab(3)" id="wtb3"><span class="tab-icon">🔗</span><span class="tab-name">Cause</span><span class="tab-check">✓</span></button>
+    <button class="tab-btn" onclick="wbShowTab(4)" id="wtb4"><span class="tab-icon">🏆</span><span class="tab-name">Quiz</span><span class="tab-check">✓</span></button>
+  </div>
+
+  <div class="tab-content" id="wtc0">
+    <div class="tab-body">
+      <div><div class="section-title">📚 Bullet Train Words</div>
+        <div class="section-sub">6 words · Practice: tap to flip · Quiz: type the word</div></div>
+      <div class="fc-controls">
+        <button class="mode-btn active" id="wbv-prac" onclick="wbvMode('practice')">📖 Practice</button>
+        <button class="mode-btn" id="wbv-quiz" onclick="wbvMode('quiz')">🧠 Quiz</button>
+      </div>
+      <div id="wbv-practice">
+        <div class="flashcard-wrap" onclick="wbvFlip()">
+          <div class="flashcard" id="wbv-card">
+            <div class="fc-face fc-front">
+              <div class="fc-emoji" id="wbv-emoji"></div>
+              <div class="fc-word" id="wbv-word"></div>
+              <div class="fc-pos" id="wbv-pos"></div>
+              <div class="fc-tap">tap to flip 👆</div>
+            </div>
+            <div class="fc-face fc-back">
+              <div class="fc-emoji" id="wbv-emoji-b"></div>
+              <div class="fc-def" id="wbv-def"></div>
+              <div class="fc-jp" id="wbv-jp"></div>
+              <button class="fc-jp-btn" id="wbv-jp-btn" onclick="wbvToggleJp(event)">🇯🇵 日本語</button>
+              <div class="fc-sample" id="wbv-sample"></div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-nav">
+          <button onclick="wbvPrev()">◀ Prev</button>
+          <span class="fc-counter" id="wbv-counter">1 / 6</span>
+          <button onclick="wbvNext()">Next ▶</button>
+        </div>
+      </div>
+      <div id="wbv-quizmode" style="display:none">
+        <div class="quiz-wrap">
+          <div class="quiz-emoji" id="wbvq-emoji"></div>
+          <div class="quiz-sentence" id="wbvq-sentence"></div>
+          <div class="quiz-input-row">
+            <input class="quiz-input" id="wbvq-input" placeholder="Type the word…" onkeydown="if(event.key==='Enter')wbvCheck()">
+            <button class="quiz-check" onclick="wbvCheck()">✓</button>
+          </div>
+          <div class="quiz-fb" id="wbvq-fb"></div>
+          <div class="quiz-prog" id="wbvq-prog">0 / 6 done</div>
+        </div>
+      </div>
+      <div class="done-banner" id="wbv-done">🎉 All 6 words practiced and typed!</div>
+    </div>
+    <div class="tab-footer">
+      <button class="btn-redo" id="wb-redo-0" onclick="wbDoRedo(0)">↺ Redo</button>
+      <button class="btn-complete" id="wb-complete-0" onclick="wbMarkComplete(0)">Mark Vocab complete ✓</button>
+    </div>
+  </div>
+
+  <div class="tab-content" id="wtc1">
+    <div class="tab-body">
+      <div><div class="section-title">📖 The Science of Bullet Training</div>
+        <div class="section-sub">📒 WB pp.88-89 · TR 7.5</div></div>
+      <div id="wb-read-host"></div>
+      <div class="done-banner" id="wb-read-done">🎉 Read! Mark complete below.</div>
+    </div>
+    <div class="tab-footer">
+      <button class="btn-redo" id="wb-redo-1" onclick="wbDoRedo(1)">↺ Redo</button>
+      <button class="btn-complete" id="wb-complete-1" onclick="wbMarkComplete(1)">Mark Read complete ✓</button>
+    </div>
+  </div>
+
+  <div class="tab-content" id="wtc2">
+    <div class="tab-body">
+      <div><div class="section-title">✅ True or False?</div>
+        <div class="section-sub">📒 WB p.112 · Activity 2 — one try each.</div></div>
+      <div id="wb-tf-host"></div>
+      <div class="done-banner" id="wb-tf-done">🎉 All five checked! Mark complete below.</div>
+    </div>
+    <div class="tab-footer">
+      <button class="btn-redo" id="wb-redo-2" onclick="wbDoRedo(2)">↺ Redo</button>
+      <button class="btn-complete" id="wb-complete-2" onclick="wbMarkComplete(2)">Mark T / F complete ✓</button>
+    </div>
+  </div>
+
+  <div class="tab-content" id="wtc3">
+    <div class="tab-body">
+      <div><div class="section-title">🔗 Cause and Effect</div>
+        <div class="section-sub">📒 WB p.113 · Activity 4 — tap a cause, then tap what it makes happen.</div></div>
+      <div class="dad-hint">🎯 Same strategy as the Student Book reading — a cause tells WHY, an effect is WHAT HAPPENS.</div>
+      <div id="wb-ce-host"></div>
+      <div class="done-banner" id="wb-ce-done">🎉 Chart complete! Mark complete below.</div>
+    </div>
+    <div class="tab-footer">
+      <button class="btn-redo" id="wb-redo-3" onclick="wbDoRedo(3)">↺ Redo</button>
+      <button class="btn-complete" id="wb-complete-3" onclick="wbMarkComplete(3)">Mark Cause complete ✓</button>
+    </div>
+  </div>
+
+  <div class="tab-content" id="wtc4">
+    <div class="tab-body">
+      <div><div class="section-title">🏆 Workbook Quiz</div>
+        <div class="section-sub">6 questions. One try each.</div></div>
+      <div class="quiz-score-pill" id="wbq-pill">0 / 6</div>
+      <div id="wbq-host"></div>
+      <div class="done-banner" id="wbq-done">🎉 Quiz finished! Mark complete below.</div>
+    </div>
+    <div class="tab-footer">
+      <button class="btn-redo" id="wb-redo-4" onclick="wbDoRedo(4)">↺ Redo</button>
+      <button class="btn-complete" id="wb-complete-4" onclick="wbMarkComplete(4)">Mark Quiz complete ✓</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   Unit 7 Reading — Leo's app.  Landing → 📘 SB (6 tabs) + 📒 WB (5 tabs)
+   Storage: leea-4-7-reading-   ·   Homework: leo-4-7-reading
+   Passages are verbatim from SB pp.124-125 (TR 7.9) and WB pp.88-89 (TR 7.5).
+   ═══════════════════════════════════════════════════════════════════ */
+var SAVE_PREFIX = 'leea-4-7-reading-';
+var SB_TABS = 6, WB_TABS = 5;
+
+function lSave(k, v){ try{ localStorage.setItem(SAVE_PREFIX + k, JSON.stringify(v)); }catch(e){} }
+function lLoad(k){ try{ var r = localStorage.getItem(SAVE_PREFIX + k); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
+function lDel(k){ try{ localStorage.removeItem(SAVE_PREFIX + k); }catch(e){} }
+function shuffle(a){ var b=a.slice(); for(var i=b.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=b[i]; b[i]=b[j]; b[j]=t; } return b; }
+
+/* ─── landing + aggregate progress ─── */
+function sbDoneCount(){ var n=0; for(var i=0;i<SB_TABS;i++){ if(lLoad('tab-'+i+'-done')) n++; } return n; }
+function wbDoneCount(){ var n=0; for(var i=0;i<WB_TABS;i++){ if(lLoad('wb-tab-'+i+'-done')) n++; } return n; }
+function refreshProg(){
+  try{
+    var sb = sbDoneCount(), wb = wbDoneCount();
+    var a = document.getElementById('mc-prog-sb'); if(a){ a.textContent = sb + ' / ' + SB_TABS + ' done'; a.classList.toggle('has-prog', sb>0); }
+    var b = document.getElementById('mc-prog-wb'); if(b){ b.textContent = wb + ' / ' + WB_TABS + ' done'; b.classList.toggle('has-prog', wb>0); }
+    var pill = document.getElementById('prog-pill');
+    if(pill) pill.textContent = (sb+wb) + ' / ' + (SB_TABS+WB_TABS) + ' done';
+    for(var i=0;i<SB_TABS;i++){ var t=document.getElementById('tb'+i); if(t) t.classList.toggle('done', !!lLoad('tab-'+i+'-done')); }
+    for(var j=0;j<WB_TABS;j++){ var w=document.getElementById('wtb'+j); if(w) w.classList.toggle('done', !!lLoad('wb-tab-'+j+'-done')); }
+    if(sb+wb >= SB_TABS+WB_TABS) lSave('done', { complete:true, completedAt:new Date().toISOString() });
+  }catch(e){}
+}
+function enterMode(m){
+  lSave('last-mode', m);
+  try{
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('sb-mode').style.display = m==='sb' ? 'flex' : 'none';
+    document.getElementById('wb-mode').style.display = m==='wb' ? 'flex' : 'none';
+  }catch(e){}
+  if(m==='sb') showTab(5); else wbShowTab(0);
+}
+function backToLanding(){
+  lSave('last-mode','landing');
+  try{
+    document.getElementById('landing').style.display = 'flex';
+    document.getElementById('sb-mode').style.display = 'none';
+    document.getElementById('wb-mode').style.display = 'none';
+  }catch(e){}
+  refreshProg();
+}
+
+/* ─── SB tab machinery ─── */
+var SB_NAMES = ['Read','Strategy','Questions','Interview','Quiz','Vocab'];
+var TAB_INIT = {}, TAB_RESET = {}, TAB_RESTORE = {};
+function showTab(n){
+  try{
+    for(var i=0;i<SB_TABS;i++){
+      var btn=document.getElementById('tb'+i), pane=document.getElementById('tc'+i);
+      if(btn) btn.classList.toggle('active', i===n);
+      if(pane) pane.classList.toggle('active', i===n);
+    }
+    var cb=document.getElementById('complete-'+n);
+    if(cb){
+      if(lLoad('tab-'+n+'-done')){ cb.classList.add('confirmed'); cb.textContent='✓ '+SB_NAMES[n]+' done'; }
+      else { cb.classList.remove('confirmed'); cb.textContent='Mark '+SB_NAMES[n]+' complete ✓'; }
+    }
+    if(TAB_INIT[n] && !TAB_INIT[n]._init){ TAB_INIT[n](); TAB_INIT[n]._init=true; }
+    if(TAB_RESTORE[n]) TAB_RESTORE[n]();
+  }catch(e){}
+}
+function markComplete(n){
+  lSave('tab-'+n+'-done', { done:true, completedAt:new Date().toISOString() });
+  var b=document.getElementById('complete-'+n);
+  if(b){ b.textContent='✓ '+SB_NAMES[n]+' done'; b.classList.add('confirmed'); }
+  refreshProg();
+}
+function doRedo(n){
+  try{
+    var b=document.getElementById('redo-'+n);
+    if(!b.classList.contains('armed')){
+      b.classList.add('armed'); b.textContent='Tap again ↺';
+      setTimeout(function(){ b.classList.remove('armed'); b.textContent='↺ Redo'; }, 3000);
+      return;
+    }
+    b.classList.remove('armed'); b.textContent='↺ Redo';
+    lDel('tab-'+n+'-done');
+    if(n===4) lDel('score');
+    Object.keys(localStorage).filter(function(k){ return k.indexOf(SAVE_PREFIX+'tab-'+n+'-')===0; }).forEach(function(k){ localStorage.removeItem(k); });
+    if(TAB_RESET[n]) TAB_RESET[n]();
+    var cb=document.getElementById('complete-'+n);
+    cb.classList.remove('confirmed'); cb.textContent='Mark '+SB_NAMES[n]+' complete ✓';
+    refreshProg();
+  }catch(e){}
+}
+
+/* ─── WB tab machinery (parallel registry, per the locked pattern) ─── */
+var WB_NAMES = ['Vocab','Read','T / F','Opinions','Quiz'];
+var WB_INIT = {}, WB_RESET = {}, WB_RESTORE = {};
+function wbShowTab(n){
+  try{
+    for(var i=0;i<WB_TABS;i++){
+      var btn=document.getElementById('wtb'+i), pane=document.getElementById('wtc'+i);
+      if(btn) btn.classList.toggle('active', i===n);
+      if(pane) pane.classList.toggle('active', i===n);
+    }
+    var cb=document.getElementById('wb-complete-'+n);
+    if(cb){
+      if(lLoad('wb-tab-'+n+'-done')){ cb.classList.add('confirmed'); cb.textContent='✓ '+WB_NAMES[n]+' done'; }
+      else { cb.classList.remove('confirmed'); cb.textContent='Mark '+WB_NAMES[n]+' complete ✓'; }
+    }
+    if(WB_INIT[n] && !WB_INIT[n]._init){ WB_INIT[n](); WB_INIT[n]._init=true; }
+    if(WB_RESTORE[n]) WB_RESTORE[n]();
+  }catch(e){}
+}
+function wbMarkComplete(n){
+  lSave('wb-tab-'+n+'-done', { done:true, completedAt:new Date().toISOString() });
+  var b=document.getElementById('wb-complete-'+n);
+  if(b){ b.textContent='✓ '+WB_NAMES[n]+' done'; b.classList.add('confirmed'); }
+  refreshProg();
+}
+function wbDoRedo(n){
+  try{
+    var b=document.getElementById('wb-redo-'+n);
+    if(!b.classList.contains('armed')){
+      b.classList.add('armed'); b.textContent='Tap again ↺';
+      setTimeout(function(){ b.classList.remove('armed'); b.textContent='↺ Redo'; }, 3000);
+      return;
+    }
+    b.classList.remove('armed'); b.textContent='↺ Redo';
+    lDel('wb-tab-'+n+'-done');
+    if(n===4) lDel('wb-score');
+    Object.keys(localStorage).filter(function(k){ return k.indexOf(SAVE_PREFIX+'wb-tab-'+n+'-')===0; }).forEach(function(k){ localStorage.removeItem(k); });
+    if(WB_RESET[n]) WB_RESET[n]();
+    var cb=document.getElementById('wb-complete-'+n);
+    cb.classList.remove('confirmed'); cb.textContent='Mark '+WB_NAMES[n]+' complete ✓';
+    refreshProg();
+  }catch(e){}
+}
+
+/* ─── shared one-try MCQ ─── */
+function buildMcq(cfg){
+  var host=document.getElementById(cfg.host); if(!host) return;
+  host.innerHTML='';
+  cfg.items.forEach(function(item, qi){
+    var card=document.createElement('div'); card.className='q-card';
+    var q=document.createElement('div'); q.className='comp-q'; q.innerHTML='<b>'+(qi+1)+'.</b> '+item.q;
+    card.appendChild(q);
+    item.o.forEach(function(txt, oi){
+      var b=document.createElement('button');
+      b.type='button'; b.className='comp-opt'; b.dataset.q=qi; b.dataset.o=oi; b.innerHTML=txt;
+      b.onclick=function(){
+        var ans=lLoad(cfg.storeKey)||{};
+        if(Object.prototype.hasOwnProperty.call(ans,qi)) return;
+        ans[qi]=oi; lSave(cfg.storeKey, ans); cfg.refresh();
+      };
+      card.appendChild(b);
+    });
+    var why=document.createElement('div'); why.className='qfinal'; why.dataset.q=qi; why.style.display='none'; why.innerHTML=item.why;
+    card.appendChild(why);
+    host.appendChild(card);
+  });
+  cfg.refresh();
+}
+function refreshMcq(cfg){
+  var ans=lLoad(cfg.storeKey)||{}, right=0, all=true;
+  cfg.items.forEach(function(item, qi){
+    var answered=Object.prototype.hasOwnProperty.call(ans,qi);
+    if(!answered) all=false;
+    if(answered && ans[qi]===item.a) right++;
+    var opts=document.querySelectorAll('#'+cfg.host+' .comp-opt[data-q="'+qi+'"]');
+    Array.prototype.forEach.call(opts, function(b){
+      var oi=parseInt(b.dataset.o,10);
+      b.classList.remove('correct','wrong'); b.disabled=answered;
+      if(!answered) return;
+      if(oi===item.a) b.classList.add('correct');
+      else if(oi===ans[qi]) b.classList.add('wrong');
+    });
+    var why=document.querySelector('#'+cfg.host+' .qfinal[data-q="'+qi+'"]');
+    if(why) why.style.display = answered ? 'block' : 'none';
+  });
+  return { right:right, total:cfg.items.length, all:all };
+}
+
+/* ─── shared tap-a-chip → tap-a-bin matcher ─── */
+function buildMatch(cfg){
+  var host=document.getElementById(cfg.host); if(!host) return;
+  host.innerHTML='';
+  cfg.sel=null;
+  var bank=document.createElement('div'); bank.className='label-chips'; bank.id=cfg.host+'-bank';
+  shuffle(cfg.pairs).forEach(function(p){
+    var c=document.createElement('button');
+    c.type='button'; c.className='label-chip'; c.dataset.k=p.k; c.textContent=p.left;
+    c.onclick=function(){
+      if(c.classList.contains('placed')) return;
+      Array.prototype.forEach.call(bank.querySelectorAll('.label-chip'), function(x){ x.classList.remove('sel'); });
+      if(cfg.sel===c){ cfg.sel=null; } else { c.classList.add('sel'); cfg.sel=c; }
+    };
+    bank.appendChild(c);
+  });
+  host.appendChild(bank);
+  var zones=document.createElement('div'); zones.id=cfg.host+'-zones';
+  cfg.pairs.slice().sort(function(a,b){ return a.right.localeCompare(b.right); }).forEach(function(p){
+    var z=document.createElement('div');
+    z.className='order-row'; z.dataset.k=p.k;
+    z.innerHTML='<span class="ord-num">?</span><span class="ord-text">'+p.right+'</span>';
+    z.onclick=function(){
+      if(!cfg.sel) return;
+      if(cfg.sel.dataset.k===p.k){
+        var placed=lLoad(cfg.storeKey)||{};
+        placed[p.k]=true; lSave(cfg.storeKey, placed);
+        cfg.sel=null; cfg.refresh();
+      }else{
+        z.classList.add('shake'); setTimeout(function(){ z.classList.remove('shake'); }, 400);
+      }
+    };
+    zones.appendChild(z);
+  });
+  host.appendChild(zones);
+  cfg.refresh();
+}
+function refreshMatch(cfg){
+  var placed=lLoad(cfg.storeKey)||{}, n=0;
+  cfg.pairs.forEach(function(p){
+    if(placed[p.k]) n++;
+    var chip=document.querySelector('#'+cfg.host+'-bank .label-chip[data-k="'+p.k+'"]');
+    if(chip){ chip.classList.toggle('placed', !!placed[p.k]); if(placed[p.k]) chip.classList.remove('sel'); }
+    var zone=document.querySelector('#'+cfg.host+'-zones .order-row[data-k="'+p.k+'"]');
+    if(zone){
+      zone.classList.toggle('correct', !!placed[p.k]);
+      var num=zone.querySelector('.ord-num');
+      if(num) num.textContent = placed[p.k] ? '✓' : '?';
+      var txt=zone.querySelector('.ord-text');
+      if(txt && placed[p.k] && txt.textContent.indexOf('←')===-1) txt.textContent = txt.textContent + '  ←  ' + p.left;
+    }
+  });
+  return n >= cfg.pairs.length;
+}
+
+/* ─── shared flashcard deck (flip + JP toggle + type-the-word quiz) ─── */
+function makeDeck(o){
+  var idx=0;
+  function card(){ return o.words[idx]; }
+  function render(){
+    var w=card();
+    document.getElementById(o.p+'-card').classList.remove('flipped');
+    document.getElementById(o.p+'-emoji').textContent=w.emoji;
+    document.getElementById(o.p+'-word').textContent=w.word;
+    document.getElementById(o.p+'-pos').textContent=w.pos;
+    document.getElementById(o.p+'-emoji-b').textContent=w.emoji;
+    document.getElementById(o.p+'-def').textContent=w.def;
+    var jp=document.getElementById(o.p+'-jp');
+    jp.textContent='🇯🇵 '+w.jp; jp.classList.remove('revealed');
+    document.getElementById(o.p+'-jp-btn').textContent='🇯🇵 日本語';
+    document.getElementById(o.p+'-sample').innerHTML=w.sample;
+    document.getElementById(o.p+'-counter').textContent=(idx+1)+' / '+o.words.length;
+    refresh();
+  }
+  function remaining(){
+    var typed=lLoad(o.typedKey)||[];
+    return o.words.map(function(_,i){ return i; }).filter(function(i){ return typed.indexOf(i)===-1; });
+  }
+  function renderQuiz(){
+    var rem=remaining(), typed=(lLoad(o.typedKey)||[]).length;
+    document.getElementById(o.p+'q-prog').textContent=typed+' / '+o.words.length+' done';
+    var inp=document.getElementById(o.p+'q-input'), fb=document.getElementById(o.p+'q-fb');
+    if(!rem.length){
+      document.getElementById(o.p+'q-emoji').textContent='🏆';
+      document.getElementById(o.p+'q-sentence').textContent='All '+o.words.length+' typed correctly!';
+      inp.style.display='none'; fb.textContent=''; return;
+    }
+    var w=o.words[rem[0]];
+    document.getElementById(o.p+'q-emoji').textContent=w.emoji;
+    document.getElementById(o.p+'q-sentence').innerHTML='Type the word that means:<br>“'+w.def+'”';
+    inp.style.display=''; inp.value=''; fb.textContent='';
+  }
+  function refresh(){
+    var seen=(lLoad(o.seenKey)||[]).length, typed=(lLoad(o.typedKey)||[]).length;
+    var d=document.getElementById(o.p+'-done');
+    if(d) d.classList.toggle('show', seen>=o.words.length && typed>=o.words.length);
+  }
+  return {
+    render: render, renderQuiz: renderQuiz, refresh: refresh,
+    flip: function(){
+      var c=document.getElementById(o.p+'-card');
+      // Counts as studied only once the answer side has actually been seen.
+      if(c.classList.toggle('flipped')){
+        var seen=lLoad(o.seenKey)||[];
+        if(seen.indexOf(idx)===-1){ seen.push(idx); lSave(o.seenKey, seen); }
+        refresh();
+      }
+    },
+    toggleJp: function(e){
+      e.stopPropagation();
+      var jp=document.getElementById(o.p+'-jp'), b=document.getElementById(o.p+'-jp-btn');
+      b.textContent = jp.classList.toggle('revealed') ? '🇯🇵 隠す' : '🇯🇵 日本語';
+    },
+    prev: function(){ idx=(idx-1+o.words.length)%o.words.length; render(); },
+    next: function(){ idx=(idx+1)%o.words.length; render(); },
+    mode: function(m){
+      document.getElementById(o.p+'-prac').classList.toggle('active', m==='practice');
+      document.getElementById(o.p+'-quiz').classList.toggle('active', m==='quiz');
+      document.getElementById(o.p+'-practice').style.display = m==='practice' ? 'block' : 'none';
+      document.getElementById(o.p+'-quizmode').style.display = m==='quiz' ? 'block' : 'none';
+      if(m==='quiz') renderQuiz(); else render();
+    },
+    check: function(){
+      var rem=remaining(); if(!rem.length) return;
+      var i=rem[0], w=o.words[i];
+      var inp=document.getElementById(o.p+'q-input'), fb=document.getElementById(o.p+'q-fb');
+      if((inp.value||'').trim().toLowerCase() === w.word.toLowerCase()){
+        var typed=lLoad(o.typedKey)||[]; typed.push(i); lSave(o.typedKey, typed);
+        fb.textContent='✅ Correct!'; fb.style.color='var(--green-d)';
+        setTimeout(function(){ renderQuiz(); refresh(); }, 600);
+      }else{
+        fb.textContent='❌ Not yet — look at '+w.emoji+' and try again.'; fb.style.color='var(--red)';
+      }
+    },
+    reset: function(){ idx=0; lDel(o.seenKey); lDel(o.typedKey); document.getElementById(o.p+'q-input').style.display=''; render(); renderQuiz(); }
+  };
+}
+
+/* ═══ SB TAB 5 — VOCAB ═══ */
+var SB_WORDS = [
+  { word:'blind', emoji:'🦯', pos:'Adjective · Content', def:'not able to see', jp:'目（め）の不自由（ふじゆう）な', sample:'The accident left Louis Braille <b>blind</b>.' },
+  { word:'a design', emoji:'📐', pos:'Noun · Content', def:'a drawing or plan that shows how to make something', jp:'デザイン・設計（せっけい）', sample:'An inventor draws a <b>design</b> before building.' },
+  { word:'millions', emoji:'🔢', pos:'Noun · Content', def:'a very large number — many thousands of thousands', jp:'何百万（なんびゃくまん）', sample:'Air travel is used by <b>millions</b> of people today.' },
+  { word:'a patent', emoji:'📜', pos:'Noun · Content', def:'a paper that says a certain inventor is responsible for an invention', jp:'特許（とっきょ）', sample:'A <b>patent</b> stops anyone else taking your idea.' },
+  { word:'a chart', emoji:'📊', pos:'Noun · Academic', def:'a table that shows information in rows and columns', jp:'表（ひょう）', sample:'Complete the <b>chart</b> with who, when, what, and why.' },
+  { word:'a graph', emoji:'📈', pos:'Noun · Academic', def:'a drawing with lines or dots that compares numbers', jp:'グラフ', sample:'The line <b>graph</b> shows patents from 2000 to 2006.' },
+  { word:'an opinion', emoji:'💬', pos:'Noun · Academic', def:'what one person thinks — not something everyone agrees is true', jp:'意見（いけん）', sample:'In my <b>opinion</b>, the Popsicle is the best invention.' }
+];
+var sbDeck = makeDeck({ p:'sbv', words:SB_WORDS, seenKey:'tab-5-seen', typedKey:'tab-5-typed' });
+function sbvMode(m){ sbDeck.mode(m); }
+function sbvFlip(){ sbDeck.flip(); }
+function sbvToggleJp(e){ sbDeck.toggleJp(e); }
+function sbvPrev(){ sbDeck.prev(); }
+function sbvNext(){ sbDeck.next(); }
+function sbvCheck(){ sbDeck.check(); }
+TAB_INIT[5] = function(){ sbDeck.render(); sbDeck.renderQuiz(); };
+TAB_RESET[5] = function(){ sbDeck.reset(); };
+TAB_RESTORE[5] = function(){ sbDeck.refresh(); };
+
+/* ═══ SB TAB 0 — READ (verbatim SB pp.124-125, TR 7.9) ═══
+   Paragraphs unlock in pairs; each pair's LP comprehension question gates
+   the next. Gloss tags pop a definition for words we do not drill. */
+var GLOSS = {
+  'asthma': 'when you have trouble breathing, often when the air is not clean 😮‍💨',
+  'air pollution': 'dirty air, with smoke and dust in it 🏭',
+  'particles': 'very tiny pieces of something ✨',
+  'raised dots': 'small bumps you can feel with your fingers ⠿',
+  'Popsicle': 'frozen juice or soda on a stick 🍦'
+};
+var PARAS = [
+  { n:1, html: 'Did you know that a teenager had the first idea for a television? And a six-year-old boy invented the toy truck? Kids and teens are great inventors because they have a lot of creativity and imagination.' },
+  { n:2, html: '<b>2018:</b> At the age of 19, Angad Daryani invented a solution to the problem of <span class="tag" data-g="air pollution">air pollution</span> in cities. Growing up in Mumbai, India, he suffered from <span class="tag" data-g="asthma">asthma</span> caused by the polluted air. Air pollution is a big problem. Three million people die each year. Angad&rsquo;s invention is an air pollution cleaning tower that is 6.1 meters (20 ft.) high. The tower sucks in air and takes out the <span class="tag" data-g="particles">particles</span> of dust and carbon. The particles are collected and can even be reused. Angad&rsquo;s dream is to build thousands of the towers and improve the quality of air in cities.' },
+  { n:3, html: '<b>2013:</b> Canadian high school student Ann Makosinski was 15 when she invented the &ldquo;hollow flashlight.&rdquo; The flashlight uses heat from the human body and changes it into light. It doesn&rsquo;t need batteries. Ann thought of the idea when she heard about a friend who lived in the Philippines. Her friend was doing badly in school. She needed to do her homework at night, but there was no electrical light in her home. Ann&rsquo;s flashlight isn&rsquo;t expensive. Ann hopes it will help some of the 1.1 billion people in the world who still have no electricity in their homes.' },
+  { n:4, html: '<b>1905:</b> When Frank Epperson was eleven, he left a cup filled with soda and a stick in his yard. That night he forgot about it. It was a very cold night. When he went outside the next morning, he found something amazing: a &ldquo;<span class="tag" data-g="Popsicle">Popsicle</span>&rdquo;!' },
+  { n:5, html: '<b>1824:</b> Louis Braille had an accident when he was three. The accident left him <b>blind</b>. At that time, it was hard for blind children to read. They had to touch raised letters. But it was easy to confuse a Q with an O, an R with a B, and so on. When he was fifteen, Louis invented an alphabet that used <span class="tag" data-g="raised dots">raised dots</span>. The Braille alphabet was a big success!' },
+  { n:6, html: '<b>The line graph on p. 125</b> shows the number of <b>patent</b> filings around the world from 2000 to 2006. A patent is a paper that says a certain inventor is responsible for an invention. The year with the most patents was <b>2006</b>.' }
+];
+/* LP p.306 comprehension checks, verbatim, one per paragraph pair. */
+var READ_CHECKS = [
+  { after:2, q:'Why are kids great inventors?', o:['Because they have a lot of creativity and imagination.','Because they are very strong.','Because they have a lot of money.'], a:0 },
+  { after:4, q:'How did Ann come up with the idea for her invention?', o:['She read it in a book.','She heard about a friend with no electrical light at home.','She saw it on television.'], a:1 },
+  { after:6, q:'Why was it hard for blind children to read before Braille?', o:['They had to touch raised letters, and it was easy to confuse them.','There were no books at all.','The books were too heavy.'], a:0 }
+];
+function readStage(){ return (lLoad('tab-0-stage') || 1); }
+function readRender(){
+  var host=document.getElementById('read-host'); if(!host) return;
+  host.innerHTML='';
+  var stage=readStage();
+  READ_CHECKS.forEach(function(chk, ci){
+    var block=document.createElement('div');
+    block.className='passage-block' + (ci+1 > stage ? ' locked' : '');
+    PARAS.filter(function(p){ return p.n===chk.after-1 || p.n===chk.after; }).forEach(function(p){
+      var para=document.createElement('p');
+      para.style.marginBottom='10px';
+      para.innerHTML=p.html;
+      block.appendChild(para);
+    });
+    host.appendChild(block);
+    if(ci+1 > stage) return;
+    var q=document.createElement('div'); q.className='comp-q';
+    q.innerHTML='<b>Check:</b> '+chk.q;
+    var answered = (lLoad('tab-0-answers')||{})[ci];
+    chk.o.forEach(function(txt, oi){
+      var b=document.createElement('button');
+      b.type='button'; b.className='comp-opt'; b.textContent=txt;
+      if(answered !== undefined){
+        b.disabled=true;
+        if(oi===chk.a) b.classList.add('correct');
+        else if(oi===answered) b.classList.add('wrong');
+      }
+      b.onclick=function(){
+        var ans=lLoad('tab-0-answers')||{};
+        if(ans[ci]!==undefined) return;
+        ans[ci]=oi; lSave('tab-0-answers', ans);
+        if(oi===chk.a && readStage() < READ_CHECKS.length) lSave('tab-0-stage', readStage()+1);
+        readRender();
+      };
+      q.appendChild(b);
+    });
+    host.appendChild(q);
+  });
+  // wire gloss tags
+  Array.prototype.forEach.call(host.querySelectorAll('.tag[data-g]'), function(t){
+    t.onclick=function(ev){
+      var old=document.querySelector('.gloss-pop'); if(old) old.remove();
+      var pop=document.createElement('div'); pop.className='gloss-pop';
+      pop.textContent=GLOSS[t.dataset.g] || t.dataset.g;
+      document.body.appendChild(pop);
+      var r=t.getBoundingClientRect();
+      pop.style.left=Math.max(8, Math.min(window.innerWidth-270, r.left))+'px';
+      pop.style.top=(r.bottom+8)+'px';
+      setTimeout(function(){ if(pop.parentNode) pop.remove(); }, 2600);
+      ev.stopPropagation();
+    };
+  });
+  var ans=lLoad('tab-0-answers')||{};
+  var allRight = READ_CHECKS.every(function(c,i){ return ans[i]===c.a; });
+  // Weird but True (SB p.157, verbatim) is the earned payoff for finishing the ride.
+  if(allRight){
+    var wbt=document.createElement('div');
+    wbt.className='passage-block';
+    wbt.style.borderColor='var(--amber)';
+    wbt.innerHTML='<div class="pheader">😲 Weird but True</div>'
+      + '<p>Russians invented the invention. They made the &ldquo;cars&rdquo; from ice. '
+      + 'And they put straw on the seats to keep the passengers warm.</p>';
+    host.appendChild(wbt);
+  }
+  document.getElementById('read-done').classList.toggle('show', allRight);
+}
+TAB_INIT[0] = function(){ readRender(); };
+TAB_RESET[0] = function(){ lDel('tab-0-stage'); lDel('tab-0-answers'); readRender(); };
+TAB_RESTORE[0] = function(){ readRender(); };
+
+/* ═══ SB TAB 1 — STRATEGY (cause & effect) ═══ */
+var SIG_SENTENCES = [
+  { text:'<em>Why</em> are kids great inventors?', sig:'Why' },
+  { text:'<em>What</em> problem did Angad want to solve?', sig:'What' },
+  { text:'<em>How</em> did Ann come up with her idea?', sig:'How' },
+  { text:'<em>When</em> did Frank Epperson invent the Popsicle?', sig:'When' },
+  { text:'<em>Who</em> invented the alphabet that uses raised dots?', sig:'Who' }
+];
+/* LP p.309 Extend chart, verbatim. */
+var CE_PAIRS = [
+  { k:'p', left:'It&rsquo;s something you eat. 🍦', right:'Popsicle' },
+  { k:'t', left:'It can help people who live in big cities. 🏙️', right:'the air pollution cleaning tower' },
+  { k:'b', left:'It&rsquo;s something a blind person can use to read. 🦯', right:'Braille' },
+  { k:'f', left:'It&rsquo;s useful if you don&rsquo;t have electricity. 🔦', right:'the hollow flashlight' },
+  { k:'a', left:'It happened by accident. ❄️', right:'Popsicle (again!)' }
+];
+var sigCfg = { host:'sig-host', storeKey:'tab-1-sig' };
+/* A signal may be a phrase ("as a result"), so a tap is checked against the
+   phrase's own word list — not a substring test, which would let "cause" pass
+   for "because". One-letter words ("a") are never tappable targets. */
+function sigWords(sig){
+  return sig.toLowerCase().split(/\s+/).filter(function(w){ return w.length > 1; });
+}
+function isSigWord(sig, token){
+  var clean = token.replace(/[.,!?;:"]/g,'').toLowerCase();
+  return clean.length > 1 && sigWords(sig).indexOf(clean) !== -1;
+}
+var ceCfg = { host:'ce-host', pairs:CE_PAIRS, storeKey:'tab-1-ce' };
+function stratRefresh(){
+  var found=lLoad('tab-1-sig')||{};
+  var allSig = SIG_SENTENCES.every(function(_,i){ return found[i]; });
+  var allCe = refreshMatch(ceCfg);
+  document.getElementById('strat-done').classList.toggle('show', allSig && allCe);
+}
+ceCfg.refresh = stratRefresh;
+TAB_INIT[1] = function(){
+  var host=document.getElementById('sig-host'); host.innerHTML='';
+  SIG_SENTENCES.forEach(function(s, si){
+    var row=document.createElement('div'); row.className='sig-sentence'; row.dataset.s=si;
+    // Split on the signal word so each word is tappable.
+    var plain=s.text.replace(/<\/?em>/g,'');
+    plain.split(/(\s+)/).forEach(function(tok){
+      if(!tok.trim()){ row.appendChild(document.createTextNode(tok)); return; }
+      var b=document.createElement('span');
+      b.className='sig-word'; b.textContent=tok;
+      b.style.cursor='pointer'; b.style.padding='1px 4px'; b.style.borderRadius='5px';
+      b.onclick=function(){
+        if(isSigWord(s.sig, tok)){
+          var found=lLoad('tab-1-sig')||{}; found[si]=true; lSave('tab-1-sig', found);
+          Array.prototype.forEach.call(row.querySelectorAll('.sig-word'), function(x){
+            if(isSigWord(s.sig, x.textContent)){
+              x.style.background='var(--yellow)'; x.style.fontWeight='800';
+            }
+          });
+          stratRefresh();
+        }else{
+          b.style.background='var(--red)'; b.style.color='#fff';
+          setTimeout(function(){ b.style.background=''; b.style.color=''; }, 400);
+        }
+      };
+      row.appendChild(b);
+    });
+    host.appendChild(row);
+  });
+  buildMatch(ceCfg);
+  // repaint already-found signal words
+  var found=lLoad('tab-1-sig')||{};
+  Object.keys(found).forEach(function(si){
+    var row=document.querySelector('#sig-host .sig-sentence[data-s="'+si+'"]'); if(!row) return;
+    Array.prototype.forEach.call(row.querySelectorAll('.sig-word'), function(x){
+      if(isSigWord(SIG_SENTENCES[si].sig, x.textContent)){ x.style.background='var(--yellow)'; x.style.fontWeight='800'; }
+    });
+  });
+  stratRefresh();
+};
+TAB_RESET[1] = function(){ lDel('tab-1-sig'); lDel('tab-1-ce'); TAB_INIT[1]._init=false; TAB_INIT[1](); TAB_INIT[1]._init=true; };
+TAB_RESTORE[1] = function(){ stratRefresh(); };
+
+/* ═══ SB TAB 2 — QUESTIONS (SB p.157 Activity 1, verbatim) ═══ */
+var Q2 = [
+  { q:'What is the first thing you do when you sit in a invention?', o:['You pull down the safety bar.','You go up a steep hill.','You feel very light.'], a:0, why:'✔ The answer is at the <b>beginning</b> of the text — ¶1.' },
+  { q:'How do you feel when you go fast down the hill?', o:['You feel heavy.','You feel very light.','You feel dizzy.'], a:1, why:'✔ ¶2 — “The invention moves fast. You feel very light!”' },
+  { q:'How do you feel when you go fast up the loop the loop?', o:['You feel very light.','You feel nothing.','You feel heavy.'], a:2, why:'✔ ¶3 — “When you go fast up the circle, you feel heavy.”' },
+  { q:'Why do some people feel dizzy or sick on inventions?', o:['The forces change.','The car is too slow.','The safety bar is loose.'], a:0, why:'✔ ¶5 — “…<b>because</b> the forces change.” That <i>because</i> is your cause-and-effect signal word!' }
+];
+var q2Cfg = { host:'q2-host', items:Q2, storeKey:'tab-2-answers' };
+q2Cfg.refresh = function(){ var r=refreshMcq(q2Cfg); document.getElementById('q2-done').classList.toggle('show', r.all); };
+TAB_INIT[2] = function(){ buildMcq(q2Cfg); };
+TAB_RESET[2] = function(){ lDel('tab-2-answers'); TAB_INIT[2]._init=false; TAB_INIT[2](); TAB_INIT[2]._init=true; };
+TAB_RESTORE[2] = function(){ q2Cfg.refresh(); };
+
+/* ═══ SB TAB 3 — FORCE CHART (SB p.157 Activity 2, LP answer key) ═══ */
+var FORCE_PAIRS = [
+  { k:'ad1', left:'Angad Daryani · <b>When?</b>', right:'in 2018, when he was 19 years old' },
+  { k:'ad2', left:'Angad Daryani · <b>Why?</b>', right:'He had asthma caused by air pollution.' },
+  { k:'am1', left:'Ann Makosinski · <b>When?</b>', right:'in 2013, when she was 15 years old' },
+  { k:'am2', left:'Ann Makosinski · <b>Why?</b>', right:'Her friend couldn&rsquo;t do her homework.' },
+  { k:'fe1', left:'Frank Epperson · <b>When?</b>', right:'in 1905, when he was 11 years old' },
+  { k:'fe2', left:'Frank Epperson · <b>Why?</b>', right:'He forgot a cup with soda and a stick overnight.' },
+  { k:'lb1', left:'Louis Braille · <b>When?</b>', right:'in 1824, when he was 15 years old' },
+  { k:'lb2', left:'Louis Braille · <b>Why?</b>', right:'It was hard for blind children to read.' }
+];
+var fcCfg = { host:'fc-host', pairs:FORCE_PAIRS, storeKey:'tab-3-placed' };
+fcCfg.refresh = function(){ document.getElementById('fc-done').classList.toggle('show', refreshMatch(fcCfg)); };
+TAB_INIT[3] = function(){ buildMatch(fcCfg); };
+TAB_RESET[3] = function(){ lDel('tab-3-placed'); TAB_INIT[3]._init=false; TAB_INIT[3](); TAB_INIT[3]._init=true; };
+TAB_RESTORE[3] = function(){ fcCfg.sel=null; fcCfg.refresh(); };
+
+/* ═══ SB TAB 4 — QUIZ ═══ */
+var SBQ = [
+  { q:'Why are kids and teens great inventors?', o:['They have a lot of creativity and imagination.','They are very tall.'], a:0, why:'✔ ¶1.' },
+  { q:'How old was Angad Daryani when he invented his tower?', o:['19','11'], a:0, why:'✔ ¶2 — at the age of 19.' },
+  { q:'What problem does Angad&rsquo;s tower solve?', o:['air pollution','no electricity'], a:0, why:'✔ ¶2 — it cleans polluted air.' },
+  { q:'What does Ann&rsquo;s &ldquo;hollow flashlight&rdquo; use instead of batteries?', o:['heat from the human body','sunlight'], a:0, why:'✔ ¶3.' },
+  { q:'Why did Ann invent it?', o:['Her friend had no electrical light to do homework.','She wanted to sell it.'], a:0, why:'✔ ¶3.' },
+  { q:'How did Frank Epperson invent the Popsicle?', o:['by accident, on a very cold night','in a science lab'], a:0, why:'✔ ¶4 — he forgot the cup outside.' },
+  { q:'How old was Frank Epperson?', o:['eleven','fifteen'], a:0, why:'✔ ¶4.' },
+  { q:'What did Louis Braille invent?', o:['an alphabet that uses raised dots','a new kind of pen'], a:0, why:'✔ ¶5.' },
+  { q:'What is a <b>patent</b>?', o:['a paper that says who is responsible for an invention','a kind of tower'], a:0, why:'✔ LP p.247 graphic literacy.' },
+  { q:'Which year had the most patents on the graph?', o:['2006','2000'], a:0, why:'✔ The graph runs 2000-2006; the highest dot is 2006.' }
+];
+var sbqCfg = { host:'sbq-host', items:SBQ, storeKey:'tab-4-answers' };
+sbqCfg.refresh = function(){
+  var r=refreshMcq(sbqCfg);
+  document.getElementById('sbq-pill').textContent=r.right+' / '+r.total;
+  if(r.all) lSave('score', { score:r.right, total:r.total, percent:Math.round(r.right/r.total*100), done:true, timestamp:new Date().toISOString() });
+  document.getElementById('sbq-done').classList.toggle('show', r.all);
+};
+TAB_INIT[4] = function(){ buildMcq(sbqCfg); };
+TAB_RESET[4] = function(){ lDel('tab-4-answers'); lDel('score'); TAB_INIT[4]._init=false; TAB_INIT[4](); TAB_INIT[4]._init=true; };
+TAB_RESTORE[4] = function(){ sbqCfg.refresh(); };
+
+/* ═══ WB TAB 0 — VOCAB ═══ */
+var WB_WORDS = [
+  { word:'a station', emoji:'🚉', pos:'Noun', def:'the place where a train stops so people can get on and off', jp:'駅（えき）', sample:'A famous train is coming into the <b>station</b>!' },
+  { word:'a bullet train', emoji:'🚄', pos:'Noun', def:'a very fast Japanese train, also called the Shinkansen', jp:'新幹線（しんかんせん）', sample:'Many people call it the <b>bullet train</b>.' },
+  { word:'a journey', emoji:'🗺️', pos:'Noun', def:'a trip from one place to another', jp:'旅（たび）・移動（いどう）', sample:'The <b>journey</b> from Tokyo to Nagano takes 79 minutes.' },
+  { word:'comfortable', emoji:'😌', pos:'Adjective', def:'nice to sit in or be in — not hard or painful', jp:'快適（かいてき）な', sample:'Bullet trains are always on time, and they&rsquo;re <b>comfortable</b>.' },
+  { word:'a bridge', emoji:'🌉', pos:'Noun', def:'something built over a river or road so you can cross it', jp:'橋（はし）', sample:'The bullet train travels across 300 <b>bridges</b>.' },
+  { word:'a fact', emoji:'📋', pos:'Noun · Academic', def:'true information you can check — not an opinion', jp:'事実（じじつ）', sample:'Support each opinion with a <b>fact</b>.' }
+];
+var wbDeck = makeDeck({ p:'wbv', words:WB_WORDS, seenKey:'wb-tab-0-seen', typedKey:'wb-tab-0-typed' });
+function wbvMode(m){ wbDeck.mode(m); }
+function wbvFlip(){ wbDeck.flip(); }
+function wbvToggleJp(e){ wbDeck.toggleJp(e); }
+function wbvPrev(){ wbDeck.prev(); }
+function wbvNext(){ wbDeck.next(); }
+function wbvCheck(){ wbDeck.check(); }
+WB_INIT[0] = function(){ wbDeck.render(); wbDeck.renderQuiz(); };
+WB_RESET[0] = function(){ wbDeck.reset(); };
+WB_RESTORE[0] = function(){ wbDeck.refresh(); };
+
+/* ═══ WB TAB 1 — READ (verbatim WB pp.88-89, TR 7.5) ═══ */
+var WB_PARAS = [
+  'Stand back! A famous train is coming into the <b>station</b>! It&rsquo;s called the Shinkansen, although many people call it the <b>bullet train</b> because of its long round nose. These Japanese trains, invented by Hideo Shima in the early 1960s, are amazing. They&rsquo;re one of the fastest trains in the world. The <b>journey</b> from Tokyo to Nagano used to take three hours. Now, with the bullet train, which travels at 300 kilometers per hour (186 miles per hour), it takes 79 minutes.',
+  'Bullet trains are always on time (although once it was 42 seconds late!), and they&rsquo;re <b>comfortable</b>. As you sit on the train, you feel like you aren&rsquo;t moving at all. And because they run on electricity, they&rsquo;re very quiet. But don&rsquo;t fall asleep. There is a lot to see. The bullet train travels across 300 <b>bridges</b>, and you can see the wonderful Mount Fuji out the window, too.',
+  'In fact, trains are popular in many parts of the world, not just Japan. Every day billions of people around the world travel by train, especially in China, India, and Europe. Trains are the fastest way to travel on land, and they&rsquo;re the safest, too (cars and buses are much more dangerous). And although most trains are more expensive than they used to be, trains still make the world go round!'
+];
+WB_INIT[1] = function(){
+  var host=document.getElementById('wb-read-host'); host.innerHTML='';
+  var block=document.createElement('div'); block.className='passage-block';
+  WB_PARAS.forEach(function(p){ var el=document.createElement('p'); el.style.marginBottom='10px'; el.innerHTML=p; block.appendChild(el); });
+  host.appendChild(block);
+  document.getElementById('wb-read-done').classList.add('show');
+};
+WB_RESET[1] = function(){ WB_INIT[1](); };
+WB_RESTORE[1] = function(){};
+
+/* ═══ WB TAB 2 — TRUE / FALSE (WB p.112 Activity 2, AK) ═══ */
+var WB_TF = [
+  { q:'The Shinkansen is called the bullet train because of its shape.', o:['True','False'], a:0, why:'✔ True — &ldquo;because of its long round nose&rdquo;.' },
+  { q:'Bullet trains are the slowest trains in the world.', o:['True','False'], a:1, why:'✔ False — they are one of the <b>fastest</b>.' },
+  { q:'A billion people take the bullet train every day.', o:['True','False'], a:1, why:'✔ False — billions travel by train worldwide, not on the bullet train.' },
+  { q:'Trains are very popular in Asia and Europe.', o:['True','False'], a:0, why:'✔ True — especially China, India, and Europe.' },
+  { q:'Trains used to be cheaper than they are today.', o:['True','False'], a:0, why:'✔ True — &ldquo;more expensive than they used to be&rdquo;. Note the <b>used to</b>!' }
+];
+var wbTfCfg = { host:'wb-tf-host', items:WB_TF, storeKey:'wb-tab-2-answers' };
+wbTfCfg.refresh = function(){ document.getElementById('wb-tf-done').classList.toggle('show', refreshMcq(wbTfCfg).all); };
+WB_INIT[2] = function(){ buildMcq(wbTfCfg); };
+WB_RESET[2] = function(){ lDel('wb-tab-2-answers'); WB_INIT[2]._init=false; WB_INIT[2](); WB_INIT[2]._init=true; };
+WB_RESTORE[2] = function(){ wbTfCfg.refresh(); };
+
+/* ═══ WB TAB 3 — CAUSE & EFFECT (WB p.113 Activity 4, AK) ═══ */
+var WB_CE = [
+  { k:'f', left:'💬 They&rsquo;re very fast.', right:'📋 The trains travel at around 300 km/h.' },
+  { k:'t', left:'💬 They&rsquo;re always on time.', right:'📋 The train was only late once — 42 seconds!' },
+  { k:'c', left:'💬 They&rsquo;re comfortable.', right:'📋 You feel like you aren&rsquo;t moving at all.' },
+  { k:'q', left:'💬 Bullet trains are very quiet.', right:'📋 They run on electricity, so they make little noise.' },
+  { k:'s', left:'💬 There is a lot to see.', right:'📋 There are views from hundreds of bridges.' }
+];
+var wbCeCfg = { host:'wb-ce-host', pairs:WB_CE, storeKey:'wb-tab-3-placed' };
+wbCeCfg.refresh = function(){ document.getElementById('wb-ce-done').classList.toggle('show', refreshMatch(wbCeCfg)); };
+WB_INIT[3] = function(){ buildMatch(wbCeCfg); };
+WB_RESET[3] = function(){ lDel('wb-tab-3-placed'); WB_INIT[3]._init=false; WB_INIT[3](); WB_INIT[3]._init=true; };
+WB_RESTORE[3] = function(){ wbCeCfg.sel=null; wbCeCfg.refresh(); };
+
+/* ═══ WB TAB 4 — QUIZ ═══ */
+var WBQ = [
+  { q:'What is the Japanese name for the bullet train?', o:['the Shinkansen','the Maglev'], a:0, why:'✔ ¶1.' },
+  { q:'Who invented these trains, and when?', o:['Hideo Shima, in the early 1960s','Louis Braille, in 1824'], a:0, why:'✔ ¶1.' },
+  { q:'How long does Tokyo to Nagano take now?', o:['79 minutes','three hours'], a:0, why:'✔ ¶1 — it <b>used to</b> take three hours.' },
+  { q:'Why are the trains so quiet?', o:['They run on electricity.','They travel at night.'], a:0, why:'✔ ¶2.' },
+  { q:'<b>Opinion:</b> &ldquo;They&rsquo;re comfortable.&rdquo; Which <b>fact</b> supports it?', o:['You feel like you aren&rsquo;t moving at all.','They cross 300 bridges.'], a:0, why:'✔ Workbook p.89 chart.' },
+  { q:'Which is an <b>opinion</b>, not a fact?', o:['There is a lot to see.','The trains travel at 300 km/h.'], a:0, why:'✔ A speed can be checked — that is a fact. &ldquo;A lot to see&rdquo; is what someone thinks.' }
+];
+var wbqCfg = { host:'wbq-host', items:WBQ, storeKey:'wb-tab-4-answers' };
+wbqCfg.refresh = function(){
+  var r=refreshMcq(wbqCfg);
+  document.getElementById('wbq-pill').textContent=r.right+' / '+r.total;
+  if(r.all) lSave('wb-score', { score:r.right, total:r.total, percent:Math.round(r.right/r.total*100), done:true, timestamp:new Date().toISOString() });
+  document.getElementById('wbq-done').classList.toggle('show', r.all);
+};
+WB_INIT[4] = function(){ buildMcq(wbqCfg); };
+WB_RESET[4] = function(){ lDel('wb-tab-4-answers'); lDel('wb-score'); WB_INIT[4]._init=false; WB_INIT[4](); WB_INIT[4]._init=true; };
+WB_RESTORE[4] = function(){ wbqCfg.refresh(); };
+
+/* ═══ boot ═══ */
+(function boot(){
+  refreshProg();
+  var last = lLoad('last-mode');
+  if(last === 'sb') enterMode('sb');
+  else if(last === 'wb') enterMode('wb');
+})();
+</script>
+
+</body>
+</html>

@@ -76,6 +76,20 @@ const unitGrammarPaths = [
   "content/subjects/english/courses/our-world/level-4/unit-8/grammar.json",
   "content/subjects/english/courses/our-world/level-4/unit-9/grammar.json"
 ];
+/* Level 6 units are generated from scripts/ow-l6/ and land one directory per
+   unit as they are scanned. Discovering them keeps the two lists above from
+   having to be edited by hand on every generator run — the generated files are
+   held to exactly the same rules as the hand-authored ones. */
+const level6Root = "content/subjects/english/courses/our-world/level-6";
+if (fs.existsSync(path.join(root, level6Root))) {
+  for (const unitDir of fs.readdirSync(path.join(root, level6Root)).sort()) {
+    const vocabularyPath = `${level6Root}/${unitDir}/vocabulary.json`;
+    const grammarPath = `${level6Root}/${unitDir}/grammar.json`;
+    if (fs.existsSync(path.join(root, vocabularyPath))) unitVocabularyPaths.push(vocabularyPath);
+    if (fs.existsSync(path.join(root, grammarPath))) unitGrammarPaths.push(grammarPath);
+  }
+}
+
 const sanseidoPath = "content/subjects/english/junior-high/sanseido-index.json";
 
 const vocabularyIndex = readJson(vocabularyIndexPath);
@@ -443,6 +457,15 @@ const lessonsDirs = [
   "content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons",
   "content/subjects/english/courses/special-training/lessons",
 ];
+/* Level 6 lesson records are generated one directory per scanned unit — see
+   scripts/ow-l6/. Discovered rather than listed so a newly scanned unit is held
+   to the same teacher/learner pairing rule the moment it lands. */
+if (fs.existsSync(path.join(root, level6Root))) {
+  for (const unitDir of fs.readdirSync(path.join(root, level6Root)).sort()) {
+    const dir = `${level6Root}/${unitDir}/lessons`;
+    if (fs.existsSync(path.join(root, dir))) lessonsDirs.push(dir);
+  }
+}
 const lessons = [];
 for (const lessonsDir of lessonsDirs) {
   if (!fs.existsSync(path.join(root, lessonsDir))) continue;
@@ -454,7 +477,13 @@ for (const lessonsDir of lessonsDirs) {
 }
 
 const lessonsTsPath = "src/data/lessons.ts";
-const lessonsTsSource = fs.readFileSync(path.join(root, lessonsTsPath), "utf8");
+/* Level 6's 144 records are imported through src/data/lessons-level6.generated.ts,
+   which lessons.ts spreads in — so "is this lesson registered?" has to look at
+   both files, not just the hand-authored one. */
+const lessonsTsPaths = [lessonsTsPath, "src/data/lessons-level6.generated.ts"].filter((file) =>
+  fs.existsSync(path.join(root, file))
+);
+const lessonsTsSource = lessonsTsPaths.map((file) => fs.readFileSync(path.join(root, file), "utf8")).join("\n");
 
 for (const lesson of lessons) {
   if (lesson.mode === "teacher" && !lesson.file.endsWith(".teacher.json")) {

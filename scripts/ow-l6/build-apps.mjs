@@ -398,7 +398,11 @@ export function buildAllApps(units) {
         unit: data.unit,
         component: spec.component,
         mode: "teacher",
-        status: "draft",
+        /* These decks are built and verified, so "live" rather than "draft".
+           Level 4 is mixed on this (25 draft / 12 live / 2 ready) and nothing
+           currently gates on it, but the README says a lesson goes live by
+           status data — so the status should say what is true. */
+        status: "live",
         title: spec.label,
         subtitle: `${data.title} — ${slides.length} slides for Neritan to teach from.`,
         source: { type: "html-slides", file: `${id}.html`, embedPath: `/lessons/${id}.html`, slideCount: slides.length },
@@ -428,7 +432,12 @@ export function buildAllApps(units) {
         unit: data.unit,
         component: `${spec.component}-app`,
         mode: "learner",
-        status: "draft",
+        /* "live" means Neritan can assign it — the state 36 of the 39 existing
+           learner records use. Not "assigned": that is what seedAssignments
+           auto-assigns, and it would drop all 72 apps into Leo's homework at
+           once. Not "draft" either, which is what these shipped as and is why
+           every Level 6 lesson read "Not assigned" with nothing to open. */
+        status: "live",
         title: `Unit ${data.unit} ${spec.label} App`,
         subtitle: `Leo works through ${tabs.length} modules: ${tabs.map((tab) => tab.name).join(", ")}.`,
         source: learnerSource,

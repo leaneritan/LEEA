@@ -62,6 +62,13 @@ ${grammars.join("\n")}
 export const level6UnitTitles: Record<string, string> = Object.fromEntries(
   level6Vocabularies.map((unit) => [\`\${unit.level}-\${unit.unit}\`, unit.unitTitle])
 );
+
+/* Keyed by unit number, for curriculum.ts's UNIT_TITLES_BY_LEVEL. Those titles
+   are meant to be harvested from each unit's own content, and hand-copying them
+   is how Level 6 ended up showing nine chips that all just said "Unit N". */
+export const level6UnitTitlesByUnit: Record<number, string> = Object.fromEntries(
+  level6Vocabularies.map((unit) => [unit.unit, unit.unitTitle])
+);
 `;
   writeText("src/data/reference-level6.generated.ts", body);
   return vocabularies.length;

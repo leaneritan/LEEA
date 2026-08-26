@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   fetchLearnerProgressRows,
   saveLearnerProgressValue,
@@ -16,6 +16,14 @@ import { isSupabaseConfigured } from "@/lib/supabase";
 export function LessonPage({ lesson }: { lesson: Lesson }) {
   const isLearnerApp = lesson.mode === "learner";
   const [learnerSrcDoc, setLearnerSrcDoc] = useState<string | null>(null);
+  // The bridge below runs inside a srcDoc iframe, whose document URL is
+  // about:srcdoc — so both its `location.origin` and the `event.origin` of
+  // anything it posts are the string "null", never this page's origin. An
+  // origin equality check therefore drops every message the app sends, which
+  // is what stopped a lesson in progress from reaching Supabase until some
+  // later dashboard visit happened to re-scan local storage. Identify the
+  // sender by its window instead: only this iframe can be that window.
+  const learnerFrameRef = useRef<HTMLIFrameElement>(null);
   const searchParams = useSearchParams();
   // Fullscreen still routes through this page (not the raw static file) so the
   // Supabase cloud-sync bridge below still runs — opening the raw HTML file
@@ -47,7 +55,8 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
     if (!isLearnerApp) return;
 
     async function handleMessage(event: MessageEvent) {
-      if (event.origin !== window.location.origin) return;
+      const frameWindow = learnerFrameRef.current?.contentWindow;
+      if (!frameWindow || event.source !== frameWindow) return;
       const message = event.data as
         | { type: "LEEA_CLOUD_SAVE"; homeworkId?: string; key?: string; value?: unknown }
         | { type: "LEEA_CLOUD_FETCH"; homeworkId?: string; requestId?: string }
@@ -61,9 +70,11 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
 
       if (message.type === "LEEA_CLOUD_FETCH" && message.requestId) {
         const rows = await fetchLearnerProgressRows(message.homeworkId ?? lesson.source.homeworkId);
-        (event.source as Window | null)?.postMessage(
+        // event.origin is "null" for a srcDoc frame, so it cannot be used as a
+        // target; the recipient is pinned to this iframe's window instead.
+        frameWindow.postMessage(
           { type: "LEEA_CLOUD_FETCH_RESULT", requestId: message.requestId, rows },
-          event.origin
+          "*"
         );
       }
     }
@@ -127,6 +138,7 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
 
       {lesson.source.embedPath ? (
         <iframe
+          ref={isLearnerApp ? learnerFrameRef : undefined}
           className={isFullscreen ? "deck-lesson-frame deck-lesson-frame--fullscreen" : "deck-lesson-frame"}
           src={isLearnerApp && learnerSrcDoc ? undefined : lesson.source.embedPath}
           srcDoc={isLearnerApp && learnerSrcDoc ? learnerSrcDoc : undefined}
@@ -143,22 +155,26 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
 }
 
 function injectLearnerCloudBridge(html: string, homeworkId: string | undefined, rows: LearnerProgressStorageRow[]) {
+  const parentOrigin = typeof window === "undefined" ? "/" : window.location.origin;
   const bridge = `
 <script>
 (function(){
   const HOMEWORK_ID = ${JSON.stringify(homeworkId ?? "")};
+  // Baked in because this document is about:srcdoc: its own location.origin is
+  // "null", which matches no real origin and silently drops every postMessage.
+  const PARENT_ORIGIN = ${JSON.stringify(parentOrigin)};
   const INITIAL_ROWS = ${safeScriptJson(rows)};
   const CLOUD_ENABLED = ${JSON.stringify(isSupabaseConfigured)};
 
   function send(type, payload) {
-    try { parent.postMessage(Object.assign({ type }, payload || {}), location.origin); } catch (error) {}
+    try { parent.postMessage(Object.assign({ type }, payload || {}), PARENT_ORIGIN); } catch (error) {}
   }
 
   function requestRows(homeworkId) {
     return new Promise(function(resolve) {
       const requestId = 'lp-' + Date.now() + '-' + Math.random().toString(16).slice(2);
       function handle(event) {
-        if (event.origin !== location.origin) return;
+        if (event.origin !== PARENT_ORIGIN) return;
         const message = event.data || {};
         if (message.type !== 'LEEA_CLOUD_FETCH_RESULT' || message.requestId !== requestId) return;
         window.removeEventListener('message', handle);
@@ -205,7 +221,7 @@ function injectLearnerCloudBridge(html: string, homeworkId: string | undefined, 
 })();
 </script>`;
 
-  const base = `<base href="${typeof window === "undefined" ? "/" : window.location.origin}/">`;
+  const base = `<base href="${parentOrigin}/">`;
   if (/<head[^>]*>/i.test(html)) return html.replace(/<head([^>]*)>/i, `<head$1>${base}${bridge}`);
   return `${base}${bridge}${html}`;
 }

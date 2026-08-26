@@ -58,7 +58,15 @@ export function getLearnerAppProgress(source: Lesson["source"]): LearnerAppProgr
     null
   );
   const homeworkDone = source.homeworkId ? loadLocalValue(`leea-${source.homeworkId}-done`, false) : false;
-  const done = Boolean(loadLocalValue(`${storagePrefix}done`, false) || scoreData?.done || homeworkDone);
+  // A finished quiz used to count as a finished lesson, through scoreData.done.
+  // But that flag is the quiz saying the quiz is over, not the app saying the
+  // work is: Unit 9 Reading has eleven modules and its Student Book quiz is the
+  // sixth, so passing it marked the whole lesson complete with the entire
+  // Workbook half untouched — and auto-ticked the teacher's Reading lesson on
+  // the way past. Completion is now only what the app itself declares (its
+  // all-modules key, or the homework flag) or every module actually being done.
+  const everyModuleDone = moduleCount > 0 && completedModules === moduleCount;
+  const done = Boolean(loadLocalValue(`${storagePrefix}done`, false) || homeworkDone || everyModuleDone);
   const caption = source.captionKey ? loadLocalValue(`${storagePrefix}${source.captionKey}`, "") : "";
 
   // Score is displayed as a percent. Apps may store it as `percent` (canonical)

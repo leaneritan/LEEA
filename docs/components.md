@@ -370,3 +370,30 @@ These reusable patterns came out of iterating the Unit 8 Grammar 1 teacher deck 
 5. **Source pills on every chart slide** — every chart / rule / sample slide includes a `<span class="source-pill">` at the bottom citing both sources: `Student Book p. X / TR Y.Y · Grammar Workbook p. Z`.
 
 When iterating an existing deck (per user feedback "don't add or delete slides"), improve interactivity and pack more content into existing slides — keep the slide count constant.
+
+## Generated components — Our World Level 6
+
+Level 6 does not hand-author its apps. `scripts/ow-l6/build.mjs` emits all nine
+units from `scripts/ow-l6/data/unit-<n>.mjs`, and every app runs on the shared
+`public/components/leea-app-runtime.js`, which implements the save/restore rules
+above once instead of once per app.
+
+The module lists below are what the generator produces. They keep each
+component's storage contract (`moduleKeyFormat`, `moduleKeys`, `scoreKey`,
+`captionKey`) exactly as locked, so the teacher dashboard reads them the same
+way it reads the hand-built Level 4 apps. The rendering differs in one respect,
+recorded here so nobody has to rediscover it: the generated opener, song and
+writing apps present their modules as a tab strip rather than a modal home grid.
+Same modules, same keys, same order — different chrome.
+
+| Component | Modules | Done keys | Score key |
+|---|---|---|---|
+| opener | In This Unit · Theme Reveal · Photo Explorer · Look and Check · Write Your Caption · Theme Sorter · Final Quiz | `m{n}-done` | `score` (m7), caption at `m5-caption` |
+| vocab-1 / vocab-2 | Academic · Warm Up · Present · Flashcards · Sort · Reading · Practice · Unscramble · Match · Apply · Wrap Up · Quiz · Dribble! | `tab-{i}-done` | `score` (tab 11) |
+| song | Listen & Sing · Song Words · Academic Words · Word Review · Use It Again · Write a Line · Quiz | explicit `m1-complete … m6-complete` incl. `ma-complete` | `score` (m6) |
+| grammar-1 / grammar-2 | Word Lab · Warm Up · The Rule · Detective · Build It · Sort · Practice · Survey · Word Web · Guess End · Quiz · Dribble! | `tab-{i}-done` | `score` (tab 10) |
+| reading | Vocab · Read · Strategy · Order · Practice · Quiz | `tab-{i}-done` | `score` (tab 5) |
+| writing | Academic Language · Read the Model · How It Works · Key Expressions · Plan · Write! · Edit · Can Leo Score? | `m{n}-done` | `score` (m8) |
+
+The reading app covers the Student Book passage only — there is no WB mode,
+because the Level 6 workbook answer keys are Git LFS pointers in this checkout.

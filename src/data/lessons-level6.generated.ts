@@ -81,6 +81,38 @@ import l6u5readingTeacher from "../../content/subjects/english/courses/our-world
 import l6u5readingLearner from "../../content/subjects/english/courses/our-world/level-6/unit-5/lessons/reading.learner.json";
 import l6u5writingTeacher from "../../content/subjects/english/courses/our-world/level-6/unit-5/lessons/writing.teacher.json";
 import l6u5writingLearner from "../../content/subjects/english/courses/our-world/level-6/unit-5/lessons/writing.learner.json";
+import l6u6openerTeacher from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/opener.teacher.json";
+import l6u6openerLearner from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/opener.learner.json";
+import l6u6vocab1Teacher from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/vocab1.teacher.json";
+import l6u6vocab1Learner from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/vocab1.learner.json";
+import l6u6songTeacher from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/song.teacher.json";
+import l6u6songLearner from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/song.learner.json";
+import l6u6grammar1Teacher from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/grammar1.teacher.json";
+import l6u6grammar1Learner from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/grammar1.learner.json";
+import l6u6vocab2Teacher from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/vocab2.teacher.json";
+import l6u6vocab2Learner from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/vocab2.learner.json";
+import l6u6grammar2Teacher from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/grammar2.teacher.json";
+import l6u6grammar2Learner from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/grammar2.learner.json";
+import l6u6readingTeacher from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/reading.teacher.json";
+import l6u6readingLearner from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/reading.learner.json";
+import l6u6writingTeacher from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/writing.teacher.json";
+import l6u6writingLearner from "../../content/subjects/english/courses/our-world/level-6/unit-6/lessons/writing.learner.json";
+import l6u7openerTeacher from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/opener.teacher.json";
+import l6u7openerLearner from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/opener.learner.json";
+import l6u7vocab1Teacher from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/vocab1.teacher.json";
+import l6u7vocab1Learner from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/vocab1.learner.json";
+import l6u7songTeacher from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/song.teacher.json";
+import l6u7songLearner from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/song.learner.json";
+import l6u7grammar1Teacher from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/grammar1.teacher.json";
+import l6u7grammar1Learner from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/grammar1.learner.json";
+import l6u7vocab2Teacher from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/vocab2.teacher.json";
+import l6u7vocab2Learner from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/vocab2.learner.json";
+import l6u7grammar2Teacher from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/grammar2.teacher.json";
+import l6u7grammar2Learner from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/grammar2.learner.json";
+import l6u7readingTeacher from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/reading.teacher.json";
+import l6u7readingLearner from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/reading.learner.json";
+import l6u7writingTeacher from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/writing.teacher.json";
+import l6u7writingLearner from "../../content/subjects/english/courses/our-world/level-6/unit-7/lessons/writing.learner.json";
 
 export const level6Lessons: Lesson[] = [
   l6u1openerTeacher as Lesson,
@@ -163,4 +195,36 @@ export const level6Lessons: Lesson[] = [
   l6u5readingLearner as Lesson,
   l6u5writingTeacher as Lesson,
   l6u5writingLearner as Lesson,
+  l6u6openerTeacher as Lesson,
+  l6u6openerLearner as Lesson,
+  l6u6vocab1Teacher as Lesson,
+  l6u6vocab1Learner as Lesson,
+  l6u6songTeacher as Lesson,
+  l6u6songLearner as Lesson,
+  l6u6grammar1Teacher as Lesson,
+  l6u6grammar1Learner as Lesson,
+  l6u6vocab2Teacher as Lesson,
+  l6u6vocab2Learner as Lesson,
+  l6u6grammar2Teacher as Lesson,
+  l6u6grammar2Learner as Lesson,
+  l6u6readingTeacher as Lesson,
+  l6u6readingLearner as Lesson,
+  l6u6writingTeacher as Lesson,
+  l6u6writingLearner as Lesson,
+  l6u7openerTeacher as Lesson,
+  l6u7openerLearner as Lesson,
+  l6u7vocab1Teacher as Lesson,
+  l6u7vocab1Learner as Lesson,
+  l6u7songTeacher as Lesson,
+  l6u7songLearner as Lesson,
+  l6u7grammar1Teacher as Lesson,
+  l6u7grammar1Learner as Lesson,
+  l6u7vocab2Teacher as Lesson,
+  l6u7vocab2Learner as Lesson,
+  l6u7grammar2Teacher as Lesson,
+  l6u7grammar2Learner as Lesson,
+  l6u7readingTeacher as Lesson,
+  l6u7readingLearner as Lesson,
+  l6u7writingTeacher as Lesson,
+  l6u7writingLearner as Lesson,
 ];

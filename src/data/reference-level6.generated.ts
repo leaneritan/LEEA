@@ -10,6 +10,10 @@ import l6u4Vocabulary from "../../content/subjects/english/courses/our-world/lev
 import l6u4Grammar from "../../content/subjects/english/courses/our-world/level-6/unit-4/grammar.json";
 import l6u5Vocabulary from "../../content/subjects/english/courses/our-world/level-6/unit-5/vocabulary.json";
 import l6u5Grammar from "../../content/subjects/english/courses/our-world/level-6/unit-5/grammar.json";
+import l6u6Vocabulary from "../../content/subjects/english/courses/our-world/level-6/unit-6/vocabulary.json";
+import l6u6Grammar from "../../content/subjects/english/courses/our-world/level-6/unit-6/grammar.json";
+import l6u7Vocabulary from "../../content/subjects/english/courses/our-world/level-6/unit-7/vocabulary.json";
+import l6u7Grammar from "../../content/subjects/english/courses/our-world/level-6/unit-7/grammar.json";
 
 /* Every scanned Level 6 unit file, in unit order. reference.ts spreads these so
    Level 6 words and grammar points reach the merged reference layer, the source
@@ -20,6 +24,8 @@ export const level6Vocabularies = [
   l6u3Vocabulary,
   l6u4Vocabulary,
   l6u5Vocabulary,
+  l6u6Vocabulary,
+  l6u7Vocabulary,
 ];
 
 export const level6Grammars = [
@@ -28,6 +34,8 @@ export const level6Grammars = [
   l6u3Grammar,
   l6u4Grammar,
   l6u5Grammar,
+  l6u6Grammar,
+  l6u7Grammar,
 ];
 
 export const level6UnitTitles: Record<string, string> = Object.fromEntries(

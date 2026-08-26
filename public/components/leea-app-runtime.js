@@ -59,9 +59,27 @@
     }
     var pill = document.getElementById("prog-pill");
     if (pill) pill.textContent = done + " / " + APP.tabs.length + " done";
-    if (done >= APP.tabs.length) {
-      lSave(APP.homeworkId + "-done", { complete: true, completedAt: new Date().toISOString() });
-    }
+    setHomeworkDone(done >= APP.tabs.length);
+  }
+
+  /* getLearnerAppProgress reads two completion flags: `<storagePrefix>done` and
+     the unprefixed `leea-<homeworkId>-done`. Several Level 4 apps write the
+     homework flag through lSave, which silently prefixes it — so the key they
+     produce ("leea-4-9-vocab-2-leo-4-9-vocab-2-done") is not the key the reader
+     looks for, and that flag never fires. Write both, at the keys they are
+     actually read from, and clear them again if a Redo drops the app back below
+     complete. */
+  function setHomeworkDone(complete) {
+    const flag = "leea-" + APP.homeworkId + "-done";
+    try {
+      if (complete) {
+        lSave("done", true);
+        localStorage.setItem(flag, JSON.stringify({ complete: true, completedAt: new Date().toISOString() }));
+      } else {
+        lDel("done");
+        localStorage.removeItem(flag);
+      }
+    } catch (e) { /* private mode */ }
   }
 
   /* Rule 1: the activity calls this the moment its own criteria are met, so the

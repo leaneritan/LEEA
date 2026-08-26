@@ -43,11 +43,20 @@ const STATUS_EVENT = "leea-cloud-sync-status";
 // English reported success last. One failing source must not be maskable.
 const outcomes = new Map<CloudSyncSource, CloudSyncFailure | null>();
 
+// Which sources have answered successfully at least once in this session.
+// A failure alone cannot tell you whether the numbers on screen are real: a
+// source that loaded and then failed to save still has Leo's data behind it,
+// while one that has never answered has nothing — and every count derived from
+// it renders 0, which reads exactly like a finished-nothing account. Those two
+// have to be tellable apart before a page can decide whether to show a number.
+const loaded = new Set<CloudSyncSource>();
+
 function notify() {
   if (typeof window !== "undefined") window.dispatchEvent(new Event(STATUS_EVENT));
 }
 
 export function reportCloudSyncSuccess(source: CloudSyncSource) {
+  loaded.add(source);
   if (outcomes.get(source) === null) return;
   outcomes.set(source, null);
   notify();
@@ -79,6 +88,22 @@ export function getCloudSyncFailures(): CloudSyncFailure[] {
     if (failure) failures.push(failure);
   }
   return failures;
+}
+
+/**
+ * True when a source is failing and has never loaded, so anything derived from
+ * it is unknown rather than zero. Surfaces should show a dash, not a number.
+ */
+export function isCloudSourceUnknown(source: CloudSyncSource): boolean {
+  if (!isSupabaseConfigured) return false;
+  return Boolean(outcomes.get(source)) && !loaded.has(source);
+}
+
+/** Every source currently unknown, for a page that wants to say so once. */
+export function getUnknownCloudSources(): CloudSyncSource[] {
+  return getCloudSyncFailures()
+    .map((failure) => failure.source)
+    .filter((source) => !loaded.has(source));
 }
 
 export function subscribeToCloudSyncStatus(callback: () => void) {

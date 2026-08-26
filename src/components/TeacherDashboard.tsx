@@ -36,6 +36,8 @@ import {
   type CurrentUnit
 } from "@/data/currentUnit";
 import type { Lesson } from "@/data/types";
+import { CloudSyncNotice } from "./CloudSyncNotice";
+import { useCloudSync } from "./useCloudSync";
 import { getComponentMeta } from "./componentMeta";
 
 const SPINE_LESSONS = ["Opener", "Vocabulary 1", "Song", "Grammar 1", "Vocabulary 2", "Grammar 2", "Reading", "Writing"];
@@ -131,6 +133,7 @@ export function TeacherDashboard() {
   const [assignmentsReady, setAssignmentsReady] = useState(false);
   const [progressVersion, setProgressVersion] = useState(0);
   const [completionTimestamps, setCompletionTimestamps] = useState<Record<string, string>>({});
+  const { isUnknown } = useCloudSync();
   const [currentUnit, setCurrentUnit] = useState<CurrentUnit>(fallbackCurrentUnit);
   const [selectedLevel, setSelectedLevel] = useState(fallbackCurrentUnit.level);
   const [selectedUnit, setSelectedUnit] = useState(fallbackCurrentUnit.unit);
@@ -254,6 +257,10 @@ export function TeacherDashboard() {
         avgLabel: "—"
       };
   const rosterPercent = rosterStats.lessons ? Math.round((rosterStats.taught / rosterStats.lessons) * 100) : 0;
+  // 0 taught reads as "nothing has been taught"; on a checklist that never
+  // loaded it means "we do not know". Only claimed for the real roster —
+  // levels off the live one are derived from the cursor, not from Supabase.
+  const taughtUnknown = Boolean(selectedTeacherLessons.length) && isUnknown("teacher-lessons");
 
   function setLessonDone(lessonId: string, done: boolean) {
     setProgress((current) => {
@@ -279,6 +286,8 @@ export function TeacherDashboard() {
 
   return (
     <section className="teacher-page teacher-design-page">
+      <CloudSyncNotice />
+
       <header className="teacher-hero teacher-design-hero">
         <span className="eyebrow">Neritan · Teaching mode <b>Parent view</b></span>
         <h1>Teacher menu</h1>
@@ -383,8 +392,8 @@ export function TeacherDashboard() {
 
       <section className="teacher-stats teacher-design-stats" aria-label="Teaching stats">
         <div><span>Lessons in unit</span><strong>{rosterStats.lessons}</strong></div>
-        <div><span>Taught</span><strong>{rosterStats.taught}</strong></div>
-        <div><span>To teach</span><strong>{rosterStats.lessons - rosterStats.taught}</strong></div>
+        <div><span>Taught</span><strong className={taughtUnknown ? "stat-unknown" : undefined}>{taughtUnknown ? "—" : rosterStats.taught}</strong></div>
+        <div><span>To teach</span><strong className={taughtUnknown ? "stat-unknown" : undefined}>{taughtUnknown ? "—" : rosterStats.lessons - rosterStats.taught}</strong></div>
         <div className="dark"><span>Leo&apos;s avg quiz</span><strong>{rosterStats.avgLabel}</strong></div>
       </section>
 

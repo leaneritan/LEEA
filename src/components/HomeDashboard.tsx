@@ -13,6 +13,8 @@ import { getComponentMeta } from "./componentMeta";
 import { useCurrentUnit } from "./useCurrentUnit";
 import { useKnownWordIds } from "./useKnownWordIds";
 import { AcrossSubjects } from "./AcrossSubjects";
+import { CloudSyncNotice } from "./CloudSyncNotice";
+import { useCloudSync } from "./useCloudSync";
 
 export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?: Record<string, number> }) {
   const [progress, setProgress] = useState<LessonProgressMap>({});
@@ -23,6 +25,7 @@ export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?
   const grammarPoints = allGrammar.length;
   const { knownWordSet } = useKnownWordIds();
   const currentUnit = useCurrentUnit();
+  const { isUnknown } = useCloudSync();
   const knownCount = knownWordSet.size;
   const reviewCount = Math.max(0, totalWords - knownCount);
   const totalLessonsDone = getDoneLessonCount(teacherLessons.map((lesson) => lesson.id), progress);
@@ -54,11 +57,13 @@ export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?
 
   return (
     <div className="design-home">
+      <CloudSyncNotice />
+
       <section className="design-home-hero">
         <div className="design-home-copy">
           <span>{new Intl.DateTimeFormat("en", { weekday: "long", month: "long", day: "numeric" }).format(new Date())}</span>
           <h1>Hey Leo —<br />ready to grow<br />today?</h1>
-          <p>You&apos;re {openAssignmentCount} {openAssignmentCount === 1 ? "assignment" : "assignments"} from a clean week. Pick up where you left off in Our World, Unit 8.</p>
+          <p>You&apos;re {openAssignmentCount} {openAssignmentCount === 1 ? "assignment" : "assignments"} from a clean week. Pick up where you left off in Our World, Unit {currentUnit.unit}.</p>
           <div className="design-home-pills"><b>{knownCount} words known</b><b>{reviewCount} to review</b></div>
         </div>
         <NextCard nextItem={nextItem} progress={progress} />
@@ -72,9 +77,9 @@ export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?
       </section>
 
       <section className="design-home-stats" aria-label="Academy statistics">
-        <SnapshotItem label="Lessons done" value={String(totalLessonsDone)} detail="teacher lessons" />
-        <SnapshotItem label="Words known" value={String(knownCount)} detail="reference memory" />
-        <SnapshotItem label="To review" value={String(reviewCount)} detail="words still learning" />
+        <SnapshotItem label="Lessons done" unknown={isUnknown("teacher-lessons")} value={String(totalLessonsDone)} detail="teacher lessons" />
+        <SnapshotItem label="Words known" unknown={isUnknown("reference")} value={String(knownCount)} detail="reference memory" />
+        <SnapshotItem label="To review" unknown={isUnknown("reference")} value={String(reviewCount)} detail="words still learning" />
         <SnapshotItem label="Grammar points" value={String(grammarPoints)} detail="reference cards" />
       </section>
 
@@ -190,12 +195,20 @@ function NextCard({ nextItem, progress }: { nextItem: { label: string; status: s
   );
 }
 
-function SnapshotItem({ label, value, detail }: { label: string; value: string; detail: string }) {
+// A figure whose source never loaded is unknown, not zero — see CloudSyncNotice.
+function SnapshotItem({
+  label,
+  value,
+  detail,
+  unknown
+}: { label: string; value: string; detail: string; unknown?: boolean }) {
   return (
     <div className="snapshot-item">
       <span>{label}</span>
-      <strong>{value}</strong>
-      <small>{detail}</small>
+      <strong className={unknown ? "stat-unknown" : undefined} title={unknown ? "Couldn't load — not zero" : undefined}>
+        {unknown ? "—" : value}
+      </strong>
+      <small>{unknown ? "couldn't load" : detail}</small>
     </div>
   );
 }

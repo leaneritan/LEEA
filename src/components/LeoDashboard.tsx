@@ -6,10 +6,12 @@ import { readAssignments, readAssignmentsFromCloud, type AssignmentMap, type Ass
 import { getLearnerAppProgress, syncLearnerProgressWithCloud, type LearnerAppProgress } from "@/data/learnerProgress";
 import { getCourseLabel, getLessonGroups, learnerLessons } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
+import { CloudSyncNotice } from "./CloudSyncNotice";
 import { getComponentMeta } from "./componentMeta";
 import { LeoHomeworkHero } from "./LeoHomeworkHero";
 import { LeoLibraryNavigator } from "./LeoLibraryNavigator";
 import { allWords } from "./reference/ref-data";
+import { useCloudSync } from "./useCloudSync";
 import { useCurrentUnit } from "./useCurrentUnit";
 import { useKnownWordIds } from "./useKnownWordIds";
 
@@ -22,6 +24,7 @@ export function LeoDashboard() {
   const groups = useMemo(() => getLessonGroups(learnerLessons), []);
   const { knownWordSet } = useKnownWordIds();
   const currentUnit = useCurrentUnit();
+  const { isUnknown } = useCloudSync();
 
   useEffect(() => {
     const refresh = () => {
@@ -89,6 +92,8 @@ export function LeoDashboard() {
 
   return (
     <section className="leo-page">
+      <CloudSyncNotice />
+
       <LeoHomeworkHero items={heroItems} suggested={suggestedItem} />
 
       <section className="leo-today-section">
@@ -150,9 +155,9 @@ export function LeoDashboard() {
           </Link>
         </div>
         <div className="leo-mini-stats">
-          <div><span>📚</span><strong>{knownWordSet.size}</strong><small>words known</small></div>
-          <div><span>🔁</span><strong>{Math.max(0, allWords.length - knownWordSet.size)}</strong><small>to review</small></div>
-          <div><span>🏅</span><strong>{totalDone}</strong><small>lessons done</small></div>
+          <MiniStat emoji="📚" label="words known" unknown={isUnknown("reference")} value={knownWordSet.size} />
+          <MiniStat emoji="🔁" label="to review" unknown={isUnknown("reference")} value={Math.max(0, allWords.length - knownWordSet.size)} />
+          <MiniStat emoji="🏅" label="lessons done" unknown={isUnknown("learner-progress")} value={totalDone} />
         </div>
       </section>
 
@@ -164,6 +169,22 @@ export function LeoDashboard() {
         <LeoLibraryNavigator appProgress={appProgress} assignments={assignments} groups={groups} />
       </section>
     </section>
+  );
+}
+
+// Leo should never be told he knows 0 words because a table did not answer.
+function MiniStat({
+  emoji,
+  label,
+  value,
+  unknown
+}: { emoji: string; label: string; value: number; unknown?: boolean }) {
+  return (
+    <div>
+      <span>{emoji}</span>
+      <strong className={unknown ? "stat-unknown" : undefined}>{unknown ? "—" : value}</strong>
+      <small>{unknown ? "couldn't load" : label}</small>
+    </div>
   );
 }
 

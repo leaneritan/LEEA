@@ -35,6 +35,32 @@ function tabsFor(component, data, academicCards) {
   }
 }
 
+
+/* Guard against the answer-key bug this generator shipped once already: the
+   authored data lists the right answer first, tabs.mjs permutes it, and if that
+   permutation is ever broken or removed every quiz in the level becomes
+   solvable by tapping the top option. Checking the emitted data is cheap;
+   trusting the shuffle is not. */
+function assertAnswersAreSpread(tabs, id) {
+  const spread = new Map();
+  for (const tab of tabs) {
+    const data = tab.data || {};
+    const items = data.items || data.checks || data.paras || [];
+    for (const item of items) {
+      if (!item || typeof item.correct !== "number" || !Array.isArray(item.opts)) continue;
+      spread.set(item.correct, (spread.get(item.correct) ?? 0) + 1);
+    }
+  }
+  const total = [...spread.values()].reduce((sum, n) => sum + n, 0);
+  if (total >= 12 && spread.size < 2) {
+    throw new Error(`${id}: all ${total} multiple-choice answers share index ${[...spread.keys()][0]} — the option shuffle in tabs.mjs is not running`);
+  }
+  const biggest = Math.max(0, ...spread.values());
+  if (total >= 20 && biggest / total > 0.8) {
+    throw new Error(`${id}: ${Math.round((biggest / total) * 100)}% of multiple-choice answers sit at one index — the option shuffle is biased`);
+  }
+}
+
 function lessonId(unit, component) {
   return `ow-l${LEVEL}-u${unit}-${component}`;
 }
@@ -354,6 +380,7 @@ export function buildAllApps(units) {
       const prefix = `leea-${LEVEL}-${data.unit}-${spec.component}-`;
       const homeworkId = `leo-${LEVEL}-${data.unit}-${spec.component}`;
       const scoreTab = tabs.findIndex((tab) => tab.type === "quiz");
+      assertAnswersAreSpread(tabs, id);
 
       writeText(`public/learn/${id}.html`, renderApp({ id, unit: data.unit, data, spec, tabs, prefix, homeworkId, scoreTab }));
       learner++;

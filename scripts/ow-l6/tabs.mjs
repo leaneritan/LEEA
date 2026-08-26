@@ -3,12 +3,28 @@
    public/components/leea-app-runtime.js so all nine units behave identically. */
 import { normalize } from "./lib.mjs";
 
+/* A seeded shuffle, so a rebuild produces byte-identical files. The obvious
+   implementation — a plain linear congruential generator, taking `value % n`
+   — is not good enough here: the low bits of an LCG modulo a power of two
+   cycle, so `% 2` and `% 3` come out patterned and the "shuffled" answer lands
+   in the same slot every time. (The first version of this file did exactly
+   that, and shipped 1,933 quiz questions whose right answer was never option
+   A.) Mixing the state with splitmix32 and consuming the high bits removes the
+   pattern; the assertion in build-apps.mjs checks the result rather than
+   trusting it. */
+function mix32(value) {
+  let x = (value + 0x9e3779b9) | 0;
+  x = Math.imul(x ^ (x >>> 16), 0x21f0aaad);
+  x = Math.imul(x ^ (x >>> 15), 0x735a2d97);
+  return (x ^ (x >>> 15)) >>> 0;
+}
+
 function shuffleSeeded(list, seed) {
-  var copy = list.slice();
-  var value = seed;
+  const copy = list.slice();
+  let state = mix32(seed >>> 0);
   for (let i = copy.length - 1; i > 0; i--) {
-    value = (value * 1103515245 + 12345) % 2147483648;
-    const j = value % (i + 1);
+    state = mix32(state);
+    const j = Math.floor((state / 4294967296) * (i + 1));
     const swap = copy[i];
     copy[i] = copy[j];
     copy[j] = swap;
@@ -25,6 +41,52 @@ function distractors(words, correctIndex, count = 2) {
 function optionSet(correct, wrong, seed) {
   const options = shuffleSeeded([correct, ...wrong], seed);
   return { opts: options, correct: options.indexOf(correct) };
+}
+
+
+/* Authored quiz data lists the right answer first, because that is the readable
+   way to write it. Shipping it that way would make every Level 6 quiz solvable
+   by always tapping the top option, so the option order is permuted here —
+   deterministically, so a rebuild produces the same file. */
+function hashText(text) {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function varyItem(item, seed) {
+  if (!Array.isArray(item.opts) || item.opts.length < 2 || typeof item.correct !== "number") return item;
+  /* Seed from the question's own text, not just its position. Position alone
+     reuses the same handful of seeds in every unit, which put all four Strategy
+     questions on the same answer index in all nine reading apps. */
+  const order = shuffleSeeded(item.opts.map((_, i) => i), hashText(String(item.q)) + seed);
+  return {
+    ...item,
+    opts: order.map((i) => item.opts[i]),
+    correct: order.indexOf(item.correct)
+  };
+}
+
+/** Permute a whole list of MCQ items. `salt` keeps two tabs built over the same
+    source questions from landing on the same answer key. */
+function varied(items, salt = 0) {
+  return (items || []).map((item, i) => varyItem(item, i + salt * 97 + 1));
+}
+
+/** A grammar point's quiz/master entries, converted to app MCQ items. */
+function fromGrammarItems(items, salt) {
+  return varied(
+    items.map((item) => ({
+      q: item.stem.join(" ______ ").trim(),
+      opts: item.answers,
+      correct: item.correct,
+      jp: item.jp
+    })),
+    salt
+  );
 }
 
 function flashcardWords(words) {
@@ -142,13 +204,13 @@ export function openerTabs(data) {
     { key: "m2-done", icon: "🌍", name: "Theme Reveal", type: "reveal",
       sub: opener.intro,
       hint: "Tap each card to open it, then answer the checks.",
-      data: { cards: opener.photoCards.slice(0, half), checks: opener.lookAndCheck.slice(0, 2) } },
+      data: { cards: opener.photoCards.slice(0, half), checks: varied(opener.lookAndCheck.slice(0, 2), 1) } },
     { key: "m3-done", icon: "📷", name: "Photo Explorer", type: "reveal",
       hint: "Open the rest of the photos and check what you found.",
-      data: { cards: opener.photoCards.slice(half), checks: opener.lookAndCheck.slice(2) } },
+      data: { cards: opener.photoCards.slice(half), checks: varied(opener.lookAndCheck.slice(2), 2) } },
     { key: "m4-done", icon: "🔎", name: "Look and Check", type: "mcq",
       hint: "Four quick questions about the unit opener.",
-      data: { items: opener.quiz.slice(0, 4), label: "checks answered" } },
+      data: { items: varied(opener.quiz.slice(0, 4), 3), label: "checks answered" } },
     { key: "m5-done", icon: "✍️", name: "Write Your Caption", type: "write",
       hint: `Write your own caption for the ${data.title} photo. Two sentences is enough.`,
       data: { minWords: 20, minSentences: 2, captionKey: "m5-caption",
@@ -159,7 +221,7 @@ export function openerTabs(data) {
       data: opener.sort },
     { key: "m7-done", icon: "🏁", name: "Final Quiz", type: "quiz",
       hint: "Eight questions. Six or more to pass.",
-      data: { items: opener.quiz, pass: Math.ceil(opener.quiz.length * 0.75) } }
+      data: { items: varied(opener.quiz, 4), pass: Math.ceil(opener.quiz.length * 0.75) } }
   ];
 }
 
@@ -247,7 +309,7 @@ export function songTabs(data, academicCards) {
         checklist: ["I used at least two words from this unit.", "My lines fit the song's topic."] } },
     { key: "m6-complete", icon: "🏁", name: "Quiz", type: "quiz",
       hint: "Six questions about the song.",
-      data: { items: song.quiz, pass: Math.ceil(song.quiz.length * 0.75) } }
+      data: { items: varied(song.quiz, 5), pass: Math.ceil(song.quiz.length * 0.75) } }
   ];
 }
 
@@ -282,17 +344,17 @@ export function grammarTabs(data, which, academicCards) {
     { key: "tab-1-done", icon: "🔥", name: "Warm Up", type: "mcq",
       sub: `TR ${point.tr} — ${point.title}`,
       hint: "Eight quick questions on the pattern.",
-      data: { items: point.quiz.slice(0, 8).map((item) => ({ q: item.stem.join(" ______ ").trim(), opts: item.answers, correct: item.correct, jp: item.jp })), label: "warmed up" } },
+      data: { items: fromGrammarItems(point.quiz.slice(0, 8), 1), label: "warmed up" } },
     { key: "tab-2-done", icon: "📐", name: "The Rule", type: "reveal",
       sub: point.pattern,
       hint: "Open every row of the grammar box, then answer the checks.",
       data: {
         cards: point.rows.map((row) => ({ emoji: "📐", title: row.form, text: `${row.pattern}  —  ${row.example}`, jp: row.jp })),
-        checks: point.quiz.slice(0, 3).map((item) => ({ q: item.stem.join(" ______ ").trim(), opts: item.answers, correct: item.correct, jp: item.jp }))
+        checks: fromGrammarItems(point.quiz.slice(0, 3), 2)
       } },
     { key: "tab-3-done", icon: "🕵️", name: "Detective", type: "mcq",
       hint: "Find the sentence that is written correctly.",
-      data: { items: (detectiveItems.length ? detectiveItems : point.master.slice(0, 6)).map((item) => ({ q: item.stem.join(" ______ ").trim(), opts: item.answers, correct: item.correct, jp: item.jp })), label: "solved" } },
+      data: { items: fromGrammarItems(detectiveItems.length ? detectiveItems : point.master.slice(0, 6), 3), label: "solved" } },
     { key: "tab-4-done", icon: "🔧", name: "Build It", type: "build",
       hint: "Tap the chips in order to rebuild each sentence.",
       data: { items: buildItems } },
@@ -301,7 +363,7 @@ export function grammarTabs(data, which, academicCards) {
       data: { title: "Correct or broken?", zones: [{ id: "right", label: "✅ Correct" }, { id: "wrong", label: "❌ Broken" }], tiles: sortTiles } },
     { key: "tab-6-done", icon: "✏️", name: "Practice", type: "mcq",
       hint: "The Student Book practice items.",
-      data: { items: point.quiz.map((item) => ({ q: item.stem.join(" ______ ").trim(), opts: item.answers, correct: item.correct, jp: item.jp })), label: "practised" } },
+      data: { items: fromGrammarItems(point.quiz, 4), label: "practised" } },
     { key: "tab-7-done", icon: "📋", name: "Survey", type: "survey",
       hint: "Finish each sentence about yourself.",
       data: { stems: point.levelup.rules.flatMap((rule) => rule.transforms.map(([from]) => ({ t: `Use the pattern: <b>${from}</b>`, jp: rule.jpTitle, placeholder: "Write the full sentence" }))) } },
@@ -310,13 +372,13 @@ export function grammarTabs(data, which, academicCards) {
       data: { words: point.levelup.rules.map((rule) => ({ word: rule.title, emoji: "🕸️", jp: rule.jpTitle })) } },
     { key: "tab-9-done", icon: "🎯", name: "Guess End", type: "mcq",
       hint: "How does each sentence end?",
-      data: { items: guessItems, label: "guessed" } },
+      data: { items: varied(guessItems, 6), label: "guessed" } },
     { key: "tab-10-done", icon: "📝", name: "Quiz", type: "quiz",
       hint: "Ten questions. Eight or more to pass.",
-      data: { items: point.master.map((item) => ({ q: item.stem.join(" ______ ").trim(), opts: item.answers, correct: item.correct, jp: item.jp })), pass: 8 } },
+      data: { items: fromGrammarItems(point.master, 5), pass: 8 } },
     { key: "tab-11-done", icon: "⚽", name: "Dribble!", type: "dribble",
       hint: "Every right answer beats a defender.",
-      data: { items: point.quiz.slice(0, 8).map((item, i) => ({ q: `${SOCCER_FRAMES[i % SOCCER_FRAMES.length]}${item.stem.join(" ______ ").trim()}`, opts: item.answers, correct: item.correct, jp: item.jp })) } }
+      data: { items: fromGrammarItems(point.quiz.slice(0, 8), 7).map((item, i) => ({ ...item, q: `${SOCCER_FRAMES[i % SOCCER_FRAMES.length]}${item.q}` })) } }
   ];
 }
 
@@ -331,11 +393,11 @@ export function readingTabs(data, academicCards, contentCards) {
     { key: "tab-1-done", icon: "📖", name: "Read", type: "read",
       sub: reading.title,
       hint: "Answer the question under each paragraph to unlock the next one.",
-      data: { intro: reading.intro, paras: reading.paras } },
+      data: { intro: reading.intro, paras: varied(reading.paras.map((para) => ({ ...para, q: para.q, opts: para.opts, correct: para.correct })), 10) } },
     { key: "tab-2-done", icon: "🧭", name: "Strategy", type: "mcq",
       sub: reading.strategy.title,
       hint: reading.strategy.body,
-      data: { items: reading.quiz.slice(0, 4), label: "strategy checks" } },
+      data: { items: varied(reading.quiz.slice(0, 4), 8), label: "strategy checks" } },
     { key: "tab-3-done", icon: "🔢", name: "Order", type: "order",
       sub: reading.order.title,
       hint: "Tap the events in the order they happened.",
@@ -349,7 +411,7 @@ export function readingTabs(data, academicCards, contentCards) {
       })), label: "checked" } },
     { key: "tab-5-done", icon: "📝", name: "Quiz", type: "quiz",
       hint: "Eight questions on the passage.",
-      data: { items: reading.quiz, pass: Math.ceil(reading.quiz.length * 0.75) } }
+      data: { items: varied(reading.quiz, 9), pass: Math.ceil(reading.quiz.length * 0.75) } }
   ];
 }
 
@@ -386,6 +448,6 @@ export function writingTabs(data, academicCards) {
       data: { items: writing.checklist } },
     { key: "m8-done", icon: "⚽", name: "Can Leo Score?", type: "quiz",
       hint: "Eight questions. Six or more to pass.",
-      data: { items: writing.quiz, pass: Math.ceil(writing.quiz.length * 0.75) } }
+      data: { items: varied(writing.quiz, 11), pass: Math.ceil(writing.quiz.length * 0.75) } }
   ];
 }

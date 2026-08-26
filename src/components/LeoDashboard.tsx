@@ -6,10 +6,13 @@ import { readAssignments, readAssignmentsFromCloud, type AssignmentMap, type Ass
 import { getLearnerAppProgress, syncLearnerProgressWithCloud, type LearnerAppProgress } from "@/data/learnerProgress";
 import { getCourseLabel, getLessonGroups, learnerLessons } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
+import { CloudSyncNotice } from "./CloudSyncNotice";
 import { getComponentMeta } from "./componentMeta";
 import { LeoHomeworkHero } from "./LeoHomeworkHero";
 import { LeoLibraryNavigator } from "./LeoLibraryNavigator";
 import { allWords } from "./reference/ref-data";
+import { useCloudSync } from "./useCloudSync";
+import { useCurrentUnit } from "./useCurrentUnit";
 import { useKnownWordIds } from "./useKnownWordIds";
 
 const trainingGroundLearnerLessons = learnerLessons.filter((lesson) => lesson.course === "special-training");
@@ -20,6 +23,8 @@ export function LeoDashboard() {
   const assignedLessons = useMemo(() => learnerLessons.filter((lesson) => assignments[lesson.id]), [assignments]);
   const groups = useMemo(() => getLessonGroups(learnerLessons), []);
   const { knownWordSet } = useKnownWordIds();
+  const currentUnit = useCurrentUnit();
+  const { isUnknown } = useCloudSync();
 
   useEffect(() => {
     const refresh = () => {
@@ -63,11 +68,32 @@ export function LeoDashboard() {
     if (!suggestedNextLesson) return undefined;
     return { lesson: suggestedNextLesson, progress: appProgress[suggestedNextLesson.id] ?? getLearnerAppProgress(suggestedNextLesson.source) };
   }, [suggestedNextLesson, appProgress]);
-  const focusItem = todaysHomework[0] ?? suggestedItem;
+  // Leo's hero counts every open assignment ("Dad set you 3 things today") and
+  // the section says "finish them all", but only todaysHomework[0] was ever
+  // rendered — the rest were reachable only by scrolling the whole library.
+  const homeworkRows = todaysHomework.length ? todaysHomework : suggestedItem ? [suggestedItem] : [];
   const totalDone = useMemo(() => Object.values(appProgress).filter((progress) => progress.done).length, [appProgress]);
+
+  // The Our World card used to link to unit-8, label itself "L4 · U8" and draw
+  // its bar at a literal 62% — three claims that were true when they were
+  // typed and never again. All three now come from the unit Neritan is
+  // actually teaching and from Leo's real progress in it.
+  const currentUnitCard = useMemo(() => {
+    const unitLessons = learnerLessons.filter(
+      (lesson) => lesson.course === "our-world" && lesson.level === currentUnit.level && lesson.unit === currentUnit.unit
+    );
+    const done = unitLessons.filter((lesson) => appProgress[lesson.id]?.done).length;
+    return {
+      href: `/english/our-world/level-${currentUnit.level}/unit-${currentUnit.unit}`,
+      label: `L${currentUnit.level} · U${currentUnit.unit}`,
+      percent: unitLessons.length ? Math.round((done / unitLessons.length) * 100) : 0
+    };
+  }, [appProgress, currentUnit]);
 
   return (
     <section className="leo-page">
+      <CloudSyncNotice />
+
       <LeoHomeworkHero items={heroItems} suggested={suggestedItem} />
 
       <section className="leo-today-section">
@@ -76,14 +102,16 @@ export function LeoDashboard() {
           <span>From Dad · finish them all for a 🔥 streak</span>
         </header>
         <div className="leo-today-list">
-          {focusItem ? (
-            <LeoHomeworkRow
-              assignment={assignments[focusItem.lesson.id]}
-              key={focusItem.lesson.id}
-              lesson={focusItem.lesson}
-              progress={focusItem.progress}
-              suggested={!todaysHomework.length}
-            />
+          {homeworkRows.length ? (
+            homeworkRows.map((item) => (
+              <LeoHomeworkRow
+                assignment={assignments[item.lesson.id]}
+                key={item.lesson.id}
+                lesson={item.lesson}
+                progress={item.progress}
+                suggested={!todaysHomework.length}
+              />
+            ))
           ) : (
             <article className="leo-note-card">
               <span className="leo-note-avatar">L</span>
@@ -110,10 +138,10 @@ export function LeoDashboard() {
           <span>Free play — anytime you like</span>
         </header>
         <div className="leo-world-grid">
-          <Link className="leo-world-card leo-world-card-ow" href="/english/our-world/level-4/unit-8">
+          <Link className="leo-world-card leo-world-card-ow" href={currentUnitCard.href}>
             <div><b>Our<br />World</b></div>
             <h3>Our World</h3>
-            <footer><i><span style={{ width: "62%" }} /></i><small>L4 · U8</small></footer>
+            <footer><i><span style={{ width: `${currentUnitCard.percent}%` }} /></i><small>{currentUnitCard.label}</small></footer>
           </Link>
           <Link className="leo-world-card leo-world-card-jw" href="/english">
             <div><img alt="" src="/brand/joyful_work_logo.png" /></div>
@@ -127,9 +155,9 @@ export function LeoDashboard() {
           </Link>
         </div>
         <div className="leo-mini-stats">
-          <div><span>📚</span><strong>{knownWordSet.size}</strong><small>words known</small></div>
-          <div><span>🔁</span><strong>{Math.max(0, allWords.length - knownWordSet.size)}</strong><small>to review</small></div>
-          <div><span>🏅</span><strong>{totalDone}</strong><small>lessons done</small></div>
+          <MiniStat emoji="📚" label="words known" unknown={isUnknown("reference")} value={knownWordSet.size} />
+          <MiniStat emoji="🔁" label="to review" unknown={isUnknown("reference")} value={Math.max(0, allWords.length - knownWordSet.size)} />
+          <MiniStat emoji="🏅" label="lessons done" unknown={isUnknown("learner-progress")} value={totalDone} />
         </div>
       </section>
 
@@ -141,6 +169,22 @@ export function LeoDashboard() {
         <LeoLibraryNavigator appProgress={appProgress} assignments={assignments} groups={groups} />
       </section>
     </section>
+  );
+}
+
+// Leo should never be told he knows 0 words because a table did not answer.
+function MiniStat({
+  emoji,
+  label,
+  value,
+  unknown
+}: { emoji: string; label: string; value: number; unknown?: boolean }) {
+  return (
+    <div>
+      <span>{emoji}</span>
+      <strong className={unknown ? "stat-unknown" : undefined}>{unknown ? "—" : value}</strong>
+      <small>{unknown ? "couldn't load" : label}</small>
+    </div>
   );
 }
 

@@ -148,6 +148,7 @@ grant select on public.students to anon;
 grant select, insert, update, delete on public.assignments to anon;
 grant select, insert, update, delete on public.learner_progress to anon;
 grant select, insert, update, delete on public.teacher_lesson_progress to anon;
+grant select, insert, update, delete on public.teacher_settings to anon;
 grant select, insert, update, delete on public.reference_confidence to anon;
 grant select, insert, update, delete on public.math_block_progress to anon;
 grant select, insert, update, delete on public.geography_map_progress to anon;
@@ -183,6 +184,11 @@ create trigger set_teacher_lesson_progress_updated_at
 before update on public.teacher_lesson_progress
 for each row execute function public.set_updated_at();
 
+drop trigger if exists set_teacher_settings_updated_at on public.teacher_settings;
+create trigger set_teacher_settings_updated_at
+before update on public.teacher_settings
+for each row execute function public.set_updated_at();
+
 drop trigger if exists set_reference_confidence_updated_at on public.reference_confidence;
 create trigger set_reference_confidence_updated_at
 before update on public.reference_confidence
@@ -205,6 +211,7 @@ alter table public.students enable row level security;
 alter table public.assignments enable row level security;
 alter table public.learner_progress enable row level security;
 alter table public.teacher_lesson_progress enable row level security;
+alter table public.teacher_settings enable row level security;
 alter table public.reference_confidence enable row level security;
 alter table public.math_block_progress enable row level security;
 alter table public.geography_map_progress enable row level security;
@@ -246,6 +253,17 @@ create policy "family can write teacher lesson progress"
 on public.teacher_lesson_progress for all
 using (student_id = 'leo' and teacher_id = 'neritan')
 with check (student_id = 'leo' and teacher_id = 'neritan');
+
+drop policy if exists "family can read teacher settings" on public.teacher_settings;
+create policy "family can read teacher settings"
+on public.teacher_settings for select
+using (teacher_id = 'neritan');
+
+drop policy if exists "family can write teacher settings" on public.teacher_settings;
+create policy "family can write teacher settings"
+on public.teacher_settings for all
+using (teacher_id = 'neritan')
+with check (teacher_id = 'neritan');
 
 drop policy if exists "family can read reference confidence" on public.reference_confidence;
 create policy "family can read reference confidence"

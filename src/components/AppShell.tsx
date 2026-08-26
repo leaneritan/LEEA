@@ -265,7 +265,10 @@ function getCrumbHref(crumb: string, pathname: string) {
   if (crumb === "English") return "/english";
   if (crumb === "Geography") return "/geography";
   if (crumb === "Our World") return "/english/our-world";
-  if (crumb === "Unit 8") return "/english/our-world/level-4/unit-8";
+  // Was a single hardcoded "Unit 8" case, so the Unit 7 and Unit 9 pages —
+  // which pass the same shape of crumb — fell through to a self-link.
+  const unitCrumb = /^Unit (\d+)$/.exec(crumb);
+  if (unitCrumb) return `/english/our-world/level-4/unit-${unitCrumb[1]}`;
   if (crumb === "Reference") return "/reference";
   if (crumb === "Search") return "/reference/search";
   return pathname;

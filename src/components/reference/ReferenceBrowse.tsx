@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { ChevronDown, ChevronRight, Dumbbell, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useJapanesePreference } from "@/components/AppShell";
+import { useCurrentUnit } from "@/components/useCurrentUnit";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
-import { currentFocus } from "@/data/registry";
 import { LEVEL_COLORS, LEVEL_TINTS, OUR_WORLD_LEVELS, OUR_WORLD_TOTAL_UNITS, OUR_WORLD_UNIT_TOTALS } from "@/data/reference-units";
 import type { GrammarEntry, WordEntry } from "@/data/reference-shapes";
 import { allGrammar, allWords, groupByCourse, groupByLevel, sourceTree, type TreeLevel, type TreeUnit } from "./ref-data";
@@ -92,8 +92,19 @@ function courseMeta(key: ScopeCourse): string {
 export function ReferenceBrowse() {
   const [tab, setTab] = useState<TabKey>("browse");
   const [course, setCourse] = useState<ScopeCourse>("our-world");
-  const [level, setLevel] = useState<ScopeLevel>(currentFocus.level);
+  // Opens on, and marks as active, the level Neritan is teaching. This used
+  // to read data/registry.ts, where the level was a hand-typed 4 sitting
+  // beside a hand-typed unit 8 and a set of invented word counts.
+  const currentUnit = useCurrentUnit();
+  const [level, setLevel] = useState<ScopeLevel>(currentUnit.level);
   const [scopeOpen, setScopeOpen] = useState(true);
+  // The hook answers with the local value first and the cloud value a moment
+  // later, so the opening level has to be able to move — but only until Leo
+  // picks a level himself, after which his choice stands.
+  const levelPicked = useRef(false);
+  useEffect(() => {
+    if (!levelPicked.current) setLevel(currentUnit.level);
+  }, [currentUnit.level]);
 
   const { knownWordSet, weakWordIds } = useKnownWordIds();
   const jp = useJapanesePreference();
@@ -109,7 +120,15 @@ export function ReferenceBrowse() {
 
   function pickCourse(next: ScopeCourse) {
     setCourse(next);
-    if (next !== "our-world") setLevel("all");
+    if (next !== "our-world") {
+      levelPicked.current = true;
+      setLevel("all");
+    }
+  }
+
+  function pickLevel(next: ScopeLevel) {
+    levelPicked.current = true;
+    setLevel(next);
   }
 
   const tabs: Array<{ key: TabKey; label: string; badge?: number }> = [
@@ -136,7 +155,7 @@ export function ReferenceBrowse() {
             label: `Level ${lvl}`,
             color: LEVEL_COLORS[lvl],
             tint: LEVEL_TINTS[lvl],
-            isActiveLevel: lvl === currentFocus.level,
+            isActiveLevel: lvl === currentUnit.level,
             meta: imported > 0 ? `${imported} of ${OUR_WORLD_UNIT_TOTALS[lvl]} units imported` : `${OUR_WORLD_UNIT_TOTALS[lvl]} units · not imported`
           };
         })
@@ -197,7 +216,7 @@ export function ReferenceBrowse() {
                     type="button"
                     className={`refv2-level-btn${level === entry.key ? " is-active" : ""}`}
                     style={level === entry.key ? { background: entry.tint, borderColor: entry.color, color: entry.color } : undefined}
-                    onClick={() => setLevel(entry.key)}
+                    onClick={() => pickLevel(entry.key)}
                   >
                     <span className="refv2-level-btn-top">
                       <span className="refv2-level-btn-dot" style={{ background: entry.color }} />

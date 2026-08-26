@@ -10,8 +10,11 @@ import { allGrammar, allWords } from "@/components/reference/ref-data";
 import { geographyMaps, isGeographyMapReady } from "../../content/subjects/geography/maps";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
+import { useCurrentUnit } from "./useCurrentUnit";
 import { useKnownWordIds } from "./useKnownWordIds";
 import { AcrossSubjects } from "./AcrossSubjects";
+import { CloudSyncNotice } from "./CloudSyncNotice";
+import { useCloudSync } from "./useCloudSync";
 
 export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?: Record<string, number> }) {
   const [progress, setProgress] = useState<LessonProgressMap>({});
@@ -21,6 +24,8 @@ export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?
   const totalWords = allWords.length;
   const grammarPoints = allGrammar.length;
   const { knownWordSet } = useKnownWordIds();
+  const currentUnit = useCurrentUnit();
+  const { isUnknown } = useCloudSync();
   const knownCount = knownWordSet.size;
   const reviewCount = Math.max(0, totalWords - knownCount);
   const totalLessonsDone = getDoneLessonCount(teacherLessons.map((lesson) => lesson.id), progress);
@@ -52,11 +57,13 @@ export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?
 
   return (
     <div className="design-home">
+      <CloudSyncNotice />
+
       <section className="design-home-hero">
         <div className="design-home-copy">
           <span>{new Intl.DateTimeFormat("en", { weekday: "long", month: "long", day: "numeric" }).format(new Date())}</span>
           <h1>Hey Leo —<br />ready to grow<br />today?</h1>
-          <p>You&apos;re {openAssignmentCount} {openAssignmentCount === 1 ? "assignment" : "assignments"} from a clean week. Pick up where you left off in Our World, Unit 8.</p>
+          <p>You&apos;re {openAssignmentCount} {openAssignmentCount === 1 ? "assignment" : "assignments"} from a clean week. Pick up where you left off in Our World, Unit {currentUnit.unit}.</p>
           <div className="design-home-pills"><b>{knownCount} words known</b><b>{reviewCount} to review</b></div>
         </div>
         <NextCard nextItem={nextItem} progress={progress} />
@@ -70,16 +77,16 @@ export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?
       </section>
 
       <section className="design-home-stats" aria-label="Academy statistics">
-        <SnapshotItem label="Lessons done" value={String(totalLessonsDone)} detail="teacher lessons" />
-        <SnapshotItem label="Words known" value={String(knownCount)} detail="reference memory" />
-        <SnapshotItem label="To review" value={String(reviewCount)} detail="words still learning" />
+        <SnapshotItem label="Lessons done" unknown={isUnknown("teacher-lessons")} value={String(totalLessonsDone)} detail="teacher lessons" />
+        <SnapshotItem label="Words known" unknown={isUnknown("reference")} value={String(knownCount)} detail="reference memory" />
+        <SnapshotItem label="To review" unknown={isUnknown("reference")} value={String(reviewCount)} detail="words still learning" />
         <SnapshotItem label="Grammar points" value={String(grammarPoints)} detail="reference cards" />
       </section>
 
       <section className="design-subjects">
         <header><h2>Subjects</h2><span>Pick a subject to jump into its courses</span></header>
         <div className="design-subject-grid">
-          <Link className="subject-card active" href="/english"><div><span>Active</span><b>📖</b></div><h3>English</h3><p>Our World, Joyful Work &amp; Training Ground.</p><footer><span>3 courses</span><span>L4 · U8</span></footer></Link>
+          <Link className="subject-card active" href="/english"><div><span>Active</span><b>📖</b></div><h3>English</h3><p>Our World, Joyful Work &amp; Training Ground.</p><footer><span>3 courses</span><span>L{currentUnit.level} · U{currentUnit.unit}</span></footer></Link>
           <Link className="subject-card active" href="/math"><div><span>Active</span><b>🔢</b></div><h3>Math</h3><p>新しい数学1 — 中1・8章, with an AI tutor chat.</p><footer><span>8 chapters</span><span>1章 2節</span></footer></Link>
           <Link className="subject-card active" href="/geography"><div><span>Active</span><b>🗺️</b></div><h3>Geography</h3><p>Interactive maps for Leo — 地理 &amp; 歴史.</p><footer><span>{geographyMaps.filter(isGeographyMapReady).length} maps</span><span>地理 · 歴史</span></footer></Link>
           <article className="subject-card planned"><div><span>Soon</span><b>🔬</b></div><h3>Science</h3><p>Inquiry, experiments &amp; the natural world.</p><footer><span>Planned</span></footer></article>
@@ -188,12 +195,20 @@ function NextCard({ nextItem, progress }: { nextItem: { label: string; status: s
   );
 }
 
-function SnapshotItem({ label, value, detail }: { label: string; value: string; detail: string }) {
+// A figure whose source never loaded is unknown, not zero — see CloudSyncNotice.
+function SnapshotItem({
+  label,
+  value,
+  detail,
+  unknown
+}: { label: string; value: string; detail: string; unknown?: boolean }) {
   return (
     <div className="snapshot-item">
       <span>{label}</span>
-      <strong>{value}</strong>
-      <small>{detail}</small>
+      <strong className={unknown ? "stat-unknown" : undefined} title={unknown ? "Couldn't load — not zero" : undefined}>
+        {unknown ? "—" : value}
+      </strong>
+      <small>{unknown ? "couldn't load" : detail}</small>
     </div>
   );
 }

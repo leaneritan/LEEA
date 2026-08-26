@@ -36,6 +36,8 @@ import {
   type CurrentUnit
 } from "@/data/currentUnit";
 import type { Lesson } from "@/data/types";
+import { CloudSyncNotice } from "./CloudSyncNotice";
+import { useCloudSync } from "./useCloudSync";
 import { getComponentMeta } from "./componentMeta";
 
 const SPINE_LESSONS = ["Opener", "Vocabulary 1", "Song", "Grammar 1", "Vocabulary 2", "Grammar 2", "Reading", "Writing"];
@@ -131,6 +133,7 @@ export function TeacherDashboard() {
   const [assignmentsReady, setAssignmentsReady] = useState(false);
   const [progressVersion, setProgressVersion] = useState(0);
   const [completionTimestamps, setCompletionTimestamps] = useState<Record<string, string>>({});
+  const { isUnknown } = useCloudSync();
   const [currentUnit, setCurrentUnit] = useState<CurrentUnit>(fallbackCurrentUnit);
   const [selectedLevel, setSelectedLevel] = useState(fallbackCurrentUnit.level);
   const [selectedUnit, setSelectedUnit] = useState(fallbackCurrentUnit.unit);
@@ -254,6 +257,10 @@ export function TeacherDashboard() {
         avgLabel: "—"
       };
   const rosterPercent = rosterStats.lessons ? Math.round((rosterStats.taught / rosterStats.lessons) * 100) : 0;
+  // 0 taught reads as "nothing has been taught"; on a checklist that never
+  // loaded it means "we do not know". Only claimed for the real roster —
+  // levels off the live one are derived from the cursor, not from Supabase.
+  const taughtUnknown = Boolean(selectedTeacherLessons.length) && isUnknown("teacher-lessons");
 
   function setLessonDone(lessonId: string, done: boolean) {
     setProgress((current) => {
@@ -279,6 +286,8 @@ export function TeacherDashboard() {
 
   return (
     <section className="teacher-page teacher-design-page">
+      <CloudSyncNotice />
+
       <header className="teacher-hero teacher-design-hero">
         <span className="eyebrow">Neritan · Teaching mode <b>Parent view</b></span>
         <h1>Teacher menu</h1>
@@ -383,8 +392,8 @@ export function TeacherDashboard() {
 
       <section className="teacher-stats teacher-design-stats" aria-label="Teaching stats">
         <div><span>Lessons in unit</span><strong>{rosterStats.lessons}</strong></div>
-        <div><span>Taught</span><strong>{rosterStats.taught}</strong></div>
-        <div><span>To teach</span><strong>{rosterStats.lessons - rosterStats.taught}</strong></div>
+        <div><span>Taught</span><strong className={taughtUnknown ? "stat-unknown" : undefined}>{taughtUnknown ? "—" : rosterStats.taught}</strong></div>
+        <div><span>To teach</span><strong className={taughtUnknown ? "stat-unknown" : undefined}>{taughtUnknown ? "—" : rosterStats.lessons - rosterStats.taught}</strong></div>
         <div className="dark"><span>Leo&apos;s avg quiz</span><strong>{rosterStats.avgLabel}</strong></div>
       </section>
 
@@ -657,9 +666,11 @@ function CheckpointRow({ checkpoint, unitBand }: { checkpoint: (typeof checkpoin
   );
 }
 
+// shortLessonCopy is a Unit 8 copy table. The row renderer already guards it
+// with lesson.unit === 8; this did not, so "Next to assign" titled the Unit 7
+// opener "Unit 8 Opener" right above a line reading "Unit 7", and a Unit 9
+// grammar lesson would have been announced with Unit 8's grammar title.
 function formatTeacherNextTitle(lesson: Lesson) {
-  return (shortLessonCopy[lesson.component.replace("-app", "")]?.title ?? lesson.title)
-    .replace(/^Unit 8 /, "Unit 8 ")
-    .replace(/ App$/, "")
-    .replace(/ Leo's Test App$/, "");
+  const unitEightCopy = lesson.unit === 8 ? shortLessonCopy[lesson.component.replace("-app", "")] : undefined;
+  return (unitEightCopy?.title ?? lesson.title).replace(/ App$/, "").replace(/ Leo's Test App$/, "");
 }

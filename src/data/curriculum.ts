@@ -10,7 +10,7 @@ export const LEVELS = [1, 2, 3, 4, 5, 6];
 // Neritan controls from the teacher menu — see data/currentUnit.ts. These
 // values are what a browser sees before one has ever been chosen.
 export const LIVE_LEVEL = 4;
-export const LIVE_UNIT = 8;
+export const LIVE_UNIT = 9;
 
 // Unit titles are per level — Our World gives each level its own syllabus, so
 // one shared list was wrong for every level except by coincidence. These are

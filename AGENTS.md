@@ -285,6 +285,56 @@ The Mission and Project words are reference cards now, tagged `OW4-U9-MI` (share
 
 Checkpoint lesson records live in their own folder beside the units — `content/subjects/english/courses/our-world/level-<n>/checkpoint-<start>-<end>/lessons/` — and carry `unit: <band end>` only so the teacher menu can find them from the last unit of the band. Every surface must treat them as checkpoint material, not as a lesson of that unit; use `isCheckpointComponent()` from `src/data/lessons.ts` rather than re-listing the component names. A new checkpoint folder must also be added to `lessonsDirs` in `scripts/validate-content.mjs`.
 
+## Current Build Status — Our World Level 6
+
+All nine Level 6 units are built, and they are **generated, not hand-authored**.
+`scripts/ow-l6/data/unit-<n>.mjs` holds the scanned source data for one unit;
+`node scripts/ow-l6/build.mjs` expands it into `vocabulary.json`, `grammar.json`,
+Leo's app, Neritan's deck, and both lesson records, then rewrites
+`src/data/lessons-level6.generated.ts` and `src/data/reference-level6.generated.ts`.
+Never edit the generated files — edit the unit data module and re-run the build.
+
+| Unit | Theme | Grammar 1 | Grammar 2 |
+|---|---|---|---|
+| 1 | Exciting Sports | Present perfect with for/since | Adverbs of emphasis |
+| 2 | History's a Mystery | Passive: simple past | Passive with by + agent |
+| 3 | Chocolate! | Past progressive | Cause and effect with so that |
+| 4 | Water, Water Everywhere | Present perfect progressive | whatever/whenever/wherever/whoever |
+| 5 | It's a Small World | Reported speech: statements | Order of adjectives |
+| 6 | Smart Choices | Reported speech: imperatives | Reported speech: questions |
+| 7 | Wonders of the Natural World | Passive with modals | make + someone + adjective |
+| 8 | Robots Rule | Wish statements | Passive: future |
+| 9 | Amazing Adventures at Sea | Time clauses with as soon as | It's + adjective + infinitive |
+
+Each unit ships eight components — opener, vocab-1, song, grammar-1, vocab-2,
+grammar-2, reading, writing — as a paired teacher deck and Leo app.
+
+The scan source is the Student's Book audio script docx, not the planner:
+`level-6/planner.pdf` and both workbook answer keys are Git LFS pointers in this
+checkout. The audio script carries every Vocabulary 1/2 list with its "Listen
+and repeat" sentence, both Grammar boxes, the song and the reading passage
+verbatim, so the target language is the book's own — but there are no planner
+page numbers to cite and no workbook activities, and the Mission, Project,
+Let's Talk and checkpoint components are not built. Rebuild those from the
+planner once the LFS objects are available.
+
+Two shared front-end files carry every Level 6 app, so the save/restore rules
+exist once rather than once per app:
+
+- `public/components/leea-app-runtime.js` — the tab shell, the four save/restore
+  rules, and 21 activity types (flashcards with the locked Practice+Quiz dual
+  mode, mcq, quiz, sort, match with the audio-script-order recap table,
+  unscramble, cloze, build, survey, sunshine, wordweb, write, read, karaoke,
+  reveal, order, checklist, truefalse, dribble, list).
+- `public/components/leea-app.css` — the shell and activity styling; per-app
+  theming is one `--accent` triple.
+
+Academic cards are cloned from the existing global card and gain a Level 6
+source rather than being re-authored, because `reference.ts` merges cards by id
+and a second copy would be discarded. Six cards Level 6 genuinely introduces
+(evidence, percentage, classify, observe, persuade, features) are authored in
+full in `scripts/ow-l6/data/academic-extra.mjs`.
+
 Target file paths follow the standard naming convention: `public/lessons/ow-l<level>-u<unit>-<component>.html` (teacher) and `public/learn/ow-l<level>-u<unit>-<component>.html` (learner) — see `docs/components.md` for each component's locked module structure.
 
 ### Grammar lesson HTML structure (locked — Unit 8 Grammar 1/2)

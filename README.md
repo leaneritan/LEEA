@@ -137,6 +137,8 @@ Implemented first:
 - four interactive maps on shared components — 世界のすがた, 世界の国々, 時差マップ and 古代文明マップ
 - weak-spot practice: quizzes lean on the places Leo keeps missing, with a 苦手 list on every map
 - shared country borders + facts layer (Natural Earth / world-countries), baked at build time — no runtime geodata dependency
+- Our World **Level 6 complete** — all nine units (Exciting Sports, History's a Mystery, Chocolate!, Water Water Everywhere, It's a Small World, Smart Choices, Wonders of the Natural World, Robots Rule, Amazing Adventures at Sea) with vocabulary, grammar, and eight components each as a paired teacher deck + Leo app
+- Level 6 is generated: edit `scripts/ow-l6/data/unit-<n>.mjs`, then run `node scripts/ow-l6/build.mjs`
 
 Prototype:
 

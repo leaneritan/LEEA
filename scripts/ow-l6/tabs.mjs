@@ -32,6 +32,19 @@ function shuffleSeeded(list, seed) {
   return copy;
 }
 
+/* Blanking out a target word has to swallow the whole word, inflection and all.
+   Matching only the dictionary form leaves the ending behind — "We eat cake on
+   special occasions" became "…on special ______s.", which is both ugly and a
+   free hint. Returns the surface form that was removed, so a gap-fill can ask
+   for the form the sentence actually used. */
+function blankOut(sentence, word) {
+  const stem = normalize(word.w, word.norm);
+  const pattern = stem.split(/[_\s]+/).map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("[-\\s]");
+  const match = sentence.match(new RegExp(`${pattern}\\w*`, "i"));
+  if (!match) return { text: sentence, form: stem };
+  return { text: sentence.replace(match[0], "______"), form: match[0].toLowerCase() };
+}
+
 /** Three wrong answers drawn from the same word list — a real distractor set. */
 function distractors(words, correctIndex, count = 2) {
   const others = words.filter((_, i) => i !== correctIndex).map((word) => word.w);
@@ -48,6 +61,19 @@ function optionSet(correct, wrong, seed) {
    way to write it. Shipping it that way would make every Level 6 quiz solvable
    by always tapping the top option, so the option order is permuted here —
    deterministically, so a rebuild produces the same file. */
+/* An authored stem is a two-part array with the gap between the parts. Joining
+   it blindly with " ______ " puts a stray blank after questions whose second
+   half is empty ("Choose the correct sentence. ______") and doubles the spaces
+   around the gap. */
+function stemText(stem) {
+  const [before = "", after = ""] = stem;
+  const head = before.trim();
+  const tail = after.trim();
+  if (head && tail) return `${head} ______ ${tail}`;
+  if (!head && tail) return after.startsWith(" ") ? `______ ${tail}` : tail;
+  return head;
+}
+
 function hashText(text) {
   let h = 2166136261;
   for (let i = 0; i < text.length; i++) {
@@ -80,7 +106,7 @@ function varied(items, salt = 0) {
 function fromGrammarItems(items, salt) {
   return varied(
     items.map((item) => ({
-      q: item.stem.join(" ______ ").trim(),
+      q: stemText(item.stem),
       opts: item.answers,
       correct: item.correct,
       jp: item.jp
@@ -122,20 +148,27 @@ function meaningItems(words, limit) {
 /** The book's own sentence with the target word blanked out. */
 function gapItems(words, limit, seed = 0) {
   return words.slice(0, limit).map((word, i) => {
-    const sentence = word.tr || word.ex[0][0];
-    const stem = normalize(word.w, word.norm);
-    const blanked = sentence.replace(new RegExp(stem.split(/[\s_]+/).join("[-\\s]"), "i"), "______");
+    const blanked = blankOut(word.tr || word.ex[0][0], word);
     const set = optionSet(word.w, distractors(words, i), i * 5 + seed + 2);
-    return { q: blanked, opts: set.opts, correct: set.correct, jp: `${word.jw}（${word.jr}）` };
+    return { q: blanked.text, opts: set.opts, correct: set.correct, jp: `${word.jw}（${word.jr}）` };
   });
 }
 
+/* Exactly half the statements are true, and which half is decided by hashing
+   each word rather than by its position. Alternating by index taught "the even
+   ones are true" faster than it taught the vocabulary; hashing alone left one
+   list 2-true / 6-false, which is its own giveaway. */
 function trueFalseItems(words, limit) {
-  return words.slice(0, limit).map((word, i) => {
-    const lie = words[(i + 3) % words.length];
-    const useTruth = i % 2 === 0;
+  const chosen = words.slice(0, limit);
+  const ranked = chosen
+    .map((word, i) => ({ i, key: hashText(word.w + word.mean) }))
+    .sort((a, b) => a.key - b.key);
+  const truthful = new Set(ranked.slice(0, Math.ceil(chosen.length / 2)).map((entry) => entry.i));
+  return chosen.map((word, i) => {
+    const useTruth = truthful.has(i);
+    const other = chosen[(i + 3) % chosen.length];
     return {
-      t: `“${word.w}” means: ${(useTruth ? word : lie).mean}`,
+      t: `“${word.w}” means: ${(useTruth ? word : other).mean}`,
       answer: useTruth,
       jp: `${word.w} = ${word.jw}（${word.jr}）`
     };
@@ -168,14 +201,15 @@ function dribbleItems(words) {
 
 function clozeFrom(words, count) {
   const chosen = words.slice(0, count);
+  const answers = [];
   const text = chosen
     .map((word, i) => {
-      const sentence = word.tr || word.ex[0][0];
-      const stem = normalize(word.w, word.norm);
-      return sentence.replace(new RegExp(stem.split(/[\s_]+/).join("[-\\s]"), "i"), `{{${i}}}`);
+      const blanked = blankOut(word.tr || word.ex[0][0], word);
+      answers.push(blanked.form);
+      return blanked.text.replace("______", `{{${i}}}`);
     })
     .join(" ");
-  return { text, answers: chosen.map((word) => normalize(word.w, word.norm)) };
+  return { text, answers };
 }
 
 function posZones(words) {
@@ -190,6 +224,19 @@ function posZones(words) {
 function matchPairs(words) {
   /* Array order is the audio-script order — never alphabetical, never sorted. */
   return words.map((word) => ({ word: word.w, emoji: word.emoji, sent: word.tr || word.ex[0][0] }));
+}
+
+/** "Rewrite this prompt" items, built from a grammar point's Level Up
+    transforms. The right answer is the transform's own `to`; the distractors
+    are other transforms' answers, which are the same pattern applied to
+    different words — so a wrong pick is a real mistake, not a spelling trap. */
+function transformItems(point) {
+  const all = point.levelup.rules.flatMap((rule) => rule.transforms);
+  return all.map(([from, to], i) => {
+    const wrong = all.filter((_, j) => j !== i).map(([, other]) => other);
+    const set = optionSet(to, shuffleSeeded(wrong, i + 3).slice(0, 2), i * 13 + 5);
+    return { q: `Rewrite it: <b>${from}</b>`, opts: set.opts, correct: set.correct, jp: point.jpPattern };
+  });
 }
 
 /* ── opener ─────────────────────────────────────────────────────────── */
@@ -321,13 +368,20 @@ export function grammarTabs(data, which, academicCards) {
     words: sample.t.replace(/[.?!]$/, "").split(/\s+/),
     jp: sample.jp
   }));
+  /* Broken tiles are built by dropping a wrong answer into a real gap stem.
+     Only stems that actually have a gap work — "Choose the correct sentence."
+     has nothing to fill, and splicing a wrong answer onto it produces a tile
+     that is not a sentence at all. */
+  const gapStems = point.quiz.filter((item) => item.stem[0].trim() && item.stem[1].trim());
+  const brokenTiles = gapStems.slice(0, 5).map((item) => ({
+    text: `${item.stem[0].trim()} ${item.answers[(item.correct + 1) % item.answers.length]} ${item.stem[1].trim()}`.replace(/\s+/g, " "),
+    zone: "wrong"
+  }));
   const sortTiles = [
-    ...point.samples.slice(0, 5).map((sample) => ({ text: sample.t, zone: "right" })),
-    ...point.quiz.slice(0, 5).map((item) => ({
-      text: item.stem.join(item.answers[(item.correct + 1) % item.answers.length]).trim() || item.answers[1],
-      zone: "wrong"
-    }))
+    ...point.samples.slice(0, Math.max(3, brokenTiles.length)).map((sample) => ({ text: sample.t, zone: "right" })),
+    ...brokenTiles
   ];
+
   const guessItems = point.levelup.mixed.map((sample, i) => {
     const words = sample.t.split(/\s+/);
     const tail = words.slice(-2).join(" ");
@@ -361,9 +415,12 @@ export function grammarTabs(data, which, academicCards) {
     { key: "tab-5-done", icon: "🗂️", name: "Sort", type: "sort",
       hint: "Which sentences use the pattern correctly?",
       data: { title: "Correct or broken?", zones: [{ id: "right", label: "✅ Correct" }, { id: "wrong", label: "❌ Broken" }], tiles: sortTiles } },
+    /* Practice deliberately does NOT reuse the Warm Up questions. Warm Up runs
+       the first eight gap items; Practice rewrites the Level Up transforms, so
+       Leo meets the pattern a second time in a different shape. */
     { key: "tab-6-done", icon: "✏️", name: "Practice", type: "mcq",
-      hint: "The Student Book practice items.",
-      data: { items: fromGrammarItems(point.quiz, 4), label: "practised" } },
+      hint: "Choose the correct rewrite of each prompt.",
+      data: { items: varied(transformItems(point), 4), label: "practised" } },
     { key: "tab-7-done", icon: "📋", name: "Survey", type: "survey",
       hint: "Finish each sentence about yourself.",
       data: { stems: point.levelup.rules.flatMap((rule) => rule.transforms.map(([from]) => ({ t: `Use the pattern: <b>${from}</b>`, jp: rule.jpTitle, placeholder: "Write the full sentence" }))) } },
@@ -403,12 +460,8 @@ export function readingTabs(data, academicCards, contentCards) {
       hint: "Tap the events in the order they happened.",
       data: { items: reading.order.items } },
     { key: "tab-4-done", icon: "🔍", name: "Practice", type: "truefalse",
-      hint: "True or false, from the passage.",
-      data: { items: (data.content || []).slice(0, 6).map((word, i) => ({
-        t: `“${word.w}” means: ${(i % 2 === 0 ? word : (data.content[(i + 2) % data.content.length])).mean}`,
-        answer: i % 2 === 0,
-        jp: `${word.w} = ${word.jw}（${word.jr}）`
-      })), label: "checked" } },
+      hint: "True or false? These are the content words from the passage.",
+      data: { items: trueFalseItems(data.content || [], 6), label: "checked" } },
     { key: "tab-5-done", icon: "📝", name: "Quiz", type: "quiz",
       hint: "Eight questions on the passage.",
       data: { items: varied(reading.quiz, 9), pass: Math.ceil(reading.quiz.length * 0.75) } }

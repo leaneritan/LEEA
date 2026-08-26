@@ -657,9 +657,11 @@ function CheckpointRow({ checkpoint, unitBand }: { checkpoint: (typeof checkpoin
   );
 }
 
+// shortLessonCopy is a Unit 8 copy table. The row renderer already guards it
+// with lesson.unit === 8; this did not, so "Next to assign" titled the Unit 7
+// opener "Unit 8 Opener" right above a line reading "Unit 7", and a Unit 9
+// grammar lesson would have been announced with Unit 8's grammar title.
 function formatTeacherNextTitle(lesson: Lesson) {
-  return (shortLessonCopy[lesson.component.replace("-app", "")]?.title ?? lesson.title)
-    .replace(/^Unit 8 /, "Unit 8 ")
-    .replace(/ App$/, "")
-    .replace(/ Leo's Test App$/, "");
+  const unitEightCopy = lesson.unit === 8 ? shortLessonCopy[lesson.component.replace("-app", "")] : undefined;
+  return (unitEightCopy?.title ?? lesson.title).replace(/ App$/, "").replace(/ Leo's Test App$/, "");
 }

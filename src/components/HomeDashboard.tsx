@@ -10,6 +10,7 @@ import { allGrammar, allWords } from "@/components/reference/ref-data";
 import { geographyMaps, isGeographyMapReady } from "../../content/subjects/geography/maps";
 import type { Lesson } from "@/data/types";
 import { getComponentMeta } from "./componentMeta";
+import { useCurrentUnit } from "./useCurrentUnit";
 import { useKnownWordIds } from "./useKnownWordIds";
 import { AcrossSubjects } from "./AcrossSubjects";
 
@@ -21,6 +22,7 @@ export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?
   const totalWords = allWords.length;
   const grammarPoints = allGrammar.length;
   const { knownWordSet } = useKnownWordIds();
+  const currentUnit = useCurrentUnit();
   const knownCount = knownWordSet.size;
   const reviewCount = Math.max(0, totalWords - knownCount);
   const totalLessonsDone = getDoneLessonCount(teacherLessons.map((lesson) => lesson.id), progress);
@@ -79,7 +81,7 @@ export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?
       <section className="design-subjects">
         <header><h2>Subjects</h2><span>Pick a subject to jump into its courses</span></header>
         <div className="design-subject-grid">
-          <Link className="subject-card active" href="/english"><div><span>Active</span><b>📖</b></div><h3>English</h3><p>Our World, Joyful Work &amp; Training Ground.</p><footer><span>3 courses</span><span>L4 · U8</span></footer></Link>
+          <Link className="subject-card active" href="/english"><div><span>Active</span><b>📖</b></div><h3>English</h3><p>Our World, Joyful Work &amp; Training Ground.</p><footer><span>3 courses</span><span>L{currentUnit.level} · U{currentUnit.unit}</span></footer></Link>
           <Link className="subject-card active" href="/math"><div><span>Active</span><b>🔢</b></div><h3>Math</h3><p>新しい数学1 — 中1・8章, with an AI tutor chat.</p><footer><span>8 chapters</span><span>1章 2節</span></footer></Link>
           <Link className="subject-card active" href="/geography"><div><span>Active</span><b>🗺️</b></div><h3>Geography</h3><p>Interactive maps for Leo — 地理 &amp; 歴史.</p><footer><span>{geographyMaps.filter(isGeographyMapReady).length} maps</span><span>地理 · 歴史</span></footer></Link>
           <article className="subject-card planned"><div><span>Soon</span><b>🔬</b></div><h3>Science</h3><p>Inquiry, experiments &amp; the natural world.</p><footer><span>Planned</span></footer></article>

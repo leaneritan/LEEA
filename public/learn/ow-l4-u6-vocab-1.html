@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leo · Unit 6 · Vocabulary 1 — Wonders of the Sea</title>
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Unit 6 is Wonders of the Sea — ocean blues, with Level 4 purple kept for
+     the level tag only. Green stays the "correct" colour across every app. */
+  --sea:#0369A1;--sea-d:#075985;--sea-l:#F0F9FF;--sea-b:#BAE6FD;
+  --deep:#0C4A6E;
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --red:#DC2626;--red-l:#FEF2F2;--red-b:#FECACA;
+  --amber:#F59E0B;--amber-l:#FFFBEB;--yellow:#FACC15;--yellow-b:#FDE68A;--yellow-l:#FEFCE8;
+  --ink:#111;--ink-2:#374151;--ink-3:#6B7280;--border:#E5E7EB;
+  --paper:#FFFDF5;--navy:#0f172a;
+}
+html,body{height:100%;font-family:'Outfit',system-ui,'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--paper);color:var(--ink)}
+body{display:flex;flex-direction:column}
+.app-header{background:linear-gradient(135deg,var(--sea),var(--deep));color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-header .logo{font-size:26px}
+.app-header .title{font-size:20px;font-weight:800;line-height:1.1}
+.app-header .subtitle{font-size:13px;opacity:.85;margin-top:2px}
+.app-header .badge-row{margin-left:auto}
+.prog-pill{background:rgba(255,255,255,.22);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;white-space:nowrap}
+.tab-nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:11px 12px;font-family:inherit;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;min-width:70px}
+.tab-btn .tab-icon{font-size:18px}
+.tab-btn .tab-name{font-size:11px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.tab-btn.active{color:var(--sea);border-bottom-color:var(--sea)}
+.tab-btn.done::after{content:'✓';position:absolute;top:3px;right:5px;color:var(--green);font-weight:900;font-size:12px}
+.tab-content{display:none;flex:1;overflow-y:auto;flex-direction:column;min-height:0}
+.tab-content.active{display:flex}
+.tab-body{flex:1;padding:18px 20px 8px;display:flex;flex-direction:column;gap:14px;max-width:900px;width:100%;margin:0 auto}
+.tab-footer{flex-shrink:0;border-top:2px solid var(--border);background:#fff;padding:10px 20px;display:flex;gap:10px;max-width:900px;width:100%;margin:0 auto}
+.section-title{font-size:21px;font-weight:900;color:var(--navy)}
+.section-sub{font-size:14px;color:var(--ink-3);font-weight:600;margin-top:2px}
+.dad-hint{background:var(--amber-l);border:2px solid var(--yellow-b);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:600;color:var(--ink-2);line-height:1.5}
+.src-pill{font-size:12px;font-weight:700;color:var(--ink-3);border-top:1px solid var(--border);padding-top:8px}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:12px 16px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer}
+.btn-complete:disabled{opacity:.4;cursor:not-allowed}
+.btn-complete.confirmed{background:var(--green-d);pointer-events:none}
+.btn-redo{width:112px;flex-shrink:0;background:#fff;color:var(--sea);border:2px solid var(--sea-b);border-radius:12px;padding:12px 8px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer}
+.btn-redo.armed{background:var(--sea-l);border-color:var(--sea)}
+.done-banner{display:none;background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;color:var(--green-d);text-align:center}
+.done-banner.show{display:block;animation:pop .35s}
+@keyframes pop{0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.qcard{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.qcard .qtext{font-size:16px;font-weight:800;color:var(--navy);line-height:1.45}
+.opt-group{display:flex;flex-direction:column;gap:8px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid var(--border);border-radius:12px;padding:11px 16px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit}
+.opt:hover:not(:disabled){border-color:var(--amber)}
+.opt.good{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default}
+.jp-note{font-size:14px;font-weight:600;color:var(--ink-3);background:var(--sea-l);border-radius:10px;padding:8px 12px;line-height:1.5}
+.mstatus{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mcount{background:var(--sea);color:#fff;border-radius:20px;padding:5px 16px;font-size:14px;font-weight:800}
+.mcount.alt{background:var(--navy)}
+.mhint{font-size:14px;font-weight:700;color:var(--ink-3);line-height:1.5}
+.fc-modeswitch{display:flex;gap:8px}
+.fc-modebtn{flex:1;padding:9px;border-radius:10px;border:2px solid var(--border);background:#fff;font-weight:800;font-family:inherit;cursor:pointer;color:var(--ink-3)}
+.fc-modebtn.active{background:var(--sea);color:#fff;border-color:var(--sea)}
+.fc-pane{display:none}.fc-pane.active{display:block}
+.flashcard-wrap{perspective:1000px;min-height:270px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:270px;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;gap:8px;text-align:center}
+.fc-front{background:linear-gradient(135deg,var(--sea),var(--deep));color:#fff;border:4px solid var(--yellow)}
+.fc-back{background:linear-gradient(135deg,#fff,var(--sea-l));border:4px solid var(--sea);transform:rotateY(180deg);overflow:auto}
+.fc-emoji{font-size:56px;line-height:1}
+.fc-word{font-size:30px;font-weight:900}
+.fc-ipa{font-size:14px;font-weight:600;opacity:.85}
+.fc-def{font-size:17px;color:var(--ink-2);font-weight:700;line-height:1.4}
+.fc-tap{font-size:11px;font-weight:700;opacity:.75;letter-spacing:.08em;margin-top:6px}
+.fc-jp{font-size:15px;color:var(--ink-3);font-weight:700;display:none}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:none;border:1px dashed #D1D5DB;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;color:var(--ink-3);cursor:pointer;font-family:inherit}
+.fc-sample{font-size:15px;background:var(--sea-l);border-radius:10px;padding:8px 12px;font-weight:600;color:var(--ink-2);line-height:1.4}
+.fc-sample b{color:var(--sea-d)}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+.fc-nav button{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-weight:800;font-family:inherit;cursor:pointer}
+.fc-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.fc-dot{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.fc-dot.on{background:var(--sea)}
+.svy-row{background:#fff;border:2px solid var(--border);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.svy-row input{border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:15px;font-family:inherit;flex:1;min-width:150px}
+.svy-row input:focus{border-color:var(--amber);outline:none}
+.svy-row.filled{border-color:var(--green);background:var(--green-l)}
+.svy-row.err{animation:shake .35s;border-color:var(--red)}
+.tr-btn{border:2px solid var(--border);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.tr-btn:hover{border-color:var(--sea);color:var(--sea-d)}
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.flipcard{background:linear-gradient(135deg,var(--deep),#1e293b);border:3px solid var(--yellow);border-radius:14px;padding:16px;text-align:center;cursor:pointer;color:#fff;min-height:132px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.flipcard .fce{font-size:40px}
+.flipcard .ftitle{font-size:17px;font-weight:900}
+.flipcard.revealed{background:#fff;color:var(--navy);border-color:var(--green);cursor:default;text-align:left}
+.fbody{font-size:15px;font-weight:600;color:var(--ink-2);line-height:1.55}
+.fjp{font-size:13px;font-weight:600;color:var(--ink-3)}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.mcol{display:flex;flex-direction:column;gap:8px}
+.mitem{background:#fff;border:3px solid var(--border);border-radius:12px;padding:11px 13px;font-size:15px;font-weight:800;color:var(--ink);cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;min-height:56px;line-height:1.35}
+.mitem.m-right{font-weight:600}
+.mitem:hover{border-color:var(--amber)}
+.mitem.sel{border-color:var(--sea);background:var(--sea-l)}
+.mitem.lock{border-color:var(--green);background:var(--green-l);color:var(--green-d);opacity:.7;pointer-events:none}
+.mitem.err{animation:shake .35s;border-color:var(--red);background:var(--red-l)}
+.mrecap{display:none}.mrecap.show{display:block}
+.mrecap-title{font-size:14px;font-weight:800;color:var(--green-d);margin-bottom:8px}
+.mrecap table{width:100%;border-collapse:collapse;background:#fff;border:2px solid var(--border);border-radius:12px;overflow:hidden}
+.mrecap td{padding:9px 12px;font-size:14px;border-top:1px solid var(--border);vertical-align:top}
+.mrecap tr:first-child td{border-top:none}
+.mr-word{font-weight:800;color:var(--green-d);white-space:nowrap;width:1%}
+.mr-emoji{text-align:center;font-size:18px;width:1%}
+.mr-sent{font-weight:600;color:var(--ink-2)}
+.chip-bank{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#fff;border:3px solid var(--amber);border-radius:10px;padding:8px 15px;font-size:16px;font-weight:800;color:var(--ink);cursor:pointer;font-family:inherit}
+.chip:hover{background:var(--amber-l)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.err{animation:shake .35s;border-color:var(--red)}
+.read-box{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px;font-size:16px;font-weight:600;line-height:2}
+.read-blank{display:inline-block;min-width:104px;border-bottom:3px solid var(--amber);text-align:center;font-weight:900;color:var(--ink-3);cursor:pointer;padding:0 6px}
+.read-blank.filled{color:var(--green-d);border-color:var(--green)}
+.read-blank.active{background:var(--amber-l)}
+.read-blank.wrong{animation:shake .35s;color:var(--red)}
+.zone-strip{display:flex;flex-direction:column;border-radius:14px;overflow:hidden;border:3px solid var(--border)}
+.zone-row{padding:12px 16px;font-weight:800;color:#fff;font-size:15px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.zone-sunlit{background:#0EA5E9}.zone-twilight{background:#075985}.zone-midnight{background:#0f172a}
+.zone-depth{font-weight:600;opacity:.9;font-size:13px}
+.quiz-progress{display:flex;gap:5px;flex-wrap:wrap}
+.qdot{width:14px;height:14px;border-radius:50%;background:var(--border)}
+.qdot.on{background:var(--green)}
+.qdot.now{background:var(--sea);box-shadow:0 0 0 3px var(--sea-l)}
+.result-card{border-radius:16px;padding:24px;text-align:center;display:flex;flex-direction:column;gap:8px;border:3px solid var(--border);background:#fff}
+.result-card.pass{border-color:var(--green);background:var(--green-l)}
+.result-card.fail{border-color:var(--amber);background:var(--amber-l)}
+.result-trophy{font-size:54px}
+.result-score{font-size:34px;font-weight:900;color:var(--navy)}
+.result-sub{font-size:15px;font-weight:700;color:var(--ink-2);line-height:1.5}
+.pitch{background:linear-gradient(180deg,#166534,#14532d);border-radius:14px;padding:14px 18px;color:#fff}
+.score-row{display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:800;gap:10px;flex-wrap:wrap}
+.sun-word{font-size:15px;font-weight:800;color:var(--sea-d);min-width:130px}
+@media (max-width:640px){.mgrid{grid-template-columns:1fr}.tab-body{padding:14px 14px 8px}.tab-footer{padding:10px 14px}}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="logo">🌊</div>
+  <div>
+    <div class="title">Unit 6 · Vocabulary 1</div>
+    <div class="subtitle">Our World Level 4 — Wonders of the Sea</div>
+  </div>
+  <div class="badge-row"><div class="prog-pill" id="prog-pill">0 / 13 done</div></div>
+</header>
+<nav class="tab-nav" id="tab-nav"></nav>
+<main id="tab-stack" style="flex:1;display:flex;flex-direction:column;min-height:0"></main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   OUR WORLD LEVEL 4 · UNIT 6 · VOCABULARY 1 — LEO APP
+   SAVE_PREFIX: leea-4-6-vocab-1-
+   HOMEWORK_ID: leo-4-6-vocab-1
+   moduleCount 13 (tabs 0-12) · moduleKeyFormat tab-{i}-done · scoreKey score (tab 11)
+
+   Word data is read from the shapes in unit-6/vocabulary.json — never
+   overridden here, so Reference, the teacher deck and this app all say the
+   same thing. Sentences marked TR come verbatim from the Student Book audio
+   script, Track 6.2 (Vocabulary 1, Activity 2: Listen and repeat).
+═══════════════════════════════════════════════════════════════════════ */
+const SAVE_PREFIX='leea-4-6-vocab-1-';
+const HOMEWORK_ID='leo-4-6-vocab-1';
+const TAB_COUNT=13;
+const TABS=[
+ {icon:'📚',name:'Academic'},{icon:'🔥',name:'Warm Up'},{icon:'🎯',name:'Present'},
+ {icon:'🃏',name:'Flashcards'},{icon:'🧠',name:'Sort'},{icon:'📖',name:'Reading'},
+ {icon:'📝',name:'Practice'},{icon:'🔤',name:'Unscramble'},{icon:'🔗',name:'Match'},
+ {icon:'☀️',name:'Apply'},{icon:'🎭',name:'Wrap Up'},{icon:'✅',name:'Quiz'},{icon:'⚽',name:'Dribble!'}
+];
+const TAB_INIT={},TAB_RESET={},TAB_RESTORE={};
+
+function lSave(k,v){try{localStorage.setItem(SAVE_PREFIX+k,JSON.stringify(v));}catch(e){}}
+function lLoad(k){try{const r=localStorage.getItem(SAVE_PREFIX+k);return r?JSON.parse(r):null;}catch(e){return null;}}
+function lDel(k){try{localStorage.removeItem(SAVE_PREFIX+k);}catch(e){}}
+function el(t,c,x){const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n;}
+function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function boldWord(s,w){
+  const stem=String(w).replace(/^(a|an|the)\s+/i,'').replace(/_/g,' ');
+  try{return s.replace(new RegExp('('+stem.split(/\s+/).join('[-\\s]')+'\\w*)','i'),'<b>$1</b>');}catch(e){return s;}
+}
+
+/* ── TR 6.2, in the audio script's own running order. Never re-sorted: the
+      Match recap has to read back in the order Leo hears the track. The shark
+      line is the one exception — TR 6.2 is truncated mid-sentence in the
+      source docx ("I saw a shark at the a"), so the card's own example from
+      vocabulary.json is used instead. ── */
+const WORDS=[
+ {w:'pollution',    e:'🛢️', ipa:'pəˈluːʃən',       norm:'pollution', def:'trash or harmful things that make air, water, or land dirty', jp:'汚染（おせん）', tr:'There is too much pollution.'},
+ {w:'a resource',   e:'♻️', ipa:'ˈriːsɔrs',        norm:'resource',  def:'something useful in nature, like water, fish, or trees',        jp:'資源（しげん）', tr:'We need to protect our resources.'},
+ {w:'disappear',    e:'❌', ipa:'ˌdɪsəˈpɪr',       norm:'disappear', def:'to go away so it cannot be seen',                                jp:'消（き）える',   tr:'Animals and plants can disappear.'},
+ {w:'a creature',   e:'🦀', ipa:'ˈkriːtʃər',       norm:'creature',  def:'a living animal, especially a strange or interesting one',       jp:'生き物（いきもの）', tr:'An octopus is a sea creature.'},
+ {w:'a layer',      e:'🌊', ipa:'ˈleɪər',          norm:'layer',     def:'one level of something — like the top, middle, or bottom of the ocean', jp:'層（そう）', tr:'Most fish live in the top layer of the water.'},
+ {w:'a zone',       e:'🌍', ipa:'zoʊn',            norm:'zone',      def:'a part or area, like one section of the ocean',                  jp:'区域（くいき）', tr:'The top layer is the sunlit zone.'},
+ {w:'sunlight',     e:'☀️', ipa:'ˈsʌnlaɪt',        norm:'sunlight',  def:'the light that comes from the sun',                              jp:'日光（にっこう）', tr:'Plants need sunlight.'},
+ {w:'midnight',     e:'🌌', ipa:'ˈmɪdnaɪt',        norm:'midnight',  def:'the middle of the night — also the name for the deepest, darkest ocean zone', jp:'真夜中（まよなか）', tr:'The midnight zone is very dark.'},
+ {w:'a whale',      e:'🐋', ipa:'weɪl',            norm:'whale',     def:'a very large sea animal that breathes air',                      jp:'クジラ',        tr:'The whale is the biggest sea creature.'},
+ {w:'a squid',      e:'🦑', ipa:'skwɪd',           norm:'squid',     def:'a sea animal with a long body and many arms',                    jp:'イカ',          tr:'Are all squid red?'},
+ {w:'a dolphin',    e:'🐬', ipa:'ˈdɒlfɪn',         norm:'dolphin',   def:'a smart sea animal that lives in groups and breathes air',       jp:'イルカ',        tr:'Dolphins are very friendly.'},
+ {w:'fish',         e:'🐟', ipa:'fɪʃ',             norm:'fish',      def:'an animal with fins and gills that lives in water',              jp:'魚（さかな）',  tr:'There are many fish in the sunlit zone.'},
+ {w:'a shark',      e:'🦈', ipa:'ʃɑrk',            norm:'shark',     def:'a large fish with sharp teeth that lives in the ocean',          jp:'サメ',          tr:'A shark lives in the sunlit zone.'},
+ {w:'a sea turtle', e:'🐢', ipa:'siː ˈtɜrtəl',     norm:'sea turtle',def:'a turtle that lives in the ocean and swims with flippers',       jp:'ウミガメ',      tr:'A sea turtle can swim fast.'},
+ {w:'an octopus',   e:'🐙', ipa:'ˈɒktəpəs',        norm:'octopus',   def:'a sea creature with eight arms',                                 jp:'タコ',          tr:'An octopus has eight arms.'},
+ {w:'sea sponges',  e:'🧽', ipa:'siː ˈspʌndʒɪz',   norm:'sea sponges',def:'soft sea animals that live on the ocean floor',                 jp:'海綿（かいめん）', tr:'Sea sponges are colorful.'}
+];
+
+/* Academic Language for Unit 6, from the unit's academicWordIds. */
+const ACADEMIC=[
+ {w:'obligation', e:'⚖️', ipa:'ˌɒbləˈɡeɪʃən', def:'something you must or have to do — a duty or rule',  jp:'義務（ぎむ）',   s:'We use have to and must to talk about an obligation.'},
+ {w:'prohibition',e:'🚫', ipa:'ˌprəʊɪˈbɪʃən', def:"something you can't or must not do — a rule against doing something", jp:'禁止（きんし）', s:"We use can't and don't to talk about a prohibition."},
+ {w:'definition', e:'🏷️', ipa:'ˌdɛfəˈnɪʃən', def:'a statement that tells what a word or idea means',   jp:'定義（ていぎ）', s:'The reading gives a definition of the word polyps.'},
+ {w:'diagram',    e:'📐', ipa:'ˈdaɪəɡræm',    def:'a simple drawing with labels that shows how something works', jp:'図（ず）', s:'Look at the diagram of a coral polyp to see its parts.'},
+ {w:'label',      e:'🏷️', ipa:'ˈleɪbəl',     def:'a word that names a part — or to write that word on a part', jp:'ラベル', s:'Write a label for each number on the diagram.'},
+ {w:'contrast',   e:'⚖️', ipa:'ˈkɒntrɑːst',  def:'to show how two things are different — or the difference itself', jp:'対比（たいひ）', s:'In contrast writing, we use words like but and however.'},
+ {w:'differences',e:'🔀', ipa:'ˈdɪfərənsɪz', def:'the ways in which two or more things are not the same', jp:'ちがい', s:'What are the differences between warm corals and cold corals?'},
+ {w:'expressions',e:'💬', ipa:'ɪkˈsprɛʃənz', def:'words or short phrases people often use to say a particular thing', jp:'表現（ひょうげん）', s:"Use expressions like 'in contrast' to show a difference."}
+];
+
+/* ── progress + footers (save/restore rules 1, 4, 5) ── */
+function refreshProgress(){
+  let done=0;
+  for(let i=0;i<TAB_COUNT;i++){
+    if(lLoad('tab-'+i+'-done')){done++;const b=document.getElementById('tb'+i);if(b)b.classList.add('done');}
+  }
+  document.getElementById('prog-pill').textContent=done+' / '+TAB_COUNT+' done';
+  const flag='leea-'+HOMEWORK_ID+'-done';
+  try{
+    if(done>=TAB_COUNT){lSave('done',true);localStorage.setItem(flag,JSON.stringify({complete:true,completedAt:new Date().toISOString()}));}
+    else{lDel('done');localStorage.removeItem(flag);}
+  }catch(e){}
+}
+/* Rule 1: the activity calls this the moment its own criteria are met. */
+function markDone(i,silent){
+  if(!lLoad('tab-'+i+'-done'))lSave('tab-'+i+'-done',{done:true,completedAt:new Date().toISOString()});
+  const b=document.getElementById('complete-'+i);
+  if(b){b.disabled=false;b.classList.add('confirmed');b.textContent='✓ '+TABS[i].name+' done';}
+  const banner=document.getElementById('banner-'+i);
+  if(banner&&!silent)banner.classList.add('show');
+  refreshProgress();
+}
+function allowComplete(i){
+  const b=document.getElementById('complete-'+i);
+  if(b&&!lLoad('tab-'+i+'-done')){b.disabled=false;b.textContent='Mark '+TABS[i].name+' complete ✓';}
+}
+/* Rule 4: two-tap arm, then clear this tab's keys and rebuild from zero. */
+function doRedo(i){
+  const b=document.getElementById('redo-'+i);
+  if(!b.classList.contains('armed')){
+    b.classList.add('armed');b.textContent='Tap again ↺';
+    setTimeout(()=>{b.classList.remove('armed');b.textContent='↺ Redo';},3000);
+    return;
+  }
+  b.classList.remove('armed');b.textContent='↺ Redo';
+  lDel('tab-'+i+'-done');
+  if(i===11)lDel('score');
+  Object.keys(localStorage).filter(k=>k.indexOf(SAVE_PREFIX+'tab-'+i+'-')===0).forEach(k=>localStorage.removeItem(k));
+  const c=document.getElementById('complete-'+i);
+  c.classList.remove('confirmed');c.disabled=true;c.textContent='Mark '+TABS[i].name+' complete ✓';
+  const banner=document.getElementById('banner-'+i);if(banner)banner.classList.remove('show');
+  document.getElementById('tb'+i).classList.remove('done');
+  if(TAB_RESET[i])TAB_RESET[i]();
+  refreshProgress();
+}
+/* Rule 2: only tab 11 writes the score key, and it writes the whole result. */
+function saveScore(score,total,extra){
+  const rec={score:score,total:total,percent:Math.round(score/total*100),done:true,savedAt:new Date().toISOString()};
+  for(const k in extra)rec[k]=extra[k];
+  lSave('score',rec);
+}
+let _active=0;
+function showTab(n){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===n));
+  document.querySelectorAll('.tab-content').forEach((c,i)=>c.classList.toggle('active',i===n));
+  _active=n;lSave('last-tab',n);
+  if(TAB_INIT[n]&&!TAB_INIT[n]._done){TAB_INIT[n]();TAB_INIT[n]._done=true;}
+  if(TAB_RESTORE[n])TAB_RESTORE[n]();
+  const c=document.getElementById('complete-'+n);
+  if(c&&lLoad('tab-'+n+'-done')){c.disabled=false;c.classList.add('confirmed');c.textContent='✓ '+TABS[n].name+' done';}
+}
+
+/* Shared MCQ block. Rule 6: an answered question comes back looking answered,
+   or the guard swallows the next tap with no feedback. */
+function askBlock(host,item,tab,key,after){
+  const card=el('div','qcard');
+  const q=el('div','qtext');q.innerHTML=item.q;card.appendChild(q);
+  const grp=el('div','opt-group');
+  item.opts.forEach((t,oi)=>{
+    const b=el('button','opt',t);
+    b.onclick=()=>{
+      const st=lLoad('tab-'+tab+'-ans')||{};
+      if(st[key]!=null)return;
+      st[key]=oi;lSave('tab-'+tab+'-ans',st);
+      paint(b,oi);if(after)after();
+    };
+    grp.appendChild(b);
+  });
+  card.appendChild(grp);
+  if(item.jp){const j=el('div','jp-note','🇯🇵 '+item.jp);j.style.display='none';card.appendChild(j);}
+  host.appendChild(card);
+  function paint(clicked,chosen){
+    const all=grp.querySelectorAll('.opt');
+    for(let i=0;i<all.length;i++){all[i].disabled=true;if(i===item.correct)all[i].classList.add('good');}
+    if(chosen!==item.correct&&clicked)clicked.classList.add('bad');
+    const j=card.querySelector('.jp-note');if(j)j.style.display='block';
+  }
+  const saved=(lLoad('tab-'+tab+'-ans')||{})[key];
+  if(saved!=null)paint(grp.querySelectorAll('.opt')[saved],saved);
+}
+function answered(tab,keys){const st=lLoad('tab-'+tab+'-ans')||{};return keys.filter(k=>st[k]!=null).length;}
+function counter(host,label){
+  const row=el('div','mstatus'),c=el('div','mcount','0');
+  row.appendChild(c);row.appendChild(el('div','mhint',label));host.appendChild(row);return c;
+}
+function srcPill(host,text){host.appendChild(el('div','src-pill',text));}
+
+/* ── flashcard block: Practice + Quiz, both required (PR #77 lock) ── */
+function flashcards(host,tab,list){
+  const st=lLoad('tab-'+tab+'-fc')||{seen:[],solved:[],mode:'practice'};
+  st.seen=st.seen||[];st.solved=st.solved||[];
+  const modes=el('div','fc-modeswitch');
+  const pb=el('button','fc-modebtn','📖 Practice'),qb=el('button','fc-modebtn','🧠 Quiz');
+  modes.appendChild(pb);modes.appendChild(qb);host.appendChild(modes);
+  const status=el('div','mstatus'),seenPill=el('div','mcount',''),solvedPill=el('div','mcount alt','');
+  status.appendChild(seenPill);status.appendChild(solvedPill);host.appendChild(status);
+  const pp=el('div','fc-pane'),qp=el('div','fc-pane');host.appendChild(pp);host.appendChild(qp);
+  let idx=0;
+  const wrap=el('div','flashcard-wrap'),card=el('div','flashcard'),front=el('div','fc-face fc-front'),back=el('div','fc-face fc-back');
+  card.appendChild(front);card.appendChild(back);wrap.appendChild(card);
+  wrap.onclick=()=>card.classList.toggle('flipped');
+  pp.appendChild(wrap);
+  const nav=el('div','fc-nav'),prev=el('button',null,'◀ Back'),dots=el('div','fc-dots'),next=el('button',null,'Next ▶');
+  nav.appendChild(prev);nav.appendChild(dots);nav.appendChild(next);pp.appendChild(nav);
+  prev.onclick=()=>{idx=(idx-1+list.length)%list.length;draw();};
+  next.onclick=()=>{idx=(idx+1)%list.length;draw();};
+  function draw(){
+    const w=list[idx];card.classList.remove('flipped');
+    front.innerHTML='';front.appendChild(el('div','fc-emoji',w.e));front.appendChild(el('div','fc-word',w.w));
+    front.appendChild(el('div','fc-ipa','/'+w.ipa+'/'));front.appendChild(el('div','fc-tap','TAP TO FLIP'));
+    back.innerHTML='';back.appendChild(el('div','fc-def',w.def));
+    const jp=el('div','fc-jp',w.jp),jb=el('button','fc-jp-btn','🇯🇵 Japanese');
+    jb.onclick=(ev)=>{ev.stopPropagation();jp.classList.toggle('revealed');};
+    back.appendChild(jb);back.appendChild(jp);
+    const s=el('div','fc-sample');s.innerHTML=boldWord(w.s||w.tr,w.norm||w.w);back.appendChild(s);
+    dots.innerHTML='';list.forEach((_,i)=>dots.appendChild(el('div','fc-dot'+(i===idx?' on':''))));
+    if(st.seen.indexOf(idx)<0)st.seen.push(idx);
+    persist();
+  }
+  const qcard=el('div','qcard');qp.appendChild(qcard);
+  function drawQuiz(){
+    qcard.innerHTML='';
+    const left=list.map((_,i)=>i).filter(i=>st.solved.indexOf(i)<0);
+    if(!left.length){qcard.appendChild(el('div','qtext','🎉 Every word typed correctly!'));return;}
+    const i=left[0],w=list[i];
+    qcard.appendChild(el('div','fc-emoji',w.e));
+    qcard.appendChild(el('div','qtext',w.def));
+    const row=el('div','svy-row'),inp=el('input'),ck=el('button','tr-btn','✓ Check'),clue=el('button','tr-btn','Clue');
+    inp.placeholder='Type the word';row.appendChild(inp);row.appendChild(ck);row.appendChild(clue);
+    qcard.appendChild(row);
+    const fb=el('div','mhint','');qcard.appendChild(fb);
+    const target=w.w.replace(/^(a|an|the)\s+/i,'').toLowerCase();
+    clue.onclick=()=>{fb.textContent='Starts with "'+target.charAt(0)+'" · '+target.replace(/[^\s]/g,'•');};
+    ck.onclick=()=>{
+      if(inp.value.trim().toLowerCase().replace(/^(a|an|the)\s+/,'')===target){
+        st.solved.push(i);persist();drawQuiz();
+      }else{row.classList.add('err');fb.textContent='Not yet — try again.';setTimeout(()=>row.classList.remove('err'),400);}
+    };
+    inp.onkeydown=(ev)=>{if(ev.key==='Enter')ck.onclick();};
+  }
+  function persist(){
+    st.mode=pp.classList.contains('active')?'practice':'quiz';
+    lSave('tab-'+tab+'-fc',st);
+    seenPill.textContent='📖 '+st.seen.length+' / '+list.length;
+    solvedPill.textContent='🧠 '+st.solved.length+' / '+list.length;
+    if(st.seen.length>=list.length&&st.solved.length>=list.length)markDone(tab);
+  }
+  function setMode(m){
+    pp.classList.toggle('active',m==='practice');qp.classList.toggle('active',m==='quiz');
+    pb.classList.toggle('active',m==='practice');qb.classList.toggle('active',m==='quiz');
+    if(m==='quiz')drawQuiz();
+    persist();
+  }
+  pb.onclick=()=>setMode('practice');qb.onclick=()=>setMode('quiz');
+  draw();setMode(st.mode==='quiz'?'quiz':'practice');
+}
+</script>
+<script>
+/* ═══ TAB 0 — ACADEMIC ═══ */
+TAB_INIT[0]=function(){
+  const h=document.getElementById('body-0');
+  h.appendChild(hdr('📚 Academic Language','The study words Unit 6 uses'));
+  h.appendChild(hint('Finish BOTH modes — Practice and Quiz — to complete this tab.'));
+  flashcards(h,0,ACADEMIC);
+  srcPill(h,'Unit 6 Academic Language · planner pp. 194-223');
+};
+TAB_RESET[0]=function(){rebuild(0);};
+
+/* ═══ TAB 1 — WARM UP (TR 6.1) ═══ */
+/* ── answer-position variation ──────────────────────────────────────────
+   The authored MCQ data lists the correct option first so it is readable in
+   the source. Left alone, Leo could score 100% on every quiz by always
+   tapping the top button, so each item is permuted here — deterministically
+   from its own question text, so the layout is stable across reloads and a
+   restored answer still lines up with the option it was saved against. */
+function hashText(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+/* splitmix32. A plain LCG was tried first and its low bits cycle, which
+   produced a shuffle that never picked option A — so consume the high bits. */
+function mix32(a){a=(a+0x9e3779b9)>>>0;let z=a;z=Math.imul(z^(z>>>16),0x21f0aaad)>>>0;z=Math.imul(z^(z>>>15),0x735a2d97)>>>0;return (z^(z>>>15))>>>0;}
+function varyItem(item){
+  if(!item||!Array.isArray(item.opts)||typeof item.correct!=='number')return item;
+  const answer=item.opts[item.correct];
+  const opts=item.opts.slice();
+  let state=hashText(String(item.q));
+  for(let i=opts.length-1;i>0;i--){
+    state=mix32(state);
+    const j=Math.floor((state/4294967296)*(i+1));
+    const t=opts[i];opts[i]=opts[j];opts[j]=t;
+  }
+  item.opts=opts;item.correct=opts.indexOf(answer);
+  return item;
+}
+function varyAll(list){list.forEach(varyItem);return list;}
+
+const WARMUP=[
+ {q:'What do we use the oceans for?',opts:['Fun, transportation, and food','Only for fishing','Only for swimming'],correct:0,jp:'海は遊び・輸送・食べ物のために使います。'},
+ {q:'What must we stop, to protect the oceans?',opts:['Pollution','Sunlight','Swimming'],correct:0,jp:'汚染を止めなければなりません。'},
+ {q:'What happens to our resources if we do nothing?',opts:['They will disappear','They will grow','They will freeze'],correct:0,jp:'資源は消えてしまいます。'},
+ {q:'Where do most of the creatures we know stay?',opts:['Near the top layer','On the ocean floor','In the midnight zone'],correct:0,jp:'よく知られている生き物の多くは上の層にいます。'},
+ {q:'How deep does sunlight go in the sunlit zone?',opts:['About 200 m','About 1,000 m','About 5,000 m'],correct:0,jp:'約200メートルまでです。'},
+ {q:'Why is the deepest layer called the midnight zone?',opts:["Sunlight doesn't reach below 1,000 m","Animals sleep there","It is always cold"],correct:0,jp:'1,000メートルより下には日光が届かないからです。'}
+];
+TAB_INIT[1]=function(){
+  const h=document.getElementById('body-1');
+  h.appendChild(hdr('🔥 Warm Up','Wonders of the Sea · TR 6.1'));
+  h.appendChild(hint('Six quick questions about the ocean opener you listened to.'));
+  const zs=el('div','zone-strip');
+  [['zone-sunlit','☀️ Sunlit zone','down to about 200 m'],
+   ['zone-twilight','🌆 Twilight zone','down to about 1,000 m'],
+   ['zone-midnight','🌌 Midnight zone','below 1,000 m — almost completely black']].forEach(z=>{
+    const r=el('div','zone-row '+z[0]);r.appendChild(el('div',null,z[1]));r.appendChild(el('div','zone-depth',z[2]));zs.appendChild(r);
+  });
+  h.appendChild(zs);
+  const keys=WARMUP.map((_,i)=>'w'+i);
+  const c=counter(h,'answered');
+  WARMUP.forEach((it,i)=>askBlock(h,it,1,keys[i],up));
+  srcPill(h,'Student Book TR 6.1 — Vocabulary 1, Activity 1: Listen and read');
+  function up(){const n=answered(1,keys);c.textContent=n+' / '+WARMUP.length;if(n>=WARMUP.length)markDone(1);}
+  up();
+};
+TAB_RESET[1]=function(){rebuild(1);};
+
+/* ═══ TAB 2 — PRESENT ═══ */
+TAB_INIT[2]=function(){
+  const h=document.getElementById('body-2');
+  h.appendChild(hdr('🎯 Present','All 16 words, with the sentence the audio says'));
+  h.appendChild(hint('Tap every card to open it. Then answer the three checks at the bottom.'));
+  const st=lLoad('tab-2-open')||[];
+  const c=counter(h,'cards opened');
+  const grid=el('div','flip-grid');
+  WORDS.forEach((w,i)=>{
+    const card=el('div','flipcard');
+    function open(){
+      card.classList.add('revealed');card.innerHTML='';
+      card.appendChild(el('div','fce',w.e));
+      card.appendChild(el('div','ftitle',w.w));
+      card.appendChild(el('div','fbody',w.def));
+      const q=el('div','fbody');q.innerHTML='“'+boldWord(w.tr,w.norm)+'”';card.appendChild(q);
+      card.appendChild(el('div','fjp','🇯🇵 '+w.jp));
+    }
+    card.appendChild(el('div','fce',w.e));
+    card.appendChild(el('div','ftitle',w.w));
+    card.appendChild(el('div','fc-tap','TAP TO OPEN'));
+    card.onclick=()=>{if(st.indexOf(i)<0){st.push(i);lSave('tab-2-open',st);}open();up();};
+    if(st.indexOf(i)>=0)open();
+    grid.appendChild(card);
+  });
+  h.appendChild(grid);
+  const CHECKS=[
+   {q:'Which word means “one level of the ocean — top, middle, or bottom”?',opts:['a layer','a zone','a creature'],correct:0,jp:'層（そう）'},
+   {q:'Which word means “something useful in nature, like water or fish”?',opts:['a resource','pollution','sunlight'],correct:0,jp:'資源（しげん）'},
+   {q:'Which sea animal has eight arms?',opts:['an octopus','a squid','a whale'],correct:0,jp:'タコには8本の腕があります。'}
+  ];
+  varyAll(CHECKS);
+  const ck=CHECKS.map((_,i)=>'c'+i);
+  CHECKS.forEach((it,i)=>askBlock(h,it,2,ck[i],up));
+  srcPill(h,'Student Book TR 6.2 — Vocabulary 1, Activity 2: Listen and repeat');
+  function up(){
+    c.textContent=st.length+' / '+WORDS.length;
+    if(st.length>=WORDS.length&&answered(2,ck)>=ck.length)markDone(2);
+  }
+  up();
+};
+TAB_RESET[2]=function(){rebuild(2);};
+
+/* ═══ TAB 3 — FLASHCARDS ═══ */
+TAB_INIT[3]=function(){
+  const h=document.getElementById('body-3');
+  h.appendChild(hdr('🃏 Flashcards','16 Vocabulary 1 words'));
+  h.appendChild(hint('Practice flips the cards. Quiz makes you type them. Both must be finished.'));
+  flashcards(h,3,WORDS);
+  srcPill(h,'unit-6/vocabulary.json · TR 6.2');
+};
+TAB_RESET[3]=function(){rebuild(3);};
+
+/* ═══ TAB 4 — SORT (pickChart) ═══ */
+TAB_INIT[4]=function(){
+  const h=document.getElementById('body-4');
+  h.appendChild(hdr('🧠 Sort','Creatures, ocean words, or protecting the ocean?'));
+  h.appendChild(hint('Drag each word into the right column. All 16 words go somewhere.'));
+  const mount=el('div');h.appendChild(mount);
+  if(typeof window.pickChart!=='function'){
+    mount.appendChild(hint('⚠️ Sorter component not loaded — check /components/charts.js'));
+    allowComplete(4);return;
+  }
+  mount.innerHTML=window.pickChart('classification sort',{
+    id:'u6v1-sort',
+    tiles:[
+      {text:'🐋 a whale',answer:'creature'},{text:'🦑 a squid',answer:'creature'},
+      {text:'🐬 a dolphin',answer:'creature'},{text:'🐟 fish',answer:'creature'},
+      {text:'🦈 a shark',answer:'creature'},{text:'🐢 a sea turtle',answer:'creature'},
+      {text:'🐙 an octopus',answer:'creature'},{text:'🧽 sea sponges',answer:'creature'},
+      {text:'🦀 a creature',answer:'creature'},
+      {text:'🌊 a layer',answer:'ocean'},{text:'🌍 a zone',answer:'ocean'},
+      {text:'☀️ sunlight',answer:'ocean'},{text:'🌌 midnight',answer:'ocean'},
+      {text:'🛢️ pollution',answer:'problem'},{text:'♻️ a resource',answer:'problem'},
+      {text:'❌ disappear',answer:'problem'}
+    ],
+    zones:[
+      {key:'creature',label:'🐙 Sea creatures',color:'#0EA5E9'},
+      {key:'ocean',label:'🌊 Ocean words',color:'#075985'},
+      {key:'problem',label:'🛢️ Protecting the ocean',color:'#B45309'}
+    ],
+    onComplete:function(){lSave('tab-4-sorted',true);markDone(4);}
+  });
+  srcPill(h,'unit-6/vocabulary.json — all 16 Vocabulary 1 words');
+  if(lLoad('tab-4-sorted'))markDone(4,true);
+  allowComplete(4);
+};
+TAB_RESET[4]=function(){rebuild(4);};
+
+/* ═══ TAB 5 — READING (cloze, TR 6.1 verbatim) ═══ */
+const CLOZE_TEXT="Most of the {{0}} we know stay near the top {{1}} of the water, called the sunlit {{2}}. In this zone, {{3}} goes down to about 200 m. The middle layer of the water is called the twilight zone. Many different types of {{4}} live in this layer. The mysterious bottom layer of water is almost completely black. It is called the {{5}} zone because sunlight doesn't reach below 1,000 m. We must stop {{6}}. We must protect the oceans or our {{7}} will disappear.";
+const CLOZE_ANS=['creatures','layer','zone','sunlight','fish','midnight','pollution','resources'];
+TAB_INIT[5]=function(){
+  const h=document.getElementById('body-5');
+  h.appendChild(hdr('📖 Reading','The three ocean zones · TR 6.1'));
+  h.appendChild(hint('Tap a blank, then tap the word that fills it. This is the opener text, word for word.'));
+  const st=lLoad('tab-5-fill')||{};
+  const c=counter(h,'blanks filled');
+  const box=el('div','read-box');
+  const parts=CLOZE_TEXT.split(/\{\{(\d+)\}\}/);
+  const blanks={};
+  parts.forEach((p,i)=>{
+    if(i%2===0){const s=document.createElement('span');s.textContent=p;box.appendChild(s);}
+    else{
+      const slot=Number(p),b=el('span','read-blank','________');
+      b.onclick=()=>{box.querySelectorAll('.read-blank').forEach(n=>n.classList.remove('active'));b.classList.add('active');};
+      blanks[slot]=b;box.appendChild(b);
+    }
+  });
+  h.appendChild(box);
+  const bank=el('div','chip-bank');
+  shuffle(CLOZE_ANS.slice()).forEach(word=>{
+    const chip=el('button','chip',word);
+    chip.onclick=()=>{
+      const act=box.querySelector('.read-blank.active');if(!act)return;
+      const slot=Number(Object.keys(blanks).filter(k=>blanks[k]===act)[0]);
+      if(CLOZE_ANS[slot]===word){
+        act.textContent=word;act.classList.add('filled');act.classList.remove('active');
+        chip.classList.add('used');st[slot]=word;lSave('tab-5-fill',st);up();
+      }else{act.classList.add('wrong');setTimeout(()=>act.classList.remove('wrong'),400);}
+    };
+    bank.appendChild(chip);
+  });
+  h.appendChild(bank);
+  srcPill(h,'Student Book TR 6.1 — Vocabulary 1, Activity 1: Listen and read');
+  Object.keys(st).forEach(slot=>{
+    if(!blanks[slot])return;
+    blanks[slot].textContent=st[slot];blanks[slot].classList.add('filled');
+    const chips=bank.querySelectorAll('.chip');
+    for(let i=0;i<chips.length;i++){if(chips[i].textContent===st[slot]&&!chips[i].classList.contains('used')){chips[i].classList.add('used');break;}}
+  });
+  function up(){const n=Object.keys(st).length;c.textContent=n+' / '+CLOZE_ANS.length;if(n>=CLOZE_ANS.length)markDone(5);}
+  up();
+};
+TAB_RESET[5]=function(){rebuild(5);};
+
+/* ═══ TAB 6 — PRACTICE (gap-fill from TR 6.2) ═══ */
+function gapItems(list,n,seed){
+  return list.slice(0,n).map((w,i)=>{
+    const stem=w.norm.replace(/_/g,' ');
+    let q=w.tr;
+    try{q=w.tr.replace(new RegExp(stem.split(/\s+/).join('[-\\s]')+'\\w*','i'),'______');}catch(e){}
+    const wrong=list.filter((_,j)=>j!==i).map(x=>x.w);
+    const opts=shuffle([w.w,wrong[(i+2)%wrong.length],wrong[(i+7)%wrong.length]]);
+    return {q:q,opts:opts,correct:opts.indexOf(w.w),jp:w.jp};
+  });
+}
+TAB_INIT[6]=function(){
+  const h=document.getElementById('body-6');
+  h.appendChild(hdr('📝 Practice','Fill the gap in the book sentence'));
+  h.appendChild(hint('Every sentence here is one the audio actually says.'));
+  const items=gapItems(WORDS,8,1);
+  const keys=items.map((_,i)=>'p'+i);
+  const c=counter(h,'practised');
+  items.forEach((it,i)=>askBlock(h,it,6,keys[i],up));
+  srcPill(h,'Student Book TR 6.2');
+  function up(){const n=answered(6,keys);c.textContent=n+' / '+items.length;if(n>=items.length)markDone(6);}
+  up();
+};
+TAB_RESET[6]=function(){rebuild(6);};
+
+/* ═══ TAB 7 — UNSCRAMBLE ═══ */
+TAB_INIT[7]=function(){
+  const h=document.getElementById('body-7');
+  h.appendChild(hdr('🔤 Unscramble','Type the word the letters spell'));
+  h.appendChild(hint('The meaning under each puzzle is your clue.'));
+  const st=lLoad('tab-7-solved')||[];
+  const pick=[0,3,4,5,7,8,10,14].map(i=>WORDS[i]);
+  const c=counter(h,'words unscrambled');
+  pick.forEach((w,i)=>{
+    const letters=w.norm.replace(/_/g,' ');
+    const card=el('div','qcard');
+    card.appendChild(el('div','qtext',w.e+'  '+shuffle(letters.replace(/\s/g,'').split('')).join('').toUpperCase()));
+    card.appendChild(el('div','mhint',w.def));
+    const row=el('div','svy-row'),inp=el('input'),ck=el('button','tr-btn','✓ Check');
+    inp.placeholder='Type the word';row.appendChild(inp);row.appendChild(ck);card.appendChild(row);
+    h.appendChild(card);
+    function solve(){row.classList.add('filled');inp.value=letters;inp.disabled=true;ck.disabled=true;ck.textContent='✓';}
+    ck.onclick=()=>{
+      if(inp.value.trim().toLowerCase()===letters.toLowerCase()){
+        if(st.indexOf(i)<0)st.push(i);lSave('tab-7-solved',st);solve();up();
+      }else{row.classList.add('err');setTimeout(()=>row.classList.remove('err'),400);}
+    };
+    inp.onkeydown=(ev)=>{if(ev.key==='Enter')ck.onclick();};
+    if(st.indexOf(i)>=0)solve();
+  });
+  srcPill(h,'unit-6/vocabulary.json');
+  function up(){c.textContent=st.length+' / '+pick.length;if(st.length>=pick.length)markDone(7);}
+  up();
+};
+TAB_RESET[7]=function(){rebuild(7);};
+
+/* ═══ TAB 8 — MATCH (verbatim TR 6.2, TR order, recap table) ═══ */
+TAB_INIT[8]=function(){
+  const h=document.getElementById('body-8');
+  h.appendChild(hdr('🔗 Match','TR 6.2 — Listen and repeat'));
+  h.appendChild(hint('Match each word to the sentence the audio actually says, so you know how it sounds in a real sentence.'));
+  const st=lLoad('tab-8-matched')||[];
+  const c=counter(h,'pairs matched');
+  const grid=el('div','mgrid'),left=el('div','mcol'),right=el('div','mcol');
+  grid.appendChild(left);grid.appendChild(right);h.appendChild(grid);
+  const recap=el('div','mrecap');
+  recap.appendChild(el('div','mrecap-title','📼 Audio-script order — Word · Emoji · Sentence'));
+  const table=document.createElement('table');recap.appendChild(table);h.appendChild(recap);
+  /* Rows are pre-rendered hidden in TR order and revealed in place, so the
+     recap always reads back in the order Leo hears — never match order. */
+  const rows={};
+  WORDS.forEach((w,i)=>{
+    const tr=document.createElement('tr');tr.style.display='none';
+    const a=document.createElement('td');a.className='mr-word';a.textContent=w.w;
+    const b=document.createElement('td');b.className='mr-emoji';b.textContent=w.e;
+    const d=document.createElement('td');d.className='mr-sent';d.textContent=w.tr;
+    tr.appendChild(a);tr.appendChild(b);tr.appendChild(d);table.appendChild(tr);rows[i]=tr;
+  });
+  const L={},R={};let sel=null;
+  WORDS.forEach((w,i)=>{
+    const b=el('button','mitem',w.e+'  '+w.w);b.dataset.idx=String(i);
+    b.onclick=()=>{if(b.classList.contains('lock'))return;if(sel)sel.classList.remove('sel');sel=b;b.classList.add('sel');};
+    L[i]=b;left.appendChild(b);
+  });
+  shuffle(WORDS.map((_,i)=>i)).forEach(i=>{
+    const b=el('button','mitem m-right',WORDS[i].tr);
+    b.onclick=()=>{
+      if(!sel||b.classList.contains('lock'))return;
+      if(Number(sel.dataset.idx)===i){
+        sel.classList.remove('sel');sel.classList.add('lock');b.classList.add('lock');
+        if(st.indexOf(i)<0)st.push(i);lSave('tab-8-matched',st);
+        rows[i].style.display='';recap.classList.add('show');sel=null;up();
+      }else{b.classList.add('err');setTimeout(()=>b.classList.remove('err'),400);}
+    };
+    R[i]=b;right.appendChild(b);
+  });
+  srcPill(h,'Student Book TR 6.2 · the shark line is the card example — TR 6.2 is truncated there in the source');
+  st.forEach(i=>{L[i].classList.add('lock');R[i].classList.add('lock');rows[i].style.display='';recap.classList.add('show');});
+  function up(){c.textContent=st.length+' / '+WORDS.length;if(st.length>=WORDS.length)markDone(8);}
+  up();
+};
+TAB_RESET[8]=function(){rebuild(8);};
+
+/* ═══ TAB 9 — APPLY (sunshine organizer) ═══ */
+TAB_INIT[9]=function(){
+  const h=document.getElementById('body-9');
+  h.appendChild(hdr('☀️ Apply','Write your own sentence on every ray'));
+  h.appendChild(hint('Eight rays, eight words. Use each word in a sentence about the ocean.'));
+  const st=lLoad('tab-9-text')||{};
+  const pick=[0,1,2,3,4,5,6,7].map(i=>WORDS[i]);
+  const c=counter(h,'rays written');
+  const sun=el('div');h.appendChild(sun);
+  const eds=el('div');eds.style.display='flex';eds.style.flexDirection='column';eds.style.gap='8px';h.appendChild(eds);
+  function draw(){
+    if(typeof window.pickChart!=='function'){sun.innerHTML='';sun.appendChild(hint('⚠️ Sunshine organizer not loaded.'));return;}
+    sun.innerHTML=window.pickChart('sunshine organizer',{
+      id:'u6v1-sun',words:pick.map(w=>({word:w.w,emoji:w.e})),saved:st,
+      centerLabel:'Wonders of the Sea',centerHint:'Tap a ray',
+      onSelect:function(i){const f=document.getElementById('u6v1-in-'+i);if(f){f.focus();f.scrollIntoView({block:'center'});}}
+    });
+  }
+  pick.forEach((w,i)=>{
+    const row=el('div','svy-row');
+    row.appendChild(el('div','sun-word',w.e+' '+w.w));
+    const inp=el('input');inp.id='u6v1-in-'+i;inp.placeholder='Write a sentence with "'+w.w+'"';
+    inp.value=st[i]||'';
+    if((st[i]||'').trim().length>5)row.classList.add('filled');
+    inp.oninput=()=>{st[i]=inp.value;lSave('tab-9-text',st);row.classList.toggle('filled',inp.value.trim().length>5);up();};
+    inp.onblur=draw;
+    row.appendChild(inp);eds.appendChild(row);
+  });
+  srcPill(h,'Apply phase — Leo’s own sentences');
+  function up(){
+    const n=pick.filter((_,i)=>(st[i]||'').trim().length>5).length;
+    c.textContent=n+' / '+pick.length;if(n>=pick.length)markDone(9);
+  }
+  draw();up();
+};
+TAB_RESET[9]=function(){rebuild(9);};
+
+/* ═══ TAB 10 — WRAP UP (true / false) ═══ */
+TAB_INIT[10]=function(){
+  const h=document.getElementById('body-10');
+  h.appendChild(hdr('🎭 Wrap Up','True or false?'));
+  h.appendChild(hint('Read each sentence carefully — half of them are wrong on purpose.'));
+  /* Four true and four false, in the order T F F T F T T F. The answers must
+     not alternate — a strict T/F/T/F run is a pattern Leo can score without
+     reading the sentences at all. The True/False buttons themselves stay in
+     that order, so varyAll is deliberately not applied to this tab. */
+  const TF=[
+   {t:'The sunlit zone is the top layer of the ocean.',a:true,jp:'いちばん上の層が sunlit zone です。'},
+   {t:'An octopus has four arms.',a:false,jp:'タコの腕は8本です。'},
+   {t:'“Pollution” means something useful in nature.',a:false,jp:'pollution は汚染のことです。'},
+   {t:'Sunlight does not reach below 1,000 m.',a:true,jp:'1,000メートルより下には日光が届きません。'},
+   {t:'Sea sponges swim quickly near the surface.',a:false,jp:'海綿は海底にすむ動物です。'},
+   {t:'A whale is the biggest sea creature.',a:true,jp:'クジラは最大の海の生き物です。'},
+   {t:'“Disappear” means to go away so it cannot be seen.',a:true,jp:'disappear は見えなくなることです。'},
+   {t:'The midnight zone is full of bright sunlight.',a:false,jp:'midnight zone はほぼ真っ暗です。'}
+  ];
+  const items=TF.map(x=>({q:x.t,opts:['True','False'],correct:x.a?0:1,jp:x.jp}));
+  const keys=items.map((_,i)=>'t'+i);
+  const c=counter(h,'checked');
+  items.forEach((it,i)=>askBlock(h,it,10,keys[i],up));
+  srcPill(h,'Student Book TR 6.1 / TR 6.2 · unit-6/vocabulary.json');
+  function up(){const n=answered(10,keys);c.textContent=n+' / '+items.length;if(n>=items.length)markDone(10);}
+  up();
+};
+TAB_RESET[10]=function(){rebuild(10);};
+
+/* ═══ TAB 11 — QUIZ (scored — the only tab that writes `score`) ═══ */
+const QUIZ=[
+ {q:'Which word means “trash or harmful things that make water dirty”?',opts:['pollution','a resource','a layer'],correct:0,jp:'汚染（おせん）'},
+ {q:'Which word means “a part or area of the ocean”?',opts:['a zone','a creature','midnight'],correct:0,jp:'区域（くいき）'},
+ {q:'“Most fish live in the top ______ of the water.”',opts:['layer','zone','resource'],correct:0,jp:'層（そう）'},
+ {q:'Which sea animal breathes air and is the biggest?',opts:['a whale','a shark','a squid'],correct:0,jp:'クジラです。'},
+ {q:'“We need to protect our ______.”',opts:['resources','creatures','layers'],correct:0,jp:'資源を守る必要があります。'},
+ {q:'Which creature has eight arms?',opts:['an octopus','a sea turtle','a dolphin'],correct:0,jp:'タコです。'},
+ {q:'“Animals and plants can ______.”',opts:['disappear','sunlight','midnight'],correct:0,jp:'消えてしまうことがあります。'},
+ {q:'Which word names the deepest, darkest ocean zone?',opts:['midnight','sunlight','twilight'],correct:0,jp:'midnight zone です。'},
+ {q:'Sea sponges live ______.',opts:['on the ocean floor','in the sky','on the beach'],correct:0,jp:'海綿は海底にすんでいます。'},
+ {q:'Which word means “a living animal, especially a strange one”?',opts:['a creature','a resource','a layer'],correct:0,jp:'生き物（いきもの）'},
+ {q:'“Plants need ______.”',opts:['sunlight','pollution','garbage'],correct:0,jp:'植物には日光が必要です。'},
+ {q:'A sea turtle swims with its ______.',opts:['flippers','arms','fins and gills'],correct:0,jp:'ウミガメはひれ足で泳ぎます。'}
+];
+TAB_INIT[11]=function(){
+  const h=document.getElementById('body-11');
+  h.appendChild(hdr('✅ Vocabulary Quiz','12 questions — 10 or more to pass'));
+  const active=el('div'),result=el('div');h.appendChild(active);h.appendChild(result);
+  const saved=lLoad('score');
+  const bar=el('div','quiz-progress');active.appendChild(bar);
+  const card=el('div','qcard');active.appendChild(card);
+  let cur=0,score=0,wrong=[];
+  const PASS=10;
+  function render(){
+    bar.innerHTML='';
+    QUIZ.forEach((_,i)=>bar.appendChild(el('div','qdot'+(i<cur?' on':'')+(i===cur?' now':''))));
+    card.innerHTML='';
+    const it=QUIZ[cur];
+    card.appendChild(el('div','qtext',(cur+1)+'. '+it.q));
+    const grp=el('div','opt-group');
+    it.opts.forEach((t,oi)=>{
+      const b=el('button','opt',t);
+      b.onclick=()=>{
+        const all=grp.querySelectorAll('.opt');
+        for(let i=0;i<all.length;i++){all[i].disabled=true;if(i===it.correct)all[i].classList.add('good');}
+        if(oi===it.correct)score++;else{b.classList.add('bad');wrong.push(cur+1);}
+        if(it.jp)card.appendChild(el('div','jp-note','🇯🇵 '+it.jp));
+        setTimeout(()=>{cur++;if(cur>=QUIZ.length)finish();else render();},900);
+      };
+      grp.appendChild(b);
+    });
+    card.appendChild(grp);
+  }
+  function finish(){
+    saveScore(score,QUIZ.length,{pass:score>=PASS,wrongQuestions:wrong});
+    show({score:score,total:QUIZ.length,percent:Math.round(score/QUIZ.length*100),pass:score>=PASS,wrongQuestions:wrong});
+    markDone(11);
+  }
+  /* Rule 3: a finished quiz comes back as its result, never restarted. */
+  function show(rec){
+    active.style.display='none';result.innerHTML='';
+    const pass=rec.pass!=null?rec.pass:rec.score>=PASS;
+    const box=el('div','result-card '+(pass?'pass':'fail'));
+    box.appendChild(el('div','result-trophy',pass?'🏆':'💪'));
+    box.appendChild(el('div','result-score',rec.score+' / '+rec.total));
+    box.appendChild(el('div','result-sub',pass?'You passed! '+rec.percent+'%':'Almost — you need '+PASS+' to pass. Tap ↺ Redo to try again.'));
+    if(rec.wrongQuestions&&rec.wrongQuestions.length)box.appendChild(el('div','result-sub','Look again at question(s): '+rec.wrongQuestions.join(', ')));
+    result.appendChild(box);
+    markDone(11,true);
+  }
+  if(saved&&saved.done){show(saved);}else{render();}
+  srcPill(h,'Formative assessment — Vocabulary 1');
+};
+TAB_RESET[11]=function(){rebuild(11);};
+
+/* ═══ TAB 12 — DRIBBLE! ═══ */
+const DRIB=[
+ {q:'⚽ Champions League final — beat the defender: which word means “a part or area of the ocean”?',opts:['a zone','a layer','a creature'],correct:0,jp:'区域（くいき）'},
+ {q:'⚽ Premier League derby — which sea animal is the biggest?',opts:['a whale','a squid','a shark'],correct:0,jp:'クジラです。'},
+ {q:'⚽ La Liga clásico — “There is too much ______.”',opts:['pollution','sunlight','midnight'],correct:0,jp:'汚染が多すぎます。'},
+ {q:'⚽ Bundesliga night — which creature has eight arms?',opts:['an octopus','a dolphin','fish'],correct:0,jp:'タコです。'},
+ {q:'⚽ Ligue 1 away day — which word means “to go away so it cannot be seen”?',opts:['disappear','protect','float'],correct:0,jp:'消える'},
+ {q:'⚽ Serie A matchday — “Plants need ______.”',opts:['sunlight','garbage','plastic'],correct:0,jp:'日光'},
+ {q:'⚽ World Cup quarter-final — which animal swims with flippers?',opts:['a sea turtle','a squid','sea sponges'],correct:0,jp:'ウミガメです。'},
+ {q:'⚽ Copa del Rey night — “The ______ zone is very dark.”',opts:['midnight','sunlit','twilight'],correct:0,jp:'midnight zone は真っ暗です。'}
+];
+varyAll(WARMUP);varyAll(QUIZ);varyAll(DRIB);
+
+TAB_INIT[12]=function(){
+  const h=document.getElementById('body-12');
+  h.appendChild(hdr('⚽ Dribble!','Every right answer beats a defender'));
+  const pitch=el('div','pitch'),row=el('div','score-row'),goals=el('div'),def=el('div');
+  row.appendChild(goals);row.appendChild(def);pitch.appendChild(row);h.appendChild(pitch);
+  const keys=DRIB.map((_,i)=>'d'+i);
+  DRIB.forEach((it,i)=>askBlock(h,it,12,keys[i],up));
+  srcPill(h,'Vocabulary 1 recall · Leo’s soccer round');
+  function up(){
+    const st=lLoad('tab-12-ans')||{};
+    const scored=keys.filter((k,i)=>st[k]===DRIB[i].correct).length;
+    const n=answered(12,keys);
+    goals.textContent='⚽ Goals: '+scored+' / '+DRIB.length;
+    def.textContent=new Array(Math.max(0,DRIB.length-n)+1).join('🛡️');
+    if(n>=DRIB.length)markDone(12);
+  }
+  up();
+};
+TAB_RESET[12]=function(){rebuild(12);};
+
+/* ── small helpers used by the tabs above ── */
+function hdr(title,sub){
+  const d=el('div');d.appendChild(el('div','section-title',title));
+  if(sub)d.appendChild(el('div','section-sub',sub));return d;
+}
+function hint(text){return el('div','dad-hint',text);}
+function rebuild(i){
+  const body=document.getElementById('body-'+i);
+  body.innerHTML='';
+  TAB_INIT[i]._done=false;TAB_INIT[i]();TAB_INIT[i]._done=true;
+}
+
+/* ── boot ── */
+(function(){
+  const nav=document.getElementById('tab-nav'),stack=document.getElementById('tab-stack');
+  TABS.forEach((t,i)=>{
+    const b=el('button','tab-btn');b.id='tb'+i;
+    b.appendChild(el('span','tab-icon',t.icon));
+    b.appendChild(el('span','tab-name',t.name));
+    b.onclick=()=>showTab(i);
+    nav.appendChild(b);
+    const pane=el('div','tab-content');pane.id='tc'+i;
+    const body=el('div','tab-body');body.id='body-'+i;pane.appendChild(body);
+    const banner=el('div','done-banner','Nice work! Mark it below.');banner.id='banner-'+i;body.appendChild(banner);
+    const foot=el('div','tab-footer');
+    const redo=el('button','btn-redo','↺ Redo');redo.id='redo-'+i;redo.onclick=()=>doRedo(i);
+    const done=el('button','btn-complete','Mark '+t.name+' complete ✓');done.id='complete-'+i;done.disabled=true;
+    done.onclick=()=>markDone(i);
+    foot.appendChild(redo);foot.appendChild(done);pane.appendChild(foot);
+    stack.appendChild(pane);
+  });
+  const last=lLoad('last-tab');
+  showTab(typeof last==='number'&&last>=0&&last<TAB_COUNT?last:0);
+  refreshProgress();
+})();
+</script>
+</body>
+</html>

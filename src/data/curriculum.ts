@@ -4,8 +4,6 @@
 // dashboard hardcoded its own copy of this list; keeping one source avoids
 // the two pages drifting apart (e.g. different level colors/unit titles).
 
-import { level6UnitTitlesByUnit } from "./reference-level6.generated";
-
 export const LEVELS = [1, 2, 3, 4, 5, 6];
 
 // Fallback cursor only. The unit actually being taught is now a setting
@@ -28,9 +26,7 @@ export const UNIT_TITLES_BY_LEVEL: Record<number, Record<number, string>> = {
   3: { 1: "A Helping Hand", 2: "My Place in the World", 3: "On the Move!", 4: "Our Senses", 5: "Animal Habitats", 6: "What’s for Dinner?", 7: "Feeling Fit", 8: "Let's Celebrate", 9: "My Weekend" },
   4: { 1: "All in Our Family", 2: "Fresh Food", 3: "Long Ago and Today", 4: "Get Well Soon!", 5: "My Favorites", 6: "Wonders of the Sea", 7: "Good Idea!", 8: "That's Really Interesting!", 9: "The Science of Fun" },
   5: { 1: "Extreme Weather" },
-  // Level 6 is generated (scripts/ow-l6/), so its titles come straight from the
-  // scanned unit content rather than being copied here by hand.
-  6: level6UnitTitlesByUnit,
+  6: {},
 };
 
 export const UNITS_PER_LEVEL = 9;

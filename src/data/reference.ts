@@ -45,9 +45,6 @@ import level2Unit8Grammar from "../../content/subjects/english/courses/our-world
 import level2Unit7Grammar from "../../content/subjects/english/courses/our-world/level-2/unit-7/grammar.json";
 import level2Unit6Grammar from "../../content/subjects/english/courses/our-world/level-2/unit-6/grammar.json";
 import unit9Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-9/grammar.json";
-/* Level 6 unit files are generated from scripts/ow-l6/ and collected in one
-   module, so adding a scanned unit does not mean editing four lists here. */
-import { level6Grammars, level6UnitTitles, level6Vocabularies } from "./reference-level6.generated";
 import type {
   GrammarChart,
   GrammarLevelUp,
@@ -226,8 +223,7 @@ export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
   unit7Vocabulary.words as UnitVocabularyWord[],
   unit6Vocabulary.words as UnitVocabularyWord[],
   unit5Vocabulary.words as UnitVocabularyWord[],
-  unit4Vocabulary.words as UnitVocabularyWord[],
-  ...level6Vocabularies.map((unit) => unit.words as unknown as UnitVocabularyWord[])
+  unit4Vocabulary.words as UnitVocabularyWord[]
 ]);
 
 /* Real unit titles, sourced from each unit's own vocabulary.json — keyed
@@ -257,8 +253,7 @@ export const unitTitles: Record<string, string> = {
   [`${unit6Vocabulary.level}-${unit6Vocabulary.unit}`]: unit6Vocabulary.unitTitle,
   [`${unit7Vocabulary.level}-${unit7Vocabulary.unit}`]: unit7Vocabulary.unitTitle,
   [`${unit8Vocabulary.level}-${unit8Vocabulary.unit}`]: unit8Vocabulary.unitTitle,
-  [`${unit9Vocabulary.level}-${unit9Vocabulary.unit}`]: unit9Vocabulary.unitTitle,
-  ...level6UnitTitles
+  [`${unit9Vocabulary.level}-${unit9Vocabulary.unit}`]: unit9Vocabulary.unitTitle
 };
 
 export const level5Unit1Vocab1Items = vocabularyItems.filter(
@@ -560,8 +555,7 @@ export const grammarPoints: GrammarPoint[] = [
   ...unit4Grammar.grammarPoints.map(toGrammarPoint),
   ...unit3Grammar.grammarPoints.map(toGrammarPoint),
   ...unit2Grammar.grammarPoints.map(toGrammarPoint),
-  ...unit1Grammar.grammarPoints.map(toGrammarPoint),
-  ...level6Grammars.flatMap((unit) => (unit.grammarPoints as unknown as UnitGrammarPoint[]).map(toGrammarPoint))
+  ...unit1Grammar.grammarPoints.map(toGrammarPoint)
 ];
 export const unit1GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 1);
 export const unit2GrammarItems = grammarPoints.filter((item) => item.level === 4 && item.unit === 2);

@@ -455,27 +455,45 @@ const ACADEMIC=[
 /* ── answer-position variation ──────────────────────────────────────────
    The authored MCQ data lists the correct option first so it is readable in
    the source. Left alone, Leo could score full marks by always tapping the
-   top button, so each item is permuted here — deterministically from its
-   own question text, so the layout is stable across reloads and a restored
-   answer still lines up with the option it was saved against. */
+   top button.
+
+   Positions are dealt out round-robin rather than drawn per question: a
+   per-item hash is uniform on average but still left a whole 12-question
+   quiz with no answer in the last slot, which is exactly the pattern this
+   is meant to prevent. Dealing guarantees every slot is used about equally.
+   The hash only decides the running order and the distractor order, so the
+   layout is stable across reloads and a restored answer still lines up with
+   the option it was saved against. */
 function hashText(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
 /* splitmix32. A plain LCG was tried first and its low bits cycle, which
    produced a shuffle that never picked option A — so consume the high bits. */
 function mix32(a){a=(a+0x9e3779b9)>>>0;let z=a;z=Math.imul(z^(z>>>16),0x21f0aaad)>>>0;z=Math.imul(z^(z>>>15),0x735a2d97)>>>0;return (z^(z>>>15))>>>0;}
-function varyItem(item){
+function moveAnswerTo(item,target){
   if(!item||!Array.isArray(item.opts)||typeof item.correct!=='number')return item;
   const answer=item.opts[item.correct];
-  const opts=item.opts.slice();
+  const rest=item.opts.filter((_,i)=>i!==item.correct);
   let state=hashText(String(item.q));
-  for(let i=opts.length-1;i>0;i--){
+  for(let i=rest.length-1;i>0;i--){
     state=mix32(state);
     const j=Math.floor((state/4294967296)*(i+1));
-    const t=opts[i];opts[i]=opts[j];opts[j]=t;
+    const t=rest[i];rest[i]=rest[j];rest[j]=t;
   }
-  item.opts=opts;item.correct=opts.indexOf(answer);
+  const pos=Math.min(Math.max(target,0),rest.length);
+  rest.splice(pos,0,answer);
+  item.opts=rest;item.correct=pos;
   return item;
 }
-function varyAll(list){list.forEach(varyItem);return list;}
+function varyItem(item){return moveAnswerTo(item,hashText(String(item&&item.q))%((item&&item.opts&&item.opts.length)||1));}
+function varyAll(list){
+  const order=list.map((it,i)=>({i:i,h:hashText(String(it&&it.q))}))
+                  .sort((a,b)=>(a.h-b.h)||(a.i-b.i));
+  order.forEach((o,k)=>{
+    const item=list[o.i];
+    if(!item||!Array.isArray(item.opts)||typeof item.correct!=='number')return;
+    moveAnswerTo(item,k%item.opts.length);
+  });
+  return list;
+}
 
 /* ═══ TAB 0 — ACADEMIC ═══ */
 TAB_INIT[0]=function(){

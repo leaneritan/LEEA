@@ -79,9 +79,6 @@ import tgVerbs from "../../content/subjects/english/courses/special-training/les
 import tgVerbsLearner from "../../content/subjects/english/courses/special-training/lessons/verbs-app.learner.json";
 import tgGrammarCup from "../../content/subjects/english/courses/special-training/lessons/grammar-cup.teacher.json";
 import tgGrammarCupLearner from "../../content/subjects/english/courses/special-training/lessons/grammar-cup-app.learner.json";
-/* Level 6 is generated from scripts/ow-l6/ — 144 records across 9 units, kept
-   in their own module so this hand-authored registry stays readable. */
-import { level6Lessons } from "./lessons-level6.generated";
 import type { Lesson } from "./types";
 
 // Canonical within-unit teaching order. Lessons are always sorted by this
@@ -201,8 +198,7 @@ export const lessons: Lesson[] = [
   tgVerbs as Lesson,
   tgVerbsLearner as Lesson,
   tgGrammarCup as Lesson,
-  tgGrammarCupLearner as Lesson,
-  ...level6Lessons
+  tgGrammarCupLearner as Lesson
 ].sort(compareLessonOrder);
 export const teacherLessons = lessons.filter((lesson) => lesson.mode === "teacher");
 export const learnerLessons = lessons.filter((lesson) => lesson.mode === "learner");

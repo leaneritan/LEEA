@@ -122,38 +122,30 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 
 ## Level 6
 
-- [x] Unit 1 — Vocab
-- [x] Unit 1 — Grammar
-- [x] Unit 2 — Vocab
-- [x] Unit 2 — Grammar
+- [ ] Unit 1 — Vocab
+- [ ] Unit 1 — Grammar
+- [ ] Unit 2 — Vocab
+- [ ] Unit 2 — Grammar
 - [x] Unit 3 — Vocab
-- [x] Unit 3 — Grammar
-- [x] Unit 4 — Vocab
-- [x] Unit 4 — Grammar
-- [x] Unit 5 — Vocab
-- [x] Unit 5 — Grammar
-- [x] Unit 6 — Vocab
-- [x] Unit 6 — Grammar
-- [x] Unit 7 — Vocab
-- [x] Unit 7 — Grammar
-- [x] Unit 8 — Vocab
-- [x] Unit 8 — Grammar
-- [x] Unit 9 — Vocab
-- [x] Unit 9 — Grammar
+- [ ] Unit 3 — Grammar
+- [ ] Unit 4 — Vocab
+- [ ] Unit 4 — Grammar
+- [ ] Unit 5 — Vocab
+- [ ] Unit 5 — Grammar
+- [ ] Unit 6 — Vocab
+- [ ] Unit 6 — Grammar
+- [ ] Unit 7 — Vocab
+- [ ] Unit 7 — Grammar
+- [ ] Unit 8 — Vocab
+- [ ] Unit 8 — Grammar
+- [ ] Unit 9 — Vocab
+- [ ] Unit 9 — Grammar
 
-All nine Level 6 units were scanned from the Student's Book audio script
-(`supporting/ow2e_ame_sb_level6_audioscript_website.docx`) rather than the
-planner: `level-6/planner.pdf` and both workbook answer keys are Git LFS
-pointers in this checkout, while the audio script carries every Vocabulary 1/2
-list with its "Listen and repeat" sentence, both Grammar boxes, the song and the
-reading passage verbatim. Re-run `node scripts/ow-l6/build.mjs` after editing
-`scripts/ow-l6/data/unit-<n>.mjs`.
+## Status snapshot (2026-07-18)
 
-## Status snapshot (2026-08-26)
+- **Done:** Level 4 Units 1-9 (vocab + grammar); Level 5 Unit 1 (vocab + grammar); Level 3 Unit 1 (vocab + grammar); Level 3 Unit 2 (vocab only); Level 3 Unit 3 (vocab + grammar); Level 3 Units 4-9 (vocab + grammar); Level 2 Unit 7 (grammar)
+- **Next up:** other Level 1, 2, 3, 5, 6 scans
+- **Not started:** Levels 1, 2, 6 — all 9 units each (except Level 2 Unit 7, 8, 9 grammar and Unit 3, 7, 8, 9 vocab); Level 3 Unit 2 (grammar only); Level 5 Units 2-9
+- **Remaining scans:** 74 of 108
 
-- **Done:** Level 6 Units 1-9 (vocab + grammar, from the audio script); Level 4 Units 1-9 (vocab + grammar); Level 5 Unit 1 (vocab + grammar); Level 3 Unit 1 (vocab + grammar); Level 3 Unit 2 (vocab only); Level 3 Units 3-9 (vocab + grammar); Level 2 Units 5-9 (vocab and/or grammar)
-- **Next up:** Level 5 Units 2-9, then Levels 1-2
-- **Not started:** Level 1 — all 8 units; Level 2 Units 1-4; Level 3 Unit 2 (grammar only); Level 5 Units 2-9
-- **Remaining scans:** 56 of 108
-
-Recommended order: continue Level 5 (8 units left), then Levels 1-2 in whatever order matches your teaching rollout.
+Recommended order: continue Level 5 (8 units left), then work Levels 1-3 and 6 in whatever order matches your teaching rollout — numeric order (1→2→3→6) is the default assumed here if no other priority applies.

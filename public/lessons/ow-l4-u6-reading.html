@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 6 · Reading · Colorful Corals</title>
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+
+/* HEADER */
+.slide-header{height:64px;background:#0369A1;display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.65);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.2);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.ac{background:rgba(14,165,233,.4)}
+
+/* TWO-COLUMN VOCAB LAYOUT */
+.vocab-body{flex:1;display:flex;min-height:0}
+.word-panel{width:40%;padding:30px 34px;display:flex;flex-direction:column;border-right:2px solid #e5e7eb;background:#fff}
+.game-panel{width:60%;padding:22px 32px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;overflow:hidden}
+
+/* TAGS */
+.vtag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;width:fit-content}
+.vtag.v1{background:#E0F2FE;color:#075985}
+.vtag.ac{background:#FEF3C7;color:#B45309}
+.vtag.rel{background:#f3f4f6;color:#6b7280}
+
+/* WORD PANEL */
+.word-emoji{font-size:130px;line-height:1;margin-bottom:12px;cursor:pointer;transition:transform .25s}
+.word-emoji:active{transform:scale(1.15)}
+.word-main{font-size:70px;font-weight:800;color:#111;line-height:1.05;margin-bottom:8px}
+.word-ipa{font-size:21px;color:#6b7280}
+.word-syl{font-size:18px;color:#9ca3af;letter-spacing:1px}
+.word-pos{font-size:19px;color:#0369A1;font-weight:700;margin-bottom:14px}
+.word-def{font-size:21px;color:#374151;line-height:1.45;margin-bottom:8px}
+.word-jp{font-size:18px;color:#6b7280;line-height:1.45}
+.dad-say{background:#F0F9FF;border-left:4px solid #0369A1;padding:13px 16px;border-radius:0 12px 12px 0;font-size:18px;color:#374151;line-height:1.5;margin-top:auto}
+.dad-say b{color:#075985}
+.how-box{background:#fff;border:2px dashed #BAE6FD;border-radius:12px;padding:10px 16px;font-size:16px;color:#4b5563;line-height:1.5;width:100%}
+.how-box b{color:#075985}
+.how-box li{margin-left:18px}
+
+/* MINI-GAME SHELL (shared class names across LEEA vocab decks) */
+.mg-wrap{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;flex:1;min-height:0}
+.mg-head{font-size:20px;font-weight:700;color:#374151;text-align:center;background:#f9fafb;border:2px solid #e5e7eb;border-radius:12px;padding:10px 20px;width:100%;flex-shrink:0}
+.mg-head b{color:#075985}
+.mg-stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0;overflow:hidden}
+.mg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;width:100%}
+.mg-grid.c4{grid-template-columns:repeat(4,1fr)}
+.mg-grid.c3{grid-template-columns:repeat(3,1fr)}
+.mg-tile{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 6px;font-size:38px;cursor:pointer;transition:all .15s;text-align:center}
+.mg-tile:hover{transform:translateY(-3px);border-color:#0369A1}
+.mg-tile .mg-label{display:block;font-size:14px;font-weight:700;color:#4b5563;margin-top:4px;min-height:18px}
+.mg-tile.hit{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.mg-tile.miss{background:#fef2f2;border-color:#ef4444;animation:mgShake .3s ease}
+@keyframes mgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.mg-btn{background:#0369A1;color:#fff;border:none;border-radius:12px;padding:13px 30px;font-size:20px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.mg-btn:hover{background:#075985;transform:scale(1.04)}
+.mg-btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+.mg-opt{padding:12px 22px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:19px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left}
+.mg-opt:hover{border-color:#0369A1}
+.mg-opt.ok{background:#F0F9FF;border-color:#0369A1;color:#075985;pointer-events:none}
+.mg-opt.no{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+.mg-score{font-size:20px;font-weight:800;color:#075985;background:#E0F2FE;border-radius:20px;padding:6px 22px}
+.mg-miss{font-size:17px;font-weight:700;color:#ef4444;min-height:22px}
+.mg-win{background:#0369A1;color:#fff;border-radius:14px;padding:12px 24px;font-size:20px;font-weight:800;text-align:center;opacity:0;transform:translateY(10px);transition:all .35s;width:100%}
+.mg-win.show{opacity:1;transform:translateY(0)}
+.mg-source{font-size:14px;color:#9ca3af;font-weight:600;letter-spacing:.4px}
+.mg-bar{width:100%;height:22px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.mg-bar > div{height:100%;background:linear-gradient(90deg,#38BDF8,#0369A1);width:0%;transition:width .2s;border-radius:99px}
+.mg-track{position:relative;width:100%;height:96px;background:linear-gradient(180deg,#E0F2FE,#F0F9FF);border-radius:16px;overflow:hidden;border:2px solid #BAE6FD}
+.mg-runner{position:absolute;bottom:16px;font-size:46px;transition:left .25s}
+.mg-flag{position:absolute;bottom:14px;right:2%;font-size:40px}
+.mg-spin{display:inline-block;transition:transform .3s ease}
+.mg-flip{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.mg-flip:hover{border-color:#0369A1;transform:translateY(-3px)}
+.mg-flip.open{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.mg-flip .mf-front{font-size:40px}
+.mg-flip .mf-back{display:none;font-size:15px;font-weight:700;color:#075985;line-height:1.35}
+.mg-flip.open .mf-back{display:block}
+.mg-pair{display:flex;gap:26px;width:100%;justify-content:center}
+.mg-col{display:flex;flex-direction:column;gap:10px;flex:1;max-width:340px}
+.mg-pbtn{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:17px;font-weight:700;color:#374151;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left;line-height:1.3}
+.mg-pbtn:hover{border-color:#0369A1}
+.mg-pbtn.sel{border-color:#0369A1;background:#F0F9FF}
+.mg-pbtn.done{border-color:#10b981;background:#ecfdf5;color:#047857;pointer-events:none}
+.mg-pbtn.bad{border-color:#ef4444;background:#fef2f2;animation:mgShake .3s}
+.mg-battery{width:220px;height:110px;border:6px solid #374151;border-radius:14px;position:relative;display:flex;align-items:center;padding:8px}
+.mg-battery::after{content:'';position:absolute;right:-20px;top:32px;width:16px;height:40px;background:#374151;border-radius:0 6px 6px 0}
+.mg-battery > div{height:100%;background:linear-gradient(90deg,#a3e635,#16a34a);border-radius:6px;width:0%;transition:width .2s}
+.mg-lamp{font-size:44px;filter:grayscale(1);opacity:.4;transition:all .25s}
+.mg-lamp.on{filter:none;opacity:1;transform:scale(1.1)}
+
+/* NAV BAR */
+#nav-bar{position:fixed;bottom:0;left:0;right:0;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px;transition:background .2s}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn.active,#fs-btn.active{background:rgba(124,58,237,.35)!important;color:#7DD3FC!important}
+#unit-label{color:#7DD3FC;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+
+/* TEACHER NOTES PANEL */
+#tn-panel{position:fixed;right:-460px;top:0;bottom:52px;width:440px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#7DD3FC;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-panel ul{padding-left:18px;margin-bottom:8px}
+#tn-panel .tn-lbl{color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+
+/* CONTENT SLIDES */
+.content-body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:18px;min-height:0;overflow:hidden}
+.slide-h1{font-size:40px;font-weight:800;color:#111}
+.slide-h2{font-size:25px;font-weight:600;color:#374151}
+.src-pill{display:inline-block;background:#f3f4f6;color:#6b7280;border-radius:20px;padding:6px 18px;font-size:15px;font-weight:700;letter-spacing:.4px;width:fit-content}
+
+/* READING */
+.reading-block{background:#fff;border-radius:16px;padding:26px 36px;font-size:23px;line-height:1.7;color:#1f2937;box-shadow:0 4px 16px rgba(0,0,0,.05);border-left:6px solid #0369A1}
+.reading-block b{color:#075985;font-weight:700}
+.tap-word{background:#E0F2FE;color:#075985;border:none;border-radius:6px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.tap-word.done{background:#0369A1;color:#fff}
+
+/* OBJECTIVES */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:10px}
+.obj-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;display:flex;align-items:flex-start;gap:16px}
+.obj-icon{font-size:34px;flex-shrink:0}
+.obj-text{font-size:19px;color:#374151;line-height:1.4;font-weight:500}
+.obj-text b{color:#0369A1}
+
+/* FORMATIVE ASSESSMENT */
+.assess-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px}
+.assess-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;cursor:pointer;transition:all .2s}
+.assess-card:hover{border-color:#0369A1}
+.assess-card.yes{border-color:#0369A1;background:#F0F9FF}
+.assess-q{font-size:19px;color:#374151;font-weight:600;margin-bottom:10px}
+
+/* BE THE EXPERT */
+.bte-header{background:#0369A1;color:#fff;border-radius:12px 12px 0 0;padding:13px 26px;font-size:19px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bte-body{background:#fff;border:2px solid #0369A1;border-radius:0 0 16px 16px;padding:24px;font-size:19px;color:#374151;line-height:1.6}
+.bte-body b{color:#075985}
+
+/* CHIPS / TASK CARDS */
+.chips-row{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:#E0F2FE;color:#075985;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.chip.used{background:#0369A1;color:#fff}
+.task-card{background:#fff;border-radius:16px;padding:20px 28px;border:2px solid #e5e7eb;font-size:21px;color:#374151;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card b{color:#0369A1}
+.q-item{background:#fff;border-radius:12px;padding:16px 22px;border:2px solid #e5e7eb;font-size:19px;color:#374151;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .2s}
+.q-item:hover{border-color:#0369A1}
+.q-item.done{border-color:#10b981;background:#ecfdf5}
+.q-num{background:#0369A1;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;margin-top:2px}
+.q-ans{max-height:0;overflow:hidden;transition:max-height .3s ease;color:#075985;font-weight:700}
+.q-item.done .q-ans{max-height:120px;margin-top:6px}
+
+/* DIALOGUE */
+.chat-row{display:flex;align-items:flex-end;gap:14px}
+.chat-row.right{flex-direction:row-reverse}
+.chat-ava{font-size:50px;line-height:1}
+.bub{max-width:62%;padding:18px 28px;border-radius:26px;font-size:26px;font-weight:600;line-height:1.35}
+.bub.q{background:#fff;border:2px solid #e5e7eb;border-bottom-left-radius:6px;color:#374151}
+.bub.a{background:#0369A1;color:#fff;border-bottom-right-radius:6px}
+
+/* LISTEN HERO */
+.listen-hero{background:linear-gradient(135deg,#0C4A6E,#0369A1);border-radius:20px;padding:24px 36px;display:flex;align-items:center;gap:28px;color:#fff}
+.listen-hero .lh-emoji{font-size:64px;line-height:1;animation:lhPulse 1.6s ease-in-out infinite}
+@keyframes lhPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.listen-hero .lh-text{font-size:25px;font-weight:700;flex:1}
+.listen-hero .lh-tr{background:rgba(255,255,255,.2);border-radius:20px;padding:9px 22px;font-size:21px;font-weight:800;white-space:nowrap}
+
+/* TITLE / GREAT JOB */
+.title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0C4A6E 0%,#0369A1 50%,#38BDF8 100%);color:#fff;gap:22px;padding:40px}
+.great-job-slide{background:linear-gradient(135deg,#0C4A6E,#0369A1,#38BDF8);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:18px;height:100%;padding:40px}
+
+/* MARK DONE */
+.done-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+.btn-done{background:#16A34A;color:#fff;border:none;border-radius:14px;padding:18px 46px;font-size:26px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-done:hover{background:#15803d}
+.btn-done.confirmed{background:#9ca3af;pointer-events:none}
+.btn-clear{background:#fff;color:#ef4444;border:2px solid #ef4444;border-radius:14px;padding:14px 30px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+#doneMsg{font-size:20px;color:#4b5563;font-weight:600;min-height:28px}
+
+/* VOCAB REVIEW */
+.vr-tabs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;flex-shrink:0}
+.vr-tab{padding:7px 14px;border:2px solid #e5e7eb;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s;white-space:nowrap}
+.vr-tab:hover{border-color:#0369A1;color:#0369A1}
+.vr-tab.active{background:#0369A1;color:#fff;border-color:#0369A1}
+.vr-tab.done{background:#E0F2FE;border-color:#0369A1;color:#075985}
+.vr-tab.done.active{background:#0369A1;color:#fff}
+.vr-body{flex:1;display:flex;min-height:0}
+.vr-left{width:26%;padding:18px;border-right:2px solid #e5e7eb;display:flex;flex-direction:column;gap:8px;background:#fafaf7}
+.vr-right{flex:1;padding:18px 24px;display:flex;flex-direction:column;gap:12px}
+.vr-emoji{font-size:80px;line-height:1}
+.vr-word{font-size:42px;font-weight:800;color:#111;line-height:1.1}
+.vr-ipa{font-size:16px;color:#6b7280}
+.vr-pos{font-size:15px;color:#0369A1;font-weight:700}
+.vr-mark{background:#0369A1;color:#fff;border:none;border-radius:10px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;margin-top:auto;transition:all .2s}
+.vr-mark.done{background:#9ca3af;cursor:not-allowed}
+
+/* READING */
+.read-para{background:#fff;border:2px solid #e5e7eb;border-left:6px solid #0369A1;border-radius:14px;padding:16px 24px;margin-bottom:12px}
+.rp-head{font-size:19px;font-weight:900;color:#075985;margin-bottom:6px}
+.rp-text{font-size:23px;line-height:1.65;color:#1f2937}
+.hunt-word{font-family:'Outfit',sans-serif;font-size:23px;font-weight:800;background:#BAE6FD;color:#075985;border:2px solid transparent;border-radius:8px;padding:0 10px;cursor:pointer;transition:all .15s}
+.hunt-word:hover{border-color:#0369A1}
+.hunt-word.on{background:#16A34A;color:#fff;cursor:default}
+.fact-box{background:#FFFBEB;border:3px solid #FDE68A;border-radius:14px;padding:14px 20px;font-size:20px;color:#92400E;line-height:1.55}
+.def-row{display:flex;align-items:center;gap:16px;background:#fff;border:2px solid #e5e7eb;border-radius:14px;padding:14px 20px;cursor:pointer;transition:all .15s}
+.def-row.ok{border-color:#16A34A;background:#F0FDF4}
+.def-num{background:#0369A1;color:#fff;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;flex-shrink:0}
+.def-text{font-size:22px;color:#374151;line-height:1.5;flex:1}
+.polyp-slot{display:flex;align-items:center;gap:16px;background:#fff;border:3px dashed #BAE6FD;border-radius:14px;padding:14px 20px;cursor:pointer;transition:all .15s}
+.polyp-slot.ok{border-style:solid;border-color:#16A34A;background:#F0FDF4}
+.ps-num{background:#0369A1;color:#fff;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;flex-shrink:0}
+.ps-val{font-size:23px;font-weight:700;color:#374151}
+.vs-table{display:flex;flex-direction:column;gap:10px;width:100%}
+.vs-row{display:grid;grid-template-columns:230px 1fr 1fr;gap:14px;background:#fff;border:2px solid #e5e7eb;border-radius:14px;padding:14px 18px;cursor:pointer;transition:border-color .2s}
+.vs-row:hover{border-color:#0369A1}
+.vs-row.vs-head{background:#F0F9FF;border-color:#BAE6FD;cursor:default}
+.vs-key{font-size:18px;font-weight:800;color:#075985;display:flex;align-items:center}
+.vs-cell{font-size:20px;color:#374151;line-height:1.45;transition:opacity .25s}
+.vs-cell.hidden{opacity:0}
+</style>
+
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<div class="slide active" id="s1">
+  <div class="title-bg">
+    <div style="font-size:22px;font-weight:700;letter-spacing:3px;opacity:.75;text-transform:uppercase">Our World · Level 4 · Unit 6</div>
+    <div style="font-size:78px;font-weight:900;text-align:center;line-height:1.1">Colorful Corals</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;font-size:30px;font-weight:700">📖 Reading — TR 6.9</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:1300px">
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🪸 polyps</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">💎 transparent</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🐙 tentacles</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🌿 algae</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🦐 plankton</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🏘️ colonies</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🧬 organisms</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s2">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Reading — Objectives</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 In This Lesson</div>
+    <div class="obj-grid">
+      <div class="obj-card"><div class="obj-icon">🪸</div><div class="obj-text"><b>Content:</b> Read "Colorful Corals" and explain that corals are animals, not plants.</div></div>
+      <div class="obj-card"><div class="obj-icon">⚖️</div><div class="obj-text"><b>Content:</b> Contrast warm-water and cold-water polyps — where they live and what they eat.</div></div>
+      <div class="obj-card"><div class="obj-icon">🏷️</div><div class="obj-text"><b>Language:</b> Complete four <b>definitions</b> and <b>label</b> a <b>diagram</b> of a polyp.</div></div>
+      <div class="obj-card"><div class="obj-icon">🌍</div><div class="obj-text"><b>Language:</b> Say why coral reefs matter and why we must protect them.</div></div>
+    </div>
+    <div class="task-card" style="margin-top:6px">📚 <b>Student Book pp. 102–103</b> · Audio <b>TR 6.9</b>. This reading feeds straight into the Writing lesson — Leo writes about warm vs cold corals next.</div>
+    <span class="src-pill">Lesson Planner · Unit 6 Reading</span>
+  </div>
+</div>
+
+<div class="slide" id="s3">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Academic Language</span><span class="hd-chip ac">Always first</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎓 Words the reading page itself uses</div>
+    <div class="slide-h2">Tap each card. <b id="ac-score" style="color:#075985">0 / 3 tapped</b></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:10px" id="ac-grid"></div>
+    <span class="src-pill">unit-6/vocabulary.json · academicWordIds for reading</span>
+  </div>
+</div>
+
+<div class="slide" id="s4">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Before You Read</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:26px">
+    <div style="font-size:110px">🪸🐠</div>
+    <div class="slide-h1" style="text-align:center">"Look at the photo. Is a coral a plant or an animal?"</div>
+    <div class="slide-h2" style="text-align:center;max-width:1200px">Take the guess before reading. Almost everyone says plant — that is exactly why the first paragraph is worth waiting for.</div>
+    <div class="how-box" style="font-size:20px"><b>Then:</b> "The title is <i>Colorful Corals</i>. What do you think the text will tell us?"</div>
+    <span class="src-pill">Lesson Planner · Unit 6 Reading, Before You Read</span>
+  </div>
+</div>
+
+<div class="slide" id="s5">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Listen and Read</span><span class="hd-chip">TR 6.9</span></div>
+  <div class="content-body" style="gap:12px">
+    <div class="listen-hero" style="padding:14px 28px"><div class="lh-emoji" style="font-size:44px">🎧</div><div class="lh-text" style="font-size:21px">Play TR 6.9. Leo follows along with his finger.</div><div class="lh-tr">TR 6.9</div></div>
+    <div style="flex:1;min-height:0;overflow-y:auto">
+      <div class="read-para"><div class="rp-text">A coral reef looks like a colorful underwater garden. But corals are not plants. Corals are made up of tiny animals called <button class="hunt-word" onclick="huntTap(this)">polyps</button>. Polyps have soft, <button class="hunt-word" onclick="huntTap(this)">transparent</button> bodies without bones.</div></div>
+      <div class="read-para"><div class="rp-head">What's for dinner?</div><div class="rp-text">Polyps have a mouth, stomach, and <button class="hunt-word" onclick="huntTap(this)">tentacles</button> to catch food. Some polyps live in warm, sunlit zones. In daylight, these polyps get food from tiny plants called <button class="hunt-word" onclick="huntTap(this)">algae</button>. After dark, the polyps use their tentacles to catch food. Some corals can even catch fish! In contrast, polyps that live in cold, dark zones have to work harder. There are no algae, so they have to use their tentacles to catch tiny animals called <button class="hunt-word" onclick="huntTap(this)">plankton</button> in the water.</div></div>
+      <div class="read-para"><div class="rp-head">Underwater communities.</div><div class="rp-text">Most corals live together in huge groups called <button class="hunt-word" onclick="huntTap(this)">colonies</button>. Some build a protective skeleton around themselves. Old generations die and new ones grow on top, slowly building up coral reefs. Some are millions of years old. These beautiful reefs are home to more than 4,000 kinds of fish and thousands of other <button class="hunt-word" onclick="huntTap(this)">organisms</button>.</div></div>
+      <div class="read-para"><div class="rp-head">Save the reefs!</div><div class="rp-text">Coral reefs provide food for communities. They are also a source of tourism and jobs for local people. Scientists use reef animals to develop new medicines. But coral reefs are in danger from pollution. Coral reefs are disappearing. Some experts predict that only 10 percent of the world's corals will exist in the year 2050. We must protect our corals now.</div></div>
+    </div>
+    <div class="fact-box">🌏 <b>Did you know?</b> The Great Barrier Reef is more than 2,000 km (1,200 mi.) long! You can see it from outer space!</div>
+    <div class="slide-h2">🎯 <b>Word Hunt:</b> tap each blue word as you meet it. Found: <b id="hunt-count" style="color:#075985">0 / 7</b></div>
+    <span class="src-pill">Student Book pp. 102–103 · TR 6.9 — verbatim</span>
+  </div>
+</div>
+
+<div class="slide" id="s6">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">The Seven New Words</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔎 Every one of these is in the text.</div>
+    <div class="slide-h2">Tap a card to open it. Opened: <b id="wd-count" style="color:#075985">0 / 7</b></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px;flex:1;min-height:0;overflow-y:auto" id="wd-grid"></div>
+    <span class="src-pill">unit-6/vocabulary.json · contentWordIds for reading</span>
+  </div>
+</div>
+
+<div class="slide" id="s7">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Activity 2 — Complete the Definitions</span><span class="hd-chip">SB p. 103</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🏷️ Tap a word, then tap the gap it belongs in.</div>
+    <div class="slide-h2">Completed: <b id="def-count" style="color:#075985">0 / 4</b></div>
+    <div class="chips-row" id="def-chips" style="margin-top:6px"></div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px" id="def-rows"></div>
+    <span class="src-pill">Student Book p. 103, Activity 2 · answer key: polyps, algae, plankton, colonies</span>
+  </div>
+</div>
+
+<div class="slide" id="s8">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Activity 3 — Label the Diagram</span><span class="hd-chip">SB p. 103</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📐 One coral polyp. Three parts to name.</div>
+    <div class="slide-h2">Labelled: <b id="lab-count" style="color:#075985">0 / 3</b></div>
+    <div style="display:flex;gap:26px;flex:1;min-height:0;margin-top:8px;align-items:center">
+      <div style="font-size:190px;text-align:center;width:34%">🪸</div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px" id="lab-slots"></div>
+    </div>
+    <div class="chips-row" id="lab-chips"></div>
+    <span class="src-pill">Student Book p. 103, Activity 3 · answer key: mouth, tentacle, stomach</span>
+  </div>
+</div>
+
+<div class="slide" id="s9">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Activity 4 — Warm and Cold Corals</span><span class="hd-chip">SB p. 103</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⚖️ Two kinds of coral. Find the differences in the text.</div>
+    <div class="slide-h2">Ask Leo before you reveal each row. Opened: <b id="tab-count" style="color:#075985">0 / 4</b></div>
+    <div class="vs-table" style="margin-top:10px" id="vs-table"></div>
+    <div class="how-box" style="margin-top:8px"><b>Keep this on screen for the Writing lesson</b> — the book asks Leo to write a contrast paragraph about exactly these two.</div>
+    <span class="src-pill">Student Book p. 103, Activity 4 · every cell is from the passage</span>
+  </div>
+</div>
+
+<div class="slide" id="s10">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Discuss the Reading</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💬 Ask each question. Tap to reveal the answer.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px;flex:1;min-height:0;overflow-y:auto" id="disc-grid"></div>
+    <span class="src-pill">Every answer is in the passage</span>
+  </div>
+</div>
+
+<div class="slide" id="s11">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Be the Expert — Corals Are Animals</span></div>
+  <div class="content-body" style="justify-content:center;gap:20px">
+    <div class="bte-header">The one idea to make stick</div>
+    <div class="bte-body" style="font-size:23px;line-height:1.7">
+      A coral looks like a rock or a plant, and it does not move — so almost every child files it under "plant". The text corrects that in its second sentence: <i>But corals are not plants.</i><br><br>
+      A coral is a <b>colony</b> of tiny animals called <b>polyps</b>, each with a mouth, a stomach and <b>tentacles</b>. What looks like stone is the skeleton they build around themselves, layer on layer, over millions of years.
+    </div>
+    <div class="how-box" style="font-size:19px"><b>Check it landed:</b> "Is a coral one animal or many?" — the answer is many, and that is what <b>colony</b> means.</div>
+    <span class="src-pill">Student Book pp. 102–103</span>
+  </div>
+</div>
+
+<div class="slide" id="s12">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Our World in Context — Save the Reefs</span></div>
+  <div class="content-body" style="justify-content:center;gap:22px">
+    <div class="bte-header">Why reefs matter to people</div>
+    <div class="bte-body" style="font-size:22px;line-height:1.7">
+      The last paragraph is the one that connects this unit together. Reefs give <b>food</b>, <b>tourism</b> and <b>jobs</b>, and scientists use reef animals to develop <b>new medicines</b>. And they are disappearing — some experts predict that only <b>10 percent</b> of the world's corals will still exist in <b>2050</b>.
+    </div>
+    <div class="how-box" style="font-size:20px">🔗 <b>Link back:</b> pollution, an oil spill, garbage, plastic (Vocabulary 2) · "We <b>must</b> protect our corals now" (Grammar 1) · "only 10 percent <b>will</b> exist" (Grammar 2).</div>
+    <span class="src-pill">Student Book p. 103, final paragraph</span>
+  </div>
+</div>
+
+<div class="slide" id="s13">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Think — Beyond the Text</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💭 Four questions with no single right answer.</div>
+    <div class="slide-h2">Write Leo's answers straight in. He answers these in his app too.</div>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-top:10px" id="think-rows"></div>
+    <span class="src-pill">Links the reading back to Vocabulary 2, Grammar 1 and Grammar 2</span>
+  </div>
+</div>
+
+<div class="slide" id="s14">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✔️ Can Leo…</div>
+    <div class="assess-grid" id="assess-grid"></div>
+    <div class="task-card" style="margin-top:8px">📓 <b>Homework:</b> Leo's Reading app (10 modules). Next lesson: Writing — a contrast paragraph about warm and cold corals.</div>
+  </div>
+</div>
+
+<div class="slide" id="s15">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Finish the Lesson</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:24px">
+    <div style="font-size:90px">✅</div>
+    <div class="slide-h1" style="text-align:center">Unit 6 · Reading — taught</div>
+    <div class="slide-h2" style="text-align:center;max-width:1000px">Marking this done records it on the teacher dashboard. Leo's own Reading app tracks his 10 modules separately.</div>
+    <div class="done-wrap">
+      <button class="btn-done" id="doneBtn" onclick="markDone()">✅ Mark this lesson done</button>
+      <button class="btn-clear" id="redoBtn" onclick="handleRedo()">↺ Clear saved progress</button>
+      <div id="doneMsg"></div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s16">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Recap</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:26px">
+    <div class="slide-h1" style="text-align:center">🔁 Tell me about corals in four sentences.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;width:86%">
+      <div class="task-card" style="font-size:21px">🪸 Corals are <b>animals</b>, not plants — tiny <b>polyps</b>.</div>
+      <div class="task-card" style="font-size:21px">🍽️ Warm polyps eat <b>algae</b>; cold polyps catch <b>plankton</b>.</div>
+      <div class="task-card" style="font-size:21px">🏘️ They live in huge groups called <b>colonies</b>.</div>
+      <div class="task-card" style="font-size:21px">🌍 Reefs are disappearing — we <b>must</b> protect them.</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s17">
+  <div class="great-job-slide">
+    <div style="font-size:96px">🏆</div>
+    <div style="font-size:62px;font-weight:900;text-align:center">Great Reading, Leo!</div>
+    <div style="font-size:26px;opacity:.92;text-align:center;max-width:1100px">You can explain what a coral really is — and why 2050 matters. 🪸🌊</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:1200px">
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🪸 polyps</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">💎 transparent</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🐙 tentacles</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🌿 algae</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🦐 plankton</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🏘️ colonies</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🧬 organisms</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
+
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 17</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="fs-btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+  <span id="unit-label">Unit 6 · Reading</span>
+</div>
+
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+<script>
+/* =========================================================
+   LEEA · Our World Level 4 · Unit 6 · Reading
+   "Colorful Corals" — 17 slides, 1920x1080, ocean blue
+   Every lyric is verbatim from TR 6.3 (Student Book p. 102).
+   ========================================================= */
+
+// ─── MARK DONE STORAGE ─────────────────────────────────────────
+var SAVE_PREFIX = 'leea.l4.u6.reading-';
+var HOMEWORK_ID = 'l-4-6-reading';
+/* Must match the `id` in lessons/reading.teacher.json — the teacher dashboard
+   reads leea.lessonProgress.v1 keyed by that lesson id. */
+var LESSON_ID = 'ow-l4-u6-reading';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+var LESSON_NAME = 'Unit 6 · Reading — Colorful Corals';
+
+function lSave(key, value) {
+  try {
+    var k = SAVE_PREFIX + key;
+    window.localStorage.setItem(k, JSON.stringify(value));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, value);
+    }
+  } catch (e) {}
+}
+function lLoad(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(SAVE_PREFIX + key);
+    return raw === null || raw === undefined ? fallback : JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function writeLessonProgress() {
+  try {
+    var store = {};
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (raw) store = JSON.parse(raw) || {};
+    var now = new Date().toISOString();
+    store[LESSON_ID] = { lessonId: LESSON_ID, teacherId: 'neritan', studentId: 'leo',
+                         status: 'done', completedAt: now, updatedAt: now };
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function clearLessonProgress() {
+  try {
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function markDone() {
+  writeLessonProgress();
+  lSave('complete', { name: LESSON_NAME, timestamp: new Date().toISOString(), done: true });
+  lSave('done', true);
+  var btn = document.getElementById('doneBtn');
+  if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+  var msg = document.getElementById('doneMsg');
+  if (msg) msg.textContent = 'Saved. Colorful Corals read. 🪸';
+}
+var redoArmed = false, redoTimer = null;
+function handleRedo() {
+  var btn = document.getElementById('redoBtn');
+  var msg = document.getElementById('doneMsg');
+  if (!redoArmed) {
+    redoArmed = true;
+    btn.textContent = '↺ Tap again to clear';
+    if (msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+    if (redoTimer) window.clearTimeout(redoTimer);
+    redoTimer = window.setTimeout(function () {
+      redoArmed = false;
+      btn.textContent = '↺ Clear saved progress';
+      if (msg) msg.textContent = '';
+    }, 3000);
+    return;
+  }
+  redoArmed = false;
+  if (redoTimer) window.clearTimeout(redoTimer);
+  btn.textContent = '↺ Clear saved progress';
+  clearLessonProgress();
+  lSave('complete', null);
+  lSave('done', null);
+  var d = document.getElementById('doneBtn');
+  if (d) { d.classList.remove('confirmed'); d.textContent = '✅ Mark this lesson done'; }
+  if (msg) msg.textContent = 'Cleared.';
+}
+function restoreDoneState() {
+  var c = lLoad('complete', null);
+  if (c && c.done) {
+    var btn = document.getElementById('doneBtn');
+    if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+    var msg = document.getElementById('doneMsg');
+    if (msg) msg.textContent = 'Already marked done.';
+  }
+}
+
+// ─── DATA (injected) ───────────────────────────────────────────
+// ─── DATA (injected) ───────────────────────────────────────────
+var WORDS    = [
+ [
+  "🪸",
+  "polyps",
+  "tiny sea animals that make up corals",
+  "Corals are made up of individual animals called polyps."
+ ],
+ [
+  "💎",
+  "transparent",
+  "clear — you can see through it",
+  "Polyps have soft, transparent bodies without bones."
+ ],
+ [
+  "🐙",
+  "tentacles",
+  "long, thin arms that some sea animals use to catch food",
+  "Polyps use their tentacles to catch food."
+ ],
+ [
+  "🌿",
+  "algae",
+  "tiny plant-like living things that grow in water",
+  "Warm-water polyps get food from tiny plants called algae."
+ ],
+ [
+  "🦐",
+  "plankton",
+  "tiny sea creatures that float in water",
+  "Cold-water polyps eat tiny animals called plankton."
+ ],
+ [
+  "🏘️",
+  "colonies",
+  "large groups of the same kind of animal living together",
+  "Most corals live together in huge groups called colonies."
+ ],
+ [
+  "🧬",
+  "organisms",
+  "living things — animals, plants, or other living things",
+  "Coral reefs are home to thousands of other organisms."
+ ]
+];
+var ACADEMIC = [
+ [
+  "🏷️",
+  "a definition",
+  "a statement that tells what a word or idea means",
+  "The reading gives a <b>definition</b> of the word polyps."
+ ],
+ [
+  "📐",
+  "a diagram",
+  "a simple drawing with labels showing what the parts of something are",
+  "Look at the <b>diagram</b> of a coral polyp."
+ ],
+ [
+  "🏷️",
+  "a label",
+  "a word that names a part — or to write that word on a part",
+  "Write a <b>label</b> for each number on the diagram."
+ ]
+];
+var DEFS     = [
+ [
+  1,
+  "Corals are made up of individual animals called ______.",
+  "polyps"
+ ],
+ [
+  2,
+  "Warm-water polyps get food from tiny plants called ______.",
+  "algae"
+ ],
+ [
+  3,
+  "Cold-water polyps eat tiny animals called ______.",
+  "plankton"
+ ],
+ [
+  4,
+  "Most corals live in very large groups called ______.",
+  "colonies"
+ ]
+];
+var PARTS    = [
+ [
+  1,
+  "mouth",
+  "👄",
+  "Polyps have a mouth, stomach, and tentacles to catch food."
+ ],
+ [
+  2,
+  "tentacle",
+  "🐙",
+  "The polyps use their tentacles to catch food."
+ ],
+ [
+  3,
+  "stomach",
+  "🫃",
+  "Polyps have a mouth, stomach, and tentacles to catch food."
+ ]
+];
+var TABLE    = [
+ [
+  "They are made up of",
+  "polyps",
+  "polyps"
+ ],
+ [
+  "They live in",
+  "warm, sunlit zones",
+  "cold, dark zones"
+ ],
+ [
+  "They eat",
+  "algae — tiny plants",
+  "plankton — tiny animals"
+ ],
+ [
+  "How they get food",
+  "from algae in daylight, tentacles after dark",
+  "they work harder — tentacles only"
+ ]
+];
+var DISCUSS  = [
+ [
+  "What does a coral reef look like, at the start of the text?",
+  "A colorful underwater garden — but corals are not plants."
+ ],
+ [
+  "What are corals made up of?",
+  "Tiny animals called polyps."
+ ],
+ [
+  "What are a polyp’s bodies like?",
+  "Soft and transparent, without bones."
+ ],
+ [
+  "Which three parts does a polyp use to eat?",
+  "A mouth, a stomach, and tentacles."
+ ],
+ [
+  "How do warm-water polyps eat in daylight? And after dark?",
+  "In daylight they get food from algae; after dark they use their tentacles."
+ ],
+ [
+  "Why do cold-water polyps have to work harder?",
+  "There are no algae, so they must catch plankton with their tentacles."
+ ],
+ [
+  "How do reefs slowly build up over time?",
+  "Old generations die and new ones grow on top. Some reefs are millions of years old."
+ ],
+ [
+  "Why does the writer say \"We must protect our corals now\"?",
+  "Reefs are in danger from pollution and are disappearing — experts predict only 10 percent will exist in 2050."
+ ]
+];
+var THINK    = [
+ "The text says reefs are in danger from <b>pollution</b>. Which Unit 6 words name that pollution?",
+ "\"We <b>must</b> protect our corals now.\" Why <b>must</b> and not <b>can</b>?",
+ "Write one prediction about coral reefs using <b>will</b> or <b>won't</b>.",
+ "Which is more surprising — that corals are animals, or that some reefs are millions of years old?"
+];
+var ASSESS   = [
+ "…retell the four paragraphs in his own words?",
+ "…complete all four definitions without looking back (Activity 2)?",
+ "…label the polyp diagram: mouth, tentacle, stomach (Activity 3)?",
+ "…say two differences between warm corals and cold corals (Activity 4)?"
+];
+var HUNT_TOTAL = 7;
+var NOTES    = {
+ "1": "<p class=\"tn-lbl\">Title</p><p>\"Colorful Corals\", Student Book pp. 102–103, TR 6.9. The whole reading turns on one surprise: corals are animals.</p>",
+ "2": "<p class=\"tn-lbl\">Objectives</p><p>Read all four aloud. Flag that the Writing lesson uses this reading — Leo will write about warm vs cold corals.</p>",
+ "3": "<p class=\"tn-lbl\">Academic Language</p><p>definition, diagram, label. All three are what Activities 2 and 3 actually ask Leo to do.</p>",
+ "4": "<p class=\"tn-lbl\">Before You Read</p><p>Take the plant-or-animal guess BEFORE reading. Almost everyone says plant — that is what makes paragraph 1 land.</p>",
+ "5": "<p class=\"tn-lbl\">Listen and Read — TR 6.9</p><p>Play TR 6.9 with the text up. Word Hunt: Leo taps each blue word as he meets it. The passage is verbatim from the book.</p>",
+ "6": "<p class=\"tn-lbl\">The Seven Words</p><p>Every one appears in the passage. Tap a card and read its sentence from the text aloud.</p>",
+ "7": "<p class=\"tn-lbl\">Activity 2</p><p>Do it on screen first, then in the book. Answer key: 1. polyps · 2. algae · 3. plankton · 4. colonies.</p>",
+ "8": "<p class=\"tn-lbl\">Activity 3</p><p>Label the polyp: 1. mouth · 2. tentacle · 3. stomach. Each correct label shows the sentence it came from.</p>",
+ "9": "<p class=\"tn-lbl\">Activity 4</p><p>Ask Leo for each cell BEFORE revealing it — the answers are all in paragraph 2. Leave this up; the Writing lesson needs it.</p>",
+ "10": "<p class=\"tn-lbl\">Discuss</p><p>Eight questions, all answerable from the text. Ask before revealing.</p>",
+ "11": "<p class=\"tn-lbl\">Be the Expert</p><p>The idea to make stick: a coral is many animals, not one, and the stone is the skeleton they build. Check with \"one animal or many?\"</p>",
+ "12": "<p class=\"tn-lbl\">Our World in Context</p><p>The last paragraph ties the whole unit together — pollution from Vocabulary 2, must from Grammar 1, will from Grammar 2.</p>",
+ "13": "<p class=\"tn-lbl\">Think</p><p>No single right answers. Write Leo's words down; he answers the same four in his app.</p>",
+ "14": "<p class=\"tn-lbl\">Formative Assessment</p><p>Tap each card once Leo can do it. Then set his Reading app.</p>",
+ "15": "<p class=\"tn-lbl\">Mark Done</p><p>Records this lesson on the teacher dashboard. Leo's app tracks his own 10 modules separately.</p>",
+ "16": "<p class=\"tn-lbl\">Recap</p><p>Four sentences is the target. If he gets all four, he has the text.</p>",
+ "17": "<p class=\"tn-lbl\">Great Job!</p><p>Celebrate. Next up: Writing — a contrast paragraph about warm and cold corals.</p>"
+};
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+var TOTAL = 17;
+var cur = 1;
+function goTo(n) {
+  n = Math.max(1, Math.min(TOTAL, n));
+  var old = document.getElementById('s' + cur);
+  if (old) old.classList.remove('active');
+  cur = n;
+  var next = document.getElementById('s' + cur);
+  if (next) next.classList.add('active');
+  document.getElementById('slide-counter').textContent = cur + ' / ' + TOTAL;
+  document.getElementById('tn-content').innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
+  if (SLIDE_INIT[cur]) SLIDE_INIT[cur]();
+}
+document.addEventListener('keydown', function (e) {
+  if (e.target && (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+var notesOpen = false;
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('notes-btn').classList.toggle('active', notesOpen);
+  scale();
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange', function () {
+  var btn = document.getElementById('fs-btn');
+  var active = !!document.fullscreenElement;
+  btn.textContent = active ? '⛶ Exit Full (F)' : '⛶ Fullscreen (F)';
+  btn.classList.toggle('active', active);
+  scale();
+});
+function scale() {
+  var s = document.getElementById('scaler');
+  var availW = window.innerWidth - (notesOpen ? 440 : 0);
+  var availH = window.innerHeight - 52;
+  var r = Math.min(availW / 1920, availH / 1080);
+  s.style.transform = 'scale(' + r + ')';
+  s.style.left = ((availW - 1920 * r) / 2) + 'px';
+  s.style.top = ((availH - 1080 * r) / 2) + 'px';
+  s.style.position = 'fixed';
+}
+window.addEventListener('resize', scale);
+function shuffled(arr) { return arr.slice().sort(function () { return Math.random() - 0.5; }); }
+
+// ─── SLIDE 3: ACADEMIC ─────────────────────────────────────────
+function initAcademic() {
+  var grid = document.getElementById('ac-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var n = 0;
+  ACADEMIC.forEach(function (a) {
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#fff;border:2px solid #FEF3C7;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column';
+    card.innerHTML = '<div style="background:#0EA5E9;color:#fff;padding:10px 16px;font-size:19px;font-weight:700">' + a[0] + ' ' + a[1] + '</div>' +
+      '<div style="padding:14px 16px;font-size:17px;color:#374151;line-height:1.45">' + a[2] +
+      '<div style="margin-top:10px;color:#075985;font-weight:700;display:none" class="ac-ex">' + a[3] + '</div></div>';
+    card.onclick = function () {
+      if (card.dataset.open) return;
+      card.dataset.open = '1';
+      card.querySelector('.ac-ex').style.display = 'block';
+      card.style.borderColor = '#0369A1';
+      n++;
+      document.getElementById('ac-score').textContent = n + ' / 3 tapped';
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE 5: WORD HUNT ────────────────────────────────────────
+var huntFound = 0;
+function huntTap(btn) {
+  if (btn.classList.contains('on')) return;
+  btn.classList.add('on');
+  huntFound++;
+  document.getElementById('hunt-count').textContent = huntFound + ' / ' + HUNT_TOTAL;
+}
+
+// ─── SLIDE 6: THE SEVEN WORDS ──────────────────────────────────
+function initWords() {
+  var grid = document.getElementById('wd-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var n = 0;
+  WORDS.forEach(function (w) {
+    var card = document.createElement('div');
+    card.className = 'mg-flip';
+    card.style.minHeight = '200px';
+    card.innerHTML = '<div class="mf-front">' + w[0] + '</div>' +
+      '<div style="font-size:23px;font-weight:800;color:#111;margin-top:6px">' + w[1] + '</div>' +
+      '<div class="mf-back">' + w[2] + '<div style="margin-top:8px;font-style:italic;color:#374151">"' + w[3] + '"</div></div>';
+    card.onclick = function () {
+      if (card.classList.contains('open')) return;
+      card.classList.add('open'); n++;
+      document.getElementById('wd-count').textContent = n + ' / 7';
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE 7: DEFINITIONS ──────────────────────────────────────
+function initDefs() {
+  var chips = document.getElementById('def-chips'), rows = document.getElementById('def-rows');
+  if (!chips || chips.dataset.built) return;
+  chips.dataset.built = '1';
+  var picked = null, done = 0;
+  DEFS.forEach(function (d) {
+    var row = document.createElement('div');
+    row.className = 'def-row';
+    row.innerHTML = '<div class="def-num">' + d[0] + '</div><div class="def-text">' + d[1] + '</div>';
+    row.onclick = function () {
+      if (!picked || row.classList.contains('ok')) return;
+      if (picked.word === d[2]) {
+        row.classList.add('ok');
+        row.querySelector('.def-text').innerHTML = d[1].replace('______', '<b style="color:#15803D">' + d[2] + '</b>');
+        picked.btn.classList.add('used'); picked = null; done++;
+        document.getElementById('def-count').textContent = done + ' / 4';
+      } else {
+        row.style.borderColor = '#ef4444';
+        setTimeout(function () { if (!row.classList.contains('ok')) row.style.borderColor = '#e5e7eb'; }, 450);
+      }
+    };
+    rows.appendChild(row);
+  });
+  shuffled(DEFS.map(function (d) { return d[2]; })).forEach(function (word) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = word;
+    b.onclick = function () {
+      if (b.classList.contains('used')) return;
+      chips.querySelectorAll('.chip').forEach(function (x) { x.style.outline = ''; });
+      b.style.outline = '3px solid #0369A1';
+      picked = { btn: b, word: word };
+    };
+    chips.appendChild(b);
+  });
+}
+
+// ─── SLIDE 8: LABEL THE DIAGRAM ────────────────────────────────
+function initLabels() {
+  var chips = document.getElementById('lab-chips'), slots = document.getElementById('lab-slots');
+  if (!chips || chips.dataset.built) return;
+  chips.dataset.built = '1';
+  var picked = null, done = 0;
+  PARTS.forEach(function (p) {
+    var slot = document.createElement('div');
+    slot.className = 'polyp-slot';
+    slot.innerHTML = '<div class="ps-num">' + p[0] + '</div><div class="ps-val">—</div>';
+    slot.onclick = function () {
+      if (!picked || slot.classList.contains('ok')) return;
+      if (picked.word === p[1]) {
+        slot.classList.add('ok');
+        slot.querySelector('.ps-val').textContent = p[2] + '  ' + p[1];
+        var note = document.createElement('div');
+        note.style.cssText = 'font-size:16px;color:#075985;width:100%;margin-top:4px';
+        note.textContent = '"' + p[3] + '"';
+        slot.appendChild(note);
+        picked.btn.classList.add('used'); picked = null; done++;
+        document.getElementById('lab-count').textContent = done + ' / 3';
+      } else {
+        slot.style.borderColor = '#ef4444';
+        setTimeout(function () { if (!slot.classList.contains('ok')) slot.style.borderColor = '#BAE6FD'; }, 450);
+      }
+    };
+    slots.appendChild(slot);
+  });
+  shuffled(PARTS.map(function (p) { return p[1]; })).forEach(function (word) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = word;
+    b.onclick = function () {
+      if (b.classList.contains('used')) return;
+      chips.querySelectorAll('.chip').forEach(function (x) { x.style.outline = ''; });
+      b.style.outline = '3px solid #0369A1';
+      picked = { btn: b, word: word };
+    };
+    chips.appendChild(b);
+  });
+}
+
+// ─── SLIDE 9: WARM / COLD TABLE ────────────────────────────────
+function initTable() {
+  var t = document.getElementById('vs-table');
+  if (!t || t.dataset.built) return;
+  t.dataset.built = '1';
+  var head = document.createElement('div');
+  head.className = 'vs-row vs-head';
+  head.innerHTML = '<div class="vs-key"></div>' +
+    '<div class="vs-cell" style="font-weight:800;color:#075985">☀️ Warm corals</div>' +
+    '<div class="vs-cell" style="font-weight:800;color:#075985">🌑 Cold corals</div>';
+  t.appendChild(head);
+  var n = 0;
+  TABLE.forEach(function (r) {
+    var row = document.createElement('div');
+    row.className = 'vs-row';
+    row.innerHTML = '<div class="vs-key">' + r[0] + '</div>' +
+      '<div class="vs-cell hidden">' + r[1] + '</div><div class="vs-cell hidden">' + r[2] + '</div>';
+    row.onclick = function () {
+      if (row.dataset.open) return;
+      row.dataset.open = '1';
+      row.querySelectorAll('.vs-cell').forEach(function (c) { c.classList.remove('hidden'); });
+      n++;
+      document.getElementById('tab-count').textContent = n + ' / 4';
+    };
+    t.appendChild(row);
+  });
+}
+
+// ─── SLIDE 10: DISCUSS ─────────────────────────────────────────
+function initDiscuss() {
+  var grid = document.getElementById('disc-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  DISCUSS.forEach(function (d, i) {
+    var item = document.createElement('div');
+    item.className = 'q-item';
+    item.innerHTML = '<div class="q-num">' + (i + 1) + '</div><div><div>' + d[0] + '</div><div class="q-ans">→ ' + d[1] + '</div></div>';
+    item.onclick = function () { item.classList.add('done'); };
+    grid.appendChild(item);
+  });
+}
+
+// ─── SLIDE 13: THINK ───────────────────────────────────────────
+var thinkText = lLoad('think', {}) || {};
+function initThink() {
+  var rows = document.getElementById('think-rows');
+  if (!rows || rows.dataset.built) return;
+  rows.dataset.built = '1';
+  THINK.forEach(function (t, i) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;flex-direction:column;gap:8px';
+    var q = document.createElement('div');
+    q.style.cssText = 'font-size:21px;font-weight:600;color:#374151';
+    q.innerHTML = t;
+    var inp = document.createElement('input');
+    inp.placeholder = "Write Leo's answer…";
+    inp.value = thinkText[i] || '';
+    inp.style.cssText = 'font-family:Outfit,sans-serif;font-size:21px;padding:12px 18px;border:2px solid #BAE6FD;border-radius:12px';
+    inp.oninput = function () { thinkText[i] = inp.value; lSave('think', thinkText); };
+    row.appendChild(q); row.appendChild(inp);
+    rows.appendChild(row);
+  });
+}
+
+// ─── SLIDE 14: FORMATIVE ASSESSMENT ────────────────────────────
+function initAssess() {
+  var grid = document.getElementById('assess-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  ASSESS.forEach(function (t) {
+    var card = document.createElement('div');
+    card.className = 'assess-card';
+    card.innerHTML = '<div class="assess-q">' + t + '</div><div style="font-size:15px;color:#6b7280">Tap when Leo can do it.</div>';
+    card.onclick = function () { card.classList.toggle('yes'); };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE INIT MAP ────────────────────────────────────────────
+var SLIDE_INIT = {
+  3: initAcademic,
+  6: initWords,
+  7: initDefs,
+  8: initLabels,
+  9: initTable,
+  10: initDiscuss,
+  13: initThink,
+  14: initAssess,
+  15: restoreDoneState
+};
+
+// ─── BOOT ──────────────────────────────────────────────────────
+scale();
+goTo(1);
+restoreDoneState();
+
+</script>
+</body>
+</html>

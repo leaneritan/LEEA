@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 6 Project App — Posters for Sea Animals</title>
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Unit 6 is Wonders of the Sea — ocean blues, with Level 4 purple kept for
+     the level tag only. Green stays the "correct" colour across every app. */
+  --sea:#0369A1;--sea-d:#075985;--sea-l:#F0F9FF;--sea-b:#BAE6FD;
+  --deep:#0C4A6E;
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --red:#DC2626;--red-l:#FEF2F2;--red-b:#FECACA;
+  --amber:#F59E0B;--amber-l:#FFFBEB;--yellow:#FACC15;--yellow-b:#FDE68A;--yellow-l:#FEFCE8;
+  --ink:#111;--ink-2:#374151;--ink-3:#6B7280;--border:#E5E7EB;
+  --paper:#FFFDF5;--navy:#0f172a;
+}
+html,body{height:100%;font-family:'Outfit',system-ui,'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--paper);color:var(--ink)}
+body{display:flex;flex-direction:column}
+.app-header{background:linear-gradient(135deg,var(--sea),var(--deep));color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-header .logo{font-size:26px}
+.app-header .title{font-size:20px;font-weight:800;line-height:1.1}
+.app-header .subtitle{font-size:13px;opacity:.85;margin-top:2px}
+.app-header .badge-row{margin-left:auto}
+.prog-pill{background:rgba(255,255,255,.22);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;white-space:nowrap}
+.tab-nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:11px 12px;font-family:inherit;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;min-width:70px}
+.tab-btn .tab-icon{font-size:18px}
+.tab-btn .tab-name{font-size:11px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.tab-btn.active{color:var(--sea);border-bottom-color:var(--sea)}
+.tab-btn.done::after{content:'✓';position:absolute;top:3px;right:5px;color:var(--green);font-weight:900;font-size:12px}
+.tab-content{display:none;flex:1;overflow-y:auto;flex-direction:column;min-height:0}
+.tab-content.active{display:flex}
+.tab-body{flex:1;padding:18px 20px 8px;display:flex;flex-direction:column;gap:14px;max-width:900px;width:100%;margin:0 auto}
+.tab-footer{flex-shrink:0;border-top:2px solid var(--border);background:#fff;padding:10px 20px;display:flex;gap:10px;max-width:900px;width:100%;margin:0 auto}
+.section-title{font-size:21px;font-weight:900;color:var(--navy)}
+.section-sub{font-size:14px;color:var(--ink-3);font-weight:600;margin-top:2px}
+.dad-hint{background:var(--amber-l);border:2px solid var(--yellow-b);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:600;color:var(--ink-2);line-height:1.5}
+.src-pill{font-size:12px;font-weight:700;color:var(--ink-3);border-top:1px solid var(--border);padding-top:8px}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:12px 16px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer}
+.btn-complete:disabled{opacity:.4;cursor:not-allowed}
+.btn-complete.confirmed{background:var(--green-d);pointer-events:none}
+.btn-redo{width:112px;flex-shrink:0;background:#fff;color:var(--sea);border:2px solid var(--sea-b);border-radius:12px;padding:12px 8px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer}
+.btn-redo.armed{background:var(--sea-l);border-color:var(--sea)}
+.done-banner{display:none;background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;color:var(--green-d);text-align:center}
+.done-banner.show{display:block;animation:pop .35s}
+@keyframes pop{0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.qcard{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.qcard .qtext{font-size:16px;font-weight:800;color:var(--navy);line-height:1.45}
+.opt-group{display:flex;flex-direction:column;gap:8px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid var(--border);border-radius:12px;padding:11px 16px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit}
+.opt:hover:not(:disabled){border-color:var(--amber)}
+.opt.good{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default}
+.jp-note{font-size:14px;font-weight:600;color:var(--ink-3);background:var(--sea-l);border-radius:10px;padding:8px 12px;line-height:1.5}
+.mstatus{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mcount{background:var(--sea);color:#fff;border-radius:20px;padding:5px 16px;font-size:14px;font-weight:800}
+.mcount.alt{background:var(--navy)}
+.mhint{font-size:14px;font-weight:700;color:var(--ink-3);line-height:1.5}
+.fc-modeswitch{display:flex;gap:8px}
+.fc-modebtn{flex:1;padding:9px;border-radius:10px;border:2px solid var(--border);background:#fff;font-weight:800;font-family:inherit;cursor:pointer;color:var(--ink-3)}
+.fc-modebtn.active{background:var(--sea);color:#fff;border-color:var(--sea)}
+.fc-pane{display:none}.fc-pane.active{display:block}
+.flashcard-wrap{perspective:1000px;min-height:270px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:270px;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;gap:8px;text-align:center}
+.fc-front{background:linear-gradient(135deg,var(--sea),var(--deep));color:#fff;border:4px solid var(--yellow)}
+.fc-back{background:linear-gradient(135deg,#fff,var(--sea-l));border:4px solid var(--sea);transform:rotateY(180deg);overflow:auto}
+.fc-emoji{font-size:56px;line-height:1}
+.fc-word{font-size:30px;font-weight:900}
+.fc-ipa{font-size:14px;font-weight:600;opacity:.85}
+.fc-def{font-size:17px;color:var(--ink-2);font-weight:700;line-height:1.4}
+.fc-tap{font-size:11px;font-weight:700;opacity:.75;letter-spacing:.08em;margin-top:6px}
+.fc-jp{font-size:15px;color:var(--ink-3);font-weight:700;display:none}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:none;border:1px dashed #D1D5DB;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;color:var(--ink-3);cursor:pointer;font-family:inherit}
+.fc-sample{font-size:15px;background:var(--sea-l);border-radius:10px;padding:8px 12px;font-weight:600;color:var(--ink-2);line-height:1.4}
+.fc-sample b{color:var(--sea-d)}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+.fc-nav button{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-weight:800;font-family:inherit;cursor:pointer}
+.fc-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.fc-dot{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.fc-dot.on{background:var(--sea)}
+.svy-row{background:#fff;border:2px solid var(--border);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.svy-row input{border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:15px;font-family:inherit;flex:1;min-width:150px}
+.svy-row input:focus{border-color:var(--amber);outline:none}
+.svy-row.filled{border-color:var(--green);background:var(--green-l)}
+.svy-row.err{animation:shake .35s;border-color:var(--red)}
+.tr-btn{border:2px solid var(--border);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.tr-btn:hover{border-color:var(--sea);color:var(--sea-d)}
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.flipcard{background:linear-gradient(135deg,var(--deep),#1e293b);border:3px solid var(--yellow);border-radius:14px;padding:16px;text-align:center;cursor:pointer;color:#fff;min-height:132px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.flipcard .fce{font-size:40px}
+.flipcard .ftitle{font-size:17px;font-weight:900}
+.flipcard.revealed{background:#fff;color:var(--navy);border-color:var(--green);cursor:default;text-align:left}
+.fbody{font-size:15px;font-weight:600;color:var(--ink-2);line-height:1.55}
+.fjp{font-size:13px;font-weight:600;color:var(--ink-3)}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.mcol{display:flex;flex-direction:column;gap:8px}
+.mitem{background:#fff;border:3px solid var(--border);border-radius:12px;padding:11px 13px;font-size:15px;font-weight:800;color:var(--ink);cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;min-height:56px;line-height:1.35}
+.mitem.m-right{font-weight:600}
+.mitem:hover{border-color:var(--amber)}
+.mitem.sel{border-color:var(--sea);background:var(--sea-l)}
+.mitem.lock{border-color:var(--green);background:var(--green-l);color:var(--green-d);opacity:.7;pointer-events:none}
+.mitem.err{animation:shake .35s;border-color:var(--red);background:var(--red-l)}
+.mrecap{display:none}.mrecap.show{display:block}
+.mrecap-title{font-size:14px;font-weight:800;color:var(--green-d);margin-bottom:8px}
+.mrecap table{width:100%;border-collapse:collapse;background:#fff;border:2px solid var(--border);border-radius:12px;overflow:hidden}
+.mrecap td{padding:9px 12px;font-size:14px;border-top:1px solid var(--border);vertical-align:top}
+.mrecap tr:first-child td{border-top:none}
+.mr-word{font-weight:800;color:var(--green-d);white-space:nowrap;width:1%}
+.mr-emoji{text-align:center;font-size:18px;width:1%}
+.mr-sent{font-weight:600;color:var(--ink-2)}
+.chip-bank{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#fff;border:3px solid var(--amber);border-radius:10px;padding:8px 15px;font-size:16px;font-weight:800;color:var(--ink);cursor:pointer;font-family:inherit}
+.chip:hover{background:var(--amber-l)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.err{animation:shake .35s;border-color:var(--red)}
+.read-box{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px;font-size:16px;font-weight:600;line-height:2}
+.read-blank{display:inline-block;min-width:104px;border-bottom:3px solid var(--amber);text-align:center;font-weight:900;color:var(--ink-3);cursor:pointer;padding:0 6px}
+.read-blank.filled{color:var(--green-d);border-color:var(--green)}
+.read-blank.active{background:var(--amber-l)}
+.read-blank.wrong{animation:shake .35s;color:var(--red)}
+.zone-strip{display:flex;flex-direction:column;border-radius:14px;overflow:hidden;border:3px solid var(--border)}
+.zone-row{padding:12px 16px;font-weight:800;color:#fff;font-size:15px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.zone-sunlit{background:#0EA5E9}.zone-twilight{background:#075985}.zone-midnight{background:#0f172a}
+.zone-depth{font-weight:600;opacity:.9;font-size:13px}
+.quiz-progress{display:flex;gap:5px;flex-wrap:wrap}
+.qdot{width:14px;height:14px;border-radius:50%;background:var(--border)}
+.qdot.on{background:var(--green)}
+.qdot.now{background:var(--sea);box-shadow:0 0 0 3px var(--sea-l)}
+.result-card{border-radius:16px;padding:24px;text-align:center;display:flex;flex-direction:column;gap:8px;border:3px solid var(--border);background:#fff}
+.result-card.pass{border-color:var(--green);background:var(--green-l)}
+.result-card.fail{border-color:var(--amber);background:var(--amber-l)}
+.result-trophy{font-size:54px}
+.result-score{font-size:34px;font-weight:900;color:var(--navy)}
+.result-sub{font-size:15px;font-weight:700;color:var(--ink-2);line-height:1.5}
+.pitch{background:linear-gradient(180deg,#166534,#14532d);border-radius:14px;padding:14px 18px;color:#fff}
+.score-row{display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:800;gap:10px;flex-wrap:wrap}
+.sun-word{font-size:15px;font-weight:800;color:var(--sea-d);min-width:130px}
+@media (max-width:640px){.mgrid{grid-template-columns:1fr}.tab-body{padding:14px 14px 8px}.tab-footer{padding:10px 14px}}
+/* ── Mission / Project ── */
+.mission-banner{background:linear-gradient(135deg,var(--sea),var(--deep));color:#fff;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px;box-shadow:0 4px 14px rgba(3,105,161,.25)}
+.mb-label{font-size:12px;font-weight:900;letter-spacing:2px;opacity:.8}
+.mb-text{font-size:26px;font-weight:900;line-height:1.2}
+.quote-card{background:var(--sea-l);border:2px solid var(--sea-b);border-left:6px solid var(--sea);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.qc-mark{font-size:38px;font-weight:900;color:var(--sea-b);line-height:.6}
+.qc-text{font-size:15px;font-weight:600;color:var(--ink-2);line-height:1.6}
+.qc-by{font-size:13px;font-weight:800;color:var(--sea-d)}
+.big-q{background:#fff;border:3px solid var(--sea-b);border-radius:14px;padding:18px;font-size:20px;font-weight:800;color:var(--navy);line-height:1.35;text-align:center}
+.write-area{font-family:inherit;font-size:16px;font-weight:600;color:var(--ink);line-height:1.6;border:2px solid var(--border);border-radius:12px;padding:12px 14px;min-height:120px;resize:vertical;background:#fff;width:100%}
+.write-area:focus{outline:none;border-color:var(--sea);box-shadow:0 0 0 3px var(--sea-l)}
+.check-list{display:flex;flex-direction:column;gap:8px}
+.check-row{display:flex;align-items:center;gap:12px;background:#fff;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;transition:.15s}
+.check-row:hover{border-color:var(--sea-b)}
+.check-row .check-box{width:26px;height:26px;flex-shrink:0;border-radius:8px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:900;color:transparent;font-size:15px}
+.check-row .check-text{font-size:15px;font-weight:700;color:var(--ink-2);line-height:1.45}
+.check-row.on{border-color:var(--green);background:var(--green-l)}
+.check-row.on .check-box{background:var(--green);border-color:var(--green);color:#fff}
+.step-row{display:flex;gap:14px;align-items:flex-start;background:#fff;border:2px solid var(--border);border-radius:14px;padding:14px 16px}
+.step-num{width:34px;height:34px;flex-shrink:0;border-radius:50%;background:var(--sea);color:#fff;font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center}
+.step-text{font-size:16px;font-weight:700;color:var(--ink-2);line-height:1.45}
+.step-list{display:flex;flex-direction:column;gap:10px}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.pick{background:#fff;border:2px solid var(--border);border-radius:12px;padding:12px;font-family:inherit;font-size:14px;font-weight:800;color:var(--ink-2);cursor:pointer;text-align:left;line-height:1.4;transition:.15s}
+.pick:hover{border-color:var(--sea-b)}
+.pick.on{border-color:var(--green);background:var(--green-l);color:var(--green-d)}
+.poster-frame{background:#fff;border:3px dashed var(--sea-b);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.poster-line{display:flex;flex-direction:column;gap:5px}
+.poster-line label{font-size:13px;font-weight:800;color:var(--sea-d);letter-spacing:.3px}
+.poster-in{font-family:inherit;font-size:16px;font-weight:700;color:var(--ink);border:2px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--paper);width:100%}
+.poster-in:focus{outline:none;border-color:var(--sea);box-shadow:0 0 0 3px var(--sea-l)}
+.poster-preview{background:linear-gradient(160deg,var(--sea-l),#fff);border:2px solid var(--sea-b);border-radius:14px;padding:20px;text-align:center;display:flex;flex-direction:column;gap:10px;min-height:150px;justify-content:center}
+.pp-title{font-size:24px;font-weight:900;color:var(--deep);line-height:1.2}
+.pp-fact{font-size:15px;font-weight:700;color:var(--ink-2);line-height:1.5}
+.pp-ask{font-size:16px;font-weight:900;color:var(--green-d)}
+.pp-empty{font-size:14px;font-weight:700;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="logo">🌊</div>
+  <div>
+    <div class="title">Unit 6 · Project</div>
+    <div class="subtitle">Our World Level 4 — Wonders of the Sea</div>
+  </div>
+  <div class="badge-row"><div class="prog-pill" id="prog-pill">0 / 6 done</div></div>
+</header>
+<nav class="tab-nav" id="tab-nav"></nav>
+<main id="tab-stack" style="flex:1;display:flex;flex-direction:column;min-height:0"></main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   OUR WORLD LEVEL 4 · UNIT 6 · PROJECT — LEO APP
+   "Make posters to help sea animals." · Student Book pp. 106-107
+   SAVE_PREFIX: leea-4-6-project-
+   HOMEWORK_ID: leo-4-6-project
+   moduleCount 6 (tabs 0-5) · moduleKeyFormat tab-{i}-done · scoreKey score (tab 5)
+
+   The five project steps and the "Now I can..." checklist are verbatim
+   from the Student Book.
+   ═══════════════════════════════════════════════════════════════════════ */
+const SAVE_PREFIX='leea-4-6-project-';
+const HOMEWORK_ID='leo-4-6-project';
+const TAB_COUNT=6;
+const TABS=[
+ {icon:'🎯',name:'The Project'},{icon:'🔍',name:'Research'},{icon:'🖼️',name:'My Poster'},
+ {icon:'💌',name:'Cards'},{icon:'🧹',name:'Clean-Up'},{icon:'✅',name:'Quiz'}
+];
+const TAB_INIT={},TAB_RESET={},TAB_RESTORE={};
+
+function lSave(k,v){try{localStorage.setItem(SAVE_PREFIX+k,JSON.stringify(v));}catch(e){}}
+function lLoad(k){try{const r=localStorage.getItem(SAVE_PREFIX+k);return r?JSON.parse(r):null;}catch(e){return null;}}
+function lDel(k){try{localStorage.removeItem(SAVE_PREFIX+k);}catch(e){}}
+function el(t,c,x){const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n;}
+function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function boldWord(s,w){
+  const stem=String(w).replace(/^(a|an|the)\s+/i,'').replace(/_/g,' ');
+  try{return s.replace(new RegExp('('+stem.split(/\s+/).join('[-\\s]')+'\\w*)','i'),'<b>$1</b>');}catch(e){return s;}
+}
+
+/* ── progress + footers (save/restore rules 1, 4, 5) ── */
+function refreshProgress(){
+  let done=0;
+  for(let i=0;i<TAB_COUNT;i++){
+    if(lLoad('tab-'+i+'-done')){done++;const b=document.getElementById('tb'+i);if(b)b.classList.add('done');}
+  }
+  document.getElementById('prog-pill').textContent=done+' / '+TAB_COUNT+' done';
+  const flag='leea-'+HOMEWORK_ID+'-done';
+  try{
+    if(done>=TAB_COUNT){lSave('done',true);localStorage.setItem(flag,JSON.stringify({complete:true,completedAt:new Date().toISOString()}));}
+    else{lDel('done');localStorage.removeItem(flag);}
+  }catch(e){}
+}
+/* Rule 1: the activity calls this the moment its own criteria are met. */
+function markDone(i,silent){
+  if(!lLoad('tab-'+i+'-done'))lSave('tab-'+i+'-done',{done:true,completedAt:new Date().toISOString()});
+  const b=document.getElementById('complete-'+i);
+  if(b){b.disabled=false;b.classList.add('confirmed');b.textContent='✓ '+TABS[i].name+' done';}
+  const banner=document.getElementById('banner-'+i);
+  if(banner&&!silent)banner.classList.add('show');
+  refreshProgress();
+}
+function allowComplete(i){
+  const b=document.getElementById('complete-'+i);
+  if(b&&!lLoad('tab-'+i+'-done')){b.disabled=false;b.textContent='Mark '+TABS[i].name+' complete ✓';}
+}
+/* Rule 4: two-tap arm, then clear this tab's keys and rebuild from zero. */
+function doRedo(i){
+  const b=document.getElementById('redo-'+i);
+  if(!b.classList.contains('armed')){
+    b.classList.add('armed');b.textContent='Tap again ↺';
+    setTimeout(()=>{b.classList.remove('armed');b.textContent='↺ Redo';},3000);
+    return;
+  }
+  b.classList.remove('armed');b.textContent='↺ Redo';
+  lDel('tab-'+i+'-done');
+  if(i===11)lDel('score');
+  Object.keys(localStorage).filter(k=>k.indexOf(SAVE_PREFIX+'tab-'+i+'-')===0).forEach(k=>localStorage.removeItem(k));
+  const c=document.getElementById('complete-'+i);
+  c.classList.remove('confirmed');c.disabled=true;c.textContent='Mark '+TABS[i].name+' complete ✓';
+  const banner=document.getElementById('banner-'+i);if(banner)banner.classList.remove('show');
+  document.getElementById('tb'+i).classList.remove('done');
+  if(TAB_RESET[i])TAB_RESET[i]();
+  refreshProgress();
+}
+/* Rule 2: only tab 11 writes the score key, and it writes the whole result. */
+function saveScore(score,total,extra){
+  const rec={score:score,total:total,percent:Math.round(score/total*100),done:true,savedAt:new Date().toISOString()};
+  for(const k in extra)rec[k]=extra[k];
+  lSave('score',rec);
+}
+let _active=0;
+function showTab(n){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===n));
+  document.querySelectorAll('.tab-content').forEach((c,i)=>c.classList.toggle('active',i===n));
+  _active=n;lSave('last-tab',n);
+  if(TAB_INIT[n]&&!TAB_INIT[n]._done){TAB_INIT[n]();TAB_INIT[n]._done=true;}
+  if(TAB_RESTORE[n])TAB_RESTORE[n]();
+  const c=document.getElementById('complete-'+n);
+  if(c&&lLoad('tab-'+n+'-done')){c.disabled=false;c.classList.add('confirmed');c.textContent='✓ '+TABS[n].name+' done';}
+}
+
+/* Shared MCQ block. Rule 6: an answered question comes back looking answered,
+   or the guard swallows the next tap with no feedback. */
+function askBlock(host,item,tab,key,after){
+  const card=el('div','qcard');
+  const q=el('div','qtext');q.innerHTML=item.q;card.appendChild(q);
+  const grp=el('div','opt-group');
+  item.opts.forEach((t,oi)=>{
+    const b=el('button','opt',t);
+    b.onclick=()=>{
+      const st=lLoad('tab-'+tab+'-ans')||{};
+      if(st[key]!=null)return;
+      st[key]=oi;lSave('tab-'+tab+'-ans',st);
+      paint(b,oi);if(after)after();
+    };
+    grp.appendChild(b);
+  });
+  card.appendChild(grp);
+  if(item.jp){const j=el('div','jp-note','🇯🇵 '+item.jp);j.style.display='none';card.appendChild(j);}
+  host.appendChild(card);
+  function paint(clicked,chosen){
+    const all=grp.querySelectorAll('.opt');
+    for(let i=0;i<all.length;i++){all[i].disabled=true;if(i===item.correct)all[i].classList.add('good');}
+    if(chosen!==item.correct&&clicked)clicked.classList.add('bad');
+    const j=card.querySelector('.jp-note');if(j)j.style.display='block';
+  }
+  const saved=(lLoad('tab-'+tab+'-ans')||{})[key];
+  if(saved!=null)paint(grp.querySelectorAll('.opt')[saved],saved);
+}
+function answered(tab,keys){const st=lLoad('tab-'+tab+'-ans')||{};return keys.filter(k=>st[k]!=null).length;}
+function counter(host,label){
+  const row=el('div','mstatus'),c=el('div','mcount','0');
+  row.appendChild(c);row.appendChild(el('div','mhint',label));host.appendChild(row);return c;
+}
+function srcPill(host,text){host.appendChild(el('div','src-pill',text));}
+
+/* ── flashcard block: Practice + Quiz, both required (PR #77 lock) ── */
+function flashcards(host,tab,list){
+  const st=lLoad('tab-'+tab+'-fc')||{seen:[],solved:[],mode:'practice'};
+  st.seen=st.seen||[];st.solved=st.solved||[];
+  const modes=el('div','fc-modeswitch');
+  const pb=el('button','fc-modebtn','📖 Practice'),qb=el('button','fc-modebtn','🧠 Quiz');
+  modes.appendChild(pb);modes.appendChild(qb);host.appendChild(modes);
+  const status=el('div','mstatus'),seenPill=el('div','mcount',''),solvedPill=el('div','mcount alt','');
+  status.appendChild(seenPill);status.appendChild(solvedPill);host.appendChild(status);
+  const pp=el('div','fc-pane'),qp=el('div','fc-pane');host.appendChild(pp);host.appendChild(qp);
+  let idx=0;
+  const wrap=el('div','flashcard-wrap'),card=el('div','flashcard'),front=el('div','fc-face fc-front'),back=el('div','fc-face fc-back');
+  card.appendChild(front);card.appendChild(back);wrap.appendChild(card);
+  wrap.onclick=()=>card.classList.toggle('flipped');
+  pp.appendChild(wrap);
+  const nav=el('div','fc-nav'),prev=el('button',null,'◀ Back'),dots=el('div','fc-dots'),next=el('button',null,'Next ▶');
+  nav.appendChild(prev);nav.appendChild(dots);nav.appendChild(next);pp.appendChild(nav);
+  prev.onclick=()=>{idx=(idx-1+list.length)%list.length;draw();};
+  next.onclick=()=>{idx=(idx+1)%list.length;draw();};
+  function draw(){
+    const w=list[idx];card.classList.remove('flipped');
+    front.innerHTML='';front.appendChild(el('div','fc-emoji',w.e));front.appendChild(el('div','fc-word',w.w));
+    front.appendChild(el('div','fc-ipa','/'+w.ipa+'/'));front.appendChild(el('div','fc-tap','TAP TO FLIP'));
+    back.innerHTML='';back.appendChild(el('div','fc-def',w.def));
+    const jp=el('div','fc-jp',w.jp),jb=el('button','fc-jp-btn','🇯🇵 Japanese');
+    jb.onclick=(ev)=>{ev.stopPropagation();jp.classList.toggle('revealed');};
+    back.appendChild(jb);back.appendChild(jp);
+    const s=el('div','fc-sample');s.innerHTML=boldWord(w.s||w.tr,w.norm||w.w);back.appendChild(s);
+    dots.innerHTML='';list.forEach((_,i)=>dots.appendChild(el('div','fc-dot'+(i===idx?' on':''))));
+    if(st.seen.indexOf(idx)<0)st.seen.push(idx);
+    persist();
+  }
+  const qcard=el('div','qcard');qp.appendChild(qcard);
+  function drawQuiz(){
+    qcard.innerHTML='';
+    const left=list.map((_,i)=>i).filter(i=>st.solved.indexOf(i)<0);
+    if(!left.length){qcard.appendChild(el('div','qtext','🎉 Every word typed correctly!'));return;}
+    const i=left[0],w=list[i];
+    qcard.appendChild(el('div','fc-emoji',w.e));
+    qcard.appendChild(el('div','qtext',w.def));
+    const row=el('div','svy-row'),inp=el('input'),ck=el('button','tr-btn','✓ Check'),clue=el('button','tr-btn','Clue');
+    inp.placeholder='Type the word';row.appendChild(inp);row.appendChild(ck);row.appendChild(clue);
+    qcard.appendChild(row);
+    const fb=el('div','mhint','');qcard.appendChild(fb);
+    const target=w.w.replace(/^(a|an|the)\s+/i,'').toLowerCase();
+    clue.onclick=()=>{fb.textContent='Starts with "'+target.charAt(0)+'" · '+target.replace(/[^\s]/g,'•');};
+    ck.onclick=()=>{
+      if(inp.value.trim().toLowerCase().replace(/^(a|an|the)\s+/,'')===target){
+        st.solved.push(i);persist();drawQuiz();
+      }else{row.classList.add('err');fb.textContent='Not yet — try again.';setTimeout(()=>row.classList.remove('err'),400);}
+    };
+    inp.onkeydown=(ev)=>{if(ev.key==='Enter')ck.onclick();};
+  }
+  function persist(){
+    st.mode=pp.classList.contains('active')?'practice':'quiz';
+    lSave('tab-'+tab+'-fc',st);
+    seenPill.textContent='📖 '+st.seen.length+' / '+list.length;
+    solvedPill.textContent='🧠 '+st.solved.length+' / '+list.length;
+    if(st.seen.length>=list.length&&st.solved.length>=list.length)markDone(tab);
+  }
+  function setMode(m){
+    pp.classList.toggle('active',m==='practice');qp.classList.toggle('active',m==='quiz');
+    pb.classList.toggle('active',m==='practice');qb.classList.toggle('active',m==='quiz');
+    if(m==='quiz')drawQuiz();
+    persist();
+  }
+  pb.onclick=()=>setMode('practice');qb.onclick=()=>setMode('quiz');
+  draw();setMode(st.mode==='quiz'?'quiz':'practice');
+}
+
+/* ═══ PROJECT — Student Book pp. 106-107, verbatim ══════════════════════ */
+const PROJECT='Make posters to help sea animals.';
+const STEPS=[
+ 'Research ways you can help sea animals.',
+ 'Make posters.',
+ 'Make cards to hand out.',
+ 'Invite people to a community clean-up.',
+ 'At your event, take photos for a school newspaper article.'
+];
+
+/* ── answer-position variation ── */
+function hashText(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+function mix32(a){a=(a+0x9e3779b9)>>>0;let z=a;z=Math.imul(z^(z>>>16),0x21f0aaad)>>>0;z=Math.imul(z^(z>>>15),0x735a2d97)>>>0;return (z^(z>>>15))>>>0;}
+function moveAnswerTo(item,target){
+  if(!item||!Array.isArray(item.opts)||typeof item.correct!=='number')return item;
+  const answer=item.opts[item.correct];
+  const rest=item.opts.filter((_,i)=>i!==item.correct);
+  let state=hashText(String(item.q));
+  for(let i=rest.length-1;i>0;i--){
+    state=mix32(state);
+    const j=Math.floor((state/4294967296)*(i+1));
+    const t=rest[i];rest[i]=rest[j];rest[j]=t;
+  }
+  const pos=Math.min(Math.max(target,0),rest.length);
+  rest.splice(pos,0,answer);
+  item.opts=rest;item.correct=pos;
+  return item;
+}
+/* Deal the answers round-robin over a hash-ordered list so no slot is starved
+   and no slot is favoured — the position must never be a clue. */
+function varyAll(list){
+  list.map((it,i)=>({i:i,h:hashText(String(it&&it.q))}))
+      .sort((a,b)=>(a.h-b.h)||(a.i-b.i))
+      .forEach((o,k)=>{const it=list[o.i];if(it&&Array.isArray(it.opts))moveAnswerTo(it,k%it.opts.length);});
+  return list;
+}
+
+/* ═══ TAB 0 — THE PROJECT ═══ */
+TAB_INIT[0]=function(){
+  const h=document.getElementById('body-0');
+  h.appendChild(hdr('🖼️ The Project','Student Book pp. 106-107'));
+  const banner=el('div','mission-banner');
+  banner.appendChild(el('div','mb-label','PROJECT'));
+  banner.appendChild(el('div','mb-text',PROJECT));
+  h.appendChild(banner);
+  h.appendChild(hint('Five steps. Do them in order — this app walks you through steps 1 to 4, and step 5 happens on the day.'));
+  const list=el('div','step-list');
+  STEPS.forEach((s,i)=>{
+    const row=el('div','step-row');
+    row.appendChild(el('div','step-num',String(i+1)));
+    row.appendChild(el('div','step-text',s));
+    list.appendChild(row);
+  });
+  h.appendChild(list);
+  const st=lLoad('tab-0-read');
+  const btn=el('button','btn-complete','I have read the five steps ✓');
+  btn.onclick=()=>{lSave('tab-0-read',true);btn.disabled=true;btn.textContent='✓ Read';markDone(0);};
+  if(st){btn.disabled=true;btn.textContent='✓ Read';markDone(0,true);}
+  h.appendChild(btn);
+  srcPill(h,'Student Book pp. 106-107 · Project steps 1-5 — verbatim');
+};
+TAB_RESET[0]=function(){lDel('tab-0-read');rebuild(0);};
+
+/* ═══ TAB 1 — RESEARCH (step 1) ═══ */
+const WAYS=[
+ 'Pick up garbage on the beach',
+ 'Use less plastic',
+ 'Never leave fishing line behind',
+ 'Cut pop-top rings before you bin them',
+ 'Buy fish from people who do not overfish',
+ 'Tell other people what you learned',
+ 'Join a community clean-up',
+ 'Keep oil and paint out of drains'
+];
+TAB_INIT[1]=function(){
+  const h=document.getElementById('body-1');
+  h.appendChild(hdr('🔎 Research','Step 1 — Research ways you can help sea animals.'));
+  h.appendChild(hint('Pick at least three ways your posters could ask people to help. Then write down one fact from the unit that proves why it matters.'));
+  const picked=lLoad('tab-1-ways')||[];
+  const c=counter(h,'ways chosen — pick at least 3');
+  const grid=el('div','pick-grid');
+  WAYS.forEach((w,i)=>{
+    const b=el('button','pick',w);
+    if(picked.indexOf(i)>=0)b.classList.add('on');
+    b.onclick=()=>{
+      const at=picked.indexOf(i);
+      if(at<0)picked.push(i);else picked.splice(at,1);
+      b.classList.toggle('on');lSave('tab-1-ways',picked);up();
+    };
+    grid.appendChild(b);
+  });
+  h.appendChild(grid);
+  h.appendChild(el('div','section-sub','One fact from Unit 6 that shows why sea animals need help:'));
+  const ta=document.createElement('textarea');
+  ta.className='write-area';
+  ta.placeholder='e.g. Plastic bags look like jellyfish, so sea turtles eat them.';
+  ta.value=lLoad('tab-1-fact')||'';
+  h.appendChild(ta);
+  const wc=el('div','mhint','');h.appendChild(wc);
+  function fw(){return ta.value.trim()?ta.value.trim().split(/\s+/).length:0;}
+  ta.oninput=()=>{lSave('tab-1-fact',ta.value);up();};
+  srcPill(h,'Student Book p. 106 · Step 1 Research');
+  function up(){
+    c.textContent=picked.length+' / 3';
+    wc.textContent=fw()+' words — write at least 6';
+    if(picked.length>=3&&fw()>=6)markDone(1);
+  }
+  up();
+};
+TAB_RESET[1]=function(){lDel('tab-1-ways');lDel('tab-1-fact');rebuild(1);};
+
+/* ═══ TAB 2 — MY POSTER (step 2) ═══ */
+TAB_INIT[2]=function(){
+  const h=document.getElementById('body-2');
+  h.appendChild(hdr('🎨 My Poster','Step 2 — Make posters.'));
+  h.appendChild(hint('A poster needs three things: a big title, one fact, and one clear ask. Type them and watch the poster build itself.'));
+  const st=lLoad('tab-2-poster')||{title:'',fact:'',ask:''};
+  const frame=el('div','poster-frame');
+  const preview=el('div','poster-preview');
+  const fields=[
+   {k:'title',label:'BIG TITLE',ph:'Save Our Sea Turtles!'},
+   {k:'fact',label:'ONE FACT',ph:'Sea turtles eat plastic bags because they look like jellyfish.'},
+   {k:'ask',label:'ONE ASK — use must or can’t',ph:'You must put your garbage in the bin.'}
+  ];
+  fields.forEach(f=>{
+    const line=el('div','poster-line');
+    const lab=document.createElement('label');lab.textContent=f.label;line.appendChild(lab);
+    const inp=document.createElement('input');
+    inp.className='poster-in';inp.type='text';inp.placeholder=f.ph;inp.value=st[f.k]||'';
+    inp.oninput=()=>{st[f.k]=inp.value;lSave('tab-2-poster',st);draw();};
+    line.appendChild(inp);frame.appendChild(line);
+  });
+  h.appendChild(frame);
+  h.appendChild(el('div','section-sub','Your poster:'));
+  h.appendChild(preview);
+  const wc=el('div','mhint','');h.appendChild(wc);
+  srcPill(h,'Student Book p. 106 · Step 2 Make posters');
+  function draw(){
+    preview.innerHTML='';
+    if(!st.title&&!st.fact&&!st.ask){
+      preview.appendChild(el('div','pp-empty','Type above and your poster appears here.'));
+    }else{
+      if(st.title)preview.appendChild(el('div','pp-title',st.title));
+      if(st.fact)preview.appendChild(el('div','pp-fact',st.fact));
+      if(st.ask)preview.appendChild(el('div','pp-ask',st.ask));
+    }
+    const filled=['title','fact','ask'].filter(k=>(st[k]||'').trim().length>2).length;
+    wc.textContent=filled+' / 3 parts written';
+    if(filled>=3)markDone(2);
+  }
+  draw();
+};
+TAB_RESET[2]=function(){lDel('tab-2-poster');rebuild(2);};
+
+/* ═══ TAB 3 — CARDS (step 3) ═══ */
+const CARD_CHECK=[
+ 'My card is short — someone can read it while they walk.',
+ 'It names one sea animal from Unit 6.',
+ 'It says one thing people <b>must</b> do or <b>can’t</b> do.',
+ 'It says where and when the clean-up is.',
+ 'I checked my spelling.'
+];
+TAB_INIT[3]=function(){
+  const h=document.getElementById('body-3');
+  h.appendChild(hdr('🎟️ Cards','Step 3 — Make cards to hand out.'));
+  h.appendChild(hint('A card is smaller than a poster, so every word counts. Write the words that go on your card, then tick the checklist.'));
+  const ta=document.createElement('textarea');
+  ta.className='write-area';
+  ta.placeholder='e.g. Sea turtles can’t tell plastic from food. You must take your garbage home. Beach clean-up: Saturday, 10 a.m., South Beach.';
+  ta.value=lLoad('tab-3-card')||'';
+  h.appendChild(ta);
+  const wc=el('div','mhint','');h.appendChild(wc);
+  const st=lLoad('tab-3-check')||[];
+  const c=counter(h,'ticked');
+  const list=el('div','check-list');
+  CARD_CHECK.forEach((t,i)=>{
+    const row=el('div','check-row');
+    row.appendChild(el('div','check-box','✓'));
+    const lbl=el('div','check-text');lbl.innerHTML=t;row.appendChild(lbl);
+    if(st.indexOf(i)>=0)row.classList.add('on');
+    row.onclick=()=>{
+      const at=st.indexOf(i);
+      if(at<0)st.push(i);else st.splice(at,1);
+      lSave('tab-3-check',st);row.classList.toggle('on');up();
+    };
+    list.appendChild(row);
+  });
+  h.appendChild(list);
+  srcPill(h,'Student Book p. 106 · Step 3 Make cards to hand out');
+  function cw(){return ta.value.trim()?ta.value.trim().split(/\s+/).length:0;}
+  ta.oninput=()=>{lSave('tab-3-card',ta.value);up();};
+  function up(){
+    wc.textContent=cw()+' words — write at least 10';
+    c.textContent=st.length+' / '+CARD_CHECK.length;
+    if(cw()>=10&&st.length>=CARD_CHECK.length)markDone(3);
+  }
+  up();
+};
+TAB_RESET[3]=function(){lDel('tab-3-card');lDel('tab-3-check');rebuild(3);};
+
+/* ═══ TAB 4 — CLEAN-UP (steps 4 and 5) ═══ */
+const INVITE=[
+ {k:'what',label:'WHAT is happening?',ph:'A beach clean-up to help sea animals'},
+ {k:'where',label:'WHERE is it?',ph:'South Beach, by the car park'},
+ {k:'when',label:'WHEN is it?',ph:'Saturday 12 September, 10 a.m. to 12 p.m.'},
+ {k:'bring',label:'WHAT must people bring?',ph:'Gloves, a bag and a hat'},
+ {k:'photo',label:'WHO takes the photos for the newspaper?',ph:'Me — I will take photos of every bag we fill'}
+];
+TAB_INIT[4]=function(){
+  const h=document.getElementById('body-4');
+  h.appendChild(hdr('🧹 Clean-Up','Steps 4 and 5 — invite people, then take photos on the day.'));
+  h.appendChild(hint('An invitation has to answer what, where and when, or nobody comes. Step 5 is on the list too: decide now who takes the photos.'));
+  const st=lLoad('tab-4-invite')||{};
+  const c=counter(h,'answered — all 5 needed');
+  const frame=el('div','poster-frame');
+  INVITE.forEach(f=>{
+    const line=el('div','poster-line');
+    const lab=document.createElement('label');lab.textContent=f.label;line.appendChild(lab);
+    const inp=document.createElement('input');
+    inp.className='poster-in';inp.type='text';inp.placeholder=f.ph;inp.value=st[f.k]||'';
+    inp.oninput=()=>{st[f.k]=inp.value;lSave('tab-4-invite',st);up();};
+    line.appendChild(inp);frame.appendChild(line);
+  });
+  h.appendChild(frame);
+  srcPill(h,'Student Book p. 107 · Steps 4-5 Invite people to a community clean-up; take photos for a school newspaper article');
+  function up(){
+    const n=INVITE.filter(f=>(st[f.k]||'').trim().length>2).length;
+    c.textContent=n+' / '+INVITE.length;
+    if(n>=INVITE.length)markDone(4);
+  }
+  up();
+};
+TAB_RESET[4]=function(){lDel('tab-4-invite');rebuild(4);};
+
+/* ═══ TAB 5 — QUIZ ═══ */
+const QUIZ=varyAll([
+ {q:'What is the Unit 6 project?',opts:['Make posters to help sea animals.','Build a fish tank.','Write a song about whales.'],correct:0,jp:'海の動物を助けるポスターを作ることです。'},
+ {q:'Which step comes FIRST?',opts:['Research ways you can help sea animals.','Make cards to hand out.','Take photos.'],correct:0,jp:'まず調べることです。'},
+ {q:'Step 3 is to make…',opts:['cards to hand out','a video','a model boat'],correct:0,jp:'配るカードを作ります。'},
+ {q:'Who do you invite in step 4?',opts:['people, to a community clean-up','only your teacher','nobody'],correct:0,jp:'地域の清掃活動に人々を招きます。'},
+ {q:'Why do you take photos at your event?',opts:['for a school newspaper article','to sell them','to hang on the fridge'],correct:0,jp:'学校新聞の記事のためです。'},
+ {q:'A good poster ask uses…',opts:['must or can’t','maybe','I think so'],correct:0,jp:'must や can’t を使います。'},
+ {q:'"You ______ leave your garbage on the beach."',opts:['can’t','will','are'],correct:0,jp:'禁止なので can’t です。'},
+ {q:'Which one really helps sea animals?',opts:['cutting pop-top rings before you bin them','feeding turtles bread','taking shells home'],correct:0,jp:'プルタブの輪を切ってから捨てることです。'}
+]);
+TAB_INIT[5]=function(){
+  const h=document.getElementById('body-5');
+  h.appendChild(hdr('✅ Project Quiz','8 questions — 6 or more to pass'));
+  const active=el('div'),result=el('div');h.appendChild(active);h.appendChild(result);
+  const saved=lLoad('score');
+  const bar=el('div','quiz-progress');active.appendChild(bar);
+  const card=el('div','qcard');active.appendChild(card);
+  let cur=0,score=0,wrong=[];
+  const PASS=6;
+  function render(){
+    bar.innerHTML='';
+    QUIZ.forEach((_,i)=>bar.appendChild(el('div','qdot'+(i<cur?' on':'')+(i===cur?' now':''))));
+    card.innerHTML='';
+    const it=QUIZ[cur];
+    const q=el('div','qtext');q.innerHTML=(cur+1)+'. '+it.q;card.appendChild(q);
+    const grp=el('div','opt-group');
+    it.opts.forEach((t,oi)=>{
+      const b=el('button','opt',t);
+      b.onclick=()=>{
+        const all=grp.querySelectorAll('.opt');
+        for(let i=0;i<all.length;i++){all[i].disabled=true;if(i===it.correct)all[i].classList.add('good');}
+        if(oi===it.correct)score++;else{b.classList.add('bad');wrong.push(cur+1);}
+        if(it.jp)card.appendChild(el('div','jp-note','🇯🇵 '+it.jp));
+        setTimeout(()=>{cur++;if(cur>=QUIZ.length)finish();else render();},900);
+      };
+      grp.appendChild(b);
+    });
+    card.appendChild(grp);
+  }
+  function finish(){
+    saveScore(score,QUIZ.length,{pass:score>=PASS,wrongQuestions:wrong});
+    show({score:score,total:QUIZ.length,percent:Math.round(score/QUIZ.length*100),pass:score>=PASS,wrongQuestions:wrong});
+    markDone(5);
+  }
+  /* Rule 3: a finished quiz comes back as its result, never restarted. */
+  function show(rec){
+    active.style.display='none';result.innerHTML='';
+    const pass=rec.pass!=null?rec.pass:rec.score>=PASS;
+    const box=el('div','result-card '+(pass?'pass':'fail'));
+    box.appendChild(el('div','result-trophy',pass?'🏆':'💪'));
+    box.appendChild(el('div','result-score',rec.score+' / '+rec.total));
+    box.appendChild(el('div','result-sub',pass?'You passed! '+rec.percent+'%':'Almost — you need '+PASS+' to pass. Tap ↺ Redo to try again.'));
+    if(rec.wrongQuestions&&rec.wrongQuestions.length)box.appendChild(el('div','result-sub','Look again at question(s): '+rec.wrongQuestions.join(', ')));
+    result.appendChild(box);
+    markDone(5,true);
+  }
+  if(saved&&saved.done){show(saved);}else{render();}
+  srcPill(h,'Formative assessment — Unit 6 Project');
+};
+TAB_RESET[5]=function(){rebuild(5);};
+/* ── small helpers used by the tabs above ── */
+function hdr(title,sub){
+  const d=el('div');d.appendChild(el('div','section-title',title));
+  if(sub)d.appendChild(el('div','section-sub',sub));return d;
+}
+function hint(text){return el('div','dad-hint',text);}
+function rebuild(i){
+  const body=document.getElementById('body-'+i);
+  body.innerHTML='';
+  TAB_INIT[i]._done=false;TAB_INIT[i]();TAB_INIT[i]._done=true;
+}
+
+/* ── boot ── */
+(function(){
+  const nav=document.getElementById('tab-nav'),stack=document.getElementById('tab-stack');
+  TABS.forEach((t,i)=>{
+    const b=el('button','tab-btn');b.id='tb'+i;
+    b.appendChild(el('span','tab-icon',t.icon));
+    b.appendChild(el('span','tab-name',t.name));
+    b.onclick=()=>showTab(i);
+    nav.appendChild(b);
+    const pane=el('div','tab-content');pane.id='tc'+i;
+    const body=el('div','tab-body');body.id='body-'+i;pane.appendChild(body);
+    const banner=el('div','done-banner','Nice work! Mark it below.');banner.id='banner-'+i;body.appendChild(banner);
+    const foot=el('div','tab-footer');
+    const redo=el('button','btn-redo','↺ Redo');redo.id='redo-'+i;redo.onclick=()=>doRedo(i);
+    const done=el('button','btn-complete','Mark '+t.name+' complete ✓');done.id='complete-'+i;done.disabled=true;
+    done.onclick=()=>markDone(i);
+    foot.appendChild(redo);foot.appendChild(done);pane.appendChild(foot);
+    stack.appendChild(pane);
+  });
+  const last=lLoad('last-tab');
+  showTab(typeof last==='number'&&last>=0&&last<TAB_COUNT?last:0);
+  refreshProgress();
+})();
+</script>
+</body>
+</html>

@@ -10,8 +10,14 @@ import unit6Grammar2 from "../../content/subjects/english/courses/our-world/leve
 import unit6Grammar2Learner from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/grammar2.learner.json";
 import unit6Opener from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/opener.teacher.json";
 import unit6OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/opener.learner.json";
+import unit6Reading from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/reading.teacher.json";
+import unit6ReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/reading.learner.json";
 import unit6Writing from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/writing.teacher.json";
 import unit6WritingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/writing.learner.json";
+import unit6Mission from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/mission.teacher.json";
+import unit6MissionLearner from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/mission.learner.json";
+import unit6Project from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/project.teacher.json";
+import unit6ProjectLearner from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/project.learner.json";
 import unit7Opener from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/opener.teacher.json";
 import unit7OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/opener.learner.json";
 import unit7Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/vocab1.teacher.json";
@@ -147,8 +153,14 @@ export const lessons: Lesson[] = [
   unit6Grammar1Learner as Lesson,
   unit6Grammar2 as Lesson,
   unit6Grammar2Learner as Lesson,
+  unit6Reading as Lesson,
+  unit6ReadingLearner as Lesson,
   unit6Writing as Lesson,
   unit6WritingLearner as Lesson,
+  unit6Mission as Lesson,
+  unit6MissionLearner as Lesson,
+  unit6Project as Lesson,
+  unit6ProjectLearner as Lesson,
   unit7Opener as Lesson,
   unit7OpenerLearner as Lesson,
   unit7Vocab1 as Lesson,

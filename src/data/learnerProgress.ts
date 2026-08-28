@@ -1,6 +1,7 @@
 import type { Lesson } from "./types";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { reportCloudSyncFailure, reportCloudSyncSuccess } from "@/lib/syncStatus";
+import { markAssignmentCompleted } from "./assignments";
 import { teacherLessons } from "./lessons";
 import { createLessonProgressRecord, saveLessonProgressRecord } from "./lessonProgress";
 
@@ -205,6 +206,11 @@ export async function syncLearnerProgressWithCloud(lessons: Lesson[]): Promise<b
       if (!Object.keys(localRawProgress).length) continue;
 
       const localProgress = getLearnerAppProgress(lesson.source);
+      // Closing the assignment normally rides along with a save, so a lesson
+      // that was already finished before that existed — or finished in a
+      // browser whose writes never reached the cloud — would stay open for
+      // good. Reconcile it here; the call is a no-op unless it is still open.
+      if (localProgress.done) await markAssignmentCompleted(lesson.id);
       const cloudProgress = cloudByHomeworkId.get(lesson.source.homeworkId);
       const cloudRawCount = Object.keys(cloudProgress?.raw_progress ?? {}).length;
       const shouldPushLocal =
@@ -297,7 +303,10 @@ async function upsertLearnerProgressSummary(lesson: Lesson, rawProgress: Record<
   if (error) throw error;
   reportCloudSyncSuccess("learner-progress");
 
-  if (progress.done) await markTeacherLessonDone(lesson);
+  if (progress.done) {
+    await markTeacherLessonDone(lesson);
+    await markAssignmentCompleted(lesson.id);
+  }
 }
 
 /* When Leo finishes a learner app, the matching teacher-side lesson (same

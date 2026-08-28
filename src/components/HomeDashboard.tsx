@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getOpenAssignmentCount, readAssignments, readAssignmentsFromCloud, type AssignmentMap } from "@/data/assignments";
+import { getOpenAssignmentCount, readAssignments, readAssignmentsFromCloud, type AssignmentMap, subscribeToAssignmentChanges } from "@/data/assignments";
 import { getLearnerAppProgress, syncLearnerProgressWithCloud } from "@/data/learnerProgress";
 import { getDoneLessonCount, readLessonProgress, syncLessonProgressWithCloud, type LessonProgressMap } from "@/data/lessonProgress";
 import { learnerLessons, teacherLessons } from "@/data/lessons";
@@ -47,9 +47,12 @@ export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?
     refreshProgress();
     window.addEventListener("storage", refreshProgress);
     window.addEventListener("focus", refreshProgress);
+    // "storage" is other-tab only, and an assignment closes itself in this one.
+    const unsubscribe = subscribeToAssignmentChanges(refreshProgress);
     return () => {
       window.removeEventListener("storage", refreshProgress);
       window.removeEventListener("focus", refreshProgress);
+      unsubscribe();
     };
   }, []);
 

@@ -8,6 +8,8 @@ import unit6Grammar1 from "../../content/subjects/english/courses/our-world/leve
 import unit6Grammar1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/grammar1.learner.json";
 import unit6Grammar2 from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/grammar2.teacher.json";
 import unit6Grammar2Learner from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/grammar2.learner.json";
+import unit6Opener from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/opener.teacher.json";
+import unit6OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/opener.learner.json";
 import unit7Opener from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/opener.teacher.json";
 import unit7OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/opener.learner.json";
 import unit7Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-7/lessons/vocab1.teacher.json";
@@ -131,6 +133,8 @@ function compareLessonOrder(a: Lesson, b: Lesson) {
 }
 
 export const lessons: Lesson[] = [
+  unit6Opener as Lesson,
+  unit6OpenerLearner as Lesson,
   unit6Vocab1 as Lesson,
   unit6Vocab1Learner as Lesson,
   unit6Song as Lesson,

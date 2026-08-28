@@ -159,6 +159,7 @@ body{display:flex;flex-direction:column}
 .vs-cell{font-size:15px;color:var(--ink-2);line-height:1.45;transition:opacity .25s}
 .vs-cell.hidden{opacity:0}
 .model-line{font-size:18px;line-height:1.9;color:var(--ink-2)}
+.model-title{font-size:19px;font-weight:900;color:var(--sea-d)}
 .expr-word{font-family:inherit;font-size:18px;font-weight:800;background:#fff;border:2px solid var(--border);border-radius:8px;padding:1px 9px;cursor:pointer;color:var(--ink-2);transition:all .15s}
 .expr-word:hover{border-color:var(--sea)}
 .expr-word.on{background:var(--green);border-color:var(--green-d);color:#fff;cursor:default}
@@ -205,10 +206,11 @@ body{display:flex;flex-direction:column}
    HOMEWORK_ID: leo-4-6-writing
    moduleCount 9 (tabs 0-8) · moduleKeyFormat tab-{i}-done · scoreKey score (tab 8)
 
-   The five model sentences are verbatim from the Student Book answer key
-   for Writing Activity 1 (Unit 6), and the two habitat sentences come from
-   the example fields in unit-6/vocabulary.json. Nothing on this page
-   invents Student Book text.
+   The model text, the Contrast Writing box and the Activity 2 rubric are
+   verbatim from the Student Book, pp. 104-105; the warm/cold coral table is
+   from the Reading, p. 103. The book's Activity 2 asks for a paragraph about
+   warm and cold corals, so that is what this app plans and writes. Nothing on
+   this page invents Student Book text.
    ═══════════════════════════════════════════════════════════════════════ */
 const SAVE_PREFIX='leea-4-6-writing-';
 const HOMEWORK_ID='leo-4-6-writing';
@@ -397,9 +399,28 @@ function flashcards(host,tab,list){
   draw();setMode(st.mode==='quiz'?'quiz':'practice');
 }
 
-/* ── The five model sentences, verbatim from the Student Book answer key
-   for Unit 6 Writing Activity 1. `expr` is the contrast expression the
-   activity asks Leo to find in each one. ── */
+/* ── The model text, Student Book pp. 104-105, verbatim. @…@ marks a contrast
+   expression: Writing Activity 1 is "Underline the words and expressions", so
+   each one is a tap target. ── */
+const MODEL_TITLE='Land and Sea Turtles';
+const MODEL_PARAS=[
+ "All turtles begin their lives on land. Mother turtles lay their eggs in holes and then cover them up to protect them. @But@ after that, the baby turtles\u2019 lives are very different. The baby land turtles crawl away to live in woods, swamps, grasslands, or deserts. @In contrast@, the baby sea turtles crawl to the ocean to live their lives in the water.",
+ "Land turtles and sea turtles look different, too. Land turtles have hard, high, round shells. When they are afraid, they hide in their shells. Sea turtles, @however@, have soft, flatter shells. They can\u2019t hide inside, @but@ they can swim away really fast. When cold weather comes, land turtles dig holes in the ground and sleep. They are too slow to move to warmer places. @In contrast@, sea turtles simply swim away to find warmer waters."
+];
+/* The Contrast Writing box, Student Book p. 104, verbatim. */
+const CONTRAST_BOX="In contrast writing, you write about the differences between two things. You can use facts and descriptive words to show differences. You can also use words that show contrast, such as but and however, and expressions such as in contrast.";
+/* Activity 2, Student Book p. 105, verbatim \u2014 the task is corals, not turtles. */
+const TASK_2='Write about warm and cold corals. How are they different? Use words and expressions that show contrast.';
+/* Warm and cold corals \u2014 every cell from the Reading, Student Book p. 103. */
+const CORALS=[
+ {k:'They are made up of', warm:'polyps', cold:'polyps'},
+ {k:'They live in',        warm:'warm, sunlit zones', cold:'cold, dark zones'},
+ {k:'They eat',            warm:'algae \u2014 tiny plants', cold:'plankton \u2014 tiny animals'},
+ {k:'How they get food',   warm:'from algae in daylight; tentacles after dark', cold:'they have to work harder \u2014 tentacles only'}
+];
+
+/* ── The five contrast sentences pulled out of the model text above, for the
+   practice and build-it tabs. `expr` is the expression each one turns on. ── */
 const MODEL=[
  {s:"But after that, the baby turtles' lives are very different.", expr:'But'},
  {s:'In contrast, the baby sea turtles crawl to the ocean to live their lives in the water.', expr:'In contrast'},
@@ -418,10 +439,10 @@ const HABITAT=[
 /* The facts the model paragraph contrasts. Every line is drawn from the
    model sentences above — nothing added. */
 const FACTS=[
- {k:'Where the babies go', land:'to woods, swamps, grasslands or deserts', sea:'to the ocean, to live their lives in the water'},
- {k:'Their shells',        land:'hard — they can hide inside',             sea:'soft and flatter — they cannot hide inside'},
- {k:'When danger comes',   land:'they hide inside the shell',              sea:'they swim away really fast'},
- {k:'When the water gets cold', land:'they stay on land',                  sea:'they simply swim away to find warmer waters'}
+ {k:'Where the babies go',      land:'to woods, swamps, grasslands, or deserts', sea:'to the ocean, to live their lives in the water'},
+ {k:'Their shells',             land:'hard, high and round', sea:'soft and flatter'},
+ {k:'When they are afraid',     land:'they hide in their shells', sea:'they can\u2019t hide inside \u2014 they swim away really fast'},
+ {k:'When cold weather comes',  land:'they dig holes in the ground and sleep \u2014 too slow to move to warmer places', sea:'they simply swim away to find warmer waters'}
 ];
 
 const ACADEMIC=[
@@ -518,7 +539,7 @@ TAB_INIT[1]=function(){
   hb.appendChild(el('div','qtext','📓 Where do the babies go?'));
   HABITAT.forEach(t=>hb.appendChild(el('div','mhint','“'+t+'”')));
   h.appendChild(hb);
-  srcPill(h,'Student Book answer key · Writing Activity 1 + unit-6/vocabulary.json');
+  srcPill(h,'Student Book pp. 104–105 · drawn from the model text + unit-6/vocabulary.json');
   function up(){c.textContent=st.length+' / '+FACTS.length;if(st.length>=FACTS.length)markDone(1);}
   up();
 };
@@ -527,35 +548,39 @@ TAB_RESET[1]=function(){lDel('tab-1-open');rebuild(1);};
 /* ═══ TAB 2 — THE MODEL ═══ */
 TAB_INIT[2]=function(){
   const h=document.getElementById('body-2');
-  h.appendChild(hdr('📖 The Model','Five sentences from the Student Book'));
-  h.appendChild(hint('Every sentence shows a difference. Tap the word or words that do the contrasting — that is Writing Activity 1.'));
+  h.appendChild(hdr('\u{1F4D6} The Model','Student Book pp. 104\u2013105'));
+  h.appendChild(hint('Activity 1: \u201cRead about land turtles and sea turtles. How does the writer show differences? Underline the words and expressions.\u201d Tap every one you find.'));
   const st=lLoad('tab-2-found')||[];
   const c=counter(h,'expressions found');
-  MODEL.forEach((m,i)=>{
+  h.appendChild(el('div','model-title','\u{1F422} '+MODEL_TITLE));
+  let n=0;
+  MODEL_PARAS.forEach(t=>{
     const card=el('div','qcard');
     const line=el('div','model-line');
-    /* Split on the expression so only it is tappable, and every other
-       character of the sentence stays exactly as the book prints it. */
-    const parts=m.s.split(m.expr);
-    parts.forEach((part,pi)=>{
-      if(part)line.appendChild(document.createTextNode(part));
-      if(pi<parts.length-1){
-        const b=el('button','expr-word',m.expr);
-        if(st.indexOf(i)>=0)b.classList.add('on');
-        b.onclick=()=>{
-          if(b.classList.contains('on'))return;
-          b.classList.add('on');
-          if(st.indexOf(i)<0){st.push(i);lSave('tab-2-found',st);}
-          up();
-        };
-        line.appendChild(b);
-      }
+    /* Split on the @…@ markers so only the expressions are tappable and every
+       other character stays exactly as the book prints it. */
+    t.split(/@([^@]+)@/).forEach((part,pi)=>{
+      if(pi%2===0){ if(part)line.appendChild(document.createTextNode(part)); return; }
+      const idx=n++;
+      const b=el('button','expr-word',part);
+      if(st.indexOf(idx)>=0)b.classList.add('on');
+      b.onclick=()=>{
+        if(b.classList.contains('on'))return;
+        b.classList.add('on');
+        if(st.indexOf(idx)<0){st.push(idx);lSave('tab-2-found',st);}
+        up();
+      };
+      line.appendChild(b);
     });
     card.appendChild(line);
     h.appendChild(card);
   });
-  srcPill(h,'Student Book answer key · Unit 6 Writing, Activity 1 — verbatim');
-  function up(){c.textContent=st.length+' / '+MODEL.length;if(st.length>=MODEL.length)markDone(2);}
+  const box=el('div','qcard');
+  box.appendChild(el('div','qtext','\u2696\ufe0f Contrast Writing'));
+  box.appendChild(el('div','mhint',CONTRAST_BOX));
+  h.appendChild(box);
+  srcPill(h,'Student Book pp. 104\u2013105 \u00b7 model text and Contrast Writing box \u2014 verbatim');
+  function up(){c.textContent=st.length+' / '+n;if(st.length>=n)markDone(2);}
   up();
 };
 TAB_RESET[2]=function(){lDel('tab-2-found');rebuild(2);};
@@ -615,7 +640,7 @@ TAB_INIT[4]=function(){
   const keys=PRACTICE.map((_,i)=>'p'+i);
   const c=counter(h,'answered');
   PRACTICE.forEach((it,i)=>askBlock(h,it,4,keys[i],up));
-  srcPill(h,'Student Book answer key · Unit 6 Writing, Activity 1');
+  srcPill(h,'Student Book pp. 104–105 · model sentences — verbatim');
   function up(){const n=answered(4,keys);c.textContent=n+' / '+PRACTICE.length;if(n>=PRACTICE.length)markDone(4);}
   up();
 };
@@ -668,43 +693,69 @@ TAB_INIT[5]=function(){
       bank.querySelectorAll('.chip').forEach(x=>{x.classList.add('used');x.disabled=true;});check();}
     h.appendChild(card);
   });
-  srcPill(h,'Student Book answer key · Unit 6 Writing, Activity 1 — verbatim');
+  srcPill(h,'Student Book pp. 104–105 · model sentences — verbatim');
   function up(){c.textContent=st.length+' / '+BUILDS.length;if(st.length>=BUILDS.length)markDone(5);}
   up();
 };
 TAB_RESET[5]=function(){lDel('tab-5-built');rebuild(5);};
 
 /* ═══ TAB 6 — PLAN ═══ */
-const PLAN_ROWS=['My two things','Difference 1','Difference 2','Difference 3'];
+const PLAN_ROWS=['My topic sentence','Difference 1','Difference 2','Difference 3'];
+const PLAN_EG=[
+ 'e.g. Warm corals and cold corals are both made up of polyps.',
+ 'e.g. Warm corals live in warm, sunlit zones, but cold corals live in cold, dark zones.',
+ 'e.g. Warm corals eat algae. Cold corals, however, catch plankton.',
+ 'e.g. In contrast, cold-water polyps have to work harder for their food.'
+];
 TAB_INIT[6]=function(){
   const h=document.getElementById('body-6');
-  h.appendChild(hdr('🗂️ Plan','Two sea creatures of your own'));
-  h.appendChild(hint('Choose two sea creatures from Unit 6 — a whale and a squid, a shark and a sea sponge. Then list three differences. Plan before you write.'));
+  h.appendChild(hdr('\u{1F5C2}\ufe0f Plan','Warm corals and cold corals'));
+  h.appendChild(hint('Activity 2: \u201c'+TASK_2+'\u201d Everything you need is in the Reading. Tap a row to open it, then plan.'));
+  const opened=lLoad('tab-6-open')||[];
+  const table=el('div','vs-table');
+  const head=el('div','vs-row vs-head');
+  head.appendChild(el('div','vs-key',''));
+  head.appendChild(el('div','vs-cell','\u{1FAB8} Warm corals'));
+  head.appendChild(el('div','vs-cell','\u{1FAB8} Cold corals'));
+  table.appendChild(head);
+  CORALS.forEach((f,i)=>{
+    const row=el('div','vs-row');
+    row.appendChild(el('div','vs-key',f.k));
+    const a=el('div','vs-cell',f.warm),b=el('div','vs-cell',f.cold);
+    if(opened.indexOf(i)<0){a.classList.add('hidden');b.classList.add('hidden');}
+    row.appendChild(a);row.appendChild(b);
+    row.onclick=()=>{
+      if(opened.indexOf(i)<0){opened.push(i);lSave('tab-6-open',opened);}
+      a.classList.remove('hidden');b.classList.remove('hidden');up();
+    };
+    table.appendChild(row);
+  });
+  h.appendChild(table);
   const st=lLoad('tab-6-text')||{};
   const c=counter(h,'lines planned');
   PLAN_ROWS.forEach((label,i)=>{
     const row=el('div','svy-row');
     row.appendChild(el('div','sun-word',label));
     const inp=el('input');
-    inp.placeholder=i===0?'e.g. a whale and a squid':'e.g. A whale breathes air. In contrast, a squid does not.';
+    inp.placeholder=PLAN_EG[i];
     inp.value=st[i]||'';
     if((st[i]||'').trim().length>=6)row.classList.add('filled');
     inp.oninput=()=>{st[i]=inp.value;lSave('tab-6-text',st);row.classList.toggle('filled',inp.value.trim().length>=6);up();};
     row.appendChild(inp);h.appendChild(row);
   });
-  srcPill(h,'Lesson Planner · Unit 6 Writing — plan before you write');
+  srcPill(h,'Student Book p. 105, Activity 2 \u2014 verbatim \u00b7 table from the Reading, p. 103');
   function up(){
     const n=PLAN_ROWS.filter((_,i)=>(st[i]||'').trim().length>=6).length;
     c.textContent=n+' / '+PLAN_ROWS.length;
-    if(n>=PLAN_ROWS.length)markDone(6);
+    if(n>=PLAN_ROWS.length&&opened.length>=CORALS.length)markDone(6);
   }
   up();
 };
-TAB_RESET[6]=function(){lDel('tab-6-text');rebuild(6);};
+TAB_RESET[6]=function(){lDel('tab-6-text');lDel('tab-6-open');rebuild(6);};
 
 /* ═══ TAB 7 — WRITE ═══ */
 const CHECKLIST=[
- 'I wrote about two sea creatures.',
+ 'I wrote about warm corals and cold corals.',
  'I used <b>but</b> at least once, with a comma before it.',
  'I used <b>however</b> at least once, with a comma on each side.',
  'I started one sentence with <b>In contrast</b>.',
@@ -713,13 +764,13 @@ const CHECKLIST=[
 TAB_INIT[7]=function(){
   const h=document.getElementById('body-7');
   h.appendChild(hdr('✍️ Write','Your contrast paragraph'));
-  h.appendChild(hint('Use your plan. Four sentences or more. Then tick the checklist and read it to Dad.'));
+  h.appendChild(hint('Use your plan. Four sentences or more, about warm and cold corals. Then tick the checklist and read it out loud to Dad \u2014 that is Activity 3.'));
   const st=lLoad('tab-7-text')||'';
   const ck=lLoad('tab-7-check')||[];
   const c=counter(h,'checklist ticked');
   const ta=document.createElement('textarea');
   ta.className='write-area';
-  ta.placeholder='Both a whale and a squid live in the ocean. But a whale breathes air…';
+  ta.placeholder='Warm corals and cold corals are both made up of polyps. But warm corals live in warm, sunlit zones\u2026';
   ta.value=st;
   h.appendChild(ta);
   const wc=el('div','mhint','');h.appendChild(wc);
@@ -739,7 +790,7 @@ TAB_INIT[7]=function(){
     row.appendChild(box);row.appendChild(lbl);list.appendChild(row);
   });
   h.appendChild(list);
-  srcPill(h,'Modelled on the Student Book Writing page');
+  srcPill(h,'Student Book p. 105, Activity 2 \u00b7 then Activity 3 \u2014 read it to Dad and listen to his');
   function up(){
     c.textContent=ck.length+' / '+CHECKLIST.length;
     if(ck.length>=CHECKLIST.length&&words()>=25)markDone(7);

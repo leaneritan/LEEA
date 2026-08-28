@@ -6,7 +6,7 @@ import { BarChart3, BookOpen, CheckSquare, ChevronLeft, ChevronRight, Dumbbell, 
 import { usePathname } from "next/navigation";
 import type { CSSProperties, ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { getOpenAssignmentCount, readAssignments, readAssignmentsFromCloud } from "@/data/assignments";
+import { getOpenAssignmentCount, readAssignments, readAssignmentsFromCloud, subscribeToAssignmentChanges } from "@/data/assignments";
 import { learnerLessons } from "@/data/lessons";
 import { fetchLearnerCompletionTimestamps } from "@/data/learnerProgress";
 import { useJapaneseSetting } from "@/components/useJapaneseSetting";
@@ -65,9 +65,12 @@ export function AppShell({
     refreshAssignments();
     window.addEventListener("storage", refreshAssignments);
     window.addEventListener("focus", refreshAssignments);
+    // "storage" is other-tab only, and an assignment closes itself in this one.
+    const unsubscribe = subscribeToAssignmentChanges(refreshAssignments);
     return () => {
       window.removeEventListener("storage", refreshAssignments);
       window.removeEventListener("focus", refreshAssignments);
+      unsubscribe();
     };
   }, []);
 

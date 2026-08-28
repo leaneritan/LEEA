@@ -32,6 +32,19 @@ type AssignmentRow = {
 };
 
 export const assignmentStorageKey = "leea.assignments.v1";
+
+// Same-tab notification. The `storage` event only fires in *other* tabs, and
+// an assignment now closes itself the moment Leo finishes the app — inside an
+// iframe, on the lesson route. Nothing about that is a navigation or a focus
+// change, so without this the "N assignments left" ring went on showing the
+// old number until something else happened to refresh it.
+const ASSIGNMENTS_EVENT = "leea-assignments-changed";
+
+export function subscribeToAssignmentChanges(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(ASSIGNMENTS_EVENT, callback);
+  return () => window.removeEventListener(ASSIGNMENTS_EVENT, callback);
+}
 const unassignedStorageKey = "leea.assignments.unassigned.v1";
 
 export function createAssignmentRecord(lessonId: string): AssignmentRecord {
@@ -87,7 +100,10 @@ function readLocalAssignments(): AssignmentMap {
 
 function writeLocalAssignments(assignments: AssignmentMap) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(assignmentStorageKey, JSON.stringify(assignments));
+  const previous = window.localStorage.getItem(assignmentStorageKey);
+  const next = JSON.stringify(assignments);
+  window.localStorage.setItem(assignmentStorageKey, next);
+  if (previous !== next) window.dispatchEvent(new Event(ASSIGNMENTS_EVENT));
 }
 
 function toAssignmentRecord(row: AssignmentRow): AssignmentRecord {
@@ -221,6 +237,33 @@ export function unassignLesson(lessonId: string, current: AssignmentMap): Assign
   writeUnassignedSet(unassigned);
   void deleteAssignmentRecord(lessonId);
   return next;
+}
+
+/**
+ * Close an assignment when Leo finishes the app it was set for.
+ *
+ * "completed" has been in AssignmentStatus, and handled by toAssignmentRow,
+ * since the type was written — and nothing ever set it. An assignment stayed
+ * "assigned" for good once made, so getOpenAssignmentCount went on counting
+ * finished homework: six Unit 9 apps were still being advertised as waiting
+ * with five of them done. Leo's own page hid them, because it filters on
+ * progress rather than status, which is why the two disagreed.
+ *
+ * Only an open assignment completes. One Neritan has already reviewed stays
+ * reviewed, and a lesson he never assigned does not turn into homework just
+ * because Leo played it. A "needs-redo" that gets finished again does complete,
+ * so it returns to the review queue.
+ */
+export async function markAssignmentCompleted(lessonId: string) {
+  if (typeof window === "undefined") return;
+
+  const current = readLocalAssignments();
+  const record = current[lessonId];
+  if (!record || (record.status !== "assigned" && record.status !== "needs-redo")) return;
+
+  const completed: AssignmentRecord = { ...record, status: "completed", updatedAt: new Date().toISOString() };
+  writeLocalAssignments({ ...current, [lessonId]: completed });
+  await upsertAssignmentRecords([completed]);
 }
 
 export function saveAssignments(assignments: AssignmentMap): AssignmentMap {

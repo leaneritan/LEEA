@@ -9,8 +9,7 @@ import {
   readAssignmentsFromCloud,
   unassignLesson as unassignLessonRecord,
   type AssignmentMap,
-  type AssignmentRecord
-} from "@/data/assignments";
+  type AssignmentRecord, subscribeToAssignmentChanges } from "@/data/assignments";
 import {
   fetchLearnerCompletionTimestamps,
   getLearnerAppProgress,
@@ -182,9 +181,12 @@ export function TeacherDashboard() {
 
     window.addEventListener("storage", refreshAll);
     window.addEventListener("focus", refreshAll);
+    // "storage" is other-tab only, and an assignment closes itself in this one.
+    const unsubscribe = subscribeToAssignmentChanges(refreshAll);
     return () => {
       window.removeEventListener("storage", refreshAll);
       window.removeEventListener("focus", refreshAll);
+      unsubscribe();
     };
   }, []);
 

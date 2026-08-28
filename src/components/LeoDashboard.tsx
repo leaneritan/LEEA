@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { readAssignments, readAssignmentsFromCloud, type AssignmentMap, type AssignmentRecord } from "@/data/assignments";
+import { readAssignments, readAssignmentsFromCloud, type AssignmentMap, type AssignmentRecord, subscribeToAssignmentChanges } from "@/data/assignments";
 import { getLearnerAppProgress, syncLearnerProgressWithCloud, type LearnerAppProgress } from "@/data/learnerProgress";
 import { getCourseLabel, getLessonGroups, learnerLessons } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
@@ -38,9 +38,12 @@ export function LeoDashboard() {
     refresh();
     window.addEventListener("storage", refresh);
     window.addEventListener("focus", refresh);
+    // "storage" is other-tab only, and an assignment closes itself in this one.
+    const unsubscribe = subscribeToAssignmentChanges(refresh);
     return () => {
       window.removeEventListener("storage", refresh);
       window.removeEventListener("focus", refresh);
+      unsubscribe();
     };
   }, []);
 

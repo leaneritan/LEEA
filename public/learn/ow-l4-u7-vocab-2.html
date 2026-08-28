@@ -685,12 +685,121 @@ function checkFcQuiz(){const w=FC_WORDS[fcQuizIdx];const v=document.getElementBy
 
 /* ── TAB 1 — WARM UP ── */
 const WU_SELECTED=new Set();
+
+/* ── balanced answer positions ──────────────────────────────────────────
+   The authored question data leans hard on the first option — several of
+   the arrays below had every correct answer at index 0, which Leo can beat
+   by always tapping the top button without reading anything.
+
+   Positions are dealt out round-robin over a hash-ordered list rather than
+   drawn per question: a per-item draw is uniform on average but is still a
+   draw, and it left whole quizzes with an unused slot. Dealing guarantees
+   every slot is used about equally. The hash only decides the running order
+   and the distractor order, so the layout is identical on every load and a
+   restored answer still lines up with the option it was saved against.
+   ──────────────────────────────────────────────────────────────────────── */
+function __leeaHash(s){var h=2166136261>>>0;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+/* splitmix32 — a plain LCG's low bits cycle and produce a biased shuffle. */
+function __leeaMix(a){a=(a+0x9e3779b9)>>>0;var z=a;z=Math.imul(z^(z>>>16),0x21f0aaad)>>>0;z=Math.imul(z^(z>>>15),0x735a2d97)>>>0;return (z^(z>>>15))>>>0;}
+function __leeaSeed(item,optKey){try{return __leeaHash(JSON.stringify(item[optKey]));}catch(e){return 0;}}
+function __leeaAt(item,optKey,idxKey){
+  var opts=item[optKey];
+  if(idxKey)return typeof item[idxKey]==='number'?item[idxKey]:-1;
+  for(var i=0;i<opts.length;i++){if(opts[i]&&opts[i].ok===true)return i;}
+  return -1;
+}
+/* True/False and Yes/No pairs keep their conventional order — moving them
+   changes what the buttons read, not just where the answer sits. */
+function __leeaFixedOrder(item,optKey){
+  var opts=item[optKey];
+  if(!Array.isArray(opts)||opts.length!==2)return false;
+  var t=opts.map(function(o){return String((o&&typeof o==='object')?(o.t||o.text||''):o).trim().toLowerCase();});
+  return (t[0]==='true'&&t[1]==='false')||(t[0]==='false'&&t[1]==='true')||
+         (t[0]==='yes'&&t[1]==='no')||(t[0]==='no'&&t[1]==='yes');
+}
+function __leeaPlace(item,optKey,idxKey,target){
+  var opts=item[optKey],cur=__leeaAt(item,optKey,idxKey);
+  if(cur<0||cur>=opts.length)return;
+  if(__leeaFixedOrder(item,optKey))return;
+  var answer=opts[cur],rest=opts.filter(function(_,i){return i!==cur;});
+  var state=__leeaSeed(item,optKey);
+  for(var i=rest.length-1;i>0;i--){
+    state=__leeaMix(state);
+    var j=Math.floor((state/4294967296)*(i+1));
+    var t=rest[i];rest[i]=rest[j];rest[j]=t;
+  }
+  var pos=Math.min(Math.max(target,0),rest.length);
+  rest.splice(pos,0,answer);
+  item[optKey]=rest;
+  if(idxKey)item[idxKey]=pos;
+}
+/* Reorders options in place. Never changes which option is correct — only
+   where it sits — so every answer key in this file stays true. */
+/* One-time cleanup of state saved under the OLD option order.
+   Reordering options invalidates any answer that was stored as an index, so
+   a completed module would come back with the tick on the wrong button. This
+   clears only values made entirely of numbers, booleans and nulls — answer
+   indexes and tick state. Typed sentences, quiz scores and module done-flags
+   are all left alone, so nothing Leo wrote or earned is lost. */
+function __leeaNumericOnly(v){
+  if(v===null||typeof v==='number'||typeof v==='boolean')return true;
+  if(typeof v==='string')return false;
+  if(Array.isArray(v))return v.length>0&&v.every(__leeaNumericOnly);
+  if(typeof v==='object'){var ks=Object.keys(v);return ks.length>0&&ks.every(function(k){return __leeaNumericOnly(v[k]);});}
+  return false;
+}
+function __leeaFindPrefix(){
+  var cands=[];
+  ['SAVE_PREFIX','SP','PREFIX'].forEach(function(n){
+    var v; try{ v=eval(n); }catch(e){ return; }
+    if(typeof v==='string'&&v){ cands.push(v); cands.push('leea-'+v); }
+  });
+  var keys; try{ keys=Object.keys(localStorage); }catch(e){ return null; }
+  // Longest candidate that actually prefixes saved keys wins; if nothing
+  // matches there is no old state to migrate.
+  cands.sort(function(a,b){return b.length-a.length;});
+  for(var i=0;i<cands.length;i++){
+    if(keys.some(function(k){return k.indexOf(cands[i])===0;})) return cands[i];
+  }
+  return null;
+}
+function __leeaMigrate(){
+  try{
+    var pre=__leeaFindPrefix(); if(!pre) return;
+    var flag=pre+'__answer-layout-v1';
+    if(localStorage.getItem(flag)==='1') return;
+    Object.keys(localStorage).forEach(function(k){
+      if(k.indexOf(pre)!==0) return;
+      if(/done|score|complete|known|streak|progress|layout/i.test(k)) return;
+      var val; try{ val=JSON.parse(localStorage.getItem(k)); }catch(e){ return; }
+      if(__leeaNumericOnly(val)) localStorage.removeItem(k);
+    });
+    localStorage.setItem(flag,'1');
+  }catch(e){}
+}
+function __leeaBalance(list,optKey,idxKey){
+  if(!Array.isArray(list))return list;
+  var rows=[];
+  list.forEach(function(item,i){
+    if(!item||typeof item!=='object')return;
+    var opts=item[optKey];
+    if(!Array.isArray(opts)||opts.length<2)return;
+    if(__leeaAt(item,optKey,idxKey)<0)return;
+    if(__leeaFixedOrder(item,optKey))return;
+    rows.push({item:item,i:i,h:__leeaSeed(item,optKey)});
+  });
+  rows.sort(function(a,b){return (a.h-b.h)||(a.i-b.i);});
+  rows.forEach(function(r,k){__leeaPlace(r.item,optKey,idxKey,k%r.item[optKey].length);});
+  return list;
+}
+__leeaMigrate();
 const WU_QS=[
   {q:'Look back at pp. 116-117. A wheel and a battery are examples of…',opts:['food','inventions','animals'],correct:1,exp:'Lesson Planner Warm Up: both are inventions.'},
   {q:'What do batteries help us do?',opts:['use cell phones and play video games','grow plants','make it rain'],correct:0,exp:'Batteries power the things we use every day.'},
   {q:'What do wheels help us do?',opts:['move a car or a bike','read a book','hear music'],correct:0,exp:'Wheels turn — and that moves things.'},
   {q:'put, turn, lift, move, use — all five of these words are…',opts:['action words (verbs)','colors','places'],correct:0,exp:'They are all action words. We use them to give instructions.'}
 ];
+__leeaBalance(WU_QS, 'opts', 'correct');
 TAB_INIT[1]=function(){
   const host=document.getElementById('wu-q-list');host.innerHTML='';
   WU_QS.forEach((q,i)=>{
@@ -762,6 +871,7 @@ const PRAC_QS=[
   {q:'Which is a correct instruction?',opts:['You put the hoop on the ground.','Put the hoop on the ground.','Putting the hoop on the ground.'],correct:1,exp:'Instructions drop the subject: just "Put the hoop on the ground."'},
   {q:'Words that show sequence in instructions are…',opts:['first, next, then, finally','big, small, tall','red, blue, green'],correct:0,exp:'Be the Expert: first, next, then, and finally show the order of the steps.'}
 ];
+__leeaBalance(PRAC_QS, 'opts', 'correct');
 TAB_INIT[6]=function(){const host=document.getElementById('prac-list');host.innerHTML='';PRAC_QS.forEach((q,i)=>{const card=document.createElement('div');card.className='q-card';card.id='prc-'+i;let opts='<div class="opt-row">';q.opts.forEach((o,j)=>{opts+='<button class="opt" onclick="pracPick('+i+','+j+')">'+esc(o)+'</button>';});opts+='</div>';card.innerHTML='<div class="q-prompt"><strong>Q'+(i+1)+' of 8.</strong> '+q.q+'</div>'+opts+'<div class="q-explain">'+esc(q.exp)+'</div>';host.appendChild(card);});};
 TAB_RESET[6]=function(){window._pracAns=[];TAB_INIT[6]._init=false;document.getElementById('prac-done').classList.remove('show');TAB_INIT[6]();TAB_INIT[6]._init=true;};
 TAB_RESTORE[6]=function(){const s=lLoad('tab-6-state');if(!s)return;window._pracAns=s.ans||[];(s.ans||[]).forEach((a,i)=>{if(a==null)return;const card=document.getElementById('prc-'+i);if(!card)return;const opts=card.querySelectorAll('.opt');const c=a===PRAC_QS[i].correct;opts[a].classList.add(c?'correct':'wrong');opts.forEach(o=>o.disabled=true);card.classList.add(c?'answered':'answered-bad');});if(s.allDone)document.getElementById('prac-done').classList.add('show');};
@@ -829,6 +939,7 @@ const WRAP_QS=[
   {q:"🪀 To ___ a hula hoop, you move your waist in a circle.",opts:['use','lift','put'],correct:0,exp:'Use = do something with it.'},
   {q:"Which of these is an instruction?",opts:['You lift the box.','Lift the box.','Lifting the box.'],correct:1,exp:'Instructions drop the subject and use the base verb.'}
 ];
+__leeaBalance(WRAP_QS, 'opts', 'correct');
 TAB_INIT[10]=function(){const host=document.getElementById('wrap-list');host.innerHTML='';WRAP_QS.forEach((q,i)=>{const card=document.createElement('div');card.className='wrap-card';card.id='wr-'+i;let opts='<div class="wrap-opts">';q.opts.forEach((o,j)=>{opts+='<button class="wu-opt" onclick="wrapPick('+i+','+j+')">'+esc(o)+'</button>';});opts+='</div>';card.innerHTML='<div class="wrap-q"><strong>Q'+(i+1)+'.</strong> '+esc(q.q)+'</div>'+opts+'<div style="font-size:13px;color:var(--green-d);font-weight:600;display:none;padding-top:6px" class="wrap-exp">'+esc(q.exp)+'</div>';host.appendChild(card);});};
 TAB_RESET[10]=function(){window._wrapAns=[];TAB_INIT[10]._init=false;document.getElementById('wrap-done').classList.remove('show');TAB_INIT[10]();TAB_INIT[10]._init=true;};
 TAB_RESTORE[10]=function(){const s=lLoad('tab-10-state');if(!s)return;window._wrapAns=s.ans||[];(s.ans||[]).forEach((a,i)=>{if(a==null)return;const card=document.getElementById('wr-'+i);if(!card)return;const opts=card.querySelectorAll('.wu-opt');const c=a===WRAP_QS[i].correct;opts[a].classList.add(c?'correct':'wrong');opts.forEach(o=>o.disabled=true);card.querySelector('.wrap-exp').style.display='block';});if(s.allDone)document.getElementById('wrap-done').classList.add('show');};
@@ -848,6 +959,7 @@ const QUIZ_QS=[
   {q:'Which words show sequence in a set of instructions?',opts:['first, next, then, finally','big, small','here, there'],correct:0,exp:'They show the order of the steps.'},
   {q:'🪀 The hula hoop is named after a dance from ___.',opts:['Hawaii','Japan','France'],correct:0,exp:'Our World in Context: the Hawaiian hula, danced by moving the hips in a circle.'}
 ];
+__leeaBalance(QUIZ_QS, 'opts', 'correct');
 window._quizAns=[];window._quizScore=0;
 TAB_INIT[11]=function(){const host=document.getElementById('quiz-list');host.innerHTML='';QUIZ_QS.forEach((q,i)=>{const card=document.createElement('div');card.className='q-card';card.id='qz-'+i;let opts='<div class="opt-row">';q.opts.forEach((o,j)=>{opts+='<button class="opt" onclick="quizPick('+i+','+j+')">'+esc(o)+'</button>';});opts+='</div>';card.innerHTML='<div style="font-size:12px;font-weight:800;letter-spacing:.2em;color:var(--green-d)">Q'+(i+1)+' of 10</div><div class="q-prompt">'+esc(q.q)+'</div>'+opts+'<div class="q-explain">'+esc(q.exp)+'</div>';host.appendChild(card);});const prog=document.getElementById('quiz-prog');prog.innerHTML='';for(let i=0;i<QUIZ_QS.length;i++){const dot=document.createElement('div');dot.className='qp-dot';dot.id='qp-'+i;prog.appendChild(dot);}};
 TAB_RESET[11]=function(){window._quizAns=[];window._quizScore=0;lDel('score');document.getElementById('qfinal').classList.remove('show');document.getElementById('quiz-score').textContent='Score: 0 / 10';TAB_INIT[11]._init=false;TAB_INIT[11]();TAB_INIT[11]._init=true;};
@@ -866,6 +978,7 @@ const DRIB_QS=[
   {q:'📋 A coach giving instructions says: "___ your arms and shake your legs."',opts:['Lift','Put','Use'],correct:0,exp:'Lift your arms — verbatim from TR 7.5.'},
   {q:'🎒 "Every morning I ___ my things in my backpack."',opts:['put','turn','lift'],correct:0,exp:'Put — verbatim from TR 7.5.'}
 ];
+__leeaBalance(DRIB_QS, 'opts', 'correct');
 window._dribScore=0;window._dribAns=[];
 TAB_INIT[12]=function(){const host=document.getElementById('drib-list');host.innerHTML='';DRIB_QS.forEach((q,i)=>{const card=document.createElement('div');card.className='q-card';card.id='dr-'+i;let opts='<div class="opt-row">';q.opts.forEach((o,j)=>{opts+='<button class="opt" onclick="dribPick('+i+','+j+')">'+esc(o)+'</button>';});opts+='</div>';card.innerHTML='<div style="font-size:12px;font-weight:800;letter-spacing:.2em;color:var(--green-d)">SHOT '+(i+1)+' of 8</div><div class="q-prompt">'+esc(q.q)+'</div>'+opts+'<div class="q-explain">'+esc(q.exp)+'</div>';host.appendChild(card);});};
 TAB_RESET[12]=function(){window._dribScore=0;window._dribAns=[];document.getElementById('drib-score').textContent='0 / 8';document.querySelectorAll('.drib-defender').forEach(d=>d.classList.remove('beaten'));document.getElementById('drib-done').classList.remove('show');TAB_INIT[12]._init=false;TAB_INIT[12]();TAB_INIT[12]._init=true;};

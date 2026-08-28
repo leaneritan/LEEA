@@ -660,6 +660,114 @@ function fcCheckDone(){
 /* ═════════════════════════════════════════════════════════════════════
    TAB 1 — WARM UP (8 fill-in)
 ═════════════════════════════════════════════════════════════════════ */
+
+/* ── balanced answer positions ──────────────────────────────────────────
+   The authored question data leans hard on the first option — several of
+   the arrays below had every correct answer at index 0, which Leo can beat
+   by always tapping the top button without reading anything.
+
+   Positions are dealt out round-robin over a hash-ordered list rather than
+   drawn per question: a per-item draw is uniform on average but is still a
+   draw, and it left whole quizzes with an unused slot. Dealing guarantees
+   every slot is used about equally. The hash only decides the running order
+   and the distractor order, so the layout is identical on every load and a
+   restored answer still lines up with the option it was saved against.
+   ──────────────────────────────────────────────────────────────────────── */
+function __leeaHash(s){var h=2166136261>>>0;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+/* splitmix32 — a plain LCG's low bits cycle and produce a biased shuffle. */
+function __leeaMix(a){a=(a+0x9e3779b9)>>>0;var z=a;z=Math.imul(z^(z>>>16),0x21f0aaad)>>>0;z=Math.imul(z^(z>>>15),0x735a2d97)>>>0;return (z^(z>>>15))>>>0;}
+function __leeaSeed(item,optKey){try{return __leeaHash(JSON.stringify(item[optKey]));}catch(e){return 0;}}
+function __leeaAt(item,optKey,idxKey){
+  var opts=item[optKey];
+  if(idxKey)return typeof item[idxKey]==='number'?item[idxKey]:-1;
+  for(var i=0;i<opts.length;i++){if(opts[i]&&opts[i].ok===true)return i;}
+  return -1;
+}
+/* True/False and Yes/No pairs keep their conventional order — moving them
+   changes what the buttons read, not just where the answer sits. */
+function __leeaFixedOrder(item,optKey){
+  var opts=item[optKey];
+  if(!Array.isArray(opts)||opts.length!==2)return false;
+  var t=opts.map(function(o){return String((o&&typeof o==='object')?(o.t||o.text||''):o).trim().toLowerCase();});
+  return (t[0]==='true'&&t[1]==='false')||(t[0]==='false'&&t[1]==='true')||
+         (t[0]==='yes'&&t[1]==='no')||(t[0]==='no'&&t[1]==='yes');
+}
+function __leeaPlace(item,optKey,idxKey,target){
+  var opts=item[optKey],cur=__leeaAt(item,optKey,idxKey);
+  if(cur<0||cur>=opts.length)return;
+  if(__leeaFixedOrder(item,optKey))return;
+  var answer=opts[cur],rest=opts.filter(function(_,i){return i!==cur;});
+  var state=__leeaSeed(item,optKey);
+  for(var i=rest.length-1;i>0;i--){
+    state=__leeaMix(state);
+    var j=Math.floor((state/4294967296)*(i+1));
+    var t=rest[i];rest[i]=rest[j];rest[j]=t;
+  }
+  var pos=Math.min(Math.max(target,0),rest.length);
+  rest.splice(pos,0,answer);
+  item[optKey]=rest;
+  if(idxKey)item[idxKey]=pos;
+}
+/* Reorders options in place. Never changes which option is correct — only
+   where it sits — so every answer key in this file stays true. */
+/* One-time cleanup of state saved under the OLD option order.
+   Reordering options invalidates any answer that was stored as an index, so
+   a completed module would come back with the tick on the wrong button. This
+   clears only values made entirely of numbers, booleans and nulls — answer
+   indexes and tick state. Typed sentences, quiz scores and module done-flags
+   are all left alone, so nothing Leo wrote or earned is lost. */
+function __leeaNumericOnly(v){
+  if(v===null||typeof v==='number'||typeof v==='boolean')return true;
+  if(typeof v==='string')return false;
+  if(Array.isArray(v))return v.length>0&&v.every(__leeaNumericOnly);
+  if(typeof v==='object'){var ks=Object.keys(v);return ks.length>0&&ks.every(function(k){return __leeaNumericOnly(v[k]);});}
+  return false;
+}
+function __leeaFindPrefix(){
+  var cands=[];
+  ['SAVE_PREFIX','SP','PREFIX'].forEach(function(n){
+    var v; try{ v=eval(n); }catch(e){ return; }
+    if(typeof v==='string'&&v){ cands.push(v); cands.push('leea-'+v); }
+  });
+  var keys; try{ keys=Object.keys(localStorage); }catch(e){ return null; }
+  // Longest candidate that actually prefixes saved keys wins; if nothing
+  // matches there is no old state to migrate.
+  cands.sort(function(a,b){return b.length-a.length;});
+  for(var i=0;i<cands.length;i++){
+    if(keys.some(function(k){return k.indexOf(cands[i])===0;})) return cands[i];
+  }
+  return null;
+}
+function __leeaMigrate(){
+  try{
+    var pre=__leeaFindPrefix(); if(!pre) return;
+    var flag=pre+'__answer-layout-v1';
+    if(localStorage.getItem(flag)==='1') return;
+    Object.keys(localStorage).forEach(function(k){
+      if(k.indexOf(pre)!==0) return;
+      if(/done|score|complete|known|streak|progress|layout/i.test(k)) return;
+      var val; try{ val=JSON.parse(localStorage.getItem(k)); }catch(e){ return; }
+      if(__leeaNumericOnly(val)) localStorage.removeItem(k);
+    });
+    localStorage.setItem(flag,'1');
+  }catch(e){}
+}
+function __leeaBalance(list,optKey,idxKey){
+  if(!Array.isArray(list))return list;
+  var rows=[];
+  list.forEach(function(item,i){
+    if(!item||typeof item!=='object')return;
+    var opts=item[optKey];
+    if(!Array.isArray(opts)||opts.length<2)return;
+    if(__leeaAt(item,optKey,idxKey)<0)return;
+    if(__leeaFixedOrder(item,optKey))return;
+    rows.push({item:item,i:i,h:__leeaSeed(item,optKey)});
+  });
+  rows.sort(function(a,b){return (a.h-b.h)||(a.i-b.i);});
+  rows.forEach(function(r,k){__leeaPlace(r.item,optKey,idxKey,k%r.item[optKey].length);});
+  return list;
+}
+__leeaMigrate();
 const WU_ITEMS = [
   { s1: "The more I push,", opts: ["the higher he goes.","I like pizza.","she is nice."], ok: 0 },
   { s1: "The more you practice,", opts: ["the more you learn.","the ball is round.","he plays soccer."], ok: 0 },
@@ -670,6 +778,7 @@ const WU_ITEMS = [
   { s1: "The more we win,", opts: ["the happier we feel.","the field is green.","he wears red."], ok: 0 },
   { s1: "The more it rains,", opts: ["the wetter the field gets.","the sun is hot.","she has a ball."], ok: 0 }
 ];
+__leeaBalance(WU_ITEMS, 'opts', 'ok');
 TAB_INIT[1] = function(){
   const host = document.getElementById('wu-list');
   host.innerHTML = WU_ITEMS.map((it,i)=>{
@@ -713,6 +822,7 @@ const RULE_ITEMS = [
   { q: 'The FIRST half is the:', opts: ['cause','effect','question'], ok: 0 },
   { q: '"The more you spin, the ___ you feel dizzy." Missing word:', opts: ['more','spin','good'], ok: 0 }
 ];
+__leeaBalance(RULE_ITEMS, 'opts', 'ok');
 TAB_INIT[2] = function(){
   const host = document.getElementById('rule-list');
   host.innerHTML = RULE_ITEMS.map((it,i)=>{
@@ -756,6 +866,7 @@ const DET_ITEMS = [
   { bad: '"The higher you climb the more tired you get."', opts: ['The higher you climb, the more tired you get.','The higher, you climb the more tired you get.'], ok: 0 },
   { bad: '"The more it rains the wetter the field gets."', opts: ['The more it rains, the wetter the field gets.','More it rains, wetter the field it gets.'], ok: 0 }
 ];
+__leeaBalance(DET_ITEMS, 'opts', 'ok');
 TAB_INIT[3] = function(){
   const host = document.getElementById('det-list');
   host.innerHTML = DET_ITEMS.map((it,i)=>{
@@ -913,6 +1024,7 @@ const PRAC_ITEMS = [
   { s: '⚽ The more England attacked, the ___ exciting the game got.', opts:['more','less'], ok:0 },
   { s: '⚽ The harder the game, the ___ Messi plays.', opts:['worse','better'], ok:1 }
 ];
+__leeaBalance(PRAC_ITEMS, 'opts', 'ok');
 TAB_INIT[6] = function(){
   const host = document.getElementById('prac-list');
   host.innerHTML = PRAC_ITEMS.map((it,i)=>{
@@ -1109,6 +1221,7 @@ const QUIZ_ITEMS = [
   { q:'Which sentence is broken?', opts:['The more we practice, the more we win.','More we practice, more we win.'], ok:1 },
   { q:'"The more you play soccer, the ___ you get."', opts:['better','gooder'], ok:0 }
 ];
+__leeaBalance(QUIZ_ITEMS, 'opts', 'ok');
 let quizIdx = 0, quizScore = 0, quizAnswered = [];
 TAB_INIT[10] = function(){};
 TAB_RESET[10] = function(){
@@ -1184,6 +1297,7 @@ const DRIB_ITEMS = [
   { q: '⚽ "The more you practice soccer, ___"', opts:['the better you get.','the gooder you get.'], ok:0 },
   { q: '⚽ "The more the crowd cheers, ___"', opts:['the harder the team tries.','the shorter the game gets.'], ok:0 }
 ];
+__leeaBalance(DRIB_ITEMS, 'opts', 'ok');
 let dribGoals = 0, dribIdx = 0;
 TAB_INIT[11] = function(){};
 TAB_RESET[11] = function(){

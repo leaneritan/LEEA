@@ -92,7 +92,7 @@ export function HomeDashboard({ mathPracticeCounts = {} }: { mathPracticeCounts?
           <Link className="subject-card active" href="/english"><div><span>Active</span><b>📖</b></div><h3>English</h3><p>Our World, Joyful Work &amp; Training Ground.</p><footer><span>3 courses</span><span>L{currentUnit.level} · U{currentUnit.unit}</span></footer></Link>
           <Link className="subject-card active" href="/math"><div><span>Active</span><b>🔢</b></div><h3>Math</h3><p>新しい数学1 — 中1・8章, with an AI tutor chat.</p><footer><span>8 chapters</span><span>1章 2節</span></footer></Link>
           <Link className="subject-card active" href="/geography"><div><span>Active</span><b>🗺️</b></div><h3>Geography</h3><p>Interactive maps for Leo — 地理 &amp; 歴史.</p><footer><span>{geographyMaps.filter(isGeographyMapReady).length} maps</span><span>地理 · 歴史</span></footer></Link>
-          <article className="subject-card planned"><div><span>Soon</span><b>🔬</b></div><h3>Science</h3><p>Inquiry, experiments &amp; the natural world.</p><footer><span>Planned</span></footer></article>
+          <Link className="subject-card active" href="/science"><div><span>Active</span><b>🔬</b></div><h3>Science</h3><p>新編 新しい科学1 — 中1・4単元13章。</p><footer><span>13 chapters</span><span>単元1 第1章</span></footer></Link>
           <article className="subject-card planned"><div><span>Soon</span><b>🏛️</b></div><h3>History</h3><p>People, places &amp; the story of the world.</p><footer><span>Planned</span></footer></article>
         </div>
       </section>

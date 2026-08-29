@@ -15,6 +15,7 @@ export type CloudSyncSource =
   | "current-unit"
   | "math"
   | "geography"
+  | "science"
   | "reference";
 
 export const cloudSyncSourceLabels: Record<CloudSyncSource, string> = {
@@ -24,6 +25,7 @@ export const cloudSyncSourceLabels: Record<CloudSyncSource, string> = {
   "current-unit": "Current unit",
   math: "Math",
   geography: "Geography",
+  science: "Science",
   reference: "Reference words"
 };
 

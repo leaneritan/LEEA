@@ -14,7 +14,7 @@ import { useKnownWordIds } from "@/components/useKnownWordIds";
 import { allWords } from "@/components/reference/ref-data";
 import { CloudSyncBadge } from "@/components/CloudSyncBadge";
 
-type NavKey = "home" | "teacher" | "progress" | "english" | "math" | "geography" | "assignments" | "reference" | "search" | "practice";
+type NavKey = "home" | "teacher" | "progress" | "english" | "math" | "geography" | "science" | "assignments" | "reference" | "search" | "practice";
 
 const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNode }> = [
   { key: "home", label: "Home", href: "/", icon: <Home size={20} strokeWidth={2} /> },
@@ -137,7 +137,7 @@ export function AppShell({
           <Link className={active === "english" ? "active" : ""} data-tooltip="English" href="/english"><i className="dot-english" />English</Link>
           <Link className={active === "math" ? "active" : ""} data-tooltip="Math" href="/math"><i className="dot-math" />Math</Link>
           <Link className={active === "geography" ? "active" : ""} data-tooltip="Geography" href="/geography"><i className="dot-geography" />Geography</Link>
-          <span className="disabled" data-tooltip="Science"><i className="dot-disabled" />Science</span>
+          <Link className={active === "science" ? "active" : ""} data-tooltip="Science" href="/science"><i className="dot-science" />Science</Link>
         </div>
 
         {isReferenceContext ? (
@@ -267,6 +267,7 @@ function getCrumbHref(crumb: string, pathname: string) {
   if (crumb === "Leo") return "/leo";
   if (crumb === "English") return "/english";
   if (crumb === "Geography") return "/geography";
+  if (crumb === "Science") return "/science";
   if (crumb === "Our World") return "/english/our-world";
   // Was a single hardcoded "Unit 8" case, so the Unit 7 and Unit 9 pages —
   // which pass the same shape of crumb — fell through to a self-link.

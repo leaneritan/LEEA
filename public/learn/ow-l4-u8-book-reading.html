@@ -472,12 +472,32 @@ function showSaveInd(id) {
   setTimeout(function() { el.classList.remove('show'); }, 2500);
 }
 
+/* The homework flag was written by the m6 quiz, gated on passing it, so one quiz
+   claimed all six modules — and a failed retake wrote `false`, un-completing a
+   lesson Leo had finished. It now derives from every module being done. */
+function saveHomeworkFlag(){
+  var ids = ['m1','m2','m3','m4','m5','m6'];
+  var allDone = ids.every(function(m){ return lLoad(SAVE_PREFIX+m+'-done'); });
+  try{
+    var k = 'leea-' + HOMEWORK_ID + '-done';
+    if(allDone){
+      var v = { complete:true, completedAt:new Date().toISOString() };
+      localStorage.setItem(k, JSON.stringify(v));
+      if(window.LEEA_CLOUD && typeof window.LEEA_CLOUD.saveProgress === 'function')
+        window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, v);
+    } else {
+      localStorage.removeItem(k);
+    }
+  }catch(e){}
+}
+
 // ═══ MARK COMPLETE ═══
 function markComplete(id, name) {
   try {
     lSave(SAVE_PREFIX+id+'-complete', {name:name, timestamp:new Date().toISOString(), done:true});
     lSave(SAVE_PREFIX+id+'-done', true);
     lSave(HOMEWORK_ID+'-'+id+'-done', true);
+    saveHomeworkFlag();
     updateBadge(id, 'done');
     var btn = document.getElementById('cbtn-'+id);
     if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ '+name+' complete'; }
@@ -924,7 +944,7 @@ function showM6Result() {
   var timeSpent = Math.round((Date.now()-m6StartTime)/1000)+'s';
   lSave(SAVE_PREFIX+'score', {score:m6Score, total:total, percent:pct, done:pass, timestamp:new Date().toISOString(), wrongQuestions:m6Wrong});
   lSave(SAVE_PREFIX+'done', pass);
-  lSave(HOMEWORK_ID+'-done', pass);
+  saveHomeworkFlag();
   updateBadge('m6', pass?'done':'prog');
   var res = document.getElementById('m6-result');
   res.style.display = 'block';

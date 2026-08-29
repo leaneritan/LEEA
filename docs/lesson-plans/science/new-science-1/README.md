@@ -159,6 +159,13 @@ will find — it is **not** a licence to generate the table from it.
 Run this in a browser that can reach the portal (Claude in Chrome, or by hand),
 then bring the output back and import it.
 
+**Do not ask the capture for the item's kind.** All 166 items are already
+tagged 動画 / 練習 / ワークシート / シミュレーション / 資料 / 思考ツール /
+Webページ / 他教科リンク in this index, from the publisher's own PDF. Reading it
+back off a row icon would be a guess replacing a fact — and a wrong guess would
+either be discarded or, worse, block a good link. The importer ignores a `kind`
+column if one is present.
+
 **How the portal is laid out**, from a screenshot of it: a left sidebar picks
 the 単元 at the top, and below it lists that 単元's sections — 学習前, 第1章 …,
 単元末. Picking one fills the right-hand panel with that section's rows, each
@@ -179,15 +186,13 @@ to anyway, since 「Before & After シート」 appears 17 times in this book an
 >
 > Output **TSV only**, no prose, with exactly this tab-separated header:
 >
-> `no  unit  chapter  page  title  kind  url  chapter_url`
+> `no  unit  chapter  page  title  url  chapter_url`
 >
 > - `no` — leave empty; the portal does not number the rows
 > - `unit` — the 単元 number (1–4), empty for 教科共通コンテンツ / 巻末資料
 > - `chapter` — exactly as the sidebar labels it: `学習前`, `第1章`, `単元末`, …
 > - `page` — the page badge, e.g. `10ページ` (digits alone are fine too)
 > - `title` — the row's title exactly as shown, no rewording
-> - `kind` — 動画 / シミュレーション / 思考ツール / ワークシート / 資料 / 練習 /
->   他教科リンク / Webページ, from the row's icon if it is not written out
 > - `url` — the row's own link, **only if it has one**: an `href` on the row, or
 >   the address bar after opening that row
 > - `chapter_url` — the address bar while that 単元/章 is selected in the sidebar

@@ -16,7 +16,10 @@
  *   node scripts/import-science-qr-links.mjs <capture-file> [--dry-run]
  *
  * The capture file is either JSON (an array of objects) or TSV with a header
- * row. Recognised fields: no, unit, chapter, page, title, kind, url, chapter_url.
+ * row. Recognised fields: no, unit, chapter, page, title, url, chapter_url.
+ * A `kind` column is accepted and ignored: every item is already tagged here
+ * from the publisher's PDF, so re-reading it off a row icon would put a guess
+ * where a fact already is.
  * Only `url` plus enough to identify the row (`no`, or `page` + `title`) is
  * required.
  *

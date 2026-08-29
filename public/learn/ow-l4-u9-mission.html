@@ -526,11 +526,26 @@ var MC = 6;
 function lSave(k, v) { try { localStorage.setItem(SP + k, JSON.stringify(v)); } catch(e) {} }
 function lLoad(k, fb) { try { var v = localStorage.getItem(SP + k); return v !== null ? JSON.parse(v) : (fb === undefined ? null : fb); } catch(e) { return fb === undefined ? null : fb; } }
 
+/* The homework flag the teacher dashboard reads: learnerProgress.ts looks for
+   `leea-<homeworkId>-done` exactly. It was written as `<homeworkId>-done`, with
+   no leea- prefix, so nothing ever read it — and it was written by saveScore(),
+   which meant one finished quiz claimed the whole lesson. It now belongs to
+   updateProgress(), which only fires it once every module is done. */
+function clearHomeworkFlag(){
+  try{ localStorage.removeItem('leea-' + HW_ID + '-done'); }catch(e){}
+}
+function saveHomeworkFlag(value){
+  try{ localStorage.setItem('leea-' + HW_ID + '-done', JSON.stringify(value)); }catch(e){}
+  try{ if(window.LEEA_CLOUD && typeof window.LEEA_CLOUD.saveProgress === 'function')
+         window.LEEA_CLOUD.saveProgress(HW_ID, 'leea-' + HW_ID + '-done', value); }catch(e){}
+}
+
+
 function saveScore(score, total, done, extra) {
   var data = { score:score, total:total, pct:Math.round(score/total*100), done:done, timestamp:new Date().toISOString() };
   if (extra) for (var x in extra) data[x] = extra[x];
   lSave('score', data);
-  try { localStorage.setItem(HW_ID + '-score', JSON.stringify(data)); if (done) localStorage.setItem(HW_ID + '-done', JSON.stringify(true)); } catch(e) {}
+  try { localStorage.setItem('leea-' + HW_ID + '-score', JSON.stringify(data)); } catch(e) {}
 }
 
 // ═══ MODAL + BADGE ═══
@@ -562,6 +577,8 @@ function updateProgress() {
   var done = 0;
   for (var i = 1; i <= MC; i++) if (getBadge('m' + i) === 'done') done++;
   pf.style.width = (done / MC * 100) + '%';
+  if (done >= MC) saveHomeworkFlag({ complete: true, completedAt: new Date().toISOString() });
+  else clearHomeworkFlag();
 }
 function showSaveInd(id) {
   var el = document.getElementById(id + '-saved');

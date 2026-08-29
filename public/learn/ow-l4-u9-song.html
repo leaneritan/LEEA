@@ -448,8 +448,22 @@ function renderFooter(m){
     <button class="btn-complete ${done?'confirmed':''}" id="cbtn-${m.id}" onclick="markComplete('${m.id}','Leo')">${done?'Leo complete ✓':'Mark Leo complete ✓'}</button>
     <button class="btn-redo" id="rbtn-${m.id}" onclick="armRedo('${m.id}',this)">↺ Redo</button>`;
 }
+/* The homework flag the teacher dashboard reads. learnerProgress.ts looks for
+   `leea-<homeworkId>-done` exactly; this app never wrote it at all, so the lesson
+   only ever counted as done by the every-module fallback. The dashboard module
+   (m7) is not part of the count. */
+function saveHomeworkFlag(){
+  var ids = MODULES.filter(function(m){ return !m.dash; }).map(function(m){ return m.id; });
+  var allDone = ids.every(function(x){ return (lLoad(SAVE_PREFIX+x+'-complete')||{}).timestamp; });
+  if(!allDone) return;
+  var value = { complete:true, completedAt:new Date().toISOString() };
+  try{ localStorage.setItem('leea-'+HOMEWORK_ID+'-done', JSON.stringify(value)); }catch(e){}
+  try{ if(window.LEEA_CLOUD && window.LEEA_CLOUD.enabled)
+         window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, 'leea-'+HOMEWORK_ID+'-done', value); }catch(e){}
+}
 function markComplete(id,name){
   lSave(SAVE_PREFIX+id+'-complete', {done:true, timestamp:Date.now()});
+  saveHomeworkFlag();
   updateBadge(id);
   const btn=$('cbtn-'+id);
   if(btn){ btn.classList.add('confirmed'); btn.textContent=name+' complete ✓'; }
@@ -462,6 +476,7 @@ function armRedo(id,btn){
 }
 function doRedo(id){
   try{ localStorage.removeItem('leea-'+SAVE_PREFIX+id+'-complete'); }catch(e){}
+  try{ localStorage.removeItem('leea-'+HOMEWORK_ID+'-done'); }catch(e){}
   try{ if(window.LEEA_CLOUD && window.LEEA_CLOUD.enabled) window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, SAVE_PREFIX+id+'-complete', null); }catch(e){}
   updateBadge(id);
   openModule(id);
@@ -645,6 +660,7 @@ function renderQuiz(){
     saveScore('m6', score, QUIZ.length);
     lSave(SAVE_PREFIX+'m6-wrong', wrong);
     lSave(SAVE_PREFIX+'m6-complete', {done:true, timestamp:Date.now()});
+    saveHomeworkFlag();
     updateBadge('m6');
     body.innerHTML=`<div class="quiz-result"><div class="qbig">${pct>=80?'🏆':pct>=50?'🎉':'💪'}</div>
       <div class="qpct">${pct}%</div><div style="font-size:18px;font-weight:700;margin-top:4px">${score} / ${QUIZ.length} correct</div>
@@ -684,6 +700,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   await restoreProgressFromCloud();
   if(isReview){ $('reviewBanner').innerHTML=`<div class="review-banner">👀 Review mode — Leo's results & answers</div>`; }
   buildGrid();
+  /* Derive on load too, so a lesson finished before this fix reads as done. */
+  saveHomeworkFlag();
 });
 </script>
 </body>

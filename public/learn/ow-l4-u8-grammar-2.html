@@ -583,6 +583,20 @@ function lDel(suffix){
   try{ localStorage.removeItem(SAVE_PREFIX + suffix); }catch(e){}
 }
 
+/* The homework flag the teacher dashboard reads. It is NOT a SAVE_PREFIX key:
+   learnerProgress.ts looks for `leea-<homeworkId>-done` exactly, so it has to be
+   written against localStorage directly. Routing it through lSave() prefixed it
+   twice (leea-4-8-x-leo-4-8-x-done) and nothing ever read it. */
+function clearHomeworkFlag(){
+  try{ localStorage.removeItem('leea-' + HOMEWORK_ID + '-done'); }catch(e){}
+}
+function saveHomeworkFlag(value){
+  try{ localStorage.setItem('leea-' + HOMEWORK_ID + '-done', JSON.stringify(value)); }catch(e){}
+  try{ if(window.LEEA_CLOUD && typeof window.LEEA_CLOUD.saveProgress === 'function')
+         window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, 'leea-' + HOMEWORK_ID + '-done', value); }catch(e){}
+}
+
+
 /* ── PROGRESS BADGE + TAB CHECKMARKS ── */
 function refreshProgress(){
   let done = 0;
@@ -594,7 +608,8 @@ function refreshProgress(){
     }
   }
   document.getElementById('prog-pill').textContent = done + ' / ' + TAB_COUNT + ' done';
-  if(done >= TAB_COUNT) lSave(HOMEWORK_ID + '-done', { complete: true, completedAt: new Date().toISOString() });
+  if(done >= TAB_COUNT) saveHomeworkFlag({ complete: true, completedAt: new Date().toISOString() });
+  else clearHomeworkFlag();
 }
 
 /* ── MARK COMPLETE (Rule 1: auto-save done-key) ── */

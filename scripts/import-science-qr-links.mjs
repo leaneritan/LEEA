@@ -34,8 +34,16 @@ import fs from "node:fs";
 import path from "node:path";
 
 const INDEX_PATH = "docs/lesson-plans/science/new-science-1/qr-index.json";
-/** A captured link must live on the publisher's own domain. */
+/** In-site content lives here; anything else is a wrong or invented link. */
 const ALLOWED_HOST_SUFFIX = ".tsho.jp";
+/**
+ * Kinds the index itself declares as pointing off-site — 気象庁, 防災科研,
+ * ハザードマップポータル and the cross-subject portals. For these the host
+ * check would be backwards, so it is relaxed for them and only for them,
+ * decided by what the index says the item is rather than by what the capture
+ * happened to bring back.
+ */
+const EXTERNAL_KINDS = new Set(["Webページ", "Webページ（リンク）", "他教科リンク"]);
 
 const [, , capturePath, ...flags] = process.argv;
 const dryRun = flags.includes("--dry-run");
@@ -78,7 +86,7 @@ function parseCapture(file) {
   });
 }
 
-function validateUrl(value) {
+function validateUrl(value, { allowExternal = false } = {}) {
   let url;
   try {
     url = new URL(String(value).trim());
@@ -88,10 +96,11 @@ function validateUrl(value) {
   if (url.protocol !== "https:" && url.protocol !== "http:") {
     return { ok: false, reason: `unsupported protocol ${url.protocol}` };
   }
-  if (url.hostname !== "tsho.jp" && !url.hostname.endsWith(ALLOWED_HOST_SUFFIX)) {
+  const onSite = url.hostname === "tsho.jp" || url.hostname.endsWith(ALLOWED_HOST_SUFFIX);
+  if (!onSite && !allowExternal) {
     return { ok: false, reason: `host ${url.hostname} is not the publisher's` };
   }
-  return { ok: true, url: url.toString() };
+  return { ok: true, url: url.toString(), external: !onSite };
 }
 
 const index = JSON.parse(fs.readFileSync(INDEX_PATH, "utf-8"));
@@ -108,7 +117,7 @@ for (const item of index.items) {
 }
 
 const captured = parseCapture(capturePath);
-const report = { applied: [], unchanged: [], skipped: [], mismatched: [], chapters: 0 };
+const report = { applied: [], unchanged: [], skipped: [], mismatched: [], chapters: 0, external: 0 };
 
 index.chapters ??= {};
 
@@ -154,12 +163,6 @@ for (const row of captured) {
     continue;
   }
 
-  const check = validateUrl(rawUrl);
-  if (!check.ok) {
-    report.skipped.push({ label, reason: check.reason, value: String(rawUrl).slice(0, 80) });
-    continue;
-  }
-
   const page = toPage(row.page);
   const title = normalise(row.title);
   const no = Number(String(row.no ?? "").replace(/\D/g, ""));
@@ -173,6 +176,15 @@ for (const row of captured) {
     report.skipped.push({ label, reason: "no matching item in the QR index" });
     continue;
   }
+
+  // Host is checked only once the item is known, because whether leaving
+  // tsho.jp is correct depends on the kind the index recorded for it.
+  const check = validateUrl(rawUrl, { allowExternal: EXTERNAL_KINDS.has(item.kind) });
+  if (!check.ok) {
+    report.skipped.push({ label, reason: check.reason, value: String(rawUrl).slice(0, 80) });
+    continue;
+  }
+  if (check.external) report.external += 1;
 
   // The index PDF is the authority. Disagreement means the capture landed on a
   // different row than it claims, so record it and change nothing.
@@ -218,6 +230,7 @@ console.log(`already correct   : ${report.unchanged.length}`);
 console.log(`skipped           : ${report.skipped.length}`);
 console.log(`mismatched        : ${report.mismatched.length}`);
 console.log(`chapter urls added: ${report.chapters}`);
+console.log(`off-site (by kind): ${report.external}`);
 console.log(`resolved overall  : ${resolved} / ${index.items.length}`);
 
 for (const entry of report.skipped) {

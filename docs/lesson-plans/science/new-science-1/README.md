@@ -137,6 +137,18 @@ https://sw121.tsho.jp/07jk/r/1/ — that is where the 動画 and the
 each item, and `urlsResolved: false` at the top, so the mapping can be
 filled in once without touching anything downstream.
 
+**Status: captured.** 160 of the 166 items carry a real link, plus 21
+section-level links in the index's `chapters` map. The six without one are
+items the portal itself gives no address for — the 感染症予防 group and five
+Webページ（リンク）rows that point at 気象庁, 防災科学技術研究所,
+ハザードマップポータル and 日本ジオパークネットワーク. All 16 hands-on items
+(9 シミュレーション + 7 思考ツール) are linked.
+
+The scheme turned out to be `…/r/1/<letter>/#<NN>`, a sibling of math's
+`…/m/1/<letter>/#<NN>` — but **the letter selects the 単元 here where math's
+selects the 章**. Deriving it from math would have produced wrong links at the
+wrong granularity, which is why it was captured instead.
+
 **The portal is not reachable from a Claude Code cloud session.** The
 environment's egress proxy answers 403 for `sw121.tsho.jp`, and that block
 covers every tool in the session equally — `curl`, WebFetch and headless
@@ -225,4 +237,23 @@ only ever writes `url` and `chapters`, and it refuses a row whose page, title or
 domain, or that matches no item — reporting each one instead of writing it. It
 exits non-zero when anything mismatched, so a disagreement gets looked at rather
 than committed. Partial captures are fine and the script can be run repeatedly;
-`urlsResolved` flips to `true` only once all 166 items have a link.
+`urlsResolved` flips to `true` only once all 166 items have a link — it stays
+`false` while those six remain unlinkable.
+
+The host check is relaxed for exactly the kinds the index marks as pointing
+off-site (`Webページ`, `Webページ（リンク）`, `他教科リンク`) and for no others,
+and only after the row has been matched — so what counts as an acceptable host
+is decided by what the index says the item is, not by what the capture brought
+back.
+
+### Putting the links into the app
+
+`node scripts/link-science-chips.mjs` copies them onto the chips of the authored
+section JSON, matching a chip's kind and its block's page against the index. It
+only links where a page has exactly one item of that kind: p.17 carries two
+動画 (身近な生物の観察 and ルーペの使い方), so those two are reported and left
+for a person, because a chip that opens the wrong video is worse than a chip
+that opens nothing. Hand-set chip URLs survive re-runs.
+
+Section-level links go on `digitalUrl` in `curriculum.ts`, which is what the
+📘 デジタル教科書 button in the section topbar opens.

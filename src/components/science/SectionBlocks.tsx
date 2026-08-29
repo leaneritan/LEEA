@@ -32,11 +32,33 @@ function Chips({ chips }: { chips?: ScienceChip[] }) {
   if (!chips?.length) return null;
   return (
     <div className="sci-chips">
-      {chips.map((chip) => (
-        <span className={`sci-chip sci-chip--${chip.kind}`} key={`${chip.kind}-${chip.label}`}>
-          <span aria-hidden="true">{CHIP_ICON[chip.kind]}</span> {chip.label}
-        </span>
-      ))}
+      {chips.map((chip) => {
+        const body = (
+          <>
+            <span aria-hidden="true">{CHIP_ICON[chip.kind]}</span> {chip.label}
+          </>
+        );
+        const key = `${chip.kind}-${chip.label}`;
+
+        // A chip only becomes a link when a real publisher URL was captured
+        // for it; otherwise it stays a plain tag rather than a dead link.
+        return chip.url ? (
+          <a
+            className={`sci-chip sci-chip--${chip.kind} sci-chip--link`}
+            href={chip.url}
+            key={key}
+            rel="noopener noreferrer"
+            target="_blank"
+            title="教科書のQRコンテンツをひらく"
+          >
+            {body} ↗
+          </a>
+        ) : (
+          <span className={`sci-chip sci-chip--${chip.kind}`} key={key}>
+            {body}
+          </span>
+        );
+      })}
     </div>
   );
 }

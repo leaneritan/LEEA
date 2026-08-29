@@ -99,8 +99,15 @@ egress proxy, so `qr-index.json` holds every `url` at `null`. **Do not
 extrapolate a URL from the math pattern or from an item number** — same rule as
 Geography's `sourceLabel`: set it from something real, or leave it empty.
 
+**The links are captured**: 160 of 166 items and 21 section addresses, all 16
+hands-on items among them. The six without one are rows the portal gives no
+address for. The scheme is `…/r/1/<letter>/#<NN>` where the letter is the 単元 —
+math's sibling scheme keys its letter to the 章, so deriving one from the other
+would have been wrong.
+
 Links are captured in a browser that can reach the portal (Claude in Chrome)
-and imported with `npm run import:science-links -- <capture-file>`. The capture
+and imported with `npm run import:science-links -- <capture-file>`, then put on
+the chips with `node scripts/link-science-chips.mjs`. The capture
 prompt and the format are in the README beside the index. The importer treats
 the index as the authority and the capture as a claim: it writes only `url`,
 refuses rows that disagree with the recorded page/title/単元 or point off the

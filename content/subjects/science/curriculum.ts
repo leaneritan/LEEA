@@ -12,6 +12,13 @@ import type { ScienceChapterMeta, ScienceSectionMeta, ScienceUnitMeta } from "./
  *
  * Only sections listed in `scienceSectionIsAuthored` have content behind them.
  * The rest render a 準備中 card, the same way math handles unauthored 節.
+ *
+ * `digitalUrl` values are the publisher's own section addresses, captured from
+ * the portal and recorded in `qr-index.json`'s `chapters` map — never derived.
+ * Worth noting how easily they could have been got wrong: the scheme is
+ * `…/r/1/<letter>/#<NN>`, a sibling of math's `…/m/1/<letter>/#<NN>`, but the
+ * letter here selects the 単元 where math's selects the 章. All three sections
+ * of 第1章 share one address because the portal has no finer anchor.
  */
 
 const UNIT_1_CHAPTERS: ScienceChapterMeta[] = [
@@ -30,7 +37,8 @@ const UNIT_1_CHAPTERS: ScienceChapterMeta[] = [
         name: "いろいろな生物とその共通点",
         pages: "p.10–12",
         status: "now",
-        kicker: "学習前"
+        kicker: "学習前",
+        digitalUrl: "https://sw121.tsho.jp/07jk/r/1/a/#01"
       }
     ]
   },
@@ -51,7 +59,8 @@ const UNIT_1_CHAPTERS: ScienceChapterMeta[] = [
         // 植物 / 動物 図鑑 pages are chapter-level, and the observation work
         // sends Leo back to them, so they live at the top of this section.
         pages: "p.14–21",
-        status: "now"
+        status: "now",
+        digitalUrl: "https://sw121.tsho.jp/07jk/r/1/a/#02"
       },
       {
         id: "sci-u1-c1-2",
@@ -59,7 +68,8 @@ const UNIT_1_CHAPTERS: ScienceChapterMeta[] = [
         number: 2,
         name: "生物の特徴と分類",
         pages: "p.22–25",
-        status: "todo"
+        status: "todo",
+        digitalUrl: "https://sw121.tsho.jp/07jk/r/1/a/#02"
       },
       {
         id: "sci-u1-c1-matome",
@@ -68,7 +78,8 @@ const UNIT_1_CHAPTERS: ScienceChapterMeta[] = [
         name: "学んだことをチェックしよう",
         pages: "p.26",
         status: "todo",
-        kicker: "章末"
+        kicker: "章末",
+        digitalUrl: "https://sw121.tsho.jp/07jk/r/1/a/#02"
       }
     ]
   },

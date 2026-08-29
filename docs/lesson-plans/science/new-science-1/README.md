@@ -10,16 +10,39 @@ committed as regular files, not Git LFS, as long as each file stays under
 | File | What it is |
 | --- | --- |
 | `qr-content-index.pdf` | 令和7年度版 QRコンテンツ一覧 — the publisher's digital-content index, 4 pages, 166 numbered items. Online at https://sw121.tsho.jp/07jk/r/1/#a |
-| `scans/` | **Empty — the textbook scans are still needed.** |
+| `qr-index.json` | The index above as structured data — all 166 items with number, page, title, kind, 単元/章, and a `url` field held at `null` until real links exist. |
+| `scans/` | Textbook scans. Two in so far; see the table below. |
 
 Read `qr-content-index.pdf` before the scans when starting a 章, the same
 way the math book's QR index is read first: it is what says which moments
 the publisher itself treats as hands-on, and golden rule 12 says those get
 a real widget rather than digitized text.
 
+## Scans in so far
+
+| File | Folios | PDF pages | Verified |
+| --- | --- | --- | --- |
+| `scans/front-matter_p1-9.pdf` | p.1–9 | 10 | Yes — see the anomaly below |
+| `scans/unit1-ch1_p10-26.pdf` | p.10–26 | 17 | Yes — 10→26 sequential, one folio per page, no spreads, no gaps |
+
+`unit1-ch1_p10-26.pdf` covers 単元1 学習前 (p.10–12) and 第1章 生物の観察と
+分類のしかた (p.13–26), ending on the 章末 「学んだことをチェックしよう」.
+Both ranges in the table below are confirmed by it.
+
+**Front-matter anomaly — 10 PDF pages for 9 folios.** Every page carries a
+plain folio 1–9 except PDF page 2, which has a circled ③ where the folio
+belongs. PDF pages 1 and 2 are the two halves of one 「探究」の流れを確認
+しよう spread, and they are in reverse order: page 2 holds steps 1–4 (the
+left half) and page 1 holds steps 5–8 with folio 1 (the right half). So
+either the 巻頭 pages carry their own circled numbering and this scan
+straddles the boundary, or the halves were photographed out of order.
+**Unresolved — do not cite a front-matter page number until someone opens
+the book and settles it.**
+
 ## Book structure
 
-Derived from the QR index. **The page ranges below are unverified** — each
+Derived from the QR index. Ranges marked ✓ have been checked against a
+scan's printed folios. **The rest are unverified** — each
 one runs from a 章's first QR anchor to its last, so a 章 may extend a few
 pages past what is shown here. Check the printed folio before trusting any
 of them, and correct this table when you do. (The math README carries the
@@ -29,8 +52,8 @@ wrong answer about what had been scanned.)
 
 | 単元 | 章 | Pages (unverified) |
 | --- | --- | --- |
-| 1 いろいろな生物とその共通点 | 学習前 | 10–12 |
-| | 第1章 生物の観察と分類のしかた | 13–26 |
+| 1 いろいろな生物とその共通点 | 学習前 | 10–12 ✓ |
+| | 第1章 生物の観察と分類のしかた | 13–26 ✓ |
 | | 第2章 植物の分類 | 27–44 |
 | | 第3章 動物の分類 | 45–62 |
 | | 単元末 | 65–69 |
@@ -61,7 +84,7 @@ wrong answer about what had been scanned.)
 | 動画 | 89 | Publisher video. Not ours to reproduce — a lesson may reference the moment, not embed it. |
 | 練習 | 25 | Self-check practice. Maps to an attempt-then-reveal block. |
 | ワークシート | 17 | All but one are the per-章 Before & After シート. |
-| 資料 | 9 | Reference material (岩石図鑑, レポートの書き方, 顕微鏡の使い方). |
+| 資料 | 7 | Reference material (岩石図鑑, レポートの書き方, 顕微鏡の使い方). |
 | **シミュレーション** | **9** | **Must ship as a real interactive widget** (golden rule 12). Listed below. |
 | **思考ツール** | **7** | Sorting/classification tools — inherently manipulation, so also widgets. Listed below. |
 | Webページ（リンク） | 5 | External links (ハザードマップポータル, 防災科研, ジオパーク). Link out; do not mirror. |
@@ -105,3 +128,23 @@ All in 単元1, all classification: さまざまな生物の分類 (p.23), 身�
 these. A sort/build-the-tree widget (drag organisms into groups, check the
 result) is the shape they all want, and one such widget likely covers most
 of the seven.
+
+## Linking to the publisher's online content
+
+Every item in the QR index has a counterpart on the publisher's portal at
+https://sw121.tsho.jp/07jk/r/1/ — that is where the 動画 and the
+シミュレーション actually live. `qr-index.json` carries a `url` field on
+each item, and `urlsResolved: false` at the top, so the mapping can be
+filled in once without touching anything downstream.
+
+**The portal is not reachable from a Claude Code cloud session.** The
+environment's egress proxy answers 403 for `sw121.tsho.jp`, and that block
+covers every tool in the session equally — `curl`, WebFetch and headless
+Chromium all go through the same proxy. This is a network-policy question,
+not a code one: see
+https://code.claude.com/docs/en/claude-code-on-the-web.
+
+Until a real URL is captured for an item, leave its `url` at `null`. Do not
+guess a URL from the item number or infer a pattern from a sibling — the
+same rule Geography's `sourceLabel` follows: set it from something real or
+leave it empty. A link that 404s in front of Leo is worse than no link.

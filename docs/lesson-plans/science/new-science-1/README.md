@@ -145,6 +145,56 @@ not a code one: see
 https://code.claude.com/docs/en/claude-code-on-the-web.
 
 Until a real URL is captured for an item, leave its `url` at `null`. Do not
-guess a URL from the item number or infer a pattern from a sibling — the
-same rule Geography's `sourceLabel` follows: set it from something real or
-leave it empty. A link that 404s in front of Leo is worse than no link.
+guess a URL from the item number or infer a pattern from a sibling — the same
+rule Geography's `sourceLabel` follows: set it from something real or leave it
+empty. A link that 404s in front of Leo is worse than no link.
+
+Math's `content/subjects/math/digitalCompanion.ts` maps pages onto
+`sw111.tsho.jp/07jk/m/1/<letter>/#<NN>`, and 理科's portal is the sibling
+`sw121…/r/1/` (`m` 数学, `r` 理科). That is a plausible shape for what a capture
+will find — it is **not** a licence to generate the table from it.
+
+### Capturing the links
+
+Run this in a browser that can reach the portal (Claude in Chrome, or by hand),
+then bring the output back and import it.
+
+**Prompt to paste into Claude in Chrome**, with the portal open:
+
+> Open https://sw121.tsho.jp/07jk/r/1/ — the QR content list for 新編 新しい科学1
+> (東京書籍, 令和7年度版). Walk every content item on the page, in order.
+>
+> Output **TSV only**, no prose, with exactly this header row (tab-separated):
+>
+> `no  unit  chapter  page  title  kind  url`
+>
+> One row per item:
+> - `no` — the item's number if the page shows one, otherwise leave empty
+> - `unit` — the 単元 number (1–4), or empty for 教科共通コンテンツ / 巻末資料
+> - `chapter` — the 章 number, or `学習前` / `単元末` / `巻末資料`
+> - `page` — the ページ number, digits only
+> - `title` — the title exactly as printed, no rewording
+> - `kind` — 動画 / シミュレーション / 思考ツール / ワークシート / 資料 / 練習 /
+>   他教科リンク / Webページ
+> - `url` — the item's actual link, copied from the page's own href or from the
+>   address bar after opening it
+>
+> **If you cannot see a real link for an item, leave `url` empty.** Do not
+> construct, guess, or pattern-match a URL from other rows — an empty cell is
+> correct and useful; an invented one is not. Do not drop rows either: an item
+> with no link should still appear, with its other fields filled in.
+
+Save the reply as a `.tsv` (or a JSON array of the same fields) and run:
+
+```sh
+node scripts/import-science-qr-links.mjs <capture-file> --dry-run   # inspect
+node scripts/import-science-qr-links.mjs <capture-file>             # write
+```
+
+The importer treats this index as the authority and the capture as a claim. It
+only ever writes `url`, and it refuses a row whose page, title or 単元 disagrees
+with what is recorded here, whose link is off the publisher's domain, or that
+matches no item — reporting each one instead of writing it. It exits non-zero
+when anything mismatched, so a disagreement gets looked at rather than
+committed. Partial captures are fine and the script can be run repeatedly;
+`urlsResolved` flips to `true` only once all 166 items have a link.

@@ -99,6 +99,14 @@ egress proxy, so `qr-index.json` holds every `url` at `null`. **Do not
 extrapolate a URL from the math pattern or from an item number** — same rule as
 Geography's `sourceLabel`: set it from something real, or leave it empty.
 
+Links are captured in a browser that can reach the portal (Claude in Chrome)
+and imported with `npm run import:science-links -- <capture-file>`. The capture
+prompt and the format are in the README beside the index. The importer treats
+the index as the authority and the capture as a claim: it writes only `url`,
+refuses rows that disagree with the recorded page/title/単元 or point off the
+publisher's domain, and exits non-zero on any mismatch. Add links through it
+rather than editing `qr-index.json` by hand.
+
 ### Geography
 
 One page, one map, a button row to switch. That is the whole model.

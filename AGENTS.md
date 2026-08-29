@@ -41,13 +41,14 @@ LEEA
 - Math
   - 中1数学ヘルパー (新編 新しい数学1) — see `docs/math-interactivity.md`
 - Geography (社会) — interactive maps, 地理 and 歴史
+- History (歴史) — chronology chart and other 歴史 material
 - Science
   - 中1理科ヘルパー (新編 新しい科学1) — see `### Science` below
 ```
 
 ### Subjects other than English
 
-**English is the only taught subject.** It has teacher decks, an assignment loop, a reference layer and a course spine because Neritan teaches it. Every other subject — Math, Geography, Science — exists to *support Leo working on his own*.
+**English is the only taught subject.** It has teacher decks, an assignment loop, a reference layer and a course spine because Neritan teaches it. Every other subject — Math, Geography, History, Science — exists to *support Leo working on his own*.
 
 So do not mirror the English structure into them. No teacher slides, no assign/review loop, no 章/節 navigation built to match Our World's course/level/unit. Give each one the smallest shape that lets Leo get to the thing and use it. Geography learned this the hard way: it shipped with a full 11-chapter 社会 spine, chapter pages and a 分野 switch, and all of it was scaffolding around three maps.
 
@@ -98,6 +99,59 @@ link has actually been opened yet: the domain is blocked by the environment's
 egress proxy, so `qr-index.json` holds every `url` at `null`. **Do not
 extrapolate a URL from the math pattern or from an item number** — same rule as
 Geography's `sourceLabel`: set it from something real, or leave it empty.
+
+### History
+
+Geography's model, second subject: one page, one material, a button row to
+switch. History exists because 歴史 material that is not a map has nowhere to
+live in Geography — the 巻末年表 is a single wide chart, not something with
+markers to click. 古代文明マップ stays in Geography for now (it *is* a map, and
+its progress record is keyed there); move it only deliberately, with a redirect.
+
+- `content/subjects/history/materials.ts` — a flat registry, the same shape as
+  `geographyMaps`. Each material has an id, a `kind` (`reference` / `activity`,
+  used only to label), titles, a summary and `buildStatus`.
+- `/history` opens the first live material; `/history/<materialId>` opens a
+  named one.
+- Chrome is one thin bar (`.hist-*` in globals.css), the frame takes the rest.
+
+**Adding a material**
+
+1. Drop the standalone HTML at `public/history/<id>.html`.
+2. Add an entry to `historyMaterials` with `buildStatus: "live"` and `embedPath`.
+
+Register with `buildStatus: "planned"` and no `embedPath` to show it as
+upcoming; the page renders a "file needed" card instead of a broken frame.
+
+**Nothing in History records progress yet**, on purpose: the 巻末年表 is a chart
+Leo looks things up in, with no markers and no quiz, and a status pill it can
+never earn would be noise. A material that *does* have something to score
+reports through `public/components/geo-progress.js` — the shared bridge — rather
+than growing a second one here.
+
+**巻末年表ビューア** (`public/history/nenpyou-viewer.html`) frames the chart
+帝国書院 serves from its own QR content (`ict.teikokushoin.co.jp`), the same
+publisher link Leo's textbook prints. The image is fetched by the learner's
+browser, not bundled: that domain is blocked by this environment's egress proxy,
+so the viewer has never been loaded against the real chart here — it was
+verified against a stand-in of the same 6398x1500 shape, and it renders a
+Japanese "could not load" card with the publisher link when the fetch fails.
+
+Two things the viewer had to get right:
+
+- **Fit-height, not fit-all, is the opening view.** The chart is 4.3x wider than
+  it is tall, so "everything on screen" is also "everything at 17% and
+  unreadable". It opens filling the height at the oldest end, which is how a
+  chronology is read — one era at a time, travelling sideways.
+- **Zooming out stops at fit-all and panning clamps to the edges**, the same
+  rule as Geography's `enableZoom`: the chart cannot be shrunk to a dot or
+  dragged off into empty space.
+
+The scrub slider under the bar *is* the pan, expressed as "which part of the
+timeline is in the middle of the screen" — it disables itself when the whole
+width already fits. It carries no era marks: where 平安 or 明治 sit in that
+image has never been measured here, and guessing pixel offsets would be
+inventing a reference. Same rule as `sourceLabel`.
 
 ### Geography
 

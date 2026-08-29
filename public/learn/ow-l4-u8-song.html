@@ -237,6 +237,114 @@ const VOCAB = [
     game:{type:"scramble", q:"Build the word.", pieces:["no","di","saur"], a:"dinosaur", join:""} }
 ];
 
+/* ── balanced answer positions ──────────────────────────────────────────
+   The authored question data leans hard on the first option — several of
+   the arrays below had every correct answer at index 0, which Leo can beat
+   by always tapping the top button without reading anything.
+
+   Positions are dealt out round-robin over a hash-ordered list rather than
+   drawn per question: a per-item draw is uniform on average but is still a
+   draw, and it left whole quizzes with an unused slot. Dealing guarantees
+   every slot is used about equally. The hash only decides the running order
+   and the distractor order, so the layout is identical on every load and a
+   restored answer still lines up with the option it was saved against.
+   ──────────────────────────────────────────────────────────────────────── */
+function __leeaHash(s){var h=2166136261>>>0;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+/* splitmix32 — a plain LCG's low bits cycle and produce a biased shuffle. */
+function __leeaMix(a){a=(a+0x9e3779b9)>>>0;var z=a;z=Math.imul(z^(z>>>16),0x21f0aaad)>>>0;z=Math.imul(z^(z>>>15),0x735a2d97)>>>0;return (z^(z>>>15))>>>0;}
+function __leeaSeed(item,optKey){try{return __leeaHash(JSON.stringify(item[optKey]));}catch(e){return 0;}}
+function __leeaAt(item,optKey,idxKey){
+  var opts=item[optKey];
+  if(idxKey)return typeof item[idxKey]==='number'?item[idxKey]:-1;
+  for(var i=0;i<opts.length;i++){if(opts[i]&&opts[i].ok===true)return i;}
+  return -1;
+}
+/* True/False and Yes/No pairs keep their conventional order — moving them
+   changes what the buttons read, not just where the answer sits. */
+function __leeaFixedOrder(item,optKey){
+  var opts=item[optKey];
+  if(!Array.isArray(opts)||opts.length!==2)return false;
+  var t=opts.map(function(o){return String((o&&typeof o==='object')?(o.t||o.text||''):o).trim().toLowerCase();});
+  return (t[0]==='true'&&t[1]==='false')||(t[0]==='false'&&t[1]==='true')||
+         (t[0]==='yes'&&t[1]==='no')||(t[0]==='no'&&t[1]==='yes');
+}
+function __leeaPlace(item,optKey,idxKey,target){
+  var opts=item[optKey],cur=__leeaAt(item,optKey,idxKey);
+  if(cur<0||cur>=opts.length)return;
+  if(__leeaFixedOrder(item,optKey))return;
+  var answer=opts[cur],rest=opts.filter(function(_,i){return i!==cur;});
+  var state=__leeaSeed(item,optKey);
+  for(var i=rest.length-1;i>0;i--){
+    state=__leeaMix(state);
+    var j=Math.floor((state/4294967296)*(i+1));
+    var t=rest[i];rest[i]=rest[j];rest[j]=t;
+  }
+  var pos=Math.min(Math.max(target,0),rest.length);
+  rest.splice(pos,0,answer);
+  item[optKey]=rest;
+  if(idxKey)item[idxKey]=pos;
+}
+/* Reorders options in place. Never changes which option is correct — only
+   where it sits — so every answer key in this file stays true. */
+/* One-time cleanup of state saved under the OLD option order.
+   Reordering options invalidates any answer that was stored as an index, so
+   a completed module would come back with the tick on the wrong button. This
+   clears only values made entirely of numbers, booleans and nulls — answer
+   indexes and tick state. Typed sentences, quiz scores and module done-flags
+   are all left alone, so nothing Leo wrote or earned is lost. */
+function __leeaNumericOnly(v){
+  if(v===null||typeof v==='number'||typeof v==='boolean')return true;
+  if(typeof v==='string')return false;
+  if(Array.isArray(v))return v.length>0&&v.every(__leeaNumericOnly);
+  if(typeof v==='object'){var ks=Object.keys(v);return ks.length>0&&ks.every(function(k){return __leeaNumericOnly(v[k]);});}
+  return false;
+}
+function __leeaFindPrefix(){
+  var cands=[];
+  ['SAVE_PREFIX','SP','PREFIX'].forEach(function(n){
+    var v; try{ v=eval(n); }catch(e){ return; }
+    if(typeof v==='string'&&v){ cands.push(v); cands.push('leea-'+v); }
+  });
+  var keys; try{ keys=Object.keys(localStorage); }catch(e){ return null; }
+  // Longest candidate that actually prefixes saved keys wins; if nothing
+  // matches there is no old state to migrate.
+  cands.sort(function(a,b){return b.length-a.length;});
+  for(var i=0;i<cands.length;i++){
+    if(keys.some(function(k){return k.indexOf(cands[i])===0;})) return cands[i];
+  }
+  return null;
+}
+function __leeaMigrate(){
+  try{
+    var pre=__leeaFindPrefix(); if(!pre) return;
+    var flag=pre+'__answer-layout-v1';
+    if(localStorage.getItem(flag)==='1') return;
+    Object.keys(localStorage).forEach(function(k){
+      if(k.indexOf(pre)!==0) return;
+      if(/done|score|complete|known|streak|progress|layout/i.test(k)) return;
+      var val; try{ val=JSON.parse(localStorage.getItem(k)); }catch(e){ return; }
+      if(__leeaNumericOnly(val)) localStorage.removeItem(k);
+    });
+    localStorage.setItem(flag,'1');
+  }catch(e){}
+}
+function __leeaBalance(list,optKey,idxKey){
+  if(!Array.isArray(list))return list;
+  var rows=[];
+  list.forEach(function(item,i){
+    if(!item||typeof item!=='object')return;
+    var opts=item[optKey];
+    if(!Array.isArray(opts)||opts.length<2)return;
+    if(__leeaAt(item,optKey,idxKey)<0)return;
+    if(__leeaFixedOrder(item,optKey))return;
+    rows.push({item:item,i:i,h:__leeaSeed(item,optKey)});
+  });
+  rows.sort(function(a,b){return (a.h-b.h)||(a.i-b.i);});
+  rows.forEach(function(r,k){__leeaPlace(r.item,optKey,idxKey,k%r.item[optKey].length);});
+  return list;
+}
+__leeaMigrate();
+
 const QUIZ = [
   {p:"What do we call the part of a song that <b>repeats</b>?", opts:["chorus","verse","rhyme"], c:0},
   {p:"Which part of a song <b>tells the story</b> and changes each time?", opts:["verse","chorus","score"], c:0},
@@ -247,6 +355,7 @@ const QUIZ = [
   {p:"A soft toy animal you can hug is a ___.", opts:["stuffed animal","fossil","comic book"], c:0},
   {p:"The old shape of an animal kept in rock is a ___.", opts:["fossil","dinosaur","screen"], c:0}
 ];
+__leeaBalance(QUIZ, 'opts', 'c');
 
 /* Academic words — Tier B proper games (recycled but full weight) */
 const ACADEMIC = [

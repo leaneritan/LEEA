@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 6 · Opener · Wonders of the Sea</title>
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+
+/* HEADER */
+.slide-header{height:64px;background:#0369A1;display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.65);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.2);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.ac{background:rgba(14,165,233,.4)}
+
+/* TWO-COLUMN VOCAB LAYOUT */
+.vocab-body{flex:1;display:flex;min-height:0}
+.word-panel{width:40%;padding:30px 34px;display:flex;flex-direction:column;border-right:2px solid #e5e7eb;background:#fff}
+.game-panel{width:60%;padding:22px 32px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;overflow:hidden}
+
+/* TAGS */
+.vtag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;width:fit-content}
+.vtag.v1{background:#E0F2FE;color:#075985}
+.vtag.ac{background:#FEF3C7;color:#B45309}
+.vtag.rel{background:#f3f4f6;color:#6b7280}
+
+/* WORD PANEL */
+.word-emoji{font-size:130px;line-height:1;margin-bottom:12px;cursor:pointer;transition:transform .25s}
+.word-emoji:active{transform:scale(1.15)}
+.word-main{font-size:70px;font-weight:800;color:#111;line-height:1.05;margin-bottom:8px}
+.word-ipa{font-size:21px;color:#6b7280}
+.word-syl{font-size:18px;color:#9ca3af;letter-spacing:1px}
+.word-pos{font-size:19px;color:#0369A1;font-weight:700;margin-bottom:14px}
+.word-def{font-size:21px;color:#374151;line-height:1.45;margin-bottom:8px}
+.word-jp{font-size:18px;color:#6b7280;line-height:1.45}
+.dad-say{background:#F0F9FF;border-left:4px solid #0369A1;padding:13px 16px;border-radius:0 12px 12px 0;font-size:18px;color:#374151;line-height:1.5;margin-top:auto}
+.dad-say b{color:#075985}
+.how-box{background:#fff;border:2px dashed #BAE6FD;border-radius:12px;padding:10px 16px;font-size:16px;color:#4b5563;line-height:1.5;width:100%}
+.how-box b{color:#075985}
+.how-box li{margin-left:18px}
+
+/* MINI-GAME SHELL (shared class names across LEEA vocab decks) */
+.mg-wrap{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;flex:1;min-height:0}
+.mg-head{font-size:20px;font-weight:700;color:#374151;text-align:center;background:#f9fafb;border:2px solid #e5e7eb;border-radius:12px;padding:10px 20px;width:100%;flex-shrink:0}
+.mg-head b{color:#075985}
+.mg-stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0;overflow:hidden}
+.mg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;width:100%}
+.mg-grid.c4{grid-template-columns:repeat(4,1fr)}
+.mg-grid.c3{grid-template-columns:repeat(3,1fr)}
+.mg-tile{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 6px;font-size:38px;cursor:pointer;transition:all .15s;text-align:center}
+.mg-tile:hover{transform:translateY(-3px);border-color:#0369A1}
+.mg-tile .mg-label{display:block;font-size:14px;font-weight:700;color:#4b5563;margin-top:4px;min-height:18px}
+.mg-tile.hit{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.mg-tile.miss{background:#fef2f2;border-color:#ef4444;animation:mgShake .3s ease}
+@keyframes mgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.mg-btn{background:#0369A1;color:#fff;border:none;border-radius:12px;padding:13px 30px;font-size:20px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.mg-btn:hover{background:#075985;transform:scale(1.04)}
+.mg-btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+.mg-opt{padding:12px 22px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:19px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left}
+.mg-opt:hover{border-color:#0369A1}
+.mg-opt.ok{background:#F0F9FF;border-color:#0369A1;color:#075985;pointer-events:none}
+.mg-opt.no{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+.mg-score{font-size:20px;font-weight:800;color:#075985;background:#E0F2FE;border-radius:20px;padding:6px 22px}
+.mg-miss{font-size:17px;font-weight:700;color:#ef4444;min-height:22px}
+.mg-win{background:#0369A1;color:#fff;border-radius:14px;padding:12px 24px;font-size:20px;font-weight:800;text-align:center;opacity:0;transform:translateY(10px);transition:all .35s;width:100%}
+.mg-win.show{opacity:1;transform:translateY(0)}
+.mg-source{font-size:14px;color:#9ca3af;font-weight:600;letter-spacing:.4px}
+.mg-bar{width:100%;height:22px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.mg-bar > div{height:100%;background:linear-gradient(90deg,#38BDF8,#0369A1);width:0%;transition:width .2s;border-radius:99px}
+.mg-track{position:relative;width:100%;height:96px;background:linear-gradient(180deg,#E0F2FE,#F0F9FF);border-radius:16px;overflow:hidden;border:2px solid #BAE6FD}
+.mg-runner{position:absolute;bottom:16px;font-size:46px;transition:left .25s}
+.mg-flag{position:absolute;bottom:14px;right:2%;font-size:40px}
+.mg-spin{display:inline-block;transition:transform .3s ease}
+.mg-flip{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.mg-flip:hover{border-color:#0369A1;transform:translateY(-3px)}
+.mg-flip.open{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.mg-flip .mf-front{font-size:40px}
+.mg-flip .mf-back{display:none;font-size:15px;font-weight:700;color:#075985;line-height:1.35}
+.mg-flip.open .mf-back{display:block}
+.mg-pair{display:flex;gap:26px;width:100%;justify-content:center}
+.mg-col{display:flex;flex-direction:column;gap:10px;flex:1;max-width:340px}
+.mg-pbtn{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:17px;font-weight:700;color:#374151;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left;line-height:1.3}
+.mg-pbtn:hover{border-color:#0369A1}
+.mg-pbtn.sel{border-color:#0369A1;background:#F0F9FF}
+.mg-pbtn.done{border-color:#10b981;background:#ecfdf5;color:#047857;pointer-events:none}
+.mg-pbtn.bad{border-color:#ef4444;background:#fef2f2;animation:mgShake .3s}
+.mg-battery{width:220px;height:110px;border:6px solid #374151;border-radius:14px;position:relative;display:flex;align-items:center;padding:8px}
+.mg-battery::after{content:'';position:absolute;right:-20px;top:32px;width:16px;height:40px;background:#374151;border-radius:0 6px 6px 0}
+.mg-battery > div{height:100%;background:linear-gradient(90deg,#a3e635,#16a34a);border-radius:6px;width:0%;transition:width .2s}
+.mg-lamp{font-size:44px;filter:grayscale(1);opacity:.4;transition:all .25s}
+.mg-lamp.on{filter:none;opacity:1;transform:scale(1.1)}
+
+/* NAV BAR */
+#nav-bar{position:fixed;bottom:0;left:0;right:0;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px;transition:background .2s}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn.active,#fs-btn.active{background:rgba(124,58,237,.35)!important;color:#7DD3FC!important}
+#unit-label{color:#7DD3FC;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+
+/* TEACHER NOTES PANEL */
+#tn-panel{position:fixed;right:-460px;top:0;bottom:52px;width:440px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#7DD3FC;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-panel ul{padding-left:18px;margin-bottom:8px}
+#tn-panel .tn-lbl{color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+
+/* CONTENT SLIDES */
+.content-body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:18px;min-height:0;overflow:hidden}
+.slide-h1{font-size:40px;font-weight:800;color:#111}
+.slide-h2{font-size:25px;font-weight:600;color:#374151}
+.src-pill{display:inline-block;background:#f3f4f6;color:#6b7280;border-radius:20px;padding:6px 18px;font-size:15px;font-weight:700;letter-spacing:.4px;width:fit-content}
+
+/* READING */
+.reading-block{background:#fff;border-radius:16px;padding:26px 36px;font-size:23px;line-height:1.7;color:#1f2937;box-shadow:0 4px 16px rgba(0,0,0,.05);border-left:6px solid #0369A1}
+.reading-block b{color:#075985;font-weight:700}
+.tap-word{background:#E0F2FE;color:#075985;border:none;border-radius:6px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.tap-word.done{background:#0369A1;color:#fff}
+
+/* OBJECTIVES */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:10px}
+.obj-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;display:flex;align-items:flex-start;gap:16px}
+.obj-icon{font-size:34px;flex-shrink:0}
+.obj-text{font-size:19px;color:#374151;line-height:1.4;font-weight:500}
+.obj-text b{color:#0369A1}
+
+/* FORMATIVE ASSESSMENT */
+.assess-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px}
+.assess-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;cursor:pointer;transition:all .2s}
+.assess-card:hover{border-color:#0369A1}
+.assess-card.yes{border-color:#0369A1;background:#F0F9FF}
+.assess-q{font-size:19px;color:#374151;font-weight:600;margin-bottom:10px}
+
+/* BE THE EXPERT */
+.bte-header{background:#0369A1;color:#fff;border-radius:12px 12px 0 0;padding:13px 26px;font-size:19px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bte-body{background:#fff;border:2px solid #0369A1;border-radius:0 0 16px 16px;padding:24px;font-size:19px;color:#374151;line-height:1.6}
+.bte-body b{color:#075985}
+
+/* CHIPS / TASK CARDS */
+.chips-row{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:#E0F2FE;color:#075985;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.chip.used{background:#0369A1;color:#fff}
+.task-card{background:#fff;border-radius:16px;padding:20px 28px;border:2px solid #e5e7eb;font-size:21px;color:#374151;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card b{color:#0369A1}
+.q-item{background:#fff;border-radius:12px;padding:16px 22px;border:2px solid #e5e7eb;font-size:19px;color:#374151;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .2s}
+.q-item:hover{border-color:#0369A1}
+.q-item.done{border-color:#10b981;background:#ecfdf5}
+.q-num{background:#0369A1;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;margin-top:2px}
+.q-ans{max-height:0;overflow:hidden;transition:max-height .3s ease;color:#075985;font-weight:700}
+.q-item.done .q-ans{max-height:120px;margin-top:6px}
+
+/* DIALOGUE */
+.chat-row{display:flex;align-items:flex-end;gap:14px}
+.chat-row.right{flex-direction:row-reverse}
+.chat-ava{font-size:50px;line-height:1}
+.bub{max-width:62%;padding:18px 28px;border-radius:26px;font-size:26px;font-weight:600;line-height:1.35}
+.bub.q{background:#fff;border:2px solid #e5e7eb;border-bottom-left-radius:6px;color:#374151}
+.bub.a{background:#0369A1;color:#fff;border-bottom-right-radius:6px}
+
+/* LISTEN HERO */
+.listen-hero{background:linear-gradient(135deg,#0C4A6E,#0369A1);border-radius:20px;padding:24px 36px;display:flex;align-items:center;gap:28px;color:#fff}
+.listen-hero .lh-emoji{font-size:64px;line-height:1;animation:lhPulse 1.6s ease-in-out infinite}
+@keyframes lhPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.listen-hero .lh-text{font-size:25px;font-weight:700;flex:1}
+.listen-hero .lh-tr{background:rgba(255,255,255,.2);border-radius:20px;padding:9px 22px;font-size:21px;font-weight:800;white-space:nowrap}
+
+/* TITLE / GREAT JOB */
+.title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0C4A6E 0%,#0369A1 50%,#38BDF8 100%);color:#fff;gap:22px;padding:40px}
+.great-job-slide{background:linear-gradient(135deg,#0C4A6E,#0369A1,#38BDF8);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:18px;height:100%;padding:40px}
+
+/* MARK DONE */
+.done-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+.btn-done{background:#16A34A;color:#fff;border:none;border-radius:14px;padding:18px 46px;font-size:26px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-done:hover{background:#15803d}
+.btn-done.confirmed{background:#9ca3af;pointer-events:none}
+.btn-clear{background:#fff;color:#ef4444;border:2px solid #ef4444;border-radius:14px;padding:14px 30px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+#doneMsg{font-size:20px;color:#4b5563;font-weight:600;min-height:28px}
+
+/* VOCAB REVIEW */
+.vr-tabs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;flex-shrink:0}
+.vr-tab{padding:7px 14px;border:2px solid #e5e7eb;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s;white-space:nowrap}
+.vr-tab:hover{border-color:#0369A1;color:#0369A1}
+.vr-tab.active{background:#0369A1;color:#fff;border-color:#0369A1}
+.vr-tab.done{background:#E0F2FE;border-color:#0369A1;color:#075985}
+.vr-tab.done.active{background:#0369A1;color:#fff}
+.vr-body{flex:1;display:flex;min-height:0}
+.vr-left{width:26%;padding:18px;border-right:2px solid #e5e7eb;display:flex;flex-direction:column;gap:8px;background:#fafaf7}
+.vr-right{flex:1;padding:18px 24px;display:flex;flex-direction:column;gap:12px}
+.vr-emoji{font-size:80px;line-height:1}
+.vr-word{font-size:42px;font-weight:800;color:#111;line-height:1.1}
+.vr-ipa{font-size:16px;color:#6b7280}
+.vr-pos{font-size:15px;color:#0369A1;font-weight:700}
+.vr-mark{background:#0369A1;color:#fff;border:none;border-radius:10px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;margin-top:auto;transition:all .2s}
+.vr-mark.done{background:#9ca3af;cursor:not-allowed}
+
+/* OPENER */
+.oz-band{padding:16px 22px;color:#fff;font-weight:700;font-size:20px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:all .18s;border:none;font-family:Outfit,sans-serif;text-align:left;flex:1;justify-content:center}
+.oz-band small{font-weight:600;opacity:0;font-size:17px;transition:opacity .25s}
+.oz-band .oz-note{font-size:18px;font-weight:500;opacity:0;line-height:1.45;transition:opacity .25s}
+.oz-strip{width:100%;border-radius:16px;overflow:hidden;border:2px solid #BAE6FD;display:flex;flex-direction:column;flex:1;min-height:0}
+.oz-band.sunlit{background:linear-gradient(90deg,#7DD3FC,#0EA5E9)}
+.oz-band.twilight{background:linear-gradient(90deg,#0369A1,#075985)}
+.oz-band.midnight{background:linear-gradient(90deg,#0C4A6E,#020617)}
+.photo-card{background:#fff;border:3px solid #e5e7eb;border-radius:18px;padding:20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .18s;min-height:250px;justify-content:center}
+.photo-card:hover{border-color:#0369A1;transform:translateY(-3px)}
+.photo-card.open{border-color:#0369A1;background:#F0F9FF}
+.pc-emoji{font-size:66px;line-height:1}
+.pc-word{font-size:28px;font-weight:800;color:#111}
+.pc-def{font-size:17px;color:#4b5563;line-height:1.45;text-align:center;display:none}
+.pc-ex{font-size:16px;color:#075985;font-style:italic;text-align:center;display:none}
+.photo-card.open .pc-def,.photo-card.open .pc-ex{display:block}
+.tf-row{display:flex;align-items:center;gap:20px;background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:18px 24px}
+.tf-num{background:#0369A1;color:#fff;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex-shrink:0}
+.tf-text{flex:1;font-size:23px;color:#374151;font-weight:600}
+.tf-key{font-size:30px;font-weight:900;padding:8px 26px;border-radius:12px;opacity:0;transition:opacity .25s}
+.tf-key.t{background:#DCFCE7;color:#15803D}
+.tf-key.f{background:#FEE2E2;color:#B91C1C}
+.tf-key.vary{background:#F3F4F6;color:#6b7280;font-size:20px}
+</style>
+
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<!-- SLIDE 1: TITLE -->
+<div class="slide active" id="s1">
+  <div class="title-bg">
+    <div style="font-size:22px;font-weight:700;letter-spacing:3px;opacity:.75;text-transform:uppercase">Our World · Level 4 · Unit 6</div>
+    <div style="font-size:86px;font-weight:900;text-align:center;line-height:1.1">Wonders of the Sea</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;font-size:30px;font-weight:700">🦭 Unit Opener</div>
+    <div style="font-size:26px;opacity:.9;text-align:center;max-width:1100px">A harbor seal in a California kelp forest — Student Book pp. 92–93</div>
+  </div>
+</div>
+
+<!-- SLIDE 2: OBJECTIVES -->
+<div class="slide" id="s2">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Opener — Objectives</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 In This Lesson</div>
+    <div class="obj-grid">
+      <div class="obj-card"><div class="obj-icon">🔍</div><div class="obj-text"><b>Content:</b> Look closely at the opener photo and <b>describe</b> its <b>details</b>.</div></div>
+      <div class="obj-card"><div class="obj-icon">🦭</div><div class="obj-text"><b>Content:</b> Name six things in the photo: a seal, whiskers, flippers, kelp, seaweed, underwater.</div></div>
+      <div class="obj-card"><div class="obj-icon">🌊</div><div class="obj-text"><b>Content:</b> Meet the big idea of the unit — the three layers of the ocean.</div></div>
+      <div class="obj-card"><div class="obj-icon">🔮</div><div class="obj-text"><b>Language:</b> <b>Predict</b> what the unit will be about and write a <b>caption</b> for the photo.</div></div>
+    </div>
+    <div class="task-card" style="margin-top:6px">📚 <b>Student Book pp. 92–93.</b> Open the book at the photo before you start — this whole lesson is about looking.</div>
+    <span class="src-pill">Lesson Planner pp. 194–195 · Unit 6 Opener</span>
+  </div>
+</div>
+
+<!-- SLIDE 3: ACADEMIC LANGUAGE -->
+<div class="slide" id="s3">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Academic Language</span><span class="hd-chip ac">Always first</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎓 Words we use to talk <i>about</i> a photo</div>
+    <div class="slide-h2">Tap each card. <b id="ac-score" style="color:#075985">0 / 4 tapped</b></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:10px" id="ac-grid"></div>
+    <span class="src-pill">Shared academic reference list</span>
+  </div>
+</div>
+
+<!-- SLIDE 4: LOOK FIRST -->
+<div class="slide" id="s4">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Look First — Books Open</span><span class="hd-chip">SB pp. 92–93</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:26px">
+    <div style="font-size:110px">🦭🌿</div>
+    <div class="slide-h1" style="text-align:center">Say nothing for thirty seconds. Just look at the photo.</div>
+    <div class="slide-h2" style="text-align:center;max-width:1200px">Then ask: <b>"What can you see?"</b> Let Leo say whatever he can, in English or Japanese, before you teach a single word.</div>
+    <span class="src-pill">Lesson Planner p. 194 · Warm Up</span>
+  </div>
+</div>
+
+<!-- SLIDE 5: THE SIX WORDS -->
+<div class="slide" id="s5">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">The Photo — Six Things to Find</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔍 Find each one in the photo, then tap the card.</div>
+    <div class="slide-h2">Found: <b id="pc-count" style="color:#075985">0 / 6</b></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px;flex:1;min-height:0" id="pc-grid"></div>
+    <span class="src-pill">unit-6/vocabulary.json · opener words, Lesson Planner pp. 194–195</span>
+  </div>
+</div>
+
+<!-- SLIDE 6: LOOK AND THINK -->
+<div class="slide" id="s6">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Look and Think</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💬 Ask each question. Tap to reveal the answer.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px;flex:1;min-height:0;overflow-y:auto" id="look-grid"></div>
+    <span class="src-pill">Lesson Planner pp. 194–195 · discussion questions</span>
+  </div>
+</div>
+
+<!-- SLIDE 7: THE BOOK ACTIVITY -->
+<div class="slide" id="s7">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Student Book — True or False</span><span class="hd-chip">SB p. 93</span></div>
+  <div class="content-body" style="gap:18px">
+    <div class="slide-h1">📖 Read the three sentences in the book.</div>
+    <div class="slide-h2" style="max-width:1400px">The sentences are printed on <b>Student Book p. 93</b> — read them straight from the page. Tap a row to show the answer key.</div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px" id="tf-rows"></div>
+    <div class="how-box"><b>Why the sentences are not on this slide:</b> the Student Book PDF is not readable in this project, so nothing here pretends to quote it. The answer key below is from the Student Book answer key and is exact.</div>
+    <span class="src-pill">Student Book answer key · Unit 6 Unit Opener: 1. T · 2. F · 3. T · 4. Answers will vary</span>
+  </div>
+</div>
+
+<!-- SLIDE 8: THE BIG IDEA -->
+<div class="slide" id="s8">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">The Big Idea — Three Layers</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🌊 The ocean has three layers. Our seal is in the top one.</div>
+    <div class="slide-h2">Tap each layer from the top down. Revealed: <b id="oz-count" style="color:#075985">0 / 3</b></div>
+    <div class="oz-strip" style="margin-top:10px" id="oz-strip"></div>
+    <span class="src-pill">Preview of Vocabulary 1 · Student Book pp. 94–95 · TR 6.1</span>
+  </div>
+</div>
+
+<!-- SLIDE 9: THE UNIT PLAN -->
+<div class="slide" id="s9">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">What Is Coming in Unit 6</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🗺️ Eight lessons. This is the road map.</div>
+    <div class="slide-h2">Tap each one as you talk it through. Shown: <b id="plan-count" style="color:#075985">0 / 8</b></div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px;flex:1;min-height:0;overflow-y:auto" id="plan-grid"></div>
+    <span class="src-pill">Unit 6 lessons, in teaching order</span>
+  </div>
+</div>
+
+<!-- SLIDE 10: CAPTION -->
+<div class="slide" id="s10">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Write a Caption</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🏷️ A <b>caption</b> is the words under a photo.</div>
+    <div class="slide-h2">Type Leo's caption straight in. Push for two of the six new words in one sentence.</div>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-top:10px" id="cap-rows"></div>
+    <div class="how-box"><b>Model first:</b> "A harbor seal swims underwater through the California kelp forest."</div>
+    <span class="src-pill">Student Book p. 93, Activity 4 — "Answers will vary"</span>
+  </div>
+</div>
+
+<!-- SLIDE 11: PREDICT -->
+<div class="slide" id="s11">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Predict — Before We Start</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:24px">
+    <div style="font-size:84px">🔮</div>
+    <div class="slide-h1" style="text-align:center">"What do you think we will learn in this unit?"</div>
+    <div class="slide-h2" style="text-align:center;max-width:1200px">Write Leo's prediction down and keep it. At the end of the unit, read it back and see how much of it came true — that is the whole point of predicting.</div>
+    <div class="task-card" style="width:78%;font-size:24px;text-align:center">Leo also writes this in his own Opener app, so he has his own copy to check later.</div>
+    <span class="src-pill">Lesson Planner p. 195 · Extend</span>
+  </div>
+</div>
+
+<!-- SLIDE 12: FORMATIVE ASSESSMENT -->
+<div class="slide" id="s12">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✔️ Can Leo…</div>
+    <div class="assess-grid" id="assess-grid"></div>
+    <div class="task-card" style="margin-top:8px">📓 <b>Homework:</b> Leo's Opener app (7 modules). Next lesson: Vocabulary 1 — the ocean and its creatures.</div>
+  </div>
+</div>
+
+<!-- SLIDE 13: MARK DONE -->
+<div class="slide" id="s13">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Finish the Lesson</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:24px">
+    <div style="font-size:90px">✅</div>
+    <div class="slide-h1" style="text-align:center">Unit 6 · Opener — taught</div>
+    <div class="slide-h2" style="text-align:center;max-width:1000px">Marking this done records it on the teacher dashboard. Leo's own Opener app tracks his 7 modules separately.</div>
+    <div class="done-wrap">
+      <button class="btn-done" id="doneBtn" onclick="markDone()">✅ Mark this lesson done</button>
+      <button class="btn-clear" id="redoBtn" onclick="handleRedo()">↺ Clear saved progress</button>
+      <div id="doneMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 14: GREAT JOB -->
+<div class="slide" id="s14">
+  <div class="great-job-slide">
+    <div style="font-size:96px">🏆</div>
+    <div style="font-size:64px;font-weight:900;text-align:center">Unit 6 Starts Here!</div>
+    <div style="font-size:26px;opacity:.92;text-align:center;max-width:1000px">You can describe the photo, name six new things in it, and you know what is coming. 🦭🌿</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:1200px">
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🦭 a seal</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">〰️ whiskers</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🦭 flippers</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🌿 kelp</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🌿 seaweed</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🐠 underwater</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
+
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 14</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="fs-btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+  <span id="unit-label">Unit 6 · Opener</span>
+</div>
+
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+<script>
+/* =========================================================
+   LEEA · Our World Level 4 · Unit 6 · Opener
+   Wonders of the Sea — 14 slides, 1920x1080, ocean blue
+   Every lyric is verbatim from TR 6.3 (Student Book p. 102).
+   ========================================================= */
+
+// ─── MARK DONE STORAGE ─────────────────────────────────────────
+var SAVE_PREFIX = 'leea.l4.u6.opener-';
+var HOMEWORK_ID = 'l-4-6-opener';
+/* Must match the `id` in lessons/opener.teacher.json — the teacher dashboard
+   reads leea.lessonProgress.v1 keyed by that lesson id. */
+var LESSON_ID = 'ow-l4-u6-opener';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+var LESSON_NAME = 'Unit 6 · Opener — Wonders of the Sea';
+
+function lSave(key, value) {
+  try {
+    var k = SAVE_PREFIX + key;
+    window.localStorage.setItem(k, JSON.stringify(value));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, value);
+    }
+  } catch (e) {}
+}
+function lLoad(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(SAVE_PREFIX + key);
+    return raw === null || raw === undefined ? fallback : JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function writeLessonProgress() {
+  try {
+    var store = {};
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (raw) store = JSON.parse(raw) || {};
+    var now = new Date().toISOString();
+    store[LESSON_ID] = { lessonId: LESSON_ID, teacherId: 'neritan', studentId: 'leo',
+                         status: 'done', completedAt: now, updatedAt: now };
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function clearLessonProgress() {
+  try {
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function markDone() {
+  writeLessonProgress();
+  lSave('complete', { name: LESSON_NAME, timestamp: new Date().toISOString(), done: true });
+  lSave('done', true);
+  var btn = document.getElementById('doneBtn');
+  if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+  var msg = document.getElementById('doneMsg');
+  if (msg) msg.textContent = 'Saved. The unit is open. 🦭';
+}
+var redoArmed = false, redoTimer = null;
+function handleRedo() {
+  var btn = document.getElementById('redoBtn');
+  var msg = document.getElementById('doneMsg');
+  if (!redoArmed) {
+    redoArmed = true;
+    btn.textContent = '↺ Tap again to clear';
+    if (msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+    if (redoTimer) window.clearTimeout(redoTimer);
+    redoTimer = window.setTimeout(function () {
+      redoArmed = false;
+      btn.textContent = '↺ Clear saved progress';
+      if (msg) msg.textContent = '';
+    }, 3000);
+    return;
+  }
+  redoArmed = false;
+  if (redoTimer) window.clearTimeout(redoTimer);
+  btn.textContent = '↺ Clear saved progress';
+  clearLessonProgress();
+  lSave('complete', null);
+  lSave('done', null);
+  var d = document.getElementById('doneBtn');
+  if (d) { d.classList.remove('confirmed'); d.textContent = '✅ Mark this lesson done'; }
+  if (msg) msg.textContent = 'Cleared.';
+}
+function restoreDoneState() {
+  var c = lLoad('complete', null);
+  if (c && c.done) {
+    var btn = document.getElementById('doneBtn');
+    if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+    var msg = document.getElementById('doneMsg');
+    if (msg) msg.textContent = 'Already marked done.';
+  }
+}
+
+// ─── DATA (injected) ───────────────────────────────────────────
+// ─── DATA (injected) ───────────────────────────────────────────
+var WORDS    = [
+ {
+  "label": "a seal",
+  "e": "🦭",
+  "def": "a sea mammal with flippers that lives in coastal waters",
+  "ex": "Harbor seals live in coastal waters.",
+  "jp": "アザラシ"
+ },
+ {
+  "label": "whiskers",
+  "e": "〰️",
+  "def": "long stiff hairs growing on the face of some animals (like a cat or seal)",
+  "ex": "Harbor seals have long whiskers on their face.",
+  "jp": "ひげ"
+ },
+ {
+  "label": "flippers",
+  "e": "🦭",
+  "def": "flat arms or legs sea animals use to swim",
+  "ex": "A seal uses its flippers to swim.",
+  "jp": "ひれ足"
+ },
+ {
+  "label": "kelp",
+  "e": "🌿",
+  "def": "a large, tall kind of seaweed that grows like a forest underwater",
+  "ex": "The seal in the photo is in the California kelp forest.",
+  "jp": "ケルプ／コンブ"
+ },
+ {
+  "label": "seaweed",
+  "e": "🌿",
+  "def": "plant-like growth that lives in the sea",
+  "ex": "The seal is behind the seaweed.",
+  "jp": "海草（かいそう）／わかめ"
+ },
+ {
+  "label": "underwater",
+  "e": "🐠",
+  "def": "below the surface of water",
+  "ex": "A coral reef looks like a colorful underwater garden.",
+  "jp": "水中（すいちゅう）の"
+ }
+];
+var ACADEMIC = [
+ [
+  "🗣️",
+  "describe",
+  "to say what something is like",
+  "<b>Describe</b> the photo: what can you see?"
+ ],
+ [
+  "🔍",
+  "details",
+  "the small parts of something",
+  "Look for <b>details</b> — the whiskers, the flippers, the kelp."
+ ],
+ [
+  "🔮",
+  "predict",
+  "to say what you think will happen",
+  "<b>Predict</b> what you will learn in this unit."
+ ],
+ [
+  "🏷️",
+  "a caption",
+  "the words under a photo that tell you about it",
+  "Write a <b>caption</b> for the seal photo."
+ ]
+];
+var LOOK     = [
+ [
+  "What can you see in the photo?",
+  "A harbor seal swimming underwater in a kelp forest."
+ ],
+ [
+  "What are the long stiff hairs on its face?",
+  "Whiskers."
+ ],
+ [
+  "What does the seal use to swim?",
+  "Its flippers."
+ ],
+ [
+  "What is the tall, plant-like growth all around it?",
+  "Kelp — a large, tall kind of seaweed that grows like a forest underwater."
+ ],
+ [
+  "Where do harbor seals live?",
+  "In coastal waters."
+ ],
+ [
+  "Which ocean zone is the seal in? How do you know?",
+  "The sunlit zone — there is light, and kelp needs sunlight to grow."
+ ],
+ [
+  "Is a seal a fish?",
+  "No. Like a whale and a dolphin, a seal is a mammal and breathes air."
+ ],
+ [
+  "What is the unit called? What do you think it will be about?",
+  "\"Wonders of the Sea\" — answers will vary."
+ ]
+];
+var ZONES    = [
+ [
+  "sunlit",
+  "☀️ the sunlit zone",
+  "down to about 200 m (656 ft.)",
+  "Most of the creatures we know stay here. The seal in the photo is in this zone."
+ ],
+ [
+  "twilight",
+  "🌗 the twilight zone",
+  "down to about 1,000 m (3,300 ft.)",
+  "There isn't much light. Many different types of fish live here, and some look very strange."
+ ],
+ [
+  "midnight",
+  "🌑 the midnight zone",
+  "below 1,000 m (3,300 ft.)",
+  "Almost completely black. The only light comes from the creatures who live here."
+ ]
+];
+var PLAN     = [
+ [
+  "🐙",
+  "Vocabulary 1",
+  "16 words for the ocean and its creatures — TR 6.1, TR 6.2"
+ ],
+ [
+  "🎵",
+  "Song",
+  "\"Protect the Seas\" — TR 6.3"
+ ],
+ [
+  "⚖️",
+  "Grammar 1",
+  "have to, must, can't and don't — TR 6.4"
+ ],
+ [
+  "🛢️",
+  "Vocabulary 2",
+  "5 words for what harms the sea — TR 6.5, TR 6.6"
+ ],
+ [
+  "🔮",
+  "Grammar 2",
+  "will and won't — TR 6.7"
+ ],
+ [
+  "📖",
+  "Reading",
+  "Coral reefs — the underwater cities"
+ ],
+ [
+  "✍️",
+  "Writing",
+  "Contrast writing — showing differences"
+ ],
+ [
+  "🎯",
+  "Mission & Project",
+  "Protect the ocean, and show what you know"
+ ]
+];
+var ASSESS   = [
+ "…name all six things in the photo (seal, whiskers, flippers, kelp, seaweed, underwater)?",
+ "…<b>describe</b> the photo in two or three full sentences?",
+ "…say which ocean zone the seal is in, and why?",
+ "…<b>predict</b> one thing he will learn in this unit?"
+];
+var NOTES    = {
+ "1": "<p class=\"tn-lbl\">Title</p><p>Unit 6 opens with a harbor seal in a California kelp forest (Student Book pp. 92–93). Open the book at the photo before slide 4.</p>",
+ "2": "<p class=\"tn-lbl\">Objectives</p><p>Read all four aloud. This lesson is about looking carefully — resist teaching vocabulary before Leo has looked.</p>",
+ "3": "<p class=\"tn-lbl\">Academic Language</p><p>Four cards: describe, details, predict, caption. Leo will use all four in this one lesson.</p>",
+ "4": "<p class=\"tn-lbl\">Look First</p><p>Thirty seconds of silence with the book open. Then \"What can you see?\" — accept Japanese. Do not correct anything yet.</p>",
+ "5": "<p class=\"tn-lbl\">The Six Words</p><p>These are the Lesson Planner's own opener words. Point at each thing in the real photo before you tap its card.</p>",
+ "6": "<p class=\"tn-lbl\">Look and Think</p><p>Ask each question before revealing. The seal-is-not-a-fish question sets up the whale and dolphin cards in Vocabulary 1.</p>",
+ "7": "<p class=\"tn-lbl\">Student Book — True or False</p><p>Read the three sentences from p. 93 of the book itself; they are not reproduced on the slide. Tap each row for the answer key: T, F, T. Activity 4 varies.</p>",
+ "8": "<p class=\"tn-lbl\">The Big Idea</p><p>First sight of the three layers. Do not teach them properly yet — Vocabulary 1 does that. Just plant that the seal is in the top one.</p>",
+ "9": "<p class=\"tn-lbl\">The Unit Plan</p><p>Walk the eight lessons. Leo matches these again in his app, so keep it quick and visual.</p>",
+ "10": "<p class=\"tn-lbl\">Write a Caption</p><p>Model your own caption first, out loud, then let Leo write his. Two new words in one sentence is the target.</p>",
+ "11": "<p class=\"tn-lbl\">Predict</p><p>Write the prediction down and keep it. Reading it back at the end of the unit is what makes predicting worth doing.</p>",
+ "12": "<p class=\"tn-lbl\">Formative Assessment</p><p>Tap each card once Leo can do it. Then set his Opener app.</p>",
+ "13": "<p class=\"tn-lbl\">Mark Done</p><p>Records this lesson on the teacher dashboard. Leo's app tracks his own 7 modules separately.</p>",
+ "14": "<p class=\"tn-lbl\">Great Job!</p><p>Celebrate. Next up: Vocabulary 1 — 16 words for the ocean and its creatures.</p>"
+};
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+var TOTAL = 14;
+var cur = 1;
+function goTo(n) {
+  n = Math.max(1, Math.min(TOTAL, n));
+  var old = document.getElementById('s' + cur);
+  if (old) old.classList.remove('active');
+  cur = n;
+  var next = document.getElementById('s' + cur);
+  if (next) next.classList.add('active');
+  document.getElementById('slide-counter').textContent = cur + ' / ' + TOTAL;
+  document.getElementById('tn-content').innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
+  if (SLIDE_INIT[cur]) SLIDE_INIT[cur]();
+}
+document.addEventListener('keydown', function (e) {
+  if (e.target && (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+var notesOpen = false;
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('notes-btn').classList.toggle('active', notesOpen);
+  scale();
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange', function () {
+  var btn = document.getElementById('fs-btn');
+  var active = !!document.fullscreenElement;
+  btn.textContent = active ? '⛶ Exit Full (F)' : '⛶ Fullscreen (F)';
+  btn.classList.toggle('active', active);
+  scale();
+});
+function scale() {
+  var s = document.getElementById('scaler');
+  var availW = window.innerWidth - (notesOpen ? 440 : 0);
+  var availH = window.innerHeight - 52;
+  var r = Math.min(availW / 1920, availH / 1080);
+  s.style.transform = 'scale(' + r + ')';
+  s.style.left = ((availW - 1920 * r) / 2) + 'px';
+  s.style.top = ((availH - 1080 * r) / 2) + 'px';
+  s.style.position = 'fixed';
+}
+window.addEventListener('resize', scale);
+
+// ─── SLIDE 3: ACADEMIC ─────────────────────────────────────────
+function initAcademic() {
+  var grid = document.getElementById('ac-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var tapped = 0;
+  ACADEMIC.forEach(function (a) {
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#fff;border:2px solid #FEF3C7;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column';
+    card.innerHTML = '<div style="background:#0EA5E9;color:#fff;padding:10px 16px;font-size:19px;font-weight:700">' + a[0] + ' ' + a[1] + '</div>' +
+      '<div style="padding:14px 16px;font-size:17px;color:#374151;line-height:1.45">' + a[2] +
+      '<div style="margin-top:10px;color:#075985;font-weight:700;display:none" class="ac-ex">' + a[3] + '</div></div>';
+    card.onclick = function () {
+      if (card.dataset.open) return;
+      card.dataset.open = '1';
+      card.querySelector('.ac-ex').style.display = 'block';
+      card.style.borderColor = '#0369A1';
+      tapped++;
+      document.getElementById('ac-score').textContent = tapped + ' / 4 tapped';
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE 5: THE SIX WORDS ────────────────────────────────────
+function initPhoto() {
+  var grid = document.getElementById('pc-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var open = 0;
+  WORDS.forEach(function (w) {
+    var card = document.createElement('div');
+    card.className = 'photo-card';
+    card.innerHTML = '<div class="pc-emoji">' + w.e + '</div><div class="pc-word">' + w.label + '</div>' +
+      '<div class="pc-def">' + w.def + '</div><div class="pc-ex">"' + w.ex + '"</div>';
+    card.onclick = function () {
+      if (card.classList.contains('open')) return;
+      card.classList.add('open');
+      open++;
+      document.getElementById('pc-count').textContent = open + ' / 6';
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE 6: LOOK AND THINK ───────────────────────────────────
+function initLook() {
+  var grid = document.getElementById('look-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  LOOK.forEach(function (d, i) {
+    var item = document.createElement('div');
+    item.className = 'q-item';
+    item.innerHTML = '<div class="q-num">' + (i + 1) + '</div><div><div>' + d[0] + '</div><div class="q-ans">→ ' + d[1] + '</div></div>';
+    item.onclick = function () { item.classList.add('done'); };
+    grid.appendChild(item);
+  });
+}
+
+// ─── SLIDE 7: THE BOOK ACTIVITY ────────────────────────────────
+/* The three statements live in the Student Book; only the answer key is
+   reproduced here, because the Student Book PDF cannot be read in this
+   project and nothing on these pages may pretend to quote it. */
+var TF = [
+  ['Read sentence 1 from Student Book p. 93.', 'T', 't'],
+  ['Read sentence 2 from Student Book p. 93.', 'F', 'f'],
+  ['Read sentence 3 from Student Book p. 93.', 'T', 't'],
+  ['Activity 4 — Leo answers in his own words.', 'Answers will vary', 'vary']
+];
+function initTf() {
+  var box = document.getElementById('tf-rows');
+  if (!box || box.dataset.built) return;
+  box.dataset.built = '1';
+  TF.forEach(function (t, i) {
+    var row = document.createElement('div');
+    row.className = 'tf-row';
+    row.innerHTML = '<div class="tf-num">' + (i + 1) + '</div><div class="tf-text">' + t[0] + '</div>' +
+      '<div class="tf-key ' + t[2] + '">' + t[1] + '</div>';
+    row.onclick = function () { row.querySelector('.tf-key').style.opacity = '1'; };
+    box.appendChild(row);
+  });
+}
+
+// ─── SLIDE 8: OCEAN ZONES ──────────────────────────────────────
+function initZones() {
+  var strip = document.getElementById('oz-strip');
+  if (!strip || strip.dataset.built) return;
+  strip.dataset.built = '1';
+  var open = 0;
+  ZONES.forEach(function (z) {
+    var b = document.createElement('button');
+    b.className = 'oz-band ' + z[0];
+    b.innerHTML = '<span style="font-size:26px">' + z[1] + '</span><small>' + z[2] + '</small>' +
+      '<span class="oz-note">' + z[3] + '</span>';
+    b.onclick = function () {
+      if (b.dataset.open) return;
+      b.dataset.open = '1';
+      b.querySelector('small').style.opacity = '1';
+      b.querySelector('.oz-note').style.opacity = '1';
+      open++;
+      document.getElementById('oz-count').textContent = open + ' / 3';
+    };
+    strip.appendChild(b);
+  });
+}
+
+// ─── SLIDE 9: THE UNIT PLAN ────────────────────────────────────
+function initPlan() {
+  var grid = document.getElementById('plan-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var n = 0;
+  PLAN.forEach(function (p) {
+    var item = document.createElement('div');
+    item.className = 'q-item';
+    item.innerHTML = '<div class="q-num">' + p[0] + '</div><div><div><b>' + p[1] + '</b></div><div class="q-ans">→ ' + p[2] + '</div></div>';
+    item.onclick = function () {
+      if (item.classList.contains('done')) return;
+      item.classList.add('done'); n++;
+      document.getElementById('plan-count').textContent = n + ' / ' + PLAN.length;
+    };
+    grid.appendChild(item);
+  });
+}
+
+// ─── SLIDE 10: CAPTION ─────────────────────────────────────────
+var CAPS = [
+  ['📸 Leo\'s caption', 'One sentence about the photo, using two of the new words.'],
+  ['🔎 One detail nobody noticed first', 'The whiskers? The flippers? The light through the kelp?']
+];
+var capText = lLoad('caption', {}) || {};
+function initCaption() {
+  var rows = document.getElementById('cap-rows');
+  if (!rows || rows.dataset.built) return;
+  rows.dataset.built = '1';
+  CAPS.forEach(function (c, i) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:18px';
+    var lbl = document.createElement('span');
+    lbl.style.cssText = 'font-size:22px;font-weight:800;color:#075985;min-width:340px';
+    lbl.textContent = c[0];
+    var inp = document.createElement('input');
+    inp.placeholder = c[1];
+    inp.value = capText[i] || '';
+    inp.style.cssText = 'flex:1;font-family:Outfit,sans-serif;font-size:22px;padding:12px 18px;border:2px solid #BAE6FD;border-radius:12px';
+    inp.oninput = function () { capText[i] = inp.value; lSave('caption', capText); };
+    row.appendChild(lbl); row.appendChild(inp);
+    rows.appendChild(row);
+  });
+}
+
+// ─── SLIDE 12: FORMATIVE ASSESSMENT ────────────────────────────
+function initAssess() {
+  var grid = document.getElementById('assess-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  ASSESS.forEach(function (t) {
+    var card = document.createElement('div');
+    card.className = 'assess-card';
+    card.innerHTML = '<div class="assess-q">' + t + '</div><div style="font-size:15px;color:#6b7280">Tap when Leo can do it.</div>';
+    card.onclick = function () { card.classList.toggle('yes'); };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE INIT MAP ────────────────────────────────────────────
+var SLIDE_INIT = {
+  3: initAcademic,
+  5: initPhoto,
+  6: initLook,
+  7: initTf,
+  8: initZones,
+  9: initPlan,
+  10: initCaption,
+  12: initAssess,
+  13: restoreDoneState
+};
+
+// ─── BOOT ──────────────────────────────────────────────────────
+scale();
+goTo(1);
+restoreDoneState();
+
+</script>
+</body>
+</html>

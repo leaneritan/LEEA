@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 6 Writing App — Contrast Writing</title>
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Unit 6 is Wonders of the Sea — ocean blues, with Level 4 purple kept for
+     the level tag only. Green stays the "correct" colour across every app. */
+  --sea:#0369A1;--sea-d:#075985;--sea-l:#F0F9FF;--sea-b:#BAE6FD;
+  --deep:#0C4A6E;
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --red:#DC2626;--red-l:#FEF2F2;--red-b:#FECACA;
+  --amber:#F59E0B;--amber-l:#FFFBEB;--yellow:#FACC15;--yellow-b:#FDE68A;--yellow-l:#FEFCE8;
+  --ink:#111;--ink-2:#374151;--ink-3:#6B7280;--border:#E5E7EB;
+  --paper:#FFFDF5;--navy:#0f172a;
+}
+html,body{height:100%;font-family:'Outfit',system-ui,'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--paper);color:var(--ink)}
+body{display:flex;flex-direction:column}
+.app-header{background:linear-gradient(135deg,var(--sea),var(--deep));color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-header .logo{font-size:26px}
+.app-header .title{font-size:20px;font-weight:800;line-height:1.1}
+.app-header .subtitle{font-size:13px;opacity:.85;margin-top:2px}
+.app-header .badge-row{margin-left:auto}
+.prog-pill{background:rgba(255,255,255,.22);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;white-space:nowrap}
+.tab-nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:11px 12px;font-family:inherit;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;min-width:70px}
+.tab-btn .tab-icon{font-size:18px}
+.tab-btn .tab-name{font-size:11px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.tab-btn.active{color:var(--sea);border-bottom-color:var(--sea)}
+.tab-btn.done::after{content:'✓';position:absolute;top:3px;right:5px;color:var(--green);font-weight:900;font-size:12px}
+.tab-content{display:none;flex:1;overflow-y:auto;flex-direction:column;min-height:0}
+.tab-content.active{display:flex}
+.tab-body{flex:1;padding:18px 20px 8px;display:flex;flex-direction:column;gap:14px;max-width:900px;width:100%;margin:0 auto}
+.tab-footer{flex-shrink:0;border-top:2px solid var(--border);background:#fff;padding:10px 20px;display:flex;gap:10px;max-width:900px;width:100%;margin:0 auto}
+.section-title{font-size:21px;font-weight:900;color:var(--navy)}
+.section-sub{font-size:14px;color:var(--ink-3);font-weight:600;margin-top:2px}
+.dad-hint{background:var(--amber-l);border:2px solid var(--yellow-b);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:600;color:var(--ink-2);line-height:1.5}
+.src-pill{font-size:12px;font-weight:700;color:var(--ink-3);border-top:1px solid var(--border);padding-top:8px}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:12px 16px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer}
+.btn-complete:disabled{opacity:.4;cursor:not-allowed}
+.btn-complete.confirmed{background:var(--green-d);pointer-events:none}
+.btn-redo{width:112px;flex-shrink:0;background:#fff;color:var(--sea);border:2px solid var(--sea-b);border-radius:12px;padding:12px 8px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer}
+.btn-redo.armed{background:var(--sea-l);border-color:var(--sea)}
+.done-banner{display:none;background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;color:var(--green-d);text-align:center}
+.done-banner.show{display:block;animation:pop .35s}
+@keyframes pop{0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.qcard{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.qcard .qtext{font-size:16px;font-weight:800;color:var(--navy);line-height:1.45}
+.opt-group{display:flex;flex-direction:column;gap:8px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid var(--border);border-radius:12px;padding:11px 16px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit}
+.opt:hover:not(:disabled){border-color:var(--amber)}
+.opt.good{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default}
+.jp-note{font-size:14px;font-weight:600;color:var(--ink-3);background:var(--sea-l);border-radius:10px;padding:8px 12px;line-height:1.5}
+.mstatus{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mcount{background:var(--sea);color:#fff;border-radius:20px;padding:5px 16px;font-size:14px;font-weight:800}
+.mcount.alt{background:var(--navy)}
+.mhint{font-size:14px;font-weight:700;color:var(--ink-3);line-height:1.5}
+.fc-modeswitch{display:flex;gap:8px}
+.fc-modebtn{flex:1;padding:9px;border-radius:10px;border:2px solid var(--border);background:#fff;font-weight:800;font-family:inherit;cursor:pointer;color:var(--ink-3)}
+.fc-modebtn.active{background:var(--sea);color:#fff;border-color:var(--sea)}
+.fc-pane{display:none}.fc-pane.active{display:block}
+.flashcard-wrap{perspective:1000px;min-height:270px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:270px;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;gap:8px;text-align:center}
+.fc-front{background:linear-gradient(135deg,var(--sea),var(--deep));color:#fff;border:4px solid var(--yellow)}
+.fc-back{background:linear-gradient(135deg,#fff,var(--sea-l));border:4px solid var(--sea);transform:rotateY(180deg);overflow:auto}
+.fc-emoji{font-size:56px;line-height:1}
+.fc-word{font-size:30px;font-weight:900}
+.fc-ipa{font-size:14px;font-weight:600;opacity:.85}
+.fc-def{font-size:17px;color:var(--ink-2);font-weight:700;line-height:1.4}
+.fc-tap{font-size:11px;font-weight:700;opacity:.75;letter-spacing:.08em;margin-top:6px}
+.fc-jp{font-size:15px;color:var(--ink-3);font-weight:700;display:none}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:none;border:1px dashed #D1D5DB;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;color:var(--ink-3);cursor:pointer;font-family:inherit}
+.fc-sample{font-size:15px;background:var(--sea-l);border-radius:10px;padding:8px 12px;font-weight:600;color:var(--ink-2);line-height:1.4}
+.fc-sample b{color:var(--sea-d)}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+.fc-nav button{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-weight:800;font-family:inherit;cursor:pointer}
+.fc-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.fc-dot{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.fc-dot.on{background:var(--sea)}
+.svy-row{background:#fff;border:2px solid var(--border);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.svy-row input{border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:15px;font-family:inherit;flex:1;min-width:150px}
+.svy-row input:focus{border-color:var(--amber);outline:none}
+.svy-row.filled{border-color:var(--green);background:var(--green-l)}
+.svy-row.err{animation:shake .35s;border-color:var(--red)}
+.tr-btn{border:2px solid var(--border);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.tr-btn:hover{border-color:var(--sea);color:var(--sea-d)}
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.flipcard{background:linear-gradient(135deg,var(--deep),#1e293b);border:3px solid var(--yellow);border-radius:14px;padding:16px;text-align:center;cursor:pointer;color:#fff;min-height:132px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.flipcard .fce{font-size:40px}
+.flipcard .ftitle{font-size:17px;font-weight:900}
+.flipcard.revealed{background:#fff;color:var(--navy);border-color:var(--green);cursor:default;text-align:left}
+.fbody{font-size:15px;font-weight:600;color:var(--ink-2);line-height:1.55}
+.fjp{font-size:13px;font-weight:600;color:var(--ink-3)}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.mcol{display:flex;flex-direction:column;gap:8px}
+.mitem{background:#fff;border:3px solid var(--border);border-radius:12px;padding:11px 13px;font-size:15px;font-weight:800;color:var(--ink);cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;min-height:56px;line-height:1.35}
+.mitem.m-right{font-weight:600}
+.mitem:hover{border-color:var(--amber)}
+.mitem.sel{border-color:var(--sea);background:var(--sea-l)}
+.mitem.lock{border-color:var(--green);background:var(--green-l);color:var(--green-d);opacity:.7;pointer-events:none}
+.mitem.err{animation:shake .35s;border-color:var(--red);background:var(--red-l)}
+.mrecap{display:none}.mrecap.show{display:block}
+.mrecap-title{font-size:14px;font-weight:800;color:var(--green-d);margin-bottom:8px}
+.mrecap table{width:100%;border-collapse:collapse;background:#fff;border:2px solid var(--border);border-radius:12px;overflow:hidden}
+.mrecap td{padding:9px 12px;font-size:14px;border-top:1px solid var(--border);vertical-align:top}
+.mrecap tr:first-child td{border-top:none}
+.mr-word{font-weight:800;color:var(--green-d);white-space:nowrap;width:1%}
+.mr-emoji{text-align:center;font-size:18px;width:1%}
+.mr-sent{font-weight:600;color:var(--ink-2)}
+.chip-bank{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#fff;border:3px solid var(--amber);border-radius:10px;padding:8px 15px;font-size:16px;font-weight:800;color:var(--ink);cursor:pointer;font-family:inherit}
+.chip:hover{background:var(--amber-l)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.err{animation:shake .35s;border-color:var(--red)}
+.read-box{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px;font-size:16px;font-weight:600;line-height:2}
+.read-blank{display:inline-block;min-width:104px;border-bottom:3px solid var(--amber);text-align:center;font-weight:900;color:var(--ink-3);cursor:pointer;padding:0 6px}
+.read-blank.filled{color:var(--green-d);border-color:var(--green)}
+.read-blank.active{background:var(--amber-l)}
+.read-blank.wrong{animation:shake .35s;color:var(--red)}
+.zone-strip{display:flex;flex-direction:column;border-radius:14px;overflow:hidden;border:3px solid var(--border)}
+.zone-row{padding:12px 16px;font-weight:800;color:#fff;font-size:15px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.zone-sunlit{background:#0EA5E9}.zone-twilight{background:#075985}.zone-midnight{background:#0f172a}
+.zone-depth{font-weight:600;opacity:.9;font-size:13px}
+.quiz-progress{display:flex;gap:5px;flex-wrap:wrap}
+.qdot{width:14px;height:14px;border-radius:50%;background:var(--border)}
+.qdot.on{background:var(--green)}
+.qdot.now{background:var(--sea);box-shadow:0 0 0 3px var(--sea-l)}
+.result-card{border-radius:16px;padding:24px;text-align:center;display:flex;flex-direction:column;gap:8px;border:3px solid var(--border);background:#fff}
+.result-card.pass{border-color:var(--green);background:var(--green-l)}
+.result-card.fail{border-color:var(--amber);background:var(--amber-l)}
+.result-trophy{font-size:54px}
+.result-score{font-size:34px;font-weight:900;color:var(--navy)}
+.result-sub{font-size:15px;font-weight:700;color:var(--ink-2);line-height:1.5}
+.pitch{background:linear-gradient(180deg,#166534,#14532d);border-radius:14px;padding:14px 18px;color:#fff}
+.score-row{display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:800;gap:10px;flex-wrap:wrap}
+.sun-word{font-size:15px;font-weight:800;color:var(--sea-d);min-width:130px}
+@media (max-width:640px){.mgrid{grid-template-columns:1fr}.tab-body{padding:14px 14px 8px}.tab-footer{padding:10px 14px}}
+/* ── writing lesson ── */
+.vs-table{display:flex;flex-direction:column;gap:6px}
+.vs-row{display:grid;grid-template-columns:150px 1fr 1fr;gap:8px;background:#fff;border:2px solid var(--border);border-radius:12px;padding:10px 12px;cursor:pointer;transition:border-color .2s}
+.vs-row:hover{border-color:var(--sea)}
+.vs-row.vs-head{background:var(--sea-l);border-color:var(--sea-b);cursor:default;font-weight:800;color:var(--sea-d)}
+.vs-key{font-size:13px;font-weight:800;color:var(--sea-d);letter-spacing:.3px;display:flex;align-items:center}
+.vs-cell{font-size:15px;color:var(--ink-2);line-height:1.45;transition:opacity .25s}
+.vs-cell.hidden{opacity:0}
+.model-line{font-size:18px;line-height:1.9;color:var(--ink-2)}
+.model-title{font-size:19px;font-weight:900;color:var(--sea-d)}
+.expr-word{font-family:inherit;font-size:18px;font-weight:800;background:#fff;border:2px solid var(--border);border-radius:8px;padding:1px 9px;cursor:pointer;color:var(--ink-2);transition:all .15s}
+.expr-word:hover{border-color:var(--sea)}
+.expr-word.on{background:var(--green);border-color:var(--green-d);color:#fff;cursor:default}
+.expr-card{background:#fff;border:2px solid var(--border);border-left:5px solid var(--sea);border-radius:14px;padding:14px 18px;cursor:pointer;display:grid;grid-template-columns:44px 1fr;grid-template-areas:'i w' 'i h' 'b b';gap:2px 12px}
+.ec-icon{grid-area:i;font-size:32px;line-height:1}
+.ec-word{grid-area:w;font-size:22px;font-weight:900;color:var(--sea-d)}
+.ec-how{grid-area:h;font-size:14px;color:var(--ink-3);font-weight:700}
+.ec-body{grid-area:b;display:none;margin-top:8px;padding-top:8px;border-top:2px dashed var(--sea-b);flex-direction:column;gap:6px}
+.expr-card.open .ec-body{display:flex}
+.ec-rule{font-size:15px;color:var(--ink-2);line-height:1.5}
+.ec-rule b{color:var(--sea-d)}
+.ec-eg{font-size:16px;color:var(--green-d);background:var(--green-l);border-radius:9px;padding:8px 12px;line-height:1.5}
+.ec-eg b{background:var(--green-b);border-radius:5px;padding:0 5px}
+.build-line{font-size:17px;font-weight:700;color:var(--ink-2);background:#fff;border:2px dashed var(--sea-b);border-radius:12px;padding:11px 14px;min-height:44px;margin:8px 0}
+.build-line.ok{border-style:solid;border-color:var(--green);background:var(--green-l);color:var(--green-d)}
+.write-area{width:100%;min-height:190px;font-family:inherit;font-size:17px;line-height:1.7;padding:14px 16px;border:2px solid var(--sea-b);border-radius:14px;color:var(--ink-2);resize:vertical}
+.write-area:focus{outline:none;border-color:var(--sea)}
+.check-list{display:flex;flex-direction:column;gap:8px}
+.check-row{display:flex;align-items:center;gap:12px;background:#fff;border:2px solid var(--border);border-radius:12px;padding:10px 14px;cursor:pointer;transition:all .15s}
+.check-box{width:28px;height:28px;border-radius:8px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:900;color:transparent;flex-shrink:0}
+.check-row.on{border-color:var(--green);background:var(--green-l)}
+.check-row.on .check-box{background:var(--green);border-color:var(--green-d);color:#fff}
+.check-text{font-size:15px;color:var(--ink-2);line-height:1.45}
+.check-text b{color:var(--sea-d)}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="logo">🌊</div>
+  <div>
+    <div class="title">Unit 6 · Writing</div>
+    <div class="subtitle">Our World Level 4 — Wonders of the Sea</div>
+  </div>
+  <div class="badge-row"><div class="prog-pill" id="prog-pill">0 / 9 done</div></div>
+</header>
+<nav class="tab-nav" id="tab-nav"></nav>
+<main id="tab-stack" style="flex:1;display:flex;flex-direction:column;min-height:0"></main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   OUR WORLD LEVEL 4 · UNIT 6 · WRITING — LEO APP
+   Contrast writing: land turtles and sea turtles
+   SAVE_PREFIX: leea-4-6-writing-
+   HOMEWORK_ID: leo-4-6-writing
+   moduleCount 9 (tabs 0-8) · moduleKeyFormat tab-{i}-done · scoreKey score (tab 8)
+
+   The model text, the Contrast Writing box and the Activity 2 rubric are
+   verbatim from the Student Book, pp. 104-105; the warm/cold coral table is
+   from the Reading, p. 103. The book's Activity 2 asks for a paragraph about
+   warm and cold corals, so that is what this app plans and writes. Nothing on
+   this page invents Student Book text.
+   ═══════════════════════════════════════════════════════════════════════ */
+const SAVE_PREFIX='leea-4-6-writing-';
+const HOMEWORK_ID='leo-4-6-writing';
+const TAB_COUNT=9;
+const TABS=[
+ {icon:'📚',name:'Word Lab'},{icon:'🐢',name:'The Topic'},{icon:'📖',name:'The Model'},
+ {icon:'💬',name:'Expressions'},{icon:'📝',name:'Practice'},{icon:'🧱',name:'Build It'},
+ {icon:'🗂️',name:'Plan'},{icon:'✍️',name:'Write'},{icon:'✅',name:'Quiz'}
+];
+const TAB_INIT={},TAB_RESET={},TAB_RESTORE={};
+
+function lSave(k,v){try{localStorage.setItem(SAVE_PREFIX+k,JSON.stringify(v));}catch(e){}}
+function lLoad(k){try{const r=localStorage.getItem(SAVE_PREFIX+k);return r?JSON.parse(r):null;}catch(e){return null;}}
+function lDel(k){try{localStorage.removeItem(SAVE_PREFIX+k);}catch(e){}}
+function el(t,c,x){const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n;}
+function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function boldWord(s,w){
+  const stem=String(w).replace(/^(a|an|the)\s+/i,'').replace(/_/g,' ');
+  try{return s.replace(new RegExp('('+stem.split(/\s+/).join('[-\\s]')+'\\w*)','i'),'<b>$1</b>');}catch(e){return s;}
+}
+
+/* ── progress + footers (save/restore rules 1, 4, 5) ── */
+function refreshProgress(){
+  let done=0;
+  for(let i=0;i<TAB_COUNT;i++){
+    if(lLoad('tab-'+i+'-done')){done++;const b=document.getElementById('tb'+i);if(b)b.classList.add('done');}
+  }
+  document.getElementById('prog-pill').textContent=done+' / '+TAB_COUNT+' done';
+  const flag='leea-'+HOMEWORK_ID+'-done';
+  try{
+    if(done>=TAB_COUNT){lSave('done',true);localStorage.setItem(flag,JSON.stringify({complete:true,completedAt:new Date().toISOString()}));}
+    else{lDel('done');localStorage.removeItem(flag);}
+  }catch(e){}
+}
+/* Rule 1: the activity calls this the moment its own criteria are met. */
+function markDone(i,silent){
+  if(!lLoad('tab-'+i+'-done'))lSave('tab-'+i+'-done',{done:true,completedAt:new Date().toISOString()});
+  const b=document.getElementById('complete-'+i);
+  if(b){b.disabled=false;b.classList.add('confirmed');b.textContent='✓ '+TABS[i].name+' done';}
+  const banner=document.getElementById('banner-'+i);
+  if(banner&&!silent)banner.classList.add('show');
+  refreshProgress();
+}
+function allowComplete(i){
+  const b=document.getElementById('complete-'+i);
+  if(b&&!lLoad('tab-'+i+'-done')){b.disabled=false;b.textContent='Mark '+TABS[i].name+' complete ✓';}
+}
+/* Rule 4: two-tap arm, then clear this tab's keys and rebuild from zero. */
+function doRedo(i){
+  const b=document.getElementById('redo-'+i);
+  if(!b.classList.contains('armed')){
+    b.classList.add('armed');b.textContent='Tap again ↺';
+    setTimeout(()=>{b.classList.remove('armed');b.textContent='↺ Redo';},3000);
+    return;
+  }
+  b.classList.remove('armed');b.textContent='↺ Redo';
+  lDel('tab-'+i+'-done');
+  if(i===11)lDel('score');
+  Object.keys(localStorage).filter(k=>k.indexOf(SAVE_PREFIX+'tab-'+i+'-')===0).forEach(k=>localStorage.removeItem(k));
+  const c=document.getElementById('complete-'+i);
+  c.classList.remove('confirmed');c.disabled=true;c.textContent='Mark '+TABS[i].name+' complete ✓';
+  const banner=document.getElementById('banner-'+i);if(banner)banner.classList.remove('show');
+  document.getElementById('tb'+i).classList.remove('done');
+  if(TAB_RESET[i])TAB_RESET[i]();
+  refreshProgress();
+}
+/* Rule 2: only tab 11 writes the score key, and it writes the whole result. */
+function saveScore(score,total,extra){
+  const rec={score:score,total:total,percent:Math.round(score/total*100),done:true,savedAt:new Date().toISOString()};
+  for(const k in extra)rec[k]=extra[k];
+  lSave('score',rec);
+}
+let _active=0;
+function showTab(n){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===n));
+  document.querySelectorAll('.tab-content').forEach((c,i)=>c.classList.toggle('active',i===n));
+  _active=n;lSave('last-tab',n);
+  if(TAB_INIT[n]&&!TAB_INIT[n]._done){TAB_INIT[n]();TAB_INIT[n]._done=true;}
+  if(TAB_RESTORE[n])TAB_RESTORE[n]();
+  const c=document.getElementById('complete-'+n);
+  if(c&&lLoad('tab-'+n+'-done')){c.disabled=false;c.classList.add('confirmed');c.textContent='✓ '+TABS[n].name+' done';}
+}
+
+/* Shared MCQ block. Rule 6: an answered question comes back looking answered,
+   or the guard swallows the next tap with no feedback. */
+function askBlock(host,item,tab,key,after){
+  const card=el('div','qcard');
+  const q=el('div','qtext');q.innerHTML=item.q;card.appendChild(q);
+  const grp=el('div','opt-group');
+  item.opts.forEach((t,oi)=>{
+    const b=el('button','opt',t);
+    b.onclick=()=>{
+      const st=lLoad('tab-'+tab+'-ans')||{};
+      if(st[key]!=null)return;
+      st[key]=oi;lSave('tab-'+tab+'-ans',st);
+      paint(b,oi);if(after)after();
+    };
+    grp.appendChild(b);
+  });
+  card.appendChild(grp);
+  if(item.jp){const j=el('div','jp-note','🇯🇵 '+item.jp);j.style.display='none';card.appendChild(j);}
+  host.appendChild(card);
+  function paint(clicked,chosen){
+    const all=grp.querySelectorAll('.opt');
+    for(let i=0;i<all.length;i++){all[i].disabled=true;if(i===item.correct)all[i].classList.add('good');}
+    if(chosen!==item.correct&&clicked)clicked.classList.add('bad');
+    const j=card.querySelector('.jp-note');if(j)j.style.display='block';
+  }
+  const saved=(lLoad('tab-'+tab+'-ans')||{})[key];
+  if(saved!=null)paint(grp.querySelectorAll('.opt')[saved],saved);
+}
+function answered(tab,keys){const st=lLoad('tab-'+tab+'-ans')||{};return keys.filter(k=>st[k]!=null).length;}
+function counter(host,label){
+  const row=el('div','mstatus'),c=el('div','mcount','0');
+  row.appendChild(c);row.appendChild(el('div','mhint',label));host.appendChild(row);return c;
+}
+function srcPill(host,text){host.appendChild(el('div','src-pill',text));}
+
+/* ── flashcard block: Practice + Quiz, both required (PR #77 lock) ── */
+function flashcards(host,tab,list){
+  const st=lLoad('tab-'+tab+'-fc')||{seen:[],solved:[],mode:'practice'};
+  st.seen=st.seen||[];st.solved=st.solved||[];
+  const modes=el('div','fc-modeswitch');
+  const pb=el('button','fc-modebtn','📖 Practice'),qb=el('button','fc-modebtn','🧠 Quiz');
+  modes.appendChild(pb);modes.appendChild(qb);host.appendChild(modes);
+  const status=el('div','mstatus'),seenPill=el('div','mcount',''),solvedPill=el('div','mcount alt','');
+  status.appendChild(seenPill);status.appendChild(solvedPill);host.appendChild(status);
+  const pp=el('div','fc-pane'),qp=el('div','fc-pane');host.appendChild(pp);host.appendChild(qp);
+  let idx=0;
+  const wrap=el('div','flashcard-wrap'),card=el('div','flashcard'),front=el('div','fc-face fc-front'),back=el('div','fc-face fc-back');
+  card.appendChild(front);card.appendChild(back);wrap.appendChild(card);
+  wrap.onclick=()=>card.classList.toggle('flipped');
+  pp.appendChild(wrap);
+  const nav=el('div','fc-nav'),prev=el('button',null,'◀ Back'),dots=el('div','fc-dots'),next=el('button',null,'Next ▶');
+  nav.appendChild(prev);nav.appendChild(dots);nav.appendChild(next);pp.appendChild(nav);
+  prev.onclick=()=>{idx=(idx-1+list.length)%list.length;draw();};
+  next.onclick=()=>{idx=(idx+1)%list.length;draw();};
+  function draw(){
+    const w=list[idx];card.classList.remove('flipped');
+    front.innerHTML='';front.appendChild(el('div','fc-emoji',w.e));front.appendChild(el('div','fc-word',w.w));
+    front.appendChild(el('div','fc-ipa','/'+w.ipa+'/'));front.appendChild(el('div','fc-tap','TAP TO FLIP'));
+    back.innerHTML='';back.appendChild(el('div','fc-def',w.def));
+    const jp=el('div','fc-jp',w.jp),jb=el('button','fc-jp-btn','🇯🇵 Japanese');
+    jb.onclick=(ev)=>{ev.stopPropagation();jp.classList.toggle('revealed');};
+    back.appendChild(jb);back.appendChild(jp);
+    const s=el('div','fc-sample');s.innerHTML=boldWord(w.s||w.tr,w.norm||w.w);back.appendChild(s);
+    dots.innerHTML='';list.forEach((_,i)=>dots.appendChild(el('div','fc-dot'+(i===idx?' on':''))));
+    if(st.seen.indexOf(idx)<0)st.seen.push(idx);
+    persist();
+  }
+  const qcard=el('div','qcard');qp.appendChild(qcard);
+  function drawQuiz(){
+    qcard.innerHTML='';
+    const left=list.map((_,i)=>i).filter(i=>st.solved.indexOf(i)<0);
+    if(!left.length){qcard.appendChild(el('div','qtext','🎉 Every word typed correctly!'));return;}
+    const i=left[0],w=list[i];
+    qcard.appendChild(el('div','fc-emoji',w.e));
+    qcard.appendChild(el('div','qtext',w.def));
+    const row=el('div','svy-row'),inp=el('input'),ck=el('button','tr-btn','✓ Check'),clue=el('button','tr-btn','Clue');
+    inp.placeholder='Type the word';row.appendChild(inp);row.appendChild(ck);row.appendChild(clue);
+    qcard.appendChild(row);
+    const fb=el('div','mhint','');qcard.appendChild(fb);
+    const target=w.w.replace(/^(a|an|the)\s+/i,'').toLowerCase();
+    clue.onclick=()=>{fb.textContent='Starts with "'+target.charAt(0)+'" · '+target.replace(/[^\s]/g,'•');};
+    ck.onclick=()=>{
+      if(inp.value.trim().toLowerCase().replace(/^(a|an|the)\s+/,'')===target){
+        st.solved.push(i);persist();drawQuiz();
+      }else{row.classList.add('err');fb.textContent='Not yet — try again.';setTimeout(()=>row.classList.remove('err'),400);}
+    };
+    inp.onkeydown=(ev)=>{if(ev.key==='Enter')ck.onclick();};
+  }
+  function persist(){
+    st.mode=pp.classList.contains('active')?'practice':'quiz';
+    lSave('tab-'+tab+'-fc',st);
+    seenPill.textContent='📖 '+st.seen.length+' / '+list.length;
+    solvedPill.textContent='🧠 '+st.solved.length+' / '+list.length;
+    if(st.seen.length>=list.length&&st.solved.length>=list.length)markDone(tab);
+  }
+  function setMode(m){
+    pp.classList.toggle('active',m==='practice');qp.classList.toggle('active',m==='quiz');
+    pb.classList.toggle('active',m==='practice');qb.classList.toggle('active',m==='quiz');
+    if(m==='quiz')drawQuiz();
+    persist();
+  }
+  pb.onclick=()=>setMode('practice');qb.onclick=()=>setMode('quiz');
+  draw();setMode(st.mode==='quiz'?'quiz':'practice');
+}
+
+/* ── The model text, Student Book pp. 104-105, verbatim. @…@ marks a contrast
+   expression: Writing Activity 1 is "Underline the words and expressions", so
+   each one is a tap target. ── */
+const MODEL_TITLE='Land and Sea Turtles';
+const MODEL_PARAS=[
+ "All turtles begin their lives on land. Mother turtles lay their eggs in holes and then cover them up to protect them. @But@ after that, the baby turtles\u2019 lives are very different. The baby land turtles crawl away to live in woods, swamps, grasslands, or deserts. @In contrast@, the baby sea turtles crawl to the ocean to live their lives in the water.",
+ "Land turtles and sea turtles look different, too. Land turtles have hard, high, round shells. When they are afraid, they hide in their shells. Sea turtles, @however@, have soft, flatter shells. They can\u2019t hide inside, @but@ they can swim away really fast. When cold weather comes, land turtles dig holes in the ground and sleep. They are too slow to move to warmer places. @In contrast@, sea turtles simply swim away to find warmer waters."
+];
+/* The Contrast Writing box, Student Book p. 104, verbatim. */
+const CONTRAST_BOX="In contrast writing, you write about the differences between two things. You can use facts and descriptive words to show differences. You can also use words that show contrast, such as but and however, and expressions such as in contrast.";
+/* Activity 2, Student Book p. 105, verbatim \u2014 the task is corals, not turtles. */
+const TASK_2='Write about warm and cold corals. How are they different? Use words and expressions that show contrast.';
+/* Warm and cold corals \u2014 every cell from the Reading, Student Book p. 103. */
+const CORALS=[
+ {k:'They are made up of', warm:'polyps', cold:'polyps'},
+ {k:'They live in',        warm:'warm, sunlit zones', cold:'cold, dark zones'},
+ {k:'They eat',            warm:'algae \u2014 tiny plants', cold:'plankton \u2014 tiny animals'},
+ {k:'How they get food',   warm:'from algae in daylight; tentacles after dark', cold:'they have to work harder \u2014 tentacles only'}
+];
+
+/* ── The five contrast sentences pulled out of the model text above, for the
+   practice and build-it tabs. `expr` is the expression each one turns on. ── */
+const MODEL=[
+ {s:"But after that, the baby turtles' lives are very different.", expr:'But'},
+ {s:'In contrast, the baby sea turtles crawl to the ocean to live their lives in the water.', expr:'In contrast'},
+ {s:'Sea turtles, however, have soft, flatter shells.', expr:'however'},
+ {s:"They can't hide inside, but they can swim away really fast.", expr:'but'},
+ {s:'In contrast, sea turtles simply swim away to find warmer waters.', expr:'In contrast'}
+];
+
+/* Two more sentences about where the babies go, from the example fields in
+   unit-6/vocabulary.json (the source of the swamps and woods entries). */
+const HABITAT=[
+ 'The baby land turtles crawl away to live in woods, swamps, grasslands, or deserts.',
+ 'Baby land turtles crawl away to live in woods.'
+];
+
+/* The facts the model paragraph contrasts. Every line is drawn from the
+   model sentences above — nothing added. */
+const FACTS=[
+ {k:'Where the babies go',      land:'to woods, swamps, grasslands, or deserts', sea:'to the ocean, to live their lives in the water'},
+ {k:'Their shells',             land:'hard, high and round', sea:'soft and flatter'},
+ {k:'When they are afraid',     land:'they hide in their shells', sea:'they can\u2019t hide inside \u2014 they swim away really fast'},
+ {k:'When cold weather comes',  land:'they dig holes in the ground and sleep \u2014 too slow to move to warmer places', sea:'they simply swim away to find warmer waters'}
+];
+
+const ACADEMIC=[
+ {w:'contrast',    e:'⚖️', ipa:'ˈkɒntrɑːst',   def:'to show how two things are different — or the difference itself', jp:'対比（たいひ）',
+  s:'In <b>contrast</b> writing, we use words like but and however to show contrast.'},
+ {w:'differences', e:'🔀', ipa:'ˈdɪfərənsɪz',  def:'the ways in which two or more things are not the same', jp:'ちがい',
+  s:'What are the <b>differences</b> between land turtles and sea turtles?'},
+ {w:'expressions', e:'💬', ipa:'ɪkˈsprɛʃənz',  def:'words or short phrases that people often use to say a particular thing', jp:'表現（ひょうげん）',
+  s:"Use <b>expressions</b> like 'in contrast' to show a difference in your writing."},
+ {w:'swamps',      e:'🐊', ipa:'swɒmps',       def:'wet, soft areas of land — like a marsh', jp:'沼地（ぬまち）',
+  s:'The baby land turtles crawl away to live in woods, <b>swamps</b>, grasslands, or deserts.'},
+ {w:'woods',       e:'🌳', ipa:'wʊdz',         def:'a small forest — an area with many trees', jp:'森（もり）',
+  s:'Baby land turtles crawl away to live in <b>woods</b>.'}
+];
+
+/* How each expression behaves. This is the part of contrast writing Leo
+   gets wrong: the three are not interchangeable in position. */
+const EXPRESSIONS=[
+ {e:'but', icon:'🔗', how:'joins two halves of ONE sentence',
+  rule:'Put a comma before <b>but</b>, then carry on in the same sentence.',
+  eg:"They can't hide inside, but they can swim away really fast."},
+ {e:'however', icon:'🪶', how:'sits INSIDE the sentence, with a comma on each side',
+  rule:'Commas on both sides of <b>however</b>.',
+  eg:'Sea turtles, however, have soft, flatter shells.'},
+ {e:'In contrast', icon:'⚖️', how:'STARTS a new sentence',
+  rule:'Capital letter, then a comma after <b>In contrast</b>.',
+  eg:'In contrast, sea turtles simply swim away to find warmer waters.'}
+];
+
+/* ── answer-position variation ──────────────────────────────────────────
+   Positions are dealt out round-robin over a hash-ordered list so every
+   slot is used about equally by construction, while staying deterministic. */
+function hashText(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+function mix32(a){a=(a+0x9e3779b9)>>>0;let z=a;z=Math.imul(z^(z>>>16),0x21f0aaad)>>>0;z=Math.imul(z^(z>>>15),0x735a2d97)>>>0;return (z^(z>>>15))>>>0;}
+function moveAnswerTo(item,target){
+  if(!item||!Array.isArray(item.opts)||typeof item.correct!=='number')return item;
+  const answer=item.opts[item.correct];
+  const rest=item.opts.filter((_,i)=>i!==item.correct);
+  let state=hashText(String(item.q));
+  for(let i=rest.length-1;i>0;i--){
+    state=mix32(state);
+    const j=Math.floor((state/4294967296)*(i+1));
+    const t=rest[i];rest[i]=rest[j];rest[j]=t;
+  }
+  const pos=Math.min(Math.max(target,0),rest.length);
+  rest.splice(pos,0,answer);
+  item.opts=rest;item.correct=pos;
+  return item;
+}
+function varyAll(list){
+  list.map((it,i)=>({i:i,h:hashText(String(it&&it.q))}))
+      .sort((a,b)=>(a.h-b.h)||(a.i-b.i))
+      .forEach((o,k)=>{const it=list[o.i];if(it&&Array.isArray(it.opts))moveAnswerTo(it,k%it.opts.length);});
+  return list;
+}
+
+/* ═══ TAB 0 — WORD LAB ═══ */
+TAB_INIT[0]=function(){
+  const h=document.getElementById('body-0');
+  h.appendChild(hdr('📚 Word Lab','The words this writing lesson uses'));
+  h.appendChild(hint('Finish BOTH modes — Practice flips the cards, Quiz asks you to name each one.'));
+  flashcards(h,0,ACADEMIC);
+  srcPill(h,'unit-6/vocabulary.json · academicWordIds + contentWordIds for writing');
+};
+TAB_RESET[0]=function(){rebuild(0);};
+
+/* ═══ TAB 1 — THE TOPIC ═══ */
+TAB_INIT[1]=function(){
+  const h=document.getElementById('body-1');
+  h.appendChild(hdr('🐢 The Topic','Land turtles and sea turtles'));
+  h.appendChild(hint('Both are turtles. Both hatch from eggs on land. After that, everything is different. Tap each row to open it.'));
+  const st=lLoad('tab-1-open')||[];
+  const c=counter(h,'differences opened');
+  const table=el('div','vs-table');
+  const head=el('div','vs-row vs-head');
+  head.appendChild(el('div','vs-key',''));
+  head.appendChild(el('div','vs-cell','🐢 Land turtles'));
+  head.appendChild(el('div','vs-cell','🐢 Sea turtles'));
+  table.appendChild(head);
+  FACTS.forEach((f,i)=>{
+    const row=el('div','vs-row');
+    row.appendChild(el('div','vs-key',f.k));
+    const a=el('div','vs-cell',f.land),b=el('div','vs-cell',f.sea);
+    if(st.indexOf(i)<0){a.classList.add('hidden');b.classList.add('hidden');}
+    row.appendChild(a);row.appendChild(b);
+    row.onclick=()=>{
+      if(st.indexOf(i)<0){st.push(i);lSave('tab-1-open',st);}
+      a.classList.remove('hidden');b.classList.remove('hidden');up();
+    };
+    table.appendChild(row);
+  });
+  h.appendChild(table);
+  const hb=el('div','qcard');
+  hb.appendChild(el('div','qtext','📓 Where do the babies go?'));
+  HABITAT.forEach(t=>hb.appendChild(el('div','mhint','“'+t+'”')));
+  h.appendChild(hb);
+  srcPill(h,'Student Book pp. 104–105 · drawn from the model text + unit-6/vocabulary.json');
+  function up(){c.textContent=st.length+' / '+FACTS.length;if(st.length>=FACTS.length)markDone(1);}
+  up();
+};
+TAB_RESET[1]=function(){lDel('tab-1-open');rebuild(1);};
+
+/* ═══ TAB 2 — THE MODEL ═══ */
+TAB_INIT[2]=function(){
+  const h=document.getElementById('body-2');
+  h.appendChild(hdr('\u{1F4D6} The Model','Student Book pp. 104\u2013105'));
+  h.appendChild(hint('Activity 1: \u201cRead about land turtles and sea turtles. How does the writer show differences? Underline the words and expressions.\u201d Tap every one you find.'));
+  const st=lLoad('tab-2-found')||[];
+  const c=counter(h,'expressions found');
+  h.appendChild(el('div','model-title','\u{1F422} '+MODEL_TITLE));
+  let n=0;
+  MODEL_PARAS.forEach(t=>{
+    const card=el('div','qcard');
+    const line=el('div','model-line');
+    /* Split on the @…@ markers so only the expressions are tappable and every
+       other character stays exactly as the book prints it. */
+    t.split(/@([^@]+)@/).forEach((part,pi)=>{
+      if(pi%2===0){ if(part)line.appendChild(document.createTextNode(part)); return; }
+      const idx=n++;
+      const b=el('button','expr-word',part);
+      if(st.indexOf(idx)>=0)b.classList.add('on');
+      b.onclick=()=>{
+        if(b.classList.contains('on'))return;
+        b.classList.add('on');
+        if(st.indexOf(idx)<0){st.push(idx);lSave('tab-2-found',st);}
+        up();
+      };
+      line.appendChild(b);
+    });
+    card.appendChild(line);
+    h.appendChild(card);
+  });
+  const box=el('div','qcard');
+  box.appendChild(el('div','qtext','\u2696\ufe0f Contrast Writing'));
+  box.appendChild(el('div','mhint',CONTRAST_BOX));
+  h.appendChild(box);
+  srcPill(h,'Student Book pp. 104\u2013105 \u00b7 model text and Contrast Writing box \u2014 verbatim');
+  function up(){c.textContent=st.length+' / '+n;if(st.length>=n)markDone(2);}
+  up();
+};
+TAB_RESET[2]=function(){lDel('tab-2-found');rebuild(2);};
+
+/* ═══ TAB 3 — EXPRESSIONS ═══ */
+TAB_INIT[3]=function(){
+  const h=document.getElementById('body-3');
+  h.appendChild(hdr('💬 Expressions','Three ways to show a difference'));
+  h.appendChild(hint('They all mean the same thing — but they go in different places. Tap each card.'));
+  const st=lLoad('tab-3-open')||[];
+  const c=counter(h,'opened');
+  EXPRESSIONS.forEach((e,i)=>{
+    const card=el('div','expr-card');
+    card.appendChild(el('div','ec-icon',e.icon));
+    card.appendChild(el('div','ec-word',e.e));
+    card.appendChild(el('div','ec-how',e.how));
+    const body=el('div','ec-body');
+    const r=el('div','ec-rule');r.innerHTML=e.rule;body.appendChild(r);
+    const g=el('div','ec-eg');g.innerHTML='“'+e.eg.split(e.e).join('<b>'+e.e+'</b>')+'”';body.appendChild(g);
+    card.appendChild(body);
+    if(st.indexOf(i)>=0)card.classList.add('open');
+    card.onclick=()=>{
+      if(st.indexOf(i)<0){st.push(i);lSave('tab-3-open',st);}
+      card.classList.add('open');up();
+    };
+    h.appendChild(card);
+  });
+  srcPill(h,'Every example is one of the five model sentences');
+  function up(){c.textContent=st.length+' / '+EXPRESSIONS.length;if(st.length>=EXPRESSIONS.length)markDone(3);}
+  up();
+};
+TAB_RESET[3]=function(){lDel('tab-3-open');rebuild(3);};
+
+/* ═══ TAB 4 — PRACTICE ═══ */
+const PRACTICE=varyAll([
+ {q:'Which expression <b>joins two halves of one sentence</b>, with a comma before it?',
+  opts:['but','however','In contrast'],correct:0,jp:'but は1つの文の中で2つをつなぎます。'},
+ {q:'Which expression sits <b>inside</b> the sentence with a comma on each side?',
+  opts:['however','but','In contrast'],correct:0,jp:'however は前後にコンマをつけます。'},
+ {q:'Which expression <b>starts a new sentence</b>?',
+  opts:['In contrast','but','however'],correct:0,jp:'In contrast は文のはじめに置きます。'},
+ {q:'"They can\'t hide inside, ______ they can swim away really fast."',
+  opts:['but','however','In contrast'],correct:0,jp:'コンマの後なので but です。'},
+ {q:'"Sea turtles, ______, have soft, flatter shells."',
+  opts:['however','but','In contrast'],correct:0,jp:'前後にコンマがあるので however です。'},
+ {q:'"______, sea turtles simply swim away to find warmer waters."',
+  opts:['In contrast','but','however'],correct:0,jp:'文のはじめなので In contrast です。'},
+ {q:'What is contrast writing for?',
+  opts:['showing how two things are different','listing things in order','telling a story about the past'],correct:0,jp:'ちがいを見せるための書き方です。'},
+ {q:'Before you write a contrast paragraph, what should you do first?',
+  opts:['list the differences between your two things','choose your favourite colour','count the words'],correct:0,jp:'まず、ちがいを書き出します。'}
+]);
+TAB_INIT[4]=function(){
+  const h=document.getElementById('body-4');
+  h.appendChild(hdr('📝 Practice','Which expression fits?'));
+  h.appendChild(hint('Three of these are the model sentences with the expression taken out. Put it back.'));
+  const keys=PRACTICE.map((_,i)=>'p'+i);
+  const c=counter(h,'answered');
+  PRACTICE.forEach((it,i)=>askBlock(h,it,4,keys[i],up));
+  srcPill(h,'Student Book pp. 104–105 · model sentences — verbatim');
+  function up(){const n=answered(4,keys);c.textContent=n+' / '+PRACTICE.length;if(n>=PRACTICE.length)markDone(4);}
+  up();
+};
+TAB_RESET[4]=function(){rebuild(4);};
+
+/* ═══ TAB 5 — BUILD IT ═══ */
+const BUILDS=[
+ {cue:'ウミガメは、しかし、やわらかくて平たい甲羅（こうら）をもっています。',
+  correct:['Sea','turtles,','however,','have','soft,','flatter','shells.'],
+  say:'Sea turtles, however, have soft, flatter shells.'},
+ {cue:'かれらは中にかくれることはできませんが、とても速く泳いでにげられます。',
+  correct:['They',"can't",'hide','inside,','but','they','can','swim','away','really','fast.'],
+  say:"They can't hide inside, but they can swim away really fast."},
+ {cue:'対照的に、ウミガメはあたたかい海を探して泳いでいってしまいます。',
+  correct:['In','contrast,','sea','turtles','simply','swim','away','to','find','warmer','waters.'],
+  say:'In contrast, sea turtles simply swim away to find warmer waters.'}
+];
+TAB_INIT[5]=function(){
+  const h=document.getElementById('body-5');
+  h.appendChild(hdr('🧱 Build It','Rebuild the model sentences'));
+  h.appendChild(hint('Read the Japanese, then tap the chips in order. Watch where the commas go — they are part of the chip.'));
+  const st=lLoad('tab-5-built')||[];
+  const c=counter(h,'sentences built');
+  BUILDS.forEach((b,i)=>{
+    const card=el('div','qcard');
+    card.appendChild(el('div','qtext','🇯🇵 '+b.cue));
+    const out=el('div','build-line','…');card.appendChild(out);
+    const bank=el('div','chip-bank');card.appendChild(bank);
+    const fb=el('div','mhint','');card.appendChild(fb);
+    const placed=[];
+    function check(){
+      out.textContent=placed.length?placed.join(' '):'…';
+      if(placed.join(' ')===b.correct.join(' ')){
+        out.classList.add('ok');fb.textContent='✓ '+b.say;
+        bank.querySelectorAll('.chip').forEach(x=>x.disabled=true);
+        if(st.indexOf(i)<0){st.push(i);lSave('tab-5-built',st);}
+        up();
+      }
+    }
+    shuffle(b.correct.slice()).forEach(word=>{
+      const chip=el('button','chip',word);
+      chip.onclick=()=>{if(chip.classList.contains('used'))return;chip.classList.add('used');placed.push(word);check();};
+      bank.appendChild(chip);
+    });
+    const reset=el('button','tr-btn','↺ Start over');
+    reset.onclick=()=>{placed.length=0;out.classList.remove('ok');fb.textContent='';
+      bank.querySelectorAll('.chip').forEach(x=>{x.classList.remove('used');x.disabled=false;});check();};
+    card.appendChild(reset);
+    if(st.indexOf(i)>=0){b.correct.forEach(w=>placed.push(w));
+      bank.querySelectorAll('.chip').forEach(x=>{x.classList.add('used');x.disabled=true;});check();}
+    h.appendChild(card);
+  });
+  srcPill(h,'Student Book pp. 104–105 · model sentences — verbatim');
+  function up(){c.textContent=st.length+' / '+BUILDS.length;if(st.length>=BUILDS.length)markDone(5);}
+  up();
+};
+TAB_RESET[5]=function(){lDel('tab-5-built');rebuild(5);};
+
+/* ═══ TAB 6 — PLAN ═══ */
+const PLAN_ROWS=['My topic sentence','Difference 1','Difference 2','Difference 3'];
+const PLAN_EG=[
+ 'e.g. Warm corals and cold corals are both made up of polyps.',
+ 'e.g. Warm corals live in warm, sunlit zones, but cold corals live in cold, dark zones.',
+ 'e.g. Warm corals eat algae. Cold corals, however, catch plankton.',
+ 'e.g. In contrast, cold-water polyps have to work harder for their food.'
+];
+TAB_INIT[6]=function(){
+  const h=document.getElementById('body-6');
+  h.appendChild(hdr('\u{1F5C2}\ufe0f Plan','Warm corals and cold corals'));
+  h.appendChild(hint('Activity 2: \u201c'+TASK_2+'\u201d Everything you need is in the Reading. Tap a row to open it, then plan.'));
+  const opened=lLoad('tab-6-open')||[];
+  const table=el('div','vs-table');
+  const head=el('div','vs-row vs-head');
+  head.appendChild(el('div','vs-key',''));
+  head.appendChild(el('div','vs-cell','\u{1FAB8} Warm corals'));
+  head.appendChild(el('div','vs-cell','\u{1FAB8} Cold corals'));
+  table.appendChild(head);
+  CORALS.forEach((f,i)=>{
+    const row=el('div','vs-row');
+    row.appendChild(el('div','vs-key',f.k));
+    const a=el('div','vs-cell',f.warm),b=el('div','vs-cell',f.cold);
+    if(opened.indexOf(i)<0){a.classList.add('hidden');b.classList.add('hidden');}
+    row.appendChild(a);row.appendChild(b);
+    row.onclick=()=>{
+      if(opened.indexOf(i)<0){opened.push(i);lSave('tab-6-open',opened);}
+      a.classList.remove('hidden');b.classList.remove('hidden');up();
+    };
+    table.appendChild(row);
+  });
+  h.appendChild(table);
+  const st=lLoad('tab-6-text')||{};
+  const c=counter(h,'lines planned');
+  PLAN_ROWS.forEach((label,i)=>{
+    const row=el('div','svy-row');
+    row.appendChild(el('div','sun-word',label));
+    const inp=el('input');
+    inp.placeholder=PLAN_EG[i];
+    inp.value=st[i]||'';
+    if((st[i]||'').trim().length>=6)row.classList.add('filled');
+    inp.oninput=()=>{st[i]=inp.value;lSave('tab-6-text',st);row.classList.toggle('filled',inp.value.trim().length>=6);up();};
+    row.appendChild(inp);h.appendChild(row);
+  });
+  srcPill(h,'Student Book p. 105, Activity 2 \u2014 verbatim \u00b7 table from the Reading, p. 103');
+  function up(){
+    const n=PLAN_ROWS.filter((_,i)=>(st[i]||'').trim().length>=6).length;
+    c.textContent=n+' / '+PLAN_ROWS.length;
+    if(n>=PLAN_ROWS.length&&opened.length>=CORALS.length)markDone(6);
+  }
+  up();
+};
+TAB_RESET[6]=function(){lDel('tab-6-text');lDel('tab-6-open');rebuild(6);};
+
+/* ═══ TAB 7 — WRITE ═══ */
+const CHECKLIST=[
+ 'I wrote about warm corals and cold corals.',
+ 'I used <b>but</b> at least once, with a comma before it.',
+ 'I used <b>however</b> at least once, with a comma on each side.',
+ 'I started one sentence with <b>In contrast</b>.',
+ 'Every sentence starts with a capital letter and ends with a period.'
+];
+TAB_INIT[7]=function(){
+  const h=document.getElementById('body-7');
+  h.appendChild(hdr('✍️ Write','Your contrast paragraph'));
+  h.appendChild(hint('Use your plan. Four sentences or more, about warm and cold corals. Then tick the checklist and read it out loud to Dad \u2014 that is Activity 3.'));
+  const st=lLoad('tab-7-text')||'';
+  const ck=lLoad('tab-7-check')||[];
+  const c=counter(h,'checklist ticked');
+  const ta=document.createElement('textarea');
+  ta.className='write-area';
+  ta.placeholder='Warm corals and cold corals are both made up of polyps. But warm corals live in warm, sunlit zones\u2026';
+  ta.value=st;
+  h.appendChild(ta);
+  const wc=el('div','mhint','');h.appendChild(wc);
+  function words(){return ta.value.trim()?ta.value.trim().split(/\s+/).length:0;}
+  ta.oninput=()=>{lSave('tab-7-text',ta.value);wc.textContent=words()+' words';up();};
+  wc.textContent=words()+' words';
+  const list=el('div','check-list');
+  CHECKLIST.forEach((t,i)=>{
+    const row=el('div','check-row');
+    const box=el('div','check-box','✓');
+    const lbl=el('div','check-text');lbl.innerHTML=t;
+    if(ck.indexOf(i)>=0)row.classList.add('on');
+    row.onclick=()=>{
+      if(ck.indexOf(i)<0)ck.push(i);else ck.splice(ck.indexOf(i),1);
+      lSave('tab-7-check',ck);row.classList.toggle('on');up();
+    };
+    row.appendChild(box);row.appendChild(lbl);list.appendChild(row);
+  });
+  h.appendChild(list);
+  srcPill(h,'Student Book p. 105, Activity 2 \u00b7 then Activity 3 \u2014 read it to Dad and listen to his');
+  function up(){
+    c.textContent=ck.length+' / '+CHECKLIST.length;
+    if(ck.length>=CHECKLIST.length&&words()>=25)markDone(7);
+  }
+  up();
+};
+TAB_RESET[7]=function(){lDel('tab-7-text');lDel('tab-7-check');rebuild(7);};
+
+/* ═══ TAB 8 — QUIZ ═══ */
+const QUIZ=varyAll([
+ {q:'What does <b>contrast</b> writing show?',opts:['how two things are different','how two things are the same','what happened first'],correct:0,jp:'ちがいを見せます。'},
+ {q:'What are <b>differences</b>?',opts:['the ways two things are not the same','the ways two things are the same','the names of two things'],correct:0,jp:'同じでないところです。'},
+ {q:'What are <b>expressions</b>?',opts:['words or short phrases people often use','long paragraphs','pictures in a book'],correct:0,jp:'よく使う言葉やフレーズです。'},
+ {q:'"They can\'t hide inside, ______ they can swim away really fast."',opts:['but','however','In contrast'],correct:0,jp:'but です。'},
+ {q:'"Sea turtles, ______, have soft, flatter shells."',opts:['however','but','In contrast'],correct:0,jp:'however です。'},
+ {q:'"______, the baby sea turtles crawl to the ocean."',opts:['In contrast','but','however'],correct:0,jp:'In contrast です。'},
+ {q:'Where do the commas go with <b>however</b>?',opts:['one on each side','only before it','only after it'],correct:0,jp:'前後の両方につけます。'},
+ {q:'Where do baby land turtles go, in the model paragraph?',opts:['to woods, swamps, grasslands or deserts','to the ocean','to the midnight zone'],correct:0,jp:'森・沼地・草原・砂漠です。'},
+ {q:'Where do baby sea turtles go?',opts:['to the ocean, to live their lives in the water','to the woods','to the swamps'],correct:0,jp:'海です。'},
+ {q:'What does a sea turtle do when the water gets cold?',opts:['swims away to find warmer waters','hides inside its shell','sleeps on the beach'],correct:0,jp:'あたたかい海へ泳いでいきます。'}
+]);
+TAB_INIT[8]=function(){
+  const h=document.getElementById('body-8');
+  h.appendChild(hdr('✅ Writing Quiz','10 questions — 8 or more to pass'));
+  const active=el('div'),result=el('div');h.appendChild(active);h.appendChild(result);
+  const saved=lLoad('score');
+  const bar=el('div','quiz-progress');active.appendChild(bar);
+  const card=el('div','qcard');active.appendChild(card);
+  let cur=0,score=0,wrong=[];
+  const PASS=8;
+  function render(){
+    bar.innerHTML='';
+    QUIZ.forEach((_,i)=>bar.appendChild(el('div','qdot'+(i<cur?' on':'')+(i===cur?' now':''))));
+    card.innerHTML='';
+    const it=QUIZ[cur];
+    const q=el('div','qtext');q.innerHTML=(cur+1)+'. '+it.q;card.appendChild(q);
+    const grp=el('div','opt-group');
+    it.opts.forEach((t,oi)=>{
+      const b=el('button','opt',t);
+      b.onclick=()=>{
+        const all=grp.querySelectorAll('.opt');
+        for(let i=0;i<all.length;i++){all[i].disabled=true;if(i===it.correct)all[i].classList.add('good');}
+        if(oi===it.correct)score++;else{b.classList.add('bad');wrong.push(cur+1);}
+        if(it.jp)card.appendChild(el('div','jp-note','🇯🇵 '+it.jp));
+        setTimeout(()=>{cur++;if(cur>=QUIZ.length)finish();else render();},900);
+      };
+      grp.appendChild(b);
+    });
+    card.appendChild(grp);
+  }
+  function finish(){
+    saveScore(score,QUIZ.length,{pass:score>=PASS,wrongQuestions:wrong});
+    show({score:score,total:QUIZ.length,percent:Math.round(score/QUIZ.length*100),pass:score>=PASS,wrongQuestions:wrong});
+    markDone(8);
+  }
+  /* Rule 3: a finished quiz comes back as its result, never restarted. */
+  function show(rec){
+    active.style.display='none';result.innerHTML='';
+    const pass=rec.pass!=null?rec.pass:rec.score>=PASS;
+    const box=el('div','result-card '+(pass?'pass':'fail'));
+    box.appendChild(el('div','result-trophy',pass?'🏆':'💪'));
+    box.appendChild(el('div','result-score',rec.score+' / '+rec.total));
+    box.appendChild(el('div','result-sub',pass?'You passed! '+rec.percent+'%':'Almost — you need '+PASS+' to pass. Tap ↺ Redo to try again.'));
+    if(rec.wrongQuestions&&rec.wrongQuestions.length)box.appendChild(el('div','result-sub','Look again at question(s): '+rec.wrongQuestions.join(', ')));
+    result.appendChild(box);
+    markDone(8,true);
+  }
+  if(saved&&saved.done){show(saved);}else{render();}
+  srcPill(h,'Formative assessment — Unit 6 Writing');
+};
+TAB_RESET[8]=function(){rebuild(8);};
+
+/* ── small helpers used by the tabs above ── */
+function hdr(title,sub){
+  const d=el('div');d.appendChild(el('div','section-title',title));
+  if(sub)d.appendChild(el('div','section-sub',sub));return d;
+}
+function hint(text){return el('div','dad-hint',text);}
+function rebuild(i){
+  const body=document.getElementById('body-'+i);
+  body.innerHTML='';
+  TAB_INIT[i]._done=false;TAB_INIT[i]();TAB_INIT[i]._done=true;
+}
+
+/* ── boot ── */
+(function(){
+  const nav=document.getElementById('tab-nav'),stack=document.getElementById('tab-stack');
+  TABS.forEach((t,i)=>{
+    const b=el('button','tab-btn');b.id='tb'+i;
+    b.appendChild(el('span','tab-icon',t.icon));
+    b.appendChild(el('span','tab-name',t.name));
+    b.onclick=()=>showTab(i);
+    nav.appendChild(b);
+    const pane=el('div','tab-content');pane.id='tc'+i;
+    const body=el('div','tab-body');body.id='body-'+i;pane.appendChild(body);
+    const banner=el('div','done-banner','Nice work! Mark it below.');banner.id='banner-'+i;body.appendChild(banner);
+    const foot=el('div','tab-footer');
+    const redo=el('button','btn-redo','↺ Redo');redo.id='redo-'+i;redo.onclick=()=>doRedo(i);
+    const done=el('button','btn-complete','Mark '+t.name+' complete ✓');done.id='complete-'+i;done.disabled=true;
+    done.onclick=()=>markDone(i);
+    foot.appendChild(redo);foot.appendChild(done);pane.appendChild(foot);
+    stack.appendChild(pane);
+  });
+  const last=lLoad('last-tab');
+  showTab(typeof last==='number'&&last>=0&&last<TAB_COUNT?last:0);
+  refreshProgress();
+})();
+</script>
+</body>
+</html>

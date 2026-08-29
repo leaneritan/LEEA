@@ -1,0 +1,2839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 6 · Vocabulary 1 · Wonders of the Sea</title>
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+
+/* HEADER */
+.slide-header{height:64px;background:#0369A1;display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.65);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.2);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.ac{background:rgba(14,165,233,.4)}
+
+/* TWO-COLUMN VOCAB LAYOUT */
+.vocab-body{flex:1;display:flex;min-height:0}
+.word-panel{width:40%;padding:30px 34px;display:flex;flex-direction:column;border-right:2px solid #e5e7eb;background:#fff}
+.game-panel{width:60%;padding:22px 32px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;overflow:hidden}
+
+/* TAGS */
+.vtag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;width:fit-content}
+.vtag.v1{background:#E0F2FE;color:#075985}
+.vtag.ac{background:#FEF3C7;color:#B45309}
+.vtag.rel{background:#f3f4f6;color:#6b7280}
+
+/* WORD PANEL */
+.word-emoji{font-size:130px;line-height:1;margin-bottom:12px;cursor:pointer;transition:transform .25s}
+.word-emoji:active{transform:scale(1.15)}
+.word-main{font-size:70px;font-weight:800;color:#111;line-height:1.05;margin-bottom:8px}
+.word-ipa{font-size:21px;color:#6b7280}
+.word-syl{font-size:18px;color:#9ca3af;letter-spacing:1px}
+.word-pos{font-size:19px;color:#0369A1;font-weight:700;margin-bottom:14px}
+.word-def{font-size:21px;color:#374151;line-height:1.45;margin-bottom:8px}
+.word-jp{font-size:18px;color:#6b7280;line-height:1.45}
+.dad-say{background:#F0F9FF;border-left:4px solid #0369A1;padding:13px 16px;border-radius:0 12px 12px 0;font-size:18px;color:#374151;line-height:1.5;margin-top:auto}
+.dad-say b{color:#075985}
+.how-box{background:#fff;border:2px dashed #BAE6FD;border-radius:12px;padding:10px 16px;font-size:16px;color:#4b5563;line-height:1.5;width:100%}
+.how-box b{color:#075985}
+.how-box li{margin-left:18px}
+
+/* MINI-GAME SHELL (shared class names across LEEA vocab decks) */
+.mg-wrap{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;flex:1;min-height:0}
+.mg-head{font-size:20px;font-weight:700;color:#374151;text-align:center;background:#f9fafb;border:2px solid #e5e7eb;border-radius:12px;padding:10px 20px;width:100%;flex-shrink:0}
+.mg-head b{color:#075985}
+.mg-stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0;overflow:hidden}
+.mg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;width:100%}
+.mg-grid.c4{grid-template-columns:repeat(4,1fr)}
+.mg-grid.c3{grid-template-columns:repeat(3,1fr)}
+.mg-tile{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 6px;font-size:38px;cursor:pointer;transition:all .15s;text-align:center}
+.mg-tile:hover{transform:translateY(-3px);border-color:#0369A1}
+.mg-tile .mg-label{display:block;font-size:14px;font-weight:700;color:#4b5563;margin-top:4px;min-height:18px}
+.mg-tile.hit{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.mg-tile.miss{background:#fef2f2;border-color:#ef4444;animation:mgShake .3s ease}
+@keyframes mgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.mg-btn{background:#0369A1;color:#fff;border:none;border-radius:12px;padding:13px 30px;font-size:20px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.mg-btn:hover{background:#075985;transform:scale(1.04)}
+.mg-btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+.mg-opt{padding:12px 22px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:19px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left}
+.mg-opt:hover{border-color:#0369A1}
+.mg-opt.ok{background:#F0F9FF;border-color:#0369A1;color:#075985;pointer-events:none}
+.mg-opt.no{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+.mg-score{font-size:20px;font-weight:800;color:#075985;background:#E0F2FE;border-radius:20px;padding:6px 22px}
+.mg-miss{font-size:17px;font-weight:700;color:#ef4444;min-height:22px}
+.mg-win{background:#0369A1;color:#fff;border-radius:14px;padding:12px 24px;font-size:20px;font-weight:800;text-align:center;opacity:0;transform:translateY(10px);transition:all .35s;width:100%}
+.mg-win.show{opacity:1;transform:translateY(0)}
+.mg-source{font-size:14px;color:#9ca3af;font-weight:600;letter-spacing:.4px}
+.mg-bar{width:100%;height:22px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.mg-bar > div{height:100%;background:linear-gradient(90deg,#38BDF8,#0369A1);width:0%;transition:width .2s;border-radius:99px}
+.mg-track{position:relative;width:100%;height:96px;background:linear-gradient(180deg,#E0F2FE,#F0F9FF);border-radius:16px;overflow:hidden;border:2px solid #BAE6FD}
+.mg-runner{position:absolute;bottom:16px;font-size:46px;transition:left .25s}
+.mg-flag{position:absolute;bottom:14px;right:2%;font-size:40px}
+.mg-spin{display:inline-block;transition:transform .3s ease}
+.mg-flip{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.mg-flip:hover{border-color:#0369A1;transform:translateY(-3px)}
+.mg-flip.open{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.mg-flip .mf-front{font-size:40px}
+.mg-flip .mf-back{display:none;font-size:15px;font-weight:700;color:#075985;line-height:1.35}
+.mg-flip.open .mf-back{display:block}
+.mg-pair{display:flex;gap:26px;width:100%;justify-content:center}
+.mg-col{display:flex;flex-direction:column;gap:10px;flex:1;max-width:340px}
+.mg-pbtn{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:17px;font-weight:700;color:#374151;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left;line-height:1.3}
+.mg-pbtn:hover{border-color:#0369A1}
+.mg-pbtn.sel{border-color:#0369A1;background:#F0F9FF}
+.mg-pbtn.done{border-color:#10b981;background:#ecfdf5;color:#047857;pointer-events:none}
+.mg-pbtn.bad{border-color:#ef4444;background:#fef2f2;animation:mgShake .3s}
+.mg-battery{width:220px;height:110px;border:6px solid #374151;border-radius:14px;position:relative;display:flex;align-items:center;padding:8px}
+.mg-battery::after{content:'';position:absolute;right:-20px;top:32px;width:16px;height:40px;background:#374151;border-radius:0 6px 6px 0}
+.mg-battery > div{height:100%;background:linear-gradient(90deg,#a3e635,#16a34a);border-radius:6px;width:0%;transition:width .2s}
+.mg-lamp{font-size:44px;filter:grayscale(1);opacity:.4;transition:all .25s}
+.mg-lamp.on{filter:none;opacity:1;transform:scale(1.1)}
+
+/* NAV BAR */
+#nav-bar{position:fixed;bottom:0;left:0;right:0;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px;transition:background .2s}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn.active,#fs-btn.active{background:rgba(124,58,237,.35)!important;color:#7DD3FC!important}
+#unit-label{color:#7DD3FC;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+
+/* TEACHER NOTES PANEL */
+#tn-panel{position:fixed;right:-460px;top:0;bottom:52px;width:440px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#7DD3FC;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-panel ul{padding-left:18px;margin-bottom:8px}
+#tn-panel .tn-lbl{color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+
+/* CONTENT SLIDES */
+.content-body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:18px;min-height:0;overflow:hidden}
+.slide-h1{font-size:40px;font-weight:800;color:#111}
+.slide-h2{font-size:25px;font-weight:600;color:#374151}
+.src-pill{display:inline-block;background:#f3f4f6;color:#6b7280;border-radius:20px;padding:6px 18px;font-size:15px;font-weight:700;letter-spacing:.4px;width:fit-content}
+
+/* READING */
+.reading-block{background:#fff;border-radius:16px;padding:26px 36px;font-size:23px;line-height:1.7;color:#1f2937;box-shadow:0 4px 16px rgba(0,0,0,.05);border-left:6px solid #0369A1}
+.reading-block b{color:#075985;font-weight:700}
+.tap-word{background:#E0F2FE;color:#075985;border:none;border-radius:6px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.tap-word.done{background:#0369A1;color:#fff}
+
+/* OBJECTIVES */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:10px}
+.obj-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;display:flex;align-items:flex-start;gap:16px}
+.obj-icon{font-size:34px;flex-shrink:0}
+.obj-text{font-size:19px;color:#374151;line-height:1.4;font-weight:500}
+.obj-text b{color:#0369A1}
+
+/* FORMATIVE ASSESSMENT */
+.assess-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px}
+.assess-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;cursor:pointer;transition:all .2s}
+.assess-card:hover{border-color:#0369A1}
+.assess-card.yes{border-color:#0369A1;background:#F0F9FF}
+.assess-q{font-size:19px;color:#374151;font-weight:600;margin-bottom:10px}
+
+/* BE THE EXPERT */
+.bte-header{background:#0369A1;color:#fff;border-radius:12px 12px 0 0;padding:13px 26px;font-size:19px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bte-body{background:#fff;border:2px solid #0369A1;border-radius:0 0 16px 16px;padding:24px;font-size:19px;color:#374151;line-height:1.6}
+.bte-body b{color:#075985}
+
+/* CHIPS / TASK CARDS */
+.chips-row{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:#E0F2FE;color:#075985;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.chip.used{background:#0369A1;color:#fff}
+.task-card{background:#fff;border-radius:16px;padding:20px 28px;border:2px solid #e5e7eb;font-size:21px;color:#374151;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card b{color:#0369A1}
+.q-item{background:#fff;border-radius:12px;padding:16px 22px;border:2px solid #e5e7eb;font-size:19px;color:#374151;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .2s}
+.q-item:hover{border-color:#0369A1}
+.q-item.done{border-color:#10b981;background:#ecfdf5}
+.q-num{background:#0369A1;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;margin-top:2px}
+.q-ans{max-height:0;overflow:hidden;transition:max-height .3s ease;color:#075985;font-weight:700}
+.q-item.done .q-ans{max-height:120px;margin-top:6px}
+
+/* DIALOGUE */
+.chat-row{display:flex;align-items:flex-end;gap:14px}
+.chat-row.right{flex-direction:row-reverse}
+.chat-ava{font-size:50px;line-height:1}
+.bub{max-width:62%;padding:18px 28px;border-radius:26px;font-size:26px;font-weight:600;line-height:1.35}
+.bub.q{background:#fff;border:2px solid #e5e7eb;border-bottom-left-radius:6px;color:#374151}
+.bub.a{background:#0369A1;color:#fff;border-bottom-right-radius:6px}
+
+/* LISTEN HERO */
+.listen-hero{background:linear-gradient(135deg,#0C4A6E,#0369A1);border-radius:20px;padding:24px 36px;display:flex;align-items:center;gap:28px;color:#fff}
+.listen-hero .lh-emoji{font-size:64px;line-height:1;animation:lhPulse 1.6s ease-in-out infinite}
+@keyframes lhPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.listen-hero .lh-text{font-size:25px;font-weight:700;flex:1}
+.listen-hero .lh-tr{background:rgba(255,255,255,.2);border-radius:20px;padding:9px 22px;font-size:21px;font-weight:800;white-space:nowrap}
+
+/* TITLE / GREAT JOB */
+.title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0C4A6E 0%,#0369A1 50%,#38BDF8 100%);color:#fff;gap:22px;padding:40px}
+.great-job-slide{background:linear-gradient(135deg,#0C4A6E,#0369A1,#38BDF8);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:18px;height:100%;padding:40px}
+
+/* MARK DONE */
+.done-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+.btn-done{background:#16A34A;color:#fff;border:none;border-radius:14px;padding:18px 46px;font-size:26px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-done:hover{background:#15803d}
+.btn-done.confirmed{background:#9ca3af;pointer-events:none}
+.btn-clear{background:#fff;color:#ef4444;border:2px solid #ef4444;border-radius:14px;padding:14px 30px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+#doneMsg{font-size:20px;color:#4b5563;font-weight:600;min-height:28px}
+
+/* VOCAB REVIEW */
+.vr-tabs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;flex-shrink:0}
+.vr-tab{padding:7px 14px;border:2px solid #e5e7eb;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s;white-space:nowrap}
+.vr-tab:hover{border-color:#0369A1;color:#0369A1}
+.vr-tab.active{background:#0369A1;color:#fff;border-color:#0369A1}
+.vr-tab.done{background:#E0F2FE;border-color:#0369A1;color:#075985}
+.vr-tab.done.active{background:#0369A1;color:#fff}
+.vr-body{flex:1;display:flex;min-height:0}
+.vr-left{width:26%;padding:18px;border-right:2px solid #e5e7eb;display:flex;flex-direction:column;gap:8px;background:#fafaf7}
+.vr-right{flex:1;padding:18px 24px;display:flex;flex-direction:column;gap:12px}
+.vr-emoji{font-size:80px;line-height:1}
+.vr-word{font-size:42px;font-weight:800;color:#111;line-height:1.1}
+.vr-ipa{font-size:16px;color:#6b7280}
+.vr-pos{font-size:15px;color:#0369A1;font-weight:700}
+.vr-mark{background:#0369A1;color:#fff;border:none;border-radius:10px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;margin-top:auto;transition:all .2s}
+.vr-mark.done{background:#9ca3af;cursor:not-allowed}
+
+/* OCEAN ZONE STRIP (Unit 6 only) */
+.oz-strip{width:100%;border-radius:14px;overflow:hidden;border:2px solid #BAE6FD;display:flex;flex-direction:column}
+.oz-band{padding:14px 20px;color:#fff;font-weight:700;font-size:19px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all .18s;border:none;font-family:Outfit,sans-serif;text-align:left}
+.oz-band small{font-weight:600;opacity:.85;font-size:15px}
+.oz-band.sunlit{background:linear-gradient(90deg,#7DD3FC,#0EA5E9)}
+.oz-band.twilight{background:linear-gradient(90deg,#0369A1,#075985)}
+.oz-band.midnight{background:linear-gradient(90deg,#0C4A6E,#020617)}
+.oz-band.picked{box-shadow:inset 0 0 0 5px #16A34A}
+.oz-band.wrongpick{animation:mgShake .3s}
+.dive-col{width:100%;max-width:560px;height:230px;border-radius:14px;border:2px solid #BAE6FD;overflow:hidden;position:relative;background:linear-gradient(180deg,#7DD3FC 0%,#0EA5E9 22%,#0369A1 48%,#0C4A6E 74%,#020617 100%)}
+.dive-sub{position:absolute;left:50%;transform:translateX(-50%);font-size:38px;transition:top .3s ease}
+.dive-mark{position:absolute;left:0;right:0;border-top:2px dashed rgba(255,255,255,.6);color:#fff;font-size:13px;font-weight:700;padding-left:8px}
+.arm-ring{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:520px}
+.arm{width:64px;height:64px;border-radius:50%;border:3px solid #BAE6FD;background:#fff;font-size:28px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.arm:hover{border-color:#0369A1;transform:translateY(-3px)}
+.arm.on{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.vanish{transition:opacity .45s,transform .45s}
+.vanish.gone{opacity:0;transform:scale(.4) rotate(20deg);pointer-events:none}
+</style>
+
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<!-- SLIDE 1: TITLE -->
+<div class="slide active" id="s1">
+  <div class="title-bg">
+    <div style="font-size:22px;font-weight:700;letter-spacing:3px;opacity:.75;text-transform:uppercase">Our World · Level 4 · Unit 6</div>
+    <div style="font-size:78px;font-weight:900;text-align:center;line-height:1.1">Wonders of the Sea</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;font-size:30px;font-weight:700">🌊 Vocabulary 1 — The Ocean and Its Creatures</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:1400px">
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🛢️ pollution</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">♻️ a resource</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">❌ disappear</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🦀 a creature</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🌊 a layer</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🌍 a zone</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">☀️ sunlight</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🌌 midnight</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🐋 a whale</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🦑 a squid</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🐬 a dolphin</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🐟 fish</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🦈 a shark</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🐢 a sea turtle</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🐙 an octopus</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🧽 sea sponges</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2: OBJECTIVES -->
+<div class="slide" id="s2">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1 — Objectives</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 In This Lesson</div>
+    <div class="obj-grid">
+      <div class="obj-card"><div class="obj-icon">🐙</div><div class="obj-text"><b>Content:</b> Identify and name sea creatures and the three <b>layers</b> of the ocean.</div></div>
+      <div class="obj-card"><div class="obj-icon">🌊</div><div class="obj-text"><b>Content:</b> Explain what we use the oceans for, and why <b>pollution</b> is a problem.</div></div>
+      <div class="obj-card"><div class="obj-icon">🗣️</div><div class="obj-text"><b>Language:</b> Produce all 16 target words from TR 6.1 and TR 6.2.</div></div>
+      <div class="obj-card"><div class="obj-icon">🧠</div><div class="obj-text"><b>Language:</b> Sort the words into <b>sea creatures</b> / <b>words for the ocean</b> / <b>protecting the ocean</b>.</div></div>
+    </div>
+    <div class="task-card" style="margin-top:6px">📚 <b>Student Book pp. 94–95</b> · Audio <b>TR 6.1</b> and <b>TR 6.2</b> · Workbook pp. 72–73 for homework.</div>
+    <span class="src-pill">Lesson Planner pp. 196–199 · Unit 6 Vocabulary 1</span>
+  </div>
+</div>
+
+<!-- SLIDE 3: ACADEMIC LANGUAGE -->
+<div class="slide" id="s3">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Academic Language</span><span class="hd-chip ac">Always first</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎓 Words we use to talk <i>about</i> the lesson</div>
+    <div class="slide-h2">Tap each card to hear how we use it today. <b id="ac-score" style="color:#075985">0 / 8 tapped</b></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px" id="ac-grid"></div>
+    <span class="src-pill">unit-6/vocabulary.json · academicWordIds</span>
+  </div>
+</div>
+
+<!-- SLIDE 4: CONTENT VOCABULARY -->
+<div class="slide" id="s4">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Content Vocabulary</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔎 Three words from the reading</div>
+    <div class="slide-h2">These are not target words — but Leo will meet them in TR 6.1. Tap to reveal.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:10px" id="cw-grid"></div>
+    <span class="src-pill">unit-6/vocabulary.json · contentWordIds</span>
+  </div>
+</div>
+
+<!-- SLIDE 5: pollution -->
+<div class="slide" id="s5">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">1 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🛢️</div>
+      <div class="word-main">pollution</div>
+      <div class="word-ipa">/pəˈluːʃən/</div>
+      <div class="word-syl">pol·lu·tion</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">trash or harmful things that make air, water, or land dirty</div>
+      <div class="word-jp">🇯🇵 汚染（おせん）— ごみや有害なものが、空気・水・土地をよごすこと。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "When somebody throws a plastic bottle in the sea, that is <b>pollution</b>. The sea cannot clean itself."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🔎 <b>Pollution Patrol!</b> Tap the 6 things that <b>pollute</b> the ocean. Leave the clean things alone.</div>
+<div class="mg-stage"><div class="mg-grid" id="g-pollution-grid"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-pollution-score">0 / 6</span><span class="mg-miss" id="g-pollution-miss"></span></div>
+        <div class="mg-win" id="g-pollution-win">🎉 All 6 found! Every one of those is <b>pollution</b> — and every one is made by people.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"There is too much <b>pollution</b>."</li><li><b>Pollution</b> is a noun — you cannot say "a pollution."</li></ul></div>
+        <span class="mg-source">Student Book p. 94 · TR 6.1</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: a resource -->
+<div class="slide" id="s6">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">2 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">♻️</div>
+      <div class="word-main">a resource</div>
+      <div class="word-ipa">/ˈriːsɔrs/</div>
+      <div class="word-syl">re·source</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">something useful in nature, like water, fish, or trees</div>
+      <div class="word-jp">🇯🇵 資源（しげん）— 自然の中にある、役に立つもの。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Fish are a <b>resource</b>. If we take them all today, there is nothing left for tomorrow."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🧭 <b>Resource or Not?</b> 3 rounds. Choose the ocean <b>resource</b>.</div>
+<div class="mg-stage" id="g-resource-stage"></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-resource-score">0 / 3</span><span class="mg-miss" id="g-resource-miss"></span></div>
+        <div class="mg-win" id="g-resource-win">🎉 3 / 3! Food, transportation and fun — all ocean <b>resources</b>.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"We need to protect our <b>resources</b>."</li><li>A <b>resource</b> is something we <i>use</i> — food, water, energy.</li></ul></div>
+        <span class="mg-source">Student Book p. 94 · TR 6.1</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: disappear -->
+<div class="slide" id="s7">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">3 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">❌</div>
+      <div class="word-main">disappear</div>
+      <div class="word-ipa">/ˌdɪsəˈpɪr/</div>
+      <div class="word-syl">dis·ap·pear</div>
+      <div class="word-pos">Verb</div>
+      <div class="word-def">to go away so it cannot be seen</div>
+      <div class="word-jp">🇯🇵 消（き）える — 見えなくなること。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Watch what happens when we take one fish, then another, then another…"</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🐟 <b>Vanishing Sea!</b> Tap each fish to take it out of the ocean. Count how fast they go.</div>
+<div class="mg-stage"><div class="arm-ring" id="g-disappear-vanish"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-disappear-score">0 / 8</span><span class="mg-miss" id="g-disappear-miss"></span></div>
+        <div class="mg-win" id="g-disappear-win">😟 All 8 gone. That is what <b>disappear</b> means — and why the reading says we must protect the oceans.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"Animals and plants can <b>disappear</b>."</li><li><b>dis-</b> means <i>not</i>: appear → <b>disappear</b>.</li></ul></div>
+        <span class="mg-source">Student Book p. 94 · TR 6.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8: a creature -->
+<div class="slide" id="s8">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">4 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🦀</div>
+      <div class="word-main">a creature</div>
+      <div class="word-ipa">/ˈkriːtʃər/</div>
+      <div class="word-syl">crea·ture</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a living animal, especially a strange or interesting one</div>
+      <div class="word-jp">🇯🇵 生き物（いきもの）— 動物、とくにめずらしい生き物。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "A rock is not a <b>creature</b>. A crab is. A <b>creature</b> is alive."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🦀 <b>Alive or Not?</b> Tap the 6 sea <b>creatures</b>. Leave everything that is not alive.</div>
+<div class="mg-stage"><div class="mg-grid" id="g-creature-grid"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-creature-score">0 / 6</span><span class="mg-miss" id="g-creature-miss"></span></div>
+        <div class="mg-win" id="g-creature-win">🎉 6 / 6! Every <b>creature</b> is alive. Shells and rocks are not.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"An octopus is a sea <b>creature</b>."</li><li>Use <b>creature</b> for animals — never for plants or rocks.</li></ul></div>
+        <span class="mg-source">Student Book p. 94 · TR 6.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 9: a layer -->
+<div class="slide" id="s9">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">5 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🌊</div>
+      <div class="word-main">a layer</div>
+      <div class="word-ipa">/ˈleɪər/</div>
+      <div class="word-syl">lay·er</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">one level of something — like the top, middle, or bottom of the ocean</div>
+      <div class="word-jp">🇯🇵 層（そう）— 上・中・下のような、ひとつの段。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Think of a cake. The ocean has <b>layers</b> too — top, middle and bottom."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🥞 <b>Stack the Ocean!</b> Tap the three <b>layers</b> in order — top first, then middle, then bottom.</div>
+<div class="mg-stage"><div class="oz-strip" id="g-layer-order"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-layer-score">0 / 3</span><span class="mg-miss" id="g-layer-miss"></span></div>
+        <div class="mg-win" id="g-layer-win">🎉 Right order! Three <b>layers</b>, top to bottom.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"Most fish live in the top <b>layer</b> of the water."</li><li>The reading names three <b>layers</b>: top, middle, bottom.</li></ul></div>
+        <span class="mg-source">Student Book p. 95 · TR 6.1</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10: a zone -->
+<div class="slide" id="s10">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">6 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🌍</div>
+      <div class="word-main">a zone</div>
+      <div class="word-ipa">/zoʊn/</div>
+      <div class="word-syl">zone</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a part or area, like one section of the ocean</div>
+      <div class="word-jp">🇯🇵 区域（くいき）— 場所のひとつの部分。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "A <b>zone</b> is an area with a name. Our house has a quiet <b>zone</b> — your room at bedtime!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🔗 <b>Name the Zone!</b> Tap a <b>zone</b>, then tap what the reading says about it.</div>
+<div class="mg-stage"><div class="mg-pair" id="g-zone-pair"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-zone-score">0 / 3</span><span class="mg-miss" id="g-zone-miss"></span></div>
+        <div class="mg-win" id="g-zone-win">🎉 3 / 3! Three <b>zones</b>, three depths.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"The top layer is the sunlit <b>zone</b>."</li><li>Layer and <b>zone</b> mean almost the same thing here.</li></ul></div>
+        <span class="mg-source">Student Book p. 95 · TR 6.1</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 11: sunlight -->
+<div class="slide" id="s11">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">7 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">☀️</div>
+      <div class="word-main">sunlight</div>
+      <div class="word-ipa">/ˈsʌnlaɪt/</div>
+      <div class="word-syl">sun·light</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">the light that comes from the sun</div>
+      <div class="word-jp">🇯🇵 日光（にっこう）— 太陽から来る光。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Dive down with me. Watch the <b>sunlight</b> run out."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🤿 <b>Deep Dive!</b> Tap DIVE and watch the <b>sunlight</b> disappear. How deep can you go?</div>
+<div class="mg-stage"><div class="dive-col" id="g-sunlight-col"></div><button class="mg-btn" id="g-sunlight-btn" onclick="diveStep('g-sunlight')">🤿 DIVE</button><div style="font-size:20px;font-weight:800;color:#075985" id="g-sunlight-depth">0 m — bright sunlight</div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-sunlight-score">0 / 10</span><span class="mg-miss" id="g-sunlight-miss"></span></div>
+        <div class="mg-win" id="g-sunlight-win">🎉 1,000 m! Below here there is no <b>sunlight</b> at all — that is the midnight zone.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"Plants need <b>sunlight</b>."</li><li><b>sun</b> + <b>light</b> — two small words joined into one.</li></ul></div>
+        <span class="mg-source">Student Book p. 95 · TR 6.1</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 12: midnight -->
+<div class="slide" id="s12">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">8 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🌌</div>
+      <div class="word-main">midnight</div>
+      <div class="word-ipa">/ˈmɪdnaɪt/</div>
+      <div class="word-syl">mid·night</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">the middle of the night — also the name for the deepest, darkest ocean zone</div>
+      <div class="word-jp">🇯🇵 真夜中（まよなか）— 夜の12時。いちばん深く暗い海の層の名前でもある。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Why <b>midnight</b>? Because down there it is always as dark as twelve o'clock at night."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🌑 <b>Into the Dark!</b> 3 rounds about the <b>midnight</b> zone.</div>
+<div class="mg-stage" id="g-midnight-stage"></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-midnight-score">0 / 3</span><span class="mg-miss" id="g-midnight-miss"></span></div>
+        <div class="mg-win" id="g-midnight-win">🎉 3 / 3! The deepest, darkest <b>layer</b> of all.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"The <b>midnight</b> zone is very dark."</li><li><b>mid</b> (middle) + <b>night</b>.</li></ul></div>
+        <span class="mg-source">Student Book p. 95 · TR 6.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 13: a whale -->
+<div class="slide" id="s13">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">9 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🐋</div>
+      <div class="word-main">a whale</div>
+      <div class="word-ipa">/weɪl/</div>
+      <div class="word-syl">whale</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a very large sea animal that breathes air</div>
+      <div class="word-jp">🇯🇵 クジラ — とても大きな海の動物。空気を吸う。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "A <b>whale</b> is not a fish. It comes to the top to breathe, just like you and me."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🐋 <b>Whale Facts!</b> Tap all 6 cards and read each one aloud.</div>
+<div class="mg-stage"><div class="mg-grid c3" id="g-whale-grid"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-whale-score">0 / 6</span><span class="mg-miss" id="g-whale-miss"></span></div>
+        <div class="mg-win" id="g-whale-win">🎉 6 / 6! Now say: "The <b>whale</b> is the biggest sea creature."</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"The <b>whale</b> is the biggest sea creature."</li><li>Plural: one <b>whale</b>, two <b>whales</b>.</li></ul></div>
+        <span class="mg-source">Student Book p. 94 · TR 6.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 14: a squid -->
+<div class="slide" id="s14">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">10 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🦑</div>
+      <div class="word-main">a squid</div>
+      <div class="word-ipa">/skwɪd/</div>
+      <div class="word-syl">squid</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a sea animal with a long body and many arms</div>
+      <div class="word-jp">🇯🇵 イカ — 長い体とたくさんの腕をもつ海の生き物。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Count with me. A <b>squid</b> has eight arms — plus two long tentacles. Ten in total!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🦑 <b>Count the Arms!</b> Tap every arm of the <b>squid</b>. Count out loud in English.</div>
+<div class="mg-stage"><div style="font-size:74px">🦑</div><div class="arm-ring" id="g-squid-arms"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-squid-score">0 / 10</span><span class="mg-miss" id="g-squid-miss"></span></div>
+        <div class="mg-win" id="g-squid-win">🎉 Ten! Eight arms plus two long tentacles. A <b>squid</b> is not a fish.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"Are all <b>squid</b> red?"</li><li>Careful: one <b>squid</b>, two <b>squid</b> — the plural does not change.</li></ul></div>
+        <span class="mg-source">Student Book p. 94 · TR 6.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 15: a dolphin -->
+<div class="slide" id="s15">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">11 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🐬</div>
+      <div class="word-main">a dolphin</div>
+      <div class="word-ipa">/ˈdɒlfɪn/</div>
+      <div class="word-syl">dol·phin</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a smart sea animal that lives in groups and breathes air</div>
+      <div class="word-jp">🇯🇵 イルカ — かしこくて、群れでくらす海の動物。空気を吸う。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "<b>Dolphins</b> play. They really do — they surf on waves for fun."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🐬 <b>Dolphin Quiz!</b> 3 rounds.</div>
+<div class="mg-stage" id="g-dolphin-stage"></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-dolphin-score">0 / 3</span><span class="mg-miss" id="g-dolphin-miss"></span></div>
+        <div class="mg-win" id="g-dolphin-win">🎉 3 / 3! "<b>Dolphins</b> are very friendly."</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"<b>Dolphins</b> are very friendly."</li><li>Like the whale, a <b>dolphin</b> breathes air.</li></ul></div>
+        <span class="mg-source">Student Book p. 94 · TR 6.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 16: fish -->
+<div class="slide" id="s16">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">12 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🐟</div>
+      <div class="word-main">fish</div>
+      <div class="word-ipa">/fɪʃ/</div>
+      <div class="word-syl">fish</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">an animal with fins and gills that lives in water</div>
+      <div class="word-jp">🇯🇵 魚（さかな）— ひれとえらをもち、水の中でくらす動物。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Not everything in the sea is a <b>fish</b>. Whales, dolphins, turtles and octopuses are not!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🐟 <b>Fish or Not a Fish?</b> Tap only the real <b>fish</b>. Six of them are not!</div>
+<div class="mg-stage"><div class="mg-grid" id="g-fish-grid"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-fish-score">0 / 6</span><span class="mg-miss" id="g-fish-miss"></span></div>
+        <div class="mg-win" id="g-fish-win">🎉 Sharks ARE fish. Whales and dolphins are NOT — they breathe air.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"There are many <b>fish</b> in the sunlit zone."</li><li>One <b>fish</b>, two <b>fish</b> — the plural does not change.</li></ul></div>
+        <span class="mg-source">Student Book p. 95 · TR 6.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 17: a shark -->
+<div class="slide" id="s17">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">13 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🦈</div>
+      <div class="word-main">a shark</div>
+      <div class="word-ipa">/ʃɑrk/</div>
+      <div class="word-syl">shark</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a large fish with sharp teeth that lives in the ocean</div>
+      <div class="word-jp">🇯🇵 サメ — するどい歯をもつ大きな魚。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "A <b>shark</b> IS a fish — the biggest one you will ever meet."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🦈 <b>Shark Facts!</b> Tap all 6 cards and read each one aloud.</div>
+<div class="mg-stage"><div class="mg-grid c3" id="g-shark-grid"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-shark-score">0 / 6</span><span class="mg-miss" id="g-shark-miss"></span></div>
+        <div class="mg-win" id="g-shark-win">🎉 6 / 6! Now say: "I saw a <b>shark</b> at the aquarium."</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"I saw a <b>shark</b> at the aquarium."</li><li>A <b>shark</b> is a fish; a whale is not.</li></ul></div>
+        <span class="mg-source">Student Book p. 94 · TR 6.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 18: a sea turtle -->
+<div class="slide" id="s18">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">14 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🐢</div>
+      <div class="word-main">a sea turtle</div>
+      <div class="word-ipa">/siː ˈtɜrtəl/</div>
+      <div class="word-syl">sea tur·tle</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a turtle that lives in the ocean and swims with flippers</div>
+      <div class="word-jp">🇯🇵 ウミガメ — 海でくらすカメ。ひれで泳ぐ。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "A <b>sea turtle</b> is born on the beach — then it swims for the rest of its life."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🐢 <b>Turtle Life!</b> Tap a stage, then tap what happens.</div>
+<div class="mg-stage"><div class="mg-pair" id="g-seaturtle-pair"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-seaturtle-score">0 / 4</span><span class="mg-miss" id="g-seaturtle-miss"></span></div>
+        <div class="mg-win" id="g-seaturtle-win">🎉 4 / 4! Now you know why plastic in the sea is a problem.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"A <b>sea turtle</b> can swim fast."</li><li>Two words: <b>sea</b> + <b>turtle</b>.</li></ul></div>
+        <span class="mg-source">Student Book p. 94 · TR 6.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 19: an octopus -->
+<div class="slide" id="s19">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">15 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🐙</div>
+      <div class="word-main">an octopus</div>
+      <div class="word-ipa">/ˈɒktəpəs/</div>
+      <div class="word-syl">oc·to·pus</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">a sea creature with eight arms</div>
+      <div class="word-jp">🇯🇵 タコ — 8本の腕をもつ海の生き物。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "<b>Oct</b> means eight — like <i>October</i> and an <i>octagon</i>. Count them!"</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🐙 <b>Count the Arms!</b> Tap every arm of the <b>octopus</b>. Count out loud in English.</div>
+<div class="mg-stage"><div style="font-size:74px">🐙</div><div class="arm-ring" id="g-octopus-arms"></div></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-octopus-score">0 / 8</span><span class="mg-miss" id="g-octopus-miss"></span></div>
+        <div class="mg-win" id="g-octopus-win">🎉 Eight! <b>oct-</b> means eight — an <b>octopus</b> has eight arms.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"An <b>octopus</b> has eight arms."</li><li><b>oct-</b> = eight.</li></ul></div>
+        <span class="mg-source">Student Book p. 94 · TR 6.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 20: sea sponges -->
+<div class="slide" id="s20">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary 1</span><span class="hd-chip">16 / 16</span></div>
+  <div class="vocab-body">
+    <div class="word-panel">
+      <span class="vtag v1">Vocab 1</span>
+      <div class="word-emoji" onclick="popEmoji(this)">🧽</div>
+      <div class="word-main">sea sponges</div>
+      <div class="word-ipa">/siː ˈspʌndʒɪz/</div>
+      <div class="word-syl">sea spong·es</div>
+      <div class="word-pos">Noun</div>
+      <div class="word-def">soft sea animals that live on the ocean floor</div>
+      <div class="word-jp">🇯🇵 海綿（かいめん）— 海の底にすむ、やわらかい生き物。</div>
+      <div class="dad-say">💬 <b>Dad:</b> "Here is the surprise: a <b>sea sponge</b> is an animal. It just never moves."</div>
+    </div>
+    <div class="game-panel">
+      <div class="mg-wrap">
+        <div class="mg-head">🧽 <b>Sponge Surprise!</b> 3 rounds.</div>
+<div class="mg-stage" id="g-seasponges-stage"></div>
+        <div style="display:flex;gap:16px;align-items:center"><span class="mg-score" id="g-seasponges-score">0 / 3</span><span class="mg-miss" id="g-seasponges-miss"></span></div>
+        <div class="mg-win" id="g-seasponges-win">🎉 3 / 3! A <b>sea sponge</b> is a colorful animal that never moves.</div>
+        <div class="how-box"><b>How do we use it?</b><ul><li>"<b>Sea sponges</b> are colorful."</li><li>Usually plural: <b>sea sponges</b>.</li></ul></div>
+        <span class="mg-source">Student Book p. 94 · TR 6.2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 21: VOCABULARY REVIEW -->
+<div class="slide" id="s21">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary Review — all 16</span></div>
+  <div class="content-body" style="padding:20px 30px;gap:10px">
+    <div class="vr-tabs" id="vr-tabs"></div>
+    <div class="vr-body">
+      <div class="vr-left">
+        <div class="vr-emoji" id="vr-emoji"></div>
+        <div class="vr-word" id="vr-word"></div>
+        <div class="vr-ipa" id="vr-ipa"></div>
+        <div class="vr-pos" id="vr-pos"></div>
+        <div class="vr-ipa" id="vr-jp" style="margin-top:8px;line-height:1.4"></div>
+        <button class="vr-mark" id="vr-mark" onclick="vrMark()">✓ Leo knows this word</button>
+      </div>
+      <div class="vr-right">
+        <div class="slide-h2" id="vr-q"></div>
+        <div style="display:flex;flex-direction:column;gap:10px" id="vr-opts"></div>
+        <div style="font-size:20px;font-weight:800;min-height:28px" id="vr-fb"></div>
+        <span class="src-pill" style="margin-top:auto">Quick oral check before the reading</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 22: WARM UP -->
+<div class="slide" id="s22">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Recycle</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🌊 What do we already know about the sea?</div>
+    <div class="slide-h2">Tap a question, then tap the answer on the right. Matched: <b id="wu-count" style="color:#075985">0 / 4</b></div>
+    <div class="mg-pair" style="margin-top:8px"><div class="mg-col" id="wu-left" style="max-width:440px"></div><div class="mg-col" id="wu-right" style="max-width:440px"></div></div>
+    <span class="src-pill">Lesson Planner p. 196 · Warm Up</span>
+  </div>
+</div>
+
+<!-- SLIDE 23: PRESENT -->
+<div class="slide" id="s23">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Present — Repeat after me</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🗣️ Turn to Student Book pp. 94–95</div>
+    <div class="slide-h2">Point to each word, say it, then tap its chip. Leo repeats every time.</div>
+    <div class="chips-row" style="margin-top:8px" id="present-chips"></div>
+    <div class="slide-h2" style="margin-top:6px">Said: <b id="present-count" style="color:#075985">0 / 16</b></div>
+    <span class="src-pill">Lesson Planner p. 197 · Present</span>
+  </div>
+</div>
+
+<!-- SLIDE 24: PRESENT — OCEAN ZONE DIAGRAM -->
+<div class="slide" id="s24">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Present — Diagram of the Zones</span><span class="hd-chip">TR 6.1</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📐 Label the three <b>zones</b></div>
+    <div class="slide-h2">Tap a zone to reveal its <b>label</b> and its depth. Say the name aloud first. Revealed: <b id="oz-count" style="color:#075985">0 / 3</b></div>
+    <div class="oz-strip" style="margin-top:10px;flex:1;min-height:0" id="oz-diagram"></div>
+    <div class="how-box" style="margin-top:8px"><b>Academic language in action:</b> this is a <b>diagram</b>. The words we write on it are <b>labels</b>.</div>
+    <span class="src-pill">Student Book p. 95 · the three ocean layers</span>
+  </div>
+</div>
+
+<!-- SLIDE 25: TR 6.1 PART 1 -->
+<div class="slide" id="s25">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Practice 1 — Listen and Read</span><span class="hd-chip">TR 6.1</span></div>
+  <div class="content-body" style="gap:12px">
+    <div class="listen-hero"><div class="lh-emoji">🎧</div><div class="lh-text">Play TR 6.1. Leo follows along with his finger.</div><div class="lh-tr">TR 6.1</div></div>
+    <div class="slide-h2">🎯 <b>Word Radar:</b> Leo taps each blue word the moment he hears it. Found: <b id="radar-count" style="color:#075985">0 / 11</b></div>
+<div class="reading-block">We use the oceans for fun, for <button class="tap-word" onclick="radarTap(this)">transportation</button>, and, more importantly, we use the oceans for food. We must stop <button class="tap-word" onclick="radarTap(this)">pollution</button>. We must protect the oceans or our <button class="tap-word" onclick="radarTap(this)">resources</button> will <button class="tap-word" onclick="radarTap(this)">disappear</button>.</div><div class="reading-block">The oceans are full of wonderful sea life. Most of the <button class="tap-word" onclick="radarTap(this)">creatures</button> we know stay near the top <button class="tap-word" onclick="radarTap(this)">layer</button> of the water, called the sunlit <button class="tap-word" onclick="radarTap(this)">zone</button>. In this zone, <button class="tap-word" onclick="radarTap(this)">sunlight</button> goes down to about 200 m (656 ft.).</div>
+    <div class="how-box"><b>The photos on SB p. 94 — name each one as the audio plays:</b></div>
+    <div class="chips-row" id="crt-chips"></div>
+    <span class="src-pill">Student Book p. 94 · Activity 1 — verbatim</span>
+  </div>
+</div>
+
+<!-- SLIDE 26: TR 6.1 PART 2 -->
+<div class="slide" id="s26">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Practice 1 — Listen and Read (cont.)</span><span class="hd-chip">TR 6.1</span></div>
+  <div class="content-body" style="gap:12px">
+<div class="reading-block">The middle layer of the water is called the twilight zone. This is because there isn't much light. This zone goes down to about 1,000 m (3,300 ft.). Many different types of <button class="tap-word" onclick="radarTap(this)">fish</button> live in this layer. Some of them look very strange.</div><div class="reading-block">The <button class="tap-word" onclick="radarTap(this)">mysterious</button> bottom layer of water is almost completely black. The only light comes from the creatures who live here. It is called the <button class="tap-word" onclick="radarTap(this)">midnight</button> zone because sunlight doesn't reach below 1,000 m (3,300 ft.). Some amazing animals live in this deepest part of the ocean.</div>
+    <div class="how-box"><b>Point to the photos on p. 100:</b> a whale · a squid · a dolphin · fish · a shark · a sea turtle · an octopus · sea sponges.</div>
+    <span class="src-pill">Student Book pp. 94–95 · Activity 1 — verbatim</span>
+  </div>
+</div>
+
+<!-- SLIDE 27: DISCUSS -->
+<div class="slide" id="s27">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Practice — Discuss the Reading</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💬 Ask each question. Tap to reveal the answer.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px" id="disc-grid"></div>
+    <span class="src-pill">Lesson Planner p. 198 · Practice questions</span>
+  </div>
+</div>
+
+<!-- SLIDE 28: SORT -->
+<div class="slide" id="s28">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Practice — Sort the Words</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🧠 "Now sort the words into the right column."</div>
+    <div class="slide-h2">Tap a word, then tap its column. Sorted: <b id="sort-count" style="color:#075985">0 / 16</b></div>
+    <div style="display:flex;gap:18px;margin-top:8px;min-height:0;flex:1">
+      <div style="width:30%;display:flex;flex-direction:column;gap:8px;overflow-y:auto" id="sort-pool"></div>
+      <div style="flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:14px" id="sort-cols"></div>
+    </div>
+    <span class="src-pill">Three-column chart · all 16 Vocabulary 1 words</span>
+  </div>
+</div>
+
+<!-- SLIDE 29: TR 6.2 ECHO -->
+<div class="slide" id="s29">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Practice 2 — Listen and Repeat</span><span class="hd-chip">TR 6.2</span></div>
+  <div class="content-body" style="gap:10px">
+    <div class="listen-hero" style="padding:16px 30px"><div class="lh-emoji" style="font-size:48px">🎤</div><div class="lh-text" style="font-size:22px">Play TR 6.2. Leo repeats the word <i>and</i> the sentence.</div><div class="lh-tr">TR 6.2</div></div>
+    <div class="slide-h2" style="font-size:21px">Tap a row once Leo has echoed it clearly. Echoed: <b id="echo-count" style="color:#075985">0 / 16</b></div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;overflow-y:auto;min-height:0" id="echo-grid"></div>
+    <span class="src-pill">Student Book p. 95 · Activity 2 — verbatim audio script</span>
+  </div>
+</div>
+
+<!-- SLIDE 30: BUILD THE SENTENCE -->
+<div class="slide" id="s30">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Practice — Build the Sentence</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✍️ Tap the chips in order to build the sentence.</div>
+    <div class="task-card" style="font-size:32px;text-align:center;min-height:96px;display:flex;align-items:center;justify-content:center" id="build-line">…</div>
+    <div class="chips-row" id="build-chips"></div>
+    <div style="display:flex;gap:14px;align-items:center;margin-top:6px">
+      <button class="mg-btn" onclick="buildCheck()">✔ Check</button>
+      <button class="mg-btn" style="background:#6b7280" onclick="buildReset()">↺ Start over</button>
+      <span class="mg-miss" id="build-fb"></span>
+    </div>
+    <div class="how-box"><b>Then ask:</b> which four target words are in the sentence? (<b>creatures</b>, <b>layer</b>, <b>sunlit zone</b>, <b>sunlight</b>)</div>
+    <span class="src-pill">Built from TR 6.1, paragraph 2</span>
+  </div>
+</div>
+
+<!-- SLIDE 31: APPLY — DIALOGUE -->
+<div class="slide" id="s31">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Apply — Ask and Answer</span><span class="hd-chip">SB p. 95</span></div>
+  <div class="content-body" style="gap:16px">
+    <div class="slide-h1" style="text-align:center">🗣️ Model the dialogue, then swap roles.</div>
+    <div class="chat-row"><div class="chat-ava">🧑‍🏫</div><div class="bub q">Which sea creature do you like best?</div></div>
+    <div class="chat-row right"><div class="chat-ava">🧒</div><div class="bub a">I like the octopus best. An octopus has eight arms!</div></div>
+    <div class="chat-row"><div class="chat-ava">🧑‍🏫</div><div class="bub q">Which zone does it live in?</div></div>
+    <div class="chat-row right"><div class="chat-ava">🧒</div><div class="bub a">It lives in the sunlit zone — the top layer.</div></div>
+    <span class="src-pill" style="align-self:center">Student Book p. 95 · Activity 3</span>
+  </div>
+</div>
+
+<!-- SLIDE 32: APPLY — BUILD A QUESTION -->
+<div class="slide" id="s32">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Apply — Build a Question</span></div>
+  <div class="content-body">
+    <div class="slide-h1">❓ Tap chips to build a question Leo can ask Dad.</div>
+    <div class="task-card" style="font-size:30px;text-align:center;min-height:90px;display:flex;align-items:center;justify-content:center" id="qb-line">…</div>
+    <div class="chips-row" id="qb-chips"></div>
+    <button class="mg-btn" style="background:#6b7280;width:fit-content" onclick="qbReset()">↺ Start over</button>
+    <div class="how-box"><b>Then:</b> Leo asks the question out loud and Dad answers in a full sentence. Write the answer down.</div>
+    <span class="src-pill">Extension of Student Book p. 95 · Activity 3</span>
+  </div>
+</div>
+
+<!-- SLIDE 33: EXTEND — SUNSHINE ORGANIZER -->
+<div class="slide" id="s33">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Extend — Ways to Protect the Ocean</span></div>
+  <div class="content-body">
+    <div class="slide-h1">☀️ What can we do to protect the ocean?</div>
+    <div class="slide-h2">Type Leo's answers straight into the rays. Use the new words: <b>pollution</b>, <b>resources</b>, <b>disappear</b>, <b>creatures</b>.</div>
+    <div style="flex:1;min-height:0;display:flex;gap:24px;align-items:center">
+      <div style="width:52%;display:flex;align-items:center;justify-content:center;min-height:0" id="sun-mount"></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:10px" id="sun-rows"></div>
+    </div>
+    <span class="src-pill">Lesson Planner p. 199 · Extend</span>
+  </div>
+</div>
+
+<!-- SLIDE 34: WRAP UP -->
+<div class="slide" id="s34">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — Act It Out</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:20px">
+    <div class="slide-h1">🎭 Act out a word — the other person guesses!</div>
+    <div class="slide-h2">Tap the card to draw a random word. Acted: <b id="act-count" style="color:#075985">0 / 16</b></div>
+    <div class="task-card" style="width:620px;text-align:center;cursor:pointer;padding:40px" onclick="actDraw()">
+      <div style="font-size:80px" id="act-emoji">🎴</div>
+      <div style="font-size:44px;font-weight:900;color:#075985;margin-top:10px" id="act-word">Tap to draw</div>
+    </div>
+    <span class="src-pill">Lesson Planner p. 199 · Wrap Up</span>
+  </div>
+</div>
+
+<!-- SLIDE 35: RECAP -->
+<div class="slide" id="s35">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Recap</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔁 "We learned about the wonders of the sea."</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px" id="recap-grid"></div>
+    <span class="src-pill">Lesson Planner p. 198 · Recap</span>
+  </div>
+</div>
+
+<!-- SLIDE 36: BE THE EXPERT — VOCABULARY STRATEGY -->
+<div class="slide" id="s36">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Be the Expert — Vocabulary Strategy</span></div>
+  <div class="content-body">
+    <div class="bte-header">Compound words</div>
+    <div class="bte-body">Some English words are two small words joined together. <b>sun</b> + <b>light</b> = <b>sunlight</b>. When Leo meets a long word, ask him to look for two words hiding inside it — it is often the fastest way to the meaning.</div>
+    <div class="slide-h2" style="margin-top:6px">Tap the two halves to build each word: <b id="cmp-count" style="color:#075985">0 / 4</b></div>
+    <div style="display:flex;flex-direction:column;gap:12px" id="cmp-rows"></div>
+    <span class="src-pill">Lesson Planner p. 197 · Be the Expert</span>
+  </div>
+</div>
+
+<!-- SLIDE 37: BE THE EXPERT — OUR WORLD IN CONTEXT -->
+<div class="slide" id="s37">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Be the Expert — Our World in Context</span></div>
+  <div class="content-body">
+    <div class="bte-header">How deep is the ocean?</div>
+    <div class="bte-body">The sunlit zone reaches about <b>200 m</b>. The twilight zone reaches about <b>1,000 m</b>. Below that is the midnight zone — and the deepest place in the ocean, the Mariana Trench, is about <b>11,000 m</b> deep. Mount Fuji is only 3,776 m tall. It would disappear completely.</div>
+    <div class="slide-h2" style="margin-top:6px">🥇 Tap these from <b>shallowest</b> to <b>deepest</b>: <b id="depth-count" style="color:#075985">0 / 5</b></div>
+    <div class="chips-row" id="depth-chips"></div>
+    <div class="mg-miss" id="depth-fb"></div>
+    <span class="src-pill">Depths from Student Book p. 95</span>
+  </div>
+</div>
+
+<!-- SLIDE 38: FORMATIVE ASSESSMENT -->
+<div class="slide" id="s38">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✔️ Can Leo…</div>
+    <div class="assess-grid" id="assess-grid"></div>
+    <div class="task-card" style="margin-top:8px">📓 <b>Homework:</b> Workbook pp. 72–73, and Leo's Vocabulary 1 app (13 modules).</div>
+  </div>
+</div>
+
+<!-- SLIDE 39: MARK DONE -->
+<div class="slide" id="s39">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Finish the Lesson</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:24px">
+    <div style="font-size:90px">✅</div>
+    <div class="slide-h1" style="text-align:center">Unit 6 · Vocabulary 1 — taught</div>
+    <div class="slide-h2" style="text-align:center;max-width:1000px">Marking this done records it on the teacher dashboard. Leo's own Vocabulary 1 app tracks his 13 modules separately.</div>
+    <div class="done-wrap">
+      <button class="btn-done" id="doneBtn" onclick="markDone()">✅ Mark this lesson done</button>
+      <button class="btn-clear" id="redoBtn" onclick="handleRedo()">↺ Clear saved progress</button>
+      <div id="doneMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 40: GREAT JOB -->
+<div class="slide" id="s40">
+  <div class="great-job-slide">
+    <div style="font-size:96px">🏆</div>
+    <div style="font-size:64px;font-weight:900;text-align:center">Great Job, Leo!</div>
+    <div style="font-size:26px;opacity:.92;text-align:center;max-width:1000px">You learned 16 words about the ocean — plus 8 academic words and 3 content words. 🌊🐙🐋</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:1200px">
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🛢️ pollution</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🐋 a whale</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🦑 a squid</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🐙 an octopus</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🌊 a layer</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🌌 midnight</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
+
+<!-- NAV BAR -->
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 40</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="fs-btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+  <span id="unit-label">Unit 6 · Vocabulary 1</span>
+</div>
+
+<!-- TEACHER NOTES PANEL -->
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+<script>
+/* =========================================================
+   LEEA · Our World Level 4 · Unit 6 · Vocabulary 1
+   Teacher slideshow — 40 slides, 1920x1080, ocean blue
+   Word data mirrors unit-6/vocabulary.json and TR 6.2 order,
+   so the deck, Leo's app and Reference never disagree.
+   ========================================================= */
+
+// ─── MARK DONE STORAGE ─────────────────────────────────────────
+var SAVE_PREFIX = 'leea.l4.u6.vocab1-';
+var HOMEWORK_ID = 'l-4-6-vocab1';
+/* Must match the `id` in lessons/vocab1.teacher.json — the teacher dashboard
+   reads leea.lessonProgress.v1 keyed by that lesson id. */
+var LESSON_ID = 'ow-l4-u6-vocab-1';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+var LESSON_NAME = 'Unit 6 · Vocabulary 1 — Wonders of the Sea';
+
+function lSave(key, value) {
+  try {
+    var k = SAVE_PREFIX + key;
+    window.localStorage.setItem(k, JSON.stringify(value));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, value);
+    }
+  } catch (e) {}
+}
+function lLoad(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(SAVE_PREFIX + key);
+    return raw === null || raw === undefined ? fallback : JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function writeLessonProgress() {
+  try {
+    var store = {};
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (raw) store = JSON.parse(raw) || {};
+    var now = new Date().toISOString();
+    store[LESSON_ID] = { lessonId: LESSON_ID, teacherId: 'neritan', studentId: 'leo',
+                         status: 'done', completedAt: now, updatedAt: now };
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function clearLessonProgress() {
+  try {
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function markDone() {
+  writeLessonProgress();
+  lSave('complete', { name: LESSON_NAME, timestamp: new Date().toISOString(), done: true });
+  lSave('done', true);
+  var btn = document.getElementById('doneBtn');
+  if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+  var msg = document.getElementById('doneMsg');
+  if (msg) msg.textContent = 'Saved. 16 ocean words taught. 🌊';
+}
+var redoArmed = false, redoTimer = null;
+function handleRedo() {
+  var btn = document.getElementById('redoBtn');
+  var msg = document.getElementById('doneMsg');
+  if (!redoArmed) {
+    redoArmed = true;
+    btn.textContent = '↺ Tap again to clear';
+    if (msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+    if (redoTimer) window.clearTimeout(redoTimer);
+    redoTimer = window.setTimeout(function () {
+      redoArmed = false;
+      btn.textContent = '↺ Clear saved progress';
+      if (msg) msg.textContent = '';
+    }, 3000);
+    return;
+  }
+  redoArmed = false;
+  if (redoTimer) window.clearTimeout(redoTimer);
+  btn.textContent = '↺ Clear saved progress';
+  clearLessonProgress();
+  lSave('complete', null);
+  lSave('done', null);
+  var d = document.getElementById('doneBtn');
+  if (d) { d.classList.remove('confirmed'); d.textContent = '✅ Mark this lesson done'; }
+  if (msg) msg.textContent = 'Cleared.';
+}
+function restoreDoneState() {
+  var c = lLoad('complete', null);
+  if (c && c.done) {
+    var btn = document.getElementById('doneBtn');
+    if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+    var msg = document.getElementById('doneMsg');
+    if (msg) msg.textContent = 'Already marked done.';
+  }
+}
+
+// ─── DATA (injected from unit-6/vocabulary.json + TR 6.1/6.2) ──
+var vocabWords = [
+ {
+  "key": "pollution",
+  "word": "pollution",
+  "emoji": "🛢️",
+  "ipa": "/pəˈluːʃən/",
+  "pos": "Noun",
+  "def": "trash or harmful things that make air, water, or land dirty",
+  "jp": "汚染（おせん）— ごみや有害なものが、空気・水・土地をよごすこと。",
+  "tr": "There is too much pollution.",
+  "game": {
+   "t": "grid",
+   "head": "🔎 <b>Pollution Patrol!</b> Tap the 6 things that <b>pollute</b> the ocean. Leave the clean things alone.",
+   "targets": [
+    {
+     "e": "🛢️",
+     "l": "oil"
+    },
+    {
+     "e": "🥤",
+     "l": "plastic cups"
+    },
+    {
+     "e": "🛍️",
+     "l": "plastic bags"
+    },
+    {
+     "e": "🚬",
+     "l": "cigarettes"
+    },
+    {
+     "e": "🗑️",
+     "l": "garbage"
+    },
+    {
+     "e": "🏭",
+     "l": "factory smoke"
+    }
+   ],
+   "distractors": [
+    {
+     "e": "🐠",
+     "l": "fish"
+    },
+    {
+     "e": "🌊",
+     "l": "clean water"
+    },
+    {
+     "e": "🪸",
+     "l": "coral"
+    },
+    {
+     "e": "🌿",
+     "l": "seaweed"
+    },
+    {
+     "e": "🐚",
+     "l": "shells"
+    },
+    {
+     "e": "☀️",
+     "l": "sunlight"
+    }
+   ],
+   "win": "🎉 All 6 found! Every one of those is <b>pollution</b> — and every one is made by people."
+  }
+ },
+ {
+  "key": "resource",
+  "word": "a resource",
+  "emoji": "♻️",
+  "ipa": "/ˈriːsɔrs/",
+  "pos": "Noun",
+  "def": "something useful in nature, like water, fish, or trees",
+  "jp": "資源（しげん）— 自然の中にある、役に立つもの。",
+  "tr": "We need to protect our resources.",
+  "game": {
+   "t": "mcq",
+   "head": "🧭 <b>Resource or Not?</b> 3 rounds. Choose the ocean <b>resource</b>.",
+   "rounds": [
+    {
+     "emoji": "🍽️",
+     "q": "Dad says: \"More importantly, we use the oceans for ___.\" Which resource is he talking about?",
+     "opts": [
+      "food",
+      "plastic bags",
+      "oil spills"
+     ],
+     "a": 0
+    },
+    {
+     "emoji": "🚢",
+     "q": "People also use the ocean for transportation. What does that mean?",
+     "opts": [
+      "moving people and things across the water",
+      "catching all the fish",
+      "making the water dirty"
+     ],
+     "a": 0
+    },
+    {
+     "emoji": "♻️",
+     "q": "Why must we protect our resources?",
+     "opts": [
+      "or they will disappear",
+      "because they are new",
+      "so the ocean gets darker"
+     ],
+     "a": 0
+    }
+   ],
+   "win": "🎉 3 / 3! Food, transportation and fun — all ocean <b>resources</b>."
+  }
+ },
+ {
+  "key": "disappear",
+  "word": "disappear",
+  "emoji": "❌",
+  "ipa": "/ˌdɪsəˈpɪr/",
+  "pos": "Verb",
+  "def": "to go away so it cannot be seen",
+  "jp": "消（き）える — 見えなくなること。",
+  "tr": "Animals and plants can disappear.",
+  "game": {
+   "t": "vanish",
+   "head": "🐟 <b>Vanishing Sea!</b> Tap each fish to take it out of the ocean. Count how fast they go.",
+   "n": 8,
+   "win": "😟 All 8 gone. That is what <b>disappear</b> means — and why the reading says we must protect the oceans."
+  }
+ },
+ {
+  "key": "creature",
+  "word": "a creature",
+  "emoji": "🦀",
+  "ipa": "/ˈkriːtʃər/",
+  "pos": "Noun",
+  "def": "a living animal, especially a strange or interesting one",
+  "jp": "生き物（いきもの）— 動物、とくにめずらしい生き物。",
+  "tr": "An octopus is a sea creature.",
+  "game": {
+   "t": "grid",
+   "head": "🦀 <b>Alive or Not?</b> Tap the 6 sea <b>creatures</b>. Leave everything that is not alive.",
+   "targets": [
+    {
+     "e": "🦀",
+     "l": "a crab"
+    },
+    {
+     "e": "🐙",
+     "l": "an octopus"
+    },
+    {
+     "e": "🦑",
+     "l": "a squid"
+    },
+    {
+     "e": "🐋",
+     "l": "a whale"
+    },
+    {
+     "e": "🐢",
+     "l": "a sea turtle"
+    },
+    {
+     "e": "🦈",
+     "l": "a shark"
+    }
+   ],
+   "distractors": [
+    {
+     "e": "🐚",
+     "l": "a shell"
+    },
+    {
+     "e": "🪨",
+     "l": "a rock"
+    },
+    {
+     "e": "⚓",
+     "l": "an anchor"
+    },
+    {
+     "e": "🚤",
+     "l": "a boat"
+    },
+    {
+     "e": "🌊",
+     "l": "a wave"
+    },
+    {
+     "e": "🏖️",
+     "l": "sand"
+    }
+   ],
+   "win": "🎉 6 / 6! Every <b>creature</b> is alive. Shells and rocks are not."
+  }
+ },
+ {
+  "key": "layer",
+  "word": "a layer",
+  "emoji": "🌊",
+  "ipa": "/ˈleɪər/",
+  "pos": "Noun",
+  "def": "one level of something — like the top, middle, or bottom of the ocean",
+  "jp": "層（そう）— 上・中・下のような、ひとつの段。",
+  "tr": "Most fish live in the top layer of the water.",
+  "game": {
+   "t": "order",
+   "head": "🥞 <b>Stack the Ocean!</b> Tap the three <b>layers</b> in order — top first, then middle, then bottom.",
+   "items": [
+    {
+     "l": "☀️ the top layer — the sunlit zone",
+     "cls": "sunlit",
+     "sub": "down to about 200 m (656 ft.)"
+    },
+    {
+     "l": "🌗 the middle layer — the twilight zone",
+     "cls": "twilight",
+     "sub": "down to about 1,000 m (3,300 ft.)"
+    },
+    {
+     "l": "🌑 the bottom layer — the midnight zone",
+     "cls": "midnight",
+     "sub": "below 1,000 m — almost completely black"
+    }
+   ],
+   "win": "🎉 Right order! Three <b>layers</b>, top to bottom."
+  }
+ },
+ {
+  "key": "zone",
+  "word": "a zone",
+  "emoji": "🌍",
+  "ipa": "/zoʊn/",
+  "pos": "Noun",
+  "def": "a part or area, like one section of the ocean",
+  "jp": "区域（くいき）— 場所のひとつの部分。",
+  "tr": "The top layer is the sunlit zone.",
+  "game": {
+   "t": "pair",
+   "head": "🔗 <b>Name the Zone!</b> Tap a <b>zone</b>, then tap what the reading says about it.",
+   "pairs": [
+    {
+     "key": "a",
+     "problem": "☀️ the sunlit zone",
+     "solution": "Sunlight goes down to about 200 m."
+    },
+    {
+     "key": "b",
+     "problem": "🌗 the twilight zone",
+     "solution": "There isn't much light. Some fish look very strange."
+    },
+    {
+     "key": "c",
+     "problem": "🌑 the midnight zone",
+     "solution": "Almost completely black — the only light comes from the creatures."
+    }
+   ],
+   "win": "🎉 3 / 3! Three <b>zones</b>, three depths."
+  }
+ },
+ {
+  "key": "sunlight",
+  "word": "sunlight",
+  "emoji": "☀️",
+  "ipa": "/ˈsʌnlaɪt/",
+  "pos": "Noun",
+  "def": "the light that comes from the sun",
+  "jp": "日光（にっこう）— 太陽から来る光。",
+  "tr": "Plants need sunlight.",
+  "game": {
+   "t": "dive",
+   "head": "🤿 <b>Deep Dive!</b> Tap DIVE and watch the <b>sunlight</b> disappear. How deep can you go?",
+   "win": "🎉 1,000 m! Below here there is no <b>sunlight</b> at all — that is the midnight zone."
+  }
+ },
+ {
+  "key": "midnight",
+  "word": "midnight",
+  "emoji": "🌌",
+  "ipa": "/ˈmɪdnaɪt/",
+  "pos": "Noun",
+  "def": "the middle of the night — also the name for the deepest, darkest ocean zone",
+  "jp": "真夜中（まよなか）— 夜の12時。いちばん深く暗い海の層の名前でもある。",
+  "tr": "The midnight zone is very dark.",
+  "game": {
+   "t": "mcq",
+   "head": "🌑 <b>Into the Dark!</b> 3 rounds about the <b>midnight</b> zone.",
+   "rounds": [
+    {
+     "emoji": "📏",
+     "q": "The midnight zone starts below…",
+     "opts": [
+      "1,000 m (3,300 ft.)",
+      "200 m (656 ft.)",
+      "10 m"
+     ],
+     "a": 0
+    },
+    {
+     "emoji": "💡",
+     "q": "Where does the light in the midnight zone come from?",
+     "opts": [
+      "the creatures who live there",
+      "the sun",
+      "the moon"
+     ],
+     "a": 0
+    },
+    {
+     "emoji": "🕛",
+     "q": "Why is it called the midnight zone?",
+     "opts": [
+      "it is always as dark as the middle of the night",
+      "the fish sleep at midnight",
+      "it is cold at midnight"
+     ],
+     "a": 0
+    }
+   ],
+   "win": "🎉 3 / 3! The deepest, darkest <b>layer</b> of all."
+  }
+ },
+ {
+  "key": "whale",
+  "word": "a whale",
+  "emoji": "🐋",
+  "ipa": "/weɪl/",
+  "pos": "Noun",
+  "def": "a very large sea animal that breathes air",
+  "jp": "クジラ — とても大きな海の動物。空気を吸う。",
+  "tr": "The whale is the biggest sea creature.",
+  "game": {
+   "t": "flip",
+   "head": "🐋 <b>Whale Facts!</b> Tap all 6 cards and read each one aloud.",
+   "cols": 3,
+   "cards": [
+    {
+     "front": "🐋",
+     "back": "The blue whale is the biggest animal on Earth."
+    },
+    {
+     "front": "💨",
+     "back": "A whale breathes air — it is not a fish."
+    },
+    {
+     "front": "☀️",
+     "back": "Whales live in the sunlit zone, near the top layer."
+    },
+    {
+     "front": "🎵",
+     "back": "Whales sing to talk to each other."
+    },
+    {
+     "front": "👶",
+     "back": "A baby whale drinks its mother's milk."
+    },
+    {
+     "front": "🍤",
+     "back": "Some whales eat tiny plankton, not big fish."
+    }
+   ],
+   "win": "🎉 6 / 6! Now say: \"The <b>whale</b> is the biggest sea creature.\""
+  }
+ },
+ {
+  "key": "squid",
+  "word": "a squid",
+  "emoji": "🦑",
+  "ipa": "/skwɪd/",
+  "pos": "Noun",
+  "def": "a sea animal with a long body and many arms",
+  "jp": "イカ — 長い体とたくさんの腕をもつ海の生き物。",
+  "tr": "Are all squid red?",
+  "game": {
+   "t": "arms",
+   "head": "🦑 <b>Count the Arms!</b> Tap every arm of the <b>squid</b>. Count out loud in English.",
+   "n": 10,
+   "win": "🎉 Ten! Eight arms plus two long tentacles. A <b>squid</b> is not a fish."
+  }
+ },
+ {
+  "key": "dolphin",
+  "word": "a dolphin",
+  "emoji": "🐬",
+  "ipa": "/ˈdɒlfɪn/",
+  "pos": "Noun",
+  "def": "a smart sea animal that lives in groups and breathes air",
+  "jp": "イルカ — かしこくて、群れでくらす海の動物。空気を吸う。",
+  "tr": "Dolphins are very friendly.",
+  "game": {
+   "t": "mcq",
+   "head": "🐬 <b>Dolphin Quiz!</b> 3 rounds.",
+   "rounds": [
+    {
+     "emoji": "💨",
+     "q": "How does a dolphin breathe?",
+     "opts": [
+      "it comes to the top for air",
+      "it uses gills like a fish",
+      "it does not breathe"
+     ],
+     "a": 0
+    },
+    {
+     "emoji": "👨‍👩‍👧",
+     "q": "Dolphins usually live…",
+     "opts": [
+      "in groups",
+      "completely alone",
+      "only in the midnight zone"
+     ],
+     "a": 0
+    },
+    {
+     "emoji": "🌊",
+     "q": "Which zone do dolphins live in?",
+     "opts": [
+      "the sunlit zone",
+      "the midnight zone",
+      "below 1,000 m"
+     ],
+     "a": 0
+    }
+   ],
+   "win": "🎉 3 / 3! \"<b>Dolphins</b> are very friendly.\""
+  }
+ },
+ {
+  "key": "fish",
+  "word": "fish",
+  "emoji": "🐟",
+  "ipa": "/fɪʃ/",
+  "pos": "Noun",
+  "def": "an animal with fins and gills that lives in water",
+  "jp": "魚（さかな）— ひれとえらをもち、水の中でくらす動物。",
+  "tr": "There are many fish in the sunlit zone.",
+  "game": {
+   "t": "grid",
+   "head": "🐟 <b>Fish or Not a Fish?</b> Tap only the real <b>fish</b>. Six of them are not!",
+   "targets": [
+    {
+     "e": "🐟",
+     "l": "a fish"
+    },
+    {
+     "e": "🐠",
+     "l": "a clownfish"
+    },
+    {
+     "e": "🦈",
+     "l": "a shark"
+    },
+    {
+     "e": "🐡",
+     "l": "a pufferfish"
+    },
+    {
+     "e": "🎣",
+     "l": "a tuna"
+    },
+    {
+     "e": "🐳",
+     "l": "…careful!"
+    }
+   ],
+   "distractors": [
+    {
+     "e": "🐋",
+     "l": "a whale"
+    },
+    {
+     "e": "🐬",
+     "l": "a dolphin"
+    },
+    {
+     "e": "🐢",
+     "l": "a sea turtle"
+    },
+    {
+     "e": "🐙",
+     "l": "an octopus"
+    },
+    {
+     "e": "🦑",
+     "l": "a squid"
+    },
+    {
+     "e": "🦀",
+     "l": "a crab"
+    }
+   ],
+   "win": "🎉 Sharks ARE fish. Whales and dolphins are NOT — they breathe air.",
+   "note": "The 🐳 tile is a whale — it is a miss on purpose. Let Leo make the mistake, then explain."
+  }
+ },
+ {
+  "key": "shark",
+  "word": "a shark",
+  "emoji": "🦈",
+  "ipa": "/ʃɑrk/",
+  "pos": "Noun",
+  "def": "a large fish with sharp teeth that lives in the ocean",
+  "jp": "サメ — するどい歯をもつ大きな魚。",
+  "tr": "A shark lives in the sunlit zone.",
+  "game": {
+   "t": "flip",
+   "head": "🦈 <b>Shark Facts!</b> Tap all 6 cards and read each one aloud.",
+   "cols": 3,
+   "cards": [
+    {
+     "front": "🦷",
+     "back": "A shark can grow thousands of teeth in its life."
+    },
+    {
+     "front": "🐟",
+     "back": "A shark is a fish — it breathes with gills."
+    },
+    {
+     "front": "👃",
+     "back": "Sharks can smell blood from far away."
+    },
+    {
+     "front": "🕰️",
+     "back": "Sharks lived in the ocean before the dinosaurs."
+    },
+    {
+     "front": "☀️",
+     "back": "Most sharks live in the sunlit zone."
+    },
+    {
+     "front": "🦴",
+     "back": "A shark has no bones — its body is made of cartilage."
+    }
+   ],
+   "win": "🎉 6 / 6! Now say: \"I saw a <b>shark</b> at the aquarium.\""
+  }
+ },
+ {
+  "key": "seaturtle",
+  "word": "a sea turtle",
+  "emoji": "🐢",
+  "ipa": "/siː ˈtɜrtəl/",
+  "pos": "Noun",
+  "def": "a turtle that lives in the ocean and swims with flippers",
+  "jp": "ウミガメ — 海でくらすカメ。ひれで泳ぐ。",
+  "tr": "A sea turtle can swim fast.",
+  "game": {
+   "t": "pair",
+   "head": "🐢 <b>Turtle Life!</b> Tap a stage, then tap what happens.",
+   "pairs": [
+    {
+     "key": "a",
+     "problem": "1️⃣ On the beach",
+     "solution": "The mother turtle lays her eggs in the sand."
+    },
+    {
+     "key": "b",
+     "problem": "2️⃣ The baby hatches",
+     "solution": "It runs to the water as fast as it can."
+    },
+    {
+     "key": "c",
+     "problem": "3️⃣ In the sunlit zone",
+     "solution": "It swims with flippers and eats seaweed and jellyfish."
+    },
+    {
+     "key": "d",
+     "problem": "4️⃣ The danger",
+     "solution": "It can eat a plastic bag by mistake and get sick."
+    }
+   ],
+   "win": "🎉 4 / 4! Now you know why plastic in the sea is a problem."
+  }
+ },
+ {
+  "key": "octopus",
+  "word": "an octopus",
+  "emoji": "🐙",
+  "ipa": "/ˈɒktəpəs/",
+  "pos": "Noun",
+  "def": "a sea creature with eight arms",
+  "jp": "タコ — 8本の腕をもつ海の生き物。",
+  "tr": "An octopus has eight arms.",
+  "game": {
+   "t": "arms",
+   "head": "🐙 <b>Count the Arms!</b> Tap every arm of the <b>octopus</b>. Count out loud in English.",
+   "n": 8,
+   "win": "🎉 Eight! <b>oct-</b> means eight — an <b>octopus</b> has eight arms."
+  }
+ },
+ {
+  "key": "seasponges",
+  "word": "sea sponges",
+  "emoji": "🧽",
+  "ipa": "/siː ˈspʌndʒɪz/",
+  "pos": "Noun",
+  "def": "soft sea animals that live on the ocean floor",
+  "jp": "海綿（かいめん）— 海の底にすむ、やわらかい生き物。",
+  "tr": "Sea sponges are colorful.",
+  "game": {
+   "t": "mcq",
+   "head": "🧽 <b>Sponge Surprise!</b> 3 rounds.",
+   "rounds": [
+    {
+     "emoji": "🤔",
+     "q": "A sea sponge is…",
+     "opts": [
+      "an animal",
+      "a plant",
+      "a rock"
+     ],
+     "a": 0
+    },
+    {
+     "emoji": "🏖️",
+     "q": "Where do sea sponges live?",
+     "opts": [
+      "on the ocean floor",
+      "at the top of the water",
+      "on the beach"
+     ],
+     "a": 0
+    },
+    {
+     "emoji": "🎨",
+     "q": "The audio says: \"Sea sponges are ___.\"",
+     "opts": [
+      "colorful",
+      "dangerous",
+      "very fast"
+     ],
+     "a": 0
+    }
+   ],
+   "win": "🎉 3 / 3! A <b>sea sponge</b> is a colorful animal that never moves."
+  }
+ }
+];
+var ACADEMIC   = [
+ [
+  "⚖️",
+  "obligation",
+  "something you must or have to do — a duty or rule",
+  "We use <b>have to</b> and <b>must</b> to talk about an <b>obligation</b>."
+ ],
+ [
+  "🚫",
+  "prohibition",
+  "something you can't or must not do — a rule against doing something",
+  "We use <b>can't</b> and <b>don't</b> to talk about a <b>prohibition</b>."
+ ],
+ [
+  "📖",
+  "definition",
+  "a statement that tells what a word or idea means",
+  "The reading gives a <b>definition</b> of the word <i>polyps</i>."
+ ],
+ [
+  "📐",
+  "diagram",
+  "a simple drawing with labels that shows how something works",
+  "Look at the <b>diagram</b> of the ocean zones."
+ ],
+ [
+  "🏷️",
+  "label",
+  "a word that names a part — or to write that word on a part",
+  "Write a <b>label</b> for each zone on the diagram."
+ ],
+ [
+  "⚖️",
+  "contrast",
+  "to show how two things are different",
+  "In <b>contrast</b> writing we use words like <i>but</i> and <i>however</i>."
+ ],
+ [
+  "🔀",
+  "differences",
+  "the ways in which two or more things are not the same",
+  "What are the <b>differences</b> between the sunlit zone and the midnight zone?"
+ ],
+ [
+  "💬",
+  "expressions",
+  "words or short phrases people often use to say a particular thing",
+  "Use <b>expressions</b> like <i>in contrast</i> to show a difference."
+ ]
+];
+var CONTENT    = [
+ [
+  "🌫️",
+  "mysterious",
+  "strange, and hard to know or understand",
+  "\"The <b>mysterious</b> bottom layer of water is almost completely black.\""
+ ],
+ [
+  "🌗",
+  "twilight",
+  "the dim light between day and night",
+  "\"The middle layer of the water is called the <b>twilight</b> zone.\""
+ ],
+ [
+  "🚢",
+  "transportation",
+  "moving people or things from one place to another",
+  "\"We use the oceans for fun, for <b>transportation</b>, and for food.\""
+ ]
+];
+var DISCUSS    = [
+ [
+  "What do we use the oceans for?",
+  "Fun, transportation, and — most importantly — food."
+ ],
+ [
+  "What must we stop?",
+  "Pollution. We must protect the oceans or our resources will disappear."
+ ],
+ [
+  "How many layers does the ocean have? What are they called?",
+  "Three: the sunlit zone, the twilight zone, and the midnight zone."
+ ],
+ [
+  "How deep does sunlight go in the sunlit zone?",
+  "To about 200 m (656 ft.)."
+ ],
+ [
+  "Why is the middle layer called the twilight zone?",
+  "Because there isn't much light."
+ ],
+ [
+  "Why is the bottom layer called the midnight zone?",
+  "Because sunlight doesn't reach below 1,000 m (3,300 ft.) — it is almost completely black."
+ ],
+ [
+  "Where does the light in the midnight zone come from?",
+  "From the creatures who live there."
+ ],
+ [
+  "Which sea creatures can you name from the pictures?",
+  "A whale, a squid, a dolphin, fish, a shark, a sea turtle, an octopus, sea sponges."
+ ]
+];
+var SORT_KEY   = {
+ "Sea creatures": [
+  "a whale",
+  "a squid",
+  "a dolphin",
+  "fish",
+  "a shark",
+  "a sea turtle",
+  "an octopus",
+  "sea sponges",
+  "a creature"
+ ],
+ "Words for the ocean": [
+  "a layer",
+  "a zone",
+  "sunlight",
+  "midnight"
+ ],
+ "Protecting the ocean": [
+  "pollution",
+  "a resource",
+  "disappear"
+ ]
+};
+var RADAR_TOTAL = 11;
+var NOTES      = {
+ "1": "<p class=\"tn-lbl\">Title</p><p>Show Leo all 16 words. Ask: \"Which sea animals do you already know in English?\"</p>",
+ "2": "<p class=\"tn-lbl\">Objectives</p><p>Read both objectives aloud. Have Student Book pp. 94–95 open and TR 6.1 / TR 6.2 ready.</p>",
+ "3": "<p class=\"tn-lbl\">Academic Language</p><p>Tap all 8 cards. <b>obligation</b> and <b>prohibition</b> come back in Grammar 1 (have to / must / can't / don't) — plant them now.</p>",
+ "4": "<p class=\"tn-lbl\">Content Vocabulary</p><p><b>mysterious</b>, <b>twilight</b> and <b>transportation</b> appear in TR 6.1 but are not target words. Pre-teach them so the reading flows.</p>",
+ "5": "<p class=\"tn-lbl\">pollution</p><p>Pollution Patrol: 6 polluting things among 6 clean ones. Every polluting item is human-made — say that out loud.</p>",
+ "6": "<p class=\"tn-lbl\">a resource</p><p>Three rounds straight from paragraph 1 of TR 6.1: fun, transportation, food.</p>",
+ "7": "<p class=\"tn-lbl\">disappear</p><p>Let Leo tap all 8 fish away. Then ask: \"How did that feel?\" Link it to overfishing in Vocabulary 2.</p>",
+ "8": "<p class=\"tn-lbl\">a creature</p><p>The trap tiles are the shell and the rock — they were alive or never alive. A creature is alive <i>now</i>.</p>",
+ "9": "<p class=\"tn-lbl\">a layer</p><p>Tap the three layers top → bottom. Use the cake image: layers are stacked.</p>",
+ "10": "<p class=\"tn-lbl\">a zone</p><p>Match each zone to its line from the reading. Depths are verbatim from SB p. 95.</p>",
+ "11": "<p class=\"tn-lbl\">sunlight</p><p>Tap DIVE together and read each depth aloud. Stop at 1,000 m and ask: \"Is there any sunlight here?\"</p>",
+ "12": "<p class=\"tn-lbl\">midnight</p><p>Three rounds. The key idea: the only light down there comes from the creatures themselves.</p>",
+ "13": "<p class=\"tn-lbl\">a whale</p><p>Six fact cards. Stress the big one: a whale breathes air, so it is not a fish.</p>",
+ "14": "<p class=\"tn-lbl\">a squid</p><p>Count all ten in English. Eight arms + two tentacles. Note the plural: one squid, two squid.</p>",
+ "15": "<p class=\"tn-lbl\">a dolphin</p><p>Three rounds. Same air-breathing point as the whale — Leo should say it himself this time.</p>",
+ "16": "<p class=\"tn-lbl\">fish</p><p>The 🐳 tile is a whale and it is a miss <i>on purpose</i>. Let Leo make the mistake, then explain: a shark IS a fish; a whale is not.</p>",
+ "17": "<p class=\"tn-lbl\">a shark</p><p>Six fact cards. TR 6.2 is cut off mid-sentence in the audio script, so the deck uses the aquarium sentence.</p>",
+ "18": "<p class=\"tn-lbl\">a sea turtle</p><p>Four life stages. The last one — eating a plastic bag by mistake — sets up Vocabulary 2 and the mission.</p>",
+ "19": "<p class=\"tn-lbl\">an octopus</p><p>Count all eight in English. Teach the prefix: <b>oct-</b> = eight (October, octagon).</p>",
+ "20": "<p class=\"tn-lbl\">sea sponges</p><p>The surprise: a sea sponge is an animal that never moves. Three rounds.</p>",
+ "21": "<p class=\"tn-lbl\">Vocabulary Review</p><p>Quick oral recall of all 16 before the reading. Mark the ones Leo already owns so you know what to drill.</p>",
+ "22": "<p class=\"tn-lbl\">Warm Up</p><p>Lesson Planner p. 196. Ask each question first, let Leo guess, then match.</p>",
+ "23": "<p class=\"tn-lbl\">Present</p><p>\"Repeat each word after me.\" Point to the photo on SB pp. 94–95, say the word, then tap the chip.</p>",
+ "24": "<p class=\"tn-lbl\">Diagram of the Zones</p><p>This is where <b>diagram</b> and <b>label</b> stop being abstract. Have Leo name each zone before you reveal it.</p>",
+ "25": "<p class=\"tn-lbl\">TR 6.1 — part 1</p><p>Play TR 6.1. Word Radar: Leo taps each blue word the moment he hears it. Paragraphs 1 and 2.</p>",
+ "26": "<p class=\"tn-lbl\">TR 6.1 — part 2</p><p>Paragraphs 3 and 4, then point to the eight creature photos on p. 100.</p>",
+ "27": "<p class=\"tn-lbl\">Discuss</p><p>Ask each question before tapping to reveal. Answers come straight from TR 6.1.</p>",
+ "28": "<p class=\"tn-lbl\">Three-column chart</p><p>Tap a word, then tap its column. Wrong columns flash red and the word stays in the pool.</p>",
+ "29": "<p class=\"tn-lbl\">TR 6.2</p><p>Play TR 6.2. Leo repeats the word AND its sentence. Tap a row once he has echoed it clearly. Sentences are verbatim from the audio script.</p>",
+ "30": "<p class=\"tn-lbl\">Build the Sentence</p><p>Target: \"Most of the creatures stay near the top layer of the water.\" Then find the four target words inside it.</p>",
+ "31": "<p class=\"tn-lbl\">Apply — Model Dialogue</p><p>Student Book p. 95, Activity 3. Model both parts, then swap roles.</p>",
+ "32": "<p class=\"tn-lbl\">Apply — Build a Question</p><p>Leo builds his own question with the chips, asks Dad, and writes the answer down.</p>",
+ "33": "<p class=\"tn-lbl\">Extend — Sunshine Organizer</p><p>\"Protect the ocean\" in the middle, one idea on each ray. Push Leo to use <b>pollution</b>, <b>resources</b>, <b>disappear</b> and <b>creatures</b>.</p>",
+ "34": "<p class=\"tn-lbl\">Wrap Up — Act It Out</p><p>Act out a word, the other person guesses. The hard ones (a layer, a zone, a resource) are the best ones.</p>",
+ "35": "<p class=\"tn-lbl\">Recap</p><p>Four closing questions. Tap each to reveal the expected answer.</p>",
+ "36": "<p class=\"tn-lbl\">Be the Expert — Compound words</p><p>sun + light, mid + night, sea + turtle, under + water. This strategy pays off again in the Reading lesson.</p>",
+ "37": "<p class=\"tn-lbl\">Be the Expert — Our World in Context</p><p>Order: pool → 200 m → 1,000 m → Mount Fuji → the Mariana Trench. The Fuji comparison is the one Leo will remember.</p>",
+ "38": "<p class=\"tn-lbl\">Formative Assessment</p><p>Tap each card once Leo can do it. Then set Workbook pp. 72–73 and Leo's Vocabulary 1 app.</p>",
+ "39": "<p class=\"tn-lbl\">Mark Done</p><p>Records this lesson on the teacher dashboard. Leo's app tracks his own 13 modules separately.</p>",
+ "40": "<p class=\"tn-lbl\">Great Job!</p><p>Celebrate. Next up: the Unit 6 Song (TR 6.3, \"Protect the Seas\").</p>"
+};
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+var TOTAL = 40;
+var cur = 1;
+function goTo(n) {
+  n = Math.max(1, Math.min(TOTAL, n));
+  var old = document.getElementById('s' + cur);
+  if (old) old.classList.remove('active');
+  cur = n;
+  var next = document.getElementById('s' + cur);
+  if (next) next.classList.add('active');
+  document.getElementById('slide-counter').textContent = cur + ' / ' + TOTAL;
+  document.getElementById('tn-content').innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
+  if (SLIDE_INIT[cur]) SLIDE_INIT[cur]();
+}
+document.addEventListener('keydown', function (e) {
+  if (e.target && (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+var notesOpen = false;
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('notes-btn').classList.toggle('active', notesOpen);
+  scale();
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange', function () {
+  var btn = document.getElementById('fs-btn');
+  var active = !!document.fullscreenElement;
+  btn.textContent = active ? '⛶ Exit Full (F)' : '⛶ Fullscreen (F)';
+  btn.classList.toggle('active', active);
+  scale();
+});
+function scale() {
+  var s = document.getElementById('scaler');
+  var availW = window.innerWidth - (notesOpen ? 440 : 0);
+  var availH = window.innerHeight - 52;
+  var r = Math.min(availW / 1920, availH / 1080);
+  s.style.transform = 'scale(' + r + ')';
+  s.style.left = ((availW - 1920 * r) / 2) + 'px';
+  s.style.top = ((availH - 1080 * r) / 2) + 'px';
+  s.style.position = 'fixed';
+}
+window.addEventListener('resize', scale);
+
+function popEmoji(el) {
+  el.style.transform = 'scale(1.2) rotate(-8deg)';
+  setTimeout(function () { el.style.transform = ''; }, 260);
+}
+function shuffled(arr) { return arr.slice().sort(function () { return Math.random() - 0.5; }); }
+function firstGlyph(s) { return [].concat(Array.from(s))[0]; }
+
+// ═══ SHARED MINI-GAME ENGINE ═══════════════════════════════════
+// Every game states a goal, keeps a live score, gives wrong-answer
+// feedback, and fires a win message. Reused across the 16 word slides.
+
+/* 1. Catch-the-X grid ---------------------------------------- */
+function buildTapGrid(id, targets, distractors, onWin) {
+  var grid = document.getElementById(id + '-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var hits = 0, misses = 0;
+  var all = shuffled(targets.map(function (t) { return { t: t, ok: true }; })
+    .concat(distractors.map(function (t) { return { t: t, ok: false }; })));
+  all.forEach(function (item) {
+    var tile = document.createElement('div');
+    tile.className = 'mg-tile';
+    tile.innerHTML = item.t.e + '<span class="mg-label">' + item.t.l + '</span>';
+    tile.onclick = function () {
+      if (tile.classList.contains('hit')) return;
+      if (item.ok) {
+        tile.classList.add('hit');
+        hits++;
+        document.getElementById(id + '-score').textContent = hits + ' / ' + targets.length;
+        if (hits >= targets.length) {
+          document.getElementById(id + '-win').classList.add('show');
+          if (onWin) onWin();
+        }
+      } else {
+        misses++;
+        tile.classList.add('miss');
+        document.getElementById(id + '-miss').textContent = '✖ ' + misses + ' miss' + (misses === 1 ? '' : 'es') + ' — that one is not it!';
+        setTimeout(function () { tile.classList.remove('miss'); }, 350);
+      }
+    };
+    grid.appendChild(tile);
+  });
+}
+
+/* 2. Multi-round MCQ ----------------------------------------- */
+function buildMcqRounds(id, rounds) {
+  var stage = document.getElementById(id + '-stage');
+  if (!stage || stage.dataset.built) return;
+  stage.dataset.built = '1';
+  var idx = 0, score = 0, misses = 0;
+  function render() {
+    if (idx >= rounds.length) {
+      stage.innerHTML = '<div style="font-size:56px">🎉</div>';
+      document.getElementById(id + '-win').classList.add('show');
+      return;
+    }
+    var r = rounds[idx];
+    stage.innerHTML = '<div style="font-size:60px">' + r.emoji + '</div>' +
+      '<div style="font-size:22px;font-weight:700;color:#374151;text-align:center;max-width:640px">' + r.q + '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:620px" id="' + id + '-opts"></div>';
+    var box = document.getElementById(id + '-opts');
+    // Options are shuffled so the correct answer is never in a fixed slot.
+    shuffled(r.opts.map(function (t, i) { return { t: t, ok: i === r.a }; })).forEach(function (o) {
+      var b = document.createElement('button');
+      b.className = 'mg-opt';
+      b.textContent = o.t;
+      b.onclick = function () {
+        if (o.ok) {
+          b.classList.add('ok');
+          score++;
+          document.getElementById(id + '-score').textContent = score + ' / ' + rounds.length;
+          idx++;
+          setTimeout(render, 550);
+        } else {
+          b.classList.add('no');
+          misses++;
+          document.getElementById(id + '-miss').textContent = '✖ ' + misses + ' — read the question again.';
+        }
+      };
+      box.appendChild(b);
+    });
+  }
+  render();
+}
+
+/* 3. Pair match ---------------------------------------------- */
+function buildPairMatch(id, pairs, missMsg) {
+  var wrap = document.getElementById(id + '-pair');
+  if (!wrap || wrap.dataset.built) return;
+  wrap.dataset.built = '1';
+  var sel = null, done = 0, misses = 0;
+  var lCol = document.createElement('div'); lCol.className = 'mg-col';
+  var rCol = document.createElement('div'); rCol.className = 'mg-col';
+  function mk(text, key, side) {
+    var b = document.createElement('button');
+    b.className = 'mg-pbtn';
+    b.textContent = text;
+    b.onclick = function () {
+      if (b.classList.contains('done')) return;
+      if (!sel) { sel = { b: b, key: key, side: side }; b.classList.add('sel'); return; }
+      if (sel.side === side) { sel.b.classList.remove('sel'); sel = { b: b, key: key, side: side }; b.classList.add('sel'); return; }
+      var prev = sel; sel = null;
+      if (prev.key === key) {
+        b.classList.remove('sel'); prev.b.classList.remove('sel');
+        b.classList.add('done'); prev.b.classList.add('done');
+        done++;
+        document.getElementById(id + '-score').textContent = done + ' / ' + pairs.length;
+        if (done >= pairs.length) document.getElementById(id + '-win').classList.add('show');
+      } else {
+        misses++;
+        b.classList.add('bad'); prev.b.classList.add('bad');
+        document.getElementById(id + '-miss').textContent = '✖ ' + misses + ' — ' + (missMsg || 'those two do not go together.');
+        setTimeout(function () {
+          b.classList.remove('bad', 'sel'); prev.b.classList.remove('bad', 'sel');
+        }, 700);
+      }
+    };
+    return b;
+  }
+  pairs.forEach(function (p) { lCol.appendChild(mk(p.problem, p.key, 'L')); });
+  shuffled(pairs).forEach(function (p) { rCol.appendChild(mk(p.solution, p.key, 'R')); });
+  wrap.appendChild(lCol); wrap.appendChild(rCol);
+}
+
+/* 4. Tap-to-flip discovery cards ------------------------------ */
+function buildFlipCards(id, cards) {
+  var grid = document.getElementById(id + '-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var open = 0;
+  cards.forEach(function (c) {
+    var el = document.createElement('div');
+    el.className = 'mg-flip';
+    el.innerHTML = '<div class="mf-front">' + c.front + '</div><div class="mf-back">' + c.back + '</div>';
+    el.onclick = function () {
+      if (el.classList.contains('open')) return;
+      el.classList.add('open');
+      open++;
+      document.getElementById(id + '-score').textContent = open + ' / ' + cards.length;
+      if (open >= cards.length) document.getElementById(id + '-win').classList.add('show');
+    };
+    grid.appendChild(el);
+  });
+}
+
+/* 5. Tap-in-order (used for the three ocean layers) ------------ */
+function buildOrder(id, items) {
+  var host = document.getElementById(id + '-order');
+  if (!host || host.dataset.built) return;
+  host.dataset.built = '1';
+  var next = 0, misses = 0;
+  shuffled(items.map(function (it, i) { return { it: it, i: i }; })).forEach(function (o) {
+    var b = document.createElement('button');
+    b.className = 'oz-band ' + o.it.cls;
+    b.innerHTML = '<span>' + o.it.l + '</span><small>' + o.it.sub + '</small>';
+    b.onclick = function () {
+      if (b.classList.contains('picked')) return;
+      if (o.i === next) {
+        b.classList.add('picked');
+        next++;
+        document.getElementById(id + '-score').textContent = next + ' / ' + items.length;
+        if (next >= items.length) document.getElementById(id + '-win').classList.add('show');
+      } else {
+        misses++;
+        b.classList.add('wrongpick');
+        document.getElementById(id + '-miss').textContent = '✖ ' + misses + ' — start at the top of the water and go down.';
+        setTimeout(function () { b.classList.remove('wrongpick'); }, 350);
+      }
+    };
+    host.appendChild(b);
+  });
+}
+
+/* 6. Vanishing fish (disappear) ------------------------------- */
+function buildVanish(id, n) {
+  var host = document.getElementById(id + '-vanish');
+  if (!host || host.dataset.built) return;
+  host.dataset.built = '1';
+  var gone = 0;
+  for (var i = 0; i < n; i++) {
+    (function () {
+      var el = document.createElement('div');
+      el.className = 'arm vanish';
+      el.textContent = '🐟';
+      el.onclick = function () {
+        if (el.classList.contains('gone')) return;
+        el.classList.add('gone');
+        gone++;
+        document.getElementById(id + '-score').textContent = gone + ' / ' + n;
+        if (gone >= n) document.getElementById(id + '-win').classList.add('show');
+      };
+      host.appendChild(el);
+    })();
+  }
+}
+
+/* 7. Count the arms (squid / octopus) ------------------------- */
+function buildArms(id, n) {
+  var host = document.getElementById(id + '-arms');
+  if (!host || host.dataset.built) return;
+  host.dataset.built = '1';
+  var on = 0;
+  for (var i = 0; i < n; i++) {
+    (function () {
+      var el = document.createElement('div');
+      el.className = 'arm';
+      el.textContent = '〰️';
+      el.onclick = function () {
+        if (el.classList.contains('on')) return;
+        el.classList.add('on');
+        on++;
+        el.textContent = on;
+        document.getElementById(id + '-score').textContent = on + ' / ' + n;
+        if (on >= n) document.getElementById(id + '-win').classList.add('show');
+      };
+      host.appendChild(el);
+    })();
+  }
+}
+
+/* 8. Deep dive (sunlight) ------------------------------------- */
+var diveState = {};
+var DIVE_STOPS = [
+  { m: 0,     t: '0 m — bright sunlight' },
+  { m: 50,    t: '50 m — still the sunlit zone' },
+  { m: 100,   t: '100 m — plants can still grow' },
+  { m: 200,   t: '200 m — the last of the sunlight' },
+  { m: 350,   t: '350 m — the twilight zone begins' },
+  { m: 500,   t: '500 m — very dim' },
+  { m: 700,   t: '700 m — strange fish live here' },
+  { m: 1000,  t: '1,000 m — no sunlight at all' },
+  { m: 3000,  t: '3,000 m — the midnight zone' },
+  { m: 6000,  t: '6,000 m — only creature light' },
+  { m: 11000, t: '11,000 m — the deepest place on Earth' }
+];
+function diveInit(id) {
+  var col = document.getElementById(id + '-col');
+  if (!col || col.dataset.built) return;
+  col.dataset.built = '1';
+  col.innerHTML = '<div class="dive-mark" style="top:20%">200 m — sunlit zone ends</div>' +
+                  '<div class="dive-mark" style="top:48%">1,000 m — twilight zone ends</div>' +
+                  '<div class="dive-sub" id="' + id + '-sub" style="top:2%">🤿</div>';
+  diveState[id] = 0;
+}
+function diveStep(id) {
+  var i = (diveState[id] || 0) + 1;
+  if (i >= DIVE_STOPS.length) i = DIVE_STOPS.length - 1;
+  diveState[id] = i;
+  var stop = DIVE_STOPS[i];
+  document.getElementById(id + '-sub').style.top = Math.min(88, 2 + (i / (DIVE_STOPS.length - 1)) * 86) + '%';
+  document.getElementById(id + '-depth').textContent = stop.t;
+  document.getElementById(id + '-score').textContent = i + ' / 10';
+  if (i >= 7) document.getElementById(id + '-win').classList.add('show');
+  if (i >= DIVE_STOPS.length - 1) document.getElementById(id + '-btn').disabled = true;
+}
+
+/* Dispatcher — every word slide runs its own game from vocabWords. */
+function initWordGame(w) {
+  var id = 'g-' + w.key, g = w.game;
+  if (g.t === 'grid')        buildTapGrid(id, g.targets, g.distractors);
+  else if (g.t === 'mcq')    buildMcqRounds(id, g.rounds);
+  else if (g.t === 'pair')   buildPairMatch(id, g.pairs);
+  else if (g.t === 'flip')   buildFlipCards(id, g.cards);
+  else if (g.t === 'order')  buildOrder(id, g.items);
+  else if (g.t === 'vanish') buildVanish(id, g.n);
+  else if (g.t === 'arms')   buildArms(id, g.n);
+  else if (g.t === 'dive')   diveInit(id);
+}
+
+// ─── SLIDE 3: ACADEMIC LANGUAGE ────────────────────────────────
+function initAcademic() {
+  var grid = document.getElementById('ac-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var tapped = 0;
+  ACADEMIC.forEach(function (a) {
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#fff;border:2px solid #FEF3C7;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column';
+    card.innerHTML = '<div style="background:#0EA5E9;color:#fff;padding:9px 14px;font-size:17px;font-weight:700">' + a[0] + ' ' + a[1] + '</div>' +
+      '<div style="padding:12px 14px;font-size:15px;color:#374151;line-height:1.45">' + a[2] +
+      '<div style="margin-top:8px;color:#075985;font-weight:700;display:none" class="ac-ex">' + a[3] + '</div></div>';
+    card.onclick = function () {
+      if (card.dataset.open) return;
+      card.dataset.open = '1';
+      card.querySelector('.ac-ex').style.display = 'block';
+      card.style.borderColor = '#0369A1';
+      tapped++;
+      document.getElementById('ac-score').textContent = tapped + ' / 8 tapped';
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE 4: CONTENT VOCABULARY ───────────────────────────────
+function initContentWords() {
+  var grid = document.getElementById('cw-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  CONTENT.forEach(function (c) {
+    var card = document.createElement('div');
+    card.className = 'mg-flip';
+    card.style.minHeight = '190px';
+    card.innerHTML = '<div class="mf-front">' + c[0] + '</div>' +
+      '<div style="font-size:26px;font-weight:800;color:#111;margin-top:6px">' + c[1] + '</div>' +
+      '<div class="mf-back">' + c[2] + '<div style="margin-top:8px;font-style:italic;color:#374151">' + c[3] + '</div></div>';
+    card.onclick = function () { card.classList.add('open'); };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE 21: VOCABULARY REVIEW ───────────────────────────────
+var vrIdx = 0, vrKnown = lLoad('known', {}) || {};
+function initVocabReview() {
+  var tabs = document.getElementById('vr-tabs');
+  if (tabs && !tabs.dataset.built) {
+    tabs.dataset.built = '1';
+    vocabWords.forEach(function (w, i) {
+      var b = document.createElement('button');
+      b.className = 'vr-tab' + (i === 0 ? ' active' : '');
+      b.id = 'vr-tab-' + i;
+      b.textContent = firstGlyph(w.emoji) + ' ' + w.word;
+      b.onclick = function () { vrShow(i); };
+      tabs.appendChild(b);
+    });
+  }
+  vrShow(vrIdx);
+}
+function vrShow(i) {
+  vrIdx = i;
+  var w = vocabWords[i];
+  document.querySelectorAll('.vr-tab').forEach(function (t, ti) { t.classList.toggle('active', ti === i); });
+  document.getElementById('vr-emoji').textContent = w.emoji;
+  document.getElementById('vr-word').textContent = w.word;
+  document.getElementById('vr-ipa').textContent = w.ipa;
+  document.getElementById('vr-pos').textContent = w.pos;
+  document.getElementById('vr-jp').textContent = '🇯🇵 ' + w.jp;
+  document.getElementById('vr-q').textContent = 'What does "' + w.word + '" mean?';
+  document.getElementById('vr-fb').textContent = '';
+  var wrong = vocabWords.filter(function (x) { return x.key !== w.key; });
+  var opts = shuffled([w.def, shuffled(wrong)[0].def, shuffled(wrong)[1].def]);
+  var box = document.getElementById('vr-opts');
+  box.innerHTML = '';
+  opts.forEach(function (o) {
+    var b = document.createElement('button');
+    b.className = 'mg-opt';
+    b.textContent = o;
+    b.onclick = function () {
+      var fb = document.getElementById('vr-fb');
+      if (o === w.def) { b.classList.add('ok'); fb.style.color = '#0369A1'; fb.textContent = '✅ Correct!'; }
+      else { b.classList.add('no'); fb.style.color = '#ef4444'; fb.textContent = '❌ Not quite — try again.'; }
+    };
+    box.appendChild(b);
+  });
+  document.getElementById('vr-mark').classList.toggle('done', !!vrKnown[w.key]);
+  document.getElementById('vr-tab-' + i).classList.toggle('done', !!vrKnown[w.key]);
+}
+function vrMark() {
+  var w = vocabWords[vrIdx];
+  vrKnown[w.key] = true;
+  document.getElementById('vr-tab-' + vrIdx).classList.add('done');
+  document.getElementById('vr-mark').classList.add('done');
+  lSave('known', vrKnown);
+}
+
+// ─── SLIDE 22: WARM UP ─────────────────────────────────────────
+var wuPairs = [
+  { key: 'a', q: '🌊 How much of the Earth is ocean?', a: 'About 7 parts out of 10 — most of our world is water.' },
+  { key: 'b', q: '🍽️ Why do we need the ocean?',       a: 'For food, for transportation, and for fun.' },
+  { key: 'c', q: '🐋 What is the biggest sea creature?', a: 'The whale.' },
+  { key: 'd', q: '🌑 Is the bottom of the ocean light or dark?', a: 'Dark — sunlight cannot reach that deep.' }
+];
+function initWarmUp() {
+  var left = document.getElementById('wu-left'), right = document.getElementById('wu-right');
+  if (!left || left.dataset.built) return;
+  left.dataset.built = '1';
+  var sel = null, done = 0;
+  function mk(text, key, side) {
+    var b = document.createElement('button');
+    b.className = 'mg-pbtn';
+    b.textContent = text;
+    b.onclick = function () {
+      if (b.classList.contains('done')) return;
+      if (!sel) { sel = { b: b, key: key, side: side }; b.classList.add('sel'); return; }
+      if (sel.side === side) { sel.b.classList.remove('sel'); sel = { b: b, key: key, side: side }; b.classList.add('sel'); return; }
+      var prev = sel; sel = null;
+      if (prev.key === key) {
+        b.classList.remove('sel'); prev.b.classList.remove('sel');
+        b.classList.add('done'); prev.b.classList.add('done');
+        done++;
+        document.getElementById('wu-count').textContent = done + ' / 4';
+      } else {
+        b.classList.add('bad'); prev.b.classList.add('bad');
+        setTimeout(function () { b.classList.remove('bad', 'sel'); prev.b.classList.remove('bad', 'sel'); }, 700);
+      }
+    };
+    return b;
+  }
+  wuPairs.forEach(function (p) { left.appendChild(mk(p.q, p.key, 'L')); });
+  shuffled(wuPairs).forEach(function (p) { right.appendChild(mk(p.a, p.key, 'R')); });
+}
+
+// ─── SLIDE 23: PRESENT CHIPS ───────────────────────────────────
+function initPresentChips() {
+  var row = document.getElementById('present-chips');
+  if (!row || row.dataset.built) return;
+  row.dataset.built = '1';
+  var said = 0;
+  vocabWords.forEach(function (w) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = w.emoji + ' ' + w.word;
+    b.onclick = function () {
+      if (b.classList.contains('used')) return;
+      b.classList.add('used');
+      said++;
+      document.getElementById('present-count').textContent = said + ' / 16';
+    };
+    row.appendChild(b);
+  });
+}
+
+// ─── SLIDE 24: OCEAN ZONE DIAGRAM ──────────────────────────────
+var OZ = [
+  { cls: 'sunlit',   name: '☀️ the sunlit zone',   life: '🐋 🐬 🦈 🐢 🐟 🐙',
+    sub: 'the top layer — sunlight goes down to about 200 m (656 ft.)' },
+  { cls: 'twilight', name: '🌗 the twilight zone', life: '🦑 🐠 🐡',
+    sub: "the middle layer — there isn't much light; down to about 1,000 m (3,300 ft.)" },
+  { cls: 'midnight', name: '🌑 the midnight zone', life: '🧽 🦐 ✨',
+    sub: 'the bottom layer — almost completely black; the only light comes from the creatures' }
+];
+function initOzDiagram() {
+  var host = document.getElementById('oz-diagram');
+  if (!host || host.dataset.built) return;
+  host.dataset.built = '1';
+  var open = 0;
+  OZ.forEach(function (z) {
+    var b = document.createElement('button');
+    b.className = 'oz-band ' + z.cls;
+    // Each band is a slice of the real cross-section, so it grows to fill the slide.
+    b.style.cssText = 'flex:1;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px';
+    b.innerHTML = '<span style="font-size:26px">' + z.name + '</span>' +
+      '<small style="opacity:0;font-size:17px">' + z.sub + '</small>' +
+      '<span style="opacity:0;font-size:30px;letter-spacing:6px" class="oz-life">' + z.life + '</span>';
+    b.onclick = function () {
+      if (b.dataset.open) return;
+      b.dataset.open = '1';
+      b.querySelector('small').style.opacity = '1';
+      b.querySelector('.oz-life').style.opacity = '1';
+      open++;
+      document.getElementById('oz-count').textContent = open + ' / 3';
+    };
+    host.appendChild(b);
+  });
+}
+
+// ─── SLIDE 25: THE EIGHT CREATURE PHOTOS (SB p. 94) ───────────
+/* TR 6.1 names these eight in this order after the four paragraphs. */
+var CREATURE_ORDER = ['a whale', 'a squid', 'a dolphin', 'fish', 'a shark', 'a sea turtle', 'an octopus', 'sea sponges'];
+function initCreatureChips() {
+  var row = document.getElementById('crt-chips');
+  if (!row || row.dataset.built) return;
+  row.dataset.built = '1';
+  CREATURE_ORDER.forEach(function (name) {
+    var w = vocabWords.filter(function (v) { return v.word === name; })[0];
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.style.fontSize = '20px';
+    b.textContent = (w ? w.emoji : '🐚') + ' ' + name;
+    b.onclick = function () { b.classList.toggle('used'); };
+    row.appendChild(b);
+  });
+}
+
+// ─── SLIDES 25–26: WORD RADAR ──────────────────────────────────
+var radarFound = 0;
+function radarTap(btn) {
+  if (btn.classList.contains('done')) return;
+  btn.classList.add('done');
+  radarFound++;
+  document.getElementById('radar-count').textContent = radarFound + ' / ' + RADAR_TOTAL;
+}
+
+// ─── SLIDE 27: DISCUSS ─────────────────────────────────────────
+function initDiscussion() {
+  var grid = document.getElementById('disc-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  DISCUSS.forEach(function (d, i) {
+    var item = document.createElement('div');
+    item.className = 'q-item';
+    item.innerHTML = '<div class="q-num">' + (i + 1) + '</div><div><div>' + d[0] + '</div><div class="q-ans">→ ' + d[1] + '</div></div>';
+    item.onclick = function () { item.classList.add('done'); };
+    grid.appendChild(item);
+  });
+}
+
+// ─── SLIDE 28: THREE-COLUMN SORT ───────────────────────────────
+function initSortTeacher() {
+  var pool = document.getElementById('sort-pool'), cols = document.getElementById('sort-cols');
+  if (!pool || pool.dataset.built) return;
+  pool.dataset.built = '1';
+  var picked = null, placed = 0;
+  var names = Object.keys(SORT_KEY);
+  var boxes = {};
+  names.forEach(function (n) {
+    var box = document.createElement('div');
+    box.style.cssText = 'background:#fff;border:3px dashed #BAE6FD;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;overflow-y:auto';
+    box.innerHTML = '<div style="font-size:18px;font-weight:800;color:#075985;text-align:center">' + n + '</div>';
+    box.onclick = function () {
+      if (!picked) return;
+      var correct = SORT_KEY[n].indexOf(picked.word) !== -1;
+      if (correct) {
+        var tag = document.createElement('div');
+        tag.style.cssText = 'background:#F0F9FF;border:2px solid #0369A1;border-radius:10px;padding:7px 12px;font-size:16px;font-weight:700;color:#075985';
+        tag.textContent = picked.label;
+        box.appendChild(tag);
+        picked.btn.remove();
+        picked = null;
+        placed++;
+        document.getElementById('sort-count').textContent = placed + ' / 16';
+      } else {
+        box.style.borderColor = '#ef4444';
+        setTimeout(function () { box.style.borderColor = '#BAE6FD'; }, 500);
+      }
+    };
+    boxes[n] = box;
+    cols.appendChild(box);
+  });
+  var all = [];
+  names.forEach(function (n) { SORT_KEY[n].forEach(function (w) { all.push(w); }); });
+  shuffled(all).forEach(function (word) {
+    var found = vocabWords.filter(function (v) { return v.word === word; })[0];
+    var label = (found ? found.emoji + ' ' : '🦀 ') + word;
+    var b = document.createElement('button');
+    b.className = 'mg-pbtn';
+    b.textContent = label;
+    b.onclick = function () {
+      if (picked) picked.btn.classList.remove('sel');
+      picked = { btn: b, word: word, label: label };
+      b.classList.add('sel');
+    };
+    pool.appendChild(b);
+  });
+}
+
+// ─── SLIDE 29: ECHO METER (TR 6.2 verbatim) ────────────────────
+function initEcho() {
+  var grid = document.getElementById('echo-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var n = 0;
+  vocabWords.forEach(function (w) {
+    var row = document.createElement('div');
+    row.className = 'q-item';
+    row.style.fontSize = '17px';
+    row.innerHTML = '<div class="q-num">' + w.emoji + '</div><div><b style="color:#075985">' + w.word + '</b><div style="color:#4b5563">' + w.tr + '</div></div>';
+    row.onclick = function () {
+      if (row.classList.contains('done')) return;
+      row.classList.add('done');
+      n++;
+      document.getElementById('echo-count').textContent = n + ' / 16';
+    };
+    grid.appendChild(row);
+  });
+}
+
+// ─── SLIDE 30: BUILD THE SENTENCE ──────────────────────────────
+var BUILD_TARGET = ['Most', 'of', 'the', 'creatures', 'stay', 'near', 'the', 'top', 'layer', 'of', 'the', 'water.'];
+var buildPicked = [];
+function buildRender() {
+  buildPicked = [];
+  document.getElementById('build-line').textContent = '…';
+  document.getElementById('build-fb').textContent = '';
+  var row = document.getElementById('build-chips');
+  row.innerHTML = '';
+  shuffled(BUILD_TARGET).forEach(function (t) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = t;
+    b.onclick = function () {
+      if (b.classList.contains('used')) return;
+      b.classList.add('used');
+      buildPicked.push(t);
+      document.getElementById('build-line').textContent = buildPicked.join(' ');
+    };
+    row.appendChild(b);
+  });
+}
+function buildCheck() {
+  var fb = document.getElementById('build-fb');
+  if (buildPicked.join(' ') === BUILD_TARGET.join(' ')) {
+    fb.style.color = '#16A34A';
+    fb.textContent = '✅ That is the sentence from the reading!';
+  } else {
+    fb.style.color = '#ef4444';
+    fb.textContent = '✖ Not yet — start with "Most of the…"';
+  }
+}
+function buildReset() { buildRender(); }
+function initBuild() { if (!document.getElementById('build-chips').dataset.built) { document.getElementById('build-chips').dataset.built = '1'; buildRender(); } }
+
+// ─── SLIDE 32: BUILD A QUESTION ────────────────────────────────
+var QB = ['Which', 'What', 'creature', 'zone', 'do', 'does', 'you', 'a shark', 'like', 'live', 'best', 'in', '?'];
+var qbPicked = [];
+function initQb() {
+  var row = document.getElementById('qb-chips');
+  if (!row || row.dataset.built) return;
+  row.dataset.built = '1';
+  QB.forEach(function (t) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = t;
+    b.onclick = function () {
+      qbPicked.push(t);
+      document.getElementById('qb-line').textContent = qbPicked.join(' ');
+    };
+    row.appendChild(b);
+  });
+}
+function qbReset() { qbPicked = []; document.getElementById('qb-line').textContent = '…'; }
+
+// ─── SLIDE 33: SUNSHINE ORGANIZER ──────────────────────────────
+/* pickChart returns an HTML string, so the sun is redrawn whenever a ray
+   is filled in — that is how the ray changes colour. */
+var SUN_WORDS = [
+  { word: 'pollution', emoji: '🛢️' },
+  { word: 'resources', emoji: '♻️' },
+  { word: 'garbage',   emoji: '🗑️' },
+  { word: 'creatures', emoji: '🐙' },
+  { word: 'plastic',   emoji: '🥤' },
+  { word: 'teach',     emoji: '📣' }
+];
+var SUN_HINTS = ['How do we stop pollution?','How do we protect resources?',
+  'What do we do with garbage?','How do we save the creatures?','How can we use less plastic?','Who can we teach?'];
+var sunText = lLoad('sun', {}) || {};
+function sunDraw() {
+  var mount = document.getElementById('sun-mount');
+  if (!mount) return;
+  if (typeof window.pickChart !== 'function') {
+    mount.innerHTML = '<div class="task-card">☀️ Draw a sun on the board. Write "Protect the ocean" in the middle and one idea on each ray.</div>';
+    return;
+  }
+  mount.innerHTML = window.pickChart('sunshine organizer', {
+    id: 'u6v1-teacher-sun',
+    words: SUN_WORDS,
+    saved: sunText,
+    centerLabel: 'Protect the ocean',
+    centerHint: 'Tap a ray',
+    onSelect: function (i) {
+      var f = document.getElementById('sun-in-' + i);
+      if (f) { f.focus(); f.scrollIntoView({ block: 'center' }); }
+    }
+  });
+}
+function initSun() {
+  var rows = document.getElementById('sun-rows');
+  if (!rows || rows.dataset.built) { sunDraw(); return; }
+  rows.dataset.built = '1';
+  SUN_WORDS.forEach(function (w, i) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px';
+    var lbl = document.createElement('span');
+    lbl.style.cssText = 'font-size:18px;font-weight:700;color:#075985;min-width:150px';
+    lbl.textContent = w.emoji + ' ' + w.word;
+    var inp = document.createElement('input');
+    inp.id = 'sun-in-' + i;
+    inp.placeholder = SUN_HINTS[i];
+    inp.value = sunText[i] || '';
+    inp.style.cssText = 'flex:1;font-family:Outfit,sans-serif;font-size:17px;padding:9px 14px;border:2px solid #BAE6FD;border-radius:10px';
+    inp.oninput = function () { sunText[i] = inp.value; lSave('sun', sunText); };
+    inp.onblur = sunDraw;
+    row.appendChild(lbl); row.appendChild(inp);
+    rows.appendChild(row);
+  });
+  sunDraw();
+}
+
+// ─── SLIDE 34: ACT IT OUT ──────────────────────────────────────
+var actLeft = null, actDone = 0;
+function actDraw() {
+  if (!actLeft) actLeft = shuffled(vocabWords.slice());
+  if (!actLeft.length) {
+    document.getElementById('act-word').textContent = 'All 16 acted! 🎉';
+    document.getElementById('act-emoji').textContent = '🏆';
+    return;
+  }
+  var w = actLeft.pop();
+  document.getElementById('act-emoji').textContent = w.emoji;
+  document.getElementById('act-word').textContent = w.word;
+  actDone++;
+  document.getElementById('act-count').textContent = actDone + ' / 16';
+}
+
+// ─── SLIDE 35: RECAP ───────────────────────────────────────────
+var RECAP = [
+  ['What are the three layers of the ocean called?', 'The sunlit zone, the twilight zone, and the midnight zone.'],
+  ['Which zone has the most creatures? Why?', 'The sunlit zone — it has sunlight, so plants grow and fish have food.'],
+  ['Name four sea creatures from today.', 'Answers will vary: a whale, a squid, a dolphin, a shark, a sea turtle, an octopus, sea sponges, fish.'],
+  ['What must we stop, and why?', 'Pollution — or our resources will disappear.']
+];
+function initRecap() {
+  var grid = document.getElementById('recap-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  RECAP.forEach(function (r, i) {
+    var item = document.createElement('div');
+    item.className = 'q-item';
+    item.innerHTML = '<div class="q-num">' + (i + 1) + '</div><div><div>' + r[0] + '</div><div class="q-ans">→ ' + r[1] + '</div></div>';
+    item.onclick = function () { item.classList.add('done'); };
+    grid.appendChild(item);
+  });
+}
+
+// ─── SLIDE 36: COMPOUND WORDS ──────────────────────────────────
+var CMP = [
+  { a: 'sun',   b: 'light',  w: 'sunlight' },
+  { a: 'mid',   b: 'night',  w: 'midnight' },
+  { a: 'sea',   b: 'turtle', w: 'a sea turtle' },
+  { a: 'under', b: 'water',  w: 'underwater' }
+];
+function initCompound() {
+  var host = document.getElementById('cmp-rows');
+  if (!host || host.dataset.built) return;
+  host.dataset.built = '1';
+  var made = 0;
+  CMP.forEach(function (c) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:12px;font-size:24px;font-weight:700;color:#374151';
+    var a = document.createElement('button'); a.className = 'chip'; a.textContent = c.a;
+    var plus = document.createElement('span'); plus.textContent = '+';
+    var b = document.createElement('button'); b.className = 'chip'; b.textContent = c.b;
+    var eq = document.createElement('span'); eq.textContent = '=';
+    var out = document.createElement('span'); out.style.cssText = 'color:#075985;font-weight:900'; out.textContent = '?';
+    var hit = 0;
+    function tap(btn) {
+      return function () {
+        if (btn.classList.contains('used')) return;
+        btn.classList.add('used');
+        hit++;
+        if (hit === 2) {
+          out.textContent = c.w;
+          made++;
+          document.getElementById('cmp-count').textContent = made + ' / 4';
+        }
+      };
+    }
+    a.onclick = tap(a); b.onclick = tap(b);
+    row.appendChild(a); row.appendChild(plus); row.appendChild(b); row.appendChild(eq); row.appendChild(out);
+    host.appendChild(row);
+  });
+}
+
+// ─── SLIDE 37: DEPTH ORDER ─────────────────────────────────────
+var DEPTHS = [
+  { l: '🏊 A swimming pool — 2 m',        i: 0 },
+  { l: '☀️ End of the sunlit zone — 200 m', i: 1 },
+  { l: '🌗 End of the twilight zone — 1,000 m', i: 2 },
+  { l: '🗻 Mount Fuji upside down — 3,776 m', i: 3 },
+  { l: '🕳️ The Mariana Trench — 11,000 m', i: 4 }
+];
+function initDepth() {
+  var row = document.getElementById('depth-chips');
+  if (!row || row.dataset.built) return;
+  row.dataset.built = '1';
+  var next = 0;
+  shuffled(DEPTHS).forEach(function (d) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = d.l;
+    b.onclick = function () {
+      if (b.classList.contains('used')) return;
+      if (d.i === next) {
+        b.classList.add('used');
+        next++;
+        document.getElementById('depth-count').textContent = next + ' / 5';
+        document.getElementById('depth-fb').textContent = '';
+      } else {
+        document.getElementById('depth-fb').style.color = '#ef4444';
+        document.getElementById('depth-fb').textContent = '✖ Not that one — go from shallowest to deepest.';
+      }
+    };
+    row.appendChild(b);
+  });
+}
+
+// ─── SLIDE 38: FORMATIVE ASSESSMENT ────────────────────────────
+var ASSESS = [
+  '…name all 16 words when Dad points at the pictures on SB pp. 94–95?',
+  '…name the three zones and say which one has the most light?',
+  '…say why we must stop pollution, using the word <b>resources</b>?',
+  '…sort every word into sea creatures / words for the ocean / protecting the ocean?'
+];
+function initAssess() {
+  var grid = document.getElementById('assess-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  ASSESS.forEach(function (t) {
+    var card = document.createElement('div');
+    card.className = 'assess-card';
+    card.innerHTML = '<div class="assess-q">' + t + '</div><div style="font-size:15px;color:#6b7280">Tap when Leo can do it.</div>';
+    card.onclick = function () { card.classList.toggle('yes'); };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE INIT MAP ────────────────────────────────────────────
+var SLIDE_INIT = {
+  3: initAcademic,
+  4: initContentWords,
+  21: initVocabReview,
+  22: initWarmUp,
+  23: initPresentChips,
+  24: initOzDiagram,
+  25: initCreatureChips,
+  27: initDiscussion,
+  28: initSortTeacher,
+  29: initEcho,
+  30: initBuild,
+  32: initQb,
+  33: initSun,
+  35: initRecap,
+  36: initCompound,
+  37: initDepth,
+  38: initAssess,
+  39: restoreDoneState
+};
+// Slides 5–20 are the 16 word slides; each runs its own game.
+vocabWords.forEach(function (w, i) {
+  SLIDE_INIT[i + 5] = function () { initWordGame(w); };
+});
+
+// ─── BOOT ──────────────────────────────────────────────────────
+scale();
+goTo(1);
+restoreDoneState();
+
+</script>
+</body>
+</html>

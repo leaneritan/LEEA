@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 6 · Grammar 2 · will / won't</title>
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+
+/* HEADER */
+.slide-header{height:64px;background:#0369A1;display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.65);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.2);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.ac{background:rgba(14,165,233,.4)}
+
+/* TWO-COLUMN VOCAB LAYOUT */
+.vocab-body{flex:1;display:flex;min-height:0}
+.word-panel{width:40%;padding:30px 34px;display:flex;flex-direction:column;border-right:2px solid #e5e7eb;background:#fff}
+.game-panel{width:60%;padding:22px 32px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;overflow:hidden}
+
+/* TAGS */
+.vtag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;width:fit-content}
+.vtag.v1{background:#E0F2FE;color:#075985}
+.vtag.ac{background:#FEF3C7;color:#B45309}
+.vtag.rel{background:#f3f4f6;color:#6b7280}
+
+/* WORD PANEL */
+.word-emoji{font-size:130px;line-height:1;margin-bottom:12px;cursor:pointer;transition:transform .25s}
+.word-emoji:active{transform:scale(1.15)}
+.word-main{font-size:70px;font-weight:800;color:#111;line-height:1.05;margin-bottom:8px}
+.word-ipa{font-size:21px;color:#6b7280}
+.word-syl{font-size:18px;color:#9ca3af;letter-spacing:1px}
+.word-pos{font-size:19px;color:#0369A1;font-weight:700;margin-bottom:14px}
+.word-def{font-size:21px;color:#374151;line-height:1.45;margin-bottom:8px}
+.word-jp{font-size:18px;color:#6b7280;line-height:1.45}
+.dad-say{background:#F0F9FF;border-left:4px solid #0369A1;padding:13px 16px;border-radius:0 12px 12px 0;font-size:18px;color:#374151;line-height:1.5;margin-top:auto}
+.dad-say b{color:#075985}
+.how-box{background:#fff;border:2px dashed #BAE6FD;border-radius:12px;padding:10px 16px;font-size:16px;color:#4b5563;line-height:1.5;width:100%}
+.how-box b{color:#075985}
+.how-box li{margin-left:18px}
+
+/* MINI-GAME SHELL (shared class names across LEEA vocab decks) */
+.mg-wrap{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;flex:1;min-height:0}
+.mg-head{font-size:20px;font-weight:700;color:#374151;text-align:center;background:#f9fafb;border:2px solid #e5e7eb;border-radius:12px;padding:10px 20px;width:100%;flex-shrink:0}
+.mg-head b{color:#075985}
+.mg-stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0;overflow:hidden}
+.mg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;width:100%}
+.mg-grid.c4{grid-template-columns:repeat(4,1fr)}
+.mg-grid.c3{grid-template-columns:repeat(3,1fr)}
+.mg-tile{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 6px;font-size:38px;cursor:pointer;transition:all .15s;text-align:center}
+.mg-tile:hover{transform:translateY(-3px);border-color:#0369A1}
+.mg-tile .mg-label{display:block;font-size:14px;font-weight:700;color:#4b5563;margin-top:4px;min-height:18px}
+.mg-tile.hit{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.mg-tile.miss{background:#fef2f2;border-color:#ef4444;animation:mgShake .3s ease}
+@keyframes mgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.mg-btn{background:#0369A1;color:#fff;border:none;border-radius:12px;padding:13px 30px;font-size:20px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.mg-btn:hover{background:#075985;transform:scale(1.04)}
+.mg-btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+.mg-opt{padding:12px 22px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:19px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left}
+.mg-opt:hover{border-color:#0369A1}
+.mg-opt.ok{background:#F0F9FF;border-color:#0369A1;color:#075985;pointer-events:none}
+.mg-opt.no{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+.mg-score{font-size:20px;font-weight:800;color:#075985;background:#E0F2FE;border-radius:20px;padding:6px 22px}
+.mg-miss{font-size:17px;font-weight:700;color:#ef4444;min-height:22px}
+.mg-win{background:#0369A1;color:#fff;border-radius:14px;padding:12px 24px;font-size:20px;font-weight:800;text-align:center;opacity:0;transform:translateY(10px);transition:all .35s;width:100%}
+.mg-win.show{opacity:1;transform:translateY(0)}
+.mg-source{font-size:14px;color:#9ca3af;font-weight:600;letter-spacing:.4px}
+.mg-bar{width:100%;height:22px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.mg-bar > div{height:100%;background:linear-gradient(90deg,#38BDF8,#0369A1);width:0%;transition:width .2s;border-radius:99px}
+.mg-track{position:relative;width:100%;height:96px;background:linear-gradient(180deg,#E0F2FE,#F0F9FF);border-radius:16px;overflow:hidden;border:2px solid #BAE6FD}
+.mg-runner{position:absolute;bottom:16px;font-size:46px;transition:left .25s}
+.mg-flag{position:absolute;bottom:14px;right:2%;font-size:40px}
+.mg-spin{display:inline-block;transition:transform .3s ease}
+.mg-flip{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.mg-flip:hover{border-color:#0369A1;transform:translateY(-3px)}
+.mg-flip.open{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.mg-flip .mf-front{font-size:40px}
+.mg-flip .mf-back{display:none;font-size:15px;font-weight:700;color:#075985;line-height:1.35}
+.mg-flip.open .mf-back{display:block}
+.mg-pair{display:flex;gap:26px;width:100%;justify-content:center}
+.mg-col{display:flex;flex-direction:column;gap:10px;flex:1;max-width:340px}
+.mg-pbtn{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:17px;font-weight:700;color:#374151;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left;line-height:1.3}
+.mg-pbtn:hover{border-color:#0369A1}
+.mg-pbtn.sel{border-color:#0369A1;background:#F0F9FF}
+.mg-pbtn.done{border-color:#10b981;background:#ecfdf5;color:#047857;pointer-events:none}
+.mg-pbtn.bad{border-color:#ef4444;background:#fef2f2;animation:mgShake .3s}
+.mg-battery{width:220px;height:110px;border:6px solid #374151;border-radius:14px;position:relative;display:flex;align-items:center;padding:8px}
+.mg-battery::after{content:'';position:absolute;right:-20px;top:32px;width:16px;height:40px;background:#374151;border-radius:0 6px 6px 0}
+.mg-battery > div{height:100%;background:linear-gradient(90deg,#a3e635,#16a34a);border-radius:6px;width:0%;transition:width .2s}
+.mg-lamp{font-size:44px;filter:grayscale(1);opacity:.4;transition:all .25s}
+.mg-lamp.on{filter:none;opacity:1;transform:scale(1.1)}
+
+/* NAV BAR */
+#nav-bar{position:fixed;bottom:0;left:0;right:0;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px;transition:background .2s}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn.active,#fs-btn.active{background:rgba(124,58,237,.35)!important;color:#7DD3FC!important}
+#unit-label{color:#7DD3FC;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+
+/* TEACHER NOTES PANEL */
+#tn-panel{position:fixed;right:-460px;top:0;bottom:52px;width:440px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#7DD3FC;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-panel ul{padding-left:18px;margin-bottom:8px}
+#tn-panel .tn-lbl{color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+
+/* CONTENT SLIDES */
+.content-body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:18px;min-height:0;overflow:hidden}
+.slide-h1{font-size:40px;font-weight:800;color:#111}
+.slide-h2{font-size:25px;font-weight:600;color:#374151}
+.src-pill{display:inline-block;background:#f3f4f6;color:#6b7280;border-radius:20px;padding:6px 18px;font-size:15px;font-weight:700;letter-spacing:.4px;width:fit-content}
+
+/* READING */
+.reading-block{background:#fff;border-radius:16px;padding:26px 36px;font-size:23px;line-height:1.7;color:#1f2937;box-shadow:0 4px 16px rgba(0,0,0,.05);border-left:6px solid #0369A1}
+.reading-block b{color:#075985;font-weight:700}
+.tap-word{background:#E0F2FE;color:#075985;border:none;border-radius:6px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.tap-word.done{background:#0369A1;color:#fff}
+
+/* OBJECTIVES */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:10px}
+.obj-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;display:flex;align-items:flex-start;gap:16px}
+.obj-icon{font-size:34px;flex-shrink:0}
+.obj-text{font-size:19px;color:#374151;line-height:1.4;font-weight:500}
+.obj-text b{color:#0369A1}
+
+/* FORMATIVE ASSESSMENT */
+.assess-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px}
+.assess-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;cursor:pointer;transition:all .2s}
+.assess-card:hover{border-color:#0369A1}
+.assess-card.yes{border-color:#0369A1;background:#F0F9FF}
+.assess-q{font-size:19px;color:#374151;font-weight:600;margin-bottom:10px}
+
+/* BE THE EXPERT */
+.bte-header{background:#0369A1;color:#fff;border-radius:12px 12px 0 0;padding:13px 26px;font-size:19px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bte-body{background:#fff;border:2px solid #0369A1;border-radius:0 0 16px 16px;padding:24px;font-size:19px;color:#374151;line-height:1.6}
+.bte-body b{color:#075985}
+
+/* CHIPS / TASK CARDS */
+.chips-row{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:#E0F2FE;color:#075985;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.chip.used{background:#0369A1;color:#fff}
+.task-card{background:#fff;border-radius:16px;padding:20px 28px;border:2px solid #e5e7eb;font-size:21px;color:#374151;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card b{color:#0369A1}
+.q-item{background:#fff;border-radius:12px;padding:16px 22px;border:2px solid #e5e7eb;font-size:19px;color:#374151;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .2s}
+.q-item:hover{border-color:#0369A1}
+.q-item.done{border-color:#10b981;background:#ecfdf5}
+.q-num{background:#0369A1;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;margin-top:2px}
+.q-ans{max-height:0;overflow:hidden;transition:max-height .3s ease;color:#075985;font-weight:700}
+.q-item.done .q-ans{max-height:120px;margin-top:6px}
+
+/* DIALOGUE */
+.chat-row{display:flex;align-items:flex-end;gap:14px}
+.chat-row.right{flex-direction:row-reverse}
+.chat-ava{font-size:50px;line-height:1}
+.bub{max-width:62%;padding:18px 28px;border-radius:26px;font-size:26px;font-weight:600;line-height:1.35}
+.bub.q{background:#fff;border:2px solid #e5e7eb;border-bottom-left-radius:6px;color:#374151}
+.bub.a{background:#0369A1;color:#fff;border-bottom-right-radius:6px}
+
+/* LISTEN HERO */
+.listen-hero{background:linear-gradient(135deg,#0C4A6E,#0369A1);border-radius:20px;padding:24px 36px;display:flex;align-items:center;gap:28px;color:#fff}
+.listen-hero .lh-emoji{font-size:64px;line-height:1;animation:lhPulse 1.6s ease-in-out infinite}
+@keyframes lhPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.listen-hero .lh-text{font-size:25px;font-weight:700;flex:1}
+.listen-hero .lh-tr{background:rgba(255,255,255,.2);border-radius:20px;padding:9px 22px;font-size:21px;font-weight:800;white-space:nowrap}
+
+/* TITLE / GREAT JOB */
+.title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0C4A6E 0%,#0369A1 50%,#38BDF8 100%);color:#fff;gap:22px;padding:40px}
+.great-job-slide{background:linear-gradient(135deg,#0C4A6E,#0369A1,#38BDF8);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:18px;height:100%;padding:40px}
+
+/* MARK DONE */
+.done-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+.btn-done{background:#16A34A;color:#fff;border:none;border-radius:14px;padding:18px 46px;font-size:26px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-done:hover{background:#15803d}
+.btn-done.confirmed{background:#9ca3af;pointer-events:none}
+.btn-clear{background:#fff;color:#ef4444;border:2px solid #ef4444;border-radius:14px;padding:14px 30px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+#doneMsg{font-size:20px;color:#4b5563;font-weight:600;min-height:28px}
+
+/* VOCAB REVIEW */
+.vr-tabs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;flex-shrink:0}
+.vr-tab{padding:7px 14px;border:2px solid #e5e7eb;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s;white-space:nowrap}
+.vr-tab:hover{border-color:#0369A1;color:#0369A1}
+.vr-tab.active{background:#0369A1;color:#fff;border-color:#0369A1}
+.vr-tab.done{background:#E0F2FE;border-color:#0369A1;color:#075985}
+.vr-tab.done.active{background:#0369A1;color:#fff}
+.vr-body{flex:1;display:flex;min-height:0}
+.vr-left{width:26%;padding:18px;border-right:2px solid #e5e7eb;display:flex;flex-direction:column;gap:8px;background:#fafaf7}
+.vr-right{flex:1;padding:18px 24px;display:flex;flex-direction:column;gap:12px}
+.vr-emoji{font-size:80px;line-height:1}
+.vr-word{font-size:42px;font-weight:800;color:#111;line-height:1.1}
+.vr-ipa{font-size:16px;color:#6b7280}
+.vr-pos{font-size:15px;color:#0369A1;font-weight:700}
+.vr-mark{background:#0369A1;color:#fff;border:none;border-radius:10px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;margin-top:auto;transition:all .2s}
+.vr-mark.done{background:#9ca3af;cursor:not-allowed}
+
+/* GRAMMAR DECK */
+.rule-hero{background:linear-gradient(135deg,#F0F9FF,#fff);border:4px solid #0369A1;border-radius:20px;padding:26px 34px;display:flex;flex-direction:column;gap:14px}
+.rule-hero .rh-line{font-size:42px;font-weight:800;color:#111;line-height:1.35}
+.rule-hero .rh-line b{color:#075985;background:#BAE6FD;border-radius:9px;padding:2px 14px}
+.rule-hero .rh-exp{font-size:22px;color:#374151;line-height:1.5}
+.rule-hero .rh-pat{font-size:20px;font-weight:800;color:#075985;background:#fff;border:3px dashed #BAE6FD;border-radius:12px;padding:12px 18px;font-family:ui-monospace,monospace;width:fit-content}
+.rule-row{background:#fff;border:2px solid #e5e7eb;border-left:6px solid #0369A1;border-radius:14px;padding:14px 20px;display:flex;flex-direction:column;gap:5px;cursor:pointer;transition:border-color .2s}
+.rr-form{font-size:16px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#075985}
+.rr-pattern{font-size:16px;font-weight:700;color:#6b7280;font-family:ui-monospace,monospace}
+.rr-example{font-size:22px;color:#1f2937;line-height:1.4}
+.rr-example b{color:#075985;background:#BAE6FD;border-radius:6px;padding:0 8px}
+.rr-jp{font-size:16px;color:#6b7280}
+.rule-but{background:#FFFBEB;border:3px solid #FDE68A;border-radius:14px;padding:16px 22px;font-size:20px;color:#92400E;line-height:1.5}
+.gap{display:inline-block;min-width:120px;border-bottom:4px solid #0369A1;margin:0 6px;color:transparent}
+.gap-filled{color:#075985;background:#BAE6FD;border-radius:6px;padding:0 10px}
+.detect-line{font-size:23px;line-height:2.1;color:#1f2937}
+.detect-word{font-family:'Outfit',sans-serif;font-size:23px;font-weight:800;background:#fff;border:2px solid #e5e7eb;border-radius:9px;padding:2px 12px;cursor:pointer;color:#374151;transition:all .15s}
+.detect-word:hover{border-color:#0369A1}
+.detect-word.on{background:#16A34A;border-color:#15803D;color:#fff;cursor:default}
+.build-line{font-size:30px;font-weight:700;color:#374151;background:#fff;border:3px dashed #BAE6FD;border-radius:14px;padding:18px 24px;min-height:78px;display:flex;align-items:center;justify-content:center;width:100%}
+.build-line.ok{border-style:solid;border-color:#16A34A;background:#F0FDF4;color:#15803D}
+.lu-head{margin-top:8px}
+.lu-title{font-size:24px;font-weight:900;color:#075985}
+.lu-sub{font-size:19px;color:#4b5563;line-height:1.45}
+.lu-card{background:#fff;border:2px solid #e5e7eb;border-radius:14px;padding:14px 20px;cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.lu-from{font-size:20px;color:#6b7280;line-height:1.45}
+.lu-to{font-size:22px;font-weight:700;color:#15803D;line-height:1.45}
+.lu-to b{background:#BBF7D0;border-radius:6px;padding:0 8px}
+.lu-tap{font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#9ca3af}
+</style>
+
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<!-- SLIDE 1: TITLE -->
+<div class="slide active" id="s1">
+  <div class="title-bg">
+    <div style="font-size:22px;font-weight:700;letter-spacing:3px;opacity:.75;text-transform:uppercase">Our World · Level 4 · Unit 6</div>
+    <div style="font-size:66px;font-weight:900;text-align:center;line-height:1.15;max-width:1500px">Future predictions with will and won't</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;font-size:30px;font-weight:700">📐 Grammar 2 — TR 6.7</div>
+    <div style="font-size:26px;opacity:.9;font-family:ui-monospace,monospace;background:rgba(255,255,255,.12);border-radius:14px;padding:12px 28px">subject + will / won't + base verb</div>
+  </div>
+</div>
+
+<!-- SLIDE 2: OBJECTIVES -->
+<div class="slide" id="s2">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Grammar 2 — Objectives</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 In This Lesson</div>
+    <div class="obj-grid">
+      <div class="obj-card"><div class="obj-icon">🔮</div><div class="obj-text"><b>Content:</b> Predict what will happen to the ocean if pollution and overfishing continue.</div></div>
+      <div class="obj-card"><div class="obj-icon">🌍</div><div class="obj-text"><b>Content:</b> Say what people will and won't do to protect the planet.</div></div>
+      <div class="obj-card"><div class="obj-icon">🗣️</div><div class="obj-text"><b>Language:</b> Use will and won't + the base verb to make predictions.</div></div>
+      <div class="obj-card"><div class="obj-icon">❓</div><div class="obj-text"><b>Language:</b> Ask and answer questions with will (Will they…? Yes, they will. / No, they won't.)</div></div>
+    </div>
+    <div class="task-card" style="margin-top:6px">📚 <b>Student Book pp. 101</b> · Audio <b>TR 6.7</b> · Grammar Workbook pp. 26-27 for homework.</div>
+    <span class="src-pill">Lesson Planner pp. 208-209 · Unit 6 Grammar 2</span>
+  </div>
+</div>
+
+<!-- SLIDE 3: ACADEMIC LANGUAGE -->
+<div class="slide" id="s3">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Academic Language</span><span class="hd-chip ac">Always first</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎓 Words we use to talk <i>about</i> this grammar</div>
+    <div class="slide-h2">Tap each card. <b id="ac-score" style="color:#075985">0 / 3 tapped</b></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:10px" id="ac-grid"></div>
+    <span class="src-pill">unit-6/vocabulary.json · academicWordIds + contentWordIds</span>
+  </div>
+</div>
+
+<!-- SLIDE 4: WARM UP -->
+<div class="slide" id="s4">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Listen First</span><span class="hd-chip">TR 6.7</span></div>
+  <div class="content-body">
+    <div class="listen-hero" style="padding:16px 30px"><div class="lh-emoji" style="font-size:48px">🎧</div><div class="lh-text" style="font-size:22px">Play TR 6.7. Leo listens, then reads each sentence aloud.</div><div class="lh-tr">TR 6.7</div></div>
+    <div class="slide-h2" style="margin-top:8px">Tap a sentence to reveal the Japanese. Read: <b id="wu-count" style="color:#075985">0 / 6</b></div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px" id="wu-grid"></div>
+    <span class="src-pill">Student Book pp. 101 · Future with will and won't — TR: 6.7</span>
+  </div>
+</div>
+
+<!-- SLIDE 5: THE RULE -->
+<div class="slide" id="s5">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">The Grammar Chart</span><span class="hd-chip">TR 6.7</span></div>
+  <div class="content-body" style="justify-content:center;gap:22px">
+    <div class="rule-hero">
+      <div class="rh-line">Sea animals and plants <b>will</b> disappear.</div>
+      <div class="rh-exp">Use will to predict something that you think will happen in the future.</div>
+      <div class="rh-pat">subject + will / won't + base verb</div>
+    </div>
+    <div class="how-box" style="font-size:19px">🇯🇵 未来のことを予測するときにwillとwon'tを使います。won't = will notです。</div>
+    <div class="rule-but"><b>Watch out:</b> Sea animals and plants will disappear. → We'll live ... (contraction with pronoun)</div>
+    <span class="src-pill">l4_ak-gwb.pdf · Grammar Chart, Unit 6 Grammar 2</span>
+  </div>
+</div>
+
+<!-- SLIDE 6: THE FORMS -->
+<div class="slide" id="s6">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">The Forms</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📐 One form at a time</div>
+    <div class="slide-h2">Read the example aloud, then tap for the Japanese. Read: <b id="row-count" style="color:#075985">0 / 5</b></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;flex:1;min-height:0;overflow-y:auto" id="row-grid"></div>
+    <span class="src-pill">unit-6/grammar.json · chart.rows</span>
+  </div>
+</div>
+
+<!-- SLIDE 7: LEVEL UP 1 -->
+<div class="slide" id="s7">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Level Up — Say It Better (1 of 2)</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⬆️ Same meaning, better English</div>
+    <div class="slide-h2">Tap a card to see the upgrade. Opened: <b id="lu-count-1" style="color:#075985">0 / 0</b></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;flex:1;min-height:0;overflow-y:auto" id="lu-grid-1"></div>
+    <span class="src-pill">unit-6/grammar.json · tab2_levelup</span>
+  </div>
+</div>
+
+<!-- SLIDE 8: LEVEL UP 2 -->
+<div class="slide" id="s8">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Level Up — Say It Better (2 of 2)</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⬆️ Two more upgrades</div>
+    <div class="slide-h2">Tap a card to see the upgrade. Opened: <b id="lu-count-2" style="color:#075985">0 / 0</b></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;flex:1;min-height:0;overflow-y:auto" id="lu-grid-2"></div>
+    <span class="src-pill">unit-6/grammar.json · tab2_levelup</span>
+  </div>
+</div>
+
+<!-- SLIDE 9: DETECTIVE -->
+<div class="slide" id="s9">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Detective — Find the Grammar</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔎 Tap the words that carry the grammar.</div>
+    <div class="slide-h2">Found: <b id="det-count" style="color:#075985">0 / 0</b></div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;flex:1;min-height:0;overflow-y:auto" id="det-grid"></div>
+    <span class="src-pill">unit-6/grammar.json · examples (Student Book pp. 101)</span>
+  </div>
+</div>
+
+<!-- SLIDE 10: SORT -->
+<div class="slide" id="s10">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Sort the Sentences</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🧠 Tap a sentence, then tap its column.</div>
+    <div class="slide-h2">Sorted: <b id="sort-count" style="color:#075985">0 / 10</b></div>
+    <div style="display:flex;gap:18px;flex:1;min-height:0;margin-top:8px">
+      <div style="width:44%;display:flex;flex-direction:column;gap:8px;overflow-y:auto" id="sort-pool"></div>
+      <div style="flex:1;display:grid;grid-template-columns:repeat(2,1fr);gap:14px" id="sort-cols"></div>
+    </div>
+    <span class="src-pill">unit-6/grammar.json · tab1_samples</span>
+  </div>
+</div>
+
+<!-- SLIDE 11: WORKBOOK PRACTICE -->
+<div class="slide" id="s11">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Practice — Grammar Workbook</span><span class="hd-chip">pp. 26-27</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📝 Do the workbook page together.</div>
+    <div class="slide-h2">Correct: <b id="pr-count" style="color:#075985">0 / 5</b></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;flex:1;min-height:0;overflow-y:auto" id="pr-grid"></div>
+    <span class="src-pill">l4_ak-gwb.pdf · Unit 6 Grammar 2 · answer key</span>
+  </div>
+</div>
+
+<!-- SLIDE 12: BUILD IT -->
+<div class="slide" id="s12">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Build the Sentence</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:20px">
+    <div class="slide-h1">🧱 Tap the chips in order.</div>
+    <div class="mg-stage" id="bd-stage" style="width:88%;gap:16px"></div>
+    <div style="display:flex;gap:16px;align-items:center">
+      <button class="mg-btn" style="background:#6b7280" onclick="buildPrev()">◀ Back</button>
+      <span class="mg-score" id="bd-count">1 / 10</span>
+      <button class="mg-btn" onclick="buildNext()">Next ▶</button>
+    </div>
+    <span class="src-pill">unit-6/grammar.json · tab4_master + the workbook unscramble</span>
+  </div>
+</div>
+
+<!-- SLIDE 13: MASTER -->
+<div class="slide" id="s13">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Master — The Harder Ones</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 Choose, then read the reason out loud.</div>
+    <div class="slide-h2">Correct: <b id="ms-count" style="color:#075985">0 / 4</b></div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px;flex:1;min-height:0;overflow-y:auto" id="ms-grid"></div>
+    <span class="src-pill">unit-6/grammar.json · tab4_master</span>
+  </div>
+</div>
+
+<!-- SLIDE 14: APPLY -->
+<div class="slide" id="s14">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Apply — Lesson Planner</span><span class="hd-chip">pp. 208-209</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💬 Work through the planner activities. Tap to reveal.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px;flex:1;min-height:0;overflow-y:auto" id="lp-grid"></div>
+    <span class="src-pill">Lesson Planner pp. 208-209 · Unit 6 Grammar 2</span>
+  </div>
+</div>
+
+<!-- SLIDE 15: BE THE EXPERT -->
+<div class="slide" id="s15">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Be the Expert</span></div>
+  <div class="content-body" style="justify-content:center;gap:20px">
+    <div class="bte-header">won't = will not</div>
+    <div class="bte-body" style="font-size:23px"><b>won't</b> is the contraction of <b>will not</b> — the spelling is irregular, so Leo has to learn it as a word, not build it. In short answers we never contract the positive: <i>Yes, they will</i> (never &ldquo;Yes, they&rsquo;ll&rdquo;).</div>
+    <div class="how-box" style="font-size:19px">🇯🇵 主語 + will / won't + 動詞の原形</div>
+    <span class="src-pill">Lesson Planner pp. 208-209</span>
+  </div>
+</div>
+
+<!-- SLIDE 16: FORMATIVE ASSESSMENT -->
+<div class="slide" id="s16">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✔️ Can Leo…</div>
+    <div class="assess-grid" id="assess-grid"></div>
+    <div class="task-card" style="margin-top:8px">📓 <b>Homework:</b> Grammar Workbook pp. 26-27, and Leo's Grammar 2 app (12 modules).</div>
+  </div>
+</div>
+
+<!-- SLIDE 17: MARK DONE -->
+<div class="slide" id="s17">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Finish the Lesson</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:24px">
+    <div style="font-size:90px">✅</div>
+    <div class="slide-h1" style="text-align:center">Unit 6 · Grammar 2 — taught</div>
+    <div class="slide-h2" style="text-align:center;max-width:1000px">Marking this done records it on the teacher dashboard. Leo's own Grammar 2 app tracks his 12 modules separately.</div>
+    <div class="done-wrap">
+      <button class="btn-done" id="doneBtn" onclick="markDone()">✅ Mark this lesson done</button>
+      <button class="btn-clear" id="redoBtn" onclick="handleRedo()">↺ Clear saved progress</button>
+      <div id="doneMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 18: RECAP -->
+<div class="slide" id="s18">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Recap</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:26px">
+    <div class="slide-h1" style="text-align:center">🔁 Say the rule back to me.</div>
+    <div class="rule-hero" style="width:80%">
+      <div class="rh-line">Sea animals and plants <b>will</b> disappear.</div>
+      <div class="rh-pat">subject + will / won't + base verb</div>
+    </div>
+    <div class="slide-h2" style="text-align:center;max-width:1100px">Use will and won't to make predictions (guesses) about the future.</div>
+  </div>
+</div>
+
+<!-- SLIDE 19: GREAT JOB -->
+<div class="slide" id="s19">
+  <div class="great-job-slide">
+    <div style="font-size:96px">🏆</div>
+    <div style="font-size:60px;font-weight:900;text-align:center">Great Job, Leo!</div>
+    <div style="font-size:26px;opacity:.92;text-align:center;max-width:1100px">Future predictions with will and won't — done. 🌊</div>
+    <div style="font-size:24px;opacity:.85;font-family:ui-monospace,monospace;background:rgba(255,255,255,.15);border-radius:14px;padding:12px 26px">subject + will / won't + base verb</div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
+
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 19</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="fs-btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+  <span id="unit-label">Unit 6 · Grammar 2</span>
+</div>
+
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+<script>
+/* =========================================================
+   LEEA · Our World Level 4 · Unit 6 · Grammar 2
+   Future predictions with will and won't — 19 slides, 1920x1080, ocean blue
+   Chart, samples, quiz and activities are injected verbatim from
+   unit-6/grammar.json (Grammar Workbook l4_ak-gwb.pdf, pp. 26-27).
+   ========================================================= */
+
+// ─── MARK DONE STORAGE ─────────────────────────────────────────
+var SAVE_PREFIX = 'leea.l4.u6.grammar2-';
+var HOMEWORK_ID = 'l-4-6-grammar-2';
+/* Must match the `id` in lessons/grammar2.teacher.json — the teacher dashboard
+   reads leea.lessonProgress.v1 keyed by that lesson id. */
+var LESSON_ID = 'ow-l4-u6-grammar-2';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+var LESSON_NAME = 'Unit 6 · Grammar 2 — will / won\'t';
+
+function lSave(key, value) {
+  try {
+    var k = SAVE_PREFIX + key;
+    window.localStorage.setItem(k, JSON.stringify(value));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, value);
+    }
+  } catch (e) {}
+}
+function lLoad(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(SAVE_PREFIX + key);
+    return raw === null || raw === undefined ? fallback : JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function writeLessonProgress() {
+  try {
+    var store = {};
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (raw) store = JSON.parse(raw) || {};
+    var now = new Date().toISOString();
+    store[LESSON_ID] = { lessonId: LESSON_ID, teacherId: 'neritan', studentId: 'leo',
+                         status: 'done', completedAt: now, updatedAt: now };
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function clearLessonProgress() {
+  try {
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function markDone() {
+  writeLessonProgress();
+  lSave('complete', { name: LESSON_NAME, timestamp: new Date().toISOString(), done: true });
+  lSave('done', true);
+  var btn = document.getElementById('doneBtn');
+  if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+  var msg = document.getElementById('doneMsg');
+  if (msg) msg.textContent = 'Saved. Grammar 2 taught. 🌊';
+}
+var redoArmed = false, redoTimer = null;
+function handleRedo() {
+  var btn = document.getElementById('redoBtn');
+  var msg = document.getElementById('doneMsg');
+  if (!redoArmed) {
+    redoArmed = true;
+    btn.textContent = '↺ Tap again to clear';
+    if (msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+    if (redoTimer) window.clearTimeout(redoTimer);
+    redoTimer = window.setTimeout(function () {
+      redoArmed = false;
+      btn.textContent = '↺ Clear saved progress';
+      if (msg) msg.textContent = '';
+    }, 3000);
+    return;
+  }
+  redoArmed = false;
+  if (redoTimer) window.clearTimeout(redoTimer);
+  btn.textContent = '↺ Clear saved progress';
+  clearLessonProgress();
+  lSave('complete', null);
+  lSave('done', null);
+  var d = document.getElementById('doneBtn');
+  if (d) { d.classList.remove('confirmed'); d.textContent = '✅ Mark this lesson done'; }
+  if (msg) msg.textContent = 'Cleared.';
+}
+function restoreDoneState() {
+  var c = lLoad('complete', null);
+  if (c && c.done) {
+    var btn = document.getElementById('doneBtn');
+    if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+    var msg = document.getElementById('doneMsg');
+    if (msg) msg.textContent = 'Already marked done.';
+  }
+}
+
+// ─── DATA (injected verbatim from unit-6/grammar.json) ─────────
+var G = {
+ "label": "Grammar 2",
+ "title": "Future predictions with will and won't",
+ "pattern": "subject + will / won't + base verb",
+ "japanese": {
+  "title": "willとwon'tを使った未来の予測",
+  "rule": "未来のことを予測するときにwillとwon'tを使います。won't = will notです。",
+  "pattern": "主語 + will / won't + 動詞の原形",
+  "needsReview": false
+ },
+ "chart": {
+  "title": "Future with will and won't — TR: 6.7",
+  "workbookChart": {
+   "label": "Grammar Chart",
+   "title": "Future with will and won't",
+   "seeHowItWorks": {
+    "beforeTarget": "Sea animals and plants ",
+    "target": "will",
+    "afterTarget": " disappear.",
+    "explanation": "Use will to predict something that you think will happen in the future."
+   },
+   "columns": [
+    "Form",
+    "Example"
+   ],
+   "rows": [
+    {
+     "form": "Positive prediction (will)",
+     "example": "Sea animals and plants will disappear."
+    },
+    {
+     "form": "Negative prediction (won't)",
+     "example": "We won't have as much food as we need."
+    },
+    {
+     "form": "Question (Will ... ?)",
+     "example": "Will people live longer?"
+    },
+    {
+     "form": "Short answer",
+     "example": "Yes, they will. / No, they won't."
+    },
+    {
+     "form": "Contraction: will = 'll",
+     "example": "We'll live in crowded cities."
+    },
+    {
+     "form": "Contraction: will not = won't",
+     "example": "We won't live in small towns."
+    }
+   ],
+   "rule": "Use will and won't to talk about the future. won't = will not.",
+   "but": "Sea animals and plants will disappear. → We'll live ... (contraction with pronoun)"
+  },
+  "intro_examples": [
+   {
+    "text": "Sea animals and plants will disappear.",
+    "jp": "海の動植物は消えてしまうでしょう。"
+   },
+   {
+    "text": "We won't have as much food as we need.",
+    "jp": "私たちは必要なだけの食料が手に入らなくなるでしょう。"
+   },
+   {
+    "text": "Fish and birds will die.",
+    "jp": "魚と鳥は死んでしまうでしょう。"
+   },
+   {
+    "text": "We won't be able to swim.",
+    "jp": "私たちは泳げなくなるでしょう。"
+   },
+   {
+    "text": "There will be no oxygen.",
+    "jp": "酸素がなくなるでしょう。"
+   },
+   {
+    "text": "We won't have healthy oceans.",
+    "jp": "私たちは健全な海を持てなくなるでしょう。"
+   }
+  ],
+  "rows": [
+   {
+    "form": "Positive (will)",
+    "pattern": "subject + will + base verb",
+    "example": "Dolphins will swim near the top of the ocean.",
+    "jp": "willは未来のことが起こると予測するときに使います。"
+   },
+   {
+    "form": "Negative (won't)",
+    "pattern": "subject + won't + base verb",
+    "example": "Most creatures won't live in the ocean's middle layer.",
+    "jp": "won'tはwill notの短縮形で、未来に起こらないことを予測します。"
+   },
+   {
+    "form": "Contraction with pronoun",
+    "pattern": "I'll / You'll / She'll / He'll / We'll / They'll + base verb",
+    "example": "We'll live in crowded cities. We won't live in small towns.",
+    "jp": "代名詞とwillはよく短縮されます。"
+   },
+   {
+    "form": "Question with will",
+    "pattern": "Will + subject + base verb?",
+    "example": "Will people live longer?",
+    "jp": "willの疑問文はWill + 主語 + 動詞の原形の順になります。"
+   },
+   {
+    "form": "Short answers",
+    "pattern": "Yes, they will. / No, they won't.",
+    "example": "Will sea animals disappear? Maybe.",
+    "jp": "短い答えにはYes, ... will. / No, ... won't. または Maybe.を使います。"
+   }
+  ],
+  "note_rule": "Use will and won't to make predictions about the future. won't = will not.",
+  "note_exception": "When you are not 100% sure, you can use maybe: Maybe it will rain tomorrow.",
+  "note_exception_detail": "Will is the same for all persons: I/You/He/She/We/They will live in a different city.",
+  "table": {
+   "title": "Future with will and won't",
+   "columns": [
+    "Positive",
+    "Negative"
+   ],
+   "rows": [
+    {
+     "cells": [
+      "Sea animals will disappear.",
+      "We won't have enough food."
+     ],
+     "roles": [
+      "futurePositive",
+      "futureNegative"
+     ]
+    },
+    {
+     "cells": [
+      "Oil spills will harm sea life.",
+      "Sunlight won't reach the bottom of the ocean."
+     ],
+     "roles": [
+      "futurePositive",
+      "futureNegative"
+     ]
+    }
+   ],
+   "notes": [
+    "won't = will not",
+    "Use maybe when you are not 100% sure: Maybe it will rain tomorrow.",
+    "Contractions with pronouns: I'll, You'll, He'll, She'll, We'll, They'll"
+   ]
+  }
+ },
+ "rows": [
+  {
+   "form": "Positive (will)",
+   "pattern": "subject + will + base verb",
+   "example": "Dolphins will swim near the top of the ocean.",
+   "jp": "willは未来のことが起こると予測するときに使います。"
+  },
+  {
+   "form": "Negative (won't)",
+   "pattern": "subject + won't + base verb",
+   "example": "Most creatures won't live in the ocean's middle layer.",
+   "jp": "won'tはwill notの短縮形で、未来に起こらないことを予測します。"
+  },
+  {
+   "form": "Contraction with pronoun",
+   "pattern": "I'll / You'll / She'll / He'll / We'll / They'll + base verb",
+   "example": "We'll live in crowded cities. We won't live in small towns.",
+   "jp": "代名詞とwillはよく短縮されます。"
+  },
+  {
+   "form": "Question with will",
+   "pattern": "Will + subject + base verb?",
+   "example": "Will people live longer?",
+   "jp": "willの疑問文はWill + 主語 + 動詞の原形の順になります。"
+  },
+  {
+   "form": "Short answers",
+   "pattern": "Yes, they will. / No, they won't.",
+   "example": "Will sea animals disappear? Maybe.",
+   "jp": "短い答えにはYes, ... will. / No, ... won't. または Maybe.を使います。"
+  }
+ ],
+ "examples": [
+  {
+   "sentence": "Sea animals and plants will disappear.",
+   "highlight": "will"
+  },
+  {
+   "sentence": "We won't have as much food as we need.",
+   "highlight": "won't"
+  },
+  {
+   "sentence": "Dolphins will swim near the top of the ocean.",
+   "highlight": "will"
+  },
+  {
+   "sentence": "Oil spills will harm sea life.",
+   "highlight": "will"
+  },
+  {
+   "sentence": "Most creatures won't live in the ocean's middle layer.",
+   "highlight": "won't"
+  },
+  {
+   "sentence": "Sunlight won't reach the bottom of the ocean.",
+   "highlight": "won't"
+  },
+  {
+   "sentence": "Robots will help us with our work.",
+   "highlight": "will"
+  },
+  {
+   "sentence": "Tankers won't transport oil across the ocean.",
+   "highlight": "won't"
+  },
+  {
+   "sentence": "There won't be trash in the sea in 100 years.",
+   "highlight": "won't"
+  },
+  {
+   "sentence": "People will take care of the oceans better than they do now.",
+   "highlight": "will"
+  },
+  {
+   "sentence": "People won't use plastic bottles or plastic bags.",
+   "highlight": "won't"
+  },
+  {
+   "sentence": "Fish and birds will die if there is a big oil spill.",
+   "highlight": "will"
+  },
+  {
+   "sentence": "We won't be able to swim if the beach is polluted.",
+   "highlight": "won't"
+  },
+  {
+   "sentence": "There will be no oxygen when pollution is severe.",
+   "highlight": "will"
+  },
+  {
+   "sentence": "We won't have healthy oceans.",
+   "highlight": "won't"
+  },
+  {
+   "sentence": "Some types of fish will disappear if overfishing continues.",
+   "highlight": "will"
+  },
+  {
+   "sentence": "There won't be enough fish to reproduce.",
+   "highlight": "won't"
+  },
+  {
+   "sentence": "The Green Team will clean up the river banks.",
+   "highlight": "will"
+  },
+  {
+   "sentence": "Will people live longer in the future?",
+   "highlight": "Will"
+  },
+  {
+   "sentence": "We'll know more about the ocean floor in the future.",
+   "highlight": "We'll"
+  }
+ ],
+ "tab2_levelup": {
+  "rules": [
+   {
+    "title": "will — positive prediction",
+    "jp_title": "will — 肯定の予測",
+    "subtitle": "Use will + base verb to predict something you think will happen.",
+    "jp_subtitle": "起こると思うことを予測するとき、will + 動詞の原形を使います。",
+    "transforms": [
+     {
+      "from": "I think sea animals disappear.",
+      "to": "Sea animals will disappear."
+     },
+     {
+      "from": "I think oil spills harm sea life.",
+      "to": "Oil spills will harm sea life."
+     },
+     {
+      "from": "I think people live in crowded cities.",
+      "to": "People will live in crowded cities."
+     }
+    ],
+    "examples": [
+     {
+      "text": "Fish and birds will die if there is a big oil spill.",
+      "jp": "大きな石油流出事故があれば、魚と鳥は死んでしまうでしょう。"
+     },
+     {
+      "text": "There will be no oxygen in the midnight zone.",
+      "jp": "深海域には酸素がなくなるでしょう。"
+     }
+    ]
+   },
+   {
+    "title": "won't — negative prediction",
+    "jp_title": "won't — 否定の予測",
+    "subtitle": "Use won't (= will not) + base verb to predict something you think will NOT happen.",
+    "jp_subtitle": "起こらないと思うことを予測するとき、won't + 動詞の原形を使います。",
+    "transforms": [
+     {
+      "from": "I don't think we have healthy oceans.",
+      "to": "We won't have healthy oceans."
+     },
+     {
+      "from": "I don't think there is any fish left.",
+      "to": "There won't be any fish left."
+     }
+    ],
+    "examples": [
+     {
+      "text": "There won't be enough fish to reproduce.",
+      "jp": "繁殖するための魚が十分にいなくなるでしょう。"
+     },
+     {
+      "text": "We won't have as much food as we need.",
+      "jp": "私たちは必要なだけの食料が手に入らなくなるでしょう。"
+     }
+    ]
+   },
+   {
+    "title": "Contractions with will",
+    "jp_title": "willの短縮形",
+    "subtitle": "With pronouns, will is often shortened. won't = will not.",
+    "jp_subtitle": "代名詞とwillはよく短縮されます。won't = will notです。",
+    "transforms": [
+     {
+      "from": "We will live in crowded cities.",
+      "to": "We'll live in crowded cities."
+     },
+     {
+      "from": "They will not drive cars anymore.",
+      "to": "They won't drive cars anymore."
+     }
+    ],
+    "examples": [
+     {
+      "text": "We'll know more about the ocean floor.",
+      "jp": "私たちは海底についてもっとよく知るようになるでしょう。"
+     },
+     {
+      "text": "People won't use plastic bottles or plastic bags.",
+      "jp": "人々はペットボトルやビニール袋を使わなくなるでしょう。"
+     }
+    ]
+   },
+   {
+    "title": "Questions and short answers with will",
+    "jp_title": "willの疑問文と短い答え",
+    "subtitle": "Use Will + subject + verb to ask about the future. Answer with Yes/No + will/won't.",
+    "jp_subtitle": "Will + 主語 + 動詞で未来について質問します。答えはYes + will / No + won'tです。",
+    "transforms": [
+     {
+      "from": "People live longer in the future?",
+      "to": "Will people live longer in the future?"
+     },
+     {
+      "from": "Sea animals disappear?",
+      "to": "Will sea animals disappear?"
+     }
+    ],
+    "examples": [
+     {
+      "text": "Will the children pick up the trash on the beach? Yes, they will.",
+      "jp": "子どもたちはビーチのごみを拾いますか。はい、拾うでしょう。"
+     },
+     {
+      "text": "Will they travel in cars? No, they won't. They'll travel by bicycle.",
+      "jp": "彼らは車で移動しますか。いいえ、しないでしょう。自転車で移動するでしょう。"
+     }
+    ]
+   }
+  ],
+  "mixed_samples": [
+   {
+    "kind": "positive",
+    "text": "Fish and birds will die if there is a big oil spill.",
+    "jp": "大きな石油流出事故があれば、魚と鳥は死んでしまうでしょう。"
+   },
+   {
+    "kind": "negative",
+    "text": "We won't be able to swim if the beach is polluted.",
+    "jp": "ビーチが汚染されたら、私たちは泳げなくなるでしょう。"
+   },
+   {
+    "kind": "positive",
+    "text": "There will be no oxygen when pollution is severe.",
+    "jp": "汚染がひどくなると、酸素がなくなるでしょう。"
+   },
+   {
+    "kind": "negative",
+    "text": "We won't have healthy oceans.",
+    "jp": "私たちは健康な海を持てなくなるでしょう。"
+   },
+   {
+    "kind": "positive",
+    "text": "Some types of fish will disappear if overfishing continues.",
+    "jp": "乱獲が続けば、一部の種類の魚は消えてしまうでしょう。"
+   },
+   {
+    "kind": "negative",
+    "text": "There won't be enough fish to reproduce.",
+    "jp": "繁殖するのに十分な魚がいなくなるでしょう。"
+   },
+   {
+    "kind": "question",
+    "text": "Will people live longer in the future?",
+    "jp": "将来、人々はもっと長く生きるでしょうか。"
+   },
+   {
+    "kind": "contraction",
+    "text": "We'll know more about the ocean floor in the future.",
+    "jp": "将来、私たちは海底についてもっとよく知るようになるでしょう。"
+   },
+   {
+    "kind": "negative",
+    "text": "People won't use plastic bottles or plastic bags.",
+    "jp": "人々はペットボトルやビニール袋を使わなくなるでしょう。"
+   },
+   {
+    "kind": "positive",
+    "text": "The Green Team will clean up the river banks.",
+    "jp": "グリーンチームは川岸を掃除するでしょう。"
+   }
+  ]
+ },
+ "tab4_master": [
+  {
+   "type": "mcq",
+   "stem": [
+    "Pollution affects sea creatures. It ",
+    " harm the environment."
+   ],
+   "answers": [
+    "will",
+    "won't",
+    "is",
+    "does"
+   ],
+   "correct": 0,
+   "explanation": {
+    "title": "Positive future prediction",
+    "body": "Pollution harming the environment is predicted to happen — use will."
+   },
+   "jp": "汚染が環境を傷つけるという肯定の予測なので、willを使います。"
+  },
+  {
+   "type": "build",
+   "cue": "イルカは海の水面近くを泳ぐでしょう。",
+   "bank": [
+    "near",
+    "the",
+    "Dolphins",
+    "will",
+    "swim",
+    "top",
+    "of",
+    "the",
+    "ocean"
+   ],
+   "correct": [
+    "Dolphins",
+    "will",
+    "swim",
+    "near",
+    "the",
+    "top",
+    "of",
+    "the",
+    "ocean"
+   ],
+   "jp": "イルカは海の水面近くを泳ぐでしょう。"
+  },
+  {
+   "type": "build",
+   "cue": "石油流出事故は海の生き物を傷つけるでしょう。",
+   "bank": [
+    "will",
+    "Oil",
+    "sea",
+    "harm",
+    "spills",
+    "life"
+   ],
+   "correct": [
+    "Oil",
+    "spills",
+    "will",
+    "harm",
+    "sea",
+    "life"
+   ],
+   "jp": "石油流出事故は海の生き物を傷つけるでしょう。"
+  },
+  {
+   "type": "mcq",
+   "stem": [
+    "Will they travel in cars? No, they ",
+    "."
+   ],
+   "answers": [
+    "will",
+    "won't",
+    "are",
+    "don't"
+   ],
+   "correct": 1,
+   "explanation": {
+    "title": "Short answer — won't",
+    "body": "The negative short answer to a Will question is No, they won't."
+   },
+   "jp": "willの疑問文に対する否定の短い答えはNo, ... won'tです。"
+  },
+  {
+   "type": "build",
+   "cue": "海にごみがなくなるでしょう。",
+   "bank": [
+    "There",
+    "won't",
+    "be",
+    "trash",
+    "in",
+    "the",
+    "sea"
+   ],
+   "correct": [
+    "There",
+    "won't",
+    "be",
+    "trash",
+    "in",
+    "the",
+    "sea"
+   ],
+   "jp": "海にごみがなくなるでしょう。"
+  },
+  {
+   "type": "mcq",
+   "stem": [
+    "In the future, I ",
+    " a different city."
+   ],
+   "answers": [
+    "live in",
+    "will live in",
+    "living in",
+    "lived in"
+   ],
+   "correct": 1,
+   "explanation": {
+    "title": "will + base verb",
+    "body": "Use will + base verb for future predictions."
+   },
+   "jp": "未来の予測にはwill + 動詞の原形を使います。"
+  },
+  {
+   "type": "build",
+   "cue": "私たちは必要なだけの食料が手に入らなくなるでしょう。",
+   "bank": [
+    "We",
+    "won't",
+    "have",
+    "as",
+    "much",
+    "food",
+    "as",
+    "we",
+    "need"
+   ],
+   "correct": [
+    "We",
+    "won't",
+    "have",
+    "as",
+    "much",
+    "food",
+    "as",
+    "we",
+    "need"
+   ],
+   "jp": "私たちは必要なだけの食料が手に入らなくなるでしょう。"
+  },
+  {
+   "type": "mcq",
+   "stem": [
+    "",
+    " people live longer in the future?"
+   ],
+   "answers": [
+    "Do",
+    "Are",
+    "Will",
+    "Have"
+   ],
+   "correct": 2,
+   "explanation": {
+    "title": "Will at the start of a question",
+    "body": "For yes/no questions about the future, start with Will."
+   },
+   "jp": "未来についてのyes/no疑問文はWillで始まります。"
+  },
+  {
+   "type": "build",
+   "cue": "人々はペットボトルやビニール袋を使わなくなるでしょう。",
+   "bank": [
+    "People",
+    "won't",
+    "use",
+    "plastic",
+    "bottles",
+    "or",
+    "plastic",
+    "bags"
+   ],
+   "correct": [
+    "People",
+    "won't",
+    "use",
+    "plastic",
+    "bottles",
+    "or",
+    "plastic",
+    "bags"
+   ],
+   "jp": "人々はペットボトルやビニール袋を使わなくなるでしょう。"
+  },
+  {
+   "type": "build",
+   "cue": "人々は今よりも上手に海の世話をするようになるでしょう。",
+   "bank": [
+    "People",
+    "will",
+    "take",
+    "care",
+    "of",
+    "the",
+    "oceans",
+    "better",
+    "than",
+    "they",
+    "do",
+    "now"
+   ],
+   "correct": [
+    "People",
+    "will",
+    "take",
+    "care",
+    "of",
+    "the",
+    "oceans",
+    "better",
+    "than",
+    "they",
+    "do",
+    "now"
+   ],
+   "jp": "人々は今よりも上手に海の世話をするようになるでしょう。"
+  }
+ ],
+ "highlightWord": "will",
+ "wordLab": [
+  {
+   "w": "future",
+   "e": "🔮",
+   "def": "time that has not happened yet",
+   "s": "What will happen in the future if there is a big oil spill?"
+  },
+  {
+   "w": "oxygen",
+   "e": "🫧",
+   "def": "a gas in the air and water that animals need to breathe",
+   "s": "Pollution affects oxygen levels in the midnight zone."
+  },
+  {
+   "w": "reproduce",
+   "e": "🐠",
+   "def": "to have babies — to make new living things of the same kind",
+   "s": "Sea turtles reproduce by laying eggs on the beach."
+  }
+ ],
+ "builds": [
+  {
+   "cue": "イルカは海の水面近くを泳ぐでしょう。",
+   "bank": [
+    "near",
+    "the",
+    "Dolphins",
+    "will",
+    "swim",
+    "top",
+    "of",
+    "the",
+    "ocean"
+   ],
+   "correct": [
+    "Dolphins",
+    "will",
+    "swim",
+    "near",
+    "the",
+    "top",
+    "of",
+    "the",
+    "ocean"
+   ],
+   "jp": "イルカは海の水面近くを泳ぐでしょう。"
+  },
+  {
+   "cue": "石油流出事故は海の生き物を傷つけるでしょう。",
+   "bank": [
+    "will",
+    "Oil",
+    "sea",
+    "harm",
+    "spills",
+    "life"
+   ],
+   "correct": [
+    "Oil",
+    "spills",
+    "will",
+    "harm",
+    "sea",
+    "life"
+   ],
+   "jp": "石油流出事故は海の生き物を傷つけるでしょう。"
+  },
+  {
+   "cue": "海にごみがなくなるでしょう。",
+   "bank": [
+    "There",
+    "won't",
+    "be",
+    "trash",
+    "in",
+    "the",
+    "sea"
+   ],
+   "correct": [
+    "There",
+    "won't",
+    "be",
+    "trash",
+    "in",
+    "the",
+    "sea"
+   ],
+   "jp": "海にごみがなくなるでしょう。"
+  },
+  {
+   "cue": "私たちは必要なだけの食料が手に入らなくなるでしょう。",
+   "bank": [
+    "We",
+    "won't",
+    "have",
+    "as",
+    "much",
+    "food",
+    "as",
+    "we",
+    "need"
+   ],
+   "correct": [
+    "We",
+    "won't",
+    "have",
+    "as",
+    "much",
+    "food",
+    "as",
+    "we",
+    "need"
+   ],
+   "jp": "私たちは必要なだけの食料が手に入らなくなるでしょう。"
+  },
+  {
+   "cue": "人々はペットボトルやビニール袋を使わなくなるでしょう。",
+   "bank": [
+    "People",
+    "won't",
+    "use",
+    "plastic",
+    "bottles",
+    "or",
+    "plastic",
+    "bags"
+   ],
+   "correct": [
+    "People",
+    "won't",
+    "use",
+    "plastic",
+    "bottles",
+    "or",
+    "plastic",
+    "bags"
+   ],
+   "jp": "人々はペットボトルやビニール袋を使わなくなるでしょう。"
+  },
+  {
+   "cue": "人々は今よりも上手に海の世話をするようになるでしょう。",
+   "bank": [
+    "People",
+    "will",
+    "take",
+    "care",
+    "of",
+    "the",
+    "oceans",
+    "better",
+    "than",
+    "they",
+    "do",
+    "now"
+   ],
+   "correct": [
+    "People",
+    "will",
+    "take",
+    "care",
+    "of",
+    "the",
+    "oceans",
+    "better",
+    "than",
+    "they",
+    "do",
+    "now"
+   ],
+   "jp": "人々は今よりも上手に海の世話をするようになるでしょう。"
+  },
+  {
+   "cue": "top / will / near / the / of / the / dolphins / swim / ocean",
+   "bank": [
+    "Dolphins",
+    "will",
+    "swim",
+    "near",
+    "the",
+    "top",
+    "of",
+    "the",
+    "ocean"
+   ],
+   "correct": [
+    "Dolphins",
+    "will",
+    "swim",
+    "near",
+    "the",
+    "top",
+    "of",
+    "the",
+    "ocean"
+   ],
+   "jp": "Dolphins will swim near the top of the ocean.",
+   "fromWorkbook": true
+  },
+  {
+   "cue": "oil spills / sea / harm / will / life",
+   "bank": [
+    "Oil",
+    "spills",
+    "will",
+    "harm",
+    "sea",
+    "life"
+   ],
+   "correct": [
+    "Oil",
+    "spills",
+    "will",
+    "harm",
+    "sea",
+    "life"
+   ],
+   "jp": "Oil spills will harm sea life.",
+   "fromWorkbook": true
+  },
+  {
+   "cue": "ocean's / creatures / middle layer / the / most / live / won't / in",
+   "bank": [
+    "Most",
+    "creatures",
+    "won't",
+    "live",
+    "in",
+    "the",
+    "ocean's",
+    "middle",
+    "layer"
+   ],
+   "correct": [
+    "Most",
+    "creatures",
+    "won't",
+    "live",
+    "in",
+    "the",
+    "ocean's",
+    "middle",
+    "layer"
+   ],
+   "jp": "Most creatures won't live in the ocean's middle layer.",
+   "fromWorkbook": true
+  },
+  {
+   "cue": "sunlight / won't / bottom / the / of / the / ocean / reach",
+   "bank": [
+    "Sunlight",
+    "won't",
+    "reach",
+    "the",
+    "bottom",
+    "of",
+    "the",
+    "ocean"
+   ],
+   "correct": [
+    "Sunlight",
+    "won't",
+    "reach",
+    "the",
+    "bottom",
+    "of",
+    "the",
+    "ocean"
+   ],
+   "jp": "Sunlight won't reach the bottom of the ocean.",
+   "fromWorkbook": true
+  }
+ ],
+ "practice": [
+  {
+   "q": "Robots ______ help us with our work.",
+   "opts": [
+    "will",
+    "won't"
+   ],
+   "correct": 0
+  },
+  {
+   "q": "Tankers ______ transport oil across the ocean.",
+   "opts": [
+    "will",
+    "won't"
+   ],
+   "correct": 1
+  },
+  {
+   "q": "There ______ be trash in the sea in 100 years.",
+   "opts": [
+    "will",
+    "won't"
+   ],
+   "correct": 1
+  },
+  {
+   "q": "We ______ use plastic bottles or plastic bags.",
+   "opts": [
+    "will",
+    "won't"
+   ],
+   "correct": 1
+  },
+  {
+   "q": "People ______ take care of the oceans better than they do now.",
+   "opts": [
+    "will",
+    "won't"
+   ],
+   "correct": 0
+  }
+ ],
+ "sort": {
+  "zones": [
+   {
+    "key": "yes",
+    "label": "✅ will",
+    "color": "#0369A1"
+   },
+   {
+    "key": "no",
+    "label": "🚫 won't",
+    "color": "#B45309"
+   }
+  ],
+  "tiles": [
+   {
+    "text": "Sea animals and plants will disappear.",
+    "answer": "yes"
+   },
+   {
+    "text": "We won't have as much food as we need.",
+    "answer": "no"
+   },
+   {
+    "text": "Dolphins will swim near the top of the ocean.",
+    "answer": "yes"
+   },
+   {
+    "text": "Oil spills will harm sea life.",
+    "answer": "yes"
+   },
+   {
+    "text": "Most creatures won't live in the ocean's middle layer.",
+    "answer": "no"
+   },
+   {
+    "text": "Sunlight won't reach the bottom of the ocean.",
+    "answer": "no"
+   },
+   {
+    "text": "Robots will help us with our work.",
+    "answer": "yes"
+   },
+   {
+    "text": "Tankers won't transport oil across the ocean.",
+    "answer": "no"
+   },
+   {
+    "text": "There won't be trash in the sea in 100 years.",
+    "answer": "no"
+   },
+   {
+    "text": "People will take care of the oceans better than they do now.",
+    "answer": "yes"
+   }
+  ]
+ },
+ "lpItems": [
+  {
+   "q": "Oil pollution affects the sunlit zone of the ocean. What will happen if there is a big oil spill?",
+   "a": "Fish and birds will die.  ·  There will be oil on our beaches.  ·  We won't be able to swim."
+  },
+  {
+   "q": "Pollution affects oxygen levels in the midnight zone and creates areas with no oxygen. Animals live in this area. What will happen to the animals?",
+   "a": "There will be no oxygen.  ·  When there is no oxygen, animals will die."
+  },
+  {
+   "q": "Imagine there are no more fish in the ocean. What will happen if there are no more fish?",
+   "a": "We won't have healthy oceans.  ·  There won't be any fish for animals and people to eat."
+  },
+  {
+   "q": "In some places, fishing boats catch too many fish. What will happen if overfishing happens for a long time?",
+   "a": "There won't be enough fish to reproduce.  ·  Some types of fish will disappear."
+  }
+ ],
+ "assess": [
+  "…make a prediction about the ocean using <b>will</b>?",
+  "…make a negative prediction using <b>won't</b>?",
+  "…ask a question with <b>Will…?</b> and give a short answer?",
+  "…sort ten Student Book sentences into <b>will</b> and <b>won't</b>?"
+ ]
+};
+var NOTES = {
+ "1": "<p class=\"tn-lbl\">Title</p><p>Future predictions with will and won't. Pattern: subject + will / won't + base verb</p>",
+ "2": "<p class=\"tn-lbl\">Objectives</p><p>Read all four aloud. Have SB pp. 101 open and TR 6.7 cued.</p>",
+ "3": "<p class=\"tn-lbl\">Academic Language</p><p>Tap every card. These are the words you will use to <i>explain</i> the grammar, so teach them before the chart.</p>",
+ "4": "<p class=\"tn-lbl\">Warm Up</p><p>Play TR 6.7 first, books open. Leo reads each sentence aloud before you reveal the Japanese.</p>",
+ "5": "<p class=\"tn-lbl\">The Grammar Chart</p><p>This is the Grammar Workbook chart, verbatim. Read the highlighted sentence, then the pattern, then the explanation — in that order.</p>",
+ "6": "<p class=\"tn-lbl\">The Forms</p><p>One row at a time. Leo reads the example; you tap for the Japanese only if he needs it.</p>",
+ "7": "<p class=\"tn-lbl\">Level Up (1 of 2)</p><p>The left sentence is what a beginner says. The right one is what this grammar lets Leo say instead.</p>",
+ "8": "<p class=\"tn-lbl\">Level Up (2 of 2)</p><p>The last two rules are the fine distinctions. Do not rush these.</p>",
+ "9": "<p class=\"tn-lbl\">Detective</p><p>Twelve Student Book sentences. Leo taps the exact words that carry the grammar — that is the whole skill.</p>",
+ "10": "<p class=\"tn-lbl\">Sort</p><p>All ten sentences come from the Student Book. A wrong column flashes red and the sentence stays in the pool.</p>",
+ "11": "<p class=\"tn-lbl\">Workbook Practice</p><p>Every item and every answer is the Grammar Workbook answer key (pp. 26-27). Do it on screen first, then in the book.</p>",
+ "12": "<p class=\"tn-lbl\">Build the Sentence</p><p>Use Back and Next to move between sentences. The 📓 ones are the workbook's own unscramble activity.</p>",
+ "13": "<p class=\"tn-lbl\">Master</p><p>The harder items. Read the reason aloud every time, even when Leo gets it right first go.</p>",
+ "14": "<p class=\"tn-lbl\">Apply</p><p>The Lesson Planner activities for this grammar (pp. 208-209). Ask each one before revealing.</p>",
+ "15": "<p class=\"tn-lbl\">Be the Expert</p><p>The distinction Leo is most likely to get wrong. Keep it short and give one example of each.</p>",
+ "16": "<p class=\"tn-lbl\">Formative Assessment</p><p>Tap each card once Leo can do it. Then set Grammar Workbook pp. 26-27.</p>",
+ "17": "<p class=\"tn-lbl\">Mark Done</p><p>Records this lesson on the teacher dashboard. Leo's app tracks his own 12 modules separately.</p>",
+ "18": "<p class=\"tn-lbl\">Recap</p><p>Leo says the rule back in his own words, then reads the pattern aloud.</p>",
+ "19": "<p class=\"tn-lbl\">Great Job!</p><p>Celebrate, then set the homework.</p>"
+};
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+var TOTAL = 19;
+var cur = 1;
+function goTo(n) {
+  n = Math.max(1, Math.min(TOTAL, n));
+  var old = document.getElementById('s' + cur);
+  if (old) old.classList.remove('active');
+  cur = n;
+  var next = document.getElementById('s' + cur);
+  if (next) next.classList.add('active');
+  document.getElementById('slide-counter').textContent = cur + ' / ' + TOTAL;
+  document.getElementById('tn-content').innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
+  if (SLIDE_INIT[cur]) SLIDE_INIT[cur]();
+}
+document.addEventListener('keydown', function (e) {
+  if (e.target && (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+var notesOpen = false;
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('notes-btn').classList.toggle('active', notesOpen);
+  scale();
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange', function () {
+  var btn = document.getElementById('fs-btn');
+  var active = !!document.fullscreenElement;
+  btn.textContent = active ? '⛶ Exit Full (F)' : '⛶ Fullscreen (F)';
+  btn.classList.toggle('active', active);
+  scale();
+});
+function scale() {
+  var s = document.getElementById('scaler');
+  var availW = window.innerWidth - (notesOpen ? 440 : 0);
+  var availH = window.innerHeight - 52;
+  var r = Math.min(availW / 1920, availH / 1080);
+  s.style.transform = 'scale(' + r + ')';
+  s.style.left = ((availW - 1920 * r) / 2) + 'px';
+  s.style.top = ((availH - 1080 * r) / 2) + 'px';
+  s.style.position = 'fixed';
+}
+window.addEventListener('resize', scale);
+function shuffled(arr) { return arr.slice().sort(function () { return Math.random() - 0.5; }); }
+function stemHtml(stem, fill) {
+  var gap = fill ? '<b class="gap-filled">' + fill + '</b>' : '<span class="gap">______</span>';
+  return (stem[0] || '') + gap + (stem[1] || '');
+}
+function boldTarget(text, target) {
+  if (!target) return text;
+  return text.split(target).join('<b>' + target + '</b>');
+}
+
+// ─── SLIDE 3: ACADEMIC ─────────────────────────────────────────
+function initAcademic() {
+  var grid = document.getElementById('ac-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var tapped = 0;
+  G.wordLab.forEach(function (a) {
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#fff;border:2px solid #FEF3C7;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column';
+    card.innerHTML = '<div style="background:#0EA5E9;color:#fff;padding:10px 16px;font-size:19px;font-weight:700">' + a.e + ' ' + a.w + '</div>' +
+      '<div style="padding:14px 16px;font-size:17px;color:#374151;line-height:1.45">' + a.def +
+      '<div style="margin-top:10px;color:#075985;font-weight:700;display:none" class="ac-ex">' + a.s + '</div></div>';
+    card.onclick = function () {
+      if (card.dataset.open) return;
+      card.dataset.open = '1';
+      card.querySelector('.ac-ex').style.display = 'block';
+      card.style.borderColor = '#0369A1';
+      tapped++;
+      document.getElementById('ac-score').textContent = tapped + ' / ' + G.wordLab.length + ' tapped';
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE 4: WARM UP ──────────────────────────────────────────
+function initWarmUp() {
+  var grid = document.getElementById('wu-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var n = 0;
+  G.chart.intro_examples.forEach(function (ex, i) {
+    var item = document.createElement('div');
+    item.className = 'q-item';
+    item.innerHTML = '<div class="q-num">' + (i + 1) + '</div><div><div>' + boldTarget(ex.text, G.highlightWord) + '</div><div class="q-ans">🇯🇵 ' + ex.jp + '</div></div>';
+    item.onclick = function () {
+      if (item.classList.contains('done')) return;
+      item.classList.add('done'); n++;
+      document.getElementById('wu-count').textContent = n + ' / ' + G.chart.intro_examples.length;
+    };
+    grid.appendChild(item);
+  });
+}
+
+// ─── SLIDE 6: THE RULE ROWS ────────────────────────────────────
+function initRows() {
+  var box = document.getElementById('row-grid');
+  if (!box || box.dataset.built) return;
+  box.dataset.built = '1';
+  var open = 0;
+  G.chart.rows.forEach(function (r) {
+    var card = document.createElement('div');
+    card.className = 'rule-row';
+    card.innerHTML = '<div class="rr-form">' + r.form + '</div>' +
+      '<div class="rr-pattern">' + r.pattern + '</div>' +
+      '<div class="rr-example">' + boldTarget(r.example, G.highlightWord) + '</div>' +
+      '<div class="rr-jp" style="display:none">🇯🇵 ' + r.jp + '</div>';
+    card.onclick = function () {
+      if (card.dataset.open) return;
+      card.dataset.open = '1';
+      card.querySelector('.rr-jp').style.display = 'block';
+      card.style.borderLeftColor = '#16A34A';
+      open++;
+      document.getElementById('row-count').textContent = open + ' / ' + G.chart.rows.length;
+    };
+    box.appendChild(card);
+  });
+}
+
+// ─── SLIDES 7-8: LEVEL UP ──────────────────────────────────────
+function initLevelUp(half) {
+  return function () {
+    var box = document.getElementById('lu-grid-' + half);
+    if (!box || box.dataset.built) return;
+    box.dataset.built = '1';
+    var rules = G.tab2_levelup.rules;
+    var slice = half === 1 ? rules.slice(0, 2) : rules.slice(2);
+    var open = 0, total = 0;
+    slice.forEach(function (rule) { total += rule.transforms.length; });
+    slice.forEach(function (rule) {
+      var head = document.createElement('div');
+      head.className = 'lu-head';
+      head.innerHTML = '<div class="lu-title">' + rule.title + '</div><div class="lu-sub">' + rule.subtitle + '</div><div class="rr-jp">🇯🇵 ' + rule.jp_subtitle + '</div>';
+      box.appendChild(head);
+      rule.transforms.forEach(function (t) {
+        var card = document.createElement('div');
+        card.className = 'lu-card';
+        card.innerHTML = '<div class="lu-from">😐 ' + t.from + '</div>' +
+          '<div class="lu-to" style="display:none">✨ ' + boldTarget(t.to, G.highlightWord) + '</div>' +
+          '<div class="lu-tap">tap to see the better sentence</div>';
+        card.onclick = function () {
+          if (card.dataset.open) return;
+          card.dataset.open = '1';
+          card.querySelector('.lu-to').style.display = 'block';
+          card.querySelector('.lu-tap').style.display = 'none';
+          open++;
+          document.getElementById('lu-count-' + half).textContent = open + ' / ' + total;
+        };
+        box.appendChild(card);
+      });
+    });
+  };
+}
+
+// ─── SLIDE 9: DETECTIVE ────────────────────────────────────────
+function initDetective() {
+  var box = document.getElementById('det-grid');
+  if (!box || box.dataset.built) return;
+  box.dataset.built = '1';
+  var found = 0, total = 0;
+  G.examples.slice(0, 12).forEach(function (ex) {
+    var line = document.createElement('div');
+    line.className = 'detect-line';
+    var parts = ex.sentence.split(ex.highlight);
+    parts.forEach(function (part, pi) {
+      if (part) line.appendChild(document.createTextNode(part));
+      if (pi < parts.length - 1) {
+        total++;
+        var b = document.createElement('button');
+        b.className = 'detect-word';
+        b.textContent = ex.highlight;
+        b.onclick = function () {
+          if (b.classList.contains('on')) return;
+          b.classList.add('on'); found++;
+          document.getElementById('det-count').textContent = found + ' / ' + total;
+        };
+        line.appendChild(b);
+      }
+    });
+    box.appendChild(line);
+  });
+  document.getElementById('det-count').textContent = '0 / ' + total;
+}
+
+// ─── SLIDE 10: SORT ────────────────────────────────────────────
+function initSort() {
+  var pool = document.getElementById('sort-pool'), cols = document.getElementById('sort-cols');
+  if (!pool || pool.dataset.built) return;
+  pool.dataset.built = '1';
+  var picked = null, placed = 0;
+  G.sort.zones.forEach(function (z) {
+    var box = document.createElement('div');
+    box.style.cssText = 'background:#fff;border:3px dashed ' + z.color + ';border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;overflow-y:auto';
+    box.innerHTML = '<div style="font-size:20px;font-weight:800;color:' + z.color + ';text-align:center">' + z.label + '</div>';
+    box.onclick = function () {
+      if (!picked) return;
+      if (picked.answer === z.key) {
+        var tag = document.createElement('div');
+        tag.style.cssText = 'background:#F0F9FF;border:2px solid #0369A1;border-radius:10px;padding:8px 12px;font-size:17px;font-weight:700;color:#075985';
+        tag.textContent = picked.text;
+        box.appendChild(tag);
+        picked.btn.remove();
+        picked = null; placed++;
+        document.getElementById('sort-count').textContent = placed + ' / ' + G.sort.tiles.length;
+      } else {
+        var was = box.style.borderColor;
+        box.style.borderColor = '#ef4444';
+        setTimeout(function () { box.style.borderColor = was; }, 450);
+      }
+    };
+    cols.appendChild(box);
+  });
+  shuffled(G.sort.tiles).forEach(function (t) {
+    var b = document.createElement('button');
+    b.className = 'mg-pbtn';
+    b.textContent = t.text;
+    b.onclick = function () {
+      if (picked) picked.btn.classList.remove('sel');
+      picked = { btn: b, text: t.text, answer: t.answer };
+      b.classList.add('sel');
+    };
+    pool.appendChild(b);
+  });
+}
+
+// ─── SLIDE 11: WORKBOOK PRACTICE ───────────────────────────────
+function initPractice() {
+  var box = document.getElementById('pr-grid');
+  if (!box || box.dataset.built) return;
+  box.dataset.built = '1';
+  var got = 0;
+  G.practice.forEach(function (it) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:16px;background:#fff;border:2px solid #e5e7eb;border-radius:14px;padding:12px 18px';
+    var q = document.createElement('div');
+    q.style.cssText = 'flex:1;font-size:20px;font-weight:600;color:#374151';
+    q.innerHTML = it.q;
+    row.appendChild(q);
+    it.opts.forEach(function (opt, oi) {
+      var b = document.createElement('button');
+      b.className = 'mg-btn';
+      b.style.cssText = 'padding:9px 18px;font-size:17px' + (oi === 1 ? ';background:#0C4A6E' : '');
+      b.textContent = opt;
+      b.onclick = function () {
+        if (row.dataset.done) return;
+        if (oi === it.correct) {
+          row.dataset.done = '1';
+          row.style.borderColor = '#16A34A';
+          row.style.background = '#F0FDF4';
+          q.innerHTML = it.q.replace('______', '<b style="color:#15803D">' + opt + '</b>');
+          got++;
+          document.getElementById('pr-count').textContent = got + ' / ' + G.practice.length;
+        } else {
+          row.style.borderColor = '#ef4444';
+          setTimeout(function () { if (!row.dataset.done) row.style.borderColor = '#e5e7eb'; }, 450);
+        }
+      };
+      row.appendChild(b);
+    });
+    box.appendChild(row);
+  });
+}
+
+// ─── SLIDE 12: BUILD IT ────────────────────────────────────────
+var buildIdx = 0;
+function initBuild() { buildRender(); }
+function buildRender() {
+  var host = document.getElementById('bd-stage');
+  if (!host) return;
+  var b = G.builds[buildIdx];
+  document.getElementById('bd-count').textContent = (buildIdx + 1) + ' / ' + G.builds.length;
+  host.innerHTML = '<div class="slide-h2" style="text-align:center">' + (b.fromWorkbook ? '📓 ' : '🇯🇵 ') + b.cue + '</div>' +
+    '<div class="build-line" id="bd-line">…</div><div class="chips-row" id="bd-chips" style="justify-content:center"></div>' +
+    '<div class="mg-miss" id="bd-fb"></div>';
+  var placed = [];
+  var chips = document.getElementById('bd-chips');
+  shuffled(b.bank).forEach(function (w) {
+    var c = document.createElement('button');
+    c.className = 'chip';
+    c.textContent = w;
+    c.onclick = function () {
+      if (c.classList.contains('used')) return;
+      c.classList.add('used'); placed.push(w);
+      var line = document.getElementById('bd-line');
+      line.textContent = placed.join(' ');
+      if (placed.join(' ') === b.correct.join(' ')) {
+        line.classList.add('ok');
+        document.getElementById('bd-fb').style.color = '#16A34A';
+        document.getElementById('bd-fb').textContent = '✅ ' + b.jp;
+      }
+    };
+    chips.appendChild(c);
+  });
+}
+function buildNext() { if (buildIdx < G.builds.length - 1) buildIdx++; buildRender(); }
+function buildPrev() { if (buildIdx > 0) buildIdx--; buildRender(); }
+
+// ─── SLIDE 13: MASTER ──────────────────────────────────────────
+function initMaster() {
+  var box = document.getElementById('ms-grid');
+  if (!box || box.dataset.built) return;
+  box.dataset.built = '1';
+  var got = 0;
+  var mcqs = G.tab4_master.filter(function (x) { return x.type === 'mcq'; });
+  mcqs.forEach(function (it) {
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#fff;border:2px solid #e5e7eb;border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;gap:10px';
+    var q = document.createElement('div');
+    q.style.cssText = 'font-size:21px;font-weight:600;color:#374151';
+    q.innerHTML = stemHtml(it.stem);
+    card.appendChild(q);
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap';
+    it.answers.forEach(function (a, ai) {
+      var b = document.createElement('button');
+      b.className = 'mg-opt';
+      b.style.cssText = 'padding:8px 16px;font-size:17px';
+      b.textContent = a;
+      b.onclick = function () {
+        if (card.dataset.done) return;
+        if (ai === it.correct) {
+          card.dataset.done = '1';
+          b.classList.add('ok');
+          q.innerHTML = stemHtml(it.stem, a);
+          var ex = document.createElement('div');
+          ex.style.cssText = 'font-size:16px;color:#075985;background:#F0F9FF;border-radius:10px;padding:9px 13px;line-height:1.45';
+          ex.innerHTML = '<b>' + it.explanation.title + '</b> — ' + it.explanation.body + '<br>🇯🇵 ' + it.jp;
+          card.appendChild(ex);
+          got++;
+          document.getElementById('ms-count').textContent = got + ' / ' + mcqs.length;
+        } else { b.classList.add('no'); }
+      };
+      row.appendChild(b);
+    });
+    card.appendChild(row);
+    box.appendChild(card);
+  });
+}
+
+// ─── SLIDE 14: LESSON-PLANNER ACTIVITIES ───────────────────────
+function initLp() {
+  var box = document.getElementById('lp-grid');
+  if (!box || box.dataset.built) return;
+  box.dataset.built = '1';
+  G.lpItems.forEach(function (it, i) {
+    var item = document.createElement('div');
+    item.className = 'q-item';
+    item.innerHTML = '<div class="q-num">' + (i + 1) + '</div><div><div>' + it.q + '</div><div class="q-ans">→ ' + it.a + '</div></div>';
+    item.onclick = function () { item.classList.add('done'); };
+    box.appendChild(item);
+  });
+}
+
+// ─── SLIDE 16: FORMATIVE ASSESSMENT ────────────────────────────
+function initAssess() {
+  var grid = document.getElementById('assess-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  G.assess.forEach(function (t) {
+    var card = document.createElement('div');
+    card.className = 'assess-card';
+    card.innerHTML = '<div class="assess-q">' + t + '</div><div style="font-size:15px;color:#6b7280">Tap when Leo can do it.</div>';
+    card.onclick = function () { card.classList.toggle('yes'); };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE INIT MAP ────────────────────────────────────────────
+var SLIDE_INIT = {
+  3: initAcademic,
+  4: initWarmUp,
+  6: initRows,
+  7: initLevelUp(1),
+  8: initLevelUp(2),
+  9: initDetective,
+  10: initSort,
+  11: initPractice,
+  12: initBuild,
+  13: initMaster,
+  14: initLp,
+  16: initAssess,
+  17: restoreDoneState
+};
+
+// ─── BOOT ──────────────────────────────────────────────────────
+scale();
+goTo(1);
+restoreDoneState();
+
+</script>
+</body>
+</html>

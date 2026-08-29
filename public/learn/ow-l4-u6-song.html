@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 6 Song App — Protect the Seas</title>
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Unit 6 is Wonders of the Sea — ocean blues, with Level 4 purple kept for
+     the level tag only. Green stays the "correct" colour across every app. */
+  --sea:#0369A1;--sea-d:#075985;--sea-l:#F0F9FF;--sea-b:#BAE6FD;
+  --deep:#0C4A6E;
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --red:#DC2626;--red-l:#FEF2F2;--red-b:#FECACA;
+  --amber:#F59E0B;--amber-l:#FFFBEB;--yellow:#FACC15;--yellow-b:#FDE68A;--yellow-l:#FEFCE8;
+  --ink:#111;--ink-2:#374151;--ink-3:#6B7280;--border:#E5E7EB;
+  --paper:#FFFDF5;--navy:#0f172a;
+}
+html,body{height:100%;font-family:'Outfit',system-ui,'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--paper);color:var(--ink)}
+body{display:flex;flex-direction:column}
+.app-header{background:linear-gradient(135deg,var(--sea),var(--deep));color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-header .logo{font-size:26px}
+.app-header .title{font-size:20px;font-weight:800;line-height:1.1}
+.app-header .subtitle{font-size:13px;opacity:.85;margin-top:2px}
+.app-header .badge-row{margin-left:auto}
+.prog-pill{background:rgba(255,255,255,.22);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;white-space:nowrap}
+.tab-nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:11px 12px;font-family:inherit;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;min-width:70px}
+.tab-btn .tab-icon{font-size:18px}
+.tab-btn .tab-name{font-size:11px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.tab-btn.active{color:var(--sea);border-bottom-color:var(--sea)}
+.tab-btn.done::after{content:'✓';position:absolute;top:3px;right:5px;color:var(--green);font-weight:900;font-size:12px}
+.tab-content{display:none;flex:1;overflow-y:auto;flex-direction:column;min-height:0}
+.tab-content.active{display:flex}
+.tab-body{flex:1;padding:18px 20px 8px;display:flex;flex-direction:column;gap:14px;max-width:900px;width:100%;margin:0 auto}
+.tab-footer{flex-shrink:0;border-top:2px solid var(--border);background:#fff;padding:10px 20px;display:flex;gap:10px;max-width:900px;width:100%;margin:0 auto}
+.section-title{font-size:21px;font-weight:900;color:var(--navy)}
+.section-sub{font-size:14px;color:var(--ink-3);font-weight:600;margin-top:2px}
+.dad-hint{background:var(--amber-l);border:2px solid var(--yellow-b);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:600;color:var(--ink-2);line-height:1.5}
+.src-pill{font-size:12px;font-weight:700;color:var(--ink-3);border-top:1px solid var(--border);padding-top:8px}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:12px 16px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer}
+.btn-complete:disabled{opacity:.4;cursor:not-allowed}
+.btn-complete.confirmed{background:var(--green-d);pointer-events:none}
+.btn-redo{width:112px;flex-shrink:0;background:#fff;color:var(--sea);border:2px solid var(--sea-b);border-radius:12px;padding:12px 8px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer}
+.btn-redo.armed{background:var(--sea-l);border-color:var(--sea)}
+.done-banner{display:none;background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;color:var(--green-d);text-align:center}
+.done-banner.show{display:block;animation:pop .35s}
+@keyframes pop{0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.qcard{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.qcard .qtext{font-size:16px;font-weight:800;color:var(--navy);line-height:1.45}
+.opt-group{display:flex;flex-direction:column;gap:8px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid var(--border);border-radius:12px;padding:11px 16px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit}
+.opt:hover:not(:disabled){border-color:var(--amber)}
+.opt.good{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default}
+.jp-note{font-size:14px;font-weight:600;color:var(--ink-3);background:var(--sea-l);border-radius:10px;padding:8px 12px;line-height:1.5}
+.mstatus{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mcount{background:var(--sea);color:#fff;border-radius:20px;padding:5px 16px;font-size:14px;font-weight:800}
+.mcount.alt{background:var(--navy)}
+.mhint{font-size:14px;font-weight:700;color:var(--ink-3);line-height:1.5}
+.fc-modeswitch{display:flex;gap:8px}
+.fc-modebtn{flex:1;padding:9px;border-radius:10px;border:2px solid var(--border);background:#fff;font-weight:800;font-family:inherit;cursor:pointer;color:var(--ink-3)}
+.fc-modebtn.active{background:var(--sea);color:#fff;border-color:var(--sea)}
+.fc-pane{display:none}.fc-pane.active{display:block}
+.flashcard-wrap{perspective:1000px;min-height:270px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:270px;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;gap:8px;text-align:center}
+.fc-front{background:linear-gradient(135deg,var(--sea),var(--deep));color:#fff;border:4px solid var(--yellow)}
+.fc-back{background:linear-gradient(135deg,#fff,var(--sea-l));border:4px solid var(--sea);transform:rotateY(180deg);overflow:auto}
+.fc-emoji{font-size:56px;line-height:1}
+.fc-word{font-size:30px;font-weight:900}
+.fc-ipa{font-size:14px;font-weight:600;opacity:.85}
+.fc-def{font-size:17px;color:var(--ink-2);font-weight:700;line-height:1.4}
+.fc-tap{font-size:11px;font-weight:700;opacity:.75;letter-spacing:.08em;margin-top:6px}
+.fc-jp{font-size:15px;color:var(--ink-3);font-weight:700;display:none}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:none;border:1px dashed #D1D5DB;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;color:var(--ink-3);cursor:pointer;font-family:inherit}
+.fc-sample{font-size:15px;background:var(--sea-l);border-radius:10px;padding:8px 12px;font-weight:600;color:var(--ink-2);line-height:1.4}
+.fc-sample b{color:var(--sea-d)}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+.fc-nav button{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-weight:800;font-family:inherit;cursor:pointer}
+.fc-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.fc-dot{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.fc-dot.on{background:var(--sea)}
+.svy-row{background:#fff;border:2px solid var(--border);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.svy-row input{border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:15px;font-family:inherit;flex:1;min-width:150px}
+.svy-row input:focus{border-color:var(--amber);outline:none}
+.svy-row.filled{border-color:var(--green);background:var(--green-l)}
+.svy-row.err{animation:shake .35s;border-color:var(--red)}
+.tr-btn{border:2px solid var(--border);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.tr-btn:hover{border-color:var(--sea);color:var(--sea-d)}
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.flipcard{background:linear-gradient(135deg,var(--deep),#1e293b);border:3px solid var(--yellow);border-radius:14px;padding:16px;text-align:center;cursor:pointer;color:#fff;min-height:132px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.flipcard .fce{font-size:40px}
+.flipcard .ftitle{font-size:17px;font-weight:900}
+.flipcard.revealed{background:#fff;color:var(--navy);border-color:var(--green);cursor:default;text-align:left}
+.fbody{font-size:15px;font-weight:600;color:var(--ink-2);line-height:1.55}
+.fjp{font-size:13px;font-weight:600;color:var(--ink-3)}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.mcol{display:flex;flex-direction:column;gap:8px}
+.mitem{background:#fff;border:3px solid var(--border);border-radius:12px;padding:11px 13px;font-size:15px;font-weight:800;color:var(--ink);cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;min-height:56px;line-height:1.35}
+.mitem.m-right{font-weight:600}
+.mitem:hover{border-color:var(--amber)}
+.mitem.sel{border-color:var(--sea);background:var(--sea-l)}
+.mitem.lock{border-color:var(--green);background:var(--green-l);color:var(--green-d);opacity:.7;pointer-events:none}
+.mitem.err{animation:shake .35s;border-color:var(--red);background:var(--red-l)}
+.mrecap{display:none}.mrecap.show{display:block}
+.mrecap-title{font-size:14px;font-weight:800;color:var(--green-d);margin-bottom:8px}
+.mrecap table{width:100%;border-collapse:collapse;background:#fff;border:2px solid var(--border);border-radius:12px;overflow:hidden}
+.mrecap td{padding:9px 12px;font-size:14px;border-top:1px solid var(--border);vertical-align:top}
+.mrecap tr:first-child td{border-top:none}
+.mr-word{font-weight:800;color:var(--green-d);white-space:nowrap;width:1%}
+.mr-emoji{text-align:center;font-size:18px;width:1%}
+.mr-sent{font-weight:600;color:var(--ink-2)}
+.chip-bank{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#fff;border:3px solid var(--amber);border-radius:10px;padding:8px 15px;font-size:16px;font-weight:800;color:var(--ink);cursor:pointer;font-family:inherit}
+.chip:hover{background:var(--amber-l)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.err{animation:shake .35s;border-color:var(--red)}
+.read-box{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px;font-size:16px;font-weight:600;line-height:2}
+.read-blank{display:inline-block;min-width:104px;border-bottom:3px solid var(--amber);text-align:center;font-weight:900;color:var(--ink-3);cursor:pointer;padding:0 6px}
+.read-blank.filled{color:var(--green-d);border-color:var(--green)}
+.read-blank.active{background:var(--amber-l)}
+.read-blank.wrong{animation:shake .35s;color:var(--red)}
+.zone-strip{display:flex;flex-direction:column;border-radius:14px;overflow:hidden;border:3px solid var(--border)}
+.zone-row{padding:12px 16px;font-weight:800;color:#fff;font-size:15px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.zone-sunlit{background:#0EA5E9}.zone-twilight{background:#075985}.zone-midnight{background:#0f172a}
+.zone-depth{font-weight:600;opacity:.9;font-size:13px}
+.quiz-progress{display:flex;gap:5px;flex-wrap:wrap}
+.qdot{width:14px;height:14px;border-radius:50%;background:var(--border)}
+.qdot.on{background:var(--green)}
+.qdot.now{background:var(--sea);box-shadow:0 0 0 3px var(--sea-l)}
+.result-card{border-radius:16px;padding:24px;text-align:center;display:flex;flex-direction:column;gap:8px;border:3px solid var(--border);background:#fff}
+.result-card.pass{border-color:var(--green);background:var(--green-l)}
+.result-card.fail{border-color:var(--amber);background:var(--amber-l)}
+.result-trophy{font-size:54px}
+.result-score{font-size:34px;font-weight:900;color:var(--navy)}
+.result-sub{font-size:15px;font-weight:700;color:var(--ink-2);line-height:1.5}
+.pitch{background:linear-gradient(180deg,#166534,#14532d);border-radius:14px;padding:14px 18px;color:#fff}
+.score-row{display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:800;gap:10px;flex-wrap:wrap}
+.sun-word{font-size:15px;font-weight:800;color:var(--sea-d);min-width:130px}
+@media (max-width:640px){.mgrid{grid-template-columns:1fr}.tab-body{padding:14px 14px 8px}.tab-footer{padding:10px 14px}}
+/* ── song-specific ── */
+.lyric-sheet{display:flex;flex-direction:column;gap:14px}
+.lyric-block{background:#fff;border:2px solid var(--border);border-left:5px solid var(--sea);border-radius:12px;padding:12px 16px}
+.lyric-block.chorus{background:var(--sea-l);border-left-color:var(--deep)}
+.lyric-label{font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--sea-d);margin-bottom:6px}
+.lyric-line{font-size:17px;line-height:1.75;color:var(--ink-2)}
+.lyric-hit{background:var(--sea-b);color:var(--sea-d);border-radius:6px;padding:1px 7px;font-weight:800;cursor:pointer;transition:all .15s}
+.lyric-hit:hover{background:var(--sea);color:#fff}
+.lyric-hit.on{background:var(--green);color:#fff;cursor:default}
+.order-out{display:flex;flex-direction:column;gap:4px;margin:8px 0;min-height:24px}
+.order-line{font-size:16px;font-weight:700;color:var(--green-d);background:var(--green-l);border-radius:8px;padding:5px 10px}
+.order-pool{display:flex;flex-wrap:wrap;gap:7px}
+.order-chip{font-family:inherit;font-size:15px;font-weight:600;background:#fff;border:2px solid var(--border);border-radius:10px;padding:7px 12px;cursor:pointer;color:var(--ink-2);transition:all .15s;text-align:left}
+.order-chip:hover{border-color:var(--sea)}
+.order-chip.used{opacity:.35;pointer-events:none}
+.order-chip.bad{border-color:var(--red);background:var(--red-l);animation:shakeX .3s}
+@keyframes shakeX{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="logo">🌊</div>
+  <div>
+    <div class="title">Unit 6 · Song</div>
+    <div class="subtitle">Our World Level 4 — Wonders of the Sea</div>
+  </div>
+  <div class="badge-row"><div class="prog-pill" id="prog-pill">0 / 8 done</div></div>
+</header>
+<nav class="tab-nav" id="tab-nav"></nav>
+<main id="tab-stack" style="flex:1;display:flex;flex-direction:column;min-height:0"></main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   OUR WORLD LEVEL 4 · UNIT 6 · SONG — LEO APP
+   "Protect the Seas" (TR 6.3, Student Book p. 96)
+   SAVE_PREFIX: leea-4-6-song-
+   HOMEWORK_ID: leo-4-6-song
+   moduleCount 8 (tabs 0-7) · moduleKeyFormat tab-{i}-done · scoreKey score (tab 7)
+
+   Every lyric on this page is verbatim from the TR 6.3 audio script — the
+   line breaks and the CHORUS markers are the ones the script prints, so the
+   app, the teacher deck and the Student Book all show the same song.
+   ═══════════════════════════════════════════════════════════════════════ */
+const SAVE_PREFIX='leea-4-6-song-';
+const HOMEWORK_ID='leo-4-6-song';
+const TAB_COUNT=8;
+const TABS=[
+ {icon:'📚',name:'Academic'},{icon:'🎧',name:'Sing'},{icon:'🆕',name:'Song Words'},
+ {icon:'🔤',name:'Word Review'},{icon:'🧩',name:'Line Order'},{icon:'⚖️',name:'Must / Can\'t'},
+ {icon:'✍️',name:'Write a Line'},{icon:'✅',name:'Quiz'}
+];
+const TAB_INIT={},TAB_RESET={},TAB_RESTORE={};
+
+function lSave(k,v){try{localStorage.setItem(SAVE_PREFIX+k,JSON.stringify(v));}catch(e){}}
+function lLoad(k){try{const r=localStorage.getItem(SAVE_PREFIX+k);return r?JSON.parse(r):null;}catch(e){return null;}}
+function lDel(k){try{localStorage.removeItem(SAVE_PREFIX+k);}catch(e){}}
+function el(t,c,x){const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n;}
+function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function boldWord(s,w){
+  const stem=String(w).replace(/^(a|an|the)\s+/i,'').replace(/_/g,' ');
+  try{return s.replace(new RegExp('('+stem.split(/\s+/).join('[-\\s]')+'\\w*)','i'),'<b>$1</b>');}catch(e){return s;}
+}
+
+/* ── progress + footers (save/restore rules 1, 4, 5) ── */
+function refreshProgress(){
+  let done=0;
+  for(let i=0;i<TAB_COUNT;i++){
+    if(lLoad('tab-'+i+'-done')){done++;const b=document.getElementById('tb'+i);if(b)b.classList.add('done');}
+  }
+  document.getElementById('prog-pill').textContent=done+' / '+TAB_COUNT+' done';
+  const flag='leea-'+HOMEWORK_ID+'-done';
+  try{
+    if(done>=TAB_COUNT){lSave('done',true);localStorage.setItem(flag,JSON.stringify({complete:true,completedAt:new Date().toISOString()}));}
+    else{lDel('done');localStorage.removeItem(flag);}
+  }catch(e){}
+}
+/* Rule 1: the activity calls this the moment its own criteria are met. */
+function markDone(i,silent){
+  if(!lLoad('tab-'+i+'-done'))lSave('tab-'+i+'-done',{done:true,completedAt:new Date().toISOString()});
+  const b=document.getElementById('complete-'+i);
+  if(b){b.disabled=false;b.classList.add('confirmed');b.textContent='✓ '+TABS[i].name+' done';}
+  const banner=document.getElementById('banner-'+i);
+  if(banner&&!silent)banner.classList.add('show');
+  refreshProgress();
+}
+function allowComplete(i){
+  const b=document.getElementById('complete-'+i);
+  if(b&&!lLoad('tab-'+i+'-done')){b.disabled=false;b.textContent='Mark '+TABS[i].name+' complete ✓';}
+}
+/* Rule 4: two-tap arm, then clear this tab's keys and rebuild from zero. */
+function doRedo(i){
+  const b=document.getElementById('redo-'+i);
+  if(!b.classList.contains('armed')){
+    b.classList.add('armed');b.textContent='Tap again ↺';
+    setTimeout(()=>{b.classList.remove('armed');b.textContent='↺ Redo';},3000);
+    return;
+  }
+  b.classList.remove('armed');b.textContent='↺ Redo';
+  lDel('tab-'+i+'-done');
+  if(i===11)lDel('score');
+  Object.keys(localStorage).filter(k=>k.indexOf(SAVE_PREFIX+'tab-'+i+'-')===0).forEach(k=>localStorage.removeItem(k));
+  const c=document.getElementById('complete-'+i);
+  c.classList.remove('confirmed');c.disabled=true;c.textContent='Mark '+TABS[i].name+' complete ✓';
+  const banner=document.getElementById('banner-'+i);if(banner)banner.classList.remove('show');
+  document.getElementById('tb'+i).classList.remove('done');
+  if(TAB_RESET[i])TAB_RESET[i]();
+  refreshProgress();
+}
+/* Rule 2: only tab 11 writes the score key, and it writes the whole result. */
+function saveScore(score,total,extra){
+  const rec={score:score,total:total,percent:Math.round(score/total*100),done:true,savedAt:new Date().toISOString()};
+  for(const k in extra)rec[k]=extra[k];
+  lSave('score',rec);
+}
+let _active=0;
+function showTab(n){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===n));
+  document.querySelectorAll('.tab-content').forEach((c,i)=>c.classList.toggle('active',i===n));
+  _active=n;lSave('last-tab',n);
+  if(TAB_INIT[n]&&!TAB_INIT[n]._done){TAB_INIT[n]();TAB_INIT[n]._done=true;}
+  if(TAB_RESTORE[n])TAB_RESTORE[n]();
+  const c=document.getElementById('complete-'+n);
+  if(c&&lLoad('tab-'+n+'-done')){c.disabled=false;c.classList.add('confirmed');c.textContent='✓ '+TABS[n].name+' done';}
+}
+
+/* Shared MCQ block. Rule 6: an answered question comes back looking answered,
+   or the guard swallows the next tap with no feedback. */
+function askBlock(host,item,tab,key,after){
+  const card=el('div','qcard');
+  const q=el('div','qtext');q.innerHTML=item.q;card.appendChild(q);
+  const grp=el('div','opt-group');
+  item.opts.forEach((t,oi)=>{
+    const b=el('button','opt',t);
+    b.onclick=()=>{
+      const st=lLoad('tab-'+tab+'-ans')||{};
+      if(st[key]!=null)return;
+      st[key]=oi;lSave('tab-'+tab+'-ans',st);
+      paint(b,oi);if(after)after();
+    };
+    grp.appendChild(b);
+  });
+  card.appendChild(grp);
+  if(item.jp){const j=el('div','jp-note','🇯🇵 '+item.jp);j.style.display='none';card.appendChild(j);}
+  host.appendChild(card);
+  function paint(clicked,chosen){
+    const all=grp.querySelectorAll('.opt');
+    for(let i=0;i<all.length;i++){all[i].disabled=true;if(i===item.correct)all[i].classList.add('good');}
+    if(chosen!==item.correct&&clicked)clicked.classList.add('bad');
+    const j=card.querySelector('.jp-note');if(j)j.style.display='block';
+  }
+  const saved=(lLoad('tab-'+tab+'-ans')||{})[key];
+  if(saved!=null)paint(grp.querySelectorAll('.opt')[saved],saved);
+}
+function answered(tab,keys){const st=lLoad('tab-'+tab+'-ans')||{};return keys.filter(k=>st[k]!=null).length;}
+function counter(host,label){
+  const row=el('div','mstatus'),c=el('div','mcount','0');
+  row.appendChild(c);row.appendChild(el('div','mhint',label));host.appendChild(row);return c;
+}
+function srcPill(host,text){host.appendChild(el('div','src-pill',text));}
+
+/* ── flashcard block: Practice + Quiz, both required (PR #77 lock) ── */
+function flashcards(host,tab,list){
+  const st=lLoad('tab-'+tab+'-fc')||{seen:[],solved:[],mode:'practice'};
+  st.seen=st.seen||[];st.solved=st.solved||[];
+  const modes=el('div','fc-modeswitch');
+  const pb=el('button','fc-modebtn','📖 Practice'),qb=el('button','fc-modebtn','🧠 Quiz');
+  modes.appendChild(pb);modes.appendChild(qb);host.appendChild(modes);
+  const status=el('div','mstatus'),seenPill=el('div','mcount',''),solvedPill=el('div','mcount alt','');
+  status.appendChild(seenPill);status.appendChild(solvedPill);host.appendChild(status);
+  const pp=el('div','fc-pane'),qp=el('div','fc-pane');host.appendChild(pp);host.appendChild(qp);
+  let idx=0;
+  const wrap=el('div','flashcard-wrap'),card=el('div','flashcard'),front=el('div','fc-face fc-front'),back=el('div','fc-face fc-back');
+  card.appendChild(front);card.appendChild(back);wrap.appendChild(card);
+  wrap.onclick=()=>card.classList.toggle('flipped');
+  pp.appendChild(wrap);
+  const nav=el('div','fc-nav'),prev=el('button',null,'◀ Back'),dots=el('div','fc-dots'),next=el('button',null,'Next ▶');
+  nav.appendChild(prev);nav.appendChild(dots);nav.appendChild(next);pp.appendChild(nav);
+  prev.onclick=()=>{idx=(idx-1+list.length)%list.length;draw();};
+  next.onclick=()=>{idx=(idx+1)%list.length;draw();};
+  function draw(){
+    const w=list[idx];card.classList.remove('flipped');
+    front.innerHTML='';front.appendChild(el('div','fc-emoji',w.e));front.appendChild(el('div','fc-word',w.w));
+    front.appendChild(el('div','fc-ipa','/'+w.ipa+'/'));front.appendChild(el('div','fc-tap','TAP TO FLIP'));
+    back.innerHTML='';back.appendChild(el('div','fc-def',w.def));
+    const jp=el('div','fc-jp',w.jp),jb=el('button','fc-jp-btn','🇯🇵 Japanese');
+    jb.onclick=(ev)=>{ev.stopPropagation();jp.classList.toggle('revealed');};
+    back.appendChild(jb);back.appendChild(jp);
+    const s=el('div','fc-sample');s.innerHTML=boldWord(w.s||w.tr,w.norm||w.w);back.appendChild(s);
+    dots.innerHTML='';list.forEach((_,i)=>dots.appendChild(el('div','fc-dot'+(i===idx?' on':''))));
+    if(st.seen.indexOf(idx)<0)st.seen.push(idx);
+    persist();
+  }
+  const qcard=el('div','qcard');qp.appendChild(qcard);
+  function drawQuiz(){
+    qcard.innerHTML='';
+    const left=list.map((_,i)=>i).filter(i=>st.solved.indexOf(i)<0);
+    if(!left.length){qcard.appendChild(el('div','qtext','🎉 Every word typed correctly!'));return;}
+    const i=left[0],w=list[i];
+    qcard.appendChild(el('div','fc-emoji',w.e));
+    qcard.appendChild(el('div','qtext',w.def));
+    const row=el('div','svy-row'),inp=el('input'),ck=el('button','tr-btn','✓ Check'),clue=el('button','tr-btn','Clue');
+    inp.placeholder='Type the word';row.appendChild(inp);row.appendChild(ck);row.appendChild(clue);
+    qcard.appendChild(row);
+    const fb=el('div','mhint','');qcard.appendChild(fb);
+    const target=w.w.replace(/^(a|an|the)\s+/i,'').toLowerCase();
+    clue.onclick=()=>{fb.textContent='Starts with "'+target.charAt(0)+'" · '+target.replace(/[^\s]/g,'•');};
+    ck.onclick=()=>{
+      if(inp.value.trim().toLowerCase().replace(/^(a|an|the)\s+/,'')===target){
+        st.solved.push(i);persist();drawQuiz();
+      }else{row.classList.add('err');fb.textContent='Not yet — try again.';setTimeout(()=>row.classList.remove('err'),400);}
+    };
+    inp.onkeydown=(ev)=>{if(ev.key==='Enter')ck.onclick();};
+  }
+  function persist(){
+    st.mode=pp.classList.contains('active')?'practice':'quiz';
+    lSave('tab-'+tab+'-fc',st);
+    seenPill.textContent='📖 '+st.seen.length+' / '+list.length;
+    solvedPill.textContent='🧠 '+st.solved.length+' / '+list.length;
+    if(st.seen.length>=list.length&&st.solved.length>=list.length)markDone(tab);
+  }
+  function setMode(m){
+    pp.classList.toggle('active',m==='practice');qp.classList.toggle('active',m==='quiz');
+    pb.classList.toggle('active',m==='practice');qb.classList.toggle('active',m==='quiz');
+    if(m==='quiz')drawQuiz();
+    persist();
+  }
+  pb.onclick=()=>setMode('practice');qb.onclick=()=>setMode('quiz');
+  draw();setMode(st.mode==='quiz'?'quiz':'practice');
+}
+
+/* ═══ SONG DATA — TR 6.3 verbatim ═══════════════════════════════════════
+   Blocks and CHORUS markers are exactly as the Student Book audio script
+   prints them. `hits` are the Unit 6 words the singer uses; tapping one in
+   the Sing tab is how Leo hears the vocabulary inside real language. */
+const SONG=[
+ {kind:'chorus', label:'CHORUS', lines:[
+   'Please, please protect the seas.',
+   'Put good deeds into motion.',
+   'Help save the oceans.',
+   'We must protect',
+   'the wonders of the seas,',
+   'to make a better world',
+   'for you and me.'
+ ]},
+ {kind:'verse', label:'Verse 1', lines:[
+   'We must stop polluting',
+   'the ocean blue.',
+   'An octopus would like that,',
+   'and so would you.'
+ ]},
+ {kind:'marker', label:'CHORUS', lines:[]},
+ {kind:'verse', label:'(chorus tail, printed again)', lines:[
+   'We must protect',
+   'the wonders of the seas,',
+   'to make a better world',
+   'for you and me.'
+ ]},
+ {kind:'verse', label:'Verse 2', lines:[
+   'When we make a mess,',
+   "we can't dump it in the sea.",
+   "Sharks don't want that.",
+   'Do we?'
+ ]},
+ {kind:'verse', label:'Verse 3', lines:[
+   'There are layers in the ocean below.',
+   "There are creatures there that we don't know.",
+   "They live deep underwater. They don't breathe air,",
+   'but our world is a part of theirs.'
+ ]},
+ {kind:'marker', label:'CHORUS', lines:[]}
+];
+
+/* The Unit 6 words the song actually uses, in the order they are sung.
+   `norm` is the vocabulary.json normalizedWord so Reference stays the
+   single source of truth for what each word means. */
+const HITS=[
+ {sung:'protect',    w:'protect',    norm:'protect',    e:'🛡️', ipa:'prəˈtɛkt',      def:'to keep something safe from harm',                     jp:'守（まも）る',                s:'We must protect the wonders of the seas.'},
+ {sung:'seas',       w:'the seas',   norm:'sea',        e:'🌊', ipa:'siːz',           def:'large areas of salt water — another word for oceans',   jp:'海（うみ）',                  s:'Please, please protect the seas.'},
+ {sung:'oceans',     w:'the oceans', norm:'ocean',      e:'🌏', ipa:'ˈoʊʃənz',        def:'the very large seas that cover most of the Earth',      jp:'海洋（かいよう）',             s:'Help save the oceans.'},
+ {sung:'polluting',  w:'pollution',  norm:'pollut',     e:'🛢️', ipa:'pəˈluːtɪŋ',      def:'making the air, water or land dirty',                   jp:'汚（よご）すこと',             s:'We must stop polluting the ocean blue.'},
+ {sung:'octopus',    w:'an octopus', norm:'octopus',    e:'🐙', ipa:'ˈɒktəpəs',       def:'a sea creature with eight arms',                        jp:'タコ',                       s:'An octopus would like that, and so would you.'},
+ {sung:'Sharks',     w:'a shark',    norm:'shark',      e:'🦈', ipa:'ʃɑrk',           def:'a large fish with sharp teeth that lives in the ocean',  jp:'サメ',                       s:"Sharks don't want that. Do we?"},
+ {sung:'layers',     w:'a layer',    norm:'layer',      e:'🌊', ipa:'ˈleɪərz',        def:'levels of the ocean — top, middle and bottom',          jp:'層（そう）',                  s:'There are layers in the ocean below.'},
+ {sung:'creatures',  w:'a creature', norm:'creature',   e:'🦀', ipa:'ˈkriːtʃərz',     def:'living animals, especially strange or interesting ones',jp:'生（い）き物（もの）',           s:"There are creatures there that we don't know."},
+ {sung:'underwater', w:'underwater', norm:'underwater', e:'🤿', ipa:'ˌʌndərˈwɔːtər',  def:'below the surface of the water',                        jp:'水中（すいちゅう）で',          s:'They live deep underwater.'}
+];
+
+/* Unit 6 Academic Language that the song puts to work. obligation and
+   prohibition are the two the Grammar 1 lesson builds on directly. */
+const ACADEMIC=[
+ {w:'obligation', e:'⚖️', ipa:'ˌɒbləˈɡeɪʃən', def:'something you must or have to do — a duty or rule', jp:'義務（ぎむ）',
+  s:'"We <b>must</b> protect the wonders of the seas" is an <b>obligation</b>.'},
+ {w:'prohibition',e:'🚫', ipa:'ˌprəʊɪˈbɪʃən', def:"something you can't or must not do — a rule against doing something", jp:'禁止（きんし）',
+  s:'"We <b>can\'t</b> dump it in the sea" is a <b>prohibition</b>.'},
+ {w:'chorus',     e:'🔁', ipa:'ˈkɔːrəs',      def:'the part of a song that comes back again and again', jp:'サビ・繰（く）り返（かえ）し',
+  s:'"Please, please protect the seas" opens the <b>chorus</b>.'},
+ {w:'verse',      e:'📜', ipa:'vɜːrs',        def:'a part of a song that tells the story; each one is different', jp:'バース（歌（うた）の一節（いっせつ））',
+  s:'Verse 3 is the <b>verse</b> about the layers of the ocean.'},
+ {w:'rhyme',      e:'🎶', ipa:'raɪm',         def:'words that end with the same sound', jp:'韻（いん）',
+  s:'<b>below</b> and <b>know</b> <b>rhyme</b> in verse 3.'}
+];
+
+/* ── answer-position variation ──────────────────────────────────────────
+   The authored MCQ data lists the correct option first so it is readable in
+   the source. Left alone, Leo could score full marks by always tapping the
+   top button.
+
+   Positions are dealt out round-robin rather than drawn per question: a
+   per-item hash is uniform on average but still left a whole 12-question
+   quiz with no answer in the last slot, which is exactly the pattern this
+   is meant to prevent. Dealing guarantees every slot is used about equally.
+   The hash only decides the running order and the distractor order, so the
+   layout is stable across reloads and a restored answer still lines up with
+   the option it was saved against. */
+function hashText(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+/* splitmix32. A plain LCG was tried first and its low bits cycle, which
+   produced a shuffle that never picked option A — so consume the high bits. */
+function mix32(a){a=(a+0x9e3779b9)>>>0;let z=a;z=Math.imul(z^(z>>>16),0x21f0aaad)>>>0;z=Math.imul(z^(z>>>15),0x735a2d97)>>>0;return (z^(z>>>15))>>>0;}
+function moveAnswerTo(item,target){
+  if(!item||!Array.isArray(item.opts)||typeof item.correct!=='number')return item;
+  const answer=item.opts[item.correct];
+  const rest=item.opts.filter((_,i)=>i!==item.correct);
+  let state=hashText(String(item.q));
+  for(let i=rest.length-1;i>0;i--){
+    state=mix32(state);
+    const j=Math.floor((state/4294967296)*(i+1));
+    const t=rest[i];rest[i]=rest[j];rest[j]=t;
+  }
+  const pos=Math.min(Math.max(target,0),rest.length);
+  rest.splice(pos,0,answer);
+  item.opts=rest;item.correct=pos;
+  return item;
+}
+function varyItem(item){return moveAnswerTo(item,hashText(String(item&&item.q))%((item&&item.opts&&item.opts.length)||1));}
+function varyAll(list){
+  const order=list.map((it,i)=>({i:i,h:hashText(String(it&&it.q))}))
+                  .sort((a,b)=>(a.h-b.h)||(a.i-b.i));
+  order.forEach((o,k)=>{
+    const item=list[o.i];
+    if(!item||!Array.isArray(item.opts)||typeof item.correct!=='number')return;
+    moveAnswerTo(item,k%item.opts.length);
+  });
+  return list;
+}
+
+/* ═══ TAB 0 — ACADEMIC ═══ */
+TAB_INIT[0]=function(){
+  const h=document.getElementById('body-0');
+  h.appendChild(hdr('📚 Academic Language','Words for talking about a song — and about rules'));
+  h.appendChild(hint('Finish BOTH modes — Practice flips the cards, Quiz asks you to name each one.'));
+  flashcards(h,0,ACADEMIC);
+  srcPill(h,'unit-6/vocabulary.json · academicWordIds + song-craft words');
+};
+TAB_RESET[0]=function(){rebuild(0);};
+
+/* ═══ TAB 1 — SING (TR 6.3 verbatim, tap the Unit 6 words) ═══ */
+TAB_INIT[1]=function(){
+  const h=document.getElementById('body-1');
+  h.appendChild(hdr('🎧 Listen and Sing','Protect the Seas · TR 6.3'));
+  /* Several of the target words are sung more than once, so the total comes
+     from the spans that actually get rendered, not from HITS.length. */
+  h.appendChild(hint('Play TR 6.3 and sing along. Tap every blue word the moment you sing it — some come back more than once.'));
+  const c=counter(h,'words tapped');
+  const st=lLoad('tab-1-hits')||{};
+  const sheet=el('div','lyric-sheet');h.appendChild(sheet);
+  const hitWords=HITS.map(x=>x.sung);
+  let placed=0;
+  SONG.forEach(block=>{
+    const b=el('div','lyric-block'+(block.kind==='chorus'?' chorus':''));
+    b.appendChild(el('div','lyric-label',block.label));
+    block.lines.forEach(line=>{
+      const row=el('div','lyric-line');
+      /* Split on the sung forms so each hit becomes its own tappable span
+         and every other character of the line stays exactly as printed. */
+      const re=new RegExp('('+hitWords.join('|')+')');
+      line.split(re).forEach(part=>{
+        const k=hitWords.indexOf(part);
+        if(k>=0){
+          const idx=placed++;
+          const s=el('span','lyric-hit',part);
+          s.title=HITS[k].def;
+          if(st[idx]){s.classList.add('on');}
+          s.onclick=()=>{
+            if(st[idx])return;
+            st[idx]=true;lSave('tab-1-hits',st);
+            s.classList.add('on');up();
+          };
+          row.appendChild(s);
+        } else if(part){
+          row.appendChild(document.createTextNode(part));
+        }
+      });
+      b.appendChild(row);
+    });
+    sheet.appendChild(b);
+  });
+  srcPill(h,'Student Book p. 96 · TR 6.3 — verbatim');
+  function up(){
+    const n=Object.keys(st).filter(k=>st[k]).length;
+    c.textContent=n+' / '+placed;
+    if(n>=placed)markDone(1);
+  }
+  up();
+};
+TAB_RESET[1]=function(){lDel('tab-1-hits');rebuild(1);};
+
+/* ═══ TAB 2 — SONG WORDS ═══ */
+const SONGWORDS=varyAll([
+ {q:'Which part of "Protect the Seas" comes back again and again?',
+  opts:['Please, please protect the seas…','There are layers in the ocean below.','An octopus would like that.'],correct:0,
+  jp:'繰り返される部分が chorus（サビ）です。'},
+ {q:'What do we call a part of a song that tells the story and changes each time?',
+  opts:['a verse','a chorus','a rhyme'],correct:0,jp:'物語を進める部分が verse です。'},
+ {q:'In verse 3, which word <b>rhymes</b> with <b>below</b>?',
+  opts:['know','air','sea'],correct:0,jp:'below と know が韻をふんでいます。'},
+ {q:'How many times is the CHORUS sung in the whole song?',
+  opts:['three times','once','five times'],correct:0,jp:'CHORUS は3回歌われます。'},
+ {q:'Verse 2 asks a question at the end. What is it?',
+  opts:['Do we?','And so would you?','Can you help?'],correct:0,jp:'"Sharks don’t want that. Do we?"'}
+]);
+TAB_INIT[2]=function(){
+  const h=document.getElementById('body-2');
+  h.appendChild(hdr('🆕 Song Words','chorus · verse · rhyme'));
+  h.appendChild(hint('Five questions about how the song is built. Look back at the Sing tab if you need to.'));
+  const keys=SONGWORDS.map((_,i)=>'s'+i);
+  const c=counter(h,'answered');
+  SONGWORDS.forEach((it,i)=>askBlock(h,it,2,keys[i],up));
+  srcPill(h,'Student Book p. 96 · Activity 1');
+  function up(){const n=answered(2,keys);c.textContent=n+' / '+SONGWORDS.length;if(n>=SONGWORDS.length)markDone(2);}
+  up();
+};
+TAB_RESET[2]=function(){rebuild(2);};
+
+/* ═══ TAB 3 — WORD REVIEW (the words the song sings) ═══ */
+TAB_INIT[3]=function(){
+  const h=document.getElementById('body-3');
+  h.appendChild(hdr('🔤 Word Review','The '+HITS.length+' Unit 6 words inside the song'));
+  h.appendChild(hint('Practice flips the cards. Quiz asks you to name each word from its meaning.'));
+  flashcards(h,3,HITS);
+  srcPill(h,'TR 6.3 · matched to unit-6/vocabulary.json');
+};
+TAB_RESET[3]=function(){rebuild(3);};
+
+/* ═══ TAB 4 — LINE ORDER ═══ */
+const ORDERS=[
+ {label:'CHORUS — put the seven lines back in order',
+  lines:['Please, please protect the seas.','Put good deeds into motion.','Help save the oceans.','We must protect','the wonders of the seas,','to make a better world','for you and me.']},
+ {label:'Verse 3 — put the four lines back in order',
+  lines:['There are layers in the ocean below.',"There are creatures there that we don't know.","They live deep underwater. They don't breathe air,",'but our world is a part of theirs.']}
+];
+TAB_INIT[4]=function(){
+  const h=document.getElementById('body-4');
+  h.appendChild(hdr('🧩 Line Order','Rebuild the song, line by line'));
+  h.appendChild(hint('Tap the lines in the order the singer sings them. A wrong line shakes and stays where it is.'));
+  const st=lLoad('tab-4-done')||{};
+  const c=counter(h,'blocks rebuilt');
+  let solved=0;
+  ORDERS.forEach((blk,bi)=>{
+    const card=el('div','qcard');
+    card.appendChild(el('div','qtext',blk.label));
+    const out=el('div','order-out');card.appendChild(out);
+    const pool=el('div','order-pool');card.appendChild(pool);
+    let next=0;
+    const saved=lLoad('tab-4-b'+bi);
+    shuffle(blk.lines.map((l,i)=>({l:l,i:i}))).forEach(item=>{
+      const b=el('button','order-chip',item.l);
+      b.onclick=()=>{
+        if(b.disabled)return;
+        if(item.i!==next){b.classList.add('bad');setTimeout(()=>b.classList.remove('bad'),350);return;}
+        b.disabled=true;b.classList.add('used');
+        out.appendChild(el('div','order-line',(next+1)+'. '+item.l));
+        next++;
+        if(next>=blk.lines.length){
+          lSave('tab-4-b'+bi,true);solved++;up();
+        }
+      };
+      pool.appendChild(b);
+    });
+    if(saved){
+      blk.lines.forEach((l,i)=>out.appendChild(el('div','order-line',(i+1)+'. '+l)));
+      pool.querySelectorAll('.order-chip').forEach(b=>{b.disabled=true;b.classList.add('used');});
+      next=blk.lines.length;solved++;
+    }
+    h.appendChild(card);
+  });
+  srcPill(h,'Student Book p. 96 · TR 6.3 — verbatim');
+  function up(){c.textContent=solved+' / '+ORDERS.length;if(solved>=ORDERS.length)markDone(4);}
+  up();
+};
+TAB_RESET[4]=function(){ORDERS.forEach((_,i)=>lDel('tab-4-b'+i));rebuild(4);};
+
+/* ═══ TAB 5 — MUST / CAN'T (Grammar 1 preview, straight from the song) ═══ */
+const MUSTCANT=varyAll([
+ {q:'"We <b>must</b> protect the wonders of the seas." Is this an obligation or a prohibition?',
+  opts:['an obligation — something we have to do','a prohibition — something we cannot do','neither'],correct:0,jp:'must は義務（obligation）です。'},
+ {q:'"We <b>can\'t</b> dump it in the sea." Is this an obligation or a prohibition?',
+  opts:['a prohibition — something we cannot do','an obligation — something we have to do','neither'],correct:0,jp:"can't は禁止（prohibition）です。"},
+ {q:'"We must stop polluting the ocean blue." What must we stop?',
+  opts:['polluting the ocean','swimming in the ocean','singing about the ocean'],correct:0,jp:'海を汚すことをやめなければなりません。'},
+ {q:'Which line is a <b>prohibition</b>?',
+  opts:["we can't dump it in the sea",'Help save the oceans.','We must protect'],correct:0,jp:"can't の行が禁止です。"},
+ {q:'"Help save the oceans." Who is the singer talking to?',
+  opts:['everybody who hears the song','only sharks','only the octopus'],correct:0,jp:'歌を聞くみんなに向けて言っています。'},
+ {q:'The song says an octopus "would like that" if we stop polluting. Why?',
+  opts:['because the octopus lives in the ocean','because the octopus likes music','because the octopus has eight arms'],correct:0,jp:'タコは海にすんでいるからです。'}
+]);
+TAB_INIT[5]=function(){
+  const h=document.getElementById('body-5');
+  h.appendChild(hdr("⚖️ Must / Can't",'The song is already teaching Grammar 1'));
+  h.appendChild(hint('Every question here uses a line you have just sung. Grammar 1 picks these up next lesson.'));
+  const keys=MUSTCANT.map((_,i)=>'m'+i);
+  const c=counter(h,'answered');
+  MUSTCANT.forEach((it,i)=>askBlock(h,it,5,keys[i],up));
+  srcPill(h,'TR 6.3 lines · previews unit-6/grammar.json grammar-1');
+  function up(){const n=answered(5,keys);c.textContent=n+' / '+MUSTCANT.length;if(n>=MUSTCANT.length)markDone(5);}
+  up();
+};
+TAB_RESET[5]=function(){rebuild(5);};
+
+/* ═══ TAB 6 — WRITE A LINE ═══ */
+const PROMPTS=[
+ {lead:'We must',      hint:'…what must we do for the ocean?',   eg:'We must pick up the garbage on the beach.'},
+ {lead:"We can't",     hint:'…what must we never do?',           eg:"We can't throw plastic bags in the water."},
+ {lead:'A sea turtle', hint:'…what would a sea turtle like?',    eg:'A sea turtle would like a clean beach.'},
+ {lead:'There are',    hint:'…what is down in the ocean?',       eg:'There are creatures there that we don’t know.'}
+];
+TAB_INIT[6]=function(){
+  const h=document.getElementById('body-6');
+  h.appendChild(hdr('✍️ Write a Line','Add your own verse to Protect the Seas'));
+  h.appendChild(hint('Finish all four lines. Six letters or more each — then sing your verse to Dad.'));
+  const st=lLoad('tab-6-text')||{};
+  const c=counter(h,'lines written');
+  PROMPTS.forEach((p,i)=>{
+    const row=el('div','svy-row');
+    row.appendChild(el('div','sun-word',p.lead+'…'));
+    const inp=el('input');inp.id='song-in-'+i;inp.placeholder=p.hint+'  e.g. '+p.eg;
+    inp.value=st[i]||'';
+    if((st[i]||'').trim().length>=6)row.classList.add('filled');
+    inp.oninput=()=>{st[i]=inp.value;lSave('tab-6-text',st);row.classList.toggle('filled',inp.value.trim().length>=6);up();};
+    row.appendChild(inp);h.appendChild(row);
+  });
+  srcPill(h,'Extension of Student Book p. 96 · Activity 2');
+  function up(){
+    const n=PROMPTS.filter((_,i)=>(st[i]||'').trim().length>=6).length;
+    c.textContent=n+' / '+PROMPTS.length;
+    if(n>=PROMPTS.length)markDone(6);
+  }
+  up();
+};
+TAB_RESTORE[6]=function(){};
+TAB_RESET[6]=function(){lDel('tab-6-text');rebuild(6);};
+
+/* ═══ TAB 7 — QUIZ ═══ */
+const QUIZ=varyAll([
+ {q:'What is our Unit 6 song called?',opts:['Protect the Seas','Wonders of the Sea','Save the Octopus'],correct:0,jp:'曲名は Protect the Seas です。'},
+ {q:'"Please, please protect the seas" is the first line of the…',opts:['chorus','third verse','last line'],correct:0,jp:'サビ（chorus）の最初の行です。'},
+ {q:'"We must stop ______ the ocean blue."',opts:['polluting','painting','crossing'],correct:0,jp:'polluting（汚すこと）'},
+ {q:'Which sea creature "would like that" if we stop polluting?',opts:['an octopus','a whale','a squid'],correct:0,jp:'タコです。'},
+ {q:'"When we make a mess, we ______ dump it in the sea."',opts:["can't",'must','should'],correct:0,jp:"can't（してはいけない）"},
+ {q:'Which animal does the singer say does not want our mess?',opts:['Sharks','Dolphins','Sea turtles'],correct:0,jp:'サメです。'},
+ {q:'"There are ______ in the ocean below."',opts:['layers','boats','islands'],correct:0,jp:'layers（層）'},
+ {q:'What does the song say about the creatures in the deep?',opts:["we don't know them",'they sing to us','they live on the beach'],correct:0,jp:'私たちが知らない生き物です。'},
+ {q:'"They live deep underwater. They don’t breathe ______."',opts:['air','water','sand'],correct:0,jp:'air（空気）'},
+ {q:'"We must protect the wonders of the seas" — this is an example of…',opts:['an obligation','a prohibition','a question'],correct:0,jp:'義務（obligation）です。'},
+ {q:'In verse 3, which word rhymes with <b>below</b>?',opts:['know','air','theirs'],correct:0,jp:'know と韻をふみます。'},
+ {q:'Why should we protect the oceans, according to the song?',opts:['to make a better world for you and me','to make the water warmer','to find more boats'],correct:0,jp:'よりよい世界をつくるためです。'}
+]);
+TAB_INIT[7]=function(){
+  const h=document.getElementById('body-7');
+  h.appendChild(hdr('✅ Song Quiz','12 questions — 10 or more to pass'));
+  const active=el('div'),result=el('div');h.appendChild(active);h.appendChild(result);
+  const saved=lLoad('score');
+  const bar=el('div','quiz-progress');active.appendChild(bar);
+  const card=el('div','qcard');active.appendChild(card);
+  let cur=0,score=0,wrong=[];
+  const PASS=10;
+  function render(){
+    bar.innerHTML='';
+    QUIZ.forEach((_,i)=>bar.appendChild(el('div','qdot'+(i<cur?' on':'')+(i===cur?' now':''))));
+    card.innerHTML='';
+    const it=QUIZ[cur];
+    card.appendChild(el('div','qtext',(cur+1)+'. '+it.q));
+    const grp=el('div','opt-group');
+    it.opts.forEach((t,oi)=>{
+      const b=el('button','opt',t);
+      b.onclick=()=>{
+        const all=grp.querySelectorAll('.opt');
+        for(let i=0;i<all.length;i++){all[i].disabled=true;if(i===it.correct)all[i].classList.add('good');}
+        if(oi===it.correct)score++;else{b.classList.add('bad');wrong.push(cur+1);}
+        if(it.jp)card.appendChild(el('div','jp-note','🇯🇵 '+it.jp));
+        setTimeout(()=>{cur++;if(cur>=QUIZ.length)finish();else render();},900);
+      };
+      grp.appendChild(b);
+    });
+    card.appendChild(grp);
+  }
+  function finish(){
+    saveScore(score,QUIZ.length,{pass:score>=PASS,wrongQuestions:wrong});
+    show({score:score,total:QUIZ.length,percent:Math.round(score/QUIZ.length*100),pass:score>=PASS,wrongQuestions:wrong});
+    markDone(7);
+  }
+  /* Rule 3: a finished quiz comes back as its result, never restarted. */
+  function show(rec){
+    active.style.display='none';result.innerHTML='';
+    const pass=rec.pass!=null?rec.pass:rec.score>=PASS;
+    const box=el('div','result-card '+(pass?'pass':'fail'));
+    box.appendChild(el('div','result-trophy',pass?'🏆':'💪'));
+    box.appendChild(el('div','result-score',rec.score+' / '+rec.total));
+    box.appendChild(el('div','result-sub',pass?'You passed! '+rec.percent+'%':'Almost — you need '+PASS+' to pass. Tap ↺ Redo to try again.'));
+    if(rec.wrongQuestions&&rec.wrongQuestions.length)box.appendChild(el('div','result-sub','Look again at question(s): '+rec.wrongQuestions.join(', ')));
+    result.appendChild(box);
+    markDone(7,true);
+  }
+  if(saved&&saved.done){show(saved);}else{render();}
+  srcPill(h,'Formative assessment — Unit 6 Song');
+};
+TAB_RESET[7]=function(){rebuild(7);};
+
+/* ── small helpers used by the tabs above ── */
+function hdr(title,sub){
+  const d=el('div');d.appendChild(el('div','section-title',title));
+  if(sub)d.appendChild(el('div','section-sub',sub));return d;
+}
+function hint(text){return el('div','dad-hint',text);}
+function rebuild(i){
+  const body=document.getElementById('body-'+i);
+  body.innerHTML='';
+  TAB_INIT[i]._done=false;TAB_INIT[i]();TAB_INIT[i]._done=true;
+}
+
+/* ── boot ── */
+(function(){
+  const nav=document.getElementById('tab-nav'),stack=document.getElementById('tab-stack');
+  TABS.forEach((t,i)=>{
+    const b=el('button','tab-btn');b.id='tb'+i;
+    b.appendChild(el('span','tab-icon',t.icon));
+    b.appendChild(el('span','tab-name',t.name));
+    b.onclick=()=>showTab(i);
+    nav.appendChild(b);
+    const pane=el('div','tab-content');pane.id='tc'+i;
+    const body=el('div','tab-body');body.id='body-'+i;pane.appendChild(body);
+    const banner=el('div','done-banner','Nice work! Mark it below.');banner.id='banner-'+i;body.appendChild(banner);
+    const foot=el('div','tab-footer');
+    const redo=el('button','btn-redo','↺ Redo');redo.id='redo-'+i;redo.onclick=()=>doRedo(i);
+    const done=el('button','btn-complete','Mark '+t.name+' complete ✓');done.id='complete-'+i;done.disabled=true;
+    done.onclick=()=>markDone(i);
+    foot.appendChild(redo);foot.appendChild(done);pane.appendChild(foot);
+    stack.appendChild(pane);
+  });
+  const last=lLoad('last-tab');
+  showTab(typeof last==='number'&&last>=0&&last<TAB_COUNT?last:0);
+  refreshProgress();
+})();
+</script>
+</body>
+</html>

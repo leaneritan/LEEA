@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 6 · Song · Protect the Seas</title>
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+
+/* HEADER */
+.slide-header{height:64px;background:#0369A1;display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.65);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.2);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.ac{background:rgba(14,165,233,.4)}
+
+/* TWO-COLUMN VOCAB LAYOUT */
+.vocab-body{flex:1;display:flex;min-height:0}
+.word-panel{width:40%;padding:30px 34px;display:flex;flex-direction:column;border-right:2px solid #e5e7eb;background:#fff}
+.game-panel{width:60%;padding:22px 32px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;overflow:hidden}
+
+/* TAGS */
+.vtag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;width:fit-content}
+.vtag.v1{background:#E0F2FE;color:#075985}
+.vtag.ac{background:#FEF3C7;color:#B45309}
+.vtag.rel{background:#f3f4f6;color:#6b7280}
+
+/* WORD PANEL */
+.word-emoji{font-size:130px;line-height:1;margin-bottom:12px;cursor:pointer;transition:transform .25s}
+.word-emoji:active{transform:scale(1.15)}
+.word-main{font-size:70px;font-weight:800;color:#111;line-height:1.05;margin-bottom:8px}
+.word-ipa{font-size:21px;color:#6b7280}
+.word-syl{font-size:18px;color:#9ca3af;letter-spacing:1px}
+.word-pos{font-size:19px;color:#0369A1;font-weight:700;margin-bottom:14px}
+.word-def{font-size:21px;color:#374151;line-height:1.45;margin-bottom:8px}
+.word-jp{font-size:18px;color:#6b7280;line-height:1.45}
+.dad-say{background:#F0F9FF;border-left:4px solid #0369A1;padding:13px 16px;border-radius:0 12px 12px 0;font-size:18px;color:#374151;line-height:1.5;margin-top:auto}
+.dad-say b{color:#075985}
+.how-box{background:#fff;border:2px dashed #BAE6FD;border-radius:12px;padding:10px 16px;font-size:16px;color:#4b5563;line-height:1.5;width:100%}
+.how-box b{color:#075985}
+.how-box li{margin-left:18px}
+
+/* MINI-GAME SHELL (shared class names across LEEA vocab decks) */
+.mg-wrap{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;flex:1;min-height:0}
+.mg-head{font-size:20px;font-weight:700;color:#374151;text-align:center;background:#f9fafb;border:2px solid #e5e7eb;border-radius:12px;padding:10px 20px;width:100%;flex-shrink:0}
+.mg-head b{color:#075985}
+.mg-stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0;overflow:hidden}
+.mg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;width:100%}
+.mg-grid.c4{grid-template-columns:repeat(4,1fr)}
+.mg-grid.c3{grid-template-columns:repeat(3,1fr)}
+.mg-tile{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 6px;font-size:38px;cursor:pointer;transition:all .15s;text-align:center}
+.mg-tile:hover{transform:translateY(-3px);border-color:#0369A1}
+.mg-tile .mg-label{display:block;font-size:14px;font-weight:700;color:#4b5563;margin-top:4px;min-height:18px}
+.mg-tile.hit{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.mg-tile.miss{background:#fef2f2;border-color:#ef4444;animation:mgShake .3s ease}
+@keyframes mgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.mg-btn{background:#0369A1;color:#fff;border:none;border-radius:12px;padding:13px 30px;font-size:20px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.mg-btn:hover{background:#075985;transform:scale(1.04)}
+.mg-btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+.mg-opt{padding:12px 22px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:19px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left}
+.mg-opt:hover{border-color:#0369A1}
+.mg-opt.ok{background:#F0F9FF;border-color:#0369A1;color:#075985;pointer-events:none}
+.mg-opt.no{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+.mg-score{font-size:20px;font-weight:800;color:#075985;background:#E0F2FE;border-radius:20px;padding:6px 22px}
+.mg-miss{font-size:17px;font-weight:700;color:#ef4444;min-height:22px}
+.mg-win{background:#0369A1;color:#fff;border-radius:14px;padding:12px 24px;font-size:20px;font-weight:800;text-align:center;opacity:0;transform:translateY(10px);transition:all .35s;width:100%}
+.mg-win.show{opacity:1;transform:translateY(0)}
+.mg-source{font-size:14px;color:#9ca3af;font-weight:600;letter-spacing:.4px}
+.mg-bar{width:100%;height:22px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.mg-bar > div{height:100%;background:linear-gradient(90deg,#38BDF8,#0369A1);width:0%;transition:width .2s;border-radius:99px}
+.mg-track{position:relative;width:100%;height:96px;background:linear-gradient(180deg,#E0F2FE,#F0F9FF);border-radius:16px;overflow:hidden;border:2px solid #BAE6FD}
+.mg-runner{position:absolute;bottom:16px;font-size:46px;transition:left .25s}
+.mg-flag{position:absolute;bottom:14px;right:2%;font-size:40px}
+.mg-spin{display:inline-block;transition:transform .3s ease}
+.mg-flip{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.mg-flip:hover{border-color:#0369A1;transform:translateY(-3px)}
+.mg-flip.open{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.mg-flip .mf-front{font-size:40px}
+.mg-flip .mf-back{display:none;font-size:15px;font-weight:700;color:#075985;line-height:1.35}
+.mg-flip.open .mf-back{display:block}
+.mg-pair{display:flex;gap:26px;width:100%;justify-content:center}
+.mg-col{display:flex;flex-direction:column;gap:10px;flex:1;max-width:340px}
+.mg-pbtn{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:17px;font-weight:700;color:#374151;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left;line-height:1.3}
+.mg-pbtn:hover{border-color:#0369A1}
+.mg-pbtn.sel{border-color:#0369A1;background:#F0F9FF}
+.mg-pbtn.done{border-color:#10b981;background:#ecfdf5;color:#047857;pointer-events:none}
+.mg-pbtn.bad{border-color:#ef4444;background:#fef2f2;animation:mgShake .3s}
+.mg-battery{width:220px;height:110px;border:6px solid #374151;border-radius:14px;position:relative;display:flex;align-items:center;padding:8px}
+.mg-battery::after{content:'';position:absolute;right:-20px;top:32px;width:16px;height:40px;background:#374151;border-radius:0 6px 6px 0}
+.mg-battery > div{height:100%;background:linear-gradient(90deg,#a3e635,#16a34a);border-radius:6px;width:0%;transition:width .2s}
+.mg-lamp{font-size:44px;filter:grayscale(1);opacity:.4;transition:all .25s}
+.mg-lamp.on{filter:none;opacity:1;transform:scale(1.1)}
+
+/* NAV BAR */
+#nav-bar{position:fixed;bottom:0;left:0;right:0;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px;transition:background .2s}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn.active,#fs-btn.active{background:rgba(124,58,237,.35)!important;color:#7DD3FC!important}
+#unit-label{color:#7DD3FC;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+
+/* TEACHER NOTES PANEL */
+#tn-panel{position:fixed;right:-460px;top:0;bottom:52px;width:440px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#7DD3FC;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-panel ul{padding-left:18px;margin-bottom:8px}
+#tn-panel .tn-lbl{color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+
+/* CONTENT SLIDES */
+.content-body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:18px;min-height:0;overflow:hidden}
+.slide-h1{font-size:40px;font-weight:800;color:#111}
+.slide-h2{font-size:25px;font-weight:600;color:#374151}
+.src-pill{display:inline-block;background:#f3f4f6;color:#6b7280;border-radius:20px;padding:6px 18px;font-size:15px;font-weight:700;letter-spacing:.4px;width:fit-content}
+
+/* READING */
+.reading-block{background:#fff;border-radius:16px;padding:26px 36px;font-size:23px;line-height:1.7;color:#1f2937;box-shadow:0 4px 16px rgba(0,0,0,.05);border-left:6px solid #0369A1}
+.reading-block b{color:#075985;font-weight:700}
+.tap-word{background:#E0F2FE;color:#075985;border:none;border-radius:6px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.tap-word.done{background:#0369A1;color:#fff}
+
+/* OBJECTIVES */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:10px}
+.obj-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;display:flex;align-items:flex-start;gap:16px}
+.obj-icon{font-size:34px;flex-shrink:0}
+.obj-text{font-size:19px;color:#374151;line-height:1.4;font-weight:500}
+.obj-text b{color:#0369A1}
+
+/* FORMATIVE ASSESSMENT */
+.assess-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px}
+.assess-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;cursor:pointer;transition:all .2s}
+.assess-card:hover{border-color:#0369A1}
+.assess-card.yes{border-color:#0369A1;background:#F0F9FF}
+.assess-q{font-size:19px;color:#374151;font-weight:600;margin-bottom:10px}
+
+/* BE THE EXPERT */
+.bte-header{background:#0369A1;color:#fff;border-radius:12px 12px 0 0;padding:13px 26px;font-size:19px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bte-body{background:#fff;border:2px solid #0369A1;border-radius:0 0 16px 16px;padding:24px;font-size:19px;color:#374151;line-height:1.6}
+.bte-body b{color:#075985}
+
+/* CHIPS / TASK CARDS */
+.chips-row{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:#E0F2FE;color:#075985;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.chip.used{background:#0369A1;color:#fff}
+.task-card{background:#fff;border-radius:16px;padding:20px 28px;border:2px solid #e5e7eb;font-size:21px;color:#374151;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card b{color:#0369A1}
+.q-item{background:#fff;border-radius:12px;padding:16px 22px;border:2px solid #e5e7eb;font-size:19px;color:#374151;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .2s}
+.q-item:hover{border-color:#0369A1}
+.q-item.done{border-color:#10b981;background:#ecfdf5}
+.q-num{background:#0369A1;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;margin-top:2px}
+.q-ans{max-height:0;overflow:hidden;transition:max-height .3s ease;color:#075985;font-weight:700}
+.q-item.done .q-ans{max-height:120px;margin-top:6px}
+
+/* DIALOGUE */
+.chat-row{display:flex;align-items:flex-end;gap:14px}
+.chat-row.right{flex-direction:row-reverse}
+.chat-ava{font-size:50px;line-height:1}
+.bub{max-width:62%;padding:18px 28px;border-radius:26px;font-size:26px;font-weight:600;line-height:1.35}
+.bub.q{background:#fff;border:2px solid #e5e7eb;border-bottom-left-radius:6px;color:#374151}
+.bub.a{background:#0369A1;color:#fff;border-bottom-right-radius:6px}
+
+/* LISTEN HERO */
+.listen-hero{background:linear-gradient(135deg,#0C4A6E,#0369A1);border-radius:20px;padding:24px 36px;display:flex;align-items:center;gap:28px;color:#fff}
+.listen-hero .lh-emoji{font-size:64px;line-height:1;animation:lhPulse 1.6s ease-in-out infinite}
+@keyframes lhPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.listen-hero .lh-text{font-size:25px;font-weight:700;flex:1}
+.listen-hero .lh-tr{background:rgba(255,255,255,.2);border-radius:20px;padding:9px 22px;font-size:21px;font-weight:800;white-space:nowrap}
+
+/* TITLE / GREAT JOB */
+.title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0C4A6E 0%,#0369A1 50%,#38BDF8 100%);color:#fff;gap:22px;padding:40px}
+.great-job-slide{background:linear-gradient(135deg,#0C4A6E,#0369A1,#38BDF8);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:18px;height:100%;padding:40px}
+
+/* MARK DONE */
+.done-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+.btn-done{background:#16A34A;color:#fff;border:none;border-radius:14px;padding:18px 46px;font-size:26px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-done:hover{background:#15803d}
+.btn-done.confirmed{background:#9ca3af;pointer-events:none}
+.btn-clear{background:#fff;color:#ef4444;border:2px solid #ef4444;border-radius:14px;padding:14px 30px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+#doneMsg{font-size:20px;color:#4b5563;font-weight:600;min-height:28px}
+
+/* VOCAB REVIEW */
+.vr-tabs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;flex-shrink:0}
+.vr-tab{padding:7px 14px;border:2px solid #e5e7eb;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s;white-space:nowrap}
+.vr-tab:hover{border-color:#0369A1;color:#0369A1}
+.vr-tab.active{background:#0369A1;color:#fff;border-color:#0369A1}
+.vr-tab.done{background:#E0F2FE;border-color:#0369A1;color:#075985}
+.vr-tab.done.active{background:#0369A1;color:#fff}
+.vr-body{flex:1;display:flex;min-height:0}
+.vr-left{width:26%;padding:18px;border-right:2px solid #e5e7eb;display:flex;flex-direction:column;gap:8px;background:#fafaf7}
+.vr-right{flex:1;padding:18px 24px;display:flex;flex-direction:column;gap:12px}
+.vr-emoji{font-size:80px;line-height:1}
+.vr-word{font-size:42px;font-weight:800;color:#111;line-height:1.1}
+.vr-ipa{font-size:16px;color:#6b7280}
+.vr-pos{font-size:15px;color:#0369A1;font-weight:700}
+.vr-mark{background:#0369A1;color:#fff;border:none;border-radius:10px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;margin-top:auto;transition:all .2s}
+.vr-mark.done{background:#9ca3af;cursor:not-allowed}
+
+/* SONG SHEET (Unit 6 song deck) */
+.song-sheet{display:flex;gap:22px;width:100%;flex:1;min-height:0}
+.song-col{flex:1;display:flex;flex-direction:column;gap:14px;overflow-y:auto;min-height:0}
+.song-block{background:#fff;border:2px solid #e5e7eb;border-left:6px solid #0369A1;border-radius:14px;padding:16px 22px}
+.song-block.chorus{background:#F0F9FF;border-left-color:#0C4A6E}
+.song-label{font-size:15px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#075985;margin-bottom:8px}
+.song-line{font-size:24px;line-height:1.6;color:#1f2937}
+.song-hit{background:#BAE6FD;color:#075985;border:none;border-radius:7px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.song-hit.done{background:#0369A1;color:#fff}
+.karaoke-line{font-size:34px;font-weight:800;color:#111;line-height:1.4;text-align:center}
+.karaoke-line .k-on{color:#0369A1}
+.oz-band{padding:14px 20px;color:#fff;font-weight:700;font-size:19px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all .18s;border:none;font-family:Outfit,sans-serif;text-align:left}
+.rule-card{background:#fff;border:3px solid #0369A1;border-radius:16px;padding:20px 26px;display:flex;flex-direction:column;gap:8px}
+.rule-card .rc-tag{font-size:15px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#075985}
+.rule-card .rc-line{font-size:28px;font-weight:800;color:#111}
+.rule-card .rc-note{font-size:19px;color:#4b5563;line-height:1.5}
+.rule-card.no{border-color:#DC2626}
+.rule-card.no .rc-tag{color:#B91C1C}
+</style>
+
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<!-- SLIDE 1: TITLE -->
+<div class="slide active" id="s1">
+  <div class="title-bg">
+    <div style="font-size:22px;font-weight:700;letter-spacing:3px;opacity:.75;text-transform:uppercase">Our World · Level 4 · Unit 6</div>
+    <div style="font-size:78px;font-weight:900;text-align:center;line-height:1.1">Protect the Seas</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;font-size:30px;font-weight:700">🎵 The Unit 6 Song — TR 6.3</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:1300px">
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🛡️ protect</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🌊 the seas</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🌏 the oceans</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🛢️ polluting</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🐙 an octopus</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🦈 a shark</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🌊 a layer</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🦀 a creature</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:23px">🤿 underwater</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2: OBJECTIVES -->
+<div class="slide" id="s2">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Song — Objectives</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 In This Lesson</div>
+    <div class="obj-grid">
+      <div class="obj-card"><div class="obj-icon">🎵</div><div class="obj-text"><b>Content:</b> Identify the <b>chorus</b>, the <b>verses</b> and the <b>rhymes</b> in "Protect the Seas".</div></div>
+      <div class="obj-card"><div class="obj-icon">🌊</div><div class="obj-text"><b>Content:</b> Say what the song asks us to do for the ocean, and why.</div></div>
+      <div class="obj-card"><div class="obj-icon">🗣️</div><div class="obj-text"><b>Language:</b> Recycle nine Vocabulary 1 words inside real sung language.</div></div>
+      <div class="obj-card"><div class="obj-icon">⚖️</div><div class="obj-text"><b>Language:</b> Hear <b>must</b> and <b>can't</b> in context — <b>obligation</b> and <b>prohibition</b>, straight into Grammar 1.</div></div>
+    </div>
+    <div class="task-card" style="margin-top:6px">📚 <b>Student Book p. 96</b> · Audio <b>TR 6.3</b>. Play the song at least three times: listen, read along, then sing.</div>
+    <span class="src-pill">Lesson Planner pp. 200–201 · Unit 6 Song</span>
+  </div>
+</div>
+
+<!-- SLIDE 3: ACADEMIC LANGUAGE -->
+<div class="slide" id="s3">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Academic Language</span><span class="hd-chip ac">Always first</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎓 Words we use to talk <i>about</i> the song</div>
+    <div class="slide-h2">Tap each card. <b id="ac-score" style="color:#075985">0 / 5 tapped</b></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:10px" id="ac-grid"></div>
+    <span class="src-pill">unit-6/vocabulary.json · academicWordIds + song-craft words</span>
+  </div>
+</div>
+
+<!-- SLIDE 4: FIRST LISTEN -->
+<div class="slide" id="s4">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">First Listen</span><span class="hd-chip">TR 6.3</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:26px">
+    <div class="listen-hero" style="width:80%"><div class="lh-emoji">🎧</div><div class="lh-text">Play TR 6.3 all the way through. Books closed. Just listen.</div><div class="lh-tr">TR 6.3</div></div>
+    <div class="slide-h1" style="text-align:center">🤔 Before we read it — what did you hear?</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:80%" id="first-grid"></div>
+    <span class="src-pill">Lesson Planner p. 200 · Warm Up</span>
+  </div>
+</div>
+
+<!-- SLIDE 5: THE SONG, PART 1 -->
+<div class="slide" id="s5">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Listen and Read</span><span class="hd-chip">TR 6.3</span></div>
+  <div class="content-body" style="gap:12px">
+    <div class="slide-h2">🎯 <b>Word Radar:</b> tap each blue word the moment you hear it. Found: <b id="hit-count" style="color:#075985">0 / 7</b></div>
+    <div class="song-sheet">
+      <div class="song-col">
+<div class="song-block chorus"><div class="song-label">CHORUS</div><div class="song-line">Please, please protect the seas.</div><div class="song-line">Put good deeds into motion.</div><div class="song-line">Help save the oceans.</div><div class="song-line">We must <button class="song-hit" onclick="hitTap(this)">protect</button></div><div class="song-line">the wonders of the seas,</div><div class="song-line">to make a better world</div><div class="song-line">for you and me.</div></div>
+<div class="song-block"><div class="song-label">Verse 1</div><div class="song-line">We must stop <button class="song-hit" onclick="hitTap(this)">polluting</button></div><div class="song-line">the ocean blue.</div><div class="song-line">An <button class="song-hit" onclick="hitTap(this)">octopus</button> would like that,</div><div class="song-line">and so would you.</div></div>
+<div class="song-block chorus"><div class="song-label">CHORUS</div><div class="song-line" style="font-style:italic;color:#6b7280">Sing the chorus again.</div></div>
+      </div>
+      <div class="song-col">
+<div class="song-block"><div class="song-label">(chorus tail, printed again)</div><div class="song-line">We must protect</div><div class="song-line">the wonders of the seas,</div><div class="song-line">to make a better world</div><div class="song-line">for you and me.</div></div>
+<div class="song-block"><div class="song-label">Verse 2</div><div class="song-line">When we make a mess,</div><div class="song-line">we can't dump it in the sea.</div><div class="song-line"><button class="song-hit" onclick="hitTap(this)">Sharks</button> don't want that.</div><div class="song-line">Do we?</div></div>
+<div class="song-block"><div class="song-label">Verse 3</div><div class="song-line">There are <button class="song-hit" onclick="hitTap(this)">layers</button> in the ocean below.</div><div class="song-line">There are <button class="song-hit" onclick="hitTap(this)">creatures</button> there that we don't know.</div><div class="song-line">They live deep <button class="song-hit" onclick="hitTap(this)">underwater</button>. They don't breathe air,</div><div class="song-line">but our world is a part of theirs.</div></div>
+<div class="song-block chorus"><div class="song-label">CHORUS</div><div class="song-line" style="font-style:italic;color:#6b7280">Sing the chorus again.</div></div>
+      </div>
+    </div>
+    <span class="src-pill">Student Book p. 96 · TR 6.3 — verbatim</span>
+  </div>
+</div>
+
+<!-- SLIDE 6: KARAOKE -->
+<div class="slide" id="s6">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Sing It — Line by Line</span><span class="hd-chip">TR 6.3</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:26px">
+    <div class="slide-h1">🎤 One line at a time. Dad sings it, Leo sings it back.</div>
+    <div class="task-card" style="width:88%;min-height:190px;display:flex;align-items:center;justify-content:center">
+      <div class="karaoke-line" id="k-line">Tap Next to start.</div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:center">
+      <button class="mg-btn" style="background:#6b7280" onclick="kPrev()">◀ Back</button>
+      <span class="mg-score" id="k-count">0 / 0</span>
+      <button class="mg-btn" onclick="kNext()">Next ▶</button>
+    </div>
+    <span class="src-pill">Lesson Planner p. 200 · Present</span>
+  </div>
+</div>
+
+<!-- SLIDE 7: WORD REVIEW -->
+<div class="slide" id="s7">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">The Words Inside the Song</span></div>
+  <div class="content-body" style="padding:20px 30px;gap:10px">
+    <div class="vr-tabs" id="vr-tabs"></div>
+    <div class="vr-body">
+      <div class="vr-left">
+        <div class="vr-emoji" id="vr-emoji"></div>
+        <div class="vr-word" id="vr-word"></div>
+        <div class="vr-ipa" id="vr-jp" style="margin-top:8px;line-height:1.4"></div>
+        <button class="vr-mark" id="vr-mark" onclick="vrMark()">✓ Leo knows this word</button>
+      </div>
+      <div class="vr-right">
+        <div class="slide-h2" id="vr-q"></div>
+        <div style="display:flex;flex-direction:column;gap:10px" id="vr-opts"></div>
+        <div style="font-size:20px;font-weight:800;min-height:28px" id="vr-fb"></div>
+        <div class="how-box" id="vr-line"></div>
+        <span class="src-pill" style="margin-top:auto">Each sentence is the line the singer actually sings.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8: CHORUS OR VERSE -->
+<div class="slide" id="s8">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Chorus or Verse?</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔁 Which part of the song is this?</div>
+    <div class="slide-h2">Read the line, then choose. Correct: <b id="cv-count" style="color:#075985">0 / 6</b></div>
+    <div class="mg-stage" id="cv-stage" style="flex:1;justify-content:flex-start;padding-top:14px"></div>
+    <div class="mg-win" id="cv-win">🎉 The chorus repeats. Each verse is different.</div>
+    <span class="src-pill">Student Book p. 96 · TR 6.3</span>
+  </div>
+</div>
+
+<!-- SLIDE 9: RHYME HUNT -->
+<div class="slide" id="s9">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Rhyme Hunt</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎶 Do these two words <b>rhyme</b>?</div>
+    <div class="slide-h2">Say both words out loud first. Correct: <b id="rh-count" style="color:#075985">0 / 6</b></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:10px" id="rh-grid"></div>
+    <div class="mg-win" id="rh-win">🎉 Rhyming words end with the same sound — not the same letters.</div>
+    <span class="src-pill">All pairs taken from TR 6.3</span>
+  </div>
+</div>
+
+<!-- SLIDE 10: MUST / CAN'T -->
+<div class="slide" id="s10">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">The Song Is Already Grammar 1</span></div>
+  <div class="content-body" style="gap:20px">
+    <div class="slide-h1">⚖️ Two lines. Two rules.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:22px" id="rule-grid"></div>
+    <div class="slide-h2" style="margin-top:4px">Now sort these lines: <b id="mc-count" style="color:#075985">0 / 6</b></div>
+    <div style="display:flex;gap:18px;flex:1;min-height:0">
+      <div style="width:44%;display:flex;flex-direction:column;gap:8px;overflow-y:auto" id="mc-pool"></div>
+      <div style="flex:1;display:grid;grid-template-columns:repeat(2,1fr);gap:14px" id="mc-cols"></div>
+    </div>
+    <span class="src-pill">Previews unit-6/grammar.json · grammar-1</span>
+  </div>
+</div>
+
+<!-- SLIDE 11: DISCUSS -->
+<div class="slide" id="s11">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Discuss the Song</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💬 Ask each question. Tap to reveal the answer.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px" id="disc-grid"></div>
+    <span class="src-pill">Lesson Planner p. 201 · Practice</span>
+  </div>
+</div>
+
+<!-- SLIDE 12: WRITE A LINE -->
+<div class="slide" id="s12">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Extend — Write Your Own Verse</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✍️ Add a verse to "Protect the Seas".</div>
+    <div class="slide-h2">Type Leo's lines straight in. Then sing the whole song with his verse at the end.</div>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-top:10px" id="write-rows"></div>
+    <div class="how-box"><b>Push for:</b> one line with <b>must</b>, one line with <b>can't</b>, and one Unit 6 sea creature.</div>
+    <span class="src-pill">Lesson Planner p. 201 · Extend</span>
+  </div>
+</div>
+
+<!-- SLIDE 13: SING IT ALL -->
+<div class="slide" id="s13">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — Sing It All</span><span class="hd-chip">TR 6.3</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:24px">
+    <div style="font-size:84px">🎤🌊</div>
+    <div class="slide-h1" style="text-align:center">Play TR 6.3 one more time and sing the whole song together.</div>
+    <div class="slide-h2" style="text-align:center;max-width:1100px">Stand up for the chorus, sit down for the verses. Leo leads the second chorus on his own.</div>
+    <span class="src-pill">Lesson Planner p. 201 · Wrap Up</span>
+  </div>
+</div>
+
+<!-- SLIDE 14: FORMATIVE ASSESSMENT -->
+<div class="slide" id="s14">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✔️ Can Leo…</div>
+    <div class="assess-grid" id="assess-grid"></div>
+    <div class="task-card" style="margin-top:8px">📓 <b>Homework:</b> Leo's Song app (8 modules) — the Must / Can't tab is the bridge into Grammar 1.</div>
+  </div>
+</div>
+
+<!-- SLIDE 15: MARK DONE -->
+<div class="slide" id="s15">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Finish the Lesson</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:24px">
+    <div style="font-size:90px">✅</div>
+    <div class="slide-h1" style="text-align:center">Unit 6 · Song — taught</div>
+    <div class="slide-h2" style="text-align:center;max-width:1000px">Marking this done records it on the teacher dashboard. Leo's own Song app tracks his 8 modules separately.</div>
+    <div class="done-wrap">
+      <button class="btn-done" id="doneBtn" onclick="markDone()">✅ Mark this lesson done</button>
+      <button class="btn-clear" id="redoBtn" onclick="handleRedo()">↺ Clear saved progress</button>
+      <div id="doneMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 16: GREAT JOB -->
+<div class="slide" id="s16">
+  <div class="great-job-slide">
+    <div style="font-size:96px">🏆</div>
+    <div style="font-size:64px;font-weight:900;text-align:center">Great Singing, Leo!</div>
+    <div style="font-size:26px;opacity:.92;text-align:center;max-width:1000px">You sang nine Unit 6 words — and you already know <b>must</b> and <b>can't</b>. Grammar 1 is next. 🌊🎵</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:1200px">
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🛡️ protect</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🛢️ polluting</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🐙 an octopus</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🦈 a shark</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🌊 a layer</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">🦀 a creature</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
+
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 16</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="fs-btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+  <span id="unit-label">Unit 6 · Song</span>
+</div>
+
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+<script>
+/* =========================================================
+   LEEA · Our World Level 4 · Unit 6 · Song
+   "Protect the Seas" — 16 slides, 1920x1080, ocean blue
+   Every lyric is verbatim from TR 6.3 (Student Book p. 96).
+   ========================================================= */
+
+// ─── MARK DONE STORAGE ─────────────────────────────────────────
+var SAVE_PREFIX = 'leea.l4.u6.song-';
+var HOMEWORK_ID = 'l-4-6-song';
+/* Must match the `id` in lessons/song.teacher.json — the teacher dashboard
+   reads leea.lessonProgress.v1 keyed by that lesson id. */
+var LESSON_ID = 'ow-l4-u6-song';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+var LESSON_NAME = 'Unit 6 · Song — Protect the Seas';
+
+function lSave(key, value) {
+  try {
+    var k = SAVE_PREFIX + key;
+    window.localStorage.setItem(k, JSON.stringify(value));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, value);
+    }
+  } catch (e) {}
+}
+function lLoad(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(SAVE_PREFIX + key);
+    return raw === null || raw === undefined ? fallback : JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function writeLessonProgress() {
+  try {
+    var store = {};
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (raw) store = JSON.parse(raw) || {};
+    var now = new Date().toISOString();
+    store[LESSON_ID] = { lessonId: LESSON_ID, teacherId: 'neritan', studentId: 'leo',
+                         status: 'done', completedAt: now, updatedAt: now };
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function clearLessonProgress() {
+  try {
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function markDone() {
+  writeLessonProgress();
+  lSave('complete', { name: LESSON_NAME, timestamp: new Date().toISOString(), done: true });
+  lSave('done', true);
+  var btn = document.getElementById('doneBtn');
+  if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+  var msg = document.getElementById('doneMsg');
+  if (msg) msg.textContent = 'Saved. Protect the Seas is sung. 🌊';
+}
+var redoArmed = false, redoTimer = null;
+function handleRedo() {
+  var btn = document.getElementById('redoBtn');
+  var msg = document.getElementById('doneMsg');
+  if (!redoArmed) {
+    redoArmed = true;
+    btn.textContent = '↺ Tap again to clear';
+    if (msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+    if (redoTimer) window.clearTimeout(redoTimer);
+    redoTimer = window.setTimeout(function () {
+      redoArmed = false;
+      btn.textContent = '↺ Clear saved progress';
+      if (msg) msg.textContent = '';
+    }, 3000);
+    return;
+  }
+  redoArmed = false;
+  if (redoTimer) window.clearTimeout(redoTimer);
+  btn.textContent = '↺ Clear saved progress';
+  clearLessonProgress();
+  lSave('complete', null);
+  lSave('done', null);
+  var d = document.getElementById('doneBtn');
+  if (d) { d.classList.remove('confirmed'); d.textContent = '✅ Mark this lesson done'; }
+  if (msg) msg.textContent = 'Cleared.';
+}
+function restoreDoneState() {
+  var c = lLoad('complete', null);
+  if (c && c.done) {
+    var btn = document.getElementById('doneBtn');
+    if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+    var msg = document.getElementById('doneMsg');
+    if (msg) msg.textContent = 'Already marked done.';
+  }
+}
+
+// ─── DATA (injected) ───────────────────────────────────────────
+var HITS       = [
+ [
+  "🛡️",
+  "protect",
+  "to keep something safe from harm",
+  "守（まも）る",
+  "We must protect the wonders of the seas."
+ ],
+ [
+  "🌊",
+  "the seas",
+  "large areas of salt water — another word for oceans",
+  "海（うみ）",
+  "Please, please protect the seas."
+ ],
+ [
+  "🌏",
+  "the oceans",
+  "the very large seas that cover most of the Earth",
+  "海洋（かいよう）",
+  "Help save the oceans."
+ ],
+ [
+  "🛢️",
+  "polluting",
+  "making the air, water or land dirty",
+  "汚（よご）すこと",
+  "We must stop polluting the ocean blue."
+ ],
+ [
+  "🐙",
+  "an octopus",
+  "a sea creature with eight arms",
+  "タコ",
+  "An octopus would like that, and so would you."
+ ],
+ [
+  "🦈",
+  "a shark",
+  "a large fish with sharp teeth that lives in the ocean",
+  "サメ",
+  "Sharks don't want that. Do we?"
+ ],
+ [
+  "🌊",
+  "a layer",
+  "one level of the ocean — top, middle or bottom",
+  "層（そう）",
+  "There are layers in the ocean below."
+ ],
+ [
+  "🦀",
+  "a creature",
+  "a living animal, especially a strange one",
+  "生き物（いきもの）",
+  "There are creatures there that we don't know."
+ ],
+ [
+  "🤿",
+  "underwater",
+  "below the surface of the water",
+  "水中（すいちゅう）で",
+  "They live deep underwater."
+ ]
+];
+var ACADEMIC   = [
+ [
+  "⚖️",
+  "obligation",
+  "something you must or have to do — a duty or rule",
+  "\"We <b>must</b> protect the wonders of the seas\" is an <b>obligation</b>."
+ ],
+ [
+  "🚫",
+  "prohibition",
+  "something you can't or must not do",
+  "\"We <b>can't</b> dump it in the sea\" is a <b>prohibition</b>."
+ ],
+ [
+  "🔁",
+  "chorus",
+  "the part of a song that comes back again and again",
+  "\"Please, please protect the seas…\" opens the <b>chorus</b>."
+ ],
+ [
+  "📜",
+  "verse",
+  "a part of a song that tells the story; each one is different",
+  "Verse 3 is the <b>verse</b> about the layers of the ocean."
+ ],
+ [
+  "🎶",
+  "rhyme",
+  "words that end with the same sound",
+  "<b>below</b> and <b>know</b> <b>rhyme</b> in verse 3."
+ ]
+];
+var DISCUSS    = [
+ [
+  "What is the song asking us to do?",
+  "Protect the seas — put good deeds into motion and help save the oceans."
+ ],
+ [
+  "What must we stop?",
+  "Polluting the ocean blue."
+ ],
+ [
+  "Which sea creature \"would like that\"?",
+  "An octopus."
+ ],
+ [
+  "What can we not do when we make a mess?",
+  "We can't dump it in the sea."
+ ],
+ [
+  "Which animal does the singer say does not want our mess?",
+  "Sharks."
+ ],
+ [
+  "What does verse 3 say is in the ocean below?",
+  "Layers — and creatures that we don't know."
+ ],
+ [
+  "Do those creatures breathe air?",
+  "No. They live deep underwater and they don't breathe air."
+ ],
+ [
+  "Why should we protect the seas?",
+  "To make a better world for you and me."
+ ]
+];
+var RULES      = [
+ {
+  "tag": "Obligation",
+  "cls": "",
+  "line": "We <b>must</b> protect the wonders of the seas.",
+  "note": "<b>must</b> — something we have to do. This is Grammar 1, and Leo has already sung it."
+ },
+ {
+  "tag": "Prohibition",
+  "cls": "no",
+  "line": "We <b>can't</b> dump it in the sea.",
+  "note": "<b>can't</b> — something we must not do. The other half of Grammar 1."
+ }
+];
+var RHYMES     = [
+ {
+  "a": "below",
+  "b": "know",
+  "ok": true
+ },
+ {
+  "a": "blue",
+  "b": "you",
+  "ok": true
+ },
+ {
+  "a": "sea",
+  "b": "we",
+  "ok": true
+ },
+ {
+  "a": "air",
+  "b": "theirs",
+  "ok": false
+ },
+ {
+  "a": "seas",
+  "b": "motion",
+  "ok": false
+ },
+ {
+  "a": "mess",
+  "b": "oceans",
+  "ok": false
+ }
+];
+var ASSESS     = [
+ "…sing the whole chorus from memory?",
+ "…point to the line that is an <b>obligation</b> and the line that is a <b>prohibition</b>?",
+ "…name the four Unit 6 words the song uses for sea life (octopus, sharks, creatures, layers)?",
+ "…say in his own words why we should protect the seas?"
+];
+var SONG       = [
+ {
+  "label": "CHORUS",
+  "lines": [
+   "Please, please protect the seas.",
+   "Put good deeds into motion.",
+   "Help save the oceans.",
+   "We must protect",
+   "the wonders of the seas,",
+   "to make a better world",
+   "for you and me."
+  ]
+ },
+ {
+  "label": "Verse 1",
+  "lines": [
+   "We must stop polluting",
+   "the ocean blue.",
+   "An octopus would like that,",
+   "and so would you."
+  ]
+ },
+ {
+  "label": "CHORUS",
+  "lines": []
+ },
+ {
+  "label": "(chorus tail, printed again)",
+  "lines": [
+   "We must protect",
+   "the wonders of the seas,",
+   "to make a better world",
+   "for you and me."
+  ]
+ },
+ {
+  "label": "Verse 2",
+  "lines": [
+   "When we make a mess,",
+   "we can't dump it in the sea.",
+   "Sharks don't want that.",
+   "Do we?"
+  ]
+ },
+ {
+  "label": "Verse 3",
+  "lines": [
+   "There are layers in the ocean below.",
+   "There are creatures there that we don't know.",
+   "They live deep underwater. They don't breathe air,",
+   "but our world is a part of theirs."
+  ]
+ },
+ {
+  "label": "CHORUS",
+  "lines": []
+ }
+];
+var HIT_TOTAL  = 7;
+var NOTES      = {
+ "1": "<p class=\"tn-lbl\">Title</p><p>Unit 6 song: \"Protect the Seas\" (TR 6.3, SB p. 96). Show Leo the nine words he already knows.</p>",
+ "2": "<p class=\"tn-lbl\">Objectives</p><p>Read both objectives aloud. Have TR 6.3 cued and SB p. 96 open.</p>",
+ "3": "<p class=\"tn-lbl\">Academic Language</p><p>Five cards. <b>obligation</b> and <b>prohibition</b> are the Grammar 1 words — the song hands them to Leo before the grammar lesson does.</p>",
+ "4": "<p class=\"tn-lbl\">First Listen</p><p>Books closed. Play the whole song once, then ask each question before revealing.</p>",
+ "5": "<p class=\"tn-lbl\">Listen and Read — TR 6.3</p><p>Play again with the lyrics up. Word Radar: Leo taps each blue word when he hears it. The song is printed exactly as the audio script prints it, CHORUS markers and all.</p>",
+ "6": "<p class=\"tn-lbl\">Sing It — Line by Line</p><p>Dad sings the line, Leo sings it back. Go slowly through the chorus twice before starting verse 1.</p>",
+ "7": "<p class=\"tn-lbl\">Word Review</p><p>Nine words, each with the line the singer actually sings. Mark the ones Leo owns.</p>",
+ "8": "<p class=\"tn-lbl\">Chorus or Verse?</p><p>The test is simple: does it come back? Chorus lines repeat; verse lines happen once.</p>",
+ "9": "<p class=\"tn-lbl\">Rhyme Hunt</p><p>Say both words aloud first — rhyme is about sound, not spelling. air/theirs is the tricky one: it is close, but not a rhyme.</p>",
+ "10": "<p class=\"tn-lbl\">Must / Can't</p><p>This is the whole of Grammar 1 in two lines Leo has already sung. Sort the six lines, then stop — the grammar lesson does the rest.</p>",
+ "11": "<p class=\"tn-lbl\">Discuss</p><p>Ask each question before tapping. Every answer comes straight from the lyrics.</p>",
+ "12": "<p class=\"tn-lbl\">Extend — Write a Verse</p><p>Type Leo's lines in. Push for one <b>must</b>, one <b>can't</b>, and one sea creature. Then sing the whole song with his verse at the end.</p>",
+ "13": "<p class=\"tn-lbl\">Wrap Up</p><p>Full sing-through. Stand for the chorus, sit for the verses — it makes the structure physical.</p>",
+ "14": "<p class=\"tn-lbl\">Formative Assessment</p><p>Tap each card once Leo can do it. Then set Leo's Song app.</p>",
+ "15": "<p class=\"tn-lbl\">Mark Done</p><p>Records this lesson on the teacher dashboard. Leo's app tracks his own 8 modules separately.</p>",
+ "16": "<p class=\"tn-lbl\">Great Job!</p><p>Celebrate. Next up: Grammar 1 — have to, must, can't and don't.</p>"
+};
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+var TOTAL = 16;
+var cur = 1;
+function goTo(n) {
+  n = Math.max(1, Math.min(TOTAL, n));
+  var old = document.getElementById('s' + cur);
+  if (old) old.classList.remove('active');
+  cur = n;
+  var next = document.getElementById('s' + cur);
+  if (next) next.classList.add('active');
+  document.getElementById('slide-counter').textContent = cur + ' / ' + TOTAL;
+  document.getElementById('tn-content').innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
+  if (SLIDE_INIT[cur]) SLIDE_INIT[cur]();
+}
+document.addEventListener('keydown', function (e) {
+  if (e.target && (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+var notesOpen = false;
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('notes-btn').classList.toggle('active', notesOpen);
+  scale();
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange', function () {
+  var btn = document.getElementById('fs-btn');
+  var active = !!document.fullscreenElement;
+  btn.textContent = active ? '⛶ Exit Full (F)' : '⛶ Fullscreen (F)';
+  btn.classList.toggle('active', active);
+  scale();
+});
+function scale() {
+  var s = document.getElementById('scaler');
+  var availW = window.innerWidth - (notesOpen ? 440 : 0);
+  var availH = window.innerHeight - 52;
+  var r = Math.min(availW / 1920, availH / 1080);
+  s.style.transform = 'scale(' + r + ')';
+  s.style.left = ((availW - 1920 * r) / 2) + 'px';
+  s.style.top = ((availH - 1080 * r) / 2) + 'px';
+  s.style.position = 'fixed';
+}
+window.addEventListener('resize', scale);
+function shuffled(arr) { return arr.slice().sort(function () { return Math.random() - 0.5; }); }
+
+// ─── SLIDE 3: ACADEMIC ─────────────────────────────────────────
+function initAcademic() {
+  var grid = document.getElementById('ac-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var tapped = 0;
+  ACADEMIC.forEach(function (a) {
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#fff;border:2px solid #FEF3C7;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column';
+    card.innerHTML = '<div style="background:#0EA5E9;color:#fff;padding:10px 16px;font-size:19px;font-weight:700">' + a[0] + ' ' + a[1] + '</div>' +
+      '<div style="padding:14px 16px;font-size:17px;color:#374151;line-height:1.45">' + a[2] +
+      '<div style="margin-top:10px;color:#075985;font-weight:700;display:none" class="ac-ex">' + a[3] + '</div></div>';
+    card.onclick = function () {
+      if (card.dataset.open) return;
+      card.dataset.open = '1';
+      card.querySelector('.ac-ex').style.display = 'block';
+      card.style.borderColor = '#0369A1';
+      tapped++;
+      document.getElementById('ac-score').textContent = tapped + ' / 5 tapped';
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE 4: FIRST LISTEN ─────────────────────────────────────
+var FIRST = [
+  ['🌊 What is the song about?', 'Protecting the seas and the oceans.'],
+  ['🐙 Which sea animals did you hear?', 'An octopus and sharks.'],
+  ['🔁 Which part came back again and again?', '"Please, please protect the seas…" — the chorus.'],
+  ['⚖️ Did you hear a rule?', '"We must protect…" and "we can\'t dump it in the sea."']
+];
+function initFirst() {
+  var grid = document.getElementById('first-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  FIRST.forEach(function (f, i) {
+    var item = document.createElement('div');
+    item.className = 'q-item';
+    item.innerHTML = '<div class="q-num">' + (i + 1) + '</div><div><div>' + f[0] + '</div><div class="q-ans">→ ' + f[1] + '</div></div>';
+    item.onclick = function () { item.classList.add('done'); };
+    grid.appendChild(item);
+  });
+}
+
+// ─── SLIDE 5: WORD RADAR ───────────────────────────────────────
+var hitFound = 0;
+function hitTap(btn) {
+  if (btn.classList.contains('done')) return;
+  btn.classList.add('done');
+  hitFound++;
+  document.getElementById('hit-count').textContent = hitFound + ' / ' + HIT_TOTAL;
+}
+
+// ─── SLIDE 6: KARAOKE ──────────────────────────────────────────
+/* Every sung line, flattened in order — the CHORUS markers carry no lines. */
+var KLINES = [];
+SONG.forEach(function (b) {
+  b.lines.forEach(function (l) { KLINES.push({ label: b.label, text: l.replace(/@/g, '') }); });
+});
+var kIdx = -1;
+function kRender() {
+  var el = document.getElementById('k-line');
+  if (kIdx < 0) { el.textContent = 'Tap Next to start.'; }
+  else {
+    var l = KLINES[kIdx];
+    el.innerHTML = '<div style="font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#075985;margin-bottom:12px">' + l.label + '</div>' + l.text;
+  }
+  document.getElementById('k-count').textContent = Math.max(0, kIdx + 1) + ' / ' + KLINES.length;
+}
+function kNext() { if (kIdx < KLINES.length - 1) kIdx++; kRender(); }
+function kPrev() { if (kIdx > -1) kIdx--; kRender(); }
+function initKaraoke() { kRender(); }
+
+// ─── SLIDE 7: WORD REVIEW ──────────────────────────────────────
+var vrIdx = 0, vrKnown = lLoad('known', {}) || {};
+function initVocabReview() {
+  var tabs = document.getElementById('vr-tabs');
+  if (tabs && !tabs.dataset.built) {
+    tabs.dataset.built = '1';
+    HITS.forEach(function (h, i) {
+      var b = document.createElement('button');
+      b.className = 'vr-tab' + (i === 0 ? ' active' : '');
+      b.id = 'vr-tab-' + i;
+      b.textContent = h[0] + ' ' + h[1];
+      b.onclick = function () { vrShow(i); };
+      tabs.appendChild(b);
+    });
+  }
+  vrShow(vrIdx);
+}
+function vrShow(i) {
+  vrIdx = i;
+  var h = HITS[i];
+  document.querySelectorAll('.vr-tab').forEach(function (t, ti) { t.classList.toggle('active', ti === i); });
+  document.getElementById('vr-emoji').textContent = h[0];
+  document.getElementById('vr-word').textContent = h[1];
+  document.getElementById('vr-jp').textContent = '🇯🇵 ' + h[3];
+  document.getElementById('vr-q').textContent = 'What does "' + h[1] + '" mean?';
+  document.getElementById('vr-fb').textContent = '';
+  document.getElementById('vr-line').innerHTML = '<b>In the song:</b> "' + h[4] + '"';
+  var wrong = HITS.filter(function (x) { return x[1] !== h[1]; });
+  var opts = shuffled([h[2], shuffled(wrong)[0][2], shuffled(wrong)[1][2]]);
+  var box = document.getElementById('vr-opts');
+  box.innerHTML = '';
+  opts.forEach(function (o) {
+    var b = document.createElement('button');
+    b.className = 'mg-opt';
+    b.textContent = o;
+    b.onclick = function () {
+      var fb = document.getElementById('vr-fb');
+      if (o === h[2]) { b.classList.add('ok'); fb.style.color = '#0369A1'; fb.textContent = '✅ Correct!'; }
+      else { b.classList.add('no'); fb.style.color = '#ef4444'; fb.textContent = '❌ Not quite — try again.'; }
+    };
+    box.appendChild(b);
+  });
+  document.getElementById('vr-mark').classList.toggle('done', !!vrKnown[h[1]]);
+  document.getElementById('vr-tab-' + i).classList.toggle('done', !!vrKnown[h[1]]);
+}
+function vrMark() {
+  vrKnown[HITS[vrIdx][1]] = true;
+  document.getElementById('vr-tab-' + vrIdx).classList.add('done');
+  document.getElementById('vr-mark').classList.add('done');
+  lSave('known', vrKnown);
+}
+
+// ─── SLIDE 8: CHORUS OR VERSE ──────────────────────────────────
+var CV = [
+  { line: 'Please, please protect the seas.',            a: 'chorus' },
+  { line: 'An octopus would like that, and so would you.', a: 'verse' },
+  { line: 'Help save the oceans.',                       a: 'chorus' },
+  { line: "There are layers in the ocean below.",        a: 'verse' },
+  { line: 'to make a better world for you and me.',      a: 'chorus' },
+  { line: "we can't dump it in the sea.",                a: 'verse' }
+];
+function initCv() {
+  var stage = document.getElementById('cv-stage');
+  if (!stage || stage.dataset.built) return;
+  stage.dataset.built = '1';
+  var got = 0;
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;flex-direction:column;gap:12px;width:100%';
+  CV.forEach(function (c) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:16px;background:#fff;border:2px solid #e5e7eb;border-radius:14px;padding:14px 20px';
+    var t = document.createElement('div');
+    t.style.cssText = 'flex:1;font-size:22px;font-weight:600;color:#374151';
+    t.textContent = '"' + c.line + '"';
+    row.appendChild(t);
+    ['chorus', 'verse'].forEach(function (kind) {
+      var b = document.createElement('button');
+      b.className = 'mg-btn';
+      b.style.cssText = 'padding:10px 24px;font-size:18px' + (kind === 'verse' ? ';background:#0C4A6E' : '');
+      b.textContent = kind === 'chorus' ? '🔁 Chorus' : '📜 Verse';
+      b.onclick = function () {
+        if (row.dataset.done) return;
+        if (kind === c.a) {
+          row.dataset.done = '1';
+          row.style.borderColor = '#16A34A';
+          row.style.background = '#F0FDF4';
+          got++;
+          document.getElementById('cv-count').textContent = got + ' / 6';
+          if (got >= CV.length) document.getElementById('cv-win').classList.add('show');
+        } else {
+          row.style.borderColor = '#ef4444';
+          setTimeout(function () { if (!row.dataset.done) row.style.borderColor = '#e5e7eb'; }, 450);
+        }
+      };
+      row.appendChild(b);
+    });
+    wrap.appendChild(row);
+  });
+  stage.appendChild(wrap);
+}
+
+// ─── SLIDE 9: RHYME HUNT ───────────────────────────────────────
+function initRhyme() {
+  var grid = document.getElementById('rh-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  var got = 0;
+  RHYMES.forEach(function (r) {
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#fff;border:3px solid #e5e7eb;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;align-items:center';
+    card.innerHTML = '<div style="font-size:26px;font-weight:800;color:#111">' + r.a + ' &nbsp;/&nbsp; ' + r.b + '</div>';
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:10px';
+    [['🎶 Rhyme', true], ['✖ No', false]].forEach(function (opt) {
+      var b = document.createElement('button');
+      b.className = 'mg-btn';
+      b.style.cssText = 'padding:9px 20px;font-size:17px' + (opt[1] ? '' : ';background:#6b7280');
+      b.textContent = opt[0];
+      b.onclick = function () {
+        if (card.dataset.done) return;
+        if (opt[1] === r.ok) {
+          card.dataset.done = '1';
+          card.style.borderColor = '#16A34A';
+          card.style.background = '#F0FDF4';
+          got++;
+          document.getElementById('rh-count').textContent = got + ' / ' + RHYMES.length;
+          if (got >= RHYMES.length) document.getElementById('rh-win').classList.add('show');
+        } else {
+          card.style.borderColor = '#ef4444';
+          setTimeout(function () { if (!card.dataset.done) card.style.borderColor = '#e5e7eb'; }, 450);
+        }
+      };
+      row.appendChild(b);
+    });
+    card.appendChild(row);
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE 10: MUST / CAN'T ────────────────────────────────────
+var MC = [
+  { line: 'We must protect the wonders of the seas.', a: 'Obligation' },
+  { line: "We can't dump it in the sea.",             a: 'Prohibition' },
+  { line: 'We must stop polluting the ocean blue.',   a: 'Obligation' },
+  { line: 'We must pick up the garbage.',             a: 'Obligation' },
+  { line: "You can't throw plastic in the water.",    a: 'Prohibition' },
+  { line: "Don't leave food on the beach.",           a: 'Prohibition' }
+];
+function initRules() {
+  var grid = document.getElementById('rule-grid');
+  if (grid && !grid.dataset.built) {
+    grid.dataset.built = '1';
+    RULES.forEach(function (r) {
+      var c = document.createElement('div');
+      c.className = 'rule-card ' + r.cls;
+      c.innerHTML = '<div class="rc-tag">' + r.tag + '</div><div class="rc-line">' + r.line + '</div><div class="rc-note">' + r.note + '</div>';
+      grid.appendChild(c);
+    });
+  }
+  var pool = document.getElementById('mc-pool'), cols = document.getElementById('mc-cols');
+  if (!pool || pool.dataset.built) return;
+  pool.dataset.built = '1';
+  var picked = null, placed = 0;
+  var boxes = {};
+  ['Obligation', 'Prohibition'].forEach(function (name) {
+    var box = document.createElement('div');
+    box.style.cssText = 'background:#fff;border:3px dashed ' + (name === 'Obligation' ? '#BAE6FD' : '#FECACA') +
+      ';border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;overflow-y:auto';
+    box.innerHTML = '<div style="font-size:19px;font-weight:800;color:' + (name === 'Obligation' ? '#075985' : '#B91C1C') +
+      ';text-align:center">' + (name === 'Obligation' ? '⚖️ Obligation — must / have to' : "🚫 Prohibition — can't / don't") + '</div>';
+    box.onclick = function () {
+      if (!picked) return;
+      if (picked.a === name) {
+        var tag = document.createElement('div');
+        tag.style.cssText = 'background:#F0F9FF;border:2px solid #0369A1;border-radius:10px;padding:8px 12px;font-size:17px;font-weight:700;color:#075985';
+        tag.textContent = picked.line;
+        box.appendChild(tag);
+        picked.btn.remove();
+        picked = null;
+        placed++;
+        document.getElementById('mc-count').textContent = placed + ' / 6';
+      } else {
+        var was = box.style.borderColor;
+        box.style.borderColor = '#ef4444';
+        setTimeout(function () { box.style.borderColor = was; }, 450);
+      }
+    };
+    boxes[name] = box;
+    cols.appendChild(box);
+  });
+  shuffled(MC).forEach(function (m) {
+    var b = document.createElement('button');
+    b.className = 'mg-pbtn';
+    b.textContent = m.line;
+    b.onclick = function () {
+      if (picked) picked.btn.classList.remove('sel');
+      picked = { btn: b, line: m.line, a: m.a };
+      b.classList.add('sel');
+    };
+    pool.appendChild(b);
+  });
+}
+
+// ─── SLIDE 11: DISCUSS ─────────────────────────────────────────
+function initDiscussion() {
+  var grid = document.getElementById('disc-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  DISCUSS.forEach(function (d, i) {
+    var item = document.createElement('div');
+    item.className = 'q-item';
+    item.innerHTML = '<div class="q-num">' + (i + 1) + '</div><div><div>' + d[0] + '</div><div class="q-ans">→ ' + d[1] + '</div></div>';
+    item.onclick = function () { item.classList.add('done'); };
+    grid.appendChild(item);
+  });
+}
+
+// ─── SLIDE 12: WRITE A VERSE ───────────────────────────────────
+var WRITE = [
+  { lead: 'We must…',      hint: 'What must we do for the ocean?' },
+  { lead: "We can't…",     hint: 'What must we never do?' },
+  { lead: 'A sea turtle…', hint: 'What would a sea turtle like?' },
+  { lead: 'There are…',    hint: 'What is down in the ocean?' }
+];
+var writeText = lLoad('verse', {}) || {};
+function initWrite() {
+  var rows = document.getElementById('write-rows');
+  if (!rows || rows.dataset.built) return;
+  rows.dataset.built = '1';
+  WRITE.forEach(function (w, i) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:16px';
+    var lbl = document.createElement('span');
+    lbl.style.cssText = 'font-size:24px;font-weight:800;color:#075985;min-width:190px';
+    lbl.textContent = w.lead;
+    var inp = document.createElement('input');
+    inp.placeholder = w.hint;
+    inp.value = writeText[i] || '';
+    inp.style.cssText = 'flex:1;font-family:Outfit,sans-serif;font-size:22px;padding:12px 18px;border:2px solid #BAE6FD;border-radius:12px';
+    inp.oninput = function () { writeText[i] = inp.value; lSave('verse', writeText); };
+    row.appendChild(lbl); row.appendChild(inp);
+    rows.appendChild(row);
+  });
+}
+
+// ─── SLIDE 14: FORMATIVE ASSESSMENT ────────────────────────────
+function initAssess() {
+  var grid = document.getElementById('assess-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  ASSESS.forEach(function (t) {
+    var card = document.createElement('div');
+    card.className = 'assess-card';
+    card.innerHTML = '<div class="assess-q">' + t + '</div><div style="font-size:15px;color:#6b7280">Tap when Leo can do it.</div>';
+    card.onclick = function () { card.classList.toggle('yes'); };
+    grid.appendChild(card);
+  });
+}
+
+// ─── SLIDE INIT MAP ────────────────────────────────────────────
+var SLIDE_INIT = {
+  3: initAcademic,
+  4: initFirst,
+  6: initKaraoke,
+  7: initVocabReview,
+  8: initCv,
+  9: initRhyme,
+  10: initRules,
+  11: initDiscussion,
+  12: initWrite,
+  14: initAssess,
+  15: restoreDoneState
+};
+
+// ─── BOOT ──────────────────────────────────────────────────────
+scale();
+goTo(1);
+restoreDoneState();
+
+</script>
+</body>
+</html>

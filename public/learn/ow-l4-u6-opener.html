@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 6 Opener App — Wonders of the Sea</title>
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Unit 6 is Wonders of the Sea — ocean blues, with Level 4 purple kept for
+     the level tag only. Green stays the "correct" colour across every app. */
+  --sea:#0369A1;--sea-d:#075985;--sea-l:#F0F9FF;--sea-b:#BAE6FD;
+  --deep:#0C4A6E;
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --red:#DC2626;--red-l:#FEF2F2;--red-b:#FECACA;
+  --amber:#F59E0B;--amber-l:#FFFBEB;--yellow:#FACC15;--yellow-b:#FDE68A;--yellow-l:#FEFCE8;
+  --ink:#111;--ink-2:#374151;--ink-3:#6B7280;--border:#E5E7EB;
+  --paper:#FFFDF5;--navy:#0f172a;
+}
+html,body{height:100%;font-family:'Outfit',system-ui,'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--paper);color:var(--ink)}
+body{display:flex;flex-direction:column}
+.app-header{background:linear-gradient(135deg,var(--sea),var(--deep));color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-header .logo{font-size:26px}
+.app-header .title{font-size:20px;font-weight:800;line-height:1.1}
+.app-header .subtitle{font-size:13px;opacity:.85;margin-top:2px}
+.app-header .badge-row{margin-left:auto}
+.prog-pill{background:rgba(255,255,255,.22);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;white-space:nowrap}
+.tab-nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:11px 12px;font-family:inherit;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;min-width:70px}
+.tab-btn .tab-icon{font-size:18px}
+.tab-btn .tab-name{font-size:11px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.tab-btn.active{color:var(--sea);border-bottom-color:var(--sea)}
+.tab-btn.done::after{content:'✓';position:absolute;top:3px;right:5px;color:var(--green);font-weight:900;font-size:12px}
+.tab-content{display:none;flex:1;overflow-y:auto;flex-direction:column;min-height:0}
+.tab-content.active{display:flex}
+.tab-body{flex:1;padding:18px 20px 8px;display:flex;flex-direction:column;gap:14px;max-width:900px;width:100%;margin:0 auto}
+.tab-footer{flex-shrink:0;border-top:2px solid var(--border);background:#fff;padding:10px 20px;display:flex;gap:10px;max-width:900px;width:100%;margin:0 auto}
+.section-title{font-size:21px;font-weight:900;color:var(--navy)}
+.section-sub{font-size:14px;color:var(--ink-3);font-weight:600;margin-top:2px}
+.dad-hint{background:var(--amber-l);border:2px solid var(--yellow-b);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:600;color:var(--ink-2);line-height:1.5}
+.src-pill{font-size:12px;font-weight:700;color:var(--ink-3);border-top:1px solid var(--border);padding-top:8px}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:12px 16px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer}
+.btn-complete:disabled{opacity:.4;cursor:not-allowed}
+.btn-complete.confirmed{background:var(--green-d);pointer-events:none}
+.btn-redo{width:112px;flex-shrink:0;background:#fff;color:var(--sea);border:2px solid var(--sea-b);border-radius:12px;padding:12px 8px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer}
+.btn-redo.armed{background:var(--sea-l);border-color:var(--sea)}
+.done-banner{display:none;background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;color:var(--green-d);text-align:center}
+.done-banner.show{display:block;animation:pop .35s}
+@keyframes pop{0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.qcard{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.qcard .qtext{font-size:16px;font-weight:800;color:var(--navy);line-height:1.45}
+.opt-group{display:flex;flex-direction:column;gap:8px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid var(--border);border-radius:12px;padding:11px 16px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit}
+.opt:hover:not(:disabled){border-color:var(--amber)}
+.opt.good{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default}
+.jp-note{font-size:14px;font-weight:600;color:var(--ink-3);background:var(--sea-l);border-radius:10px;padding:8px 12px;line-height:1.5}
+.mstatus{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mcount{background:var(--sea);color:#fff;border-radius:20px;padding:5px 16px;font-size:14px;font-weight:800}
+.mcount.alt{background:var(--navy)}
+.mhint{font-size:14px;font-weight:700;color:var(--ink-3);line-height:1.5}
+.fc-modeswitch{display:flex;gap:8px}
+.fc-modebtn{flex:1;padding:9px;border-radius:10px;border:2px solid var(--border);background:#fff;font-weight:800;font-family:inherit;cursor:pointer;color:var(--ink-3)}
+.fc-modebtn.active{background:var(--sea);color:#fff;border-color:var(--sea)}
+.fc-pane{display:none}.fc-pane.active{display:block}
+.flashcard-wrap{perspective:1000px;min-height:270px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:270px;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;gap:8px;text-align:center}
+.fc-front{background:linear-gradient(135deg,var(--sea),var(--deep));color:#fff;border:4px solid var(--yellow)}
+.fc-back{background:linear-gradient(135deg,#fff,var(--sea-l));border:4px solid var(--sea);transform:rotateY(180deg);overflow:auto}
+.fc-emoji{font-size:56px;line-height:1}
+.fc-word{font-size:30px;font-weight:900}
+.fc-ipa{font-size:14px;font-weight:600;opacity:.85}
+.fc-def{font-size:17px;color:var(--ink-2);font-weight:700;line-height:1.4}
+.fc-tap{font-size:11px;font-weight:700;opacity:.75;letter-spacing:.08em;margin-top:6px}
+.fc-jp{font-size:15px;color:var(--ink-3);font-weight:700;display:none}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:none;border:1px dashed #D1D5DB;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;color:var(--ink-3);cursor:pointer;font-family:inherit}
+.fc-sample{font-size:15px;background:var(--sea-l);border-radius:10px;padding:8px 12px;font-weight:600;color:var(--ink-2);line-height:1.4}
+.fc-sample b{color:var(--sea-d)}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+.fc-nav button{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-weight:800;font-family:inherit;cursor:pointer}
+.fc-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.fc-dot{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.fc-dot.on{background:var(--sea)}
+.svy-row{background:#fff;border:2px solid var(--border);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.svy-row input{border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:15px;font-family:inherit;flex:1;min-width:150px}
+.svy-row input:focus{border-color:var(--amber);outline:none}
+.svy-row.filled{border-color:var(--green);background:var(--green-l)}
+.svy-row.err{animation:shake .35s;border-color:var(--red)}
+.tr-btn{border:2px solid var(--border);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.tr-btn:hover{border-color:var(--sea);color:var(--sea-d)}
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.flipcard{background:linear-gradient(135deg,var(--deep),#1e293b);border:3px solid var(--yellow);border-radius:14px;padding:16px;text-align:center;cursor:pointer;color:#fff;min-height:132px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.flipcard .fce{font-size:40px}
+.flipcard .ftitle{font-size:17px;font-weight:900}
+.flipcard.revealed{background:#fff;color:var(--navy);border-color:var(--green);cursor:default;text-align:left}
+.fbody{font-size:15px;font-weight:600;color:var(--ink-2);line-height:1.55}
+.fjp{font-size:13px;font-weight:600;color:var(--ink-3)}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.mcol{display:flex;flex-direction:column;gap:8px}
+.mitem{background:#fff;border:3px solid var(--border);border-radius:12px;padding:11px 13px;font-size:15px;font-weight:800;color:var(--ink);cursor:pointer;text-align:left;font-family:inherit;display:flex;align-items:center;min-height:56px;line-height:1.35}
+.mitem.m-right{font-weight:600}
+.mitem:hover{border-color:var(--amber)}
+.mitem.sel{border-color:var(--sea);background:var(--sea-l)}
+.mitem.lock{border-color:var(--green);background:var(--green-l);color:var(--green-d);opacity:.7;pointer-events:none}
+.mitem.err{animation:shake .35s;border-color:var(--red);background:var(--red-l)}
+.mrecap{display:none}.mrecap.show{display:block}
+.mrecap-title{font-size:14px;font-weight:800;color:var(--green-d);margin-bottom:8px}
+.mrecap table{width:100%;border-collapse:collapse;background:#fff;border:2px solid var(--border);border-radius:12px;overflow:hidden}
+.mrecap td{padding:9px 12px;font-size:14px;border-top:1px solid var(--border);vertical-align:top}
+.mrecap tr:first-child td{border-top:none}
+.mr-word{font-weight:800;color:var(--green-d);white-space:nowrap;width:1%}
+.mr-emoji{text-align:center;font-size:18px;width:1%}
+.mr-sent{font-weight:600;color:var(--ink-2)}
+.chip-bank{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#fff;border:3px solid var(--amber);border-radius:10px;padding:8px 15px;font-size:16px;font-weight:800;color:var(--ink);cursor:pointer;font-family:inherit}
+.chip:hover{background:var(--amber-l)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.err{animation:shake .35s;border-color:var(--red)}
+.read-box{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px;font-size:16px;font-weight:600;line-height:2}
+.read-blank{display:inline-block;min-width:104px;border-bottom:3px solid var(--amber);text-align:center;font-weight:900;color:var(--ink-3);cursor:pointer;padding:0 6px}
+.read-blank.filled{color:var(--green-d);border-color:var(--green)}
+.read-blank.active{background:var(--amber-l)}
+.read-blank.wrong{animation:shake .35s;color:var(--red)}
+.zone-strip{display:flex;flex-direction:column;border-radius:14px;overflow:hidden;border:3px solid var(--border)}
+.zone-row{padding:12px 16px;font-weight:800;color:#fff;font-size:15px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.zone-sunlit{background:#0EA5E9}.zone-twilight{background:#075985}.zone-midnight{background:#0f172a}
+.zone-depth{font-weight:600;opacity:.9;font-size:13px}
+.quiz-progress{display:flex;gap:5px;flex-wrap:wrap}
+.qdot{width:14px;height:14px;border-radius:50%;background:var(--border)}
+.qdot.on{background:var(--green)}
+.qdot.now{background:var(--sea);box-shadow:0 0 0 3px var(--sea-l)}
+.result-card{border-radius:16px;padding:24px;text-align:center;display:flex;flex-direction:column;gap:8px;border:3px solid var(--border);background:#fff}
+.result-card.pass{border-color:var(--green);background:var(--green-l)}
+.result-card.fail{border-color:var(--amber);background:var(--amber-l)}
+.result-trophy{font-size:54px}
+.result-score{font-size:34px;font-weight:900;color:var(--navy)}
+.result-sub{font-size:15px;font-weight:700;color:var(--ink-2);line-height:1.5}
+.pitch{background:linear-gradient(180deg,#166534,#14532d);border-radius:14px;padding:14px 18px;color:#fff}
+.score-row{display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:800;gap:10px;flex-wrap:wrap}
+.sun-word{font-size:15px;font-weight:800;color:var(--sea-d);min-width:130px}
+@media (max-width:640px){.mgrid{grid-template-columns:1fr}.tab-body{padding:14px 14px 8px}.tab-footer{padding:10px 14px}}
+/* ── opener zone strip ── */
+.zone-row{padding:14px 18px;color:#fff;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:all .18s}
+.zone-row.zone-sunlit{background:linear-gradient(90deg,#7DD3FC,#0EA5E9)}
+.zone-row.zone-twilight{background:linear-gradient(90deg,#0369A1,#075985)}
+.zone-row.zone-midnight{background:linear-gradient(90deg,#0C4A6E,#020617)}
+.zone-name{font-size:17px;font-weight:800}
+.zone-depth{font-size:14px;font-weight:700;opacity:0;transition:opacity .25s}
+.zone-note{font-size:14px;line-height:1.5;opacity:.95;display:none}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="logo">🌊</div>
+  <div>
+    <div class="title">Unit 6 · Opener</div>
+    <div class="subtitle">Our World Level 4 — Wonders of the Sea</div>
+  </div>
+  <div class="badge-row"><div class="prog-pill" id="prog-pill">0 / 7 done</div></div>
+</header>
+<nav class="tab-nav" id="tab-nav"></nav>
+<main id="tab-stack" style="flex:1;display:flex;flex-direction:column;min-height:0"></main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   OUR WORLD LEVEL 4 · UNIT 6 · OPENER — LEO APP
+   Wonders of the Sea · Student Book pp. 92-93
+   SAVE_PREFIX: leea-4-6-opener-
+   HOMEWORK_ID: leo-4-6-opener
+   moduleCount 7 (tabs 0-6) · moduleKeyFormat tab-{i}-done · scoreKey score (tab 6)
+
+   The six opener words and every sentence about the photo come from
+   unit-6/vocabulary.json, whose opener entries were scanned from the
+   Lesson Planner (pp. 194-195). The Student Book's own three true/false
+   statements are NOT reproduced here: that page is a Git LFS pointer in
+   this checkout and could not be read, so Leo does those in the book with
+   Dad, and the teacher deck carries the answer key (T, F, T) for them.
+   ═══════════════════════════════════════════════════════════════════════ */
+const SAVE_PREFIX='leea-4-6-opener-';
+const HOMEWORK_ID='leo-4-6-opener';
+const TAB_COUNT=7;
+const TABS=[
+ {icon:'📚',name:'Word Lab'},{icon:'🦭',name:'The Photo'},{icon:'🔎',name:'Look & Think'},
+ {icon:'🌊',name:'Ocean Zones'},{icon:'🗺️',name:'Unit Preview'},{icon:'✍️',name:'My Prediction'},
+ {icon:'✅',name:'Quiz'}
+];
+const TAB_INIT={},TAB_RESET={},TAB_RESTORE={};
+
+function lSave(k,v){try{localStorage.setItem(SAVE_PREFIX+k,JSON.stringify(v));}catch(e){}}
+function lLoad(k){try{const r=localStorage.getItem(SAVE_PREFIX+k);return r?JSON.parse(r):null;}catch(e){return null;}}
+function lDel(k){try{localStorage.removeItem(SAVE_PREFIX+k);}catch(e){}}
+function el(t,c,x){const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n;}
+function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function boldWord(s,w){
+  const stem=String(w).replace(/^(a|an|the)\s+/i,'').replace(/_/g,' ');
+  try{return s.replace(new RegExp('('+stem.split(/\s+/).join('[-\\s]')+'\\w*)','i'),'<b>$1</b>');}catch(e){return s;}
+}
+
+/* ── progress + footers (save/restore rules 1, 4, 5) ── */
+function refreshProgress(){
+  let done=0;
+  for(let i=0;i<TAB_COUNT;i++){
+    if(lLoad('tab-'+i+'-done')){done++;const b=document.getElementById('tb'+i);if(b)b.classList.add('done');}
+  }
+  document.getElementById('prog-pill').textContent=done+' / '+TAB_COUNT+' done';
+  const flag='leea-'+HOMEWORK_ID+'-done';
+  try{
+    if(done>=TAB_COUNT){lSave('done',true);localStorage.setItem(flag,JSON.stringify({complete:true,completedAt:new Date().toISOString()}));}
+    else{lDel('done');localStorage.removeItem(flag);}
+  }catch(e){}
+}
+/* Rule 1: the activity calls this the moment its own criteria are met. */
+function markDone(i,silent){
+  if(!lLoad('tab-'+i+'-done'))lSave('tab-'+i+'-done',{done:true,completedAt:new Date().toISOString()});
+  const b=document.getElementById('complete-'+i);
+  if(b){b.disabled=false;b.classList.add('confirmed');b.textContent='✓ '+TABS[i].name+' done';}
+  const banner=document.getElementById('banner-'+i);
+  if(banner&&!silent)banner.classList.add('show');
+  refreshProgress();
+}
+function allowComplete(i){
+  const b=document.getElementById('complete-'+i);
+  if(b&&!lLoad('tab-'+i+'-done')){b.disabled=false;b.textContent='Mark '+TABS[i].name+' complete ✓';}
+}
+/* Rule 4: two-tap arm, then clear this tab's keys and rebuild from zero. */
+function doRedo(i){
+  const b=document.getElementById('redo-'+i);
+  if(!b.classList.contains('armed')){
+    b.classList.add('armed');b.textContent='Tap again ↺';
+    setTimeout(()=>{b.classList.remove('armed');b.textContent='↺ Redo';},3000);
+    return;
+  }
+  b.classList.remove('armed');b.textContent='↺ Redo';
+  lDel('tab-'+i+'-done');
+  if(i===11)lDel('score');
+  Object.keys(localStorage).filter(k=>k.indexOf(SAVE_PREFIX+'tab-'+i+'-')===0).forEach(k=>localStorage.removeItem(k));
+  const c=document.getElementById('complete-'+i);
+  c.classList.remove('confirmed');c.disabled=true;c.textContent='Mark '+TABS[i].name+' complete ✓';
+  const banner=document.getElementById('banner-'+i);if(banner)banner.classList.remove('show');
+  document.getElementById('tb'+i).classList.remove('done');
+  if(TAB_RESET[i])TAB_RESET[i]();
+  refreshProgress();
+}
+/* Rule 2: only tab 11 writes the score key, and it writes the whole result. */
+function saveScore(score,total,extra){
+  const rec={score:score,total:total,percent:Math.round(score/total*100),done:true,savedAt:new Date().toISOString()};
+  for(const k in extra)rec[k]=extra[k];
+  lSave('score',rec);
+}
+let _active=0;
+function showTab(n){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===n));
+  document.querySelectorAll('.tab-content').forEach((c,i)=>c.classList.toggle('active',i===n));
+  _active=n;lSave('last-tab',n);
+  if(TAB_INIT[n]&&!TAB_INIT[n]._done){TAB_INIT[n]();TAB_INIT[n]._done=true;}
+  if(TAB_RESTORE[n])TAB_RESTORE[n]();
+  const c=document.getElementById('complete-'+n);
+  if(c&&lLoad('tab-'+n+'-done')){c.disabled=false;c.classList.add('confirmed');c.textContent='✓ '+TABS[n].name+' done';}
+}
+
+/* Shared MCQ block. Rule 6: an answered question comes back looking answered,
+   or the guard swallows the next tap with no feedback. */
+function askBlock(host,item,tab,key,after){
+  const card=el('div','qcard');
+  const q=el('div','qtext');q.innerHTML=item.q;card.appendChild(q);
+  const grp=el('div','opt-group');
+  item.opts.forEach((t,oi)=>{
+    const b=el('button','opt',t);
+    b.onclick=()=>{
+      const st=lLoad('tab-'+tab+'-ans')||{};
+      if(st[key]!=null)return;
+      st[key]=oi;lSave('tab-'+tab+'-ans',st);
+      paint(b,oi);if(after)after();
+    };
+    grp.appendChild(b);
+  });
+  card.appendChild(grp);
+  if(item.jp){const j=el('div','jp-note','🇯🇵 '+item.jp);j.style.display='none';card.appendChild(j);}
+  host.appendChild(card);
+  function paint(clicked,chosen){
+    const all=grp.querySelectorAll('.opt');
+    for(let i=0;i<all.length;i++){all[i].disabled=true;if(i===item.correct)all[i].classList.add('good');}
+    if(chosen!==item.correct&&clicked)clicked.classList.add('bad');
+    const j=card.querySelector('.jp-note');if(j)j.style.display='block';
+  }
+  const saved=(lLoad('tab-'+tab+'-ans')||{})[key];
+  if(saved!=null)paint(grp.querySelectorAll('.opt')[saved],saved);
+}
+function answered(tab,keys){const st=lLoad('tab-'+tab+'-ans')||{};return keys.filter(k=>st[k]!=null).length;}
+function counter(host,label){
+  const row=el('div','mstatus'),c=el('div','mcount','0');
+  row.appendChild(c);row.appendChild(el('div','mhint',label));host.appendChild(row);return c;
+}
+function srcPill(host,text){host.appendChild(el('div','src-pill',text));}
+
+/* ── flashcard block: Practice + Quiz, both required (PR #77 lock) ── */
+function flashcards(host,tab,list){
+  const st=lLoad('tab-'+tab+'-fc')||{seen:[],solved:[],mode:'practice'};
+  st.seen=st.seen||[];st.solved=st.solved||[];
+  const modes=el('div','fc-modeswitch');
+  const pb=el('button','fc-modebtn','📖 Practice'),qb=el('button','fc-modebtn','🧠 Quiz');
+  modes.appendChild(pb);modes.appendChild(qb);host.appendChild(modes);
+  const status=el('div','mstatus'),seenPill=el('div','mcount',''),solvedPill=el('div','mcount alt','');
+  status.appendChild(seenPill);status.appendChild(solvedPill);host.appendChild(status);
+  const pp=el('div','fc-pane'),qp=el('div','fc-pane');host.appendChild(pp);host.appendChild(qp);
+  let idx=0;
+  const wrap=el('div','flashcard-wrap'),card=el('div','flashcard'),front=el('div','fc-face fc-front'),back=el('div','fc-face fc-back');
+  card.appendChild(front);card.appendChild(back);wrap.appendChild(card);
+  wrap.onclick=()=>card.classList.toggle('flipped');
+  pp.appendChild(wrap);
+  const nav=el('div','fc-nav'),prev=el('button',null,'◀ Back'),dots=el('div','fc-dots'),next=el('button',null,'Next ▶');
+  nav.appendChild(prev);nav.appendChild(dots);nav.appendChild(next);pp.appendChild(nav);
+  prev.onclick=()=>{idx=(idx-1+list.length)%list.length;draw();};
+  next.onclick=()=>{idx=(idx+1)%list.length;draw();};
+  function draw(){
+    const w=list[idx];card.classList.remove('flipped');
+    front.innerHTML='';front.appendChild(el('div','fc-emoji',w.e));front.appendChild(el('div','fc-word',w.w));
+    front.appendChild(el('div','fc-ipa','/'+w.ipa+'/'));front.appendChild(el('div','fc-tap','TAP TO FLIP'));
+    back.innerHTML='';back.appendChild(el('div','fc-def',w.def));
+    const jp=el('div','fc-jp',w.jp),jb=el('button','fc-jp-btn','🇯🇵 Japanese');
+    jb.onclick=(ev)=>{ev.stopPropagation();jp.classList.toggle('revealed');};
+    back.appendChild(jb);back.appendChild(jp);
+    const s=el('div','fc-sample');s.innerHTML=boldWord(w.s||w.tr,w.norm||w.w);back.appendChild(s);
+    dots.innerHTML='';list.forEach((_,i)=>dots.appendChild(el('div','fc-dot'+(i===idx?' on':''))));
+    if(st.seen.indexOf(idx)<0)st.seen.push(idx);
+    persist();
+  }
+  const qcard=el('div','qcard');qp.appendChild(qcard);
+  function drawQuiz(){
+    qcard.innerHTML='';
+    const left=list.map((_,i)=>i).filter(i=>st.solved.indexOf(i)<0);
+    if(!left.length){qcard.appendChild(el('div','qtext','🎉 Every word typed correctly!'));return;}
+    const i=left[0],w=list[i];
+    qcard.appendChild(el('div','fc-emoji',w.e));
+    qcard.appendChild(el('div','qtext',w.def));
+    const row=el('div','svy-row'),inp=el('input'),ck=el('button','tr-btn','✓ Check'),clue=el('button','tr-btn','Clue');
+    inp.placeholder='Type the word';row.appendChild(inp);row.appendChild(ck);row.appendChild(clue);
+    qcard.appendChild(row);
+    const fb=el('div','mhint','');qcard.appendChild(fb);
+    const target=w.w.replace(/^(a|an|the)\s+/i,'').toLowerCase();
+    clue.onclick=()=>{fb.textContent='Starts with "'+target.charAt(0)+'" · '+target.replace(/[^\s]/g,'•');};
+    ck.onclick=()=>{
+      if(inp.value.trim().toLowerCase().replace(/^(a|an|the)\s+/,'')===target){
+        st.solved.push(i);persist();drawQuiz();
+      }else{row.classList.add('err');fb.textContent='Not yet — try again.';setTimeout(()=>row.classList.remove('err'),400);}
+    };
+    inp.onkeydown=(ev)=>{if(ev.key==='Enter')ck.onclick();};
+  }
+  function persist(){
+    st.mode=pp.classList.contains('active')?'practice':'quiz';
+    lSave('tab-'+tab+'-fc',st);
+    seenPill.textContent='📖 '+st.seen.length+' / '+list.length;
+    solvedPill.textContent='🧠 '+st.solved.length+' / '+list.length;
+    if(st.seen.length>=list.length&&st.solved.length>=list.length)markDone(tab);
+  }
+  function setMode(m){
+    pp.classList.toggle('active',m==='practice');qp.classList.toggle('active',m==='quiz');
+    pb.classList.toggle('active',m==='practice');qb.classList.toggle('active',m==='quiz');
+    if(m==='quiz')drawQuiz();
+    persist();
+  }
+  pb.onclick=()=>setMode('practice');qb.onclick=()=>setMode('quiz');
+  draw();setMode(st.mode==='quiz'?'quiz':'practice');
+}
+
+/* ── The six words the Lesson Planner lists for the opener photo, with the
+   planner's own example sentences. Together they describe the photo: a
+   harbor seal swimming underwater in a California kelp forest. ── */
+const WORDS=[
+ {w:'a seal',      e:'🦭', ipa:'siːl',           norm:'seal',      syl:'seal',
+  def:'a sea mammal with flippers that lives in coastal waters', jp:'アザラシ',
+  tr:'Harbor seals live in coastal waters.'},
+ {w:'whiskers',    e:'〰️', ipa:'ˈwɪskərz',       norm:'whiskers',  syl:'whisk·ers',
+  def:'long stiff hairs growing on the face of some animals', jp:'ひげ',
+  tr:'Harbor seals have long whiskers on their face.'},
+ {w:'flippers',    e:'🦭', ipa:'ˈflɪpərz',       norm:'flippers',  syl:'flip·pers',
+  def:'flat arms or legs sea animals use to swim', jp:'ひれ足',
+  tr:'A seal uses its flippers to swim.'},
+ {w:'kelp',        e:'🌿', ipa:'kɛlp',           norm:'kelp',      syl:'kelp',
+  def:'a large, tall kind of seaweed that grows like a forest underwater', jp:'ケルプ／コンブ',
+  tr:'The seal in the photo is in the California kelp forest.'},
+ {w:'seaweed',     e:'🌿', ipa:'ˈsiːwiːd',       norm:'seaweed',   syl:'sea·weed',
+  def:'plant-like growth that lives in the sea', jp:'海草（かいそう）',
+  tr:'The seal is behind the seaweed.'},
+ {w:'underwater',  e:'🐠', ipa:'ˌʌndərˈwɔtər',   norm:'underwater',syl:'un·der·wa·ter',
+  def:'below the surface of water', jp:'水中（すいちゅう）の',
+  tr:'A coral reef looks like a colorful underwater garden.'}
+];
+
+/* Academic language for looking at a photo. These ids already exist in the
+   shared reference list, so Leo meets the same cards here as elsewhere. */
+const ACADEMIC=[
+ {w:'describe', e:'🗣️', ipa:'dɪˈskraɪb', def:'to say what something is like', jp:'説明（せつめい）する',
+  s:'<b>Describe</b> the photo: what can you see?'},
+ {w:'details',  e:'🔍', ipa:'ˈdiːteɪlz', def:'the small parts of something', jp:'細部（さいぶ）・くわしいところ',
+  s:'Look for <b>details</b> — the whiskers, the flippers, the kelp.'},
+ {w:'predict',  e:'🔮', ipa:'prɪˈdɪkt',  def:'to say what you think will happen', jp:'予測（よそく）する',
+  s:'<b>Predict</b> what you will learn in this unit.'},
+ {w:'a caption',e:'🏷️', ipa:'ˈkæpʃən',  def:'the words under a photo that tell you about it', jp:'キャプション',
+  s:'Write a <b>caption</b> for the seal photo.'}
+];
+
+/* ── answer-position variation ──────────────────────────────────────────
+   Positions are dealt out round-robin over a hash-ordered list so every
+   slot is used about equally by construction, while staying deterministic. */
+function hashText(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+function mix32(a){a=(a+0x9e3779b9)>>>0;let z=a;z=Math.imul(z^(z>>>16),0x21f0aaad)>>>0;z=Math.imul(z^(z>>>15),0x735a2d97)>>>0;return (z^(z>>>15))>>>0;}
+function moveAnswerTo(item,target){
+  if(!item||!Array.isArray(item.opts)||typeof item.correct!=='number')return item;
+  const answer=item.opts[item.correct];
+  const rest=item.opts.filter((_,i)=>i!==item.correct);
+  let state=hashText(String(item.q));
+  for(let i=rest.length-1;i>0;i--){
+    state=mix32(state);
+    const j=Math.floor((state/4294967296)*(i+1));
+    const t=rest[i];rest[i]=rest[j];rest[j]=t;
+  }
+  const pos=Math.min(Math.max(target,0),rest.length);
+  rest.splice(pos,0,answer);
+  item.opts=rest;item.correct=pos;
+  return item;
+}
+function varyAll(list){
+  list.map((it,i)=>({i:i,h:hashText(String(it&&it.q))}))
+      .sort((a,b)=>(a.h-b.h)||(a.i-b.i))
+      .forEach((o,k)=>{const it=list[o.i];if(it&&Array.isArray(it.opts))moveAnswerTo(it,k%it.opts.length);});
+  return list;
+}
+
+/* ═══ TAB 0 — WORD LAB ═══ */
+TAB_INIT[0]=function(){
+  const h=document.getElementById('body-0');
+  h.appendChild(hdr('📚 Word Lab','The words we use to talk about a photo'));
+  h.appendChild(hint('Finish BOTH modes — Practice flips the cards, Quiz asks you to name each one.'));
+  flashcards(h,0,ACADEMIC);
+  srcPill(h,'Shared academic reference list');
+};
+TAB_RESET[0]=function(){rebuild(0);};
+
+/* ═══ TAB 1 — THE PHOTO ═══ */
+TAB_INIT[1]=function(){
+  const h=document.getElementById('body-1');
+  h.appendChild(hdr('🦭 The Photo','Open your Student Book at pp. 92–93'));
+  h.appendChild(hint('Find each thing in the photo, then tap its card to check the word. All six are in the picture.'));
+  const st=lLoad('tab-1-open')||[];
+  const c=counter(h,'found in the photo');
+  const grid=el('div','flip-grid');
+  WORDS.forEach((w,i)=>{
+    const card=el('div','flipcard');
+    function open(){
+      card.classList.add('revealed');card.innerHTML='';
+      card.appendChild(el('div','fce',w.e));
+      card.appendChild(el('div','ftitle',w.w));
+      card.appendChild(el('div','fbody',w.def));
+      const q=el('div','fbody');q.innerHTML='“'+boldWord(w.tr,w.norm)+'”';card.appendChild(q);
+      card.appendChild(el('div','fjp','🇯🇵 '+w.jp));
+    }
+    card.appendChild(el('div','fce',w.e));
+    card.appendChild(el('div','ftitle',w.w));
+    card.appendChild(el('div','fc-tap','TAP TO OPEN'));
+    card.onclick=()=>{if(st.indexOf(i)<0){st.push(i);lSave('tab-1-open',st);}open();up();};
+    if(st.indexOf(i)>=0)open();
+    grid.appendChild(card);
+  });
+  h.appendChild(grid);
+  h.appendChild(hint('📓 In the book: read the three sentences on p. 93 and mark each one true or false. Do that part with Dad — the answers are on his screen.'));
+  srcPill(h,'unit-6/vocabulary.json · opener words, Lesson Planner pp. 194–195');
+  function up(){c.textContent=st.length+' / '+WORDS.length;if(st.length>=WORDS.length)markDone(1);}
+  up();
+};
+TAB_RESET[1]=function(){lDel('tab-1-open');rebuild(1);};
+
+/* ═══ TAB 2 — LOOK & THINK ═══ */
+const LOOK=varyAll([
+ {q:'What kind of animal is in the photo?',opts:['a harbor seal','a shark','a squid'],correct:0,jp:'アザラシです。'},
+ {q:'What are the long stiff hairs on its face called?',opts:['whiskers','flippers','kelp'],correct:0,jp:'ひげ（whiskers）です。'},
+ {q:'What does a seal use to swim?',opts:['its flippers','its whiskers','its ears'],correct:0,jp:'ひれ足（flippers）を使います。'},
+ {q:'The tall plant-like growth around the seal is a forest of…',opts:['kelp','trees','coral'],correct:0,jp:'ケルプ（kelp）の森です。'},
+ {q:'Where is the seal in the photo?',opts:['underwater','on the beach','in a boat'],correct:0,jp:'水中（underwater）です。'},
+ {q:'Where do harbor seals live?',opts:['in coastal waters','in the desert','in the midnight zone'],correct:0,jp:'海べ（coastal waters）にすんでいます。'},
+ {q:'Which word means "the small parts of something you notice when you look carefully"?',
+  opts:['details','a caption','a prediction'],correct:0,jp:'details（細部）です。'},
+ {q:'Which word means "the words under a photo that tell you about it"?',
+  opts:['a caption','details','kelp'],correct:0,jp:'caption（キャプション）です。'}
+]);
+TAB_INIT[2]=function(){
+  const h=document.getElementById('body-2');
+  h.appendChild(hdr('🔎 Look and Think','Describe what you can see'));
+  h.appendChild(hint('Eight questions about the photo. Look carefully before you answer.'));
+  const keys=LOOK.map((_,i)=>'l'+i);
+  const c=counter(h,'answered');
+  LOOK.forEach((it,i)=>askBlock(h,it,2,keys[i],up));
+  srcPill(h,'Student Book pp. 92–93 · opener photo');
+  function up(){const n=answered(2,keys);c.textContent=n+' / '+LOOK.length;if(n>=LOOK.length)markDone(2);}
+  up();
+};
+TAB_RESET[2]=function(){rebuild(2);};
+
+/* ═══ TAB 3 — OCEAN ZONES (a first look at the unit's big idea) ═══ */
+const ZONES=[
+ {name:'☀️ the sunlit zone',   depth:'down to about 200 m (656 ft.)',
+  note:'Most of the creatures we know stay here. A seal in a kelp forest is in this zone.',cls:'sunlit'},
+ {name:'🌗 the twilight zone', depth:'down to about 1,000 m (3,300 ft.)',
+  note:"There isn't much light. Many different types of fish live here, and some look very strange.",cls:'twilight'},
+ {name:'🌑 the midnight zone', depth:'below 1,000 m (3,300 ft.)',
+  note:'Almost completely black. The only light comes from the creatures who live here.',cls:'midnight'}
+];
+TAB_INIT[3]=function(){
+  const h=document.getElementById('body-3');
+  h.appendChild(hdr('🌊 Ocean Zones','A first look at the big idea of Unit 6'));
+  h.appendChild(hint('Tap each layer from the top down. You will learn all three properly in Vocabulary 1.'));
+  const st=lLoad('tab-3-open')||[];
+  const c=counter(h,'layers opened');
+  const strip=el('div','zone-strip');
+  ZONES.forEach((z,i)=>{
+    const row=el('div','zone-row zone-'+z.cls);
+    row.appendChild(el('div','zone-name',z.name));
+    const d=el('div','zone-depth',z.depth);d.style.opacity=st.indexOf(i)>=0?'1':'0';row.appendChild(d);
+    const n=el('div','zone-note',z.note);n.style.display=st.indexOf(i)>=0?'block':'none';row.appendChild(n);
+    row.onclick=()=>{
+      if(st.indexOf(i)<0){st.push(i);lSave('tab-3-open',st);}
+      d.style.opacity='1';n.style.display='block';up();
+    };
+    strip.appendChild(row);
+  });
+  h.appendChild(strip);
+  srcPill(h,'Student Book pp. 94–95 · TR 6.1 — preview');
+  function up(){c.textContent=st.length+' / 3';if(st.length>=3)markDone(3);}
+  up();
+};
+TAB_RESET[3]=function(){lDel('tab-3-open');rebuild(3);};
+
+/* ═══ TAB 4 — UNIT PREVIEW ═══ */
+const PLAN=[
+ {icon:'🐙',name:'Vocabulary 1',what:'16 words for the ocean and its creatures',key:'v1'},
+ {icon:'🎵',name:'Song',        what:'"Protect the Seas" — sing the words back',key:'song'},
+ {icon:'⚖️',name:'Grammar 1',   what:"have to, must, can't and don't",key:'g1'},
+ {icon:'🛢️',name:'Vocabulary 2',what:'5 words for the problems that harm the sea',key:'v2'},
+ {icon:'🔮',name:'Grammar 2',   what:"will and won't — predicting the future",key:'g2'},
+ {icon:'📖',name:'Reading',     what:'Coral reefs — the underwater cities',key:'read'}
+];
+TAB_INIT[4]=function(){
+  const h=document.getElementById('body-4');
+  h.appendChild(hdr('🗺️ Unit Preview','What is coming in Unit 6'));
+  h.appendChild(hint('Tap a lesson, then tap what you will learn in it. Six to match.'));
+  const st=lLoad('tab-4-matched')||[];
+  const c=counter(h,'matched');
+  const grid=el('div','mgrid'),left=el('div','mcol'),right=el('div','mcol');
+  grid.appendChild(left);grid.appendChild(right);h.appendChild(grid);
+  const L={},R={};let sel=null;
+  PLAN.forEach((p,i)=>{
+    const b=el('button','mitem',p.icon+'  '+p.name);b.dataset.idx=String(i);
+    b.onclick=()=>{if(b.classList.contains('lock'))return;if(sel)sel.classList.remove('sel');sel=b;b.classList.add('sel');};
+    L[i]=b;left.appendChild(b);
+  });
+  shuffle(PLAN.map((_,i)=>i)).forEach(i=>{
+    const b=el('button','mitem m-right',PLAN[i].what);
+    b.onclick=()=>{
+      if(!sel||b.classList.contains('lock'))return;
+      if(Number(sel.dataset.idx)===i){
+        sel.classList.remove('sel');sel.classList.add('lock');b.classList.add('lock');
+        if(st.indexOf(i)<0){st.push(i);lSave('tab-4-matched',st);}
+        sel=null;up();
+      }else{b.classList.add('err');setTimeout(()=>b.classList.remove('err'),400);}
+    };
+    R[i]=b;right.appendChild(b);
+  });
+  st.forEach(i=>{L[i].classList.add('lock');R[i].classList.add('lock');});
+  srcPill(h,'The Unit 6 lessons, in teaching order');
+  function up(){c.textContent=st.length+' / '+PLAN.length;if(st.length>=PLAN.length)markDone(4);}
+  up();
+};
+TAB_RESET[4]=function(){lDel('tab-4-matched');rebuild(4);};
+
+/* ═══ TAB 5 — MY PREDICTION ═══ */
+const PROMPTS=[
+ {lead:'📸 A caption for the photo',  hint:'Write one sentence about the seal. e.g. A harbor seal swims through the kelp forest.'},
+ {lead:'🤔 One thing I already know', hint:'Something you know about the ocean already.'},
+ {lead:'🔮 One thing I will learn',   hint:'Predict something you think Unit 6 will teach you.'},
+ {lead:'❓ One question I have',      hint:'Something about the sea you want the answer to.'}
+];
+TAB_INIT[5]=function(){
+  const h=document.getElementById('body-5');
+  h.appendChild(hdr('✍️ My Prediction','Before we start the unit'));
+  h.appendChild(hint('Write all four. Six letters or more each — then read them to Dad. At the end of the unit, come back and check your prediction.'));
+  const st=lLoad('tab-5-text')||{};
+  const c=counter(h,'written');
+  PROMPTS.forEach((p,i)=>{
+    const row=el('div','svy-row');
+    row.appendChild(el('div','sun-word',p.lead));
+    const inp=el('input');inp.placeholder=p.hint;
+    inp.value=st[i]||'';
+    if((st[i]||'').trim().length>=6)row.classList.add('filled');
+    inp.oninput=()=>{st[i]=inp.value;lSave('tab-5-text',st);row.classList.toggle('filled',inp.value.trim().length>=6);up();};
+    row.appendChild(inp);h.appendChild(row);
+  });
+  srcPill(h,'Student Book p. 93, Activity 4 — "Answers will vary"');
+  function up(){
+    const n=PROMPTS.filter((_,i)=>(st[i]||'').trim().length>=6).length;
+    c.textContent=n+' / '+PROMPTS.length;
+    if(n>=PROMPTS.length)markDone(5);
+  }
+  up();
+};
+TAB_RESET[5]=function(){lDel('tab-5-text');rebuild(5);};
+
+/* ═══ TAB 6 — QUIZ ═══ */
+const QUIZ=varyAll([
+ {q:'What is the name of Unit 6?',opts:['Wonders of the Sea','Good Idea!','My Favorites'],correct:0,jp:'Wonders of the Sea です。'},
+ {q:'Which animal is in the opener photo?',opts:['a harbor seal','a dolphin','a sea turtle'],correct:0,jp:'アザラシです。'},
+ {q:'What is <b>kelp</b>?',opts:['a large, tall kind of seaweed','a small fish','a kind of boat'],correct:0,jp:'大きな海草です。'},
+ {q:'What does a seal use its <b>flippers</b> for?',opts:['swimming','eating','seeing in the dark'],correct:0,jp:'泳ぐために使います。'},
+ {q:'Where are the seal\'s <b>whiskers</b>?',opts:['on its face','on its back','on its flippers'],correct:0,jp:'顔にあります。'},
+ {q:'<b>Underwater</b> means…',opts:['below the surface of water','next to the water','above the clouds'],correct:0,jp:'水面の下です。'},
+ {q:'In which country is the kelp forest in the photo?',opts:['the United States (California)','Japan','Brazil'],correct:0,jp:'アメリカのカリフォルニアです。'},
+ {q:'What does <b>describe</b> mean?',opts:['to say what something is like','to draw a picture','to count something'],correct:0,jp:'説明することです。'},
+ {q:'What is a <b>caption</b>?',opts:['the words under a photo','the title of a book','a kind of seaweed'],correct:0,jp:'写真の下の説明文です。'},
+ {q:'What does <b>predict</b> mean?',opts:['to say what you think will happen','to remember the past','to read aloud'],correct:0,jp:'予測することです。'}
+]);
+TAB_INIT[6]=function(){
+  const h=document.getElementById('body-6');
+  h.appendChild(hdr('✅ Opener Quiz','10 questions — 8 or more to pass'));
+  const active=el('div'),result=el('div');h.appendChild(active);h.appendChild(result);
+  const saved=lLoad('score');
+  const bar=el('div','quiz-progress');active.appendChild(bar);
+  const card=el('div','qcard');active.appendChild(card);
+  let cur=0,score=0,wrong=[];
+  const PASS=8;
+  function render(){
+    bar.innerHTML='';
+    QUIZ.forEach((_,i)=>bar.appendChild(el('div','qdot'+(i<cur?' on':'')+(i===cur?' now':''))));
+    card.innerHTML='';
+    const it=QUIZ[cur];
+    const q=el('div','qtext');q.innerHTML=(cur+1)+'. '+it.q;card.appendChild(q);
+    const grp=el('div','opt-group');
+    it.opts.forEach((t,oi)=>{
+      const b=el('button','opt',t);
+      b.onclick=()=>{
+        const all=grp.querySelectorAll('.opt');
+        for(let i=0;i<all.length;i++){all[i].disabled=true;if(i===it.correct)all[i].classList.add('good');}
+        if(oi===it.correct)score++;else{b.classList.add('bad');wrong.push(cur+1);}
+        if(it.jp)card.appendChild(el('div','jp-note','🇯🇵 '+it.jp));
+        setTimeout(()=>{cur++;if(cur>=QUIZ.length)finish();else render();},900);
+      };
+      grp.appendChild(b);
+    });
+    card.appendChild(grp);
+  }
+  function finish(){
+    saveScore(score,QUIZ.length,{pass:score>=PASS,wrongQuestions:wrong});
+    show({score:score,total:QUIZ.length,percent:Math.round(score/QUIZ.length*100),pass:score>=PASS,wrongQuestions:wrong});
+    markDone(6);
+  }
+  /* Rule 3: a finished quiz comes back as its result, never restarted. */
+  function show(rec){
+    active.style.display='none';result.innerHTML='';
+    const pass=rec.pass!=null?rec.pass:rec.score>=PASS;
+    const box=el('div','result-card '+(pass?'pass':'fail'));
+    box.appendChild(el('div','result-trophy',pass?'🏆':'💪'));
+    box.appendChild(el('div','result-score',rec.score+' / '+rec.total));
+    box.appendChild(el('div','result-sub',pass?'You passed! '+rec.percent+'%':'Almost — you need '+PASS+' to pass. Tap ↺ Redo to try again.'));
+    if(rec.wrongQuestions&&rec.wrongQuestions.length)box.appendChild(el('div','result-sub','Look again at question(s): '+rec.wrongQuestions.join(', ')));
+    result.appendChild(box);
+    markDone(6,true);
+  }
+  if(saved&&saved.done){show(saved);}else{render();}
+  srcPill(h,'Formative assessment — Unit 6 Opener');
+};
+TAB_RESET[6]=function(){rebuild(6);};
+
+/* ── small helpers used by the tabs above ── */
+function hdr(title,sub){
+  const d=el('div');d.appendChild(el('div','section-title',title));
+  if(sub)d.appendChild(el('div','section-sub',sub));return d;
+}
+function hint(text){return el('div','dad-hint',text);}
+function rebuild(i){
+  const body=document.getElementById('body-'+i);
+  body.innerHTML='';
+  TAB_INIT[i]._done=false;TAB_INIT[i]();TAB_INIT[i]._done=true;
+}
+
+/* ── boot ── */
+(function(){
+  const nav=document.getElementById('tab-nav'),stack=document.getElementById('tab-stack');
+  TABS.forEach((t,i)=>{
+    const b=el('button','tab-btn');b.id='tb'+i;
+    b.appendChild(el('span','tab-icon',t.icon));
+    b.appendChild(el('span','tab-name',t.name));
+    b.onclick=()=>showTab(i);
+    nav.appendChild(b);
+    const pane=el('div','tab-content');pane.id='tc'+i;
+    const body=el('div','tab-body');body.id='body-'+i;pane.appendChild(body);
+    const banner=el('div','done-banner','Nice work! Mark it below.');banner.id='banner-'+i;body.appendChild(banner);
+    const foot=el('div','tab-footer');
+    const redo=el('button','btn-redo','↺ Redo');redo.id='redo-'+i;redo.onclick=()=>doRedo(i);
+    const done=el('button','btn-complete','Mark '+t.name+' complete ✓');done.id='complete-'+i;done.disabled=true;
+    done.onclick=()=>markDone(i);
+    foot.appendChild(redo);foot.appendChild(done);pane.appendChild(foot);
+    stack.appendChild(pane);
+  });
+  const last=lLoad('last-tab');
+  showTab(typeof last==='number'&&last>=0&&last<TAB_COUNT?last:0);
+  refreshProgress();
+})();
+</script>
+</body>
+</html>

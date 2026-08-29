@@ -467,6 +467,19 @@ function lDel(suffix){
   try{ localStorage.removeItem(SAVE_PREFIX + suffix); }catch(e){}
 }
 
+/* The homework flag the teacher dashboard reads. It is NOT a SAVE_PREFIX key:
+   learnerProgress.ts looks for `leea-<homeworkId>-done` exactly, so it has to
+   be written against localStorage directly. Routing it through lSave() prefixed
+   it twice (leea-4-7-x-leo-4-7-x-done) and nothing ever read it. */
+function clearHomeworkFlag(){
+  try{ localStorage.removeItem('leea-' + HOMEWORK_ID + '-done'); }catch(e){}
+}
+function saveHomeworkFlag(value){
+  try{ localStorage.setItem('leea-' + HOMEWORK_ID + '-done', JSON.stringify(value)); }catch(e){}
+  try{ if(window.LEEA_CLOUD && typeof window.LEEA_CLOUD.saveProgress === 'function')
+         window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, 'leea-' + HOMEWORK_ID + '-done', value); }catch(e){}
+}
+
 /* ── PROGRESS BADGE + TAB CHECKMARKS ── */
 function refreshProgress(){
   try{
@@ -481,7 +494,8 @@ function refreshProgress(){
     }
     const pill = document.getElementById('prog-pill');
     if(pill) pill.textContent = done + ' / ' + TAB_COUNT + ' done';
-    if(done >= TAB_COUNT) lSave(HOMEWORK_ID + '-done', { complete: true, completedAt: new Date().toISOString() });
+    if(done >= TAB_COUNT) saveHomeworkFlag({ complete: true, completedAt: new Date().toISOString() });
+    else clearHomeworkFlag();
   }catch(e){}
 }
 
@@ -660,6 +674,114 @@ function fcCheckDone(){
 /* ═════════════════════════════════════════════════════════════════════
    TAB 1 — WARM UP (8 fill-in)
 ═════════════════════════════════════════════════════════════════════ */
+
+/* ── balanced answer positions ──────────────────────────────────────────
+   The authored question data leans hard on the first option — several of
+   the arrays below had every correct answer at index 0, which Leo can beat
+   by always tapping the top button without reading anything.
+
+   Positions are dealt out round-robin over a hash-ordered list rather than
+   drawn per question: a per-item draw is uniform on average but is still a
+   draw, and it left whole quizzes with an unused slot. Dealing guarantees
+   every slot is used about equally. The hash only decides the running order
+   and the distractor order, so the layout is identical on every load and a
+   restored answer still lines up with the option it was saved against.
+   ──────────────────────────────────────────────────────────────────────── */
+function __leeaHash(s){var h=2166136261>>>0;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+/* splitmix32 — a plain LCG's low bits cycle and produce a biased shuffle. */
+function __leeaMix(a){a=(a+0x9e3779b9)>>>0;var z=a;z=Math.imul(z^(z>>>16),0x21f0aaad)>>>0;z=Math.imul(z^(z>>>15),0x735a2d97)>>>0;return (z^(z>>>15))>>>0;}
+function __leeaSeed(item,optKey){try{return __leeaHash(JSON.stringify(item[optKey]));}catch(e){return 0;}}
+function __leeaAt(item,optKey,idxKey){
+  var opts=item[optKey];
+  if(idxKey)return typeof item[idxKey]==='number'?item[idxKey]:-1;
+  for(var i=0;i<opts.length;i++){if(opts[i]&&opts[i].ok===true)return i;}
+  return -1;
+}
+/* True/False and Yes/No pairs keep their conventional order — moving them
+   changes what the buttons read, not just where the answer sits. */
+function __leeaFixedOrder(item,optKey){
+  var opts=item[optKey];
+  if(!Array.isArray(opts)||opts.length!==2)return false;
+  var t=opts.map(function(o){return String((o&&typeof o==='object')?(o.t||o.text||''):o).trim().toLowerCase();});
+  return (t[0]==='true'&&t[1]==='false')||(t[0]==='false'&&t[1]==='true')||
+         (t[0]==='yes'&&t[1]==='no')||(t[0]==='no'&&t[1]==='yes');
+}
+function __leeaPlace(item,optKey,idxKey,target){
+  var opts=item[optKey],cur=__leeaAt(item,optKey,idxKey);
+  if(cur<0||cur>=opts.length)return;
+  if(__leeaFixedOrder(item,optKey))return;
+  var answer=opts[cur],rest=opts.filter(function(_,i){return i!==cur;});
+  var state=__leeaSeed(item,optKey);
+  for(var i=rest.length-1;i>0;i--){
+    state=__leeaMix(state);
+    var j=Math.floor((state/4294967296)*(i+1));
+    var t=rest[i];rest[i]=rest[j];rest[j]=t;
+  }
+  var pos=Math.min(Math.max(target,0),rest.length);
+  rest.splice(pos,0,answer);
+  item[optKey]=rest;
+  if(idxKey)item[idxKey]=pos;
+}
+/* Reorders options in place. Never changes which option is correct — only
+   where it sits — so every answer key in this file stays true. */
+/* One-time cleanup of state saved under the OLD option order.
+   Reordering options invalidates any answer that was stored as an index, so
+   a completed module would come back with the tick on the wrong button. This
+   clears only values made entirely of numbers, booleans and nulls — answer
+   indexes and tick state. Typed sentences, quiz scores and module done-flags
+   are all left alone, so nothing Leo wrote or earned is lost. */
+function __leeaNumericOnly(v){
+  if(v===null||typeof v==='number'||typeof v==='boolean')return true;
+  if(typeof v==='string')return false;
+  if(Array.isArray(v))return v.length>0&&v.every(__leeaNumericOnly);
+  if(typeof v==='object'){var ks=Object.keys(v);return ks.length>0&&ks.every(function(k){return __leeaNumericOnly(v[k]);});}
+  return false;
+}
+function __leeaFindPrefix(){
+  var cands=[];
+  ['SAVE_PREFIX','SP','PREFIX'].forEach(function(n){
+    var v; try{ v=eval(n); }catch(e){ return; }
+    if(typeof v==='string'&&v){ cands.push(v); cands.push('leea-'+v); }
+  });
+  var keys; try{ keys=Object.keys(localStorage); }catch(e){ return null; }
+  // Longest candidate that actually prefixes saved keys wins; if nothing
+  // matches there is no old state to migrate.
+  cands.sort(function(a,b){return b.length-a.length;});
+  for(var i=0;i<cands.length;i++){
+    if(keys.some(function(k){return k.indexOf(cands[i])===0;})) return cands[i];
+  }
+  return null;
+}
+function __leeaMigrate(){
+  try{
+    var pre=__leeaFindPrefix(); if(!pre) return;
+    var flag=pre+'__answer-layout-v1';
+    if(localStorage.getItem(flag)==='1') return;
+    Object.keys(localStorage).forEach(function(k){
+      if(k.indexOf(pre)!==0) return;
+      if(/done|score|complete|known|streak|progress|layout/i.test(k)) return;
+      var val; try{ val=JSON.parse(localStorage.getItem(k)); }catch(e){ return; }
+      if(__leeaNumericOnly(val)) localStorage.removeItem(k);
+    });
+    localStorage.setItem(flag,'1');
+  }catch(e){}
+}
+function __leeaBalance(list,optKey,idxKey){
+  if(!Array.isArray(list))return list;
+  var rows=[];
+  list.forEach(function(item,i){
+    if(!item||typeof item!=='object')return;
+    var opts=item[optKey];
+    if(!Array.isArray(opts)||opts.length<2)return;
+    if(__leeaAt(item,optKey,idxKey)<0)return;
+    if(__leeaFixedOrder(item,optKey))return;
+    rows.push({item:item,i:i,h:__leeaSeed(item,optKey)});
+  });
+  rows.sort(function(a,b){return (a.h-b.h)||(a.i-b.i);});
+  rows.forEach(function(r,k){__leeaPlace(r.item,optKey,idxKey,k%r.item[optKey].length);});
+  return list;
+}
+__leeaMigrate();
 const WU_ITEMS = [
   { s1: '"You need to have creativity to invent things."', opts: ['🌐 general you — everybody','🙋 specific you — one person'], ok: 0 },
   { s1: '"Leo, you are wearing a red shirt."', opts: ['🌐 general you — everybody','🙋 specific you — one person'], ok: 1 },
@@ -670,6 +792,7 @@ const WU_ITEMS = [
   { s1: '"Naoko, you are standing at your desk."', opts: ['🌐 general you — everybody','🙋 specific you — one person'], ok: 1 },
   { s1: '"You should eat breakfast every morning. It\'s healthy."', opts: ['🌐 general you — everybody','🙋 specific you — one person'], ok: 0 }
 ];
+__leeaBalance(WU_ITEMS, 'opts', 'ok');
 TAB_INIT[1] = function(){
   const host = document.getElementById('wu-list');
   host.innerHTML = WU_ITEMS.map((it,i)=>{
@@ -713,6 +836,7 @@ const RULE_ITEMS = [
   { q: '"Marc, where are you from?" — this you is:', opts: ['specific','general'], ok: 0 },
   { q: 'We often use the general you to:', opts: ['explain how to do something','name one friend','talk about yesterday'], ok: 0 }
 ];
+__leeaBalance(RULE_ITEMS, 'opts', 'ok');
 TAB_INIT[2] = function(){
   const host = document.getElementById('rule-list');
   host.innerHTML = RULE_ITEMS.map((it,i)=>{
@@ -756,6 +880,7 @@ const DET_ITEMS = [
   { bad: '"You cut meat with he."', opts: ['You cut meat with it.','You cut meat with them.'], ok: 0 },
   { bad: '"You color pictures with it." (about crayons)', opts: ['You color pictures with them.','You colors pictures with them.'], ok: 0 }
 ];
+__leeaBalance(DET_ITEMS, 'opts', 'ok');
 TAB_INIT[3] = function(){
   const host = document.getElementById('det-list');
   host.innerHTML = DET_ITEMS.map((it,i)=>{
@@ -913,6 +1038,7 @@ const PRAC_ITEMS = [
   { s: '⚽ "How ___ you use a soccer goal?" — You shoot the ball into it.', opts:['do','does'], ok:0 },
   { s: '🦇 "You ___ to be brave to be Batman." Which fits?', opts:['need','needs'], ok:0 }
 ];
+__leeaBalance(PRAC_ITEMS, 'opts', 'ok');
 TAB_INIT[6] = function(){
   const host = document.getElementById('prac-list');
   host.innerHTML = PRAC_ITEMS.map((it,i)=>{
@@ -1109,6 +1235,7 @@ const QUIZ_ITEMS = [
   { q:'We often use the general you to…', opts:['explain how to do something','name one friend','talk about last week'], ok:0 },
   { q:'⚽ "How do you use a soccer goal?"', opts:['You shoot the ball into it.','You cook food in it.'], ok:0 }
 ];
+__leeaBalance(QUIZ_ITEMS, 'opts', 'ok');
 let quizIdx = 0, quizScore = 0, quizAnswered = [];
 TAB_INIT[10] = function(){};
 TAB_RESET[10] = function(){
@@ -1184,6 +1311,7 @@ const DRIB_ITEMS = [
   { q: '👟 "Why do you need boots?" — "You ___ them to grip the grass."', opts:['use','uses'], ok:0 },
   { q: '🙋 "Leo, are you coming to the match?" This you is…', opts:['specific','general'], ok:0 }
 ];
+__leeaBalance(DRIB_ITEMS, 'opts', 'ok');
 let dribGoals = 0, dribIdx = 0;
 TAB_INIT[11] = function(){};
 TAB_RESET[11] = function(){

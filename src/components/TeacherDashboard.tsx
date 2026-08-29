@@ -51,6 +51,10 @@ const trainingGroundLearnerLessons = learnerLessons.filter((lesson) => lesson.co
 
 // Units that don't have any authored lesson yet fall back to the placeholder
 // spine above, positioned relative to the current-unit cursor Neritan sets.
+// The ✓ marks there are Neritan's own teaching record — the unit was taught
+// from the book — and never a claim that a deck or a Leo app exists for it.
+// The table says so out loud, because reading "✓ Taught" on eight rows with
+// nothing to open is what made an empty unit look like a broken one.
 
 type MockLessonStatus = "taught" | "todo" | "locked";
 
@@ -462,6 +466,10 @@ export function TeacherDashboard() {
           </div>
         ) : (
           <div className="teacher-table teacher-table-simple">
+            <p className="teacher-table-notice">
+              No lessons have been built for this unit yet. The rows below are the standard shape of an
+              Our World unit, and the status is your own teaching record — not material you can open here.
+            </p>
             <div className="teacher-table-head">
               <span>Lesson</span>
               <span>Status</span>
@@ -474,6 +482,7 @@ export function TeacherDashboard() {
                 <div className="teacher-table-row teacher-table-row-simple" key={label}>
                   <div className="teacher-table-lesson">
                     <h3>{label}</h3>
+                    <small className="teacher-table-nodeck">Not built yet — nothing to open</small>
                   </div>
                   <div className="teacher-table-teaching">
                     <span className={`status-pill ${statusClass}`}>{statusLabel}</span>

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 6 · Project · Posters to Help Sea Animals</title>
+<script src="/components/charts.js"></script>
+<script src="/components/sunshine.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+
+/* HEADER */
+.slide-header{height:64px;background:#0369A1;display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.65);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.2);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.ac{background:rgba(14,165,233,.4)}
+
+/* TWO-COLUMN VOCAB LAYOUT */
+.vocab-body{flex:1;display:flex;min-height:0}
+.word-panel{width:40%;padding:30px 34px;display:flex;flex-direction:column;border-right:2px solid #e5e7eb;background:#fff}
+.game-panel{width:60%;padding:22px 32px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;overflow:hidden}
+
+/* TAGS */
+.vtag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;width:fit-content}
+.vtag.v1{background:#E0F2FE;color:#075985}
+.vtag.ac{background:#FEF3C7;color:#B45309}
+.vtag.rel{background:#f3f4f6;color:#6b7280}
+
+/* WORD PANEL */
+.word-emoji{font-size:130px;line-height:1;margin-bottom:12px;cursor:pointer;transition:transform .25s}
+.word-emoji:active{transform:scale(1.15)}
+.word-main{font-size:70px;font-weight:800;color:#111;line-height:1.05;margin-bottom:8px}
+.word-ipa{font-size:21px;color:#6b7280}
+.word-syl{font-size:18px;color:#9ca3af;letter-spacing:1px}
+.word-pos{font-size:19px;color:#0369A1;font-weight:700;margin-bottom:14px}
+.word-def{font-size:21px;color:#374151;line-height:1.45;margin-bottom:8px}
+.word-jp{font-size:18px;color:#6b7280;line-height:1.45}
+.dad-say{background:#F0F9FF;border-left:4px solid #0369A1;padding:13px 16px;border-radius:0 12px 12px 0;font-size:18px;color:#374151;line-height:1.5;margin-top:auto}
+.dad-say b{color:#075985}
+.how-box{background:#fff;border:2px dashed #BAE6FD;border-radius:12px;padding:10px 16px;font-size:16px;color:#4b5563;line-height:1.5;width:100%}
+.how-box b{color:#075985}
+.how-box li{margin-left:18px}
+
+/* MINI-GAME SHELL (shared class names across LEEA vocab decks) */
+.mg-wrap{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;flex:1;min-height:0}
+.mg-head{font-size:20px;font-weight:700;color:#374151;text-align:center;background:#f9fafb;border:2px solid #e5e7eb;border-radius:12px;padding:10px 20px;width:100%;flex-shrink:0}
+.mg-head b{color:#075985}
+.mg-stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0;overflow:hidden}
+.mg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;width:100%}
+.mg-grid.c4{grid-template-columns:repeat(4,1fr)}
+.mg-grid.c3{grid-template-columns:repeat(3,1fr)}
+.mg-tile{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 6px;font-size:38px;cursor:pointer;transition:all .15s;text-align:center}
+.mg-tile:hover{transform:translateY(-3px);border-color:#0369A1}
+.mg-tile .mg-label{display:block;font-size:14px;font-weight:700;color:#4b5563;margin-top:4px;min-height:18px}
+.mg-tile.hit{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.mg-tile.miss{background:#fef2f2;border-color:#ef4444;animation:mgShake .3s ease}
+@keyframes mgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.mg-btn{background:#0369A1;color:#fff;border:none;border-radius:12px;padding:13px 30px;font-size:20px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.mg-btn:hover{background:#075985;transform:scale(1.04)}
+.mg-btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+.mg-opt{padding:12px 22px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:19px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left}
+.mg-opt:hover{border-color:#0369A1}
+.mg-opt.ok{background:#F0F9FF;border-color:#0369A1;color:#075985;pointer-events:none}
+.mg-opt.no{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+.mg-score{font-size:20px;font-weight:800;color:#075985;background:#E0F2FE;border-radius:20px;padding:6px 22px}
+.mg-miss{font-size:17px;font-weight:700;color:#ef4444;min-height:22px}
+.mg-win{background:#0369A1;color:#fff;border-radius:14px;padding:12px 24px;font-size:20px;font-weight:800;text-align:center;opacity:0;transform:translateY(10px);transition:all .35s;width:100%}
+.mg-win.show{opacity:1;transform:translateY(0)}
+.mg-source{font-size:14px;color:#9ca3af;font-weight:600;letter-spacing:.4px}
+.mg-bar{width:100%;height:22px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.mg-bar > div{height:100%;background:linear-gradient(90deg,#38BDF8,#0369A1);width:0%;transition:width .2s;border-radius:99px}
+.mg-track{position:relative;width:100%;height:96px;background:linear-gradient(180deg,#E0F2FE,#F0F9FF);border-radius:16px;overflow:hidden;border:2px solid #BAE6FD}
+.mg-runner{position:absolute;bottom:16px;font-size:46px;transition:left .25s}
+.mg-flag{position:absolute;bottom:14px;right:2%;font-size:40px}
+.mg-spin{display:inline-block;transition:transform .3s ease}
+.mg-flip{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.mg-flip:hover{border-color:#0369A1;transform:translateY(-3px)}
+.mg-flip.open{background:#F0F9FF;border-color:#0369A1;cursor:default}
+.mg-flip .mf-front{font-size:40px}
+.mg-flip .mf-back{display:none;font-size:15px;font-weight:700;color:#075985;line-height:1.35}
+.mg-flip.open .mf-back{display:block}
+.mg-pair{display:flex;gap:26px;width:100%;justify-content:center}
+.mg-col{display:flex;flex-direction:column;gap:10px;flex:1;max-width:340px}
+.mg-pbtn{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:17px;font-weight:700;color:#374151;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left;line-height:1.3}
+.mg-pbtn:hover{border-color:#0369A1}
+.mg-pbtn.sel{border-color:#0369A1;background:#F0F9FF}
+.mg-pbtn.done{border-color:#10b981;background:#ecfdf5;color:#047857;pointer-events:none}
+.mg-pbtn.bad{border-color:#ef4444;background:#fef2f2;animation:mgShake .3s}
+.mg-battery{width:220px;height:110px;border:6px solid #374151;border-radius:14px;position:relative;display:flex;align-items:center;padding:8px}
+.mg-battery::after{content:'';position:absolute;right:-20px;top:32px;width:16px;height:40px;background:#374151;border-radius:0 6px 6px 0}
+.mg-battery > div{height:100%;background:linear-gradient(90deg,#a3e635,#16a34a);border-radius:6px;width:0%;transition:width .2s}
+.mg-lamp{font-size:44px;filter:grayscale(1);opacity:.4;transition:all .25s}
+.mg-lamp.on{filter:none;opacity:1;transform:scale(1.1)}
+
+/* NAV BAR */
+#nav-bar{position:fixed;bottom:0;left:0;right:0;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px;transition:background .2s}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn.active,#fs-btn.active{background:rgba(124,58,237,.35)!important;color:#7DD3FC!important}
+#unit-label{color:#7DD3FC;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+
+/* TEACHER NOTES PANEL */
+#tn-panel{position:fixed;right:-460px;top:0;bottom:52px;width:440px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#7DD3FC;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-panel ul{padding-left:18px;margin-bottom:8px}
+#tn-panel .tn-lbl{color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+
+/* CONTENT SLIDES */
+.content-body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:18px;min-height:0;overflow:hidden}
+.slide-h1{font-size:40px;font-weight:800;color:#111}
+.slide-h2{font-size:25px;font-weight:600;color:#374151}
+.src-pill{display:inline-block;background:#f3f4f6;color:#6b7280;border-radius:20px;padding:6px 18px;font-size:15px;font-weight:700;letter-spacing:.4px;width:fit-content}
+
+/* READING */
+.reading-block{background:#fff;border-radius:16px;padding:26px 36px;font-size:23px;line-height:1.7;color:#1f2937;box-shadow:0 4px 16px rgba(0,0,0,.05);border-left:6px solid #0369A1}
+.reading-block b{color:#075985;font-weight:700}
+.tap-word{background:#E0F2FE;color:#075985;border:none;border-radius:6px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.tap-word.done{background:#0369A1;color:#fff}
+
+/* OBJECTIVES */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:10px}
+.obj-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;display:flex;align-items:flex-start;gap:16px}
+.obj-icon{font-size:34px;flex-shrink:0}
+.obj-text{font-size:19px;color:#374151;line-height:1.4;font-weight:500}
+.obj-text b{color:#0369A1}
+
+/* FORMATIVE ASSESSMENT */
+.assess-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px}
+.assess-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;cursor:pointer;transition:all .2s}
+.assess-card:hover{border-color:#0369A1}
+.assess-card.yes{border-color:#0369A1;background:#F0F9FF}
+.assess-q{font-size:19px;color:#374151;font-weight:600;margin-bottom:10px}
+
+/* BE THE EXPERT */
+.bte-header{background:#0369A1;color:#fff;border-radius:12px 12px 0 0;padding:13px 26px;font-size:19px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bte-body{background:#fff;border:2px solid #0369A1;border-radius:0 0 16px 16px;padding:24px;font-size:19px;color:#374151;line-height:1.6}
+.bte-body b{color:#075985}
+
+/* CHIPS / TASK CARDS */
+.chips-row{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:#E0F2FE;color:#075985;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.chip.used{background:#0369A1;color:#fff}
+.task-card{background:#fff;border-radius:16px;padding:20px 28px;border:2px solid #e5e7eb;font-size:21px;color:#374151;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card b{color:#0369A1}
+.q-item{background:#fff;border-radius:12px;padding:16px 22px;border:2px solid #e5e7eb;font-size:19px;color:#374151;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .2s}
+.q-item:hover{border-color:#0369A1}
+.q-item.done{border-color:#10b981;background:#ecfdf5}
+.q-num{background:#0369A1;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;margin-top:2px}
+.q-ans{max-height:0;overflow:hidden;transition:max-height .3s ease;color:#075985;font-weight:700}
+.q-item.done .q-ans{max-height:120px;margin-top:6px}
+
+/* DIALOGUE */
+.chat-row{display:flex;align-items:flex-end;gap:14px}
+.chat-row.right{flex-direction:row-reverse}
+.chat-ava{font-size:50px;line-height:1}
+.bub{max-width:62%;padding:18px 28px;border-radius:26px;font-size:26px;font-weight:600;line-height:1.35}
+.bub.q{background:#fff;border:2px solid #e5e7eb;border-bottom-left-radius:6px;color:#374151}
+.bub.a{background:#0369A1;color:#fff;border-bottom-right-radius:6px}
+
+/* LISTEN HERO */
+.listen-hero{background:linear-gradient(135deg,#0C4A6E,#0369A1);border-radius:20px;padding:24px 36px;display:flex;align-items:center;gap:28px;color:#fff}
+.listen-hero .lh-emoji{font-size:64px;line-height:1;animation:lhPulse 1.6s ease-in-out infinite}
+@keyframes lhPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.listen-hero .lh-text{font-size:25px;font-weight:700;flex:1}
+.listen-hero .lh-tr{background:rgba(255,255,255,.2);border-radius:20px;padding:9px 22px;font-size:21px;font-weight:800;white-space:nowrap}
+
+/* TITLE / GREAT JOB */
+.title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0C4A6E 0%,#0369A1 50%,#38BDF8 100%);color:#fff;gap:22px;padding:40px}
+.great-job-slide{background:linear-gradient(135deg,#0C4A6E,#0369A1,#38BDF8);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:18px;height:100%;padding:40px}
+
+/* MARK DONE */
+.done-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+.btn-done{background:#16A34A;color:#fff;border:none;border-radius:14px;padding:18px 46px;font-size:26px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-done:hover{background:#15803d}
+.btn-done.confirmed{background:#9ca3af;pointer-events:none}
+.btn-clear{background:#fff;color:#ef4444;border:2px solid #ef4444;border-radius:14px;padding:14px 30px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+#doneMsg{font-size:20px;color:#4b5563;font-weight:600;min-height:28px}
+
+/* VOCAB REVIEW */
+.vr-tabs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;flex-shrink:0}
+.vr-tab{padding:7px 14px;border:2px solid #e5e7eb;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s;white-space:nowrap}
+.vr-tab:hover{border-color:#0369A1;color:#0369A1}
+.vr-tab.active{background:#0369A1;color:#fff;border-color:#0369A1}
+.vr-tab.done{background:#E0F2FE;border-color:#0369A1;color:#075985}
+.vr-tab.done.active{background:#0369A1;color:#fff}
+.vr-body{flex:1;display:flex;min-height:0}
+.vr-left{width:26%;padding:18px;border-right:2px solid #e5e7eb;display:flex;flex-direction:column;gap:8px;background:#fafaf7}
+.vr-right{flex:1;padding:18px 24px;display:flex;flex-direction:column;gap:12px}
+.vr-emoji{font-size:80px;line-height:1}
+.vr-word{font-size:42px;font-weight:800;color:#111;line-height:1.1}
+.vr-ipa{font-size:16px;color:#6b7280}
+.vr-pos{font-size:15px;color:#0369A1;font-weight:700}
+.vr-mark{background:#0369A1;color:#fff;border:none;border-radius:10px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;margin-top:auto;transition:all .2s}
+.vr-mark.done{background:#9ca3af;cursor:not-allowed}
+
+/* MISSION / PROJECT */
+.flip-card{background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:20px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center}
+.flip-card:hover{border-color:#0369A1}
+.flip-card.open{border-color:#16A34A;background:#F0FDF4}
+.fc-emoji{font-size:46px;line-height:1}
+.fc-word{font-size:21px;font-weight:800;color:#075985;line-height:1.3}
+.fc-back{font-size:18px;color:#374151;line-height:1.5}
+.mbanner{background:linear-gradient(135deg,#0369A1,#0C4A6E);color:#fff;border-radius:20px;padding:30px 40px;display:flex;flex-direction:column;gap:8px}
+.mb-label{font-size:18px;font-weight:900;letter-spacing:4px;opacity:.8}
+.mb-text{font-size:48px;font-weight:900;line-height:1.15}
+.qcard{background:#F0F9FF;border:3px solid #BAE6FD;border-left:10px solid #0369A1;border-radius:18px;padding:26px 32px;display:flex;flex-direction:column;gap:10px}
+.qc-mark{font-size:64px;font-weight:900;color:#BAE6FD;line-height:.55}
+.qc-text{font-size:25px;font-weight:600;color:#374151;line-height:1.6}
+.qc-by{font-size:20px;font-weight:800;color:#075985}
+.bigq{background:#fff;border:3px solid #BAE6FD;border-radius:18px;padding:30px;font-size:38px;font-weight:900;color:#0f172a;text-align:center;line-height:1.25}
+.steps{display:flex;flex-direction:column;gap:14px;width:100%}
+.step{display:flex;gap:20px;align-items:center;background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:18px 26px;cursor:pointer;transition:all .18s}
+.step:hover{border-color:#0369A1}
+.step.on{border-color:#16A34A;background:#F0FDF4}
+.step-n{background:#0369A1;color:#fff;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;flex-shrink:0}
+.step-t{font-size:25px;font-weight:700;color:#374151}
+</style>
+
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+<div class="slide active" id="s1">
+  <div class="title-bg">
+    <div style="font-size:22px;font-weight:700;letter-spacing:3px;opacity:.75;text-transform:uppercase">Our World · Level 4 · Unit 6</div>
+    <div style="font-size:70px;font-weight:900;text-align:center;line-height:1.1">Make Posters to<br>Help Sea Animals</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;font-size:30px;font-weight:700">🖼️ Project — Student Book pp. 106–107</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:1300px">
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:20px">1. Research ways you can help sea animals.</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:20px">2. Make posters.</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:20px">3. Make cards to hand out.</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:20px">4. Invite people to a community clean-up.</span>
+      <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:10px 22px;font-size:20px">5. At your event, take photos for a school newspaper article.</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s2">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Project — Objectives</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 In This Lesson</div>
+    <div class="obj-grid">
+      <div class="obj-card"><div class="obj-icon">🔎</div><div class="obj-text"><b>Content:</b> Research real ways to help sea animals and choose three.</div></div>
+      <div class="obj-card"><div class="obj-icon">🖼️</div><div class="obj-text"><b>Content:</b> Design a poster with a title, one fact and one ask.</div></div>
+      <div class="obj-card"><div class="obj-icon">⚠️</div><div class="obj-text"><b>Language:</b> Write the ask with <b>must</b> and <b>can’t</b> (Grammar 1).</div></div>
+      <div class="obj-card"><div class="obj-icon">📅</div><div class="obj-text"><b>Language:</b> Write an invitation that answers <b>what</b>, <b>where</b> and <b>when</b>.</div></div>
+    </div>
+    <div class="task-card" style="margin-top:6px">📚 <b>Student Book pp. 106–107.</b> Steps 1–4 happen in this lesson and in Leo's app. Step 5 — the photos — happens on the day of the clean-up.</div>
+    <span class="src-pill">Lesson Planner · Unit 6 Project</span>
+  </div>
+</div>
+
+<div class="slide" id="s3">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">The Project</span><span class="hd-chip">SB pp. 106–107</span></div>
+  <div class="content-body" style="gap:20px">
+    <div class="mbanner">
+      <div class="mb-label">PROJECT</div>
+      <div class="mb-text">Make posters to help sea animals.</div>
+    </div>
+    <div class="slide-h2">Five steps, in order. Tap each one as you read it. Ticked: <b id="step-count" style="color:#075985">0 / 5</b></div>
+    <div class="steps" id="steps"></div>
+    <span class="src-pill">Student Book pp. 106–107 · steps 1–5 — verbatim</span>
+  </div>
+</div>
+
+<div class="slide" id="s4">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Step 1 — Research</span><span class="hd-chip">SB p. 106</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔎 Research ways you can help sea animals.</div>
+    <div class="slide-h2">Six real actions. Tap each card for the reason behind it — Leo picks three for his posters.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px;flex:1;min-height:0;overflow-y:auto" id="ways-grid"></div>
+    <span class="src-pill">Student Book p. 106 · Step 1 · reasons drawn from Unit 6 vocabulary and the Reading</span>
+  </div>
+</div>
+
+<div class="slide" id="s5">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Step 2 — Make Posters</span><span class="hd-chip">SB p. 106</span></div>
+  <div class="content-body" style="gap:18px">
+    <div class="slide-h1">🎨 Here is what a finished poster looks like.</div>
+    <div style="display:flex;gap:26px;flex:1;min-height:0;align-items:stretch">
+      <div style="flex:1;background:linear-gradient(160deg,#F0F9FF,#fff);border:3px solid #BAE6FD;border-radius:18px;padding:30px;display:flex;flex-direction:column;gap:18px;justify-content:center;text-align:center">
+        <div style="font-size:44px;font-weight:900;color:#0C4A6E;line-height:1.15">Save Our Sea Turtles!</div>
+        <div style="font-size:100px">🐢</div>
+        <div style="font-size:24px;font-weight:700;color:#374151;line-height:1.5">Sea turtles eat plastic bags because they look like jellyfish.</div>
+        <div style="font-size:28px;font-weight:900;color:#15803D">You must take your garbage home.</div>
+      </div>
+      <div style="width:40%;display:flex;flex-direction:column;gap:14px;justify-content:center">
+        <div class="task-card" style="font-size:20px">📏 <b>Readable from the far side of the room.</b> If Dad has to walk closer, the title is too small.</div>
+        <div class="task-card" style="font-size:20px">⏱️ <b>Five seconds.</b> That is how long a stranger looks. One fact, one ask — no paragraphs.</div>
+        <div class="task-card" style="font-size:20px">🖍️ <b>One picture, drawn big.</b> The animal you are asking people to save.</div>
+      </div>
+    </div>
+    <span class="src-pill">Student Book p. 106 · Step 2 Make posters · model poster built from Unit 6 content</span>
+  </div>
+</div>
+
+<div class="slide" id="s6">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Anatomy of a Poster</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🧩 Four parts. Tap each card.</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:10px;flex:1;min-height:0" id="poster-grid"></div>
+    <div class="how-box" style="font-size:20px"><b>The ask is grammar:</b> an obligation takes <b>must</b> or <b>have to</b>; a prohibition takes <b>can’t</b>. That is Grammar 1, doing real work.</div>
+    <span class="src-pill">Student Book p. 106 · Step 2 · language links to unit-6/grammar.json</span>
+  </div>
+</div>
+
+<div class="slide" id="s7">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Step 3 — Make Cards</span><span class="hd-chip">SB p. 106</span></div>
+  <div class="content-body" style="gap:18px">
+    <div class="slide-h1">🎟️ Make cards to hand out.</div>
+    <div style="display:flex;gap:26px;flex:1;min-height:0;align-items:center">
+      <div style="width:46%;background:#fff;border:3px dashed #BAE6FD;border-radius:16px;padding:26px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:26px;font-weight:900;color:#0C4A6E">🐢 Sea turtles can’t tell plastic from food.</div>
+        <div style="font-size:22px;font-weight:700;color:#15803D">You must take your garbage home.</div>
+        <div style="font-size:20px;color:#374151;line-height:1.5">Beach clean-up<br><b>Saturday, 10 a.m. · South Beach</b></div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px">
+        <div class="task-card" style="font-size:21px">✂️ <b>A card is a poster you can carry.</b> Same fact, same ask — smaller, and it goes home with the person.</div>
+        <div class="task-card" style="font-size:21px">🚶 <b>Written to be read while walking.</b> Short lines. No sentence longer than a breath.</div>
+        <div class="task-card" style="font-size:21px">📅 <b>Always put the clean-up details on it.</b> The card is how people find out where to come.</div>
+      </div>
+    </div>
+    <span class="src-pill">Student Book p. 106 · Step 3 Make cards to hand out</span>
+  </div>
+</div>
+
+<div class="slide" id="s8">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Step 4 — Invite People</span><span class="hd-chip">SB p. 107</span></div>
+  <div class="content-body" style="gap:18px">
+    <div class="slide-h1">🧹 Invite people to a community clean-up.</div>
+    <div class="slide-h2">An invitation that misses one of these three brings nobody.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:6px">
+      <div class="task-card" style="text-align:center"><div style="font-size:56px">❓</div><b style="font-size:26px">WHAT</b><br><span style="font-size:19px">A beach clean-up to help sea animals</span></div>
+      <div class="task-card" style="text-align:center"><div style="font-size:56px">📍</div><b style="font-size:26px">WHERE</b><br><span style="font-size:19px">Name the exact spot — "South Beach, by the car park"</span></div>
+      <div class="task-card" style="text-align:center"><div style="font-size:56px">🕙</div><b style="font-size:26px">WHEN</b><br><span style="font-size:19px">Day, date and time — and when it finishes</span></div>
+    </div>
+    <div class="how-box" style="font-size:20px"><b>Then add one line:</b> what people <b>must</b> bring. Gloves, a bag, a hat. "You must bring gloves" — Grammar 1 again.</div>
+    <span class="src-pill">Student Book p. 107 · Step 4 Invite people to a community clean-up</span>
+  </div>
+</div>
+
+<div class="slide" id="s9">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Step 5 — Photos</span><span class="hd-chip">SB p. 107</span></div>
+  <div class="content-body" style="justify-content:center;gap:24px">
+    <div style="font-size:90px;text-align:center">📸</div>
+    <div class="slide-h1" style="text-align:center">At your event, take photos for a school newspaper article.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;width:100%">
+      <div class="task-card" style="font-size:20px">📷 <b>Before and after.</b> The same spot, twice. That is the photo a newspaper prints.</div>
+      <div class="task-card" style="font-size:20px">👥 <b>People working.</b> Not posing — filling bags, carrying them, reading your poster.</div>
+      <div class="task-card" style="font-size:20px">🧮 <b>Count the bags.</b> A number in the caption turns a photo into news.</div>
+    </div>
+    <div class="how-box" style="font-size:20px"><b>Decide the photographer now,</b> before the day. Leo answers this in his app too — a job nobody was given is a job nobody does.</div>
+    <span class="src-pill">Student Book p. 107 · Step 5 — verbatim</span>
+  </div>
+</div>
+
+<div class="slide" id="s10">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Be the Expert — Five Seconds</span></div>
+  <div class="content-body" style="justify-content:center;gap:20px">
+    <div class="bte-header">The one idea to make stick</div>
+    <div class="bte-body" style="font-size:23px;line-height:1.7">
+      A child who has just read four pages about coral reefs wants to put all of it on the poster. That is exactly what kills a poster.<br><br>
+      A stranger walking past gives it <b>five seconds</b>. In five seconds you can land one title, one fact and one ask — and nothing more. Everything Leo cuts makes the poster stronger, not weaker.
+    </div>
+    <div class="how-box" style="font-size:20px"><b>Check it landed:</b> hold the draft up, count to five out loud, then take it away and ask "What do I have to do?" If Dad can’t say it, the poster is not finished.</div>
+    <span class="src-pill">Student Book p. 106 · Step 2</span>
+  </div>
+</div>
+
+<div class="slide" id="s11">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Discuss the Project</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💬 Ask each question. Tap to reveal the answer.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px;flex:1;min-height:0;overflow-y:auto" id="disc-grid"></div>
+    <span class="src-pill">Answers come from pp. 106–107 and the Unit 6 grammar</span>
+  </div>
+</div>
+
+<div class="slide" id="s12">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Think — Beyond the Project</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💭 Four questions with no single right answer.</div>
+    <div class="slide-h2">Write Leo's answers straight in.</div>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-top:10px" id="think-rows"></div>
+    <span class="src-pill">Links the Project back to the Mission, the Reading and Grammar 1 and 2</span>
+  </div>
+</div>
+
+<div class="slide" id="s13">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✔️ Can Leo…</div>
+    <div class="assess-grid" id="assess-grid"></div>
+    <div class="task-card" style="margin-top:8px">📓 <b>Homework:</b> Leo's Project app (6 modules) — it walks him through steps 1 to 4 and saves his poster, his card and his invitation.</div>
+  </div>
+</div>
+
+<div class="slide" id="s14">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Finish the Lesson</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:24px">
+    <div style="font-size:90px">✅</div>
+    <div class="slide-h1" style="text-align:center">Unit 6 · Project — taught</div>
+    <div class="slide-h2" style="text-align:center;max-width:1000px">Marking this done records it on the teacher dashboard. The project itself keeps going — set a real date for the clean-up.</div>
+    <div class="done-wrap">
+      <button class="btn-done" id="doneBtn" onclick="markDone()">✅ Mark this lesson done</button>
+      <button class="btn-clear" id="redoBtn" onclick="handleRedo()">↺ Clear saved progress</button>
+      <div id="doneMsg"></div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s15">
+  <div class="slide-header"><span class="hd-unit">Unit 6</span><span class="hd-sep">·</span><span class="hd-section">Recap</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:26px">
+    <div class="slide-h1" style="text-align:center">🔁 Five steps, in order — go.</div>
+    <div style="display:grid;grid-template-columns:repeat(1,1fr);gap:14px;width:78%">
+      <div class="task-card" style="font-size:22px"><b>1.</b> Research ways you can help sea animals.</div>
+      <div class="task-card" style="font-size:22px"><b>2.</b> Make posters.</div>
+      <div class="task-card" style="font-size:22px"><b>3.</b> Make cards to hand out.</div>
+      <div class="task-card" style="font-size:22px"><b>4.</b> Invite people to a community clean-up.</div>
+      <div class="task-card" style="font-size:22px"><b>5.</b> At your event, take photos for a school newspaper article.</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s16">
+  <div class="great-job-slide">
+    <div style="font-size:96px">🏆</div>
+    <div style="font-size:62px;font-weight:900;text-align:center">Unit 6 Complete, Leo!</div>
+    <div style="font-size:26px;opacity:.92;text-align:center;max-width:1100px">You know what lives down there, what is hurting it, and what to say to make people help. Now go and put the posters up. 🌊🖼️</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:1200px">
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">1. Research ways you can help sea animals.</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">2. Make posters.</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">3. Make cards to hand out.</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">4. Invite people to a community clean-up.</span>
+      <span class="chip" style="background:rgba(255,255,255,.25);color:#fff">5. At your event, take photos for a school newspaper article.</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
+
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 16</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="fs-btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+  <span id="unit-label">Unit 6 · Project</span>
+</div>
+
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+<script>
+/* =========================================================
+   LEEA · Our World Level 4 · Unit 6 · Reading
+   "Colorful Corals" — 17 slides, 1920x1080, ocean blue
+   Every lyric is verbatim from TR 6.3 (Student Book p. 102).
+   ========================================================= */
+
+// ─── MARK DONE STORAGE ─────────────────────────────────────────
+var SAVE_PREFIX = 'leea.l4.u6.project-';
+var HOMEWORK_ID = 'l-4-6-project';
+/* Must match the `id` in lessons/reading.teacher.json — the teacher dashboard
+   reads leea.lessonProgress.v1 keyed by that lesson id. */
+var LESSON_ID = 'ow-l4-u6-project';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+var LESSON_NAME = "Unit 6 · Project — Make posters to help sea animals";
+
+function lSave(key, value) {
+  try {
+    var k = SAVE_PREFIX + key;
+    window.localStorage.setItem(k, JSON.stringify(value));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, value);
+    }
+  } catch (e) {}
+}
+function lLoad(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(SAVE_PREFIX + key);
+    return raw === null || raw === undefined ? fallback : JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function writeLessonProgress() {
+  try {
+    var store = {};
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (raw) store = JSON.parse(raw) || {};
+    var now = new Date().toISOString();
+    store[LESSON_ID] = { lessonId: LESSON_ID, teacherId: 'neritan', studentId: 'leo',
+                         status: 'done', completedAt: now, updatedAt: now };
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function clearLessonProgress() {
+  try {
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function markDone() {
+  writeLessonProgress();
+  lSave('complete', { name: LESSON_NAME, timestamp: new Date().toISOString(), done: true });
+  lSave('done', true);
+  var btn = document.getElementById('doneBtn');
+  if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+  var msg = document.getElementById('doneMsg');
+  if (msg) msg.textContent = "Saved. Project launched. 🖼️";
+}
+var redoArmed = false, redoTimer = null;
+function handleRedo() {
+  var btn = document.getElementById('redoBtn');
+  var msg = document.getElementById('doneMsg');
+  if (!redoArmed) {
+    redoArmed = true;
+    btn.textContent = '↺ Tap again to clear';
+    if (msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+    if (redoTimer) window.clearTimeout(redoTimer);
+    redoTimer = window.setTimeout(function () {
+      redoArmed = false;
+      btn.textContent = '↺ Clear saved progress';
+      if (msg) msg.textContent = '';
+    }, 3000);
+    return;
+  }
+  redoArmed = false;
+  if (redoTimer) window.clearTimeout(redoTimer);
+  btn.textContent = '↺ Clear saved progress';
+  clearLessonProgress();
+  lSave('complete', null);
+  lSave('done', null);
+  var d = document.getElementById('doneBtn');
+  if (d) { d.classList.remove('confirmed'); d.textContent = '✅ Mark this lesson done'; }
+  if (msg) msg.textContent = 'Cleared.';
+}
+function restoreDoneState() {
+  var c = lLoad('complete', null);
+  if (c && c.done) {
+    var btn = document.getElementById('doneBtn');
+    if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+    var msg = document.getElementById('doneMsg');
+    if (msg) msg.textContent = 'Already marked done.';
+  }
+}
+
+// ─── DATA (injected) ───────────────────────────────────────────
+var CHIPS   = {
+ "ways-grid": [
+  [
+   "🗑️",
+   "Pick up garbage",
+   "Beach garbage goes straight into the water. This is the action every child can actually do."
+  ],
+  [
+   "🥤",
+   "Use less plastic",
+   "A sea turtle can’t tell a plastic bag from a jellyfish. Less plastic bought means less plastic in the sea."
+  ],
+  [
+   "🎣",
+   "Leave no fishing line",
+   "Line and net tangle around flippers and fins. The Unit 6 word for the bigger problem is <b>overfishing</b>."
+  ],
+  [
+   "🔘",
+   "Cut pop-top rings",
+   "<b>pop-top</b> is a Unit 6 word. Cut the ring before you bin it and nothing gets its head stuck."
+  ],
+  [
+   "🛢️",
+   "Keep oil out of drains",
+   "A drain runs to the sea. This is a small <b>oil spill</b> — the same words, a smaller scale."
+  ],
+  [
+   "📣",
+   "Tell other people",
+   "One poster reaches more people than one clean pair of hands. That is the whole point of this project."
+  ]
+ ],
+ "poster-grid": [
+  [
+   "🔠",
+   "A big title",
+   "Six words or fewer, readable from across a room: \"Save Our Sea Turtles!\""
+  ],
+  [
+   "💡",
+   "One fact",
+   "Just one, and make it the surprising one: \"Sea turtles eat plastic bags because they look like jellyfish.\""
+  ],
+  [
+   "👉",
+   "One ask",
+   "What you want people to DO — use <b>must</b> or <b>can’t</b>: \"You must take your garbage home.\""
+  ],
+  [
+   "🎨",
+   "One picture",
+   "A poster with no picture does not get looked at. One animal, drawn big."
+  ]
+ ]
+};
+var STEPS   = [
+ "Research ways you can help sea animals.",
+ "Make posters.",
+ "Make cards to hand out.",
+ "Invite people to a community clean-up.",
+ "At your event, take photos for a school newspaper article."
+];
+var DISCUSS = [
+ [
+  "What is our project?",
+  "Make posters to help sea animals."
+ ],
+ [
+  "What is step 1?",
+  "Research ways you can help sea animals."
+ ],
+ [
+  "Why research <i>before</i> making the poster?",
+  "Because a poster with no real fact on it convinces nobody."
+ ],
+ [
+  "What are the three things every poster needs?",
+  "A big title, one fact, and one clear ask (plus a picture)."
+ ],
+ [
+  "What is the difference between a poster and a card?",
+  "A poster stays on a wall; a card is small and you hand it to someone to take away."
+ ],
+ [
+  "What three things must an invitation tell people?",
+  "What is happening, where it is, and when it is."
+ ],
+ [
+  "What is step 5?",
+  "At your event, take photos for a school newspaper article."
+ ],
+ [
+  "Which grammar do you use for the ask on your poster?",
+  "<b>must</b> for an obligation and <b>can’t</b> for a prohibition — Grammar 1."
+ ]
+];
+var THINK   = [
+ "Which of the five steps will be the hardest? Why?",
+ "Who exactly are your posters for — children, shoppers, fishermen? Your words change depending on the answer.",
+ "Your poster has room for <b>one</b> fact. Which fact from Unit 6 would change someone's mind?",
+ "If ten people come to the clean-up, what will be different afterwards? Answer with <b>will</b>."
+];
+var ASSESS  = [
+ "…name all five project steps in order?",
+ "…name three real ways to help sea animals, with a reason for each?",
+ "…write a poster ask using <b>must</b> or <b>can’t</b>?",
+ "…write an invitation that says what, where and when?"
+];
+var NOTES   = {
+ "1": "<p class=\"tn-lbl\">Title</p><p>Unit 6 Project, Student Book pp. 106–107. \"Make posters to help sea animals.\" This is the unit's output — plan it as real work, with a real date.</p>",
+ "2": "<p class=\"tn-lbl\">Objectives</p><p>Read all four aloud. The project runs past this lesson: today is steps 1–4, the clean-up and photos happen on the day.</p>",
+ "3": "<p class=\"tn-lbl\">The Five Steps</p><p>All five verbatim from pp. 106–107. Tap each step as you read it. Do not let Leo jump to step 2 — the research is what makes the poster true.</p>",
+ "4": "<p class=\"tn-lbl\">Step 1 · Research</p><p>Six real actions, each with the reason behind it. Leo picks at least three for his posters; he does the same choosing in his app.</p>",
+ "5": "<p class=\"tn-lbl\">Step 2 · Make posters</p><p>Show the model poster first, then take it away. A poster is not an essay — if it takes longer than five seconds to read, it fails.</p>",
+ "6": "<p class=\"tn-lbl\">Anatomy of a Poster</p><p>Title, one fact, one ask, one picture. Tap each card. The ask is where Grammar 1 comes back: <b>must</b> and <b>can’t</b>.</p>",
+ "7": "<p class=\"tn-lbl\">Step 3 · Cards</p><p>The card is the poster made portable. Everything on it has to survive being read while walking.</p>",
+ "8": "<p class=\"tn-lbl\">Step 4 · Invite people</p><p>What, where, when — an invitation missing any one of the three brings nobody. Agree a real date if you can.</p>",
+ "9": "<p class=\"tn-lbl\">Step 5 · Photos</p><p>Decide now who takes the photos. A \"before and after\" pair of the same spot is the shot the newspaper prints.</p>",
+ "10": "<p class=\"tn-lbl\">Be the Expert</p><p>The idea to make stick: a poster persuades a stranger in five seconds. Fewer words, bigger words, one ask.</p>",
+ "11": "<p class=\"tn-lbl\">Discuss</p><p>Eight questions. Ask before revealing. Questions 4 and 6 are the ones that make the posters good.</p>",
+ "12": "<p class=\"tn-lbl\">Think</p><p>No right answers. Question 2 — who the posters are for — usually changes the whole design.</p>",
+ "13": "<p class=\"tn-lbl\">Formative Assessment</p><p>Tap each card once Leo can do it. Then set his Project app (6 modules) — it walks steps 1 to 4.</p>",
+ "14": "<p class=\"tn-lbl\">Mark Done</p><p>Records this lesson on the teacher dashboard. The project itself continues outside the deck.</p>",
+ "15": "<p class=\"tn-lbl\">Recap</p><p>Five steps in order. If he can list them, he can run the project.</p>",
+ "16": "<p class=\"tn-lbl\">Great Job!</p><p>Celebrate — this is the end of Unit 6. Then set the date for the clean-up.</p>"
+};
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+var TOTAL = 16;
+var cur = 1;
+function goTo(n) {
+  n = Math.max(1, Math.min(TOTAL, n));
+  var old = document.getElementById('s' + cur);
+  if (old) old.classList.remove('active');
+  cur = n;
+  var next = document.getElementById('s' + cur);
+  if (next) next.classList.add('active');
+  document.getElementById('slide-counter').textContent = cur + ' / ' + TOTAL;
+  document.getElementById('tn-content').innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
+  if (SLIDE_INIT[cur]) SLIDE_INIT[cur]();
+}
+document.addEventListener('keydown', function (e) {
+  if (e.target && (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+var notesOpen = false;
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('notes-btn').classList.toggle('active', notesOpen);
+  scale();
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange', function () {
+  var btn = document.getElementById('fs-btn');
+  var active = !!document.fullscreenElement;
+  btn.textContent = active ? '⛶ Exit Full (F)' : '⛶ Fullscreen (F)';
+  btn.classList.toggle('active', active);
+  scale();
+});
+function scale() {
+  var s = document.getElementById('scaler');
+  var availW = window.innerWidth - (notesOpen ? 440 : 0);
+  var availH = window.innerHeight - 52;
+  var r = Math.min(availW / 1920, availH / 1080);
+  s.style.transform = 'scale(' + r + ')';
+  s.style.left = ((availW - 1920 * r) / 2) + 'px';
+  s.style.top = ((availH - 1080 * r) / 2) + 'px';
+  s.style.position = 'fixed';
+}
+window.addEventListener('resize', scale);
+
+// ─── GENERIC SLIDE BUILDERS ────────────────────────────────────
+/* Chip strips: each entry is [gridId, [[emoji, text, note], …]]. */
+function initChips() {
+  Object.keys(CHIPS).forEach(function (gid) {
+    var grid = document.getElementById(gid);
+    if (!grid || grid.dataset.built) return;
+    grid.dataset.built = '1';
+    CHIPS[gid].forEach(function (c) {
+      var card = document.createElement('div');
+      card.className = 'flip-card';
+      card.innerHTML = '<div class="fc-emoji">' + c[0] + '</div><div class="fc-word">' + c[1] + '</div>' +
+                       '<div class="fc-back" style="display:none">' + c[2] + '</div>';
+      card.onclick = function () {
+        card.classList.toggle('open');
+        var b = card.querySelector('.fc-back');
+        b.style.display = card.classList.contains('open') ? 'block' : 'none';
+      };
+      grid.appendChild(card);
+    });
+  });
+}
+function initSteps() {
+  var host = document.getElementById('steps');
+  if (!host || host.dataset.built) return;
+  host.dataset.built = '1';
+  var ticked = 0;
+  STEPS.forEach(function (t, i) {
+    var row = document.createElement('div');
+    row.className = 'step';
+    row.innerHTML = '<div class="step-n">' + (i + 1) + '</div><div class="step-t">' + t + '</div>';
+    row.onclick = function () {
+      if (row.classList.contains('on')) return;
+      row.classList.add('on');
+      ticked++;
+      document.getElementById('step-count').textContent = ticked + ' / ' + STEPS.length;
+    };
+    host.appendChild(row);
+  });
+}
+function initDiscuss() {
+  var grid = document.getElementById('disc-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  DISCUSS.forEach(function (d, i) {
+    var item = document.createElement('div');
+    item.className = 'q-item';
+    item.innerHTML = '<div class="q-num">' + (i + 1) + '</div><div><div>' + d[0] + '</div><div class="q-ans">→ ' + d[1] + '</div></div>';
+    item.onclick = function () { item.classList.add('done'); };
+    grid.appendChild(item);
+  });
+}
+var thinkText = lLoad('think', {}) || {};
+function initThink() {
+  var rows = document.getElementById('think-rows');
+  if (!rows || rows.dataset.built) return;
+  rows.dataset.built = '1';
+  THINK.forEach(function (t, i) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;flex-direction:column;gap:8px';
+    var q = document.createElement('div');
+    q.style.cssText = 'font-size:21px;font-weight:600;color:#374151';
+    q.innerHTML = t;
+    var inp = document.createElement('input');
+    inp.placeholder = "Write Leo's answer…";
+    inp.value = thinkText[i] || '';
+    inp.style.cssText = 'font-family:Outfit,sans-serif;font-size:21px;padding:12px 18px;border:2px solid #BAE6FD;border-radius:12px';
+    inp.oninput = function () { thinkText[i] = inp.value; lSave('think', thinkText); };
+    row.appendChild(q); row.appendChild(inp);
+    rows.appendChild(row);
+  });
+}
+function initAssess() {
+  var grid = document.getElementById('assess-grid');
+  if (!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  ASSESS.forEach(function (t) {
+    var card = document.createElement('div');
+    card.className = 'assess-card';
+    card.innerHTML = '<div class="assess-q">' + t + '</div><div style="font-size:15px;color:#6b7280">Tap when Leo can do it.</div>';
+    card.onclick = function () { card.classList.toggle('yes'); };
+    grid.appendChild(card);
+  });
+}
+/* Every slide gets initChips; the id lookup makes it a no-op where unused. */
+var SLIDE_INIT = { 3: initSteps, 4: initChips, 6: initChips, 11: initDiscuss, 12: initThink, 13: initAssess, 14: restoreDoneState };
+
+// ─── BOOT ──────────────────────────────────────────────────────
+scale();
+goTo(1);
+restoreDoneState();
+
+</script>
+</body>
+</html>

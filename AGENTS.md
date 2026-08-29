@@ -42,14 +42,62 @@ LEEA
   - 中1数学ヘルパー (新編 新しい数学1) — see `docs/math-interactivity.md`
 - Geography (社会) — interactive maps, 地理 and 歴史
 - Science
-  - planned later
+  - 中1理科ヘルパー (新編 新しい科学1) — see `### Science` below
 ```
 
 ### Subjects other than English
 
-**English is the only taught subject.** It has teacher decks, an assignment loop, a reference layer and a course spine because Neritan teaches it. Every other subject — Math, Geography, Science later — exists to *support Leo working on his own*.
+**English is the only taught subject.** It has teacher decks, an assignment loop, a reference layer and a course spine because Neritan teaches it. Every other subject — Math, Geography, Science — exists to *support Leo working on his own*.
 
 So do not mirror the English structure into them. No teacher slides, no assign/review loop, no 章/節 navigation built to match Our World's course/level/unit. Give each one the smallest shape that lets Leo get to the thing and use it. Geography learned this the hard way: it shipped with a full 11-chapter 社会 spine, chapter pages and a 分野 switch, and all of it was scaffolding around three maps.
+
+### Science
+
+新編 新しい科学1 (東京書籍, 中1). Leo-solo like Math and Geography: no teacher
+decks, no assign/review loop.
+
+- `content/subjects/science/curriculum.ts` — the 単元 / 章 / 節 spine, all 4 単元
+  and 13 章 registered. Only ids in `AUTHORED_SECTION_IDS` have a JSON file
+  behind them; everything else renders a 準備中 card. **Built so far: 単元1
+  第1章 生物の観察と分類のしかた (p.10–26), complete.**
+- `content/subjects/science/sections/<sectionId>.json` — one file per 節.
+- `/science` is the book spine; `/science/<chapterId>/<sectionId>` opens a 節.
+- Progress is `src/data/scienceProgress.ts`, local-first and Supabase-shaped in
+  the `science_block_progress` table, keyed section + block.
+
+**Page ranges outside 単元1 第1章 are unverified.** They were derived from the
+publisher's QR index, anchor to anchor, not read off printed folios. Check them
+against the scan when each chapter's arrives, and fix the table in
+`docs/lesson-plans/science/new-science-1/README.md` at the same time.
+
+**Its block vocabulary is smaller than math's, on purpose.** 理科 reuses the
+subject-neutral shapes (intro, goal, q, recall, quickcheck, reflect) and adds
+its own — `procedure` (観察/実験/実習), `technique` (基礎操作), `term` (ことば),
+`field` (図鑑). It does **not** copy math's 52-member widget union: the whole
+book has 16 hands-on moments, so `ScienceInteractiveWidget` grows one entry at a
+time as chapters are authored.
+
+**What must be a widget.** Golden rule 12 applies here through the publisher's
+own tags: the 9 シミュレーション *and* the 7 思考ツール, all inventoried with
+their pages in `docs/lesson-plans/science/new-science-1/README.md`. The 思考ツール
+count because they are all sorting/classification — manipulation, not reading.
+Two of the シミュレーション (世界の活火山・震源の分布, p.204 and p.212) are world
+maps: build them on Geography's `public/components/world-map.js`, not from
+scratch.
+
+**Progress never downgrades**, the same rule as Geography: a solved widget stays
+solved and the best score is kept, so replaying it and slipping cannot take the
+tick away. A plain tick stays a free toggle — unticking a 観察 must work. The
+merge lives in `saveScienceBlockProgress`, and `SectionView` applies the same
+merge to its own state, or a replay would visibly lose the tick until reload.
+
+**Publisher links.** The portal is `https://sw121.tsho.jp/07jk/r/1/` — the same
+`/07jk/` scheme as math's digital companion (`sw111…/m/1/`, `m` 数学 / `r` 理科),
+so `content/subjects/math/digitalCompanion.ts` is the shape to copy. No science
+link has actually been opened yet: the domain is blocked by the environment's
+egress proxy, so `qr-index.json` holds every `url` at `null`. **Do not
+extrapolate a URL from the math pattern or from an item number** — same rule as
+Geography's `sourceLabel`: set it from something real, or leave it empty.
 
 ### Geography
 

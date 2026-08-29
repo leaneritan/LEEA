@@ -159,42 +159,65 @@ will find — it is **not** a licence to generate the table from it.
 Run this in a browser that can reach the portal (Claude in Chrome, or by hand),
 then bring the output back and import it.
 
+**How the portal is laid out**, from a screenshot of it: a left sidebar picks
+the 単元 at the top, and below it lists that 単元's sections — 学習前, 第1章 …,
+単元末. Picking one fills the right-hand panel with that section's rows, each
+showing a page badge (`10ページ`), the item's title, and an icon for its kind.
+**The rows carry no item numbers**, so `no` will be empty in the capture; that
+is expected and fine — the importer keys on page + title instead, which it has
+to anyway, since 「Before & After シート」 appears 17 times in this book and
+「学んだことをチェックしよう」 13 times.
+
 **Prompt to paste into Claude in Chrome**, with the portal open:
 
 > Open https://sw121.tsho.jp/07jk/r/1/ — the QR content list for 新編 新しい科学1
-> (東京書籍, 令和7年度版). Walk every content item on the page, in order.
+> (東京書籍, 令和7年度版).
 >
-> Output **TSV only**, no prose, with exactly this header row (tab-separated):
+> Using the left sidebar, go through every 単元 (1–4) and, inside each, every
+> section listed (学習前, each 第N章, 単元末), plus 巻末資料 and any
+> 教科共通コンテンツ. For each one, record every row shown in the right panel.
 >
-> `no  unit  chapter  page  title  kind  url`
+> Output **TSV only**, no prose, with exactly this tab-separated header:
 >
-> One row per item:
-> - `no` — the item's number if the page shows one, otherwise leave empty
-> - `unit` — the 単元 number (1–4), or empty for 教科共通コンテンツ / 巻末資料
-> - `chapter` — the 章 number, or `学習前` / `単元末` / `巻末資料`
-> - `page` — the ページ number, digits only
-> - `title` — the title exactly as printed, no rewording
+> `no  unit  chapter  page  title  kind  url  chapter_url`
+>
+> - `no` — leave empty; the portal does not number the rows
+> - `unit` — the 単元 number (1–4), empty for 教科共通コンテンツ / 巻末資料
+> - `chapter` — exactly as the sidebar labels it: `学習前`, `第1章`, `単元末`, …
+> - `page` — the page badge, e.g. `10ページ` (digits alone are fine too)
+> - `title` — the row's title exactly as shown, no rewording
 > - `kind` — 動画 / シミュレーション / 思考ツール / ワークシート / 資料 / 練習 /
->   他教科リンク / Webページ
-> - `url` — the item's actual link, copied from the page's own href or from the
->   address bar after opening it
+>   他教科リンク / Webページ, from the row's icon if it is not written out
+> - `url` — the row's own link, **only if it has one**: an `href` on the row, or
+>   the address bar after opening that row
+> - `chapter_url` — the address bar while that 単元/章 is selected in the sidebar
 >
-> **If you cannot see a real link for an item, leave `url` empty.** Do not
-> construct, guess, or pattern-match a URL from other rows — an empty cell is
-> correct and useful; an invented one is not. Do not drop rows either: an item
-> with no link should still appear, with its other fields filled in.
+> Many rows may open a viewer without giving the row its own address. That is
+> expected: leave `url` empty for those and still fill in `chapter_url`.
+>
+> **Never construct, guess, or pattern-match a URL.** Do not derive one row's
+> link from another's, and do not build one from the page number. An empty cell
+> is correct and useful; an invented one is worse than nothing, because it
+> becomes a dead link in front of a student. Do not drop rows either — a row
+> with no link should still appear with its other fields filled in.
 
 Save the reply as a `.tsv` (or a JSON array of the same fields) and run:
 
 ```sh
-node scripts/import-science-qr-links.mjs <capture-file> --dry-run   # inspect
-node scripts/import-science-qr-links.mjs <capture-file>             # write
+npm run import:science-links -- capture.tsv --dry-run   # inspect
+npm run import:science-links -- capture.tsv             # write
 ```
 
+Per-row links go into each item's `url`; `chapter_url` values are collected
+separately into the index's `chapters` map, keyed `<unit>/<章>`. Both are worth
+having: math's `digitalCompanion.ts` is itself only page-to-章-anchor, so
+section-level links are enough to build the same thing for 理科, and per-row
+links are a bonus if the portal exposes them.
+
 The importer treats this index as the authority and the capture as a claim. It
-only ever writes `url`, and it refuses a row whose page, title or 単元 disagrees
-with what is recorded here, whose link is off the publisher's domain, or that
-matches no item — reporting each one instead of writing it. It exits non-zero
-when anything mismatched, so a disagreement gets looked at rather than
-committed. Partial captures are fine and the script can be run repeatedly;
+only ever writes `url` and `chapters`, and it refuses a row whose page, title or
+単元 disagrees with what is recorded here, whose link is off the publisher's
+domain, or that matches no item — reporting each one instead of writing it. It
+exits non-zero when anything mismatched, so a disagreement gets looked at rather
+than committed. Partial captures are fine and the script can be run repeatedly;
 `urlsResolved` flips to `true` only once all 166 items have a link.

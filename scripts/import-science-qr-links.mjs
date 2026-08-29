@@ -16,9 +16,15 @@
  *   node scripts/import-science-qr-links.mjs <capture-file> [--dry-run]
  *
  * The capture file is either JSON (an array of objects) or TSV with a header
- * row. Recognised fields: no, unit, chapter, page, title, kind, url.
+ * row. Recognised fields: no, unit, chapter, page, title, kind, url, chapter_url.
  * Only `url` plus enough to identify the row (`no`, or `page` + `title`) is
  * required.
+ *
+ * `chapter_url` is collected separately, into the index's `chapters` map. The
+ * portal navigates by 単元 → 章 in a sidebar, so a 章 may have its own address
+ * while individual rows open a viewer with no distinct URL of their own — which
+ * is also all math's `digitalCompanion.ts` has. Capturing both means whichever
+ * granularity actually exists is recorded, and neither is invented.
  */
 
 import fs from "node:fs";
@@ -99,10 +105,45 @@ for (const item of index.items) {
 }
 
 const captured = parseCapture(capturePath);
-const report = { applied: [], unchanged: [], skipped: [], mismatched: [] };
+const report = { applied: [], unchanged: [], skipped: [], mismatched: [], chapters: 0 };
+
+index.chapters ??= {};
+
+/** 単元 + 章 as the portal names them, e.g. "1/第1章" or "1/学習前". */
+function chapterKey(row) {
+  const unit = String(row.unit ?? "").replace(/\D/g, "");
+  const chapter = String(row.chapter ?? "").trim();
+  return unit && chapter ? `${unit}/${chapter}` : null;
+}
+
+for (const row of captured) {
+  const raw = row.chapter_url ?? row.chapterurl ?? row.chapterUrl ?? "";
+  if (!String(raw).trim()) continue;
+  const key = chapterKey(row);
+  if (!key) continue;
+  const check = validateUrl(raw);
+  if (!check.ok) {
+    report.skipped.push({ label: `chapter ${key}`, reason: check.reason });
+    continue;
+  }
+  if (index.chapters[key] && index.chapters[key] !== check.url) {
+    report.mismatched.push({
+      label: `chapter ${key}`,
+      no: "-",
+      problems: [`chapter url already set to ${index.chapters[key]}, capture says ${check.url}`]
+    });
+    continue;
+  }
+  if (index.chapters[key] !== check.url) {
+    index.chapters[key] = check.url;
+    report.chapters += 1;
+  }
+}
 
 for (const row of captured) {
   const rawUrl = row.url ?? row.link ?? row.href ?? "";
+  // A row that only carried a chapter url is not a per-item failure.
+  if (!String(rawUrl).trim() && String(row.chapter_url ?? row.chapterurl ?? "").trim()) continue;
   const label = `${row.no ? `#${row.no} ` : ""}${row.title ?? "(no title)"}`;
 
   if (!String(rawUrl).trim()) {
@@ -173,6 +214,7 @@ console.log(`urls applied      : ${report.applied.length}`);
 console.log(`already correct   : ${report.unchanged.length}`);
 console.log(`skipped           : ${report.skipped.length}`);
 console.log(`mismatched        : ${report.mismatched.length}`);
+console.log(`chapter urls added: ${report.chapters}`);
 console.log(`resolved overall  : ${resolved} / ${index.items.length}`);
 
 for (const entry of report.skipped) {
@@ -185,7 +227,7 @@ for (const entry of report.mismatched) {
 
 if (dryRun) {
   console.log("\n--dry-run: nothing written.");
-} else if (report.applied.length) {
+} else if (report.applied.length || report.chapters) {
   fs.writeFileSync(INDEX_PATH, `${JSON.stringify(index, null, 2)}\n`, "utf-8");
   console.log(`\nWrote ${path.basename(INDEX_PATH)}.`);
 } else {

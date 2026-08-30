@@ -566,6 +566,11 @@ npm run audio:assessment -- --from ~/Downloads/ExamViewAudio
 npm run audio:assessment -- --check
 ```
 
+The level comes from the filenames (`ow2e_ev4_ame_…`), and a level with no
+manifest gets one drafted from them, summarised per unit for checking. Levels
+are found by scanning `content/subjects/english/courses`, by both the validator
+and the generator, so a new level's manifest needs no registering anywhere.
+
 Audio is committed as ordinary files, not Git LFS. Keep each track under 25MB
 (64 kbps mono is about 0.5MB/minute and is plenty for speech). If the library
 outgrows the repo, move the files to Supabase Storage and repoint `basePath` —

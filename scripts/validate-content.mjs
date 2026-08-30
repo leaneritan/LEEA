@@ -621,13 +621,25 @@ for (const [id, entry] of registeredLessons) {
 // internally consistent and that every path it claims sits under the level's
 // basePath in the folder its placement implies — otherwise the unit page would
 // point a player at a URL nothing will ever be filed to.
-const assessmentAudioPaths = ["content/subjects/english/courses/our-world/level-4/assessment-audio.json"];
+function findAssessmentAudioManifests(dir, results = []) {
+  if (!fs.existsSync(dir)) return results;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) findAssessmentAudioManifests(fullPath, results);
+    else if (entry.isFile() && entry.name === "assessment-audio.json") {
+      results.push(path.relative(root, fullPath));
+    }
+  }
+  return results;
+}
+
+// Found by scanning, not listed, so a new level's manifest is checked the
+// moment it lands rather than whenever someone remembers to register it.
+const assessmentAudioPaths = findAssessmentAudioManifests(
+  path.join(root, "content/subjects/english/courses")
+).sort();
 
 for (const relativePath of assessmentAudioPaths) {
-  if (!fs.existsSync(path.join(root, relativePath))) {
-    fail(`${relativePath} is listed as an assessment-audio manifest but does not exist.`);
-    continue;
-  }
   const manifest = readJson(relativePath);
   const label = `${relativePath}`;
   assertPresent(manifest.basePath, `${label} basePath`);

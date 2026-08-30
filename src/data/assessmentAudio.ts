@@ -1,4 +1,4 @@
-import level4Assessment from "../../content/subjects/english/courses/our-world/level-4/assessment-audio.json";
+import generated from "@/generated/assessmentAudio.json";
 
 export type AssessmentTrack = {
   n: number;
@@ -21,15 +21,24 @@ export type AssessmentAudio = {
   tracks: AssessmentTrack[];
 };
 
-const manifests: AssessmentAudio[] = [level4Assessment as AssessmentAudio];
+// Both come from scripts/generate-assessment-audio-map.mjs, which scans the
+// course folders — a new level's manifest is picked up by existing, with no
+// import to add here.
+const manifests = generated.manifests as AssessmentAudio[];
+const availablePaths = new Set(generated.available as string[]);
 
 function getManifest(course: string, level: number) {
   return manifests.find((manifest) => manifest.course === course && manifest.level === level);
 }
 
+/** Whether a track's .mp3 was in public/audio/ when the app was built. */
+export function isAssessmentTrackAvailable(track: AssessmentTrack) {
+  return availablePaths.has(track.path);
+}
+
 /**
- * The test tracks for one unit — the two ExamView tracks Leo listens to during
- * the test he takes after finishing the unit.
+ * The test tracks for one unit — the ExamView tracks Leo listens to during the
+ * test he takes after finishing the unit.
  */
 export function getUnitAssessmentTracks(course: string, level: number, unit: number) {
   const manifest = getManifest(course, level);

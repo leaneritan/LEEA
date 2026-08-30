@@ -69,15 +69,12 @@ is safe to re-run — files already in place are left alone. Add `--dry-run` to
 see the plan without touching anything, or `--check` to ask what is currently
 in place.
 
-For a level that has no manifest yet:
-
-```bash
-npm run audio:assessment -- --scaffold --level 5 --from ~/Downloads/L5Audio
-```
-
-That drafts a manifest from the filenames using the Level 4 numbering rules.
-**Read the draft before committing it** — the rules were derived from Level 4
-and another level may not follow them.
+A level with no manifest yet needs no extra step — the script drafts one
+from the filenames and prints a per-unit summary of what it worked out, so the
+draft can be checked against the disc's track listing without opening the JSON.
+Anything numbered in a way Level 4's rules do not cover is called out
+explicitly. `--scaffold` does the drafting on its own if you want to look
+before filing any audio.
 
 ## Size
 

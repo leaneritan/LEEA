@@ -1,28 +1,39 @@
 import fs from "node:fs";
 import path from "node:path";
 
-// Which assessment tracks actually have their .mp3 in public/audio/.
+// The assessment audio the app can see: every level's manifest, plus which of
+// its tracks actually have their .mp3 in public/audio/.
 //
-// The manifest lists every track on the disc, but the audio is filed in
-// separately (scripts/sort-assessment-audio.mjs) and may not be there yet, so
-// the unit page has to tell a playable track from one that is still missing.
-// It cannot find that out at runtime: with preload="none" the browser never
-// requests the file, so a missing track fires no error event and renders as a
-// dead player that does nothing when pressed. Files under public/ are static
-// and known at build time, so the check belongs here — same arrangement as
-// learnerAppMap.json, regenerated on predev/prebuild and never committed.
+// Both halves are build-time facts. Levels are found by scanning rather than
+// listed here, so a disc for a new level is picked up by dropping its manifest
+// in — nothing to remember to register. And a track's availability cannot be
+// discovered at runtime: with preload="none" the browser never requests the
+// file, so a missing track fires no error event and would render as a dead
+// player that does nothing when pressed.
+//
+// Regenerated on predev/prebuild, gitignored, same arrangement as
+// learnerAppMap.json.
 const root = process.cwd();
-const outFile = path.join(root, "src", "generated", "assessmentAudioAvailable.json");
+const coursesRoot = path.join(root, "content/subjects/english/courses");
+const outFile = path.join(root, "src", "generated", "assessmentAudio.json");
 
-const manifestPaths = ["content/subjects/english/courses/our-world/level-4/assessment-audio.json"];
+function findManifests(dir, results = []) {
+  if (!fs.existsSync(dir)) return results;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) findManifests(fullPath, results);
+    else if (entry.isFile() && entry.name === "assessment-audio.json") results.push(fullPath);
+  }
+  return results;
+}
 
+const manifests = [];
 const available = [];
 let total = 0;
 
-for (const relativePath of manifestPaths) {
-  const absolute = path.join(root, relativePath);
-  if (!fs.existsSync(absolute)) continue;
-  const manifest = JSON.parse(fs.readFileSync(absolute, "utf8"));
+for (const filePath of findManifests(coursesRoot).sort()) {
+  const manifest = JSON.parse(fs.readFileSync(filePath, "utf8"));
+  manifests.push(manifest);
   for (const track of manifest.tracks ?? []) {
     if (!track.path) continue;
     total += 1;
@@ -33,5 +44,7 @@ for (const relativePath of manifestPaths) {
 }
 
 fs.mkdirSync(path.dirname(outFile), { recursive: true });
-fs.writeFileSync(outFile, `${JSON.stringify(available, null, 2)}\n`);
-console.log(`Wrote ${available.length} of ${total} assessment audio track(s) to ${path.relative(root, outFile)}`);
+fs.writeFileSync(outFile, `${JSON.stringify({ manifests, available }, null, 2)}\n`);
+console.log(
+  `Wrote ${manifests.length} assessment audio manifest(s), ${available.length} of ${total} track(s) present, to ${path.relative(root, outFile)}`
+);

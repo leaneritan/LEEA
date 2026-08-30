@@ -1,12 +1,10 @@
-import availablePaths from "@/generated/assessmentAudioAvailable.json";
 import {
   getAssessmentAlbum,
   getCheckpointAssessmentTracks,
   getUnitAssessmentTracks,
+  isAssessmentTrackAvailable,
   type AssessmentTrack
 } from "@/data/assessmentAudio";
-
-const available = new Set(availablePaths as string[]);
 
 function bandLabel(track: AssessmentTrack) {
   const [from, to] = track.checkpoint ?? [];
@@ -41,7 +39,7 @@ export function UnitAssessmentAudio({ course, level, unit }: { course: string; l
 
       <ol className="unit-audio__list">
         {tracks.map((track) => {
-          const playable = available.has(track.path);
+          const playable = isAssessmentTrackAvailable(track);
           return (
             <li className={`unit-audio__row${playable ? "" : " is-missing"}`} key={track.path}>
               <span className="unit-audio__num" aria-hidden="true">

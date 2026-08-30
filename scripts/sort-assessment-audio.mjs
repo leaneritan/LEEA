@@ -74,13 +74,22 @@ function manifestPath(level) {
   return `content/subjects/english/courses/our-world/level-${level}/assessment-audio.json`;
 }
 
-function readManifest(level) {
+function readManifest(level, from, dryRun = false) {
   const rel = manifestPath(level);
   const abs = path.join(root, rel);
   if (!fs.existsSync(abs)) {
-    console.error(`No manifest at ${rel}.`);
-    console.error(`Run with --scaffold --from <dir> to draft one from the filenames.`);
-    process.exit(1);
+    // A level with no manifest yet is the normal case for a disc arriving for
+    // the first time, so draft one from the filenames rather than stopping. It
+    // is printed as a per-unit summary for checking; the disc's own track
+    // listing is the thing to check it against.
+    if (!from) {
+      console.error(`No manifest at ${rel}, and no --from <dir> to draft one from.`);
+      process.exit(1);
+    }
+    console.log(`No manifest for level ${level} yet — drafting one from the filenames.\n`);
+    const { draft } = scaffold(level, from, { write: !dryRun });
+    console.log("");
+    return draft;
   }
   return JSON.parse(fs.readFileSync(abs, "utf8"));
 }
@@ -118,7 +127,14 @@ function classify(track, level) {
       title: `OW2e EV L${level}U${from}-${to} Review Track ${track}`
     };
   }
-  return { kind: "unit", unit, folder, title: `OW2e EV L${level}U${unit} Track ${track}` };
+  const expected = seq.startsWith("1") || seq.startsWith("2");
+  return {
+    kind: "unit",
+    unit,
+    folder,
+    title: `OW2e EV L${level}U${unit} Track ${track}`,
+    unexpected: !expected
+  };
 }
 
 function trackFromFilename(file, level) {
@@ -133,7 +149,7 @@ function listMp3s(dir) {
     .sort();
 }
 
-function scaffold(level, from) {
+function scaffold(level, from, { write = true } = {}) {
   const files = listMp3s(from);
   if (!files.length) {
     console.error(`No .mp3 files in ${from}.`);
@@ -141,21 +157,24 @@ function scaffold(level, from) {
   }
   const base = `/audio/our-world/level-${level}`;
   const unknown = [];
+  const flagged = [];
   const tracks = [];
-  files.forEach((file) => {
+
+  for (const file of files) {
     const track = trackFromFilename(file, level);
     if (!track) {
       unknown.push(file);
-      return;
+      continue;
     }
     const placement = classify(track, level);
+    if (placement.unexpected) flagged.push(track);
     const dir = placement.folder ? `${base}/${placement.folder}` : base;
     const entry = { n: tracks.length, track, title: placement.title, file, path: `${dir}/${file}` };
     if (placement.unit) entry.unit = placement.unit;
     if (placement.checkpoint) entry.checkpoint = placement.checkpoint;
     entry.kind = placement.kind;
     tracks.push(entry);
-  });
+  }
 
   const draft = {
     schemaVersion: 1,
@@ -167,19 +186,61 @@ function scaffold(level, from) {
     publisher: "National Geographic Learning",
     basePath: base,
     _note:
-      "DRAFT — scaffolded from filenames by scripts/sort-assessment-audio.mjs. Check every title and placement against the disc's own track listing before trusting this file; the numbering rules were read off Level 4 and may not hold here.",
+      "Scaffolded from the disc's filenames by scripts/sort-assessment-audio.mjs, using the numbering rules read off Level 4: the number before the dot is the unit and decides the folder; .1/.2 are that unit's own test; .3/.4 on a band-closing unit are the band review; 9.5 is the whole-level review; 0.0 is the copyright notice. Titles are generated to match the publisher's ID3 pattern, not read from the files — check them against the disc's own track listing if a row on the unit page looks wrong.",
     tracks
   };
 
-  const out = path.join(root, manifestPath(level));
-  fs.mkdirSync(path.dirname(out), { recursive: true });
-  fs.writeFileSync(out, JSON.stringify(draft, null, 2) + "\n");
-  console.log(`Drafted ${manifestPath(level)} with ${tracks.length} track(s).`);
+  if (write) {
+    const out = path.join(root, manifestPath(level));
+    fs.mkdirSync(path.dirname(out), { recursive: true });
+    fs.writeFileSync(out, JSON.stringify(draft, null, 2) + "\n");
+  }
+
+  console.log(
+    `${write ? "Drafted" : "Would draft"} ${manifestPath(level)} from ${tracks.length} file(s):\n`
+  );
+  summarise(tracks);
   if (unknown.length) {
-    console.log(`\nNot recognised, left out of the draft — add them by hand:`);
+    console.log(`\nNot named like ExamView audio, so left out — add them by hand if they belong:`);
     for (const file of unknown) console.log(`  ${file}`);
   }
-  console.log(`\nRead the draft before committing it. Then run --from ${from} to file the audio.`);
+  if (flagged.length) {
+    console.log(`\n! These are numbered in a way Level 4's rules do not cover, so each`);
+    console.log(`  was filed under its own unit as an ordinary test track. Check them`);
+    console.log(`  against the disc's track listing: ${flagged.join(", ")}`);
+  }
+  return { draft, unknown, flagged };
+}
+
+// A per-unit summary of a drafted manifest, so it can be checked against the
+// disc without reading the JSON.
+function summarise(tracks) {
+  const byUnit = new Map();
+  for (const track of tracks) {
+    const key = track.unit ?? 0;
+    if (!byUnit.has(key)) byUnit.set(key, []);
+    byUnit.get(key).push(track);
+  }
+
+  for (const unit of [...byUnit.keys()].sort((a, b) => a - b)) {
+    const rows = byUnit.get(unit);
+    if (unit === 0) {
+      console.log(`  level-wide  ${rows.map((t) => t.track).join(", ")}  (copyright)`);
+      continue;
+    }
+
+    const own = rows.filter((t) => t.kind === "unit").map((t) => t.track);
+    const bands = new Map();
+    for (const review of rows.filter((t) => t.kind === "checkpoint")) {
+      const band = `${review.checkpoint[0]}-${review.checkpoint[1]}`;
+      if (!bands.has(band)) bands.set(band, []);
+      bands.get(band).push(review.track);
+    }
+
+    const parts = [`test ${own.join(", ") || "(none)"}`];
+    for (const [band, list] of bands) parts.push(`review of units ${band}: ${list.join(", ")}`);
+    console.log(`  unit ${String(unit).padEnd(2)}     ${parts.join("   +   ")}`);
+  }
 }
 
 function publicPathFor(entry) {
@@ -257,7 +318,7 @@ if (args.scaffold) {
 } else {
   const level = args.level ?? (args.from ? inferLevel(args.from) : 4);
   if (args.from && !args.level) console.log(`Level ${level} (from the filenames).`);
-  const manifest = readManifest(level);
+  const manifest = readManifest(level, args.from, args.dryRun);
   if (args.check || !args.from) {
     const missing = check(manifest);
     if (!args.from && !args.check) {

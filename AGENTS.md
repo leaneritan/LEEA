@@ -552,9 +552,10 @@ nothing when pressed.
 
 Filing is by unit alone — the number before the dot. Review tracks are no
 exception: 9.3 reviews Units 7–9 but lives in `unit-9/`, because that is how
-the publisher numbers it. A band-closing unit (3, 6, 9) therefore has more
-tracks than the rest, since it ships two tests: its own, and the band review
-(Unit 9 also carries 9.5, the whole-level review). Nothing in the filename
+the publisher numbers it. Every test is two tracks, and a band-closing unit
+(3, 6, 9) ships two tests, so it has more tracks than the rest: its own test,
+and the band review — with `.5`/`.6` on the last unit being the whole-level
+review. Nothing in the filename
 says which is which — only the title does, which is why `kind` and
 `checkpoint` are recorded in the manifest. They label the row on the unit
 page so the two tests read as different things; they never move the file.

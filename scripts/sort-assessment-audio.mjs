@@ -114,11 +114,14 @@ function readManifest(level, sources, dryRun = false) {
 }
 
 // The publisher's numbering: the number before the dot is the unit, and that
-// alone decides the folder — review tracks included, so 9.1 through 9.5 all go
-// in unit-9/. A band-closing unit (3, 6, 9) ships two tests and so has more
-// tracks than the others: .1/.2 are its own test, .3/.4 are the review covering
-// the band, and 9.5 is the whole-level review. That distinction lives in the
-// title and in `kind`; it does not move the file. 0.0 is the copyright notice.
+// alone decides the folder — review tracks included, so 9.1 through 9.6 all go
+// in unit-9/.
+//
+// Every test is two tracks. .1/.2 are the unit's own test; on a band-closing
+// unit (3, 6, 9) .3/.4 are the review covering that band; and on the last unit
+// .5/.6 are the whole-level review. 9.4a is an extra track within the band
+// review. That distinction lives in the title and in `kind`; it does not move
+// the file. 0.0 is the copyright notice.
 const BANDS = { 3: [1, 3], 6: [4, 6], 9: [7, 9] };
 const LAST_UNIT = 9;
 
@@ -127,7 +130,7 @@ function classify(track, level) {
   const unit = Number(unitStr);
   if (unit === 0) return { kind: "level", folder: "", title: "Copyright" };
   const folder = `unit-${unit}`;
-  if (unit === LAST_UNIT && seq.startsWith("5")) {
+  if (unit === LAST_UNIT && (seq.startsWith("5") || seq.startsWith("6"))) {
     return {
       kind: "checkpoint",
       unit,
@@ -244,7 +247,7 @@ function scaffold(level, sources, { write = true } = {}) {
     publisher: "National Geographic Learning",
     basePath: base,
     _note:
-      "Scaffolded from the disc's filenames by scripts/sort-assessment-audio.mjs, using the numbering rules read off Level 4: the number before the dot is the unit and decides the folder; .1/.2 are that unit's own test; .3/.4 on a band-closing unit are the band review; 9.5 is the whole-level review; 0.0 is the copyright notice. Titles are generated to match the publisher's ID3 pattern, not read from the files — check them against the disc's own track listing if a row on the unit page looks wrong.",
+      "Scaffolded from the disc's filenames by scripts/sort-assessment-audio.mjs. The number before the dot is the unit and decides the folder — review tracks included, so 9.1 through 9.6 all live in unit-9/. Every test is two tracks: .1/.2 are the unit's own test, .3/.4 on a band-closing unit (3, 6, 9) are the review covering that band, and .5/.6 on the last unit are the whole-level review. A band-closing unit therefore has more tracks than the rest, because it carries two tests. Only the publisher's title tells them apart, which is why `kind` and `checkpoint` are recorded here: they label the row on the unit page, they do not move the file. 0.0 is the copyright notice, kept at the level root and not shown to Leo. Titles are generated to match the publisher's ID3 pattern rather than read from the files — check them against the disc's own track listing if a row looks wrong.",
     tracks
   };
 

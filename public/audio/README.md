@@ -26,7 +26,7 @@ public/audio/our-world/level-4/
   unit-4/ … unit-5/
   unit-6/                      ← 6.1, 6.2, 6.3, 6.4
   unit-7/ … unit-8/
-  unit-9/                      ← 9.1, 9.2, 9.3, 9.4, 9.4a, 9.5
+  unit-9/                      ← 9.1, 9.2, 9.3, 9.4, 9.4a, 9.5, 9.6
 ```
 
 **The number before the dot is the unit, and that alone decides the folder.**
@@ -34,17 +34,18 @@ Review tracks are no exception: 9.3 reviews Units 7–9 but still lives in
 `unit-9/`, because that is how the publisher numbers it and where Leo would
 look for it.
 
-Files keep the publisher's names (`ow2e_ev<level>_ame_<track>_0.mp3`) so a
+Files keep the publisher's names (`ow2e_ev<level>_ame_<track>[_<n>].mp3` —
+the trailing number varies by disc and means nothing) so a
 track can always be traced back to the disc it came from. The folder supplies
 the organisation; the filename supplies the provenance.
 
 ## Why some units have more tracks
 
-A band-closing unit ships **two tests**, so it has more tracks than the rest:
-the unit's own test, plus the review covering the band. Unit 3 has 3.1/3.2 for
-itself and 3.3/3.4 for the Units 1–3 review; Unit 6 the same; Unit 9 carries
-9.1/9.2 for itself, 9.3/9.4/9.4a for the Units 7–9 review, and 9.5 for the
-whole-level review.
+Every test is **two tracks**, and a band-closing unit ships **two tests**, so
+it has more tracks than the rest: the unit's own test, plus the review covering
+the band. Unit 3 has 3.1/3.2 for itself and 3.3/3.4 for the Units 1–3 review;
+Unit 6 the same; Unit 9 carries 9.1/9.2 for itself, 9.3/9.4 (plus an extra
+9.4a) for the Units 7–9 review, and 9.5/9.6 for the whole-level review.
 
 Nothing in the filename says which is which — only the publisher's title does.
 That is why the manifest records a `kind` (`unit` or `checkpoint`) and, for a

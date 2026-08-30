@@ -1,9 +1,13 @@
-// Files a folder of ExamView test audio into public/audio/, one folder per
-// unit, and checks it against the level's assessment-audio.json manifest.
+// Files ExamView test audio into public/audio/, one folder per unit, and
+// checks it against each level's assessment-audio.json manifest.
 //
 //   node scripts/sort-assessment-audio.mjs --from ~/Downloads/ExamViewAudio
-//   node scripts/sort-assessment-audio.mjs --from <dir> --level 4 --dry-run
+//   node scripts/sort-assessment-audio.mjs --from <dir> --dry-run
 //   node scripts/sort-assessment-audio.mjs --check
+//
+// --from searches subfolders and sorts what it finds by the level in each file
+// name, so it can be one level's folder or the parent of several — pointing it
+// at the folder holding every level files them all in one go.
 //
 // The manifest is the source of truth: it says where every track belongs and
 // what it is called. This script only moves files into place and reports what
@@ -38,8 +42,9 @@ const args = parseArgs(process.argv.slice(2));
 
 if (args.help) {
   console.log(`Usage:
-  --from <dir>   folder holding the .mp3 files to file (copied, not moved)
-  --level <n>    Our World level; inferred from the filenames when omitted
+  --from <dir>   folder holding the .mp3 files, or the parent of several such
+                 folders; subfolders are searched (files are copied, not moved)
+  --level <n>    Our World level; inferred from each file name when omitted
   --dry-run      report what would happen, change nothing
   --check        verify what is already in public/audio/ against the manifest
   --scaffold     draft a manifest from --from filenames (new levels only)`);
@@ -88,7 +93,7 @@ function manifestPath(level) {
   return `content/subjects/english/courses/our-world/level-${level}/assessment-audio.json`;
 }
 
-function readManifest(level, from, dryRun = false) {
+function readManifest(level, sources, dryRun = false) {
   const rel = manifestPath(level);
   const abs = path.join(root, rel);
   if (!fs.existsSync(abs)) {
@@ -96,12 +101,12 @@ function readManifest(level, from, dryRun = false) {
     // the first time, so draft one from the filenames rather than stopping. It
     // is printed as a per-unit summary for checking; the disc's own track
     // listing is the thing to check it against.
-    if (!from) {
+    if (!sources) {
       console.error(`No manifest at ${rel}, and no --from <dir> to draft one from.`);
       process.exit(1);
     }
     console.log(`No manifest for level ${level} yet — drafting one from the filenames.\n`);
-    const { draft } = scaffold(level, from, { write: !dryRun });
+    const { draft } = scaffold(level, sources, { write: !dryRun });
     console.log("");
     return draft;
   }
@@ -156,19 +161,41 @@ function trackFromFilename(file, level) {
   return match ? match[1] : null;
 }
 
-function listMp3s(dir) {
-  return fs
-    .readdirSync(dir)
-    .filter((file) => file.toLowerCase().endsWith(".mp3"))
-    .sort();
+// Every .mp3 at or under a folder, keyed by file name. Searching subfolders
+// means --from can be the folder holding one subfolder per level, so all the
+// discs go in with one command and one path to get right.
+function collectMp3s(dir, found = new Map()) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) collectMp3s(fullPath, found);
+    else if (entry.isFile() && entry.name.toLowerCase().endsWith(".mp3") && !found.has(entry.name)) {
+      found.set(entry.name, fullPath);
+    }
+  }
+  return found;
 }
 
-function scaffold(level, from, { write = true } = {}) {
-  const files = listMp3s(from);
-  if (!files.length) {
-    console.error(`No .mp3 files in ${from}.`);
-    process.exit(1);
+// Split what was found by the level in each file name. A file the pattern does
+// not match has no level to file it under, so it is held aside as unknown
+// rather than guessed at.
+function groupByLevel(files, forcedLevel = null) {
+  const byLevel = new Map();
+  const unknown = [];
+  for (const [name, fullPath] of files) {
+    const match = name.match(/^ow2e_ev(\d+)_ame_/i);
+    const level = forcedLevel ?? (match ? Number(match[1]) : null);
+    if (!level) {
+      unknown.push(name);
+      continue;
+    }
+    if (!byLevel.has(level)) byLevel.set(level, new Map());
+    byLevel.get(level).set(name, fullPath);
   }
+  return { byLevel, unknown };
+}
+
+function scaffold(level, sources, { write = true } = {}) {
+  const files = [...sources.keys()].sort();
   const base = `/audio/our-world/level-${level}`;
   const unknown = [];
   const flagged = [];
@@ -277,12 +304,7 @@ function check(manifest) {
   return missing;
 }
 
-function file(manifest, from, dryRun) {
-  if (!fs.existsSync(from)) {
-    console.error(`Source folder not found: ${from}`);
-    process.exit(1);
-  }
-  const available = new Set(listMp3s(from));
+function file(manifest, sources, dryRun) {
   const byFile = new Map(manifest.tracks.map((entry) => [entry.file, entry]));
 
   let copied = 0;
@@ -291,7 +313,7 @@ function file(manifest, from, dryRun) {
 
   for (const entry of manifest.tracks) {
     const target = publicPathFor(entry);
-    if (!available.has(entry.file)) {
+    if (!sources.has(entry.file)) {
       if (!fs.existsSync(target)) missing.push(entry);
       continue;
     }
@@ -303,12 +325,12 @@ function file(manifest, from, dryRun) {
       console.log(`would copy  ${entry.file}  →  public${entry.path}`);
     } else {
       fs.mkdirSync(path.dirname(target), { recursive: true });
-      fs.copyFileSync(path.join(from, entry.file), target);
+      fs.copyFileSync(sources.get(entry.file), target);
     }
     copied += 1;
   }
 
-  const unexpected = [...available].filter((f) => !byFile.has(f));
+  const unexpected = [...sources.keys()].filter((f) => !byFile.has(f)).sort();
 
   console.log(
     dryRun
@@ -320,10 +342,35 @@ function file(manifest, from, dryRun) {
     for (const entry of missing) console.log(`  ${entry.file}  (track ${entry.track})`);
   }
   if (unexpected.length) {
-    console.log(`\nIn ${from} but not in the manifest — left alone:`);
+    console.log(`\nFound but not in the manifest — left alone:`);
     for (const f of unexpected) console.log(`  ${f}`);
   }
   return missing.length + unexpected.length;
+}
+
+function levelsFrom(from, forcedLevel) {
+  if (!fs.existsSync(from)) {
+    console.error(`Source folder not found: ${from}`);
+    console.error(`Check the spelling — or point --from at the folder that holds the level folders.`);
+    process.exit(1);
+  }
+  const { byLevel, unknown } = groupByLevel(collectMp3s(from), forcedLevel);
+  if (!byLevel.size) {
+    console.error(`No ExamView audio found in ${from} or its subfolders.`);
+    console.error(`Files should be named like ow2e_ev4_ame_1.1_0.mp3; pass --level <n> if yours are not.`);
+    if (unknown.length) console.error(`${unknown.length} .mp3 file(s) there did not match that pattern.`);
+    process.exit(1);
+  }
+  const levels = [...byLevel.keys()].sort((a, b) => a - b);
+  console.log(
+    `Found level ${levels.join(", ")}${forcedLevel ? "" : " (from the filenames)"} — ` +
+      levels.map((level) => `${byLevel.get(level).size} file(s) for level ${level}`).join(", ") +
+      "."
+  );
+  if (unknown.length) {
+    console.log(`Ignoring ${unknown.length} .mp3 file(s) not named like ExamView audio.`);
+  }
+  return { byLevel, levels };
 }
 
 if (args.scaffold) {
@@ -331,12 +378,14 @@ if (args.scaffold) {
     console.error("--scaffold needs --from <dir>.");
     process.exit(1);
   }
-  const level = args.level ?? inferLevel(args.from);
-  console.log(`Level ${level}${args.level ? "" : " (from the filenames)"}.`);
-  scaffold(level, args.from);
-} else if (!args.from && !args.level) {
-  // Nothing named: report every level there is a manifest for, so one command
-  // answers "what is actually in place?" across the whole library.
+  const { byLevel, levels } = levelsFrom(args.from, args.level);
+  for (const level of levels) {
+    console.log("");
+    scaffold(level, byLevel.get(level));
+  }
+} else if (!args.from) {
+  // Nothing to file: report every level there is a manifest for, so one
+  // command answers "what is actually in place?" across the whole library.
   const manifests = findManifests();
   if (!manifests.length) {
     console.log("No assessment audio manifests yet.");
@@ -349,12 +398,13 @@ if (args.scaffold) {
   if (!args.check) console.log(`\nTo file a disc into place: --from <folder holding the .mp3 files>`);
   process.exit(missing ? 1 : 0);
 } else {
-  const level = args.level ?? inferLevel(args.from);
-  if (args.from && !args.level) console.log(`Level ${level} (from the filenames).`);
-  const manifest = readManifest(level, args.from, args.dryRun);
-  if (args.check || !args.from) {
-    process.exit(check(manifest).length ? 1 : 0);
+  const { byLevel, levels } = levelsFrom(args.from, args.level);
+  let problems = 0;
+  for (const level of levels) {
+    console.log(`\n── Level ${level} ──`);
+    const sources = byLevel.get(level);
+    const manifest = readManifest(level, sources, args.dryRun);
+    problems += args.check ? check(manifest).length : file(manifest, sources, args.dryRun);
   }
-  const problems = file(manifest, args.from, args.dryRun);
   process.exit(problems ? 1 : 0);
 }

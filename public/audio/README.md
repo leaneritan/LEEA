@@ -59,9 +59,10 @@ Copy the `.mp3` files somewhere local, then point the script at the folder:
 npm run audio:assessment -- --from ~/Downloads/ExamViewAudio
 ```
 
-The level is read from the filenames (`ow2e_ev4_ame_…` is Level 4), so one
-command handles any level. A folder holding more than one level is an error
-rather than a guess — split it, or pass `--level <n>`.
+`--from` searches subfolders and sorts what it finds by the level in each file
+name (`ow2e_ev4_ame_…` is Level 4), so it can be one level's folder or the
+parent of several. Pointing it at the folder holding every level files them all
+in one command.
 
 The script reads the manifest, copies each track to the path the manifest
 gives it, and reports anything missing from the disc or unexpected in it. It

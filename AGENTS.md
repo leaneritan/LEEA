@@ -566,8 +566,10 @@ npm run audio:assessment -- --from ~/Downloads/ExamViewAudio
 npm run audio:assessment -- --check
 ```
 
-The level comes from the filenames (`ow2e_ev4_ame_…`), and a level with no
-manifest gets one drafted from them, summarised per unit for checking. Levels
+`--from` searches subfolders and sorts what it finds by the level in each file
+name (`ow2e_ev4_ame_…`), so one command can file several levels at once, and a
+level with no manifest gets one drafted from them, summarised per unit for
+checking. Levels
 are found by scanning `content/subjects/english/courses`, by both the validator
 and the generator, so a new level's manifest needs no registering anywhere.
 

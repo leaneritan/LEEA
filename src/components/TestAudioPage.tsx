@@ -29,6 +29,9 @@ function rowLabel(track: AssessmentTrack) {
 export function TestAudioPage() {
   const levels = getAssessmentLevels(COURSE);
   const [selectedLevel, setSelectedLevel] = useState(levels[0] ?? 4);
+  // null means every unit. Kept across a level change, since someone working
+  // in Unit 8 is usually comparing the same unit between levels.
+  const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
 
   if (!levels.length) {
     return (
@@ -45,6 +48,11 @@ export function TestAudioPage() {
   const units = getAssessmentUnits(COURSE, selectedLevel);
   const album = getAssessmentAlbum(COURSE, selectedLevel);
   const { total, available } = countAssessmentTracks(COURSE, selectedLevel);
+  // A unit the chosen level does not have falls back to showing everything,
+  // rather than an empty page that looks broken.
+  const unitExists = units.some((entry) => entry.unit === selectedUnit);
+  const shownUnits = selectedUnit && unitExists ? units.filter((entry) => entry.unit === selectedUnit) : units;
+  const shownTracks = shownUnits.reduce((count, entry) => count + entry.tracks.length, 0);
 
   return (
     <section className="ow-page ow-page--final">
@@ -76,18 +84,52 @@ export function TestAudioPage() {
         </div>
       </div>
 
+      <div className="ow-level-picker test-audio__units-picker">
+        <span>Jump to a unit</span>
+        <div>
+          <button
+            aria-pressed={selectedUnit === null}
+            className={selectedUnit === null ? "active" : ""}
+            onClick={() => setSelectedUnit(null)}
+            type="button"
+          >
+            All
+          </button>
+          {units.map(({ unit, tracks }) => (
+            <button
+              aria-pressed={unit === selectedUnit}
+              className={unit === selectedUnit ? "active" : ""}
+              key={unit}
+              onClick={() => setSelectedUnit(unit)}
+              title={`${tracks.length} tracks`}
+              type="button"
+            >
+              {unit}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <header className="unit-list-heading">
-        <h2>Level {selectedLevel}</h2>
+        <h2>
+          Level {selectedLevel}
+          {selectedUnit && unitExists ? ` · Unit ${selectedUnit}` : ""}
+        </h2>
         <strong>
-          {available === total ? `${total} tracks` : `${available} of ${total} tracks added`}
+          {selectedUnit && unitExists
+            ? `${shownTracks} tracks`
+            : available === total
+              ? `${total} tracks`
+              : `${available} of ${total} tracks added`}
           {album ? ` · ${album}` : ""}
         </strong>
       </header>
 
       <div className="test-audio__units">
-        {units.map(({ unit, tracks }) => (
+        {shownUnits.map(({ unit, tracks }) => (
           <section className="test-audio__unit" key={unit}>
-            <h3>Unit {unit}</h3>
+            {/* The heading above already names the unit when one is picked. */}
+            {shownUnits.length > 1 ? <h3>Unit {unit}</h3> : null}
             <ol className="unit-audio__list">
               {tracks.map((track) => {
                 const playable = isAssessmentTrackAvailable(track);

@@ -63,7 +63,7 @@ export function HistoryMaterialView({ material }: { material: HistoryMaterial })
               href={material.embedPath}
               rel="noreferrer"
               target="_blank"
-              title="Open fullscreen"
+              title="Open in a new tab"
             >
               <ExternalLink size={15} />
             </a>
@@ -72,7 +72,9 @@ export function HistoryMaterialView({ material }: { material: HistoryMaterial })
       </div>
 
       {material.embedPath ? (
-        <iframe className="hist-frame" src={material.embedPath} title={material.title} />
+        // allow="fullscreen" is what lets the 全画面 button inside a material
+        // work: without it the browser refuses the request from an iframe.
+        <iframe allow="fullscreen" className="hist-frame" src={material.embedPath} title={material.title} />
       ) : (
         <div className="hist-missing">
           <h2>{material.jpShortTitle} — file needed</h2>

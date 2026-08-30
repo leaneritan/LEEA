@@ -644,6 +644,13 @@ for (const relativePath of assessmentAudioPaths) {
   const label = `${relativePath}`;
   assertPresent(manifest.basePath, `${label} basePath`);
 
+  // A manifest with no tracks records a level as known and empty, which reads
+  // as "this level has no test audio" rather than "nothing was recognised".
+  // Levels 1-3 and 6 were committed in exactly that state once.
+  if (!manifest.tracks?.length) {
+    fail(`${label} has no tracks. Delete it, or fill it in — an empty manifest claims the level has no assessment audio.`);
+  }
+
   const seenTracks = new Set();
   const seenPaths = new Set();
 

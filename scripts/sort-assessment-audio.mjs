@@ -108,7 +108,7 @@ function readManifest(level, sources, dryRun = false) {
     console.log(`No manifest for level ${level} yet — drafting one from the filenames.\n`);
     const { draft } = scaffold(level, sources, { write: !dryRun });
     console.log("");
-    return draft;
+    return draft;  // null when nothing matched — the caller skips the level
   }
   return JSON.parse(fs.readFileSync(abs, "utf8"));
 }
@@ -230,6 +230,18 @@ function scaffold(level, sources, { write = true } = {}) {
       "Scaffolded from the disc's filenames by scripts/sort-assessment-audio.mjs, using the numbering rules read off Level 4: the number before the dot is the unit and decides the folder; .1/.2 are that unit's own test; .3/.4 on a band-closing unit are the band review; 9.5 is the whole-level review; 0.0 is the copyright notice. Titles are generated to match the publisher's ID3 pattern, not read from the files — check them against the disc's own track listing if a row on the unit page looks wrong.",
     tracks
   };
+
+  if (!tracks.length) {
+    // An empty manifest is worse than none: it records a level as known and
+    // having nothing, and the validator has nothing to object to. Say what was
+    // actually found instead, and write nothing.
+    console.log(`Level ${level}: none of the ${sources.size} file(s) are named the way this script expects.`);
+    console.log(`  Expected names like ow2e_ev${level}_ame_1.1_0.mp3. Found, for example:`);
+    for (const name of unknown.slice(0, 5)) console.log(`    ${name}`);
+    if (unknown.length > 5) console.log(`    ... and ${unknown.length - 5} more`);
+    console.log(`  No manifest written for level ${level}.`);
+    return { draft: null, unknown, flagged };
+  }
 
   if (write) {
     const out = path.join(root, manifestPath(level));
@@ -400,11 +412,44 @@ if (args.scaffold) {
 } else {
   const { byLevel, levels } = levelsFrom(args.from, args.level);
   let problems = 0;
+  const skipped = [];
+  const shortfalls = [];
+
   for (const level of levels) {
     console.log(`\n── Level ${level} ──`);
     const sources = byLevel.get(level);
     const manifest = readManifest(level, sources, args.dryRun);
+    if (!manifest) {
+      skipped.push({ level, names: [...sources.keys()] });
+      problems += 1;
+      continue;
+    }
     problems += args.check ? check(manifest).length : file(manifest, sources, args.dryRun);
+
+    // Files present for this level that the manifest has no entry for. On a
+    // freshly drafted manifest this means the naming pattern did not match
+    // them, which is the difference between a complete level and a partial one.
+    const known = new Set(manifest.tracks.map((entry) => entry.file));
+    const unmatched = [...sources.keys()].filter((name) => !known.has(name));
+    if (unmatched.length) shortfalls.push({ level, unmatched });
   }
+
+  if (skipped.length || shortfalls.length) {
+    console.log(`\n${"=".repeat(60)}`);
+    console.log(`Not everything was filed.\n`);
+    for (const { level, names } of skipped) {
+      console.log(`  Level ${level}: none of its ${names.length} file(s) matched the expected naming,`);
+      console.log(`    so no manifest was written. For example:`);
+      for (const name of names.slice(0, 5)) console.log(`      ${name}`);
+      if (names.length > 5) console.log(`      ... and ${names.length - 5} more`);
+    }
+    for (const { level, unmatched } of shortfalls) {
+      console.log(`  Level ${level}: ${unmatched.length} file(s) not in the manifest, so not filed:`);
+      for (const name of unmatched.slice(0, 8)) console.log(`      ${name}`);
+      if (unmatched.length > 8) console.log(`      ... and ${unmatched.length - 8} more`);
+    }
+    console.log(`\nSend these file names on — the naming pattern needs widening to cover them.`);
+  }
+
   process.exit(problems ? 1 : 0);
 }

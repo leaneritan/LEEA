@@ -614,6 +614,91 @@ for (const [id, entry] of registeredLessons) {
   }
 }
 
+// Assessment audio — the ExamView test tracks. The manifest is the source of
+// truth for where each track lives; the audio itself is filed into public/audio
+// by scripts/sort-assessment-audio.mjs and may legitimately not be there yet, so
+// a missing .mp3 is not an error. What must hold is that the manifest is
+// internally consistent and that every path it claims sits under the level's
+// basePath in the folder its placement implies — otherwise the unit page would
+// point a player at a URL nothing will ever be filed to.
+function findAssessmentAudioManifests(dir, results = []) {
+  if (!fs.existsSync(dir)) return results;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) findAssessmentAudioManifests(fullPath, results);
+    else if (entry.isFile() && entry.name === "assessment-audio.json") {
+      results.push(path.relative(root, fullPath));
+    }
+  }
+  return results;
+}
+
+// Found by scanning, not listed, so a new level's manifest is checked the
+// moment it lands rather than whenever someone remembers to register it.
+const assessmentAudioPaths = findAssessmentAudioManifests(
+  path.join(root, "content/subjects/english/courses")
+).sort();
+
+for (const relativePath of assessmentAudioPaths) {
+  const manifest = readJson(relativePath);
+  const label = `${relativePath}`;
+  assertPresent(manifest.basePath, `${label} basePath`);
+
+  // A manifest with no tracks records a level as known and empty, which reads
+  // as "this level has no test audio" rather than "nothing was recognised".
+  // Levels 1-3 and 6 were committed in exactly that state once.
+  if (!manifest.tracks?.length) {
+    fail(`${label} has no tracks. Delete it, or fill it in — an empty manifest claims the level has no assessment audio.`);
+  }
+
+  const seenTracks = new Set();
+  const seenPaths = new Set();
+
+  for (const track of manifest.tracks ?? []) {
+    const where = `${label} track ${track.track ?? "(unnumbered)"}`;
+    assertPresent(track.track, `${where} track number`);
+    assertPresent(track.title, `${where} title`);
+    assertPresent(track.file, `${where} file`);
+    assertPresent(track.path, `${where} path`);
+
+    if (seenTracks.has(track.track)) fail(`${where} is listed twice.`);
+    seenTracks.add(track.track);
+    if (seenPaths.has(track.path)) fail(`${where} reuses path ${track.path}.`);
+    seenPaths.add(track.path);
+
+    if (track.path && !track.path.startsWith(`${manifest.basePath}/`)) {
+      fail(`${where} has path ${track.path}, which is outside the manifest basePath ${manifest.basePath}.`);
+    }
+    if (track.path && track.file && !track.path.endsWith(`/${track.file}`)) {
+      fail(`${where} has path ${track.path}, which does not end in its file name ${track.file}.`);
+    }
+
+    // Filing is by unit alone — the number before the dot. Review tracks are
+    // no exception: 9.3 is the Units 7-9 review but still lives in unit-9/,
+    // because that is how the publisher numbers and how Leo looks for it.
+    const numberedUnit = Number(String(track.track).split(".")[0]);
+    const expectedDir = numberedUnit ? `${manifest.basePath}/unit-${numberedUnit}` : manifest.basePath;
+    if (track.path && track.file && track.path !== `${expectedDir}/${track.file}`) {
+      fail(
+        `${where} is numbered under unit ${numberedUnit} so it belongs at ${expectedDir}/${track.file}, but the manifest puts it at ${track.path}.`
+      );
+    }
+    if (numberedUnit && track.unit !== numberedUnit) {
+      fail(`${where} is numbered under unit ${numberedUnit} but the manifest records unit ${track.unit}.`);
+    }
+
+    if (track.kind === "unit" && !Number.isInteger(track.unit)) {
+      fail(`${where} is kind "unit" but has no unit number.`);
+    }
+    if (track.kind === "checkpoint" && (track.checkpoint?.length !== 2 || track.checkpoint[0] > track.checkpoint[1])) {
+      fail(`${where} is kind "checkpoint" but its band ${JSON.stringify(track.checkpoint)} is not a [from, to] pair.`);
+    }
+    if (!["unit", "checkpoint", "level"].includes(track.kind)) {
+      fail(`${where} has unknown kind "${track.kind}".`);
+    }
+  }
+}
+
 if (errors.length) {
   console.error(`Content validation failed with ${errors.length} issue(s):`);
   for (const error of errors) console.error(`- ${error}`);

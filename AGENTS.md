@@ -526,6 +526,59 @@ Grammar cards need:
 - Tab 4 reveals Japanese automatically after each answer, regardless of toggle state
 - related lesson button, disabled until the lesson is live
 
+## Assessment Audio
+
+The ExamView listening tracks for the test Leo takes after each unit live in
+`public/audio/`, filed one folder per unit. What each track is comes from the
+level's manifest, not from scanning the folder:
+
+```
+content/subjects/english/courses/our-world/level-4/assessment-audio.json
+```
+
+Each entry carries the publisher's track number (`1.1`), its ID3 title, the
+file name, the URL the player uses, and a `kind` of `unit`, `checkpoint` or
+`level`. `scripts/validate-content.mjs` checks that every path sits under the
+manifest's `basePath` in the folder its `kind` implies, so a misfiled track
+fails the build rather than producing a player pointed at a URL nothing will
+be filed to. A track whose `.mp3` is not in the repo yet is **not** an error —
+the audio is added separately, and `UnitAssessmentAudio` renders those rows as
+"Not added yet". Which tracks have a file is decided at build time by
+`scripts/generate-assessment-audio-map.mjs` (chained into predev/prebuild,
+output gitignored under `src/generated/`), not by an `onError` handler on the
+player: with `preload="none"` the browser never requests the file, so a missing
+track fires no error and would otherwise render as a player that silently does
+nothing when pressed.
+
+Filing is by unit alone — the number before the dot. Review tracks are no
+exception: 9.3 reviews Units 7–9 but lives in `unit-9/`, because that is how
+the publisher numbers it. Every test is two tracks, and a band-closing unit
+(3, 6, 9) ships two tests, so it has more tracks than the rest: its own test,
+and the band review — with `.5`/`.6` on the last unit being the whole-level
+review. Nothing in the filename
+says which is which — only the title does, which is why `kind` and
+`checkpoint` are recorded in the manifest. They label the row on the unit
+page so the two tests read as different things; they never move the file.
+
+To file a disc into place, or to see what is still missing:
+
+```bash
+npm run audio:assessment -- --from ~/Downloads/ExamViewAudio
+npm run audio:assessment -- --check
+```
+
+`--from` searches subfolders and sorts what it finds by the level in each file
+name (`ow2e_ev4_ame_…`), so one command can file several levels at once, and a
+level with no manifest gets one drafted from them, summarised per unit for
+checking. Levels
+are found by scanning `content/subjects/english/courses`, by both the validator
+and the generator, so a new level's manifest needs no registering anywhere.
+
+Audio is committed as ordinary files, not Git LFS. Keep each track under 25MB
+(64 kbps mono is about 0.5MB/minute and is plenty for speech). If the library
+outgrows the repo, move the files to Supabase Storage and repoint `basePath` —
+every player reads its URL from the manifest, so nothing else changes.
+
 ## Navigation Rules
 
 Navigation must stay consistent across every route.

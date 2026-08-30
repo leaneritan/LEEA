@@ -61,9 +61,12 @@ function readManifest(level) {
   return JSON.parse(fs.readFileSync(abs, "utf8"));
 }
 
-// The publisher's numbering, as documented in the manifest's _note: .1/.2 are
-// the unit's own test; .3/.4 on a band-closing unit are that band's review;
-// .5 on the last unit is the whole-level review; 0.0 is the copyright notice.
+// The publisher's numbering: the number before the dot is the unit, and that
+// alone decides the folder — review tracks included, so 9.1 through 9.5 all go
+// in unit-9/. A band-closing unit (3, 6, 9) ships two tests and so has more
+// tracks than the others: .1/.2 are its own test, .3/.4 are the review covering
+// the band, and 9.5 is the whole-level review. That distinction lives in the
+// title and in `kind`; it does not move the file. 0.0 is the copyright notice.
 const BANDS = { 3: [1, 3], 6: [4, 6], 9: [7, 9] };
 const LAST_UNIT = 9;
 
@@ -71,11 +74,13 @@ function classify(track, level) {
   const [unitStr, seq] = track.split(".");
   const unit = Number(unitStr);
   if (unit === 0) return { kind: "level", folder: "", title: "Copyright" };
+  const folder = `unit-${unit}`;
   if (unit === LAST_UNIT && seq.startsWith("5")) {
     return {
       kind: "checkpoint",
+      unit,
       checkpoint: [1, LAST_UNIT],
-      folder: `checkpoint-1-${LAST_UNIT}`,
+      folder,
       title: `OW2e EV L${level}U1-${LAST_UNIT} Review Track ${track}`
     };
   }
@@ -83,12 +88,13 @@ function classify(track, level) {
     const [from, to] = BANDS[unit];
     return {
       kind: "checkpoint",
+      unit,
       checkpoint: [from, to],
-      folder: `checkpoint-${from}-${to}`,
+      folder,
       title: `OW2e EV L${level}U${from}-${to} Review Track ${track}`
     };
   }
-  return { kind: "unit", unit, folder: `unit-${unit}`, title: `OW2e EV L${level}U${unit} Track ${track}` };
+  return { kind: "unit", unit, folder, title: `OW2e EV L${level}U${unit} Track ${track}` };
 }
 
 function trackFromFilename(file, level) {
@@ -121,8 +127,8 @@ function scaffold(level, from) {
     const placement = classify(track, level);
     const dir = placement.folder ? `${base}/${placement.folder}` : base;
     const entry = { n: tracks.length, track, title: placement.title, file, path: `${dir}/${file}` };
-    if (placement.kind === "unit") entry.unit = placement.unit;
-    if (placement.kind === "checkpoint") entry.checkpoint = placement.checkpoint;
+    if (placement.unit) entry.unit = placement.unit;
+    if (placement.checkpoint) entry.checkpoint = placement.checkpoint;
     entry.kind = placement.kind;
     tracks.push(entry);
   });

@@ -20,30 +20,36 @@ rebuild — `npm run dev` and `npm run build` both regenerate it.
 ```
 public/audio/our-world/level-4/
   ow2e_ev4_ame_0.0_0.mp3      ← copyright notice, level-wide, not shown to Leo
-  unit-1/                      ← tracks 1.1, 1.2 — the Unit 1 test
-  unit-2/                      ← tracks 2.1, 2.2
-  unit-3/                      ← tracks 3.1, 3.2
-  checkpoint-1-3/              ← tracks 3.3, 3.4 — the Units 1–3 review
-  unit-4/ … unit-6/
-  checkpoint-4-6/              ← tracks 6.3, 6.4
-  unit-7/ … unit-9/
-  checkpoint-7-9/              ← tracks 9.3, 9.4, 9.4a
-  checkpoint-1-9/              ← track 9.5 — the whole-level review
+  unit-1/                      ← 1.1, 1.2
+  unit-2/                      ← 2.1, 2.2
+  unit-3/                      ← 3.1, 3.2, 3.3, 3.4
+  unit-4/ … unit-5/
+  unit-6/                      ← 6.1, 6.2, 6.3, 6.4
+  unit-7/ … unit-8/
+  unit-9/                      ← 9.1, 9.2, 9.3, 9.4, 9.4a, 9.5
 ```
+
+**The number before the dot is the unit, and that alone decides the folder.**
+Review tracks are no exception: 9.3 reviews Units 7–9 but still lives in
+`unit-9/`, because that is how the publisher numbers it and where Leo would
+look for it.
 
 Files keep the publisher's names (`ow2e_ev<level>_ame_<track>_0.mp3`) so a
 track can always be traced back to the disc it came from. The folder supplies
 the organisation; the filename supplies the provenance.
 
-## Why review tracks sit in `checkpoint-N-M`
+## Why some units have more tracks
 
-ExamView numbers a review under the band's **last** unit — the Units 1–3
-review is tracks 3.3 and 3.4, not 1.x. LEEA already does the same thing for
-checkpoint lessons, which carry the band's last unit number so the teacher
-menu can find them (see `CHECKPOINT_COMPONENTS` in `src/data/lessons.ts`).
-Filing the review tracks under `checkpoint-1-3/` rather than `unit-3/` keeps
-the two conventions in step: Unit 3's page shows the Unit 3 test *and* the
-1–3 review, clearly labelled as different things.
+A band-closing unit ships **two tests**, so it has more tracks than the rest:
+the unit's own test, plus the review covering the band. Unit 3 has 3.1/3.2 for
+itself and 3.3/3.4 for the Units 1–3 review; Unit 6 the same; Unit 9 carries
+9.1/9.2 for itself, 9.3/9.4/9.4a for the Units 7–9 review, and 9.5 for the
+whole-level review.
+
+Nothing in the filename says which is which — only the publisher's title does.
+That is why the manifest records a `kind` (`unit` or `checkpoint`) and, for a
+review, the band it covers. Those fields **label the row** on the unit page so
+the two tests read as different things; they never move the file.
 
 ## Adding a disc
 

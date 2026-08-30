@@ -654,17 +654,18 @@ for (const relativePath of assessmentAudioPaths) {
       fail(`${where} has path ${track.path}, which does not end in its file name ${track.file}.`);
     }
 
-    const expectedFolder =
-      track.kind === "unit"
-        ? `unit-${track.unit}`
-        : track.kind === "checkpoint"
-          ? `checkpoint-${track.checkpoint?.[0]}-${track.checkpoint?.[1]}`
-          : "";
-    const expectedDir = expectedFolder ? `${manifest.basePath}/${expectedFolder}` : manifest.basePath;
+    // Filing is by unit alone — the number before the dot. Review tracks are
+    // no exception: 9.3 is the Units 7-9 review but still lives in unit-9/,
+    // because that is how the publisher numbers and how Leo looks for it.
+    const numberedUnit = Number(String(track.track).split(".")[0]);
+    const expectedDir = numberedUnit ? `${manifest.basePath}/unit-${numberedUnit}` : manifest.basePath;
     if (track.path && track.file && track.path !== `${expectedDir}/${track.file}`) {
       fail(
-        `${where} is kind "${track.kind}" so it belongs at ${expectedDir}/${track.file}, but the manifest puts it at ${track.path}.`
+        `${where} is numbered under unit ${numberedUnit} so it belongs at ${expectedDir}/${track.file}, but the manifest puts it at ${track.path}.`
       );
+    }
+    if (numberedUnit && track.unit !== numberedUnit) {
+      fail(`${where} is numbered under unit ${numberedUnit} but the manifest records unit ${track.unit}.`);
     }
 
     if (track.kind === "unit" && !Number.isInteger(track.unit)) {

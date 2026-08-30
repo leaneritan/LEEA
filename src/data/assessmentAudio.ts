@@ -38,16 +38,16 @@ export function getUnitAssessmentTracks(course: string, level: number, unit: num
 }
 
 /**
- * The review tracks for the band a unit closes, or an empty list when the unit
- * does not close one. ExamView numbers its review tracks under the band's last
- * unit (3.3 is the Units 1-3 review), which is the same convention LEEA uses
- * for checkpoint lessons — so Unit 3, 6 and 9 each carry a review alongside
- * their own test, and the other units carry none.
+ * The review tracks numbered under a unit, or an empty list when it has none.
+ * A band-closing unit (3, 6, 9) ships two tests: its own, and the review
+ * covering the band — 9.3 reviews Units 7-9, and Unit 9 also carries 9.5, the
+ * whole-level review. Both are numbered under the unit and filed with it; only
+ * the title tells them apart, which is what the unit page labels them by.
  */
 export function getCheckpointAssessmentTracks(course: string, level: number, unit: number) {
   const manifest = getManifest(course, level);
   if (!manifest) return [];
-  return manifest.tracks.filter((track) => track.kind === "checkpoint" && track.checkpoint?.[1] === unit);
+  return manifest.tracks.filter((track) => track.kind === "checkpoint" && track.unit === unit);
 }
 
 export function getAssessmentAlbum(course: string, level: number) {

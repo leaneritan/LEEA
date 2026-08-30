@@ -550,11 +550,14 @@ player: with `preload="none"` the browser never requests the file, so a missing
 track fires no error and would otherwise render as a player that silently does
 nothing when pressed.
 
-Review tracks are numbered by the publisher under the band's **last** unit —
-the Units 1–3 review is tracks 3.3/3.4 — which is the same convention LEEA
-uses for checkpoint lessons (`CHECKPOINT_COMPONENTS` in `src/data/lessons.ts`).
-They are filed under `checkpoint-1-3/`, not `unit-3/`, so Unit 3's page can
-show the unit test and the band review as separate, labelled things.
+Filing is by unit alone — the number before the dot. Review tracks are no
+exception: 9.3 reviews Units 7–9 but lives in `unit-9/`, because that is how
+the publisher numbers it. A band-closing unit (3, 6, 9) therefore has more
+tracks than the rest, since it ships two tests: its own, and the band review
+(Unit 9 also carries 9.5, the whole-level review). Nothing in the filename
+says which is which — only the title does, which is why `kind` and
+`checkpoint` are recorded in the manifest. They label the row on the unit
+page so the two tests read as different things; they never move the file.
 
 To file a disc into place, or to see what is still missing:
 

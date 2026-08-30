@@ -53,11 +53,15 @@ the two tests read as different things; they never move the file.
 
 ## Adding a disc
 
-Copy the `.mp3` files somewhere local, then:
+Copy the `.mp3` files somewhere local, then point the script at the folder:
 
 ```bash
 npm run audio:assessment -- --from ~/Downloads/ExamViewAudio
 ```
+
+The level is read from the filenames (`ow2e_ev4_ame_…` is Level 4), so one
+command handles any level. A folder holding more than one level is an error
+rather than a guess — split it, or pass `--level <n>`.
 
 The script reads the manifest, copies each track to the path the manifest
 gives it, and reports anything missing from the disc or unexpected in it. It

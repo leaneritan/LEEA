@@ -17,7 +17,7 @@ import path from "node:path";
 const root = process.cwd();
 
 function parseArgs(argv) {
-  const args = { level: 4, from: null, dryRun: false, check: false, scaffold: false };
+  const args = { level: null, from: null, dryRun: false, check: false, scaffold: false };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--from") args.from = argv[++i];
@@ -39,11 +39,35 @@ const args = parseArgs(process.argv.slice(2));
 if (args.help) {
   console.log(`Usage:
   --from <dir>   folder holding the .mp3 files to file (copied, not moved)
-  --level <n>    Our World level, default 4
+  --level <n>    Our World level; inferred from the filenames when omitted
   --dry-run      report what would happen, change nothing
   --check        verify what is already in public/audio/ against the manifest
   --scaffold     draft a manifest from --from filenames (new levels only)`);
   process.exit(0);
+}
+
+// The level is in every filename (ow2e_ev4_ame_...), so a folder can say which
+// level it is without being told. Guessing wrong would file a disc into the
+// wrong level, so a folder carrying more than one level is an error, not a
+// best guess.
+function inferLevel(from) {
+  if (!fs.existsSync(from)) {
+    console.error(`Source folder not found: ${from}`);
+    process.exit(1);
+  }
+  const levels = new Set();
+  for (const file of listMp3s(from)) {
+    const match = file.match(/^ow2e_ev(\d+)_ame_/i);
+    if (match) levels.add(Number(match[1]));
+  }
+  if (levels.size === 1) return [...levels][0];
+  if (levels.size === 0) {
+    console.error(`Could not tell which level ${from} holds — no file there is named like ow2e_ev<level>_ame_<track>_0.mp3.`);
+    console.error(`Pass --level <n> to say which it is.`);
+  } else {
+    console.error(`${from} holds more than one level (${[...levels].sort().join(", ")}). Split it, or pass --level <n>.`);
+  }
+  process.exit(1);
 }
 
 function manifestPath(level) {
@@ -227,9 +251,13 @@ if (args.scaffold) {
     console.error("--scaffold needs --from <dir>.");
     process.exit(1);
   }
-  scaffold(args.level, args.from);
+  const level = args.level ?? inferLevel(args.from);
+  console.log(`Level ${level}${args.level ? "" : " (from the filenames)"}.`);
+  scaffold(level, args.from);
 } else {
-  const manifest = readManifest(args.level);
+  const level = args.level ?? (args.from ? inferLevel(args.from) : 4);
+  if (args.from && !args.level) console.log(`Level ${level} (from the filenames).`);
+  const manifest = readManifest(level);
   if (args.check || !args.from) {
     const missing = check(manifest);
     if (!args.from && !args.check) {

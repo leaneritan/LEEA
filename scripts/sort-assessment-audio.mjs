@@ -156,23 +156,32 @@ function classify(track, level) {
   };
 }
 
+// ow2e_ev<level>_ame_<track>[_<n>].mp3 — the trailing _<n> varies by disc
+// (Level 4 ships _0, Level 2 _2, Levels 1, 3, 5 and 6 none), so it is optional
+// and carries nothing. Requiring the `ev<digit>` stem is what keeps the student
+// book (sb), workbook (wb), readers (rdr) and placement test (evp) audio out.
 function trackFromFilename(file, level) {
-  const match = file.match(new RegExp(`^ow2e_ev${level}_ame_(\\d+\\.\\d+[a-z]?)_0\\.mp3$`, "i"));
+  const match = file.match(new RegExp(`^ow2e_ev${level}_ame_(\\d+\\.\\d+[a-z]?)(?:_\\d+)?\\.mp3$`, "i"));
   return match ? match[1] : null;
 }
 
 // Every .mp3 at or under a folder, keyed by file name. Searching subfolders
 // means --from can be the folder holding one subfolder per level, so all the
 // discs go in with one command and one path to get right.
-function collectMp3s(dir, found = new Map()) {
+function collectMp3s(dir, found = new Map(), repeats = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) collectMp3s(fullPath, found);
-    else if (entry.isFile() && entry.name.toLowerCase().endsWith(".mp3") && !found.has(entry.name)) {
-      found.set(entry.name, fullPath);
+    if (entry.isDirectory()) collectMp3s(fullPath, found, repeats);
+    else if (entry.isFile() && entry.name.toLowerCase().endsWith(".mp3")) {
+      // The same disc can sit in two folders — Level 5's assessment and
+      // placement folders hold identically named files. Take the first and
+      // count the rest, so a folder that is a copy does not look like extra
+      // tracks and does not go unmentioned either.
+      if (found.has(entry.name)) repeats.push(entry.name);
+      else found.set(entry.name, fullPath);
     }
   }
-  return found;
+  return { found, repeats };
 }
 
 // Split what was found by the level in each file name. A file the pattern does
@@ -201,12 +210,20 @@ function scaffold(level, sources, { write = true } = {}) {
   const flagged = [];
   const tracks = [];
 
+  const seen = new Map();
+  const duplicates = [];
+
   for (const file of files) {
     const track = trackFromFilename(file, level);
     if (!track) {
       unknown.push(file);
       continue;
     }
+    if (seen.has(track)) {
+      duplicates.push(`${track}: keeping ${seen.get(track)}, ignoring ${file}`);
+      continue;
+    }
+    seen.set(track, file);
     const placement = classify(track, level);
     if (placement.unexpected) flagged.push(track);
     const dir = placement.folder ? `${base}/${placement.folder}` : base;
@@ -256,6 +273,11 @@ function scaffold(level, sources, { write = true } = {}) {
   if (unknown.length) {
     console.log(`\nNot named like ExamView audio, so left out — add them by hand if they belong:`);
     for (const file of unknown) console.log(`  ${file}`);
+  }
+  if (duplicates.length) {
+    console.log(`\n  Two files claim the same track — the disc appears more than once.`);
+    console.log(`  One of each is used; check they are the same recording:`);
+    for (const line of duplicates) console.log(`    ${line}`);
   }
   if (flagged.length) {
     console.log(`\n! These are numbered in a way Level 4's rules do not cover, so each`);
@@ -366,7 +388,8 @@ function levelsFrom(from, forcedLevel) {
     console.error(`Check the spelling — or point --from at the folder that holds the level folders.`);
     process.exit(1);
   }
-  const { byLevel, unknown } = groupByLevel(collectMp3s(from), forcedLevel);
+  const { found, repeats } = collectMp3s(from);
+  const { byLevel, unknown } = groupByLevel(found, forcedLevel);
   if (!byLevel.size) {
     console.error(`No ExamView audio found in ${from} or its subfolders.`);
     console.error(`Files should be named like ow2e_ev4_ame_1.1_0.mp3; pass --level <n> if yours are not.`);
@@ -381,6 +404,9 @@ function levelsFrom(from, forcedLevel) {
   );
   if (unknown.length) {
     console.log(`Ignoring ${unknown.length} .mp3 file(s) not named like ExamView audio.`);
+  }
+  if (repeats.length) {
+    console.log(`Ignoring ${repeats.length} repeat(s) of a file already found in another folder.`);
   }
   return { byLevel, levels };
 }

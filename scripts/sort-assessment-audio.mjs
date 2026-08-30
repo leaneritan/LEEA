@@ -70,6 +70,20 @@ function inferLevel(from) {
   process.exit(1);
 }
 
+// The levels that have a manifest, found the same way the generator and the
+// validator find them, so nothing has to be kept in step by hand.
+function findManifests(dir = path.join(root, "content/subjects/english/courses"), results = []) {
+  if (!fs.existsSync(dir)) return results;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) findManifests(fullPath, results);
+    else if (entry.isFile() && entry.name === "assessment-audio.json") {
+      results.push(path.relative(root, fullPath));
+    }
+  }
+  return results.sort();
+}
+
 function manifestPath(level) {
   return `content/subjects/english/courses/our-world/level-${level}/assessment-audio.json`;
 }
@@ -252,8 +266,13 @@ function check(manifest) {
   const present = manifest.tracks.length - missing.length;
   console.log(`Level ${manifest.level}: ${present} of ${manifest.tracks.length} track(s) in public/audio/.`);
   if (missing.length) {
-    console.log(`\nMissing:`);
-    for (const entry of missing) console.log(`  ${entry.track}  →  public${entry.path}`);
+    // A whole level missing is the ordinary state before its disc is filed, so
+    // list a few and count the rest rather than printing 27 identical lines.
+    const shown = missing.slice(0, 6);
+    console.log(`  missing: ${shown.map((entry) => entry.track).join(", ")}${missing.length > shown.length ? `, and ${missing.length - shown.length} more` : ""}`);
+    if (missing.length <= shown.length) {
+      for (const entry of missing) console.log(`    → public${entry.path}`);
+    }
   }
   return missing;
 }
@@ -315,16 +334,26 @@ if (args.scaffold) {
   const level = args.level ?? inferLevel(args.from);
   console.log(`Level ${level}${args.level ? "" : " (from the filenames)"}.`);
   scaffold(level, args.from);
+} else if (!args.from && !args.level) {
+  // Nothing named: report every level there is a manifest for, so one command
+  // answers "what is actually in place?" across the whole library.
+  const manifests = findManifests();
+  if (!manifests.length) {
+    console.log("No assessment audio manifests yet.");
+    process.exit(0);
+  }
+  let missing = 0;
+  for (const relativePath of manifests) {
+    missing += check(JSON.parse(fs.readFileSync(path.join(root, relativePath), "utf8"))).length;
+  }
+  if (!args.check) console.log(`\nTo file a disc into place: --from <folder holding the .mp3 files>`);
+  process.exit(missing ? 1 : 0);
 } else {
-  const level = args.level ?? (args.from ? inferLevel(args.from) : 4);
+  const level = args.level ?? inferLevel(args.from);
   if (args.from && !args.level) console.log(`Level ${level} (from the filenames).`);
   const manifest = readManifest(level, args.from, args.dryRun);
   if (args.check || !args.from) {
-    const missing = check(manifest);
-    if (!args.from && !args.check) {
-      console.log(`\nTo file a disc into place: --from <folder holding the .mp3 files>`);
-    }
-    process.exit(missing.length ? 1 : 0);
+    process.exit(check(manifest).length ? 1 : 0);
   }
   const problems = file(manifest, args.from, args.dryRun);
   process.exit(problems ? 1 : 0);

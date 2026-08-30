@@ -158,6 +158,9 @@ export function OurWorldPage() {
             <span>{teacherLessons.length} teacher lessons built</span>
             <span>Level {currentUnit.level} of {LEVELS.length}</span>
           </div>
+          <Link className="ow-hero-link" href="/english/our-world/test-audio">
+            🎧 Test audio — every unit, Levels 4–6
+          </Link>
         </div>
         <aside>
           <span>Continue</span>

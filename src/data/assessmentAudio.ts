@@ -62,3 +62,45 @@ export function getCheckpointAssessmentTracks(course: string, level: number, uni
 export function getAssessmentAlbum(course: string, level: number) {
   return getManifest(course, level)?.album;
 }
+
+/** Levels that have assessment audio, lowest first. */
+export function getAssessmentLevels(course: string) {
+  return manifests
+    .filter((manifest) => manifest.course === course)
+    .map((manifest) => manifest.level)
+    .sort((a, b) => a - b);
+}
+
+/**
+ * A level's tracks grouped by the unit they are filed under, in unit order,
+ * with each unit's own test before any review numbered under it. Units with no
+ * tracks are left out rather than shown empty.
+ */
+export function getAssessmentUnits(course: string, level: number) {
+  const manifest = getManifest(course, level);
+  if (!manifest) return [];
+
+  const byUnit = new Map<number, AssessmentTrack[]>();
+  for (const track of manifest.tracks) {
+    if (track.kind === "level" || !track.unit) continue;
+    if (!byUnit.has(track.unit)) byUnit.set(track.unit, []);
+    byUnit.get(track.unit)!.push(track);
+  }
+
+  return [...byUnit.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([unit, tracks]) => ({
+      unit,
+      tracks: [
+        ...tracks.filter((track) => track.kind === "unit"),
+        ...tracks.filter((track) => track.kind === "checkpoint")
+      ]
+    }));
+}
+
+export function countAssessmentTracks(course: string, level: number) {
+  const manifest = getManifest(course, level);
+  if (!manifest) return { total: 0, available: 0 };
+  const total = manifest.tracks.length;
+  return { total, available: manifest.tracks.filter(isAssessmentTrackAvailable).length };
+}

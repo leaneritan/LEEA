@@ -526,6 +526,48 @@ Grammar cards need:
 - Tab 4 reveals Japanese automatically after each answer, regardless of toggle state
 - related lesson button, disabled until the lesson is live
 
+## Assessment Audio
+
+The ExamView listening tracks for the test Leo takes after each unit live in
+`public/audio/`, filed one folder per unit. What each track is comes from the
+level's manifest, not from scanning the folder:
+
+```
+content/subjects/english/courses/our-world/level-4/assessment-audio.json
+```
+
+Each entry carries the publisher's track number (`1.1`), its ID3 title, the
+file name, the URL the player uses, and a `kind` of `unit`, `checkpoint` or
+`level`. `scripts/validate-content.mjs` checks that every path sits under the
+manifest's `basePath` in the folder its `kind` implies, so a misfiled track
+fails the build rather than producing a player pointed at a URL nothing will
+be filed to. A track whose `.mp3` is not in the repo yet is **not** an error —
+the audio is added separately, and `UnitAssessmentAudio` renders those rows as
+"Not added yet". Which tracks have a file is decided at build time by
+`scripts/generate-assessment-audio-map.mjs` (chained into predev/prebuild,
+output gitignored under `src/generated/`), not by an `onError` handler on the
+player: with `preload="none"` the browser never requests the file, so a missing
+track fires no error and would otherwise render as a player that silently does
+nothing when pressed.
+
+Review tracks are numbered by the publisher under the band's **last** unit —
+the Units 1–3 review is tracks 3.3/3.4 — which is the same convention LEEA
+uses for checkpoint lessons (`CHECKPOINT_COMPONENTS` in `src/data/lessons.ts`).
+They are filed under `checkpoint-1-3/`, not `unit-3/`, so Unit 3's page can
+show the unit test and the band review as separate, labelled things.
+
+To file a disc into place, or to see what is still missing:
+
+```bash
+npm run audio:assessment -- --from ~/Downloads/ExamViewAudio
+npm run audio:assessment -- --check
+```
+
+Audio is committed as ordinary files, not Git LFS. Keep each track under 25MB
+(64 kbps mono is about 0.5MB/minute and is plenty for speech). If the library
+outgrows the repo, move the files to Supabase Storage and repoint `basePath` —
+every player reads its URL from the manifest, so nothing else changes.
+
 ## Navigation Rules
 
 Navigation must stay consistent across every route.

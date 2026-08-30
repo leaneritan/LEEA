@@ -614,6 +614,71 @@ for (const [id, entry] of registeredLessons) {
   }
 }
 
+// Assessment audio — the ExamView test tracks. The manifest is the source of
+// truth for where each track lives; the audio itself is filed into public/audio
+// by scripts/sort-assessment-audio.mjs and may legitimately not be there yet, so
+// a missing .mp3 is not an error. What must hold is that the manifest is
+// internally consistent and that every path it claims sits under the level's
+// basePath in the folder its placement implies — otherwise the unit page would
+// point a player at a URL nothing will ever be filed to.
+const assessmentAudioPaths = ["content/subjects/english/courses/our-world/level-4/assessment-audio.json"];
+
+for (const relativePath of assessmentAudioPaths) {
+  if (!fs.existsSync(path.join(root, relativePath))) {
+    fail(`${relativePath} is listed as an assessment-audio manifest but does not exist.`);
+    continue;
+  }
+  const manifest = readJson(relativePath);
+  const label = `${relativePath}`;
+  assertPresent(manifest.basePath, `${label} basePath`);
+
+  const seenTracks = new Set();
+  const seenPaths = new Set();
+
+  for (const track of manifest.tracks ?? []) {
+    const where = `${label} track ${track.track ?? "(unnumbered)"}`;
+    assertPresent(track.track, `${where} track number`);
+    assertPresent(track.title, `${where} title`);
+    assertPresent(track.file, `${where} file`);
+    assertPresent(track.path, `${where} path`);
+
+    if (seenTracks.has(track.track)) fail(`${where} is listed twice.`);
+    seenTracks.add(track.track);
+    if (seenPaths.has(track.path)) fail(`${where} reuses path ${track.path}.`);
+    seenPaths.add(track.path);
+
+    if (track.path && !track.path.startsWith(`${manifest.basePath}/`)) {
+      fail(`${where} has path ${track.path}, which is outside the manifest basePath ${manifest.basePath}.`);
+    }
+    if (track.path && track.file && !track.path.endsWith(`/${track.file}`)) {
+      fail(`${where} has path ${track.path}, which does not end in its file name ${track.file}.`);
+    }
+
+    const expectedFolder =
+      track.kind === "unit"
+        ? `unit-${track.unit}`
+        : track.kind === "checkpoint"
+          ? `checkpoint-${track.checkpoint?.[0]}-${track.checkpoint?.[1]}`
+          : "";
+    const expectedDir = expectedFolder ? `${manifest.basePath}/${expectedFolder}` : manifest.basePath;
+    if (track.path && track.file && track.path !== `${expectedDir}/${track.file}`) {
+      fail(
+        `${where} is kind "${track.kind}" so it belongs at ${expectedDir}/${track.file}, but the manifest puts it at ${track.path}.`
+      );
+    }
+
+    if (track.kind === "unit" && !Number.isInteger(track.unit)) {
+      fail(`${where} is kind "unit" but has no unit number.`);
+    }
+    if (track.kind === "checkpoint" && (track.checkpoint?.length !== 2 || track.checkpoint[0] > track.checkpoint[1])) {
+      fail(`${where} is kind "checkpoint" but its band ${JSON.stringify(track.checkpoint)} is not a [from, to] pair.`);
+    }
+    if (!["unit", "checkpoint", "level"].includes(track.kind)) {
+      fail(`${where} has unknown kind "${track.kind}".`);
+    }
+  }
+}
+
 if (errors.length) {
   console.error(`Content validation failed with ${errors.length} issue(s):`);
   for (const error of errors) console.error(`- ${error}`);

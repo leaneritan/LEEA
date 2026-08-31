@@ -77,6 +77,16 @@ its own — `procedure` (観察/実験/実習), `technique` (基礎操作), `ter
 book has 16 hands-on moments, so `ScienceInteractiveWidget` grows one entry at a
 time as chapters are authored.
 
+**Two books.** `docs/lesson-plans/science/new-science-1/` is the textbook;
+`docs/lesson-plans/science/yokuwakaru-rika-1/` is the よくわかる 理科の学習1（東）
+workbook that accompanies it. Their paginations are unrelated while covering the
+same 単元, so a bare page number is ambiguous — every `page` field in
+`content/subjects/science/` means a **textbook** page. The workbook prints its
+own 教p.NN cross-reference on each section, so read the mapping off the page
+rather than inferring it. Content taken from the workbook stays labelled as
+such: `ClassificationSortWidget` keeps its 教科書 and ワーク sets separate
+rather than merging them, because each is its own book's worked example.
+
 **What must be a widget.** Golden rule 12 applies here through the publisher's
 own tags: the 9 シミュレーション *and* the 7 思考ツール, all inventoried with
 their pages in `docs/lesson-plans/science/new-science-1/README.md`. The 思考ツール

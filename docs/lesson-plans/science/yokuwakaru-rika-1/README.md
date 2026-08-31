@@ -64,6 +64,15 @@ runs the same classification exercise as 教科書 p.23 — same 観点 (水中/
 クロオオアリ, ナナホシテントウ and マアジ among its eight. It also adds a
 動き方 question (飛ぶ／走る／泳ぐ) over シマリス, ニホンミツバチ, クジラ, メダカ.
 
-That is a ready-made second set for `ClassificationSortWidget`, which today
-carries only the textbook's — but the two sets must not be merged into one pool,
-because each belongs to its own book's worked example.
+**Built.** `ClassificationSortWidget` now offers both as separate sets behind a
+教科書 / ワーク switch, kept apart rather than merged, because each belongs to
+its own book's worked example. Solved 観点 are tracked per set, so credit does
+not carry across books.
+
+One thing to know if you extend it: the workbook asks its version as **multiple
+choice over four pre-made groups** (図1 ア〜エ, of which **エ is a distractor** —
+タンポポ appears in both ア and エ), not as sorting. It is offered as sorting so
+both sets play the same way. The memberships are still the book's own: ア, イ
+and ウ are its stated answers to (3), (4) and (2), and the rest follow as the
+complement. 図2's 動き方 question runs over its own four organisms (シマリス,
+ニホンミツバチ, クジラ, メダカ), only メダカ shared with the eight.

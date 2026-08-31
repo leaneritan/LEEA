@@ -137,6 +137,18 @@ https://sw121.tsho.jp/07jk/r/1/ — that is where the 動画 and the
 each item, and `urlsResolved: false` at the top, so the mapping can be
 filled in once without touching anything downstream.
 
+**Status: captured.** 160 of the 166 items carry a real link, plus 21
+section-level links in the index's `chapters` map. The six without one are
+items the portal itself gives no address for — the 感染症予防 group and five
+Webページ（リンク）rows that point at 気象庁, 防災科学技術研究所,
+ハザードマップポータル and 日本ジオパークネットワーク. All 16 hands-on items
+(9 シミュレーション + 7 思考ツール) are linked.
+
+The scheme turned out to be `…/r/1/<letter>/#<NN>`, a sibling of math's
+`…/m/1/<letter>/#<NN>` — but **the letter selects the 単元 here where math's
+selects the 章**. Deriving it from math would have produced wrong links at the
+wrong granularity, which is why it was captured instead.
+
 **The portal is not reachable from a Claude Code cloud session.** The
 environment's egress proxy answers 403 for `sw121.tsho.jp`, and that block
 covers every tool in the session equally — `curl`, WebFetch and headless
@@ -145,6 +157,103 @@ not a code one: see
 https://code.claude.com/docs/en/claude-code-on-the-web.
 
 Until a real URL is captured for an item, leave its `url` at `null`. Do not
-guess a URL from the item number or infer a pattern from a sibling — the
-same rule Geography's `sourceLabel` follows: set it from something real or
-leave it empty. A link that 404s in front of Leo is worse than no link.
+guess a URL from the item number or infer a pattern from a sibling — the same
+rule Geography's `sourceLabel` follows: set it from something real or leave it
+empty. A link that 404s in front of Leo is worse than no link.
+
+Math's `content/subjects/math/digitalCompanion.ts` maps pages onto
+`sw111.tsho.jp/07jk/m/1/<letter>/#<NN>`, and 理科's portal is the sibling
+`sw121…/r/1/` (`m` 数学, `r` 理科). That is a plausible shape for what a capture
+will find — it is **not** a licence to generate the table from it.
+
+### Capturing the links
+
+Run this in a browser that can reach the portal (Claude in Chrome, or by hand),
+then bring the output back and import it.
+
+**Do not ask the capture for the item's kind.** All 166 items are already
+tagged 動画 / 練習 / ワークシート / シミュレーション / 資料 / 思考ツール /
+Webページ / 他教科リンク in this index, from the publisher's own PDF. Reading it
+back off a row icon would be a guess replacing a fact — and a wrong guess would
+either be discarded or, worse, block a good link. The importer ignores a `kind`
+column if one is present.
+
+**How the portal is laid out**, from a screenshot of it: a left sidebar picks
+the 単元 at the top, and below it lists that 単元's sections — 学習前, 第1章 …,
+単元末. Picking one fills the right-hand panel with that section's rows, each
+showing a page badge (`10ページ`), the item's title, and an icon for its kind.
+**The rows carry no item numbers**, so `no` will be empty in the capture; that
+is expected and fine — the importer keys on page + title instead, which it has
+to anyway, since 「Before & After シート」 appears 17 times in this book and
+「学んだことをチェックしよう」 13 times.
+
+**Prompt to paste into Claude in Chrome**, with the portal open:
+
+> Open https://sw121.tsho.jp/07jk/r/1/ — the QR content list for 新編 新しい科学1
+> (東京書籍, 令和7年度版).
+>
+> Using the left sidebar, go through every 単元 (1–4) and, inside each, every
+> section listed (学習前, each 第N章, 単元末), plus 巻末資料 and any
+> 教科共通コンテンツ. For each one, record every row shown in the right panel.
+>
+> Output **TSV only**, no prose, with exactly this tab-separated header:
+>
+> `no  unit  chapter  page  title  url  chapter_url`
+>
+> - `no` — leave empty; the portal does not number the rows
+> - `unit` — the 単元 number (1–4), empty for 教科共通コンテンツ / 巻末資料
+> - `chapter` — exactly as the sidebar labels it: `学習前`, `第1章`, `単元末`, …
+> - `page` — the page badge, e.g. `10ページ` (digits alone are fine too)
+> - `title` — the row's title exactly as shown, no rewording
+> - `url` — the row's own link, **only if it has one**: an `href` on the row, or
+>   the address bar after opening that row
+> - `chapter_url` — the address bar while that 単元/章 is selected in the sidebar
+>
+> Many rows may open a viewer without giving the row its own address. That is
+> expected: leave `url` empty for those and still fill in `chapter_url`.
+>
+> **Never construct, guess, or pattern-match a URL.** Do not derive one row's
+> link from another's, and do not build one from the page number. An empty cell
+> is correct and useful; an invented one is worse than nothing, because it
+> becomes a dead link in front of a student. Do not drop rows either — a row
+> with no link should still appear with its other fields filled in.
+
+Save the reply as a `.tsv` (or a JSON array of the same fields) and run:
+
+```sh
+npm run import:science-links -- capture.tsv --dry-run   # inspect
+npm run import:science-links -- capture.tsv             # write
+```
+
+Per-row links go into each item's `url`; `chapter_url` values are collected
+separately into the index's `chapters` map, keyed `<unit>/<章>`. Both are worth
+having: math's `digitalCompanion.ts` is itself only page-to-章-anchor, so
+section-level links are enough to build the same thing for 理科, and per-row
+links are a bonus if the portal exposes them.
+
+The importer treats this index as the authority and the capture as a claim. It
+only ever writes `url` and `chapters`, and it refuses a row whose page, title or
+単元 disagrees with what is recorded here, whose link is off the publisher's
+domain, or that matches no item — reporting each one instead of writing it. It
+exits non-zero when anything mismatched, so a disagreement gets looked at rather
+than committed. Partial captures are fine and the script can be run repeatedly;
+`urlsResolved` flips to `true` only once all 166 items have a link — it stays
+`false` while those six remain unlinkable.
+
+The host check is relaxed for exactly the kinds the index marks as pointing
+off-site (`Webページ`, `Webページ（リンク）`, `他教科リンク`) and for no others,
+and only after the row has been matched — so what counts as an acceptable host
+is decided by what the index says the item is, not by what the capture brought
+back.
+
+### Putting the links into the app
+
+`node scripts/link-science-chips.mjs` copies them onto the chips of the authored
+section JSON, matching a chip's kind and its block's page against the index. It
+only links where a page has exactly one item of that kind: p.17 carries two
+動画 (身近な生物の観察 and ルーペの使い方), so those two are reported and left
+for a person, because a chip that opens the wrong video is worse than a chip
+that opens nothing. Hand-set chip URLs survive re-runs.
+
+Section-level links go on `digitalUrl` in `curriculum.ts`, which is what the
+📘 デジタル教科書 button in the section topbar opens.

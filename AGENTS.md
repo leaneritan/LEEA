@@ -78,6 +78,16 @@ its own — `procedure` (観察/実験/実習), `technique` (基礎操作), `ter
 book has 16 hands-on moments, so `ScienceInteractiveWidget` grows one entry at a
 time as chapters are authored.
 
+**Two books.** `docs/lesson-plans/science/new-science-1/` is the textbook;
+`docs/lesson-plans/science/yokuwakaru-rika-1/` is the よくわかる 理科の学習1（東）
+workbook that accompanies it. Their paginations are unrelated while covering the
+same 単元, so a bare page number is ambiguous — every `page` field in
+`content/subjects/science/` means a **textbook** page. The workbook prints its
+own 教p.NN cross-reference on each section, so read the mapping off the page
+rather than inferring it. Content taken from the workbook stays labelled as
+such: `ClassificationSortWidget` keeps its 教科書 and ワーク sets separate
+rather than merging them, because each is its own book's worked example.
+
 **What must be a widget.** Golden rule 12 applies here through the publisher's
 own tags: the 9 シミュレーション *and* the 7 思考ツール, all inventoried with
 their pages in `docs/lesson-plans/science/new-science-1/README.md`. The 思考ツール
@@ -92,13 +102,27 @@ tick away. A plain tick stays a free toggle — unticking a 観察 must work. Th
 merge lives in `saveScienceBlockProgress`, and `SectionView` applies the same
 merge to its own state, or a replay would visibly lose the tick until reload.
 
-**Publisher links.** The portal is `https://sw121.tsho.jp/07jk/r/1/` — the same
-`/07jk/` scheme as math's digital companion (`sw111…/m/1/`, `m` 数学 / `r` 理科),
-so `content/subjects/math/digitalCompanion.ts` is the shape to copy. No science
-link has actually been opened yet: the domain is blocked by the environment's
-egress proxy, so `qr-index.json` holds every `url` at `null`. **Do not
-extrapolate a URL from the math pattern or from an item number** — same rule as
-Geography's `sourceLabel`: set it from something real, or leave it empty.
+**Publisher links.** The portal is `https://sw121.tsho.jp/07jk/r/1/`, and
+`content/subjects/math/digitalCompanion.ts` is the shape to copy. The domain is
+blocked by this environment's egress proxy, so nothing here can open or check a
+link: **do not extrapolate a URL from the math pattern or from an item number**
+— same rule as Geography's `sourceLabel`, set it from something real or leave it
+empty. Items with no captured link keep `url: null`.
+
+**The links are captured**: 160 of 166 items and 21 section addresses, all 16
+hands-on items among them. The six without one are rows the portal gives no
+address for. Writing `L` for the letter segment and `NN` for the anchor, science is
+`…/r/1/L/#NN` where **L is the 単元**, while math's sibling `…/m/1/L/#NN` keys
+L to the **章** — so deriving one from the other would have been wrong.
+
+Links are captured in a browser that can reach the portal (Claude in Chrome)
+and imported with `npm run import:science-links -- <capture-file>`, then put on
+the chips with `node scripts/link-science-chips.mjs`. The capture
+prompt and the format are in the README beside the index. The importer treats
+the index as the authority and the capture as a claim: it writes only `url`,
+refuses rows that disagree with the recorded page/title/単元 or point off the
+publisher's domain, and exits non-zero on any mismatch. Add links through it
+rather than editing `qr-index.json` by hand.
 
 ### History
 

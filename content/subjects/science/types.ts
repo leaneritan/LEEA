@@ -22,6 +22,13 @@ export type ScienceChipKind =
 export type ScienceChip = {
   kind: ScienceChipKind;
   label: string;
+  /**
+   * The publisher's own address for this QR item, when one exists. Only ever
+   * set from a link recorded in `docs/lesson-plans/science/new-science-1/
+   * qr-index.json`, which is only ever filled by the checked importer — never
+   * written by hand and never derived from a neighbouring item's URL.
+   */
+  url?: string;
 };
 
 export type ScienceBlockIntro = {

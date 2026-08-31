@@ -80,6 +80,12 @@ Each step becomes its own skill so a unit can be built one chunk at a time. Most
 
 Also built beyond the original numbered pipeline: `/mission-app`, `/project-app`, `/reader-app` (`.claude/commands/mission-app.md`, `project-app.md`, `reader-app.md`) — see `docs/components.md` for each component's locked module structure.
 
+**理科 has its own build doc**, `docs/science-chapter.md` (`/science-chapter`),
+built to the same rule: the skill was written once 単元1 第1章 had shipped and
+the pattern was locked. It is one chapter-level skill rather than a per-component
+family, because 理科's widgets are chosen by reuse against a family table — about
+six for the whole book — not one per lesson component.
+
 Naming rule going forward: the **`-unit-scanner`** suffix means "scans the unit PDF and produces unit-level JSON (vocabulary or grammar)"; the **`-app`** suffix means "builds the teacher slideshow + paired Leo learner app for that component" (except `/grammar-app`, which currently builds the teacher slideshow only — the Leo grammar app pattern is locked after grammar-2's Leo app ships, same way `/vocab-app` waited for vocab-2). Skills are added after the corresponding template/Leo app is built and locked.
 
 `/reading-app` includes a **landing-screen mode pattern**: one card per source (📘 SB, 📒 WB, future 📕 Extra-Reading). Each mode has its own tab strip starting with a Vocab tab (flashcards + quiz of every word in that source — including any WB-only words pre-added to `vocabulary.json`). Storage is namespaced per mode (`tab-N-done` for SB, `wb-tab-N-done` for WB). See `.claude/commands/reading-app.md` for the locked pattern.

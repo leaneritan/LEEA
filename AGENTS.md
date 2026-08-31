@@ -78,6 +78,12 @@ its own — `procedure` (観察/実験/実習), `technique` (基礎操作), `ter
 book has 16 hands-on moments, so `ScienceInteractiveWidget` grows one entry at a
 time as chapters are authored.
 
+**Building a chapter: follow `docs/science-chapter.md`**, or run
+`/science-chapter <unit> <chapter>`. It is the whole workflow — verifying the
+scan's folios, the block vocabulary, which widget families to reuse before
+building a new one, chip linking, the ワーク practice layer, and the traps. The
+worked example it was written from is 単元1 第1章.
+
 **Two books.** `docs/lesson-plans/science/new-science-1/` is the textbook;
 `docs/lesson-plans/science/yokuwakaru-rika-1/` is the よくわかる 理科の学習1（東）
 workbook that accompanies it. Their paginations are unrelated while covering the
@@ -630,6 +636,7 @@ The lesson-building workflow is documented in six focused docs under `docs/`:
 
 - `docs/build-order.md` — master per-unit pipeline (read this first)
 - `docs/pdf-mapping.md` — `index.json`, `pdf_offset`, page math
+- `docs/science-chapter.md` — build one 理科 章 end to end (`/science-chapter`)
 - `docs/vocab.md` — scan + build + wire vocabulary
 - `docs/grammar.md` — scan + build + wire grammar
 - `docs/components.md` — locked Leo app structure per component type

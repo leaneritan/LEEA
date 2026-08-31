@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>巻末年表ビューア｜歴史</title>
+<style>
+  :root{
+    --night:#0B1420; --panel:#122132; --panel2:#0F1B29;
+    --ink:#F4EDE0; --muted:#8FA2B4; --line:#25384C;
+    --ochre:#EFB13C; --jade:#48C3A9; --sky:#6FB3E0; --vermilion:#FF6B57;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Noto Serif JP",serif;
+    --gothic:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",sans-serif;
+    --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden}
+  body{
+    background:radial-gradient(1200px 600px at 20% -10%, #16273A 0%, transparent 60%),var(--night);
+    color:var(--ink);font-family:var(--gothic);-webkit-font-smoothing:antialiased;
+    padding:10px 12px 12px;
+  }
+  /* The viewer lives in an iframe of fixed height, so the whole page is one
+     flex column and the stage takes every pixel the chrome does not. */
+  .shell{display:flex;flex-direction:column;height:100%;max-width:1480px;margin:0 auto;min-height:0}
+
+  header{display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:9px;flex:none}
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+  h1{font-family:var(--mincho);font-weight:600;font-size:clamp(16px,2.1vw,21px);margin:0;letter-spacing:.04em;flex:none}
+  h1 .sub{color:var(--sky)}
+  .lede{color:var(--muted);font-size:12px;line-height:1.5;margin:0;flex:1 1 260px;min-width:0}
+
+  .bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 8px;flex:none}
+  .btn{
+    font-family:var(--gothic);font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--ink);
+    background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 13px;
+    cursor:pointer;transition:.15s;white-space:nowrap;
+  }
+  .btn:hover{border-color:#3D5771;background:#1B2E43}
+  .btn.icon{width:32px;padding:6px 0;text-align:center;font-size:15px;line-height:1}
+  .zoomval{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:52px;text-align:center}
+  /* Nothing to pan or zoom until the chart is actually on screen. */
+  .bar[aria-disabled="true"] .btn, .scrub[aria-disabled="true"]{opacity:.4;pointer-events:none}
+  .spacer{flex:1}
+  .src{font-size:11px;color:var(--muted);white-space:nowrap}
+  .src a{color:var(--sky);text-decoration:none}
+  .src a:hover{text-decoration:underline}
+
+  /* 左が古く右が新しい一本の帯なので、横位置そのものが「時代の位置」になる。 */
+  .scrub{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:10px;padding:6px 12px;margin:0 0 8px;flex:none}
+  .scrub label{font-size:11px;color:var(--muted);white-space:nowrap;font-family:var(--gothic)}
+  .scrub input[type=range]{flex:1;min-width:120px;accent-color:var(--ochre)}
+  .scrub input[type=range]:disabled{opacity:.35}
+
+  .stagewrap{position:relative;flex:1 1 auto;min-height:0;background:var(--panel2);
+    border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  #stage{position:absolute;inset:0;overflow:hidden;cursor:grab;touch-action:none}
+  #stage.dragging{cursor:grabbing}
+  #viewport{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
+  #chart{display:block;width:6398px;height:1500px;max-width:none;-webkit-user-drag:none;user-select:none;background:#fff}
+
+  .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:10px;padding:24px;text-align:center;background:var(--panel2);z-index:4}
+  .overlay[hidden]{display:none}
+  .overlay .big{font-family:var(--mincho);font-size:16px;letter-spacing:.04em}
+  .overlay p{max-width:52ch;margin:0;color:var(--muted);font-size:12px;line-height:1.9}
+  .overlay a{color:var(--sky);font-size:12px}
+  .spin{width:26px;height:26px;border:2px solid var(--line);border-top-color:var(--sky);border-radius:50%;
+    animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .hint{position:absolute;left:10px;bottom:10px;font-size:11px;color:var(--muted);
+    background:#0B1420cc;border:1px solid var(--line);border-radius:8px;padding:5px 9px;z-index:3;pointer-events:none}
+
+  /* Screen: the print sheets exist only for the printer. */
+  #sheets{display:none}
+
+  @media print{
+    /* Three A4 landscape sheets. The slice is sized by height, so its width
+       (182mm x 1.422 = 259mm) always fits inside the 281mm printable strip
+       whatever the printer's own margins round to. */
+    @page{size:A4 landscape;margin:8mm}
+    html,body{height:auto;overflow:visible;background:#fff;color:#000;padding:0}
+    .shell{display:none}
+    #sheets{display:block}
+    .sheet{
+      display:flex;flex-direction:column;align-items:center;gap:3mm;
+      height:194mm;break-after:page;page-break-after:always;
+    }
+    .sheet:last-child{break-after:auto;page-break-after:auto}
+    .sheethead{display:flex;justify-content:space-between;align-items:baseline;
+      width:250mm;font-family:var(--gothic);font-size:10pt;color:#000}
+    .sheethead b{font-family:var(--mincho);font-size:13pt;letter-spacing:.04em}
+    .sheetfoot{width:250mm;font-family:var(--gothic);font-size:7.5pt;color:#444}
+    /* The slice is sized by WIDTH only, and its height comes from the image's
+       own proportions — so the three sheets tile exactly. Giving the box a
+       height (or an aspect-ratio) instead makes the tiling depend on that
+       number matching the chart's real ratio, and a 0.3% miss there repeats
+       or drops a sliver of chart at each join.
+       250mm wide leaves the image 176mm tall; with the head, foot and gaps
+       that is 191mm inside A4 landscape's 194mm printable height. */
+    .slice{width:250mm;flex:none;overflow:hidden;line-height:0;
+      border:.3pt dashed #999}   /* a trim guide for taping the three together */
+    .slice img{display:block;width:300%;height:auto;max-width:none;
+      margin-left:calc(var(--n) * -100%)}
+  }
+
+  @media (max-width:760px){
+    header{gap:4px 10px}
+    .lede{flex-basis:100%}
+    .src{display:none}
+    .hint{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header>
+    <div>
+      <div class="eyebrow">Chronology · 巻末年表</div>
+      <h1>巻末年表 <span class="sub">旧石器時代 → 現代</span></h1>
+    </div>
+    <p class="lede">
+      ドラッグで動かし、ホイール（スマホは指2本）で拡大。左へ行くほど古く、右へ行くほど新しい時代です。下のスライダーでも移動できます。
+    </p>
+  </header>
+
+  <div class="bar" id="bar">
+    <button class="btn icon" id="zoomOut" type="button" title="縮小（−キー）" aria-label="縮小">−</button>
+    <span class="zoomval" id="zoomVal">100%</span>
+    <button class="btn icon" id="zoomIn" type="button" title="拡大（＋キー）" aria-label="拡大">＋</button>
+    <button class="btn" id="fitHeight" type="button" title="高さに合わせる（Fキー）">高さに合わせる</button>
+    <button class="btn" id="fitAll" type="button" title="全体表示（0キー）">全体表示</button>
+    <button class="btn" id="actual" type="button" title="原寸（1キー）">100%</button>
+    <button class="btn" id="fullscreen" type="button" title="全画面で見る（Escで戻る）">⛶ 全画面</button>
+    <button class="btn" id="printBtn" type="button" title="A4横 3枚に分けて印刷し、左から貼り合わせます">🖨 印刷（A4横×3）</button>
+    <span class="spacer"></span>
+    <span class="src">出典：<a href="https://ict.teikokushoin.co.jp/07jh_qr/his/chronology/nenpyo/index.html" target="_blank" rel="noreferrer noopener">帝国書院「巻末年表」</a></span>
+  </div>
+
+  <div class="scrub" id="scrubRow">
+    <label for="scrub">古い</label>
+    <input id="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="年表の横位置">
+    <label for="scrub">新しい</label>
+  </div>
+
+  <div class="stagewrap">
+    <div id="stage">
+      <div id="viewport">
+        <img id="chart" alt="巻末年表（旧石器時代〜現代）" draggable="false"
+             src="https://ict.teikokushoin.co.jp/07jh_qr/his/chronology/nenpyo/image/nenpyou.webp">
+      </div>
+    </div>
+
+    <div class="overlay" id="loading">
+      <div class="spin" aria-hidden="true"></div>
+      <p>年表を読み込んでいます…</p>
+    </div>
+
+    <div class="overlay" id="err" hidden>
+      <div class="big">年表の画像を読み込めませんでした</div>
+      <p>この年表は帝国書院のサーバーから読み込みます。インターネットにつながっているか確認して、ページを開き直してください。</p>
+      <a href="https://ict.teikokushoin.co.jp/07jh_qr/his/chronology/nenpyo/index.html" target="_blank" rel="noreferrer noopener">帝国書院の元ページを開く</a>
+    </div>
+
+    <div class="hint">ドラッグで移動 ／ ホイールで拡大・縮小 ／ ダブルクリックで拡大</div>
+  </div>
+</div>
+
+<!--
+  Print: the chart is 6398x1500, so one A4 cannot hold it at any readable
+  size. Three A4 landscape sheets each take a third (2133x1500), which is
+  the slice that matches an A4 landscape print area — about 195ppi on
+  paper. Taped left to right they make one ~78cm wall chart.
+
+  Each sheet shows the same <img> the screen uses, sized to three sheet
+  widths and slid sideways. No canvas: the chart is served from another
+  origin, and drawing it into a canvas would taint it and throw.
+-->
+<div id="sheets" aria-hidden="true">
+  <section class="sheet"><div class="sheethead"><b>巻末年表</b><span>1 ／ 3 ・いちばん古い時代</span></div>
+    <div class="slice"><img alt="" src="https://ict.teikokushoin.co.jp/07jh_qr/his/chronology/nenpyo/image/nenpyou.webp" style="--n:0"></div>
+    <div class="sheetfoot">出典：帝国書院 中学社会科用QRコンテンツ「巻末年表」　／　3枚を左から順に貼り合わせてください</div>
+  </section>
+  <section class="sheet"><div class="sheethead"><b>巻末年表</b><span>2 ／ 3 ・まんなか</span></div>
+    <div class="slice"><img alt="" src="https://ict.teikokushoin.co.jp/07jh_qr/his/chronology/nenpyo/image/nenpyou.webp" style="--n:1"></div>
+    <div class="sheetfoot">出典：帝国書院 中学社会科用QRコンテンツ「巻末年表」　／　3枚を左から順に貼り合わせてください</div>
+  </section>
+  <section class="sheet"><div class="sheethead"><b>巻末年表</b><span>3 ／ 3 ・いちばん新しい時代</span></div>
+    <div class="slice"><img alt="" src="https://ict.teikokushoin.co.jp/07jh_qr/his/chronology/nenpyo/image/nenpyou.webp" style="--n:2"></div>
+    <div class="sheetfoot">出典：帝国書院 中学社会科用QRコンテンツ「巻末年表」　／　3枚を左から順に貼り合わせてください</div>
+  </section>
+</div>
+
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var viewport = document.getElementById('viewport');
+  var img = document.getElementById('chart');
+  var zoomVal = document.getElementById('zoomVal');
+  var scrub = document.getElementById('scrub');
+  var loading = document.getElementById('loading');
+  var errBox = document.getElementById('err');
+
+  var NATURAL_W = 6398;
+  var NATURAL_H = 1500;
+  var MAX_SCALE = 4;
+
+  var scale = 1, tx = 0, ty = 0;
+
+  function stageSize() {
+    return { w: stage.clientWidth, h: stage.clientHeight };
+  }
+
+  /** The whole chart on screen — also the floor for zooming out, so the
+      year chart can never be shrunk or dragged off into nothing. */
+  function fitScale() {
+    var s = stageSize();
+    if (!s.w || !s.h) return 0.05;
+    return Math.min(s.w / NATURAL_W, s.h / NATURAL_H);
+  }
+
+  function clampScale(value) {
+    return Math.min(MAX_SCALE, Math.max(fitScale(), value));
+  }
+
+  /** Keeps the chart overlapping the stage: centred on an axis it does not
+      fill, and edge-locked on an axis it does. */
+  function clampPan() {
+    var s = stageSize();
+    var w = NATURAL_W * scale, h = NATURAL_H * scale;
+    tx = w <= s.w ? (s.w - w) / 2 : Math.min(0, Math.max(s.w - w, tx));
+    ty = h <= s.h ? (s.h - h) / 2 : Math.min(0, Math.max(s.h - h, ty));
+  }
+
+  function apply() {
+    clampPan();
+    viewport.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
+    zoomVal.textContent = Math.round(scale * 100) + '%';
+    syncScrub();
+  }
+
+  /** Slider follows the pan, and the pan follows the slider — one shared
+      idea: which part of the timeline is in the middle of the screen. */
+  function syncScrub() {
+    var s = stageSize();
+    var w = NATURAL_W * scale;
+    if (w <= s.w) {
+      scrub.disabled = true;
+      scrub.value = 500;
+      return;
+    }
+    scrub.disabled = false;
+    var centreX = (s.w / 2 - tx) / scale;               // image coords
+    var span = NATURAL_W - s.w / scale;                 // pannable width
+    var ratio = span > 0 ? (centreX - s.w / scale / 2) / span : 0;
+    scrub.value = Math.round(Math.min(1, Math.max(0, ratio)) * 1000);
+  }
+
+  function scrubTo(ratio) {
+    var s = stageSize();
+    var span = NATURAL_W - s.w / scale;
+    if (span <= 0) return;
+    tx = -(ratio * span) * scale;
+    apply();
+  }
+
+  function fitAll() {
+    scale = clampScale(fitScale());
+    apply();
+  }
+
+  /** The chart is 4.3x wider than it is tall, so "everything on screen" is
+      also "everything too small to read". Filling the height instead is how
+      the chart is meant to be read: one era at a time, travelling sideways. */
+  function fitHeight() {
+    var s = stageSize();
+    scale = clampScale(s.h / NATURAL_H);
+    tx = 0;   // start at the oldest end
+    ty = 0;
+    apply();
+  }
+
+  function zoomAt(cx, cy, factor) {
+    var next = clampScale(scale * factor);
+    if (next === scale) return;
+    var wx = (cx - tx) / scale;
+    var wy = (cy - ty) / scale;
+    scale = next;
+    tx = cx - wx * scale;
+    ty = cy - wy * scale;
+    apply();
+  }
+
+  function zoomCentre(factor) {
+    var s = stageSize();
+    zoomAt(s.w / 2, s.h / 2, factor);
+  }
+
+  function stagePoint(event) {
+    var rect = stage.getBoundingClientRect();
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+  }
+
+  // ---- wheel + pinch -------------------------------------------------
+  stage.addEventListener('wheel', function (event) {
+    event.preventDefault();
+    var point = stagePoint(event);
+    zoomAt(point.x, point.y, Math.pow(1.0015, -event.deltaY));
+  }, { passive: false });
+
+  var pointers = new Map();
+  var pinchDistance = 0;
+  var lastX = 0, lastY = 0;
+
+  stage.addEventListener('pointerdown', function (event) {
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    stage.setPointerCapture(event.pointerId);
+    if (pointers.size === 1) {
+      stage.classList.add('dragging');
+      lastX = event.clientX;
+      lastY = event.clientY;
+    } else if (pointers.size === 2) {
+      pinchDistance = spread();
+    }
+  });
+
+  stage.addEventListener('pointermove', function (event) {
+    if (!pointers.has(event.pointerId)) return;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+    if (pointers.size >= 2) {
+      var next = spread();
+      if (pinchDistance > 0 && next > 0) {
+        var mid = midpoint();
+        var rect = stage.getBoundingClientRect();
+        zoomAt(mid.x - rect.left, mid.y - rect.top, next / pinchDistance);
+      }
+      pinchDistance = next;
+      return;
+    }
+
+    tx += event.clientX - lastX;
+    ty += event.clientY - lastY;
+    lastX = event.clientX;
+    lastY = event.clientY;
+    apply();
+  });
+
+  function endPointer(event) {
+    pointers.delete(event.pointerId);
+    if (pointers.size < 2) pinchDistance = 0;
+    if (pointers.size === 0) stage.classList.remove('dragging');
+    // A finger lifted mid-pinch would otherwise jump the remaining one.
+    var remaining = pointers.values().next().value;
+    if (remaining) { lastX = remaining.x; lastY = remaining.y; }
+  }
+  stage.addEventListener('pointerup', endPointer);
+  stage.addEventListener('pointercancel', endPointer);
+
+  function spread() {
+    var list = Array.from(pointers.values());
+    if (list.length < 2) return 0;
+    return Math.hypot(list[0].x - list[1].x, list[0].y - list[1].y);
+  }
+
+  function midpoint() {
+    var list = Array.from(pointers.values());
+    return { x: (list[0].x + list[1].x) / 2, y: (list[0].y + list[1].y) / 2 };
+  }
+
+  stage.addEventListener('dblclick', function (event) {
+    var point = stagePoint(event);
+    zoomAt(point.x, point.y, 1.8);
+  });
+
+  // ---- controls ------------------------------------------------------
+  document.getElementById('zoomIn').addEventListener('click', function () { zoomCentre(1.25); });
+  document.getElementById('zoomOut').addEventListener('click', function () { zoomCentre(0.8); });
+  document.getElementById('fitAll').addEventListener('click', fitAll);
+  document.getElementById('fitHeight').addEventListener('click', fitHeight);
+  document.getElementById('actual').addEventListener('click', function () {
+    var s = stageSize();
+    zoomAt(s.w / 2, s.h / 2, 1 / scale);
+  });
+  scrub.addEventListener('input', function () { scrubTo(Number(scrub.value) / 1000); });
+
+  // ---- full screen ---------------------------------------------------
+  // Inside the app this is an iframe, so the app's <iframe allow="fullscreen">
+  // is what lets this work there; standalone it just works.
+  var fsBtn = document.getElementById('fullscreen');
+
+  fsBtn.addEventListener('click', function () {
+    if (document.fullscreenElement) {
+      if (document.exitFullscreen) document.exitFullscreen();
+      return;
+    }
+    var root = document.documentElement;
+    var request = root.requestFullscreen || root.webkitRequestFullscreen;
+    if (request) request.call(root);
+  });
+
+  document.addEventListener('fullscreenchange', function () {
+    var full = Boolean(document.fullscreenElement);
+    fsBtn.textContent = full ? '⛶ 全画面をやめる' : '⛶ 全画面';
+    // Full screen is asked for to read the chart bigger, so grow the chart
+    // with the stage — but hold the spot Leo was looking at.
+    var span = NATURAL_W - stageSize().w / scale;
+    var ratio = span > 0 ? -tx / scale / span : 0;
+    requestAnimationFrame(function () {
+      fitHeight();
+      scrubTo(Math.min(1, Math.max(0, ratio)));
+    });
+  });
+
+  if (!document.documentElement.requestFullscreen && !document.documentElement.webkitRequestFullscreen) {
+    fsBtn.hidden = true;
+  }
+
+  // ---- print ---------------------------------------------------------
+  // Called from inside the iframe, so the browser prints this document —
+  // the three A4 sheets — rather than the app page around it.
+  document.getElementById('printBtn').addEventListener('click', function () {
+    window.print();
+  });
+
+  window.addEventListener('keydown', function (event) {
+    if (event.target !== document.body && event.target !== scrub) return;
+    var step = 90;
+    if (event.key === 'ArrowRight') { tx -= step; apply(); }
+    else if (event.key === 'ArrowLeft') { tx += step; apply(); }
+    else if (event.key === 'ArrowDown') { ty -= step; apply(); }
+    else if (event.key === 'ArrowUp') { ty += step; apply(); }
+    else if (event.key === '+' || event.key === '=') zoomCentre(1.25);
+    else if (event.key === '-') zoomCentre(0.8);
+    else if (event.key === '0') fitAll();
+    else if (event.key === 'f' || event.key === 'F') fitHeight();
+    else if (event.key === '1') { var s = stageSize(); zoomAt(s.w / 2, s.h / 2, 1 / scale); }
+    else return;
+    event.preventDefault();
+  });
+
+  // Re-fitting on resize would throw away a zoom Leo set; re-clamping keeps
+  // the chart on screen without moving him somewhere he did not ask for.
+  window.addEventListener('resize', function () {
+    scale = clampScale(scale);
+    apply();
+  });
+
+  // ---- load ----------------------------------------------------------
+  function ready() {
+    loading.hidden = true;
+    fitHeight();
+  }
+
+  img.addEventListener('load', ready);
+  img.addEventListener('error', function () {
+    loading.hidden = true;
+    errBox.hidden = false;
+    document.getElementById('bar').setAttribute('aria-disabled', 'true');
+    document.getElementById('scrubRow').setAttribute('aria-disabled', 'true');
+    scrub.disabled = true;
+    stage.style.pointerEvents = 'none';
+    document.getElementById('sheets').remove();
+  });
+  if (img.complete && img.naturalWidth > 0) ready();
+})();
+</script>
+
+</body>
+</html>

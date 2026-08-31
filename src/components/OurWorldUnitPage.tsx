@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getLearnerAppProgress, syncLearnerProgressWithCloud } from "@/data/learnerProgress";
 import { getLessonGroups, isCheckpointComponent } from "@/data/lessons";
 import type { Lesson } from "@/data/types";
+import { UnitAssessmentAudio } from "./UnitAssessmentAudio";
 import { getComponentMeta } from "./componentMeta";
 
 const lessonCopy: Record<string, { title: string; subtitle: string }> = {
@@ -184,6 +185,8 @@ export function OurWorldUnitPage({ unit }: { unit: number }) {
           );
         })}
       </div>
+
+      <UnitAssessmentAudio course="our-world" level={4} unit={unit} />
     </section>
   );
 }

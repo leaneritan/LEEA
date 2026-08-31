@@ -225,6 +225,32 @@
 .unit-row-meter i { grid-column: 1; grid-row: 1; height: 8px; border-radius: 999px; background: #9cb98c; }
 .unit-row-meter b { color: #6e7c86; font-size: 12px; }
 
+.unit-audio { margin-top: 28px; }
+.unit-audio__head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; margin-bottom: 12px; }
+.unit-audio__head h2 { color: #2a3b47; font-size: 22px; letter-spacing: -.02em; }
+.unit-audio__head small { color: #94a08c; font-size: 12px; font-weight: 700; }
+.unit-audio__list { display: grid; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.unit-audio__row { display: grid; grid-template-columns: 52px minmax(0,1fr) auto; gap: 16px; align-items: center; border: 1px solid #e7eae3; border-radius: 14px; background: #fff; padding: 14px 18px; }
+.unit-audio__row.is-missing { opacity: .55; }
+.unit-audio__num { display: grid; place-items: center; height: 38px; border-radius: 10px; background: #f1e8f6; color: #74508c; font-size: 13px; font-weight: 900; }
+.unit-audio__copy { min-width: 0; }
+.unit-audio__copy strong { display: block; color: #2a3b47; font-size: 15px; }
+.unit-audio__copy small { color: #94a08c; font-size: 11px; font-weight: 700; }
+.unit-audio__row audio { height: 36px; max-width: 100%; }
+.unit-audio__pending { border-radius: 999px; background: #f3f4f1; color: #8d9782; padding: 6px 12px; font-size: 12px; font-weight: 800; }
+@media (max-width: 680px) {
+  .unit-audio__row { grid-template-columns: 52px minmax(0,1fr); }
+  .unit-audio__row audio, .unit-audio__pending { grid-column: 1 / -1; width: 100%; justify-self: stretch; text-align: center; }
+}
+
+.test-audio__units-picker > div { grid-template-columns: repeat(10,1fr); }
+.test-audio__units-picker button { padding: 12px 6px; }
+.test-audio__units { display: grid; gap: 26px; }
+.test-audio__unit h3 { margin-bottom: 10px; color: #2a3b47; font-size: 18px; letter-spacing: -.02em; }
+.test-audio__empty { color: #94a08c; }
+.ow-hero-link { display: inline-block; margin-top: 14px; border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 9px 16px; font-size: 13px; font-weight: 800; text-decoration: none; }
+.ow-hero-link:hover { border-color: #ffcc00; color: #ffcc00; }
+
 .tg-page { max-width: 1180px; margin: 0 auto; }
 .tg-hero {
   position: relative;
@@ -345,6 +371,7 @@
   .leo-today-section > header,.leo-worlds-section > header,.leo-library-section > header { align-items:start; flex-direction:column; }
   .ow-unit-grid,.design-home-links { grid-template-columns:1fr 1fr; }
   .ow-level-picker > div { grid-template-columns:repeat(3,1fr); }
+  .test-audio__units-picker > div { grid-template-columns:repeat(5,1fr); }
   .unit-design-row { grid-template-columns:50px 1fr; }
   .unit-design-state { grid-column:2; justify-items:start; }
 }
@@ -532,10 +559,11 @@ mark {
   background: var(--accent-tint); color: var(--accent-ink);
 }
 .sidebar-collapsed .sidebar-reference a b { display: none; }
-.dot-english, .dot-math, .dot-geography, .dot-science, .dot-disabled { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.dot-english, .dot-math, .dot-geography, .dot-history, .dot-science, .dot-disabled { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .dot-english { background: var(--good-soft); }
 .dot-math { background: #c9804f; }
 .dot-geography { background: #3aa6a0; }
+.dot-history { background: #b07a3c; }
 .dot-science { background: #4a9d6e; }
 .dot-disabled { background: #dfe2da; }
 
@@ -544,7 +572,7 @@ mark {
 .sidebar-collapsed .sidebar-subjects-title { display: none; }
 .sidebar-collapsed .sidebar-subjects a,
 .sidebar-collapsed .sidebar-subjects .disabled { padding: 8px; gap: 0; font-size: 0; }
-.sidebar-collapsed .dot-english, .sidebar-collapsed .dot-math, .sidebar-collapsed .dot-geography, .sidebar-collapsed .dot-science, .sidebar-collapsed .dot-disabled { width: 10px; height: 10px; }
+.sidebar-collapsed .dot-english, .sidebar-collapsed .dot-math, .sidebar-collapsed .dot-geography, .sidebar-collapsed .dot-history, .sidebar-collapsed .dot-science, .sidebar-collapsed .dot-disabled { width: 10px; height: 10px; }
 
 /* footer progress card → ring when collapsed */
 .sidebar-progress {
@@ -8270,6 +8298,57 @@ a.math-block-page:hover { text-decoration: underline; }
   .geo-bar { gap: 8px; }
   .geo-switch { margin-left: 0; width: 100%; }
   .geo-map-frame { height: calc(100vh - 210px); min-height: 480px; }
+}
+
+/* ============================================================
+   History — same chrome as Geography: one page, one material,
+   a button row to switch. History is Leo-support too, so the
+   shell stays thin and the frame takes everything else.
+   ============================================================ */
+.hist-page { display: flex; flex-direction: column; gap: 10px; }
+
+.hist-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 8px 12px; }
+.hist-bar-title { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; min-width: 0; }
+.hist-bar-title strong { color: var(--ink); font-family: var(--font-jp); font-size: 15px; }
+.hist-bar-title small { color: var(--muted); font-size: 11px; }
+
+.hist-switch { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+.hist-switch-btn { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface-muted); color: var(--body); padding: 5px 12px; font-family: var(--font-jp); font-size: 12px; font-weight: 700; text-decoration: none; transition: .15s ease; }
+.hist-switch-btn:hover { border-color: #cfd8cd; color: var(--ink); }
+.hist-switch-btn--active { border-color: var(--accent-ink); background: var(--accent-tint); color: var(--accent-ink); }
+.hist-switch-btn--planned { opacity: .5; }
+
+.hist-bar-end { display: flex; align-items: center; gap: 8px; }
+.hist-pill { border-radius: 999px; background: var(--surface-muted); color: var(--muted); padding: 4px 10px; font-family: var(--font-jp); font-size: 11px; font-weight: 900; letter-spacing: .06em; }
+.hist-fullscreen { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-muted); color: var(--body); padding: 5px 7px; text-decoration: none; transition: .15s ease; }
+.hist-fullscreen:hover { border-color: var(--accent-ink); color: var(--accent-ink); }
+
+/* The material gets everything the bar and the shell chrome do not. */
+.hist-frame { width: 100%; height: calc(100vh - 150px); min-height: 560px; border: 1px solid var(--border); border-radius: 14px; background: #0b1420; display: block; }
+
+.hist-missing { display: grid; gap: 8px; border: 1px dashed var(--border); border-radius: 16px; background: var(--surface-muted); padding: 40px 30px; text-align: center; }
+.hist-missing h2 { color: var(--ink); font-family: var(--font-jp); font-size: 18px; }
+.hist-missing p { max-width: 60ch; margin: 0 auto; color: var(--body-2); font-size: 13px; line-height: 1.6; }
+
+@media (max-width: 900px) {
+  .hist-bar { gap: 8px; }
+  .hist-switch { margin-left: 0; width: 100%; }
+  .hist-frame { height: calc(100vh - 210px); min-height: 480px; }
+}
+
+/* Printing the app page around a material would print one screenful of the
+   frame, cropped. The material prints itself properly — the 巻末年表 lays
+   itself out as three A4 sheets — so send the reader to its own button
+   rather than spending a page on a slice of chart. */
+@media print {
+  .hist-bar, .hist-frame { display: none; }
+  .hist-page::after {
+    content: "この資料は、年表の中の「印刷」ボタンから印刷してください（A4に合わせて分割されます）。";
+    display: block;
+    padding: 24px 0;
+    font-family: var(--font-jp);
+    font-size: 13px;
+  }
 }
 
 /* ============================================================

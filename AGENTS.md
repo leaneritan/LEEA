@@ -41,13 +41,14 @@ LEEA
 - Math
   - 中1数学ヘルパー (新編 新しい数学1) — see `docs/math-interactivity.md`
 - Geography (社会) — interactive maps, 地理 and 歴史
+- History (歴史) — chronology chart and other 歴史 material
 - Science
   - 中1理科ヘルパー (新編 新しい科学1) — see `### Science` below
 ```
 
 ### Subjects other than English
 
-**English is the only taught subject.** It has teacher decks, an assignment loop, a reference layer and a course spine because Neritan teaches it. Every other subject — Math, Geography, Science — exists to *support Leo working on his own*.
+**English is the only taught subject.** It has teacher decks, an assignment loop, a reference layer and a course spine because Neritan teaches it. Every other subject — Math, Geography, History, Science — exists to *support Leo working on his own*.
 
 So do not mirror the English structure into them. No teacher slides, no assign/review loop, no 章/節 navigation built to match Our World's course/level/unit. Give each one the smallest shape that lets Leo get to the thing and use it. Geography learned this the hard way: it shipped with a full 11-chapter 社会 spine, chapter pages and a 分野 switch, and all of it was scaffolding around three maps.
 
@@ -101,19 +102,18 @@ tick away. A plain tick stays a free toggle — unticking a 観察 must work. Th
 merge lives in `saveScienceBlockProgress`, and `SectionView` applies the same
 merge to its own state, or a replay would visibly lose the tick until reload.
 
-**Publisher links.** The portal is `https://sw121.tsho.jp/07jk/r/1/` — the same
-`/07jk/` scheme as math's digital companion (`sw111…/m/1/`, `m` 数学 / `r` 理科),
-so `content/subjects/math/digitalCompanion.ts` is the shape to copy. No science
-link has actually been opened yet: the domain is blocked by the environment's
-egress proxy, so `qr-index.json` holds every `url` at `null`. **Do not
-extrapolate a URL from the math pattern or from an item number** — same rule as
-Geography's `sourceLabel`: set it from something real, or leave it empty.
+**Publisher links.** The portal is `https://sw121.tsho.jp/07jk/r/1/`, and
+`content/subjects/math/digitalCompanion.ts` is the shape to copy. The domain is
+blocked by this environment's egress proxy, so nothing here can open or check a
+link: **do not extrapolate a URL from the math pattern or from an item number**
+— same rule as Geography's `sourceLabel`, set it from something real or leave it
+empty. Items with no captured link keep `url: null`.
 
 **The links are captured**: 160 of 166 items and 21 section addresses, all 16
 hands-on items among them. The six without one are rows the portal gives no
-address for. The scheme is `…/r/1/<letter>/#<NN>` where the letter is the 単元 —
-math's sibling scheme keys its letter to the 章, so deriving one from the other
-would have been wrong.
+address for. Writing `L` for the letter segment and `NN` for the anchor, science is
+`…/r/1/L/#NN` where **L is the 単元**, while math's sibling `…/m/1/L/#NN` keys
+L to the **章** — so deriving one from the other would have been wrong.
 
 Links are captured in a browser that can reach the portal (Claude in Chrome)
 and imported with `npm run import:science-links -- <capture-file>`, then put on
@@ -123,6 +123,59 @@ the index as the authority and the capture as a claim: it writes only `url`,
 refuses rows that disagree with the recorded page/title/単元 or point off the
 publisher's domain, and exits non-zero on any mismatch. Add links through it
 rather than editing `qr-index.json` by hand.
+
+### History
+
+Geography's model, second subject: one page, one material, a button row to
+switch. History exists because 歴史 material that is not a map has nowhere to
+live in Geography — the 巻末年表 is a single wide chart, not something with
+markers to click. 古代文明マップ stays in Geography for now (it *is* a map, and
+its progress record is keyed there); move it only deliberately, with a redirect.
+
+- `content/subjects/history/materials.ts` — a flat registry, the same shape as
+  `geographyMaps`. Each material has an id, a `kind` (`reference` / `activity`,
+  used only to label), titles, a summary and `buildStatus`.
+- `/history` opens the first live material; `/history/<materialId>` opens a
+  named one.
+- Chrome is one thin bar (`.hist-*` in globals.css), the frame takes the rest.
+
+**Adding a material**
+
+1. Drop the standalone HTML at `public/history/<id>.html`.
+2. Add an entry to `historyMaterials` with `buildStatus: "live"` and `embedPath`.
+
+Register with `buildStatus: "planned"` and no `embedPath` to show it as
+upcoming; the page renders a "file needed" card instead of a broken frame.
+
+**Nothing in History records progress yet**, on purpose: the 巻末年表 is a chart
+Leo looks things up in, with no markers and no quiz, and a status pill it can
+never earn would be noise. A material that *does* have something to score
+reports through `public/components/geo-progress.js` — the shared bridge — rather
+than growing a second one here.
+
+**巻末年表ビューア** (`public/history/nenpyou-viewer.html`) frames the chart
+帝国書院 serves from its own QR content (`ict.teikokushoin.co.jp`), the same
+publisher link Leo's textbook prints. The image is fetched by the learner's
+browser, not bundled: that domain is blocked by this environment's egress proxy,
+so the viewer has never been loaded against the real chart here — it was
+verified against a stand-in of the same 6398x1500 shape, and it renders a
+Japanese "could not load" card with the publisher link when the fetch fails.
+
+Two things the viewer had to get right:
+
+- **Fit-height, not fit-all, is the opening view.** The chart is 4.3x wider than
+  it is tall, so "everything on screen" is also "everything at 17% and
+  unreadable". It opens filling the height at the oldest end, which is how a
+  chronology is read — one era at a time, travelling sideways.
+- **Zooming out stops at fit-all and panning clamps to the edges**, the same
+  rule as Geography's `enableZoom`: the chart cannot be shrunk to a dot or
+  dragged off into empty space.
+
+The scrub slider under the bar *is* the pan, expressed as "which part of the
+timeline is in the middle of the screen" — it disables itself when the whole
+width already fits. It carries no era marks: where 平安 or 明治 sit in that
+image has never been measured here, and guessing pixel offsets would be
+inventing a reference. Same rule as `sourceLabel`.
 
 ### Geography
 
@@ -496,6 +549,59 @@ Grammar cards need:
 - Tabs 1-3 use the global Japanese ON/OFF
 - Tab 4 reveals Japanese automatically after each answer, regardless of toggle state
 - related lesson button, disabled until the lesson is live
+
+## Assessment Audio
+
+The ExamView listening tracks for the test Leo takes after each unit live in
+`public/audio/`, filed one folder per unit. What each track is comes from the
+level's manifest, not from scanning the folder:
+
+```
+content/subjects/english/courses/our-world/level-4/assessment-audio.json
+```
+
+Each entry carries the publisher's track number (`1.1`), its ID3 title, the
+file name, the URL the player uses, and a `kind` of `unit`, `checkpoint` or
+`level`. `scripts/validate-content.mjs` checks that every path sits under the
+manifest's `basePath` in the folder its `kind` implies, so a misfiled track
+fails the build rather than producing a player pointed at a URL nothing will
+be filed to. A track whose `.mp3` is not in the repo yet is **not** an error —
+the audio is added separately, and `UnitAssessmentAudio` renders those rows as
+"Not added yet". Which tracks have a file is decided at build time by
+`scripts/generate-assessment-audio-map.mjs` (chained into predev/prebuild,
+output gitignored under `src/generated/`), not by an `onError` handler on the
+player: with `preload="none"` the browser never requests the file, so a missing
+track fires no error and would otherwise render as a player that silently does
+nothing when pressed.
+
+Filing is by unit alone — the number before the dot. Review tracks are no
+exception: 9.3 reviews Units 7–9 but lives in `unit-9/`, because that is how
+the publisher numbers it. Every test is two tracks, and a band-closing unit
+(3, 6, 9) ships two tests, so it has more tracks than the rest: its own test,
+and the band review — with `.5`/`.6` on the last unit being the whole-level
+review. Nothing in the filename
+says which is which — only the title does, which is why `kind` and
+`checkpoint` are recorded in the manifest. They label the row on the unit
+page so the two tests read as different things; they never move the file.
+
+To file a disc into place, or to see what is still missing:
+
+```bash
+npm run audio:assessment -- --from ~/Downloads/ExamViewAudio
+npm run audio:assessment -- --check
+```
+
+`--from` searches subfolders and sorts what it finds by the level in each file
+name (`ow2e_ev4_ame_…`), so one command can file several levels at once, and a
+level with no manifest gets one drafted from them, summarised per unit for
+checking. Levels
+are found by scanning `content/subjects/english/courses`, by both the validator
+and the generator, so a new level's manifest needs no registering anywhere.
+
+Audio is committed as ordinary files, not Git LFS. Keep each track under 25MB
+(64 kbps mono is about 0.5MB/minute and is plenty for speech). If the library
+outgrows the repo, move the files to Supabase Storage and repoint `basePath` —
+every player reads its URL from the manifest, so nothing else changes.
 
 ## Navigation Rules
 

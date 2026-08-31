@@ -88,6 +88,18 @@ rather than inferring it. Content taken from the workbook stays labelled as
 such: `ClassificationSortWidget` keeps its 教科書 and ワーク sets separate
 rather than merging them, because each is its own book's worked example.
 
+**The workbook is 理科's practice layer**, and the textbook its reference layer
+— the split golden rule 12 implies, since re-typing prose on a screen beats
+nothing but questions on a screen beat paper. Workbook content becomes
+`practice` blocks appended to the section its own 教p. line names.
+`ScienceBlockPractice` is the one block type with no `page` field: it carries
+`workbookPage` instead, so a ワーク page can never be mistaken for a 教科書 one.
+Every answer records the textbook page it was checked against, and that citation
+is shown with the answer; an item with no single answer (a スケッチ, a 書きかえ)
+carries none and renders no reveal button. The 解答 booklet is not scanned, so
+only pages whose textbook range is also scanned can be authored — that booklet
+is the blocker for the rest.
+
 **What must be a widget.** Golden rule 12 applies here through the publisher's
 own tags: the 9 シミュレーション *and* the 7 思考ツール, all inventoried with
 their pages in `docs/lesson-plans/science/new-science-1/README.md`. The 思考ツール

@@ -50,12 +50,39 @@ guessing, so read it off the pages themselves when a chapter is built.
 | 3 身のまわりの現象 | p.62–92 | No |
 | 4 大地の変化 | p.94–120 | No |
 
+## What this book is for
+
+**The workbook is the practice layer; the textbook is the reference layer.**
+That split follows from golden rule 12 and `docs/math-interactivity.md`: a
+textbook page is prose and procedure, and re-typing it on a screen is worth less
+than the printed page it came from. A workbook page is *questions*, and
+questions are exactly what a screen does better than paper — checked instantly,
+repeatable, and able to track what Leo keeps missing, where a paper workbook is
+written in once and done.
+
+So workbook content becomes `practice` blocks appended to the textbook section
+its own 教p. line points at. `ScienceBlockPractice` is the only block type whose
+page numbers are **not** textbook pages; it carries `workbookPage` and cites the
+textbook range separately, and it has no `page` field at all so the two can
+never be confused. TypeScript enforces that — the section renderer has to check
+for `page` before reading it.
+
+**Built so far:** ワーク p.2 → `sci-u1-c1-1`, ワーク p.3 → `sci-u1-c1-2`.
+
+**Every answer is traced.** Each item records the textbook page it was checked
+against, and that citation is shown to Leo with the answer. Items with no single
+answer — the 作図 スケッチ and the まとめ・対話 書きかえ — carry no answer and
+render no reveal button, because a reveal with nothing behind it is worse than
+no button.
+
 ## Two things to know before building from it
 
-**The answers are not here.** Every question block points at 解答 p.N, a
-separate answer booklet that is not in this scan. Practice without an answer key
-is worth much less, so get that booklet before authoring 基本問題 or 力だめし
-content.
+**The answers are not here.** Every question points at 解答 p.N, a separate
+booklet that is not in this scan. p.2 and p.3 could still be authored because
+they cover 教科書 p.16〜25, which *is* scanned — every answer was derived from
+the textbook and cited. That does not scale: past p.31, and for 基本問題 /
+力だめし / 確かめ問題 generally, the 解答 booklet is the blocker. **Getting it
+scanned is the single highest-value thing for this book.**
 
 **Its 実習1 uses a different organism set from the textbook's.** Workbook p.3
 runs the same classification exercise as 教科書 p.23 — same 観点 (水中/陸上,

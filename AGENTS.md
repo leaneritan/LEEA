@@ -78,6 +78,16 @@ its own — `procedure` (観察/実験/実習), `technique` (基礎操作), `ter
 book has 16 hands-on moments, so `ScienceInteractiveWidget` grows one entry at a
 time as chapters are authored.
 
+**理科 has its own tutor**, `/api/science-tutor` with
+`src/components/science/ChatPanel.tsx` — the same two modes math has (a Socratic
+explain mode and a 3-question quiz weighted by what Leo got wrong), on 理科's own
+endpoint, block types and `leea.scienceQuizAttempts.v1` store. It is deliberately
+a separate route rather than a shared one: `summarizePage` has to render 理科's
+own blocks (観察・実験, 基礎操作, ことば, 図鑑, ワーク practice), and the two
+tutors are told different things about what they may assert. 理科's extra rules:
+do not go beyond the textbook, use the book's own terms, and never drop a
+安全上の注意 when explaining a procedure. Both routes need `ANTHROPIC_API_KEY`.
+
 **Building a chapter: follow `docs/science-chapter.md`**, or run
 `/science-chapter <unit> <chapter>`. It is the whole workflow — verifying the
 scan's folios, the block vocabulary, which widget families to reuse before

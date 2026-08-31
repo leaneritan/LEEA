@@ -8733,3 +8733,65 @@ a.math-block-page:hover { text-decoration: underline; }
 .sci-practice-keyword { font-size: 11px; font-weight: 700; color: #9a7a3e; margin-bottom: 6px; }
 .sci-practice-paper { font-size: 12px; color: #8fa398; }
 .sci-answer-source { display: block; margin-top: 4px; font-size: 11px; color: #8fa398; font-weight: 700; }
+
+
+/* ── 理科の先生 (chat + その場クイズ) ─────────────────────────────────────
+   Modelled on the math tutor panel, in 理科's own tokens and namespace. Kept
+   as its own rules rather than shared selectors, for the same reason the rest
+   of .sci-* is: math's panel keeps working exactly as it does today.
+   ------------------------------------------------------------------------ */
+.sci-chat-fab {
+  position: fixed; right: 22px; bottom: 22px; z-index: 40; display: flex; align-items: center; gap: 9px;
+  border: 0; background: var(--s-accent); color: #fff; border-radius: 99px; padding: 13px 22px;
+  font-family: var(--font-jp-display); font-weight: 900; font-size: 15px; cursor: pointer;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--s-accent) 40%, transparent);
+}
+.sci-chat-fab:hover { background: var(--s-dark); }
+.sci-chat-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 50; width: min(400px, 100vw); background: #fbfdfc;
+  box-shadow: -6px 0 24px #00000022; display: flex; flex-direction: column;
+  transform: translateX(105%); transition: transform .25s ease;
+}
+.sci-chat-panel--open { transform: translateX(0); }
+.sci-chat-panel--expanded { width: min(880px, 96vw); }
+.sci-chat-header { flex: none; background: var(--s-accent); color: #fff; padding: 14px 18px; display: flex; align-items: center; gap: 10px; }
+.sci-chat-avatar { width: 34px; height: 34px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; flex: none; }
+.sci-chat-title { flex: 1; min-width: 0; }
+.sci-chat-name { font-family: var(--font-jp-display); font-weight: 900; font-size: 15px; }
+.sci-chat-context { font-size: 11px; color: #e6f2ea; }
+.sci-chat-resize { border: 0; background: #ffffff2e; color: #fff; border-radius: 8px; height: 30px; padding: 0 10px; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; flex: none; white-space: nowrap; }
+.sci-chat-resize:hover { background: #ffffff45; }
+.sci-chat-close { border: 0; background: #ffffff2e; color: #fff; border-radius: 8px; width: 30px; height: 30px; font-size: 15px; cursor: pointer; flex: none; }
+.sci-chat-messages { flex: 1; overflow-y: auto; padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; }
+.sci-chat-bubble { border-radius: 14px 14px 14px 4px; padding: 11px 14px; font-size: 13.5px; max-width: 85%; line-height: 1.7; align-self: flex-start; white-space: pre-wrap; background: #e9f3ec; color: #2b3a31; }
+.sci-chat-bubble--user { border-radius: 14px 14px 4px 14px; align-self: flex-end; background: var(--s-accent); color: #fff; }
+.sci-chat-busy { align-self: flex-start; background: #e9f3ec; border-radius: 14px 14px 14px 4px; padding: 11px 16px; font-size: 13.5px; color: var(--s-dark); }
+.sci-chat-footer { flex: none; border-top: 1px solid #dfe9e3; padding: 10px 14px 14px; background: #fbfdfc; }
+.sci-chat-suggestions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 9px; }
+.sci-chat-suggestion { border: 1.5px solid #d6e4dc; background: #fff; color: #5d7268; border-radius: 99px; padding: 4px 11px; font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+.sci-chat-suggestion:hover { background: #f2f8f4; }
+.sci-chat-quiz-btn { border: 0; background: #d9a441; color: #fff; border-radius: 99px; padding: 4px 12px; font: inherit; font-size: 11.5px; font-weight: 900; cursor: pointer; }
+.sci-chat-quiz-btn:hover { background: #c08f2e; }
+.sci-chat-input-row { display: flex; gap: 8px; }
+.sci-chat-input { flex: 1; border: 2px solid #d6e4dc; border-radius: 12px; padding: 10px 14px; font: inherit; font-size: 13.5px; outline: none; background: #fff; }
+.sci-chat-send { border: 0; background: var(--s-accent); color: #fff; border-radius: 12px; padding: 0 18px; font-family: var(--font-jp-display); font-weight: 900; font-size: 14px; cursor: pointer; }
+.sci-chat-send:hover { background: var(--s-dark); }
+
+/* ---- in-chat quiz card ---- */
+.sci-quiz-card { border: 2px solid #d9a441; border-radius: 14px; overflow: hidden; background: #fff; }
+.sci-quiz-header { background: #d9a441; color: #fff; padding: 7px 14px; font-family: var(--font-jp-display); font-weight: 900; font-size: 13px; }
+.sci-quiz-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 14px; }
+.sci-quiz-question-label { font-size: 13.5px; font-weight: 700; margin-bottom: 7px; }
+.sci-quiz-choices { display: flex; flex-direction: column; gap: 6px; }
+.sci-quiz-choice {
+  text-align: left; border: 2px solid #d6e4dc; background: #fff; color: #2b3a31; border-radius: 10px;
+  padding: 8px 12px; font: inherit; font-size: 13.5px; cursor: pointer;
+}
+.sci-quiz-choice--correct { border-color: #7c9a5e; background: #eef5e8; color: #4a6b35; }
+.sci-quiz-choice--wrong { border-color: #d6486e; background: #fbeaef; color: #a33352; }
+.sci-quiz-choice:disabled { cursor: default; }
+.sci-quiz-explain { margin-top: 7px; background: #f6f9f7; border-radius: 10px; padding: 8px 12px; font-size: 12.5px; color: #5d7268; }
+.sci-quiz-score { display: flex; align-items: center; gap: 10px; border-top: 1.5px dashed #d6e4dc; padding-top: 12px; }
+.sci-quiz-score-text { font-family: var(--font-jp-display); font-weight: 900; font-size: 14px; color: var(--s-dark); }
+.sci-quiz-retry { margin-left: auto; border: 0; background: #d9a441; color: #fff; border-radius: 99px; padding: 6px 14px; font-family: var(--font-jp-display); font-weight: 900; font-size: 12px; cursor: pointer; }
+

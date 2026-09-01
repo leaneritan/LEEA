@@ -141,6 +141,37 @@ export type ScienceBlockReflect = {
 };
 
 /**
+ * A practice set from the ワーク (よくわかる 理科の学習1), the workbook that
+ * accompanies the textbook. This is the one block type whose page numbers are
+ * **not** textbook pages — see `workbookPage` — because the workbook has its
+ * own pagination. It cites the textbook range through the 教p. line the
+ * workbook itself prints.
+ */
+export type ScienceBlockPractice = {
+  id: string;
+  type: "practice";
+  label: string;
+  heading: string;
+  /** ワーク page. NOT a textbook page. */
+  workbookPage: string;
+  /** The textbook range the workbook's own 教p. line names. */
+  textbookRef?: string;
+  items: {
+    prompt: string;
+    /**
+     * Left out when the task is done on paper — a スケッチ or a 書きかえ has no
+     * single answer to reveal, and a reveal button with nothing behind it is
+     * worse than no button.
+     */
+    answer?: string;
+    /** Where the answer was checked, so it can be re-checked. */
+    source?: string;
+    /** A hint the workbook itself prints beside its answer column. */
+    keyword?: string;
+  }[];
+};
+
+/**
  * A hands-on widget standing in for a シミュレーション or 思考ツール QR item.
  * Golden rule 12: anything the book flags as digital/hands-on ships as a real
  * widget that computes from Leo's input, never as re-typed text.
@@ -168,16 +199,20 @@ export type ScienceBlock =
   | ScienceBlockRecall
   | ScienceBlockQuickCheck
   | ScienceBlockReflect
+  | ScienceBlockPractice
   | ScienceBlockInteractive;
 
 /** Blocks with a per-student done state that progress tracking keys off. */
 export type ScienceStatefulBlock =
   | ScienceBlockQuickCheck
   | ScienceBlockProcedure
+  | ScienceBlockPractice
   | ScienceBlockInteractive;
 
+const STATEFUL_TYPES = new Set(["quickcheck", "procedure", "practice", "interactive"]);
+
 export function isScienceStatefulBlock(block: ScienceBlock): block is ScienceStatefulBlock {
-  return block.type === "quickcheck" || block.type === "procedure" || block.type === "interactive";
+  return STATEFUL_TYPES.has(block.type);
 }
 
 export type ScienceSectionStatus = "done" | "now" | "todo";

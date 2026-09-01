@@ -19,6 +19,7 @@ import {
   syncScienceProgressWithCloud,
   type ScienceBlockProgressMap
 } from "../../data/scienceProgress";
+import { ChatPanel } from "./ChatPanel";
 import { ScienceTopbarHome } from "./ScienceTopbarHome";
 import { SectionBlockList } from "./SectionBlocks";
 
@@ -132,6 +133,13 @@ export function SectionView({
           ) : null}
         </div>
       </div>
+
+      <ChatPanel
+        blocks={section.blocks}
+        chapterTitle={`単元${unit.num} ${chapter.num ? `第${chapter.num}章 ${chapter.title}` : chapter.title}`}
+        sectionId={section.id}
+        sectionTitle={section.kicker ?? `${section.number} ${section.title}`}
+      />
     </div>
   );
 }

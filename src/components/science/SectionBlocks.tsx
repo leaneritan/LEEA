@@ -8,6 +8,7 @@ import type {
   ScienceBlockGoal,
   ScienceBlockInteractive,
   ScienceBlockIntro,
+  ScienceBlockPractice,
   ScienceBlockProcedure,
   ScienceBlockQ,
   ScienceBlockQuickCheck,
@@ -280,6 +281,64 @@ function QuickCheckBlock({
   );
 }
 
+/** One ワーク question, with its own reveal so a set is worked one at a time. */
+function PracticeItem({ item }: { item: ScienceBlockPractice["items"][number] }) {
+  const [shown, setShown] = useState(false);
+
+  return (
+    <li>
+      <p>{item.prompt}</p>
+      {item.keyword ? <p className="sci-practice-keyword">キーワード → {item.keyword}</p> : null}
+      {item.answer ? (
+        <>
+          <button className="sci-btn sci-btn--tiny" onClick={() => setShown((v) => !v)} type="button">
+            {shown ? "答えをかくす" : "答えを見る"}
+          </button>
+          {shown ? (
+            <p className="sci-answer">
+              {item.answer}
+              {item.source ? <span className="sci-answer-source">{item.source}</span> : null}
+            </p>
+          ) : null}
+        </>
+      ) : (
+        <p className="sci-practice-paper">ノートでやってみよう（答えは1つではないよ）</p>
+      )}
+    </li>
+  );
+}
+
+function PracticeBlock({
+  block,
+  done,
+  onToggleDone
+}: {
+  block: ScienceBlockPractice;
+  done: boolean;
+  onToggleDone: () => void;
+}) {
+  return (
+    <section className="sci-card sci-practice">
+      <div className="sci-card-head">
+        <span className="sci-card-label sci-card-label--strong">{block.label}</span>
+        <h2>{block.heading}</h2>
+      </div>
+      <p className="sci-practice-source">
+        ワーク p.{block.workbookPage}
+        {block.textbookRef ? <span>／ {block.textbookRef}</span> : null}
+      </p>
+      <ol className="sci-practice-items">
+        {block.items.map((item) => (
+          <PracticeItem item={item} key={item.prompt} />
+        ))}
+      </ol>
+      <button className={`sci-done${done ? " is-done" : ""}`} onClick={onToggleDone} type="button">
+        {done ? "✓ やった" : "やったらチェック"}
+      </button>
+    </section>
+  );
+}
+
 function ReflectBlock({ block }: { block: ScienceBlockReflect }) {
   return (
     <section className="sci-card sci-reflect">
@@ -379,6 +438,15 @@ export function SectionBlockList({
           case "reflect":
             rendered = <ReflectBlock block={block} />;
             break;
+          case "practice":
+            rendered = (
+              <PracticeBlock
+                block={block}
+                done={isBlockDone(block.id)}
+                onToggleDone={() => onToggleDone(block.id)}
+              />
+            );
+            break;
           case "interactive":
             rendered = (
               <InteractiveBlock
@@ -392,9 +460,14 @@ export function SectionBlockList({
             rendered = null;
         }
 
+        // Only blocks sourced from the textbook carry `page`, and it always
+        // means a textbook page. A practice block has none: its pages are
+        // ワーク pages, which it prints itself.
+        const textbookPage = "page" in block ? block.page : undefined;
+
         return (
           <div className="sci-block-wrap" key={block.id}>
-            {block.page ? <span className="sci-block-page">教科書 p.{block.page}</span> : null}
+            {textbookPage ? <span className="sci-block-page">教科書 p.{textbookPage}</span> : null}
             {rendered}
           </div>
         );

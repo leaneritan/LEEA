@@ -110,9 +110,17 @@ nothing but questions on a screen beat paper. Workbook content becomes
 `practice` blocks appended to the section its own 教p. line names.
 `ScienceBlockPractice` is the one block type with no `page` field: it carries
 `workbookPage` instead, so a ワーク page can never be mistaken for a 教科書 one.
-Every answer records the textbook page it was checked against, and that citation
-is shown with the answer; an item with no single answer (a スケッチ, a 書きかえ)
-carries none and renders no reveal button. The 解答 booklet is not scanned, so
+**A ワーク question is answered, not revealed.** Where the book prints options
+— ア〜エ, A・B, 図1's four groups, the photo's part names — the item carries them
+as `choices` in the book's own order with `correct` as indices into them, and Leo
+picks and is marked ○/×. `correct` is an array, so a すべて選びなさい question
+scores as one item needing every right option. **Distractors are never
+invented**: a made-up wrong answer teaches a made-up distinction, so an item the
+book asks open-ended stays a self-check reveal, and a スケッチ or 書きかえ carries
+no answer and renders no button at all. The block scores itself from first
+answers and feeds progress the way a widget does — it ticks only on a clean run,
+and a later wrong replay never takes the tick back. Every answer records the
+textbook page it was checked against, and that citation is shown with it. The 解答 booklet is not scanned, so
 only pages whose textbook range is also scanned can be authored — that booklet
 is the blocker for the rest.
 

@@ -127,9 +127,22 @@ pages are ワーク pages. It carries `workbookPage` and cites the textbook rang
 separately, so the two paginations can never be confused. TypeScript enforces
 this: the renderer has to check for `page` before reading it.
 
+**Where the book prints options, the item is answerable.** Give it `choices`
+in the book's own order and `correct` as indices into them, and Leo picks and is
+marked ○/×. `correct` is an array, so a すべて選びなさい question scores as one
+item needing every right option. Split a multi-part question (a 「①〜③にあては
+まる」) into one item per blank, all sharing the same `choices`.
+
+**Never invent a distractor.** A made-up wrong answer teaches a made-up
+distinction. If the book asks it open-ended, leave `choices` off and it renders
+as a self-check reveal; a スケッチ or a 書きかえ carries no `answer` either and
+renders no button at all.
+
+The block scores itself from first answers, so it feeds progress the way a
+widget does — no self-declared tick. It ticks only on a clean run.
+
 **Every answer records the textbook page it was checked against**, and that
-citation is shown to Leo. An item with no single answer — a スケッチ, a
-書きかえ — carries no `answer` and renders no reveal button.
+citation is shown to Leo.
 
 Without the 解答 booklet you can only author pages whose textbook range is also
 scanned, deriving each answer from the textbook. If you cannot derive it, leave

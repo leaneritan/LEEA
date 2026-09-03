@@ -69,11 +69,18 @@ for `page` before reading it.
 
 **Built so far:** ワーク p.2 → `sci-u1-c1-1`, ワーク p.3 → `sci-u1-c1-2`.
 
+**The questions are answered on screen, not revealed.** Every question the book
+prints options for — (1)'s A・B, (4)'s ア〜エ, (6)'s two places, (8)'s part names
+off the photo, p.3's 図1 groups and 図2's 動き方 — carries those exact options and
+is marked ○/× as Leo picks. The options are always the book's; **no distractor is
+invented**, because a made-up wrong answer teaches a made-up distinction. That
+leaves 7 of 10 items on p.2 and 7 of 8 on p.3 answerable; the rest (the 記述 and the
+open questions) stay self-check reveals, and the 作図 スケッチ carries no
+answer and renders no button, because a reveal with nothing behind it is worse
+than no button.
+
 **Every answer is traced.** Each item records the textbook page it was checked
-against, and that citation is shown to Leo with the answer. Items with no single
-answer — the 作図 スケッチ and the まとめ・対話 書きかえ — carry no answer and
-render no reveal button, because a reveal with nothing behind it is worse than
-no button.
+against, and that citation is shown to Leo with the answer.
 
 ## Two things to know before building from it
 

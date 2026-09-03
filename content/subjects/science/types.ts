@@ -156,19 +156,33 @@ export type ScienceBlockPractice = {
   workbookPage: string;
   /** The textbook range the workbook's own 教p. line names. */
   textbookRef?: string;
-  items: {
-    prompt: string;
-    /**
-     * Left out when the task is done on paper — a スケッチ or a 書きかえ has no
-     * single answer to reveal, and a reveal button with nothing behind it is
-     * worse than no button.
-     */
-    answer?: string;
-    /** Where the answer was checked, so it can be re-checked. */
-    source?: string;
-    /** A hint the workbook itself prints beside its answer column. */
-    keyword?: string;
-  }[];
+  items: ScienceBlockPracticeItem[];
+};
+
+/**
+ * One ワーク question. How Leo answers it depends on what the book gives:
+ *
+ * - `choices` present → he answers by choosing, and is told right or wrong.
+ *   **The options are always the book's own** — ア〜エ, A・B, the two halves of
+ *   a 「〜か、〜か」 question, the labels printed on a photo. Distractors are
+ *   never invented, because a made-up wrong answer teaches a made-up
+ *   distinction.
+ * - `choices` absent, `answer` present → a 記述 or open question: he answers in
+ *   his head or his notebook, then checks himself.
+ * - neither → a スケッチ or 書きかえ, done on paper. No button.
+ */
+export type ScienceBlockPracticeItem = {
+  prompt: string;
+  /** The book's own options, in the book's own order. */
+  choices?: string[];
+  /** Indices into `choices`. More than one for a すべて選びなさい question. */
+  correct?: number[];
+  /** The explanation, shown once answered. */
+  answer?: string;
+  /** Where the answer was checked, so it can be re-checked. */
+  source?: string;
+  /** A hint the workbook itself prints beside its answer column. */
+  keyword?: string;
 };
 
 /**

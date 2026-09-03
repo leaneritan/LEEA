@@ -9,6 +9,7 @@ import type {
   ScienceBlockInteractive,
   ScienceBlockIntro,
   ScienceBlockPractice,
+  ScienceBlockPracticeItem,
   ScienceBlockProcedure,
   ScienceBlockQ,
   ScienceBlockQuickCheck,
@@ -281,16 +282,102 @@ function QuickCheckBlock({
   );
 }
 
-/** One ワーク question, with its own reveal so a set is worked one at a time. */
-function PracticeItem({ item }: { item: ScienceBlockPractice["items"][number] }) {
+/**
+ * One ワーク question. A question the book gives options for is answered by
+ * choosing and marked right or wrong; an open one is self-checked; a paper one
+ * gets no button at all. Reveal-then-read was the wrong shape for a workbook —
+ * a book already does that, and golden rule 12 is about Leo touching the work.
+ */
+function PracticeItem({
+  item,
+  onFirstAnswer
+}: {
+  item: ScienceBlockPracticeItem;
+  onFirstAnswer: (correct: boolean) => void;
+}) {
+  const [picked, setPicked] = useState<number[]>([]);
+  const [submitted, setSubmitted] = useState(false);
   const [shown, setShown] = useState(false);
+
+  const choices = item.choices ?? [];
+  const correct = item.correct ?? [];
+  const multi = correct.length > 1;
+  const answerable = choices.length > 0 && correct.length > 0;
+  const matches = (chosen: number[]) =>
+    chosen.length === correct.length && correct.every((c) => chosen.includes(c));
+
+  function toggle(choiceIndex: number) {
+    if (submitted) return;
+    setPicked((current) =>
+      multi
+        ? current.includes(choiceIndex)
+          ? current.filter((i) => i !== choiceIndex)
+          : [...current, choiceIndex]
+        : [choiceIndex]
+    );
+  }
+
+  function submit() {
+    if (submitted || picked.length === 0) return;
+    setSubmitted(true);
+    onFirstAnswer(matches(picked));
+  }
 
   return (
     <li>
       <p>{item.prompt}</p>
       {item.keyword ? <p className="sci-practice-keyword">キーワード → {item.keyword}</p> : null}
-      {item.answer ? (
+
+      {answerable ? (
         <>
+          {multi ? <p className="sci-practice-multi">あてはまるものを、すべてえらぼう。</p> : null}
+          <div className="sci-practice-choices">
+            {choices.map((choice, choiceIndex) => {
+              const chosen = picked.includes(choiceIndex);
+              const isAnswer = correct.includes(choiceIndex);
+              const variant = submitted
+                ? isAnswer
+                  ? " is-correct"
+                  : chosen
+                    ? " is-wrong"
+                    : ""
+                : chosen
+                  ? " is-picked"
+                  : "";
+              return (
+                <button
+                  className={`sci-practice-choice${variant}`}
+                  disabled={submitted}
+                  key={choice}
+                  onClick={() => toggle(choiceIndex)}
+                  type="button"
+                >
+                  {submitted && isAnswer ? "○ " : submitted && chosen ? "× " : ""}
+                  {choice}
+                </button>
+              );
+            })}
+          </div>
+          {submitted ? (
+            <p className={`sci-answer${matches(picked) ? "" : " is-wrong"}`}>
+              {matches(picked) ? "せいかい！ " : "おしい。 "}
+              {item.answer}
+              {item.source ? <span className="sci-answer-source">{item.source}</span> : null}
+            </p>
+          ) : (
+            <button
+              className="sci-btn sci-btn--tiny sci-btn--primary"
+              disabled={picked.length === 0}
+              onClick={submit}
+              type="button"
+            >
+              こたえる
+            </button>
+          )}
+        </>
+      ) : item.answer ? (
+        <>
+          <p className="sci-practice-selfcheck">ノートに答えてから、たしかめよう。</p>
           <button className="sci-btn sci-btn--tiny" onClick={() => setShown((v) => !v)} type="button">
             {shown ? "答えをかくす" : "答えを見る"}
           </button>
@@ -308,33 +395,63 @@ function PracticeItem({ item }: { item: ScienceBlockPractice["items"][number] })
   );
 }
 
+/**
+ * A ワーク set scores itself from first answers, so it feeds progress the same
+ * way a widget does rather than needing a self-declared tick.
+ */
 function PracticeBlock({
   block,
   done,
-  onToggleDone
+  onScored
 }: {
   block: ScienceBlockPractice;
   done: boolean;
-  onToggleDone: () => void;
+  onScored: (correct: number, total: number) => void;
 }) {
+  const answerableCount = block.items.filter(
+    (item) => item.choices?.length && item.correct?.length
+  ).length;
+  const [results, setResults] = useState<Record<number, boolean>>({});
+  const answered = Object.keys(results).length;
+  const correct = Object.values(results).filter(Boolean).length;
+
+  function recordFirstAnswer(itemIndex: number, wasRight: boolean) {
+    setResults((current) => {
+      if (itemIndex in current) return current;
+      const next = { ...current, [itemIndex]: wasRight };
+      if (Object.keys(next).length === answerableCount) {
+        onScored(Object.values(next).filter(Boolean).length, answerableCount);
+      }
+      return next;
+    });
+  }
+
   return (
     <section className="sci-card sci-practice">
       <div className="sci-card-head">
         <span className="sci-card-label sci-card-label--strong">{block.label}</span>
         <h2>{block.heading}</h2>
+        {done ? <span className="sci-done is-done">✓ できた</span> : null}
       </div>
       <p className="sci-practice-source">
         ワーク p.{block.workbookPage}
         {block.textbookRef ? <span>／ {block.textbookRef}</span> : null}
       </p>
       <ol className="sci-practice-items">
-        {block.items.map((item) => (
-          <PracticeItem item={item} key={item.prompt} />
+        {block.items.map((item, itemIndex) => (
+          <PracticeItem
+            item={item}
+            key={item.prompt}
+            onFirstAnswer={(wasRight) => recordFirstAnswer(itemIndex, wasRight)}
+          />
         ))}
       </ol>
-      <button className={`sci-done${done ? " is-done" : ""}`} onClick={onToggleDone} type="button">
-        {done ? "✓ やった" : "やったらチェック"}
-      </button>
+      {answerableCount > 0 ? (
+        <div className={`sci-practice-score${answered === answerableCount ? " is-done" : ""}`}>
+          こたえた問題：{answered} / {answerableCount}
+          {answered === answerableCount ? `　→　${correct} 問せいかい` : null}
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -443,7 +560,7 @@ export function SectionBlockList({
               <PracticeBlock
                 block={block}
                 done={isBlockDone(block.id)}
-                onToggleDone={() => onToggleDone(block.id)}
+                onScored={(correct, total) => onWidgetScored(block.id, correct, total)}
               />
             );
             break;

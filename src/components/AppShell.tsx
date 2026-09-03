@@ -13,6 +13,7 @@ import { useJapaneseSetting } from "@/components/useJapaneseSetting";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
 import { allWords } from "@/components/reference/ref-data";
 import { CloudSyncBadge } from "@/components/CloudSyncBadge";
+import { useOurWorldUnitProgress } from "@/components/useOurWorldUnitProgress";
 
 type NavKey = "home" | "teacher" | "progress" | "english" | "math" | "geography" | "history" | "science" | "assignments" | "reference" | "search" | "practice";
 
@@ -50,6 +51,10 @@ export function AppShell({
   const isReferenceContext = active === "reference" || active === "search" || active === "practice";
   const knownWordCount = knownWordSet.size;
   const reviewWordCount = Math.max(0, allWords.length - knownWordCount);
+  // The sidebar card on English pages is the Our World course map in miniature,
+  // so it reads the same progress the map does instead of keeping its own idea
+  // of where Leo is.
+  const ourWorld = useOurWorldUnitProgress(active === "english");
 
   useEffect(() => {
     const saved = window.localStorage.getItem("leea-sidebar-collapsed");
@@ -152,6 +157,22 @@ export function AppShell({
             <strong className="progress-ring-count">{knownWordCount}</strong>
             <span>{knownWordCount} known · {reviewWordCount} to review</span>
           </div>
+        ) : active === "english" ? (
+          <Link
+            className="sidebar-progress"
+            data-tooltip={`Our World · Level ${ourWorld.level} · Unit ${ourWorld.unit} · ${ourWorld.rollup.appsDone} of ${ourWorld.rollup.apps} done`}
+            data-ring-count={ourWorld.rollup.appsDone}
+            href={ourWorld.nextLesson ? `/lessons/${ourWorld.nextLesson.id}` : `/english/our-world/level-${ourWorld.level}/unit-${ourWorld.unit}`}
+            style={{ "--ring-pct": `${ourWorld.percent}%` } as CSSProperties}
+          >
+            <strong className="progress-label">Our World</strong>
+            <strong className="progress-ring-count">{ourWorld.rollup.appsDone}</strong>
+            <span>
+              Level {ourWorld.level} · Unit {ourWorld.unit}
+              {ourWorld.rollup.apps > 0 ? ` · ${ourWorld.rollup.appsDone} of ${ourWorld.rollup.apps} done` : ""}
+            </span>
+            <div className="sidebar-mini-progress"><i /></div>
+          </Link>
         ) : (
           <div
             className="sidebar-progress"
@@ -159,13 +180,9 @@ export function AppShell({
             data-ring-count={assignmentsLeft ?? 0}
             style={{ "--ring-pct": `${assignmentsLeft ? Math.min(100, Math.round(((12 - assignmentsLeft) / 12) * 100)) : 100}%` } as CSSProperties}
           >
-            <strong className="progress-label">{active === "teacher" || active === "progress" ? "This week" : active === "english" ? "Our World" : "Leo’s Progress"}</strong>
+            <strong className="progress-label">{active === "teacher" || active === "progress" ? "This week" : "Leo’s Progress"}</strong>
             <strong className="progress-ring-count">{assignmentsLeft ?? 0}</strong>
-            {active === "english" ? (
-              <><span>Level 4 · Unit 8</span><div className="sidebar-mini-progress"><i /></div></>
-            ) : (
-              <span>{assignmentsLeft === null ? "…" : assignmentsLeft === 0 ? "No homework waiting" : `${assignmentsLeft} assignment${assignmentsLeft === 1 ? "" : "s"} left`}</span>
-            )}
+            <span>{assignmentsLeft === null ? "…" : assignmentsLeft === 0 ? "No homework waiting" : `${assignmentsLeft} assignment${assignmentsLeft === 1 ? "" : "s"} left`}</span>
           </div>
         )}
 

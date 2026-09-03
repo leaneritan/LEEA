@@ -3,8 +3,23 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { readLessonProgress, syncLessonProgressWithCloud, type LessonProgressMap } from "@/data/lessonProgress";
-import { isCheckpointComponent, learnerLessons, teacherLessons } from "@/data/lessons";
-import { getLearnerAppProgress, syncLearnerProgressWithCloud } from "@/data/learnerProgress";
+import { syncLearnerProgressWithCloud } from "@/data/learnerProgress";
+import {
+  countTaught,
+  courseLearnerLessons,
+  courseTeacherLessons,
+  emptyRollup,
+  learnerLabel,
+  nextUnfinishedApp,
+  OUR_WORLD_COURSE,
+  readCourseLearnerStats,
+  rollupLearner,
+  unitLearnerLessons,
+  unitPercent,
+  unitTeacherLessons,
+  type LearnerRollup,
+  type LearnerStatMap
+} from "@/data/ourWorldProgress";
 import {
   getCheckpointAssessmentTracks,
   getUnitAssessmentTracks,
@@ -20,34 +35,17 @@ import {
   type CurrentUnit
 } from "@/data/currentUnit";
 
-const COURSE = "our-world";
-
-// Only Our World lessons matter here, and only these are worth syncing —
-// pulling every course's learner progress would query rows this page never
-// shows.
-const courseLearnerLessons = learnerLessons.filter((lesson) => lesson.course === COURSE);
-const courseTeacherLessons = teacherLessons.filter((lesson) => lesson.course === COURSE);
-
 /** Level 1 ships eight units, every other level nine. */
 function unitsInLevel(level: number) {
   return OUR_WORLD_UNIT_TOTALS[level] ?? UNITS_PER_LEVEL;
 }
 
-/** One learner app's state, read from the app's own localStorage keys. */
-type LearnerStat = { done: boolean; completedModules: number; moduleCount: number };
-type LearnerStatMap = Record<string, LearnerStat>;
-
 /** What a row can actually say about itself. Teacher-side (built/taught) and
-    Leo-side (apps/modules) are separate signals: a lesson can be taught and
-    the app untouched, or the app finished before the deck is marked done. */
-type RowProgress = {
+    Leo-side (the rollup) are separate signals: a lesson can be taught and the
+    app untouched, or the app finished before the deck is marked done. */
+type RowProgress = LearnerRollup & {
   built: number;
   taught: number;
-  apps: number;
-  appsDone: number;
-  appsStarted: number;
-  modulesDone: number;
-  modulesTotal: number;
   audioTracks: number;
 };
 
@@ -68,65 +66,19 @@ type SequenceItem = {
 type GapItem = { kind: "gap"; items: SequenceItem[] };
 type SequenceEntry = SequenceItem | GapItem;
 
-const emptyProgress: RowProgress = {
-  built: 0,
-  taught: 0,
-  apps: 0,
-  appsDone: 0,
-  appsStarted: 0,
-  modulesDone: 0,
-  modulesTotal: 0,
-  audioTracks: 0
-};
+const emptyProgress: RowProgress = { ...emptyRollup, built: 0, taught: 0, audioTracks: 0 };
 
-function readLearnerStats(): LearnerStatMap {
-  const stats: LearnerStatMap = {};
-  for (const lesson of courseLearnerLessons) {
-    const progress = getLearnerAppProgress(lesson.source);
-    stats[lesson.id] = {
-      done: progress.done,
-      completedModules: progress.completedModules,
-      moduleCount: progress.moduleCount || lesson.source.moduleCount || 0
-    };
-  }
-  return stats;
-}
-
-function collectProgress(
+function rowProgress(
   teachers: Lesson[],
   learners: Lesson[],
   progress: LessonProgressMap,
   stats: LearnerStatMap,
-  audioTracks: number
+  audioTracks = 0
 ): RowProgress {
-  let appsDone = 0;
-  let appsStarted = 0;
-  let modulesDone = 0;
-  let modulesTotal = 0;
-
-  for (const lesson of learners) {
-    const stat = stats[lesson.id];
-    const moduleCount = stat?.moduleCount || lesson.source.moduleCount || 0;
-    modulesTotal += moduleCount;
-    if (!stat) continue;
-    if (stat.done) {
-      appsDone += 1;
-      modulesDone += moduleCount;
-      continue;
-    }
-    const partial = Math.min(stat.completedModules, moduleCount);
-    modulesDone += partial;
-    if (partial > 0) appsStarted += 1;
-  }
-
   return {
+    ...rollupLearner(learners, stats),
     built: teachers.length,
-    taught: teachers.filter((lesson) => progress[lesson.id]?.status === "done").length,
-    apps: learners.length,
-    appsDone,
-    appsStarted,
-    modulesDone,
-    modulesTotal,
+    taught: countTaught(teachers, progress),
     audioTracks
   };
 }
@@ -150,18 +102,14 @@ function buildSequence(
   const totalUnits = unitsInLevel(level);
 
   for (let unit = 1; unit <= totalUnits; unit++) {
-    const unitTeachers = courseTeacherLessons.filter(
-      (lesson) => lesson.level === level && lesson.unit === unit && !isCheckpointComponent(lesson.component)
-    );
-    const unitLearners = courseLearnerLessons.filter(
-      (lesson) => lesson.level === level && lesson.unit === unit && !isCheckpointComponent(lesson.component)
-    );
-    const rowProgress = collectProgress(
+    const unitTeachers = unitTeacherLessons(level, unit);
+    const unitLearners = unitLearnerLessons(level, unit);
+    const unitRow = rowProgress(
       unitTeachers,
       unitLearners,
       progress,
       stats,
-      availableTracks(getUnitAssessmentTracks(COURSE, level, unit))
+      availableTracks(getUnitAssessmentTracks(OUR_WORLD_COURSE, level, unit))
     );
 
     const state: SequenceItem["state"] = unitTeachers.length
@@ -176,7 +124,7 @@ function buildSequence(
       title: unitTitle(level, unit),
       subtitle: unitTeachers.length ? `${unitTeachers.length} teaching components` : "Not built yet",
       state,
-      progress: rowProgress
+      progress: unitRow
     });
 
     // Checkpoints land after each three-unit band. Their lesson records carry
@@ -203,7 +151,7 @@ function buildSequence(
           title,
           subtitle: built.length ? built[0].title : subtitle,
           state: built.length ? "active" : bandLocked ? "locked" : "planned",
-          progress: collectProgress(built, apps, progress, stats, audioTracks),
+          progress: rowProgress(built, apps, progress, stats, audioTracks),
           lessonId: built[0]?.id
         };
       };
@@ -214,7 +162,7 @@ function buildSequence(
           "review",
           `Review · Units ${band}`,
           "Mixed quiz, grammar and reading from this band.",
-          availableTracks(getCheckpointAssessmentTracks(COURSE, level, unit))
+          availableTracks(getCheckpointAssessmentTracks(OUR_WORLD_COURSE, level, unit))
         )
       );
       items.push(
@@ -265,12 +213,6 @@ function foldGaps(items: SequenceItem[]): SequenceEntry[] {
   return entries;
 }
 
-/** Learner decks are titled "... App" so the teacher menu can tell the two
-    modes apart; on the Continue button that suffix is just noise. */
-function learnerLabel(title: string) {
-  return title.replace(/\s+App$/i, "");
-}
-
 function gapHeadline(items: SequenceItem[]) {
   const units = items.filter((item) => item.kind === "unit").map((item) => item.number ?? 0);
   const extras = items.length - units.length;
@@ -305,7 +247,7 @@ export function OurWorldPage() {
   const refresh = useCallback(() => {
     const localProgress = readLessonProgress();
     setProgress(localProgress);
-    setLearnerStats(readLearnerStats());
+    setLearnerStats(readCourseLearnerStats());
     void syncLessonProgressWithCloud(localProgress).then(setProgress);
   }, []);
 
@@ -329,7 +271,7 @@ export function OurWorldPage() {
   // the rows never moved.
   useEffect(() => {
     void syncLearnerProgressWithCloud(courseLearnerLessons).then((changed) => {
-      if (changed) setLearnerStats(readLearnerStats());
+      if (changed) setLearnerStats(readCourseLearnerStats());
     });
   }, []);
 
@@ -347,51 +289,27 @@ export function OurWorldPage() {
     [selectedLevel]
   );
   const levelProgress = useMemo(
-    () => collectProgress(levelTeachers, levelLearners, progress, learnerStats, 0),
+    () => rowProgress(levelTeachers, levelLearners, progress, learnerStats),
     [levelTeachers, levelLearners, progress, learnerStats]
   );
 
   const courseProgress = useMemo(
-    () => collectProgress(courseTeacherLessons, courseLearnerLessons, progress, learnerStats, 0),
+    () => rowProgress(courseTeacherLessons, courseLearnerLessons, progress, learnerStats),
     [progress, learnerStats]
   );
 
   // The unit Neritan is teaching right now, and the next thing in it Leo has
   // not finished — the one row on this page that answers "what happens next".
-  const currentUnitLearners = useMemo(
-    () =>
-      courseLearnerLessons.filter(
-        (lesson) =>
-          lesson.level === currentUnit.level
-          && lesson.unit === currentUnit.unit
-          && !isCheckpointComponent(lesson.component)
-      ),
-    [currentUnit]
-  );
-  const currentUnitProgress = useMemo(
-    () =>
-      collectProgress(
-        courseTeacherLessons.filter(
-          (lesson) =>
-            lesson.level === currentUnit.level
-            && lesson.unit === currentUnit.unit
-            && !isCheckpointComponent(lesson.component)
-        ),
-        currentUnitLearners,
-        progress,
-        learnerStats,
-        0
-      ),
-    [currentUnit, currentUnitLearners, progress, learnerStats]
+  // The sidebar card reads these same three helpers, so the two always agree.
+  const currentUnitRollup = useMemo(
+    () => rollupLearner(unitLearnerLessons(currentUnit.level, currentUnit.unit), learnerStats),
+    [currentUnit, learnerStats]
   );
   const nextLesson = useMemo(
-    () => currentUnitLearners.find((lesson) => !learnerStats[lesson.id]?.done) ?? null,
-    [currentUnitLearners, learnerStats]
+    () => nextUnfinishedApp(currentUnit.level, currentUnit.unit, learnerStats),
+    [currentUnit, learnerStats]
   );
-
-  const unitPercent = currentUnitProgress.apps
-    ? Math.round((currentUnitProgress.appsDone / currentUnitProgress.apps) * 100)
-    : 0;
+  const currentPercent = unitPercent(currentUnitRollup);
 
   return (
     <section className="ow-page ow-page--final">
@@ -413,14 +331,14 @@ export function OurWorldPage() {
           <span>Continue</span>
           <small>Level {currentUnit.level} · Unit {currentUnit.unit}</small>
           <strong>{unitTitle(currentUnit.level, currentUnit.unit)}</strong>
-          {currentUnitProgress.apps > 0 && (
+          {currentUnitRollup.apps > 0 && (
             <>
               <div className="ow-continue-meter" aria-hidden="true">
-                <i style={{ width: `${unitPercent}%` }} />
+                <i style={{ width: `${currentPercent}%` }} />
               </div>
               <em>
-                Leo {currentUnitProgress.appsDone} / {currentUnitProgress.apps} done
-                {currentUnitProgress.appsStarted ? ` · ${currentUnitProgress.appsStarted} in progress` : ""}
+                Leo {currentUnitRollup.appsDone} / {currentUnitRollup.apps} done
+                {currentUnitRollup.appsStarted ? ` · ${currentUnitRollup.appsStarted} in progress` : ""}
               </em>
             </>
           )}

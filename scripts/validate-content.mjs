@@ -57,6 +57,7 @@ const vocabularyIndexPath = "content/subjects/english/reference/vocabulary-index
 const unitGrammarPaths = [
   "content/subjects/english/courses/our-world/level-2/unit-1/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-2/grammar.json",
+  "content/subjects/english/courses/our-world/level-2/unit-3/grammar.json",
   "content/subjects/english/courses/our-world/level-5/unit-1/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-9/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-8/grammar.json",

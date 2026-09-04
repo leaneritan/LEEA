@@ -41,7 +41,7 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 - [x] Unit 1 — Vocab
 - [x] Unit 1 — Grammar
 - [x] Unit 2 — Vocab
-- [ ] Unit 2 — Grammar
+- [x] Unit 2 — Grammar
 - [ ] Unit 3 — Vocab
 - [ ] Unit 3 — Grammar
 - [ ] Unit 4 — Vocab
@@ -143,8 +143,8 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 
 ## Status snapshot (2026-09-04)
 
-- **Done:** Level 4 Units 1-9 (vocab + grammar); Level 5 Unit 1 (vocab + grammar); Level 3 Unit 1 (vocab + grammar); Level 3 Unit 2 (vocab only); Level 3 Unit 3 (vocab + grammar); Level 3 Units 4-9 (vocab + grammar); Level 2 Units 6-9 (vocab + grammar); Level 2 Unit 1 (vocab + grammar — 29 words + 2 grammar points: present progressive first-person-plural `OW2-U1-G1`, questions with "Are there...?" `OW2-U1-G2`); Level 2 Unit 2 (vocab only — 51 words: 11 vocab1, 5 vocab2, 6 academic incl. merged `column`/`row`/`put`, 13 content incl. merged `fur`/`polar_bear`/`mobile`, 16 related incl. merged `snow`/`puddle`/`outside`/`ice`/`sunlight`/`thermometer`)
-- **Next up:** Level 2 Unit 2 grammar (2 points: "What's + noun + like?" and answers with "It's..."; Imperatives), then Level 2 Units 3-4 (currently unscanned, no content directory)
+- **Done:** Level 4 Units 1-9 (vocab + grammar); Level 5 Unit 1 (vocab + grammar); Level 3 Unit 1 (vocab + grammar); Level 3 Unit 2 (vocab only); Level 3 Unit 3 (vocab + grammar); Level 3 Units 4-9 (vocab + grammar); Level 2 Units 6-9 (vocab + grammar); Level 2 Unit 1 (vocab + grammar — 29 words + 2 grammar points: present progressive first-person-plural `OW2-U1-G1`, questions with "Are there...?" `OW2-U1-G2`); Level 2 Unit 2 (vocab + grammar — 51 words + 2 grammar points: "What's + noun + like?" and answers with "It's..." `OW2-U2-G1`, Imperatives `OW2-U2-G2`)
+- **Next up:** Level 2 Units 3-4 (currently unscanned, no content directory)
 - **Not started:** Levels 1, 6 — checkboxes above are unverified against actual files for Level 1 (see note below); Level 2 Units 3-4; Level 3 Unit 2 (grammar only); Level 5 Units 2-9
 - **Note:** the per-unit checkboxes in this file have been found stale in more than one place (e.g. Level 2 Unit 5 was unchecked despite `vocabulary.json` existing) — verify against actual `content/subjects/english/courses/our-world/level-<n>/unit-<n>/` files before trusting a checked/unchecked box, don't rely on this snapshot alone.
 

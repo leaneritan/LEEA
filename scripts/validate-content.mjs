@@ -28,6 +28,7 @@ const unitVocabularyPaths = [
   "content/subjects/english/courses/our-world/level-2/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-2/unit-2/vocabulary.json",
   "content/subjects/english/courses/our-world/level-2/unit-3/vocabulary.json",
+  "content/subjects/english/courses/our-world/level-2/unit-4/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-2/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-3/vocabulary.json",

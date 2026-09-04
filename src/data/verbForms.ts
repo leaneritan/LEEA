@@ -42,6 +42,7 @@ const IRREGULAR_VERBS: Record<string, [string, string]> = {
   give: ["gave", "given"],
   go: ["went", "gone"],
   grow: ["grew", "grown"],
+  hang: ["hung", "hung"],
   have: ["had", "had"],
   hear: ["heard", "heard"],
   hide: ["hid", "hidden"],

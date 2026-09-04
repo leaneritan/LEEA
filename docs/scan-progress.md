@@ -38,17 +38,17 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 
 ## Level 2
 
-- [ ] Unit 1 — Vocab
+- [x] Unit 1 — Vocab
 - [ ] Unit 1 — Grammar
 - [ ] Unit 2 — Vocab
 - [ ] Unit 2 — Grammar
-- [x] Unit 3 — Vocab
+- [ ] Unit 3 — Vocab
 - [ ] Unit 3 — Grammar
 - [ ] Unit 4 — Vocab
 - [ ] Unit 4 — Grammar
-- [ ] Unit 5 — Vocab
+- [x] Unit 5 — Vocab
 - [ ] Unit 5 — Grammar
-- [ ] Unit 6 — Vocab
+- [x] Unit 6 — Vocab
 - [x] Unit 6 — Grammar
 - [x] Unit 7 — Vocab
 - [x] Unit 7 — Grammar
@@ -141,11 +141,11 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 - [ ] Unit 9 — Vocab
 - [ ] Unit 9 — Grammar
 
-## Status snapshot (2026-07-18)
+## Status snapshot (2026-09-04)
 
-- **Done:** Level 4 Units 1-9 (vocab + grammar); Level 5 Unit 1 (vocab + grammar); Level 3 Unit 1 (vocab + grammar); Level 3 Unit 2 (vocab only); Level 3 Unit 3 (vocab + grammar); Level 3 Units 4-9 (vocab + grammar); Level 2 Unit 7 (grammar)
-- **Next up:** other Level 1, 2, 3, 5, 6 scans
-- **Not started:** Levels 1, 2, 6 — all 9 units each (except Level 2 Unit 7, 8, 9 grammar and Unit 3, 7, 8, 9 vocab); Level 3 Unit 2 (grammar only); Level 5 Units 2-9
-- **Remaining scans:** 74 of 108
+- **Done:** Level 4 Units 1-9 (vocab + grammar); Level 5 Unit 1 (vocab + grammar); Level 3 Unit 1 (vocab + grammar); Level 3 Unit 2 (vocab only); Level 3 Unit 3 (vocab + grammar); Level 3 Units 4-9 (vocab + grammar); Level 2 Units 6-9 (vocab + grammar); Level 2 Unit 1 (vocab only — 29 words: 10 vocab1, 5 vocab2, 5 academic incl. merged `order`/`different`, 3 content, 6 related)
+- **Next up:** Level 2 Unit 1 grammar (2 points: present progressive first-person-plural; questions with "Are there...?"), then Level 2 Units 2-4 (currently unscanned, no content directory)
+- **Not started:** Levels 1, 6 — checkboxes above are unverified against actual files for Level 1 (see note below); Level 2 Units 2-4; Level 3 Unit 2 (grammar only); Level 5 Units 2-9
+- **Note:** the per-unit checkboxes in this file have been found stale in more than one place (e.g. Level 2 Unit 5 was unchecked despite `vocabulary.json` existing) — verify against actual `content/subjects/english/courses/our-world/level-<n>/unit-<n>/` files before trusting a checked/unchecked box, don't rely on this snapshot alone.
 
 Recommended order: continue Level 5 (8 units left), then work Levels 1-3 and 6 in whatever order matches your teaching rollout — numeric order (1→2→3→6) is the default assumed here if no other priority applies.

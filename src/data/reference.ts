@@ -1,4 +1,8 @@
 import level5Unit1Vocabulary from "../../content/subjects/english/courses/our-world/level-5/unit-1/vocabulary.json";
+import level2Unit1Vocabulary from "../../content/subjects/english/courses/our-world/level-2/unit-1/vocabulary.json";
+import level2Unit2Vocabulary from "../../content/subjects/english/courses/our-world/level-2/unit-2/vocabulary.json";
+import level2Unit3Vocabulary from "../../content/subjects/english/courses/our-world/level-2/unit-3/vocabulary.json";
+import level2Unit4Vocabulary from "../../content/subjects/english/courses/our-world/level-2/unit-4/vocabulary.json";
 import level2Unit9Vocabulary from "../../content/subjects/english/courses/our-world/level-2/unit-9/vocabulary.json";
 import level2Unit8Vocabulary from "../../content/subjects/english/courses/our-world/level-2/unit-8/vocabulary.json";
 import level2Unit7Vocabulary from "../../content/subjects/english/courses/our-world/level-2/unit-7/vocabulary.json";
@@ -40,6 +44,10 @@ import unit5Grammar from "../../content/subjects/english/courses/our-world/level
 import unit6Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-6/grammar.json";
 import unit7Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-7/grammar.json";
 import unit8Grammar from "../../content/subjects/english/courses/our-world/level-4/unit-8/grammar.json";
+import level2Unit1Grammar from "../../content/subjects/english/courses/our-world/level-2/unit-1/grammar.json";
+import level2Unit2Grammar from "../../content/subjects/english/courses/our-world/level-2/unit-2/grammar.json";
+import level2Unit3Grammar from "../../content/subjects/english/courses/our-world/level-2/unit-3/grammar.json";
+import level2Unit4Grammar from "../../content/subjects/english/courses/our-world/level-2/unit-4/grammar.json";
 import level2Unit9Grammar from "../../content/subjects/english/courses/our-world/level-2/unit-9/grammar.json";
 import level2Unit8Grammar from "../../content/subjects/english/courses/our-world/level-2/unit-8/grammar.json";
 import level2Unit7Grammar from "../../content/subjects/english/courses/our-world/level-2/unit-7/grammar.json";
@@ -57,6 +65,10 @@ import type {
 
 type UnitVocabularyWord =
   | (typeof level5Unit1Vocabulary.words)[number]
+  | (typeof level2Unit1Vocabulary.words)[number]
+  | (typeof level2Unit2Vocabulary.words)[number]
+  | (typeof level2Unit3Vocabulary.words)[number]
+  | (typeof level2Unit4Vocabulary.words)[number]
   | (typeof level2Unit8Vocabulary.words)[number]
   | (typeof level2Unit7Vocabulary.words)[number]
   | (typeof level2Unit6Vocabulary.words)[number]
@@ -81,6 +93,10 @@ type UnitVocabularyWord =
   | (typeof unit4Vocabulary.words)[number];
 type UnitGrammarPoint =
   | (typeof level5Unit1Grammar.grammarPoints)[number]
+  | (typeof level2Unit1Grammar.grammarPoints)[number]
+  | (typeof level2Unit2Grammar.grammarPoints)[number]
+  | (typeof level2Unit3Grammar.grammarPoints)[number]
+  | (typeof level2Unit4Grammar.grammarPoints)[number]
   | (typeof level2Unit9Grammar.grammarPoints)[number]
   | (typeof level2Unit8Grammar.grammarPoints)[number]
   | (typeof level2Unit7Grammar.grammarPoints)[number]
@@ -200,6 +216,10 @@ function mergeWordsAcrossUnits(unitWordLists: UnitVocabularyWord[][]): Vocabular
 }
 
 export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
+  level2Unit1Vocabulary.words as UnitVocabularyWord[],
+  level2Unit2Vocabulary.words as UnitVocabularyWord[],
+  level2Unit3Vocabulary.words as UnitVocabularyWord[],
+  level2Unit4Vocabulary.words as UnitVocabularyWord[],
   level2Unit9Vocabulary.words as UnitVocabularyWord[],
   level2Unit8Vocabulary.words as UnitVocabularyWord[],
   level2Unit7Vocabulary.words as UnitVocabularyWord[],
@@ -230,6 +250,10 @@ export const vocabularyItems: VocabularyItem[] = mergeWordsAcrossUnits([
    "<level>-<unit>". Add a new entry here whenever a unit is scanned, so the
    Reference tree never has to guess or hardcode a title elsewhere. */
 export const unitTitles: Record<string, string> = {
+  [`${level2Unit1Vocabulary.level}-${level2Unit1Vocabulary.unit}`]: level2Unit1Vocabulary.unitTitle,
+  [`${level2Unit2Vocabulary.level}-${level2Unit2Vocabulary.unit}`]: level2Unit2Vocabulary.unitTitle,
+  [`${level2Unit3Vocabulary.level}-${level2Unit3Vocabulary.unit}`]: level2Unit3Vocabulary.unitTitle,
+  [`${level2Unit4Vocabulary.level}-${level2Unit4Vocabulary.unit}`]: level2Unit4Vocabulary.unitTitle,
   [`${level2Unit9Vocabulary.level}-${level2Unit9Vocabulary.unit}`]: level2Unit9Vocabulary.unitTitle,
   [`${level2Unit8Vocabulary.level}-${level2Unit8Vocabulary.unit}`]: level2Unit8Vocabulary.unitTitle,
   [`${level2Unit7Vocabulary.level}-${level2Unit7Vocabulary.unit}`]: level2Unit7Vocabulary.unitTitle,
@@ -339,6 +363,34 @@ export const level2Unit5Vocab2Items = vocabularyItems.filter((item) => (level2Un
 export const level2Unit5AcademicItems = vocabularyItems.filter((item) => (level2Unit5Vocabulary.academicWordIds as string[]).includes(item.id));
 export const level2Unit5GlossaryItems = vocabularyItems.filter(
   (item) => (level2Unit5Vocabulary.contentWordIds as string[]).includes(item.id) || (level2Unit5Vocabulary.relatedWordIds as string[]).includes(item.id)
+);
+
+export const level2Unit1Vocab1Items = vocabularyItems.filter((item) => (level2Unit1Vocabulary.vocab1WordIds as string[]).includes(item.id));
+export const level2Unit1Vocab2Items = vocabularyItems.filter((item) => (level2Unit1Vocabulary.vocab2WordIds as string[]).includes(item.id));
+export const level2Unit1AcademicItems = vocabularyItems.filter((item) => (level2Unit1Vocabulary.academicWordIds as string[]).includes(item.id));
+export const level2Unit1GlossaryItems = vocabularyItems.filter(
+  (item) => (level2Unit1Vocabulary.contentWordIds as string[]).includes(item.id) || (level2Unit1Vocabulary.relatedWordIds as string[]).includes(item.id)
+);
+
+export const level2Unit2Vocab1Items = vocabularyItems.filter((item) => (level2Unit2Vocabulary.vocab1WordIds as string[]).includes(item.id));
+export const level2Unit2Vocab2Items = vocabularyItems.filter((item) => (level2Unit2Vocabulary.vocab2WordIds as string[]).includes(item.id));
+export const level2Unit2AcademicItems = vocabularyItems.filter((item) => (level2Unit2Vocabulary.academicWordIds as string[]).includes(item.id));
+export const level2Unit2GlossaryItems = vocabularyItems.filter(
+  (item) => (level2Unit2Vocabulary.contentWordIds as string[]).includes(item.id) || (level2Unit2Vocabulary.relatedWordIds as string[]).includes(item.id)
+);
+
+export const level2Unit3Vocab1Items = vocabularyItems.filter((item) => (level2Unit3Vocabulary.vocab1WordIds as string[]).includes(item.id));
+export const level2Unit3Vocab2Items = vocabularyItems.filter((item) => (level2Unit3Vocabulary.vocab2WordIds as string[]).includes(item.id));
+export const level2Unit3AcademicItems = vocabularyItems.filter((item) => (level2Unit3Vocabulary.academicWordIds as string[]).includes(item.id));
+export const level2Unit3GlossaryItems = vocabularyItems.filter(
+  (item) => (level2Unit3Vocabulary.contentWordIds as string[]).includes(item.id) || (level2Unit3Vocabulary.relatedWordIds as string[]).includes(item.id)
+);
+
+export const level2Unit4Vocab1Items = vocabularyItems.filter((item) => (level2Unit4Vocabulary.vocab1WordIds as string[]).includes(item.id));
+export const level2Unit4Vocab2Items = vocabularyItems.filter((item) => (level2Unit4Vocabulary.vocab2WordIds as string[]).includes(item.id));
+export const level2Unit4AcademicItems = vocabularyItems.filter((item) => (level2Unit4Vocabulary.academicWordIds as string[]).includes(item.id));
+export const level2Unit4GlossaryItems = vocabularyItems.filter(
+  (item) => (level2Unit4Vocabulary.contentWordIds as string[]).includes(item.id) || (level2Unit4Vocabulary.relatedWordIds as string[]).includes(item.id)
 );
 
 export const level2Unit6Vocab1Items = vocabularyItems.filter((item) => (level2Unit6Vocabulary.vocab1WordIds as string[]).includes(item.id));
@@ -534,6 +586,10 @@ function toGrammarPoint(point: UnitGrammarPoint): GrammarPoint {
 
 export const grammarPoints: GrammarPoint[] = [
   ...level5Unit1Grammar.grammarPoints.map(toGrammarPoint),
+  ...level2Unit1Grammar.grammarPoints.map(toGrammarPoint),
+  ...level2Unit2Grammar.grammarPoints.map(toGrammarPoint),
+  ...level2Unit3Grammar.grammarPoints.map(toGrammarPoint),
+  ...level2Unit4Grammar.grammarPoints.map(toGrammarPoint),
   ...level2Unit9Grammar.grammarPoints.map(toGrammarPoint),
   ...level2Unit8Grammar.grammarPoints.map(toGrammarPoint),
   ...level2Unit7Grammar.grammarPoints.map(toGrammarPoint),
@@ -571,6 +627,10 @@ export const level3Unit6GrammarItems = grammarPoints.filter((item) => item.level
 export const level3Unit7GrammarItems = grammarPoints.filter((item) => item.level === 3 && item.unit === 7);
 export const level3Unit8GrammarItems = grammarPoints.filter((item) => item.level === 3 && item.unit === 8);
 export const level3Unit9GrammarItems = grammarPoints.filter((item) => item.level === 3 && item.unit === 9);
+export const level2Unit1GrammarItems = grammarPoints.filter((item) => item.level === 2 && item.unit === 1);
+export const level2Unit2GrammarItems = grammarPoints.filter((item) => item.level === 2 && item.unit === 2);
+export const level2Unit3GrammarItems = grammarPoints.filter((item) => item.level === 2 && item.unit === 3);
+export const level2Unit4GrammarItems = grammarPoints.filter((item) => item.level === 2 && item.unit === 4);
 export const level2Unit9GrammarItems = grammarPoints.filter((item) => item.level === 2 && item.unit === 9);
 export const level2Unit8GrammarItems = grammarPoints.filter((item) => item.level === 2 && item.unit === 8);
 export const level2Unit7GrammarItems = grammarPoints.filter((item) => item.level === 2 && item.unit === 7);

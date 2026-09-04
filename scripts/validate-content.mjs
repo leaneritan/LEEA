@@ -25,6 +25,10 @@ function sourceLabel(word, suffix) {
 }
 
 const unitVocabularyPaths = [
+  "content/subjects/english/courses/our-world/level-2/unit-1/vocabulary.json",
+  "content/subjects/english/courses/our-world/level-2/unit-2/vocabulary.json",
+  "content/subjects/english/courses/our-world/level-2/unit-3/vocabulary.json",
+  "content/subjects/english/courses/our-world/level-2/unit-4/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-2/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-3/vocabulary.json",
@@ -52,6 +56,10 @@ const unitVocabularyPaths = [
 ];
 const vocabularyIndexPath = "content/subjects/english/reference/vocabulary-index.json";
 const unitGrammarPaths = [
+  "content/subjects/english/courses/our-world/level-2/unit-1/grammar.json",
+  "content/subjects/english/courses/our-world/level-2/unit-2/grammar.json",
+  "content/subjects/english/courses/our-world/level-2/unit-3/grammar.json",
+  "content/subjects/english/courses/our-world/level-2/unit-4/grammar.json",
   "content/subjects/english/courses/our-world/level-5/unit-1/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-9/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-8/grammar.json",
@@ -156,7 +164,7 @@ const IRREGULAR_VERBS_FOR_VALIDATION = {
   fall: ["fell", "fallen"], feel: ["felt", "felt"], feed: ["fed", "fed"], find: ["found", "found"],
   rise: ["rose", "risen"],
   fly: ["flew", "flown"], forget: ["forgot", "forgotten"], get: ["got", "gotten"],
-  give: ["gave", "given"], go: ["went", "gone"], grow: ["grew", "grown"],
+  give: ["gave", "given"], go: ["went", "gone"], grow: ["grew", "grown"], hang: ["hung", "hung"],
   have: ["had", "had"], hear: ["heard", "heard"], hide: ["hid", "hidden"],
   hold: ["held", "held"], keep: ["kept", "kept"], know: ["knew", "known"],
   leave: ["left", "left"], lose: ["lost", "lost"], make: ["made", "made"],
@@ -164,7 +172,7 @@ const IRREGULAR_VERBS_FOR_VALIDATION = {
   read: ["read", "read"], ride: ["rode", "ridden"], run: ["ran", "run"],
   say: ["said", "said"], see: ["saw", "seen"], sell: ["sold", "sold"],
   send: ["sent", "sent"], sing: ["sang", "sung"], sit: ["sat", "sat"],
-  sleep: ["slept", "slept"], speak: ["spoke", "spoken"], spend: ["spent", "spent"],
+  sleep: ["slept", "slept"], slide: ["slid", "slid"], speak: ["spoke", "spoken"], spend: ["spent", "spent"],
   spin: ["spun", "spun"], stand: ["stood", "stood"], swim: ["swam", "swum"], swing: ["swung", "swung"],
   take: ["took", "taken"], teach: ["taught", "taught"], tell: ["told", "told"], travel: ["traveled", "traveled"],
   think: ["thought", "thought"], throw: ["threw", "thrown"],

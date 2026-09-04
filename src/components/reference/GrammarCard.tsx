@@ -238,7 +238,7 @@ function PatternChart({ entry, jp }: { entry: GrammarEntry; jp: boolean }) {
   // existing Unit 8 points and any future point that's a pure S-V-O
   // sentence pattern, where chips read more naturally than table cells.
   if (entry.chart.table && !entry.chart.table.preferChips) {
-    return <GrammarTableChart table={entry.chart.table} />;
+    return <GrammarTableChart table={entry.chart.table} entry={entry} />;
   }
 
   return (
@@ -293,23 +293,35 @@ function PatternChart({ entry, jp }: { entry: GrammarEntry; jp: boolean }) {
   );
 }
 
-/* General-purpose grammar table renderer — mirrors the print Grammar
-   Workbook's boxed-table visual language (shaded header, bordered rows,
-   optional Question/Answer mini-table, footer rule notes) so any grammar
-   point's chart can be expressed as data instead of one-off UI code. See
-   GrammarChartTable in src/data/types.ts for the schema. */
-function GrammarTableChart({ table }: { table: NonNullable<GrammarEntry["chart"]["table"]> }) {
+/* General-purpose grammar table renderer — styled after the printed Grammar
+   Workbook's boxed chart (cream box, gold rule, a "how it works" spotlight
+   sentence with the target phrase bolded, a gridded table) so any grammar
+   point's chart reads like a page from the book instead of a generic web
+   data table. See GrammarChartTable in src/data/types.ts for the schema. */
+function GrammarTableChart({
+  table,
+  entry
+}: {
+  table: NonNullable<GrammarEntry["chart"]["table"]>;
+  entry: GrammarEntry;
+}) {
   const usedRoleKeys = new Set<string>();
   for (const row of table.rows) {
     if (row.labelRole) usedRoleKeys.add(row.labelRole);
     row.roles?.forEach((role) => role && usedRoleKeys.add(role));
   }
   const roleLegend = CHART_LEGEND.filter((item) => usedRoleKeys.has(item.key));
+  // The book's grammar box always opens with one "see how it works" example,
+  // the target phrase bolded mid-sentence. The chart's own first sample
+  // sentence always has a matching highlight — every grammar point's
+  // examples[] covers every tab1_samples entry (enforced by the content
+  // validator) — so this needs no extra authored data.
+  const spotlight = entry.chartAndSamples.samples[0];
 
   return (
     <section className="gcardv2-chart">
       <div className="gcardv2-chart-head">
-        <div className="rcardv2-eyebrow">Pattern chart</div>
+        <span className="gcardv2-chart-badge">Grammar Chart</span>
         {table.title && <div className="gcardv2-table-title">{table.title}</div>}
         {roleLegend.length > 0 && (
           <div className="gcardv2-legend">
@@ -322,6 +334,12 @@ function GrammarTableChart({ table }: { table: NonNullable<GrammarEntry["chart"]
           </div>
         )}
       </div>
+
+      {spotlight && (
+        <p className="gcardv2-chart-spotlight">
+          {highlightGrammarPhrase(spotlight.en, entry.highlightsBySentence[spotlight.en], entry.highlightRole)}
+        </p>
+      )}
 
       <div className="gcardv2-table-wrap">
         <table className="gcardv2-table">

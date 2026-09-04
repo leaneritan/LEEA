@@ -67,6 +67,7 @@ const IRREGULAR_VERBS: Record<string, [string, string]> = {
   sing: ["sang", "sung"],
   sit: ["sat", "sat"],
   sleep: ["slept", "slept"],
+  slide: ["slid", "slid"],
   speak: ["spoke", "spoken"],
   spend: ["spent", "spent"],
   spin: ["spun", "spun"],

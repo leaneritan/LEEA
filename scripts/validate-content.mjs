@@ -27,6 +27,7 @@ function sourceLabel(word, suffix) {
 const unitVocabularyPaths = [
   "content/subjects/english/courses/our-world/level-2/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-2/unit-2/vocabulary.json",
+  "content/subjects/english/courses/our-world/level-2/unit-3/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-2/vocabulary.json",
   "content/subjects/english/courses/our-world/level-3/unit-3/vocabulary.json",
@@ -168,7 +169,7 @@ const IRREGULAR_VERBS_FOR_VALIDATION = {
   read: ["read", "read"], ride: ["rode", "ridden"], run: ["ran", "run"],
   say: ["said", "said"], see: ["saw", "seen"], sell: ["sold", "sold"],
   send: ["sent", "sent"], sing: ["sang", "sung"], sit: ["sat", "sat"],
-  sleep: ["slept", "slept"], speak: ["spoke", "spoken"], spend: ["spent", "spent"],
+  sleep: ["slept", "slept"], slide: ["slid", "slid"], speak: ["spoke", "spoken"], spend: ["spent", "spent"],
   spin: ["spun", "spun"], stand: ["stood", "stood"], swim: ["swam", "swum"], swing: ["swung", "swung"],
   take: ["took", "taken"], teach: ["taught", "taught"], tell: ["told", "told"], travel: ["traveled", "traveled"],
   think: ["thought", "thought"], throw: ["threw", "thrown"],

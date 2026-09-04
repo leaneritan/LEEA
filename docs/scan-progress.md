@@ -45,7 +45,7 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 - [x] Unit 3 — Vocab
 - [x] Unit 3 — Grammar
 - [x] Unit 4 — Vocab
-- [ ] Unit 4 — Grammar
+- [x] Unit 4 — Grammar
 - [x] Unit 5 — Vocab
 - [ ] Unit 5 — Grammar
 - [x] Unit 6 — Vocab
@@ -143,9 +143,9 @@ Grammar scan for a unit can't start until that unit's vocab scan is merged (`doc
 
 ## Status snapshot (2026-09-04)
 
-- **Done:** Level 4 Units 1-9 (vocab + grammar); Level 5 Unit 1 (vocab + grammar); Level 3 Unit 1 (vocab + grammar); Level 3 Unit 2 (vocab only); Level 3 Unit 3 (vocab + grammar); Level 3 Units 4-9 (vocab + grammar); Level 2 Units 6-9 (vocab + grammar); Level 2 Unit 1 (vocab + grammar — 29 words + 2 grammar points: present progressive first-person-plural `OW2-U1-G1`, questions with "Are there...?" `OW2-U1-G2`); Level 2 Unit 2 (vocab + grammar — 51 words + 2 grammar points: "What's + noun + like?" and answers with "It's..." `OW2-U2-G1`, Imperatives `OW2-U2-G2`); Level 2 Unit 3 (vocab + grammar — 36 words + 2 grammar points: "like + infinitive" `OW2-U3-G1`, "Let's" `OW2-U3-G2`); Level 2 Unit 4 (vocab only — 36 words: 10 vocab1 incl. `shelves` upgraded from content→vocabulary, 5 vocab2 incl. a surprise merge on `refrigerator`, 10 academic incl. merged `compare`/`describe`/`chart`/`remember`/`different`/`same`, 2 content, 9 related incl. merged `blanket`/`fur`/`chores`). **Level 2 vocab is now complete — 9 of 9 units imported.**
-- **Next up:** Level 2 Unit 4 grammar (2 points: Prepositions of place; Subject-pronoun agreement: it, they) — the last unscanned grammar in Level 2
-- **Not started:** Levels 1, 6 — checkboxes above are unverified against actual files for Level 1 (see note below); Level 2 Unit 4 grammar; Level 3 Unit 2 (grammar only); Level 5 Units 2-9
+- **Done:** Level 4 Units 1-9 (vocab + grammar); Level 5 Unit 1 (vocab + grammar); Level 3 Unit 1 (vocab + grammar); Level 3 Unit 2 (vocab only); Level 3 Unit 3 (vocab + grammar); Level 3 Units 4-9 (vocab + grammar); Level 2 Units 1-9 (vocab + grammar — Level 2 is now fully scanned, both vocab and grammar, all 9 units). Unit-by-unit for Level 2: Unit 1 (29 words + 2 grammar points: present progressive first-person-plural `OW2-U1-G1`, questions with "Are there...?" `OW2-U1-G2`); Unit 2 (51 words + 2 grammar points: "What's + noun + like?" and answers with "It's..." `OW2-U2-G1`, Imperatives `OW2-U2-G2`); Unit 3 (36 words + 2 grammar points: "like + infinitive" `OW2-U3-G1`, "Let's" `OW2-U3-G2`); Unit 4 (36 words incl. `shelves` upgraded content→vocabulary and a surprise merge on `refrigerator`, + 2 grammar points: Prepositions of place `OW2-U4-G1`, Subject-pronoun agreement it/they `OW2-U4-G2`); Units 6-9 (scanned in earlier sessions).
+- **Next up:** Level 1 and Level 6 (entirely unscanned); Level 3 Unit 2 grammar; Level 5 Units 2-9
+- **Not started:** Levels 1, 6 — checkboxes above are unverified against actual files for Level 1 (see note below); Level 3 Unit 2 (grammar only); Level 5 Units 2-9
 - **Note:** the per-unit checkboxes in this file have been found stale in more than one place (e.g. Level 2 Unit 5 was unchecked despite `vocabulary.json` existing) — verify against actual `content/subjects/english/courses/our-world/level-<n>/unit-<n>/` files before trusting a checked/unchecked box, don't rely on this snapshot alone.
 
 Recommended order: continue Level 5 (8 units left), then work Levels 1-3 and 6 in whatever order matches your teaching rollout — numeric order (1→2→3→6) is the default assumed here if no other priority applies.

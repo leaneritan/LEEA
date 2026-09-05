@@ -25,6 +25,7 @@ function sourceLabel(word, suffix) {
 }
 
 const unitVocabularyPaths = [
+  "content/subjects/english/courses/our-world/level-1/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-2/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-2/unit-2/vocabulary.json",
   "content/subjects/english/courses/our-world/level-2/unit-3/vocabulary.json",
@@ -56,6 +57,7 @@ const unitVocabularyPaths = [
 ];
 const vocabularyIndexPath = "content/subjects/english/reference/vocabulary-index.json";
 const unitGrammarPaths = [
+  "content/subjects/english/courses/our-world/level-1/unit-1/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-1/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-2/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-3/grammar.json",

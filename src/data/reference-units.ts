@@ -12,7 +12,7 @@ export const OUR_WORLD_LEVELS = [1, 2, 3, 4, 5, 6] as const;
 
 /** Total units per Our World level (curriculum shape, not import status). */
 export const OUR_WORLD_UNIT_TOTALS: Record<number, number> = {
-  1: 8,
+  1: 9,
   2: 9,
   3: 9,
   4: 9,

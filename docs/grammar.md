@@ -38,9 +38,9 @@ For each grammar point (G1 and G2) extract:
 
 - **Rule name** — the bold title in the yellow grammar box, e.g. "Describing people with *who*"
 - **Pattern** — the rule structure, e.g. `person + who + verb phrase`
-- **Chart examples** — the 3 sentences shown in the grammar box, verbatim
-- **Be the Expert sidebar** — the metalinguistic explanation, useful for Level Up rule subtitles
-- **Practice activities** — numbered exercises, mine these for more sample sentences and quiz material
+- **Chart examples** — every sentence shown *inside the grammar box itself*, verbatim, word for word. This is the single source for both `chart.intro_examples` and `chart.table` — see the callout in Step 3, "`chart.table` transcribes the box, it doesn't summarize it." Copy the box's exact wording before you read anything else on the page, so later steps can't quietly substitute in something else.
+- **Be the Expert sidebar** — the metalinguistic explanation, useful for Level Up rule subtitles. This is a *different* source than the grammar box — good for `tab2_levelup` rule prose, never a source for `chart.table` rows.
+- **Practice activities** — numbered exercises, mine these for `tab1_samples`/`tab2_levelup`/quiz material — **not** for `chart.table`, which must stay limited to what the box itself prints (see Step 3).
 - **Academic Language terms** (e.g. clause, contraction) and **Content Vocabulary terms** — note these; they go into `vocabulary.json` as `type: "academic"` / `"content"`. They may already be captured if vocab scan ran first — don't duplicate, check first.
 
 ### When no workbook answer key is available
@@ -130,6 +130,35 @@ Required schema — copy the shape, don't skip fields:
 
 `highlightRole` colors the `examples[].highlight` substring — use `"clause"` for relative-clause/definition patterns, `"verb"` for tense/aspect patterns (used to, will), or another `GrammarRoleKey` value from `docs/content-model.md` when it fits better.
 
+### ⚠️ `chart.table` transcribes the box — it doesn't summarize, categorize, or improve on it
+
+**This is the most common defect found across every level scanned so far** — an audit of Levels 1-5 found 47 of 56 grammar points (84%) had a `chart.table` that didn't match its planner source. The failure mode is always the same: instead of copying the box's actual example sentences into the table, the table gets built as a *plausible-looking* reference structure instead — a spelling-rule chart, a subject/pronoun conjugation grid, a noun-type taxonomy, a "Positive/Negative" or "Affirmative/Negative" breakdown — using sentences invented from scratch, borrowed from a nearby practice exercise or word list, or pulled from the "Be the Expert" sidebar. The result reads as correct (it's grammatically fine, on-topic, even well-formatted) but doesn't match one word of what's actually printed in the box, so it's silently teaching Leo content the textbook never said.
+
+**The rule: every string inside `chart.table` — every column header's *content* (not just its label), every cell, every row — must trace back to text that is literally printed inside the yellow grammar box for that grammar point.** Nothing else on the page is a valid source for `chart.table`, no matter how relevant it looks:
+
+- ❌ The "Be the Expert" sidebar, even though it explains the same rule
+- ❌ A numbered practice/exercise activity elsewhere on the spread, even if it uses the same pattern
+- ❌ A word bank, sticker sheet, or vocabulary list on the same page
+- ❌ A "more natural" or "clearer" example you compose yourself to replace an awkward box sentence
+- ❌ An answer key entry that happens to fit, if that sentence isn't also in the box
+
+**Default shape — use this unless the box is genuinely a different kind of table:** most grammar boxes are a Question → Answer pair (or two). For these, build a plain two-column table with one row per Q/A pair actually printed:
+
+```json
+"table": {
+  "title": "<grammar point title, matching the box's own title>",
+  "columns": ["Question", "Answer"],
+  "rows": [
+    { "cells": ["<question line, verbatim>", "<answer line, verbatim>"], "roles": ["clause", "clause"] }
+  ],
+  "notes": ["<any footnote actually printed in the box, e.g. contraction reminders>"]
+}
+```
+
+If the box genuinely prints a reference/data table (spelling rules, irregular verb pairs, comparative forms) rather than a Q&A pair, transcribe *that* table's real columns, rows, and example sentences faithfully — same rule, different shape. Don't invent extra rows to make the table feel more complete, and don't swap in a "better" example sentence than the one actually printed.
+
+**Before moving to Step 4, do this self-check:** put the grammar box's page image and your `chart.table` JSON side by side. Read every cell out loud. If any cell's wording doesn't appear verbatim in the box, fix it — either replace it with what the box actually says, or (if the box truly has fewer lines than your table has rows) delete the extra row. A table with 2 correct rows is better than a table with 2 correct rows and 2 invented ones.
+
 ### `examples[]` must cover every sample sentence — enforced by the validator
 
 `examples[]` is not "a few highlighted samples" — it must contain one entry for **every single sentence** in both `tab1_samples` and `tab2_levelup.mixed_samples`, matched by exact text. The grammar card looks up each sample's highlight by exact sentence match; any sentence with no matching `examples[]` entry renders with **no color-coded phrase** — a silent visual gap, not an error you'd notice from a clean build. Build the full sentence list from both tabs first, then write one `examples` entry per sentence.
@@ -172,10 +201,11 @@ Grammar validator requires: `id`, `title`, `rule`, `pattern`, `tag` on every poi
 
 ## Step 6 — Verify it actually works
 
-A clean `tsc`/validate pass does not prove the cards render or the tree links correctly. If you can run the dev server and a browser (or Playwright), check:
+A clean `tsc`/validate pass does not prove the cards render or the tree links correctly, and it does not catch a `chart.table` full of invented content — nothing in the schema or the validator checks that a table cell's text was actually printed in the source. That check is manual, every time. If you can run the dev server and a browser (or Playwright), check:
 
 - Both grammar cards load at `/reference/grammar/<id>` with no console errors
 - The pattern chart / table renders with real data, not blank, and table cells are actually colored (not just gray) if you added `roles`
+- **Re-open the grammar box's planner page image and re-read `chart.table` against it one more time, cell by cell** — this is the single check most likely to catch a real content bug (see the ⚠️ callout in Step 3), and it's cheap to do now versus expensive to discover in a later audit
 - The Unit Reference page's Grammar section links to the correct grammar IDs, not a stale or missing route
 
 If you cannot run a browser in your environment, say so explicitly rather than claiming this was verified — neither `tsc` nor the validator catches a missing CSS class or a broken link.
@@ -189,6 +219,7 @@ Push to the working branch. Do not open a PR unless asked to — a human merges 
 ## Output checklist
 
 - [ ] `grammar.json` created with both grammar points at full 10/10/10/10 depth
+- [ ] `chart.table` re-checked cell by cell against the actual grammar box — every cell traces to text literally printed in the box, nothing invented or borrowed from elsewhere on the page (see the ⚠️ callout in Step 3)
 - [ ] `examples[]` covers every sentence in `tab1_samples` and `tab2_levelup.mixed_samples` — validator passes this check
 - [ ] Any new academic/content words added to `vocabulary.json`
 - [ ] `grammar-index.json` updated (IDs + `sourceFiles`)

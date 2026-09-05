@@ -348,6 +348,7 @@ const UNIT_REFERENCE_PAGES: Record<string, string> = {
   "1-4": "/reference/our-world/level-1/unit-4",
   "1-5": "/reference/our-world/level-1/unit-5",
   "1-6": "/reference/our-world/level-1/unit-6",
+  "1-7": "/reference/our-world/level-1/unit-7",
   "2-1": "/reference/our-world/level-2/unit-1",
   "2-2": "/reference/our-world/level-2/unit-2",
   "2-3": "/reference/our-world/level-2/unit-3",

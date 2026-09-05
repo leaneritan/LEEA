@@ -507,6 +507,7 @@ function VocabularyPane({
   const [query, setQuery] = useState("");
   const [posType, setPosType] = useState<string>("all");
   const [sort, setSort] = useState<VocabSort>("unit");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const known = useMemo(() => words.filter((word) => knownSet.has(word.id)), [words, knownSet]);
   const review = useMemo(() => words.filter((word) => !knownSet.has(word.id)), [words, knownSet]);
@@ -527,6 +528,8 @@ function VocabularyPane({
     if (sort === "az") return [...list].sort((a, b) => a.word.localeCompare(b.word));
     return list;
   }, [words, posType, q, sort]);
+
+  const hasActiveFilters = posType !== "all" || q.length > 0;
 
   function clearFilters() {
     setPosType("all");
@@ -551,32 +554,42 @@ function VocabularyPane({
 
       {status === "all" ? (
         <>
-          <div className="refv2-fbar">
-            <div className="refv2-fbar-field">
-              <Search size={14} />
-              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter words…" />
-            </div>
-            <div className="refv2-fbar-chips">
-              <button type="button" className={`refv2-filter${posType === "all" ? " is-active" : ""}`} onClick={() => setPosType("all")}>
-                <span>All types</span>
-              </button>
-              {posPresent.map((pos) => (
-                <button key={pos} type="button" className={`refv2-filter${posType === pos ? " is-active" : ""}`} onClick={() => setPosType(pos)}>
-                  <span>{POS_LABELS[pos] ?? pos}</span>
-                </button>
-              ))}
-              <button
-                type="button"
-                className={`refv2-fbar-sort${sort === "az" ? " is-active" : ""}`}
-                onClick={() => setSort((current) => (current === "az" ? "unit" : "az"))}
-              >
-                A–Z
-              </button>
-            </div>
+          <button type="button" className="refv2-fbar-toggle" onClick={() => setFiltersOpen((open) => !open)} aria-expanded={filtersOpen}>
+            {filtersOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            <span className="refv2-fbar-toggle-label">
+              Filters
+              {hasActiveFilters ? <span className="refv2-fbar-toggle-dot" /> : null}
+            </span>
             <span className="refv2-fbar-count">
               Showing {filtered.length} of {words.length} words in {scopeLabel}
             </span>
-          </div>
+          </button>
+
+          {filtersOpen ? (
+            <div className="refv2-fbar">
+              <div className="refv2-fbar-field">
+                <Search size={14} />
+                <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter words…" />
+              </div>
+              <div className="refv2-fbar-chips">
+                <button type="button" className={`refv2-filter${posType === "all" ? " is-active" : ""}`} onClick={() => setPosType("all")}>
+                  <span>All types</span>
+                </button>
+                {posPresent.map((pos) => (
+                  <button key={pos} type="button" className={`refv2-filter${posType === pos ? " is-active" : ""}`} onClick={() => setPosType(pos)}>
+                    <span>{POS_LABELS[pos] ?? pos}</span>
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className={`refv2-fbar-sort${sort === "az" ? " is-active" : ""}`}
+                  onClick={() => setSort((current) => (current === "az" ? "unit" : "az"))}
+                >
+                  A–Z
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           <div className="refv2-card refv2-vocab-card">
             <div className="refv2-vocab-head">
@@ -779,6 +792,7 @@ function ReviewCard({
 function GrammarPane({ grammar, scopeLabel }: { grammar: GrammarEntry[]; scopeLabel: string }) {
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState<string>("all");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const topicsPresent = useMemo(() => Array.from(new Set(grammar.map((g) => g.topic))), [grammar]);
 
@@ -795,6 +809,8 @@ function GrammarPane({ grammar, scopeLabel }: { grammar: GrammarEntry[]; scopeLa
       return matchesTopic && matchesQuery;
     });
   }, [grammar, topic, q]);
+
+  const hasActiveFilters = topic !== "all" || q.length > 0;
 
   function clearFilters() {
     setTopic("all");
@@ -813,27 +829,39 @@ function GrammarPane({ grammar, scopeLabel }: { grammar: GrammarEntry[]; scopeLa
 
   return (
     <div className="refv2-pane-stack">
-      <div className="refv2-fbar">
-        <div className="refv2-fbar-field refv2-fbar-field--wide">
-          <Search size={14} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter grammar points…" />
-        </div>
+      <button type="button" className="refv2-fbar-toggle" onClick={() => setFiltersOpen((open) => !open)} aria-expanded={filtersOpen}>
+        {filtersOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        <span className="refv2-fbar-toggle-label">
+          Filters
+          {hasActiveFilters ? <span className="refv2-fbar-toggle-dot" /> : null}
+        </span>
         <span className="refv2-fbar-count">
           {filtered.length} of {grammar.length} points in {scopeLabel}
         </span>
-      </div>
+      </button>
 
-      <div className="refv2-fbar-row">
-        <span className="refv2-fbar-row-label">Topic</span>
-        <button type="button" className={`refv2-filter${topic === "all" ? " is-active" : ""}`} onClick={() => setTopic("all")}>
-          <span>All topics</span>
-        </button>
-        {topicsPresent.map((t) => (
-          <button key={t} type="button" className={`refv2-filter${topic === t ? " is-active" : ""}`} onClick={() => setTopic(t)}>
-            <span>{t}</span>
-          </button>
-        ))}
-      </div>
+      {filtersOpen ? (
+        <>
+          <div className="refv2-fbar">
+            <div className="refv2-fbar-field refv2-fbar-field--wide">
+              <Search size={14} />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter grammar points…" />
+            </div>
+          </div>
+
+          <div className="refv2-fbar-row">
+            <span className="refv2-fbar-row-label">Topic</span>
+            <button type="button" className={`refv2-filter${topic === "all" ? " is-active" : ""}`} onClick={() => setTopic("all")}>
+              <span>All topics</span>
+            </button>
+            {topicsPresent.map((t) => (
+              <button key={t} type="button" className={`refv2-filter${topic === t ? " is-active" : ""}`} onClick={() => setTopic(t)}>
+                <span>{t}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      ) : null}
 
       {filtered.length === 0 ? (
         <div className="refv2-fbar-empty-card">

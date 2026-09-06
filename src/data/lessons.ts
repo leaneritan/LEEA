@@ -99,6 +99,7 @@ import tgVerbs from "../../content/subjects/english/courses/special-training/les
 import tgVerbsLearner from "../../content/subjects/english/courses/special-training/lessons/verbs-app.learner.json";
 import tgGrammarCup from "../../content/subjects/english/courses/special-training/lessons/grammar-cup.teacher.json";
 import tgGrammarCupLearner from "../../content/subjects/english/courses/special-training/lessons/grammar-cup-app.learner.json";
+import level5Unit1Opener from "../../content/subjects/english/courses/our-world/level-5/unit-1/lessons/opener.teacher.json";
 import type { Lesson } from "./types";
 
 // Canonical within-unit teaching order. Lessons are always sorted by this
@@ -238,7 +239,8 @@ export const lessons: Lesson[] = [
   tgVerbs as Lesson,
   tgVerbsLearner as Lesson,
   tgGrammarCup as Lesson,
-  tgGrammarCupLearner as Lesson
+  tgGrammarCupLearner as Lesson,
+  level5Unit1Opener as Lesson
 ].sort(compareLessonOrder);
 export const teacherLessons = lessons.filter((lesson) => lesson.mode === "teacher");
 export const learnerLessons = lessons.filter((lesson) => lesson.mode === "learner");

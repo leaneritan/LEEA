@@ -190,12 +190,13 @@ export function AppShell({
           <span className="sidebar-streak-label">Day streak</span>
           <div className="sidebar-streak-count">
             <strong>{streakDays}</strong>
-            <small>days 🔥</small>
+            <small>{sidebarCollapsed ? "🔥" : "days 🔥"}</small>
           </div>
           <div className="sidebar-streak-bar">
             {Array.from({ length: 5 }).map((_, index) => (
               <i className={index < Math.min(streakDays, 5) ? "filled" : ""} key={index} />
             ))}
+            {streakDays > 5 && <span className="sidebar-streak-overflow">+{streakDays - 5}</span>}
           </div>
         </div>
         </aside>

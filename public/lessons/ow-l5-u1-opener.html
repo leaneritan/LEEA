@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Level 5 · Unit 1 Opener — Extreme Weather | LEEA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"></noscript>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../lib/leea-cloud-config.js"></script>
+<script src="../../lib/leea-cloud.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* ── UNIT 9 · FORCE LAB PALETTE ── */
+  --u9:#0D9488;      --u9d:#0F766E;    --u9l:#F0FDFA;   --u9ll:#F5FFFE;
+  --acc:#FACC15;     --accd:#A16207;   --accl:#FEFCE8;
+  --gn:#16A34A;      --gnd:#15803D;    --gnl:#F0FDF4;
+  --bl:#2563EB;      --bld:#1D4ED8;    --bll:#EFF6FF;
+  --pu:#DB2777;      --pul:#FDF2F8;
+  --tl:#0D9488;      --tll:#F0FDFA;
+  --rd:#DC2626;      --rdl:#FEE2E2;
+  --ink:#0F172A;     --ink2:#334155;   --ink3:#64748B;   --ink4:#94A3B8;
+  --paper:#FFFDF8;   --surf:#FFFFFF;   --bdr:#E2E8F0;    --bdr2:#CBD5E1;
+  --fn:'Outfit',system-ui,sans-serif;
+}
+html,body{height:100%;background:#0B0F1A;overflow:hidden;font-family:var(--fn)}
+
+/* ══ DECK STAGE (1920×1080 fixed coordinate space) ══ */
+#deckWrap{position:fixed;inset:0;overflow:hidden;background:#0B0F1A}
+#deck{position:absolute;top:0;left:0;width:1920px;height:1080px;flex:0 0 auto;transform-origin:top left;background:var(--paper);overflow:hidden;will-change:transform}
+
+/* ══ SLIDES ══ */
+.slide{position:absolute;inset:0;padding:96px 110px 130px;display:none;flex-direction:column;justify-content:center}
+.slide.on{display:flex}
+.slide.top{justify-content:flex-start;padding-top:120px}
+
+/* ══ STAGE BADGE (injected by <deck-stage>) ══ */
+deck-stage{position:absolute;top:38px;left:110px;display:flex;align-items:center;gap:12px;z-index:5}
+.sb{font-size:19px;font-weight:800;letter-spacing:3.2px;text-transform:uppercase;padding:8px 20px;border-radius:6px;border:2px solid}
+.sb.warmup{background:var(--accl);color:var(--accd);border-color:#FCD34D}
+.sb.present{background:var(--bll);color:var(--bld);border-color:#BFDBFE}
+.sb.practice{background:var(--pul);color:var(--pu);border-color:#DDD6FE}
+.sb.apply{background:var(--gnl);color:var(--gnd);border-color:#BBF7D0}
+.sb.recap{background:var(--tll);color:var(--tl);border-color:#99F6E4}
+.sb.wrapup{background:#F1F5F9;color:var(--ink2);border-color:var(--bdr2)}
+.sb.vocab{background:var(--u9l);color:var(--u9d);border-color:#FECACA}
+.sb.expert{background:#FDF4FF;color:#A21CAF;border-color:#F5D0FE}
+.sb-sub{font-size:18px;font-weight:600;color:var(--ink4);letter-spacing:.6px}
+
+/* ══ TYPOGRAPHY ══ */
+h1.big{font-size:104px;font-weight:900;line-height:1.02;letter-spacing:-2.5px;color:var(--ink)}
+h2.hd{font-size:70px;font-weight:900;line-height:1.06;letter-spacing:-1.6px;color:var(--ink);margin-bottom:34px}
+h3.sub{font-size:44px;font-weight:800;color:var(--ink);line-height:1.18;margin-bottom:24px}
+p.lead{font-size:38px;font-weight:500;color:var(--ink2);line-height:1.5}
+.kick{font-size:22px;font-weight:800;letter-spacing:5px;text-transform:uppercase;color:var(--u9);margin-bottom:20px}
+.jp{font-size:27px;font-weight:600;color:var(--ink3);line-height:1.5}
+.hl{color:var(--u9)}
+.hl2{color:var(--acc)}
+.hlbl{color:var(--bl)}
+.hlgn{color:var(--gn)}
+
+/* ══ LAYOUT HELPERS ══ */
+.row{display:flex;gap:30px;align-items:stretch;justify-content:center}
+.col{display:flex;flex-direction:column;gap:24px;justify-content:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-content:center}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-content:center}
+.center{text-align:center;align-items:center}
+.mt{margin-top:32px}
+
+/* ══ CARDS ══ */
+.card{background:var(--surf);border:3px solid var(--bdr);border-radius:20px;padding:32px 36px}
+.card.u9{border-color:#FECACA;background:var(--u9l)}
+.card.acc{border-color:#FDE68A;background:var(--accl)}
+.card.bl{border-color:#BFDBFE;background:var(--bll)}
+.card.gn{border-color:#BBF7D0;background:var(--gnl)}
+.card.pu{border-color:#DDD6FE;background:var(--pul)}
+.card-lbl{font-size:20px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+
+/* ══ WORD CARD (vocab reveal prize) ══ */
+.wordcard{background:linear-gradient(155deg,#fff,#FFF7F7);border:5px solid var(--u9);border-radius:28px;padding:44px 54px;text-align:center;box-shadow:0 22px 60px rgba(13,148,136,.18)}
+.wordcard .emo{font-size:104px;line-height:1}
+.wordcard .w{font-size:82px;font-weight:900;color:var(--u9d);letter-spacing:-1.4px;margin-top:8px}
+.wordcard .pos{font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--ink4);margin-top:6px}
+.wordcard .def{font-size:34px;font-weight:600;color:var(--ink2);margin-top:20px;line-height:1.4}
+.wordcard .ex{font-size:30px;font-weight:600;color:var(--u9);font-style:italic;margin-top:16px}
+.wordcard .jpx{font-size:26px;font-weight:600;color:var(--ink3);margin-top:14px}
+
+/* ══ BUTTONS / OPTIONS ══ */
+.opt{background:var(--surf);border:4px solid var(--bdr2);border-radius:18px;padding:26px 32px;font-family:var(--fn);font-size:36px;font-weight:700;color:var(--ink);cursor:pointer;text-align:left;transition:all .18s;line-height:1.3}
+.opt:hover:not(.locked){border-color:var(--u9);background:var(--u9ll);transform:translateY(-3px)}
+.opt.ok{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+.opt.bad{border-color:var(--rd);background:var(--rdl);color:var(--rd);animation:shk .32s}
+.opt.locked{cursor:default}
+.opt .ltr{display:inline-block;min-width:52px;font-weight:900;color:var(--ink4)}
+
+.fb{font-size:32px;font-weight:700;padding:22px 30px;border-radius:16px;margin-top:24px;display:none;line-height:1.4}
+.fb.show{display:block}
+.fb.ok{background:var(--gnl);border:3px solid #BBF7D0;color:var(--gnd)}
+.fb.bad{background:var(--rdl);border:3px solid #FECACA;color:var(--rd)}
+
+.btn{background:var(--u9);color:#fff;border:none;border-radius:16px;padding:22px 44px;font-family:var(--fn);font-size:32px;font-weight:800;cursor:pointer;transition:all .18s}
+.btn:hover{background:var(--u9d);transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--u9);border:4px solid var(--u9)}
+.btn.acc{background:var(--acc);color:#3F2D00}
+.btn.acc:hover{background:var(--accd);color:#fff}
+
+/* ══ REVEAL ══ */
+.hide{display:none}
+.reveal{animation:pop .34s cubic-bezier(.22,1,.36,1)}
+@keyframes pop{0%{opacity:0;transform:scale(.9) translateY(18px)}100%{opacity:1;transform:none}}
+@keyframes shk{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-9px)}50%{transform:translateX(9px)}}
+
+/* ══ TAP TILE ══ */
+.tile{background:var(--surf);border:4px dashed var(--bdr2);border-radius:20px;padding:34px 30px;text-align:center;cursor:pointer;transition:all .2s;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.tile:hover{border-color:var(--acc);background:var(--accl);transform:translateY(-4px)}
+.tile.open{border-style:solid;border-color:var(--gn);background:var(--gnl);cursor:default}
+.tile .t-emo{font-size:60px;line-height:1}
+.tile .t-q{font-size:32px;font-weight:800;color:var(--ink2)}
+.tile .t-a{font-size:34px;font-weight:800;color:var(--gnd);line-height:1.3}
+
+/* ══ CAUSE/EFFECT CHART ══ */
+.ce{display:grid;grid-template-columns:1fr 120px 1fr;gap:0;border:4px solid var(--ink);border-radius:20px;overflow:hidden;background:var(--surf)}
+.ce-hd{padding:20px;font-size:28px;font-weight:900;letter-spacing:3px;text-transform:uppercase;text-align:center;color:#fff}
+.ce-hd.c{background:var(--bl)}
+.ce-hd.arrow{background:var(--ink);color:#fff;font-size:34px}
+.ce-hd.e{background:var(--gn)}
+.ce-cell{padding:24px 26px;border-top:3px solid var(--bdr);font-size:31px;font-weight:600;color:var(--ink2);line-height:1.35;display:flex;align-items:center;min-height:104px}
+.ce-cell.mid{justify-content:center;font-size:40px;color:var(--ink4);background:#F8FAFC}
+.ce-cell.blank{background:#FFFBEB;color:var(--ink4);font-style:italic}
+.ce-cell.fill{background:var(--gnl);color:var(--gnd);font-weight:800}
+
+/* ══ MODEL TEXT ══ */
+.model{background:var(--surf);border:4px solid var(--bdr);border-left:14px solid var(--acc);border-radius:0 20px 20px 0;padding:34px 40px;font-size:33px;font-weight:500;color:var(--ink2);line-height:1.62}
+.model .cw{background:#DBEAFE;border-bottom:5px solid var(--bl);border-radius:5px;padding:0 6px;font-weight:800;color:var(--bld)}
+.model .ew{background:#DCFCE7;border-bottom:5px solid var(--gn);border-radius:5px;padding:0 6px;font-weight:800;color:var(--gnd)}
+.model .pn{font-size:22px;font-weight:800;letter-spacing:2px;color:var(--ink4);display:block;margin-bottom:8px}
+
+/* ══ CHIPS ══ */
+.chips{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.chip{background:var(--surf);border:4px solid var(--bdr2);border-radius:999px;padding:16px 34px;font-size:32px;font-weight:800;color:var(--ink2)}
+.chip.c{border-color:var(--bl);background:var(--bll);color:var(--bld)}
+.chip.e{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+
+/* ══ WORD MAP ══ */
+.map{position:relative;height:430px}
+.node{position:absolute;background:var(--surf);border:4px solid var(--u9);border-radius:999px;padding:18px 34px;font-size:30px;font-weight:800;color:var(--u9d);white-space:nowrap}
+.node.mid{background:var(--u9);color:#fff;font-size:38px;padding:24px 46px}
+.mapline{position:absolute;background:var(--bdr2);height:4px;transform-origin:left center}
+
+/* ══ PROGRESS / NAV / NOTES (absolute inside #deck) ══ */
+#prog{position:absolute;left:0;right:0;bottom:0;height:9px;background:#F1F5F9;z-index:20}
+#progFill{height:100%;background:linear-gradient(90deg,var(--u9),var(--acc));width:0;transition:width .35s}
+#nav{position:absolute;right:44px;bottom:36px;display:flex;align-items:center;gap:14px;z-index:22}
+.nb{width:74px;height:74px;border-radius:50%;border:4px solid var(--bdr2);background:var(--surf);font-size:32px;font-weight:900;color:var(--ink2);cursor:pointer;transition:all .18s}
+.nb:hover{border-color:var(--u9);color:var(--u9)}
+#counter{font-size:26px;font-weight:800;color:var(--ink3);min-width:130px;text-align:center;letter-spacing:1px}
+.tn-btn{position:absolute;left:44px;bottom:36px;width:74px;height:74px;border-radius:50%;border:4px solid var(--bdr2);background:var(--surf);font-size:32px;cursor:pointer;z-index:22;transition:all .18s}
+.tn-btn:hover{border-color:var(--acc);background:var(--accl)}
+.fs-btn{left:134px}
+.tn-btn.act{background:var(--acc);border-color:var(--accd)}
+.tn-panel{position:absolute;left:0;right:0;bottom:0;max-height:430px;overflow-y:auto;background:rgba(15,23,42,.97);color:#E2E8F0;padding:38px 110px 60px;z-index:21;display:none;border-top:6px solid var(--acc)}
+.tn-panel.open{display:block}
+.tn-panel h4{font-size:24px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:16px}
+.tn-panel p{font-size:27px;line-height:1.55;font-weight:500;margin-bottom:12px}
+.tn-panel em{color:#FDE68A;font-style:italic}
+.tn-panel .say{color:#BBF7D0;font-weight:700}
+#badge{position:absolute;right:44px;top:38px;font-size:20px;font-weight:800;letter-spacing:3px;color:var(--ink4);z-index:5}
+
+/* ══ SCOREBOARD / MISC ══ */
+.stepbar{display:flex;gap:14px;justify-content:center;margin-bottom:26px}
+.step{width:60px;height:12px;border-radius:999px;background:var(--bdr)}
+.step.on{background:var(--u9)}
+.big-emo{font-size:150px;line-height:1}
+.mid-emo{font-size:92px;line-height:1}
+.list{display:flex;flex-direction:column;gap:20px}
+.li{display:flex;gap:20px;align-items:flex-start;font-size:34px;font-weight:600;color:var(--ink2);line-height:1.35}
+.li .n{flex:0 0 54px;height:54px;border-radius:50%;background:var(--u9);color:#fff;font-size:28px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.li .n.gn{background:var(--gn)}
+.li .n.bl{background:var(--bl)}
+.frame{background:var(--accl);border:4px dashed var(--acc);border-radius:20px;padding:28px 34px;font-size:34px;font-weight:700;color:var(--accd);line-height:1.5}
+.tick{display:flex;align-items:center;gap:22px;background:var(--surf);border:4px solid var(--bdr);border-radius:18px;padding:22px 30px;font-size:32px;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .18s}
+.tick:hover{border-color:var(--gn)}
+.tick.on{background:var(--gnl);border-color:var(--gn);color:var(--gnd)}
+.tick .bx{flex:0 0 48px;height:48px;border:4px solid var(--bdr2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:30px}
+.tick.on .bx{background:var(--gn);border-color:var(--gn);color:#fff}
+.dad{background:var(--gnl);border:4px solid #BBF7D0;border-radius:18px;padding:24px 30px;font-size:30px;font-weight:700;color:var(--gnd);line-height:1.45}
+table.share{width:100%;border-collapse:collapse;border:4px solid var(--ink);border-radius:16px;overflow:hidden}
+table.share th{background:var(--ink);color:#fff;font-size:28px;font-weight:800;letter-spacing:2px;padding:18px;text-transform:uppercase}
+table.share td{border:3px solid var(--bdr);padding:22px;font-size:30px;font-weight:600;color:var(--ink2)}
+
+/* ══ MINI-GAME MECHANICS ══ */
+.game{background:var(--surf);border:4px solid var(--bdr);border-radius:22px;padding:26px 28px}
+.game-hint{font-size:26px;font-weight:700;color:var(--ink3);text-align:center;margin-bottom:18px}
+.pool{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;min-height:118px;align-items:flex-start}
+.gitem{background:var(--surf);border:4px solid var(--bdr2);border-radius:18px;padding:16px 24px;font-size:30px;font-weight:800;color:var(--ink);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;line-height:1.2}
+.gitem:hover:not(.locked){border-color:var(--u9);transform:translateY(-4px)}
+.gitem.sel{border-color:var(--acc);background:var(--accl);transform:scale(1.06);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.gitem.ok{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+.gitem.bad{border-color:var(--rd);background:var(--rdl);color:var(--rd);animation:shk .32s}
+.gitem.locked{cursor:default}
+.gitem .ge{font-size:40px}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:22px}
+.bin{border:5px dashed var(--bdr2);border-radius:20px;padding:16px;min-height:210px;transition:all .18s;cursor:pointer}
+.bin.A{border-color:var(--gn)}
+.bin.B{border-color:var(--rd)}
+.bin-hd{font-size:30px;font-weight:900;text-align:center;margin-bottom:14px;letter-spacing:.5px}
+.bin.A .bin-hd{color:var(--gnd)}
+.bin.B .bin-hd{color:var(--rd)}
+.bin-body{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-content:flex-start}
+.seq-row{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.seq-item{position:relative;flex:1 1 0;min-width:210px;text-align:center}
+.seq-item .ord{position:absolute;top:-14px;left:-14px;width:52px;height:52px;border-radius:50%;background:var(--gn);color:#fff;font-size:28px;font-weight:900;display:none;align-items:center;justify-content:center;z-index:2}
+.seq-item.ok .ord{display:flex}
+.seq-item .gitem{flex-direction:column;justify-content:center;min-height:180px;width:100%}
+.m-cols{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+.m-col{display:flex;flex-direction:column;gap:14px}
+.m-lbl{font-size:22px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink3);text-align:center;margin-bottom:4px}
+.hunt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.hunt-grid .gitem{flex-direction:column;justify-content:center;min-height:150px;text-align:center;font-size:27px}
+.gcount{font-size:30px;font-weight:900;color:var(--u9);text-align:center;margin-top:16px}
+</style>
+</head>
+<body>
+<div id="deckWrap"><div id="deck">
+<div id="badge">LEEA · L5 · U1 · UNIT OPENER</div>
+<section class="slide center" data-stage="Unit Opener" data-stagetone="vocab">
+<div class="col center">
+ <div class="big-emo">🌪️⛈️</div>
+ <div class="kick">Our World 2E · Level 5 · Unit 1</div>
+ <h1 class="big">Extreme<br><span class="hl">Weather</span></h1>
+ <p class="lead mt">Student&rsquo;s Book pp. 6&ndash;7 &nbsp;·&nbsp; Video Sc. 1</p></div>
+</section>
+<section class="slide top" data-stage="Unit Opener" data-stagetone="vocab">
+<h2 class="hd">🗺️ In this unit</h2>
+<div class="row" style="gap:22px;margin-bottom:22px">
+ <div class="card bl" style="flex:1"><div class="card-lbl" style="color:var(--bld)">📖 READING</div><p class="lead">Tornado Trouble</p></div>
+ <div class="card gn" style="flex:1"><div class="card-lbl" style="color:var(--gnd)">✍️ WRITING</div><p class="lead">Personal narrative</p></div>
+ <div class="card acc" style="flex:1"><div class="card-lbl">🧠 MISSION</div><p class="lead">Understand weather</p></div>
+ <div class="card pu" style="flex:1"><div class="card-lbl" style="color:var(--pu)">🌪️ PROJECT</div><p class="lead">Make a tornado in a bottle</p></div>
+</div>
+<div class="row" style="gap:22px">
+ <div class="card u9" style="flex:1"><div class="card-lbl">📐 GRAMMAR 1</div><p class="lead"><strong>be going to</strong></p></div>
+ <div class="card u9" style="flex:1"><div class="card-lbl">📐 GRAMMAR 2</div><p class="lead"><strong>zero conditional</strong> (present tense)</p></div>
+</div>
+<div class="frame mt">🌪️ <strong>Theme:</strong> this unit is about extreme weather &mdash; and how to prepare for it.</div>
+</section>
+<section class="slide top" data-stage="Unit Opener" data-stagetone="vocab">
+<h2 class="hd">In this unit, I will&hellip;</h2>
+<div class="list"><div class="li"><div class="n">1</div><div>talk about different kinds of <strong>extreme weather</strong>. 🌪️</div></div><div class="li"><div class="n bl">2</div><div>describe the <strong>damage</strong> storms can cause. 🏚️</div></div><div class="li"><div class="n gn">3</div><div>describe how to <strong>prepare</strong> for extreme weather. 🎒</div></div><div class="li"><div class="n">4</div><div>write a <strong>personal narrative</strong>. ✍️</div></div></div>
+<div class="card acc mt"><div class="card-lbl">Today only &mdash; the Unit Opener</div>
+ <p class="lead">🔍 analyze a photograph for information &nbsp;·&nbsp; ⚖️ evaluate whether statements are true</p></div>
+</section>
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+<div class="col center">
+ <div class="kick">Words we need before we open the book</div>
+ <h2 class="hd">4 words first</h2>
+ <div class="chips mt"><span class="chip">🌾 field</span><span class="chip">☁️ cloud</span><span class="chip">🌀 rotate</span><span class="chip">⚠️ dangerous</span></div>
+ <p class="lead mt">Win the game &rarr; win the word card.</p></div>
+</section>
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="vocab">
+<h3 class="sub">🌾 Land Sorter &mdash; is it a field?</h3>
+<div class="game" data-sort="field" data-win="A field is wide, open land — usually for growing things." data-lose="Look again: a field is open LAND. Buildings and water are not fields.">
+  <div class="game-hint">Tap a picture, then tap a box to put it there.</div>
+  <div class="pool"><div class="gitem" data-act="gsel" data-cat="A"><span class="ge">🌾</span>wheat land</div><div class="gitem" data-act="gsel" data-cat="B"><span class="ge">🏙️</span>a city</div><div class="gitem" data-act="gsel" data-cat="A"><span class="ge">🌱</span>a crop farm</div><div class="gitem" data-act="gsel" data-cat="B"><span class="ge">🏢</span>an office</div><div class="gitem" data-act="gsel" data-cat="A"><span class="ge">🟩</span>open grass</div><div class="gitem" data-act="gsel" data-cat="B"><span class="ge">🌊</span>the sea</div></div>
+  <div class="bins">
+    <div class="bin A" data-act="gbin" data-bin="A"><div class="bin-hd">🌾 A FIELD</div><div class="bin-body"></div></div>
+    <div class="bin B" data-act="gbin" data-bin="B"><div class="bin-hd">🏙️ NOT A FIELD</div><div class="bin-body"></div></div>
+  </div>
+</div>
+<div class="fb" id="fb-field"></div>
+</section>
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(13,148,136,.18)">
+  <div class="emo">🌾</div><div class="w" style="color:var(--u9d)">field</div>
+  <div class="pos">noun</div><div class="def">a wide, open piece of land</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;There are some cars, a field, and a very big cloud.&rdquo;</div><div class="jpx">畑(はたけ)・野原(のはら)</div>
+</div>
+</section>
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="vocab">
+<h3 class="sub">☁️ Storm Ladder &mdash; tap from safest to most dangerous</h3>
+<div class="game" data-seq="cloud" data-step="1" data-win="Perfect. The bigger and darker the cloud, the more dangerous the weather.">
+  <div class="game-hint">Tap the safest cloud first. If you are wrong it will shake &mdash; try again!</div>
+  <div class="seq-row"><div class="seq-item"><div class="ord"></div><div class="gitem" data-act="gseq" data-ord="3"><span class="ge">⛈️</span>huge, dark, tilted</div></div><div class="seq-item"><div class="ord"></div><div class="gitem" data-act="gseq" data-ord="1"><span class="ge">🌤️</span>small and white</div></div><div class="seq-item"><div class="ord"></div><div class="gitem" data-act="gseq" data-ord="2"><span class="ge">☁️</span>grey and flat</div></div></div>
+</div>
+<div class="fb" id="fb-cloud"></div>
+</section>
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(13,148,136,.18)">
+  <div class="emo">☁️</div><div class="w" style="color:var(--u9d)">cloud</div>
+  <div class="pos">noun</div><div class="def">water in the sky &mdash; some bring rain, some bring storms</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;How can you describe the cloud? Big, dark and tilted.&rdquo;</div><div class="jpx">雲(くも)</div>
+</div>
+</section>
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="vocab">
+<h3 class="sub">🌀 Make It Rotate &mdash; tap five times</h3>
+<div class="game">
+  <div class="game-hint">Every tap turns the air one more time. Watch what forms.</div>
+  <div class="row" style="align-items:center;gap:60px">
+    <div class="col center" style="flex:0 0 460px">
+      <div class="tile" data-act="count" data-key="rot" data-max="5" style="min-height:270px;width:100%">
+        <div class="t-emo" id="rotEmo" style="font-size:96px">🌬️</div><div class="t-q">Tap to spin!</div>
+      </div>
+      <div style="font-size:56px;font-weight:900;color:var(--u9)" id="rotOut">0</div>
+    </div>
+    <div class="col" style="flex:1"><div class="card acc"><p class="lead">Air that goes round and round is air that <strong>rotates</strong>. 🌀</p></div>
+    <div class="card gn mt"><p class="lead">Spin it fast enough for long enough&hellip; and you get a <strong>tornado</strong>. 🌪️</p></div>
+    <div class="card bl mt"><p class="lead">👉 Now spin your finger. Now your whole arm. That is rotating.</p></div></div>
+  </div>
+</div>
+</section>
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(13,148,136,.18)">
+  <div class="emo">🌀</div><div class="w" style="color:var(--u9d)">rotate</div>
+  <div class="pos">verb</div><div class="def">to turn around and around</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;The winds rotate over a very large area.&rdquo;</div><div class="jpx">回転(かいてん)する・回(まわ)る</div>
+</div>
+</section>
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="vocab">
+<h3 class="sub">⚠️ Safety Sorter &mdash; safe or dangerous?</h3>
+<div class="game" data-sort="danger" data-win="Dangerous means it can really hurt you — not just make you uncomfortable." data-lose="Careful: being cold or wet is not the same as being in danger.">
+  <div class="game-hint">Tap a card, then drop it in the right box.</div>
+  <div class="pool"><div class="gitem" data-act="gsel" data-cat="A"><span class="ge">☔</span>walking with an umbrella</div><div class="gitem" data-act="gsel" data-cat="B"><span class="ge">⚡</span>standing out in lightning</div><div class="gitem" data-act="gsel" data-cat="A"><span class="ge">🧥</span>a cold day with a coat</div><div class="gitem" data-act="gsel" data-cat="B"><span class="ge">🌪️</span>driving toward a tornado</div><div class="gitem" data-act="gsel" data-cat="A"><span class="ge">🌤️</span>a sunny afternoon</div><div class="gitem" data-act="gsel" data-cat="B"><span class="ge">🌊</span>swimming in a flood</div></div>
+  <div class="bins">
+    <div class="bin A" data-act="gbin" data-bin="A"><div class="bin-hd">✅ SAFE</div><div class="bin-body"></div></div>
+    <div class="bin B" data-act="gbin" data-bin="B"><div class="bin-hd">⚠️ DANGEROUS</div><div class="bin-body"></div></div>
+  </div>
+</div>
+<div class="fb" id="fb-danger"></div>
+</section>
+<section class="slide center" data-stage="Related Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(13,148,136,.18)">
+  <div class="emo">⚠️</div><div class="w" style="color:var(--u9d)">dangerous</div>
+  <div class="pos">adjective</div><div class="def">able to hurt or harm you</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;The cloud looks dangerous.&rdquo;</div><div class="jpx">危険(きけん)な</div>
+</div>
+</section>
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+<div class="col center">
+ <div class="kick">What today&rsquo;s objectives actually ask for</div>
+ <h2 class="hd">2 <span class="hl">academic</span> words</h2>
+ <div class="chips mt"><span class="chip">🔍 analyze</span><span class="chip">⚖️ evaluate</span></div>
+ <p class="lead mt">One for the photo. One for the statements.</p></div>
+</section>
+<section class="slide top" data-stage="Academic Language" data-stagetone="expert">
+<h3 class="sub">🔍 Detail Hunt &mdash; find the 4 things you can really SEE</h3>
+<div class="game" data-hunt="analyze" data-need="4" data-win="That is analyzing: you named only what the picture actually shows.">
+  <div class="game-hint">Tap only what the photo shows. Opinions and guesses are traps!</div>
+  <div class="hunt-grid"><div class="gitem" data-act="ghunt" data-good="1" data-why=""><span class="ge">🚗</span>some cars</div><div class="gitem" data-act="ghunt" data-good="0" data-why="That is a guess — you cannot see feelings in a photo."><span class="ge">😱</span>the driver is scared</div><div class="gitem" data-act="ghunt" data-good="1" data-why=""><span class="ge">🌾</span>a field</div><div class="gitem" data-act="ghunt" data-good="1" data-why=""><span class="ge">☁️</span>a very big cloud</div><div class="gitem" data-act="ghunt" data-good="0" data-why="Look at the ground — it is dry. The rain has not started."><span class="ge">🌧️</span>it is raining hard</div><div class="gitem" data-act="ghunt" data-good="1" data-why=""><span class="ge">🛣️</span>a road</div></div>
+</div>
+<div class="gcount" id="cnt-analyze">Found: 0 / 4</div>
+<div class="fb" id="fb-analyze"></div>
+</section>
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+<div class="wordcard" style="border-color:var(--acc);box-shadow:0 22px 60px rgba(250,204,21,.22)">
+  <div class="emo">🔍</div><div class="w" style="color:var(--accd)">analyze</div>
+  <div class="pos">verb</div><div class="def">to look closely and work out what something tells you</div>
+  <div class="ex" style="color:var(--acc)">&ldquo;Analyze the photograph for information.&rdquo;</div><div class="jpx">分析(ぶんせき)する</div>
+</div>
+</section>
+<section class="slide top" data-stage="Academic Language" data-stagetone="expert">
+<h3 class="sub">⚖️ Judge It &mdash; put the 4 steps in order</h3>
+<div class="game" data-seq="evaluate" data-step="1" data-win="That is evaluating — and step 4 is the one people forget.">
+  <div class="game-hint">How do you decide if a statement is true? Tap the first step first.</div>
+  <div class="seq-row"><div class="seq-item"><div class="ord"></div><div class="gitem" data-act="gseq" data-ord="3"><span class="ge">💭</span>Decide: true or false?</div></div><div class="seq-item"><div class="ord"></div><div class="gitem" data-act="gseq" data-ord="1"><span class="ge">👀</span>Read the statement</div></div><div class="seq-item"><div class="ord"></div><div class="gitem" data-act="gseq" data-ord="4"><span class="ge">🗣️</span>Say WHY you decided</div></div><div class="seq-item"><div class="ord"></div><div class="gitem" data-act="gseq" data-ord="2"><span class="ge">🔍</span>Look at the evidence</div></div></div>
+</div>
+<div class="fb" id="fb-evaluate"></div>
+</section>
+<section class="slide center" data-stage="Academic Language" data-stagetone="expert">
+<div class="wordcard" style="border-color:var(--acc);box-shadow:0 22px 60px rgba(250,204,21,.22)">
+  <div class="emo">⚖️</div><div class="w" style="color:var(--accd)">evaluate</div>
+  <div class="pos">verb</div><div class="def">to think carefully and decide if something is true</div>
+  <div class="ex" style="color:var(--acc)">&ldquo;Evaluate the truth of each statement.&rdquo;</div><div class="jpx">評価(ひょうか)する・判断(はんだん)する</div>
+</div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="col center">
+ <div class="kick">The unit&rsquo;s big idea</div>
+ <h2 class="hd">2 <span class="hl">content</span> words</h2>
+ <div class="chips mt"><span class="chip">🌪️ extreme</span><span class="chip">⛈️ a supercell</span></div>
+ <p class="lead mt">One is the unit title. One is the photo.</p></div>
+</section>
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+<h3 class="sub">🌪️ Weather Dial &mdash; tap from normal to extreme</h3>
+<div class="game" data-seq="extreme" data-step="1" data-win="Extreme means far past normal — serious, and not safe.">
+  <div class="game-hint">Three amounts of snow. Which is just normal winter? Tap that one first.</div>
+  <div class="seq-row"><div class="seq-item"><div class="ord"></div><div class="gitem" data-act="gseq" data-ord="3"><span class="ge">🌨️</span>snow above your head</div></div><div class="seq-item"><div class="ord"></div><div class="gitem" data-act="gseq" data-ord="1"><span class="ge">❄️</span>snow to your ankle</div></div><div class="seq-item"><div class="ord"></div><div class="gitem" data-act="gseq" data-ord="2"><span class="ge">🧊</span>snow to your waist</div></div></div>
+</div>
+<div class="fb" id="fb-extreme"></div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(13,148,136,.18)">
+  <div class="emo">🌪️</div><div class="w" style="color:var(--u9d)">extreme</div>
+  <div class="pos">adjective</div><div class="def">very serious, much more than normal &mdash; and not safe</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;Extreme weather is not safe. We take it seriously.&rdquo;</div><div class="jpx">極端(きょくたん)な・激(はげ)しい</div>
+</div>
+</section>
+<section class="slide top" data-stage="Content Vocabulary" data-stagetone="vocab">
+<h3 class="sub">⛈️ Storm Machine &mdash; match each part to what it does</h3>
+<div class="game" data-match="supercell" data-win="That is a supercell — and the rotating updraft is what makes it one.">
+  <div class="game-hint">Tap one on the left, then its partner on the right.</div>
+  <div class="m-cols">
+    <div class="m-col"><div class="m-lbl">STORM PART</div><div class="gitem" data-act="gml" data-k="up">🌀 the updraft</div><div class="gitem" data-act="gml" data-k="wind">💨 the winds</div><div class="gitem" data-act="gml" data-k="lite">⚡ the lightning</div><div class="gitem" data-act="gml" data-k="hail">🧊 the hail</div></div>
+    <div class="m-col"><div class="m-lbl">WHAT IT DOES</div><div class="gitem" data-act="gmr" data-k="up">rotates over a huge area, for hours</div><div class="gitem" data-act="gmr" data-k="wind">are very high</div><div class="gitem" data-act="gmr" data-k="lite">is frequent</div><div class="gitem" data-act="gmr" data-k="hail">is large</div></div>
+  </div>
+</div>
+<div class="fb" id="fb-supercell"></div>
+</section>
+<section class="slide center" data-stage="Content Vocabulary" data-stagetone="vocab">
+<div class="wordcard" style="border-color:var(--u9);box-shadow:0 22px 60px rgba(13,148,136,.18)">
+  <div class="emo">⛈️</div><div class="w" style="color:var(--u9d)">a supercell</div>
+  <div class="pos">noun</div><div class="def">a huge storm whose rising winds rotate over a large area for hours</div>
+  <div class="ex" style="color:var(--u9)">&ldquo;This photo shows a supercell thunderstorm.&rdquo;</div><div class="jpx">スーパーセル（巨大(きょだい)な積乱雲(せきらんうん)）</div>
+</div>
+</section>
+<section class="slide top" data-stage="Introduce · Explain" data-stagetone="warmup">
+<h2 class="hd">🌡️ What&rsquo;s the weather like <span class="hl">today</span>?</h2>
+<div class="card acc" style="margin-bottom:26px"><p class="lead">👉 Go to the window. Look outside together. Then act it out:</p></div>
+<div class="grid3"><div class="tile" data-act="tap" data-a="Rub your hands and shiver! 🤝"><div class="t-emo">🥶</div><div class="t-q">Is it cold?</div></div><div class="tile" data-act="tap" data-a="Pretend to open an umbrella! ☂️"><div class="t-emo">☔</div><div class="t-q">Is it rainy?</div></div><div class="tile" data-act="tap" data-a="Shade your eyes! 😎"><div class="t-emo">☀️</div><div class="t-q">Is it sunny?</div></div><div class="tile" data-act="tap" data-a="Lean into the wind! 🌬️"><div class="t-emo">💨</div><div class="t-q">Is it windy?</div></div></div>
+<div class="dad mt">💬 LP: point out of the window and ask <em>What&rsquo;s the weather like today?</em></div>
+</section>
+<section class="slide top" data-stage="Introduce · Recycle" data-stagetone="warmup">
+<h2 class="hd">🔁 What types of weather do you <span class="hl">already</span> know?</h2>
+<div class="grid3"><div class="tile" data-act="tap" data-a="rainy"><div class="t-emo">🌧️</div><div class="t-q">?</div></div><div class="tile" data-act="tap" data-a="cloudy"><div class="t-emo">☁️</div><div class="t-q">?</div></div><div class="tile" data-act="tap" data-a="snowy"><div class="t-emo">❄️</div><div class="t-q">?</div></div><div class="tile" data-act="tap" data-a="sunny"><div class="t-emo">☀️</div><div class="t-q">?</div></div><div class="tile" data-act="tap" data-a="windy"><div class="t-emo">💨</div><div class="t-q">?</div></div><div class="tile" data-act="tap" data-a="Leo&#x27;s own word!"><div class="t-emo">➕</div><div class="t-q">one more?</div></div></div>
+<div class="dad mt">💬 Write every word Leo says on paper <strong>first</strong> &mdash; then tap. The list is his, not the slide&rsquo;s.</div>
+</section>
+<section class="slide top" data-stage="Introduce · Recycle" data-stagetone="warmup">
+<h2 class="hd">💬 What weather do <span class="hl">you</span> like? Why?</h2>
+<div class="card bl" style="margin-bottom:26px"><div class="card-lbl" style="color:var(--bld)">Dad goes first &mdash; the LP&rsquo;s model</div>
+ <p class="lead" style="font-size:40px">&ldquo;I like when it&rsquo;s rainy. I can play in the rain. My umbrella and boots keep me dry.&rdquo; ☔</p></div>
+<div class="card gn"><div class="card-lbl" style="color:var(--gnd)">Now Leo</div>
+ <p class="lead">&ldquo;I like when it&rsquo;s ______ . I can ______ . ______ keeps me ______ .&rdquo;</p></div>
+<div class="frame mt">⚽ Sunny for soccer? Snowy for a snow day? Give a <strong>reason</strong> &mdash; that is the task.</div>
+</section>
+<section class="slide top" data-stage="Unit Opener" data-stagetone="practice">
+<h2 class="hd">📸 Open to pages 6&ndash;7 &mdash; <span class="hl">analyze</span> the photo</h2>
+<div class="grid3" style="grid-template-columns:repeat(1,1fr)"><div class="tile" data-act="tap" data-a="some cars · a field · a very big cloud"><div class="t-emo">👀</div><div class="t-q">What do you see in the photo?</div></div><div class="tile" data-act="tap" data-a="big · dark · tilted · dangerous"><div class="t-emo">☁️</div><div class="t-q">How can you describe the cloud?</div></div><div class="tile" data-act="tap" data-a="rainy · windy"><div class="t-emo">🌧️</div><div class="t-q">What weather could this cloud bring?</div></div><div class="tile" data-act="tap" data-a="Yes — the cloud is close. Or no — the skies are clear."><div class="t-emo">🚗</div><div class="t-q">Are the cars in danger? Why / why not?</div></div></div>
+<div class="dad mt">💬 Caption in the book: <em>Supercell thunderstorm, Colorado, USA</em> 🇺🇸</div>
+</section>
+<section class="slide top" data-stage="Be the Expert" data-stagetone="expert">
+<h2 class="hd">⛈️ Be the Expert &mdash; About the Photo</h2>
+<div class="list"><div class="li"><div class="n">1</div><div>This is a <strong>supercell</strong> &mdash; a type of storm. ⛈️</div></div><div class="li"><div class="n bl">2</div><div>Its <strong>updraft</strong> (upward moving wind) <strong>rotates</strong> over very large areas &mdash; sometimes for hours. 🌀</div></div><div class="li"><div class="n bl">3</div><div>The updraft starts rotating where wind <strong>speed and direction</strong> differ. 💨</div></div><div class="li"><div class="n gn">4</div><div>Supercells can bring very high winds, <strong>tornadoes</strong>, frequent lightning and large hail. ⚡</div></div></div>
+<div class="dad mt">💬 So the cloud is not just big &mdash; it is <strong>turning</strong>. That is what makes it dangerous.</div>
+</section>
+<section class="slide top" data-stage="Be the Expert" data-stagetone="expert">
+<h2 class="hd">🌍 Be the Expert &mdash; Our World in Context</h2>
+<div class="row" style="gap:26px;margin-bottom:24px">
+ <div class="card acc" style="flex:1"><div class="card-lbl">Where can supercells happen?</div>
+  <p class="lead">Anywhere in the world &mdash; if the weather conditions are right. 🌍</p></div>
+ <div class="card u9" style="flex:1"><div class="card-lbl">But usually&hellip;</div>
+  <p class="lead">In areas where <strong>tornadoes</strong> hit. 🌪️</p></div>
+</div>
+<div class="grid3"><div class="tile" data-act="tap" data-a="Tornado Alley, in the United States"><div class="t-emo">🇺🇸</div><div class="t-q">Most common area?</div></div><div class="tile" data-act="tap" data-a="Central Canada"><div class="t-emo">🇨🇦</div><div class="t-q">Second?</div></div><div class="tile" data-act="tap" data-a="Japan gets tornadoes too — but far fewer."><div class="t-emo">🇯🇵</div><div class="t-q">And Japan?</div></div></div>
+</section>
+<section class="slide top" data-stage="Apply" data-stagetone="apply">
+<h2 class="hd">✍️ Imagine you are in one of those cars 🚗</h2>
+<div class="card bl" style="margin-bottom:24px"><div class="card-lbl" style="color:var(--bld)">Answer these, then write</div>
+ <p class="lead">Why are you on that road? &nbsp;·&nbsp; What are you thinking? &nbsp;·&nbsp; How do you feel? &nbsp;·&nbsp; What do you want to do next?</p></div>
+<div class="card acc"><div class="card-lbl">⏱️ Three minutes &mdash; one or two sentences</div>
+ <p class="lead">&ldquo;I&rsquo;m driving home. I see a big dark cloud. I feel ______ because ______ . I want to ______ .&rdquo;</p></div>
+<div class="dad mt">💬 Then read them aloud to each other. Dad writes one too. ✍️</div>
+</section>
+<section class="slide top" data-stage="Evaluate" data-stagetone="practice">
+<h2 class="hd">⚖️ Check <span class="hlgn">T</span> for true and <span class="hl">F</span> for false</h2>
+<div class="card acc" style="margin-bottom:22px"><p class="lead">Look at the photo on pp. 6&ndash;7. For each one: <strong>decide, then say why.</strong></p></div>
+<div class="list"><div class="li"><div class="n">1</div><div>There&rsquo;s a storm cloud in the sky. ☁️</div></div><div class="li"><div class="n bl">2</div><div>The trees are covered in ice. 🌲</div></div><div class="li"><div class="n bl">3</div><div>It&rsquo;s raining heavily. 🌧️</div></div><div class="li"><div class="n gn">4</div><div>It&rsquo;s safe to be outside. ⚠️</div></div></div>
+<div class="frame mt">🙋 Raise your hand if you think it is true &mdash; then give your <strong>reason</strong> before we check.</div>
+</section>
+<section class="slide top" data-stage="Evaluate" data-stagetone="practice">
+<h2 class="hd">✅ Now check &mdash; tap each one</h2>
+<div class="grid3" style="grid-template-columns:repeat(1,1fr)"><div class="tile" data-act="tap" data-a="TRUE — big, dark and tilted."><div class="t-emo">☁️</div><div class="t-q">1. There&rsquo;s a storm cloud in the sky.</div></div><div class="tile" data-act="tap" data-a="FALSE — no ice. It is not winter."><div class="t-emo">🌲</div><div class="t-q">2. The trees are covered in ice.</div></div><div class="tile" data-act="tap" data-a="FALSE — the rain has not started yet."><div class="t-emo">🌧️</div><div class="t-q">3. It&rsquo;s raining heavily.</div></div><div class="tile" data-act="tap" data-a="FALSE — a supercell is dangerous."><div class="t-emo">⚠️</div><div class="t-q">4. It&rsquo;s safe to be outside.</div></div></div>
+<div class="dad mt">💬 Three of the four are false. Saying <strong>why</strong> something is false is harder &mdash; and more useful.</div>
+</section>
+<section class="slide top" data-stage="Related Vocabulary" data-stagetone="practice">
+<h2 class="hd">🔁 Word check &mdash; definition first this time</h2>
+<div class="grid3"><div class="tile" data-act="tap" data-a="field"><div class="t-emo">🌾</div><div class="t-q">a wide open piece of land</div></div><div class="tile" data-act="tap" data-a="cloud"><div class="t-emo">☁️</div><div class="t-q">water in the sky</div></div><div class="tile" data-act="tap" data-a="rotate"><div class="t-emo">🌀</div><div class="t-q">to turn around and around</div></div><div class="tile" data-act="tap" data-a="dangerous"><div class="t-emo">⚠️</div><div class="t-q">able to hurt you</div></div><div class="tile" data-act="tap" data-a="extreme"><div class="t-emo">🌪️</div><div class="t-q">very serious, not safe</div></div><div class="tile" data-act="tap" data-a="a supercell"><div class="t-emo">⛈️</div><div class="t-q">a huge rotating storm</div></div></div>
+<div class="frame mt">🎯 Cover the tiles. How many can Leo say <strong>before</strong> tapping? 6/6? 🏆</div>
+</section>
+<section class="slide top" data-stage="Extend" data-stagetone="expert">
+<h2 class="hd">⚽ When weather beats the players</h2>
+<div class="grid3"><div class="tile" data-act="tap" data-a="The pitch floods — the ball stops dead in the water."><div class="t-emo">🌧️</div><div class="t-q">Heavy rain</div></div><div class="tile" data-act="tap" data-a="Play stops immediately. It is too dangerous to stay outside."><div class="t-emo">⚡</div><div class="t-q">Lightning</div></div><div class="tile" data-act="tap" data-a="They use an orange ball so players can see it!"><div class="t-emo">❄️</div><div class="t-q">Snow</div></div></div>
+<div class="card acc mt"><p class="lead">💡 In 2025&ndash;26 Arsenal took the Premier League title and Erling Haaland won the Golden Boot with <strong>27</strong> goals &mdash; played right through an English winter. ⚽</p></div>
+<div class="frame mt">💬 Which of these three is <strong>extreme</strong> weather? Why? 🤔</div>
+</section>
+<section class="slide top" data-stage="Recap" data-stagetone="recap">
+<h2 class="hd">🔁 Recap &mdash; tap each one</h2>
+<div class="grid3"><div class="tile" data-act="tap" data-a="Very serious — and not safe."><div class="t-emo">🌪️</div><div class="t-q">What does extreme mean?</div></div><div class="tile" data-act="tap" data-a="A huge storm with rotating winds."><div class="t-emo">⛈️</div><div class="t-q">What is a supercell?</div></div><div class="tile" data-act="tap" data-a="To turn around and around."><div class="t-emo">🌀</div><div class="t-q">What does rotate mean?</div></div><div class="tile" data-act="tap" data-a="Look closely and work out what it tells you."><div class="t-emo">🔍</div><div class="t-q">What does analyze mean?</div></div><div class="tile" data-act="tap" data-a="Decide if something is true — and say why."><div class="t-emo">⚖️</div><div class="t-q">What does evaluate mean?</div></div><div class="tile" data-act="tap" data-a="Tornado Alley, in the USA."><div class="t-emo">🇺🇸</div><div class="t-q">Where do most tornadoes hit?</div></div></div>
+</section>
+<section class="slide top" data-stage="Formative Assessment" data-stagetone="recap">
+<h2 class="hd">✔️ Can Leo&hellip;</h2>
+<div class="list"><div class="li"><div class="n gn">✓</div><div>&hellip;<strong>analyze</strong> the photograph &mdash; name what he sees and what it means?</div></div><div class="li"><div class="n gn">✓</div><div>&hellip;describe the cloud with at least two adjectives?</div></div><div class="li"><div class="n gn">✓</div><div>&hellip;<strong>evaluate</strong> each statement and give a <strong>reason</strong>?</div></div><div class="li"><div class="n gn">✓</div><div>&hellip;say what kind of weather he likes, and why?</div></div></div>
+<div class="card u9 mt"><div class="card-lbl">Quick check</div><p class="lead">&ldquo;Look at the photo. Tell me one thing that is true and one thing that is false &mdash; and why.&rdquo;</p></div>
+</section>
+<section class="slide center" data-stage="Wrap Up" data-stagetone="wrapup">
+<div class="col center">
+ <div class="big-emo">🌪️📚</div>
+ <h2 class="hd">Level 5 has started!</h2>
+ <p class="lead">Unit 1 is about extreme weather &mdash; and how to be ready for it.</p>
+ <div class="card acc mt" style="max-width:1200px"><div class="card-lbl">Coming next</div>
+  <p class="lead">📗 <strong>Vocabulary 1</strong> &mdash; blizzard, drought, flood, heat wave, hurricane, ice storm, lightning, sandstorm, thunder, tornado, tropical storm&hellip; ⛈️</p></div>
+ <div class="chips mt"><span class="chip">🌾 field</span><span class="chip">☁️ cloud</span><span class="chip">🌀 rotate</span><span class="chip">⚠️ dangerous</span><span class="chip">🌪️ extreme</span><span class="chip">⛈️ supercell</span></div></div>
+</section>
+
+<div id="prog"><div id="progFill"></div></div>
+<button class="tn-btn" data-act="notes" title="Teacher notes (N)">📋</button>
+<button class="tn-btn fs-btn" data-act="full" title="Fullscreen (F)">⛶</button>
+<div class="tn-panel" id="tnPanel"></div>
+<div id="nav">
+  <button class="nb" data-act="nav" data-dir="-1">‹</button>
+  <div id="counter">1 / 36</div>
+  <button class="nb" data-act="nav" data-dir="1">›</button>
+</div>
+</div></div>
+<script>
+(function(){
+"use strict";
+
+/* ═══════ LEEA SAVE STANDARD ═══════ */
+var SAVE_PREFIX = '5-1-opener-slides-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-5-1-opener-slides';
+
+function lSave(key, val){
+  try{ localStorage.setItem('leea-' + key, JSON.stringify(val)); }catch(e){}
+  try{
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && LEEA_CLOUD.enabled){
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val);
+    }
+  }catch(e){}
+}
+function lLoad(key, fb){
+  try{ var v = localStorage.getItem('leea-' + key); return v !== null ? JSON.parse(v) : fb; }
+  catch(e){ return fb; }
+}
+
+/* ═══════ <deck-stage> WEB COMPONENT ═══════ */
+class DeckStage extends HTMLElement{
+  connectedCallback(){
+    try{
+      var stage = this.getAttribute('stage') || '';
+      var tone  = this.getAttribute('tone')  || 'wrapup';
+      var sub   = this.getAttribute('sub')   || '';
+      this.innerHTML = '<span class="sb ' + tone + '">' + stage + '</span>' +
+                       (sub ? '<span class="sb-sub">' + sub + '</span>' : '');
+    }catch(e){ console.warn('deck-stage', e); }
+  }
+}
+try{ customElements.define('deck-stage', DeckStage); }catch(e){}
+
+/* ═══════ TEACHER NOTES (per slide) ═══════ */
+var NOTES = {
+0:{h:'Open Level 5',b:'<p>This is the <strong>first unit of a new level</strong>. Say that out loud &mdash; Leo has finished Level 4 and this is the start of Level 5.</p><p>Resources: Video Sc. 1 · Home-School Connection Letter · Unit Opener Poster · Classroom Presentation Tool.</p>'},
+1:{h:'In this unit',b:'<p>The whole unit on one slide, from the In This Unit page.</p><p>Flag the Project now &mdash; a tornado in a bottle is a very good reason to care about the vocabulary that is coming.</p>'},
+2:{h:'Objectives',b:'<p>The four unit goals are the SB p. 6 &lsquo;In this unit, I will&hellip;&rsquo; box, verbatim.</p><p>The amber card holds today&rsquo;s two Unit Opener objectives: analyze a photograph for information, evaluate the truth of statements.</p>'},
+3:{h:'Related Vocabulary',b:'<p>The LP&rsquo;s Related Vocabulary for this Unit Opener: <em>field, cloud, rotate, dangerous</em>.</p><p>Teach all four <strong>before</strong> opening to pp. 6&ndash;7 &mdash; every photo question needs them.</p>'},
+4:{h:'field &mdash; Land Sorter',b:'<p>Leo taps a card, then taps a box. Six cards, two boxes &mdash; it only checks once the pool is empty.</p><p>He knows <em>field</em> from soccer. Start there, then widen it to any open land.</p>'},
+5:{h:'field &mdash; word card',b:'<p>Answer to photo question 1: <em>some cars, a field, a very big cloud</em>.</p>'},
+6:{h:'cloud &mdash; Storm Ladder',b:'<p>Ordering, not choosing &mdash; he must compare all three before his first tap.</p><p>The three descriptions are exactly the adjectives the photo question needs: big, dark, tilted.</p>'},
+7:{h:'cloud &mdash; word card',b:'<p><em>Tilted</em> is the hard one &mdash; lean a book over to show it.</p>'},
+8:{h:'rotate &mdash; Make It Rotate',b:'<p>Five taps, with the counter climbing. Do it physically at the same time &mdash; finger, then arm.</p><p>This is the word About the Photo depends on, so get it into his body, not just his ears.</p>'},
+9:{h:'rotate &mdash; word card',b:'<p>He will need this word again for the tornado-in-a-bottle project.</p>'},
+10:{h:'dangerous &mdash; Safety Sorter',b:'<p>The distinction that matters all unit: <strong>uncomfortable</strong> is not the same as <strong>dangerous</strong>.</p><p>If he puts the umbrella in DANGEROUS, ask <em>could that actually hurt you?</em></p>'},
+11:{h:'dangerous &mdash; word card',b:'<p>danger &rarr; dangerous, like fame &rarr; famous.</p>'},
+12:{h:'Academic Language',b:'<p>The LP prints no Academic Language line for the Unit Opener, so these two are taken from its own objectives &mdash; <em>analyze a photograph</em>, <em>evaluate statements</em>. Nothing invented.</p>'},
+13:{h:'analyze &mdash; Detail Hunt',b:'<p>The trap cards are the lesson. A guess and an observation feel the same to a child until they are separated like this.</p><p>Both wrong cards give a reason when tapped. Read it aloud with him.</p>'},
+14:{h:'analyze &mdash; word card',b:'<p>The book uses the American spelling; <em>analyse</em> is the British form.</p>'},
+15:{h:'evaluate &mdash; Judge It',b:'<p>Four steps out of order. He has to reason about the process, not recall a definition.</p><p>Step 4 is the whole objective: the LP asks for a <strong>reason</strong> with every True/False answer.</p>'},
+16:{h:'evaluate &mdash; word card',b:'<p>Same word Leo met in the Level 4 Mission lesson. Point that out &mdash; recognising a returning word is confidence.</p>'},
+17:{h:'Content Vocabulary',b:'<p><em>extreme</em> comes from the LP Build Background script; <em>supercell</em> from About the Photo.</p><p>The fourteen weather words on the In This Unit page belong to Vocabulary 1, not here. Do not pre-empt that lesson.</p>'},
+18:{h:'extreme &mdash; Weather Dial',b:'<p>LP Build Background, made physical: raise your hand to ankle, waist, then above your head as he taps each one.</p><p>Then the LP&rsquo;s line: <em>extreme weather is not safe, and we take it seriously.</em></p>'},
+19:{h:'extreme &mdash; word card',b:'<p>The unit title word. Everything for the next several weeks hangs off it.</p>'},
+20:{h:'supercell &mdash; Storm Machine',b:'<p>All four facts are from About the Photo. Matching forces him to read both columns rather than recognise one answer.</p><p>The updraft pair is the key one &mdash; it is the definition of a supercell.</p>'},
+21:{h:'supercell &mdash; word card',b:'<p>The book&rsquo;s photo caption: <em>Supercell thunderstorm, Colorado, USA</em>.</p>'},
+22:{h:'Introduce &mdash; Explain',b:'<p>LP script, verbatim in its actions: rub your hands and shiver for cold; pretend to cover yourself with an umbrella for rain.</p><p>Actually go to the window. This is where the unit stops being a book and becomes Leo&rsquo;s own day.</p>'},
+23:{h:'Introduce &mdash; Recycle',b:'<p>LP: ask <em>What types of weather do you know?</em> and write the responses on the board. Expected: rainy, cloudy, snowy, sunny, windy.</p><p>This is prior knowledge, so he produces first. The sixth tile is deliberately his own &mdash; accept Japanese, then supply the English.</p>'},
+24:{h:'Introduce &mdash; preference and reason',b:'<p>LP: model your own preference with a reason, then ask <em>What type of weather do you like? Why?</em></p><p>Model it fully first. The reason matters more than the choice &mdash; it is the first extended speaking of Level 5.</p>'},
+25:{h:'Analyze the photograph',b:'<p>The LP&rsquo;s four photo questions with its own bracketed answers.</p><p>Question 4 has <strong>two acceptable answers</strong> and the LP prints both &mdash; yes because the cloud is close, no because the skies are clear. Accept either <em>with a reason</em>. That is objective 1 met.</p>'},
+26:{h:'Be the Expert &mdash; About the Photo',b:'<p>About the Photo, in four steps.</p><p>Step 4 links to the whole unit: tornadoes, lightning and hail are all coming in Vocabulary 1, and the Reading is <em>Tornado Trouble</em>.</p>'},
+27:{h:'Be the Expert &mdash; Our World in Context',b:'<p>From the LP: supercells can happen anywhere with the right conditions, but typically where tornadoes hit &mdash; most commonly Tornado Alley in the USA, followed by central Canada.</p><p>The Japan tile is <strong>my addition</strong>, not the LP&rsquo;s. It is accurate &mdash; Japan does record tornadoes, just far fewer &mdash; and it makes the topic local.</p>'},
+28:{h:'Apply &mdash; imagine the situation',b:'<p>LP task, verbatim: imagine you are in one of the cars; write about what you are doing and feeling. Three minutes, one or two sentences.</p><p>Write one yourself &mdash; and make yours frightened rather than brave. It gives Leo permission to use feeling words.</p><p>This is the first seed of the unit&rsquo;s <strong>personal narrative</strong>.</p>'},
+29:{h:'Evaluate the statements',b:'<p>The four SB p. 6 statements, verbatim.</p><p>LP method: read each aloud, hands up for true, <strong>ask for a reason</strong>, then discuss and confirm. The reason is the objective &mdash; do not let him just point.</p>'},
+30:{h:'Evaluate &mdash; answers',b:'<p>Statement 1 is true; 2, 3 and 4 are false, judged against the photograph.</p><p>If Leo said true to 3, that is a reasonable misread &mdash; the sky looks like rain. Praise the reasoning, then look at the ground: it is dry.</p>'},
+31:{h:'Related Vocabulary &mdash; recycle',b:'<p>Reverse direction: definition &rarr; word. Harder than the cards, and the real test.</p><p>This is the second Related Vocabulary pass the Unit Opener structure calls for. If a word is shaky, go back to its card rather than repeating the list.</p>'},
+32:{h:'Extend &mdash; soccer and weather',b:'<p>Brings <em>extreme</em> and <em>dangerous</em> into the one topic Leo will always engage with.</p><p>Answer to the closing question: lightning &mdash; because it is genuinely unsafe, not merely inconvenient. That distinction is the unit&rsquo;s core idea.</p><p>Stats are 2025&ndash;26.</p>'},
+33:{h:'Recap',b:'<p>Recap before Wrap Up. Answers aloud first, tap to confirm.</p>'},
+34:{h:'Formative Assessment',b:'<p>The two Unit Opener objectives were <em>analyze a photograph for information</em> and <em>evaluate the truth of statements</em>. All four checks trace back to them.</p><p>Reasons matter more than answers throughout this lesson.</p>'},
+35:{h:'Wrap Up',b:'<p>Send the Home-School Connection Letter home if you use it, and put the Unit Opener Poster up.</p><p>Vocabulary 1 is fourteen words &mdash; a big lesson. Today&rsquo;s four related words make it land much more easily.</p>'}
+};
+
+/* ═══════ DECK STATE ═══════ */
+var deck    = document.getElementById('deck');
+var slides  = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+var total   = slides.length;
+var idx     = 0;
+var notesOpen = false;
+
+/* Inject stage badges from data-stage / data-stagetone */
+try{
+  slides.forEach(function(s, i){
+    var st = s.getAttribute('data-stage');
+    if(!st) return;
+    var el = document.createElement('deck-stage');
+    el.setAttribute('stage', st);
+    el.setAttribute('tone', s.getAttribute('data-stagetone') || 'wrapup');
+    el.setAttribute('sub', (i + 1) + ' of ' + total);
+    s.insertBefore(el, s.firstChild);
+  });
+}catch(e){ console.warn('badge inject', e); }
+
+function render(){
+  try{
+    slides.forEach(function(s, i){ s.classList.toggle('on', i === idx); });
+    var c = document.getElementById('counter');
+    if(c) c.textContent = (idx + 1) + ' / ' + total;
+    var pf = document.getElementById('progFill');
+    if(pf) pf.style.width = ((idx + 1) / total * 100) + '%';
+    paintNotes();
+    lSave(SAVE_PREFIX + 'slide', idx);
+  }catch(e){ console.warn('render', e); }
+}
+
+function paintNotes(){
+  try{
+    var p = document.getElementById('tnPanel');
+    if(!p) return;
+    var n = NOTES[idx];
+    p.innerHTML = n ? ('<h4>' + n.h + '</h4>' + n.b)
+                    : '<h4>Teacher notes</h4><p>No notes for this slide.</p>';
+  }catch(e){ console.warn('paintNotes', e); }
+}
+
+function go(d){
+  var n = idx + d;
+  if(n < 0 || n >= total) return;
+  idx = n;
+  render();
+}
+
+/* ═══════ SCALING ═══════ */
+function fit(){
+  try{
+    var vw = window.innerWidth  || document.documentElement.clientWidth;
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var s  = Math.min(vw / 1920, vh / 1080);
+    var ox = Math.max(0, (vw - 1920 * s) / 2);
+    var oy = Math.max(0, (vh - 1080 * s) / 2);
+    deck.style.transform = 'translate(' + ox + 'px,' + oy + 'px) scale(' + s + ')';
+  }catch(e){ console.warn('fit', e); }
+}
+window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', function(){ setTimeout(fit, 120); });
+if(window.visualViewport){ window.visualViewport.addEventListener('resize', fit); }
+
+/* ═══════ SINGLE DELEGATED CLICK HANDLER ═══════ */
+document.addEventListener('click', function(ev){
+  try{
+    var t = ev.target.closest('[data-act]');
+    if(!t) return;
+    var act = t.getAttribute('data-act');
+
+    if(act === 'nav'){ go(parseInt(t.getAttribute('data-dir'), 10)); return; }
+
+    if(act === 'notes'){
+      notesOpen = !notesOpen;
+      var p = document.getElementById('tnPanel');
+      if(p) p.classList.toggle('open', notesOpen);
+      t.classList.toggle('act', notesOpen);
+      return;
+    }
+
+    if(act === 'full'){ toggleFull(); return; }
+
+
+    if(act === 'gsel'){
+      var sb0 = t.closest('[data-sort]');
+      if(!sb0 || t.classList.contains('locked')) return;
+      Array.prototype.forEach.call(sb0.querySelectorAll('.gitem.sel'), function(x){ x.classList.remove('sel'); });
+      t.classList.add('sel');
+      return;
+    }
+    if(act === 'gbin'){
+      var sbox = t.closest('[data-sort]');
+      if(!sbox) return;
+      var sel = sbox.querySelector('.gitem.sel');
+      if(!sel) return;
+      sel.classList.remove('sel');
+      t.querySelector('.bin-body').appendChild(sel);
+      sel.setAttribute('data-in', t.getAttribute('data-bin'));
+      var pool = sbox.querySelector('.pool');
+      if(pool && pool.children.length === 0){
+        var right = 0, all = sbox.querySelectorAll('.gitem');
+        Array.prototype.forEach.call(all, function(it){
+          it.classList.add('locked');
+          var good = it.getAttribute('data-cat') === it.getAttribute('data-in');
+          it.classList.add(good ? 'ok' : 'bad');
+          if(good) right++;
+        });
+        gfb(sbox.getAttribute('data-sort'), right, all.length,
+            right === all.length ? sbox.getAttribute('data-win') : sbox.getAttribute('data-lose'));
+      }
+      return;
+    }
+    if(act === 'gseq'){
+      var qbox = t.closest('[data-seq]');
+      if(!qbox || t.classList.contains('locked')) return;
+      var wrap = t.closest('.seq-item');
+      var step = parseInt(qbox.getAttribute('data-step') || '1', 10);
+      if(parseInt(t.getAttribute('data-ord'), 10) === step){
+        t.classList.add('ok', 'locked');
+        if(wrap){
+          wrap.classList.add('ok');
+          var ordEl = wrap.querySelector('.ord');
+          if(ordEl) ordEl.textContent = step;
+        }
+        qbox.setAttribute('data-step', step + 1);
+        if(step === qbox.querySelectorAll('.gitem').length){
+          gfb(qbox.getAttribute('data-seq'), 1, 1, qbox.getAttribute('data-win'));
+        }
+      } else {
+        t.classList.add('bad');
+        setTimeout(function(){ t.classList.remove('bad'); }, 340);
+      }
+      return;
+    }
+    if(act === 'gml' || act === 'gmr'){
+      var mbox = t.closest('[data-match]');
+      if(!mbox || t.classList.contains('locked')) return;
+      var side = act === 'gml' ? 'L' : 'R';
+      var cur = mbox.querySelector('.gitem.sel');
+      if(!cur){ t.classList.add('sel'); t.setAttribute('data-side', side); return; }
+      if(cur === t){ t.classList.remove('sel'); return; }
+      if(cur.getAttribute('data-side') === side){
+        cur.classList.remove('sel'); t.classList.add('sel'); t.setAttribute('data-side', side); return;
+      }
+      if(cur.getAttribute('data-k') === t.getAttribute('data-k')){
+        [cur, t].forEach(function(x){ x.classList.remove('sel'); x.classList.add('ok', 'locked'); });
+        if(mbox.querySelectorAll('.gitem.ok').length === mbox.querySelectorAll('.gitem').length){
+          gfb(mbox.getAttribute('data-match'), 1, 1, mbox.getAttribute('data-win'));
+        }
+      } else {
+        var other = cur;
+        other.classList.remove('sel');          /* clear selection at once */
+        t.classList.add('bad'); other.classList.add('bad');
+        setTimeout(function(){ t.classList.remove('bad'); other.classList.remove('bad'); }, 340);
+      }
+      return;
+    }
+    if(act === 'ghunt'){
+      var hbox = t.closest('[data-hunt]');
+      if(!hbox || t.classList.contains('locked')) return;
+      var need = parseInt(hbox.getAttribute('data-need'), 10);
+      t.classList.add('locked');
+      if(t.getAttribute('data-good') === '1'){
+        t.classList.add('ok');
+        var got = hbox.querySelectorAll('.gitem.ok').length;
+        var c = document.getElementById('cnt-' + hbox.getAttribute('data-hunt'));
+        if(c) c.textContent = 'Found: ' + got + ' / ' + need;
+        if(got === need) gfb(hbox.getAttribute('data-hunt'), 1, 1, hbox.getAttribute('data-win'));
+      } else {
+        t.classList.add('bad');
+        gfb(hbox.getAttribute('data-hunt'), 0, 1, t.getAttribute('data-why') || '');
+      }
+      return;
+    }
+
+    if(act === 'tap'){
+      if(t.classList.contains('open')) return;
+      t.classList.add('open', 'reveal');
+      var ans = t.getAttribute('data-a') || '';
+      if(t.classList.contains('ce-cell')){
+        t.classList.remove('blank');
+        t.classList.add('fill');
+        t.textContent = ans;
+      } else {
+        var q = t.querySelector('.t-q');
+        var out = document.createElement('div');
+        out.className = 't-a';
+        out.innerHTML = ans;
+        if(q && q.parentNode === t) t.appendChild(out); else t.appendChild(out);
+      }
+      var ck = t.getAttribute('data-count');
+      if(ck) checkGroupDone(ck);
+      return;
+    }
+
+    if(act === 'count'){
+      var key = t.getAttribute('data-key');
+      var max = parseInt(t.getAttribute('data-max'), 10) || 3;
+      var cur = (parseInt(t.getAttribute('data-n'), 10) || 0) + 1;
+      if(cur > max) return;
+      t.setAttribute('data-n', cur);
+      var out2 = document.getElementById(key + 'Out');
+      if(out2) out2.textContent = cur;
+      var emo = document.getElementById(key + 'Emo');
+      if(emo){ emo.classList.remove('reveal'); void emo.offsetWidth; emo.classList.add('reveal'); }
+      if(cur >= max) t.classList.add('open');
+      return;
+    }
+
+    if(act === 'opt'){
+      var g = t.getAttribute('data-g');
+      var box = document.getElementById('q-' + g);
+      if(!box || box.getAttribute('data-locked') === '1') return;
+      box.setAttribute('data-locked', '1');
+      var ok = t.getAttribute('data-c') === '1';
+      Array.prototype.forEach.call(box.querySelectorAll('.opt'), function(o){
+        o.classList.add('locked');
+        if(o.getAttribute('data-c') === '1') o.classList.add('ok');
+      });
+      if(!ok) t.classList.add('bad');
+      var fb = document.getElementById('fb-' + g);
+      if(fb){
+        fb.className = 'fb show ' + (ok ? 'ok' : 'bad');
+        fb.innerHTML = (ok ? '✅ ' : '💡 ') + (t.getAttribute('data-fb') || '');
+      }
+      lSave(SAVE_PREFIX + 'q-' + g, { correct: ok, ts: new Date().toISOString() });
+      return;
+    }
+
+    if(act === 'tick'){
+      t.classList.toggle('on');
+      var bx = t.querySelector('.bx');
+      if(bx) bx.textContent = t.classList.contains('on') ? '✓' : '';
+      var all = Array.prototype.slice.call(document.querySelectorAll('[data-act="tick"]'));
+      var done = all.filter(function(x){ return x.classList.contains('on'); }).length;
+      var ed = document.getElementById('editDone');
+      if(ed) ed.classList.toggle('hide', done !== all.length);
+      lSave(SAVE_PREFIX + 'edit-checklist', done);
+      return;
+    }
+  }catch(e){ console.warn('click handler', e); }
+});
+
+function gfb(key, right, total, msg){
+  try{
+    var fb = document.getElementById('fb-' + key);
+    if(!fb) return;
+    var win = right === total;
+    fb.className = 'fb show ' + (win ? 'ok' : 'bad');
+    fb.innerHTML = (win ? '🎉 ' : '💡 ') + (msg || '') + (total > 1 ? ' (' + right + '/' + total + ')' : '');
+  }catch(e){ console.warn('gfb', e); }
+}
+function checkGroupDone(key){
+  try{
+    var all = Array.prototype.slice.call(document.querySelectorAll('[data-count="' + key + '"]'));
+    if(!all.length) return;
+    var open = all.filter(function(x){ return x.classList.contains('open'); }).length;
+    if(open === all.length){
+      var r = document.getElementById(key + 'Reveal');
+      if(r){ r.classList.remove('hide'); r.classList.add('reveal'); }
+    }
+  }catch(e){ console.warn('checkGroupDone', e); }
+}
+
+function toggleFull(){
+  try{
+    var el = document.documentElement;
+    if(!document.fullscreenElement){
+      if(el.requestFullscreen) el.requestFullscreen();
+      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } else {
+      if(document.exitFullscreen) document.exitFullscreen();
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+    setTimeout(fit, 150);
+  }catch(e){ console.warn('toggleFull', e); }
+}
+document.addEventListener('fullscreenchange', function(){ setTimeout(fit, 120); });
+
+/* ═══════ KEYBOARD ═══════ */
+document.addEventListener('keydown', function(e){
+  try{
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); go(1); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+    else if(e.key === 'f' || e.key === 'F'){ toggleFull(); }
+    else if(e.key === 'n' || e.key === 'N'){
+      var b = document.querySelector('[data-act="notes"]');
+      if(b) b.click();
+    }
+  }catch(err){ console.warn('key', err); }
+});
+
+/* ═══════ INIT ═══════ */
+document.addEventListener('DOMContentLoaded', function(){ fit(); render(); });
+fit();
+render();
+
+})();
+</script>
+</body>
+</html>

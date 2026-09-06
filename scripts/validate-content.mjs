@@ -466,6 +466,7 @@ const lessonsDirs = [
   "content/subjects/english/courses/our-world/level-4/unit-7/lessons",
   "content/subjects/english/courses/our-world/level-4/unit-8/lessons",
   "content/subjects/english/courses/our-world/level-4/unit-9/lessons",
+  "content/subjects/english/courses/our-world/level-5/unit-1/lessons",
   // Checkpoint lessons after each three-unit band live beside the units, not inside them.
   "content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons",
   "content/subjects/english/courses/special-training/lessons",

@@ -1,6 +1,10 @@
 /**
- * irregularVerbs.ts — the Our World 4 end-of-book "Irregular Verbs" table
+ * irregularVerbs.ts — the Our World end-of-book "Irregular Verbs" table
  * (infinitive / simple past / past participle), wired into Reference.
+ *
+ * Levels 4 and 5 print the same appendix — the two tables were compared verb
+ * for verb and form for form and are identical — so this is one shared list
+ * rather than a copy per level.
  *
  * Roughly a third of these verbs already have a real vocabulary card
  * somewhere in the curriculum (tagged `pos: "verb"`), and those cards win —
@@ -79,11 +83,14 @@ function buildCard(raw: RawVerb, light: IrregularVerbLight): WordEntry {
     examples: light.examples,
     examplesJp: light.examplesJp,
     family: [],
+    /* No level on the source: the same table sits in the back of both the
+       Level 4 and Level 5 books, and this label is also printed under each
+       example sentence — where naming one level would be wrong twice over,
+       since these sentences are the list's own, not the book's. */
     sources: [
       {
         course: "our-world",
-        level: 4,
-        tag: "Irregular Verbs list",
+        tag: "Irregular Verbs list · Levels 4–5",
         lessonId: "tg-verb-time-machine",
         lessonStatus: "live"
       }

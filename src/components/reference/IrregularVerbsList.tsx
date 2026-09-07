@@ -27,11 +27,11 @@ export function IrregularVerbsList() {
     <section className="irrv">
       <header className="irrv-head">
         <div>
-          <span>Reference · Our World 4</span>
+          <span>Reference · Our World 4 &amp; 5</span>
           <h1>Irregular Verbs</h1>
           <p>
-            The {irregularVerbs.length} irregular verbs from the back of the Level 4 book. Tap any verb to see its own
-            card. {knownCount} of {irregularVerbs.length} marked known.
+            The {irregularVerbs.length} irregular verbs printed in the back of the Level 4 and Level 5 books — the same
+            list in both. Tap any verb to see its own card. {knownCount} of {irregularVerbs.length} marked known.
           </p>
         </div>
         <div className="irrv-head-actions">

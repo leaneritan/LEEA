@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Dumbbell } from "lucide-react";
+import { Dumbbell, Presentation } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
 import { irregularVerbs } from "@/data/irregularVerbs";
@@ -34,10 +34,18 @@ export function IrregularVerbsList() {
             card. {knownCount} of {irregularVerbs.length} marked known.
           </p>
         </div>
-        <Link className="primary-button irrv-test-link" href="/reference/irregular-verbs/test">
-          <Dumbbell size={16} strokeWidth={2.6} />
-          Take the test
-        </Link>
+        <div className="irrv-head-actions">
+          <Link className="primary-button irrv-test-link" href="/reference/irregular-verbs/test">
+            <Dumbbell size={16} strokeWidth={2.6} />
+            Take the test
+          </Link>
+          {/* The teaching deck behind this list — what the three forms are for,
+              and how to pick between them. Training Ground, not a unit lesson. */}
+          <Link className="ghost-button irrv-test-link" href="/lessons/tg-verb-time-machine">
+            <Presentation size={16} strokeWidth={2.6} />
+            The Verb Time Machine
+          </Link>
+        </div>
       </header>
 
       <input
@@ -64,7 +72,9 @@ export function IrregularVerbsList() {
                 <tr key={verb.id} className={known ? "is-known" : ""}>
                   <td>
                     <Link className="irrv-word" href={verb.href}>
-                      {verb.light ? <span className="irrv-emoji" aria-hidden>{verb.light.emoji}</span> : null}
+                      {/* Verbs with a real vocabulary card bring that card's own
+                          emoji, so the column reads evenly either way. */}
+                      <span className="irrv-emoji" aria-hidden>{verb.light?.emoji ?? verb.card?.emoji}</span>
                       {verb.infinitive}
                     </Link>
                   </td>

@@ -21,7 +21,7 @@ export function IrregularVerbsList() {
     );
   }, [query]);
 
-  const knownCount = irregularVerbs.filter((verb) => knownWordSet.has(verb.card?.id ?? verb.id)).length;
+  const knownCount = irregularVerbs.filter((verb) => knownWordSet.has(verb.card.id)).length;
 
   return (
     <section className="irrv">
@@ -67,14 +67,12 @@ export function IrregularVerbsList() {
           </thead>
           <tbody>
             {rows.map((verb) => {
-              const known = knownWordSet.has(verb.card?.id ?? verb.id);
+              const known = knownWordSet.has(verb.card.id);
               return (
                 <tr key={verb.id} className={known ? "is-known" : ""}>
                   <td>
                     <Link className="irrv-word" href={verb.href}>
-                      {/* Verbs with a real vocabulary card bring that card's own
-                          emoji, so the column reads evenly either way. */}
-                      <span className="irrv-emoji" aria-hidden>{verb.light?.emoji ?? verb.card?.emoji}</span>
+                      <span className="irrv-emoji" aria-hidden>{verb.card.emoji}</span>
                       {verb.infinitive}
                     </Link>
                   </td>

@@ -11,8 +11,10 @@ const SESSION_LENGTH = 12;
 type Field = "past" | "pastParticiple";
 type Result = { verbId: string; correct: boolean };
 
+/* Verbs that have a real vocabulary card score against that card, so a round
+   here feeds the same known/weak record the rest of Reference reads. */
 function confidenceId(verb: IrregularVerbEntry) {
-  return verb.card?.id ?? verb.id;
+  return verb.card.id;
 }
 
 /** "was/were" accepts either word; everything else is a single exact answer. */
@@ -199,7 +201,8 @@ export function IrregularVerbsTest() {
           <strong>
             {current.infinitive} → {current.past} → {current.pastParticiple}
           </strong>
-          {current.light?.examples?.[1] ? <p className="vp-feedback-example">{current.light.examples[1]}</p> : null}
+          {/* The past-tense example, so the form he just typed is shown in use. */}
+          {current.card.examples[1] ? <p className="vp-feedback-example">{current.card.examples[1]}</p> : null}
           <button className="primary-button" onClick={next} type="button">
             {index + 1 >= queue.length ? "See result" : "Next"}
           </button>

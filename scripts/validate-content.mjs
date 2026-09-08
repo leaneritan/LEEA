@@ -33,6 +33,7 @@ const unitVocabularyPaths = [
   "content/subjects/english/courses/our-world/level-1/unit-6/vocabulary.json",
   "content/subjects/english/courses/our-world/level-1/unit-7/vocabulary.json",
   "content/subjects/english/courses/our-world/level-1/unit-8/vocabulary.json",
+  "content/subjects/english/courses/our-world/level-1/unit-9/vocabulary.json",
   "content/subjects/english/courses/our-world/level-2/unit-1/vocabulary.json",
   "content/subjects/english/courses/our-world/level-2/unit-2/vocabulary.json",
   "content/subjects/english/courses/our-world/level-2/unit-3/vocabulary.json",
@@ -73,6 +74,7 @@ const unitGrammarPaths = [
   "content/subjects/english/courses/our-world/level-1/unit-6/grammar.json",
   "content/subjects/english/courses/our-world/level-1/unit-7/grammar.json",
   "content/subjects/english/courses/our-world/level-1/unit-8/grammar.json",
+  "content/subjects/english/courses/our-world/level-1/unit-9/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-1/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-2/grammar.json",
   "content/subjects/english/courses/our-world/level-2/unit-3/grammar.json",
@@ -466,6 +468,7 @@ const lessonsDirs = [
   "content/subjects/english/courses/our-world/level-4/unit-7/lessons",
   "content/subjects/english/courses/our-world/level-4/unit-8/lessons",
   "content/subjects/english/courses/our-world/level-4/unit-9/lessons",
+  "content/subjects/english/courses/our-world/level-5/unit-1/lessons",
   // Checkpoint lessons after each three-unit band live beside the units, not inside them.
   "content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons",
   "content/subjects/english/courses/special-training/lessons",

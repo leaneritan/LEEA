@@ -9,6 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap"></noscript>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../lib/leea-cloud-config.js"></script>
+  <script src="../../lib/leea-cloud.js"></script>
 
   <style>
     /* ═══════════════════════════════════════════
@@ -49,10 +52,9 @@
     ═══════════════════════════════════════════ */
     #wrap {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: calc(100vh - 52px);
+      inset: 0;
       overflow: hidden;
+      background: #0B0F1A;
     }
     #deck {
       position: absolute;
@@ -75,69 +77,45 @@
     .slide.active { display: block; }
 
     /* ═══════════════════════════════════════════
-       NAV BAR
+       NAV / BADGE / PROGRESS (shared LEEA deck shell)
     ═══════════════════════════════════════════ */
-    #nav {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: 52px;
-      background: #0D0D0D;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      gap: 10px;
-      z-index: 9000;
+    #prog { position: absolute; left: 0; right: 0; bottom: 0; height: 9px; background: #F1F5F9; z-index: 20; }
+    #progFill { height: 100%; background: linear-gradient(90deg, var(--green), var(--yellow)); width: 0; transition: width .35s; }
+    #nav { position: absolute; right: 44px; bottom: 36px; display: flex; align-items: center; gap: 14px; z-index: 22; }
+    .nb {
+      width: 74px; height: 74px; border-radius: 50%;
+      border: 4px solid var(--border); background: var(--surface);
+      font-size: 32px; font-weight: 900; color: var(--ink2);
+      cursor: pointer; transition: all .18s;
     }
-    .nb { /* nav button */
-      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
-      color: #fff; padding: 6px 18px; border-radius: 4px;
-      cursor: pointer; font-weight: 600; font-size: 14px;
-      transition: all .15s;
+    .nb:hover { border-color: var(--green); color: var(--green); }
+    #sc { font-size: 26px; font-weight: 800; color: var(--ink3); min-width: 130px; text-align: center; letter-spacing: 1px; }
+    .tn-btn {
+      position: absolute; left: 44px; bottom: 36px;
+      width: 74px; height: 74px; border-radius: 50%;
+      border: 4px solid var(--border); background: var(--surface);
+      font-size: 32px; cursor: pointer; z-index: 22; transition: all .18s;
     }
-    .nb:hover { background: rgba(255,255,255,.2); }
-    .nb.green { background: var(--green); border-color: var(--green); }
-    #sc { /* slide counter */
-      color: rgba(255,255,255,.65); font-size: 13px; font-weight: 600;
-      min-width: 64px; text-align: center;
-    }
-    #pgbar { flex: 1; height: 4px; background: rgba(255,255,255,.12); border-radius: 2px; overflow: hidden; }
-    #pgfill { height: 100%; background: var(--green); transition: width .3s; }
-    #unit-lbl { color: var(--green-md); font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin-left: auto; }
+    .tn-btn:hover { border-color: var(--yellow); background: var(--ybg); }
+    .tn-btn.act { background: var(--yellow); border-color: #92400E; }
+    .fs-btn { left: 134px; }
 
     /* ═══════════════════════════════════════════
-       TEACHER NOTES PANEL
+       TEACHER NOTES PANEL (slides up from the bottom)
     ═══════════════════════════════════════════ */
     #tn-panel {
-      position: fixed;
-      top: 0; right: -440px;
-      width: 440px; height: calc(100vh - 52px);
-      background: #1a2332;
-      transition: right .3s ease;
-      z-index: 8000;
-      display: flex; flex-direction: column;
+      position: absolute; left: 0; right: 0; bottom: 0;
+      max-height: 430px; overflow-y: auto;
+      background: rgba(15,23,42,.97); color: #E2E8F0;
+      padding: 38px 110px 60px; z-index: 21;
+      display: none; border-top: 6px solid var(--yellow);
     }
-    #tn-panel.open { right: 0; }
-    .tn-head {
-      background: var(--green-dk);
-      padding: 16px 20px;
-      font-weight: 800; font-size: 12px; letter-spacing: .2em; text-transform: uppercase;
-      color: #fff;
-      display: flex; justify-content: space-between; align-items: center;
-      flex-shrink: 0;
-    }
-    .tn-close { cursor: pointer; font-size: 20px; opacity: .7; }
-    .tn-close:hover { opacity: 1; }
-    #tn-body {
-      flex: 1; overflow-y: auto;
-      padding: 20px 22px;
-      font-size: 15px; line-height: 1.75;
-      color: rgba(255,255,255,.82);
-    }
+    #tn-panel.open { display: block; }
     #tn-body strong { color: var(--yellow); }
-    #tn-body .tn-sec { margin-bottom: 16px; }
+    #tn-body .tn-sec { margin-bottom: 16px; font-size: 27px; line-height: 1.55; font-weight: 500; }
     #tn-body .tn-lbl {
-      font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
-      color: var(--green-md); font-weight: 700; margin-bottom: 6px; display: block;
+      font-size: 24px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--yellow); font-weight: 800; margin-bottom: 16px; display: block;
     }
     #tn-body ul { padding-left: 18px; }
     #tn-body li { margin-bottom: 5px; }
@@ -1363,27 +1341,19 @@
       </div>
     </div>
 
+    <div id="prog"><div id="progFill"></div></div>
+    <button class="tn-btn" id="tn-btn" onclick="toggleNotes()" title="Teacher notes (N)">📋</button>
+    <button class="tn-btn fs-btn" onclick="toggleFull()" title="Fullscreen (F)">⛶</button>
+    <div id="tn-panel">
+      <div id="tn-body"></div>
+    </div>
+    <div id="nav">
+      <button class="nb" onclick="prevSlide()">‹</button>
+      <div id="sc">1 / 21</div>
+      <button class="nb" onclick="nextSlide()">›</button>
+    </div>
   </div><!-- /deck -->
 </div><!-- /wrap -->
-
-<!-- ═══════════ NAV BAR ═══════════ -->
-<div id="nav">
-  <button class="nb" onclick="prevSlide()">◀ Prev</button>
-  <span id="sc">1 / 21</span>
-  <button class="nb" onclick="nextSlide()">Next ▶</button>
-  <div id="pgbar"><div id="pgfill"></div></div>
-  <button class="nb" id="tn-btn" onclick="toggleNotes()">📝 Notes</button>
-  <span id="unit-lbl">Unit 8 · Opener</span>
-</div>
-
-<!-- ═══════════ TEACHER NOTES PANEL ═══════════ -->
-<div id="tn-panel">
-  <div class="tn-head">
-    📝 Teacher Notes
-    <span class="tn-close" onclick="toggleNotes()">✕</span>
-  </div>
-  <div id="tn-body"></div>
-</div>
 
 <script>
 /* ═══════════════════════════════════════════
@@ -1434,16 +1404,35 @@ const NOTES = {
 };
 
 /* ═══════════════════════════════════════════
+   LEEA SAVE STANDARD
+═══════════════════════════════════════════ */
+var SAVE_PREFIX = '4-8-opener-slides-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-8-opener-slides';
+
+function lSave(key, val){
+  try{ localStorage.setItem('leea-' + key, JSON.stringify(val)); }catch(e){}
+  try{
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && LEEA_CLOUD.enabled){
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val);
+    }
+  }catch(e){}
+}
+function lLoad(key, fb){
+  try{ var v = localStorage.getItem('leea-' + key); return v !== null ? JSON.parse(v) : fb; }
+  catch(e){ return fb; }
+}
+
+/* ═══════════════════════════════════════════
    SCALING
 ═══════════════════════════════════════════ */
 let notesOpen = false;
 const TOTAL = 21;
-let current  = 1;
+let current  = lLoad(SAVE_PREFIX + 'slide', 1);
+if (current < 1 || current > TOTAL) current = 1;
 
 function scaleSlides() {
-  const tnW = notesOpen ? 440 : 0;
-  const aw  = window.innerWidth  - tnW;
-  const ah  = window.innerHeight - 52; // nav bar
+  const aw  = window.innerWidth;
+  const ah  = window.innerHeight;
   const s   = Math.min(aw / 1920, ah / 1080);
   const deck = document.getElementById('deck');
   const left = (aw  - 1920 * s) / 2;
@@ -1453,6 +1442,7 @@ function scaleSlides() {
   deck.style.top       = top  + 'px';
 }
 window.addEventListener('resize', scaleSlides);
+window.addEventListener('orientationchange', () => setTimeout(scaleSlides, 120));
 scaleSlides();
 
 /* ═══════════════════════════════════════════
@@ -1463,8 +1453,9 @@ function goTo(n) {
   document.getElementById('s' + current).classList.remove('active');
   current = n;
   document.getElementById('s' + current).classList.add('active');
-  document.getElementById('sc').textContent    = current + ' / ' + TOTAL;
-  document.getElementById('pgfill').style.width = ((current - 1) / (TOTAL - 1) * 100) + '%';
+  document.getElementById('sc').textContent      = current + ' / ' + TOTAL;
+  document.getElementById('progFill').style.width = ((current - 1) / (TOTAL - 1) * 100) + '%';
+  lSave(SAVE_PREFIX + 'slide', current);
   showNotes();
 }
 function nextSlide() { goTo(current + 1); }
@@ -1474,7 +1465,23 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown'  || e.key === ' ')  { e.preventDefault(); nextSlide(); }
   if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                      { e.preventDefault(); prevSlide(); }
   if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFull();
 });
+
+/* ═══════════════════════════════════════════
+   FULLSCREEN
+═══════════════════════════════════════════ */
+function toggleFull() {
+  try{
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+    setTimeout(scaleSlides, 150);
+  }catch(e){ console.warn('fullscreen', e); }
+}
+document.addEventListener('fullscreenchange', () => setTimeout(scaleSlides, 120));
 
 /* ═══════════════════════════════════════════
    TEACHER NOTES
@@ -1485,10 +1492,15 @@ function showNotes() {
 function toggleNotes() {
   notesOpen = !notesOpen;
   document.getElementById('tn-panel').classList.toggle('open', notesOpen);
-  document.getElementById('tn-btn').classList.toggle('green', notesOpen);
-  scaleSlides();
+  document.getElementById('tn-btn').classList.toggle('act', notesOpen);
   showNotes();
 }
+
+/* Apply the restored slide (from lLoad above) now that the deck exists */
+document.getElementById('s1').classList.remove('active');
+document.getElementById('s' + current).classList.add('active');
+document.getElementById('sc').textContent      = current + ' / ' + TOTAL;
+document.getElementById('progFill').style.width = ((current - 1) / (TOTAL - 1) * 100) + '%';
 showNotes();
 
 /* ═══════════════════════════════════════════

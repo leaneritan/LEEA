@@ -10,6 +10,33 @@ Leo learner apps are templated by component (see `docs/components.md`). Teacher 
 - Lesson ID: `ow-l<level>-u<unit>-<component>` e.g. `ow-l4-u8-opener`
 - Teacher `<component>` must have a paired learner `<component>-app` in the same level/unit — the validator enforces this and the Neritan Teacher Menu surfaces app controls on the teacher card via this pairing
 
+## Handoff hooks for externally-built decks
+
+If a deck is drafted outside this repo (e.g. in a separate Claude conversation) and handed over as a finished `.html` file, only these technical hooks need to match before it's dropped in — the slide content and pedagogy are the drafting session's call, not this checklist's:
+
+- **Filename matches the lesson it's for.** `ow-l<level>-u<unit>-<component>.html` — using this lesson's own level/unit/component, not whatever value was left over from a template file it was copied from.
+- **`SAVE_PREFIX` and `HOMEWORK_ID` match the same lesson id**, not the template it was built from:
+  ```js
+  var SAVE_PREFIX = '<level>-<unit>-<component>-slides-';
+  var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-<level>-<unit>-<component>-slides';
+  ```
+  e.g. Level 5 Unit 1 opener: `'5-1-opener-slides-'` / `'leo-5-1-opener-slides'`. A leftover value here silently saves Leo's progress under the wrong lesson's key.
+- **Fonts load non-blocking**, since every lesson renders inside an iframe and a stalled render-blocking font request can hang the whole document:
+  ```html
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="...&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="...&display=swap"></noscript>
+  ```
+- **Cloud sync script tags are present, unchanged**, with the relative path kept as-is (two levels up from `public/lessons/` or `public/learn/`):
+  ```html
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../lib/leea-cloud-config.js"></script>
+  <script src="../../lib/leea-cloud.js"></script>
+  ```
+
+Everything else — registering the lesson so it appears on the teacher dashboard, pairing it with a learner app, adding any new vocabulary word the deck introduces to the content model — happens after handoff, not before it.
+
 ## Why custom, not templated
 
 Each lesson plan in the NatGeo planner has its own teaching flow: opener has a photo discussion and caption activity; vocab-1 has a graphic organizer (sunshine, two-column chart, etc.); song has lyrics and listen-and-sing; grammar has the rule box, Notice / Build / Fix / Use activities; reading has a passage and comprehension; writing has a model and planning chart.

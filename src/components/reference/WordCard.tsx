@@ -25,14 +25,44 @@ const POS_LABEL: Record<string, string> = {
   other: "word"
 };
 
-export function WordCard({ entry }: { entry: WordEntry }) {
+/* A card is normally one stop in the full vocabulary list, but the same card
+   can also be reached from a themed list (Irregular Verbs), where prev/next
+   should stay inside that list instead of jumping to whatever word happens to
+   sit beside it globally. Both overrides default to the vocabulary behavior. */
+export type CardNav = {
+  prev: { href: string; label: string } | null;
+  next: { href: string; label: string } | null;
+  index: number;
+  total: number;
+  noun: string;
+};
+
+export function WordCard({
+  entry,
+  nav: navOverride,
+  back
+}: {
+  entry: WordEntry;
+  nav?: CardNav;
+  back?: { href: string; label: string };
+}) {
   const jp = useJapanesePreference();
   const { knownWordSet, setWordKnown } = useKnownWordIds();
   const known = knownWordSet.has(entry.id);
   const [playing, setPlaying] = useState(false);
 
   const sanseidoUrl = useMemo(() => sanseidoByWord.get(entry.word.toLowerCase()), [entry]);
-  const nav = useMemo(() => getWordNav(entry.id), [entry.id]);
+  const nav = useMemo<CardNav>(() => {
+    if (navOverride) return navOverride;
+    const wordNav = getWordNav(entry.id);
+    return {
+      prev: wordNav.prev ? { href: `/reference/word/${wordNav.prev.id}`, label: wordNav.prev.word } : null,
+      next: wordNav.next ? { href: `/reference/word/${wordNav.next.id}`, label: wordNav.next.word } : null,
+      index: wordNav.index,
+      total: wordNav.total,
+      noun: "Word"
+    };
+  }, [entry.id, navOverride]);
   const family = useMemo(() => getWordFamily(entry), [entry]);
   const similar = useMemo(() => getSimilarWords(entry, family), [entry, family]);
   const verbForms = useMemo(
@@ -58,8 +88,8 @@ export function WordCard({ entry }: { entry: WordEntry }) {
 
   return (
     <div className="rcardv2-shell rcardv2-shell--word">
-      <Link href="/reference" className="rcardv2-back">
-        ← Back to Vocabulary
+      <Link href={back?.href ?? "/reference"} className="rcardv2-back">
+        ← Back to {back?.label ?? "Vocabulary"}
       </Link>
 
       <section className="rcardv2-hero">
@@ -142,11 +172,11 @@ export function WordCard({ entry }: { entry: WordEntry }) {
         </div>
       </section>
 
-      <nav className="rcardv2-prevnext" aria-label="Word navigation">
+      <nav className="rcardv2-prevnext" aria-label={`${nav.noun} navigation`}>
         {nav.prev ? (
-          <Link href={`/reference/word/${nav.prev.id}`} className="rcardv2-prevnext-btn">
+          <Link href={nav.prev.href} className="rcardv2-prevnext-btn">
             <span className="rcardv2-prevnext-arrow">←</span>
-            {nav.prev.word}
+            {nav.prev.label}
           </Link>
         ) : (
           <button type="button" className="rcardv2-prevnext-btn is-disabled" disabled>
@@ -156,13 +186,13 @@ export function WordCard({ entry }: { entry: WordEntry }) {
 
         <div className="rcardv2-prevnext-pos">
           <div className="rcardv2-prevnext-count">
-            Word {nav.index} of {nav.total}
+            {nav.noun} {nav.index} of {nav.total}
           </div>
         </div>
 
         {nav.next ? (
-          <Link href={`/reference/word/${nav.next.id}`} className="rcardv2-prevnext-btn">
-            {nav.next.word}
+          <Link href={nav.next.href} className="rcardv2-prevnext-btn">
+            {nav.next.label}
             <span className="rcardv2-prevnext-arrow">→</span>
           </Link>
         ) : (

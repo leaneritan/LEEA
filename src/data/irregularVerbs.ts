@@ -1,13 +1,20 @@
 /**
- * irregularVerbs.ts — the Our World 4 end-of-book "Irregular Verbs" table
+ * irregularVerbs.ts — the Our World end-of-book "Irregular Verbs" table
  * (infinitive / simple past / past participle), wired into Reference.
  *
+ * Levels 4 and 5 print the same appendix — the two tables were compared verb
+ * for verb and form for form and are identical — so this is one shared list
+ * rather than a copy per level.
+ *
  * Roughly a third of these verbs already have a real vocabulary card
- * somewhere in the curriculum (tagged `pos: "verb"`); the rest don't, so this
- * list carries its own light-card content (`light`) for those. Matching to
- * an existing card is done here at runtime rather than hardcoded in the JSON
- * — if a verb later gets scanned into a real unit, it upgrades to the real
- * card automatically with no data change needed.
+ * somewhere in the curriculum (tagged `pos: "verb"`), and those cards win —
+ * they carry the unit sources and lesson links this list can't. The rest
+ * carry their own card content here (`light`) in the same shape, so every
+ * verb in the table opens the same Word Card either way.
+ *
+ * Matching to an existing card happens at runtime rather than being
+ * hardcoded in the JSON: if a verb later gets scanned into a real unit, it
+ * upgrades to that card automatically with no data change needed.
  */
 
 import irregularVerbsData from "../../content/subjects/english/reference/irregular-verbs.json";
@@ -16,7 +23,12 @@ import type { WordEntry } from "./reference-shapes";
 
 export type IrregularVerbLight = {
   emoji: string;
-  examples: [string, string, string];
+  meaning: string;
+  ipa: string;
+  syllables: string;
+  japanese: { word: string; meaning: string; needsReview: boolean };
+  examples: string[];
+  examplesJp: string[];
 };
 
 export type IrregularVerbEntry = {
@@ -24,10 +36,10 @@ export type IrregularVerbEntry = {
   infinitive: string;
   past: string;
   pastParticiple: string;
-  /** Set only for verbs without a real Reference card yet. */
-  light: IrregularVerbLight | null;
-  /** The real vocab card for this verb, when one exists. */
-  card: WordEntry | null;
+  /** The card to render — a real vocabulary card when one exists, else one built from `light`. */
+  card: WordEntry;
+  /** True when `card` is a real curriculum card rather than one built from this list. */
+  hasVocabularyCard: boolean;
   href: string;
 };
 
@@ -39,7 +51,7 @@ type RawVerb = {
   light?: IrregularVerbLight;
 };
 
-function findCard(infinitive: string): WordEntry | null {
+function findVocabularyCard(infinitive: string): WordEntry | null {
   const head = infinitive.split(/\s+/)[0]?.toLowerCase();
   return (
     allWords.find(
@@ -52,16 +64,56 @@ function findCard(infinitive: string): WordEntry | null {
   );
 }
 
+/* Built to match what reference-shapes.ts produces for a scanned word, so
+   WordCard can't tell the difference: `japanese.meaning` lands on jp.sentence
+   (the 日 row under Meaning) and `japanese.word` on jp.gloss (the hero
+   reading), exactly as toWordEntry maps them. */
+function buildCard(raw: RawVerb, light: IrregularVerbLight): WordEntry {
+  return {
+    id: raw.id,
+    type: "vocabulary",
+    word: raw.infinitive,
+    normalizedWord: raw.infinitive,
+    emoji: light.emoji,
+    pos: "verb",
+    syllables: light.syllables,
+    pronUS: light.ipa,
+    definition: light.meaning,
+    senses: [{ text: light.meaning }],
+    examples: light.examples,
+    examplesJp: light.examplesJp,
+    family: [],
+    /* No level on the source: the same table sits in the back of both the
+       Level 4 and Level 5 books, and this label is also printed under each
+       example sentence — where naming one level would be wrong twice over,
+       since these sentences are the list's own, not the book's. */
+    sources: [
+      {
+        course: "our-world",
+        tag: "Irregular Verbs list · Levels 4–5",
+        lessonId: "tg-verb-time-machine",
+        lessonStatus: "live"
+      }
+    ],
+    jp: {
+      gloss: light.japanese.word,
+      sentence: light.japanese.meaning,
+      needsReview: light.japanese.needsReview
+    }
+  };
+}
+
 export const irregularVerbs: IrregularVerbEntry[] = (irregularVerbsData.verbs as RawVerb[]).map((raw) => {
-  const card = findCard(raw.infinitive);
+  const vocabularyCard = findVocabularyCard(raw.infinitive);
+  const card = vocabularyCard ?? buildCard(raw, raw.light as IrregularVerbLight);
   return {
     id: raw.id,
     infinitive: raw.infinitive,
     past: raw.past,
     pastParticiple: raw.pastParticiple,
-    light: card ? null : raw.light ?? null,
     card,
-    href: card ? `/reference/word/${card.id}` : `/reference/irregular-verb/${raw.id}`
+    hasVocabularyCard: Boolean(vocabularyCard),
+    href: `/reference/irregular-verb/${raw.id}`
   };
 });
 
@@ -69,23 +121,16 @@ export function getIrregularVerbById(id: string): IrregularVerbEntry | undefined
   return irregularVerbs.find((entry) => entry.id === id);
 }
 
-export type PrevNextIrregular = {
-  prev: IrregularVerbEntry | null;
-  next: IrregularVerbEntry | null;
-  index: number;
-  total: number;
-};
-
-/* Prev/next only walks the light-card verbs — the ones with a real card use
-   that card's own prev/next through the full vocabulary list instead. */
-export function getIrregularVerbNav(currentId: string): PrevNextIrregular {
-  const list = irregularVerbs.filter((entry) => entry.light);
-  const i = list.findIndex((entry) => entry.id === currentId);
-  if (i < 0) return { prev: null, next: null, index: 0, total: list.length };
+/* Prev/next walks this list, not the 1,000-plus-word global vocabulary —
+   browsing a themed list should stay inside that theme. */
+export function getIrregularVerbNav(currentId: string) {
+  const i = irregularVerbs.findIndex((entry) => entry.id === currentId);
+  const toLink = (entry: IrregularVerbEntry) => ({ href: entry.href, label: entry.infinitive });
   return {
-    prev: i > 0 ? list[i - 1] : null,
-    next: i < list.length - 1 ? list[i + 1] : null,
+    prev: i > 0 ? toLink(irregularVerbs[i - 1]) : null,
+    next: i >= 0 && i < irregularVerbs.length - 1 ? toLink(irregularVerbs[i + 1]) : null,
     index: i + 1,
-    total: list.length
+    total: irregularVerbs.length,
+    noun: "Verb"
   };
 }

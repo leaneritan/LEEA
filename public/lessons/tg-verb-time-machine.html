@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Verb Time Machine — Infinitive · Simple Past · Past Participle</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+<style>
+  :root{
+    --purple:#7C3AED; --purple-dark:#5B21B6;
+    --gold:#F59E0B; --gold-dark:#B45309;
+    --blue:#0EA5E9; --green:#16A34A; --red:#EF4444;
+    --ink:#1E1B2E; --card:#FFFFFF; --jp:#0EA5E9;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#111022;font-family:'Outfit',sans-serif;overflow:hidden;height:100%;}
+  #stageWrap{position:relative;width:100vw;height:100vh;overflow:hidden;background:#111022;}
+  .stage{position:absolute;top:0;left:0;width:1920px;height:1080px;transform-origin:top left;
+    background:linear-gradient(160deg,#FFFBF2 0%,#F3ECFF 100%);overflow:hidden;}
+  .slide{position:absolute;top:0;left:0;width:1920px;height:1080px;display:none;padding:96px 90px 90px 90px;}
+  .slide.active{display:block;}
+  .badge{position:absolute;top:36px;left:90px;background:var(--purple);color:#fff;font-weight:700;
+    font-size:22px;padding:9px 24px;border-radius:999px;letter-spacing:.4px;}
+  .badge.gold{background:var(--gold);color:#3A2400;}
+  .badge.blue{background:var(--blue);}
+  .badge.green{background:var(--green);}
+  .badge.red{background:var(--red);}
+  h1.title{font-size:60px;font-weight:800;color:var(--ink);margin:0 0 8px 0;line-height:1.1;}
+  h2.sub{font-size:32px;font-weight:700;color:var(--purple-dark);margin:0 0 18px 0;}
+  h3.mini{font-size:28px;font-weight:700;color:var(--purple-dark);margin:0 0 10px 0;}
+  .note{font-size:25px;color:#3F3A52;line-height:1.55;margin:8px 0;}
+  .note.big{font-size:29px;}
+  .card{background:var(--card);border-radius:24px;box-shadow:0 8px 0 rgba(0,0,0,.05),0 12px 32px rgba(0,0,0,.07);padding:28px 34px;}
+  .card.tight{padding:20px 26px;}
+  .row{display:flex;gap:26px;}
+  .col{flex:1;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  .pill{display:inline-block;padding:5px 16px;border-radius:999px;font-weight:700;font-size:19px;color:#fff;}
+  .pill.p1{background:var(--blue);} .pill.p2{background:var(--gold-dark);} .pill.p3{background:var(--red);}
+  .pill.ok{background:var(--green);}
+  .verbword{font-size:38px;font-weight:800;color:var(--ink);}
+  .example{font-size:28px;color:var(--ink);font-weight:600;margin:9px 0;line-height:1.4;}
+  .example.sm{font-size:24px;}
+  .example .hl{background:#FEF3C7;padding:2px 9px;border-radius:7px;}
+  .example .hlg{background:#DCFCE7;padding:2px 9px;border-radius:7px;}
+  .example .hlr{background:#FEE2E2;padding:2px 9px;border-radius:7px;}
+  .example .helper{background:#DBEAFE;padding:2px 9px;border-radius:7px;color:#1D4ED8;}
+  .jp-tap{display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--jp);
+    color:var(--jp);font-weight:700;font-size:21px;padding:7px 18px;border-radius:13px;cursor:pointer;
+    user-select:none;box-shadow:0 3px 0 rgba(14,165,233,.3);}
+  .jp-tap:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(14,165,233,.3);}
+  .jp-reveal{display:none;background:#EAF7FF;border:2px dashed var(--jp);color:#075985;
+    font-size:23px;font-weight:500;line-height:1.6;padding:16px 22px;border-radius:14px;margin-top:12px;}
+  .jp-reveal.shown{display:block;}
+  table.gram{border-collapse:collapse;width:100%;font-size:25px;}
+  table.gram th{background:var(--purple);color:#fff;padding:13px;font-weight:700;}
+  table.gram th:first-child{border-top-left-radius:14px;}
+  table.gram th:last-child{border-top-right-radius:14px;}
+  table.gram td{padding:11px 13px;border-bottom:2px solid #F0EAFB;font-weight:600;text-align:center;}
+  table.gram tr:nth-child(even) td{background:#FAF7FF;}
+  .diffcell{color:var(--red);} .samecell{color:var(--green);}
+  .nav{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;align-items:center;
+    gap:16px;background:rgba(17,16,34,.88);padding:9px 20px;border-radius:999px;z-index:50;}
+  .nav button{background:var(--gold);border:none;color:#3A2400;font-weight:800;font-size:19px;
+    padding:9px 20px;border-radius:999px;cursor:pointer;}
+  .nav button:disabled{opacity:.35;cursor:default;}
+  .nav span{color:#fff;font-weight:600;font-size:17px;min-width:74px;text-align:center;}
+  .tn-btn{position:fixed;top:16px;right:20px;background:#1E1B2E;color:#fff;border:none;
+    padding:9px 16px;border-radius:999px;font-weight:700;font-size:15px;cursor:pointer;z-index:60;}
+  .tn-panel{position:fixed;top:62px;right:20px;width:430px;max-height:74vh;overflow:auto;background:#fff;
+    border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.25);padding:20px 24px;display:none;z-index:60;
+    font-size:16px;line-height:1.55;color:#333;}
+  .tn-panel.shown{display:block;}
+  .tn-panel h3{margin-top:0;color:var(--purple-dark);}
+  .center-col{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;}
+  .choice{background:#fff;border:3px solid #E5D9FF;border-radius:16px;padding:15px 24px;font-size:25px;
+    font-weight:700;cursor:pointer;color:var(--ink);transition:.15s;text-align:center;}
+  .choice:hover{border-color:var(--purple);}
+  .choice.correct{background:#DCFCE7;border-color:var(--green);}
+  .choice.wrong{background:#FEE2E2;border-color:var(--red);}
+  .qtext{font-size:31px;font-weight:700;color:var(--ink);margin-bottom:14px;line-height:1.35;}
+  .scoreBox{font-size:28px;font-weight:800;color:var(--purple-dark);margin-bottom:6px;}
+  .helperTag{background:var(--red);color:#fff;font-weight:700;padding:3px 12px;border-radius:7px;font-size:19px;}
+  .aloneTag{background:var(--green);color:#fff;font-weight:700;padding:3px 12px;border-radius:7px;font-size:19px;}
+  ul.tips{font-size:25px;color:#3F3A52;line-height:1.75;padding-left:26px;margin:6px 0;}
+  ul.tips li{margin-bottom:6px;}
+  .bigicon{font-size:70px;line-height:1;}
+  .scrollq{max-height:830px;overflow:auto;padding-right:14px;}
+  .flowbox{background:#fff;border:3px solid var(--purple);border-radius:18px;padding:16px 22px;
+    font-size:24px;font-weight:700;color:var(--ink);text-align:center;}
+  .flowarrow{font-size:34px;color:var(--purple);text-align:center;font-weight:800;}
+  .xmark{color:var(--red);font-weight:800;}
+  .cmark{color:var(--green);font-weight:800;}
+</style>
+</head>
+<body>
+<div id="stageWrap"><div class="stage" id="stage">
+
+<!-- 1 TITLE -->
+<section class="slide active">
+  <div class="center-col">
+    <div style="font-size:110px;">⚽🎬🕰️</div>
+    <h1 class="title" style="font-size:72px;">The Verb Time Machine</h1>
+    <h2 class="sub" style="font-size:34px;">Infinitive ・ Simple Past ・ Past Participle</h2>
+    <p class="note big" style="max-width:1100px;">Today we learn the <b>three forms</b> of every English verb — and the one big secret that makes the third form easy.</p>
+    <div class="jp-tap" data-jp="j1">🇯🇵 タップして日本語で見る</div>
+    <div class="jp-reveal" id="j1" style="max-width:1050px;">英語の動詞（どうし）には3つの形があります。<br>今日はその3つの違いと、3つ目「過去分詞（かこぶんし）」が何のためにあるのかを、サッカーと映画の例で学びます。</div>
+  </div>
+</section>
+
+<!-- 2 WHY THREE FORMS -->
+<section class="slide">
+  <div class="badge">Why three forms? 🤔</div>
+  <div class="row" style="margin-top:20px;">
+    <div class="col card">
+      <h3 class="mini">🇯🇵 Japanese has 2</h3>
+      <div class="example">食べる &nbsp;→&nbsp; 食べた</div>
+      <div class="example">行く &nbsp;→&nbsp; 行った</div>
+      <p class="note">Present form, past form. Two shapes and you're done.</p>
+    </div>
+    <div class="col card">
+      <h3 class="mini">🇬🇧 English has 3</h3>
+      <div class="example">eat &nbsp;→&nbsp; ate &nbsp;→&nbsp; <span class="hlr">eaten</span></div>
+      <div class="example">go &nbsp;→&nbsp; went &nbsp;→&nbsp; <span class="hlr">gone</span></div>
+      <p class="note">The <b>third</b> shape has no simple Japanese match. That's why it feels strange — and that's exactly what we'll fix today.</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:24px;">
+    <p class="note big" style="margin:0;">The third form is called the <b>past participle</b>. It is <b>not a tense</b>. It is a <b>part</b> — a piece you snap onto a helper word to build something bigger. 🧩</p>
+  </div>
+  <div style="text-align:center;margin-top:18px;">
+    <div class="jp-tap" data-jp="j2">🇯🇵 タップ</div>
+  </div>
+  <div class="jp-reveal" id="j2">日本語は「食べる / 食べた」の2つですが、英語は3つ目があります。<br>この3つ目「過去分詞」は<b>時制（じせい）ではありません</b>。単独では時間を表さず、他の言葉とくっついて初めて意味を持つ「部品（ぶひん）」です。だから一人では使えないのです。</div>
+</section>
+
+<!-- 3 MAP -->
+<section class="slide">
+  <div class="badge">Today's Map 🗺️</div>
+  <div class="grid3" style="margin-top:30px;">
+    <div class="card" style="text-align:center;">
+      <div class="bigicon">1️⃣</div>
+      <div class="pill p1">Infinitive</div>
+      <div class="verbword" style="margin-top:12px;">play / go / eat</div>
+      <p class="note">原形（げんけい）<br>The verb's real name. You already know this one.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="bigicon">2️⃣</div>
+      <div class="pill p2">Simple Past</div>
+      <div class="verbword" style="margin-top:12px;">played / went / ate</div>
+      <p class="note">過去形（かこけい）<br>It happened. It's finished. It stands <b>alone</b>. ✅</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="bigicon">3️⃣</div>
+      <div class="pill p3">Past Participle</div>
+      <div class="verbword" style="margin-top:12px;">played / gone / eaten</div>
+      <p class="note">過去分詞（かこぶんし）<br>Never alone. Always needs a <b>helper word</b>. 🤝</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:26px;">
+    <h3 class="mini">The past participle has exactly TWO jobs:</h3>
+    <div class="example">Job 1 · <span class="helper">have / has</span> + eaten &nbsp;→&nbsp; "I <b>have eaten</b>." (experience / just finished)</div>
+    <div class="example">Job 2 · <span class="helper">was / were</span> + kicked &nbsp;→&nbsp; "The ball <b>was kicked</b>." (someone did it to it)</div>
+  </div>
+</section>
+
+<!-- 4 INFINITIVE -->
+<section class="slide">
+  <div class="badge blue">Form 1 — Infinitive 原形</div>
+  <div class="row" style="margin-top:20px;">
+    <div class="col">
+      <h1 class="title" style="font-size:50px;">The verb's real name</h1>
+      <p class="note">This is the form you find in the dictionary. No <b>-ed</b>, no <b>-s</b>, no <b>-ing</b>. Just the plain word.</p>
+      <div class="card tight" style="margin-top:12px;">
+        <div class="example sm">play ⚽ &nbsp; watch 🎬 &nbsp; score 🥅 &nbsp; win 🏆 &nbsp; go 🚗 &nbsp; eat 🍞</div>
+      </div>
+      <p class="note" style="margin-top:16px;">Leo, <b>you already use this form every day</b> — it's the word that comes after <b>want to</b> and <b>like to</b>.</p>
+      <div class="example">I <span class="hl">want to play</span> soccer.</div>
+      <div class="example">Leo <span class="hl">likes to watch</span> Marvel movies.</div>
+      <div class="jp-tap" data-jp="j4" style="margin-top:14px;">🇯🇵 タップ</div>
+      <div class="jp-reveal" id="j4">原形は辞書に載っている「もとの形」です。-ed も -s も -ing もつきません。<br>"want to ~" や "like to ~" のあとに使う形なので、レオはもう毎日使っています！</div>
+    </div>
+    <div class="col card">
+      <h3 class="mini">5 places the infinitive appears 📍</h3>
+      <div class="example sm">1. After <b>to</b> → I want <span class="hl">to go</span>.</div>
+      <div class="example sm">2. After <b>can / will / must</b> → He can <span class="hl">run</span> fast.</div>
+      <div class="example sm">3. After <b>do / does</b> → Do you <span class="hl">like</span> soccer?</div>
+      <div class="example sm">4. After <b>did</b> → I didn't <span class="hl">go</span>. ⚠️ not "didn't went"!</div>
+      <div class="example sm">5. As a command → <span class="hl">Pass</span> the ball!</div>
+      <div class="jp-tap" data-jp="j4b" style="margin-top:12px;">🇯🇵 タップ</div>
+      <div class="jp-reveal" id="j4b">特に4番が大事！<br>"did" や "didn't" が文にあるとき、動詞は<b>原形にもどります</b>。<br>❌ I didn't went. → ✅ I didn't <b>go</b>.<br>過去を表す仕事は "did" がもうやっているので、動詞は原形でいいのです。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 SIMPLE PAST MEANING -->
+<section class="slide">
+  <div class="badge gold">Form 2 — Simple Past 過去形</div>
+  <div class="row" style="margin-top:20px;">
+    <div class="col">
+      <h1 class="title" style="font-size:48px;">It happened. It's finished. ✅</h1>
+      <p class="note">Simple past puts an action at a <b>finished point in the past</b>. The action is over. We are looking back at it like a photo. 📸</p>
+      <div class="example">Messi <span class="hl">played</span> for Argentina yesterday.</div>
+      <div class="example">Leo <span class="hl">watched</span> John Wick last night.</div>
+      <div class="example">Arsenal <span class="hl">won</span> the title in 2026.</div>
+      <p class="note">Notice: each sentence has a <b>finished time</b> — yesterday, last night, in 2026.</p>
+      <div class="jp-tap" data-jp="j5">🇯🇵 タップ</div>
+      <div class="jp-reveal" id="j5">過去形は「過去のある時点で終わったこと」を表します。日本語の「〜した」とほぼ同じです。<br>いつ起きたかがはっきりしている（yesterday, last night, in 2026 など）のが特徴です。</div>
+    </div>
+    <div class="col card" style="text-align:center;">
+      <div class="bigicon">🕰️ ➡️ 📸</div>
+      <h3 class="mini" style="margin-top:14px;">Simple past time words</h3>
+      <div class="example sm">yesterday · last night · last week</div>
+      <div class="example sm">in 2026 · two days ago · when I was 8</div>
+      <div class="example sm">this morning (if morning is over)</div>
+      <p class="note">If you can point at <b>when</b>, use simple past.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -ED SPELLING -->
+<section class="slide">
+  <div class="badge gold">Simple Past — Spelling the -ed ✍️</div>
+  <div class="grid2" style="margin-top:22px;">
+    <div class="card tight">
+      <h3 class="mini">Rule 1 · Most verbs → add <b>-ed</b></h3>
+      <div class="example sm">play → play<b>ed</b> · watch → watch<b>ed</b> · kick → kick<b>ed</b></div>
+    </div>
+    <div class="card tight">
+      <h3 class="mini">Rule 2 · Ends in <b>e</b> → add only <b>-d</b></h3>
+      <div class="example sm">live → live<b>d</b> · score → score<b>d</b> · like → like<b>d</b></div>
+    </div>
+    <div class="card tight">
+      <h3 class="mini">Rule 3 · Short vowel + 1 consonant → <b>double it</b></h3>
+      <div class="example sm">stop → sto<b>pp</b>ed · plan → pla<b>nn</b>ed · drop → dro<b>pp</b>ed</div>
+    </div>
+    <div class="card tight">
+      <h3 class="mini">Rule 4 · Consonant + <b>y</b> → y becomes <b>i</b></h3>
+      <div class="example sm">study → stud<b>ied</b> · try → tr<b>ied</b> · carry → carr<b>ied</b></div>
+      <div class="note" style="font-size:21px;">But: play → played (vowel + y, no change!)</div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:20px;">
+    <div class="jp-tap" data-jp="j6">🇯🇵 タップ</div>
+  </div>
+  <div class="jp-reveal" id="j6">① ふつうは -ed をつける<br>② e で終わる語は -d だけ<br>③ 「短い母音＋子音1つ」で終わる語は子音を2つに（stop→stopped）<br>④ 「子音＋y」は y を i にして -ied（study→studied）。ただし「母音＋y」はそのまま（play→played）。</div>
+</section>
+
+<!-- 7 -ED PRONUNCIATION -->
+<section class="slide">
+  <div class="badge gold">Simple Past — The 3 sounds of -ed 👄</div>
+  <p class="note big" style="margin-top:10px;">"-ed" is written the same way, but it has <b>three different sounds</b>. This is where Japanese speakers get caught. 🎯</p>
+  <div class="grid3" style="margin-top:18px;">
+    <div class="card tight">
+      <div class="pill p2">/t/</div>
+      <h3 class="mini" style="margin-top:10px;">Sounds like "t"</h3>
+      <div class="example sm">watch<b>ed</b> → "watcht"<br>kick<b>ed</b> → "kickt"<br>stop<b>ed</b> → "stopt"</div>
+      <p class="note" style="font-size:20px;">After quiet sounds: k, p, s, ch, sh, f</p>
+    </div>
+    <div class="card tight">
+      <div class="pill p2">/d/</div>
+      <h3 class="mini" style="margin-top:10px;">Sounds like "d"</h3>
+      <div class="example sm">play<b>ed</b> → "playd"<br>score<b>d</b> → "scord"<br>live<b>d</b> → "livd"</div>
+      <p class="note" style="font-size:20px;">After noisy sounds & vowels: b, g, l, m, n, r, v</p>
+    </div>
+    <div class="card tight">
+      <div class="pill p2">/ɪd/</div>
+      <h3 class="mini" style="margin-top:10px;">Extra syllable "id"</h3>
+      <div class="example sm">want<b>ed</b> → "want-id"<br>need<b>ed</b> → "need-id"<br>start<b>ed</b> → "start-id"</div>
+      <p class="note" style="font-size:20px;">ONLY after <b>t</b> or <b>d</b></p>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:20px;">
+    <div class="jp-tap" data-jp="j7">🇯🇵 タップ</div>
+  </div>
+  <div class="jp-reveal" id="j7">日本語話者がやりがちなミス：全部「〜エッド」と読んでしまうこと。<br>実際は3種類だけ：<br>・t や d で終わる動詞だけ「イド」と1音節ふえる（wanted =「ウォンティッド」）<br>・それ以外は音がふえません。watched は「ウォッチト」、played は「プレイド」。<br>👄 口のヒント：watched を言うとき、最後は舌を上の歯ぐきにつけて「ト」と切るだけ。母音は入れません。</div>
+</section>
+
+<!-- 8 IRREGULAR SIMPLE PAST -->
+<section class="slide">
+  <div class="badge gold">Simple Past — Irregular verbs 不規則動詞</div>
+  <div class="row" style="margin-top:20px;">
+    <div class="col">
+      <p class="note big">About 200 English verbs <b>refuse</b> to take -ed. They change shape instead. There is no rule — but there <b>are patterns</b>, and patterns make memorizing 3× easier. 💪</p>
+      <div class="example">go → <span class="hl">went</span> &nbsp;&nbsp; see → <span class="hl">saw</span></div>
+      <div class="example">take → <span class="hl">took</span> &nbsp;&nbsp; win → <span class="hl">won</span></div>
+      <p class="note">Bad news: they're the <b>most common</b> verbs in English, so you can't avoid them.<br>Good news: because they're common, you'll hear them constantly and they'll stick.</p>
+      <div class="jp-tap" data-jp="j8">🇯🇵 タップ</div>
+      <div class="jp-reveal" id="j8">不規則動詞は -ed をつけず、形そのものが変わります。約200語ありますが、よく使うのは60語くらい。<br>ルールはありませんが「パターン（型）」があります。バラバラに覚えるより、型ごとにまとめて覚えるほうが3倍ラクです。</div>
+    </div>
+    <div class="col card">
+      <table class="gram">
+        <tr><th>Infinitive</th><th>Simple Past</th></tr>
+        <tr><td>go</td><td>went</td></tr>
+        <tr><td>see</td><td>saw</td></tr>
+        <tr><td>take</td><td>took</td></tr>
+        <tr><td>make</td><td>made</td></tr>
+        <tr><td>win</td><td>won</td></tr>
+        <tr><td>buy</td><td>bought</td></tr>
+        <tr><td>eat</td><td>ate</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 9 KEY IDEA 1 -->
+<section class="slide">
+  <div class="badge green">⭐ KEY IDEA 1</div>
+  <div class="center-col">
+    <div class="bigicon">🧍</div>
+    <h1 class="title" style="font-size:54px;">Simple past can stand <span style="color:var(--green);">ALONE</span></h1>
+    <p class="note big" style="max-width:1200px;">It doesn't need any helper word. Put it after the subject and the sentence is finished.</p>
+    <div class="card" style="margin-top:8px;max-width:1300px;">
+      <div class="example" style="font-size:32px;">Leo <span class="hlg">ate</span> breakfast. <span class="aloneTag">complete ✅</span></div>
+      <div class="example" style="font-size:32px;">Mbappé <span class="hlg">scored</span> 25 goals in La Liga. <span class="aloneTag">complete ✅</span></div>
+      <div class="example" style="font-size:32px;">We <span class="hlg">went</span> to the stadium. <span class="aloneTag">complete ✅</span></div>
+    </div>
+    <div class="jp-tap" data-jp="j9" style="margin-top:16px;">🇯🇵 タップ</div>
+    <div class="jp-reveal" id="j9" style="max-width:1200px;">過去形は<b>それだけで文が完成します</b>。have や was などの助けの言葉はいりません。<br>「主語＋過去形」でもう文になります。これが次に習う過去分詞との一番大きな違いです。</div>
+  </div>
+</section>
+
+<!-- 10 DID + INFINITIVE TRAP -->
+<section class="slide">
+  <div class="badge red">⚠️ Careful — the "did" trap</div>
+  <p class="note big" style="margin-top:12px;">When you make a <b>question</b> or a <b>negative</b> in the past, the word <b>did</b> carries the past. So the verb goes <b>back to the infinitive</b>.</p>
+  <div class="grid2" style="margin-top:18px;">
+    <div class="card tight">
+      <h3 class="mini" style="color:var(--red);">✗ Wrong</h3>
+      <div class="example sm"><span class="xmark">✗</span> Did you <span class="hlr">went</span> to the game?</div>
+      <div class="example sm"><span class="xmark">✗</span> I didn't <span class="hlr">saw</span> the movie.</div>
+      <div class="example sm"><span class="xmark">✗</span> He didn't <span class="hlr">played</span> yesterday.</div>
+    </div>
+    <div class="card tight">
+      <h3 class="mini" style="color:var(--green);">✓ Right</h3>
+      <div class="example sm"><span class="cmark">✓</span> Did you <span class="hlg">go</span> to the game?</div>
+      <div class="example sm"><span class="cmark">✓</span> I didn't <span class="hlg">see</span> the movie.</div>
+      <div class="example sm"><span class="cmark">✓</span> He didn't <span class="hlg">play</span> yesterday.</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <p class="note big" style="margin:0;">🧠 Think of it this way: <b>only one word gets to be past.</b> If "did" is there, "did" is the past one — the main verb rests. 😴</p>
+  </div>
+  <div style="text-align:center;margin-top:16px;">
+    <div class="jp-tap" data-jp="j10">🇯🇵 タップ</div>
+  </div>
+  <div class="jp-reveal" id="j10">疑問文・否定文では "did" が過去を表す仕事をします。<br>だから動詞は原形にもどります。<b>「過去を表すのは1語だけ」</b>と覚えましょう。<br>❌ I didn't went. → ✅ I didn't go.（did がもう過去だから、go はそのまま）</div>
+</section>
+
+<!-- 11 PAST PARTICIPLE INTRO -->
+<section class="slide">
+  <div class="badge red">Form 3 — Past Participle 過去分詞</div>
+  <div class="row" style="margin-top:20px;">
+    <div class="col">
+      <h1 class="title" style="font-size:48px;">The one that's not a tense 🧩</h1>
+      <p class="note">The past participle does <b>not tell time by itself</b>. It's a puzzle piece. You snap it onto a helper word, and <b>together</b> they make a meaning.</p>
+      <h3 class="mini" style="margin-top:16px;">What does it look like?</h3>
+      <div class="example">Regular verbs → <b>exactly the same</b> as simple past</div>
+      <div class="example sm">play → played → <span class="hlg">played</span> &nbsp; (easy! 😄)</div>
+      <div class="example" style="margin-top:12px;">Irregular verbs → often a <b>third, different word</b></div>
+      <div class="example sm">go → went → <span class="hlr">gone</span></div>
+      <div class="example sm">see → saw → <span class="hlr">seen</span></div>
+      <div class="example sm">eat → ate → <span class="hlr">eaten</span></div>
+      <div class="jp-tap" data-jp="j11" style="margin-top:12px;">🇯🇵 タップ</div>
+      <div class="jp-reveal" id="j11">過去分詞は<b>それだけでは時間を表しません</b>。パズルのピースのようなもので、助けの言葉とくっついて初めて意味ができます。<br>規則動詞なら過去形とまったく同じ形。不規則動詞は go→went→<b>gone</b> のように3つ目の形になることが多いです。</div>
+    </div>
+    <div class="col card" style="text-align:center;">
+      <div class="bigicon">🧩 ➕ 🤝</div>
+      <h3 class="mini" style="margin-top:16px;">Helper words it snaps onto</h3>
+      <div class="example"><span class="helper">have / has / had</span> + participle</div>
+      <div class="example"><span class="helper">am / is / are / was / were</span> + participle</div>
+      <p class="note" style="margin-top:14px;">Without a helper, a past participle is just a piece lying on the floor. It can't be a sentence. 🚫</p>
+    </div>
+  </div>
+</section>
+
+<!-- 12 KEY IDEA 2 -->
+<section class="slide">
+  <div class="badge red">⭐ KEY IDEA 2 — the most important rule</div>
+  <div class="center-col">
+    <div class="bigicon">🚫🧍</div>
+    <h1 class="title" style="font-size:52px;">Past participle <span style="color:var(--red);">NEVER</span> stands alone</h1>
+    <div class="card" style="margin-top:12px;max-width:1350px;">
+      <div class="example" style="font-size:30px;"><span class="cmark">✓</span> Leo <span class="helper">has</span> <span class="hlg">eaten</span> breakfast.</div>
+      <div class="example" style="font-size:30px;"><span class="cmark">✓</span> The ball <span class="helper">was</span> <span class="hlg">kicked</span> into the net.</div>
+      <div class="example" style="font-size:30px;"><span class="xmark">✗</span> <span style="color:#999;">I <span class="hlr">gone</span> to the game.</span> &nbsp;<span class="helperTag">no helper — broken!</span></div>
+      <div class="example" style="font-size:30px;"><span class="xmark">✗</span> <span style="color:#999;">He <span class="hlr">seen</span> the movie.</span> &nbsp;<span class="helperTag">no helper — broken!</span></div>
+    </div>
+    <div class="jp-tap" data-jp="j12" style="margin-top:16px;">🇯🇵 タップ</div>
+    <div class="jp-reveal" id="j12" style="max-width:1250px;">過去分詞は<b>絶対に一人では使えません</b>。必ず have / has / had か am / is / are / was / were と一緒に使います。<br>❌ I gone to the game. は、部品だけ置いてあって文になっていない状態です。<br>✅ I <b>have</b> gone / I <b>went</b> のどちらかにする必要があります。</div>
+  </div>
+</section>
+
+<!-- 13 JOB 1 PRESENT PERFECT -->
+<section class="slide">
+  <div class="badge blue">Job 1 — have / has + participle</div>
+  <div class="row" style="margin-top:16px;">
+    <div class="col">
+      <h1 class="title" style="font-size:46px;">"I have eaten." 🍞</h1>
+      <p class="note">This is called the <b>present perfect</b>. It connects the past to <b>now</b>. It has two main meanings:</p>
+      <div class="card tight" style="margin-top:12px;">
+        <h3 class="mini">Meaning A · Experience 経験</h3>
+        <div class="example sm">I <span class="helper">have</span> <span class="hlg">been</span> to England. → sometime in my life</div>
+        <div class="example sm">Leo <span class="helper">has</span> <span class="hlg">seen</span> Avatar three times.</div>
+      </div>
+      <div class="card tight" style="margin-top:12px;">
+        <h3 class="mini">Meaning B · Just finished / result now 完了</h3>
+        <div class="example sm">I <span class="helper">have</span> <span class="hlg">finished</span> my homework. → so I'm free now!</div>
+        <div class="example sm">Arsenal <span class="helper">have</span> <span class="hlg">won</span> the title. → they are champions now</div>
+      </div>
+    </div>
+    <div class="col card">
+      <h3 class="mini">🇯🇵 The Japanese bridge</h3>
+      <div class="example sm"><b>Experience</b> → 「〜したことがある」</div>
+      <div class="example sm">I have been to England.<br>= イギリスに行った<b>ことがある</b>。</div>
+      <div class="example sm" style="margin-top:14px;"><b>Just finished</b> → 「〜してしまった / もう〜した」</div>
+      <div class="example sm">I have finished.<br>= <b>もう</b>終わった。</div>
+      <div class="jp-tap" data-jp="j13" style="margin-top:14px;">🇯🇵 もっと見る</div>
+      <div class="jp-reveal" id="j13">present perfect（現在完了）は「過去」と「今」をつなぐ形です。<br>have/has ＋ 過去分詞 で作ります。<br>ポイント：<b>いつ</b>やったかは言いません。大事なのは「今どうなっているか」だからです。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 14 SIMPLE PAST VS PRESENT PERFECT -->
+<section class="slide">
+  <div class="badge">⚖️ The big comparison</div>
+  <div class="grid2" style="margin-top:16px;">
+    <div class="card">
+      <div class="pill p2">Simple Past</div>
+      <div class="example" style="margin-top:12px;font-size:30px;">I <span class="hl">ate</span> breakfast <b>at 7:00</b>.</div>
+      <p class="note">📸 A photo of a finished moment.<br>We say <b>WHEN</b>. The time is over and closed.</p>
+      <div class="example sm">Leo <span class="hl">watched</span> John Wick <b>last night</b>.</div>
+      <div class="example sm">Messi <span class="hl">went</span> to Paris <b>in 2021</b>.</div>
+    </div>
+    <div class="card">
+      <div class="pill p3">Present Perfect</div>
+      <div class="example" style="margin-top:12px;font-size:30px;">I <span class="helper">have</span> <span class="hlg">eaten</span> breakfast.</div>
+      <p class="note">🔗 A line from the past to now.<br>We <b>don't</b> say when. We care about <b>now</b>.</p>
+      <div class="example sm">Leo <span class="helper">has</span> <span class="hlg">watched</span> John Wick. (he knows the story)</div>
+      <div class="example sm">Messi <span class="helper">has</span> <span class="hlg">won</span> the World Cup. (he's a winner now)</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <p class="note big" style="margin:0;">🔑 <b>The test:</b> If the sentence says <b>when</b> (yesterday, last night, in 2021) → <b>simple past</b>. If it does not say when, and you care about the result <b>now</b> → <b>present perfect</b>.</p>
+  </div>
+  <div style="text-align:center;margin-top:14px;">
+    <div class="jp-tap" data-jp="j14">🇯🇵 タップ</div>
+  </div>
+  <div class="jp-reveal" id="j14">日本語だとどちらも「食べた」になるので混ざりやすい部分です。<br>・「7時に食べた」→ いつが言ってある → <b>simple past</b>（I ate at 7:00）<br>・「（もう）食べた」→ いつは言わない、今おなかがいっぱい → <b>present perfect</b>（I have eaten）<br>⚠️ ❌ I have eaten at 7:00. は間違い。「いつ」を言った瞬間、simple past にしなければなりません。</div>
+</section>
+
+<!-- 15 TIME WORD SIGNALS -->
+<section class="slide">
+  <div class="badge">Time words tell you which one 🚦</div>
+  <div class="grid2" style="margin-top:22px;">
+    <div class="card">
+      <div class="pill p2">→ Simple Past</div>
+      <ul class="tips">
+        <li>yesterday · last night · last week</li>
+        <li>in 2026 · two days ago</li>
+        <li>when I was 8 · this morning (finished)</li>
+        <li>after the game · at 7:00</li>
+      </ul>
+      <div class="example sm">Leo <span class="hl">played</span> soccer <b>yesterday</b>.</div>
+    </div>
+    <div class="card">
+      <div class="pill p3">→ Present Perfect (have + pp)</div>
+      <ul class="tips">
+        <li>already · yet · just</li>
+        <li>ever · never</li>
+        <li>so far · up to now</li>
+        <li>three times · many times</li>
+      </ul>
+      <div class="example sm">Leo <span class="helper">has</span> <span class="hlg">played</span> soccer <b>many times</b>.</div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:20px;">
+    <div class="jp-tap" data-jp="j15">🇯🇵 タップ</div>
+  </div>
+  <div class="jp-reveal" id="j15">時を表す言葉が「合図（あいず）」になります。<br>yesterday や last night が見えたら → 過去形<br>already, just, ever, never, ~times が見えたら → have/has ＋ 過去分詞<br>この合図を覚えるだけで、正解率がぐっと上がります。</div>
+</section>
+
+<!-- 16 JOB 2 PASSIVE -->
+<section class="slide">
+  <div class="badge blue">Job 2 — be + participle (passive)</div>
+  <div class="row" style="margin-top:16px;">
+    <div class="col">
+      <h1 class="title" style="font-size:46px;">"The ball was kicked." ⚽</h1>
+      <p class="note">Normally the subject <b>does</b> the action:</p>
+      <div class="example">Mbappé <span class="hl">kicked</span> the ball. &nbsp;→ Mbappé does it.</div>
+      <p class="note" style="margin-top:14px;">But sometimes we want to talk about the <b>ball</b>, not the player. Then we use <b>be + past participle</b>:</p>
+      <div class="example">The ball <span class="helper">was</span> <span class="hlg">kicked</span>. &nbsp;→ the ball receives it.</div>
+      <div class="example sm">The movie <span class="helper">was</span> <span class="hlg">made</span> in 2008. 🎬</div>
+      <div class="example sm">The goal <span class="helper">was</span> <span class="hlg">scored</span> in the 90th minute. 🥅</div>
+      <div class="example sm">Fossils <span class="helper">are</span> <span class="hlg">found</span> in rocks. 🦴</div>
+    </div>
+    <div class="col card">
+      <h3 class="mini">🇯🇵 The Japanese bridge</h3>
+      <div class="example sm">passive = 受け身（うけみ）「〜される / 〜された」</div>
+      <div class="example sm" style="margin-top:12px;">The ball was kicked.<br>= ボールが<b>けられた</b>。</div>
+      <div class="example sm">The movie was made in 2008.<br>= その映画は2008年に<b>作られた</b>。</div>
+      <div class="jp-tap" data-jp="j16" style="margin-top:14px;">🇯🇵 もっと見る</div>
+      <div class="jp-reveal" id="j16">日本語の受け身「〜られる／〜された」と同じ考え方です。<br>英語では <b>be動詞 ＋ 過去分詞</b> で作ります。<br>だから過去分詞は「現在完了」と「受け身」の<b>両方</b>で必要になる、とても働き者の形なのです。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 17 DECISION FLOWCHART -->
+<section class="slide">
+  <div class="badge green">🧭 The decision flowchart</div>
+  <div style="margin-top:20px;max-width:1450px;margin-left:auto;margin-right:auto;">
+    <div class="flowbox">Look at the sentence. Is there a <b>helper word</b> — have / has / had / am / is / are / was / were?</div>
+    <div class="row" style="margin-top:14px;">
+      <div class="col">
+        <div class="flowarrow">⬇️ NO helper</div>
+        <div class="flowbox" style="border-color:var(--gold);">Use <b>SIMPLE PAST</b><br><span style="font-size:20px;font-weight:500;">went · ate · played</span></div>
+        <div class="flowarrow" style="font-size:24px;">⬇️</div>
+        <div class="flowbox" style="border-color:var(--gold);font-size:21px;">"Messi <b>went</b> to Paris."</div>
+      </div>
+      <div class="col">
+        <div class="flowarrow">⬇️ YES, there's a helper</div>
+        <div class="flowbox" style="border-color:var(--red);">Use <b>PAST PARTICIPLE</b><br><span style="font-size:20px;font-weight:500;">gone · eaten · played</span></div>
+        <div class="flowarrow" style="font-size:24px;">⬇️</div>
+        <div class="flowbox" style="border-color:var(--red);font-size:21px;">"Messi <b>has gone</b> to Paris."</div>
+      </div>
+      <div class="col">
+        <div class="flowarrow">⬇️ "did / didn't" is there</div>
+        <div class="flowbox" style="border-color:var(--blue);">Use <b>INFINITIVE</b><br><span style="font-size:20px;font-weight:500;">go · eat · play</span></div>
+        <div class="flowarrow" style="font-size:24px;">⬇️</div>
+        <div class="flowbox" style="border-color:var(--blue);font-size:21px;">"Messi <b>didn't go</b> to Paris."</div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:20px;">
+    <div class="jp-tap" data-jp="j17">🇯🇵 タップ</div>
+  </div>
+  <div class="jp-reveal" id="j17" style="max-width:1300px;margin-left:auto;margin-right:auto;">迷ったらこの3ステップ：<br>① 文に have/has/was/were などの助けの言葉がある？ → <b>過去分詞</b><br>② 助けの言葉がない？ → <b>過去形</b><br>③ did / didn't がある？ → <b>原形</b><br>これだけで、ほとんどの問題が解けます。</div>
+</section>
+
+<!-- 18 COMPARISON TABLE -->
+<section class="slide">
+  <div class="badge">All three side by side 📋</div>
+  <div style="margin-top:16px;">
+    <table class="gram">
+      <tr><th>Infinitive 原形</th><th>Simple Past 過去形</th><th>Past Participle 過去分詞</th><th>Type</th></tr>
+      <tr><td>play</td><td class="samecell">played</td><td class="samecell">played</td><td>👯 twins</td></tr>
+      <tr><td>watch</td><td class="samecell">watched</td><td class="samecell">watched</td><td>👯 twins</td></tr>
+      <tr><td>buy</td><td class="samecell">bought</td><td class="samecell">bought</td><td>👯 twins</td></tr>
+      <tr><td>win</td><td class="samecell">won</td><td class="samecell">won</td><td>👯 twins</td></tr>
+      <tr><td>make</td><td class="samecell">made</td><td class="samecell">made</td><td>👯 twins</td></tr>
+      <tr><td>go</td><td class="diffcell">went</td><td class="diffcell">gone</td><td>👨‍👩‍👦 triplets</td></tr>
+      <tr><td>see</td><td class="diffcell">saw</td><td class="diffcell">seen</td><td>👨‍👩‍👦 triplets</td></tr>
+      <tr><td>eat</td><td class="diffcell">ate</td><td class="diffcell">eaten</td><td>👨‍👩‍👦 triplets</td></tr>
+      <tr><td>take</td><td class="diffcell">took</td><td class="diffcell">taken</td><td>👨‍👩‍👦 triplets</td></tr>
+      <tr><td>write</td><td class="diffcell">wrote</td><td class="diffcell">written</td><td>👨‍👩‍👦 triplets</td></tr>
+      <tr><td>cut</td><td style="color:var(--blue);">cut</td><td style="color:var(--blue);">cut</td><td>🥚 triplets-in-one</td></tr>
+    </table>
+  </div>
+  <div style="text-align:center;margin-top:16px;">
+    <div class="jp-tap" data-jp="j18">🇯🇵 タップ</div>
+  </div>
+  <div class="jp-reveal" id="j18" style="max-width:1300px;margin-left:auto;margin-right:auto;">緑（👯 twins）＝ 過去形と過去分詞が<b>同じ形</b>。覚えるのは2つだけ。<br>赤（👨‍👩‍👦 triplets）＝ 3つとも<b>違う形</b>。ここが一番よく出るので、しっかり練習しましょう。<br>青（🥚）＝ 3つとも<b>同じ形</b>（cut / cut / cut, put, hit, let など）。ラッキーな動詞です！</div>
+</section>
+
+<!-- 19 PATTERN FAMILIES -->
+<section class="slide">
+  <div class="badge">🧠 Memory trick — learn them in families</div>
+  <div class="grid3" style="margin-top:20px;">
+    <div class="card tight">
+      <h3 class="mini" style="color:var(--blue);">🥚 All the same</h3>
+      <div class="example sm">cut / cut / cut<br>put / put / put<br>hit / hit / hit<br>let / let / let<br>cost / cost / cost</div>
+      <p class="note" style="font-size:20px;">Free points! Nothing to memorize.</p>
+    </div>
+    <div class="card tight">
+      <h3 class="mini" style="color:var(--green);">👯 Past = Participle</h3>
+      <div class="example sm">buy / bought / bought<br>bring / brought / brought<br>teach / taught / taught<br>win / won / won<br>make / made / made</div>
+      <p class="note" style="font-size:20px;">Learn 2 shapes, get 3.</p>
+    </div>
+    <div class="card tight">
+      <h3 class="mini" style="color:var(--red);">👨‍👩‍👦 Three different</h3>
+      <div class="example sm">sing / sang / sung<br>drink / drank / drunk<br>swim / swam / swum<br>begin / began / begun<br>ring / rang / rung</div>
+      <p class="note" style="font-size:20px;">Pattern: i → a → u 🎵</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <h3 class="mini">The "-en" family 🔚 &nbsp;<span style="font-weight:500;font-size:22px;">Many participles just end in -en:</span></h3>
+    <div class="example sm">eat / ate / eat<b>en</b> &nbsp;·&nbsp; take / took / tak<b>en</b> &nbsp;·&nbsp; write / wrote / writt<b>en</b> &nbsp;·&nbsp; give / gave / giv<b>en</b> &nbsp;·&nbsp; break / broke / brok<b>en</b> &nbsp;·&nbsp; speak / spoke / spok<b>en</b></div>
+  </div>
+  <div style="text-align:center;margin-top:16px;">
+    <div class="jp-tap" data-jp="j19">🇯🇵 タップ</div>
+  </div>
+  <div class="jp-reveal" id="j19" style="max-width:1300px;margin-left:auto;margin-right:auto;">バラバラに覚えず、<b>型（パターン）</b>でまとめて覚えるのがコツです。<br>特に「i → a → u」型（sing/sang/sung）と「-en で終わる」型（eaten, taken, written）を覚えると、一気にたくさんの動詞が使えるようになります。</div>
+</section>
+
+<!-- 20 COMMON MISTAKES -->
+<section class="slide">
+  <div class="badge red">🚨 The 5 mistakes to avoid</div>
+  <div class="card" style="margin-top:18px;">
+    <div class="example sm"><span class="xmark">✗</span> I <span class="hlr">gone</span> to the stadium. &nbsp;→&nbsp; <span class="cmark">✓</span> I <span class="hlg">went</span> / I <span class="helper">have</span> <span class="hlg">gone</span>. <span class="note" style="display:inline;font-size:20px;">(participle needs a helper)</span></div>
+  </div>
+  <div class="card" style="margin-top:12px;">
+    <div class="example sm"><span class="xmark">✗</span> He <span class="hlr">has went</span> home. &nbsp;→&nbsp; <span class="cmark">✓</span> He <span class="helper">has</span> <span class="hlg">gone</span> home. <span class="note" style="display:inline;font-size:20px;">(after "has" use the participle, not the past)</span></div>
+  </div>
+  <div class="card" style="margin-top:12px;">
+    <div class="example sm"><span class="xmark">✗</span> I didn't <span class="hlr">saw</span> it. &nbsp;→&nbsp; <span class="cmark">✓</span> I didn't <span class="hlg">see</span> it. <span class="note" style="display:inline;font-size:20px;">("did" already carries the past)</span></div>
+  </div>
+  <div class="card" style="margin-top:12px;">
+    <div class="example sm"><span class="xmark">✗</span> I have eaten <span class="hlr">at 7:00</span>. &nbsp;→&nbsp; <span class="cmark">✓</span> I <span class="hlg">ate</span> at 7:00. <span class="note" style="display:inline;font-size:20px;">(if you say WHEN, use simple past)</span></div>
+  </div>
+  <div class="card" style="margin-top:12px;">
+    <div class="example sm"><span class="xmark">✗</span> The ball <span class="hlr">was kick</span>. &nbsp;→&nbsp; <span class="cmark">✓</span> The ball <span class="helper">was</span> <span class="hlg">kicked</span>. <span class="note" style="display:inline;font-size:20px;">(after "was" use the participle)</span></div>
+  </div>
+  <div style="text-align:center;margin-top:18px;">
+    <div class="jp-tap" data-jp="j20">🇯🇵 タップ</div>
+  </div>
+  <div class="jp-reveal" id="j20" style="max-width:1350px;margin-left:auto;margin-right:auto;">この5つが日本人学習者のミスのほとんどです。特に②「has went」と④「have eaten at 7:00」は中学・高校でもよく出ます。<br>覚え方：<b>have/has のあとは必ず過去分詞</b>／<b>「いつ」を言ったら過去形</b>。</div>
+</section>
+
+<!-- 21 PRACTICE 1 -->
+<section class="slide">
+  <div class="badge">Practice 1 — think out loud 🗣️</div>
+  <div style="margin-top:26px;" data-practice="1">
+    <div class="qtext">Ronaldo ___ three goals last night. ⚽</div>
+    <p class="note">🔎 Check: Is there a helper word? Is there a time word?</p>
+    <div class="row" style="gap:22px;margin-top:14px;">
+      <div class="choice" data-correct="true" data-fb="✅ Correct! No helper word + 'last night' (a finished time) = simple past. 「last night」があるので過去形です。">scored</div>
+      <div class="choice" data-fb="❌ 'score' is the infinitive. We only use the infinitive after to / can / did. 原形はここでは使えません。">score</div>
+      <div class="choice" data-fb="❌ 'has scored' is present perfect — but the sentence says 'last night'. When you say WHEN, you must use simple past. 「いつ」を言ったら過去形です。">has scored</div>
+    </div>
+    <div class="jp-reveal practice-fb" style="margin-top:22px;"></div>
+  </div>
+</section>
+
+<!-- 22 PRACTICE 2 -->
+<section class="slide">
+  <div class="badge">Practice 2 — spot the helper 🤝</div>
+  <div style="margin-top:26px;" data-practice="2">
+    <div class="qtext">Leo has already ___ that movie. 🎬</div>
+    <p class="note">🔎 Check: <span class="helper" style="padding:2px 9px;border-radius:7px;">has</span> is sitting right there. That's a helper word!</p>
+    <div class="row" style="gap:22px;margin-top:14px;">
+      <div class="choice" data-fb="❌ 'saw' is simple past. Simple past cannot follow 'has'. has のあとに過去形は置けません。">saw</div>
+      <div class="choice" data-correct="true" data-fb="✅ Correct! 'has' is a helper word, so we need the past participle: has seen. Also 'already' is a present perfect signal word. has ＋ 過去分詞 ＝ seen。">seen</div>
+      <div class="choice" data-fb="❌ 'see' is the infinitive. After 'has' we need the past participle form. 原形ではなく過去分詞が必要です。">see</div>
+    </div>
+    <div class="jp-reveal practice-fb" style="margin-top:22px;"></div>
+  </div>
+</section>
+
+<!-- 23 PRACTICE 3 -->
+<section class="slide">
+  <div class="badge">Practice 3 — the "did" trap ⚠️</div>
+  <div style="margin-top:26px;" data-practice="3">
+    <div class="qtext">Leo didn't ___ to the stadium yesterday.</div>
+    <p class="note">🔎 Check: "didn't" is in the sentence. Who carries the past?</p>
+    <div class="row" style="gap:22px;margin-top:14px;">
+      <div class="choice" data-fb="❌ 'went' is simple past — but 'didn't' is ALREADY past. Only one word can be past. 過去を表すのは1語だけ！">went</div>
+      <div class="choice" data-correct="true" data-fb="✅ Correct! 'didn't' carries the past, so the main verb goes back to the infinitive: didn't go. did/didn't のあとは原形です。">go</div>
+      <div class="choice" data-fb="❌ 'gone' is the past participle — it needs have/has/was, not 'didn't'. 過去分詞は did とは組み合わせません。">gone</div>
+    </div>
+    <div class="jp-reveal practice-fb" style="margin-top:22px;"></div>
+  </div>
+</section>
+
+<!-- 24 PRACTICE 4 -->
+<section class="slide">
+  <div class="badge">Practice 4 — passive ⚽</div>
+  <div style="margin-top:26px;" data-practice="4">
+    <div class="qtext">The winning goal was ___ in the 90th minute. 🥅</div>
+    <p class="note">🔎 Check: <span class="helper" style="padding:2px 9px;border-radius:7px;">was</span> + ??? — and the goal didn't score itself, someone scored it.</p>
+    <div class="row" style="gap:22px;margin-top:14px;">
+      <div class="choice" data-fb="❌ 'score' is the infinitive. After 'was' we need a past participle. was のあとは過去分詞です。">score</div>
+      <div class="choice" data-fb="❌ 'scores' is present tense — it can't follow 'was'.">scores</div>
+      <div class="choice" data-correct="true" data-fb="✅ Correct! be + past participle = passive. 'was scored' = ゴールが決められた。The goal received the action.">scored</div>
+    </div>
+    <div class="jp-reveal practice-fb" style="margin-top:22px;"></div>
+  </div>
+</section>
+
+<!-- 25 QUIZ -->
+<section class="slide">
+  <div class="badge green">✔ Formative Assessment — 10 questions</div>
+  <div style="margin-top:14px;">
+    <div class="scoreBox" id="scoreDisplay">Score: 0 / 10</div>
+    <div class="scrollq" id="quizQuestions"></div>
+  </div>
+</section>
+
+<!-- 26 WRAP UP -->
+<section class="slide">
+  <div class="badge green">Recap & Wrap Up 🏆</div>
+  <div class="row" style="margin-top:20px;">
+    <div class="col card">
+      <h3 class="mini">The three forms</h3>
+      <ul class="tips">
+        <li><b>Infinitive</b> — the real name: play, go, eat. Used after <i>to, can, did</i>.</li>
+        <li><b>Simple Past</b> — finished, says WHEN, stands <b>alone</b>: played, went, ate.</li>
+        <li><b>Past Participle</b> — never alone, always with a helper: played, gone, eaten.</li>
+      </ul>
+    </div>
+    <div class="col card">
+      <h3 class="mini">The participle's two jobs</h3>
+      <ul class="tips">
+        <li><b>have / has + pp</b> → present perfect<br><span style="font-size:21px;">"I have eaten." 「もう食べた／食べたことがある」</span></li>
+        <li><b>be + pp</b> → passive<br><span style="font-size:21px;">"The ball was kicked." 「ボールがけられた」</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="card" style="margin-top:20px;text-align:center;">
+    <p class="note big" style="margin:0;">🔑 If you remember only one thing today: <b>Simple past stands alone. Past participle needs a friend.</b> 🧍 vs 🤝</p>
+  </div>
+  <div style="text-align:center;margin-top:18px;">
+    <div class="jp-tap" data-jp="j26">🇯🇵 タップ</div>
+  </div>
+  <div class="jp-reveal" id="j26" style="max-width:1300px;margin-left:auto;margin-right:auto;">よくがんばりました、レオ！ 🎉<br>今日の一番大事なポイント：<b>過去形は一人で立てる。過去分詞は必ず友だち（have / was など）が必要。</b><br>この2つの違いが分かれば、これから習う「現在完了」も「受け身」もずっと簡単になります。</div>
+</section>
+
+</div></div>
+
+<button class="tn-btn" id="tnBtn">📝 Teacher Notes</button>
+<div class="tn-panel" id="tnPanel"><h3>Teacher Notes</h3><div id="tnContent"></div></div>
+
+<div class="nav">
+  <button id="prevBtn">◀ Prev</button>
+  <span id="slideCounter">1 / 26</span>
+  <button id="nextBtn">Next ▶</button>
+</div>
+
+<script>
+(function(){
+  try{
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var total = slides.length;
+    var current = 0;
+    var QUIZ_SLIDE = 24;
+
+    var teacherNotes = [
+      "Title. Frame this as a bridge lesson — it sits outside the unit sequence and prepares Leo for present perfect and passive voice in Level 5. Say the three names aloud together before starting.",
+      "The 'why' slide. This is the single most useful framing: Japanese has two verb shapes, English has three. Leo's confusion is structural, not laziness. Let him notice the mismatch himself before you tap the Japanese.",
+      "Overview map. Point out that the participle's TWO JOBS are previewed here — he'll meet them properly on slides 13 and 16. Don't explain them yet, just plant the flag.",
+      "Infinitive. Confidence slide — he's known this since Level 1 ('want to' + verb). The right-hand card introduces the did+infinitive rule early because it prevents the most common error later.",
+      "Simple past meaning. Emphasize the 'photo' metaphor: a closed, finished moment. Ask Leo for three of his own sentences with a time word.",
+      "Spelling rules. Have Leo write out the four rules by hand with one example each. Rule 4's exception (play → played) trips learners up — test it.",
+      "Pronunciation. This is high-value for a Japanese L1 speaker. Model each of the three sounds yourself and have Leo repeat. The /ɪd/ group is tiny (only after t/d) — the mistake is adding a syllable everywhere.",
+      "Irregular verbs. Reassure: only ~60 matter in practice. The patterns come on slide 19 — mention that so he doesn't panic here.",
+      "KEY IDEA 1. Have Leo say it back in his own words before moving on. This is half the lesson.",
+      "The 'did' trap. Drill this verbally: give him five negatives to fix aloud ('He didn't went' → ?). One-word-past is a sticky mental hook.",
+      "Past participle introduced. Lead with 'not a tense, a part.' The puzzle-piece image does a lot of work — return to it whenever he's stuck.",
+      "KEY IDEA 2. Pause here. Ask him to explain WHY 'I gone to the game' is broken. If he can articulate 'no helper', the lesson has landed.",
+      "Job 1 — present perfect. This is new grammar (not yet in Level 4), so present it as a preview, not something to master today. The 〜したことがある bridge is the key.",
+      "The big comparison. Spend real time here. The WHEN test is the practical takeaway. Give him mixed sentences to sort verbally.",
+      "Time-word signals. Turn this into a quick verbal game: you say a time word, he says 'past!' or 'perfect!'.",
+      "Job 2 — passive. Japanese passive 〜られる maps cleanly, so this is usually easier for Leo than present perfect. Use it to build confidence back up.",
+      "Flowchart. Print this one if you can. It's the reference he should use during the practice slides and homework.",
+      "Full comparison table. Cover the third column and have him guess the participles before revealing.",
+      "Pattern families. Optionally do this as a physical card-sorting activity: write 15 verbs on index cards, sort into the three family piles.",
+      "Common mistakes. Read each wrong sentence aloud and let Leo catch the error before you show the fix.",
+      "Practice 1 — tap an answer for detailed feedback. Encourage him to reason aloud using the flowchart before tapping.",
+      "Practice 2 — the helper word is visually highlighted as a cue.",
+      "Practice 3 — the did trap. This is the one he'll most likely get wrong first time; that's fine and expected.",
+      "Practice 4 — passive. Note the reasoning hint: 'the goal didn't score itself.'",
+      "10-question assessment. Mixed across all three forms plus both participle jobs. Score is session-only (no cloud save — this lesson sits outside the unit homework sequence).",
+      "Wrap up. End with the one-line takeaway and have Leo repeat it. Praise effort specifically on the participle-needs-a-helper rule."
+    ];
+
+    var quizData = [
+      {q:"Leo likes ___ soccer after school. ⚽", opts:["to play","played","to played"], correct:0,
+       fb:"After 'likes to' we use the infinitive: to play. 「like to ＋ 原形」です。"},
+      {q:"Mbappé ___ 25 goals in La Liga last season.", opts:["score","scored","has scored"], correct:1,
+       fb:"'last season' tells us WHEN → simple past: scored. 「いつ」を言っているので過去形。"},
+      {q:"Leo has ___ Avatar three times. 🎬", opts:["saw","see","seen"], correct:2,
+       fb:"After the helper 'has' → past participle: seen. has ＋ 過去分詞。"},
+      {q:"We didn't ___ to the stadium.", opts:["went","go","gone"], correct:1,
+       fb:"'didn't' already carries the past, so the verb returns to the infinitive: go. 過去を表すのは1語だけ。"},
+      {q:"The ball was ___ into the net. 🥅", opts:["kick","kicked","kicks"], correct:1,
+       fb:"be + past participle = passive: was kicked. 受け身は be動詞 ＋ 過去分詞。"},
+      {q:"Batman ___ the Batmobile through Gotham. 🦇 (no helper word)", opts:["drove","driven","drive"], correct:0,
+       fb:"No helper word → simple past: drove. 助けの言葉がないので過去形。"},
+      {q:"I have never ___ sushi in England. 🍣", opts:["ate","eat","eaten"], correct:2,
+       fb:"'have' + 'never' = present perfect → past participle: eaten. 「食べたことがない」＝ have ＋ 過去分詞。"},
+      {q:"Which sentence is CORRECT?", opts:["He has went home.","He has gone home.","He have gone home."], correct:1,
+       fb:"After 'has' use the participle 'gone', and 'he' takes 'has' (not 'have'). ❌has went ❌he have"},
+      {q:"The movie ___ made in 2008. 🎬", opts:["was","has","did"], correct:0,
+       fb:"'made' is a past participle here, and the movie RECEIVES the action → passive: was made."},
+      {q:"Arsenal ___ the title yesterday. 🏆", opts:["have won","won","has won"], correct:1,
+       fb:"'yesterday' names the time → simple past: won. If you say WHEN, never use present perfect."}
+    ];
+
+    var quizAnswered = new Array(quizData.length).fill(false);
+    var score = 0;
+
+    function renderStage(){
+      var stage = document.getElementById('stage');
+      var wrap = document.getElementById('stageWrap');
+      var scale = Math.min(wrap.clientWidth/1920, wrap.clientHeight/1080);
+      var ox = (wrap.clientWidth - 1920*scale)/2;
+      var oy = (wrap.clientHeight - 1080*scale)/2;
+      stage.style.transform = 'translate('+ox+'px,'+oy+'px) scale('+scale+')';
+    }
+    window.addEventListener('resize', function(){ try{ renderStage(); }catch(e){} });
+
+    function showSlide(idx){
+      if(idx<0||idx>=total) return;
+      slides[current].classList.remove('active');
+      current = idx;
+      slides[current].classList.add('active');
+      document.getElementById('slideCounter').textContent = (current+1)+' / '+total;
+      document.getElementById('prevBtn').disabled = (current===0);
+      document.getElementById('nextBtn').disabled = (current===total-1);
+      var tn = document.getElementById('tnContent');
+      if(tn) tn.textContent = teacherNotes[current] || '';
+      if(current === QUIZ_SLIDE) buildQuiz();
+    }
+
+    function buildQuiz(){
+      var qArea = document.getElementById('quizQuestions');
+      if(!qArea || qArea.getAttribute('data-built')==='1') return;
+      qArea.setAttribute('data-built','1');
+      quizData.forEach(function(item, qi){
+        var block = document.createElement('div');
+        block.className = 'card tight';
+        block.style.marginTop = '16px';
+        block.setAttribute('data-qi', qi);
+
+        var qt = document.createElement('div');
+        qt.className = 'qtext';
+        qt.style.fontSize = '25px';
+        qt.textContent = (qi+1)+'. '+item.q;
+        block.appendChild(qt);
+
+        var row = document.createElement('div');
+        row.className = 'row';
+        row.style.gap = '16px';
+        item.opts.forEach(function(opt, oi){
+          var c = document.createElement('div');
+          c.className = 'choice';
+          c.style.fontSize = '22px';
+          c.style.padding = '11px 16px';
+          c.textContent = opt;
+          c.setAttribute('data-qi', qi);
+          c.setAttribute('data-oi', oi);
+          row.appendChild(c);
+        });
+        block.appendChild(row);
+
+        var fb = document.createElement('div');
+        fb.className = 'jp-reveal quiz-fb';
+        fb.style.marginTop = '10px';
+        fb.style.fontSize = '21px';
+        fb.setAttribute('data-qi', qi);
+        block.appendChild(fb);
+
+        qArea.appendChild(block);
+      });
+    }
+
+    document.addEventListener('click', function(e){
+      try{
+        var jpTap = e.target.closest('.jp-tap');
+        if(jpTap){
+          var rev = document.getElementById(jpTap.getAttribute('data-jp'));
+          if(rev) rev.classList.toggle('shown');
+          return;
+        }
+
+        var pc = e.target.closest('[data-practice] .choice');
+        if(pc){
+          var container = pc.closest('[data-practice]');
+          var choices = container.querySelectorAll('.choice');
+          Array.prototype.forEach.call(choices, function(c){ c.classList.remove('correct','wrong'); });
+          pc.classList.add(pc.getAttribute('data-correct')==='true' ? 'correct' : 'wrong');
+          var fbEl = container.querySelector('.practice-fb');
+          if(fbEl){
+            fbEl.textContent = pc.getAttribute('data-fb') || '';
+            fbEl.classList.add('shown');
+          }
+          return;
+        }
+
+        var qc = e.target.closest('#quizQuestions .choice');
+        if(qc){
+          var qi = parseInt(qc.getAttribute('data-qi'),10);
+          if(quizAnswered[qi]) return;
+          var oi = parseInt(qc.getAttribute('data-oi'),10);
+          var item = quizData[qi];
+          var block = qc.closest('[data-qi]');
+          var opts = block.querySelectorAll('.choice');
+          Array.prototype.forEach.call(opts, function(c){
+            var coi = parseInt(c.getAttribute('data-oi'),10);
+            if(coi === item.correct) c.classList.add('correct');
+            if(c === qc && coi !== item.correct) c.classList.add('wrong');
+          });
+          quizAnswered[qi] = true;
+          if(oi === item.correct) score++;
+          var sd = document.getElementById('scoreDisplay');
+          if(sd) sd.textContent = 'Score: '+score+' / '+quizData.length;
+          var fb2 = document.querySelector('.quiz-fb[data-qi="'+qi+'"]');
+          if(fb2){ fb2.textContent = item.fb; fb2.classList.add('shown'); }
+          return;
+        }
+
+        if(e.target.id === 'tnBtn'){ document.getElementById('tnPanel').classList.toggle('shown'); return; }
+        if(e.target.id === 'prevBtn'){ showSlide(current-1); return; }
+        if(e.target.id === 'nextBtn'){ showSlide(current+1); return; }
+      }catch(err){ console.error('click handler error:', err); }
+    });
+
+    document.addEventListener('keydown', function(e){
+      try{
+        if(e.key === 'ArrowRight') showSlide(current+1);
+        if(e.key === 'ArrowLeft') showSlide(current-1);
+      }catch(err){ console.error(err); }
+    });
+
+    renderStage();
+    showSlide(0);
+  }catch(err){
+    console.error('Deck init error:', err);
+  }
+})();
+</script>
+</body>
+</html>

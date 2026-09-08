@@ -99,6 +99,10 @@ import tgVerbs from "../../content/subjects/english/courses/special-training/les
 import tgVerbsLearner from "../../content/subjects/english/courses/special-training/lessons/verbs-app.learner.json";
 import tgGrammarCup from "../../content/subjects/english/courses/special-training/lessons/grammar-cup.teacher.json";
 import tgGrammarCupLearner from "../../content/subjects/english/courses/special-training/lessons/grammar-cup-app.learner.json";
+// Bridge lesson: sits outside the unit sequence and teaches the three verb
+// forms behind the Irregular Verbs reference list. Teacher-only by design —
+// the deck's own practices and assessment are session-scored, not homework.
+import tgVerbTimeMachine from "../../content/subjects/english/courses/special-training/lessons/verb-time-machine.teacher.json";
 import level5Unit1Opener from "../../content/subjects/english/courses/our-world/level-5/unit-1/lessons/opener.teacher.json";
 import type { Lesson } from "./types";
 
@@ -240,6 +244,7 @@ export const lessons: Lesson[] = [
   tgVerbsLearner as Lesson,
   tgGrammarCup as Lesson,
   tgGrammarCupLearner as Lesson,
+  tgVerbTimeMachine as Lesson,
   level5Unit1Opener as Lesson
 ].sort(compareLessonOrder);
 export const teacherLessons = lessons.filter((lesson) => lesson.mode === "teacher");

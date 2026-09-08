@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Dumbbell } from "lucide-react";
+import { Dumbbell, Presentation } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useKnownWordIds } from "@/components/useKnownWordIds";
 import { irregularVerbs } from "@/data/irregularVerbs";
@@ -21,23 +21,31 @@ export function IrregularVerbsList() {
     );
   }, [query]);
 
-  const knownCount = irregularVerbs.filter((verb) => knownWordSet.has(verb.card?.id ?? verb.id)).length;
+  const knownCount = irregularVerbs.filter((verb) => knownWordSet.has(verb.card.id)).length;
 
   return (
     <section className="irrv">
       <header className="irrv-head">
         <div>
-          <span>Reference · Our World 4</span>
+          <span>Reference · Our World 4 &amp; 5</span>
           <h1>Irregular Verbs</h1>
           <p>
-            The {irregularVerbs.length} irregular verbs from the back of the Level 4 book. Tap any verb to see its own
-            card. {knownCount} of {irregularVerbs.length} marked known.
+            The {irregularVerbs.length} irregular verbs printed in the back of the Level 4 and Level 5 books — the same
+            list in both. Tap any verb to see its own card. {knownCount} of {irregularVerbs.length} marked known.
           </p>
         </div>
-        <Link className="primary-button irrv-test-link" href="/reference/irregular-verbs/test">
-          <Dumbbell size={16} strokeWidth={2.6} />
-          Take the test
-        </Link>
+        <div className="irrv-head-actions">
+          <Link className="primary-button irrv-test-link" href="/reference/irregular-verbs/test">
+            <Dumbbell size={16} strokeWidth={2.6} />
+            Take the test
+          </Link>
+          {/* The teaching deck behind this list — what the three forms are for,
+              and how to pick between them. Training Ground, not a unit lesson. */}
+          <Link className="ghost-button irrv-test-link" href="/lessons/tg-verb-time-machine">
+            <Presentation size={16} strokeWidth={2.6} />
+            The Verb Time Machine
+          </Link>
+        </div>
       </header>
 
       <input
@@ -59,12 +67,12 @@ export function IrregularVerbsList() {
           </thead>
           <tbody>
             {rows.map((verb) => {
-              const known = knownWordSet.has(verb.card?.id ?? verb.id);
+              const known = knownWordSet.has(verb.card.id);
               return (
                 <tr key={verb.id} className={known ? "is-known" : ""}>
                   <td>
                     <Link className="irrv-word" href={verb.href}>
-                      {verb.light ? <span className="irrv-emoji" aria-hidden>{verb.light.emoji}</span> : null}
+                      <span className="irrv-emoji" aria-hidden>{verb.card.emoji}</span>
                       {verb.infinitive}
                     </Link>
                   </td>

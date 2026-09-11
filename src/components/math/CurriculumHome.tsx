@@ -68,6 +68,9 @@ export function CurriculumHome({ extraLessons = {} }: { extraLessons?: Record<st
           <Link className="math-speciallesson-navbtn" href="/math/free">
             特訓レッスン
           </Link>
+          <Link className="math-speciallesson-navbtn math-note-navbtn" href="/math/note">
+            学習ノート
+          </Link>
           <span className="math-home-book-label">{gradeMeta.book}</span>
           <span className="math-home-student">レオ</span>
         </div>

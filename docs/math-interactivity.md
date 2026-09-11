@@ -55,6 +55,21 @@ Every one of these computes something real from Leo's input and reports
 whether he's right — none of them replay a fixed animation or just show the
 book's answer. New widgets should match that bar, not fall short of it.
 
+## Two source books
+
+- `docs/lesson-plans/math/new-mathematics-1/` — 新編 新しい数学1, the textbook.
+  Fully scanned, 0章–7章.
+- `docs/lesson-plans/math/sugaku-no-gakushu-note-1/` — 数学の学習ノート 1年
+  （東京書籍版）, the 教科書準拠ワーク that goes with it. Scanned so far:
+  中学数学スタートDASH! p.2–9, 0章 p.10–11, 1章 p.12–41.
+
+Their paginations are unrelated, so a bare page number is ambiguous between
+them: every `page` field in `content/subjects/math/` means a **textbook** page.
+Each workbook section prints its own 教科書 P.NN cross-reference, so read that
+mapping off the page rather than inferring it from chapter order. The workbook
+scans are Leo's worked copy, marked in red — the printed question is the source
+of truth, the handwriting is evidence of what he did, not an answer key.
+
 ## Process for a new lesson
 
 1. **Read every page of the source scan before writing anything.** A full

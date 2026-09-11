@@ -39,7 +39,7 @@ LEEA
   - Training Ground
   - Reference
 - Math
-  - 中1数学ヘルパー (新編 新しい数学1) — see `docs/math-interactivity.md`
+  - 中1数学ヘルパー (新編 新しい数学1 + 数学の学習ノート1 ワーク) — see `docs/math-interactivity.md`
 - Geography (社会) — interactive maps, 地理 and 歴史
 - History (歴史) — chronology chart and other 歴史 material
 - Science

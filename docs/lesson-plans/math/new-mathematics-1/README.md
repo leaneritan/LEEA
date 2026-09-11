@@ -5,6 +5,15 @@ content is authored from — not the app content itself. Committed as
 regular files (not Git LFS, unlike `docs/lesson-plans/english/`) since
 each file here is under 25MB.
 
+**Two books.** This directory is the textbook;
+`../sugaku-no-gakushu-note-1/` is the 数学の学習ノート 1年（東京書籍版）
+workbook that accompanies it. Their paginations are unrelated while covering
+the same 章, so a bare page number is ambiguous between them — every `page`
+field in `content/subjects/math/` means a **textbook** page. The workbook
+prints its own 教科書 P.NN cross-reference on each section, so read the
+mapping off the page rather than inferring it. Same split 理科 already has
+between `../../science/new-science-1/` and `../../science/yokuwakaru-rika-1/`.
+
 ## Files
 
 **Filenames state the textbook pages inside, and every one below has been

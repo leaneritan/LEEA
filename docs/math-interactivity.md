@@ -70,6 +70,48 @@ mapping off the page rather than inferring it from chapter order. The workbook
 scans are Leo's worked copy, marked in red — the printed question is the source
 of truth, the handwriting is evidence of what he did, not an answer key.
 
+## Authoring a 学習ノート section
+
+The workbook is its own tab at `/math/note`, not extra blocks bolted onto a
+textbook 節 — two books, two spines, each owning its own page numbers.
+
+- `content/subjects/math/note/curriculum.ts` — the workbook's 目次. Flip
+  `authored: true` on a row when its JSON lands; everything else renders 準備中.
+- `content/subjects/math/note/sections/<id>.json` — one file per section.
+- `content/subjects/math/note/types.ts` — the block vocabulary: `teach`,
+  `point`, `qset`, `carry`.
+
+**Widgets are shared, not duplicated.** A `qset` question can carry a `widget`
+instead of `parts`, and its `kind` is the same `MathBlockInteractiveWidget`
+union the textbook uses — so every widget already built is available here.
+Parameterise an existing widget before writing a new one: p.14 問2 is the
+textbook's own `NumberLinePlotWidget` over a different range, which is why that
+component takes `min`/`max`/`targets` now instead of having been forked.
+
+**How Leo answers, in order of preference** (`note/answer.ts` does the marking):
+
+1. `accept` — he types the answer and is marked ○/×. The common case in 数学,
+   where an answer is a value rather than a choice. The normaliser handles
+   full-width ＋－, a katakana ー for a minus, 、 for a comma, and stray spaces;
+   numbers compare numerically, so "+14", "14" and "14.0" agree, as do "-8/3"
+   and "-2.666…". Add `unordered` for a set answer, `unit` so he types the
+   number and not the 冊/℃.
+2. `choices` + `correct` — **only where the book itself prints options**, in the
+   book's own order. A 「どちらですか」 question prints exactly two. Never invent
+   distractors: a made-up wrong answer teaches a made-up distinction.
+3. `answer` alone — a 記述 question. Self-check, no marking.
+4. Nothing — paper work. No button.
+
+Set `strictSign: true` on a question that exists to teach ＋/－ notation
+("＋，－の符号を使って…"), so a bare "7" is not accepted for "+7" — there, that
+is the mistake being corrected rather than a formatting difference.
+
+**Answers are recomputed, and say so.** The 別冊解答 is not scanned, so every
+`answer` carries a `source` recording how it was established. Where the
+handwriting in the scan disagrees with the mathematics, the `source` says that
+too — p.13 B問1(2) is written as ＋3時間 and is actually －3時間, and p.12 A問2
+is missing 7 and wrongly includes 0. Those are the reason the rule exists.
+
 ## Process for a new lesson
 
 1. **Read every page of the source scan before writing anything.** A full

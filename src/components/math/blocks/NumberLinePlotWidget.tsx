@@ -2,10 +2,11 @@
 
 import { useState, type MouseEvent } from "react";
 
-const MIN = -6;
-const MAX = 6;
 const TOLERANCE = 0.4;
-const TARGETS = [
+
+const DEFAULT_MIN = -6;
+const DEFAULT_MAX = 6;
+const DEFAULT_TARGETS = [
   { value: 3, label: "＋3" },
   { value: -2, label: "－2" },
   { value: 4.5, label: "＋4.5" },
@@ -13,16 +14,36 @@ const TARGETS = [
   { value: -0.5, label: "－1/2" }
 ];
 
-function pct(value: number) {
-  return ((value - MIN) / (MAX - MIN)) * 100;
-}
-
-export function NumberLinePlotWidget() {
+/**
+ * Plot a number on a number line.
+ *
+ * The defaults are the textbook's own set (教 p.25). The 学習ノート asks the
+ * same question over a different range with different points, so the line is
+ * parameterised rather than forked — a second copy of this would be a second
+ * place for the marking logic to drift.
+ */
+export function NumberLinePlotWidget({
+  min = DEFAULT_MIN,
+  max = DEFAULT_MAX,
+  step = 0.5,
+  targets = DEFAULT_TARGETS
+}: {
+  min?: number;
+  max?: number;
+  step?: number;
+  targets?: { value: number; label: string }[];
+} = {}) {
   const [index, setIndex] = useState(0);
   const [guess, setGuess] = useState<number | null>(null);
   const [checked, setChecked] = useState(false);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+
+  const MIN = min;
+  const MAX = max;
+  const TARGETS = targets;
+  const pct = (value: number) => ((value - MIN) / (MAX - MIN)) * 100;
+  const snap = (value: number) => Math.round(value / step) * step;
 
   const target = TARGETS[index];
   const correct = checked && guess !== null && Math.abs(guess - target.value) <= TOLERANCE;
@@ -32,7 +53,7 @@ export function NumberLinePlotWidget() {
     const rect = event.currentTarget.getBoundingClientRect();
     const fraction = (event.clientX - rect.left) / rect.width;
     const value = MIN + fraction * (MAX - MIN);
-    setGuess(Math.max(MIN, Math.min(MAX, Math.round(value * 2) / 2)));
+    setGuess(Math.max(MIN, Math.min(MAX, snap(value))));
   }
 
   function check() {

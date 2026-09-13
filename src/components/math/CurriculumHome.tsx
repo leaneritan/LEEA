@@ -1,5 +1,6 @@
 "use client";
 
+import { Dumbbell, NotebookPen } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { mathBooksByGrade } from "../../../content/subjects/math/curriculum";
@@ -65,9 +66,16 @@ export function CurriculumHome({ extraLessons = {} }: { extraLessons?: Record<st
               </button>
             ))}
           </span>
-          <Link className="math-speciallesson-navbtn" href="/math/free">
-            特訓レッスン
-          </Link>
+          <span className="math-navbtn-group">
+            <Link className="math-navbtn math-navbtn--drill" href="/math/free">
+              <Dumbbell size={15} strokeWidth={2.4} />
+              特訓レッスン
+            </Link>
+            <Link className="math-navbtn math-navbtn--note" href="/math/note">
+              <NotebookPen size={15} strokeWidth={2.4} />
+              学習ノート
+            </Link>
+          </span>
           <span className="math-home-book-label">{gradeMeta.book}</span>
           <span className="math-home-student">レオ</span>
         </div>

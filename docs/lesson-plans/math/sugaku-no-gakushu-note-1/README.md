@@ -104,18 +104,22 @@ p.152. These parts are not in this directory:
 
 ## Coverage status
 
-| 章 | Workbook pages | Textbook pages | Scanned |
-| --- | --- | --- | --- |
-| 中学数学スタートDASH! | p.2–9 | — (算数 review) | full |
-| 0章 整数の性質 | p.10–11 | 教 P.12–17 | full |
-| 1章 正負の数 | p.12–41 | 教 P.22–59 | full |
-| 2章 文字と式 | p.42–61 | 教 P.66–87 | no |
-| 3章 方程式 | p.62–81 | 教 P.94–111 | no |
-| 4章 比例と反比例 | p.82–99 | 教 P.120–153 | no |
-| 5章 平面図形 | p.100–115 | 教 P.160–185 | no |
-| 6章 空間図形 | p.116–137 | 教 P.194–221 | no |
-| 7章 データの分析と活用 | p.138–149 | 教 P.228–245 | no |
-| 1年のまとめ・重要事項のチェック | p.150–152 | — | no |
+Built sections live at `/math/note` — the workbook is its own tab, separate from
+the textbook spine at `/math`. See "Authoring a 学習ノート section" in
+`docs/math-interactivity.md` for how a scan becomes a section.
+
+| 章 | Workbook pages | Textbook pages | Scanned | Built |
+| --- | --- | --- | --- | --- |
+| 中学数学スタートDASH! | p.2–9 | — (算数 review) | full | no |
+| 0章 整数の性質 | p.10–11 | 教 P.12–17 | full | no |
+| 1章 正負の数 | p.12–41 | 教 P.22–59 | full | p.12–15 only |
+| 2章 文字と式 | p.42–61 | 教 P.66–87 | no | no |
+| 3章 方程式 | p.62–81 | 教 P.94–111 | no | no |
+| 4章 比例と反比例 | p.82–99 | 教 P.120–153 | no | no |
+| 5章 平面図形 | p.100–115 | 教 P.160–185 | no | no |
+| 6章 空間図形 | p.116–137 | 教 P.194–221 | no | no |
+| 7章 データの分析と活用 | p.138–149 | 教 P.228–245 | no | no |
+| 1年のまとめ・重要事項のチェック | p.150–152 | — | no | no |
 
 **Every row below 1章 is derived from the 目次, not read off a folio.** The 目次
 lists only where each numbered section begins, and folds 確認テスト・C問題・

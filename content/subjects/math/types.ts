@@ -128,6 +128,7 @@ export type MathBlockInteractiveWidget =
   | "number-line-walk"
   | "card-game"
   | "number-line-plot"
+  | "number-line-points"
   | "signed-product"
   | "walk-rate"
   | "number-range-grid"

@@ -10,10 +10,15 @@ import {
 import type {
   MathNoteBlockQuestionSet,
   MathNotePart,
-  MathNoteQuestion
+  MathNoteQuestion,
+  MathNoteWidget
 } from "../../../../content/subjects/math/note/types";
+import { MagicSquareWidget } from "../blocks/MagicSquareWidget";
 import { NumberLinePlotWidget } from "../blocks/NumberLinePlotWidget";
 import { NumberLinePointsWidget } from "../blocks/NumberLinePointsWidget";
+import { NumberLineWalkReadWidget } from "../blocks/NumberLineWalkReadWidget";
+import { SubtractionFlipWidget } from "../blocks/SubtractionFlipWidget";
+import { TermSortWidget } from "../blocks/TermSortWidget";
 
 /**
  * One 小問.
@@ -156,6 +161,59 @@ function NotePart({
   );
 }
 
+/**
+ * Each widget family reads only its own config, so a question wired to a shape
+ * the widget does not understand renders nothing rather than crashing on a
+ * missing field.
+ */
+function renderWidget(widget: MathNoteWidget) {
+  switch (widget.kind) {
+    case "number-line-points":
+      return widget.numberLine ? (
+        <NumberLinePointsWidget
+          max={widget.numberLine.max}
+          min={widget.numberLine.min}
+          points={widget.numberLine.points}
+          step={widget.numberLine.step}
+        />
+      ) : null;
+    case "number-line-plot":
+      return widget.numberLine ? (
+        <NumberLinePlotWidget
+          max={widget.numberLine.max}
+          min={widget.numberLine.min}
+          step={widget.numberLine.step}
+          targets={widget.numberLine.points.map((point) => ({ value: point.value, label: point.label }))}
+        />
+      ) : null;
+    case "number-line-walk-read":
+      return widget.walkRead ? (
+        <NumberLineWalkReadWidget
+          example={widget.walkRead.example}
+          max={widget.walkRead.max}
+          min={widget.walkRead.min}
+          problems={widget.walkRead.problems}
+        />
+      ) : null;
+    case "subtraction-flip":
+      return widget.subtractionFlip ? (
+        <SubtractionFlipWidget
+          max={widget.subtractionFlip.max}
+          min={widget.subtractionFlip.min}
+          problems={widget.subtractionFlip.problems}
+        />
+      ) : null;
+    case "term-sort":
+      return widget.termSort ? <TermSortWidget problems={widget.termSort.problems} /> : null;
+    case "magic-square":
+      return widget.magicSquare ? (
+        <MagicSquareWidget answers={widget.magicSquare.answers} cells={widget.magicSquare.cells} />
+      ) : null;
+    default:
+      return null;
+  }
+}
+
 function NoteQuestionCard({
   question,
   onFirstAnswer
@@ -164,7 +222,6 @@ function NoteQuestionCard({
   onFirstAnswer: (partIndex: number, wasRight: boolean) => void;
 }) {
   const widget = question.widget;
-  const line = widget?.numberLine;
 
   return (
     <li className="note-question">
@@ -178,20 +235,7 @@ function NoteQuestionCard({
       <p className="note-question-prompt">{question.prompt}</p>
       {question.given ? <p className="note-question-given">{question.given}</p> : null}
 
-      {widget && line ? (
-        <div className="note-widget">
-          {widget.kind === "number-line-points" ? (
-            <NumberLinePointsWidget max={line.max} min={line.min} points={line.points} step={line.step} />
-          ) : widget.kind === "number-line-plot" ? (
-            <NumberLinePlotWidget
-              max={line.max}
-              min={line.min}
-              step={line.step}
-              targets={line.points.map((point) => ({ value: point.value, label: point.label }))}
-            />
-          ) : null}
-        </div>
-      ) : null}
+      {widget ? <div className="note-widget">{renderWidget(widget)}</div> : null}
 
       {question.parts?.length ? (
         <ul className="note-parts">

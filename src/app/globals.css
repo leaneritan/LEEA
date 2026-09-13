@@ -9270,6 +9270,11 @@ a.math-block-page:hover { text-decoration: underline; }
 }
 
 .note-section-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 26px; }
+/* 学習ノート section names are far longer than the textbook's ("分数や小数の加法
+   加法の交換法則と結合法則" vs "2節 加法と減法"), and the shared nav link is
+   `white-space: nowrap` — which pushed the next-section link off the side of a
+   phone. Let these wrap without touching the textbook's own nav. */
+.note-section-nav .math-nav-link { white-space: normal; max-width: 48%; text-align: left; line-height: 1.5; }
 
 /* Reading points off a number line — 学習ノート p.14 問1. */
 .math-readline-line { cursor: default; }
@@ -9293,8 +9298,123 @@ a.math-block-page:hover { text-decoration: underline; }
 .math-readline-field.is-wrong .math-readline-mark { color: #c06565; }
 
 @media (max-width: 640px) {
+  .note-section-nav { flex-direction: column; }
+  .note-section-nav .math-nav-link { max-width: 100%; justify-content: center; text-align: center; }
   .note-section-progress { margin-left: 0; width: 100%; }
   .note-row > a, .note-row--pending { flex-wrap: wrap; gap: 6px 10px; }
   .note-row-ref { width: 100%; padding-left: 32px; }
   .note-input { width: 140px; }
+}
+
+/* ── 学習ノート widgets: 加法・減法 (p.16–23) ──────────────────────────
+   These four carry the ideas of their pages rather than decorating them:
+   adding is walking, subtracting is the same walk with the second arrow
+   turned round, and a long mixed expression becomes short once the 項 are
+   gathered by sign. */
+
+/* Read the walk — p.16 問1 */
+.math-walkread { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.math-walkread-example {
+  width: 100%; padding: 10px 12px; border-radius: 12px; background: #fffdf7; border: 1.5px dashed #e3d9c6;
+}
+.math-walkread-example-tag {
+  display: inline-block; padding: 2px 9px; border-radius: 6px; background: #f0e2cd;
+  color: #8a6a2f; font-size: 11px; font-weight: 800;
+}
+.math-walkread-example-eq { margin: 4px 0 0; text-align: center; font-size: 14px; font-weight: 800; color: #5a4f3c; }
+
+.math-walkread-tabs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.math-walkread-tab {
+  min-height: 34px; padding: 6px 15px; border-radius: 99px; border: 2px solid #e3d9c6; background: #fff;
+  font: inherit; font-size: 13px; font-weight: 800; color: #6d5f47; cursor: pointer;
+}
+.math-walkread-tab.is-active { border-color: var(--m-accent); background: var(--m-tint); color: var(--m-dark); }
+.math-walkread-tab.is-correct { border-color: #7fb37c; color: #3d7a3a; }
+.math-walkread-tab.is-wrong { border-color: #d69b9b; color: #a85252; }
+
+.math-walkread-ask { margin: 0; font-size: 13px; font-weight: 700; color: #8a7a5c; }
+.math-walkread-eq { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; justify-content: center; font-size: 17px; font-weight: 800; color: #3f3627; }
+.math-walkread-signpair { display: inline-flex; gap: 3px; }
+.math-walkread-sign {
+  width: 34px; height: 34px; border-radius: 8px; border: 2px solid #e3d9c6; background: #fff;
+  font: inherit; font-size: 16px; font-weight: 900; color: #8a7a5c; cursor: pointer; line-height: 1;
+}
+.math-walkread-sign.is-picked { border-color: var(--m-accent); background: var(--m-tint); color: var(--m-dark); }
+.math-walkread-sign.is-correct { border-color: #7fb37c; background: #f2f9f1; color: #3d7a3a; }
+.math-walkread-num { min-width: 20px; text-align: center; }
+.math-walkread-input {
+  width: 96px; padding: 6px 10px; border-radius: 9px; border: 2px solid #e3d9c6; background: #fff;
+  font: inherit; font-size: 16px; font-weight: 800; color: #3f3627; text-align: center;
+}
+.math-walkread-input:focus { outline: none; border-color: var(--m-accent); }
+.math-walkread-input.is-correct { border-color: #7fb37c; background: #f2f9f1; }
+.math-walkread-input.is-wrong { border-color: #d69b9b; background: #fdf3f3; }
+.math-walkread-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+/* Flip the sign — p.20 */
+.math-flip { display: flex; flex-direction: column; gap: 12px; }
+.math-flip-rows { display: flex; flex-direction: column; gap: 10px; }
+.math-flip-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 9px 12px; border-radius: 10px; background: #fffdf7; border: 1.5px solid #efe7d8; }
+.math-flip-row.is-done { background: #f6f9f4; border-color: #d6e6d0; }
+.math-flip-step { flex: none; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; background: var(--m-accent); color: #fff; font-size: 12px; font-weight: 900; }
+.math-flip-eq { font-size: 16px; font-weight: 800; color: #3f3627; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.math-flip-eq mark { background: #fdf0d8; color: #a0653a; padding: 1px 5px; border-radius: 5px; }
+.math-flip-note { font-size: 11.5px; font-weight: 700; color: #a08e6c; }
+.math-flip-ask { font-size: 13.5px; font-weight: 700; color: #6d5f47; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.math-flip-choices { display: inline-flex; gap: 6px; }
+.math-flip-choice {
+  min-height: 34px; padding: 5px 14px; border-radius: 8px; border: 2px solid #e3d9c6; background: #fff;
+  font: inherit; font-size: 15px; font-weight: 800; color: #4a4133; cursor: pointer;
+}
+.math-flip-choice:hover { border-color: var(--m-accent); background: var(--m-tint); }
+.math-flip-controls { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+
+/* Sort the terms — p.18–19 and p.22–23 */
+.math-termsort { display: flex; flex-direction: column; gap: 12px; }
+.math-termsort-expression { margin: 0; text-align: center; font-size: 19px; font-weight: 900; color: #3f3627; letter-spacing: .03em; }
+.math-termsort-ask { margin: 0; text-align: center; font-size: 13px; font-weight: 700; color: #8a7a5c; }
+.math-termsort-pool { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.math-termsort-term { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 10px; border-radius: 10px; border: 2px solid #e3d9c6; background: #fff; }
+.math-termsort-term.is-placed { border-color: var(--m-accent); background: var(--m-tint); }
+.math-termsort-term.is-wrong { border-color: #d69b9b; background: #fdf3f3; }
+.math-termsort-value { font-size: 17px; font-weight: 900; color: #3f3627; }
+.math-termsort-buttons { display: flex; gap: 4px; }
+.math-termsort-pick {
+  width: 32px; height: 30px; border-radius: 7px; border: 1.5px solid #e3d9c6; background: #fff;
+  font: inherit; font-size: 12.5px; font-weight: 800; color: #a08e6c; cursor: pointer;
+}
+.math-termsort-pick.is-pos { border-color: #c9804f; background: #f8e9dc; color: #a05c30; }
+.math-termsort-pick.is-neg { border-color: #6f8fa8; background: #e4edf3; color: #42607a; }
+.math-termsort-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.math-termsort-column { padding: 11px 13px; border-radius: 12px; text-align: center; }
+.math-termsort-column h4 { margin: 0; font-size: 12.5px; font-weight: 800; }
+.math-termsort-column p { margin: 6px 0 0; font-size: 16px; font-weight: 800; color: #3f3627; }
+.math-termsort-column--pos { background: #f8e9dc; }
+.math-termsort-column--pos h4 { color: #a05c30; }
+.math-termsort-column--neg { background: #e4edf3; }
+.math-termsort-column--neg h4 { color: #42607a; }
+.math-termsort-total { display: inline-block; margin-top: 6px; font-size: 13px; font-weight: 900; color: #4a4133; }
+
+/* Magic square — p.23 B問1 */
+.math-magic { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.math-magic-grid { border-collapse: collapse; }
+.math-magic-grid td { width: 66px; height: 60px; border: 2px solid #c8bda2; text-align: center; padding: 0; }
+.math-magic-grid td.is-given { background: #f6f1e7; font-size: 18px; font-weight: 900; color: #4a4133; }
+.math-magic-grid input {
+  width: 100%; height: 100%; border: 0; background: transparent; text-align: center;
+  font: inherit; font-size: 18px; font-weight: 800; color: var(--m-dark);
+}
+.math-magic-grid input:focus { outline: 2px solid var(--m-accent); outline-offset: -2px; }
+.math-magic-grid input.is-wrong { background: #fdf3f3; color: #a85252; }
+.math-magic-lines { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px; width: 100%; max-width: 420px; }
+.math-magic-lines li { display: flex; justify-content: space-between; font-size: 12px; color: #a08e6c; padding: 3px 8px; border-radius: 6px; }
+.math-magic-lines li.is-ok { background: #eef5ea; color: #4d8b4a; font-weight: 800; }
+.math-magic-lines li.is-bad { background: #fdf3f3; color: #a85252; font-weight: 800; }
+.math-magic-hint { margin: 0; font-size: 12.5px; color: #8a7a5c; text-align: center; line-height: 1.7; }
+
+@media (max-width: 640px) {
+  .math-termsort-columns { grid-template-columns: 1fr; }
+  .math-magic-lines { grid-template-columns: 1fr; }
+  .math-magic-grid td { width: 56px; height: 54px; }
+  .math-walkread-eq { font-size: 15px; }
 }

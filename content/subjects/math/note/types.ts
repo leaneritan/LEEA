@@ -87,10 +87,15 @@ export type MathNoteQuestion = {
   widget?: MathNoteWidget;
 };
 
-/** A widget standing in for a question better done by touching than by typing. */
+/**
+ * A widget standing in for a question better done by touching than by typing.
+ *
+ * Each family carries its own config rather than one loose bag, so a widget
+ * cannot be wired to a shape it does not understand.
+ */
 export type MathNoteWidget = {
   kind: MathBlockInteractiveWidget;
-  /** Config for the number-line widgets. */
+  /** `number-line-points` and `number-line-plot`. */
   numberLine?: {
     min: number;
     max: number;
@@ -98,6 +103,38 @@ export type MathNoteWidget = {
     step?: number;
     /** Points to plot (plot mode) or to read off (points mode). */
     points: { label: string; value: number }[];
+  };
+  /**
+   * `number-line-walk-read` — the book draws two arrows and asks what addition
+   * they show. Each problem is the pair of moves, drawn from 0.
+   */
+  walkRead?: {
+    min: number;
+    max: number;
+    /** The worked example the book prints above the questions. */
+    example?: { moves: [number, number] };
+    problems: { label: string; moves: [number, number] }[];
+  };
+  /**
+   * `subtraction-flip` — a − b becomes a + (−b). Leo flips the sign himself and
+   * then walks the result, so the rule is something he does rather than recites.
+   */
+  subtractionFlip?: {
+    min: number;
+    max: number;
+    problems: { a: number; b: number }[];
+  };
+  /**
+   * `term-sort` — the move both 加法の計算法則 and 加減の混じった計算 turn on:
+   * split an expression into its 項, gather 正の項 and 負の項, total each side.
+   */
+  termSort?: {
+    problems: { expression: string; terms: number[] }[];
+  };
+  /** `magic-square` — 3x3, `cells` giving the printed numbers and null for blanks. */
+  magicSquare?: {
+    cells: (number | null)[];
+    answers: number[];
   };
 };
 

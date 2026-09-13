@@ -136,6 +136,21 @@ export type MathNoteWidget = {
     cells: (number | null)[];
     answers: number[];
   };
+  /**
+   * `drill` — a 特訓ドリル group, run against the clock.
+   *
+   * The timer is the book's own: every 特訓ドリル page prints
+   * 「全問解くのにかかった時間　分　秒」 at the top. Paper cannot start it,
+   * mark as you go, or bring the missed ones back, which is the whole reason
+   * this page is worth putting on a screen at all.
+   */
+  drill?: {
+    /** The yellow note the book prints under the group heading. */
+    hint?: string;
+    /** Where in the workbook the group drills, as the book's own back-reference. */
+    backRef?: string;
+    items: { expression: string; answer: string; accept?: string[]; note?: string; tag?: string }[];
+  };
 };
 
 /** The teaching box at the top of a 基本のページ. */
@@ -176,11 +191,18 @@ export type MathNoteBlockCarry = {
 export type MathNoteBlockIntro = {
   id: string;
   type: "intro";
-  number: number;
+  /** Absent on 特訓ドリル and 確認テスト, which the book does not number as 節. */
+  number?: number;
   title: string;
   /** WORKBOOK pages. */
   workbookPages: string;
-  textbookRef: string;
+  /**
+   * Absent on 特訓ドリル, which drills earlier WORKBOOK pages rather than
+   * practising a 教科書 range — its own header says 「3〜6 の内容を特訓!」.
+   */
+  textbookRef?: string;
+  /** Replaces the 教科書 line when the page has none, e.g. the 特訓ドリル badge. */
+  kicker?: string;
 };
 
 export type MathNoteBlock =
@@ -193,11 +215,15 @@ export type MathNoteBlock =
 export type MathNoteSection = {
   id: string;
   chapterKey: string;
-  number: number;
+  /** Absent on 特訓ドリル and 確認テスト, which the book does not number as 節. */
+  number?: number;
   title: string;
   /** WORKBOOK pages. */
   workbookPages: string;
-  textbookRef: string;
+  /** Absent on 特訓ドリル — see the intro block's note. */
+  textbookRef?: string;
+  /** Replaces the 教科書 line when the page has none. */
+  kicker?: string;
   blocks: MathNoteBlock[];
 };
 

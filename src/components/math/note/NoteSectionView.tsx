@@ -76,7 +76,8 @@ export function NoteSectionView({
           </span>
           <span className="math-topbar-chevron">›</span>
           <span className="math-topbar-section">
-            {section.number} {section.title}
+            {section.number ? `${section.number} ` : ""}
+            {section.title}
           </span>
         </div>
       </div>
@@ -86,12 +87,17 @@ export function NoteSectionView({
           <div>
             <span className="note-book-pill">数学の学習ノート</span>
             <h1>
-              {section.number}　{section.title}
+              {section.number ? `${section.number}　` : ""}
+              {section.title}
             </h1>
             <p className="note-section-pages">
               ワーク {section.workbookPages}
-              <span className="note-section-sep">／</span>
-              {section.textbookRef}
+              {section.textbookRef || section.kicker ? (
+                <>
+                  <span className="note-section-sep">／</span>
+                  {section.textbookRef ?? section.kicker}
+                </>
+              ) : null}
             </p>
           </div>
           <div className="note-section-progress">
@@ -111,14 +117,14 @@ export function NoteSectionView({
         <nav className="note-section-nav">
           {prev ? (
             <Link className="math-nav-link" href={`/math/note/${prev.id}`}>
-              ← {prev.number} {prev.name}
+              ← {prev.number ? `${prev.number} ` : ""}{prev.name}
             </Link>
           ) : (
             <span />
           )}
           {next ? (
             <Link className="math-nav-link math-nav-link--next" href={`/math/note/${next.id}`}>
-              {next.number} {next.name} →
+              {next.number ? `${next.number} ` : ""}{next.name} →
             </Link>
           ) : (
             <span />

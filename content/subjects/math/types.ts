@@ -133,6 +133,7 @@ export type MathBlockInteractiveWidget =
   | "subtraction-flip"
   | "term-sort"
   | "magic-square"
+  | "drill"
   | "signed-product"
   | "walk-rate"
   | "number-range-grid"

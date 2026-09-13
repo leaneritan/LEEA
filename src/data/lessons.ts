@@ -104,6 +104,7 @@ import tgGrammarCupLearner from "../../content/subjects/english/courses/special-
 // the deck's own practices and assessment are session-scored, not homework.
 import tgVerbTimeMachine from "../../content/subjects/english/courses/special-training/lessons/verb-time-machine.teacher.json";
 import level5Unit1Opener from "../../content/subjects/english/courses/our-world/level-5/unit-1/lessons/opener.teacher.json";
+import level5Unit1OpenerLearner from "../../content/subjects/english/courses/our-world/level-5/unit-1/lessons/opener-app.learner.json";
 import type { Lesson } from "./types";
 
 // Canonical within-unit teaching order. Lessons are always sorted by this
@@ -245,7 +246,8 @@ export const lessons: Lesson[] = [
   tgGrammarCup as Lesson,
   tgGrammarCupLearner as Lesson,
   tgVerbTimeMachine as Lesson,
-  level5Unit1Opener as Lesson
+  level5Unit1Opener as Lesson,
+  level5Unit1OpenerLearner as Lesson
 ].sort(compareLessonOrder);
 export const teacherLessons = lessons.filter((lesson) => lesson.mode === "teacher");
 export const learnerLessons = lessons.filter((lesson) => lesson.mode === "learner");

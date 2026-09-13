@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L5 U1 · Extreme Weather — Leo's App</title>
+<!-- Google Fonts must load non-blocking: this app runs inside a srcdoc iframe, and a
+     stalled cross-origin stylesheet can hang the whole document parser. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap"></noscript>
+<!-- window.LEEA_CLOUD is supplied by the cloud-sync bridge that LessonPage injects
+     ahead of this app's own script; a relative <script src> cannot resolve from
+     about:srcdoc, so the app never loads the cloud lib itself. -->
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --tl:#0D9488;--tld:#0F766E;--tll:#F0FDFA;
+  --ye:#FACC15;--yed:#A16207;--yel:#FEFCE8;
+  --pk:#DB2777;--pkl:#FDF2F8;
+  --gn:#16A34A;--gnd:#15803D;--gnl:#F0FDF4;
+  --bl:#2563EB;--bld:#1D4ED8;--bll:#EFF6FF;
+  --rd:#DC2626;--rdl:#FEE2E2;
+  --ink:#111111;--ink2:#374151;--ink3:#6B7280;
+  --paper:#FAFAF7;--surf:#FFFFFF;--bdr:#E5E7EB;
+  --fn:'Nunito',sans-serif;--fnh:'Oswald',sans-serif;
+}
+body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+.app-hdr{background:var(--ink);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.hdr-badge{background:var(--ye);color:var(--ink);font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;padding:2px 7px;border-radius:2px}
+.hdr-title{font-family:var(--fnh);font-size:.85rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hdr-unit{font-size:.7rem;font-weight:700;color:var(--tl)}
+.hero{background:linear-gradient(135deg,var(--tl),var(--tld));padding:20px 16px 16px;text-align:center}
+.hero-kick{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.72);margin-bottom:6px}
+.hero-title{font-family:var(--fnh);font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hero-title span{color:var(--ye)}
+.hero-sub{font-size:.78rem;color:rgba(255,255,255,.9);font-weight:600;margin-top:4px}
+.hero-em{font-size:1.3rem;margin-top:8px}
+.prog-wrap{background:rgba(0,0,0,.15);height:4px}
+.prog-fill{height:100%;background:var(--ye);transition:width .5s;width:0%}
+.hw-banner{background:var(--bll);border-bottom:2px solid var(--bl);padding:8px 16px;font-size:.8rem;font-weight:700;color:var(--bld);display:none;align-items:center;gap:8px}
+.home{max-width:680px;margin:0 auto;padding:16px 14px 80px}
+.sec-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--ink3);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mod-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px 13px 11px;cursor:pointer;transition:all .2s}
+.mod-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.1)}
+.mod-card.w:hover{border-color:var(--tl)}
+.mod-card.p:hover{border-color:var(--pk)}
+.mod-card.q:hover{border-color:var(--yed)}
+.mod-icon{font-size:1.5rem;margin-bottom:5px}
+.mod-name{font-weight:800;font-size:.82rem;color:var(--ink);margin-bottom:2px}
+.mod-desc{font-size:.7rem;color:var(--ink3);font-weight:600;line-height:1.4}
+.mod-badge{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;margin-top:7px;display:inline-block}
+.badge-new{background:var(--paper);color:var(--ink3);border:1px solid var(--bdr)}
+.badge-done{background:#D1FAE5;color:var(--gn)}
+.badge-prog{background:var(--yel);color:var(--yed)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;overflow-y:auto}
+.modal.open{display:block}
+.mbox{background:var(--surf);min-height:100vh;display:flex;flex-direction:column;max-width:680px;margin:0 auto}
+.mhd{padding:13px 14px;display:flex;align-items:center;gap:10px;color:#fff;position:sticky;top:0;z-index:20;flex-shrink:0}
+.mhd.tl{background:var(--tl)}.mhd.pk{background:var(--pk)}.mhd.gn{background:var(--gn)}.mhd.dk{background:var(--ink)}
+.mhd-title{font-weight:900;font-size:1rem;flex:1;letter-spacing:.3px;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.mhd-num{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:1px;opacity:.75}
+.mhd-close{background:rgba(255,255,255,.18);border:none;color:#fff;font-size:1rem;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:8px;line-height:1}
+.mhd-close:hover{background:rgba(255,255,255,.35)}
+.mbody{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--paper);overflow:auto}
+.task{background:#D1FAE5;border:2px solid #A7F3D0;border-radius:4px;padding:11px 13px;font-size:.82rem;font-weight:700;color:#065F46;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.task-icon{font-size:1.1rem;flex-shrink:0}
+.sent-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:12px}
+.def-text{font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.def-emo{font-size:1.6rem;margin-right:6px}
+.mcq-opts{display:flex;flex-direction:column;gap:7px}
+.mcq-opt{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.82rem;font-weight:700;cursor:pointer;text-align:left;transition:all .2s}
+.mcq-opt:hover:not(:disabled){background:var(--paper);border-color:var(--tl)}
+.mcq-opt.ok{background:#D1FAE5;border-color:var(--gn);color:var(--gn)}
+.mcq-opt.bad{background:var(--rdl);border-color:var(--rd);color:var(--rd);animation:shake .3s}
+.mcq-opt:disabled{cursor:not-allowed}
+.fb{font-size:.75rem;font-weight:700;padding:7px 11px;border-radius:4px;margin-top:7px;display:none;line-height:1.45}
+.fb.show{display:block}
+.fb.ok{background:#D1FAE5;color:#065F46}
+.fb.bad{background:var(--rdl);color:var(--rd)}
+.bin-btns{display:flex;gap:8px}
+.bin-btn{flex:1;padding:9px 6px;border:2px solid var(--bdr);border-radius:4px;font-family:var(--fn);font-size:.8rem;font-weight:800;cursor:pointer;transition:all .2s;text-align:center}
+.bin-btn.a{background:var(--bll);color:var(--bld);border-color:var(--bl)}
+.bin-btn.b{background:var(--yel);color:var(--yed);border-color:var(--ye)}
+.bin-btn.t{background:var(--gnl);color:var(--gnd);border-color:var(--gn)}
+.bin-btn.f{background:var(--rdl);color:var(--rd);border-color:var(--rd)}
+.bin-btn:disabled{opacity:.55;cursor:not-allowed}
+.bin-btn.ans-ok{background:#D1FAE5;border-color:var(--gn);color:var(--gn)}
+.bin-btn.ans-bad{background:var(--rdl);border-color:var(--rd);color:var(--rd);animation:shake .3s}
+.spell-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+.spell-inp{flex:1;border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.9rem;font-weight:700;color:var(--ink);outline:none}
+.spell-inp:focus{border-color:var(--tl)}
+.spell-inp.ok{border-color:var(--gn);background:#D1FAE5}
+.spell-inp.bad{border-color:var(--rd);background:var(--rdl)}
+.chk-btn{background:var(--tl);color:#fff;border:none;border-radius:4px;padding:9px 16px;font-family:var(--fn);font-size:.8rem;font-weight:800;cursor:pointer}
+.chk-btn:hover{background:var(--tld)}
+.hint-btn{background:transparent;border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-size:.75rem;font-weight:800;color:var(--ink3);cursor:pointer}
+.hint-btn:hover{border-color:var(--ye);color:var(--yed)}
+.write-ta{width:100%;border:2px solid var(--bdr);border-radius:4px;padding:11px 13px;font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--ink);background:var(--surf);resize:none;outline:none;min-height:110px;line-height:1.75}
+.write-ta:focus{border-color:var(--tl)}
+.reason-inp{width:100%;border:2px solid var(--bdr);border-radius:4px;padding:8px 11px;font-family:var(--fn);font-size:.8rem;font-weight:600;color:var(--ink);outline:none;margin-top:7px}
+.reason-inp:focus{border-color:var(--tl)}
+.wc{font-size:.72rem;font-weight:700;color:var(--ink3);text-align:right;margin-top:3px}
+.wc.met{color:var(--gn)}
+.bank{position:sticky;top:0;z-index:10;background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:8px 10px;box-shadow:0 3px 10px rgba(0,0,0,.07)}
+.bank-title{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:2px;color:var(--ink3);margin-bottom:6px}
+.bank-row{display:flex;flex-wrap:wrap;gap:5px}
+.bchip{border-radius:20px;padding:3px 11px;font-size:.75rem;font-weight:800;border:2px solid var(--tl);color:var(--tld);background:#fff}
+.qz-prog{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.qz-num{font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--ink3)}
+.qz-sc{font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--tl)}
+.qz-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px}
+.qz-q{font-size:.88rem;font-weight:800;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.result-box{text-align:center;padding:20px 10px}
+.result-score{font-family:var(--fnh);font-size:2.8rem;font-weight:700;color:var(--tl);line-height:1}
+.result-msg{font-size:.95rem;font-weight:800;color:var(--ink);margin-top:8px}
+.result-bullets{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+.result-bullet{border:1px solid var(--bdr);border-radius:4px;padding:7px 12px;font-size:.78rem;font-weight:700;text-align:left}
+.result-bullet.ok{background:#D1FAE5;border-color:var(--gn);color:#065F46}
+.result-bullet.bad{background:var(--rdl);border-color:var(--rd);color:var(--rd)}
+.score-mini{font-size:.78rem;font-weight:800;color:var(--tl);text-align:right}
+.save-ind{font-size:.68rem;font-weight:700;color:var(--gn);text-align:right;height:14px;opacity:0;transition:opacity .5s}
+.save-ind.show{opacity:1}
+.btn-row-bottom{display:flex;justify-content:space-between;align-items:stretch;gap:14px;margin-top:20px}
+.complete-btn{flex:1;padding:18px 20px;background:#16A34A;border:3px solid #15803D;border-radius:4px;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;color:#fff;transition:all .2s;text-align:center}
+.complete-btn:hover{background:#15803D;border-color:#14532D}
+.complete-btn.confirmed{background:#D1FAE5;border-color:#16A34A;color:#16A34A;cursor:default;pointer-events:none;opacity:.85}
+.reset-btn{pointer-events:auto !important;opacity:1 !important;flex:0 0 110px;padding:18px 14px;background:#fff;border:3px solid #DC2626;border-radius:4px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer;color:#DC2626;transition:all .2s;text-align:center;white-space:nowrap}
+.reset-btn:hover{background:#DC2626;color:#fff}
+.review-screen{display:none;min-height:100vh;background:var(--paper)}
+.review-screen.show{display:block}
+.rv-hdr{background:var(--tld);padding:14px 16px;color:#fff}
+.rv-title{font-family:var(--fnh);font-size:.95rem;font-weight:700;letter-spacing:1px}
+.rv-sub{font-size:.72rem;color:rgba(255,255,255,.75);font-weight:600;margin-top:2px}
+.rv-body{padding:14px;max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.rv-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px}
+.rv-lbl{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;color:var(--ink3);margin-bottom:8px}
+.rv-val{font-size:.85rem;font-weight:700;color:var(--ink);line-height:1.6;white-space:pre-wrap}
+.rv-score-big{font-family:var(--fnh);font-size:2.5rem;font-weight:700;color:var(--tl)}
+.rv-not-started{text-align:center;padding:40px 20px;font-size:.9rem;font-weight:700;color:var(--ink3)}
+.goal-anim{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:3.5rem;z-index:1000;pointer-events:none;transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.goal-anim.show{transform:translate(-50%,-50%) scale(1)}
+.cp{position:fixed;width:9px;height:9px;border-radius:2px;pointer-events:none;animation:cf 1.5s linear forwards;z-index:999}
+@keyframes cf{0%{transform:translateY(-10px) rotate(0)}100%{transform:translateY(100vh) rotate(720deg) translateX(var(--drift));opacity:0}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-5px)}50%{transform:translateX(5px)}}
+</style>
+</head>
+<body>
+
+<div class="review-screen" id="reviewScreen">
+  <div class="rv-hdr">
+    <div class="rv-title">📋 Review Mode — Leo's Solo Work</div>
+    <div class="rv-sub">Level 5 · Unit 1 · Extreme Weather (Unit Opener)</div>
+  </div>
+  <div class="rv-body" id="reviewBody"></div>
+</div>
+
+<div class="goal-anim" id="goalAnim">🌪️ YES!</div>
+
+<div id="appRoot">
+<div class="app-hdr">
+  <div class="hdr-left"><div class="hdr-badge">LEEA</div><div class="hdr-title">LEO'S SOLO WORK</div></div>
+  <div class="hdr-unit">L5 · U1 🌪️</div>
+</div>
+<div id="hwBanner" class="hw-banner"></div>
+<div class="hero">
+  <div class="hero-kick">OUR WORLD · LEVEL 5 · UNIT 1 · UNIT OPENER</div>
+  <div class="hero-title">🌪️ Extreme <span>Weather</span></div>
+  <div class="hero-sub">Now do it on your own — no slides!</div>
+  <div class="hero-em">🌾 ☁️ 🌀 ⚠️ ⛈️</div>
+</div>
+<div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
+
+<div class="home">
+  <div class="sec-lbl">📗 THE WORDS</div>
+  <div class="mod-grid">
+    <div class="mod-card w" data-open="m1">
+      <div class="mod-icon">🎯</div><div class="mod-name">Name That Word</div>
+      <div class="mod-desc">Read the meaning — choose the word</div>
+      <div class="mod-badge badge-new" id="badge-m1">NOT STARTED</div>
+    </div>
+    <div class="mod-card w" data-open="m2">
+      <div class="mod-icon">⌨️</div><div class="mod-name">Spell It</div>
+      <div class="mod-desc">Type the word yourself — no options!</div>
+      <div class="mod-badge badge-new" id="badge-m2">NOT STARTED</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">📸 THE PHOTO — pp. 6–7</div>
+  <div class="mod-grid">
+    <div class="mod-card p" data-open="m3">
+      <div class="mod-icon">🔍</div><div class="mod-name">See It or Guess It?</div>
+      <div class="mod-desc">Which ones can you really see?</div>
+      <div class="mod-badge badge-new" id="badge-m3">NOT STARTED</div>
+    </div>
+    <div class="mod-card p" data-open="m4">
+      <div class="mod-icon">⚖️</div><div class="mod-name">True or False</div>
+      <div class="mod-desc">Decide — and type your reason</div>
+      <div class="mod-badge badge-new" id="badge-m4">NOT STARTED</div>
+    </div>
+    <div class="mod-card p" data-open="m5">
+      <div class="mod-icon">☁️</div><div class="mod-name">Describe the Cloud</div>
+      <div class="mod-desc">Write 3 words about it</div>
+      <div class="mod-badge badge-new" id="badge-m5">NOT STARTED</div>
+    </div>
+    <div class="mod-card p" data-open="m6">
+      <div class="mod-icon">🚗</div><div class="mod-name">In the Car</div>
+      <div class="mod-desc">You're in the photo. Write about it.</div>
+      <div class="mod-badge badge-new" id="badge-m6">NOT STARTED</div>
+    </div>
+    <div class="mod-card p" data-open="m7" style="grid-column:1/-1">
+      <div class="mod-icon">🌤️</div><div class="mod-name">My Weather</div>
+      <div class="mod-desc">What weather do you like? Say why.</div>
+      <div class="mod-badge badge-new" id="badge-m7">NOT STARTED</div>
+    </div>
+    <div class="mod-card q" data-open="m8" style="grid-column:1/-1">
+      <div class="mod-icon">⚽</div><div class="mod-name">Can Leo Score?</div>
+      <div class="mod-desc">8 questions — 80% to score the goal!</div>
+      <div class="mod-badge badge-new" id="badge-m8">FINAL QUIZ</div>
+    </div>
+  </div>
+</div>
+</div><!-- /appRoot -->
+
+<!-- M1 -->
+<div class="modal" id="m1"><div class="mbox">
+<div class="mhd tl"><div class="mhd-title">🎯 Name That Word</div><div class="mhd-num">1 / 8</div><button class="mhd-close" data-close="m1" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="task"><div class="task-icon">📋</div><div>Read the meaning. Choose the word that matches. 8 questions.</div></div>
+  <div id="m1-q"></div>
+  <div class="score-mini" id="m1-score" style="display:none"></div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m1" data-complete="m1">Mark Name That Word complete ✓</button>
+    <button class="reset-btn" data-reset="m1">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- M2 -->
+<div class="modal" id="m2"><div class="mbox">
+<div class="mhd tl"><div class="mhd-title">⌨️ Spell It</div><div class="mhd-num">2 / 8</div><button class="mhd-close" data-close="m2" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="task"><div class="task-icon">📋</div><div>No word bank this time. Read the meaning and <strong>type the word</strong>. Stuck? Tap 💡 for the first letter.</div></div>
+  <div id="m2-q"></div>
+  <div class="score-mini" id="m2-score" style="display:none"></div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m2" data-complete="m2">Mark Spell It complete ✓</button>
+    <button class="reset-btn" data-reset="m2">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- M3 -->
+<div class="modal" id="m3"><div class="mbox">
+<div class="mhd pk"><div class="mhd-title">🔍 See It or Guess It?</div><div class="mhd-num">3 / 8</div><button class="mhd-close" data-close="m3" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="task"><div class="task-icon">📋</div><div>Look at the photo on pages 6–7. For each sentence: can you really <strong>see</strong> it in the photo, or are you <strong>guessing</strong>?</div></div>
+  <div id="m3-q"></div>
+  <div class="score-mini" id="m3-score" style="display:none"></div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m3" data-complete="m3">Mark See It or Guess It complete ✓</button>
+    <button class="reset-btn" data-reset="m3">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- M4 -->
+<div class="modal" id="m4"><div class="mbox">
+<div class="mhd pk"><div class="mhd-title">⚖️ True or False</div><div class="mhd-num">4 / 8</div><button class="mhd-close" data-close="m4" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="task"><div class="task-icon">📋</div><div>Decide TRUE or FALSE from the photo. Then <strong>type your reason</strong> — Dad will read it.</div></div>
+  <div id="m4-q"></div>
+  <div class="score-mini" id="m4-score" style="display:none"></div>
+  <div class="save-ind" id="m4-saved">✅ Saved!</div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m4" data-complete="m4">Mark True or False complete ✓</button>
+    <button class="reset-btn" data-reset="m4">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- M5 -->
+<div class="modal" id="m5"><div class="mbox">
+<div class="mhd pk"><div class="mhd-title">☁️ Describe the Cloud</div><div class="mhd-num">5 / 8</div><button class="mhd-close" data-close="m5" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="task"><div class="task-icon">📋</div><div>Look at the big cloud in the photo. Write <strong>3 different words</strong> that describe it — one in each box.</div></div>
+  <div class="sent-card">
+    <div class="def-text">The cloud is&hellip;</div>
+    <div class="spell-row"><span style="font-weight:900;color:var(--ink3)">1.</span><input class="spell-inp" id="m5-a" placeholder="word 1" data-w="m5"></div>
+    <div class="spell-row"><span style="font-weight:900;color:var(--ink3)">2.</span><input class="spell-inp" id="m5-b" placeholder="word 2" data-w="m5"></div>
+    <div class="spell-row"><span style="font-weight:900;color:var(--ink3)">3.</span><input class="spell-inp" id="m5-c" placeholder="word 3" data-w="m5"></div>
+    <div class="fb" id="m5-fb"></div>
+  </div>
+  <div class="save-ind" id="m5-saved">✅ Saved!</div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m5" data-complete="m5">Mark Describe the Cloud complete ✓</button>
+    <button class="reset-btn" data-reset="m5">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- M6 -->
+<div class="modal" id="m6"><div class="mbox">
+<div class="mhd pk"><div class="mhd-title">🚗 In the Car</div><div class="mhd-num">6 / 8</div><button class="mhd-close" data-close="m6" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="bank">
+    <div class="bank-title">WORDS YOU COULD USE</div>
+    <div class="bank-row"><span class="bchip">field</span><span class="bchip">cloud</span><span class="bchip">rotate</span><span class="bchip">dangerous</span><span class="bchip">extreme</span></div>
+  </div>
+  <div class="task"><div class="task-icon">📋</div><div>You are in one of the cars in the photo. Answer all four questions in your writing.</div></div>
+  <div class="sent-card">
+    <div class="def-text">1️⃣ Why are you on that road?<br>2️⃣ What are you thinking?<br>3️⃣ How do you feel?<br>4️⃣ What do you want to do next?</div>
+  </div>
+  <textarea class="write-ta" id="m6-ta" placeholder="I'm driving..." data-w="m6"></textarea>
+  <div class="wc" id="m6-wc">Words: 0 · aim for 25–60 words</div>
+  <div class="save-ind" id="m6-saved">✅ Saved!</div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m6" data-complete="m6">Mark In the Car complete ✓</button>
+    <button class="reset-btn" data-reset="m6">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- M7 -->
+<div class="modal" id="m7"><div class="mbox">
+<div class="mhd pk"><div class="mhd-title">🌤️ My Weather</div><div class="mhd-num">7 / 8</div><button class="mhd-close" data-close="m7" title="Just close">✕</button></div>
+<div class="mbody">
+  <div class="task"><div class="task-icon">📋</div><div>What type of weather do you like? Write 2 or 3 sentences. You <strong>must</strong> give a reason.</div></div>
+  <div class="sent-card">
+    <div class="def-text">Try this shape:</div>
+    <div style="font-size:.82rem;font-weight:700;color:var(--ink2);line-height:1.8">
+      I like when it&rsquo;s ______ .<br>I can ______ .<br>______ keeps me ______ .</div>
+  </div>
+  <textarea class="write-ta" id="m7-ta" style="min-height:130px" placeholder="I like when it's..." data-w="m7"></textarea>
+  <div class="wc" id="m7-wc">Words: 0 · aim for 20–50 words</div>
+  <div class="fb" id="m7-fb"></div>
+  <div class="save-ind" id="m7-saved">✅ Saved!</div>
+  <div class="btn-row-bottom">
+    <button class="complete-btn" id="cbtn-m7" data-complete="m7">Mark My Weather complete ✓</button>
+    <button class="reset-btn" data-reset="m7">↺ Redo</button>
+  </div>
+</div></div></div>
+
+<!-- M8 -->
+<div class="modal" id="m8"><div class="mbox">
+<div class="mhd dk"><div class="mhd-title">⚽ Can Leo Score?</div><div class="mhd-num">8 / 8</div><button class="mhd-close" data-close="m8" title="Just close">✕</button></div>
+<div class="mbody" id="m8-body">
+  <div class="task"><div class="task-icon">📋</div><div>8 questions. You need 7/8 (80%) to score the goal! ⚽</div></div>
+  <div id="m8-quiz"></div>
+  <div id="m8-result" style="display:none"></div>
+</div></div></div>
+
+<script>
+/* ═══════ LEEA SAVE STANDARD ═══════ */
+const SAVE_PREFIX = '5-1-opener-';
+const HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-5-1-opener';
+const isReview    = new URLSearchParams(location.search).get('review') === '1';
+
+function lSave(key, val){
+  try{ localStorage.setItem('leea-' + key, JSON.stringify(val)); }catch(e){}
+  try{ if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && LEEA_CLOUD.enabled) LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val); }catch(e){}
+}
+function lLoad(key, fb){
+  if (fb === undefined) fb = null;
+  try{ const v = localStorage.getItem('leea-' + key); return v !== null ? JSON.parse(v) : fb; }catch(e){ return fb; }
+}
+async function restoreProgressFromCloud(){
+  try{
+    if (typeof LEEA_CLOUD === 'undefined' || !LEEA_CLOUD || !LEEA_CLOUD.enabled) return;
+    const rows = await LEEA_CLOUD.fetchProgress(HOMEWORK_ID);
+    if (!rows) return;
+    rows.forEach(function(r){ try{ localStorage.setItem('leea-' + r.storage_key, JSON.stringify(r.value)); }catch(e){} });
+  }catch(e){ console.warn('cloud restore', e); }
+}
+function saveScore(score, total, done, extra){
+  const data = Object.assign({ score:score, total:total, percent:Math.round(score/total*100), done:done, timestamp:new Date().toISOString() }, extra || {});
+  lSave(SAVE_PREFIX + 'score', data);
+  lSave(HOMEWORK_ID + '-score', data);
+  if (done){ lSave(SAVE_PREFIX + 'done', true); lSave(HOMEWORK_ID + '-done', true); }
+}
+const MOD_NAMES = { m1:'Name That Word', m2:'Spell It', m3:'See It or Guess It', m4:'True or False',
+                    m5:'Describe the Cloud', m6:'In the Car', m7:'My Weather', m8:'Can Leo Score' };
+const WB = { m8:'FINAL QUIZ' };
+
+function updateBadge(id, state){
+  try{
+    const el = document.getElementById('badge-' + id);
+    if (!el) return;
+    el.className = 'mod-badge ' + (state==='done'?'badge-done':state==='prog'?'badge-prog':'badge-new');
+    el.textContent = state==='done'?'✅ DONE':state==='prog'?'▶ IN PROGRESS':(WB[id]||'NOT STARTED');
+    const pf = document.getElementById('progFill');
+    if (pf){
+      const n = Object.keys(MOD_NAMES).filter(function(m){
+        const b = document.getElementById('badge-'+m); return b && b.classList.contains('badge-done'); }).length;
+      pf.style.width = (n/Object.keys(MOD_NAMES).length*100) + '%';
+    }
+  }catch(e){ console.warn('updateBadge', e); }
+}
+function showSaveInd(id){
+  try{ const el=document.getElementById(id+'-saved'); if(!el) return;
+    el.classList.add('show'); setTimeout(function(){ el.classList.remove('show'); },1600);
+  }catch(e){}
+}
+function countWords(t){ return (t||'').trim().split(/\s+/).filter(function(w){return w.length>0;}).length; }
+function norm(s){ return (s||'').toLowerCase().trim().replace(/^(a|an|the)\s+/,'').replace(/[^a-z]/g,''); }
+
+/* ═══════ M1 · MEANING → WORD ═══════ */
+const WORDS = [
+  { w:'field',     e:'🌾', d:'a wide, open piece of land' },
+  { w:'cloud',     e:'☁️', d:'water in the sky' },
+  { w:'rotate',    e:'🌀', d:'to turn around and around' },
+  { w:'dangerous', e:'⚠️', d:'able to hurt or harm you' },
+  { w:'extreme',   e:'🌪️', d:'very serious, much more than normal — and not safe' },
+  { w:'supercell', e:'⛈️', d:'a huge storm whose winds rotate over a large area for hours' },
+  { w:'analyze',   e:'🔍', d:'to look closely and work out what something tells you' },
+  { w:'evaluate',  e:'⚖️', d:'to think carefully and decide if something is true' }
+];
+const M1_OPTS = [
+  ['field','cloud','supercell'], ['cloud','field','rotate'], ['rotate','evaluate','extreme'],
+  ['dangerous','extreme','analyze'], ['extreme','dangerous','cloud'], ['supercell','cloud','field'],
+  ['analyze','evaluate','rotate'], ['evaluate','analyze','dangerous']
+];
+function initM1(){
+  try{
+    const box = document.getElementById('m1-q'); if(!box) return;
+    box.innerHTML = '';
+    WORDS.forEach(function(item, i){
+      const opts = M1_OPTS[i];
+      const d = document.createElement('div');
+      d.className = 'sent-card'; d.id = 'm1-c'+i;
+      d.innerHTML = '<div class="def-text"><span class="def-emo">'+item.e+'</span>'+item.d+'</div>'+
+        '<div class="mcq-opts" id="m1-o'+i+'">'+
+        opts.map(function(o,j){ return '<button class="mcq-opt" data-m1="'+i+'" data-j="'+j+'">'+String.fromCharCode(65+j)+') '+o+'</button>'; }).join('')+
+        '</div><div class="fb" id="m1-f'+i+'"></div>';
+      box.appendChild(d);
+    });
+    const saved = lLoad(SAVE_PREFIX+'m1-ans', null);
+    if (saved) saved.forEach(function(a,i){ if(a!==null&&a!==undefined) markM1(i,a); });
+    const sc = lLoad(SAVE_PREFIX+'m1-score', null);
+    if (sc) showMini('m1', sc.score, WORDS.length);
+  }catch(e){ console.warn('initM1', e); }
+}
+function markM1(i, j){
+  try{
+    const box = document.getElementById('m1-o'+i); if(!box) return;
+    const opts = box.querySelectorAll('.mcq-opt');
+    const ok = j === 0 ? true : false;
+    const correctIdx = M1_OPTS[i].indexOf(WORDS[i].w);
+    const isOk = j === correctIdx;
+    opts.forEach(function(o){ o.disabled = true; });
+    if (opts[j]) opts[j].classList.add(isOk?'ok':'bad');
+    if (!isOk && opts[correctIdx]) opts[correctIdx].classList.add('ok');
+    const fb = document.getElementById('m1-f'+i);
+    if (fb){
+      fb.className = 'fb show ' + (isOk?'ok':'bad');
+      fb.textContent = isOk ? '✅ Yes — '+WORDS[i].w+'.' : '❌ The answer is "'+WORDS[i].w+'". '+WORDS[i].d+'.';
+    }
+  }catch(e){ console.warn('markM1', e); }
+}
+function answerM1(i, j){
+  try{
+    const ans = lLoad(SAVE_PREFIX+'m1-ans', new Array(WORDS.length).fill(null));
+    if (ans[i]!==null && ans[i]!==undefined) return;
+    ans[i] = j; lSave(SAVE_PREFIX+'m1-ans', ans);
+    markM1(i,j);
+    const done = ans.filter(function(a){return a!==null&&a!==undefined;}).length;
+    if (done === WORDS.length){
+      const score = ans.filter(function(a,k){ return a === M1_OPTS[k].indexOf(WORDS[k].w); }).length;
+      lSave(SAVE_PREFIX+'m1-score', {score:score,total:WORDS.length});
+      showMini('m1', score, WORDS.length);
+      updateBadge('m1', score>=6?'done':'prog');
+      if (score===WORDS.length) launchConfetti();
+    } else updateBadge('m1','prog');
+  }catch(e){ console.warn('answerM1', e); }
+}
+function showMini(m, s, t){
+  const el = document.getElementById(m+'-score');
+  if (el){ el.style.display='block'; el.textContent = 'Score: '+s+'/'+t+' 🌪️'; }
+}
+
+/* ═══════ M2 · SPELL IT ═══════ */
+const SPELL = [WORDS[0], WORDS[1], WORDS[2], WORDS[3], WORDS[4], WORDS[5]];
+function initM2(){
+  try{
+    const box = document.getElementById('m2-q'); if(!box) return;
+    box.innerHTML = '';
+    SPELL.forEach(function(item,i){
+      const d = document.createElement('div');
+      d.className='sent-card';
+      d.innerHTML = '<div class="def-text"><span class="def-emo">'+item.e+'</span>'+item.d+'</div>'+
+        '<div class="spell-row">'+
+          '<input class="spell-inp" id="m2-i'+i+'" placeholder="type the word..." autocomplete="off">'+
+          '<button class="hint-btn" data-hint="'+i+'">💡</button>'+
+          '<button class="chk-btn" data-m2="'+i+'">Check</button>'+
+        '</div><div class="fb" id="m2-f'+i+'"></div>';
+      box.appendChild(d);
+    });
+    const saved = lLoad(SAVE_PREFIX+'m2-ans', null);
+    if (saved) saved.forEach(function(a,i){ if(a){ const el=document.getElementById('m2-i'+i); if(el) el.value=a; checkM2(i,true); } });
+    const sc = lLoad(SAVE_PREFIX+'m2-score', null);
+    if (sc) showMini('m2', sc.score, SPELL.length);
+  }catch(e){ console.warn('initM2', e); }
+}
+function checkM2(i, restoring){
+  try{
+    const el = document.getElementById('m2-i'+i); if(!el) return;
+    const val = el.value;
+    if (!val.trim() && !restoring) return;
+    const ok = norm(val) === norm(SPELL[i].w);
+    el.classList.remove('ok','bad'); el.classList.add(ok?'ok':'bad');
+    el.disabled = true;
+    const fb = document.getElementById('m2-f'+i);
+    if (fb){
+      fb.className='fb show '+(ok?'ok':'bad');
+      fb.textContent = ok ? '✅ Correct — '+SPELL[i].w+'.' : '❌ You wrote "'+val.trim()+'". The word is "'+SPELL[i].w+'".';
+    }
+    if (!restoring){
+      const ans = lLoad(SAVE_PREFIX+'m2-ans', new Array(SPELL.length).fill(''));
+      ans[i] = val; lSave(SAVE_PREFIX+'m2-ans', ans);
+      const done = ans.filter(function(a){return a&&a.trim();}).length;
+      if (done === SPELL.length){
+        const score = ans.filter(function(a,k){ return norm(a)===norm(SPELL[k].w); }).length;
+        lSave(SAVE_PREFIX+'m2-score', {score:score,total:SPELL.length});
+        showMini('m2', score, SPELL.length);
+        updateBadge('m2', score>=4?'done':'prog');
+        if (score===SPELL.length) launchConfetti();
+      } else updateBadge('m2','prog');
+    }
+  }catch(e){ console.warn('checkM2', e); }
+}
+function hintM2(i){
+  try{
+    const el = document.getElementById('m2-i'+i);
+    if (!el || el.disabled) return;
+    const w = SPELL[i].w;
+    const shown = el.value.trim().length;
+    el.value = w.substring(0, Math.min(shown+1, w.length-1) || 1);
+    el.focus();
+  }catch(e){}
+}
+
+/* ═══════ M3 · SEE IT OR GUESS IT ═══════ */
+const M3 = [
+  { s:'There are some cars on the road.',        a:'see',   why:'You can see the cars in the photo.' },
+  { s:'The driver is feeling frightened.',       a:'guess', why:'You cannot see feelings. That is a guess.' },
+  { s:'There is a very big cloud.',              a:'see',   why:'The cloud is right there in the photo.' },
+  { s:'The storm will hit in ten minutes.',      a:'guess', why:'Nothing in the photo tells you the time.' },
+  { s:'There is a field beside the road.',       a:'see',   why:'The open land is visible.' },
+  { s:'It is raining heavily right now.',        a:'guess', why:'Look at the ground — it is dry. The rain has not started.' }
+];
+function initM3(){
+  try{
+    const box = document.getElementById('m3-q'); if(!box) return;
+    box.innerHTML='';
+    M3.forEach(function(item,i){
+      const d=document.createElement('div'); d.className='sent-card'; d.id='m3-c'+i;
+      d.innerHTML='<div class="def-text">'+item.s+'</div>'+
+        '<div class="bin-btns">'+
+          '<button class="bin-btn a" data-m3="'+i+'" data-v="see">👀 I CAN SEE IT</button>'+
+          '<button class="bin-btn b" data-m3="'+i+'" data-v="guess">💭 I AM GUESSING</button>'+
+        '</div><div class="fb" id="m3-f'+i+'"></div>';
+      box.appendChild(d);
+    });
+    const saved=lLoad(SAVE_PREFIX+'m3-ans',null);
+    if (saved) saved.forEach(function(a,i){ if(a) markM3(i,a); });
+    const sc=lLoad(SAVE_PREFIX+'m3-score',null);
+    if (sc) showMini('m3', sc.score, M3.length);
+  }catch(e){ console.warn('initM3', e); }
+}
+function markM3(i,v){
+  try{
+    const card=document.getElementById('m3-c'+i); if(!card) return;
+    const ok = v === M3[i].a;
+    card.querySelectorAll('.bin-btn').forEach(function(b){
+      b.disabled=true;
+      const bv=b.getAttribute('data-v');
+      if (bv===v) b.classList.add(ok?'ans-ok':'ans-bad');
+      if (!ok && bv===M3[i].a) b.classList.add('ans-ok');
+    });
+    const fb=document.getElementById('m3-f'+i);
+    if (fb){ fb.className='fb show '+(ok?'ok':'bad'); fb.textContent=(ok?'✅ ':'❌ ')+M3[i].why; }
+  }catch(e){ console.warn('markM3', e); }
+}
+function answerM3(i,v){
+  try{
+    const ans=lLoad(SAVE_PREFIX+'m3-ans',new Array(M3.length).fill(null));
+    if (ans[i]) return;
+    ans[i]=v; lSave(SAVE_PREFIX+'m3-ans',ans);
+    markM3(i,v);
+    const done=ans.filter(function(a){return a;}).length;
+    if (done===M3.length){
+      const score=ans.filter(function(a,k){return a===M3[k].a;}).length;
+      lSave(SAVE_PREFIX+'m3-score',{score:score,total:M3.length});
+      showMini('m3',score,M3.length);
+      updateBadge('m3', score>=5?'done':'prog');
+      if (score===M3.length) launchConfetti();
+    } else updateBadge('m3','prog');
+  }catch(e){ console.warn('answerM3', e); }
+}
+
+/* ═══════ M4 · TRUE OR FALSE + REASON ═══════ */
+const M4 = [
+  { s:"There's a storm cloud in the sky.", a:true,  why:'The big dark tilted cloud is a storm cloud.' },
+  { s:'The trees are covered in ice.',     a:false, why:'There is no ice anywhere in the photo.' },
+  { s:"It's raining heavily.",             a:false, why:'The rain has not started — the ground is dry.' },
+  { s:"It's safe to be outside.",          a:false, why:'A supercell is dangerous. It is not safe.' }
+];
+function initM4(){
+  try{
+    const box=document.getElementById('m4-q'); if(!box) return;
+    box.innerHTML='';
+    M4.forEach(function(item,i){
+      const d=document.createElement('div'); d.className='sent-card'; d.id='m4-c'+i;
+      d.innerHTML='<div class="def-text">'+(i+1)+'. '+item.s+'</div>'+
+        '<div class="bin-btns">'+
+          '<button class="bin-btn t" data-m4="'+i+'" data-v="T">✅ TRUE</button>'+
+          '<button class="bin-btn f" data-m4="'+i+'" data-v="F">❌ FALSE</button>'+
+        '</div><div class="fb" id="m4-f'+i+'"></div>'+
+        '<input class="reason-inp" id="m4-r'+i+'" placeholder="Why? Type your reason..." data-w="m4">';
+      box.appendChild(d);
+    });
+    const saved=lLoad(SAVE_PREFIX+'m4-ans',null);
+    if (saved) saved.forEach(function(a,i){ if(a) markM4(i,a); });
+    for (let i=0;i<M4.length;i++){
+      const r=document.getElementById('m4-r'+i);
+      if (r) r.value = lLoad(SAVE_PREFIX+'m4-r'+i,'');
+    }
+    const sc=lLoad(SAVE_PREFIX+'m4-score',null);
+    if (sc) showMini('m4', sc.score, M4.length);
+  }catch(e){ console.warn('initM4', e); }
+}
+function markM4(i,v){
+  try{
+    const card=document.getElementById('m4-c'+i); if(!card) return;
+    const ok = (v==='T') === M4[i].a;
+    card.querySelectorAll('.bin-btn').forEach(function(b){
+      b.disabled=true;
+      const bv=b.getAttribute('data-v');
+      if (bv===v) b.classList.add(ok?'ans-ok':'ans-bad');
+      if (!ok && ((bv==='T')===M4[i].a)) b.classList.add('ans-ok');
+    });
+    const fb=document.getElementById('m4-f'+i);
+    if (fb){ fb.className='fb show '+(ok?'ok':'bad');
+      fb.textContent=(ok?'✅ ':'❌ It is '+(M4[i].a?'TRUE':'FALSE')+'. ')+M4[i].why+' Now type your own reason below. ✍️'; }
+  }catch(e){ console.warn('markM4', e); }
+}
+function answerM4(i,v){
+  try{
+    const ans=lLoad(SAVE_PREFIX+'m4-ans',new Array(M4.length).fill(null));
+    if (ans[i]) return;
+    ans[i]=v; lSave(SAVE_PREFIX+'m4-ans',ans);
+    markM4(i,v);
+    const done=ans.filter(function(a){return a;}).length;
+    if (done===M4.length){
+      const score=ans.filter(function(a,k){return (a==='T')===M4[k].a;}).length;
+      lSave(SAVE_PREFIX+'m4-score',{score:score,total:M4.length});
+      showMini('m4',score,M4.length);
+    }
+    m4Badge();
+  }catch(e){ console.warn('answerM4', e); }
+}
+function m4Save(){
+  try{
+    for (let i=0;i<M4.length;i++){
+      const r=document.getElementById('m4-r'+i);
+      if (r) lSave(SAVE_PREFIX+'m4-r'+i, r.value);
+    }
+    showSaveInd('m4'); m4Badge();
+  }catch(e){}
+}
+function m4Badge(){
+  try{
+    const ans=lLoad(SAVE_PREFIX+'m4-ans',new Array(M4.length).fill(null));
+    const picked=ans.filter(function(a){return a;}).length;
+    let reasons=0;
+    for (let i=0;i<M4.length;i++){ const r=document.getElementById('m4-r'+i); if (r && r.value.trim()) reasons++; }
+    if (picked===M4.length && reasons===M4.length) updateBadge('m4','done');
+    else if (picked || reasons) updateBadge('m4','prog');
+  }catch(e){}
+}
+
+/* ═══════ M5 · DESCRIBE THE CLOUD ═══════ */
+function m5Save(){
+  try{
+    const vals = ['m5-a','m5-b','m5-c'].map(function(id){
+      const el=document.getElementById(id); return el?el.value:''; });
+    vals.forEach(function(v,i){ lSave(SAVE_PREFIX+['m5-a','m5-b','m5-c'][i], v); });
+    const filled = vals.filter(function(v){return v.trim();}).length;
+    const uniq = new Set(vals.map(function(v){return norm(v);}).filter(function(v){return v;})).size;
+    const fb=document.getElementById('m5-fb');
+    if (fb){
+      if (filled===3 && uniq===3){ fb.className='fb show ok'; fb.textContent='✅ Three different words. Nice describing!'; }
+      else if (filled===3 && uniq<3){ fb.className='fb show bad'; fb.textContent='💡 Two of your words are the same. Try three DIFFERENT words.'; }
+      else fb.className='fb';
+    }
+    showSaveInd('m5');
+    updateBadge('m5', (filled===3&&uniq===3)?'done':filled?'prog':'new');
+  }catch(e){ console.warn('m5Save', e); }
+}
+function loadM5(){
+  try{ ['m5-a','m5-b','m5-c'].forEach(function(id){ const el=document.getElementById(id); if(el) el.value=lLoad(SAVE_PREFIX+id,''); }); }catch(e){}
+}
+
+/* ═══════ M6 / M7 · WRITING ═══════ */
+function m6Update(){
+  try{
+    const el=document.getElementById('m6-ta'); const t=el?el.value:'';
+    const w=countWords(t);
+    const wc=document.getElementById('m6-wc');
+    if (wc){ wc.textContent='Words: '+w+' · aim for 25–60 words'; wc.className='wc'+(w>=25?' met':''); }
+    lSave(SAVE_PREFIX+'m6-ta', t); showSaveInd('m6');
+    updateBadge('m6', w>=20?'done':w>0?'prog':'new');
+  }catch(e){}
+}
+function m7Update(){
+  try{
+    const el=document.getElementById('m7-ta'); const t=el?el.value:'';
+    const w=countWords(t);
+    const wc=document.getElementById('m7-wc');
+    if (wc){ wc.textContent='Words: '+w+' · aim for 20–50 words'; wc.className='wc'+(w>=20?' met':''); }
+    const fb=document.getElementById('m7-fb');
+    const hasReason = /\b(because|so|it keeps|i can)\b/i.test(t);
+    if (fb){
+      if (w>=10 && hasReason){ fb.className='fb show ok'; fb.textContent='✅ You gave a reason. That was the task!'; }
+      else if (w>=10){ fb.className='fb show bad'; fb.textContent='💡 You said WHAT you like. Now say WHY — try using "because".'; }
+      else fb.className='fb';
+    }
+    lSave(SAVE_PREFIX+'m7-ta', t); showSaveInd('m7');
+    updateBadge('m7', (w>=15&&hasReason)?'done':w>0?'prog':'new');
+  }catch(e){}
+}
+function loadWrites(){
+  try{
+    const a=document.getElementById('m6-ta'); if(a) a.value=lLoad(SAVE_PREFIX+'m6-ta','');
+    const b=document.getElementById('m7-ta'); if(b) b.value=lLoad(SAVE_PREFIX+'m7-ta','');
+  }catch(e){}
+}
+
+/* ═══════ M8 · FINAL QUIZ ═══════ */
+const QZ = [
+  { t:'mcq', q:'Which word means "to turn around and around"?', opts:['rotate','evaluate','release'], c:0,
+    fb:'rotate — it is what the winds inside a supercell do.' },
+  { t:'mcq', q:'Which word means "very serious, and not safe"?', opts:['dangerous','extreme','cloudy'], c:1,
+    fb:'extreme — more than normal, and not safe. It is the unit title.' },
+  { t:'tf',  q:'True or False?', s:'A field is a wide, open piece of land.', a:true,
+    fb:'TRUE — open land, often for growing things.' },
+  { t:'mcq', q:'What makes a supercell special?', opts:['It is very small','Its winds rotate for hours','It only happens at night'], c:1,
+    fb:'Its rotating updraft — that is what makes it a supercell.' },
+  { t:'tf',  q:'True or False?', s:'In the photo on pages 6–7, it is raining heavily.', a:false,
+    fb:'FALSE — the ground is dry. The rain has not started yet.' },
+  { t:'mcq', q:'"The driver feels scared." Is that seeing or guessing?', opts:['Seeing — it is in the photo','Guessing — you cannot see feelings'], c:1,
+    fb:'Guessing. To analyze, you name only what you can actually see.' },
+  { t:'mcq', q:'Where do most tornadoes hit?', opts:['Tornado Alley, in the USA','Central Canada','Northern Japan'], c:0,
+    fb:'Tornado Alley in the USA — central Canada is second.' },
+  { t:'tf',  q:'True or False?', s:'When you evaluate a statement, you should give a reason.', a:true,
+    fb:'TRUE — the reason IS the evaluating. Deciding alone is not enough.' }
+];
+let qStarted=false, qIdx=0, qScore=0, qWrong=[], qStart=null;
+
+function initM8(){
+  qStarted=true; qIdx=0; qScore=0; qWrong=[]; qStart=Date.now();
+  const r=document.getElementById('m8-result'); if(r){ r.style.display='none'; r.innerHTML=''; }
+  renderQ();
+}
+function renderQ(){
+  try{
+    const box=document.getElementById('m8-quiz'); if(!box) return;
+    if (qIdx>=QZ.length){ showResult(); return; }
+    const q=QZ[qIdx];
+    const pct=Math.round(qIdx/QZ.length*100);
+    let h='<div class="qz-prog"><span class="qz-num">Question '+(qIdx+1)+' of '+QZ.length+'</span>'+
+          '<span class="qz-sc">Score: '+qScore+' 🌪️</span></div>'+
+          '<div style="background:var(--bdr);height:4px;border-radius:2px;margin-bottom:12px">'+
+          '<div style="background:var(--tl);height:4px;border-radius:2px;width:'+pct+'%;transition:width .4s"></div></div>'+
+          '<div class="qz-card"><div class="qz-q">'+q.q+'</div>'+
+          (q.s?'<div class="def-text" style="font-style:italic">'+q.s+'</div>':'');
+    if (q.t==='tf'){
+      h+='<div class="bin-btns"><button class="bin-btn t" data-q="true">✅ TRUE</button>'+
+         '<button class="bin-btn f" data-q="false">❌ FALSE</button></div>';
+    } else {
+      h+='<div class="mcq-opts">'+q.opts.map(function(o,i){
+        return '<button class="mcq-opt" data-q="'+i+'">'+String.fromCharCode(65+i)+') '+o+'</button>'; }).join('')+'</div>';
+    }
+    h+='<div class="fb" id="q-fb"></div></div>';
+    box.innerHTML=h;
+  }catch(e){ console.warn('renderQ', e); }
+}
+function answerQ(raw){
+  try{
+    const q=QZ[qIdx];
+    let ok, chosen, correct;
+    if (q.t==='tf'){ const v=(raw==='true'); ok=v===q.a; chosen=v?'TRUE':'FALSE'; correct=q.a?'TRUE':'FALSE'; }
+    else { const i=parseInt(raw,10); ok=i===q.c; chosen=q.opts[i]; correct=q.opts[q.c]; }
+    document.querySelectorAll('#m8-quiz .bin-btn, #m8-quiz .mcq-opt').forEach(function(b){ b.disabled=true; });
+    if (q.t==='tf'){
+      document.querySelectorAll('#m8-quiz .bin-btn').forEach(function(b){
+        const bv=(b.getAttribute('data-q')==='true');
+        if (String(bv)===String(raw==='true')) b.classList.add(ok?'ans-ok':'ans-bad');
+        if (!ok && bv===q.a) b.classList.add('ans-ok');
+      });
+    } else {
+      const opts=document.querySelectorAll('#m8-quiz .mcq-opt');
+      const i=parseInt(raw,10);
+      if (opts[i]) opts[i].classList.add(ok?'ok':'bad');
+      if (!ok && opts[q.c]) opts[q.c].classList.add('ok');
+    }
+    const fb=document.getElementById('q-fb');
+    if (fb){ fb.className='fb show '+(ok?'ok':'bad'); fb.textContent=(ok?'⚽ YES! ':'❌ Not quite. ')+q.fb; }
+    if (ok){ qScore++; goalAnim(); }
+    else qWrong.push({question:'Q'+(qIdx+1), prompt:q.s||q.q, chosen:chosen, correct:correct});
+    setTimeout(function(){ qIdx++; renderQ(); }, 1700);
+  }catch(e){ console.warn('answerQ', e); }
+}
+function showResult(){
+  try{
+    const box=document.getElementById('m8-quiz'); if(box) box.innerHTML='';
+    const pct=Math.round(qScore/QZ.length*100);
+    const pass=pct>=80;
+    const time=Math.round((Date.now()-qStart)/1000)+'s';
+    saveScore(qScore, QZ.length, pass, {wrongQuestions:qWrong, timeSpent:time});
+    // Auto-save m8-done so completedModules counts the quiz without waiting for the button tap.
+    lSave(SAVE_PREFIX+'m8-done', true);
+    renderM8Result(qScore, qWrong, pass);
+    if (pass) launchConfetti();
+  }catch(e){ console.warn('showResult', e); }
+}
+// Restore a finished quiz instead of restarting it from zero. A failed attempt is
+// still a finished attempt: it comes back with its 🔄 Try Again button.
+function restoreM8Result(saved){
+  try{
+    qStarted=true;
+    qScore=saved.score||0;
+    qWrong=saved.wrongQuestions||[];
+    const box=document.getElementById('m8-quiz'); if(box) box.innerHTML='';
+    const pct=typeof saved.percent==='number'?saved.percent:Math.round(qScore/QZ.length*100);
+    renderM8Result(qScore, qWrong, pct>=80);
+  }catch(e){ console.warn('restoreM8Result', e); }
+}
+function renderM8Result(score, wrong, pass){
+  try{
+    const pct=Math.round(score/QZ.length*100);
+    updateBadge('m8', pass?'done':'prog');
+    const res=document.getElementById('m8-result'); if(!res) return;
+    res.style.display='block';
+    const wrongIds=(wrong||[]).map(function(x){return x.question;});
+    res.innerHTML='<div class="result-box"><div style="font-size:3rem">'+(pass?'🏆':'💪')+'</div>'+
+      '<div class="result-score">'+score+'/'+QZ.length+'</div>'+
+      '<div style="font-family:var(--fnh);font-size:1.1rem;font-weight:700;color:'+(pass?'var(--gn)':'var(--rd)')+'">'+
+        pct+'% — '+(pass?'⚽ GOAL! You passed!':'Keep trying!')+'</div>'+
+      '<div class="result-msg">'+(pass?'🎉 Brilliant, Leo! Level 5 is off to a great start!':'📚 Good effort! Look at the slides again and retry.')+'</div>'+
+      '<div class="result-bullets">'+QZ.map(function(q,i){
+        const bad=wrongIds.indexOf('Q'+(i+1))!==-1;
+        return '<div class="result-bullet '+(bad?'bad':'ok')+'">'+(bad?'❌':'✅')+' Q'+(i+1)+': '+(q.s||q.q).substring(0,44)+'…</div>'; }).join('')+
+      '</div>'+(pass?'':'<button class="chk-btn" style="margin:16px auto 0;display:block" data-retry="1">🔄 Try Again</button>')+
+      '</div><div class="btn-row-bottom"><button class="complete-btn" id="cbtn-m8" data-complete="m8">Mark Can Leo Score complete ✓</button>'+
+      '<button class="reset-btn" data-reset="m8">↺ Redo</button></div>';
+    const done=lLoad(SAVE_PREFIX+'m8-complete',null);
+    const cb=document.getElementById('cbtn-m8');
+    if (done&&done.timestamp&&cb){ cb.classList.add('confirmed'); cb.textContent='✅ '+MOD_NAMES.m8+' complete'; }
+  }catch(e){ console.warn('renderM8Result', e); }
+}
+
+/* ═══════ FX ═══════ */
+function goalAnim(){ try{ const el=document.getElementById('goalAnim'); if(!el) return;
+  el.classList.add('show'); setTimeout(function(){ el.classList.remove('show'); },900); }catch(e){} }
+function launchConfetti(){
+  try{
+    const cols=['#0D9488','#FACC15','#DB2777','#16A34A','#2563EB'];
+    for (let i=0;i<44;i++){
+      const p=document.createElement('div'); p.className='cp';
+      p.style.left=Math.random()*100+'vw'; p.style.top='-10px';
+      p.style.background=cols[Math.floor(Math.random()*cols.length)];
+      p.style.setProperty('--drift',((Math.random()-0.5)*200)+'px');
+      p.style.animationDuration=(1.2+Math.random()*1.5)+'s';
+      p.style.animationDelay=Math.random()*0.5+'s';
+      p.style.width=p.style.height=(7+Math.random()*8)+'px';
+      document.body.appendChild(p); setTimeout(function(){ p.remove(); },2500);
+    }
+  }catch(e){}
+}
+
+/* ═══════ MODALS / COMPLETE / RESET ═══════ */
+function openModal(id){
+  try{ const m=document.getElementById(id); if(!m) return;
+    m.classList.add('open'); document.body.style.overflow='hidden';
+    if (id==='m8' && !qStarted){
+      const saved=lLoad(SAVE_PREFIX+'score',null);
+      if (saved && typeof saved.score==='number') restoreM8Result(saved);
+      else initM8();
+    }
+  }catch(e){}
+}
+function closeModal(id){
+  try{ const m=document.getElementById(id); if(m) m.classList.remove('open'); document.body.style.overflow=''; }catch(e){}
+}
+function markComplete(id){
+  try{
+    const name=MOD_NAMES[id]||id;
+    lSave(SAVE_PREFIX+id+'-complete',{name:name,timestamp:new Date().toISOString(),done:true});
+    lSave(SAVE_PREFIX+id+'-done',true);
+    lSave(HOMEWORK_ID+'-'+id+'-done',true);
+    updateBadge(id,'done');
+    const b=document.getElementById('cbtn-'+id);
+    if (b){ b.classList.add('confirmed'); b.textContent='✅ '+name+' complete'; }
+    setTimeout(function(){ closeModal(id); },400);
+  }catch(e){ console.warn('markComplete', e); }
+}
+function resetModule(id, btn){
+  try{
+    if (btn && !btn.dataset.armed){
+      btn.dataset.armed='1'; btn.textContent='Sure? ↺';
+      btn.style.background='#DC2626'; btn.style.color='#fff';
+      setTimeout(function(){ if(btn&&btn.dataset.armed){ delete btn.dataset.armed;
+        btn.textContent='↺ Redo'; btn.style.background=''; btn.style.color=''; } },3000);
+      return;
+    }
+    if (btn){ delete btn.dataset.armed; btn.textContent='↺ Redo'; btn.style.background=''; btn.style.color=''; }
+    const pre='leea-'+SAVE_PREFIX;
+    Object.keys(localStorage).filter(function(k){ return k.indexOf(pre+id+'-')===0 || k===pre+id+'-done'; })
+      .forEach(function(k){ localStorage.removeItem(k); });
+    localStorage.removeItem('leea-'+HOMEWORK_ID+'-'+id+'-done');
+    if (id==='m8'){ localStorage.removeItem(pre+'score'); localStorage.removeItem('leea-'+HOMEWORK_ID+'-score'); }
+    [SAVE_PREFIX+id+'-complete',SAVE_PREFIX+id+'-done',HOMEWORK_ID+'-'+id+'-done'].forEach(function(k){
+      try{ if (typeof LEEA_CLOUD!=='undefined'&&LEEA_CLOUD&&LEEA_CLOUD.enabled&&LEEA_CLOUD.deleteProgress) LEEA_CLOUD.deleteProgress(HOMEWORK_ID,k); }catch(e){}
+    });
+    updateBadge(id,'new');
+    const cb=document.getElementById('cbtn-'+id);
+    if (cb){ cb.classList.remove('confirmed'); cb.textContent='Mark '+(MOD_NAMES[id]||id)+' complete ✓'; }
+    if (id==='m1') initM1();
+    else if (id==='m2') initM2();
+    else if (id==='m3') initM3();
+    else if (id==='m4'){ for(let i=0;i<M4.length;i++){ localStorage.removeItem(pre+'m4-r'+i); } initM4(); }
+    else if (id==='m5'){ ['m5-a','m5-b','m5-c'].forEach(function(k){ const el=document.getElementById(k); if(el) el.value=''; });
+      const fb=document.getElementById('m5-fb'); if(fb){ fb.className='fb'; fb.textContent=''; } }
+    else if (id==='m6'){ const el=document.getElementById('m6-ta'); if(el) el.value=''; m6Update(); }
+    else if (id==='m7'){ const el=document.getElementById('m7-ta'); if(el) el.value=''; m7Update();
+      const fb=document.getElementById('m7-fb'); if(fb){ fb.className='fb'; fb.textContent=''; } }
+    else if (id==='m8'){ qStarted=false;
+      const q=document.getElementById('m8-quiz'); if(q) q.innerHTML='';
+      const r=document.getElementById('m8-result'); if(r){ r.style.display='none'; r.innerHTML=''; } }
+  }catch(e){ console.warn('resetModule', e); }
+}
+
+/* ═══════ REVIEW MODE ═══════ */
+function initReviewMode(){
+  try{
+    const root=document.getElementById('appRoot'); if(root) root.style.display='none';
+    const rs=document.getElementById('reviewScreen'); if(rs) rs.classList.add('show');
+    const body=document.getElementById('reviewBody'); if(!body) return;
+    const completed=Object.keys(MOD_NAMES).filter(function(id){
+      const d=lLoad(SAVE_PREFIX+id+'-complete',null); return d&&d.timestamp; });
+    const score=lLoad(SAVE_PREFIX+'score',null);
+    const m6=lLoad(SAVE_PREFIX+'m6-ta','');
+    const m7=lLoad(SAVE_PREFIX+'m7-ta','');
+    const cloud=['m5-a','m5-b','m5-c'].map(function(k){return lLoad(SAVE_PREFIX+k,'');});
+    const reasons=[0,1,2,3].map(function(i){return lLoad(SAVE_PREFIX+'m4-r'+i,'');});
+    const subs=['m1','m2','m3','m4'].map(function(k){return lLoad(SAVE_PREFIX+k+'-score',null);});
+    if (!completed.length && !score && !m6.trim() && !m7.trim() && !cloud.join('').trim()
+        && !reasons.join('').trim() && !subs.some(Boolean)){
+      body.innerHTML='<div class="rv-not-started">📋 Leo has not started yet.</div>'; return;
+    }
+    let h='';
+    if (completed.length){
+      h+='<div class="rv-card"><div class="rv-lbl">COMPLETED — '+completed.length+' / '+Object.keys(MOD_NAMES).length+'</div><div class="rv-val" style="font-size:.82rem;line-height:1.9">'+
+        completed.map(function(id){ const d=lLoad(SAVE_PREFIX+id+'-complete',null);
+          return '✅ '+MOD_NAMES[id]+(d&&d.timestamp?' · '+new Date(d.timestamp).toLocaleString():''); }).join('\n')+'</div></div>';
+    }
+    if (score){
+      h+='<div class="rv-card"><div class="rv-lbl">FINAL QUIZ</div><div class="rv-score-big">'+score.score+'/'+score.total+' — '+score.percent+'% '+(score.done?'✅ PASS':'❌ Retry')+'</div>'+
+        '<div class="rv-val" style="margin-top:4px;font-size:.75rem;color:var(--ink3)">'+new Date(score.timestamp).toLocaleString()+'</div>'+
+        (score.wrongQuestions&&score.wrongQuestions.length?'<div class="rv-val" style="margin-top:8px;color:var(--rd);font-size:.78rem">'+
+          score.wrongQuestions.map(function(w){ return '❌ '+w.question+' — chose "'+w.chosen+'", answer was "'+w.correct+'"'; }).join('\n')+'</div>':'')+'</div>';
+    }
+    const names=['Name That Word','Spell It','See It or Guess It','True or False'];
+    subs.forEach(function(s,i){ if(s) h+='<div class="rv-card"><div class="rv-lbl">'+names[i].toUpperCase()+'</div><div class="rv-val">Score: '+s.score+'/'+s.total+'</div></div>'; });
+    const typed=lLoad(SAVE_PREFIX+'m2-ans',null);
+    if (typed && typed.join('').trim()){
+      h+='<div class="rv-card"><div class="rv-lbl">SPELL IT — WHAT LEO TYPED</div><div class="rv-val" style="font-size:.8rem">'+
+        typed.map(function(a,i){ const ok=norm(a)===norm(SPELL[i].w);
+          return (ok?'✅ ':'❌ ')+'"'+(a||'')+'"'+(ok?'':' → '+SPELL[i].w); }).join('\n')+'</div></div>';
+    }
+    if (reasons.join('').trim()){
+      h+='<div class="rv-card"><div class="rv-lbl">TRUE / FALSE — LEO&rsquo;S REASONS</div><div class="rv-val" style="font-size:.8rem">'+
+        reasons.map(function(r,i){ return (i+1)+'. '+M4[i].s+'\n   → '+(r||'(no reason given)'); }).join('\n\n')+'</div></div>';
+    }
+    if (cloud.join('').trim()) h+='<div class="rv-card"><div class="rv-lbl">DESCRIBE THE CLOUD</div><div class="rv-val">'+cloud.filter(Boolean).join(' · ')+'</div></div>';
+    if (m6.trim()) h+='<div class="rv-card"><div class="rv-lbl">IN THE CAR</div><div class="rv-val">'+m6+'</div></div>';
+    if (m7.trim()) h+='<div class="rv-card"><div class="rv-lbl">MY WEATHER</div><div class="rv-val">'+m7+'</div></div>';
+    if (!score) h+='<div class="rv-card" style="border-color:var(--tl)"><div class="rv-lbl">STATUS</div><div class="rv-val" style="color:var(--tl)">In progress — quiz not done yet.</div></div>';
+    body.innerHTML=h;
+  }catch(e){ console.warn('initReviewMode', e); }
+}
+
+/* ═══════ HANDLERS ═══════ */
+document.addEventListener('click', function(ev){
+  try{
+    const t=ev.target.closest('[data-open],[data-close],[data-complete],[data-reset],[data-m1],[data-m2],[data-hint],[data-m3],[data-m4],[data-q],[data-retry]');
+    if (!t) return;
+    if (t.hasAttribute('data-open')){ openModal(t.getAttribute('data-open')); return; }
+    if (t.hasAttribute('data-close')){ closeModal(t.getAttribute('data-close')); return; }
+    if (t.hasAttribute('data-complete')){ markComplete(t.getAttribute('data-complete')); return; }
+    if (t.hasAttribute('data-reset')){ resetModule(t.getAttribute('data-reset'), t); return; }
+    if (t.hasAttribute('data-m1')){ answerM1(parseInt(t.getAttribute('data-m1'),10), parseInt(t.getAttribute('data-j'),10)); return; }
+    if (t.hasAttribute('data-hint')){ hintM2(parseInt(t.getAttribute('data-hint'),10)); return; }
+    if (t.hasAttribute('data-m2')){ checkM2(parseInt(t.getAttribute('data-m2'),10), false); return; }
+    if (t.hasAttribute('data-m3')){ answerM3(parseInt(t.getAttribute('data-m3'),10), t.getAttribute('data-v')); return; }
+    if (t.hasAttribute('data-m4')){ answerM4(parseInt(t.getAttribute('data-m4'),10), t.getAttribute('data-v')); return; }
+    if (t.hasAttribute('data-retry')){ initM8(); return; }
+    if (t.hasAttribute('data-q')){ answerQ(t.getAttribute('data-q')); return; }
+  }catch(e){ console.warn('click', e); }
+});
+document.addEventListener('input', function(ev){
+  try{
+    const w=ev.target.getAttribute && ev.target.getAttribute('data-w');
+    if (w==='m4') m4Save();
+    else if (w==='m5') m5Save();
+    else if (w==='m6') m6Update();
+    else if (w==='m7') m7Update();
+  }catch(e){}
+});
+function initHW(){
+  try{
+    if (HOMEWORK_ID==='leo-5-1-opener') return;
+    const b=document.getElementById('hwBanner'); if(!b) return;
+    b.style.display='flex'; b.textContent='📚 Homework · L5 Unit 1 · Extreme Weather';
+  }catch(e){}
+}
+
+/* ═══════ INIT ═══════ */
+window.addEventListener('DOMContentLoaded', async function(){
+  await restoreProgressFromCloud();
+  if (isReview){ initReviewMode(); return; }
+  initHW();
+  initM1(); initM2(); initM3(); initM4(); loadM5(); loadWrites();
+  m5Save(); m6Update(); m7Update();
+  try{
+    [['m1',6],['m2',4],['m3',5]].forEach(function(p){
+      const s=lLoad(SAVE_PREFIX+p[0]+'-score',null);
+      if (s) updateBadge(p[0], s.score>=p[1]?'done':'prog');
+    });
+    m4Badge();
+    const q=lLoad(SAVE_PREFIX+'score',null); if(q) updateBadge('m8', q.done?'done':'prog');
+  }catch(e){ console.warn('badges', e); }
+  Object.keys(MOD_NAMES).forEach(function(id){
+    try{
+      const d=lLoad(SAVE_PREFIX+id+'-complete',null);
+      const b=document.getElementById('cbtn-'+id);
+      if (d&&d.timestamp){ updateBadge(id,'done'); if(b){ b.classList.add('confirmed'); b.textContent='✅ '+MOD_NAMES[id]+' complete'; } }
+    }catch(e){}
+  });
+});
+</script>
+</body>
+</html>

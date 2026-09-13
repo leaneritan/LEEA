@@ -90,7 +90,7 @@ export const mathNoteChapters: MathNoteChapterMeta[] = [
       section("1", 4, 4, "分数や小数の加法　加法の交換法則と結合法則", "p.18–19", { textbookRef: "教 P.32〜33", authored: true, scanned: true }),
       section("1", 5, 5, "減法", "p.20–21", { textbookRef: "教 P.34〜36", authored: true, scanned: true }),
       section("1", 6, 6, "加法と減法の混じった計算", "p.22–23", { textbookRef: "教 P.37〜39", authored: true, scanned: true }),
-      section("1", null, "drill1", "特訓ドリル①　正負の数の加法と減法", "p.24–25", { scanned: true }),
+      section("1", null, "drill1", "特訓ドリル①　正負の数の加法と減法", "p.24–25", { authored: true, scanned: true }),
       section("1", 7, 7, "乗法", "p.26–27", { textbookRef: "教 P.42〜46", scanned: true }),
       section("1", 8, 8, "累乗", "p.28", { textbookRef: "教 P.47", scanned: true }),
       section("1", 9, 9, "除法", "p.29", { textbookRef: "教 P.48〜49", scanned: true }),

@@ -13,6 +13,7 @@ import type {
   MathNoteQuestion,
   MathNoteWidget
 } from "../../../../content/subjects/math/note/types";
+import { DrillWidget } from "../blocks/DrillWidget";
 import { MagicSquareWidget } from "../blocks/MagicSquareWidget";
 import { NumberLinePlotWidget } from "../blocks/NumberLinePlotWidget";
 import { NumberLinePointsWidget } from "../blocks/NumberLinePointsWidget";
@@ -166,7 +167,7 @@ function NotePart({
  * the widget does not understand renders nothing rather than crashing on a
  * missing field.
  */
-function renderWidget(widget: MathNoteWidget) {
+function renderWidget(widget: MathNoteWidget, onDrillFinish?: (correct: number, total: number) => void) {
   switch (widget.kind) {
     case "number-line-points":
       return widget.numberLine ? (
@@ -209,6 +210,15 @@ function renderWidget(widget: MathNoteWidget) {
       return widget.magicSquare ? (
         <MagicSquareWidget answers={widget.magicSquare.answers} cells={widget.magicSquare.cells} />
       ) : null;
+    case "drill":
+      return widget.drill ? (
+        <DrillWidget
+          backRef={widget.drill.backRef}
+          hint={widget.drill.hint}
+          items={widget.drill.items}
+          onFinish={onDrillFinish}
+        />
+      ) : null;
     default:
       return null;
   }
@@ -216,10 +226,12 @@ function renderWidget(widget: MathNoteWidget) {
 
 function NoteQuestionCard({
   question,
-  onFirstAnswer
+  onFirstAnswer,
+  onDrillFinish
 }: {
   question: MathNoteQuestion;
   onFirstAnswer: (partIndex: number, wasRight: boolean) => void;
+  onDrillFinish: (correct: number, total: number) => void;
 }) {
   const widget = question.widget;
 
@@ -235,7 +247,7 @@ function NoteQuestionCard({
       <p className="note-question-prompt">{question.prompt}</p>
       {question.given ? <p className="note-question-given">{question.given}</p> : null}
 
-      {widget ? <div className="note-widget">{renderWidget(widget)}</div> : null}
+      {widget ? <div className="note-widget">{renderWidget(widget, onDrillFinish)}</div> : null}
 
       {question.parts?.length ? (
         <ul className="note-parts">
@@ -267,13 +279,22 @@ export function NoteQuestionSet({
   done: boolean;
   onScored: (correct: number, total: number) => void;
 }) {
+  // A 特訓ドリル page has no typed parts at all — its questions are drills. So a
+  // drill counts for as many scorable items as it holds, and reports them in
+  // one go when the run finishes; otherwise a whole page would never tick.
   const scorableCount = block.questions.reduce(
-    (total, question) => total + (question.parts ?? []).filter(isScorable).length,
+    (total, question) =>
+      total + (question.parts ?? []).filter(isScorable).length + (question.widget?.drill?.items.length ?? 0),
     0
   );
   const [results, setResults] = useState<Record<string, boolean>>({});
-  const answered = Object.keys(results).length;
-  const correct = Object.values(results).filter(Boolean).length;
+  const [drills, setDrills] = useState<Record<number, { correct: number; total: number }>>({});
+  const drillTotals = Object.values(drills).reduce(
+    (acc, d) => ({ correct: acc.correct + d.correct, total: acc.total + d.total }),
+    { correct: 0, total: 0 }
+  );
+  const answered = Object.keys(results).length + drillTotals.total;
+  const correct = Object.values(results).filter(Boolean).length + drillTotals.correct;
   const reported = useRef(false);
 
   // Reporting the score has to happen after the render that completes the set,
@@ -293,6 +314,13 @@ export function NoteQuestionSet({
     setResults((current) => (key in current ? current : { ...current, [key]: wasRight }));
   }
 
+  /** A drill reports its whole first pass at once; a replay never re-reports. */
+  function recordDrill(questionNumber: number, correctCount: number, total: number) {
+    setDrills((current) =>
+      questionNumber in current ? current : { ...current, [questionNumber]: { correct: correctCount, total } }
+    );
+  }
+
   return (
     <section className={`math-card note-qset note-qset--${block.label === "A問題" ? "a" : "b"}`}>
       <div className="note-qset-head">
@@ -303,6 +331,7 @@ export function NoteQuestionSet({
         {block.questions.map((question) => (
           <NoteQuestionCard
             key={question.number}
+            onDrillFinish={(correctCount, total) => recordDrill(question.number, correctCount, total)}
             onFirstAnswer={(partIndex, wasRight) => record(question.number, partIndex, wasRight)}
             question={question}
           />

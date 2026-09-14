@@ -15,9 +15,14 @@ import type {
 } from "../../../../content/subjects/math/note/types";
 import { DrillWidget } from "../blocks/DrillWidget";
 import { MagicSquareWidget } from "../blocks/MagicSquareWidget";
+import { MixedChainWidget } from "../blocks/MixedChainWidget";
 import { NumberLinePlotWidget } from "../blocks/NumberLinePlotWidget";
 import { NumberLinePointsWidget } from "../blocks/NumberLinePointsWidget";
 import { NumberLineWalkReadWidget } from "../blocks/NumberLineWalkReadWidget";
+import { OrderStepsWidget } from "../blocks/OrderStepsWidget";
+import { PowerExpandWidget } from "../blocks/PowerExpandWidget";
+import { ReciprocalWidget } from "../blocks/ReciprocalWidget";
+import { SignCountWidget } from "../blocks/SignCountWidget";
 import { SubtractionFlipWidget } from "../blocks/SubtractionFlipWidget";
 import { TermSortWidget } from "../blocks/TermSortWidget";
 
@@ -210,6 +215,16 @@ function renderWidget(widget: MathNoteWidget, onDrillFinish?: (correct: number, 
       return widget.magicSquare ? (
         <MagicSquareWidget answers={widget.magicSquare.answers} cells={widget.magicSquare.cells} />
       ) : null;
+    case "power-expand":
+      return widget.powerExpand ? <PowerExpandWidget problems={widget.powerExpand.problems} /> : null;
+    case "reciprocal":
+      return widget.reciprocal ? <ReciprocalWidget problems={widget.reciprocal.problems} /> : null;
+    case "sign-count":
+      return widget.signCount ? <SignCountWidget problems={widget.signCount.problems} /> : null;
+    case "mixed-chain":
+      return widget.mixedChain ? <MixedChainWidget problems={widget.mixedChain.problems} /> : null;
+    case "order-steps":
+      return widget.orderSteps ? <OrderStepsWidget problems={widget.orderSteps.problems} /> : null;
     case "drill":
       return widget.drill ? (
         <DrillWidget

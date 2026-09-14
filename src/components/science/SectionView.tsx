@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getAdjacentSections } from "../../../content/subjects/science/curriculum";
+import {
+  getAdjacentSections,
+  getScienceChapterTokens
+} from "../../../content/subjects/science/curriculum";
 import {
   isScienceStatefulBlock,
   type ScienceChapterMeta,
@@ -62,6 +65,9 @@ export function SectionView({
     record(blockId, total > 0 && correct === total, { correct, total });
   }
 
+  // The section runs in its 章's colour, not the 単元's, so the page matches the
+  // card Leo clicked to get here. Math has always done this; 理科 did not.
+  const tokens = getScienceChapterTokens(chapter);
   const percent = getSectionCompletionPercent(section.id, statefulBlockIds, progress);
   const { prev, next } = getAdjacentSections(section.id);
   const sectionMeta = chapter.sections.find((entry) => entry.id === section.id);
@@ -70,7 +76,7 @@ export function SectionView({
     <div
       className="sci-scope"
       style={
-        { "--s-accent": unit.color, "--s-tint": unit.tint, "--s-dark": unit.dark } as React.CSSProperties
+        { "--s-accent": tokens.color, "--s-tint": tokens.tint, "--s-dark": tokens.dark } as React.CSSProperties
       }
     >
       <div className="sci-topbar">

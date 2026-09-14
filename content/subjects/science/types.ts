@@ -267,6 +267,15 @@ export type ScienceChapterMeta = {
   title: string;
   subtitle: string;
   pages: string;
+  /**
+   * The colour tokens this 章's card and section pages run under, the way
+   * math gives every 章 its own. A numbered 章 declares them; 学習前 and 単元末
+   * leave them out and inherit the 単元's, because they are unit-level
+   * bookends rather than chapters — the inheritance says so on screen.
+   */
+  color?: string;
+  tint?: string;
+  dark?: string;
   sections: ScienceSectionMeta[];
 };
 

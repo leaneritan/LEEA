@@ -49,6 +49,9 @@ const UNIT_1_CHAPTERS: ScienceChapterMeta[] = [
     title: "生物の観察と分類のしかた",
     subtitle: "身近な生物を観察して特徴を見つけて分類しよう",
     pages: "p.13–26",
+    color: "#3aa6a0",
+    tint: "#e2f2f1",
+    dark: "#20736e",
     sections: [
       {
         id: "sci-u1-c1-1",
@@ -90,6 +93,9 @@ const UNIT_1_CHAPTERS: ScienceChapterMeta[] = [
     title: "植物の分類",
     subtitle: "植物をその特徴によりいくつかのグループに分類しよう",
     pages: "p.27–44",
+    color: "#6aa564",
+    tint: "#e8f1e6",
+    dark: "#47793f",
     sections: []
   },
   {
@@ -99,6 +105,9 @@ const UNIT_1_CHAPTERS: ScienceChapterMeta[] = [
     title: "動物の分類",
     subtitle: "動物をその特徴によりいくつかのグループに分類しよう",
     pages: "p.45–62",
+    color: "#c98f3c",
+    tint: "#f8eeda",
+    dark: "#8a6114",
     sections: []
   },
   {
@@ -131,10 +140,10 @@ export const scienceUnits: ScienceUnitMeta[] = [
     dark: "#8a5230",
     chapters: [
       { id: "u2-intro", unitId: "u2", num: null, title: "学習前", subtitle: "この単元で学ぶこと", pages: "p.70–72", sections: [] },
-      { id: "u2-c1", unitId: "u2", num: "1", title: "身のまわりの物質とその性質", subtitle: "金属と非金属、密度", pages: "p.73–90", sections: [] },
-      { id: "u2-c2", unitId: "u2", num: "2", title: "気体の性質", subtitle: "気体の集め方と見分け方", pages: "p.91–100", sections: [] },
-      { id: "u2-c3", unitId: "u2", num: "3", title: "水溶液の性質", subtitle: "とけ方、濃度、溶解度", pages: "p.101–114", sections: [] },
-      { id: "u2-c4", unitId: "u2", num: "4", title: "物質の姿と状態変化", subtitle: "融点・沸点と粒子の運動", pages: "p.115–131", sections: [] },
+      { id: "u2-c1", unitId: "u2", num: "1", title: "身のまわりの物質とその性質", subtitle: "金属と非金属、密度", pages: "p.73–90", color: "#c0703f", tint: "#f9ebe0", dark: "#8a4a20", sections: [] },
+      { id: "u2-c2", unitId: "u2", num: "2", title: "気体の性質", subtitle: "気体の集め方と見分け方", pages: "p.91–100", color: "#5aa9c9", tint: "#e6f3f8", dark: "#2e7794", sections: [] },
+      { id: "u2-c3", unitId: "u2", num: "3", title: "水溶液の性質", subtitle: "とけ方、濃度、溶解度", pages: "p.101–114", color: "#7b7fc7", tint: "#ecedf9", dark: "#4e5292", sections: [] },
+      { id: "u2-c4", unitId: "u2", num: "4", title: "物質の姿と状態変化", subtitle: "融点・沸点と粒子の運動", pages: "p.115–131", color: "#c9607f", tint: "#f9e7ed", dark: "#943a56", sections: [] },
       { id: "u2-matome", unitId: "u2", num: null, title: "単元末", subtitle: "学習内容の整理と確かめ問題", pages: "p.133–137", sections: [] }
     ]
   },
@@ -147,9 +156,9 @@ export const scienceUnits: ScienceUnitMeta[] = [
     dark: "#3a558c",
     chapters: [
       { id: "u3-intro", unitId: "u3", num: null, title: "学習前", subtitle: "この単元で学ぶこと", pages: "p.138–140", sections: [] },
-      { id: "u3-c1", unitId: "u3", num: "1", title: "光の世界", subtitle: "反射、屈折、凸レンズ", pages: "p.141–158", sections: [] },
-      { id: "u3-c2", unitId: "u3", num: "2", title: "音の世界", subtitle: "振動と音の大きさ・高さ", pages: "p.159–166", sections: [] },
-      { id: "u3-c3", unitId: "u3", num: "3", title: "力の世界", subtitle: "力の大きさとばね、力のつり合い", pages: "p.167–181", sections: [] },
+      { id: "u3-c1", unitId: "u3", num: "1", title: "光の世界", subtitle: "反射、屈折、凸レンズ", pages: "p.141–158", color: "#d9b23a", tint: "#f9f0d3", dark: "#9c7c14", sections: [] },
+      { id: "u3-c2", unitId: "u3", num: "2", title: "音の世界", subtitle: "振動と音の大きさ・高さ", pages: "p.159–166", color: "#8d7fb5", tint: "#efecf5", dark: "#63558c", sections: [] },
+      { id: "u3-c3", unitId: "u3", num: "3", title: "力の世界", subtitle: "力の大きさとばね、力のつり合い", pages: "p.167–181", color: "#4d7fc0", tint: "#e5edf8", dark: "#31578c", sections: [] },
       { id: "u3-matome", unitId: "u3", num: null, title: "単元末", subtitle: "学習内容の整理と確かめ問題", pages: "p.183–187", sections: [] }
     ]
   },
@@ -162,9 +171,9 @@ export const scienceUnits: ScienceUnitMeta[] = [
     dark: "#7c4462",
     chapters: [
       { id: "u4-intro", unitId: "u4", num: null, title: "学習前", subtitle: "この単元で学ぶこと", pages: "p.188–192", sections: [] },
-      { id: "u4-c1", unitId: "u4", num: "1", title: "火をふく大地", subtitle: "火山と火成岩", pages: "p.193–206", sections: [] },
-      { id: "u4-c2", unitId: "u4", num: "2", title: "動き続ける大地", subtitle: "地震と大地の動き", pages: "p.207–218", sections: [] },
-      { id: "u4-c3", unitId: "u4", num: "3", title: "地層から読みとる大地の変化", subtitle: "堆積岩と地層", pages: "p.219–235", sections: [] },
+      { id: "u4-c1", unitId: "u4", num: "1", title: "火をふく大地", subtitle: "火山と火成岩", pages: "p.193–206", color: "#c95f4f", tint: "#f9e8e5", dark: "#933526", sections: [] },
+      { id: "u4-c2", unitId: "u4", num: "2", title: "動き続ける大地", subtitle: "地震と大地の動き", pages: "p.207–218", color: "#a3784f", tint: "#f4ece2", dark: "#71502f", sections: [] },
+      { id: "u4-c3", unitId: "u4", num: "3", title: "地層から読みとる大地の変化", subtitle: "堆積岩と地層", pages: "p.219–235", color: "#8a9440", tint: "#f0f2e0", dark: "#5d651f", sections: [] },
       { id: "u4-matome", unitId: "u4", num: null, title: "単元末", subtitle: "学習内容の整理と確かめ問題", pages: "p.237–241", sections: [] }
     ]
   }
@@ -211,4 +220,22 @@ export function getAdjacentSections(sectionId: string) {
   const index = ordered.findIndex((section) => section.id === sectionId);
   if (index === -1) return { prev: undefined, next: undefined };
   return { prev: ordered[index - 1], next: ordered[index + 1] };
+}
+
+/**
+ * The colour tokens a 章 runs under: its own where it declares them, the 単元's
+ * where it does not. 学習前 and 単元末 are the ones that do not — they are
+ * unit-level bookends, and inheriting the unit's colour is what says so.
+ *
+ * This is math's arrangement: the colour belongs to the 章, not the page, so a
+ * card and the section behind it are the same colour and Leo can find a chapter
+ * by its colour instead of reading every title.
+ */
+export function getScienceChapterTokens(chapter: ScienceChapterMeta) {
+  const unit = getScienceUnit(chapter.unitId);
+  return {
+    color: chapter.color ?? unit?.color ?? "#4a9d6e",
+    tint: chapter.tint ?? unit?.tint ?? "#eaf5ee",
+    dark: chapter.dark ?? unit?.dark ?? "#2f6b49"
+  };
 }

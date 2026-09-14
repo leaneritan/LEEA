@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { scienceSectionIsAuthored, scienceUnits } from "../../../content/subjects/science/curriculum";
+import {
+  getScienceChapterTokens,
+  scienceSectionIsAuthored,
+  scienceUnits
+} from "../../../content/subjects/science/curriculum";
 import type { ScienceChapterMeta, ScienceSectionMeta } from "../../../content/subjects/science/types";
 import {
   readScienceProgress,
@@ -19,6 +23,9 @@ import { ScienceTopbarHome } from "./ScienceTopbarHome";
  *
  * - Math switches 中1/中2/中3; 理科 is one book, so the tabs switch 単元
  *   instead. It is the same move — show one part of the book at a time.
+ * - Colour belongs to the 章, set on each card, exactly as math sets
+ *   `--m-accent` per `.math-chapter-card`. The page itself only carries the
+ *   単元's colour for the topbar and its tabs.
  * - Math reads "done" off a hand-set `status` in its curriculum data. 理科 has
  *   real block progress, so a 節 counts as done when every tickable block in it
  *   is ticked. The number on screen is then something Leo earned rather than
@@ -29,12 +36,9 @@ export function CurriculumHome({ blockCounts }: { blockCounts: Record<string, nu
   const [unitId, setUnitId] = useState(scienceUnits[0].id);
   const unit = scienceUnits.find((entry) => entry.id === unitId) ?? scienceUnits[0];
 
-  const [open, setOpen] = useState<Record<string, boolean>>(() => {
-    const first = scienceUnits[0].chapters.find((chapter) =>
-      chapter.sections.some((section) => scienceSectionIsAuthored(section.id))
-    );
-    return first ? { [first.id]: true } : {};
-  });
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  /** Set once progress has loaded, so the open card is the one Leo is in. */
+  const [openedForResume, setOpenedForResume] = useState(false);
 
   useEffect(() => {
     const local = readScienceProgress();
@@ -95,6 +99,12 @@ export function CurriculumHome({ blockCounts }: { blockCounts: Record<string, nu
     return chapter && u ? { unit: u, chapter, section: first } : null;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [progress, blockCounts]);
+
+  useEffect(() => {
+    if (openedForResume || !resume) return;
+    setOpen({ [resume.chapter.id]: true });
+    setOpenedForResume(true);
+  }, [openedForResume, resume]);
 
   return (
     <div
@@ -170,8 +180,20 @@ export function CurriculumHome({ blockCounts }: { blockCounts: Record<string, nu
             const pct = sections.length ? Math.round((done / sections.length) * 100) : 0;
             const isOpen = !!open[chapter.id];
 
+            const tokens = getScienceChapterTokens(chapter);
+
             return (
-              <div className="sci-chapter-card" key={chapter.id}>
+              <div
+                className="sci-chapter-card"
+                key={chapter.id}
+                style={
+                  {
+                    "--s-accent": tokens.color,
+                    "--s-tint": tokens.tint,
+                    "--s-dark": tokens.dark
+                  } as React.CSSProperties
+                }
+              >
                 <button
                   className="sci-chapter-row"
                   disabled={sections.length === 0}

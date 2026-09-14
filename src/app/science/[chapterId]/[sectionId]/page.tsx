@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getScienceChapter,
+  getScienceChapterTokens,
   getScienceSectionMeta,
   getUnitForChapter
 } from "../../../../../content/subjects/science/curriculum";
@@ -20,13 +21,14 @@ export default async function ScienceSectionPage({
   if (!chapter || !unit || !sectionMeta) notFound();
 
   const section = loadScienceSection(sectionId);
+  const tokens = getScienceChapterTokens(chapter);
 
   if (!section) {
     return (
       <div
         className="sci-scope"
         style={
-          { "--s-accent": unit.color, "--s-tint": unit.tint, "--s-dark": unit.dark } as React.CSSProperties
+          { "--s-accent": tokens.color, "--s-tint": tokens.tint, "--s-dark": tokens.dark } as React.CSSProperties
         }
       >
         <div className="sci-page">

@@ -88,6 +88,25 @@ Worked and marked through p.37. Still blank: 確認テスト p.39, C問題 p.40 
 考えてみよう p.41 entirely, and p.38 apart from ①'s number line, ②(1)'s answer
 box and some margin scratch.
 
+Where the handwriting is wrong and **was not caught in red**, the built section
+says so in the question's own explanation. In p.26–33 those are all the same
+mistake — reading a 累乗 as though the minus were inside the power:
+
+| Page | Question | Written | Correct |
+| --- | --- | --- | --- |
+| p.28 | A問1(3) | －0.5² | （－0.5）² |
+| p.28 | A問1(4) | 4³/3 | （4/3）³ |
+| p.28 | A問3(2) | －72 | ＋72 —— the print is（－6²）, so only 6 is squared |
+| p.28 | A問2(3) | 81 | －81 —— －9² is －(9×9) |
+| p.28 | A問3(3) | －2 | －8 —— －2³ is －8, not －2 |
+| p.33 | B問1(1) | －33 | 39 —— （－3²）is －9, not ＋9 |
+| p.33 | B問1(3) | 40 | 22 —— －4² is －16, and 7－(3－4) is 8 |
+| p.33 | B問2(1) | （unfinished） | －600 |
+
+p.27 B問1(1) and 1(3), and p.30 A問2(4), were written wrong and **were** corrected
+in red; the app follows the red. Every answer in these six sections was
+recomputed from the printed question, and each carries a `source` note saying so.
+
 ## Not scanned
 
 From the 目次 in `front-matter-start-dash_p2-9.pdf`, the book runs to at least
@@ -112,7 +131,7 @@ the textbook spine at `/math`. See "Authoring a 学習ノート section" in
 | --- | --- | --- | --- | --- |
 | 中学数学スタートDASH! | p.2–9 | — (算数 review) | full | no |
 | 0章 整数の性質 | p.10–11 | 教 P.12–17 | full | no |
-| 1章 正負の数 | p.12–41 | 教 P.22–59 | full | p.12–25（1〜6節・特訓ドリル①） |
+| 1章 正負の数 | p.12–41 | 教 P.22–59 | full | p.12–33（1〜12節・特訓ドリル①） |
 | 2章 文字と式 | p.42–61 | 教 P.66–87 | no | no |
 | 3章 方程式 | p.62–81 | 教 P.94–111 | no | no |
 | 4章 比例と反比例 | p.82–99 | 教 P.120–153 | no | no |

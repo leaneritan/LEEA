@@ -124,6 +124,25 @@ textbook page it was checked against, and that citation is shown with it. The �
 only pages whose textbook range is also scanned can be authored — that booklet
 is the blocker for the rest.
 
+**Colour belongs to the 章, not the page.** Math sets `--m-accent` per
+`.math-chapter-card`, which is why a chapter can be found by its colour; 理科
+does the same through `getScienceChapterTokens`. A numbered 章 declares its own
+`color`/`tint`/`dark`; 学習前 and 単元末 leave them out and inherit the 単元's,
+because they are unit-level bookends. The section page uses the 章's tokens too,
+so a page matches the card that led to it.
+
+**QRコンテンツ (`/science/library`) is 理科's second surface**, the counterpart of
+math's 特訓レッスン. The publisher's index holds 166 items and 160 carry a
+captured URL, but a chip inside an authored 節 could only reach the handful that
+節 cited — so most of the book's own material was unreachable, including every
+item belonging to a 章 with no sections yet. The library groups all of them by
+章 in the book's order and links out; the 6 with no captured URL render as plain
+rows, never as dead links. Chapter cards for unauthored 章 carry their QR count
+and link into it, so no card on the home page is a dead end. The join is the
+index's own 単元 number plus 章 number — and `chapter.no` is a **string** there,
+so reading it as a number silently drops every numbered 章 into the common
+group.
+
 **What must be a widget.** Golden rule 12 applies here through the publisher's
 own tags: the 9 シミュレーション *and* the 7 思考ツール, all inventoried with
 their pages in `docs/lesson-plans/science/new-science-1/README.md`. The 思考ツール

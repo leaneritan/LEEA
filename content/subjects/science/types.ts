@@ -289,3 +289,32 @@ export type ScienceUnitMeta = {
   dark: string;
   chapters: ScienceChapterMeta[];
 };
+
+/**
+ * One item from the publisher's QRコンテンツ一覧, as captured in
+ * `docs/lesson-plans/science/new-science-1/qr-index.json`.
+ *
+ * 166 of these exist and 160 carry a real captured URL. Until now only the
+ * handful cited by an authored block were reachable, which left roughly 150
+ * pieces of the publisher's own material invisible inside the app — including
+ * every item belonging to a 章 that has no sections written yet.
+ */
+export type ScienceQrItem = {
+  no: number;
+  /** Textbook page, or null for the book-level items that have none. */
+  page: number | null;
+  title: string;
+  /** The publisher's own label: 動画, 練習, ワークシート, シミュレーション … */
+  kind: string;
+  /** Captured, never derived. Absent for the 6 items with no link. */
+  url?: string;
+};
+
+/** The QR items belonging to one 章, plus the two book-level groups. */
+export type ScienceQrGroup = {
+  /** A curriculum chapter id, or "common" / "appendix" for the book-level ones. */
+  chapterId: string;
+  unitNum: string | null;
+  title: string;
+  items: ScienceQrItem[];
+};

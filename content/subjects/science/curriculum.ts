@@ -50,7 +50,7 @@ const UNIT_1_CHAPTERS: ScienceChapterMeta[] = [
     subtitle: "身近な生物を観察して特徴を見つけて分類しよう",
     pages: "p.13–26",
     color: "#3aa6a0",
-    tint: "#e2f2f1",
+    tint: "#d4ecea",
     dark: "#20736e",
     sections: [
       {
@@ -94,7 +94,7 @@ const UNIT_1_CHAPTERS: ScienceChapterMeta[] = [
     subtitle: "植物をその特徴によりいくつかのグループに分類しよう",
     pages: "p.27–44",
     color: "#6aa564",
-    tint: "#e8f1e6",
+    tint: "#dcebd9",
     dark: "#47793f",
     sections: []
   },
@@ -127,7 +127,7 @@ export const scienceUnits: ScienceUnitMeta[] = [
     num: "1",
     title: "いろいろな生物とその共通点",
     color: "#4a9d6e",
-    tint: "#eaf5ee",
+    tint: "#dcefe3",
     dark: "#2f6b49",
     chapters: UNIT_1_CHAPTERS
   },
@@ -141,8 +141,8 @@ export const scienceUnits: ScienceUnitMeta[] = [
     chapters: [
       { id: "u2-intro", unitId: "u2", num: null, title: "学習前", subtitle: "この単元で学ぶこと", pages: "p.70–72", sections: [] },
       { id: "u2-c1", unitId: "u2", num: "1", title: "身のまわりの物質とその性質", subtitle: "金属と非金属、密度", pages: "p.73–90", color: "#c0703f", tint: "#f9ebe0", dark: "#8a4a20", sections: [] },
-      { id: "u2-c2", unitId: "u2", num: "2", title: "気体の性質", subtitle: "気体の集め方と見分け方", pages: "p.91–100", color: "#5aa9c9", tint: "#e6f3f8", dark: "#2e7794", sections: [] },
-      { id: "u2-c3", unitId: "u2", num: "3", title: "水溶液の性質", subtitle: "とけ方、濃度、溶解度", pages: "p.101–114", color: "#7b7fc7", tint: "#ecedf9", dark: "#4e5292", sections: [] },
+      { id: "u2-c2", unitId: "u2", num: "2", title: "気体の性質", subtitle: "気体の集め方と見分け方", pages: "p.91–100", color: "#5aa9c9", tint: "#d8ecf4", dark: "#2e7794", sections: [] },
+      { id: "u2-c3", unitId: "u2", num: "3", title: "水溶液の性質", subtitle: "とけ方、濃度、溶解度", pages: "p.101–114", color: "#7b7fc7", tint: "#e0e2f4", dark: "#4e5292", sections: [] },
       { id: "u2-c4", unitId: "u2", num: "4", title: "物質の姿と状態変化", subtitle: "融点・沸点と粒子の運動", pages: "p.115–131", color: "#c9607f", tint: "#f9e7ed", dark: "#943a56", sections: [] },
       { id: "u2-matome", unitId: "u2", num: null, title: "単元末", subtitle: "学習内容の整理と確かめ問題", pages: "p.133–137", sections: [] }
     ]
@@ -158,7 +158,7 @@ export const scienceUnits: ScienceUnitMeta[] = [
       { id: "u3-intro", unitId: "u3", num: null, title: "学習前", subtitle: "この単元で学ぶこと", pages: "p.138–140", sections: [] },
       { id: "u3-c1", unitId: "u3", num: "1", title: "光の世界", subtitle: "反射、屈折、凸レンズ", pages: "p.141–158", color: "#d9b23a", tint: "#f9f0d3", dark: "#9c7c14", sections: [] },
       { id: "u3-c2", unitId: "u3", num: "2", title: "音の世界", subtitle: "振動と音の大きさ・高さ", pages: "p.159–166", color: "#8d7fb5", tint: "#efecf5", dark: "#63558c", sections: [] },
-      { id: "u3-c3", unitId: "u3", num: "3", title: "力の世界", subtitle: "力の大きさとばね、力のつり合い", pages: "p.167–181", color: "#4d7fc0", tint: "#e5edf8", dark: "#31578c", sections: [] },
+      { id: "u3-c3", unitId: "u3", num: "3", title: "力の世界", subtitle: "力の大きさとばね、力のつり合い", pages: "p.167–181", color: "#4d7fc0", tint: "#d9e6f5", dark: "#31578c", sections: [] },
       { id: "u3-matome", unitId: "u3", num: null, title: "単元末", subtitle: "学習内容の整理と確かめ問題", pages: "p.183–187", sections: [] }
     ]
   },
@@ -173,7 +173,7 @@ export const scienceUnits: ScienceUnitMeta[] = [
       { id: "u4-intro", unitId: "u4", num: null, title: "学習前", subtitle: "この単元で学ぶこと", pages: "p.188–192", sections: [] },
       { id: "u4-c1", unitId: "u4", num: "1", title: "火をふく大地", subtitle: "火山と火成岩", pages: "p.193–206", color: "#c95f4f", tint: "#f9e8e5", dark: "#933526", sections: [] },
       { id: "u4-c2", unitId: "u4", num: "2", title: "動き続ける大地", subtitle: "地震と大地の動き", pages: "p.207–218", color: "#a3784f", tint: "#f4ece2", dark: "#71502f", sections: [] },
-      { id: "u4-c3", unitId: "u4", num: "3", title: "地層から読みとる大地の変化", subtitle: "堆積岩と地層", pages: "p.219–235", color: "#8a9440", tint: "#f0f2e0", dark: "#5d651f", sections: [] },
+      { id: "u4-c3", unitId: "u4", num: "3", title: "地層から読みとる大地の変化", subtitle: "堆積岩と地層", pages: "p.219–235", color: "#8a9440", tint: "#e7ebd0", dark: "#5d651f", sections: [] },
       { id: "u4-matome", unitId: "u4", num: null, title: "単元末", subtitle: "学習内容の整理と確かめ問題", pages: "p.237–241", sections: [] }
     ]
   }

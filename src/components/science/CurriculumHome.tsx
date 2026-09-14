@@ -31,7 +31,13 @@ import { ScienceTopbarHome } from "./ScienceTopbarHome";
  *   is ticked. The number on screen is then something Leo earned rather than
  *   something an author typed.
  */
-export function CurriculumHome({ blockCounts }: { blockCounts: Record<string, number> }) {
+export function CurriculumHome({
+  blockCounts,
+  qrCounts
+}: {
+  blockCounts: Record<string, number>;
+  qrCounts: Record<string, number>;
+}) {
   const [progress, setProgress] = useState<ScienceBlockProgressMap>({});
   const [unitId, setUnitId] = useState(scienceUnits[0].id);
   const unit = scienceUnits.find((entry) => entry.id === unitId) ?? scienceUnits[0];
@@ -131,6 +137,9 @@ export function CurriculumHome({ blockCounts }: { blockCounts: Record<string, nu
               </button>
             ))}
           </span>
+          <Link className="sci-library-navbtn" href="/science/library">
+            QRコンテンツ
+          </Link>
           <span className="sci-home-book-label">新編 新しい科学1</span>
           <span className="sci-home-student">レオ</span>
         </div>
@@ -194,41 +203,43 @@ export function CurriculumHome({ blockCounts }: { blockCounts: Record<string, nu
                   } as React.CSSProperties
                 }
               >
-                <button
-                  className="sci-chapter-row"
-                  disabled={sections.length === 0}
-                  onClick={() => setOpen((current) => ({ ...current, [chapter.id]: !current[chapter.id] }))}
-                  type="button"
-                >
-                  <span className="sci-chapter-badge">{chapter.num ?? "–"}</span>
-                  <span className="sci-chapter-titles">
-                    <span className="sci-chapter-title">
-                      {chapter.num ? `第${chapter.num}章 ${chapter.title}` : chapter.title}
+                {sections.length > 0 ? (
+                  <button
+                    className="sci-chapter-row"
+                    onClick={() => setOpen((current) => ({ ...current, [chapter.id]: !current[chapter.id] }))}
+                    type="button"
+                  >
+                    <ChapterFace chapter={chapter} />
+                    <span className="sci-chapter-end">
+                      <span className="sci-chapter-pages">{chapter.pages}</span>
+                      <span className="sci-progress-track" style={{ width: 110 }}>
+                        <span className="sci-progress-fill" style={{ width: `${pct}%`, display: "block" }} />
+                      </span>
+                      <span className="sci-chapter-progress-label">
+                        {done} / {sections.length} 節
+                      </span>
+                      <span className={`sci-chapter-chevron${isOpen ? " sci-chapter-chevron--open" : ""}`}>
+                        ▼
+                      </span>
                     </span>
-                    <span className="sci-chapter-subtitle">{chapter.subtitle}</span>
-                  </span>
-                  <span className="sci-chapter-end">
-                    <span className="sci-chapter-pages">{chapter.pages}</span>
-                    {sections.length > 0 ? (
-                      <>
-                        <span className="sci-progress-track" style={{ width: 110 }}>
-                          <span
-                            className="sci-progress-fill"
-                            style={{ width: `${pct}%`, display: "block" }}
-                          />
-                        </span>
-                        <span className="sci-chapter-progress-label">
-                          {done} / {sections.length} 節
-                        </span>
-                        <span className={`sci-chapter-chevron${isOpen ? " sci-chapter-chevron--open" : ""}`}>
-                          ▼
-                        </span>
-                      </>
-                    ) : (
-                      <span className="sci-chapter-soon">準備中</span>
-                    )}
-                  </span>
-                </button>
+                  </button>
+                ) : (
+                  // Not a button: there is nothing to expand. It still carries
+                  // a real destination, because the publisher's videos and 練習
+                  // for these pages exist whether or not the 節 are written.
+                  <div className="sci-chapter-row sci-chapter-row--static">
+                    <ChapterFace chapter={chapter} />
+                    <span className="sci-chapter-end">
+                      <span className="sci-chapter-pages">{chapter.pages}</span>
+                      {qrCounts[chapter.id] ? (
+                        <Link className="sci-chapter-qr" href="/science/library">
+                          ▶ QRコンテンツ {qrCounts[chapter.id]} 件
+                        </Link>
+                      ) : null}
+                      <span className="sci-chapter-soon">節は準備中</span>
+                    </span>
+                  </div>
+                )}
 
                 {isOpen && sections.length > 0 ? (
                   <div className="sci-section-list">
@@ -249,6 +260,21 @@ export function CurriculumHome({ blockCounts }: { blockCounts: Record<string, nu
         </div>
       </div>
     </div>
+  );
+}
+
+/** The badge and titles, shared by the expandable row and the static one. */
+function ChapterFace({ chapter }: { chapter: ScienceChapterMeta }) {
+  return (
+    <>
+      <span className="sci-chapter-badge">{chapter.num ?? "–"}</span>
+      <span className="sci-chapter-titles">
+        <span className="sci-chapter-title">
+          {chapter.num ? `第${chapter.num}章 ${chapter.title}` : chapter.title}
+        </span>
+        <span className="sci-chapter-subtitle">{chapter.subtitle}</span>
+      </span>
+    </>
   );
 }
 

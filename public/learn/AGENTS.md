@@ -47,6 +47,20 @@ Every learner app lives in THIS folder (`public/learn/`). Do not create learner 
 }
 ```
 
+## Tests are a special case
+
+A test app (`ow-l<level>-t<band>-test.html`) follows every rule above, plus the
+rules in `docs/tests.md`: no right/wrong shown while answering, a score screen
+locked until all parts are done, and the publisher's points split between what
+the app marks and what Neritan marks. Its lesson JSON lives in
+`checkpoint-<band>/lessons/`, not in a unit folder.
+
+Images a test needs are extracted from the publisher's RTF by
+`scripts/extract-examview-test.mjs`, filed under
+`public/tests/<course>/level-<n>/<slug>/`, and referenced absolutely — apps are
+embedded with `srcdoc`, so a relative image path resolves against the site root,
+not the app.
+
 ## Save/restore contract
 
 - Auto-save done-key when module finishes (don't rely on a button)

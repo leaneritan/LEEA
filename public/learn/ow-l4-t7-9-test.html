@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test · Units 7–9</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ts:#0F766E;--tsd:#115E59;--tsl:#F0FDFA;
+  --bl:#3B82F6;--bld:#1D4ED8;--bll:#EFF6FF;
+  --ye:#FDE047;--yed:#EAB308;
+  --gn:#16A34A;--gnl:#F0FDF4;
+  --rd:#DC2626;--rdl:#FEE2E2;
+  --am:#D97706;--aml:#FFFBEB;
+  --pu:#7C3AED;--pul:#F5F3FF;
+  --ink:#111111;--ink2:#374151;--ink3:#6B7280;
+  --paper:#FAFAF7;--surf:#FFFFFF;--bdr:#E5E7EB;
+  --fn:'Nunito',sans-serif;--fnh:'Oswald',sans-serif;
+}
+body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+.app-hdr{background:var(--ink);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.hdr-badge{background:var(--ye);color:var(--ink);font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;padding:2px 7px;border-radius:2px}
+.hdr-title{font-family:var(--fnh);font-size:.85rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hdr-unit{font-size:.7rem;font-weight:700;color:#5EEAD4}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#115E59,#0F766E);padding:20px 16px 16px;text-align:center}
+.hero-kick{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.7);margin-bottom:6px}
+.hero-title{font-family:var(--fnh);font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hero-title span{color:var(--ye)}
+.hero-sub{font-size:.78rem;color:rgba(255,255,255,.85);font-weight:600;margin-top:4px}
+.hero-em{font-size:1.3rem;margin-top:8px}
+.prog-wrap{background:rgba(0,0,0,.2);height:4px}
+.prog-fill{height:100%;background:var(--ye);transition:width .5s;width:0%}
+
+/* HOME */
+.home{max-width:680px;margin:0 auto;padding:16px 14px 80px}
+.sec-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--ink3);margin-bottom:10px;margin-top:20px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mod-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px 13px 11px;cursor:pointer;transition:all .2s;position:relative;text-align:left}
+.mod-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.1);border-color:var(--ts)}
+.mod-card.dad{border-color:#C4B5FD;background:linear-gradient(180deg,#fff,#F5F3FF)}
+.mod-card.dad:hover{border-color:var(--pu)}
+.mod-icon{font-size:1.5rem;margin-bottom:5px}
+.mod-name{font-weight:800;font-size:.82rem;color:var(--ink);margin-bottom:2px}
+.mod-desc{font-size:.7rem;color:var(--ink3);font-weight:600;line-height:1.4}
+.mod-badge{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;margin-top:7px;display:inline-block}
+.badge-new{background:var(--paper);color:var(--ink3);border:1px solid var(--bdr)}
+.badge-done{background:#D1FAE5;color:var(--gn)}
+.badge-prog{background:var(--tsl);color:var(--ts)}
+.mod-pts{position:absolute;top:6px;right:6px;font-family:var(--fnh);font-size:.5rem;font-weight:700;letter-spacing:1px;color:var(--ts);background:var(--tsl);padding:2px 6px;border-radius:2px}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;overflow-y:auto}
+.modal.open{display:block}
+.mbox{background:var(--surf);min-height:100vh;display:flex;flex-direction:column;max-width:680px;margin:0 auto}
+.mhd{padding:13px 14px;display:flex;align-items:center;gap:10px;color:#fff;position:sticky;top:0;z-index:10;flex-shrink:0;background:var(--ts)}
+.mhd.dad{background:var(--pu)}
+.mbk{background:rgba(255,255,255,.15);border:none;color:#fff;font-family:var(--fn);font-size:.72rem;font-weight:800;padding:5px 11px;border-radius:20px;cursor:pointer;flex-shrink:0}
+.mhd-title{font-weight:900;font-size:1rem;flex:1;letter-spacing:.3px;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.mhd-num{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:1px;opacity:.75}
+.mbody{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
+.mod-foot{padding:12px 14px;background:var(--surf);border-top:2px solid var(--bdr);display:flex;gap:10px;position:sticky;bottom:0}
+.done-btn{flex:1;background:var(--gn);color:#fff;border:none;border-radius:4px;padding:11px 14px;font-family:var(--fn);font-size:.78rem;font-weight:800;cursor:pointer}
+.done-btn:disabled{background:var(--bdr);color:var(--ink3);cursor:not-allowed}
+.redo-btn{background:var(--rd);color:#fff;border:none;border-radius:4px;padding:11px 14px;font-family:var(--fn);font-size:.78rem;font-weight:800;cursor:pointer;min-width:96px}
+.redo-btn.armed{background:var(--ink);}
+
+/* CARDS */
+.instr-card{background:var(--ink);color:#fff;border-radius:4px;padding:12px 14px;font-size:.92rem;font-weight:800;line-height:1.45}
+.instr-card .sub{display:block;font-size:.72rem;font-weight:600;color:#9CA3AF;margin-top:4px}
+.dad-card{background:#F3E8FF;border:2px solid #D8B4FE;border-radius:4px;padding:11px 13px;font-size:.82rem;font-weight:700;color:#581C87;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.dad-icon{font-size:1.1rem;flex-shrink:0}
+.info-card{background:var(--bll);border:2px solid #BFDBFE;border-radius:4px;padding:10px 12px;font-size:.78rem;font-weight:600;color:var(--bld);line-height:1.5}
+.warn-card{background:var(--aml);border:2px solid #FCD34D;border-radius:4px;padding:10px 12px;font-size:.78rem;font-weight:700;color:#92400E;line-height:1.5}
+
+/* AUDIO */
+.audio-card{background:var(--surf);border:2px solid var(--ts);border-radius:4px;padding:12px}
+.audio-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:2px;color:var(--ts);margin-bottom:8px}
+.audio-card audio{width:100%}
+
+/* IMAGE */
+.pic-wrap{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:8px}
+.pic-wrap img{width:100%;height:auto;display:block;border-radius:2px}
+.pic-cap{font-size:.68rem;font-weight:700;color:var(--ink3);margin-top:6px;text-align:center}
+.pic-zoom{background:var(--ink);color:#fff;border:none;border-radius:4px;padding:7px 12px;font-family:var(--fn);font-size:.72rem;font-weight:800;cursor:pointer;margin-top:8px;width:100%}
+
+/* WORD BANK */
+.bank{background:var(--surf);border:2px dashed var(--ts);border-radius:4px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px}
+.bank-lbl{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;color:var(--ts);width:100%;margin-bottom:2px}
+.bank-chip{background:var(--tsl);border:1px solid #99F6E4;border-radius:14px;padding:4px 11px;font-size:.78rem;font-weight:800;color:var(--tsd)}
+
+/* PASSAGE */
+.passage{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px 14px}
+.passage h4{font-family:var(--fnh);font-size:.95rem;font-weight:700;letter-spacing:1px;color:var(--ts);margin-bottom:8px}
+.passage p{font-size:.85rem;line-height:1.65;color:var(--ink2);font-weight:600;margin-bottom:8px}
+.passage p:last-child{margin-bottom:0}
+
+/* QUESTIONS */
+.q{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:12px 13px}
+.q.answered{border-color:#99F6E4;background:linear-gradient(180deg,#fff,var(--tsl))}
+.q-n{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:1px;color:var(--ink3);margin-bottom:5px}
+.q-stem{font-size:.88rem;font-weight:700;color:var(--ink);line-height:1.6}
+.q-sel{font-family:var(--fn);font-size:.85rem;font-weight:800;color:var(--tsd);background:var(--tsl);border:2px solid var(--ts);border-radius:4px;padding:4px 6px;margin:0 3px;max-width:100%}
+.q-opts{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.opt-btn{background:var(--paper);border:2px solid var(--bdr);border-radius:4px;padding:8px 13px;font-family:var(--fn);font-size:.82rem;font-weight:800;color:var(--ink2);cursor:pointer;flex:1;min-width:110px;text-align:left}
+.opt-btn:hover{border-color:var(--ts)}
+.opt-btn.picked{background:var(--ts);border-color:var(--tsd);color:#fff}
+.opt-btn .k{font-family:var(--fnh);opacity:.7;margin-right:6px}
+.q-text{width:100%;font-family:var(--fn);font-size:.85rem;font-weight:600;color:var(--ink);border:2px solid var(--bdr);border-radius:4px;padding:9px 11px;margin-top:9px;line-height:1.6;resize:vertical;background:var(--paper)}
+.q-text:focus{outline:none;border-color:var(--ts);background:#fff}
+.q-hint{font-size:.7rem;font-weight:700;color:var(--ink3);margin-top:6px}
+
+/* SPEAKING */
+.sp-row{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start}
+.sp-row.ok{border-color:#6EE7B7;background:var(--gnl)}
+.sp-tick{width:30px;height:30px;border-radius:4px;border:2px solid var(--bdr);background:var(--paper);font-size:.9rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sp-row.ok .sp-tick{background:var(--gn);border-color:var(--gn);color:#fff}
+.sp-body{flex:1}
+.sp-q{font-size:.84rem;font-weight:800;color:var(--ink);line-height:1.5}
+.sp-a{font-size:.74rem;font-weight:700;color:var(--ink3);line-height:1.5;margin-top:4px}
+.sp-toggle{background:var(--pu);color:#fff;border:none;border-radius:4px;padding:9px 13px;font-family:var(--fn);font-size:.76rem;font-weight:800;cursor:pointer;width:100%}
+
+/* REPORT */
+.rep-btn{width:100%;background:var(--ink);color:#fff;border:none;border-radius:4px;padding:15px;font-family:var(--fnh);font-size:.9rem;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:18px}
+.rep-btn:disabled{background:var(--bdr);color:var(--ink3);cursor:not-allowed}
+.score-hero{background:linear-gradient(135deg,#115E59,#0F766E);border-radius:4px;padding:22px 16px;text-align:center;color:#fff}
+.score-big{font-family:var(--fnh);font-size:3rem;font-weight:700;line-height:1;color:var(--ye)}
+.score-of{font-size:.9rem;font-weight:800;opacity:.85;margin-top:4px}
+.score-pct{font-family:var(--fnh);font-size:1.1rem;font-weight:700;letter-spacing:2px;margin-top:10px}
+.brk{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;overflow:hidden}
+.brk-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--bdr);font-size:.8rem;font-weight:700}
+.brk-row:last-child{border-bottom:none}
+.brk-name{flex:1;color:var(--ink2)}
+.brk-score{font-family:var(--fnh);font-weight:700;color:var(--ink)}
+.brk-row.pending .brk-score{color:var(--pu)}
+.mark-row{background:var(--surf);border:2px solid #D8B4FE;border-radius:4px;padding:11px 12px}
+.mark-q{font-size:.78rem;font-weight:800;color:#581C87;margin-bottom:5px}
+.mark-said{font-size:.8rem;font-weight:600;color:var(--ink2);background:var(--paper);border-radius:4px;padding:8px 10px;line-height:1.55;white-space:pre-wrap;margin-bottom:6px}
+.mark-sample{font-size:.73rem;font-weight:700;color:var(--gn);line-height:1.5;margin-bottom:7px}
+.mark-steps{display:flex;gap:6px;flex-wrap:wrap}
+.step-btn{background:var(--paper);border:2px solid var(--bdr);border-radius:4px;padding:6px 13px;font-family:var(--fn);font-size:.78rem;font-weight:800;color:var(--ink2);cursor:pointer}
+.step-btn.on{background:var(--pu);border-color:var(--pu);color:#fff}
+
+/* LIGHTBOX */
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:none;align-items:center;justify-content:center;padding:10px}
+.lb.open{display:flex}
+.lb img{max-width:100%;max-height:92vh;object-fit:contain}
+.lb-x{position:absolute;top:12px;right:14px;background:rgba(255,255,255,.2);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:1.1rem;cursor:pointer}
+
+@media(max-width:420px){.mod-grid{grid-template-columns:1fr}.opt-btn{min-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="app-hdr">
+  <div class="hdr-left">
+    <span class="hdr-badge">LEEA</span>
+    <span class="hdr-title">TEST</span>
+  </div>
+  <span class="hdr-unit">Units 7–9</span>
+</div>
+
+<div class="hero">
+  <div class="hero-kick">OUR WORLD · LEVEL 4</div>
+  <div class="hero-title">Units 7–9 <span>Test</span></div>
+  <div class="hero-sub">13 parts · 42 questions · 80 points</div>
+  <div class="hero-em">📝</div>
+</div>
+<div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
+
+<div class="home">
+  <div class="warn-card" style="margin-bottom:4px">
+    ⚠️ This is a <b>test</b>, not practice. You will <b>not</b> see right or wrong while you answer.
+    Do your best, finish every part, then open <b>My Score</b> at the bottom with Dad.
+  </div>
+  <div class="info-card">
+    💾 Every answer saves the moment you make it. You can stop and come back — nothing is lost.
+  </div>
+
+  <div class="sec-lbl">TEST PARTS</div>
+  <div class="mod-grid" id="modGrid"></div>
+
+  <button class="rep-btn" id="repBtn" onclick="openReport()" disabled>🔒 MY SCORE</button>
+  <div class="q-hint" id="repHint" style="text-align:center;margin-top:8px"></div>
+</div>
+
+<div id="modals"></div>
+
+<div class="modal" id="report">
+  <div class="mbox">
+    <div class="mhd"><button class="mbk" onclick="closeModal('report')">← Back</button><div class="mhd-title">My Score</div></div>
+    <div class="mbody" id="report-body"></div>
+  </div>
+</div>
+
+<div class="lb" id="lb" onclick="closeLb()"><button class="lb-x" onclick="closeLb()">✕</button><img id="lb-img" alt=""></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   THE TEST
+   One data object per test. Everything below it is generic — a new
+   ExamView test is a new TEST object and nothing else. See docs/tests.md.
+
+   kinds:
+     select   — fill the blank from the part's word bank (one <select> per blank)
+     buttons  — pick ONE option (True/False, which/who, a–d)
+     multi    — pick TWO options; 2 pts both right, 1 pt one right, 0 if any wrong
+     text     — type it; `ans` auto-marks (normalised), no `ans` means Dad marks it
+     writing  — choose a prompt and write; Dad marks with the rubric
+     speaking — Dad asks, Leo answers, Dad ticks
+   ═══════════════════════════════════════════════════════════════════════ */
+var AUDIO_BASE = '/audio/our-world/level-4/unit-9/';
+var PIC_BASE   = '/tests/our-world/level-4/t7-9/';
+
+var TEST = {
+  id: 'ow-l4-t7-9',
+  parts: [
+  {
+    id:'m1', icon:'🎧', name:'Listen & Match', kind:'select', pts:1,
+    instr:'Look. Listen. Write the letter.',
+    sub:'Listen to the track. For each number, choose the letter in the picture.',
+    track:'9.3', audio:AUDIO_BASE+'ow2e_ev4_ame_9.3_0.mp3',
+    image:PIC_BASE+'q01-playground.png',
+    imageAlt:'A playground. Seven places are labelled A to G: two children kicking a ball (A), a child swinging (B), a child pulling a swing rope (C), a child pushing another child on a swing (D), a child on a slide (E), a woman helping a fallen roller skater (F), and a child taking a photo (G).',
+    caption:'Tap the picture to see it bigger.',
+    bank:['A','B','C','D','E','F','G'],
+    example:'Example:  0)  E',
+    questions:[
+      {n:1,label:'1)',ans:'G'},{n:2,label:'2)',ans:'F'},{n:3,label:'3)',ans:'D'},
+      {n:4,label:'4)',ans:'C'},{n:5,label:'5)',ans:'B'},{n:6,label:'6)',ans:'A'}
+    ]
+  },
+  {
+    id:'m2', icon:'🔤', name:'Word Box 1', kind:'select', pts:1,
+    instr:'Complete with the best word from the box.',
+    bank:['cooperate','direction','friction','imaginations','inventions','score','turn'],
+    example:'Example:  I like to turn around and around.',
+    questions:[
+      {n:2,before:'The person who has the highest',after:'wins.',ans:'score'},
+      {n:3,before:'When two things rub together it’s called',after:'.',ans:'friction'},
+      {n:4,before:'One of the first',after:'was the wheel.',ans:'inventions'},
+      {n:5,before:'Inventors often use their',after:'to solve problems.',ans:'imaginations'},
+      {n:6,before:'This is a video game which doesn’t make players compete. They',after:'instead.',ans:'cooperate'},
+      {n:7,before:'Don’t go in that',after:'! Turn right.',ans:'direction'}
+    ]
+  },
+  {
+    id:'m3', icon:'✌️', name:'Choose Two', kind:'multi', pts:2,
+    instr:'Choose the best answers.',
+    sub:'Each question has TWO right answers.',
+    questions:[
+      {n:8,stem:'Which words describe how you can move something?',
+       options:[{k:'a',t:'fossil'},{k:'b',t:'lift'},{k:'c',t:'screen'},{k:'d',t:'turn'}],ans:['b','d']},
+      {n:9,stem:'Which words are things you can collect?',
+       options:[{k:'a',t:'alone'},{k:'b',t:'comic books'},{k:'c',t:'fossils'},{k:'d',t:'push'}],ans:['b','c']},
+      {n:10,stem:'Which words describe the direction something can move in?',
+       options:[{k:'a',t:'backward'},{k:'b',t:'balance'},{k:'c',t:'controller'},{k:'d',t:'forward'}],ans:['a','d']}
+    ]
+  },
+  {
+    id:'m4', icon:'🔗', name:'which or who', kind:'buttons', pts:1,
+    instr:'Choose which or who.',
+    questions:[
+      {n:11,stem:'A strawberry is a fruit ______ is red.',
+       options:[{k:'a',t:'which'},{k:'b',t:'who'}],ans:'a'},
+      {n:12,stem:'There is a boy in my class ______ likes to collect fossils.',
+       options:[{k:'a',t:'which'},{k:'b',t:'who'}],ans:'b'},
+      {n:13,stem:'Dinosaurs are creatures ______ lived long ago.',
+       options:[{k:'a',t:'which'},{k:'b',t:'who'}],ans:'a'},
+      {n:14,stem:'Thomas Edison is the man ______ invented the light bulb.',
+       options:[{k:'a',t:'which'},{k:'b',t:'who'}],ans:'b'}
+    ]
+  },
+  {
+    id:'m5', icon:'🧩', name:'Word Box 2', kind:'select', pts:1,
+    instr:'Complete with the best word(s) from the box.',
+    bank:['didn’t use to','for','to','the more','use','used to','who','which','you'],
+    example:'Example:  How do you use a hula hoop?',
+    questions:[
+      {n:15,before:'People',after:'have cell phones.',ans:'didn’t use to'},
+      {n:16,before:'',after:'put it over your head when it’s raining.',ans:'you'},
+      {n:17,before:'I have a friend',after:'collects stuffed animals.',ans:'who'},
+      {n:18,before:'Long ago, people',after:'read by candlelight.',ans:'used to'},
+      {n:19,before:'I bought a stuffed animal',after:'my friend.',ans:'for'},
+      {n:20,before:'He gave a toy dinosaur',after:'me.',ans:'to'},
+      {n:21,before:'',after:'you practice, the better you’ll be!',ans:'the more'},
+      {n:22,before:'This is a force',after:'keeps you moving in a circle.',ans:'which'}
+    ]
+  },
+  {
+    id:'m6', icon:'✏️', name:'Rewrite', kind:'text', pts:2,
+    instr:'Rewrite the sentence. Use the word(s) in parentheses.',
+    questions:[
+      {n:23,stem:'People rode horses. (use to)',ans:'People used to ride horses.'},
+      {n:24,stem:'My father sent me a stuffed animal. (to)',ans:'My father sent a stuffed animal to me.'},
+      {n:25,stem:'My mother bought us a pizza. (for)',ans:'My mother bought a pizza for us.'}
+    ]
+  },
+  {
+    id:'m7', icon:'✅', name:'True or False', kind:'buttons', pts:1,
+    instr:'Write T for True or F for False.',
+    passage:{title:'Inventions',paragraphs:[
+      'Inventors need imagination and creativity. The Wright brothers tried to fly many times, but they failed. Finally, they succeeded in 1903. Now that we have planes, our world is very different.',
+      'Louis Braille had an accident when he was three. The accident left him blind. At that time, it was hard for blind children to read. They had to touch raised letters. It was easy to confuse Q with O. When he was fifteen, Louis invented an alphabet that used raised dots. It was a big success!'
+    ]},
+    questions:[
+      {n:26,stem:'Creativity is important for inventors.',options:[{k:'T',t:'True'},{k:'F',t:'False'}],ans:'T'},
+      {n:27,stem:'The Wright brothers failed many times before they flew an airplane.',options:[{k:'T',t:'True'},{k:'F',t:'False'}],ans:'T'},
+      {n:28,stem:'Before Louis Braille’s invention it was difficult for blind children to read.',options:[{k:'T',t:'True'},{k:'F',t:'False'}],ans:'T'},
+      {n:29,stem:'Louis Braille invented an alphabet with raised letters.',options:[{k:'T',t:'True'},{k:'F',t:'False'}],ans:'F'}
+    ]
+  },
+  {
+    id:'m8', icon:'🛹', name:'Read & Match', kind:'select', pts:1,
+    instr:'Read and match.',
+    passage:{title:'Electric Skateboards',paragraphs:[
+      'Electric skateboards are a great invention! The first electric skateboard, or eboard, was built by Louie Finkle in 1997. Finkle was an inventor who used to take apart machines so he could learn about them. This helped him understand how to build an eboard.',
+      'It was difficult to create a battery-powered skateboard back then. The batteries and motors weren’t strong enough. This made Finkle’s skateboard expensive. It cost $995. It took 15 years to solve this problem. Around 2005, new inventions made it possible to build an eboard with a stronger battery. Now there are a lot of inventors trying to create the fastest, cheapest, or lightest electric skateboard. Today you can buy an eboard for as little as $200.',
+      'An electric skateboard has a controller which you use to go slow or fast and to brake. Old-fashioned skateboards used to have four wheels. Some of the newer eboards only have one big wheel. These eboards can go up to 20 mph. So you’ll still need your helmet, knee pads, and elbow pads!'
+    ]},
+    bank:['a. $200.','b. 1997.','c. 20 mph.','d. 2005.','e. $995.','f. one.'],
+    questions:[
+      {n:30,before:'The first electric skateboard was built in',after:'',ans:'b. 1997.'},
+      {n:31,before:'The first eboard cost',after:'',ans:'e. $995.'},
+      {n:32,before:'Stronger batteries for eboards were available in',after:'',ans:'d. 2005.'},
+      {n:33,before:'Now you can buy an eboard for',after:'',ans:'a. $200.'},
+      {n:34,before:'An eboard is an electric skateboard which can travel',after:'',ans:'c. 20 mph.'},
+      {n:35,before:'An eboard can have four wheels or',after:'',ans:'f. one.'}
+    ]
+  },
+  {
+    id:'m9', icon:'💬', name:'Answer in a Sentence', kind:'text', pts:2, dadMarks:true,
+    instr:'Answer the question with a complete sentence.',
+    sub:'Dad marks these two. Write a whole sentence, not one word.',
+    passage:{title:'Electric Skateboards',paragraphs:[
+      'Electric skateboards are a great invention! The first electric skateboard, or eboard, was built by Louie Finkle in 1997. Finkle was an inventor who used to take apart machines so he could learn about them. This helped him understand how to build an eboard.',
+      'It was difficult to create a battery-powered skateboard back then. The batteries and motors weren’t strong enough. This made Finkle’s skateboard expensive. It cost $995. It took 15 years to solve this problem. Around 2005, new inventions made it possible to build an eboard with a stronger battery. Now there are a lot of inventors trying to create the fastest, cheapest, or lightest electric skateboard. Today you can buy an eboard for as little as $200.',
+      'An electric skateboard has a controller which you use to go slow or fast and to brake. Old-fashioned skateboards used to have four wheels. Some of the newer eboards only have one big wheel. These eboards can go up to 20 mph. So you’ll still need your helmet, knee pads, and elbow pads!'
+    ]},
+    questions:[
+      {n:36,stem:'What is one thing old-fashioned skateboards used to have? What thing didn’t they use to have?',
+       sample:'Old-fashioned skateboards used to have four wheels. They didn’t use to have batteries / a motor / controllers.'},
+      {n:37,stem:'What do you use the controller on an electric skateboard for?',
+       sample:'You use it to go fast or slow / to brake.'}
+    ]
+  },
+  {
+    id:'m10', icon:'🔊', name:'Listen & Write', kind:'select', pts:1,
+    instr:'Listen and write the word(s) from the box.',
+    track:'9.4', audio:AUDIO_BASE+'ow2e_ev4_ame_9.4_0.mp3',
+    bank:['batteries','braille','popsicle','video game','wheel','windshield wipers'],
+    questions:[
+      {n:'38.1',label:'1)',ans:'video game'},{n:'38.2',label:'2)',ans:'wheel'},
+      {n:'38.3',label:'3)',ans:'popsicle'},{n:'38.4',label:'4)',ans:'batteries'},
+      {n:'38.5',label:'5)',ans:'windshield wipers'},{n:'38.6',label:'6)',ans:'braille'}
+    ]
+  },
+  {
+    id:'m11', icon:'🎙️', name:'Listen & Choose', kind:'multi', pts:2,
+    instr:'Choose the best answers.',
+    sub:'Each question has TWO right answers.',
+    track:'9.4a', audio:AUDIO_BASE+'ow2e_ev4_ame_9.4a_0.mp3',
+    questions:[
+      {n:39,stem:'Choose the words you hear that describe the first invention.',
+       options:[{k:'a',t:'controller'},{k:'b',t:'together'},{k:'c',t:'cooperate'},{k:'d',t:'points'}],ans:['a','d']},
+      {n:40,stem:'Choose the words you hear that describe the second invention.',
+       options:[{k:'a',t:'backward'},{k:'b',t:'forward'},{k:'c',t:'push'},{k:'d',t:'pull'}],ans:['c','d']}
+    ]
+  },
+  {
+    id:'m12', icon:'📝', name:'Writing', kind:'writing', pts:10, dadMarks:true,
+    instr:'Choose one and write.',
+    sub:'3 to 4 sentences. Dad marks this out of 10.',
+    prompts:[
+      {k:'a',t:'Think about a hobby you like. Write 3 to 4 sentences explaining why the hobby is your favorite and why you think it is interesting. Use words and expressions like <b>for example</b> and <b>such as</b> to help you explain.'},
+      {k:'b',t:'Write about your favorite invention. Include your opinion of the invention. Use words like <b>in my opinion</b>, <b>I think</b>, and <b>I believe</b>.'}
+    ],
+    rubric:[
+      'The task: you write about the hobby (a) or the invention (b) using the words asked for.',
+      'Theme: the topic is clear and you stay on it.',
+      'Vocabulary: you use the words correctly.',
+      'Grammar: you use correct grammar.'
+    ],
+    n:41
+  },
+  {
+    id:'m13', icon:'🗣️', name:'Speaking with Dad', kind:'speaking', pts:10, dad:true, dadMarks:true,
+    instr:'Speaking',
+    sub:'Dad asks, you answer out loud. 1 point each.',
+    image:PIC_BASE+'q42-town-park.png',
+    imageAlt:'A town with a park. A girl on a bicycle pulls a boy on a skateboard. A mother pushes a small child on a swing. A boy flies a kite. Children spin on a merry-go-round. Signs point to the mall, the zoo, the city center and the airport, and there is an ice cream shop and a toy store.',
+    caption:'Look at the picture while Dad asks you.',
+    n:42,
+    prompts:[
+      {say:'Say',q:'Look at the girl on the bicycle. What is she doing with the boy on the skateboard?',a:'She is pulling the boy on the skateboard.'},
+      {say:'Ask',q:'If she rides the bike faster, what will happen to the boy?',a:'The faster she rides, the faster the boy goes. / If she rides the bike faster, the boy will go faster.'},
+      {say:'Ask',q:'What do you use to keep safe on a bike or skateboard?',a:'You use a helmet / knee pads / elbow pads.'},
+      {say:'Ask',q:'If you’re riding a bike and want to turn left, what do you do?',a:'You turn your wheel to the left. / You lean to the left.'},
+      {say:'Ask',q:'Are they riding toward the mall?',a:'No, they’re riding away from the mall.'},
+      {say:'Ask',q:'What is the mom in the park doing?',a:'The mom is pushing the daughter (on the swings).'},
+      {say:'Ask',q:'How do you swing?',a:'You push and pull your legs up and down.'},
+      {say:'Say',q:'The mom gave the boy the kite. What is another way to say that sentence using “to”?',a:'The mom gave the kite to him / to the boy.'},
+      {say:'Ask',q:'What are the children doing on the merry-go-round?',a:'They are spinning / turning.'},
+      {say:'Ask',q:'How can the children on the merry-go-round get dizzier?',a:'The faster they go, the dizzier they get. / They can push more / faster.'}
+    ]
+  }
+]};
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ENGINE — generic. Nothing below this line knows about Units 7–9.
+   ═══════════════════════════════════════════════════════════════════════ */
+var SP = 'leea-4-t7-9-test-';
+var HW_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-t7-9-test';
+var PARTS = TEST.parts;
+var MC = PARTS.length;
+
+function lSave(k,v){try{localStorage.setItem(SP+k,JSON.stringify(v));}catch(e){}}
+function lLoad(k,fb){try{var v=localStorage.getItem(SP+k);return v!==null?JSON.parse(v):(fb===undefined?null:fb);}catch(e){return fb===undefined?null:fb;}}
+function lDrop(k){try{localStorage.removeItem(SP+k);}catch(e){}}
+
+function saveScore(score,total,done,extra){
+  var data={score:score,total:total,pct:total?Math.round(score/total*100):0,done:done,timestamp:new Date().toISOString()};
+  if(extra)for(var x in extra)data[x]=extra[x];
+  lSave('score',data);
+  try{
+    localStorage.setItem(HW_ID+'-score',JSON.stringify(data));
+    if(done)localStorage.setItem(HW_ID+'-done',JSON.stringify(true));
+  }catch(e){}
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function partById(id){for(var i=0;i<PARTS.length;i++)if(PARTS[i].id===id)return PARTS[i];return null;}
+
+/* Answers live in one object per part so a single write saves the whole part. */
+function getAns(p){return lLoad(p.id+'-ans',{})||{};}
+function setAns(p,key,val){var a=getAns(p);a[key]=val;lSave(p.id+'-ans',a);}
+
+/* ── marking ────────────────────────────────────────────────────────── */
+function norm(s){
+  return String(s||'').toLowerCase()
+    .replace(/[‘’ʼ]/g,"'").replace(/[“”]/g,'"')
+    .replace(/[.,!?;:]+$/g,'').replace(/\s+/g,' ').trim();
+}
+
+/** What a part is worth, what Leo earned automatically, and what Dad still owes. */
+function markPart(p){
+  var a=getAns(p), got=0, max=0, pending=[];
+  if(p.kind==='speaking'){
+    var ticks=lLoad(p.id+'-ticks',[])||[];
+    max=p.pts;
+    for(var t=0;t<p.prompts.length;t++)if(ticks[t])got++;
+    return {got:got,max:max,pending:pending,dadOnly:true};
+  }
+  if(p.kind==='writing'){
+    max=p.pts;
+    var dm=lLoad(p.id+'-dad',null);
+    if(dm!==null)got=dm;
+    else pending.push({key:p.id+':'+p.n,part:p,n:p.n,max:p.pts,said:a.text||'',
+                      sample:'Rubric: '+p.rubric.join(' · ')});
+    return {got:got,max:max,pending:pending,dadOnly:true};
+  }
+  for(var i=0;i<p.questions.length;i++){
+    var q=p.questions[i], key=String(q.n), given=a[key];
+    max+=p.pts;
+    if(p.kind==='multi'){
+      var picked=given||[];
+      var right=0,wrong=0;
+      for(var j=0;j<picked.length;j++){(q.ans.indexOf(picked[j])>=0?right++:wrong++);}
+      if(wrong===0)got+=(right>=2?p.pts:right>=1?1:0);
+    } else if(p.kind==='text'){
+      var dmq=lLoad(p.id+'-dad-'+key,null);
+      if(q.ans && norm(given)===norm(q.ans)) got+=p.pts;
+      else if(dmq!==null) got+=dmq;
+      else if(String(given||'').trim()!=='' || q.ans)
+        pending.push({key:p.id+':'+key,part:p,n:q.n,max:p.pts,said:given||'',
+                      sample:q.ans||q.sample||''});
+    } else {
+      if(given!==undefined && given!==null && String(given)===String(q.ans)) got+=p.pts;
+    }
+  }
+  return {got:got,max:max,pending:pending,dadOnly:!!p.dadMarks};
+}
+
+function totals(){
+  var got=0,max=0,pending=[];
+  for(var i=0;i<PARTS.length;i++){
+    var m=markPart(PARTS[i]);
+    got+=m.got;max+=m.max;pending=pending.concat(m.pending);
+  }
+  return {got:got,max:max,pending:pending};
+}
+
+/* ── completion ─────────────────────────────────────────────────────── */
+function partComplete(p){
+  var a=getAns(p);
+  if(p.kind==='speaking')return !!lLoad(p.id+'-seen',false);
+  if(p.kind==='writing')return !!a.choice && String(a.text||'').trim().length>0;
+  for(var i=0;i<p.questions.length;i++){
+    var v=a[String(p.questions[i].n)];
+    if(p.kind==='multi'){if(!v||v.length<2)return false;}
+    else if(p.kind==='text'){if(String(v||'').trim()==='')return false;}
+    else if(v===undefined||v===null||v==='')return false;
+  }
+  return true;
+}
+function isDone(p){return !!lLoad(p.id+'-done',false);}
+
+/* ── home ───────────────────────────────────────────────────────────── */
+function renderHome(){
+  var h='';
+  for(var i=0;i<PARTS.length;i++){
+    var p=PARTS[i], done=isDone(p), started=Object.keys(getAns(p)).length>0||!!lLoad(p.id+'-seen',false);
+    var state=done?'done':started?'prog':'new';
+    var m=markPart(p);
+    h+='<button class="mod-card'+(p.dad?' dad':'')+'" onclick="openPart(\''+p.id+'\')">'
+      +'<span class="mod-pts">'+m.max+' PTS</span>'
+      +'<div class="mod-icon">'+p.icon+'</div>'
+      +'<div class="mod-name">'+(i+1)+'. '+esc(p.name)+'</div>'
+      +'<div class="mod-desc">'+esc(p.instr)+'</div>'
+      +'<span class="mod-badge '+(state==='done'?'badge-done':state==='prog'?'badge-prog':'badge-new')+'">'
+      +(state==='done'?'✅ DONE':state==='prog'?'▶ IN PROGRESS':(p.dad?'WITH DAD':'NOT STARTED'))+'</span>'
+      +'</button>';
+  }
+  document.getElementById('modGrid').innerHTML=h;
+
+  var done=0;for(var k=0;k<PARTS.length;k++)if(isDone(PARTS[k]))done++;
+  document.getElementById('progFill').style.width=(done/MC*100)+'%';
+  var btn=document.getElementById('repBtn'), hint=document.getElementById('repHint');
+  if(done===MC){btn.disabled=false;btn.textContent='📊 MY SCORE';hint.textContent='All 13 parts finished. Open it with Dad.';}
+  else{btn.disabled=true;btn.textContent='🔒 MY SCORE';hint.textContent=done+' of '+MC+' parts finished — the score opens when every part is done.';}
+}
+
+/* ── part rendering ─────────────────────────────────────────────────── */
+function audioBlock(p){
+  if(!p.audio)return '';
+  return '<div class="audio-card"><div class="audio-lbl">TRACK '+esc(p.track)+'</div>'
+    +'<audio controls preload="none" src="'+esc(p.audio)+'"></audio></div>';
+}
+function imageBlock(p){
+  if(!p.image)return '';
+  return '<div class="pic-wrap"><img src="'+esc(p.image)+'" alt="'+esc(p.imageAlt||'')+'" onclick="openLb(\''+esc(p.image)+'\')">'
+    +(p.caption?'<div class="pic-cap">'+esc(p.caption)+'</div>':'')
+    +'<button class="pic-zoom" onclick="openLb(\''+esc(p.image)+'\')">🔍 See it bigger</button></div>';
+}
+function passageBlock(p){
+  if(!p.passage)return '';
+  var h='<div class="passage"><h4>'+esc(p.passage.title)+'</h4>';
+  for(var i=0;i<p.passage.paragraphs.length;i++)h+='<p>'+esc(p.passage.paragraphs[i])+'</p>';
+  return h+'</div>';
+}
+function bankBlock(p){
+  if(!p.bank)return '';
+  var h='<div class="bank"><div class="bank-lbl">WORD BOX</div>';
+  for(var i=0;i<p.bank.length;i++)h+='<span class="bank-chip">'+esc(p.bank[i])+'</span>';
+  return h+'</div>';
+}
+
+function renderPartBody(p){
+  var a=getAns(p);
+  var h='<div class="instr-card">'+esc(p.instr)+(p.sub?'<span class="sub">'+esc(p.sub)+'</span>':'')+'</div>';
+  h+=audioBlock(p)+imageBlock(p)+passageBlock(p)+bankBlock(p);
+  if(p.example)h+='<div class="info-card">'+esc(p.example)+'</div>';
+
+  if(p.kind==='speaking'){
+    var ticks=lLoad(p.id+'-ticks',[])||[];
+    h+='<div class="dad-card"><div class="dad-icon">💬</div><div>Dad reads each one out loud. Leo answers by looking at the picture. Tick the ones Leo gets right — 1 point each.</div></div>';
+    h+='<button class="sp-toggle" onclick="showPrompts(\''+p.id+'\')" id="'+p.id+'-toggle">👀 Dad: show the 10 questions</button>';
+    h+='<div id="'+p.id+'-prompts" style="display:none;flex-direction:column;gap:9px">';
+    for(var s=0;s<p.prompts.length;s++){
+      var pr=p.prompts[s];
+      h+='<div class="sp-row'+(ticks[s]?' ok':'')+'" id="'+p.id+'-sp-'+s+'">'
+        +'<button class="sp-tick" onclick="tickSp(\''+p.id+'\','+s+')">'+(ticks[s]?'✓':'')+'</button>'
+        +'<div class="sp-body"><div class="sp-q">'+(s+1)+') <b>'+esc(pr.say)+'</b> '+esc(pr.q)+'</div>'
+        +'<div class="sp-a">Expected: '+esc(pr.a)+'</div></div></div>';
+    }
+    h+='</div>';
+    return h;
+  }
+
+  if(p.kind==='writing'){
+    h+='<div class="q"><div class="q-n">QUESTION '+p.n+'</div>';
+    for(var w=0;w<p.prompts.length;w++){
+      var pw=p.prompts[w];
+      h+='<button class="opt-btn'+(a.choice===pw.k?' picked':'')+'" style="min-width:100%;margin-top:8px;line-height:1.5" '
+        +'onclick="pickWriting(\''+p.id+'\',\''+pw.k+'\')"><span class="k">'+pw.k+'.</span>'+pw.t+'</button>';
+    }
+    h+='<textarea class="q-text" rows="8" placeholder="Write 3 to 4 sentences here…" '
+      +'oninput="typeWriting(\''+p.id+'\',this.value)">'+esc(a.text||'')+'</textarea>';
+    h+='<div class="q-hint">Dad marks this out of 10: the task · the theme · vocabulary · grammar.</div></div>';
+    return h;
+  }
+
+  for(var i=0;i<p.questions.length;i++){
+    var q=p.questions[i], key=String(q.n), given=a[key];
+    var answered=(p.kind==='multi')?(given&&given.length>0):(given!==undefined&&given!==null&&String(given).trim()!=='');
+    h+='<div class="q'+(answered?' answered':'')+'" id="'+p.id+'-q-'+i+'">'
+      +'<div class="q-n">QUESTION '+esc(q.label?q.label.replace(')',''):q.n)+'</div>';
+
+    if(p.kind==='select'){
+      var opts='<option value="">— choose —</option>';
+      for(var b=0;b<p.bank.length;b++){
+        var bv=p.bank[b];
+        opts+='<option value="'+esc(bv)+'"'+(given===bv?' selected':'')+'>'+esc(bv)+'</option>';
+      }
+      h+='<div class="q-stem">'+(q.label?esc(q.label)+' ':'')+(q.before?esc(q.before)+' ':'')
+        +'<select class="q-sel" onchange="pickSelect(\''+p.id+'\',\''+esc(key)+'\',this.value,'+i+')">'+opts+'</select>'
+        +(q.after?' '+esc(q.after):'')+'</div>';
+    } else if(p.kind==='buttons'||p.kind==='multi'){
+      h+='<div class="q-stem">'+esc(q.n)+'. '+esc(q.stem)+'</div><div class="q-opts">';
+      for(var o=0;o<q.options.length;o++){
+        var op=q.options[o];
+        var on=(p.kind==='multi')?((given||[]).indexOf(op.k)>=0):(given===op.k);
+        h+='<button class="opt-btn'+(on?' picked':'')+'" onclick="'
+          +(p.kind==='multi'?'toggleMulti':'pickOne')+'(\''+p.id+'\',\''+esc(key)+'\',\''+op.k+'\','+i+')">'
+          +'<span class="k">'+esc(op.k)+'.</span>'+esc(op.t)+'</button>';
+      }
+      h+='</div>';
+      if(p.kind==='multi')h+='<div class="q-hint">Pick two. Tap again to unpick.</div>';
+    } else if(p.kind==='text'){
+      h+='<div class="q-stem">'+esc(q.n)+'. '+esc(q.stem)+'</div>'
+        +'<textarea class="q-text" rows="3" placeholder="Write the whole sentence…" '
+        +'oninput="typeText(\''+p.id+'\',\''+esc(key)+'\',this.value,'+i+')">'+esc(given||'')+'</textarea>';
+    }
+    h+='</div>';
+  }
+  return h;
+}
+
+function renderModals(){
+  var h='';
+  for(var i=0;i<PARTS.length;i++){
+    var p=PARTS[i];
+    h+='<div class="modal" id="'+p.id+'"><div class="mbox">'
+      +'<div class="mhd'+(p.dad?' dad':'')+'"><button class="mbk" onclick="closePart(\''+p.id+'\')">← Back</button>'
+      +'<div class="mhd-title">'+esc(p.name)+'</div>'
+      +'<div class="mhd-num">PART '+(i+1)+'/'+MC+'</div></div>'
+      +'<div class="mbody" id="'+p.id+'-body"></div>'
+      +'<div class="mod-foot">'
+      +'<button class="redo-btn" id="'+p.id+'-redo" onclick="redoPart(\''+p.id+'\')">↺ Redo</button>'
+      +'<button class="done-btn" id="'+p.id+'-done-btn" onclick="markDone(\''+p.id+'\')">✅ Mark '+esc(p.name)+' complete</button>'
+      +'</div></div></div>';
+  }
+  document.getElementById('modals').innerHTML=h;
+}
+
+/* Re-render from saved answers every time the part opens, so the DOM and the
+   saved data can never disagree — a completed part comes back exactly as it
+   was left, never reset to zero. */
+function openPart(id){
+  var p=partById(id);
+  document.getElementById(id+'-body').innerHTML=renderPartBody(p);
+  if(p.kind==='speaking'&&lLoad(id+'-seen',false))showPrompts(id);
+  refreshFoot(id);
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closePart(id){
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow='';
+  renderHome();
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow='';
+  renderHome();
+}
+
+function refreshFoot(id){
+  var p=partById(id), btn=document.getElementById(id+'-done-btn');
+  var ok=partComplete(p);
+  btn.disabled=!ok;
+  btn.textContent=isDone(p)?'✅ Complete — tap to re-save':(ok?'✅ Mark '+p.name+' complete':'Answer every question first');
+  /* Rule 1: the done-key saves itself the moment the part is finished — the
+     button is how Leo confirms it, not how the data gets written. */
+  if(ok&&!isDone(p)){lSave(id+'-done',true);recordScore();}
+}
+
+/* ── answer handlers — every one writes straight to storage ─────────── */
+function touch(pid,i){
+  var el=document.getElementById(pid+'-q-'+i);
+  if(el)el.classList.add('answered');
+  refreshFoot(pid);recordScore();
+}
+function pickSelect(pid,key,val,i){setAns(partById(pid),key,val);
+  var el=document.getElementById(pid+'-q-'+i);
+  if(el)el.classList.toggle('answered',val!=='');
+  refreshFoot(pid);recordScore();}
+function pickOne(pid,key,k,i){
+  var p=partById(pid);setAns(p,key,k);
+  var q=document.getElementById(pid+'-q-'+i);
+  var btns=q.querySelectorAll('.opt-btn');
+  for(var b=0;b<btns.length;b++)btns[b].classList.remove('picked');
+  for(var c=0;c<btns.length;c++)if(btns[c].textContent.indexOf(k+'.')===0)btns[c].classList.add('picked');
+  touch(pid,i);
+}
+function toggleMulti(pid,key,k,i){
+  var p=partById(pid),a=getAns(p),cur=a[key]||[],at=cur.indexOf(k);
+  if(at>=0)cur.splice(at,1);else cur.push(k);
+  setAns(p,key,cur);
+  var q=document.getElementById(pid+'-q-'+i),btns=q.querySelectorAll('.opt-btn');
+  for(var b=0;b<btns.length;b++){
+    var kk=btns[b].querySelector('.k').textContent.replace('.','');
+    btns[b].classList.toggle('picked',cur.indexOf(kk)>=0);
+  }
+  if(cur.length===0)q.classList.remove('answered');else q.classList.add('answered');
+  refreshFoot(pid);recordScore();
+}
+function typeText(pid,key,val,i){setAns(partById(pid),key,val);
+  var el=document.getElementById(pid+'-q-'+i);
+  if(el)el.classList.toggle('answered',val.trim()!=='');
+  refreshFoot(pid);recordScore();}
+function pickWriting(pid,k){
+  var p=partById(pid);setAns(p,'choice',k);
+  var btns=document.querySelectorAll('#'+pid+'-body .opt-btn');
+  for(var b=0;b<btns.length;b++)btns[b].classList.toggle('picked',btns[b].querySelector('.k').textContent===k+'.');
+  refreshFoot(pid);recordScore();
+}
+function typeWriting(pid,val){setAns(partById(pid),'text',val);refreshFoot(pid);recordScore();}
+function showPrompts(pid){
+  document.getElementById(pid+'-prompts').style.display='flex';
+  document.getElementById(pid+'-toggle').style.display='none';
+  lSave(pid+'-seen',true);refreshFoot(pid);
+}
+function tickSp(pid,i){
+  var t=lLoad(pid+'-ticks',[])||[];
+  t[i]=!t[i];lSave(pid+'-ticks',t);
+  var row=document.getElementById(pid+'-sp-'+i);
+  row.classList.toggle('ok',!!t[i]);
+  row.querySelector('.sp-tick').textContent=t[i]?'✓':'';
+  refreshFoot(pid);recordScore();
+}
+
+/* ── mark complete / redo ───────────────────────────────────────────── */
+function markDone(id){
+  lSave(id+'-done',true);recordScore();
+  closePart(id);
+}
+var redoTimers={};
+function redoPart(id){
+  var btn=document.getElementById(id+'-redo');
+  if(btn.dataset.armed){
+    clearTimeout(redoTimers[id]);delete btn.dataset.armed;btn.classList.remove('armed');btn.textContent='↺ Redo';
+    var p=partById(id);
+    lDrop(id+'-ans');lDrop(id+'-done');lDrop(id+'-ticks');lDrop(id+'-seen');lDrop(id+'-dad');
+    if(p.questions)for(var i=0;i<p.questions.length;i++)lDrop(id+'-dad-'+p.questions[i].n);
+    document.getElementById(id+'-body').innerHTML=renderPartBody(p);
+    refreshFoot(id);recordScore();
+    return;
+  }
+  btn.dataset.armed='1';btn.classList.add('armed');btn.textContent='Tap again to clear';
+  redoTimers[id]=setTimeout(function(){delete btn.dataset.armed;btn.classList.remove('armed');btn.textContent='↺ Redo';},3000);
+}
+
+/* ── score ──────────────────────────────────────────────────────────── */
+function recordScore(){
+  var t=totals(), allDone=true;
+  for(var i=0;i<PARTS.length;i++)if(!isDone(PARTS[i]))allDone=false;
+  saveScore(t.got,t.max,allDone,{pending:t.pending.length});
+}
+
+function openReport(){
+  document.getElementById('report-body').innerHTML=renderReport();
+  document.getElementById('report').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function renderReport(){
+  var t=totals();
+  var h='<div class="score-hero"><div class="score-big">'+t.got+'</div>'
+    +'<div class="score-of">out of '+t.max+' points</div>'
+    +'<div class="score-pct">'+(t.max?Math.round(t.got/t.max*100):0)+'%</div></div>';
+  if(t.pending.length)
+    h+='<div class="warn-card">⏳ '+t.pending.length+' answer'+(t.pending.length>1?'s are':' is')
+      +' still waiting for Dad. The score above goes up as he marks them.</div>';
+  else h+='<div class="info-card">✅ Everything is marked. This is the final score.</div>';
+
+  h+='<div class="sec-lbl" style="margin-top:6px">PART BY PART</div><div class="brk">';
+  for(var i=0;i<PARTS.length;i++){
+    var p=PARTS[i],m=markPart(p);
+    h+='<div class="brk-row'+(m.pending.length?' pending':'')+'"><span>'+p.icon+'</span>'
+      +'<span class="brk-name">'+(i+1)+'. '+esc(p.name)+'</span>'
+      +'<span class="brk-score">'+m.got+' / '+m.max+'</span></div>';
+  }
+  h+='</div>';
+
+  if(t.pending.length){
+    h+='<div class="sec-lbl">DAD MARKS THESE</div>';
+    for(var k=0;k<t.pending.length;k++){
+      var pn=t.pending[k];
+      h+='<div class="mark-row" style="margin-bottom:9px"><div class="mark-q">Question '+pn.n+' · out of '+pn.max+'</div>'
+        +'<div class="mark-said">'+(esc(pn.said)||'<i>nothing written</i>')+'</div>'
+        +(pn.sample?'<div class="mark-sample">✔ '+esc(pn.sample)+'</div>':'')
+        +'<div class="mark-steps">';
+      for(var s=0;s<=pn.max;s++)
+        h+='<button class="step-btn" onclick="dadMark(\''+pn.key+'\','+s+')">'+s+'</button>';
+      h+='</div></div>';
+    }
+  }
+  h+='<div class="dad-card" style="margin-top:6px"><div class="dad-icon">💬</div><div>'
+    +'Dad: the full answer key, the speaking script and the writing rubric are on the teacher deck for this test.</div></div>';
+  return h;
+}
+function dadMark(key,val){
+  var bits=key.split(':'), pid=bits[0], qn=bits[1];
+  var p=partById(pid);
+  if(p.kind==='writing')lSave(pid+'-dad',val);
+  else lSave(pid+'-dad-'+qn,val);
+  recordScore();
+  document.getElementById('report-body').innerHTML=renderReport();
+}
+
+/* ── lightbox ───────────────────────────────────────────────────────── */
+function openLb(src){
+  document.getElementById('lb-img').src=src;
+  document.getElementById('lb').classList.add('open');
+}
+function closeLb(){document.getElementById('lb').classList.remove('open');}
+
+/* ── boot ───────────────────────────────────────────────────────────── */
+renderModals();
+renderHome();
+recordScore();
+</script>
+</body>
+</html>

@@ -639,6 +639,45 @@ Audio is committed as ordinary files, not Git LFS. Keep each track under 25MB
 outgrows the repo, move the files to Supabase Storage and repoint `basePath` —
 every player reads its URL from the manifest, so nothing else changes.
 
+## Tests
+
+The test Leo takes after each unit and each three-unit band comes from the
+publisher's **ExamView** bank, exported as a single `.rtf`. `docs/tests.md` is
+the standard for turning one into a digital test; read it before building one.
+`ow-l4-t7-9-test` (the Units 7–9 band test) is the reference pair.
+
+Three things about tests are easy to get wrong:
+
+**The pictures are inside the RTF, and they come out losslessly.** They are not
+separate files and LibreOffice cannot open the export at all, which makes it look
+as though the picture has to be screenshotted or redrawn. It does not: each one
+is a Windows Metafile wrapping an 8-bit DIB stored as hex in a `\pict` group, and
+`scripts/extract-examview-test.mjs` writes it straight out as an indexed PNG
+using Node's own `zlib` — no dependency, no quality loss.
+
+```bash
+node scripts/extract-examview-test.mjs <file.rtf> --out <dir> --slug <slug>
+```
+
+Test images are filed under `public/tests/<course>/level-<n>/<slug>/` and
+referenced **absolutely** (`/tests/…`), because learner apps render from `srcdoc`
+against a `<base href>` at the site root.
+
+**A test is not a practice app.** Leo sees no right or wrong while he answers,
+and the score screen stays locked until every part is complete. That single rule
+is what makes the result worth reading; an app that marks as it goes is a review,
+and there is already one of those for each band.
+
+**The publisher's points are kept exactly, and split.** What has one exact answer
+the app marks; open responses, writing and speaking are Neritan's, and appear on
+the score screen with the sample answer or rubric and a 0-to-max button row. A
+typed sentence that does not match the key is handed to Neritan rather than
+marked wrong — a rewrite can be right in words the key did not predict.
+
+Tests are **checkpoint material**: they live in `checkpoint-<band>/lessons/`
+beside review and extra reading, carry the band's last unit number, and are
+registered through `CHECKPOINT_COMPONENTS`.
+
 ## Navigation Rules
 
 Navigation must stay consistent across every route.
@@ -659,6 +698,7 @@ The lesson-building workflow is documented in six focused docs under `docs/`:
 - `docs/grammar.md` — scan + build + wire grammar
 - `docs/components.md` — locked Leo app structure per component type
 - `docs/teacher-slides.md` — teacher slideshow conventions
+- `docs/tests.md` — turn an ExamView test export into a digital test
 
 NatGeo lesson planner PDFs live in `docs/lesson-plans/` organised by subject → course → level (or year). Each level folder holds:
 

@@ -13,7 +13,9 @@ import type {
   MathNoteQuestion,
   MathNoteWidget
 } from "../../../../content/subjects/math/note/types";
+import { DistributeWidget } from "../blocks/DistributeWidget";
 import { DrillWidget } from "../blocks/DrillWidget";
+import { LikeTermsWidget } from "../blocks/LikeTermsWidget";
 import { MagicSquareWidget } from "../blocks/MagicSquareWidget";
 import { MixedChainWidget } from "../blocks/MixedChainWidget";
 import { NotationRulesWidget } from "../blocks/NotationRulesWidget";
@@ -24,6 +26,7 @@ import { OrderStepsWidget } from "../blocks/OrderStepsWidget";
 import { PowerExpandWidget } from "../blocks/PowerExpandWidget";
 import { ReciprocalWidget } from "../blocks/ReciprocalWidget";
 import { SignCountWidget } from "../blocks/SignCountWidget";
+import { StrawPatternWidget } from "../blocks/StrawPatternWidget";
 import { SubstituteWidget } from "../blocks/SubstituteWidget";
 import { SubtractionFlipWidget } from "../blocks/SubtractionFlipWidget";
 import { TermSortWidget } from "../blocks/TermSortWidget";
@@ -233,6 +236,22 @@ function renderWidget(widget: MathNoteWidget, onDrillFinish?: (correct: number, 
       ) : null;
     case "substitute":
       return widget.substitute ? <SubstituteWidget problems={widget.substitute.problems} /> : null;
+    case "like-terms":
+      return widget.likeTerms ? <LikeTermsWidget problems={widget.likeTerms.problems} /> : null;
+    case "distribute":
+      return widget.distribute ? <DistributeWidget problems={widget.distribute.problems} /> : null;
+    case "straw-pattern":
+      return widget.strawPattern ? (
+        <StrawPatternWidget
+          accept={widget.strawPattern.accept}
+          answer={widget.strawPattern.answer}
+          ask={widget.strawPattern.ask}
+          first={widget.strawPattern.first}
+          maxN={widget.strawPattern.maxN}
+          note={widget.strawPattern.note}
+          perExtra={widget.strawPattern.perExtra}
+        />
+      ) : null;
     case "drill":
       return widget.drill ? (
         <DrillWidget

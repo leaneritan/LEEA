@@ -299,6 +299,76 @@ export type MathNoteWidget = {
     }[];
   };
   /**
+   * `like-terms` — 2章 p.48–49. 「文字の部分が同じ項どうし、数の項どうしを加える」
+   * is the whole method, and it is 1章's 項を並べた式 with letters attached: the
+   * same move, sorting into two piles and totalling each, except the piles are
+   * now 文字の項 and 数の項 rather than 正の項 and 負の項.
+   *
+   * Sorting by hand is what makes 8x－6x＋3＋2 stop being one frightening line
+   * and become 2x and 5. It also catches the specific slip this page exists to
+   * prevent — adding an x term to a bare number — at the moment it happens,
+   * instead of at the answer.
+   */
+  likeTerms?: {
+    problems: {
+      expression: string;
+      /** Each 項 with its sign, as printed, plus which pile it belongs in. */
+      terms: { display: string; kind: "letter" | "number" }[];
+      /** The totals of each pile, and the finished expression. */
+      letterTotal: string;
+      numberTotal: string;
+      answer: string;
+      accept?: string[];
+      note?: string;
+    }[];
+  };
+  /**
+   * `distribute` — 2章 p.50–52. 分配法則 with letters, where the error is always
+   * the same one: the number outside reaches the first term and not the second.
+   * p.51 B問2 prints that mistake as the question — (10a－5)÷5 written as 2a－5,
+   * where the 10 was divided and the 5 was left alone.
+   *
+   * So the multiplication is done one term at a time, with the term being
+   * reached lit up, and the answer is not available until every term has been
+   * paired. Missing one is impossible rather than merely marked wrong.
+   */
+  distribute?: {
+    problems: {
+      expression: string;
+      /** The number (or divisor-as-multiplier) being distributed, as printed. */
+      multiplier: string;
+      /** Each term inside the bracket, and what it becomes. */
+      terms: { term: string; becomes: string }[];
+      answer: string;
+      accept?: string[];
+      note?: string;
+    }[];
+  };
+  /**
+   * `straw-pattern` — 2章 p.53 文字式の利用.
+   *
+   * The book draws a strip of triangles made of straws and asks for the count as
+   * an expression in n. The answer 2n＋1 is unremarkable; *seeing why* is the
+   * lesson, and it cannot be seen from a static picture of one case.
+   *
+   * So the strip is drawn for whatever n Leo picks, and the straw count is
+   * obtained by actually enumerating the edges and removing the duplicates —
+   * the shared sides — rather than by evaluating a formula. The picture is the
+   * proof: each new triangle adds two straws because one of its three sides is
+   * already there.
+   */
+  strawPattern?: {
+    /** How many straws the first shape needs, and how many each one after adds. */
+    first: number;
+    perExtra: number;
+    maxN: number;
+    /** The question asked once he has played with the strip. */
+    ask: string;
+    answer: string;
+    accept?: string[];
+    note?: string;
+  };
+  /**
    * `drill` — a 特訓ドリル group, run against the clock.
    *
    * The timer is the book's own: every 特訓ドリル page prints

@@ -138,6 +138,8 @@ export type MathBlockInteractiveWidget =
   | "sign-count"
   | "mixed-chain"
   | "order-steps"
+  | "notation-rules"
+  | "substitute"
   | "drill"
   | "signed-product"
   | "walk-rate"

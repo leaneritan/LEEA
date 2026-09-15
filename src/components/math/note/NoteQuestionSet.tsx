@@ -16,6 +16,7 @@ import type {
 import { DrillWidget } from "../blocks/DrillWidget";
 import { MagicSquareWidget } from "../blocks/MagicSquareWidget";
 import { MixedChainWidget } from "../blocks/MixedChainWidget";
+import { NotationRulesWidget } from "../blocks/NotationRulesWidget";
 import { NumberLinePlotWidget } from "../blocks/NumberLinePlotWidget";
 import { NumberLinePointsWidget } from "../blocks/NumberLinePointsWidget";
 import { NumberLineWalkReadWidget } from "../blocks/NumberLineWalkReadWidget";
@@ -23,6 +24,7 @@ import { OrderStepsWidget } from "../blocks/OrderStepsWidget";
 import { PowerExpandWidget } from "../blocks/PowerExpandWidget";
 import { ReciprocalWidget } from "../blocks/ReciprocalWidget";
 import { SignCountWidget } from "../blocks/SignCountWidget";
+import { SubstituteWidget } from "../blocks/SubstituteWidget";
 import { SubtractionFlipWidget } from "../blocks/SubtractionFlipWidget";
 import { TermSortWidget } from "../blocks/TermSortWidget";
 
@@ -225,6 +227,12 @@ function renderWidget(widget: MathNoteWidget, onDrillFinish?: (correct: number, 
       return widget.mixedChain ? <MixedChainWidget problems={widget.mixedChain.problems} /> : null;
     case "order-steps":
       return widget.orderSteps ? <OrderStepsWidget problems={widget.orderSteps.problems} /> : null;
+    case "notation-rules":
+      return widget.notationRules ? (
+        <NotationRulesWidget problems={widget.notationRules.problems} rules={widget.notationRules.rules} />
+      ) : null;
+    case "substitute":
+      return widget.substitute ? <SubstituteWidget problems={widget.substitute.problems} /> : null;
     case "drill":
       return widget.drill ? (
         <DrillWidget

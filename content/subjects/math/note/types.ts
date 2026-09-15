@@ -245,6 +245,60 @@ export type MathNoteWidget = {
     }[];
   };
   /**
+   * `notation-rules` — 2章 p.42–43. The POINT box prints six rules for writing a
+   * 文字式 (×をはぶく, 数を文字の前に, アルファベット順, 同じ文字は累乗, 1をはぶく,
+   * ÷は分数の形), and a single answer like 3a²b exercises four of them at once.
+   * When that answer comes back wrong, a bare × says nothing about *which* rule
+   * was missed — the same diagnostic problem 節7's sign-count solved by splitting
+   * 符号 from 絶対値.
+   *
+   * So the rule list is on screen and stays there, and answering lights up the
+   * rules this particular expression turns on, each with a line saying what it
+   * means *here*. The box stops being decoration and becomes the thing being
+   * practised.
+   */
+  notationRules?: {
+    /** The book's own POINT box, in the book's own order. */
+    rules: string[];
+    problems: {
+      expression: string;
+      answer: string;
+      accept?: string[];
+      /** Indices into `rules` that this expression actually exercises. */
+      rulesUsed: number[];
+      /** What each used rule means here. Same length and order as `rulesUsed`. */
+      howApplied: string[];
+      note?: string;
+    }[];
+  };
+  /**
+   * `substitute` — 2章 p.46 代入と式の値.
+   *
+   * The seal in the margin says 「負の数を代入するときは、（　）をつけて代入するよ」,
+   * and that parenthesis is the entire difficulty: －x² with x＝－4 is －16, but
+   * written without the brackets it turns into something else on the way. So the
+   * bracket is a decision Leo makes before any arithmetic happens, and it is a
+   * real decision — a positive value genuinely does not need them, so the
+   * question cannot be answered 「はい」 every time.
+   *
+   * This is 1章節8's 累乗 trap wearing letters. x², －x², （－x)² and －x³ at
+   * x＝－4 give 16, －16, 16 and ＋64 — the last one positive, which is the
+   * surprise worth stopping on.
+   */
+  substitute?: {
+    problems: {
+      /** As printed, e.g. "－x²". */
+      expression: string;
+      /** The assignments, in the book's order. */
+      values: { letter: string; value: string; negative: boolean }[];
+      /** The expression with the values written in, as it should be written. */
+      substituted: string;
+      answer: string;
+      accept?: string[];
+      note?: string;
+    }[];
+  };
+  /**
    * `drill` — a 特訓ドリル group, run against the clock.
    *
    * The timer is the book's own: every 特訓ドリル page prints

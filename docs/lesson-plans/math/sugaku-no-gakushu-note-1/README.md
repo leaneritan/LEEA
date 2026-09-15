@@ -22,6 +22,7 @@ middle — so for these three files the count and the range do agree.
 | `front-matter-start-dash_p2-9.pdf` | 目次 + 構成と使い方 (unnumbered), then p.2–9 | 10 | 中学数学スタートDASH! — the 算数 review feature |
 | `ch0_p10-11.pdf` | p.10–11 | 2 | 0章 算数から数学へ, complete |
 | `ch1_p12-41.pdf` | p.12–41 | 30 | 1章 正負の数, complete incl. 確認テスト, C問題, 考えてみよう |
+| `ch2_p42-61.pdf` | p.42–61 | 20 | 2章 文字と式, complete incl. 確認テスト, C問題, 考えてみよう. **Unworked** — no pencil, no red pen |
 
 The two front-matter pages carry no printed folio. p.1 is not among the scanned
 pages; the 目次's first entry is 中学数学スタートDASH! at p.2.
@@ -74,10 +75,36 @@ textbook page they practise.
   確認テスト 正負の数 p.38–39,
   C問題 入試レベルに挑戦 p.40,
   考えてみよう ゴルフのスコア p.41.
+- **2章** (p.42–61): the full 文字と式 chapter —
+  1 文字の使用／文字を使った式の表し方 p.42–43 (教 P.66〜70),
+  2 いろいろな数量の表し方 p.44 (教 P.71〜72),
+  3 式の表す意味 p.45 (教 P.72),
+  4 代入と式の値 p.46 (教 P.73〜74),
+  特訓ドリル③ 代入と式の値 p.47,
+  5 項と係数／1次式の加法，減法 p.48–49 (教 P.76〜78),
+  6 1次式と数の乗法，除法(1) p.50–51 (教 P.79〜81),
+  7 1次式と数の乗法，除法(2) p.52 (教 P.81),
+  8 文字式の利用 p.53 (教 P.83〜85),
+  特訓ドリル④ 1次式の計算 p.54–55,
+  9 数量の間の関係の表し方 p.56–57 (教 P.86〜87),
+  確認テスト 文字と式 p.58–59,
+  C問題 入試レベルに挑戦 p.60,
+  考えてみよう n段積むと、全部で何個？ p.61.
 
-### These scans are worked pages, not blanks
+  **Note the ordering.** 特訓ドリル④ is printed at p.54–55, *between* 8 文字式の利用
+  (p.53) and 9 数量の間の関係の表し方 (p.56), but it drills 5〜7節 — its own header
+  says 「⑤〜⑦の内容を特訓!」. The book's page order and its teaching order differ
+  here, so the spine follows the printed page order and the drill's own
+  back-references (P.48〜49, P.50〜51, P.52) say what it actually covers.
 
-Leo has written in this copy and it has been marked in red pen, so most pages
+### 1章 is worked; 2章 is not
+
+**This differs per chapter, so check before reading handwriting as evidence.**
+`ch2_p42-61.pdf` is clean — no pencil, no red pen, nothing to cross-reference.
+Every 2章 answer therefore has to be computed from the printed question alone.
+What follows describes 1章 only.
+
+Leo has written in the 1章 pages and they have been marked in red pen, so most
 carry both his working and the correction. That is the point of scanning them —
 they show what he actually did — but it means **the printed question is the
 source of truth and the handwriting is evidence, not answer key**. A pencil
@@ -132,7 +159,7 @@ the textbook spine at `/math`. See "Authoring a 学習ノート section" in
 | 中学数学スタートDASH! | p.2–9 | — (算数 review) | full | no |
 | 0章 整数の性質 | p.10–11 | 教 P.12–17 | full | no |
 | 1章 正負の数 | p.12–41 | 教 P.22–59 | full | p.12–33（1〜12節・特訓ドリル①） |
-| 2章 文字と式 | p.42–61 | 教 P.66–87 | no | no |
+| 2章 文字と式 | p.42–61 | 教 P.66–87 | full | no |
 | 3章 方程式 | p.62–81 | 教 P.94–111 | no | no |
 | 4章 比例と反比例 | p.82–99 | 教 P.120–153 | no | no |
 | 5章 平面図形 | p.100–115 | 教 P.160–185 | no | no |
@@ -140,12 +167,14 @@ the textbook spine at `/math`. See "Authoring a 学習ノート section" in
 | 7章 データの分析と活用 | p.138–149 | 教 P.228–245 | no | no |
 | 1年のまとめ・重要事項のチェック | p.150–152 | — | no | no |
 
-**Every row below 1章 is derived from the 目次, not read off a folio.** The 目次
+**Every row below 2章 is derived from the 目次, not read off a folio.** 1章 and
+2章 are folio-verified — every page of both has been read. The 目次
 lists only where each numbered section begins, and folds 確認テスト・C問題・
 考えてみよう into one entry at the 確認テスト's page, so each 章's end here is
 inferred as "the page before the next 章 starts" — the pattern 1章 actually
-follows (確認テスト p.38–39, C問題 p.40, 考えてみよう p.41, then 2章 at p.42), but
-still an inference for the rest. The 教科書 column comes from the 目次's own
+follows (確認テスト p.38–39, C問題 p.40, 考えてみよう p.41, then 2章 at p.42) and
+2章 repeats (確認テスト p.58–59, C問題 p.60, 考えてみよう p.61, then 3章 at p.62),
+but still an inference for the rest. The 教科書 column comes from the 目次's own
 (NN~NN) cross-references, which cover the numbered sections only and skip the
 特訓ドリル / 確認テスト pages. Check both against the printed folios when those
 scans arrive, and fix this table in the same PR.

@@ -110,7 +110,23 @@ export const mathNoteChapters: MathNoteChapterMeta[] = [
     subtitle: "文字を使った式・文字式の計算",
     workbookPages: "p.42–61",
     ...palette("2"),
-    sections: [section("2", null, "all", "2章 全体", "p.42–61", { textbookRef: "教 P.66〜87" })]
+    sections: [
+      section("2", 1, 1, "文字の使用　文字を使った式の表し方", "p.42–43", { textbookRef: "教 P.66〜70", authored: true, scanned: true }),
+      section("2", 2, 2, "いろいろな数量の表し方", "p.44", { textbookRef: "教 P.71〜72", authored: true, scanned: true }),
+      section("2", 3, 3, "式の表す意味", "p.45", { textbookRef: "教 P.72", authored: true, scanned: true }),
+      section("2", 4, 4, "代入と式の値", "p.46", { textbookRef: "教 P.73〜74", authored: true, scanned: true }),
+      section("2", null, "drill3", "特訓ドリル③　代入と式の値", "p.47", { authored: true, scanned: true }),
+      section("2", 5, 5, "項と係数　1次式の加法，減法", "p.48–49", { textbookRef: "教 P.76〜78", scanned: true }),
+      section("2", 6, 6, "1次式と数の乗法，除法(1)", "p.50–51", { textbookRef: "教 P.79〜81", scanned: true }),
+      section("2", 7, 7, "1次式と数の乗法，除法(2)", "p.52", { textbookRef: "教 P.81", scanned: true }),
+      section("2", 8, 8, "文字式の利用", "p.53", { textbookRef: "教 P.83〜85", scanned: true }),
+      // Printed between 8節 and 9節, but it drills 5〜7節 — its own header says
+      // 「⑤〜⑦の内容を特訓!」. Page order and teaching order differ here; the
+      // spine follows the page order the book prints.
+      section("2", null, "drill4", "特訓ドリル④　1次式の計算", "p.54–55", { scanned: true }),
+      section("2", 9, 9, "数量の間の関係の表し方", "p.56–57", { textbookRef: "教 P.86〜87", scanned: true }),
+      section("2", null, "test", "確認テスト・C問題・考えてみよう", "p.58–61", { scanned: true })
+    ]
   },
   {
     key: "3",

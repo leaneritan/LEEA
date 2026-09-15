@@ -67,6 +67,8 @@ import checkpoint79Review from "../../content/subjects/english/courses/our-world
 import checkpoint79ReviewLearner from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/review-app.learner.json";
 import checkpoint79ExtraReading from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/extra-reading.teacher.json";
 import checkpoint79ExtraReadingLearner from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/extra-reading-app.learner.json";
+import checkpoint79Test from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/test.teacher.json";
+import checkpoint79TestLearner from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/test-app.learner.json";
 import unit8Opener from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.teacher.json";
 import unit8OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.learner.json";
 import unit8Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab1.teacher.json";
@@ -125,7 +127,8 @@ const componentOrder = [
   "reader",
   "book-reading",
   "extra-reading",
-  "review"
+  "review",
+  "test"
 ];
 
 function componentOrderIndex(component: string) {
@@ -247,7 +250,9 @@ export const lessons: Lesson[] = [
   tgGrammarCupLearner as Lesson,
   tgVerbTimeMachine as Lesson,
   level5Unit1Opener as Lesson,
-  level5Unit1OpenerLearner as Lesson
+  level5Unit1OpenerLearner as Lesson,
+  checkpoint79Test as Lesson,
+  checkpoint79TestLearner as Lesson
 ].sort(compareLessonOrder);
 export const teacherLessons = lessons.filter((lesson) => lesson.mode === "teacher");
 export const learnerLessons = lessons.filter((lesson) => lesson.mode === "learner");
@@ -265,7 +270,7 @@ export type LessonGroup = {
 // Their lesson records carry the band's last unit number (3, 6, 9) so they can be
 // found from that unit, but every surface must show them as checkpoint material,
 // never as an ordinary lesson of that unit.
-export const CHECKPOINT_COMPONENTS = ["review", "extra-reading"];
+export const CHECKPOINT_COMPONENTS = ["review", "extra-reading", "test"];
 
 export function isCheckpointComponent(component: string) {
   return CHECKPOINT_COMPONENTS.includes(component.replace(/-app$/, ""));

@@ -24,6 +24,9 @@ export function getComponentMeta(component: string): ComponentMeta {
   if (component.includes("writing")) return { emoji: "✍️", label: "Writing", tone: "writing" };
   if (component.includes("song")) return { emoji: "🎵", label: "Song", tone: "song" };
   if (component.includes("review")) return { emoji: "🏁", label: "Review", tone: "review" };
+  // The band test shares the review tone — it is checkpoint material, not a unit
+  // lesson — but keeps its own cue and label so it never reads as another review.
+  if (component.includes("test")) return { emoji: "📝", label: "Test", tone: "review" };
   // Mission / Project / Reader apps are all free-play "activity" components —
   // not openers — so they get their own tone/tint instead of borrowing gold.
   if (component.includes("mission") || component.includes("project") || component.includes("reader")) {

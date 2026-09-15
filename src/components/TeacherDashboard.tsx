@@ -82,6 +82,11 @@ const checkpointComponents = [
     component: "extra-reading",
     title: "Extra Reading",
     subtitle: "Extended comprehension & vocabulary practice."
+  },
+  {
+    component: "test",
+    title: "Test",
+    subtitle: "ExamView band test — answer key, rubric and speaking script."
   }
 ];
 
@@ -667,7 +672,7 @@ function CheckpointRow({ checkpoint, unitBand }: { checkpoint: (typeof checkpoin
   return (
     <article className={`teacher-table-row teacher-table-row-${meta.tone} planned`}>
       <div className="teacher-table-lesson">
-        <span>{checkpoint.component === "review" ? "Review" : "Extra Reading"}</span>
+        <span>{checkpoint.title}</span>
         <h3>{checkpoint.title} {unitBand.start}–{unitBand.end}</h3>
         <p>{checkpoint.subtitle}</p>
       </div>

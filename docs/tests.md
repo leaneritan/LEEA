@@ -8,8 +8,16 @@ This doc is the standard for turning one of those into a test Leo can take on
 screen. It was written building `ow-l4-t7-9-test` (Units 7–9, Level 4); use that
 pair as the reference implementation.
 
-A test is **not** a practice app. The one rule that separates them: Leo sees no
-right/wrong while he answers. Everything else here follows from that.
+A test is **not** a practice app, and it must not look like one. Three rules
+separate them, and everything else here follows from them:
+
+1. **It looks like the printed test page**, not like a LEEA app. One paper page,
+   the publisher's own instructions and wording, questions numbered as they are
+   numbered on the sheet. No module grid, no modals, no emoji chrome, no colour
+   rewards. A test Leo recognises as the test is a test he can practise for.
+2. **The picture, the reading and the word box stay on screen the whole time he
+   answers.** That is what paper does for free and a screen does not.
+3. **He sees no right/wrong while he answers.**
 
 ## What you get and what you build
 
@@ -72,6 +80,13 @@ specific to a test:
   `ow-l4-t7-9-test.html` knows nothing about Units 7–9 — a new test is a new
   `TEST` object and nothing else. Grow the engine only when a test needs a
   question shape it does not have.
+- **One continuous page, every section rendered at load.** Not a home screen you
+  open sections from. The whole test scrolls, exactly like the sheet.
+- **Paper affordances, not app buttons.** A blank in a sentence is an inline
+  `<select>` styled as an underline; a multiple-choice answer is written into the
+  `____` that precedes the question number; a rewrite or a written answer is a
+  textarea ruled like the underscores on the sheet. Options print down-then-across
+  (a/b in the left column, c/d in the right) the way ExamView lays them out.
 - **Question kinds so far:** `select` (fill the blank from a word bank),
   `buttons` (pick one), `multi` (pick two), `text` (type it), `writing`,
   `speaking`.
@@ -81,6 +96,23 @@ specific to a test:
 - **The score screen stays locked** until every part is marked complete.
 - **Every answer saves as it is made** (the general rule in `AGENTS.md`, and it
   matters more here — a test is long and Leo will stop halfway).
+
+### Keeping the picture and the reading in view
+
+Any section carrying a picture, a reading passage or a track puts them in a
+sticky panel so they stay put while its questions scroll past. A word box does
+the same: on paper the eye returns to it for every blank, so it rides inside the
+panel when the section has one and pins itself when it does not.
+
+The layout is **block on a phone** (the panel sticks above the questions) and
+**two columns from 900px** (it sticks beside them). Both work because the sticky
+element is a child of a box as tall as the whole section — give the panel a grid
+row of its own and it is pinned to its own height and will not travel.
+
+On a phone the panel has to earn its space: cap the picture at about 25vh and let
+a long passage scroll inside itself, or the questions are left with a strip. Test
+this by scrolling to the *last* question of each media section and checking that
+it clears the panel while the panel is still on screen.
 
 ### Scoring
 
@@ -96,6 +128,9 @@ them into what the app can mark and what Neritan must:
   row on the score screen and the publisher's sample answer or rubric shown.
 - **Two-answer questions** (worth 2) give 2 for both right, 1 for one right with
   nothing wrong, 0 if anything wrong is picked. Say that rule on screen.
+
+The teacher deck is the exception to rule 1: it is Neritan's, it is a deck like
+every other teacher deck, and it should stay that way.
 
 ## 4. Build the teacher deck
 

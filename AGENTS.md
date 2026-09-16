@@ -663,10 +663,20 @@ Test images are filed under `public/tests/<course>/level-<n>/<slug>/` and
 referenced **absolutely** (`/tests/…`), because learner apps render from `srcdoc`
 against a `<base href>` at the site root.
 
-**A test is not a practice app.** Leo sees no right or wrong while he answers,
-and the score screen stays locked until every part is complete. That single rule
-is what makes the result worth reading; an app that marks as it goes is a review,
-and there is already one of those for each band.
+**A test is not a practice app, and it must not look like one.** It is built to
+look like the printed test page — one continuous paper page, the publisher's own
+instructions and numbering, blanks and ruled lines instead of app buttons. No
+module grid, no modals, no emoji chrome, no colour rewards. Leo sees no right or
+wrong while he answers, and the score screen stays locked until every section is
+complete; an app that marks as it goes is a review, and there is already one of
+those for each band. The teacher deck is the exception — that stays a deck.
+
+**The picture, the reading and the word box stay on screen while he answers
+them.** Paper does this for free and a screen does not, so any section carrying a
+picture, a passage, a track or a word box keeps it in a sticky panel that the
+questions scroll past — stacked above them on a phone, beside them from 900px.
+The sticky element must be a child of a box as tall as the whole section; give it
+a grid row of its own and it is pinned to its own height and will not travel.
 
 **The publisher's points are kept exactly, and split.** What has one exact answer
 the app marks; open responses, writing and speaking are Neritan's, and appear on

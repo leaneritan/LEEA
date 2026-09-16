@@ -49,11 +49,17 @@ Every learner app lives in THIS folder (`public/learn/`). Do not create learner 
 
 ## Tests are a special case
 
-A test app (`ow-l<level>-t<band>-test.html`) follows every rule above, plus the
-rules in `docs/tests.md`: no right/wrong shown while answering, a score screen
-locked until all parts are done, and the publisher's points split between what
-the app marks and what Neritan marks. Its lesson JSON lives in
-`checkpoint-<band>/lessons/`, not in a unit folder.
+A test app (`ow-l<level>-t<band>-test.html`) is the one learner app that does
+**not** use the shapes above. It is built to look like the printed test page —
+one continuous page, the publisher's wording and numbering, blanks and ruled
+lines — and any picture, reading, track or word box stays in a sticky panel while
+its questions are answered. See `docs/tests.md` before building one.
+
+It still follows the save/restore contract below, and the rest of the test rules:
+no right/wrong shown while answering, a score screen locked until every section
+is done, and the publisher's points split between what the app marks and what
+Neritan marks. Its lesson JSON lives in `checkpoint-<band>/lessons/`, not in a
+unit folder.
 
 Images a test needs are extracted from the publisher's RTF by
 `scripts/extract-examview-test.mjs`, filed under

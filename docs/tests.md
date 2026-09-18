@@ -21,6 +21,7 @@ separate them, and everything else here follows from them:
 3. **The picture, the reading and the word box stay on screen the whole time he
    answers.** That is what paper does for free and a screen does not.
 4. **He sees no right/wrong while he answers.**
+5. **The clock is the publisher's, not ours** (see below).
 
 ## What you get and what you build
 
@@ -165,6 +166,46 @@ Neritan runs:
 The pictures belong on the deck too — the Q1 key next to its picture, and the
 speaking picture beside its prompts.
 
+### The clock
+
+The lesson planner sets the time for each kind of assessment, so we do not invent
+one:
+
+| Kind | `assessment.kind` | Publisher's allowance | We use |
+| --- | --- | --- | --- |
+| Unit quiz (1 unit) | `unit-quiz` | 15–20 minutes | 20 |
+| Mastery test (3 units) | `mastery` | 20–30 minutes | 30 |
+| Final test (9 units) | `final` | 30–35 minutes | 35 |
+
+Take the top of the range: it is the same test on a screen, and Leo is A1–A2.
+`scripts/validate-content.mjs` rejects a `minutes` outside its kind's range,
+because that is nearly always a typo.
+
+How the clock behaves, and why:
+
+- **It starts on his first answer**, not when the page opens, so Neritan can look
+  at the test without draining it.
+- **It pauses when the test is closed** and resumes when it reopens — this is a
+  test at the kitchen table, not an invigilated hall. Tapping it pauses by hand.
+- **At zero it says so and keeps counting**, in red, as overtime. Nothing locks.
+  A half-written sentence is never thrown away, and whether to stop is Neritan's
+  call, not the app's.
+- **The time taken is recorded** into the score record (`timeTakenSec`) and shown
+  on the Answer Section and on `/tests`.
+
+Keep the clock clear of the top-right corner of the frame: the page that embeds a
+learner app floats its own "Exit Fullscreen" button there, and anything tappable
+underneath it cannot be tapped at all. This was a real bug — the clock shipped
+there first and could not be paused.
+
+### Easy on the eyes
+
+A test is read for half an hour straight, so it is not plain black on plain
+white: the page is a warm off-white, reference material (picture, reading, word
+box) stays bright so it stands out against it, and the questions are striped like
+a ledger — every other row tinted. The stripes are not decoration; they keep each
+blank visibly tied to its own question.
+
 ## 5. Register it
 
 A test is **checkpoint material**, like review and extra reading: it sits after a
@@ -173,9 +214,26 @@ three-unit band, not inside the last unit. So:
 - lesson JSON goes in `…/level-<n>/checkpoint-<band>/lessons/`, as
   `test.teacher.json` and `test-app.learner.json`, carrying `unit:` = the band's
   last unit
+- the teacher JSON carries an **`assessment` block** — `kind`, `covers`, `units`,
+  `minutes`, `questions`, `points`. `/tests` builds its card from this, and the
+  validator requires it:
+
+  ```json
+  "assessment": {
+    "kind": "mastery", "covers": "Units 7–9", "units": [7, 8, 9],
+    "minutes": 30, "questions": 42, "points": 80
+  }
+  ```
+
 - import both in `src/data/lessons.ts` and add them to the `lessons` array
 - `test` is already in `componentOrder`, `CHECKPOINT_COMPONENTS`,
   `checkpointComponents` (TeacherDashboard) and `getComponentMeta`
+
+Nothing needs adding to `/tests` itself: `src/components/TestsPage.tsx` derives
+the shelf from the lesson registry, pairing each teacher `test` with its learner
+`test-app`, and filters by level. A new test appears the moment it is registered.
+Results come from `getAssessmentResult(source)` in `src/data/learnerProgress.ts`,
+which reads the marks (not the percent) and what is still waiting on Neritan.
 
 Then run the usual chain: `npm run validate:content`, `npm run typecheck`,
 `npm run build`.

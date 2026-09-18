@@ -32,6 +32,44 @@ type LearnerProgressCloudRow = {
   raw_progress: Record<string, unknown> | null;
 };
 
+export type AssessmentResult = {
+  score: number;
+  total: number;
+  percent: number;
+  done: boolean;
+  /** Open responses still waiting on Neritan's marking. */
+  pending: number;
+  timeTakenSec: number | null;
+};
+
+/**
+ * A test's marks as marks, not as a percent — /tests shows "66 / 80", and how
+ * many answers are still waiting on Neritan. Reads the same record
+ * `getLearnerAppProgress` does, through the same keys the lesson JSON declares.
+ */
+export function getAssessmentResult(source: Lesson["source"]): AssessmentResult | null {
+  const storagePrefix = source.storagePrefix ?? "";
+  if (typeof window === "undefined" || !storagePrefix) return null;
+  const record = loadLocalValue<{
+    score?: number; total?: number; pct?: number; percent?: number;
+    done?: boolean; pending?: number; timeTakenSec?: number;
+  } | null>(`${storagePrefix}${source.scoreKey ?? "score"}`, null);
+  if (!record || typeof record.score !== "number" || typeof record.total !== "number") return null;
+  const percent = typeof record.percent === "number"
+    ? record.percent
+    : typeof record.pct === "number"
+      ? record.pct
+      : record.total > 0 ? Math.round((record.score / record.total) * 100) : 0;
+  return {
+    score: record.score,
+    total: record.total,
+    percent,
+    done: Boolean(record.done),
+    pending: typeof record.pending === "number" ? record.pending : 0,
+    timeTakenSec: typeof record.timeTakenSec === "number" ? record.timeTakenSec : null
+  };
+}
+
 export function getLearnerAppProgress(source: Lesson["source"]): LearnerAppProgress {
   const moduleCount = source.moduleCount ?? 0;
   const storagePrefix = source.storagePrefix ?? "";

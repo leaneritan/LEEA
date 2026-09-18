@@ -106,6 +106,8 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
 .box{flex:0 0 auto;border:1px solid var(--ink);padding:8px 11px;background:var(--card);
      display:flex;flex-wrap:wrap;gap:5px 24px;justify-content:center;font-size:.9rem;font-weight:700}
 .qcol > .box{margin-bottom:10px}
+.box span.used{text-decoration:line-through;text-decoration-thickness:2px;
+               color:var(--ink3);opacity:.5}
 .example{font-size:.88rem;font-style:italic;color:var(--ink2);margin-bottom:4px}
 
 /* ── one question ─────────────────────────────────────────────────── */
@@ -168,6 +170,7 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
 .rev-note{font-size:.79rem;color:var(--ink3);font-weight:700;margin-top:5px}
 .retake{background:none;border:1px solid var(--hair);color:var(--ink3);font-family:var(--fn);
         font-size:.8rem;font-weight:700;padding:8px 14px;cursor:pointer;margin-top:18px}
+#retake-sheet{display:block;width:100%;margin-top:0;text-align:center}
 
 .dad-note{border-left:3px solid var(--ink);padding:5px 0 5px 11px;font-size:.85rem;
           color:var(--ink2);margin-bottom:9px}
@@ -204,8 +207,11 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
 /* ── page index ───────────────────────────────────────────────────── */
 .sheet{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:70;display:none}
 .sheet.open{display:block}
-.sheet-in{position:absolute;inset:auto 0 0 0;max-height:82%;overflow-y:auto;background:var(--paper);
-          max-width:760px;margin:0 auto;padding:16px 16px 22px}
+.sheet-in{position:absolute;inset:auto 0 0 0;max-height:82%;background:var(--paper);
+          max-width:760px;margin:0 auto;padding:16px 16px 22px;
+          display:flex;flex-direction:column}
+#sheet-list{flex:1 1 auto;min-height:0;overflow-y:auto}
+.sheet-foot{flex:0 0 auto;border-top:1px solid var(--hair);margin-top:10px;padding-top:12px}
 .sheet-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .sheet-h h3{font-size:.98rem;font-weight:700}
 .sheet-x{background:none;border:none;font-size:1.15rem;cursor:pointer;color:var(--ink3);padding:2px 6px}
@@ -278,6 +284,9 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
   <div class="sheet-in">
     <div class="sheet-h"><h3>Pages</h3><button class="sheet-x" onclick="closeIndex()">✕</button></div>
     <div id="sheet-list"></div>
+    <div class="sheet-foot">
+      <button class="retake" id="retake-sheet" onclick="retake('retake-sheet')">Take the test again</button>
+    </div>
   </div>
 </div>
 
@@ -640,8 +649,27 @@ function boxHtml(p){
   /* Q1's bank is the A–G labels printed on the picture itself, not a word box. */
   if(p.questions&&p.questions[0]&&p.questions[0].label&&p.bank.length<=7&&p.bank[0].length===1)return '';
   var h='<div class="box">';
-  for(var i=0;i<p.bank.length;i++)h+='<span>'+esc(p.bank[i])+'</span>';
+  for(var i=0;i<p.bank.length;i++)
+    h+='<span data-w="'+esc(p.bank[i])+'">'+esc(p.bank[i])+'</span>';
   return h+'</div>';
+}
+
+/**
+ * Cross a word off the box once it has been used, the way a pencil would.
+ * Every box on this test is one-to-one — a word answers one blank — so a
+ * struck word is genuinely spent, and what is left is the field still to
+ * choose from. The example's word is left alone: he did not use it.
+ */
+function paintBox(p){
+  var chips=document.querySelectorAll('.box span');
+  if(!chips.length)return;
+  var used={}, a=getAns(p);
+  if(p.questions)for(var i=0;i<p.questions.length;i++){
+    var v=a[String(p.questions[i].n)];
+    if(v)used[v]=true;
+  }
+  for(var c=0;c<chips.length;c++)
+    chips[c].classList.toggle('used',!!used[chips[c].dataset.w]);
 }
 
 /* Everything the questions on this page need to keep looking at. */
@@ -796,6 +824,7 @@ function render(){
     var p=PARTS[page];
     stage.innerHTML=pageHtml(p);
     sizeLines(p.id);
+    paintBox(p);
     var q=document.getElementById('qcol');
     if(q)q.scrollTop=0;
   }
@@ -845,7 +874,12 @@ function openIndex(){
     +' onclick="'+(ok?'goTo('+ANSWERS_PAGE+')':'')+'">'
     +'<span class="pn">★</span><span class="pname">Answer Section</span>'
     +'<span class="pst '+(ok?'':'none')+'">'+(ok?'ready':'locked')+'</span></button>';
+  /* The retake is a pinned footer of this sheet rather than the last row of
+     the list: the result page's copy is only reachable once every page is
+     finished, and wanting to start over is most likely mid-test. */
   document.getElementById('sheet-list').innerHTML=h;
+  var r=document.getElementById('retake-sheet');
+  r.classList.remove('armed');delete r.dataset.armed;r.textContent='Take the test again';
   document.getElementById('sheet').classList.add('open');
 }
 function closeIndex(){document.getElementById('sheet').classList.remove('open');}
@@ -921,8 +955,10 @@ function afterAnswer(pid){
   paintNav();
 }
 function onSelect(pid,key,el){
-  setAns(partById(pid),key,el.value);
+  var p=partById(pid);
+  setAns(p,key,el.value);
   el.classList.toggle('filled',el.value!=='');
+  paintBox(p);
   afterAnswer(pid);
 }
 function pickOne(pid,key,k,i){
@@ -1083,15 +1119,15 @@ function reviewHtml(){
 /* A real retake: everything goes, the clock and the marks included. Two taps,
    because there is no undo. */
 var retakeTimer;
-function retake(){
-  var btn=document.getElementById('retake');
+function retake(btnId){
+  var btn=document.getElementById(btnId||'retake');
   if(btn.dataset.armed){
     clearTimeout(retakeTimer);btn.classList.remove('armed');
     try{
       Object.keys(localStorage).forEach(function(k){ if(k.indexOf(SP)===0)localStorage.removeItem(k); });
     }catch(e){}
     revealed=false;elapsed=0;started=false;paused=false;showAllReview=false;
-    page=0;render();paintClock();
+    page=0;closeIndex();render();paintClock();
     return;
   }
   btn.dataset.armed='1';btn.classList.add('armed');

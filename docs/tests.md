@@ -152,6 +152,42 @@ them into what the app can mark and what Neritan must:
 The teacher deck is the exception to rule 1: it is Neritan's, it is a deck like
 every other teacher deck, and it should stay that way.
 
+### The result
+
+Nothing about right or wrong is shown until he has finished all the pages and
+opened the result — `See the result →` on the last page. That one action reveals
+the marking, and it stays revealed.
+
+**The pages become the marked paper.** Going back through them, every question
+carries a green ✔ for full marks, a red ✘ for none, the marks earned for a partly
+right one, and the model answer in green underneath anything he did not get
+right. Leo's own answers are locked at that point — the paper is a record now —
+but Neritan's controls are not: the speaking ticks and the 0-to-max steppers stay
+live, because the marking happens after.
+
+**Under the score, the review.** Every question he did not get right, in the
+paper's order: what was asked, what he wrote, and what it should have been.
+
+```
+✘ Question 24 · Rewrite · Dad marks this
+My father sent me a stuffed animal. (to)
+He wrote   My father sent a stuffed animal to.
+Answer     My father sent a stuffed animal to me.
+```
+
+An open answer Neritan has not marked yet appears here too, with the model answer
+beside it — a rewrite in unexpected words is exactly what the review is for, so
+leaving it out until it had been marked would hide the most teachable entry on
+the page. "Show every question" turns the same list into the whole paper for
+walking through together.
+
+One rule holds all of this together: **`markOne(part, question)` is the only
+thing that decides right or wrong.** The total, the tick on the page and the
+review entry all read from it, so they cannot drift apart.
+
+`Take the test again` at the foot of the result clears everything — answers,
+marks, clock — behind a two-tap confirm.
+
 ## 4. Build the teacher deck
 
 `public/lessons/ow-l<level>-t<band>-test.html`, on the shared slideshow shell

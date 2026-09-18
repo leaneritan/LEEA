@@ -26,7 +26,7 @@
   --pencil-bg:#EFF6FF;
   --paper:#FDFCFA;    /* warm off-white — plain white glares */
   --card:#FFFFFF;     /* reference material stays bright so it stands out */
-  --stripe:#F5F3EE;   /* every other question row */
+  --stripe:#F8F7F3;   /* every other question row — just enough to follow */
   --fn:Arial,'Helvetica Neue',Helvetica,'Segoe UI',sans-serif;
 }
 html,body{height:100%}
@@ -115,7 +115,7 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
 .item:nth-child(odd){background:var(--stripe)}
 .num{font-weight:700;min-width:26px;flex-shrink:0;text-align:right}
 .ilabel{font-weight:700;min-width:24px;flex-shrink:0}
-.body{flex:1;min-width:0;font-size:.95rem;line-height:1.85}
+.body{flex:1;min-width:0;font-size:.95rem;line-height:1.85;font-weight:600;color:var(--ink)}
 .blank{flex-shrink:0;min-width:46px;height:26px;border-bottom:1.5px solid var(--rule);
        text-align:center;font-weight:700;color:var(--pencil);font-size:.92rem;line-height:26px}
 .blank.filled{border-bottom-color:var(--pencil)}
@@ -147,8 +147,8 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
 .mk.pending{color:var(--ink3);font-size:.72rem;font-weight:700}
 .fix{font-size:.84rem;font-weight:700;color:#15803D;margin-top:5px}
 .fix b{font-weight:700}
-.item.wrong{background:#FEF2F2}
-.item.wrong:nth-child(odd){background:#FEE9E9}
+.item.wrong{background:#FEF5F5}
+.item.wrong:nth-child(odd){background:#FDEFEF}
 .locked-note{font-size:.8rem;color:var(--ink3);margin-top:12px;padding-top:10px;
              border-top:1px solid var(--hair)}
 
@@ -178,14 +178,16 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
 .sp-tick{width:26px;height:26px;flex-shrink:0;border:1.5px solid var(--rule);background:var(--paper);
          cursor:pointer;font-size:.9rem;line-height:1;color:var(--pencil);font-weight:700}
 .sp.ok .sp-tick{border-color:var(--pencil);background:var(--pencil-bg)}
-.sp-q{font-size:.92rem;line-height:1.6}
+.sp-q{font-size:.92rem;line-height:1.6;font-weight:600}
 .sp-a{font-size:.81rem;color:var(--ink3);margin-top:3px}
 
 /* ── page foot ────────────────────────────────────────────────────── */
 .pfoot{margin-top:14px;padding-top:10px;border-top:1px solid var(--hair);
        display:flex;align-items:center;gap:12px}
-.clear-btn{background:none;border:none;color:var(--ink3);font-family:var(--fn);font-size:.79rem;
-           font-weight:700;cursor:pointer;padding:0;text-decoration:underline}
+.clear-btn{background:none;border:1.5px solid transparent;color:var(--ink3);font-family:var(--fn);
+           font-size:.79rem;font-weight:700;cursor:pointer;padding:6px 2px;text-decoration:underline}
+.clear-btn.armed,.retake.armed{color:#B91C1C;border-color:#B91C1C;background:#FEF2F2;
+           text-decoration:none;border-radius:4px;padding:6px 12px}
 
 /* ── bottom navigation ────────────────────────────────────────────── */
 .nav{flex:0 0 auto;border-top:1px solid var(--hair);background:var(--paper);
@@ -967,15 +969,18 @@ var clearTimers={};
 function clearPage(id){
   var btn=document.getElementById(id+'-clear');
   if(btn.dataset.armed){
-    clearTimeout(clearTimers[id]);delete btn.dataset.armed;
+    clearTimeout(clearTimers[id]);delete btn.dataset.armed;btn.classList.remove('armed');
     var p=partById(id);
     lDrop(id+'-ans');lDrop(id+'-done');lDrop(id+'-ticks');lDrop(id+'-seen');lDrop(id+'-dad');
     if(p.questions)for(var i=0;i<p.questions.length;i++)lDrop(id+'-dad-'+p.questions[i].n);
     render();
     return;
   }
-  btn.dataset.armed='1';btn.textContent='Tap again to clear this page';
-  clearTimers[id]=setTimeout(function(){delete btn.dataset.armed;btn.textContent='Clear this page';},3000);
+  btn.dataset.armed='1';btn.classList.add('armed');
+  btn.textContent='Tap again to clear this page';
+  clearTimers[id]=setTimeout(function(){
+    delete btn.dataset.armed;btn.classList.remove('armed');btn.textContent='Clear this page';
+  },5000);
 }
 
 /* ── the answer section ─────────────────────────────────────────────── */
@@ -1081,7 +1086,7 @@ var retakeTimer;
 function retake(){
   var btn=document.getElementById('retake');
   if(btn.dataset.armed){
-    clearTimeout(retakeTimer);
+    clearTimeout(retakeTimer);btn.classList.remove('armed');
     try{
       Object.keys(localStorage).forEach(function(k){ if(k.indexOf(SP)===0)localStorage.removeItem(k); });
     }catch(e){}
@@ -1089,8 +1094,11 @@ function retake(){
     page=0;render();paintClock();
     return;
   }
-  btn.dataset.armed='1';btn.textContent='Tap again — this erases everything';
-  retakeTimer=setTimeout(function(){delete btn.dataset.armed;btn.textContent='Take the test again';},3000);
+  btn.dataset.armed='1';btn.classList.add('armed');
+  btn.textContent='Tap again — this erases everything';
+  retakeTimer=setTimeout(function(){
+    delete btn.dataset.armed;btn.classList.remove('armed');btn.textContent='Take the test again';
+  },5000);
 }
 
 function dadMark(key,val){

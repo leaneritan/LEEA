@@ -7,135 +7,99 @@
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    This is a TEST, so it is built to look like the printed test page, not
-   like the LEEA practice apps. No module cards, no modals, no emoji
-   chrome, no colour rewards — one paper page, questions 1 to 42 in the
-   publisher's own order and wording.
+   like the LEEA practice apps: the publisher's own instructions, wording
+   and numbering, blanks and ruled lines instead of app buttons.
 
-   The one thing paper does for free and a screen does not: on paper the
-   picture and the reading sit in front of you the whole time you answer.
-   Every section that has a picture, a reading or a track keeps it in a
-   sticky panel that stays put while the questions scroll past it.
-   No system font stack is loaded from the network, so nothing can stall.
+   One page per screen. Finish a page, tap Next — the way the paper test
+   is actually taken, and the reason the layout can be a fixed split: the
+   picture or the reading holds the top of the screen and the questions
+   scroll in what is left, so neither can ever hide the other.
    ═══════════════════════════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#111111;      /* printed text            */
+  --ink:#111111;      /* printed text        */
   --ink2:#3F3F46;
-  --ink3:#71717A;     /* instructions, meta      */
-  --rule:#A1A1AA;     /* answer lines, blanks    */
-  --hair:#D4D4D8;     /* light rules             */
-  --pencil:#1D4ED8;   /* what Leo writes in      */
+  --ink3:#71717A;     /* instructions, meta  */
+  --rule:#A1A1AA;     /* answer lines        */
+  --hair:#D4D4D8;
+  --pencil:#1D4ED8;   /* what Leo writes in  */
   --pencil-bg:#EFF6FF;
-  --desk:#E4E4E7;     /* behind the page         */
   --paper:#FFFFFF;
   --fn:Arial,'Helvetica Neue',Helvetica,'Segoe UI',sans-serif;
 }
+html,body{height:100%}
 html{-webkit-text-size-adjust:100%}
-body{font-family:var(--fn);background:var(--desk);color:var(--ink);font-size:16px;line-height:1.65}
+body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16px;
+     line-height:1.65;overflow:hidden}
 
-/* ── thin status strip ─────────────────────────────────────────────── */
-.bar{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:1px solid var(--hair);
-     height:38px;display:flex;align-items:center;justify-content:space-between;
-     padding:0 14px;font-size:.78rem;font-weight:700;color:var(--ink3)}
-.bar b{color:var(--ink);font-weight:700}
-.bar .saved{color:#15803D;opacity:0;transition:opacity .3s}
-.bar .saved.on{opacity:1}
+/* ── frame ─────────────────────────────────────────────────────────── */
+.app{height:100%;display:flex;flex-direction:column;max-width:900px;margin:0 auto;
+     background:var(--paper)}
+.bar{flex:0 0 auto;border-bottom:1px solid var(--hair);padding:7px 14px 0}
+.bar-row{display:flex;align-items:center;justify-content:space-between;font-size:.78rem;
+         font-weight:700;color:var(--ink3);padding-bottom:6px}
+.bar-row b{color:var(--ink)}
+.saved{color:#15803D;opacity:0;transition:opacity .3s}
+.saved.on{opacity:1}
+.bar-prog{height:3px;background:#F4F4F5;margin:0 -14px}
+.bar-prog i{display:block;height:100%;background:var(--ink);width:0;transition:width .35s}
 
-/* ── the page ──────────────────────────────────────────────────────── */
-.page{max-width:820px;margin:0 auto;background:var(--paper);padding:26px 26px 90px;
-      box-shadow:0 0 0 1px #D4D4D8}
-@media(min-width:880px){.page{padding:34px 46px 110px;margin:14px auto}}
+.stage{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
 
-.sheet-hd{border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:6px}
-.sheet-title{font-size:1.08rem;font-weight:700;letter-spacing:.2px}
-.sheet-meta{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:8px;font-size:.84rem;color:var(--ink2)}
-.sheet-meta span{white-space:nowrap}
-.sheet-meta u{text-decoration:none;border-bottom:1px solid var(--rule);padding:0 26px 0 4px}
-.sheet-note{font-size:.8rem;color:var(--ink3);margin:12px 0 4px;line-height:1.6}
-
-/* ── a section of the test ─────────────────────────────────────────── */
-.sec{padding-top:24px;margin-top:22px;border-top:1px solid var(--hair)}
-.sec:first-of-type{border-top:none;margin-top:8px}
-.instr{font-size:.98rem;font-weight:700;margin-bottom:2px}
+/* ── one page ──────────────────────────────────────────────────────── */
+.page{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:13px 16px 0}
+.phd{flex:0 0 auto;padding-bottom:8px}
+.instr{font-size:.98rem;font-weight:700}
 .instr .tr{float:right;font-weight:700;color:var(--ink3);font-size:.84rem;letter-spacing:.5px}
-.sub{font-size:.82rem;color:var(--ink3);margin-bottom:10px}
-.example{font-size:.9rem;font-style:italic;color:var(--ink2);margin:10px 0 4px}
+.sub{font-size:.81rem;color:var(--ink3);margin-top:2px}
 
-/* Media that must stay in view while the questions are answered. Block
-   layout on a phone (the panel sticks above the questions), two columns
-   from 900px (it sticks beside them). In both cases the sticky element is
-   a child of a box as tall as the whole section, which is what lets it
-   travel — a grid row of its own would pin it to its own height. */
-.with-media{display:block}
-.media{position:sticky;top:38px;z-index:20;background:var(--paper);
-       padding:8px 0 10px;border-bottom:1px solid var(--hair);margin-bottom:12px;
-       box-shadow:0 8px 10px -8px rgba(0,0,0,.22)}
-.qs{display:block}
-@media(min-width:900px){
-  .with-media{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);
-              gap:26px;align-items:start}
-  .media{border-bottom:none;padding-bottom:0;margin-bottom:0;box-shadow:none}
+.split{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:10px}
+/* Reference material: fixed, never scrolls away, never overlaps a question. */
+.ref{flex:0 0 auto;max-height:52%;min-height:0;display:flex;flex-direction:column;gap:7px}
+.qcol{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+      padding-bottom:14px}
+@media(min-width:900px) and (min-height:520px){
+  .split{flex-direction:row;gap:26px}
+  .ref{flex:0 0 45%;max-height:none}
 }
 
-.media img{width:100%;height:auto;max-height:25vh;object-fit:contain;display:block;
-           border:1px solid var(--hair);cursor:zoom-in}
-@media(min-width:900px){.media img{max-height:none}}
-.media audio{width:100%;margin-top:6px;height:34px}
-.track-lbl{font-size:.74rem;font-weight:700;color:var(--ink3);letter-spacing:1px;margin-top:8px}
-.zoom{font-size:.76rem;color:var(--pencil);background:none;border:none;font-family:var(--fn);
-      font-weight:700;cursor:pointer;padding:5px 0 0}
-
-/* reading passage — scrolls inside itself on a phone so it never eats the screen */
-.passage{border:1px solid var(--hair);padding:12px 14px;max-height:30vh;overflow:auto}
-@media(min-width:900px){.passage{max-height:72vh}}
-.passage h4{font-size:.98rem;font-weight:700;text-align:center;margin-bottom:8px}
-.passage p{font-size:.92rem;line-height:1.7;margin-bottom:9px;text-align:justify}
+.ref img{flex:1 1 auto;min-height:0;width:100%;object-fit:contain;object-position:center top;
+         border:1px solid var(--hair);cursor:zoom-in}
+.ref audio{flex:0 0 auto;width:100%;height:34px}
+.zoom{flex:0 0 auto;font-size:.76rem;color:var(--pencil);background:none;border:none;
+      font-family:var(--fn);font-weight:700;cursor:pointer;padding:0;text-align:left}
+.passage{flex:1 1 auto;min-height:0;overflow-y:auto;border:1px solid var(--hair);padding:11px 13px}
+.passage h4{font-size:.96rem;font-weight:700;text-align:center;margin-bottom:7px}
+.passage p{font-size:.9rem;line-height:1.7;margin-bottom:8px;text-align:justify}
 .passage p:last-child{margin-bottom:0}
 
-/* ── word box, exactly as it is printed ────────────────────────────── */
-.box{border:1px solid var(--ink);padding:9px 12px;margin:10px 0 4px;
-     display:flex;flex-wrap:wrap;gap:6px 26px;justify-content:center;font-size:.93rem;font-weight:700;
-     background:var(--paper)}
-/* A word box is reference material: on paper the eye goes back to it for every
-   blank, so it stays in view the same way the picture and the reading do —
-   pinned on its own when the section has no media panel, inside the panel when
-   it has one. */
-.box.pin{position:sticky;top:38px;z-index:20;box-shadow:0 8px 10px -8px rgba(0,0,0,.22)}
-.media .box{margin:10px 0 0}
-@media(min-width:900px){.box.pin{box-shadow:none}}
+/* ── word box, as it is printed ────────────────────────────────────── */
+.box{flex:0 0 auto;border:1px solid var(--ink);padding:8px 11px;background:var(--paper);
+     display:flex;flex-wrap:wrap;gap:5px 24px;justify-content:center;font-size:.9rem;font-weight:700}
+.qcol > .box{margin-bottom:10px}
+.example{font-size:.88rem;font-style:italic;color:var(--ink2);margin-bottom:4px}
 
 /* ── one question ─────────────────────────────────────────────────── */
 .item{display:flex;gap:8px;align-items:flex-start;padding:9px 0;border-bottom:1px dotted #E4E4E7}
-.item:last-child{border-bottom:none}
 .num{font-weight:700;min-width:26px;flex-shrink:0;text-align:right}
 .ilabel{font-weight:700;min-width:24px;flex-shrink:0}
 .body{flex:1;min-width:0;font-size:.95rem;line-height:1.85}
-
-/* the blank that carries the answer, printed as "____ 8." */
 .blank{flex-shrink:0;min-width:46px;height:26px;border-bottom:1.5px solid var(--rule);
        text-align:center;font-weight:700;color:var(--pencil);font-size:.92rem;line-height:26px}
 .blank.filled{border-bottom-color:var(--pencil)}
-
-/* an inline blank inside a sentence is a select with no chrome */
 .inl{font-family:var(--fn);font-size:.95rem;font-weight:700;color:var(--pencil);
-     background:transparent;border:none;border-bottom:1.5px solid var(--rule);
-     border-radius:0;padding:1px 2px;min-width:112px;max-width:100%;
-     -webkit-appearance:none;appearance:none;cursor:pointer}
+     background:transparent;border:none;border-bottom:1.5px solid var(--rule);border-radius:0;
+     padding:1px 2px;min-width:112px;max-width:100%;-webkit-appearance:none;appearance:none;cursor:pointer}
 .inl:focus{outline:none;border-bottom-color:var(--pencil);background:var(--pencil-bg)}
 .inl.filled{border-bottom-color:var(--pencil)}
 .inl.short{min-width:56px;text-align:center}
-
-/* options, laid out down-then-across the way the sheet prints them */
-.opts{display:grid;grid-template-rows:repeat(2,auto);grid-auto-flow:column;
-      gap:2px 20px;margin-top:5px}
+.opts{display:grid;grid-template-rows:repeat(2,auto);grid-auto-flow:column;gap:2px 18px;margin-top:5px}
 .opts.two{grid-template-rows:auto}
 .opt{text-align:left;background:none;border:1px solid transparent;border-radius:3px;
      font-family:var(--fn);font-size:.93rem;color:var(--ink);cursor:pointer;padding:4px 7px}
 .opt:hover{background:#FAFAFA;border-color:var(--hair)}
 .opt .k{font-weight:700;margin-right:7px}
 .opt.picked{background:var(--pencil-bg);border-color:var(--pencil);color:var(--pencil);font-weight:700}
-
-/* ruled writing lines, like the underscores on the sheet */
 .lines{width:100%;font-family:var(--fn);font-size:.95rem;color:var(--pencil);font-weight:700;
        border:none;border-radius:0;background-image:repeating-linear-gradient(
          transparent,transparent 31px,var(--rule) 31px,var(--rule) 32px);
@@ -143,33 +107,60 @@ body{font-family:var(--fn);background:var(--desk);color:var(--ink);font-size:16p
 .lines:focus{outline:none}
 
 /* ── speaking ─────────────────────────────────────────────────────── */
-.dad-note{border-left:3px solid var(--ink);padding:6px 0 6px 11px;font-size:.86rem;
-          color:var(--ink2);margin:10px 0}
+.dad-note{border-left:3px solid var(--ink);padding:5px 0 5px 11px;font-size:.85rem;
+          color:var(--ink2);margin-bottom:9px}
 .sp-show{background:var(--paper);border:1px solid var(--ink);padding:9px 14px;font-family:var(--fn);
-         font-size:.88rem;font-weight:700;cursor:pointer;width:100%;margin-top:4px}
+         font-size:.87rem;font-weight:700;cursor:pointer;width:100%}
 .sp{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px dotted #E4E4E7}
 .sp-tick{width:26px;height:26px;flex-shrink:0;border:1.5px solid var(--rule);background:var(--paper);
          cursor:pointer;font-size:.9rem;line-height:1;color:var(--pencil);font-weight:700}
 .sp.ok .sp-tick{border-color:var(--pencil);background:var(--pencil-bg)}
 .sp-q{font-size:.92rem;line-height:1.6}
-.sp-a{font-size:.82rem;color:var(--ink3);margin-top:3px}
+.sp-a{font-size:.81rem;color:var(--ink3);margin-top:3px}
 
-/* ── the small footer that closes each section ─────────────────────── */
-.sec-foot{display:flex;gap:10px;align-items:center;margin-top:14px;padding-top:11px;
-          border-top:1px solid var(--hair);flex-wrap:wrap}
-.f-done{background:var(--paper);border:1.5px solid var(--ink);color:var(--ink);font-family:var(--fn);
-        font-size:.83rem;font-weight:700;padding:8px 15px;cursor:pointer}
-.f-done:disabled{border-color:var(--hair);color:#A1A1AA;cursor:not-allowed}
-.f-done.is-done{background:var(--ink);color:var(--paper)}
-.f-redo{background:none;border:none;color:var(--ink3);font-family:var(--fn);font-size:.8rem;
-        font-weight:700;cursor:pointer;padding:8px 4px;text-decoration:underline}
-.f-state{font-size:.79rem;color:var(--ink3);margin-left:auto}
+/* ── page foot ────────────────────────────────────────────────────── */
+.pfoot{margin-top:14px;padding-top:10px;border-top:1px solid var(--hair);
+       display:flex;align-items:center;gap:12px}
+.clear-btn{background:none;border:none;color:var(--ink3);font-family:var(--fn);font-size:.79rem;
+           font-weight:700;cursor:pointer;padding:0;text-decoration:underline}
 
-/* ── answer section (the score), printed like the key page ─────────── */
-.answers{margin-top:34px;padding-top:20px;border-top:2px solid var(--ink)}
-.answers h3{font-size:1.02rem;font-weight:700;margin-bottom:3px}
-.locked{font-size:.86rem;color:var(--ink3);padding:14px 0}
-.total{display:flex;align-items:baseline;gap:10px;margin:14px 0 4px}
+/* ── bottom navigation ────────────────────────────────────────────── */
+.nav{flex:0 0 auto;border-top:1px solid var(--hair);background:var(--paper);
+     display:flex;align-items:center;gap:8px;padding:9px 12px}
+.nv{background:var(--paper);border:1.5px solid var(--ink);color:var(--ink);font-family:var(--fn);
+    font-size:.85rem;font-weight:700;padding:10px 16px;cursor:pointer;white-space:nowrap}
+.nv:disabled{border-color:var(--hair);color:#A1A1AA;cursor:not-allowed}
+.nv.go{background:var(--ink);color:var(--paper)}
+.pager{flex:1;background:none;border:none;font-family:var(--fn);font-size:.82rem;font-weight:700;
+       color:var(--ink2);cursor:pointer;text-align:center;line-height:1.35;padding:2px}
+.pager small{display:block;font-size:.72rem;font-weight:700;color:var(--ink3)}
+.pager small.warn{color:#B45309}
+
+/* ── page index ───────────────────────────────────────────────────── */
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:70;display:none}
+.sheet.open{display:block}
+.sheet-in{position:absolute;inset:auto 0 0 0;max-height:82%;overflow-y:auto;background:var(--paper);
+          max-width:900px;margin:0 auto;padding:16px 16px 22px}
+.sheet-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.sheet-h h3{font-size:.98rem;font-weight:700}
+.sheet-x{background:none;border:none;font-size:1.15rem;cursor:pointer;color:var(--ink3);padding:2px 6px}
+.prow{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;
+      border-bottom:1px solid var(--hair);padding:10px 2px;font-family:var(--fn);
+      font-size:.88rem;color:var(--ink);cursor:pointer;text-align:left}
+.prow:hover{background:#FAFAFA}
+.prow.now{font-weight:700}
+.prow .pn{min-width:22px;color:var(--ink3);font-weight:700}
+.prow .pname{flex:1}
+.prow .pst{font-size:.77rem;font-weight:700;color:#15803D;white-space:nowrap}
+.prow .pst.blank{color:#B45309}
+.prow .pst.none{color:var(--ink3)}
+.prow[disabled]{opacity:.45;cursor:not-allowed}
+
+/* ── answer section ───────────────────────────────────────────────── */
+.answers{flex:1 1 auto;min-height:0;overflow-y:auto;padding:16px 16px 24px}
+.answers h3{font-size:1.02rem;font-weight:700;border-bottom:2px solid var(--ink);padding-bottom:7px}
+.locked{font-size:.88rem;color:var(--ink2);padding:14px 0;line-height:1.7}
+.total{display:flex;align-items:baseline;gap:10px;margin:16px 0 4px}
 .total b{font-size:2.5rem;font-weight:700;line-height:1}
 .total span{font-size:.92rem;color:var(--ink2)}
 .pend{font-size:.85rem;color:var(--ink2);border-left:3px solid var(--ink);padding:5px 0 5px 11px;margin:10px 0}
@@ -178,10 +169,10 @@ body{font-family:var(--fn);background:var(--desk);color:var(--ink);font-size:16p
 .brk td:last-child{text-align:right;font-weight:700;white-space:nowrap}
 .brk tr.open td:last-child{color:var(--pencil)}
 .mark{border:1px solid var(--hair);padding:11px 13px;margin-top:11px}
-.mark-h{font-size:.82rem;font-weight:700;color:var(--ink3);margin-bottom:6px}
+.mark-h{font-size:.81rem;font-weight:700;color:var(--ink3);margin-bottom:6px}
 .mark-said{font-size:.9rem;line-height:1.65;white-space:pre-wrap;border-left:2px solid var(--hair);
-           padding-left:10px;margin-bottom:7px;color:var(--ink)}
-.mark-key{font-size:.83rem;color:var(--ink2);margin-bottom:8px;line-height:1.55}
+           padding-left:10px;margin-bottom:7px}
+.mark-key{font-size:.82rem;color:var(--ink2);margin-bottom:8px;line-height:1.55}
 .steps{display:flex;gap:5px;flex-wrap:wrap}
 .step{background:var(--paper);border:1px solid var(--rule);font-family:var(--fn);font-size:.85rem;
       font-weight:700;padding:5px 12px;cursor:pointer;color:var(--ink2)}
@@ -196,28 +187,29 @@ body{font-family:var(--fn);background:var(--desk);color:var(--ink);font-size:16p
 </head>
 <body>
 
-<div class="bar">
-  <span><b>Units 7–9 Test</b></span>
-  <span><span class="saved" id="saved">saved ✓</span> <span id="secCount">0 of 13 done</span></span>
+<div class="app">
+  <div class="bar">
+    <div class="bar-row">
+      <span><b>Our World 4 · Units 7–9 Test</b></span>
+      <span><span class="saved" id="saved">saved ✓</span></span>
+    </div>
+    <div class="bar-prog"><i id="progFill"></i></div>
+  </div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="nav">
+    <button class="nv" id="prev" onclick="goRel(-1)">← Back</button>
+    <button class="pager" id="pager" onclick="openIndex()"></button>
+    <button class="nv go" id="next" onclick="goRel(1)">Next →</button>
+  </div>
 </div>
 
-<div class="page">
-  <div class="sheet-hd">
-    <div class="sheet-title">Our World: Level 4 – Units 7–9</div>
-    <div class="sheet-meta">
-      <span>Name: <u>Leo</u></span>
-      <span>Date: <u></u></span>
-      <span>Score: <u id="hdScore"></u> / 80</span>
-    </div>
+<div class="sheet" id="sheet" onclick="if(event.target===this)closeIndex()">
+  <div class="sheet-in">
+    <div class="sheet-h"><h3>Pages</h3><button class="sheet-x" onclick="closeIndex()">✕</button></div>
+    <div id="sheet-list"></div>
   </div>
-  <p class="sheet-note">
-    Answer every question. You will not be told what is right or wrong until the end.
-    Your answers save by themselves — you can stop and come back.
-  </p>
-
-  <div id="test"></div>
-
-  <div class="answers" id="answers"></div>
 </div>
 
 <div class="lb" id="lb" onclick="closeLb()"><img id="lb-img" alt=""></div>
@@ -421,14 +413,14 @@ var TEST = {
 ]};
 /* ═══════════════════════════════════════════════════════════════════════
    ENGINE — generic. Nothing below this line knows about Units 7–9.
-   The whole test renders as one page: every section is laid out at load,
-   so the picture, the reading and the track for a section are on screen
-   the entire time its questions are being answered.
+   One page per section, plus a final Answer Section page.
    ═══════════════════════════════════════════════════════════════════════ */
 var SP = 'leea-4-t7-9-test-';
 var HW_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-t7-9-test';
 var PARTS = TEST.parts;
 var MC = PARTS.length;
+var ANSWERS_PAGE = MC;          /* the page after the last section */
+var page = 0;
 
 function lSave(k,v){try{localStorage.setItem(SP+k,JSON.stringify(v));}catch(e){}}
 function lLoad(k,fb){try{var v=localStorage.getItem(SP+k);return v!==null?JSON.parse(v):(fb===undefined?null:fb);}catch(e){return fb===undefined?null:fb;}}
@@ -456,7 +448,7 @@ function norm(s){
     .replace(/[.,!?;:]+$/g,'').replace(/\s+/g,' ').trim();
 }
 
-/** What a section is worth, what Leo earned automatically, what Dad still owes. */
+/** What a page is worth, what Leo earned automatically, what Dad still owes. */
 function markPart(p){
   var a=getAns(p), got=0, max=0, pending=[];
   if(p.kind==='speaking'){
@@ -503,25 +495,38 @@ function totals(){
   return {got:got,max:max,pending:pending};
 }
 
-function partComplete(p){
-  var a=getAns(p);
-  if(p.kind==='speaking')return !!lLoad(p.id+'-seen',false);
-  if(p.kind==='writing')return !!a.choice && String(a.text||'').trim().length>0;
+/** How many answers on a page are still blank — what "3 still blank" counts. */
+function blanksOn(p){
+  var a=getAns(p), n=0;
+  if(p.kind==='speaking')return lLoad(p.id+'-seen',false)?0:1;
+  if(p.kind==='writing')return (a.choice?0:1)+(String(a.text||'').trim()?0:1);
   for(var i=0;i<p.questions.length;i++){
     var v=a[String(p.questions[i].n)];
-    if(p.kind==='multi'){if(!v||v.length<2)return false;}
-    else if(p.kind==='text'){if(String(v||'').trim()==='')return false;}
-    else if(v===undefined||v===null||v==='')return false;
+    if(p.kind==='multi'){if(!v||v.length<2)n++;}
+    else if(p.kind==='text'){if(String(v||'').trim()==='')n++;}
+    else if(v===undefined||v===null||v==='')n++;
   }
-  return true;
+  return n;
 }
+function partComplete(p){return blanksOn(p)===0;}
 function isDone(p){return !!lLoad(p.id+'-done',false);}
+function doneCount(){var n=0;for(var i=0;i<MC;i++)if(isDone(PARTS[i]))n++;return n;}
+function allDone(){return doneCount()===MC;}
 
-/* ── the page ───────────────────────────────────────────────────────── */
-/** Whether a section carries something that must stay in view while answering. */
-function hasMedia(p){return !!(p.image||p.passage||p.audio);}
+/* ── page pieces ────────────────────────────────────────────────────── */
+function hasRef(p){return !!(p.image||p.passage||p.audio||boxHtml(p));}
 
-function mediaHtml(p){
+function boxHtml(p){
+  if(!p.bank||p.kind==='buttons'||p.kind==='multi')return '';
+  /* Q1's bank is the A–G labels printed on the picture itself, not a word box. */
+  if(p.questions&&p.questions[0]&&p.questions[0].label&&p.bank.length<=7&&p.bank[0].length===1)return '';
+  var h='<div class="box">';
+  for(var i=0;i<p.bank.length;i++)h+='<span>'+esc(p.bank[i])+'</span>';
+  return h+'</div>';
+}
+
+/* Everything the questions on this page need to keep looking at. */
+function refHtml(p){
   var h='';
   if(p.image){
     h+='<img src="'+esc(p.image)+'" alt="'+esc(p.imageAlt||'')+'" onclick="openLb(\''+esc(p.image)+'\')">'
@@ -533,19 +538,9 @@ function mediaHtml(p){
     h+='</div>';
   }
   if(p.audio){
-    h+='<div class="track-lbl">TR '+esc(p.track)+'</div>'
-      +'<audio controls preload="none" src="'+esc(p.audio)+'"></audio>';
+    h+='<audio controls preload="none" src="'+esc(p.audio)+'"></audio>';
   }
-  return h + boxHtml(p,false);
-}
-
-function boxHtml(p,pinned){
-  if(!p.bank||p.kind==='buttons'||p.kind==='multi')return '';
-  /* Q1's bank is the A–G labels printed on the picture itself, not a word box. */
-  if(p.questions&&p.questions[0]&&p.questions[0].label&&p.bank.length<=7&&p.bank[0].length===1)return '';
-  var h='<div class="box'+(pinned?' pin':'')+'">';
-  for(var i=0;i<p.bank.length;i++)h+='<span>'+esc(p.bank[i])+'</span>';
-  return h+'</div>';
+  return h + boxHtml(p);
 }
 
 function selectHtml(p,key,given,extraClass){
@@ -563,8 +558,7 @@ function questionsHtml(p){
 
   if(p.kind==='speaking'){
     var ticks=lLoad(p.id+'-ticks',[])||[], seen=!!lLoad(p.id+'-seen',false);
-    h+='<div class="dad-note">Dad asks each question out loud. Leo answers from the picture. '
-      +'1 point each.</div>';
+    h+='<div class="dad-note">Dad asks each question out loud. Leo answers from the picture. 1 point each.</div>';
     if(!seen)h+='<button class="sp-show" id="'+p.id+'-show" onclick="showPrompts(\''+p.id+'\')">Dad: show the 10 questions</button>';
     h+='<div id="'+p.id+'-prompts"'+(seen?'':' hidden')+'>';
     for(var s=0;s<p.prompts.length;s++){
@@ -591,13 +585,10 @@ function questionsHtml(p){
   for(var i=0;i<p.questions.length;i++){
     var q=p.questions[i], key=String(q.n), given=a[key];
     h+='<div class="item">';
-
     if(p.kind==='select'){
       if(q.label){
-        /* "1) ____" — the sheet's numbered sub-answers */
         h+='<span class="ilabel">'+esc(q.label)+'</span><div class="body">'+selectHtml(p,key,given,'short')+'</div>';
       } else if(p.blankFirst){
-        /* "____ 30. The first electric skateboard was built in" */
         h+=selectHtml(p,key,given)+'<span class="num">'+esc(q.n)+'.</span>'
           +'<div class="body">'+esc(q.before)+'</div>';
       } else {
@@ -626,58 +617,88 @@ function questionsHtml(p){
   return h;
 }
 
-function sectionHtml(p,i){
-  /* With a media panel the box rides inside it; without one it pins itself. */
-  var inner = (hasMedia(p)?'':boxHtml(p,true))
-            + (p.example?'<div class="example">'+esc(p.example)+'</div>':'')
-            + '<div id="'+p.id+'-qs">'+questionsHtml(p)+'</div>';
-  var body = hasMedia(p)
-    ? '<div class="with-media"><div class="media">'+mediaHtml(p)+'</div><div class="qs">'+inner+'</div></div>'
-    : inner;
-  return '<section class="sec" id="'+p.id+'">'
-    +'<div class="instr">'+(p.track?'<span class="tr">TR: '+esc(p.track)+'</span>':'')+esc(p.instr)+'</div>'
-    +(p.sub?'<div class="sub">'+esc(p.sub)+'</div>':'')
-    + body
-    +'<div class="sec-foot">'
-      +'<button class="f-done" id="'+p.id+'-done-btn" onclick="markDone(\''+p.id+'\')"></button>'
-      +'<button class="f-redo" id="'+p.id+'-redo" onclick="redoPart(\''+p.id+'\')">Clear this section</button>'
-      +'<span class="f-state" id="'+p.id+'-state"></span>'
-    +'</div></section>';
+function pageHtml(p){
+  var qs = (hasRef(p)?'':boxHtml(p))
+         + (p.example?'<div class="example">'+esc(p.example)+'</div>':'')
+         + '<div id="'+p.id+'-qs">'+questionsHtml(p)+'</div>'
+         + '<div class="pfoot"><button class="clear-btn" id="'+p.id+'-clear" onclick="clearPage(\''+p.id+'\')">Clear this page</button></div>';
+  var split = hasRef(p)
+    ? '<div class="split"><div class="ref">'+refHtml(p)+'</div><div class="qcol" id="qcol">'+qs+'</div></div>'
+    : '<div class="split"><div class="qcol" id="qcol">'+qs+'</div></div>';
+  return '<div class="page">'
+    +'<div class="phd"><div class="instr">'+(p.track?'<span class="tr">TR: '+esc(p.track)+'</span>':'')+esc(p.instr)+'</div>'
+    +(p.sub?'<div class="sub">'+esc(p.sub)+'</div>':'')+'</div>'
+    + split + '</div>';
 }
 
-function renderTest(){
-  var h='';
-  for(var i=0;i<PARTS.length;i++)h+=sectionHtml(PARTS[i],i);
-  document.getElementById('test').innerHTML=h;
-  for(var k=0;k<PARTS.length;k++){refreshFoot(PARTS[k].id);sizeLines(PARTS[k].id);}
-  refreshBar();
+/* ── navigation ─────────────────────────────────────────────────────── */
+function render(){
+  var stage=document.getElementById('stage');
+  if(page===ANSWERS_PAGE){ stage.innerHTML=answersHtml(); }
+  else{
+    var p=PARTS[page];
+    stage.innerHTML=pageHtml(p);
+    sizeLines(p.id);
+    var q=document.getElementById('qcol');
+    if(q)q.scrollTop=0;
+  }
+  lSave('page',page);
+  paintNav();
 }
 
-/* Ruled textareas grow with what is written, so nothing is ever hidden. */
-function grow(el){el.style.height='auto';el.style.height=(Math.ceil(el.scrollHeight/32)*32)+'px';}
-function sizeLines(pid){
-  var els=document.querySelectorAll('#'+pid+' .lines');
-  for(var i=0;i<els.length;i++)grow(els[i]);
-}
-
-function refreshFoot(id){
-  var p=partById(id), btn=document.getElementById(id+'-done-btn'), st=document.getElementById(id+'-state');
-  if(!btn)return;
-  var ok=partComplete(p), done=isDone(p);
-  btn.disabled=!ok;
-  btn.classList.toggle('is-done',done);
-  btn.textContent=done?'Finished ✓':'Finished';
-  st.textContent=done?'':(ok?'ready':'not finished yet');
-  /* The done-key writes itself the moment the section is finished; the button
-     is how Leo confirms it, not how the data gets saved. */
-  if(ok&&!done){lSave(id+'-done',true);btn.classList.add('is-done');btn.textContent='Finished ✓';st.textContent='';}
+function paintNav(){
+  var prev=document.getElementById('prev'), next=document.getElementById('next'),
+      pager=document.getElementById('pager');
+  prev.disabled = page===0;
+  if(page===ANSWERS_PAGE){
+    next.style.visibility='hidden';
+    pager.innerHTML='Answer Section';
+  } else {
+    next.style.visibility='visible';
+    next.textContent = page===MC-1 ? 'Finish →' : 'Next →';
+    var p=PARTS[page], blanks=blanksOn(p);
+    /* Never block the way forward — just say quietly what is still open. */
+    pager.innerHTML='Page '+(page+1)+' of '+MC
+      +'<small'+(blanks?' class="warn"':'')+'>'
+      +(blanks? blanks+' still blank' : 'all answered')+'</small>';
+  }
+  document.getElementById('progFill').style.width=(doneCount()/MC*100)+'%';
   recordScore();
 }
 
-function refreshBar(){
-  var done=0;for(var i=0;i<PARTS.length;i++)if(isDone(PARTS[i]))done++;
-  document.getElementById('secCount').textContent=done+' of '+MC+' done';
-  renderAnswers(done===MC);
+function goTo(i){
+  if(i<0)i=0;
+  if(i>ANSWERS_PAGE)i=ANSWERS_PAGE;
+  page=i;render();closeIndex();
+}
+function goRel(d){goTo(page+d);}
+
+function openIndex(){
+  var h='';
+  for(var i=0;i<MC;i++){
+    var p=PARTS[i], b=blanksOn(p), started=Object.keys(getAns(p)).length>0||!!lLoad(p.id+'-seen',false);
+    var cls = b===0?'':(started?'blank':'none');
+    var txt = b===0?'done':(started? b+' blank' : 'not started');
+    h+='<button class="prow'+(i===page?' now':'')+'" onclick="goTo('+i+')">'
+      +'<span class="pn">'+(i+1)+'</span><span class="pname">'+esc(p.name)+'</span>'
+      +'<span class="pst '+cls+'">'+txt+'</span></button>';
+  }
+  var ok=allDone();
+  h+='<button class="prow'+(page===ANSWERS_PAGE?' now':'')+'"'+(ok?'':' disabled')
+    +' onclick="'+(ok?'goTo('+ANSWERS_PAGE+')':'')+'">'
+    +'<span class="pn">★</span><span class="pname">Answer Section</span>'
+    +'<span class="pst '+(ok?'':'none')+'">'+(ok?'ready':'locked')+'</span></button>';
+  document.getElementById('sheet-list').innerHTML=h;
+  document.getElementById('sheet').classList.add('open');
+}
+function closeIndex(){document.getElementById('sheet').classList.remove('open');}
+
+/* ── answering ──────────────────────────────────────────────────────── */
+/* Ruled textareas grow with what is written, so nothing is ever hidden. */
+function grow(el){el.style.height='auto';el.style.height=(Math.ceil(el.scrollHeight/32)*32)+'px';}
+function sizeLines(pid){
+  var els=document.querySelectorAll('#'+pid+'-qs .lines');
+  for(var i=0;i<els.length;i++)grow(els[i]);
 }
 var savedTimer;
 function flashSaved(){
@@ -686,11 +707,17 @@ function flashSaved(){
   savedTimer=setTimeout(function(){el.classList.remove('on');},1200);
 }
 
-/* ── answering ──────────────────────────────────────────────────────── */
+/* A page's done-key saves itself the moment its last blank is filled —
+   there is no Finished button to press; Next just moves on. */
+function afterAnswer(pid){
+  var p=partById(pid);
+  if(partComplete(p))lSave(pid+'-done',true);
+  paintNav();
+}
 function onSelect(pid,key,el){
   setAns(partById(pid),key,el.value);
   el.classList.toggle('filled',el.value!=='');
-  refreshFoot(pid);refreshBar();
+  afterAnswer(pid);
 }
 function pickOne(pid,key,k,i){
   setAns(partById(pid),key,k);
@@ -698,7 +725,7 @@ function pickOne(pid,key,k,i){
   for(var b=0;b<opts.length;b++)opts[b].classList.toggle('picked',opts[b].dataset.k===k);
   var bl=document.getElementById(pid+'-bl-'+i);
   bl.textContent=k;bl.classList.add('filled');
-  refreshFoot(pid);refreshBar();
+  afterAnswer(pid);
 }
 function toggleMulti(pid,key,k,i){
   var p=partById(pid),a=getAns(p),cur=(a[key]||[]).slice(),at=cur.indexOf(k);
@@ -708,20 +735,20 @@ function toggleMulti(pid,key,k,i){
   for(var b=0;b<opts.length;b++)opts[b].classList.toggle('picked',cur.indexOf(opts[b].dataset.k)>=0);
   var bl=document.getElementById(pid+'-bl-'+i);
   bl.textContent=cur.join(', ');bl.classList.toggle('filled',cur.length>0);
-  refreshFoot(pid);refreshBar();
+  afterAnswer(pid);
 }
-function typeText(pid,key,el){setAns(partById(pid),key,el.value);grow(el);refreshFoot(pid);refreshBar();}
+function typeText(pid,key,el){setAns(partById(pid),key,el.value);grow(el);afterAnswer(pid);}
 function pickWriting(pid,k){
   var p=partById(pid);setAns(p,'choice',k);
   var opts=document.querySelectorAll('#'+pid+'-qs .opt');
   for(var b=0;b<opts.length;b++)opts[b].classList.toggle('picked',opts[b].querySelector('.k').textContent===k+'.');
-  refreshFoot(pid);refreshBar();
+  afterAnswer(pid);
 }
-function typeWriting(pid,el){setAns(partById(pid),'text',el.value);grow(el);refreshFoot(pid);refreshBar();}
+function typeWriting(pid,el){setAns(partById(pid),'text',el.value);grow(el);afterAnswer(pid);}
 function showPrompts(pid){
   document.getElementById(pid+'-prompts').hidden=false;
   var b=document.getElementById(pid+'-show');if(b)b.remove();
-  lSave(pid+'-seen',true);refreshFoot(pid);refreshBar();
+  lSave(pid+'-seen',true);afterAnswer(pid);
 }
 function tickSp(pid,i){
   var t=(lLoad(pid+'-ticks',[])||[]).slice();
@@ -729,43 +756,44 @@ function tickSp(pid,i){
   var row=document.getElementById(pid+'-sp-'+i);
   row.classList.toggle('ok',!!t[i]);
   row.querySelector('.sp-tick').textContent=t[i]?'✓':'';
-  refreshFoot(pid);refreshBar();
+  afterAnswer(pid);
 }
 
-function markDone(id){lSave(id+'-done',true);refreshFoot(id);refreshBar();}
-var redoTimers={};
-function redoPart(id){
-  var btn=document.getElementById(id+'-redo');
+var clearTimers={};
+function clearPage(id){
+  var btn=document.getElementById(id+'-clear');
   if(btn.dataset.armed){
-    clearTimeout(redoTimers[id]);delete btn.dataset.armed;btn.textContent='Clear this section';
+    clearTimeout(clearTimers[id]);delete btn.dataset.armed;
     var p=partById(id);
     lDrop(id+'-ans');lDrop(id+'-done');lDrop(id+'-ticks');lDrop(id+'-seen');lDrop(id+'-dad');
     if(p.questions)for(var i=0;i<p.questions.length;i++)lDrop(id+'-dad-'+p.questions[i].n);
-    document.getElementById(id+'-qs').innerHTML=questionsHtml(p);
-    sizeLines(id);refreshFoot(id);refreshBar();
+    render();
     return;
   }
-  btn.dataset.armed='1';btn.textContent='Tap again to clear';
-  redoTimers[id]=setTimeout(function(){delete btn.dataset.armed;btn.textContent='Clear this section';},3000);
+  btn.dataset.armed='1';btn.textContent='Tap again to clear this page';
+  clearTimers[id]=setTimeout(function(){delete btn.dataset.armed;btn.textContent='Clear this page';},3000);
 }
 
 /* ── the answer section ─────────────────────────────────────────────── */
 function recordScore(){
-  var t=totals(), allDone=true;
-  for(var i=0;i<PARTS.length;i++)if(!isDone(PARTS[i]))allDone=false;
-  saveScore(t.got,t.max,allDone,{pending:t.pending.length});
-  document.getElementById('hdScore').textContent=allDone?t.got:'';
+  var t=totals();
+  saveScore(t.got,t.max,allDone(),{pending:t.pending.length});
 }
-function renderAnswers(unlocked){
-  var el=document.getElementById('answers');
-  if(!unlocked){
-    var done=0;for(var i=0;i<PARTS.length;i++)if(isDone(PARTS[i]))done++;
-    el.innerHTML='<h3>Answer Section</h3><div class="locked">Opens when all '+MC
-      +' sections are finished — '+done+' so far. Go through it with Dad.</div>';
-    return;
+function answersHtml(){
+  if(!allDone()){
+    var h='<div class="answers"><h3>Answer Section</h3><div class="locked">'
+      +'It opens when all '+MC+' pages are finished — '+doneCount()+' so far. '
+      +'These still have blanks:</div>';
+    for(var i=0;i<MC;i++){
+      var p=PARTS[i],b=blanksOn(p);
+      if(!b)continue;
+      h+='<button class="prow" onclick="goTo('+i+')"><span class="pn">'+(i+1)+'</span>'
+        +'<span class="pname">'+esc(p.name)+'</span><span class="pst blank">'+b+' blank</span></button>';
+    }
+    return h+'</div>';
   }
   var t=totals();
-  var h='<h3>Answer Section</h3>'
+  var h='<div class="answers"><h3>Answer Section</h3>'
     +'<div class="total"><b>'+t.got+'</b><span>out of '+t.max+' points · '
     +(t.max?Math.round(t.got/t.max*100):0)+'%</span></div>';
   h+= t.pending.length
@@ -789,14 +817,15 @@ function renderAnswers(unlocked){
       h+='<button class="step" onclick="dadMark(\''+pn.key+'\','+s+')">'+s+'</button>';
     h+='</div></div>';
   }
-  el.innerHTML=h;
+  return h+'</div>';
 }
 function dadMark(key,val){
   var bits=key.split(':'), pid=bits[0], qn=bits[1], p=partById(pid);
   if(p.kind==='writing')lSave(pid+'-dad',val);
   else lSave(pid+'-dad-'+qn,val);
-  recordScore();refreshBar();
-  document.getElementById('answers').scrollIntoView({block:'nearest'});
+  var el=document.querySelector('.answers'), top=el?el.scrollTop:0;
+  render();
+  el=document.querySelector('.answers');if(el)el.scrollTop=top;
 }
 
 /* ── zoom ───────────────────────────────────────────────────────────── */
@@ -806,7 +835,10 @@ function openLb(src){
 }
 function closeLb(){document.getElementById('lb').classList.remove('open');}
 
-renderTest();
+/* Come back to the page he left off on. */
+page = Math.max(0, Math.min(ANSWERS_PAGE, lLoad('page',0)|0));
+if(page===ANSWERS_PAGE && !allDone())page=MC-1;
+render();
 </script>
 </body>
 </html>

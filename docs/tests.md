@@ -15,9 +15,12 @@ separate them, and everything else here follows from them:
    the publisher's own instructions and wording, questions numbered as they are
    numbered on the sheet. No module grid, no modals, no emoji chrome, no colour
    rewards. A test Leo recognises as the test is a test he can practise for.
-2. **The picture, the reading and the word box stay on screen the whole time he
+2. **One page per screen.** Finish a page, tap Next — the way the paper test is
+   actually taken. The printed test is several pages; one endless scroll is the
+   thing paper never does.
+3. **The picture, the reading and the word box stay on screen the whole time he
    answers.** That is what paper does for free and a screen does not.
-3. **He sees no right/wrong while he answers.**
+4. **He sees no right/wrong while he answers.**
 
 ## What you get and what you build
 
@@ -80,8 +83,9 @@ specific to a test:
   `ow-l4-t7-9-test.html` knows nothing about Units 7–9 — a new test is a new
   `TEST` object and nothing else. Grow the engine only when a test needs a
   question shape it does not have.
-- **One continuous page, every section rendered at load.** Not a home screen you
-  open sections from. The whole test scrolls, exactly like the sheet.
+- **One page per section**, rendered one at a time, with Back / page counter /
+  Next along the bottom. Sections map to pages exactly — no question is ever
+  split across two pages — so `moduleCount` and `moduleLabels` still line up.
 - **Paper affordances, not app buttons.** A blank in a sentence is an inline
   `<select>` styled as an underline; a multiple-choice answer is written into the
   `____` that precedes the question number; a rewrite or a written answer is a
@@ -93,26 +97,41 @@ specific to a test:
 - **One part per section of the paper test**, in the paper's order, numbered
   `m1`…`mN` so `moduleCount` / `moduleLabels` in the lesson JSON line up.
 - **No feedback while answering.** No ticks, no crosses, no score until the end.
-- **The score screen stays locked** until every part is marked complete.
+- **Next is never blocked.** If answers are missing the page counter says so
+  quietly ("3 still blank") and he moves on anyway; a test that refuses to
+  advance turns a hard question into a wall. He catches up from the page index.
+- **He can always go back.** Tapping the page counter opens an index of every
+  page with its state (done / N blank / not started) and jumps to any of them.
+  Without it, pagination takes away something paper gives him for free.
+- **No Finished button.** The done-key saves itself the moment a page's last
+  blank is filled; Next carries the meaning. This is the one place a test departs
+  from the learner-app footer rule in `AGENTS.md` — only "Clear this page"
+  remains.
+- **The Answer Section is the last page**, locked until every page is finished,
+  and while locked it lists the pages that still have blanks as jump links.
+- **It reopens where he left off** — the current page is saved like an answer.
 - **Every answer saves as it is made** (the general rule in `AGENTS.md`, and it
   matters more here — a test is long and Leo will stop halfway).
 
 ### Keeping the picture and the reading in view
 
-Any section carrying a picture, a reading passage or a track puts them in a
-sticky panel so they stay put while its questions scroll past. A word box does
-the same: on paper the eye returns to it for every blank, so it rides inside the
-panel when the section has one and pins itself when it does not.
+Pagination is what makes this simple. Because a page holds one section, it can be
+a **fixed split**: a reference pane that never moves, and a question pane that
+scrolls inside what is left. Nothing is sticky, nothing overlaps, and neither can
+hide the other. The pane carries whatever that section's questions need to keep
+looking at — the picture, the reading, the track, the word box, or several.
 
-The layout is **block on a phone** (the panel sticks above the questions) and
-**two columns from 900px** (it sticks beside them). Both work because the sticky
-element is a child of a box as tall as the whole section — give the panel a grid
-row of its own and it is pinned to its own height and will not travel.
+The whole app is one viewport tall (`html,body{height:100%}`, `body{overflow:hidden}`,
+a flex column of bar / stage / nav), so only the panes scroll. Stack them on a
+phone and put them side by side from 900px, where a reading and its questions
+usually fit together with no scrolling at all.
 
-On a phone the panel has to earn its space: cap the picture at about 25vh and let
-a long passage scroll inside itself, or the questions are left with a strip. Test
-this by scrolling to the *last* question of each media section and checking that
-it clears the panel while the panel is still on screen.
+On a phone the reference pane has to earn its space: cap it near half the screen,
+let the picture take what is left inside it (`flex:1 1 auto` with `object-fit:contain`),
+and let a long passage scroll inside itself. Do not repeat anything in the pane
+that is already on the instruction line — the track number belongs in one place,
+and that space is the picture's. Check every media page at phone size: the panes
+must not overlap, and the document itself must never scroll.
 
 ### Scoring
 

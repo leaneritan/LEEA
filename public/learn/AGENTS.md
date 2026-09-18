@@ -51,11 +51,15 @@ Every learner app lives in THIS folder (`public/learn/`). Do not create learner 
 
 A test app (`ow-l<level>-t<band>-test.html`) is the one learner app that does
 **not** use the shapes above. It is built to look like the printed test page —
-one continuous page, the publisher's wording and numbering, blanks and ruled
-lines — and any picture, reading, track or word box stays in a sticky panel while
-its questions are answered. See `docs/tests.md` before building one.
+the publisher's wording and numbering, blanks and ruled lines — and it runs one
+page per section, with any picture, reading, track or word box held in a fixed
+pane while that page's questions are answered. See `docs/tests.md` before
+building one.
 
-It still follows the save/restore contract below, and the rest of the test rules:
+It has **no per-module Finished button** (rule 5 below): Next carries that
+meaning and the done-key saves itself when a page's last blank is filled. Only
+"Clear this page" remains. It still follows the rest of the save/restore
+contract, and the rest of the test rules:
 no right/wrong shown while answering, a score screen locked until every section
 is done, and the publisher's points split between what the app marks and what
 Neritan marks. Its lesson JSON lives in `checkpoint-<band>/lessons/`, not in a

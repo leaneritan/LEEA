@@ -519,6 +519,38 @@ for (const lesson of lessons) {
   }
 }
 
+// Every `test` lesson declares what it is and how long the publisher allows for
+// it. The ranges are the publisher's own, from the lesson planner: a unit quiz
+// is 15-20 minutes, a three-unit mastery test 20-30, the nine-unit final 30-35.
+// /tests renders its cards from this block, so a test without one is a card with
+// no shape — and a minutes value outside the range is almost always a typo.
+const ASSESSMENT_MINUTES = {
+  "unit-quiz": [15, 20],
+  mastery: [20, 30],
+  final: [30, 35]
+};
+
+for (const lesson of lessons) {
+  if (lesson.mode !== "teacher" || lesson.component !== "test") continue;
+  const meta = lesson.assessment;
+  if (!meta) {
+    fail(`${lesson.id}: a test lesson needs an "assessment" block (kind, covers, units, minutes, questions, points) — /tests builds its card from it. See docs/tests.md.`);
+    continue;
+  }
+  const range = ASSESSMENT_MINUTES[meta.kind];
+  if (!range) {
+    fail(`${lesson.id}: assessment.kind "${meta.kind}" is not one of ${Object.keys(ASSESSMENT_MINUTES).join(", ")}`);
+  } else if (typeof meta.minutes !== "number" || meta.minutes < range[0] || meta.minutes > range[1]) {
+    fail(`${lesson.id}: assessment.minutes is ${meta.minutes}, but the publisher allows ${range[0]}-${range[1]} for a ${meta.kind}`);
+  }
+  for (const field of ["covers", "questions", "points"]) {
+    if (meta[field] === undefined || meta[field] === "") fail(`${lesson.id}: assessment.${field} is missing`);
+  }
+  if (!Array.isArray(meta.units) || meta.units.length === 0) {
+    fail(`${lesson.id}: assessment.units must list the units the test covers`);
+  }
+}
+
 // Orphan deck check: every ow-l*-u*-*.html in public/lessons/ must have a .teacher.json
 const lessonsHtmlDir = path.join(root, "public/lessons");
 if (fs.existsSync(lessonsHtmlDir)) {

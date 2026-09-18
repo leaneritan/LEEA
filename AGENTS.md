@@ -687,9 +687,23 @@ the score screen with the sample answer or rubric and a 0-to-max button row. A
 typed sentence that does not match the key is handed to Neritan rather than
 marked wrong — a rewrite can be right in words the key did not predict.
 
+**The clock is the publisher's.** The lesson planner allows 15–20 minutes for a
+unit quiz, 20–30 for a three-unit mastery test and 30–35 for the nine-unit final;
+take the top of the range and put it in the test's `assessment` block, where the
+validator checks it. The clock starts on Leo's first answer (so opening the test
+does not drain it), pauses when the test is closed, and at zero says so and keeps
+counting in red without locking anything — a half-written sentence is never
+thrown away, and whether to stop is Neritan's call. Keep it clear of the frame's
+top-right corner: the host page floats its own "Exit Fullscreen" button there and
+swallows every tap underneath.
+
 Tests are **checkpoint material**: they live in `checkpoint-<band>/lessons/`
 beside review and extra reading, carry the band's last unit number, and are
-registered through `CHECKPOINT_COMPONENTS`.
+registered through `CHECKPOINT_COMPONENTS`. Every test also declares an
+`assessment` block (kind, covers, units, minutes, questions, points) on its
+teacher lesson. `/tests` is the shelf of all of them, filtered by level; it is
+derived from the lesson registry, so a newly registered test appears there with
+no extra wiring.
 
 ## Navigation Rules
 

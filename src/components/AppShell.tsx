@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { BarChart3, BookOpen, CheckSquare, ChevronLeft, ChevronRight, Dumbbell, GraduationCap, History, Home, Library, Search } from "lucide-react";
+import { BarChart3, BookOpen, CheckSquare, ChevronLeft, ChevronRight, ClipboardList, Dumbbell, GraduationCap, History, Home, Library, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { CSSProperties, ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -15,13 +15,14 @@ import { allWords } from "@/components/reference/ref-data";
 import { CloudSyncBadge } from "@/components/CloudSyncBadge";
 import { useOurWorldUnitProgress } from "@/components/useOurWorldUnitProgress";
 
-type NavKey = "home" | "teacher" | "progress" | "english" | "math" | "geography" | "history" | "science" | "assignments" | "reference" | "search" | "practice" | "irregular-verbs";
+type NavKey = "home" | "teacher" | "progress" | "english" | "math" | "geography" | "history" | "science" | "assignments" | "reference" | "tests" | "search" | "practice" | "irregular-verbs";
 
 const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNode }> = [
   { key: "home", label: "Home", href: "/", icon: <Home size={20} strokeWidth={2} /> },
   { key: "assignments", label: "Leo", href: "/leo", icon: <CheckSquare size={20} strokeWidth={2} /> },
   { key: "teacher", label: "Neritan", href: "/teacher", icon: <GraduationCap size={20} strokeWidth={2} /> },
   { key: "reference", label: "Reference", href: "/reference", icon: <Library size={20} strokeWidth={2} /> },
+  { key: "tests", label: "Tests", href: "/tests", icon: <ClipboardList size={20} strokeWidth={2} /> },
   { key: "progress", label: "Progress", href: "/teacher/progress", icon: <BarChart3 size={20} strokeWidth={2} /> }
 ];
 

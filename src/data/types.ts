@@ -315,4 +315,18 @@ export type Lesson = {
     language: string[];
   };
   referenceLinks: LessonReferenceLink[];
+  /**
+   * Only on `test` lessons. What the assessment is, and how long the publisher
+   * allows for it: a unit quiz is 15-20 minutes, a three-unit mastery test
+   * 20-30, the nine-unit final 30-35. The test app reads its own allowance from
+   * its TEST data; this is what /tests renders the card from.
+   */
+  assessment?: {
+    kind: "unit-quiz" | "mastery" | "final";
+    covers: string;
+    units: number[];
+    minutes: number;
+    questions: number;
+    points: number;
+  };
 };

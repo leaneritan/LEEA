@@ -687,6 +687,14 @@ the score screen with the sample answer or rubric and a 0-to-max button row. A
 typed sentence that does not match the key is handed to Neritan rather than
 marked wrong — a rewrite can be right in words the key did not predict.
 
+**The result is the teaching artefact, not the score.** Opening it (`See the
+result →`, only once every page is finished) turns the thirteen pages into the
+marked paper — green ✔, red ✘, the model answer under anything he missed — and
+lists every question he did not get right underneath the score with what he wrote
+and what it should have been. Leo's answers lock at that point; Neritan's marking
+controls stay live. One function, `markOne(part, question)`, decides right or
+wrong for the total, the tick and the review alike, so they can never disagree.
+
 **The clock is the publisher's.** The lesson planner allows 15–20 minutes for a
 unit quiz, 20–30 for a three-unit mastery test and 30–35 for the nine-unit final;
 take the top of the range and put it in the test's `assessment` block, where the

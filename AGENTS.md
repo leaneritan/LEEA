@@ -671,12 +671,15 @@ wrong while he answers, and the score screen stays locked until every section is
 complete; an app that marks as it goes is a review, and there is already one of
 those for each band. The teacher deck is the exception — that stays a deck.
 
-**The picture, the reading and the word box stay on screen while he answers
-them.** Paper does this for free and a screen does not, so any section carrying a
-picture, a passage, a track or a word box keeps it in a sticky panel that the
-questions scroll past — stacked above them on a phone, beside them from 900px.
-The sticky element must be a child of a box as tall as the whole section; give it
-a grid row of its own and it is pinned to its own height and will not travel.
+**One page per section, and the picture or the reading stays on screen while he
+answers it.** Paper does the second part for free and a screen does not — and
+pagination is what makes it simple. A page holds one section, so it can be a
+fixed split: a reference pane that never moves over a question pane that scrolls
+inside what is left. Nothing sticky, nothing overlapping. Stack the panes on a
+phone, put them side by side from 900px. Back / page counter / Next sit along the
+bottom; the counter opens an index of every page and never blocks the way
+forward, and there is no Finished button — the done-key saves itself when the
+last blank on a page is filled.
 
 **The publisher's points are kept exactly, and split.** What has one exact answer
 the app marks; open responses, writing and speaking are Neritan's, and appear on

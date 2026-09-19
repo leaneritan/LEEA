@@ -309,7 +309,8 @@ Filing it as wrong would fill his practice list with questions nobody has marked
 
 ## 4. Build the teacher deck
 
-`public/lessons/ow-l<level>-t<band>-test.html`, on the shared slideshow shell
+`public/lessons/<lesson-id>.html` — `ow-l4-u9-quiz.html` for a unit quiz,
+`ow-l4-t7-9-test.html` for a band test — on the shared slideshow shell
 (`docs/teacher-slides.md`). It is the answer key and the script for the parts
 Neritan runs:
 
@@ -369,12 +370,18 @@ blank visibly tied to its own question.
 
 ## 5. Register it
 
-A test is **checkpoint material**, like review and extra reading: it sits after a
-three-unit band, not inside the last unit. So:
+**Where the lesson JSON goes depends on which of the three it is**, and this is
+the step most likely to go wrong:
 
-- lesson JSON goes in `…/level-<n>/checkpoint-<band>/lessons/`, as
-  `test.teacher.json` and `test-app.learner.json`, carrying `unit:` = the band's
-  last unit. A **new checkpoint folder must also be added to `lessonsDirs`** in
+- **A unit quiz belongs to its unit.** `…/level-<n>/unit-<u>/lessons/`, as
+  `quiz.teacher.json` and `quiz-app.learner.json`. It is *not* checkpoint
+  material — `quiz` is deliberately absent from `CHECKPOINT_COMPONENTS` — and it
+  needs no new folder registering anywhere.
+- **A band test and a level final are checkpoint material**, like review and
+  extra reading: they sit after a band, not inside its last unit. The lesson JSON
+  goes in `…/level-<n>/checkpoint-<band>/lessons/` as `test.teacher.json` /
+  `test-app.learner.json` (or `final-test…`), carrying `unit:` = the band's last
+  unit. A **new checkpoint folder must also be added to `lessonsDirs`** in
   `scripts/validate-content.mjs`, or nothing in it is validated.
 - the teacher JSON carries an **`assessment` block** — `kind`, `covers`, `units`,
   `minutes`, `questions`, `points`. `/tests` builds its card from this, and the
@@ -410,7 +417,22 @@ which reads the marks (not the percent) and what is still waiting on Neritan.
 Then run the usual chain: `npm run validate:content`, `npm run typecheck`,
 `npm run build`.
 
-## The two Level 4 tests, as worked examples
+## The three Level 4 tests, as worked examples
+
+One of each kind is now built, so there is a file of the right shape to copy
+whatever you are building:
+
+| Kind | Questions file | Lesson JSON pair |
+| --- | --- | --- |
+| `quiz` | `public/tests/our-world/level-4/u9/questions.json` | `…/level-4/unit-9/lessons/quiz{,-app}.*.json` |
+| `test` | `public/tests/our-world/level-4/t7-9/questions.json` | `…/level-4/checkpoint-7-9/lessons/test{,-app}.*.json` |
+| `final-test` | `public/tests/our-world/level-4/t1-9/questions.json` | `…/level-4/checkpoint-1-9/lessons/final-test{,-app}.*.json` |
+
+**Unit 9 quiz.** 50 points over 10 parts and 36 questions, 20 minutes. 39 marks
+are the app's, 11 Neritan's (Q35 writing, Q36 speaking, and any Q7–15 sentence
+the key did not predict). Audio TR 9.1 (Q1) and TR 9.2 (Q30–34); pictures on Q1
+and Q36. It is the only one of the three that is not checkpoint material.
+
 
 **Units 7–9 mastery test.** 80 points over 13 parts and 42 questions. 56 mark
 themselves; 24 are Neritan's (Q36–37 sentences, Q41 writing, Q42 speaking). By

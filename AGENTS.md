@@ -644,7 +644,9 @@ every player reads its URL from the manifest, so nothing else changes.
 The test Leo takes after each unit, each three-unit band and each whole level
 comes from the publisher's **ExamView** bank, exported as a single `.rtf`.
 `docs/tests.md` is the standard for turning one into a digital test; read it
-before building one. `ow-l4-t7-9-test` (the Units 7–9 band test) is the reference
+before building one, or run `/build-test <file.rtf> <kind> <level> <units>`,
+which is that workflow in order. One worked example of each kind is built, so
+there is always a file of the right shape to copy. `ow-l4-t7-9-test` (the Units 7–9 band test) is the reference
 pair, and `ow-l4-t1-9-test` (the Level 4 final) is the second.
 
 **Three components, because three assessments stack on the same unit.** A unit's
@@ -858,7 +860,7 @@ The lesson-building workflow is documented in six focused docs under `docs/`:
 - `docs/grammar.md` — scan + build + wire grammar
 - `docs/components.md` — locked Leo app structure per component type
 - `docs/teacher-slides.md` — teacher slideshow conventions
-- `docs/tests.md` — turn an ExamView test export into a digital test
+- `docs/tests.md` — turn an ExamView test export into a digital test (`/build-test`)
 
 NatGeo lesson planner PDFs live in `docs/lesson-plans/` organised by subject → course → level (or year). Each level folder holds:
 

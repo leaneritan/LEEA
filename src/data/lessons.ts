@@ -60,6 +60,10 @@ import unit9Project from "../../content/subjects/english/courses/our-world/level
 import unit9ProjectLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/project-app.learner.json";
 import unit9BookReading from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/book-reading.teacher.json";
 import unit9BookReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/book-reading-app.learner.json";
+// A unit's own quiz is a lesson of that unit, not checkpoint material, so it
+// lives here beside the rest of Unit 9 rather than in a checkpoint folder.
+import unit9Quiz from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/quiz.teacher.json";
+import unit9QuizLearner from "../../content/subjects/english/courses/our-world/level-4/unit-9/lessons/quiz-app.learner.json";
 // Checkpoint lessons belong to the Units 7-9 band, not to Unit 9 — they live in
 // their own `checkpoint-7-9/` folder and carry `unit: 9` only so the teacher menu
 // can show them under the last unit of their band.
@@ -130,6 +134,7 @@ const componentOrder = [
   "project",
   "reader",
   "book-reading",
+  "quiz",
   "extra-reading",
   "review",
   "test",
@@ -259,7 +264,9 @@ export const lessons: Lesson[] = [
   checkpoint79Test as Lesson,
   checkpoint79TestLearner as Lesson,
   checkpoint19Test as Lesson,
-  checkpoint19TestLearner as Lesson
+  checkpoint19TestLearner as Lesson,
+  unit9Quiz as Lesson,
+  unit9QuizLearner as Lesson
 ].sort(compareLessonOrder);
 export const teacherLessons = lessons.filter((lesson) => lesson.mode === "teacher");
 export const learnerLessons = lessons.filter((lesson) => lesson.mode === "learner");
@@ -284,14 +291,18 @@ export function isCheckpointComponent(component: string) {
 }
 
 /**
- * The components that are a test Leo sits: the three-unit band tests and the
- * whole-level final. They are separate components rather than one, because a
- * level's final covers the same band-end unit as its last mastery test — two
- * lessons at Level 4 Unit 9 — and everything that pairs a teacher lesson with
- * Leo's app pairs by component. One shared "test" component would have made
- * both teacher cards point at the same app.
+ * The components that are a test Leo sits: a unit's own quiz, the three-unit
+ * band tests and the whole-level final. They are separate components rather
+ * than one because they stack on the same unit — Level 4 Unit 9 carries all
+ * three — and everything that pairs a teacher lesson with Leo's app pairs by
+ * component, so one shared "test" component would point every teacher card at
+ * the same app.
+ *
+ * Only two of them are checkpoint material. A unit quiz belongs to its unit and
+ * sits in the unit's own `lessons/` folder, which is why `quiz` is absent from
+ * CHECKPOINT_COMPONENTS above.
  */
-export const TEST_COMPONENTS = ["test", "final-test"];
+export const TEST_COMPONENTS = ["quiz", "test", "final-test"];
 
 export function isTestComponent(component: string) {
   return TEST_COMPONENTS.includes(component.replace(/-app$/, ""));

@@ -441,7 +441,7 @@ Leo's app card list uses a third CSS variable layer: `.leo-app-card-{tone}` clas
 
 Unit 8 is fully built: opener, vocab-1, song, grammar-1, grammar-2, vocab-2, reading, writing, mission, project, and reader/book-reading all have registered teacher + learner lesson pairs in `src/data/lessons.ts`.
 
-Unit 9 ("The Science of Fun") is complete as a unit — opener, vocab-1, song, grammar-1, vocab-2, grammar-2, reading, writing, mission, project, and book-reading all have teacher + learner pairs. The Units 7-9 checkpoint band is complete too — Review 7-9, Extra Reading 7-9 (Leonardo da Vinci) and the Units 7-9 mastery test all have a teacher deck and a Leo app. The Level 4 final (Units 1-9, `checkpoint-1-9/`) is built as well, so Level 4's assessment shelf is complete. Level 4 Unit 7 ("Good Idea!") is complete. Its vocabulary and grammar scans (`unit-7/vocabulary.json`, `unit-7/grammar.json`) and all ten component pairs are registered in `src/data/lessons.ts`: opener, vocab-1, song, grammar-1, vocab-2, grammar-2, reading, writing, mission, and project. See the Unit 7 build status table in `docs/design-decisions.md` for the file map and each Leo app's module shape.
+Unit 9 ("The Science of Fun") is complete as a unit — opener, vocab-1, song, grammar-1, vocab-2, grammar-2, reading, writing, mission, project, and book-reading all have teacher + learner pairs. The Units 7-9 checkpoint band is complete too — Review 7-9, Extra Reading 7-9 (Leonardo da Vinci) and the Units 7-9 mastery test all have a teacher deck and a Leo app. The Level 4 final (Units 1-9, `checkpoint-1-9/`) is built as well, and Unit 9 has its own quiz (`unit-9/lessons/quiz.teacher.json`), so Level 4's assessment shelf carries all three kinds: a unit quiz, a band test and the level final. Level 4 Unit 7 ("Good Idea!") is complete. Its vocabulary and grammar scans (`unit-7/vocabulary.json`, `unit-7/grammar.json`) and all ten component pairs are registered in `src/data/lessons.ts`: opener, vocab-1, song, grammar-1, vocab-2, grammar-2, reading, writing, mission, and project. See the Unit 7 build status table in `docs/design-decisions.md` for the file map and each Leo app's module shape.
 
 The Mission and Project words are reference cards now, tagged `OW4-U9-MI` (share, evaluate, unexpected, curious, thermal image, think creatively, think critically, physicist — LP p.159) and `OW4-U9-PJ` (research, upside down, attach, combine, thaumatrope, optical illusion, predict — LP p.160). Three of them already existed as global cards and gained a Unit 9 source rather than a duplicate: `research` and `predict` were already rich academic cards, and `share` was a light Unit 1 card that the Mission page lists under Academic Language, so it was upgraded to one academic card carrying both senses.
 
@@ -647,23 +647,51 @@ comes from the publisher's **ExamView** bank, exported as a single `.rtf`.
 before building one. `ow-l4-t7-9-test` (the Units 7–9 band test) is the reference
 pair, and `ow-l4-t1-9-test` (the Level 4 final) is the second.
 
-**A band test is the `test` component; a whole-level final is `final-test`.**
-They are two components because a level's final covers the same band-end unit as
-its last mastery test — Level 4 has both at Unit 9 — and every surface that pairs
-a teacher lesson with Leo's app pairs by component, so one shared component would
-point both teacher cards at the same app. Use `isTestComponent()` from
-`src/data/lessons.ts` rather than listing them. The final's checkpoint folder is
-named for what it covers (`checkpoint-1-9/`), and a new checkpoint folder must be
-added to `lessonsDirs` in `scripts/validate-content.mjs` in the same change.
+**Three components, because three assessments stack on the same unit.** A unit's
+own quiz is `quiz`, a three-unit band test is `test`, a whole-level final is
+`final-test` — Level 4 Unit 9 carries all three. Every surface that pairs a
+teacher lesson with Leo's app pairs by component, so one shared component would
+point every teacher card at the same app. Use `isTestComponent()` from
+`src/data/lessons.ts` rather than listing them.
 
-Every test file carries the same engine below its `ENGINE` line — the data block
-above it is the only part that knows which test it is. Adding a capability means
-adding it to **both** files, so `diff` of the two engines stays three lines (the
-title comment, `SP`, `HW_ID`). What the final added: `exact: true` for a part
-whose answers have one right form (a number heard on a track marks itself wrong
-rather than going to Neritan), `table` and `images` for reference panes that need
-a printed table or two pictures, and `labelsOnPicture` for a bank of letters that
-are printed on the picture instead of being a word box.
+Only two of them are checkpoint material. **A unit quiz belongs to its unit** and
+lives in that unit's own `lessons/` folder, which is why `quiz` is absent from
+`CHECKPOINT_COMPONENTS`. A band test and a final live in a checkpoint folder
+named for what they cover (`checkpoint-7-9/`, `checkpoint-1-9/`), and a new
+checkpoint folder must be added to `lessonsDirs` in
+`scripts/validate-content.mjs` in the same change.
+
+**A test is its questions and nothing else.** The engine every test runs on —
+the paper layout, the pages, the clock, the marking, the attempt record — is
+`public/components/test-engine.js`, shared by all of them. Each test is a data
+file beside its own pictures (`public/tests/<course>/level-<n>/<slug>/questions.json`)
+and a 16-line shell that names it:
+
+```html
+<script>window.LEEA_TEST = '/tests/our-world/level-4/u9/questions.json';</script>
+<script src="/components/test-engine.js"></script>
+```
+
+It was one self-contained HTML file per test until the third one, when ~950 of
+each file's ~1,250 lines turned out to be the same engine copied verbatim — so
+every fix had to land three times or the copies drifted. **Adding a test is now
+writing its questions and nothing else.**
+
+The six kinds between them cover every ExamView section seen so far, across a
+unit quiz, a three-unit mastery test and a nine-unit final: `select` (a word
+bank), `buttons` (pick one), `multi` (pick two), `text` (typed), `writing`,
+`speaking`. Grow the engine only when a paper genuinely needs a shape it has
+not got, and add the flag to `docs/tests.md` in the same change. A `text` key
+may be a list of accepted wordings, because the publisher prints alternatives
+for some transformations; a `writing` part with two prompts is a choice and with
+one is just the question.
+
+`scripts/validate-content.mjs` reads each questions file and checks it against
+the registry: the storage prefix, homework id and lesson id it claims, its part
+count and names against `moduleCount` / `moduleLabels`, its points and question
+numbers against the `assessment` block, its minutes against the same, and that
+every picture path is absolute and actually in the repo. Those used to be kept
+by hand in three places at once.
 
 Three things about tests are easy to get wrong:
 

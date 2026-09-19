@@ -83,14 +83,38 @@ So re-running the file is not a migration. Changing an existing table needs an e
 
 The schema was applied when it had only the five English tables. `math_block_progress` and `geography_map_progress` were added to the file later, in the PRs that built those subjects, and nobody re-ran it. For months the app happily wrote Math and Geography progress, every write failed, and each one fell back to localStorage exactly as designed — so nothing errored, nothing looked broken, and all of that progress lived on whichever browser Leo happened to use.
 
-### And it is happening again, with Science
+### And it happened again, with Science
 
-`science_block_progress` is in `supabase/schema.sql` and **was never applied**.
-Checked live on 19 Sep 2026: `to_regclass('public.science_block_progress')` is
-null. Every 理科 tick Leo has earned is on whichever browser he earned it on, and
-nothing about it looks broken, because the fallback is working exactly as
-designed. It needs the same `create table` + `enable row level security` +
-policies run against the live project — and then a row in the table below.
+`science_block_progress` was in `supabase/schema.sql` and had never been
+applied. Every 理科 tick Leo earned lived on whichever browser he earned it on,
+and nothing about it looked broken, because the fallback was working exactly as
+designed. Applied 19 Sep 2026.
+
+### A table can be live and still unusable
+
+Applying the table is not the whole job. `test_attempts` was created, had RLS
+and both policies, and read back perfectly from `execute_sql` — and the browser
+still could not touch it, because nothing had granted the **anon** role
+`select, insert, update, delete` on it. PostgREST connects as `anon`, so every
+call came back refused and fell back to localStorage: the same silence as a
+missing table.
+
+It hid because a privileged SQL check bypasses grants *and* RLS, so the check
+that proves the table exists proves nothing about the path the app actually
+takes. Use the role the browser uses:
+
+```sql
+begin;
+set local role anon;
+insert into public.<table> (...) values (...);   -- the app's exact row shape
+select * from public.<table> where ...;
+rollback;
+```
+
+Supabase's default privileges cover tables created through the dashboard, which
+is why the earlier tables were fine and this one — created by `apply_migration`
+— was not. Add the `grant` line to `supabase/schema.sql` **and** run it in the
+same migration.
 
 It surfaced only when someone thought to compare the file against the live project:
 
@@ -127,6 +151,8 @@ If the Supabase MCP server is connected, `apply_migration` handles the DDL and `
 | (geography items) | Added `items jsonb` to `geography_map_progress` for per-item weak-spot history. |
 | `add_reference_confidence_practice_history` | Added `asked`, `correct`, `last_correct`, `last_practiced_at` to `reference_confidence` for the vocabulary practice drill. |
 | `add_test_attempts` | Created `test_attempts`, one row per sitting of a test. |
+| `add_science_block_progress` | Created `science_block_progress`, which had been in the file but never applied — 理科 progress had been local-only. |
+| `grant_anon_on_test_attempts` | Granted the browser's `anon` role select/insert/update/delete on `test_attempts`, which `add_test_attempts` had left out — see above. |
 
 `list_migrations` on the live project is the authoritative list; add a row here whenever you apply one.
 

@@ -203,6 +203,7 @@ grant select, insert, update, delete on public.reference_confidence to anon;
 grant select, insert, update, delete on public.math_block_progress to anon;
 grant select, insert, update, delete on public.science_block_progress to anon;
 grant select, insert, update, delete on public.geography_map_progress to anon;
+grant select, insert, update, delete on public.test_attempts to anon;
 
 -- Keep updated_at fresh on row changes.
 create or replace function public.set_updated_at()

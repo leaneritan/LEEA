@@ -132,6 +132,7 @@ export function TestsPage() {
   const [openHistory, setOpenHistory] = useState<string | null>(null);
   const [paperFor, setPaperFor] = useState<string | null>(null);
   const [resetArmed, setResetArmed] = useState<string | null>(null);
+  const [cleared, setCleared] = useState<string | null>(null);
 
   const refresh = useCallback(() => setAttempts(readTestAttempts()), []);
   useEffect(() => {
@@ -299,13 +300,18 @@ export function TestsPage() {
                 >
                   Add a paper result
                 </button>
-                {learner && (sitting || latest) ? (
+                {/* Only when there is actually a sitting to clear. It used to
+                    show whenever a result had ever been filed, so clearing it
+                    changed nothing on screen and read as a dead button. */}
+                {learner && sitting ? (
                   <button
                     className={`tests-btn quiet${resetArmed === testId ? " armed" : ""}`}
                     onClick={() => {
                       if (resetArmed === testId) {
                         clearSitting(learner);
                         setResetArmed(null);
+                        setCleared(testId);
+                        window.setTimeout(() => setCleared((cur) => (cur === testId ? null : cur)), 4000);
                         refresh();
                         return;
                       }
@@ -320,6 +326,13 @@ export function TestsPage() {
                   </button>
                 ) : null}
               </div>
+
+              {cleared === testId ? (
+                <p className="tests-cleared">
+                  Sitting cleared — he starts from a blank paper and a full clock. The results below
+                  are kept.
+                </p>
+              ) : null}
 
               {paperFor === testId ? (
                 <PaperForm

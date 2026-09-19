@@ -705,6 +705,35 @@ thrown away, and whether to stop is Neritan's call. Keep it clear of the frame's
 top-right corner: the host page floats its own "Exit Fullscreen" button there and
 swallows every tap underneath.
 
+**A sitting is the unit of a result, not a score.** Every completed test files a
+dated `TestAttempt` (`src/data/testAttempts.ts`, `leea.testAttempts.v1`), written
+by the test app itself once the result is opened and kept current as Neritan
+marks. A retake clears the app's own `leea-<prefix>-` keys and starts a new
+attempt, so sitting the same test twice leaves two records rather than one
+overwritten one. `/tests` lists them per test, newest first. A `pending` question
+— an open response not yet marked — is recorded as itself and is **never** a
+mistake: an unmarked answer says nothing about whether he got it right.
+
+**A paper test is a first-class sitting.** Most of what Leo has sat is on paper,
+so `/tests` records one by hand against a digital test, and "Other paper tests"
+records one for a test that has no digital version at all (keyed
+`paper:<slug>`). Same record, `medium: "paper"`.
+
+**`/tests/mistakes` is practice, not a test**, and is the one place in this area
+that marks as it goes and shows the answer. `collectMistakes` gathers every
+question Leo has got wrong, keyed test + question number so missing Q24 twice is
+one thing he keeps missing rather than two mistakes; `mistakeWeight` /
+`pickMistakes` then lean the round on the freshest misses, the same weak-spot
+idea as Reference Practice and the Geography maps. Attempt records carry each
+question's options, so the drill rebuilds a question from the record alone and
+never needs the test file. Drill results live in their own store —
+getting something right in practice must never rewrite what he scored on the day.
+
+The attempts store is **local-only and has no Supabase table yet**, deliberately:
+golden rule 11a says a schema change is not done until it is applied, and it
+could not be applied when this was built. The field names are the columns it
+will become.
+
 Tests are **checkpoint material**: they live in `checkpoint-<band>/lessons/`
 beside review and extra reading, carry the band's last unit number, and are
 registered through `CHECKPOINT_COMPONENTS`. Every test also declares an

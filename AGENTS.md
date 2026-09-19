@@ -758,16 +758,36 @@ switches from "34:56 left" to "0:04 taken" and nothing restarts it but a retake.
 It used to keep counting while Neritan marked, which also inflated the time the
 attempt recorded, because the attempt is rewritten on every mark.
 
-**A wipe is one cloud write, never one per key.** Every `localStorage` write in
-a learner app is mirrored to Supabase by the bridge in `LessonPage.tsx`, and
-each mirror is a read-modify-write of that homework's whole `raw_progress`.
-A clear drops a dozen keys and a retake thirty, so those writes raced and put
-each other's deletions back; the cleared answers then came home on the next
-`syncLearnerProgressWithCloud`. Send a wipe as one `LEEA_CLOUD_CLEAR`
-(`LEEA_CLOUD.clearProgress(keys)`, `lDropAll` in the test files), and note that
-cloud writes are now queued per homework id in `learnerProgress.ts`. Anything
-clearing from *outside* the learner frame — `/tests` does — must call
-`clearLearnerProgressCloud` itself, or it only clears one of the two copies.
+**Resetting a sitting has to beat four different ways of coming back.** It took
+several goes, and every one of them only misbehaved with Supabase configured —
+which is why they were invisible to a local build. All four now have a guard,
+and `sittingStorageKeys()` in `learnerProgress.ts` is the single definition of
+what a sitting owns:
+
+1. **Keys outside the prefix.** `saveScore` writes `<homeworkId>-done` and
+   `-score`, and the cloud bridge mirrors every write to a `leea-` spelling —
+   `leea-<homeworkId>-done` being the one `getLearnerAppProgress` reads as "this
+   homework is finished". A retake wiped only `storagePrefix`, so the app still
+   read as finished afterwards, everywhere.
+2. **Writes still in flight.** Each mirrored write is a read-modify-write of the
+   whole `raw_progress`, and one sitting made over 1,500 of them, so a clear
+   landed at the back of a very long queue of stale values. Writes are now
+   coalesced (1,500 became 3) and a full clear bumps a generation so everything
+   queued before it becomes a no-op.
+3. **Another tab or device.** `syncLearnerProgressWithCloud` pushes local up when
+   this browser has more of it — right for progress, wrong for a reset. A clear
+   records `leea-__sitting-cleared-at` inside `raw_progress` (jsonb, so no schema
+   change), and each device wipes its own copy the first time it sees a marker it
+   has not applied. Every ordinary write checks it too, so the tab Leo sat the
+   test in stands down instead of re-uploading answer by answer.
+4. **No reset button at all.** `/tests` gated it on this browser holding a
+   sitting, so on the parent's laptop, for a test Leo sat on his own device,
+   there was simply nothing to press. It is always offered now, and `/tests`
+   syncs on mount like every other page that reports progress.
+
+Send a wipe as one `LEEA_CLOUD_CLEAR` (`LEEA_CLOUD.clearProgress(keys, all)`,
+`lDropAll` in the engine); anything clearing from *outside* the learner frame
+must call `clearLearnerProgressCloud` itself, or it clears one copy of two.
 
 **A sitting is the unit of a result, not a score.** Every completed test files a
 dated `TestAttempt` (`src/data/testAttempts.ts`, `leea.testAttempts.v1`), written

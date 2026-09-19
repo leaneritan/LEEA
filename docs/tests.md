@@ -265,13 +265,23 @@ removed. The answers survived in the cloud, the next page that called
 `syncLearnerProgressWithCloud` hydrated them into localStorage, and the cleared
 work came back with the old clock still on it.
 
-Two things stop that, and new code needs both:
+Four things stop it, and new code needs all of them:
 
 - `LEEA_CLOUD.clearProgress(keys)` — the app sends one `LEEA_CLOUD_CLEAR`
   message for the whole wipe (`lDropAll` in the test files), removing the keys
   locally through the *unpatched* `removeItem` so no per-key messages also fire.
 - Cloud writes queue per homework id in `learnerProgress.ts`, so two of them can
-  never interleave even when something else sends them one at a time.
+  never interleave even when something else sends them one at a time. They are
+  also coalesced on a 400ms idle: a sitting used to make over 1,500 round trips,
+  one per keystroke, which is what put a reset at the back of a long queue.
+- A full clear bumps a write generation, so everything queued before it becomes
+  a no-op rather than putting its own key back.
+- A clear records `leea-__sitting-cleared-at` in `raw_progress`, and every device
+  wipes its own copy the first time it sees a marker it has not applied. Without
+  it the tab Leo sat the test in simply uploads the sitting again.
+- `sittingStorageKeys()` is the one definition of what a sitting owns, including
+  the homework flags that live OUTSIDE the storage prefix in two spellings. The
+  retake used to miss them, so the test still read as finished after a reset.
 
 Clearing from **outside** the learner frame needs saying out loud: `/tests` runs
 in the app, not in the iframe, so its "Clear the sitting" calls

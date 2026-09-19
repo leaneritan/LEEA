@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { isTestComponent, lessons } from "@/data/lessons";
-import { clearLearnerProgressCloud, getLearnerAppProgress } from "@/data/learnerProgress";
+import {
+  clearLearnerProgressCloud,
+  getLearnerAppProgress,
+  syncLearnerProgressWithCloud,
+  wipeSittingLocally
+} from "@/data/learnerProgress";
 import {
   attemptsForTest,
   collectMistakes,
@@ -115,32 +120,12 @@ function hasSitting(learner: Lesson) {
  * what he scored last time.
  */
 async function clearSitting(learner: Lesson) {
-  const prefix = learner.source.storagePrefix;
-  if (!prefix || typeof window === "undefined") return;
-  try {
-    // Everything the app stores under its prefix goes — answers, page, reveal
-    // state, and the clock — so the next sitting starts from a full 30 minutes.
-    Object.keys(window.localStorage)
-      .filter((key) => key.startsWith(prefix))
-      .forEach((key) => window.localStorage.removeItem(key));
-    // The homework flags sit OUTSIDE the storage prefix. The app writes them as
-    // `<homeworkId>-score` / `-done`; this used to delete `leea-<homeworkId>-…`,
-    // which is the name in AGENTS.md but not the name on disk, so the score
-    // survived every clear. Both spellings go, so it works either way.
-    const hw = learner.source.homeworkId;
-    if (hw) {
-      [`${hw}-done`, `${hw}-score`, `leea-${hw}-done`, `leea-${hw}-score`].forEach((key) =>
-        window.localStorage.removeItem(key)
-      );
-    }
-  } catch {
-    /* ignore */
-  }
-
-  // And the cloud copy, which is the one that actually undid this. Clearing
-  // runs out here in the app, not inside the learner app's frame, so nothing
-  // was telling Supabase — the row stayed whole, and the next page that synced
-  // hydrated every answer and the old clock straight back into localStorage.
+  // Both copies, through the one definition of what a sitting owns — the app's
+  // own keys and the homework flags that sit outside its prefix.
+  wipeSittingLocally(learner.source);
+  // The cloud row too. Clearing runs out here in the app, not inside the
+  // learner app's frame, so nothing was telling Supabase about it: the row
+  // stayed whole and the next page that synced hydrated the sitting back.
   await clearLearnerProgressCloud(learner);
 }
 
@@ -164,7 +149,13 @@ export function TestsPage() {
   useEffect(() => {
     setMounted(true);
     refresh();
-  }, [refresh]);
+    // This is the page about results, and it was reading only this browser's.
+    // A test Leo sat on his own device showed here as "Not sat yet" — with no
+    // score and, until now, no reset button either. Every other page that
+    // reports progress already pulls the cloud copy first; so does this one.
+    const learners = tests.map((test) => test.learner).filter((lesson): lesson is Lesson => Boolean(lesson));
+    if (learners.length) void syncLearnerProgressWithCloud(learners).then(() => refresh());
+  }, [refresh, tests]);
 
   const mistakes = useMemo(() => (mounted ? collectMistakes(attempts) : []), [mounted, attempts]);
   const liveMistakes = mistakes.filter((item) => item.lastWrong).length;
@@ -326,10 +317,12 @@ export function TestsPage() {
                 >
                   Add a paper result
                 </button>
-                {/* Only when there is actually a sitting to clear. It used to
-                    show whenever a result had ever been filed, so clearing it
-                    changed nothing on screen and read as a dead button. */}
-                {learner && sitting ? (
+                {/* Always offered, never conditional. It used to appear only
+                    when THIS browser held a sitting — so on the parent's laptop,
+                    for a test Leo sat on his own device, there was simply no
+                    reset button at all. It is idempotent and it clears both
+                    copies, so the safe thing is for it to always be reachable. */}
+                {learner ? (
                   <button
                     className={`tests-btn quiet${resetArmed === testId ? " armed" : ""}`}
                     onClick={() => {
@@ -348,15 +341,18 @@ export function TestsPage() {
                   >
                     {resetArmed === testId
                       ? "Tap again — clears his answers and the clock"
-                      : "Clear the sitting"}
+                      : sitting
+                        ? "Reset this test"
+                        : "Reset this test (nothing here)"}
                   </button>
                 ) : null}
               </div>
 
               {cleared === testId ? (
                 <p className="tests-cleared">
-                  Sitting cleared — he starts from a blank paper and a full clock. The results below
-                  are kept.
+                  Reset — on this device and in the cloud, so any device Leo sat it on clears
+                  itself too. He starts from a blank paper and a full clock; the results below are
+                  kept.
                 </p>
               ) : null}
 

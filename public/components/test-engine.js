@@ -350,13 +350,31 @@ function lDrop(k){try{localStorage.removeItem(SP+k);}catch(e){}}
  * `clearProgress` is the app frame's one-shot version; standalone, there is no
  * bridge and the plain removes are all there is to do.
  */
-function lDropAll(keys){
+function lDropAll(keys,extraFullKeys,wholeSitting){
   var full=[];
   for(var i=0;i<keys.length;i++)full.push(SP+keys[i]);
+  if(extraFullKeys)for(var e=0;e<extraFullKeys.length;e++)full.push(extraFullKeys[e]);
   try{
-    if(window.LEEA_CLOUD && window.LEEA_CLOUD.clearProgress){window.LEEA_CLOUD.clearProgress(full);return;}
+    if(window.LEEA_CLOUD && window.LEEA_CLOUD.clearProgress){
+      window.LEEA_CLOUD.clearProgress(full,wholeSitting);return;
+    }
   }catch(e){}
   for(var j=0;j<full.length;j++){try{localStorage.removeItem(full[j]);}catch(e){}}
+}
+
+/**
+ * The keys a sitting owns that are NOT under this test's prefix.
+ *
+ * `saveScore` writes the homework flags straight to `<homeworkId>-score` and
+ * `-done`, and the cloud bridge mirrors every write to a `leea-` spelling —
+ * `leea-<homeworkId>-done` being the one the app reads as "this homework is
+ * finished". A retake used to wipe only the prefix, so the done flag stood and
+ * the test still read as finished afterwards, on every surface. That only
+ * showed up where Supabase is configured, because the mirrored spelling is
+ * written by the parent and the parent does nothing without it.
+ */
+function homeworkKeys(){
+  return [HW_ID+'-done', HW_ID+'-score', 'leea-'+HW_ID+'-done', 'leea-'+HW_ID+'-score'];
 }
 
 function saveScore(score,total,done,extra){
@@ -1105,7 +1123,10 @@ function retake(btnId){
     try{
       var mine=Object.keys(localStorage).filter(function(k){ return k.indexOf(SP)===0; })
                      .map(function(k){ return k.slice(SP.length); });
-      lDropAll(mine);
+      /* `true`: wipe the whole stored sitting, not just the keys this browser
+         happens to hold — otherwise a device that holds a fuller copy uploads
+         it again and the reset undoes itself. */
+      lDropAll(mine, homeworkKeys(), true);
     }catch(e){}
     revealed=false;elapsed=0;started=false;paused=false;showAllReview=false;
     page=0;closeIndex();render();paintClock();

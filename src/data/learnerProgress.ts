@@ -130,6 +130,109 @@ export function getLearnerAppProgress(source: Lesson["source"]): LearnerAppProgr
   };
 }
 
+/* ── one sitting, everywhere it lives ───────────────────────────────────── */
+
+/**
+ * Every localStorage key one sitting of a learner app owns.
+ *
+ * There are two homes, and the second is easy to miss: the app's own keys all
+ * start with its `storagePrefix`, but the homework flags sit OUTSIDE it, in two
+ * spellings. The app writes `<homeworkId>-done`; the cloud bridge in
+ * LessonPage mirrors every write through `normalizeLearnerStorageKey`, so it
+ * also lands as `leea-<homeworkId>-done` — and that is the one
+ * `getLearnerAppProgress` reads as "this homework is finished".
+ *
+ * The test app's own retake only knew about the prefix, so a reset left the
+ * done flag standing and the app still read as finished afterwards. That only
+ * happened with Supabase configured, because the mirrored spelling is written
+ * by `saveLearnerProgressValue`, which returns early when it is not.
+ */
+export function sittingStorageKeys(source: Lesson["source"]): string[] {
+  if (typeof window === "undefined") return [];
+  const keys: string[] = [];
+  const prefix = source.storagePrefix;
+  if (prefix) {
+    for (let index = 0; index < window.localStorage.length; index += 1) {
+      const key = window.localStorage.key(index);
+      if (key && key.startsWith(prefix)) keys.push(key);
+    }
+  }
+  const homeworkId = source.homeworkId;
+  if (homeworkId) {
+    keys.push(`${homeworkId}-done`, `${homeworkId}-score`, `leea-${homeworkId}-done`, `leea-${homeworkId}-score`);
+  }
+  return keys;
+}
+
+export function wipeSittingLocally(source: Lesson["source"]) {
+  if (typeof window === "undefined") return;
+  for (const key of sittingStorageKeys(source)) {
+    try {
+      window.localStorage.removeItem(key);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+/**
+ * A clear is an intent, and intent has to beat volume.
+ *
+ * `syncLearnerProgressWithCloud` pushes local state up whenever this browser
+ * has more of it than the cloud — right for progress, wrong for a reset. Clear
+ * a sitting on one device and the device Leo actually sat it on still holds
+ * every answer, so its next visit uploads the lot and every device hydrates it
+ * back. The clear is therefore recorded IN the row as a timestamp, and each
+ * device wipes its own copy the first time it sees a marker it has not applied.
+ *
+ * It lives inside `raw_progress` rather than in a column of its own because
+ * golden rule 11a: a schema change is not done until it is applied, and this
+ * session cannot reach Supabase to apply one.
+ */
+const CLEAR_MARKER_KEY = "leea-__sitting-cleared-at";
+const APPLIED_CLEARS_KEY = "leea.clearedSittings.v1";
+
+function readAppliedClears(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(window.localStorage.getItem(APPLIED_CLEARS_KEY) ?? "{}") as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+
+function rememberAppliedClear(homeworkId: string, marker: string) {
+  if (typeof window === "undefined") return;
+  const applied = readAppliedClears();
+  applied[homeworkId] = marker;
+  try {
+    window.localStorage.setItem(APPLIED_CLEARS_KEY, JSON.stringify(applied));
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Wipes this device's copy if the cloud says the sitting was cleared elsewhere.
+ *
+ * It also bumps the write generation, which is the half that makes a clear hold
+ * across tabs and devices. The generation counter alone only silences writes
+ * queued in the same page — the tab Leo actually sat the test in has its own
+ * queue and its own counter, and goes on pushing answer after answer into a row
+ * that was cleared on the laptop. Seeing an unapplied marker is how that tab
+ * learns the sitting is gone: it drops what it was about to send.
+ */
+function applyClearedSitting(lesson: Lesson, rawProgress: Record<string, unknown> | null | undefined): boolean {
+  const homeworkId = lesson.source.homeworkId;
+  const marker = rawProgress?.[CLEAR_MARKER_KEY];
+  if (!homeworkId || typeof marker !== "string") return false;
+  if (readAppliedClears()[homeworkId] === marker) return false;
+  wipeSittingLocally(lesson.source);
+  rememberAppliedClear(homeworkId, marker);
+  cloudGenerations.set(homeworkId, (cloudGenerations.get(homeworkId) ?? 0) + 1);
+  return true;
+}
+
 export async function fetchLearnerProgressRows(homeworkId: string | undefined): Promise<LearnerProgressStorageRow[]> {
   if (!homeworkId || !isSupabaseConfigured || !supabase) return [];
 
@@ -201,8 +304,13 @@ export async function hydrateLearnerProgressFromCloud(lessons: Lesson[]): Promis
     if (error) throw error;
     reportCloudSyncSuccess("learner-progress");
 
+    const byHomeworkId = new Map(lessons.map((lesson) => [lesson.source.homeworkId, lesson]));
     for (const row of (data ?? []) as LearnerProgressCloudRow[]) {
+      const lesson = byHomeworkId.get(row.homework_id);
+      // A sitting cleared on another device is cleared here too, once.
+      if (lesson) applyClearedSitting(lesson, row.raw_progress);
       for (const [storageKey, value] of Object.entries(row.raw_progress ?? {})) {
+        if (storageKey === CLEAR_MARKER_KEY) continue;      // bookkeeping, not progress
         if (value === null || value === undefined) {
           window.localStorage.removeItem(storageKey);
         } else {
@@ -240,6 +348,13 @@ export async function syncLearnerProgressWithCloud(lessons: Lesson[]): Promise<b
 
     for (const lesson of lessons) {
       if (!lesson.source.homeworkId) continue;
+      const cloudRow = cloudByHomeworkId.get(lesson.source.homeworkId);
+      // Take the clear first, so what follows sees an already-empty sitting
+      // rather than uploading the copy this browser still happens to hold.
+      if (applyClearedSitting(lesson, cloudRow?.raw_progress)) {
+        changed = true;
+        continue;
+      }
       const localRawProgress = collectLocalProgress(lesson);
       if (!Object.keys(localRawProgress).length) continue;
 
@@ -249,7 +364,7 @@ export async function syncLearnerProgressWithCloud(lessons: Lesson[]): Promise<b
       // browser whose writes never reached the cloud — would stay open for
       // good. Reconcile it here; the call is a no-op unless it is still open.
       if (localProgress.done) await markAssignmentCompleted(lesson.id);
-      const cloudProgress = cloudByHomeworkId.get(lesson.source.homeworkId);
+      const cloudProgress = cloudRow;
       const cloudRawCount = Object.keys(cloudProgress?.raw_progress ?? {}).length;
       const shouldPushLocal =
         !cloudProgress
@@ -260,7 +375,11 @@ export async function syncLearnerProgressWithCloud(lessons: Lesson[]): Promise<b
         );
 
       if (shouldPushLocal) {
-        await upsertLearnerProgressSummary(lesson, localRawProgress);
+        await queueCloudWrite(lesson.source.homeworkId, () =>
+          mutateCloudProgress(lesson, (raw) => {
+            for (const [key, value] of Object.entries(localRawProgress)) raw[key] = value;
+          }, true)
+        );
         changed = true;
       }
     }
@@ -290,16 +409,47 @@ export async function syncLearnerProgressWithCloud(lessons: Lesson[]): Promise<b
  */
 const cloudWriteQueues = new Map<string, Promise<void>>();
 
-function queueCloudWrite(homeworkId: string, run: () => Promise<void>) {
+/**
+ * A clear supersedes everything queued before it.
+ *
+ * Every answer Leo types is mirrored to the cloud as its own read-modify-write,
+ * so one sitting of a test is well over a thousand of them. Tapping "Take the
+ * test again" lands the clear at the BACK of that queue — behind hundreds of
+ * writes that each carry an old value and put their key back. The sitting kept
+ * reappearing for as long as the queue took to drain, which over a real network
+ * is a long time, and that is what "the reset does not work" looked like.
+ *
+ * Bumping a generation makes those stale writes no-ops: they describe a sitting
+ * that no longer exists, so there is nothing to send.
+ */
+const cloudGenerations = new Map<string, number>();
+
+function queueCloudWrite(homeworkId: string, run: () => Promise<void>, supersedes = false) {
+  if (supersedes) cloudGenerations.set(homeworkId, (cloudGenerations.get(homeworkId) ?? 0) + 1);
+  const generation = cloudGenerations.get(homeworkId) ?? 0;
+  const task = async () => {
+    if ((cloudGenerations.get(homeworkId) ?? 0) !== generation) return;
+    await run();
+  };
   const queued = (cloudWriteQueues.get(homeworkId) ?? Promise.resolve())
-    .then(run, run)
+    .then(task, task)
     .catch(() => {});
   cloudWriteQueues.set(homeworkId, queued);
   return queued;
 }
 
-/** Applies one change to the stored `raw_progress` and writes it back. */
-async function mutateCloudProgress(lesson: Lesson, apply: (raw: Record<string, unknown>) => void) {
+/**
+ * Applies one change to the stored `raw_progress` and writes it back.
+ *
+ * `guardCleared` makes the write stand down when the row says the sitting was
+ * cleared and this browser has not caught up yet — otherwise the tab that holds
+ * the old answers quietly puts them back one by one.
+ */
+async function mutateCloudProgress(
+  lesson: Lesson,
+  apply: (raw: Record<string, unknown>) => void,
+  guardCleared = false
+) {
   if (!lesson.source.homeworkId || !supabase) return;
   try {
     const { data, error } = await supabase
@@ -311,6 +461,8 @@ async function mutateCloudProgress(lesson: Lesson, apply: (raw: Record<string, u
 
     if (error) throw error;
 
+    if (guardCleared && applyClearedSitting(lesson, data?.raw_progress as Record<string, unknown> | null)) return;
+
     const rawProgress = { ...((data?.raw_progress ?? {}) as Record<string, unknown>) };
     apply(rawProgress);
     await upsertLearnerProgressSummary(lesson, rawProgress);
@@ -318,6 +470,49 @@ async function mutateCloudProgress(lesson: Lesson, apply: (raw: Record<string, u
     console.warn("LEEA Supabase learner progress save failed", error);
     reportCloudSyncFailure("learner-progress", error);
   }
+}
+
+/**
+ * Writes waiting to be sent, coalesced per homework.
+ *
+ * Every keystroke in a test used to be its own read-modify-write of the whole
+ * row: one sitting of the Unit 9 quiz made over 1,500 round trips. The parent's
+ * view then ran minutes behind Leo's, and — worse — a reset landed at the back
+ * of that queue, which is most of why it never seemed to take. Collecting the
+ * changes and sending them together makes it tens of writes instead.
+ */
+type PendingWrite = { lesson: Lesson; values: Map<string, unknown>; timer: ReturnType<typeof setTimeout> | null };
+const pendingWrites = new Map<string, PendingWrite>();
+const FLUSH_AFTER_MS = 400;
+
+function flushPending(homeworkId: string) {
+  const pending = pendingWrites.get(homeworkId);
+  if (!pending) return Promise.resolve();
+  pendingWrites.delete(homeworkId);
+  if (pending.timer) clearTimeout(pending.timer);
+  return queueCloudWrite(homeworkId, () =>
+    mutateCloudProgress(
+      pending.lesson,
+      (raw) => {
+        for (const [storageKey, value] of pending.values) {
+          if (value === null || value === undefined) delete raw[storageKey];
+          else raw[storageKey] = value;
+        }
+      },
+      true
+    )
+  );
+}
+
+/** Nothing in flight may be lost because the tab went away. */
+if (typeof window !== "undefined") {
+  const flushAll = () => {
+    for (const homeworkId of [...pendingWrites.keys()]) void flushPending(homeworkId);
+  };
+  window.addEventListener("pagehide", flushAll);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) flushAll();
+  });
 }
 
 export async function saveLearnerProgressValue(lesson: Lesson, key: string, value: unknown) {
@@ -330,12 +525,12 @@ export async function saveLearnerProgressValue(lesson: Lesson, key: string, valu
     window.localStorage.setItem(storageKey, JSON.stringify(value));
   }
 
-  await queueCloudWrite(lesson.source.homeworkId, () =>
-    mutateCloudProgress(lesson, (raw) => {
-      if (value === null || value === undefined) delete raw[storageKey];
-      else raw[storageKey] = value;
-    })
-  );
+  const homeworkId = lesson.source.homeworkId;
+  const pending = pendingWrites.get(homeworkId) ?? { lesson, values: new Map(), timer: null };
+  pending.values.set(storageKey, value);
+  if (pending.timer) clearTimeout(pending.timer);
+  pending.timer = setTimeout(() => void flushPending(homeworkId), FLUSH_AFTER_MS);
+  pendingWrites.set(homeworkId, pending);
 }
 
 /**
@@ -351,11 +546,16 @@ export async function clearLearnerProgressValues(lesson: Lesson, keys: string[])
   const storageKeys = keys.map(normalizeLearnerStorageKey);
   for (const storageKey of storageKeys) window.localStorage.removeItem(storageKey);
   if (!isSupabaseConfigured || !supabase) return;
+  await flushPending(lesson.source.homeworkId);   // send what is buffered, then delete
 
   await queueCloudWrite(lesson.source.homeworkId, () =>
-    mutateCloudProgress(lesson, (raw) => {
-      for (const storageKey of storageKeys) delete raw[storageKey];
-    })
+    mutateCloudProgress(
+      lesson,
+      (raw) => {
+        for (const storageKey of storageKeys) delete raw[storageKey];
+      },
+      true
+    )
   );
 }
 
@@ -368,11 +568,24 @@ export async function clearLearnerProgressValues(lesson: Lesson, keys: string[])
  * is what makes "clear the sitting" mean it.
  */
 export async function clearLearnerProgressCloud(lesson: Lesson) {
-  if (!lesson.source.homeworkId || !isSupabaseConfigured || !supabase) return;
-  await queueCloudWrite(lesson.source.homeworkId, () =>
-    mutateCloudProgress(lesson, (raw) => {
-      for (const storageKey of Object.keys(raw)) delete raw[storageKey];
-    })
+  const homeworkId = lesson.source.homeworkId;
+  if (!homeworkId) return;
+  const marker = new Date().toISOString();
+  // This device has just done the clearing, so it has already applied it.
+  rememberAppliedClear(homeworkId, marker);
+  // Anything still waiting to be sent describes a sitting that no longer exists.
+  const waiting = pendingWrites.get(homeworkId);
+  if (waiting?.timer) clearTimeout(waiting.timer);
+  pendingWrites.delete(homeworkId);
+  if (!isSupabaseConfigured || !supabase) return;
+  await queueCloudWrite(
+    homeworkId,
+    () =>
+      mutateCloudProgress(lesson, (raw) => {
+        for (const storageKey of Object.keys(raw)) delete raw[storageKey];
+        raw[CLEAR_MARKER_KEY] = marker;
+      }),
+    true                                  // everything queued before this is moot
   );
 }
 

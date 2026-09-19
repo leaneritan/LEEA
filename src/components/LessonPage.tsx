@@ -5,6 +5,7 @@ import { ExternalLink } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
+  clearLearnerProgressCloud,
   clearLearnerProgressValues,
   fetchLearnerProgressRows,
   saveLearnerProgressValue,
@@ -60,7 +61,7 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
       if (!frameWindow || event.source !== frameWindow) return;
       const message = event.data as
         | { type: "LEEA_CLOUD_SAVE"; homeworkId?: string; key?: string; value?: unknown }
-        | { type: "LEEA_CLOUD_CLEAR"; homeworkId?: string; keys?: string[] }
+        | { type: "LEEA_CLOUD_CLEAR"; homeworkId?: string; keys?: string[]; all?: boolean }
         | { type: "LEEA_CLOUD_FETCH"; homeworkId?: string; requestId?: string }
         | undefined;
 
@@ -72,9 +73,12 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
 
       // A clear or a retake drops many keys at once. It arrives as one message
       // so it becomes one write, rather than a dozen racing ones that put each
-      // other's deletions back.
+      // other's deletions back. `all` is a retake: the whole sitting goes and
+      // the clear is recorded, so a device still holding the old answers wipes
+      // its own copy instead of uploading them again.
       if (message.type === "LEEA_CLOUD_CLEAR" && Array.isArray(message.keys)) {
-        await clearLearnerProgressValues(lesson, message.keys);
+        if (message.all) await clearLearnerProgressCloud(lesson);
+        else await clearLearnerProgressValues(lesson, message.keys);
       }
 
       if (message.type === "LEEA_CLOUD_FETCH" && message.requestId) {
@@ -220,10 +224,10 @@ function injectLearnerCloudBridge(html: string, homeworkId: string | undefined, 
      * concurrent read-modify-writes of the same cloud row put each other's
      * deletions back, and the cleared answers returned on the next sync.
      */
-    clearProgress: function(keys) {
+    clearProgress: function(keys, wholeSitting) {
       if (!Array.isArray(keys) || !keys.length) return;
       keys.forEach(function(key) { try { originalRemoveItem(key); } catch (error) {} });
-      send('LEEA_CLOUD_CLEAR', { homeworkId: HOMEWORK_ID, keys: keys });
+      send('LEEA_CLOUD_CLEAR', { homeworkId: HOMEWORK_ID, keys: keys, all: !!wholeSitting });
     },
     fetchProgress: requestRows
   };

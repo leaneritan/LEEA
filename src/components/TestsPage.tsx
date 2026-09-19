@@ -77,6 +77,24 @@ function todayValue() {
 }
 
 /**
+ * Whether the test app has anything stored for this test at all.
+ *
+ * Deliberately not "has he finished a page": a sitting exists the moment he
+ * answers one question, and that is exactly when wanting to start over is most
+ * likely. Keying the reset off completed pages left a part-answered test with
+ * no way to clear it from here.
+ */
+function hasSitting(learner: Lesson) {
+  const prefix = learner.source.storagePrefix;
+  if (!prefix || typeof window === "undefined") return false;
+  try {
+    return Object.keys(window.localStorage).some((key) => key.startsWith(prefix));
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Clears one test app's saved sitting — the same thing the app's own "Take the
  * test again" does, reachable from the shelf. Attempts already filed are NOT
  * touched: they live under their own key precisely so a retake cannot erase
@@ -86,6 +104,8 @@ function clearSitting(learner: Lesson) {
   const prefix = learner.source.storagePrefix;
   if (!prefix || typeof window === "undefined") return;
   try {
+    // Everything the app stores under its prefix goes — answers, page, reveal
+    // state, and the clock — so the next sitting starts from a full 30 minutes.
     Object.keys(window.localStorage)
       .filter((key) => key.startsWith(prefix))
       .forEach((key) => window.localStorage.removeItem(key));
@@ -185,8 +205,9 @@ export function TestsPage() {
           const testId = learner?.id ?? teacher.id;
           const history = mounted ? attemptsForTest(testId, attempts) : [];
           const latest = history[0] ?? null;
+          const sitting = mounted && learner ? hasSitting(learner) : false;
           const started = (progress?.completedModules ?? 0) > 0;
-          const inProgress = started && !latest;
+          const inProgress = sitting && !latest;
 
           return (
             <article className="tests-card" key={teacher.id}>
@@ -220,7 +241,9 @@ export function TestsPage() {
                   </>
                 ) : inProgress && progress ? (
                   <span className="tests-pill open">
-                    In progress — {progress.completedModules} of {progress.moduleCount} pages
+                    {started
+                      ? `In progress — ${progress.completedModules} of ${progress.moduleCount} pages`
+                      : "Started"}
                   </span>
                 ) : (
                   <span className="tests-pill muted">Not sat yet</span>
@@ -276,7 +299,7 @@ export function TestsPage() {
                 >
                   Add a paper result
                 </button>
-                {learner && (started || latest) ? (
+                {learner && (sitting || latest) ? (
                   <button
                     className={`tests-btn quiet${resetArmed === testId ? " armed" : ""}`}
                     onClick={() => {
@@ -291,7 +314,9 @@ export function TestsPage() {
                     }}
                     type="button"
                   >
-                    {resetArmed === testId ? "Tap again — clears his answers" : "Clear the sitting"}
+                    {resetArmed === testId
+                      ? "Tap again — clears his answers and the clock"
+                      : "Clear the sitting"}
                   </button>
                 ) : null}
               </div>

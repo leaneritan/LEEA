@@ -724,6 +724,23 @@ thrown away, and whether to stop is Neritan's call. Keep it clear of the frame's
 top-right corner: the host page floats its own "Exit Fullscreen" button there and
 swallows every tap underneath.
 
+**The clock belongs to the sitting.** It runs from Leo's first answer and stops
+when the result is opened — the sitting is over at that point, so the pill
+switches from "34:56 left" to "0:04 taken" and nothing restarts it but a retake.
+It used to keep counting while Neritan marked, which also inflated the time the
+attempt recorded, because the attempt is rewritten on every mark.
+
+**A wipe is one cloud write, never one per key.** Every `localStorage` write in
+a learner app is mirrored to Supabase by the bridge in `LessonPage.tsx`, and
+each mirror is a read-modify-write of that homework's whole `raw_progress`.
+A clear drops a dozen keys and a retake thirty, so those writes raced and put
+each other's deletions back; the cleared answers then came home on the next
+`syncLearnerProgressWithCloud`. Send a wipe as one `LEEA_CLOUD_CLEAR`
+(`LEEA_CLOUD.clearProgress(keys)`, `lDropAll` in the test files), and note that
+cloud writes are now queued per homework id in `learnerProgress.ts`. Anything
+clearing from *outside* the learner frame — `/tests` does — must call
+`clearLearnerProgressCloud` itself, or it only clears one of the two copies.
+
 **A sitting is the unit of a result, not a score.** Every completed test files a
 dated `TestAttempt` (`src/data/testAttempts.ts`, `leea.testAttempts.v1`), written
 by the test app itself once the result is opened and kept current as Neritan

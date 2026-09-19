@@ -58,6 +58,8 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
        font-variant-numeric:tabular-nums;white-space:nowrap}
 .clock.paused{color:var(--ink3);border-style:dashed}
 .clock.over{color:#B91C1C;border-color:#B91C1C}
+/* Stopped, because the result is open — a record of the sitting, not a timer. */
+.clock.done{color:var(--ink3);border-style:solid;cursor:default}
 .bar-prog{height:3px;background:#F4F4F5;margin:0 -176px 0 -14px}
 .bar-prog i{display:block;height:100%;background:var(--ink);width:0;transition:width .35s}
 
@@ -549,6 +551,24 @@ var revealed = !!lLoad('revealed',false);
 function lSave(k,v){try{localStorage.setItem(SP+k,JSON.stringify(v));}catch(e){}}
 function lLoad(k,fb){try{var v=localStorage.getItem(SP+k);return v!==null?JSON.parse(v):(fb===undefined?null:fb);}catch(e){return fb===undefined?null:fb;}}
 function lDrop(k){try{localStorage.removeItem(SP+k);}catch(e){}}
+/**
+ * Drop several keys as one operation.
+ *
+ * Clearing a page or retaking the test wipes a dozen to thirty keys. Each
+ * removeItem is mirrored to the cloud on its own, and those writes are all
+ * read-modify-writes of the same row — so they put each other's deletions back
+ * and the cleared answers (and the old clock) returned on the next sync.
+ * `clearProgress` is the app frame's one-shot version; standalone, there is no
+ * bridge and the plain removes are all there is to do.
+ */
+function lDropAll(keys){
+  var full=[];
+  for(var i=0;i<keys.length;i++)full.push(SP+keys[i]);
+  try{
+    if(window.LEEA_CLOUD && window.LEEA_CLOUD.clearProgress){window.LEEA_CLOUD.clearProgress(full);return;}
+  }catch(e){}
+  for(var j=0;j<full.length;j++){try{localStorage.removeItem(full[j]);}catch(e){}}
+}
 
 function saveScore(score,total,done,extra){
   var data={score:score,total:total,pct:total?Math.round(score/total*100):0,done:done,timestamp:new Date().toISOString()};
@@ -885,7 +905,7 @@ function render(){
   if(page===ANSWERS_PAGE){
     /* Opening the result is the moment the marks appear — on this page and,
        from now on, on all thirteen pages behind it. */
-    if(allDone() && !revealed){ revealed=true; lSave('revealed',true); }
+    if(allDone() && !revealed){ revealed=true; lSave('revealed',true); persistTime(); paintClock(); }
     stage.innerHTML=answersHtml();
   }
   else{
@@ -981,8 +1001,14 @@ function paintClock(){
   var el=document.getElementById('clock');
   if(!el)return;
   var left=ALLOWED-elapsed;
-  el.classList.toggle('paused',started&&paused);
-  el.classList.toggle('over',left<0);
+  el.classList.toggle('paused',started&&paused&&!revealed);
+  el.classList.toggle('over',left<0&&!revealed);
+  el.classList.toggle('done',revealed);
+  if(revealed){
+    el.textContent='⏱ '+mmss(elapsed)+' taken';
+    el.title='The test is finished — this is how long it took';
+    return;
+  }
   if(!started)el.textContent='⏱ '+mmss(ALLOWED);
   else if(left<0)el.textContent="Time's up · +"+mmss(-left);
   else el.textContent=(paused?'▶ ':'⏱ ')+mmss(left)+(paused?' paused':' left');
@@ -990,17 +1016,22 @@ function paintClock(){
                   :'Starts on the first answer';
 }
 function startClock(){
-  if(started)return;
+  if(started||revealed)return;
   runId();
   started=true;paused=false;lSave('time-started',true);lSave('time-paused',false);paintClock();
 }
 function toggleClock(){
+  if(revealed)return;          /* the sitting is over; the time is a record now */
   if(!started){startClock();return;}
   paused=!paused;lSave('time-paused',paused);paintClock();
 }
 function persistTime(){lSave('time-elapsed',elapsed);}
 setInterval(function(){
-  if(!started||paused)return;
+  /* Opening the result ends the sitting, so the clock stops there. It used to
+     keep counting while Dad marked, which both read as a running test and
+     inflated the time this sitting recorded — the attempt is rewritten on every
+     mark, so twenty minutes of marking became twenty minutes of test. */
+  if(!started||paused||revealed)return;
   elapsed++;
   if(++tickN%5===0)persistTime();
   paintClock();
@@ -1076,8 +1107,9 @@ function clearPage(id){
   if(btn.dataset.armed){
     clearTimeout(clearTimers[id]);delete btn.dataset.armed;btn.classList.remove('armed');
     var p=partById(id);
-    lDrop(id+'-ans');lDrop(id+'-done');lDrop(id+'-ticks');lDrop(id+'-seen');lDrop(id+'-dad');
-    if(p.questions)for(var i=0;i<p.questions.length;i++)lDrop(id+'-dad-'+p.questions[i].n);
+    var keys=[id+'-ans',id+'-done',id+'-ticks',id+'-seen',id+'-dad'];
+    if(p.questions)for(var i=0;i<p.questions.length;i++)keys.push(id+'-dad-'+p.questions[i].n);
+    lDropAll(keys);
     render();
     return;
   }
@@ -1255,7 +1287,9 @@ function retake(btnId){
   if(btn.dataset.armed){
     clearTimeout(retakeTimer);btn.classList.remove('armed');
     try{
-      Object.keys(localStorage).forEach(function(k){ if(k.indexOf(SP)===0)localStorage.removeItem(k); });
+      var mine=Object.keys(localStorage).filter(function(k){ return k.indexOf(SP)===0; })
+                     .map(function(k){ return k.slice(SP.length); });
+      lDropAll(mine);
     }catch(e){}
     revealed=false;elapsed=0;started=false;paused=false;showAllReview=false;
     page=0;closeIndex();render();paintClock();

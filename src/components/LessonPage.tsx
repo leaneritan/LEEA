@@ -5,6 +5,7 @@ import { ExternalLink } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
+  clearLearnerProgressValues,
   fetchLearnerProgressRows,
   saveLearnerProgressValue,
   type LearnerProgressStorageRow
@@ -59,6 +60,7 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
       if (!frameWindow || event.source !== frameWindow) return;
       const message = event.data as
         | { type: "LEEA_CLOUD_SAVE"; homeworkId?: string; key?: string; value?: unknown }
+        | { type: "LEEA_CLOUD_CLEAR"; homeworkId?: string; keys?: string[] }
         | { type: "LEEA_CLOUD_FETCH"; homeworkId?: string; requestId?: string }
         | undefined;
 
@@ -66,6 +68,13 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
 
       if (message.type === "LEEA_CLOUD_SAVE" && message.key) {
         await saveLearnerProgressValue(lesson, message.key, message.value);
+      }
+
+      // A clear or a retake drops many keys at once. It arrives as one message
+      // so it becomes one write, rather than a dozen racing ones that put each
+      // other's deletions back.
+      if (message.type === "LEEA_CLOUD_CLEAR" && Array.isArray(message.keys)) {
+        await clearLearnerProgressValues(lesson, message.keys);
       }
 
       if (message.type === "LEEA_CLOUD_FETCH" && message.requestId) {
@@ -196,16 +205,29 @@ function injectLearnerCloudBridge(html: string, homeworkId: string | undefined, 
 
   INITIAL_ROWS.forEach(writeRow);
 
+  const originalSetItem = localStorage.setItem.bind(localStorage);
+  const originalRemoveItem = localStorage.removeItem.bind(localStorage);
+
   window.LEEA_CLOUD = {
     enabled: CLOUD_ENABLED,
     saveProgress: function(homeworkId, key, value) {
       send('LEEA_CLOUD_SAVE', { homeworkId: homeworkId || HOMEWORK_ID, key, value });
     },
+    /**
+     * Drop many keys as ONE operation — what a "clear this page" or a retake
+     * actually is. It removes them locally through the unpatched removeItem on
+     * purpose, so this does not also fire one save message per key: a dozen
+     * concurrent read-modify-writes of the same cloud row put each other's
+     * deletions back, and the cleared answers returned on the next sync.
+     */
+    clearProgress: function(keys) {
+      if (!Array.isArray(keys) || !keys.length) return;
+      keys.forEach(function(key) { try { originalRemoveItem(key); } catch (error) {} });
+      send('LEEA_CLOUD_CLEAR', { homeworkId: HOMEWORK_ID, keys: keys });
+    },
     fetchProgress: requestRows
   };
 
-  const originalSetItem = localStorage.setItem.bind(localStorage);
-  const originalRemoveItem = localStorage.removeItem.bind(localStorage);
   localStorage.setItem = function(key, value) {
     originalSetItem(key, value);
     try {

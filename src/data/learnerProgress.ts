@@ -274,16 +274,33 @@ export async function syncLearnerProgressWithCloud(lessons: Lesson[]): Promise<b
   }
 }
 
-export async function saveLearnerProgressValue(lesson: Lesson, key: string, value: unknown) {
-  if (!lesson.source.homeworkId || !isSupabaseConfigured || !supabase || typeof window === "undefined") return;
+/**
+ * Cloud writes for one homework, run one at a time.
+ *
+ * Every write is a read-modify-write of the whole `raw_progress` object, so two
+ * of them in flight at once both read the same starting state and the second
+ * one puts back what the first removed. That never mattered while an app saved
+ * one answer at a time — but clearing a page of a test drops a dozen keys in a
+ * loop and a retake drops thirty, and most of those deletions were being undone
+ * by their own siblings. The cloud kept the answers, the next visit to any page
+ * that syncs hydrated them back into localStorage, and the cleared work
+ * reappeared with the old clock still on it.
+ *
+ * Chaining per homework id keeps each read seeing the previous write's result.
+ */
+const cloudWriteQueues = new Map<string, Promise<void>>();
 
-  const storageKey = normalizeLearnerStorageKey(key);
-  if (value === null || value === undefined) {
-    window.localStorage.removeItem(storageKey);
-  } else {
-    window.localStorage.setItem(storageKey, JSON.stringify(value));
-  }
+function queueCloudWrite(homeworkId: string, run: () => Promise<void>) {
+  const queued = (cloudWriteQueues.get(homeworkId) ?? Promise.resolve())
+    .then(run, run)
+    .catch(() => {});
+  cloudWriteQueues.set(homeworkId, queued);
+  return queued;
+}
 
+/** Applies one change to the stored `raw_progress` and writes it back. */
+async function mutateCloudProgress(lesson: Lesson, apply: (raw: Record<string, unknown>) => void) {
+  if (!lesson.source.homeworkId || !supabase) return;
   try {
     const { data, error } = await supabase
       .from("learner_progress")
@@ -295,17 +312,68 @@ export async function saveLearnerProgressValue(lesson: Lesson, key: string, valu
     if (error) throw error;
 
     const rawProgress = { ...((data?.raw_progress ?? {}) as Record<string, unknown>) };
-    if (value === null || value === undefined) {
-      delete rawProgress[storageKey];
-    } else {
-      rawProgress[storageKey] = value;
-    }
-
+    apply(rawProgress);
     await upsertLearnerProgressSummary(lesson, rawProgress);
   } catch (error) {
     console.warn("LEEA Supabase learner progress save failed", error);
     reportCloudSyncFailure("learner-progress", error);
   }
+}
+
+export async function saveLearnerProgressValue(lesson: Lesson, key: string, value: unknown) {
+  if (!lesson.source.homeworkId || !isSupabaseConfigured || !supabase || typeof window === "undefined") return;
+
+  const storageKey = normalizeLearnerStorageKey(key);
+  if (value === null || value === undefined) {
+    window.localStorage.removeItem(storageKey);
+  } else {
+    window.localStorage.setItem(storageKey, JSON.stringify(value));
+  }
+
+  await queueCloudWrite(lesson.source.homeworkId, () =>
+    mutateCloudProgress(lesson, (raw) => {
+      if (value === null || value === undefined) delete raw[storageKey];
+      else raw[storageKey] = value;
+    })
+  );
+}
+
+/**
+ * Removes many keys in one write.
+ *
+ * What a clear or a retake actually is: one decision, not twelve. Sending it as
+ * one read-modify-write also means it cannot half-apply, so a cleared page is
+ * cleared in the cloud too and does not come back on the next sync.
+ */
+export async function clearLearnerProgressValues(lesson: Lesson, keys: string[]) {
+  if (!lesson.source.homeworkId || typeof window === "undefined") return;
+
+  const storageKeys = keys.map(normalizeLearnerStorageKey);
+  for (const storageKey of storageKeys) window.localStorage.removeItem(storageKey);
+  if (!isSupabaseConfigured || !supabase) return;
+
+  await queueCloudWrite(lesson.source.homeworkId, () =>
+    mutateCloudProgress(lesson, (raw) => {
+      for (const storageKey of storageKeys) delete raw[storageKey];
+    })
+  );
+}
+
+/**
+ * Wipes everything stored for one homework, locally and in the cloud.
+ *
+ * `/tests` clearing a sitting runs in the app, not inside the learner app's
+ * frame, so nothing was telling the cloud about it — the row stayed whole and
+ * the next page that synced hydrated the whole sitting back. Clearing both ends
+ * is what makes "clear the sitting" mean it.
+ */
+export async function clearLearnerProgressCloud(lesson: Lesson) {
+  if (!lesson.source.homeworkId || !isSupabaseConfigured || !supabase) return;
+  await queueCloudWrite(lesson.source.homeworkId, () =>
+    mutateCloudProgress(lesson, (raw) => {
+      for (const storageKey of Object.keys(raw)) delete raw[storageKey];
+    })
+  );
 }
 
 async function upsertLearnerProgressSummary(lesson: Lesson, rawProgress: Record<string, unknown>) {

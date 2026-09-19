@@ -101,6 +101,10 @@ import unit8Reader from "../../content/subjects/english/courses/our-world/level-
 import unit8ReaderLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/reader-app.learner.json";
 import unit8BookReading from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/book-reading.teacher.json";
 import unit8BookReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/book-reading.learner.json";
+// A unit's own quiz is a lesson of that unit, not checkpoint material, so it
+// lives here beside the rest of Unit 8 rather than in a checkpoint folder.
+import unit8Quiz from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/quiz.teacher.json";
+import unit8QuizLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/quiz-app.learner.json";
 import tgPhonicsShortVowels from "../../content/subjects/english/courses/special-training/lessons/phonics-short-vowels.teacher.json";
 import tgPhonicsShortVowelsLearner from "../../content/subjects/english/courses/special-training/lessons/phonics-short-vowels-app.learner.json";
 import tgNouns from "../../content/subjects/english/courses/special-training/lessons/nouns.teacher.json";
@@ -250,6 +254,8 @@ export const lessons: Lesson[] = [
   unit8ReaderLearner as Lesson,
   unit8BookReading as Lesson,
   unit8BookReadingLearner as Lesson,
+  unit8Quiz as Lesson,
+  unit8QuizLearner as Lesson,
   tgPhonicsShortVowels as Lesson,
   tgPhonicsShortVowelsLearner as Lesson,
   tgNouns as Lesson,

@@ -188,6 +188,25 @@ review entry all read from it, so they cannot drift apart.
 `Take the test again` at the foot of the result clears everything — answers,
 marks, clock — behind a two-tap confirm.
 
+### Sittings, paper results and mistakes
+
+A finished test files a **dated attempt** rather than overwriting a score. The
+app writes it when the result is opened, keeps it current while Neritan marks,
+and a retake starts a new one — see `src/data/testAttempts.ts` for the record and
+`AGENTS.md` for the rules. Three things follow from it, and a new test gets all
+three for free once it declares `lessonId` and `title` in its `TEST` object:
+
+- **`/tests` shows the history** — every sitting with its date, score and whether
+  it was taken in the app or on paper.
+- **Paper results are recorded by hand**, either against a digital test or, for a
+  test never built here, under "Other paper tests".
+- **`/tests/mistakes` drills what he got wrong**, weighted toward the freshest
+  misses. It is practice, so it marks as it goes — the opposite of the test.
+
+The one rule to keep: **`pending` is not `wrong`.** An open response Neritan has
+not marked yet is recorded as `pending` and skipped by the mistakes collector.
+Filing it as wrong would fill his practice list with questions nobody has marked.
+
 ## 4. Build the teacher deck
 
 `public/lessons/ow-l<level>-t<band>-test.html`, on the shared slideshow shell

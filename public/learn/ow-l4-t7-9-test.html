@@ -298,6 +298,10 @@ var PIC_BASE   = '/tests/our-world/level-4/t7-9/';
 
 var TEST = {
   id: 'ow-l4-t7-9',
+  /* Attempts are filed under the learner lesson id, which is what /tests and
+     the mistakes drill look them up by. */
+  lessonId: 'ow-l4-t7-9-test-app',
+  title: 'Units 7–9 Mastery Test',
   /* The publisher sets the time, not us: a unit quiz is 15–20 minutes, a
      three-unit mastery test 20–30, the nine-unit final 30–35. This is a
      mastery test, so it takes the top of its range. */
@@ -923,6 +927,7 @@ function paintClock(){
 }
 function startClock(){
   if(started)return;
+  runId();
   started=true;paused=false;lSave('time-started',true);lSave('time-paused',false);paintClock();
 }
 function toggleClock(){
@@ -1019,11 +1024,73 @@ function clearPage(id){
   },5000);
 }
 
+/* ── one dated attempt per sitting ───────────────────────────────────
+   The score keys above are "where this sitting is up to", and a retake clears
+   them. An attempt is the sitting itself: written once the result is opened,
+   kept under its own id, and never touched again by a later run — so taking
+   this test in March and again in June leaves two records rather than one
+   overwritten one. src/data/testAttempts.ts owns everything read back out. */
+var ATTEMPTS_KEY = 'leea.testAttempts.v1';
+
+/** Created on the first answer and cleared by a retake, so each run files once. */
+function runId(){
+  var r = lLoad('run-id', null);
+  if(!r){ r = TEST.id + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+          lSave('run-id', r); }
+  return r;
+}
+
+function attemptQuestions(){
+  var out=[];
+  for(var i=0;i<PARTS.length;i++){
+    var p=PARTS[i];
+    if(!p.questions)continue;
+    for(var j=0;j<p.questions.length;j++){
+      var q=p.questions[j], m=markOne(p,q);
+      /* `pending` is carried through as itself: an open response Neritan has
+         not marked is not a wrong answer, and must not land in his mistakes. */
+      var row={n:paperNumber(p,q),part:p.name,state:m.state,
+               got:m.got,max:m.max,question:questionText(p,q),
+               given:answerText(p,q,m.given),answer:correctText(p,q)};
+      /* Carry the choices, so the drill can offer them again later without
+         needing this file to still exist. */
+      if(q.options)row.options=q.options.map(function(o){return o.k+'. '+o.t;});
+      else if(p.bank&&p.kind==='select')row.options=p.bank.slice();
+      out.push(row);
+    }
+  }
+  return out;
+}
+
+function writeAttempt(){
+  if(!revealed)return;            /* a sitting exists once its result is opened */
+  var t=totals(), now=new Date().toISOString(), id=runId();
+  try{
+    var all=JSON.parse(localStorage.getItem(ATTEMPTS_KEY)||'{}');
+    var prev=all[id];
+    all[id]={
+      id:id, studentId:'leo',
+      testId:TEST.lessonId, testTitle:TEST.title, medium:'app',
+      takenAt:(prev&&prev.takenAt)||now,
+      score:t.got, total:t.max,
+      percent:t.max?Math.round(t.got/t.max*100):0,
+      durationSec:elapsed,
+      questions:attemptQuestions(),
+      note:'',
+      createdAt:(prev&&prev.createdAt)||now,
+      updatedAt:now
+    };
+    localStorage.setItem(ATTEMPTS_KEY,JSON.stringify(all));
+  }catch(e){}
+}
+
 /* ── the answer section ─────────────────────────────────────────────── */
 function recordScore(){
   var t=totals();
   saveScore(t.got,t.max,allDone(),{pending:t.pending.length,
     timeTakenSec:elapsed,timeAllowedSec:ALLOWED});
+  /* Keeps the attempt current as Neritan marks the open responses. */
+  writeAttempt();
 }
 function answersHtml(){
   if(!allDone()){

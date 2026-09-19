@@ -1220,6 +1220,20 @@ function openLb(src){
 }
 function closeLb(){document.getElementById('lb').classList.remove('open');}
 
+/* A sitting can be cleared from /tests while this test is still open in
+   another tab. That other document goes on ticking and writes the clock
+   straight back, so the reset looks like it did nothing — which is exactly
+   what was reported. The storage event fires in every OTHER document of this
+   origin (never the one that made the change), so an open test hears the wipe
+   and resets itself instead of fighting it. */
+window.addEventListener('storage', function(e){
+  var wiped = e.key === null || (e.key.indexOf(SP) === 0 && e.newValue === null);
+  if(!wiped)return;
+  if(lLoad('run-id',null) !== null)return;      /* still a live sitting */
+  revealed=false;elapsed=0;started=false;paused=false;showAllReview=false;
+  page=0;render();paintClock();
+});
+
 /* Come back to the page he left off on. */
 page = Math.max(0, Math.min(ANSWERS_PAGE, lLoad('page',0)|0));
 if(page===ANSWERS_PAGE && !allDone())page=MC-1;

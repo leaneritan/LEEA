@@ -88,7 +88,14 @@ function hasSitting(learner: Lesson) {
   const prefix = learner.source.storagePrefix;
   if (!prefix || typeof window === "undefined") return false;
   try {
-    return Object.keys(window.localStorage).some((key) => key.startsWith(prefix));
+    // Answers, ticks, done-keys and a started clock count. `page` and `score`
+    // do not: the app writes those on every render, so a blank test that has
+    // merely been opened would otherwise look like work in progress.
+    return Object.keys(window.localStorage).some((key) => {
+      if (!key.startsWith(prefix)) return false;
+      const rest = key.slice(prefix.length);
+      return /^m\d/.test(rest) || rest === "time-started" || rest === "revealed";
+    });
   } catch {
     return false;
   }
@@ -109,9 +116,15 @@ function clearSitting(learner: Lesson) {
     Object.keys(window.localStorage)
       .filter((key) => key.startsWith(prefix))
       .forEach((key) => window.localStorage.removeItem(key));
-    if (learner.source.homeworkId) {
-      window.localStorage.removeItem(`leea-${learner.source.homeworkId}-done`);
-      window.localStorage.removeItem(`leea-${learner.source.homeworkId}-score`);
+    // The homework flags sit OUTSIDE the storage prefix. The app writes them as
+    // `<homeworkId>-score` / `-done`; this used to delete `leea-<homeworkId>-…`,
+    // which is the name in AGENTS.md but not the name on disk, so the score
+    // survived every clear. Both spellings go, so it works either way.
+    const hw = learner.source.homeworkId;
+    if (hw) {
+      [`${hw}-done`, `${hw}-score`, `leea-${hw}-done`, `leea-${hw}-score`].forEach((key) =>
+        window.localStorage.removeItem(key)
+      );
     }
   } catch {
     /* ignore */

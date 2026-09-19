@@ -9,6 +9,7 @@ import {
   readMistakePractice,
   readTestAttempts,
   recordMistakePractice,
+  syncTestAttemptsWithCloud,
   type MistakeItem,
   type MistakePracticeMap
 } from "@/data/testAttempts";
@@ -77,6 +78,9 @@ export function TestMistakesPage() {
   useEffect(() => {
     setMounted(true);
     load();
+    // Practice is built from every sitting, including the ones filed on Leo's
+    // own device — so pull them before deciding what he keeps getting wrong.
+    void syncTestAttemptsWithCloud().then(() => load());
   }, [load]);
 
   const byTest = useMemo(() => {

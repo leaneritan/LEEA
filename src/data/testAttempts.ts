@@ -1,3 +1,6 @@
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { reportCloudSyncFailure, reportCloudSyncSuccess } from "@/lib/syncStatus";
+
 // Every sitting of a test, kept as its own dated record.
 //
 // A test used to store one score, so retaking it overwrote what came before and
@@ -5,15 +8,15 @@
 // per sitting, whether Leo took it in the app or on paper, so the same test can
 // be sat in March and again in June and both survive.
 //
-// Local-only for now, but shaped for the `test_attempts` table it will become.
-// It is deliberately NOT in supabase/schema.sql yet: golden rule 11a says a
-// schema change is not done until it is applied, and nothing here can apply one.
-// When it is added, the columns are the fields below in snake_case, with
-// `questions` as jsonb.
+// Local-first and synced, in the `test_attempts` table — the columns are the
+// fields below in snake_case, with `questions` as jsonb. There is no unique
+// constraint on (student_id, test_id) on purpose: the sitting is the unit, so
+// the same test sat twice is two rows.
 //
 // The test app writes its own attempts directly (it is the only thing that
 // knows what Leo answered); this module owns everything else — reading them
-// back, recording a paper test by hand, and turning the misses into practice.
+// back, syncing them, recording a paper test by hand, and turning the misses
+// into practice.
 
 /**
  * `pending` is an open response Neritan has not marked yet. It is recorded so
@@ -71,6 +74,61 @@ export type TestAttempt = {
 
 export type TestAttemptMap = Record<string, TestAttempt>;
 
+type TestAttemptRow = {
+  id: string;
+  student_id: string;
+  test_id: string;
+  test_title: string;
+  medium: "app" | "paper";
+  taken_at: string;
+  score: number;
+  total: number;
+  percent: number;
+  duration_sec: number | null;
+  questions: TestAttemptQuestion[] | null;
+  note: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+function toRow(attempt: TestAttempt): TestAttemptRow {
+  return {
+    id: attempt.id,
+    student_id: attempt.studentId,
+    test_id: attempt.testId,
+    test_title: attempt.testTitle,
+    medium: attempt.medium,
+    taken_at: attempt.takenAt,
+    score: attempt.score,
+    total: attempt.total,
+    percent: attempt.percent,
+    duration_sec: attempt.durationSec,
+    questions: attempt.questions,
+    note: attempt.note,
+    created_at: attempt.createdAt,
+    updated_at: attempt.updatedAt
+  };
+}
+
+function fromRow(row: TestAttemptRow): TestAttempt {
+  return {
+    id: row.id,
+    studentId: "leo",
+    testId: row.test_id,
+    testTitle: row.test_title,
+    medium: row.medium,
+    takenAt: row.taken_at,
+    score: row.score,
+    total: row.total,
+    percent: row.percent,
+    durationSec: row.duration_sec,
+    questions: Array.isArray(row.questions) ? row.questions : [],
+    note: row.note ?? "",
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  };
+}
+
 export const testAttemptsStorageKey = "leea.testAttempts.v1";
 
 export function readTestAttempts(): TestAttemptMap {
@@ -97,8 +155,10 @@ export function writeTestAttempts(attempts: TestAttemptMap) {
 
 export function saveTestAttempt(attempt: TestAttempt) {
   const all = readTestAttempts();
-  all[attempt.id] = { ...attempt, updatedAt: new Date().toISOString() };
+  const saved = { ...attempt, updatedAt: new Date().toISOString() };
+  all[attempt.id] = saved;
   writeTestAttempts(all);
+  void pushTestAttempt(saved);
   return all;
 }
 
@@ -106,7 +166,130 @@ export function deleteTestAttempt(id: string) {
   const all = readTestAttempts();
   delete all[id];
   writeTestAttempts(all);
+  void removeTestAttempt(id);
   return all;
+}
+
+/* ── the cloud copy ───────────────────────────────────────────────────── */
+
+/** One sitting up. Called on every write, so a result is never only local. */
+export async function pushTestAttempt(attempt: TestAttempt) {
+  if (!isSupabaseConfigured || !supabase) return;
+  try {
+    const { error } = await supabase.from("test_attempts").upsert(toRow(attempt), { onConflict: "id" });
+    if (error) throw error;
+    reportCloudSyncSuccess("test-attempts");
+  } catch (error) {
+    console.warn("LEEA Supabase test attempt save failed", error);
+    reportCloudSyncFailure("test-attempts", error);
+  }
+}
+
+export async function removeTestAttempt(id: string) {
+  if (!isSupabaseConfigured || !supabase) return;
+  try {
+    const { error } = await supabase.from("test_attempts").delete().eq("id", id).eq("student_id", "leo");
+    if (error) throw error;
+    reportCloudSyncSuccess("test-attempts");
+  } catch (error) {
+    console.warn("LEEA Supabase test attempt delete failed", error);
+    reportCloudSyncFailure("test-attempts", error);
+  }
+}
+
+/**
+ * Which attempts this browser has seen in the cloud, so a delete can be told
+ * apart from something that has simply never been uploaded.
+ *
+ * Without it the two look identical from here — an attempt present locally and
+ * absent from the table — and the sync below would push a deleted sitting
+ * straight back up, from whichever device still had a copy. That is the reset
+ * bug again: one device deletes, another resurrects. Ids only, and they cost
+ * nothing to keep.
+ */
+const seenInCloudKey = "leea.testAttempts.synced.v1";
+
+function readSeenInCloud(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.localStorage.getItem(seenInCloudKey);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : null;
+    return new Set(Array.isArray(parsed) ? (parsed as string[]) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function writeSeenInCloud(ids: Set<string>) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(seenInCloudKey, JSON.stringify([...ids]));
+  } catch {
+    /* storage full or blocked — the worst case is a delete that needs one more sync */
+  }
+}
+
+/**
+ * Both ways, by id, newest write wins.
+ *
+ * A sitting is a record of something that happened, so an attempt the cloud has
+ * and this browser does not is pulled down. Leo sits a test on his device and
+ * the parent sees the marked paper on the laptop — which is the whole reason
+ * this table exists.
+ *
+ * A local attempt the cloud does *not* have is one of two things, and they are
+ * handled differently: one this browser has never managed to upload goes up,
+ * and one it has seen there before was deleted somewhere else, so it goes from
+ * here too. There is no tombstone column to read, so that memory is the seen
+ * set above.
+ */
+export async function syncTestAttemptsWithCloud(): Promise<boolean> {
+  if (!isSupabaseConfigured || !supabase || typeof window === "undefined") return false;
+  try {
+    const { data, error } = await supabase
+      .from("test_attempts")
+      .select("*")
+      .eq("student_id", "leo");
+    if (error) throw error;
+    reportCloudSyncSuccess("test-attempts");
+
+    const local = readTestAttempts();
+    const merged: TestAttemptMap = { ...local };
+    const toPush: TestAttempt[] = [];
+    const seen = readSeenInCloud();
+
+    const rows = (data ?? []) as TestAttemptRow[];
+    for (const row of rows) {
+      const remote = fromRow(row);
+      const mine = merged[remote.id];
+      if (!mine || mine.updatedAt < remote.updatedAt) merged[remote.id] = remote;
+      else if (mine.updatedAt > remote.updatedAt) toPush.push(mine);
+    }
+
+    const remoteIds = new Set(rows.map((row) => row.id));
+    for (const attempt of Object.values(local)) {
+      if (remoteIds.has(attempt.id)) continue;
+      if (seen.has(attempt.id)) delete merged[attempt.id];
+      else toPush.push(attempt);
+    }
+
+    const changed = JSON.stringify(merged) !== JSON.stringify(local);
+    if (changed) writeTestAttempts(merged);
+    if (toPush.length) {
+      const { error: pushError } = await supabase
+        .from("test_attempts")
+        .upsert(toPush.map(toRow), { onConflict: "id" });
+      if (pushError) throw pushError;
+    }
+    // Everything that is in the table right now — what was already there, and
+    // what this pass just put there — is a delete worth honouring next time.
+    writeSeenInCloud(new Set([...remoteIds, ...toPush.map((attempt) => attempt.id)]));
+    return changed || toPush.length > 0;
+  } catch (error) {
+    console.warn("LEEA Supabase test attempts sync failed", error);
+    reportCloudSyncFailure("test-attempts", error);
+    return false;
+  }
 }
 
 /** Newest first — the order these are read in. */

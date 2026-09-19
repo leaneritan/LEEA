@@ -16,6 +16,7 @@ import {
   deleteTestAttempt,
   readTestAttempts,
   saveTestAttempt,
+  syncTestAttemptsWithCloud,
   type TestAttempt,
   type TestAttemptMap
 } from "@/data/testAttempts";
@@ -155,6 +156,9 @@ export function TestsPage() {
     // reports progress already pulls the cloud copy first; so does this one.
     const learners = tests.map((test) => test.learner).filter((lesson): lesson is Lesson => Boolean(lesson));
     if (learners.length) void syncLearnerProgressWithCloud(learners).then(() => refresh());
+    // And the sittings themselves, which live in their own table: a result Leo
+    // filed on his device is what the parent came to this page to look at.
+    void syncTestAttemptsWithCloud().then(() => refresh());
   }, [refresh, tests]);
 
   const mistakes = useMemo(() => (mounted ? collectMistakes(attempts) : []), [mounted, attempts]);

@@ -83,6 +83,15 @@ So re-running the file is not a migration. Changing an existing table needs an e
 
 The schema was applied when it had only the five English tables. `math_block_progress` and `geography_map_progress` were added to the file later, in the PRs that built those subjects, and nobody re-ran it. For months the app happily wrote Math and Geography progress, every write failed, and each one fell back to localStorage exactly as designed — so nothing errored, nothing looked broken, and all of that progress lived on whichever browser Leo happened to use.
 
+### And it is happening again, with Science
+
+`science_block_progress` is in `supabase/schema.sql` and **was never applied**.
+Checked live on 19 Sep 2026: `to_regclass('public.science_block_progress')` is
+null. Every 理科 tick Leo has earned is on whichever browser he earned it on, and
+nothing about it looks broken, because the fallback is working exactly as
+designed. It needs the same `create table` + `enable row level security` +
+policies run against the live project — and then a row in the table below.
+
 It surfaced only when someone thought to compare the file against the live project:
 
 ```sql
@@ -117,6 +126,7 @@ If the Supabase MCP server is connected, `apply_migration` handles the DDL and `
 | (missing tables) | Created `math_block_progress` and `geography_map_progress`, which had been in the file but never applied — see below. |
 | (geography items) | Added `items jsonb` to `geography_map_progress` for per-item weak-spot history. |
 | `add_reference_confidence_practice_history` | Added `asked`, `correct`, `last_correct`, `last_practiced_at` to `reference_confidence` for the vocabulary practice drill. |
+| `add_test_attempts` | Created `test_attempts`, one row per sitting of a test. |
 
 `list_migrations` on the live project is the authoritative list; add a row here whenever you apply one.
 

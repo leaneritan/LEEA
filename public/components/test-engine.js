@@ -1011,7 +1011,26 @@ function writeAttempt(){
       updatedAt:now
     };
     localStorage.setItem(ATTEMPTS_KEY,JSON.stringify(all));
+    sendAttempt(all[id]);
   }catch(e){}
+}
+
+/**
+ * Hand the sitting to the app so it reaches the `test_attempts` table.
+ *
+ * The attempts store is not under this test's storage prefix, so the cloud
+ * bridge does not mirror it — and waiting for someone to open /tests on THIS
+ * device would mean a test Leo sat on his own never reaching the parent at all.
+ * Debounced, because this runs on every render while the result is open and
+ * again on every answer Neritan marks.
+ */
+var attemptTimer;
+function sendAttempt(attempt){
+  if(window.parent===window)return;             /* opened standalone */
+  clearTimeout(attemptTimer);
+  attemptTimer=setTimeout(function(){
+    try{ parent.postMessage({type:'LEEA_TEST_ATTEMPT',attempt:attempt},'*'); }catch(e){}
+  },500);
 }
 
 /* ── the answer section ─────────────────────────────────────────────── */

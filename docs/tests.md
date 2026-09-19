@@ -86,16 +86,50 @@ a band review track lives in the folder of the unit that *numbers* it (9.3
 reviews Units 7–9 and lives in `unit-9/`), and a sub-lettered track like `9.4a`
 is its own file, not a section of `9.4`.
 
-## 3. Build the learner app
+## 3. Write the questions file
 
-`public/learn/ow-l<level>-t<band>-test.html`, following `public/learn/AGENTS.md`
-and the save/restore contract in `AGENTS.md` like any learner app. What is
-specific to a test:
+**A test is its questions and nothing else.** The engine every test runs on —
+the paper layout, the pages, the clock, the marking, the attempt record — is
+`public/components/test-engine.js`, shared by all of them. A test is a data file
+beside its own pictures, and a shell page that names it:
 
-- **One `TEST` data object at the top, a generic engine below it.** The engine in
-  `ow-l4-t7-9-test.html` knows nothing about Units 7–9 — a new test is a new
-  `TEST` object and nothing else. Grow the engine only when a test needs a
-  question shape it does not have.
+```
+public/tests/our-world/level-4/u9/questions.json   <- the test
+public/tests/our-world/level-4/u9/q01-playground.png
+public/learn/ow-l4-u9-quiz.html                    <- 16 lines
+```
+
+The whole shell:
+
+```html
+<script>window.LEEA_TEST = '/tests/our-world/level-4/u9/questions.json';</script>
+<script src="/components/test-engine.js"></script>
+```
+
+It used to be one self-contained HTML file per test, and the third one made that
+untenable: ~950 of each file's ~1,250 lines were the engine, copied verbatim, so
+every fix had to be applied three times or the copies drifted. The tests are all
+the same activities, so the activities are the engine and the questions are the
+data.
+
+The file's own fields:
+
+| Field | What it is |
+| --- | --- |
+| `id` | the test's short id, used to name a sitting |
+| `lessonId` | the **learner** lesson id — attempts are filed under this |
+| `title` / `shortTitle` | the page title, and the name in the test's own bar |
+| `course` | the line before it in the bar, e.g. `Our World 4` |
+| `storagePrefix` / `homeworkId` | must match the learner lesson JSON exactly |
+| `minutes` | must match the teacher lesson's `assessment.minutes` |
+| `parts[]` | one per section of the paper, in the paper's order |
+
+`scripts/validate-content.mjs` checks every one of those against the lesson
+registry, adds up the questions' points and numbers and compares them with the
+`assessment` block, and fails on a picture path that is relative or missing. All
+three used to be kept by hand in three places at once.
+
+Then, what is specific to a test as a thing Leo sits:
 - **One page per section**, rendered one at a time, with Back / page counter /
   Next along the bottom. Sections map to pages exactly — no question is ever
   split across two pages — so `moduleCount` and `moduleLabels` still line up.
@@ -104,9 +138,29 @@ specific to a test:
   `____` that precedes the question number; a rewrite or a written answer is a
   textarea ruled like the underscores on the sheet. Options print down-then-across
   (a/b in the left column, c/d in the right) the way ExamView lays them out.
-- **Question kinds so far:** `select` (fill the blank from a word bank),
-  `buttons` (pick one), `multi` (pick two), `text` (type it), `writing`,
-  `speaking`.
+- **The six question kinds**, which between them cover every ExamView section
+  seen so far — a unit quiz, a three-unit mastery test and a nine-unit final:
+
+  | `kind` | What it is | Marked by |
+  | --- | --- | --- |
+  | `select` | fill the blank from a word bank | the app |
+  | `buttons` | pick one (a/b/c, T/F, which/who) | the app |
+  | `multi` | pick two, 2/1/0 for both/one/any wrong | the app |
+  | `text` | type it | the app when it matches a key, else Neritan |
+  | `writing` | a paragraph against a rubric | Neritan |
+  | `speaking` | prompts Neritan asks, one tick each | Neritan |
+
+  Part-level flags: `paperN`, `blankFirst`, `labelsOnPicture`, `exact`,
+  `dadMarks`, `bank`, `example`, `track` + `audio`, `passage`, `table`,
+  `image`/`imageAlt` or `images[]`, `caption`.
+
+  A `text` key may be **one string or a list of accepted wordings** — the
+  publisher prints three for "the more he feels dizzy / the more dizzy he feels
+  / the dizzier he feels", and any of them is simply right. Anything else still
+  goes to Neritan rather than being marked wrong, unless the part is `exact`.
+
+  A `writing` part with **two** prompts is a choice (a/b) Leo has to make; with
+  **one** it is just the question, and the page finishes on the text alone.
 - **One part per section of the paper test**, in the paper's order, numbered
   `m1`…`mN` so `moduleCount` / `moduleLabels` in the lesson JSON line up.
 - **No feedback while answering.** No ticks, no crosses, no score until the end.

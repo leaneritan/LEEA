@@ -29,6 +29,9 @@ export function getComponentMeta(component: string): ComponentMeta {
   // The whole-level final sits beside the band tests and shares their tone, but
   // says which one it is — they can cover the same unit.
   if (component.includes("final-test")) return { emoji: "🎓", label: "Final Test", tone: "review" };
+  // A unit's own quiz sits beside its lessons rather than in a checkpoint, so it
+  // says "Quiz" — three assessments can land on the same unit.
+  if (component.includes("quiz")) return { emoji: "📋", label: "Quiz", tone: "review" };
   if (component.includes("test")) return { emoji: "📝", label: "Test", tone: "review" };
   // Mission / Project / Reader apps are all free-play "activity" components —
   // not openers — so they get their own tone/tint instead of borrowing gold.

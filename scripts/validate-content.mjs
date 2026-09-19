@@ -532,7 +532,7 @@ const ASSESSMENT_MINUTES = {
 };
 
 for (const lesson of lessons) {
-  if (lesson.mode !== "teacher" || !["test", "final-test"].includes(lesson.component)) continue;
+  if (lesson.mode !== "teacher" || !["quiz", "test", "final-test"].includes(lesson.component)) continue;
   const meta = lesson.assessment;
   if (!meta) {
     fail(`${lesson.id}: a test lesson needs an "assessment" block (kind, covers, units, minutes, questions, points) — /tests builds its card from it. See docs/tests.md.`);
@@ -550,6 +550,94 @@ for (const lesson of lessons) {
   if (!Array.isArray(meta.units) || meta.units.length === 0) {
     fail(`${lesson.id}: assessment.units must list the units the test covers`);
   }
+}
+
+// A test is now its questions file plus a shell that names it, so the data can
+// be checked against what the lesson JSON claims. These three used to be
+// hand-kept in three places at once — the assessment block, the learner
+// lesson's moduleLabels, and the questions themselves — and nothing noticed
+// when they drifted.
+function readTestData(learner) {
+  const shellPath = path.join(root, "public", learner.source?.embedPath?.replace(/^\//, "") ?? "");
+  if (!fs.existsSync(shellPath)) return null;
+  const shell = fs.readFileSync(shellPath, "utf8");
+  const named = /window\.LEEA_TEST\s*=\s*'([^']+)'/.exec(shell);
+  if (!named) {
+    fail(`${learner.id}: its page does not name a questions file (window.LEEA_TEST = '/tests/...'). See docs/tests.md.`);
+    return null;
+  }
+  const dataPath = path.join(root, "public", named[1].replace(/^\//, ""));
+  if (!fs.existsSync(dataPath)) {
+    fail(`${learner.id}: its page points at ${named[1]}, which does not exist`);
+    return null;
+  }
+  try {
+    return { path: named[1], data: JSON.parse(fs.readFileSync(dataPath, "utf8")) };
+  } catch (error) {
+    fail(`${named[1]}: is not valid JSON — ${error.message}`);
+    return null;
+  }
+}
+
+const PART_KINDS = new Set(["select", "buttons", "multi", "text", "writing", "speaking"]);
+
+for (const teacher of lessons) {
+  if (teacher.mode !== "teacher" || !["quiz", "test", "final-test"].includes(teacher.component)) continue;
+  const learner = lessons.find(
+    (item) =>
+      item.mode === "learner"
+      && item.component === `${teacher.component}-app`
+      && item.course === teacher.course
+      && item.level === teacher.level
+      && item.unit === teacher.unit
+  );
+  if (!learner) continue;                 // the learner-pairing rule above reports this
+  const found = readTestData(learner);
+  if (!found) continue;
+  const { path: dataPath, data } = found;
+  const where = (message) => fail(`${dataPath}: ${message}`);
+
+  // The app and the registry have to agree about where the sitting is stored,
+  // or the teacher card reads one place while the test writes another.
+  if (data.storagePrefix !== learner.source.storagePrefix)
+    where(`storagePrefix is "${data.storagePrefix}" but ${learner.id} says "${learner.source.storagePrefix}"`);
+  if (data.homeworkId !== learner.source.homeworkId)
+    where(`homeworkId is "${data.homeworkId}" but ${learner.id} says "${learner.source.homeworkId}"`);
+  if (data.lessonId !== learner.id)
+    where(`lessonId is "${data.lessonId}" but the learner lesson is "${learner.id}" — attempts are filed under this`);
+
+  const parts = Array.isArray(data.parts) ? data.parts : [];
+  if (!parts.length) where("has no parts");
+  if (parts.length !== learner.source.moduleCount)
+    where(`has ${parts.length} parts but ${learner.id} says moduleCount ${learner.source.moduleCount}`);
+  const labels = learner.source.moduleLabels ?? [];
+  parts.forEach((part, index) => {
+    if (!PART_KINDS.has(part.kind)) where(`part ${index + 1} has kind "${part.kind}", which the engine does not render`);
+    if (labels[index] !== undefined && labels[index] !== part.name)
+      where(`part ${index + 1} is "${part.name}" but ${learner.id} labels it "${labels[index]}"`);
+    // Every picture is referenced absolutely, because a learner app renders
+    // from srcdoc against a <base href> at the site root.
+    const pictures = part.images ?? (part.image ? [{ src: part.image }] : []);
+    for (const picture of pictures) {
+      if (!picture.src.startsWith("/")) where(`part ${index + 1} has a relative picture path "${picture.src}"`);
+      else if (!fs.existsSync(path.join(root, "public", picture.src.replace(/^\//, ""))))
+        where(`part ${index + 1} points at a picture that is not in the repo: ${picture.src}`);
+    }
+  });
+
+  const points = parts.reduce((sum, part) => sum + (part.questions ? part.questions.length * part.pts : part.pts), 0);
+  const numbers = new Set();
+  for (const part of parts) {
+    if (part.questions) for (const question of part.questions) numbers.add(String(question.n).split(".")[0]);
+    else numbers.add(String(part.n));
+  }
+  const meta = teacher.assessment ?? {};
+  if (meta.points !== undefined && points !== meta.points)
+    where(`the questions add up to ${points} points but ${teacher.id} claims ${meta.points}`);
+  if (meta.questions !== undefined && numbers.size !== meta.questions)
+    where(`the questions cover ${numbers.size} numbers but ${teacher.id} claims ${meta.questions}`);
+  if (data.minutes !== meta.minutes)
+    where(`allows ${data.minutes} minutes but ${teacher.id} claims ${meta.minutes}`);
 }
 
 // Orphan deck check: every ow-l*-u*-*.html in public/lessons/ must have a .teacher.json

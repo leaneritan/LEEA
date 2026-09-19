@@ -60,6 +60,18 @@ public/tests/our-world/level-4/t7-9/q42-town-park.png
 Learner apps are embedded with `srcdoc` and a `<base href>` pointing at the site
 root, so reference them **absolutely** (`/tests/…`), never relatively.
 
+**One picture in the Units 1–9 export came out with a seam across it**, and the
+extractor now undoes it. Word fits a picture to its frame by duplicating a band
+of pixels at the exact middle rather than resampling, so the photo arrives with a
+strip of repeated scanlines across the centre and a matching strip of repeated
+columns down it. `unstretch()` drops them — every removed line is byte-identical
+to the one before it, so the original bitmap comes back exactly (540x289 became
+531x280). The test is narrow on purpose: a short run of identical lines, centred
+on *both* axes at once. A photo can easily have one flat band; two, both
+straddling the middle, is the stretch and nothing else. The run prints
+`(un-stretched: dropped N duplicate rows, M columns)` so it is never silent, and
+the Units 7–9 pictures still extract byte-for-byte identically.
+
 ## 2. Check the audio is filed
 
 Test audio is already handled — see **Assessment Audio** in `AGENTS.md`. Find the
@@ -268,7 +280,8 @@ three-unit band, not inside the last unit. So:
 
 - lesson JSON goes in `…/level-<n>/checkpoint-<band>/lessons/`, as
   `test.teacher.json` and `test-app.learner.json`, carrying `unit:` = the band's
-  last unit
+  last unit. A **new checkpoint folder must also be added to `lessonsDirs`** in
+  `scripts/validate-content.mjs`, or nothing in it is validated.
 - the teacher JSON carries an **`assessment` block** — `kind`, `covers`, `units`,
   `minutes`, `questions`, `points`. `/tests` builds its card from this, and the
   validator requires it:
@@ -281,21 +294,57 @@ three-unit band, not inside the last unit. So:
   ```
 
 - import both in `src/data/lessons.ts` and add them to the `lessons` array
-- `test` is already in `componentOrder`, `CHECKPOINT_COMPONENTS`,
-  `checkpointComponents` (TeacherDashboard) and `getComponentMeta`
+- `test` and `final-test` are already in `componentOrder`,
+  `CHECKPOINT_COMPONENTS`, `TEST_COMPONENTS`, `checkpointComponents`
+  (TeacherDashboard) and `getComponentMeta`
+
+**A band test is `test`; a whole-level final is `final-test`.** They are two
+components rather than one because a level's final covers the same band-end unit
+as its last mastery test — Level 4 has both at Unit 9 — and everything that pairs
+a teacher lesson with Leo's app pairs by component. One shared component would
+have pointed both teacher cards at the same app. The final's folder is named for
+what it covers: `checkpoint-1-9/`, with `final-test.teacher.json` and
+`final-test-app.learner.json`.
 
 Nothing needs adding to `/tests` itself: `src/components/TestsPage.tsx` derives
-the shelf from the lesson registry, pairing each teacher `test` with its learner
-`test-app`, and filters by level. A new test appears the moment it is registered.
+the shelf from the lesson registry, pairing each teacher test with the learner
+`<component>-app` in the same course, level and unit, and filters by level. A new
+test appears the moment it is registered.
 Results come from `getAssessmentResult(source)` in `src/data/learnerProgress.ts`,
 which reads the marks (not the percent) and what is still waiting on Neritan.
 
 Then run the usual chain: `npm run validate:content`, `npm run typecheck`,
 `npm run build`.
 
-## The Units 7–9 test, as a worked example
+## The two Level 4 tests, as worked examples
 
-80 points over 13 parts and 42 questions. 56 mark themselves; 24 are Neritan's
-(Q36–37 sentences, Q41 writing, Q42 speaking). By skill: vocabulary 30, grammar
-18, reading 12, listening 4, writing 10, speaking 10. Audio TR 9.3, 9.4 and 9.4a;
-pictures on Q1 and Q42.
+**Units 7–9 mastery test.** 80 points over 13 parts and 42 questions. 56 mark
+themselves; 24 are Neritan's (Q36–37 sentences, Q41 writing, Q42 speaking). By
+skill: vocabulary 30, grammar 18, reading 12, listening 4, writing 10, speaking
+10. Audio TR 9.3, 9.4 and 9.4a; pictures on Q1 and Q42.
+
+**Units 1–9 final test.** 80 points over 13 parts and 49 questions, 35 minutes.
+47 mark themselves; 33 are Neritan's (Q8–10, Q37–39 and Q46–47 sentences, Q48
+writing, Q49 speaking). By skill: vocabulary 18, grammar 17, reading 19,
+listening 6, writing 10, speaking 10 — the publisher files Q46–47 under reading
+even though they are heard, because they test *than*. Audio TR 9.5 (Q1) and TR
+9.6 (Q40–47); pictures on Q1, Q48 (two) and Q49.
+
+It added three things to the shared engine, all of them in both test files so the
+two stay identical below the ENGINE line:
+
+- **`exact: true`** on a part. A typed answer normally goes to Neritan when it
+  does not match the key, because a rewrite can be right in words the key did not
+  predict. A number heard on a track cannot be: 265 is 265. An `exact` part marks
+  itself either way, and its answers get one ruled line instead of two.
+- **`table: { head, rows }`** — a table the paper prints beside its questions,
+  reproduced as one in the reference pane. Q40–45 fill the soccer-and-baseball
+  table, so the table has to stay on screen while they are answered.
+- **`images: [{ src, alt }]`** — several pictures in the reference pane.
+  `image`/`imageAlt` is still the one-picture shorthand. Q48 compares a dolphin
+  and a shark, so it needs both at once.
+
+And one flag that replaced a heuristic: **`labelsOnPicture: true`** says a bank of
+single letters is printed on the picture rather than being a word box. It used to
+be guessed from "the bank is short and its first entry is one character long",
+which broke the moment a bank ran A–J instead of A–G.

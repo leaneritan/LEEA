@@ -87,6 +87,11 @@ const checkpointComponents = [
     component: "test",
     title: "Test",
     subtitle: "ExamView band test — answer key, rubric and speaking script."
+  },
+  {
+    component: "final-test",
+    title: "Final Test",
+    subtitle: "ExamView whole-level final — answer key, rubric and speaking script."
   }
 ];
 

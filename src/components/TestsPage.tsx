@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { lessons } from "@/data/lessons";
+import { isTestComponent, lessons } from "@/data/lessons";
 import { getLearnerAppProgress } from "@/data/learnerProgress";
 import {
   attemptsForTest,
@@ -16,10 +16,10 @@ import {
 } from "@/data/testAttempts";
 import type { Lesson } from "@/data/types";
 
-// A test is a teacher lesson with component "test" (the answer key, the speaking
-// script, the rubric) paired with the learner "test-app" Leo actually sits. The
-// list is derived from the lesson registry rather than kept by hand, so a new
-// test appears here the moment it is registered.
+// A test is a teacher lesson with a test component (the answer key, the speaking
+// script, the rubric) paired with the learner "-app" Leo actually sits. The list
+// is derived from the lesson registry rather than kept by hand, so a new test
+// appears here the moment it is registered.
 type TestPair = { teacher: Lesson; learner?: Lesson };
 
 const KIND_LABEL: Record<string, string> = {
@@ -44,13 +44,20 @@ function testName(teacher: Lesson) {
 }
 
 function buildTestList(): TestPair[] {
-  const learners = lessons.filter((lesson) => lesson.mode === "learner" && lesson.component === "test-app");
+  const learners = lessons.filter((lesson) => lesson.mode === "learner" && isTestComponent(lesson.component));
   return lessons
-    .filter((lesson) => lesson.mode === "teacher" && lesson.component === "test")
+    .filter((lesson) => lesson.mode === "teacher" && isTestComponent(lesson.component))
     .map((teacher) => ({
       teacher,
+      // By component as well as by unit: a level's final and its last mastery
+      // test both sit at the band-end unit, so unit alone would pair the final's
+      // card with the mastery test's app.
       learner: learners.find(
-        (item) => item.course === teacher.course && item.level === teacher.level && item.unit === teacher.unit
+        (item) =>
+          item.component === `${teacher.component}-app` &&
+          item.course === teacher.course &&
+          item.level === teacher.level &&
+          item.unit === teacher.unit
       )
     }))
     .sort((a, b) => {
@@ -502,7 +509,7 @@ function OtherPaperTests({
   const [title, setTitle] = useState("");
 
   const known = new Set(
-    lessons.filter((lesson) => lesson.component === "test-app" || lesson.component === "test").map((lesson) => lesson.id)
+    lessons.filter((lesson) => isTestComponent(lesson.component)).map((lesson) => lesson.id)
   );
   const loose: TestAttempt[] = mounted
     ? Object.values(attempts)

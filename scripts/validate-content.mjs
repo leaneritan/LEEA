@@ -471,6 +471,7 @@ const lessonsDirs = [
   "content/subjects/english/courses/our-world/level-5/unit-1/lessons",
   // Checkpoint lessons after each three-unit band live beside the units, not inside them.
   "content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons",
+  "content/subjects/english/courses/our-world/level-4/checkpoint-1-9/lessons",
   "content/subjects/english/courses/special-training/lessons",
 ];
 const lessons = [];
@@ -531,7 +532,7 @@ const ASSESSMENT_MINUTES = {
 };
 
 for (const lesson of lessons) {
-  if (lesson.mode !== "teacher" || lesson.component !== "test") continue;
+  if (lesson.mode !== "teacher" || !["test", "final-test"].includes(lesson.component)) continue;
   const meta = lesson.assessment;
   if (!meta) {
     fail(`${lesson.id}: a test lesson needs an "assessment" block (kind, covers, units, minutes, questions, points) — /tests builds its card from it. See docs/tests.md.`);

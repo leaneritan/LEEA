@@ -129,6 +129,63 @@ function findDib(buf) {
   return null;
 }
 
+/**
+ * Undo a centre-stretch.
+ *
+ * Word (and so ExamView's export) sometimes fits a picture to its frame by
+ * duplicating one band of pixels at the exact middle of the image rather than
+ * resampling it — the photo comes out with a visible seam, a strip of repeated
+ * scanlines across the centre and a matching strip of repeated columns down it.
+ * Dropping those duplicates restores the original bitmap exactly, because every
+ * removed line is byte-identical to the one before it.
+ *
+ * The test is deliberately narrow: a run of identical lines, short, centred on
+ * both axes at once. A photo can easily have one flat band (a sky, the white
+ * gutter between two pictures) — having one on each axis, both straddling the
+ * middle, is the stretch and nothing else. Picture 1 of the Level 4 final test
+ * has centred duplicate columns from its white gutters and is left alone,
+ * because its duplicate rows sit nowhere near the middle.
+ */
+function centreRun(lineAt, count, limit) {
+  let start = 0;
+  for (let i = 1; i <= count; i++) {
+    if (i < count && lineAt(i).equals(lineAt(i - 1))) continue;
+    if (i - start > 1) {
+      const run = { from: start, to: i - 1 };
+      const middle = (run.from + run.to) / 2;
+      if (Math.abs(middle - (count - 1) / 2) <= 1 && run.to - run.from < limit) return run;
+    }
+    start = i;
+  }
+  return null;
+}
+
+/** Rows as buffers, top-down, one index or RGB triple per pixel. */
+function unstretch(rows, width, pixelSize) {
+  const height = rows.length;
+  const rowRun = centreRun((y) => rows[y], height, height / 8);
+  const column = (x) => {
+    const out = Buffer.alloc(height * pixelSize);
+    for (let y = 0; y < height; y++) rows[y].copy(out, y * pixelSize, x * pixelSize, (x + 1) * pixelSize);
+    return out;
+  };
+  const columns = [];
+  for (let x = 0; x < width; x++) columns.push(column(x));
+  const colRun = centreRun((x) => columns[x], width, width / 8);
+  if (!rowRun || !colRun) return null;
+
+  const keepColumns = [];
+  for (let x = 0; x < width; x++) if (x <= colRun.from || x > colRun.to) keepColumns.push(x);
+  const kept = [];
+  for (let y = 0; y < height; y++) {
+    if (y > rowRun.from && y <= rowRun.to) continue;
+    const row = Buffer.alloc(keepColumns.length * pixelSize);
+    keepColumns.forEach((x, i) => rows[y].copy(row, i * pixelSize, x * pixelSize, (x + 1) * pixelSize));
+    kept.push(row);
+  }
+  return { rows: kept, width: keepColumns.length, dropped: { rows: rowRun.to - rowRun.from, columns: colRun.to - colRun.from } };
+}
+
 function pngChunk(type, data) {
   const head = Buffer.alloc(8);
   head.writeUInt32BE(data.length, 0);
@@ -160,7 +217,8 @@ function crc32(buf) {
  * bottom-up and padded to 4 bytes; BGR order becomes RGB.
  */
 function dibToPng(buf, dib) {
-  const { at, width, bpp, colors } = dib;
+  const { at, bpp, colors } = dib;
+  let width = dib.width;
   const bottomUp = dib.height > 0;
   const height = Math.abs(dib.height);
   const paletteAt = at + 40;
@@ -168,30 +226,52 @@ function dibToPng(buf, dib) {
   const srcStride = Math.ceil((width * bpp) / 32) * 4;
 
   const indexed = bpp <= 8;
-  const channels = indexed ? 1 : 3;
-  const dstStride = indexed ? Math.ceil((width * bpp) / 8) : width * 3;
+  const pixelSize = indexed ? 1 : 3;
 
-  const raw = Buffer.alloc((dstStride + 1) * height);
+  // Top-down rows, one byte per index or three per pixel.
+  let rows = [];
   for (let y = 0; y < height; y++) {
     const srcRow = pixelsAt + (bottomUp ? height - 1 - y : y) * srcStride;
-    const dstRow = y * (dstStride + 1);
-    raw[dstRow] = 0; // filter: none
-    if (indexed) {
-      buf.copy(raw, dstRow + 1, srcRow, srcRow + dstStride);
-    } else {
-      const step = bpp / 8;
-      for (let x = 0; x < width; x++) {
-        raw[dstRow + 1 + x * 3 + 0] = buf[srcRow + x * step + 2];
-        raw[dstRow + 1 + x * 3 + 1] = buf[srcRow + x * step + 1];
-        raw[dstRow + 1 + x * 3 + 2] = buf[srcRow + x * step + 0];
+    if (bpp < 8) {
+      const packed = Math.ceil((width * bpp) / 8);
+      rows.push(Buffer.from(buf.subarray(srcRow, srcRow + packed)));
+      continue;
+    }
+    const row = Buffer.alloc(width * pixelSize);
+    for (let x = 0; x < width; x++) {
+      if (indexed) row[x] = buf[srcRow + x];
+      else {
+        const step = bpp / 8;
+        row[x * 3 + 0] = buf[srcRow + x * step + 2];
+        row[x * 3 + 1] = buf[srcRow + x * step + 1];
+        row[x * 3 + 2] = buf[srcRow + x * step + 0];
       }
+    }
+    rows.push(row);
+  }
+
+  let note = "";
+  if (bpp >= 8) {
+    const fixed = unstretch(rows, width, pixelSize);
+    if (fixed) {
+      rows = fixed.rows;
+      width = fixed.width;
+      note = `  (un-stretched: dropped ${fixed.dropped.rows} duplicate rows, ${fixed.dropped.columns} columns)`;
     }
   }
 
+  const dstStride = bpp < 8 ? Math.ceil((width * bpp) / 8) : width * pixelSize;
+  const raw = Buffer.alloc((dstStride + 1) * rows.length);
+  rows.forEach((row, y) => {
+    const dstRow = y * (dstStride + 1);
+    raw[dstRow] = 0; // filter: none
+    row.copy(raw, dstRow + 1);
+  });
+
   const ihdr = Buffer.alloc(13);
   ihdr.writeUInt32BE(width, 0);
-  ihdr.writeUInt32BE(height, 4);
-  ihdr[8] = bpp;                       // bit depth
+  ihdr.writeUInt32BE(rows.length, 4);
+  ihdr[8] = indexed ? bpp : 8;         // bit depth
   ihdr[9] = indexed ? 3 : 2;           // colour type: 3 indexed, 2 truecolour
   const chunks = [pngChunk("IHDR", ihdr)];
 
@@ -207,8 +287,12 @@ function dibToPng(buf, dib) {
 
   chunks.push(pngChunk("IDAT", zlib.deflateSync(raw, { level: 9 })));
   chunks.push(pngChunk("IEND", Buffer.alloc(0)));
-  void channels;
-  return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), ...chunks]);
+  return {
+    png: Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), ...chunks]),
+    width,
+    height: rows.length,
+    note
+  };
 }
 
 // ------------------------------------------------------------------- CLI
@@ -248,8 +332,9 @@ pictures.forEach((picture, i) => {
     return;
   }
   const pngPath = path.join(outDir, `${slug}-p${i + 1}.png`);
-  fs.writeFileSync(pngPath, dibToPng(picture, dib));
-  console.log(`image  ${pngPath}  ${dib.width}x${Math.abs(dib.height)}  ${dib.bpp}-bit`);
+  const out = dibToPng(picture, dib);
+  fs.writeFileSync(pngPath, out.png);
+  console.log(`image  ${pngPath}  ${out.width}x${out.height}  ${dib.bpp}-bit${out.note}`);
 });
 
 if (pictures.length === 0) console.log("image  none found");

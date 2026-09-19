@@ -69,6 +69,10 @@ import checkpoint79ExtraReading from "../../content/subjects/english/courses/our
 import checkpoint79ExtraReadingLearner from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/extra-reading-app.learner.json";
 import checkpoint79Test from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/test.teacher.json";
 import checkpoint79TestLearner from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/test-app.learner.json";
+// The whole-level final covers Units 1-9, so it has its own checkpoint folder and
+// its own component — it carries `unit: 9` for the same reason the band does.
+import checkpoint19Test from "../../content/subjects/english/courses/our-world/level-4/checkpoint-1-9/lessons/final-test.teacher.json";
+import checkpoint19TestLearner from "../../content/subjects/english/courses/our-world/level-4/checkpoint-1-9/lessons/final-test-app.learner.json";
 import unit8Opener from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.teacher.json";
 import unit8OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/opener.learner.json";
 import unit8Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-8/lessons/vocab1.teacher.json";
@@ -128,7 +132,8 @@ const componentOrder = [
   "book-reading",
   "extra-reading",
   "review",
-  "test"
+  "test",
+  "final-test"
 ];
 
 function componentOrderIndex(component: string) {
@@ -252,7 +257,9 @@ export const lessons: Lesson[] = [
   level5Unit1Opener as Lesson,
   level5Unit1OpenerLearner as Lesson,
   checkpoint79Test as Lesson,
-  checkpoint79TestLearner as Lesson
+  checkpoint79TestLearner as Lesson,
+  checkpoint19Test as Lesson,
+  checkpoint19TestLearner as Lesson
 ].sort(compareLessonOrder);
 export const teacherLessons = lessons.filter((lesson) => lesson.mode === "teacher");
 export const learnerLessons = lessons.filter((lesson) => lesson.mode === "learner");
@@ -270,10 +277,24 @@ export type LessonGroup = {
 // Their lesson records carry the band's last unit number (3, 6, 9) so they can be
 // found from that unit, but every surface must show them as checkpoint material,
 // never as an ordinary lesson of that unit.
-export const CHECKPOINT_COMPONENTS = ["review", "extra-reading", "test"];
+export const CHECKPOINT_COMPONENTS = ["review", "extra-reading", "test", "final-test"];
 
 export function isCheckpointComponent(component: string) {
   return CHECKPOINT_COMPONENTS.includes(component.replace(/-app$/, ""));
+}
+
+/**
+ * The components that are a test Leo sits: the three-unit band tests and the
+ * whole-level final. They are separate components rather than one, because a
+ * level's final covers the same band-end unit as its last mastery test — two
+ * lessons at Level 4 Unit 9 — and everything that pairs a teacher lesson with
+ * Leo's app pairs by component. One shared "test" component would have made
+ * both teacher cards point at the same app.
+ */
+export const TEST_COMPONENTS = ["test", "final-test"];
+
+export function isTestComponent(component: string) {
+  return TEST_COMPONENTS.includes(component.replace(/-app$/, ""));
 }
 
 export function getLessonById(id: string) {

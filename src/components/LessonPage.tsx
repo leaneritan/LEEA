@@ -12,6 +12,7 @@ import {
   type LearnerProgressStorageRow
 } from "@/data/learnerProgress";
 import { getCourseLabel } from "@/data/lessons";
+import { pushTestAttempt, type TestAttempt } from "@/data/testAttempts";
 import type { Lesson } from "@/data/types";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
@@ -63,6 +64,7 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
         | { type: "LEEA_CLOUD_SAVE"; homeworkId?: string; key?: string; value?: unknown }
         | { type: "LEEA_CLOUD_CLEAR"; homeworkId?: string; keys?: string[]; all?: boolean }
         | { type: "LEEA_CLOUD_FETCH"; homeworkId?: string; requestId?: string }
+        | { type: "LEEA_TEST_ATTEMPT"; attempt?: TestAttempt }
         | undefined;
 
       if (!message || typeof message !== "object") return;
@@ -79,6 +81,13 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
       if (message.type === "LEEA_CLOUD_CLEAR" && Array.isArray(message.keys)) {
         if (message.all) await clearLearnerProgressCloud(lesson);
         else await clearLearnerProgressValues(lesson, message.keys);
+      }
+
+      // A sitting of a test. It lives in its own table rather than in this
+      // homework's raw_progress, because a result is a dated record of its own
+      // and a retake must leave the last one standing.
+      if (message.type === "LEEA_TEST_ATTEMPT" && message.attempt?.id) {
+        await pushTestAttempt(message.attempt);
       }
 
       if (message.type === "LEEA_CLOUD_FETCH" && message.requestId) {

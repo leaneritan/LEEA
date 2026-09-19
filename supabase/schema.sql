@@ -112,6 +112,40 @@ create table if not exists public.science_block_progress (
   unique (student_id, section_id, block_id)
 );
 
+-- Every sitting of a test, kept as its own dated row.
+--
+-- A test used to store one score, so retaking it overwrote what came before and
+-- a paper test had nowhere to live at all. The sitting is the unit instead: one
+-- row per sitting, whether Leo took it in the app or on paper, so the same test
+-- sat in March and again in June leaves two records. There is deliberately NO
+-- unique constraint on (student_id, test_id) — that is the whole point.
+create table if not exists public.test_attempts (
+  id text primary key,
+  student_id text not null references public.students(id) on delete cascade,
+  -- The learner lesson id, e.g. "ow-l4-u9-quiz-app", or "paper:<slug>" for a
+  -- paper test that has no digital version.
+  test_id text not null,
+  test_title text not null,
+  medium text not null check (medium in ('app', 'paper')),
+  taken_at timestamptz not null,
+  score integer not null default 0,
+  total integer not null default 0,
+  percent integer not null default 0,
+  duration_sec integer,
+  -- One entry per question as the paper numbers them: n, part, state, got, max,
+  -- question, given, answer and any options. Self-contained on purpose, so the
+  -- mistakes drill can rebuild a question from the row alone and never needs the
+  -- test file. `state` may be 'pending' — an open response Neritan has not marked
+  -- yet, which is never counted as a mistake.
+  questions jsonb not null default '[]'::jsonb,
+  note text not null default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists test_attempts_student_test_idx
+  on public.test_attempts (student_id, test_id, taken_at desc);
+
 create table if not exists public.reference_confidence (
   id text primary key,
   student_id text not null references public.students(id) on delete cascade,
@@ -238,6 +272,7 @@ alter table public.reference_confidence enable row level security;
 alter table public.math_block_progress enable row level security;
 alter table public.science_block_progress enable row level security;
 alter table public.geography_map_progress enable row level security;
+alter table public.test_attempts enable row level security;
 
 drop policy if exists "family can read students" on public.students;
 create policy "family can read students"
@@ -329,5 +364,16 @@ using (student_id = 'leo');
 drop policy if exists "family can write science block progress" on public.science_block_progress;
 create policy "family can write science block progress"
 on public.science_block_progress for all
+using (student_id = 'leo')
+with check (student_id = 'leo');
+
+drop policy if exists "family can read test attempts" on public.test_attempts;
+create policy "family can read test attempts"
+on public.test_attempts for select
+using (student_id = 'leo');
+
+drop policy if exists "family can write test attempts" on public.test_attempts;
+create policy "family can write test attempts"
+on public.test_attempts for all
 using (student_id = 'leo')
 with check (student_id = 'leo');

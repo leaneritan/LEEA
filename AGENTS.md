@@ -813,10 +813,22 @@ question's options, so the drill rebuilds a question from the record alone and
 never needs the test file. Drill results live in their own store —
 getting something right in practice must never rewrite what he scored on the day.
 
-The attempts store is **local-only and has no Supabase table yet**, deliberately:
-golden rule 11a says a schema change is not done until it is applied, and it
-could not be applied when this was built. The field names are the columns it
-will become.
+**Attempts sync through the `test_attempts` table**, one row per sitting, applied
+live. Leo sits a test on his own device and Neritan marks it on the laptop, so a
+result that stayed in one browser was only half a record. The test app posts its
+own sitting out of the frame (`LEEA_TEST_ATTEMPT`, handled in `LessonPage`)
+rather than waiting for someone to open `/tests` on that device — the attempts
+store sits outside the app's storage prefix, so the cloud bridge does not mirror
+it. There is deliberately **no unique constraint on (student_id, test_id)**: the
+sitting is the unit, so the same test sat twice is two rows.
+
+**A deleted sitting must stay deleted.** There is no tombstone column, so from
+another device a deleted attempt and one that has never been uploaded look
+identical — both are local and absent from the table. `leea.testAttempts.synced.v1`
+is the difference: ids this browser has seen in the table, so an attempt missing
+from it now was deleted somewhere else and goes, while one it has never seen
+goes up. Without that memory the other device pushes the deletion straight back,
+which is the reset bug wearing a different hat.
 
 Tests are **checkpoint material**: they live in `checkpoint-<band>/lessons/`
 beside review and extra reading, carry the band's last unit number, and are

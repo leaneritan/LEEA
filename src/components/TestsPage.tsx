@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { isTestComponent, lessons } from "@/data/lessons";
-import { getLearnerAppProgress } from "@/data/learnerProgress";
+import { clearLearnerProgressCloud, getLearnerAppProgress } from "@/data/learnerProgress";
 import {
   attemptsForTest,
   collectMistakes,
@@ -114,7 +114,7 @@ function hasSitting(learner: Lesson) {
  * touched: they live under their own key precisely so a retake cannot erase
  * what he scored last time.
  */
-function clearSitting(learner: Lesson) {
+async function clearSitting(learner: Lesson) {
   const prefix = learner.source.storagePrefix;
   if (!prefix || typeof window === "undefined") return;
   try {
@@ -136,6 +136,12 @@ function clearSitting(learner: Lesson) {
   } catch {
     /* ignore */
   }
+
+  // And the cloud copy, which is the one that actually undid this. Clearing
+  // runs out here in the app, not inside the learner app's frame, so nothing
+  // was telling Supabase — the row stayed whole, and the next page that synced
+  // hydrated every answer and the old clock straight back into localStorage.
+  await clearLearnerProgressCloud(learner);
 }
 
 export function TestsPage() {
@@ -328,7 +334,7 @@ export function TestsPage() {
                     className={`tests-btn quiet${resetArmed === testId ? " armed" : ""}`}
                     onClick={() => {
                       if (resetArmed === testId) {
-                        clearSitting(learner);
+                        void clearSitting(learner).then(refresh);
                         setResetArmed(null);
                         setCleared(testId);
                         window.setTimeout(() => setCleared((cur) => (cur === testId ? null : cur)), 4000);

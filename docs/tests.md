@@ -200,6 +200,30 @@ review entry all read from it, so they cannot drift apart.
 `Take the test again` at the foot of the result clears everything — answers,
 marks, clock — behind a two-tap confirm.
 
+### Clearing a sitting
+
+**A wipe is one cloud write, never one per key.** Every `localStorage` write
+inside a learner app is mirrored to Supabase by the bridge in `LessonPage.tsx`,
+and each mirror is a read-modify-write of that homework's whole `raw_progress`
+object. Clearing a page drops a dozen keys and a retake drops thirty, so those
+writes all read the same starting state and put back what the others had just
+removed. The answers survived in the cloud, the next page that called
+`syncLearnerProgressWithCloud` hydrated them into localStorage, and the cleared
+work came back with the old clock still on it.
+
+Two things stop that, and new code needs both:
+
+- `LEEA_CLOUD.clearProgress(keys)` — the app sends one `LEEA_CLOUD_CLEAR`
+  message for the whole wipe (`lDropAll` in the test files), removing the keys
+  locally through the *unpatched* `removeItem` so no per-key messages also fire.
+- Cloud writes queue per homework id in `learnerProgress.ts`, so two of them can
+  never interleave even when something else sends them one at a time.
+
+Clearing from **outside** the learner frame needs saying out loud: `/tests` runs
+in the app, not in the iframe, so its "Clear the sitting" calls
+`clearLearnerProgressCloud` itself. Wiping only localStorage there left the
+cloud row whole and the sitting came straight back on the next sync.
+
 ### Sittings, paper results and mistakes
 
 A finished test files a **dated attempt** rather than overwriting a score. The
@@ -257,6 +281,12 @@ How the clock behaves, and why:
 - **At zero it says so and keeps counting**, in red, as overtime. Nothing locks.
   A half-written sentence is never thrown away, and whether to stop is Neritan's
   call, not the app's.
+- **It stops when the result is opened.** That is the end of the sitting, so the
+  pill switches from "34:56 left" to "0:04 taken", and tapping it no longer
+  pauses or restarts anything — only a retake starts a new clock. It used to
+  keep counting while Neritan marked, which read as a test still running and
+  quietly inflated what the sitting recorded, because the attempt is rewritten
+  on every mark.
 - **The time taken is recorded** into the score record (`timeTakenSec`) and shown
   on the Answer Section and on `/tests`.
 

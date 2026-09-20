@@ -746,6 +746,14 @@ be matched by something he would not accept. The Level 4 final proved the point
 twice over: `exact` marks a listening number wrong the moment Leo writes *two
 hundred sixty five* instead of *265*, and the paper shows that answer ticked.
 
+**The marking lives in the test app, and only there.** `markOne` is the one
+thing that decides right or wrong for the total, the tick and the review alike,
+so a second place to set a mark would be a second truth. `/tests/report/` links
+to it instead — it says how many written answers are still waiting and opens the
+test — and the Answer Section that holds the marking stays locked until every
+page is finished, the speaking page included. That lock is deliberate, and it is
+also why the marking can look missing: run the speaking with Leo first.
+
 **A `pending` answer is never a mistake and must never look like one.** It is an
 answer nobody has judged yet, so it is not counted among the questions to go
 over, and the section it sits in says how many are still to mark rather than

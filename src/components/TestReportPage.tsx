@@ -220,7 +220,7 @@ export function TestReportPage({ attemptId }: { attemptId: string }) {
           {rubricQuestion.given ? (
             <blockquote className="rep-wrote">{rubricQuestion.given}</blockquote>
           ) : null}
-          <RubricTable rows={rubricQuestion.rubric} />
+          <RubricTable question={rubricQuestion} rows={rubricQuestion.rubric} />
           {rubricQuestion.comment ? <p className="rep-note">{rubricQuestion.comment}</p> : null}
         </>
       ) : null}
@@ -310,10 +310,20 @@ function QuestionDetail({ question }: { question: TestAttemptQuestion }) {
   );
 }
 
-function RubricTable({ rows }: { rows: AttemptRubricRow[] }) {
+function RubricTable({
+  question,
+  rows
+}: {
+  question: TestAttemptQuestion;
+  rows: AttemptRubricRow[];
+}) {
   const got = rows.reduce((sum, row) => sum + (row.score ?? 0), 0);
   const max = rows.reduce((sum, row) => sum + row.max, 0);
   const waiting = rows.filter((row) => row.score === null).length;
+  /* The rubric is one instrument; the question is worth what the publisher says.
+     They match on a band test and differ on a unit quiz, where a rubric out of
+     ten counts for the five points the paper allows. */
+  const scaled = Math.abs(max - question.max) > 0.001;
   return (
     <table className="rep-rubric">
       <thead>
@@ -351,6 +361,10 @@ function RubricTable({ rows }: { rows: AttemptRubricRow[] }) {
             {waiting ? (
               <span className="rep-tomark">
                 {waiting} {waiting === 1 ? "criterion is" : "criteria are"} still to mark.
+              </span>
+            ) : scaled ? (
+              <span className="rep-clean">
+                counts {trim(question.got)} / {trim(question.max)} on the test
               </span>
             ) : null}
           </td>

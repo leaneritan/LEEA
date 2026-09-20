@@ -573,8 +573,12 @@ function checkEvaluationsIn(dir) {
       if (q.rubric) {
         const rGot = q.rubric.reduce((sum, row) => sum + (row.score || 0), 0);
         const rMax = q.rubric.reduce((sum, row) => sum + (row.max || 0), 0);
-        if (rGot !== q.got) fail(`${where}: Q${q.n} scored ${q.got} but its rubric adds up to ${rGot}`);
-        if (rMax !== q.max) fail(`${where}: Q${q.n} is out of ${q.max} but its rubric adds up to ${rMax}`);
+        // A rubric may be scored out of its own total and count for the
+        // question's points — the same grid marks a five-point writing and a
+        // ten-point one. So it has to agree with the question after scaling.
+        const counts = rMax ? Math.round((rGot / rMax) * q.max * 100) / 100 : 0;
+        if (Math.abs(counts - q.got) > 0.011)
+          fail(`${where}: Q${q.n} scored ${q.got} but its rubric of ${rGot} / ${rMax} counts ${counts}`);
       }
     }
   }
@@ -709,11 +713,18 @@ for (const teacher of lessons) {
     if (part.kind === "writing") {
       const rubric = Array.isArray(part.rubric) ? part.rubric : [];
       if (!rubric.length) where(`part ${index + 1} is a writing part with no rubric to mark it against`);
-      const weights = rubric.reduce((sum, row) => sum + (typeof row === "object" ? row.max ?? 0 : 0), 0);
+      // The rubric is the publisher's marking instrument and the question is
+      // worth what its PTS says. They match on a ten-point writing and differ on
+      // a five-point one, where the same grid counts for half — so the criteria
+      // are checked for being equally weighted, not for adding up to the
+      // question.
+      const weights = rubric.map((row) => (typeof row === "object" ? row.max ?? 0 : 0));
       if (rubric.some((row) => typeof row !== "object")) {
         where(`part ${index + 1} has a rubric written as plain strings — each criterion needs { label, max, says }`);
-      } else if (Math.abs(weights - part.pts) > 1e-9) {
-        where(`part ${index + 1} is worth ${part.pts} points but its rubric criteria add up to ${weights}`);
+      } else if (weights.some((weight) => Math.abs(weight - weights[0]) > 1e-9)) {
+        where(`part ${index + 1} weights its rubric criteria unevenly (${weights.join(", ")}) — the publisher's grid gives every criterion the same columns`);
+      } else if (!(weights[0] > 0)) {
+        where(`part ${index + 1} has a rubric criterion worth nothing`);
       }
       for (const row of rubric) {
         if (typeof row === "object" && (!row.label || !row.says))

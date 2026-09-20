@@ -364,7 +364,7 @@ var TEST_CHROME = `
  * a fix that never landed. Bump this whenever the engine's behaviour changes,
  * so a screenshot says which one is running.
  */
-var ENGINE_REV = 'r2-bands';
+var ENGINE_REV = 'r3-grid';
 
 var TEST;                       /* the test's own data, loaded by boot() */
 var SP;                         /* its localStorage prefix                */
@@ -542,22 +542,29 @@ function rubricScale(p){
  * rather than quietly counting the criteria nobody has reached yet as zero.
  */
 function rubricMark(p){
-  var rows=rubricRows(p), got=0, done=rows.length>0;
+  var rows=rubricRows(p), raw=0, max=0, done=rows.length>0;
   for(var i=0;i<rows.length;i++){
     var v=lLoad(p.id+'-rub-'+i,null);
     rows[i].score=v;
     rows[i].mistake=lLoad(p.id+'-rubm-'+i,'')||'';
     rows[i].correction=lLoad(p.id+'-rubc-'+i,'')||'';
-    if(v===null)done=false; else got+=v;
+    max+=rows[i].max;
+    if(v===null)done=false; else raw+=v;
   }
-  /* A mark set before the rubric existed, or set as one number, still stands
-     until a criterion is marked over it. */
+  /* The rubric is one instrument and the question is worth what the publisher
+     says it is worth. On a band test those are the same ten points. On a unit
+     quiz the paper allows five, so a rubric out of ten counts for half — the
+     marking does not change, only what it contributes to the test. */
+  var got=max?Math.round(raw/max*p.pts*100)/100:0;
   if(!done){
+    /* A mark set before the rubric existed, or set as one number, still stands
+       until a criterion is marked over it. */
     var flat=lLoad(p.id+'-dad',null);
-    if(flat!==null)return {rows:rows,got:flat,done:true,flat:true,
+    if(flat!==null)return {rows:rows,raw:flat,max:p.pts,got:flat,done:true,flat:true,
                            note:lLoad(p.id+'-note','')||''};
   }
-  return {rows:rows,got:got,done:done,flat:false,note:lLoad(p.id+'-note','')||''};
+  return {rows:rows,raw:raw,max:max,got:got,done:done,flat:false,
+          note:lLoad(p.id+'-note','')||''};
 }
 
 /** What a page is worth, what Leo earned automatically, what Dad still owes. */
@@ -1440,8 +1447,12 @@ function rubricHtml(pn){
       +' oninput="rubNote(\''+p.id+'\','+i+',\'c\',this)">'+esc(row.correction)+'</textarea></td>'
       +'</tr>';
   }
-  h+='</tbody><tfoot><tr><td>Total</td><td class="rub-score"><b>'+trimPts(r.got)+' / '+trimPts(p.pts)
-    +'</b></td><td colspan="2">'+(r.done?'':'<span class="rub-wait">Every criterion needs a score '
+  var scaled = !r.flat && Math.abs(r.max-p.pts)>0.001;
+  h+='</tbody><tfoot><tr><td>Total</td><td class="rub-score"><b>'
+    +trimPts(r.flat?r.got:r.raw)+' / '+trimPts(r.flat?p.pts:r.max)+'</b>'
+    +(scaled?'<span class="rub-of"> &rarr; '+trimPts(r.got)+' / '+trimPts(p.pts)
+             +' on the test</span>':'')
+    +'</td><td colspan="2">'+(r.done?'':'<span class="rub-wait">Every criterion needs a score '
     +'before this counts.</span>')+'</td></tr></tfoot></table>'
     +'<textarea class="rub-in rub-note" rows="2" placeholder="A note about the writing as a whole"'
     +' oninput="rubNote(\''+p.id+'\',-1,\'n\',this)">'+esc(r.note)+'</textarea>'

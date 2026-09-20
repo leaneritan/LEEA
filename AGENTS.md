@@ -764,12 +764,19 @@ not have. **An unmarked criterion scores `null`, never 0**: the question stays
 `pending` until every row has a mark, the same rule that keeps an unmarked
 answer out of the mistakes.
 
+**Every writing is marked on that one grid, whatever the paper is worth.** The
+rubric is the marking instrument and the question's PTS is what it contributes:
+a unit quiz allows five points, so the same four criteria out of 2.5 make a
+rubric out of ten that counts for half. The engine scales it, the Total row says
+so (`8 / 10 → 4 / 5 on the test`), and the validator checks the criteria are
+equally weighted rather than adding up to the question. Do not shrink the grid
+to fit the points — 1.25 · 1 · 0.75 · 0.5 is not a scale the publisher prints.
+
 **The unit quizzes print no rubric at all** — `ANS: Answers will vary. PTS: 5`
-and nothing more — so their four criteria and their bands (1.25 · 1 · 0.75 ·
-0.5) are LEEA's, the ten-point grid's shape at a five-point scale. The band
-tests and the final are the publisher's, read off the export. Do not present the
-first as the second, and read the grid out of the RTF rather than assuming a new
-paper has one.
+and nothing more — so their four criteria are LEEA's, borrowed from the band
+test. The band tests and the final are the publisher's, read off the export. Do
+not present the first as the second, and read the grid out of the RTF rather
+than assuming a new paper has one.
 
 **Every written answer is Neritan's to mark, not only the ones the app could not
 place.** The score screen lists all of them under *Your marking* — each with what

@@ -286,6 +286,7 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
 .mark.is-open{border-left:3px solid var(--pencil)}
 .mark-by{float:right;font-weight:400;font-style:italic;text-transform:none;letter-spacing:0}
 .brk-wait{font-size:.76rem;color:var(--pencil);font-weight:700;white-space:nowrap}
+.stamp{margin-top:14px;font-size:.7rem;color:var(--ink3);text-align:right}
 .rub{width:100%;border-collapse:collapse;margin:10px 0 8px;font-size:.84rem}
 .rub th{text-align:left;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;
         color:var(--ink3);border-bottom:1px solid var(--ink);padding:0 8px 5px 0}
@@ -355,6 +356,16 @@ var TEST_CHROME = `
    THE ENGINE — generic. Nothing in this file knows which test it is running.
    One page per section, plus a final Answer Section page.
    ═══════════════════════════════════════════════════════════════════════ */
+/**
+ * Which engine this is, shown in the Answer Section.
+ *
+ * A lesson runs inside a frame from a static file, so "is this the code I just
+ * shipped?" has no answer you can see — and a cached engine looks exactly like
+ * a fix that never landed. Bump this whenever the engine's behaviour changes,
+ * so a screenshot says which one is running.
+ */
+var ENGINE_REV = 'r2-bands';
+
 var TEST;                       /* the test's own data, loaded by boot() */
 var SP;                         /* its localStorage prefix                */
 var HW_ID;                      /* its cloud namespace                    */
@@ -1300,6 +1311,8 @@ function answersHtml(){
     h+='</div></div>';
   }
   h+='<button class="retake" id="retake" onclick="retake()">Take the test again</button>';
+  h+='<div class="stamp">Test engine '+esc(ENGINE_REV)
+    +(window.LEEA_BUILD?' &middot; app '+esc(String(window.LEEA_BUILD).slice(0,7)):'')+'</div>';
   return h+'</div>';
 }
 

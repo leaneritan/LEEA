@@ -281,6 +281,11 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
 .step{background:var(--paper);border:1px solid var(--rule);font-family:var(--fn);font-size:.85rem;
       font-weight:700;padding:5px 12px;cursor:pointer;color:var(--ink2)}
 .step.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.step.ghost{border-style:dashed;color:var(--ink3);font-size:.78rem}
+.step.ghost:hover{color:var(--ink)}
+.mark.is-open{border-left:3px solid var(--pencil)}
+.mark-by{float:right;font-weight:400;font-style:italic;text-transform:none;letter-spacing:0}
+.brk-wait{font-size:.76rem;color:var(--pencil);font-weight:700;white-space:nowrap}
 
 /* ── zoom ─────────────────────────────────────────────────────────── */
 .lb{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:90;display:none;
@@ -430,12 +435,17 @@ function markOne(p,q){
     if(wrong===0)got=(right>=2?p.pts:right>=1?1:0);
     state=got===max?'right':got>0?'partial':'wrong';
   } else if(p.kind==='text'){
+    /* Dad's mark comes first, and overrules the key. A written answer is his to
+       judge: the key is a wording the publisher predicted, not the only one that
+       is right, and it can be matched by an answer he would not accept. Every
+       written question offers him the buttons, not just the ones the app could
+       not place. */
     var dm=lLoad(p.id+'-dad-'+String(q.n),null);
-    if(keyList(q).length && matchesKey(q,given)){got=p.pts;state='right';}
-    else if(dm!==null){got=dm;state=got>=max?'right':got>0?'partial':'wrong';}
-    /* A typed sentence goes to Dad, because a rewrite can be right in words
-       the key did not predict. A number heard on a track cannot: 265 is 265,
-       so a section flagged `exact` marks itself either way. */
+    if(dm!==null){got=dm;state=got>=max?'right':got>0?'partial':'wrong';}
+    else if(keyList(q).length && matchesKey(q,given)){got=p.pts;state='right';}
+    /* Otherwise a typed sentence goes to Dad, because a rewrite can be right in
+       words the key did not predict. A number heard on a track cannot: 265 is
+       265, so a section flagged `exact` marks itself either way. */
     else if(p.exact){got=0;state='wrong';}
     else state='pending';
   } else {
@@ -445,13 +455,22 @@ function markOne(p,q){
 }
 
 /** What a page is worth, what Leo earned automatically, what Dad still owes. */
+/**
+ * One section's marks, plus the two lists the score screen needs.
+ *
+ * `pending` is what nobody has decided yet — it is **not** a wrong answer, and
+ * the screen must never present it as one. `marks` is every question Dad is
+ * allowed to mark, decided or not, so a written answer the app called right is
+ * still his to change.
+ */
 function markPart(p){
-  var a=getAns(p), got=0, max=0, pending=[];
+  var a=getAns(p), got=0, max=0, pending=[], marks=[];
   if(p.kind==='speaking'){
     var ticks=lLoad(p.id+'-ticks',[])||[];
     max=p.pts;
     for(var t=0;t<p.prompts.length;t++)if(ticks[t])got++;
-    return {got:got,max:max,pending:pending,dadOnly:true};
+    /* Speaking is already marked prompt by prompt inside its own page. */
+    return {got:got,max:max,pending:pending,marks:marks,dadOnly:true};
   }
   if(p.kind==='writing'){
     max=p.pts;
@@ -459,26 +478,42 @@ function markPart(p){
     if(dm!==null)got=dm;
     else pending.push({key:p.id+':'+p.n,part:p,n:p.n,max:p.pts,said:a.text||'',
                       sample:'Rubric: '+p.rubric.join(' · ')});
-    return {got:got,max:max,pending:pending,dadOnly:true};
+    marks.push({key:p.id+':'+p.n,part:p,n:p.n,max:p.pts,said:a.text||'',
+                sample:'Rubric: '+p.rubric.join(' · '),
+                value:dm,auto:null,pending:dm===null});
+    return {got:got,max:max,pending:pending,marks:marks,dadOnly:true};
   }
   for(var i=0;i<p.questions.length;i++){
     var q=p.questions[i], key=String(q.n), given=a[key];
     var m=markOne(p,q);
     max+=m.max;got+=m.got;
+    if(p.kind==='text'){
+      var dq=lLoad(p.id+'-dad-'+key,null);
+      var matched=keyList(q).length && matchesKey(q,given);
+      marks.push({key:p.id+':'+key,part:p,n:q.n,max:p.pts,said:given||'',
+                  sample:correctText(p,q),
+                  value:dq,
+                  /* What the app would say if Dad stood back. null means it
+                     cannot say, so his mark is the only one there will be. */
+                  auto:matched?p.pts:(p.exact?0:null),
+                  pending:m.state==='pending'});
+    }
     if(m.state==='pending' && (String(given||'').trim()!=='' || q.ans))
       pending.push({key:p.id+':'+key,part:p,n:q.n,max:p.pts,said:given||'',
                     sample:q.ans||q.sample||''});
   }
-  return {got:got,max:max,pending:pending,dadOnly:!!p.dadMarks};
+  return {got:got,max:max,pending:pending,marks:marks,dadOnly:!!p.dadMarks};
 }
 
 function totals(){
-  var got=0,max=0,pending=[];
+  var got=0,max=0,pending=[],marks=[];
   for(var i=0;i<PARTS.length;i++){
     var m=markPart(PARTS[i]);
-    got+=m.got;max+=m.max;pending=pending.concat(m.pending);
+    got+=m.got;max+=m.max;
+    pending=pending.concat(m.pending);
+    marks=marks.concat(m.marks||[]);
   }
-  return {got:got,max:max,pending:pending};
+  return {got:got,max:max,pending:pending,marks:marks};
 }
 
 /** How many answers on a page are still blank — what "3 still blank" counts. */
@@ -530,9 +565,17 @@ function answerText(p,q,value){
 function correctText(p,q){
   if(p.kind==='multi')return q.ans.map(function(k){return optionLabel(q,k);}).join(' + ');
   if(p.kind==='buttons')return optionLabel(q,q.ans);
-  var keys=keyList(q);
-  /* Every accepted wording, so the review shows Leo what else would have done. */
-  return keys.length?keys.join('  /  '):(q.sample||'');
+  var keys=keyList(q), seen={}, shown=[];
+  /* Every accepted wording, so the review shows Leo what else would have done —
+     but only the ones that actually read differently. Several keys exist purely
+     to accept a capital letter, and printing "The more you practice  /  the more
+     you practice" makes the slash look like part of the answer. */
+  for(var i=0;i<keys.length;i++){
+    var k=norm(keys[i]);
+    if(seen[k])continue;
+    seen[k]=1;shown.push(keys[i]);
+  }
+  return shown.length?shown.join('  /  '):(q.sample||'');
 }
 
 /* ── page pieces ────────────────────────────────────────────────────── */
@@ -1060,7 +1103,8 @@ function answersHtml(){
     +(t.max?Math.round(t.got/t.max*100):0)+'%</span></div>';
   h+= t.pending.length
     ? '<div class="pend">'+t.pending.length+' answer'+(t.pending.length>1?'s are':' is')
-      +' still for Dad to mark. The score goes up as he marks them.</div>'
+      +' still waiting for Dad. They are under <b>Your marking</b> below, with everything'
+      +' else Leo wrote — the score changes as he marks them.</div>'
     : '<div class="pend">Everything is marked. This is the final score.</div>';
   h+='<div class="taken">Time taken <b>'+mmss(elapsed)+'</b> of the '
     +Math.round(ALLOWED/60)+' minutes allowed'
@@ -1069,19 +1113,38 @@ function answersHtml(){
   for(var i=0;i<PARTS.length;i++){
     var p=PARTS[i],m=markPart(p);
     h+='<tr'+(m.pending.length?' class="open"':'')+'><td>'+(i+1)+'. '+esc(p.name)
+      +(m.pending.length?' <span class="brk-wait">'+m.pending.length+' to mark</span>':'')
       +'</td><td>'+m.got+' / '+m.max+'</td></tr>';
   }
   h+='</table>';
   h+=reviewHtml();
 
-  for(var k=0;k<t.pending.length;k++){
-    var pn=t.pending[k];
-    h+='<div class="mark"><div class="mark-h">Question '+pn.n+' — Dad marks out of '+pn.max+'</div>'
+  /* Every written question, not only the undecided ones. A sentence Leo wrote
+     is Dad's to judge even when the app matched it to the key — the key is one
+     wording the publisher predicted, not the only right answer. The buttons
+     show what stands now, and "let the app decide" hands it back. */
+  if(t.marks.length){
+    var waits=0;
+    for(var w=0;w<t.marks.length;w++)if(t.marks[w].pending)waits++;
+    h+='<div class="sec-h">Your marking &middot; '+t.marks.length+' written answer'
+      +(t.marks.length>1?'s':'')+(waits?' &middot; '+waits+' waiting':'')+'</div>';
+    h+='<div class="pend">Every written answer is yours to mark, including the ones the app '
+      +'already placed. Tap a number to set it; the score changes as you do.</div>';
+  }
+  for(var k=0;k<t.marks.length;k++){
+    var pn=t.marks[k], cur=(pn.value!==null&&pn.value!==undefined)?pn.value:pn.auto;
+    var by=(pn.value!==null&&pn.value!==undefined) ? 'you marked this'
+         : pn.auto!==null ? 'the app placed this' : 'waiting for you';
+    h+='<div class="mark'+(pn.pending?' is-open':'')+'">'
+      +'<div class="mark-h">Question '+esc(String(pn.n))+' &middot; out of '+pn.max
+      +' <span class="mark-by">'+by+'</span></div>'
       +'<div class="mark-said">'+(esc(pn.said)||'(nothing written)')+'</div>'
-      +(pn.sample?'<div class="mark-key">'+esc(pn.sample)+'</div>':'')
+      +(pn.sample?'<div class="mark-key">Accepted: '+esc(pn.sample)+'</div>':'')
       +'<div class="steps">';
     for(var s=0;s<=pn.max;s++)
-      h+='<button class="step" onclick="dadMark(\''+pn.key+'\','+s+')">'+s+'</button>';
+      h+='<button class="step'+(cur===s?' on':'')+'" onclick="dadMark(\''+pn.key+'\','+s+')">'+s+'</button>';
+    if(pn.value!==null&&pn.value!==undefined&&pn.auto!==null)
+      h+='<button class="step ghost" onclick="dadClear(\''+pn.key+'\')">&#8635; let the app decide</button>';
     h+='</div></div>';
   }
   h+='<button class="retake" id="retake" onclick="retake()">Take the test again</button>';
@@ -1101,7 +1164,7 @@ function keepScroll(fn){
 }
 function toggleReview(){ showAllReview=!showAllReview; keepScroll(render); }
 function reviewHtml(){
-  var rows='', wrong=0, total=0;
+  var rows='', wrong=0, waiting=0, total=0;
   for(var i=0;i<PARTS.length;i++){
     var p=PARTS[i];
     if(!p.questions)continue;
@@ -1109,7 +1172,10 @@ function reviewHtml(){
       var q=p.questions[j], m=markOne(p,q);
       total++;
       var ok=m.state==='right', open=m.state==='pending';
-      if(!ok)wrong++;
+      /* An answer nobody has marked yet says nothing about whether it is right,
+         so it is never counted among the mistakes. It used to be, which made a
+         written answer waiting for Dad read as one Leo had got wrong. */
+      if(open)waiting++; else if(!ok)wrong++;   /* waiting is reported by the marking section */
       if(ok && !showAllReview)continue;
       rows+='<div class="rev'+(ok?' ok':open?' open':'')+'">'
         +'<div class="rev-n">'+(ok?'✔':open?'◑':'✘')+' Question '+esc(paperNumber(p,q))
@@ -1123,9 +1189,13 @@ function reviewHtml(){
         +'</div>';
     }
   }
-  return '<div class="sec-h">'+(wrong===0
-      ? 'Every question was right — nothing to go over'
-      : wrong+' to go over')+'</div>'
+  /* The count of what is still unmarked belongs beside the buttons that set it,
+     not here — two counts of the same thing on one screen disagree the moment
+     one of them covers the writing question and the other does not. */
+  var head = wrong===0
+      ? (waiting ? 'Nothing marked wrong so far' : 'Every question was right — nothing to go over')
+      : wrong+' to go over';
+  return '<div class="sec-h">'+head+'</div>'
     + rows
     + '<button class="rev-all" onclick="toggleReview()">'
     + (showAllReview?'Show only the ones he missed':'Show every question ('+total+')')
@@ -1158,6 +1228,13 @@ function retake(btnId){
   },5000);
 }
 
+/** Drop Dad's mark so the app's own reading stands again. */
+function dadClear(key){
+  var bits=key.split(':'), pid=bits[0], qn=bits[1], p=partById(pid);
+  if(p.kind==='writing')lSave(pid+'-dad',null);
+  else lSave(pid+'-dad-'+qn,null);
+  keepScroll(render);
+}
 function dadMark(key,val){
   var bits=key.split(':'), pid=bits[0], qn=bits[1], p=partById(pid);
   if(p.kind==='writing')lSave(pid+'-dad',val);

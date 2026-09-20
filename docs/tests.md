@@ -146,7 +146,7 @@ Then, what is specific to a test as a thing Leo sits:
   | `select` | fill the blank from a word bank | the app |
   | `buttons` | pick one (a/b/c, T/F, which/who) | the app |
   | `multi` | pick two, 2/1/0 for both/one/any wrong | the app |
-  | `text` | type it | the app when it matches a key, else Neritan |
+  | `text` | type it | the app when it matches a key, else Neritan — and his mark overrules either way |
   | `writing` | a paragraph against a rubric | Neritan |
   | `speaking` | prompts Neritan asks, one tick each | Neritan |
 
@@ -214,6 +214,22 @@ them into what the app can mark and what Neritan must:
   row on the score screen and the publisher's sample answer or rubric shown.
 - **Two-answer questions** (worth 2) give 2 for both right, 1 for one right with
   nothing wrong, 0 if anything wrong is picked. Say that rule on screen.
+- **Every written answer stays Neritan's to mark**, the ones the app placed
+  included. *Your marking* on the score screen lists them all — what Leo wrote,
+  the accepted wordings, and the button row with the standing mark highlighted —
+  and his mark **overrules** the key. `markOne` reads it first for a `text`
+  question; "let the app decide" hands one back. The key is a wording the
+  publisher predicted, not the only right answer: `exact` marks a listening
+  number wrong the moment Leo writes *two hundred sixty five* for *265*, and on
+  the Level 4 final that answer is ticked on the paper.
+- **A `pending` answer is never a mistake and must not look like one.** Nobody
+  has judged it yet, so it is not in the "to go over" count, its review row reads
+  ◑ *Dad marks this*, and its section says how many are still to mark. Showing
+  `0 / 1` beside a merely unmarked answer made a whole grammar section read as
+  failed.
+- **Print each accepted wording once.** `correctText` de-duplicates by `norm`:
+  some keys exist only to accept a capital letter, and "The more you practice  /
+  the more you practice" makes the separator look like part of the answer.
 
 The teacher deck is the exception to rule 1: it is Neritan's, it is a deck like
 every other teacher deck, and it should stay that way.

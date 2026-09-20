@@ -204,6 +204,9 @@ function injectLearnerCloudBridge(html: string, homeworkId: string | undefined, 
   const PARENT_ORIGIN = ${JSON.stringify(parentOrigin)};
   const INITIAL_ROWS = ${safeScriptJson(rows)};
   const CLOUD_ENABLED = ${JSON.stringify(isSupabaseConfigured)};
+  // So a lesson can say which deployment it came from — see ENGINE_REV in
+  // test-engine.js. A frame has no other way to tell you it is stale.
+  window.LEEA_BUILD = ${JSON.stringify(process.env.NEXT_PUBLIC_BUILD_ID ?? "")};
 
   function send(type, payload) {
     try { parent.postMessage(Object.assign({ type }, payload || {}), PARENT_ORIGIN); } catch (error) {}

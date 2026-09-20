@@ -85,7 +85,16 @@ export type TestAttemptQuestion = {
 /** One criterion of a marked writing rubric. */
 export type AttemptRubricRow = {
   label: string;
-  score: number;
+  /**
+   * What it scored, or null for a criterion nobody has marked yet.
+   *
+   * A zero and an unmarked criterion are not the same thing — the same rule
+   * that makes a `pending` question never a mistake. A paper evaluation is
+   * marked before it is written down, so every row of one has a number; an app
+   * sitting is marked in the test itself, criterion by criterion, and can be
+   * read half-way through.
+   */
+  score: number | null;
   max: number;
   /** What Leo wrote that cost the marks. Empty when nothing did. */
   mistake: string;

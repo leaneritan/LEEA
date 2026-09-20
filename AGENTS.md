@@ -732,9 +732,26 @@ last blank on a page is filled.
 
 **The publisher's points are kept exactly, and split.** What has one exact answer
 the app marks; open responses, writing and speaking are Neritan's, and appear on
-the score screen with the sample answer or rubric and a 0-to-max button row. A
+the score screen with the sample answer and a 0-to-max button row. A
 typed sentence that does not match the key is handed to Neritan rather than
 marked wrong — a rewrite can be right in words the key did not predict.
+
+**The writing is marked criterion by criterion, not out of ten.** A number says
+what it scored and nothing about why, and why is the whole point of marking a
+piece of writing — so the writing question carries the same evaluation table a
+marked paper test does: one row per criterion, with a score, what cost the marks
+and the same sentence put right, plus a note on the piece as a whole. That table
+is what reaches `/tests/report`, and it is the most useful thing on that page.
+
+A writing part's `rubric` is therefore weighted data, not a list of hints:
+`{ "label": "Grammar", "max": 2.5, "says": "You use correct grammar." }`. The
+publisher gives a point total and an unweighted list of what it is looking for,
+so the weights divide evenly — 2.5 on a ten-point writing, 1.25 on a five-point
+one — and the validator checks the criteria still add up to the question. A
+paper that *does* weight its criteria can say so in the same field. Each
+criterion is marked in fifths of its own weight, and **an unmarked criterion
+scores `null`, never 0**: the question stays `pending` until every row has a
+mark, the same rule that keeps an unmarked answer out of the mistakes.
 
 **Every written answer is Neritan's to mark, not only the ones the app could not
 place.** The score screen lists all of them under *Your marking* — each with what
@@ -859,8 +876,9 @@ Three rules make one usable rather than merely stored:
 - **An open response carries `open: true`.** Writing and speaking belong in the
   report, where the marked rubric is the most useful thing on the page, and must
   stay out of the mistakes drill: there is nothing to re-pose when the key is
-  "answers will vary". An app sitting never files one at all — `attemptQuestions()`
-  skips a part with no `questions` array — so this only arises on a paper test.
+  "answers will vary". An app sitting files them too — `attemptQuestions()`
+  gives writing and speaking their own row even though neither has a `questions`
+  array — so the report's sections add up to what the test is worth.
 
   **The test file already says which questions those are.** A question keyed on
   `sample` rather than `ans` is one the publisher prints *one way of saying* the

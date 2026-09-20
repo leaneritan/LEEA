@@ -19,6 +19,9 @@ import { isSupabaseConfigured } from "@/lib/supabase";
 export function LessonPage({ lesson }: { lesson: Lesson }) {
   const isLearnerApp = lesson.mode === "learner";
   const [learnerSrcDoc, setLearnerSrcDoc] = useState<string | null>(null);
+  /* Only true once the srcdoc attempt has actually failed. Until then a learner
+     app renders no iframe at all — see the frame below. */
+  const [learnerFailed, setLearnerFailed] = useState(false);
   // The bridge below runs inside a srcDoc iframe, whose document URL is
   // about:srcdoc — so both its `location.origin` and the `event.origin` of
   // anything it posts are the string "null", never this page's origin. An
@@ -39,14 +42,19 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
     let cancelled = false;
 
     async function loadLearnerApp() {
-      const html = await fetch(lesson.source.embedPath as string).then((response) => response.text());
+      const html = await fetch(withBuildId(lesson.source.embedPath as string)).then((response) =>
+        response.text()
+      );
       const rows = await fetchLearnerProgressRows(lesson.source.homeworkId);
       if (!cancelled) setLearnerSrcDoc(injectLearnerCloudBridge(html, lesson.source.homeworkId, rows));
     }
 
     void loadLearnerApp().catch((error) => {
       console.warn("LEEA learner app preload failed; falling back to direct iframe", error);
-      if (!cancelled) setLearnerSrcDoc(null);
+      if (!cancelled) {
+        setLearnerSrcDoc(null);
+        setLearnerFailed(true);
+      }
     });
 
     return () => {
@@ -158,11 +166,20 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
         </header>
       )}
 
-      {lesson.source.embedPath ? (
+      {lesson.source.embedPath && isLearnerApp && !learnerSrcDoc && !learnerFailed ? (
+        /* Deliberately no iframe yet.
+           Pointing it at the raw file while the srcdoc is still being fetched
+           loads that file as a real document, and that document pulls
+           /components/*.js for itself — unversioned, straight into the cache,
+           a moment before the versioned srcdoc asks for the same thing. The
+           frame then runs whatever the cache already had, which is how a
+           shipped engine fix could keep looking like it never landed. */
+        <div className="deck-lesson-frame deck-lesson-loading">Opening the lesson…</div>
+      ) : lesson.source.embedPath ? (
         <iframe
           ref={isLearnerApp ? learnerFrameRef : undefined}
           className={isFullscreen ? "deck-lesson-frame deck-lesson-frame--fullscreen" : "deck-lesson-frame"}
-          src={isLearnerApp && learnerSrcDoc ? undefined : lesson.source.embedPath}
+          src={isLearnerApp && learnerSrcDoc ? undefined : withBuildId(lesson.source.embedPath)}
           srcDoc={isLearnerApp && learnerSrcDoc ? learnerSrcDoc : undefined}
           title={lesson.title}
         />
@@ -257,8 +274,50 @@ function injectLearnerCloudBridge(html: string, homeworkId: string | undefined, 
 </script>`;
 
   const base = `<base href="${parentOrigin}/">`;
-  if (/<head[^>]*>/i.test(html)) return html.replace(/<head([^>]*)>/i, `<head$1>${base}${bridge}`);
-  return `${base}${bridge}${html}`;
+  const page = versionLessonAssets(html);
+  if (/<head[^>]*>/i.test(page)) return page.replace(/<head([^>]*)>/i, `<head$1>${base}${bridge}`);
+  return `${base}${bridge}${page}`;
+}
+
+/**
+ * The deploy the app is running, as a cache-busting query.
+ *
+ * `next.config.mjs` inlines the commit sha at build time, so this string
+ * changes on every deploy and on every local restart.
+ */
+function withBuildId(path: string) {
+  const buildId = process.env.NEXT_PUBLIC_BUILD_ID;
+  if (!buildId || !path.startsWith("/")) return path;
+  return `${path}${path.includes("?") ? "&" : "?"}v=${encodeURIComponent(buildId)}`;
+}
+
+/**
+ * Stamp the deploy onto everything a lesson loads for itself.
+ *
+ * `NewVersionPrompt` covers the app's own bundle, but a lesson is not part of
+ * it: the shell under `/learn` or `/lessons` pulls in `/components/*.js` and a
+ * test names its questions file, and those are ordinary static files the
+ * browser is free to serve from its cache. So a deploy could land, the app
+ * could be up to date, and the lesson inside the frame could still be running
+ * last week's code — which is exactly what happened to the test engine three
+ * times over, each time looking like a fix that never shipped.
+ *
+ * Versioning the URL makes it a different file to the cache, so it cannot.
+ * Pictures are left alone: they are written once and never edited, and
+ * busting them would re-download every test image on every deploy.
+ */
+function versionLessonAssets(html: string) {
+  return html
+    .replace(/(<script[^>]*\ssrc=")(\/[^"?]+\.js)(")/gi, (_m, a, path, b) => a + withBuildId(path) + b)
+    .replace(
+      /(<link[^>]*\shref=")(\/[^"?]+\.css)(")/gi,
+      (_m, a, path, b) => a + withBuildId(path) + b
+    )
+    // A test names its own questions file, which changes with the test.
+    .replace(
+      /(window\.LEEA_TEST\s*=\s*['"])(\/[^'"?]+\.json)(['"])/gi,
+      (_m, a, path, b) => a + withBuildId(path) + b
+    );
 }
 
 function safeScriptJson(value: unknown) {

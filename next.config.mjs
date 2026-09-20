@@ -19,6 +19,27 @@ const nextConfig = {
   reactStrictMode: true,
   env: {
     NEXT_PUBLIC_BUILD_ID: buildId
+  },
+  /**
+   * Lesson code must be re-checked, never assumed.
+   *
+   * A lesson is not part of the app bundle: the shells under `/learn` and
+   * `/lessons` and the shared `/components/*.js` they pull in are ordinary
+   * static files, and a deck's sub-resources are fetched by the iframe's own
+   * document where `LessonPage` cannot reach them to version the URL. Without
+   * this a deploy can land, the app can be up to date, and the lesson inside
+   * the frame can still be running last week's code.
+   *
+   * `no-cache` still lets the browser keep the file — it just has to ask
+   * first, and gets a 304 when nothing changed.
+   */
+  async headers() {
+    return [
+      {
+        source: "/:path(components|learn|lessons|tests|math-lessons|geography|history)/:file*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=0, must-revalidate" }]
+      }
+    ];
   }
 };
 

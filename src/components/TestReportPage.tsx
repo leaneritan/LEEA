@@ -44,6 +44,14 @@ export function TestReportPage({ attemptId }: { attemptId: string }) {
     () => (attempt?.questions ?? []).filter((q) => q.state === "wrong" || q.state === "partial"),
     [attempt]
   );
+  /* An answer nobody has marked yet. The marking itself lives in the test app —
+     `markOne` there is the one thing that decides right or wrong, so a second
+     place to set it would be a second truth. This page says how many are
+     waiting and shows the way in. */
+  const waiting = useMemo(
+    () => (attempt?.questions ?? []).filter((q) => q.state === "pending"),
+    [attempt]
+  );
   const rubricQuestion = useMemo(
     () => (attempt?.questions ?? []).find((q) => q.rubric && q.rubric.length > 0) ?? null,
     [attempt]
@@ -115,6 +123,26 @@ export function TestReportPage({ attemptId }: { attemptId: string }) {
       </div>
 
       {attempt.note ? <p className="rep-note">{attempt.note}</p> : null}
+
+      {attempt.medium === "app" ? (
+        <div className="rep-mark-call rep-noprint">
+          <div>
+            <strong>
+              {waiting.length
+                ? `${waiting.length} written ${waiting.length === 1 ? "answer is" : "answers are"} still waiting for your mark`
+                : "Every written answer is yours to mark"}
+            </strong>
+            <p>
+              Open the test and scroll to the Answer Section. Each written answer has its own
+              0-to-max row there — the ones the app placed included — and your mark overrules it.
+              The section opens once every page is finished, the speaking page included.
+            </p>
+          </div>
+          <Link className="rep-mark-go" href={`/lessons/${attempt.testId}`}>
+            Mark the written answers →
+          </Link>
+        </div>
+      ) : null}
 
       <h2 className="rep-h2">By section</h2>
       <table className="rep-parts">

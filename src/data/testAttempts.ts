@@ -48,6 +48,49 @@ export type TestAttemptQuestion = {
   answer: string;
   /** Present when the question offered a choice, so the drill can offer it too. */
   options?: string[];
+  /**
+   * What Neritan said about this answer when he marked it.
+   *
+   * A paper test is marked by a person, and what they wrote in the margin is
+   * most of the value — "the concept is right, the comma splice is not" teaches
+   * where a bare ✘ does not. An app sitting leaves this empty.
+   */
+  comment?: string;
+  /** The answer written out properly, where the marking spelled one out. */
+  correction?: string;
+  /**
+   * A marked writing rubric, for the one question that has one.
+   *
+   * It lives on the question rather than on the attempt because it belongs to
+   * that question — and because `questions` is already jsonb, so this needed no
+   * schema change (golden rule 11a).
+   */
+  rubric?: AttemptRubricRow[];
+  /**
+   * An open response — writing, speaking — marked by a person against a rubric
+   * or a sample rather than against a key.
+   *
+   * It belongs in the report, where the rubric is the most useful thing on the
+   * page. It must stay out of the mistakes drill, which re-poses a question and
+   * marks the answer: there is nothing to pose when the key is "answers will
+   * vary", and nothing to mark it against.
+   *
+   * An app sitting never files one at all — `attemptQuestions()` in the test
+   * engine skips a part with no `questions` array, which is every writing and
+   * speaking part — so this only ever appears on a marked paper test.
+   */
+  open?: boolean;
+};
+
+/** One criterion of a marked writing rubric. */
+export type AttemptRubricRow = {
+  label: string;
+  score: number;
+  max: number;
+  /** What Leo wrote that cost the marks. Empty when nothing did. */
+  mistake: string;
+  /** The same thing written correctly. Empty when there was nothing to fix. */
+  correction: string;
 };
 
 export type TestAttempt = {
@@ -384,6 +427,7 @@ export function collectMistakes(all: TestAttemptMap): MistakeItem[] {
   for (const attempt of ordered) {
     for (const q of attempt.questions) {
       if (q.state === "pending") continue;   // unmarked, so it says nothing yet
+      if (q.open) continue;                  // nothing to re-pose, nothing to mark it against
       const key = mistakeKey(attempt.testId, q.n);
       const wrong = q.state !== "right";
       const existing = byKey.get(key);

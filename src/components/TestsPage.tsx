@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { isTestComponent, lessons } from "@/data/lessons";
+import { seedEvaluations } from "@/data/evaluations";
 import {
   clearLearnerProgressCloud,
   getLearnerAppProgress,
@@ -149,6 +150,10 @@ export function TestsPage() {
   const refresh = useCallback(() => setAttempts(readTestAttempts()), []);
   useEffect(() => {
     setMounted(true);
+    // Marked paper tests are repo content, so they are seeded into the store
+    // before anything reads it — otherwise a sitting that exists in the
+    // repository would show as "not sat yet" until some later visit.
+    seedEvaluations();
     refresh();
     // This is the page about results, and it was reading only this browser's.
     // A test Leo sat on his own device showed here as "Not sat yet" — with no
@@ -292,6 +297,11 @@ export function TestsPage() {
                       <span className="th-score">
                         {attempt.score} / {attempt.total} · {attempt.percent}%
                       </span>
+                      {attempt.questions.length > 0 ? (
+                        <Link className="th-report" href={`/tests/report/${attempt.id}`}>
+                          Report
+                        </Link>
+                      ) : null}
                       <button
                         aria-label={`Delete the sitting of ${formatDate(attempt.takenAt)}`}
                         className="th-del"

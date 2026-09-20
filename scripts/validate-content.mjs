@@ -501,6 +501,92 @@ for (const lesson of lessons) {
   }
 }
 
+/* ── marked paper tests ───────────────────────────────────────────────────
+   An evaluation is a sitting committed to the repo (see src/data/evaluations.ts).
+   The failure it guards against is the quiet one: a file written, never imported,
+   and therefore never seen anywhere in the app. */
+const evaluationsTsPath = "src/data/evaluations.ts";
+const evaluationsTsSource = fs.readFileSync(path.join(root, evaluationsTsPath), "utf8");
+const evaluationIds = new Map();
+
+function checkEvaluationsIn(dir) {
+  const absolute = path.join(root, dir);
+  if (!fs.existsSync(absolute)) return;
+  for (const name of fs.readdirSync(absolute).sort()) {
+    if (!name.endsWith(".json")) continue;
+    const where = `${dir}/${name}`;
+    let attempt;
+    try {
+      attempt = JSON.parse(fs.readFileSync(path.join(absolute, name), "utf8"));
+    } catch (error) {
+      fail(`${where} is not valid JSON: ${error.message}`);
+      continue;
+    }
+
+    if (!evaluationsTsSource.includes(`/${name}`)) {
+      fail(`${where} is not imported by ${evaluationsTsPath}, so nothing in the app can see it`);
+    }
+    if (!String(attempt.id || "").startsWith("eval-")) {
+      fail(`${where}: id "${attempt.id}" must begin with "eval-" so a seeded sitting is recognisable`);
+    }
+    if (evaluationIds.has(attempt.id)) {
+      fail(`${where}: id "${attempt.id}" is already used by ${evaluationIds.get(attempt.id)}`);
+    }
+    evaluationIds.set(attempt.id, where);
+    if (attempt.medium !== "paper") {
+      fail(`${where}: medium is "${attempt.medium}" — an evaluation is a paper sitting`);
+    }
+
+    const questions = Array.isArray(attempt.questions) ? attempt.questions : [];
+    if (questions.length === 0) fail(`${where} has no questions, so its report would be empty`);
+
+    const got = questions.reduce((sum, q) => sum + (q.got || 0), 0);
+    const max = questions.reduce((sum, q) => sum + (q.max || 0), 0);
+    if (attempt.score !== got) fail(`${where}: score is ${attempt.score} but the questions add up to ${got}`);
+    if (attempt.total !== max) fail(`${where}: total is ${attempt.total} but the questions add up to ${max}`);
+    const percent = max ? Math.round((got / max) * 100) : 0;
+    if (attempt.percent !== percent) fail(`${where}: percent is ${attempt.percent} but ${got}/${max} is ${percent}%`);
+
+    /* The test it was sat against, when it has a digital counterpart. Its points
+       must match, or /tests would show a paper sitting out of 80 beside an app
+       sitting out of something else and call them the same test. */
+    const paired = lessons.find((lesson) => lesson.id === attempt.testId);
+    if (attempt.testId && !attempt.testId.startsWith("paper:") && !paired) {
+      fail(`${where}: testId "${attempt.testId}" is not a registered lesson`);
+    }
+    const teacherOf = paired
+      ? lessons.find(
+          (lesson) =>
+            lesson.mode === "teacher" &&
+            lesson.component === String(paired.component).replace(/-app$/, "") &&
+            lesson.level === paired.level &&
+            lesson.unit === paired.unit
+        )
+      : null;
+    if (teacherOf?.assessment?.points !== undefined && teacherOf.assessment.points !== max) {
+      fail(
+        `${where}: adds up to ${max} points but ${teacherOf.id} is a ${teacherOf.assessment.points}-point test`
+      );
+    }
+
+    for (const q of questions) {
+      if (q.rubric) {
+        const rGot = q.rubric.reduce((sum, row) => sum + (row.score || 0), 0);
+        const rMax = q.rubric.reduce((sum, row) => sum + (row.max || 0), 0);
+        if (rGot !== q.got) fail(`${where}: Q${q.n} scored ${q.got} but its rubric adds up to ${rGot}`);
+        if (rMax !== q.max) fail(`${where}: Q${q.n} is out of ${q.max} but its rubric adds up to ${rMax}`);
+      }
+    }
+  }
+}
+
+for (const lessonsDir of lessonsDirs) {
+  checkEvaluationsIn(lessonsDir.replace(/\/lessons$/, "/evaluations"));
+}
+for (const courseDir of new Set(lessonsDirs.map((d) => d.replace(/\/(unit|checkpoint)-[^/]+\/lessons$/, "")))) {
+  checkEvaluationsIn(`${courseDir}/evaluations`);
+}
+
 const byComponent = new Map();
 for (const lesson of lessons) {
   const key = `${lesson.course}|l${lesson.level}|u${lesson.unit}|${lesson.component}`;

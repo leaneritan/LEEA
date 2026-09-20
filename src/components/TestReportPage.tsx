@@ -111,7 +111,7 @@ export function TestReportPage({ attemptId }: { attemptId: string }) {
         </dl>
       </header>
 
-      <div className="rep-score">
+      <div className={`rep-score${waiting.length ? " is-provisional" : ""}`}>
         <div className="rep-score-big">
           <strong>{trim(attempt.score)}</strong>
           <span>out of {trim(attempt.total)} points</span>
@@ -120,6 +120,16 @@ export function TestReportPage({ attemptId }: { attemptId: string }) {
         <div className="rep-bar" aria-hidden="true">
           <span style={{ width: `${Math.min(100, attempt.percent)}%` }} />
         </div>
+        {waiting.length ? (
+          /* A score with unmarked answers under it is not the score. Say so on
+             the number itself, not only in the call-out below it. */
+          <p className="rep-provisional">
+            Provisional — {waiting.length} written{" "}
+            {waiting.length === 1 ? "answer is" : "answers are"} still to mark, worth up to{" "}
+            {trim(waiting.reduce((sum, q) => sum + q.max, 0))} more{" "}
+            {waiting.reduce((sum, q) => sum + q.max, 0) === 1 ? "point" : "points"}.
+          </p>
+        ) : null}
       </div>
 
       {attempt.note ? <p className="rep-note">{attempt.note}</p> : null}
@@ -161,18 +171,23 @@ export function TestReportPage({ attemptId }: { attemptId: string }) {
                 {trim(part.got)} / {trim(part.max)}
               </td>
               <td className="rep-num">
-                {part.missed.length ? (
-                  part.missed.map((entry, index) => (
-                    <span key={entry.n}>
-                      {index > 0 ? ", " : ""}
-                      <span className={entry.state === "partial" ? "rep-part" : "rep-miss"}>
-                        {entry.n}
-                      </span>
+                {part.missed.map((entry, index) => (
+                  <span key={entry.n}>
+                    {index > 0 ? ", " : ""}
+                    <span className={entry.state === "partial" ? "rep-part" : "rep-miss"}>
+                      {entry.n}
                     </span>
-                  ))
-                ) : (
+                  </span>
+                ))}
+                {part.pending.length ? (
+                  <span className="rep-tomark">
+                    {part.missed.length ? " · " : ""}
+                    {part.pending.length} to mark
+                  </span>
+                ) : null}
+                {!part.missed.length && !part.pending.length ? (
                   <span className="rep-clean">clean</span>
-                )}
+                ) : null}
               </td>
             </tr>
           ))}
@@ -224,6 +239,9 @@ export function TestReportPage({ attemptId }: { attemptId: string }) {
                 <span className="rep-sec-name">{part.name}</span>
                 <span className="rep-sec-score">
                   {trim(part.got)} / {trim(part.max)}
+                  {part.pending.length ? (
+                    <span className="rep-tomark"> · {part.pending.length} to mark</span>
+                  ) : null}
                 </span>
                 <span className="rep-sec-chev">{open ? "▴" : "▾"}</span>
               </button>
@@ -243,13 +261,23 @@ export function TestReportPage({ attemptId }: { attemptId: string }) {
 function QuestionDetail({ question }: { question: TestAttemptQuestion }) {
   const wrong = question.state === "wrong";
   const partial = question.state === "partial";
+  const answer = dedupeAnswer(question.answer);
   return (
     <article className={`rep-q is-${question.state}`}>
       <div className="rep-q-top">
         <span className="rep-q-n">{question.n}</span>
         <span className="rep-q-part">{question.part}</span>
         <span className="rep-q-mark">
-          {MARK[question.state]} {trim(question.got)} / {trim(question.max)}
+          {question.state === "pending" ? (
+            /* Not a zero. Nobody has judged this answer yet, and "0 / 4" beside
+               a written one is what made a whole grammar section read as
+               failed. */
+            <>◑ — / {trim(question.max)} · Dad marks this</>
+          ) : (
+            <>
+              {MARK[question.state]} {trim(question.got)} / {trim(question.max)}
+            </>
+          )}
         </span>
       </div>
       {question.question ? <p className="rep-q-ask">{question.question}</p> : null}
@@ -260,10 +288,10 @@ function QuestionDetail({ question }: { question: TestAttemptQuestion }) {
             {question.given ? question.given : <em>left blank</em>}
           </dd>
         </div>
-        {question.answer && question.answer !== question.given ? (
+        {answer && answer !== question.given ? (
           <div>
             <dt>Answer</dt>
-            <dd className="is-key">{question.answer}</dd>
+            <dd className="is-key">{answer}</dd>
           </div>
         ) : null}
         {question.correction && question.correction !== question.answer ? (
@@ -323,7 +351,7 @@ const MARK: Record<AttemptQuestionState, string> = {
   right: "✔",
   partial: "◐",
   wrong: "✘",
-  pending: "…"
+  pending: "◑"
 };
 
 type ReportPart = {
@@ -332,6 +360,15 @@ type ReportPart = {
   max: number;
   /** The questions in this section that were not fully right, in the paper's order. */
   missed: { n: string; state: AttemptQuestionState }[];
+  /**
+   * The questions in this section nobody has marked yet.
+   *
+   * They are not mistakes and must never be counted as any, but they do hold
+   * the section's score down — a grammar section read "0 / 4 — clean", which
+   * says the two things that cannot both be true. So the section carries them
+   * separately and says how many are still to mark.
+   */
+  pending: string[];
   questions: TestAttemptQuestion[];
 };
 
@@ -343,7 +380,7 @@ function groupByPart(questions: TestAttemptQuestion[]): ReportPart[] {
   for (const question of questions) {
     let part = byName.get(question.part);
     if (!part) {
-      part = { name: question.part, got: 0, max: 0, missed: [], questions: [] };
+      part = { name: question.part, got: 0, max: 0, missed: [], pending: [], questions: [] };
       byName.set(question.part, part);
       order.push(question.part);
     }
@@ -352,9 +389,40 @@ function groupByPart(questions: TestAttemptQuestion[]): ReportPart[] {
     part.questions.push(question);
     if (question.state === "wrong" || question.state === "partial")
       part.missed.push({ n: question.n, state: question.state });
+    if (question.state === "pending") part.pending.push(question.n);
   }
 
   return order.map((name) => byName.get(name) as ReportPart);
+}
+
+/**
+ * Print every accepted wording once.
+ *
+ * The publisher prints alternatives for some transformations, and several of
+ * its keys exist purely to accept a capital letter — so "The more you practice
+ * / the more you practice" reads as though the slash were part of the answer.
+ * The engine de-duplicates before it records, but an attempt sat before that
+ * shipped has the doubled string baked into its record, so the report has to
+ * de-duplicate what it reads too.
+ */
+function dedupeAnswer(answer: string | undefined) {
+  if (!answer || !answer.includes("/")) return answer;
+  const seen = new Set<string>();
+  const shown: string[] = [];
+  for (const piece of answer.split("/")) {
+    const text = piece.trim();
+    if (!text) continue;
+    const key = text
+      .toLowerCase()
+      .replace(/[\u2018\u2019\u02bc]/g, "'")
+      .replace(/[.,!?;:]+$/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    shown.push(text);
+  }
+  return shown.join("  /  ");
 }
 
 /** 2.5 stays 2.5; 2.0 reads as 2 — a rubric has halves and a question does not. */

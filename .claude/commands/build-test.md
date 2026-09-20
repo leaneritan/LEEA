@@ -145,8 +145,16 @@ criterion is `{ "label": "Grammar", "max": 2.5, "says": "You use correct
 grammar." }`, and the engine renders them as the evaluation table Neritan marks
 — a score row per criterion, what cost the marks, the same sentence put right.
 The publisher gives a point total and an unweighted list, so **divide the points
-evenly**: 2.5 each on a ten-point writing, 1.25 each on a five-point one. The
-validator checks they add up to the question.
+evenly**: 2.5 each on a ten-point writing. The validator checks they add up to
+the question.
+
+**Find the band grid in the answer section and copy it into `rubricScale`.** A
+ten-point writing prints the columns **2.5 · 2 · 1.5 · 1** — four bands, half a
+point apart, **no zero** — and those are the only marks on offer. Copy them
+highest first, the way the columns read. A paper that prints no grid (every unit
+quiz so far — `ANS: Answers will vary. PTS: 5`) gets the same shape at its own
+scale, and the file should say the criteria are LEEA's rather than implying the
+publisher wrote them.
 
 A `text` key may be **a list of accepted wordings** where the publisher prints
 alternatives. Anything not matching still goes to Neritan rather than being

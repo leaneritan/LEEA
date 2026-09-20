@@ -719,6 +719,22 @@ for (const teacher of lessons) {
         if (typeof row === "object" && (!row.label || !row.says))
           where(`part ${index + 1} has a rubric criterion missing a label or its description`);
       }
+      // The publisher marks a criterion on a band grid, not a range: the ten-point
+      // writing prints 2.5 / 2 / 1.5 / 1, highest first, with no zero. A scale that
+      // does not start at the criterion's own weight would make full marks
+      // unreachable, and one that is not descending is not the printed grid.
+      const scale = part.rubricScale;
+      if (scale !== undefined) {
+        const weights = new Set(rubric.map((row) => row.max));
+        if (!Array.isArray(scale) || scale.length < 2)
+          where(`part ${index + 1} has a rubricScale that is not a list of bands`);
+        else if (weights.size === 1 && Math.abs(scale[0] - [...weights][0]) > 1e-9)
+          where(`part ${index + 1}'s rubricScale tops out at ${scale[0]} but each criterion is worth ${[...weights][0]} — full marks would be unreachable`);
+        else if (scale.some((band, i) => i > 0 && band >= scale[i - 1]))
+          where(`part ${index + 1}'s rubricScale must run highest first, the way the paper prints its columns`);
+        else if (scale.some((band) => band < 0))
+          where(`part ${index + 1}'s rubricScale has a negative band`);
+      }
     }
     const pictures = part.images ?? (part.image ? [{ src: part.image }] : []);
     for (const picture of pictures) {

@@ -832,9 +832,26 @@ Three rules make one usable rather than merely stored:
   "answers will vary". An app sitting never files one at all — `attemptQuestions()`
   skips a part with no `questions` array — so this only arises on a paper test.
 
+  **The test file already says which questions those are.** A question keyed on
+  `sample` rather than `ans` is one the publisher prints *one way of saying* the
+  answer to, not the answer: on the Level 4 final that is every "answer with a
+  complete sentence" part (m3, m9, m11), and they are as undrillable as the
+  writing. Derive the flag from `sample`; do not hand-list question numbers.
+
+**Read the paper, not someone's write-up of it.** The Level 4 final was first
+imported from a marked-up evaluation written away from LEEA, and five of its
+marks were wrong: a question recorded blank that the paper shows answered and
+ticked, two recorded right that carry a red ✗, half marks recorded as full, and
+speaking recorded 10/10 when the page says 8. The score was out by four points.
+The scan is the source; a summary of it is a claim. Read every page, and take the
+question text and key from the test's own `questions.json`.
+
 Seeding is not owning: `leea.evaluations.seeded.v1` records what this browser has
-already seeded, so deleting a seeded sitting sticks instead of coming back on the
-next load — the same shape as the unassign and reset bugs before it.
+seeded **and at which revision**, so deleting a seeded sitting sticks instead of
+coming back on the next load — the same shape as the unassign and reset bugs
+before it. The revision is the record's own `updatedAt`: bump it when a marking
+is corrected and browsers holding the old copy take the new one, while a copy
+Neritan deleted stays deleted.
 `scripts/validate-content.mjs` checks every evaluation is imported, that its id is
 unique and begins `eval-`, that its questions add up to its score, total and
 percent, that those points match the test it claims, and that a rubric adds up to

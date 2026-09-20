@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { seedEvaluations } from "@/data/evaluations";
 import {
   collectMistakes,
   mistakeWeight,
@@ -77,6 +78,9 @@ export function TestMistakesPage() {
 
   useEffect(() => {
     setMounted(true);
+    // A marked paper test is a source of mistakes like any other sitting, and
+    // it is repo content — so it is seeded before the first read.
+    seedEvaluations();
     load();
     // Practice is built from every sitting, including the ones filed on Leo's
     // own device — so pull them before deciding what he keeps getting wrong.

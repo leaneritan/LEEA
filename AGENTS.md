@@ -805,6 +805,50 @@ so `/tests` records one by hand against a digital test, and "Other paper tests"
 records one for a test that has no digital version at all (keyed
 `paper:<slug>`). Same record, `medium: "paper"`.
 
+**A marked paper test is content, not a form entry.** The marking happens away
+from LEEA — a PDF of the test and an evaluation written against it — and that
+marking *is* the teaching artefact: what he wrote, what it should have been, and
+what Neritan said about it. Left as a file on a laptop it is unreachable; typed
+into the paper form on one browser it is stuck there and holds a score and
+nothing else. So an evaluation is committed beside the level it belongs to, in
+`…/level-<n>/evaluations/<slug>.json`, registered in `src/data/evaluations.ts`,
+and seeded into the ordinary attempts store on load. From there it is a sitting
+like any other: it shows on `/tests`, opens as a report, feeds `/tests/mistakes`
+and syncs through `test_attempts`.
+
+Three rules make one usable rather than merely stored:
+
+- **Number each question the way the digital test numbers it** — `paperNumber` in
+  `test-engine.js`. A paper sitting and an app sitting of the same test then
+  count as the same question in the mistakes drill instead of as two. Take the
+  question text and the answer key from the test's own `questions.json` rather
+  than retyping them.
+- **`comment`, `correction` and `rubric` live on the question**, inside the
+  `questions` jsonb — which is why none of this needed a schema change. The
+  rubric belongs to the writing question, not to the attempt.
+- **An open response carries `open: true`.** Writing and speaking belong in the
+  report, where the marked rubric is the most useful thing on the page, and must
+  stay out of the mistakes drill: there is nothing to re-pose when the key is
+  "answers will vary". An app sitting never files one at all — `attemptQuestions()`
+  skips a part with no `questions` array — so this only arises on a paper test.
+
+Seeding is not owning: `leea.evaluations.seeded.v1` records what this browser has
+already seeded, so deleting a seeded sitting sticks instead of coming back on the
+next load — the same shape as the unassign and reset bugs before it.
+`scripts/validate-content.mjs` checks every evaluation is imported, that its id is
+unique and begins `eval-`, that its questions add up to its score, total and
+percent, that those points match the test it claims, and that a rubric adds up to
+its question.
+
+**`/tests/report/<attemptId>` is the marked paper**, and reads an app sitting and
+a paper one the same way: the score, a section breakdown, every question that was
+not fully right with what he wrote and what it should have been, the marked
+writing rubric, then every question by section. It is built to print — a result is
+something a parent keeps — so the print rules drop the shell chrome and force
+every collapsed section open. Those rules name the shell's real classes
+(`.sidebar`, `.topbar`, `.main`): a selector that matches nothing hides nothing,
+and it does it silently.
+
 **`/tests/mistakes` is practice, not a test**, and is the one place in this area
 that marks as it goes and shows the answer. `collectMistakes` gathers every
 question Leo has got wrong, keyed test + question number so missing Q24 twice is

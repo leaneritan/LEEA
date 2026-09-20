@@ -260,6 +260,13 @@ export function TestsPage() {
                       {latest.score} <small>/ {latest.total}</small>
                     </span>
                     <span className="tests-pct">{latest.percent}%</span>
+                    {latest.questions.some((q) => q.state === "pending") ? (
+                      /* The score is not the score while answers under it are
+                         unmarked. Say so here too, not only in the report. */
+                      <span className="tests-pill tomark">
+                        {latest.questions.filter((q) => q.state === "pending").length} to mark
+                      </span>
+                    ) : null}
                     <span className="tests-pill muted">{formatDate(latest.takenAt)}</span>
                     {latest.medium === "paper" ? <span className="tests-pill open">On paper</span> : null}
                     {latest.durationSec ? (

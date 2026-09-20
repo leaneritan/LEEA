@@ -746,12 +746,26 @@ is what reaches `/tests/report`, and it is the most useful thing on that page.
 A writing part's `rubric` is therefore weighted data, not a list of hints:
 `{ "label": "Grammar", "max": 2.5, "says": "You use correct grammar." }`. The
 publisher gives a point total and an unweighted list of what it is looking for,
-so the weights divide evenly — 2.5 on a ten-point writing, 1.25 on a five-point
-one — and the validator checks the criteria still add up to the question. A
-paper that *does* weight its criteria can say so in the same field. Each
-criterion is marked in fifths of its own weight, and **an unmarked criterion
-scores `null`, never 0**: the question stays `pending` until every row has a
-mark, the same rule that keeps an unmarked answer out of the mistakes.
+so the weights divide evenly — 2.5 on a ten-point writing — and the validator
+checks the criteria still add up to the question. A paper that *does* weight its
+criteria can say so in the same field.
+
+**A criterion is marked on the paper's band grid, and the grid has no zero.**
+The answer section of a ten-point writing prints the columns **2.5 · 2 · 1.5 ·
+1**, and nothing else is on offer — so the lowest a writing can come out is four
+out of ten. That grid is `rubricScale` on the writing part, read off the paper,
+and the buttons run highest first the way its columns do. Offering 0 to max in
+even steps was this engine's invention and marked against a scale the paper does
+not have. **An unmarked criterion scores `null`, never 0**: the question stays
+`pending` until every row has a mark, the same rule that keeps an unmarked
+answer out of the mistakes.
+
+**The unit quizzes print no rubric at all** — `ANS: Answers will vary. PTS: 5`
+and nothing more — so their four criteria and their bands (1.25 · 1 · 0.75 ·
+0.5) are LEEA's, the ten-point grid's shape at a five-point scale. The band
+tests and the final are the publisher's, read off the export. Do not present the
+first as the second, and read the grid out of the RTF rather than assuming a new
+paper has one.
 
 **Every written answer is Neritan's to mark, not only the ones the app could not
 place.** The score screen lists all of them under *Your marking* — each with what

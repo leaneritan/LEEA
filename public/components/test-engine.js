@@ -503,6 +503,27 @@ function rubricRows(p){
 }
 
 /**
+ * The marks a criterion can be given, in the order the paper prints them.
+ *
+ * This is the publisher's own grid, not a range: the answer section of a
+ * ten-point writing prints the columns **2.5  2  1.5  1** — four bands, half a
+ * point apart, and **no zero**. A criterion cannot score nothing, so the lowest
+ * a writing can come out is four out of ten. Offering 0 through max in even
+ * steps was this engine's invention and it marked against a scale the paper
+ * does not have.
+ *
+ * `rubricScale` carries it, read off the paper. Where a paper prints no grid —
+ * the unit quizzes print only "Answers will vary. PTS: 5" — the same shape is
+ * used at that paper's scale, which is what the fallback computes.
+ */
+function rubricScale(p){
+  if(p.rubricScale&&p.rubricScale.length)return p.rubricScale.slice();
+  var rows=p.rubric||[], max=rows.length?p.pts/rows.length:p.pts, out=[];
+  for(var i=0;i<4;i++)out.push(Math.round(max*(1-i*0.2)*100)/100);
+  return out;
+}
+
+/**
  * The marked rubric: one score, one note and one correction per criterion.
  *
  * `done` is false until every criterion has been marked, because a half-marked
@@ -1369,9 +1390,10 @@ function retake(btnId){
  * report, where the marked rubric is the most useful thing on the page — an app
  * sitting used to file no writing at all.
  *
- * Each criterion is a row of steps in fifths of its own weight, which is halves
- * on a ten-point writing and quarters on a five-point one. Nothing is typed
- * into a hidden draft: a note is saved as it is typed.
+ * Each criterion is marked on the publisher's own band grid — 2.5 / 2 / 1.5 / 1
+ * on a ten-point writing, with no zero — printed highest first, the way the
+ * paper prints its columns. Nothing is typed into a hidden draft: a note is
+ * saved as it is typed.
  */
 function rubricHtml(pn){
   var p=pn.part, r=pn.rubric, rows=r.rows;
@@ -1384,14 +1406,17 @@ function rubricHtml(pn){
       +' as one number. Marking a criterion below replaces it.</div>';
   h+='<table class="rub"><thead><tr><th>What is being marked</th><th>Score</th>'
     +'<th>What cost the marks</th><th>Written properly</th></tr></thead><tbody>';
+  var bands=rubricScale(p);
   for(var i=0;i<rows.length;i++){
-    var row=rows[i], step=row.max/5;
+    var row=rows[i];
     h+='<tr class="'+(row.score===null?'rub-open':(row.score===row.max?'rub-full':''))+'">'
       +'<td><b>'+esc(row.label)+'</b> <span class="rub-of">out of '+trimPts(row.max)+'</span>'
       +'<span class="rub-says">'+esc(row.says)+'</span></td>'
       +'<td class="rub-score"><div class="steps">';
-    for(var n=0;n<=5;n++){
-      var val=Math.round(step*n*100)/100;
+    /* Highest first, because that is the order the printed grid's columns run
+       and this table is read next to it. */
+    for(var n=0;n<bands.length;n++){
+      var val=bands[n];
       h+='<button class="step'+(row.score===val?' on':'')+'" onclick="rubMark(\''+p.id+'\','+i+','+val+')">'
         +trimPts(val)+'</button>';
     }

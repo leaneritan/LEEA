@@ -222,11 +222,23 @@ them into what the app can mark and what Neritan must:
   for a paper one.
 
   The publisher gives a point total and an unweighted list of criteria, so the
-  weights **divide evenly** — 2.5 on a ten-point writing, 1.25 on a five-point
-  one — and `validate-content.mjs` checks they add up to the question. A paper
-  that does weight its criteria can say so in the same field. An unmarked
-  criterion scores `null`, never 0, and the writing question stays `pending`
-  until every row has a mark.
+  weights **divide evenly** — 2.5 each on a ten-point writing — and
+  `validate-content.mjs` checks they add up to the question. A paper that does
+  weight its criteria can say so in the same field.
+
+  **The marks on offer are the paper's own band grid, not a range.** The answer
+  section prints the columns **2.5 · 2 · 1.5 · 1** — four bands, half a point
+  apart, **no zero**, so the lowest a ten-point writing can come out is 4. Put
+  that grid in `rubricScale` on the writing part, highest first, exactly as the
+  columns read; the validator checks it starts at the criterion's own weight and
+  descends. An unmarked criterion scores `null`, never 0, and the writing
+  question stays `pending` until every row has a mark.
+
+  **Read the grid out of the export; do not assume a paper has one.** A unit
+  quiz prints `ANS: Answers will vary. PTS: 5` and no rubric — Level 4's Unit 8
+  and Unit 9 quizzes both do. Their criteria and bands are LEEA's own, the
+  ten-point grid's shape at a five-point scale, and the file should not pretend
+  otherwise.
 - **Two-answer questions** (worth 2) give 2 for both right, 1 for one right with
   nothing wrong, 0 if anything wrong is picked. Say that rule on screen.
 - **Every written answer stays Neritan's to mark**, the ones the app placed

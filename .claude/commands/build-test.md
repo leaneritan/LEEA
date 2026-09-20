@@ -145,8 +145,9 @@ criterion is `{ "label": "Grammar", "max": 2.5, "says": "You use correct
 grammar." }`, and the engine renders them as the evaluation table Neritan marks
 — a score row per criterion, what cost the marks, the same sentence put right.
 The publisher gives a point total and an unweighted list, so **divide the points
-evenly**: 2.5 each on a ten-point writing. The validator checks they add up to
-the question.
+evenly**: 2.5 each, a rubric out of ten. That grid does **not** shrink to fit a
+five-point paper — the question just counts the rubric for half, which the
+engine scales. The validator checks the criteria are equally weighted.
 
 **Find the band grid in the answer section and copy it into `rubricScale`.** A
 ten-point writing prints the columns **2.5 · 2 · 1.5 · 1** — four bands, half a

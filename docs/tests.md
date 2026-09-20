@@ -234,11 +234,17 @@ them into what the app can mark and what Neritan must:
   descends. An unmarked criterion scores `null`, never 0, and the writing
   question stays `pending` until every row has a mark.
 
+  **The grid does not shrink to fit the points.** Every writing is marked on the
+  same four criteria out of 2.5 — a rubric out of ten — and the question
+  contributes what its PTS says. A five-point unit quiz therefore counts that
+  rubric for half, which the engine scales and the Total row spells out
+  (`8 / 10 → 4 / 5 on the test`). The validator checks the criteria are equally
+  weighted, not that they add up to the question.
+
   **Read the grid out of the export; do not assume a paper has one.** A unit
   quiz prints `ANS: Answers will vary. PTS: 5` and no rubric — Level 4's Unit 8
-  and Unit 9 quizzes both do. Their criteria and bands are LEEA's own, the
-  ten-point grid's shape at a five-point scale, and the file should not pretend
-  otherwise.
+  and Unit 9 quizzes both do. Their criteria are LEEA's own, borrowed from the
+  band test, and the file should not pretend otherwise.
 - **Two-answer questions** (worth 2) give 2 for both right, 1 for one right with
   nothing wrong, 0 if anything wrong is picked. Say that rule on screen.
 - **Every written answer stays Neritan's to mark**, the ones the app placed

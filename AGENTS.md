@@ -736,6 +736,28 @@ the score screen with the sample answer or rubric and a 0-to-max button row. A
 typed sentence that does not match the key is handed to Neritan rather than
 marked wrong — a rewrite can be right in words the key did not predict.
 
+**Every written answer is Neritan's to mark, not only the ones the app could not
+place.** The score screen lists all of them under *Your marking* — each with what
+Leo wrote, the accepted wordings, and the button row with the standing mark
+highlighted — and his mark **overrules** the key. `markOne` reads his mark first
+for a `text` question, and "let the app decide" hands one back. The key is a
+wording the publisher predicted, not the only right answer, and it can equally
+be matched by something he would not accept. The Level 4 final proved the point
+twice over: `exact` marks a listening number wrong the moment Leo writes *two
+hundred sixty five* instead of *265*, and the paper shows that answer ticked.
+
+**A `pending` answer is never a mistake and must never look like one.** It is an
+answer nobody has judged yet, so it is not counted among the questions to go
+over, and the section it sits in says how many are still to mark rather than
+implying a zero. Its own review row reads ◑ and *Dad marks this*. Showing
+`0 / 1` beside a written answer that is merely unmarked is what made a whole
+grammar section read as failed.
+
+**Print every accepted wording once.** `correctText` de-duplicates the key list
+by `norm`, because several keys exist only to accept a capital letter — and
+"The more you practice  /  the more you practice" makes the separator look like
+part of the answer.
+
 **The result is the teaching artefact, not the score.** Opening it (`See the
 result →`, only once every page is finished) turns the thirteen pages into the
 marked paper — green ✔, red ✘, the model answer under anything he missed — and

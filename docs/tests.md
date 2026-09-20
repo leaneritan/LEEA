@@ -147,7 +147,7 @@ Then, what is specific to a test as a thing Leo sits:
   | `buttons` | pick one (a/b/c, T/F, which/who) | the app |
   | `multi` | pick two, 2/1/0 for both/one/any wrong | the app |
   | `text` | type it | the app when it matches a key, else Neritan — and his mark overrules either way |
-  | `writing` | a paragraph against a rubric | Neritan |
+  | `writing` | a paragraph against a weighted rubric | Neritan, criterion by criterion |
   | `speaking` | prompts Neritan asks, one tick each | Neritan |
 
   Part-level flags: `paperN`, `blankFirst`, `labelsOnPicture`, `exact`,
@@ -210,8 +210,23 @@ them into what the app can mark and what Neritan must:
 - **A `text` question with an `ans` that does not match is not marked wrong** — it
   goes to Neritan on the score screen with the model answer beside it. A rewrite
   can be right in words the key did not predict.
-- **Open responses, writing and speaking are Neritan's**, with a 0-to-max button
-  row on the score screen and the publisher's sample answer or rubric shown.
+- **Open responses and speaking are Neritan's**, with a 0-to-max button row on
+  the score screen and the publisher's sample answer shown.
+- **The writing gets an evaluation table, not a single number.** Its `rubric` is
+  weighted data — `{ "label": "Grammar", "max": 2.5, "says": "You use correct
+  grammar." }` — and the score screen renders it as the table a marked paper
+  test carries: a score row per criterion in fifths of that criterion's weight,
+  a box for what cost the marks, a box for the same sentence put right, and a
+  note on the piece as a whole. All of it is filed into the attempt, so
+  `/tests/report` shows the marked rubric for an app sitting exactly as it does
+  for a paper one.
+
+  The publisher gives a point total and an unweighted list of criteria, so the
+  weights **divide evenly** — 2.5 on a ten-point writing, 1.25 on a five-point
+  one — and `validate-content.mjs` checks they add up to the question. A paper
+  that does weight its criteria can say so in the same field. An unmarked
+  criterion scores `null`, never 0, and the writing question stays `pending`
+  until every row has a mark.
 - **Two-answer questions** (worth 2) give 2 for both right, 1 for one right with
   nothing wrong, 0 if anything wrong is picked. Say that rule on screen.
 - **Every written answer stays Neritan's to mark**, the ones the app placed

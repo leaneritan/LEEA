@@ -286,6 +286,30 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
 .mark.is-open{border-left:3px solid var(--pencil)}
 .mark-by{float:right;font-weight:400;font-style:italic;text-transform:none;letter-spacing:0}
 .brk-wait{font-size:.76rem;color:var(--pencil);font-weight:700;white-space:nowrap}
+.rub{width:100%;border-collapse:collapse;margin:10px 0 8px;font-size:.84rem}
+.rub th{text-align:left;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;
+        color:var(--ink3);border-bottom:1px solid var(--ink);padding:0 8px 5px 0}
+.rub td{border-bottom:1px solid var(--hair);padding:8px 8px 8px 0;vertical-align:top}
+.rub td:last-child,.rub th:last-child{padding-right:0}
+.rub-says{display:block;font-weight:400;color:var(--ink2);font-size:.78rem;line-height:1.5;margin-top:3px}
+.rub th:nth-child(2){width:210px}
+.rub-score .steps{flex-wrap:nowrap}
+.rub-score .step{padding:3px 0;font-size:.76rem;flex:1 1 0;min-width:0}
+.rub-of{font-size:.72rem;font-weight:400;color:var(--ink3);white-space:nowrap}
+.rub tr.rub-open td{background:var(--pencil-bg)}
+.rub tr.rub-full td:first-child b::after{content:" ✔";color:#047857}
+.rub tfoot td{border-bottom:none;border-top:1px solid var(--ink);font-weight:800}
+.rub-wait{font-weight:400;font-style:italic;color:var(--pencil)}
+.rub-in{width:100%;min-width:130px;font-family:var(--fn);font-size:.8rem;line-height:1.5;
+        border:1px solid var(--rule);background:var(--paper);color:var(--ink);padding:5px 7px;resize:vertical}
+.rub-note{margin-bottom:8px}
+@media(max-width:760px){
+  .rub,.rub tbody,.rub tr,.rub td{display:block;width:100%}
+  .rub thead,.rub tfoot th{display:none}
+  .rub tr{border-bottom:1px solid var(--hair);padding-bottom:8px}
+  .rub td{border-bottom:none;padding:5px 0}
+  .rub tfoot tr{border-bottom:none}
+}
 
 /* ── zoom ─────────────────────────────────────────────────────────── */
 .lb{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:90;display:none;
@@ -454,6 +478,56 @@ function markOne(p,q){
   return {got:got,max:max,state:state,given:given};
 }
 
+/**
+ * A writing part's marking criteria, as rows.
+ *
+ * The publisher gives the writing a point total and a list of things it is
+ * looking for, and nothing about how the points divide — so they divide evenly,
+ * which is what an unweighted list means. The weight is written down in the
+ * test's own file rather than computed here, so a paper that *does* weight its
+ * criteria can say so and the validator can check the rows still add up to the
+ * question. A rubric written as plain strings (the shape before weights) is
+ * still read, so an older test file keeps working.
+ */
+function rubricRows(p){
+  var out=[], rows=p.rubric||[], per=rows.length?p.pts/rows.length:0;
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    if(typeof r==='string'){
+      var cut=r.indexOf(':');
+      out.push({label:cut>0?r.slice(0,cut).trim():('Criterion '+(i+1)),
+                says:cut>0?r.slice(cut+1).trim():r, max:per});
+    } else out.push({label:r.label,says:r.says||'',max:(r.max!==undefined?r.max:per)});
+  }
+  return out;
+}
+
+/**
+ * The marked rubric: one score, one note and one correction per criterion.
+ *
+ * `done` is false until every criterion has been marked, because a half-marked
+ * rubric is not a score — the question stays `pending` and the total says so
+ * rather than quietly counting the criteria nobody has reached yet as zero.
+ */
+function rubricMark(p){
+  var rows=rubricRows(p), got=0, done=rows.length>0;
+  for(var i=0;i<rows.length;i++){
+    var v=lLoad(p.id+'-rub-'+i,null);
+    rows[i].score=v;
+    rows[i].mistake=lLoad(p.id+'-rubm-'+i,'')||'';
+    rows[i].correction=lLoad(p.id+'-rubc-'+i,'')||'';
+    if(v===null)done=false; else got+=v;
+  }
+  /* A mark set before the rubric existed, or set as one number, still stands
+     until a criterion is marked over it. */
+  if(!done){
+    var flat=lLoad(p.id+'-dad',null);
+    if(flat!==null)return {rows:rows,got:flat,done:true,flat:true,
+                           note:lLoad(p.id+'-note','')||''};
+  }
+  return {rows:rows,got:got,done:done,flat:false,note:lLoad(p.id+'-note','')||''};
+}
+
 /** What a page is worth, what Leo earned automatically, what Dad still owes. */
 /**
  * One section's marks, plus the two lists the score screen needs.
@@ -474,13 +548,14 @@ function markPart(p){
   }
   if(p.kind==='writing'){
     max=p.pts;
-    var dm=lLoad(p.id+'-dad',null);
-    if(dm!==null)got=dm;
-    else pending.push({key:p.id+':'+p.n,part:p,n:p.n,max:p.pts,said:a.text||'',
-                      sample:'Rubric: '+p.rubric.join(' · ')});
+    var r=rubricMark(p);
+    got=r.got;
+    if(!r.done)pending.push({key:p.id+':'+p.n,part:p,n:p.n,max:p.pts,said:a.text||'',
+                             sample:'Marked against the '+r.rows.length+' criteria below.'});
+    /* Writing is marked criterion by criterion, so it is not a step row like
+       the other written answers — its own table is rendered instead. */
     marks.push({key:p.id+':'+p.n,part:p,n:p.n,max:p.pts,said:a.text||'',
-                sample:'Rubric: '+p.rubric.join(' · '),
-                value:dm,auto:null,pending:dm===null});
+                rubric:r,value:r.done?r.got:null,auto:null,pending:!r.done});
     return {got:got,max:max,pending:pending,marks:marks,dadOnly:true};
   }
   for(var i=0;i<p.questions.length;i++){
@@ -1017,6 +1092,14 @@ function attemptQuestions(){
   var out=[];
   for(var i=0;i<PARTS.length;i++){
     var p=PARTS[i];
+    /* Writing and speaking have no `questions` array, and for a long time that
+       meant an app sitting filed neither — so the report's sections added up to
+       less than the test was worth, and the marked rubric, which is the most
+       useful thing on that page, only ever existed for a paper test. Both are
+       filed as open responses: in the report, out of the mistakes drill, where
+       there is nothing to re-pose. */
+    if(p.kind==='writing'){out.push(writingRow(p));continue;}
+    if(p.kind==='speaking'){out.push(speakingRow(p));continue;}
     if(!p.questions)continue;
     for(var j=0;j<p.questions.length;j++){
       var q=p.questions[j], m=markOne(p,q);
@@ -1034,6 +1117,52 @@ function attemptQuestions(){
   }
   return out;
 }
+
+/** The writing question as the report reads it, with its marked rubric. */
+function writingRow(p){
+  var a=getAns(p), r=rubricMark(p), chosen=null;
+  for(var i=0;i<(p.prompts||[]).length;i++)
+    if((p.prompts||[]).length===1||p.prompts[i].k===a.choice)chosen=p.prompts[i];
+  var ask=(p.instr||'')+(chosen?' '+stripTags(chosen.t):'');
+  var row={n:String(p.n),part:p.name,
+           state:!r.done?'pending':(r.got>=p.pts?'right':r.got>0?'partial':'wrong'),
+           got:r.got,max:p.pts,question:ask.trim(),given:a.text||'',
+           answer:'Marked against the criteria below.',open:true};
+  if(r.note)row.comment=r.note;
+  if(!r.flat){
+    row.rubric=r.rows.map(function(x){
+      /* null, not 0: a criterion nobody has reached is not a criterion scored
+         nought, and the report prints it as "to mark". */
+      return {label:x.label,score:x.score,max:x.max,
+              mistake:x.mistake||'',correction:x.correction||''};
+    });
+  }
+  return row;
+}
+
+/**
+ * The speaking question, marked prompt by prompt on its own page.
+ *
+ * One row, not one per prompt: the ticks are a count out of the prompts, and
+ * the page itself is where each one is judged. Until Dad has opened the
+ * prompts nothing has been asked, so it is pending rather than nought.
+ */
+function speakingRow(p){
+  var ticks=lLoad(p.id+'-ticks',[])||[], seen=!!lLoad(p.id+'-seen',false), got=0, said=[];
+  for(var i=0;i<p.prompts.length;i++){
+    if(ticks[i])got++;
+    said.push((i+1)+'. '+p.prompts[i].q+(ticks[i]?' ✔':' ✘'));
+  }
+  return {n:String(p.n),part:p.name,
+          state:!seen?'pending':(got>=p.pts?'right':got>0?'partial':'wrong'),
+          got:got,max:p.pts,
+          question:(p.instr||'Speaking')+' — '+p.prompts.length+' prompts from the picture.',
+          given:seen?said.join('\n'):'',
+          answer:'One point for each prompt answered.',open:true};
+}
+
+/** A prompt is written with <b> in it; a report row is plain text. */
+function stripTags(t){return String(t||'').replace(/<[^>]*>/g,'');}
 
 function writeAttempt(){
   if(!revealed)return;            /* a sitting exists once its result is opened */
@@ -1132,7 +1261,9 @@ function answersHtml(){
       +'already placed. Tap a number to set it; the score changes as you do.</div>';
   }
   for(var k=0;k<t.marks.length;k++){
-    var pn=t.marks[k], cur=(pn.value!==null&&pn.value!==undefined)?pn.value:pn.auto;
+    var pn=t.marks[k];
+    if(pn.rubric){h+=rubricHtml(pn);continue;}
+    var cur=(pn.value!==null&&pn.value!==undefined)?pn.value:pn.auto;
     var by=(pn.value!==null&&pn.value!==undefined) ? 'you marked this'
          : pn.auto!==null ? 'the app placed this' : 'waiting for you';
     h+='<div class="mark'+(pn.pending?' is-open':'')+'">'
@@ -1228,10 +1359,90 @@ function retake(btnId){
   },5000);
 }
 
+/**
+ * The writing question's marking table.
+ *
+ * A number out of ten says what he scored and nothing about why, and why is the
+ * whole point of marking a piece of writing. So the writing is marked the way
+ * the paper tests are marked: criterion by criterion, with room to write down
+ * what cost the marks and the same sentence put right. That is what reaches the
+ * report, where the marked rubric is the most useful thing on the page — an app
+ * sitting used to file no writing at all.
+ *
+ * Each criterion is a row of steps in fifths of its own weight, which is halves
+ * on a ten-point writing and quarters on a five-point one. Nothing is typed
+ * into a hidden draft: a note is saved as it is typed.
+ */
+function rubricHtml(pn){
+  var p=pn.part, r=pn.rubric, rows=r.rows;
+  var h='<div class="mark'+(pn.pending?' is-open':'')+'">'
+    +'<div class="mark-h">Question '+esc(String(pn.n))+' &middot; Writing &middot; out of '+trimPts(p.pts)
+    +' <span class="mark-by">'+(r.done?trimPts(r.got)+' marked':'waiting for you')+'</span></div>'
+    +'<div class="mark-said">'+(esc(pn.said)||'(nothing written)')+'</div>';
+  if(r.flat)
+    h+='<div class="mark-key">Marked '+trimPts(r.got)+' out of '+trimPts(p.pts)
+      +' as one number. Marking a criterion below replaces it.</div>';
+  h+='<table class="rub"><thead><tr><th>What is being marked</th><th>Score</th>'
+    +'<th>What cost the marks</th><th>Written properly</th></tr></thead><tbody>';
+  for(var i=0;i<rows.length;i++){
+    var row=rows[i], step=row.max/5;
+    h+='<tr class="'+(row.score===null?'rub-open':(row.score===row.max?'rub-full':''))+'">'
+      +'<td><b>'+esc(row.label)+'</b> <span class="rub-of">out of '+trimPts(row.max)+'</span>'
+      +'<span class="rub-says">'+esc(row.says)+'</span></td>'
+      +'<td class="rub-score"><div class="steps">';
+    for(var n=0;n<=5;n++){
+      var val=Math.round(step*n*100)/100;
+      h+='<button class="step'+(row.score===val?' on':'')+'" onclick="rubMark(\''+p.id+'\','+i+','+val+')">'
+        +trimPts(val)+'</button>';
+    }
+    h+='</div></td>'
+      +'<td><textarea class="rub-in" rows="2" placeholder="What he wrote that cost the marks"'
+      +' oninput="rubNote(\''+p.id+'\','+i+',\'m\',this)">'+esc(row.mistake)+'</textarea></td>'
+      +'<td><textarea class="rub-in" rows="2" placeholder="The same thing put right"'
+      +' oninput="rubNote(\''+p.id+'\','+i+',\'c\',this)">'+esc(row.correction)+'</textarea></td>'
+      +'</tr>';
+  }
+  h+='</tbody><tfoot><tr><td>Total</td><td class="rub-score"><b>'+trimPts(r.got)+' / '+trimPts(p.pts)
+    +'</b></td><td colspan="2">'+(r.done?'':'<span class="rub-wait">Every criterion needs a score '
+    +'before this counts.</span>')+'</td></tr></tfoot></table>'
+    +'<textarea class="rub-in rub-note" rows="2" placeholder="A note about the writing as a whole"'
+    +' oninput="rubNote(\''+p.id+'\',-1,\'n\',this)">'+esc(r.note)+'</textarea>'
+    +'<div class="steps"><button class="step ghost" onclick="dadClear(\''+pn.key+'\')">'
+    +'&#8635; clear this marking</button></div>';
+  return h+'</div>';
+}
+
+/** 2.5 stays 2.5; 2.0 reads as 2 — a rubric has halves and a question does not. */
+function trimPts(v){return (Math.round(v*100)/100).toString();}
+
+function rubMark(pid,i,val){
+  var cur=lLoad(pid+'-rub-'+i,null);
+  lSave(pid+'-rub-'+i, cur===val?null:val);   /* tapping the standing mark clears it */
+  keepScroll(render);
+}
+
+/* Saved as it is typed, and deliberately without a re-render: re-rendering
+   would take the caret with it. The score screen reads these back on its next
+   render, and the attempt is rewritten on the same beat as every other mark. */
+var noteTimer;
+function rubNote(pid,i,which,el){
+  var key = which==='n' ? pid+'-note' : (which==='m'?pid+'-rubm-':pid+'-rubc-')+i;
+  lSave(key, el.value);
+  clearTimeout(noteTimer);
+  noteTimer=setTimeout(recordScore,600);
+}
+
 /** Drop Dad's mark so the app's own reading stands again. */
 function dadClear(key){
   var bits=key.split(':'), pid=bits[0], qn=bits[1], p=partById(pid);
-  if(p.kind==='writing')lSave(pid+'-dad',null);
+  if(p.kind==='writing'){
+    lSave(pid+'-dad',null);
+    var rows=rubricRows(p);
+    for(var i=0;i<rows.length;i++){
+      lSave(pid+'-rub-'+i,null);lSave(pid+'-rubm-'+i,'');lSave(pid+'-rubc-'+i,'');
+    }
+    lSave(pid+'-note','');
+  }
   else lSave(pid+'-dad-'+qn,null);
   keepScroll(render);
 }

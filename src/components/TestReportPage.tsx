@@ -217,7 +217,11 @@ export function TestReportPage({ attemptId }: { attemptId: string }) {
           <h2 className="rep-h2">
             Writing rubric <span className="rep-count">Question {rubricQuestion.n}</span>
           </h2>
+          {rubricQuestion.given ? (
+            <blockquote className="rep-wrote">{rubricQuestion.given}</blockquote>
+          ) : null}
           <RubricTable rows={rubricQuestion.rubric} />
+          {rubricQuestion.comment ? <p className="rep-note">{rubricQuestion.comment}</p> : null}
         </>
       ) : null}
 
@@ -307,8 +311,9 @@ function QuestionDetail({ question }: { question: TestAttemptQuestion }) {
 }
 
 function RubricTable({ rows }: { rows: AttemptRubricRow[] }) {
-  const got = rows.reduce((sum, row) => sum + row.score, 0);
+  const got = rows.reduce((sum, row) => sum + (row.score ?? 0), 0);
   const max = rows.reduce((sum, row) => sum + row.max, 0);
+  const waiting = rows.filter((row) => row.score === null).length;
   return (
     <table className="rep-rubric">
       <thead>
@@ -324,7 +329,12 @@ function RubricTable({ rows }: { rows: AttemptRubricRow[] }) {
           <tr className={row.score === row.max ? "is-full" : ""} key={row.label}>
             <td>{row.label}</td>
             <td className="rep-num">
-              {trim(row.score)} / {trim(row.max)}
+              {row.score === null ? (
+                <span className="rep-tomark">to mark</span>
+              ) : (
+                trim(row.score)
+              )}{" "}
+              / {trim(row.max)}
             </td>
             <td>{row.mistake ? row.mistake : <span className="rep-clean">nothing</span>}</td>
             <td>{row.correction ? row.correction : "—"}</td>
@@ -337,7 +347,13 @@ function RubricTable({ rows }: { rows: AttemptRubricRow[] }) {
           <td className="rep-num">
             {trim(got)} / {trim(max)}
           </td>
-          <td colSpan={2} />
+          <td colSpan={2}>
+            {waiting ? (
+              <span className="rep-tomark">
+                {waiting} {waiting === 1 ? "criterion is" : "criteria are"} still to mark.
+              </span>
+            ) : null}
+          </td>
         </tr>
       </tfoot>
     </table>

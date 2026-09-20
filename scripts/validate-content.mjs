@@ -703,6 +703,23 @@ for (const teacher of lessons) {
       where(`part ${index + 1} is "${part.name}" but ${learner.id} labels it "${labels[index]}"`);
     // Every picture is referenced absolutely, because a learner app renders
     // from srcdoc against a <base href> at the site root.
+    // A writing part is marked criterion by criterion, so its criteria carry
+    // the weights — and they have to add up to what the question is worth, or
+    // a fully-marked rubric would not reach full marks.
+    if (part.kind === "writing") {
+      const rubric = Array.isArray(part.rubric) ? part.rubric : [];
+      if (!rubric.length) where(`part ${index + 1} is a writing part with no rubric to mark it against`);
+      const weights = rubric.reduce((sum, row) => sum + (typeof row === "object" ? row.max ?? 0 : 0), 0);
+      if (rubric.some((row) => typeof row !== "object")) {
+        where(`part ${index + 1} has a rubric written as plain strings — each criterion needs { label, max, says }`);
+      } else if (Math.abs(weights - part.pts) > 1e-9) {
+        where(`part ${index + 1} is worth ${part.pts} points but its rubric criteria add up to ${weights}`);
+      }
+      for (const row of rubric) {
+        if (typeof row === "object" && (!row.label || !row.says))
+          where(`part ${index + 1} has a rubric criterion missing a label or its description`);
+      }
+    }
     const pictures = part.images ?? (part.image ? [{ src: part.image }] : []);
     for (const picture of pictures) {
       if (!picture.src.startsWith("/")) where(`part ${index + 1} has a relative picture path "${picture.src}"`);

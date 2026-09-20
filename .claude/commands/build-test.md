@@ -140,6 +140,14 @@ so none of this is covered:
   has one exact answer the app marks; open responses, writing and speaking are
   Neritan's.
 
+**A writing part's `rubric` is weighted data, not a list of hints.** Each
+criterion is `{ "label": "Grammar", "max": 2.5, "says": "You use correct
+grammar." }`, and the engine renders them as the evaluation table Neritan marks
+— a score row per criterion, what cost the marks, the same sentence put right.
+The publisher gives a point total and an unweighted list, so **divide the points
+evenly**: 2.5 each on a ten-point writing, 1.25 each on a five-point one. The
+validator checks they add up to the question.
+
 A `text` key may be **a list of accepted wordings** where the publisher prints
 alternatives. Anything not matching still goes to Neritan rather than being
 marked wrong — a rewrite can be right in words the key did not predict — unless

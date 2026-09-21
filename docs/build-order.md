@@ -36,6 +36,7 @@ For each component in this order:
 After every three-unit band, build checkpoint components from the planner:
    16a. review        (mixed review slideshow + Leo review app)
    16b. extra-reading (extended reading slideshow + Leo extra-reading app)
+   16c. lets-talk (functional dialogue slideshow + Leo lets-talk app — Levels 4-6 only)
 
 Checkpoint lessons belong to the band, not to the last unit in the band. Use bands `1-3`, `4-6`, and `7-9`.
 
@@ -76,6 +77,7 @@ Each step becomes its own skill so a unit can be built one chunk at a time. Most
 /writing-app           step 16     BUILT (.claude/commands/writing-app.md; teacher slideshow + 13-module Leo app, see docs/components.md)
 /review-app            checkpoint  pattern locked by Level 4 band 7-9 (teacher deck + 8-module Leo app); skill itself still to write
 /extra-reading-app     checkpoint  pattern locked by Level 4 band 7-9 (teacher deck + 8-module Leo app); skill itself still to write
+/lets-talk-app         checkpoint  pattern set by Level 4 band 7-9 (teacher deck + 6-module Leo app); Levels 4-6 only; skill itself still to write
 ```
 
 Also built beyond the original numbered pipeline: `/mission-app`, `/project-app`, `/reader-app` (`.claude/commands/mission-app.md`, `project-app.md`, `reader-app.md`) — see `docs/components.md` for each component's locked module structure.

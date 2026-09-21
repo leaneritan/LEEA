@@ -71,6 +71,11 @@ import checkpoint79Review from "../../content/subjects/english/courses/our-world
 import checkpoint79ReviewLearner from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/review-app.learner.json";
 import checkpoint79ExtraReading from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/extra-reading.teacher.json";
 import checkpoint79ExtraReadingLearner from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/extra-reading-app.learner.json";
+// Let's Talk is the band's speaking page — the last of the three back-of-book
+// spreads after Units 7-9, and the only component in the band that is dialogue
+// rather than reading or marking.
+import checkpoint79LetsTalk from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/lets-talk.teacher.json";
+import checkpoint79LetsTalkLearner from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/lets-talk-app.learner.json";
 import checkpoint79Test from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/test.teacher.json";
 import checkpoint79TestLearner from "../../content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/test-app.learner.json";
 // The whole-level final covers Units 1-9, so it has its own checkpoint folder and
@@ -141,6 +146,7 @@ const componentOrder = [
   "quiz",
   "extra-reading",
   "review",
+  "lets-talk",
   "test",
   "final-test"
 ];
@@ -230,6 +236,8 @@ export const lessons: Lesson[] = [
   checkpoint79ReviewLearner as Lesson,
   checkpoint79ExtraReading as Lesson,
   checkpoint79ExtraReadingLearner as Lesson,
+  checkpoint79LetsTalk as Lesson,
+  checkpoint79LetsTalkLearner as Lesson,
   unit8Opener as Lesson,
   unit8OpenerLearner as Lesson,
   unit8Vocab1 as Lesson,
@@ -290,7 +298,7 @@ export type LessonGroup = {
 // Their lesson records carry the band's last unit number (3, 6, 9) so they can be
 // found from that unit, but every surface must show them as checkpoint material,
 // never as an ordinary lesson of that unit.
-export const CHECKPOINT_COMPONENTS = ["review", "extra-reading", "test", "final-test"];
+export const CHECKPOINT_COMPONENTS = ["review", "extra-reading", "lets-talk", "test", "final-test"];
 
 export function isCheckpointComponent(component: string) {
   return CHECKPOINT_COMPONENTS.includes(component.replace(/-app$/, ""));

@@ -24,6 +24,10 @@ export function getComponentMeta(component: string): ComponentMeta {
   if (component.includes("writing")) return { emoji: "✍️", label: "Writing", tone: "writing" };
   if (component.includes("song")) return { emoji: "🎵", label: "Song", tone: "song" };
   if (component.includes("review")) return { emoji: "🏁", label: "Review", tone: "review" };
+  // The band's speaking page. It is checkpoint material like the review beside
+  // it, but it is practice rather than assessment, so it takes the activity
+  // tone and keeps its own cue — three checkpoint rows land on the same unit.
+  if (component.includes("lets-talk")) return { emoji: "🗣️", label: "Let's Talk", tone: "activity" };
   // The band test shares the review tone — it is checkpoint material, not a unit
   // lesson — but keeps its own cue and label so it never reads as another review.
   // The whole-level final sits beside the band tests and shares their tone, but

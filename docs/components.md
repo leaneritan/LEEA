@@ -57,6 +57,7 @@ Every Our World unit follows the same component-phase pattern. The teacher slide
 | **writing** | Warm Up → Present → Read the Model → Plan → Write → Edit → Share |
 | **review** | Mixed checkpoint review after Units 1-3, 4-6, or 7-9 |
 | **extra-reading** | Extended checkpoint reading after Units 1-3, 4-6, or 7-9 |
+| **lets-talk** | Functional dialogue after Units 1-3, 4-6, or 7-9 — Levels 4-6 only |
 | **mission** | Think → Pair → Share + Be the Expert (About the Photo + Meet the Explorer) |
 | **project** | Prepare → Share → Modify |
 | **book-reading** | Before You Read → While You Read → After You Read |
@@ -316,6 +317,29 @@ The Units 7-9 teacher deck is built: `public/lessons/ow-l4-r7-9-review.html` (28
 Extra Reading apps appear beside checkpoint reviews after the same three-unit bands. They should focus on extended reading, comprehension checks, new glossary/support words, and a short response. Use teacher component `extra-reading` and learner component `extra-reading-app`. Suggested IDs: `ow-l4-er7-9-extra-reading` and `ow-l4-er7-9-extra-reading-app`.
 
 The Units 7-9 teacher deck is built: `public/lessons/ow-l4-er7-9-extra-reading.html` (40 slides — Leonardo da Vinci, SB pp.164-165: 4 academic words, 5 content words, text features and biography elements, the timeline, Activities 2-4, Share, Recap, Formative Assessment), registered from `content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/extra-reading.teacher.json`. The Leo app is still to build.
+
+### lets-talk (Level 4 band 7-9)
+
+6-module modal home grid, conversation teal. Built example: `public/learn/ow-l4-lt7-9-lets-talk.html`. It shares the Review / Extra Reading flashcard+quiz engine (`DECKS` keyed by module number) and the step-ordering pattern from the Extra Reading app.
+
+| # | Module | What Leo does | Completion |
+|---|---|---|---|
+| m1 | 🎓 Ask About Words | Flashcards + quiz on the four ways of asking about a word | Quiz pass (6/8) |
+| m2 | 🌟 Answer & React | Flashcards + quiz on the six reacting / not-knowing phrases | Quiz pass (8/10) |
+| m3 | ⚽ Favorite Sport | Hear each line, tick it said, rebuild the six-line dialogue in order, then three why-those-words questions | All three questions right |
+| m4 | 🪞 Do you? — the echo game | Pick the right echo question for eight sentences | All eight right |
+| m5 | 🙋 What Does It Mean? | Rebuild the second dialogue, match six real situations to the phrase that fits, then the two Activity 4 discussions | Both Activity 4 questions right |
+| m6 | ⚽ Can Leo Score? | 10Q across echo, reacting, asking and politeness | Score ≥8/10 |
+
+**A Let's Talk page is pair work, and Leo works alone.** The book's own instruction is "practise with a partner", which an app cannot be. So the app does the two halves a partner is not needed for — hearing the line and rebuilding it — and hands the pair practice back to the teacher deck, where Neritan reads the other part. The speak-along tick is Leo's own claim that he said it out loud, not a recording; the deck's Formative Assessment is where that gets checked.
+
+**There is no Student Book audio in the repo**, so `speechSynthesis` reads the line as a model voice and the 🔊 button is simply not rendered where the browser has no voice. The dialogues themselves are verbatim from the Student Book audio script (TR 9.12-9.14).
+
+### lets-talk — the level-band rule
+
+Let's Talk is a **Levels 4-6 page only** (see the level-band variants table above) — Levels 1-3 have no functional-dialogue spread, so those bands carry two checkpoint rows rather than three. Use teacher component `lets-talk` and learner component `lets-talk-app`. Suggested IDs: `ow-l<level>-lt<start>-<end>-lets-talk` and `…-lets-talk-app`.
+
+It is checkpoint material but **not assessment** — it takes the activity tone in `componentMeta.ts`, not the review tone the Review and Test share, and the course map labels its row "Checkpoint · Speaking".
 
 ## Reading vocab and grammar from the unit JSON
 

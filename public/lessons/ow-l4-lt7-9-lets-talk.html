@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Let’s Talk · Units 7–9 | LEEA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"></noscript>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../lib/leea-cloud-config.js"></script>
+<script src="../../lib/leea-cloud.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* ── LET'S TALK · CONVERSATION PALETTE ── */
+  --u9:#0F766E;      --u9d:#115E59;    --u9l:#F0FDFA;   --u9ll:#F6FFFD;
+  --acc:#F59E0B;     --accd:#B45309;   --accl:#FFFBEB;
+  --gn:#16A34A;      --gnd:#15803D;    --gnl:#F0FDF4;
+  --bl:#2563EB;      --bld:#1D4ED8;    --bll:#EFF6FF;
+  --pu:#7C3AED;      --pul:#F5F3FF;
+  --tl:#0D9488;      --tll:#F0FDFA;
+  --rd:#DC2626;      --rdl:#FEE2E2;
+  --ink:#0F172A;     --ink2:#334155;   --ink3:#64748B;   --ink4:#94A3B8;
+  --paper:#FDF9F0;   --surf:#FFFFFF;   --bdr:#E2E8F0;    --bdr2:#CBD5E1;
+  --fn:'Outfit',system-ui,sans-serif;
+}
+html,body{height:100%;background:#0B0F1A;overflow:hidden;font-family:var(--fn)}
+
+/* ══ DECK STAGE (1920×1080 fixed coordinate space) ══ */
+#deckWrap{position:fixed;inset:0;overflow:hidden;background:#0B0F1A}
+#deck{position:absolute;top:0;left:0;width:1920px;height:1080px;flex:0 0 auto;transform-origin:top left;background:var(--paper);overflow:hidden;will-change:transform}
+
+/* ══ SLIDES ══ */
+.slide{position:absolute;inset:0;padding:96px 110px 130px;display:none;flex-direction:column;justify-content:center}
+.slide.on{display:flex}
+.slide.top{justify-content:flex-start;padding-top:120px}
+
+/* ══ STAGE BADGE (injected by <deck-stage>) ══ */
+deck-stage{position:absolute;top:38px;left:110px;display:flex;align-items:center;gap:12px;z-index:5}
+.sb{font-size:19px;font-weight:800;letter-spacing:3.2px;text-transform:uppercase;padding:8px 20px;border-radius:6px;border:2px solid}
+.sb.warmup{background:var(--accl);color:var(--accd);border-color:#FCD34D}
+.sb.present{background:var(--bll);color:var(--bld);border-color:#BFDBFE}
+.sb.practice{background:var(--pul);color:var(--pu);border-color:#DDD6FE}
+.sb.apply{background:var(--gnl);color:var(--gnd);border-color:#BBF7D0}
+.sb.recap{background:var(--tll);color:var(--tl);border-color:#99F6E4}
+.sb.wrapup{background:#F1F5F9;color:var(--ink2);border-color:var(--bdr2)}
+.sb.vocab{background:var(--u9l);color:var(--u9d);border-color:#99F6E4}
+.sb.expert{background:#FDF4FF;color:#A21CAF;border-color:#F5D0FE}
+.sb-sub{font-size:18px;font-weight:600;color:var(--ink4);letter-spacing:.6px}
+
+/* ══ TYPOGRAPHY ══ */
+h1.big{font-size:104px;font-weight:900;line-height:1.02;letter-spacing:-2.5px;color:var(--ink)}
+h2.hd{font-size:70px;font-weight:900;line-height:1.06;letter-spacing:-1.6px;color:var(--ink);margin-bottom:34px}
+h3.sub{font-size:44px;font-weight:800;color:var(--ink);line-height:1.18;margin-bottom:24px}
+p.lead{font-size:38px;font-weight:500;color:var(--ink2);line-height:1.5}
+.kick{font-size:22px;font-weight:800;letter-spacing:5px;text-transform:uppercase;color:var(--u9);margin-bottom:20px}
+.jp{font-size:27px;font-weight:600;color:var(--ink3);line-height:1.5}
+.hl{color:var(--u9)}
+.hl2{color:var(--acc)}
+.hlbl{color:var(--bl)}
+.hlgn{color:var(--gn)}
+
+/* ══ LAYOUT HELPERS ══ */
+.row{display:flex;gap:30px;align-items:stretch;justify-content:center}
+.col{display:flex;flex-direction:column;gap:24px;justify-content:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-content:center}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-content:center}
+.center{text-align:center;align-items:center}
+.mt{margin-top:32px}
+
+/* ══ CARDS ══ */
+.card{background:var(--surf);border:3px solid var(--bdr);border-radius:20px;padding:32px 36px}
+.card.u9{border-color:#99F6E4;background:var(--u9l)}
+.card.acc{border-color:#FDE68A;background:var(--accl)}
+.card.bl{border-color:#BFDBFE;background:var(--bll)}
+.card.gn{border-color:#BBF7D0;background:var(--gnl)}
+.card.pu{border-color:#DDD6FE;background:var(--pul)}
+.card-lbl{font-size:20px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+
+/* ══ WORD CARD (vocab reveal prize) ══ */
+.wordcard{background:linear-gradient(155deg,#fff,#FFF7F7);border:5px solid var(--u9);border-radius:28px;padding:44px 54px;text-align:center;box-shadow:0 22px 60px rgba(15,118,110,.18)}
+.wordcard .emo{font-size:104px;line-height:1}
+.wordcard .w{font-size:82px;font-weight:900;color:var(--u9d);letter-spacing:-1.4px;margin-top:8px}
+.wordcard .pos{font-size:24px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--ink4);margin-top:6px}
+.wordcard .def{font-size:34px;font-weight:600;color:var(--ink2);margin-top:20px;line-height:1.4}
+.wordcard .ex{font-size:30px;font-weight:600;color:var(--u9);font-style:italic;margin-top:16px}
+.wordcard .jpx{font-size:26px;font-weight:600;color:var(--ink3);margin-top:14px}
+
+/* ══ BUTTONS / OPTIONS ══ */
+.opt{background:var(--surf);border:4px solid var(--bdr2);border-radius:18px;padding:26px 32px;font-family:var(--fn);font-size:36px;font-weight:700;color:var(--ink);cursor:pointer;text-align:left;transition:all .18s;line-height:1.3}
+.opt:hover:not(.locked){border-color:var(--u9);background:var(--u9ll);transform:translateY(-3px)}
+.opt.ok{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+.opt.bad{border-color:var(--rd);background:var(--rdl);color:var(--rd);animation:shk .32s}
+.opt.locked{cursor:default}
+.opt .ltr{display:inline-block;min-width:52px;font-weight:900;color:var(--ink4)}
+.opt.confirmed{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+.done-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+
+.fb{font-size:32px;font-weight:700;padding:22px 30px;border-radius:16px;margin-top:24px;display:none;line-height:1.4}
+.fb.show{display:block}
+.fb.ok{background:var(--gnl);border:3px solid #BBF7D0;color:var(--gnd)}
+.fb.bad{background:var(--rdl);border:3px solid #FECACA;color:var(--rd)}
+
+.btn{background:var(--u9);color:#fff;border:none;border-radius:16px;padding:22px 44px;font-family:var(--fn);font-size:32px;font-weight:800;cursor:pointer;transition:all .18s}
+.btn:hover{background:var(--u9d);transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--u9);border:4px solid var(--u9)}
+.btn.acc{background:var(--acc);color:#3F2D00}
+.btn.acc:hover{background:var(--accd);color:#fff}
+
+/* ══ REVEAL ══ */
+.hide{display:none}
+.reveal{animation:pop .34s cubic-bezier(.22,1,.36,1)}
+@keyframes pop{0%{opacity:0;transform:scale(.9) translateY(18px)}100%{opacity:1;transform:none}}
+@keyframes shk{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-9px)}50%{transform:translateX(9px)}}
+
+/* ══ TAP TILE ══ */
+.tile{background:var(--surf);border:4px dashed var(--bdr2);border-radius:20px;padding:34px 30px;text-align:center;cursor:pointer;transition:all .2s;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.tile:hover{border-color:var(--acc);background:var(--accl);transform:translateY(-4px)}
+.tile.open{border-style:solid;border-color:var(--gn);background:var(--gnl);cursor:default}
+.tile .t-emo{font-size:60px;line-height:1}
+.tile .t-q{font-size:32px;font-weight:800;color:var(--ink2)}
+.tile .t-a{font-size:34px;font-weight:800;color:var(--gnd);line-height:1.3}
+
+/* ══ CAUSE/EFFECT CHART ══ */
+.ce{display:grid;grid-template-columns:1fr 120px 1fr;gap:0;border:4px solid var(--ink);border-radius:20px;overflow:hidden;background:var(--surf)}
+.ce-hd{padding:20px;font-size:28px;font-weight:900;letter-spacing:3px;text-transform:uppercase;text-align:center;color:#fff}
+.ce-hd.c{background:var(--bl)}
+.ce-hd.arrow{background:var(--ink);color:#fff;font-size:34px}
+.ce-hd.e{background:var(--gn)}
+.ce-cell{padding:24px 26px;border-top:3px solid var(--bdr);font-size:31px;font-weight:600;color:var(--ink2);line-height:1.35;display:flex;align-items:center;min-height:104px}
+.ce-cell.mid{justify-content:center;font-size:40px;color:var(--ink4);background:#F8FAFC}
+.ce-cell.blank{background:#FFFBEB;color:var(--ink4);font-style:italic}
+.ce-cell.fill{background:var(--gnl);color:var(--gnd);font-weight:800}
+
+/* ══ MODEL TEXT ══ */
+.model{background:var(--surf);border:4px solid var(--bdr);border-left:14px solid var(--acc);border-radius:0 20px 20px 0;padding:34px 40px;font-size:33px;font-weight:500;color:var(--ink2);line-height:1.62}
+.model .cw{background:#DBEAFE;border-bottom:5px solid var(--bl);border-radius:5px;padding:0 6px;font-weight:800;color:var(--bld)}
+.model .ew{background:#DCFCE7;border-bottom:5px solid var(--gn);border-radius:5px;padding:0 6px;font-weight:800;color:var(--gnd)}
+.model .pn{font-size:22px;font-weight:800;letter-spacing:2px;color:var(--ink4);display:block;margin-bottom:8px}
+
+/* ══ CHIPS ══ */
+.chips{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.chip{background:var(--surf);border:4px solid var(--bdr2);border-radius:999px;padding:16px 34px;font-size:32px;font-weight:800;color:var(--ink2)}
+.chip.c{border-color:var(--bl);background:var(--bll);color:var(--bld)}
+.chip.e{border-color:var(--gn);background:var(--gnl);color:var(--gnd)}
+
+/* ══ WORD MAP ══ */
+.map{position:relative;height:430px}
+.node{position:absolute;background:var(--surf);border:4px solid var(--u9);border-radius:999px;padding:18px 34px;font-size:30px;font-weight:800;color:var(--u9d);white-space:nowrap}
+.node.mid{background:var(--u9);color:#fff;font-size:38px;padding:24px 46px}
+.mapline{position:absolute;background:var(--bdr2);height:4px;transform-origin:left center}
+
+/* ══ PROGRESS / NAV / NOTES (absolute inside #deck) ══ */
+#prog{position:absolute;left:0;right:0;bottom:0;height:9px;background:#F1F5F9;z-index:20}
+#progFill{height:100%;background:linear-gradient(90deg,var(--u9),var(--acc));width:0;transition:width .35s}
+#nav{position:absolute;right:44px;bottom:36px;display:flex;align-items:center;gap:14px;z-index:22}
+.nb{width:74px;height:74px;border-radius:50%;border:4px solid var(--bdr2);background:var(--surf);font-size:32px;font-weight:900;color:var(--ink2);cursor:pointer;transition:all .18s}
+.nb:hover{border-color:var(--u9);color:var(--u9)}
+#counter{font-size:26px;font-weight:800;color:var(--ink3);min-width:130px;text-align:center;letter-spacing:1px}
+.tn-btn{position:absolute;left:44px;bottom:36px;width:74px;height:74px;border-radius:50%;border:4px solid var(--bdr2);background:var(--surf);font-size:32px;cursor:pointer;z-index:22;transition:all .18s}
+.tn-btn:hover{border-color:var(--acc);background:var(--accl)}
+.fs-btn{left:134px}
+.tn-btn.act{background:var(--acc);border-color:var(--accd)}
+.tn-panel{position:absolute;left:0;right:0;bottom:0;max-height:430px;overflow-y:auto;background:rgba(15,23,42,.97);color:#E2E8F0;padding:38px 110px 60px;z-index:21;display:none;border-top:6px solid var(--acc)}
+.tn-panel.open{display:block}
+.tn-panel h4{font-size:24px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:16px}
+.tn-panel p{font-size:27px;line-height:1.55;font-weight:500;margin-bottom:12px}
+.tn-panel em{color:#FDE68A;font-style:italic}
+.tn-panel .say{color:#BBF7D0;font-weight:700}
+#badge{position:absolute;right:44px;top:38px;font-size:20px;font-weight:800;letter-spacing:3px;color:var(--ink4);z-index:5}
+
+/* ══ SCOREBOARD / MISC ══ */
+.stepbar{display:flex;gap:14px;justify-content:center;margin-bottom:26px}
+.step{width:60px;height:12px;border-radius:999px;background:var(--bdr)}
+.step.on{background:var(--u9)}
+.big-emo{font-size:150px;line-height:1}
+.mid-emo{font-size:92px;line-height:1}
+.list{display:flex;flex-direction:column;gap:20px}
+.li{display:flex;gap:20px;align-items:flex-start;font-size:34px;font-weight:600;color:var(--ink2);line-height:1.35}
+.li .n{flex:0 0 54px;height:54px;border-radius:50%;background:var(--u9);color:#fff;font-size:28px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.li .n.gn{background:var(--gn)}
+.li .n.bl{background:var(--bl)}
+.frame{background:var(--accl);border:4px dashed var(--acc);border-radius:20px;padding:28px 34px;font-size:34px;font-weight:700;color:var(--accd);line-height:1.5}
+.tick{display:flex;align-items:center;gap:22px;background:var(--surf);border:4px solid var(--bdr);border-radius:18px;padding:22px 30px;font-size:32px;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .18s}
+.tick:hover{border-color:var(--gn)}
+.tick.on{background:var(--gnl);border-color:var(--gn);color:var(--gnd)}
+.tick .bx{flex:0 0 48px;height:48px;border:4px solid var(--bdr2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:30px}
+.tick.on .bx{background:var(--gn);border-color:var(--gn);color:#fff}
+.dad{background:var(--gnl);border:4px solid #BBF7D0;border-radius:18px;padding:24px 30px;font-size:30px;font-weight:700;color:var(--gnd);line-height:1.45}
+table.share{width:100%;border-collapse:collapse;border:4px solid var(--ink);border-radius:16px;overflow:hidden}
+table.share th{background:var(--ink);color:#fff;font-size:28px;font-weight:800;letter-spacing:2px;padding:18px;text-transform:uppercase}
+table.share td{border:3px solid var(--bdr);padding:22px;font-size:30px;font-weight:600;color:var(--ink2)}
+.tile.sm{min-height:124px;padding:24px 22px;gap:6px}
+.tile.sm .t-emo{font-size:46px}
+.tile.sm .t-q{font-size:29px}
+
+/* ══ DIALOGUE (this lesson's own block — two speakers, target phrases marked) ══ */
+.dlg{background:var(--surf);border:4px solid var(--bdr);border-left:14px solid var(--u9);border-radius:0 20px 20px 0;padding:30px 38px;display:flex;flex-direction:column;gap:16px}
+.dl{display:flex;gap:22px;align-items:baseline;font-size:33px;font-weight:600;color:var(--ink2);line-height:1.45}
+.dl .who{flex:0 0 190px;font-size:26px;font-weight:900;letter-spacing:2px;color:var(--u9);text-transform:uppercase}
+.dl b{background:#CCFBF1;border-bottom:5px solid var(--u9);border-radius:5px;padding:0 7px;font-weight:800;color:var(--u9d)}
+.card .dl{font-size:28px;gap:16px}
+.card .dl .who{flex:0 0 74px;font-size:22px}
+</style>
+</head>
+<body>
+<div id="deckWrap"><div id="deck">
+<div id="badge">LEEA · L4 · LET’S TALK</div>
+<section class="slide center" data-stage="Let&rsquo;s Talk" data-stagetone="vocab">
+<div class="col center">
+ <div class="big-emo">🗣️💬</div>
+ <div class="kick">Our World 2E · Level 4 · Student&rsquo;s Book pp. 166&ndash;167</div>
+ <h1 class="big">Let&rsquo;s Talk<br><span class="hl">Units 7&ndash;9</span></h1>
+ <p class="lead mt">Showing interest &nbsp;·&nbsp; Asking about words &nbsp;·&nbsp; TR 9.12&ndash;9.14</p></div>
+</section>
+<section class="slide top" data-stage="Warm Up" data-stagetone="warmup">
+<h3 class="sub">🤔 You don&rsquo;t know a word. What do you do?</h3>
+<p class="lead" style="margin-bottom:24px">This happens in every single lesson. There is a right answer &mdash; and this page gives you the words for it.</p>
+<div class="grid3" id="q-warm"><button class="opt center" data-act="opt" data-g="warm" data-c="0" data-fb="Then the conversation stops too &mdash; and the word stays unknown.">Say nothing and keep going.</button><button class="opt center" data-act="opt" data-g="warm" data-c="1" data-fb="Correct. And today you learn three different ways to ask it.">Ask &mdash; in English.</button><button class="opt center" data-act="opt" data-g="warm" data-c="0" data-fb="It works &hellip; but then you practised nothing. English problems get English questions.">Ask in Japanese.</button></div>
+<div class="fb" id="fb-warm"></div>
+</section>
+<section class="slide top" data-stage="Let&rsquo;s Talk" data-stagetone="vocab">
+<h2 class="hd">In this lesson, I will&hellip;</h2>
+<div class="list"><div class="li"><div class="n">1</div><div>show I am interested with a short question &mdash; <strong>Do you?</strong></div></div><div class="li"><div class="n bl">2</div><div>react to good news &mdash; <strong>Wow. That&rsquo;s so cool!</strong></div></div><div class="li"><div class="n gn">3</div><div>ask about a word <strong>three different ways</strong>.</div></div><div class="li"><div class="n">4</div><div>say I am not sure &mdash; politely &mdash; and <strong>suggest what to do</strong>.</div></div></div>
+<div class="frame mt">🎯 Nothing on this page is for the test. Every phrase is for <em>real use</em>, starting in the next lesson.</div>
+</section>
+<section class="slide top" data-stage="Present" data-stagetone="present">
+<h2 class="hd">Two jobs, one page</h2>
+<div class="grid2">
+ <div class="card bl"><div class="card-lbl">Job 1 &mdash; keep it going</div>
+  <h3 class="sub">🙌 Show interest</h3>
+  <p class="lead">The other person says something. You answer in a way that makes them want to say <strong>more</strong>.</p>
+  <div class="chips mt"><span class="chip c">Do you?</span><span class="chip c">What about you?</span><span class="chip c">Wow. That&rsquo;s so cool!</span></div></div>
+ <div class="card gn"><div class="card-lbl">Job 2 &mdash; get unstuck</div>
+  <h3 class="sub">🙋 Ask for help</h3>
+  <p class="lead">You are missing a word. You get it <strong>without</strong> leaving English.</p>
+  <div class="chips mt"><span class="chip e">What does this word mean?</span><span class="chip e">How do you spell&hellip;?</span><span class="chip e">How do you say&hellip; in English?</span></div></div>
+</div>
+</section>
+<section class="slide top" data-stage="Activity 1" data-stagetone="present">
+<h3 class="sub">🎧 Listen and read &nbsp;<span class="jp">TR 9.12</span></h3>
+<div class="dlg">
+ <div class="dl"><div class="who">Pablo</div><div>What&rsquo;s your favorite sport?</div></div>
+ <div class="dl"><div class="who">Mario</div><div>Soccer. I want to be a professional soccer player.</div></div>
+ <div class="dl"><div class="who">Pablo</div><div><b>Do you?</b></div></div>
+ <div class="dl"><div class="who">Mario</div><div>Yeah! <b>What about you?</b> What&rsquo;s your favorite sport?</div></div>
+ <div class="dl"><div class="who">Pablo</div><div>I love soccer, too. My dad is taking me to the World Cup!</div></div>
+ <div class="dl"><div class="who">Mario</div><div><b>Wow. That&rsquo;s so cool!</b></div></div>
+</div>
+<p class="lead mt">Six lines. Three of them are doing the real work. 👆</p>
+</section>
+<section class="slide top" data-stage="Practice" data-stagetone="practice">
+<h3 class="sub">🔁 Two little words</h3>
+<p class="lead" style="margin-bottom:24px">Mario says <em>&ldquo;I want to be a professional soccer player.&rdquo;</em> &nbsp; Pablo answers <strong>&ldquo;Do you?&rdquo;</strong> &mdash; what is Pablo doing?</p>
+<div class="grid3" id="q-echo1"><button class="opt center" data-act="opt" data-g="echo1" data-c="0" data-fb="He is not really asking &mdash; he just heard the answer.">Asking a real question.</button><button class="opt center" data-act="opt" data-g="echo1" data-c="1" data-fb="Yes. It means &lsquo;oh really? tell me more.&rsquo; 「へえ、そうなんだ！」">Showing he is interested.</button><button class="opt center" data-act="opt" data-g="echo1" data-c="0" data-fb="Disagreeing is &lsquo;I don&rsquo;t think so.&rsquo; This one is friendly.">Disagreeing.</button></div>
+<div class="fb" id="fb-echo1"></div>
+</section>
+<section class="slide top" data-stage="Practice" data-stagetone="practice">
+<h3 class="sub">🪞 The echo copies the verb</h3>
+<p class="lead" style="margin-bottom:18px">Tap each sentence to see the echo question.</p>
+<div class="grid3" style="gap:18px">
+ <div class="tile sm" data-act="tap" data-count="echo" data-a="Do you?"><div class="t-emo">⚽</div><div class="t-q">&ldquo;I love soccer.&rdquo;</div></div>
+ <div class="tile sm" data-act="tap" data-count="echo" data-a="Are you?"><div class="t-emo">✈️</div><div class="t-q">&ldquo;I&rsquo;m going to the World Cup.&rdquo;</div></div>
+ <div class="tile sm" data-act="tap" data-count="echo" data-a="Does he?"><div class="t-emo">🏃</div><div class="t-q">&ldquo;He plays every day.&rdquo;</div></div>
+ <div class="tile sm" data-act="tap" data-count="echo" data-a="Did you?"><div class="t-emo">🎫</div><div class="t-q">&ldquo;I went to the game.&rdquo;</div></div>
+ <div class="tile sm" data-act="tap" data-count="echo" data-a="Can she?"><div class="t-emo">🏊</div><div class="t-q">&ldquo;She can swim fast.&rdquo;</div></div>
+ <div class="tile sm" data-act="tap" data-count="echo" data-a="Did they?"><div class="t-emo">🏠</div><div class="t-q">&ldquo;They used to live here.&rdquo;</div></div>
+</div>
+<div class="frame mt hide" id="echoReveal">🔑 Same helping verb &nbsp;·&nbsp; opposite person &nbsp;·&nbsp; always a question.</div>
+</section>
+<section class="slide top" data-stage="Practice" data-stagetone="practice">
+<h3 class="sub">🤩 Now react</h3>
+<p class="lead" style="margin-bottom:24px">Pablo says <em>&ldquo;My dad is taking me to the World Cup!&rdquo;</em> &nbsp; Which answer keeps the conversation alive?</p>
+<div class="grid3" id="q-react"><button class="opt center" data-act="opt" data-g="react" data-c="0" data-fb="Polite &mdash; and the conversation dies right there.">&ldquo;OK.&rdquo;</button><button class="opt center" data-act="opt" data-g="react" data-c="1" data-fb="That is the book&rsquo;s line. It makes the other person want to tell you more.">&ldquo;Wow. That&rsquo;s so cool!&rdquo;</button><button class="opt center" data-act="opt" data-g="react" data-c="0" data-fb="Close! The echo has to copy the verb &mdash; here it would be &lsquo;Is he?&rsquo;">&ldquo;Do you?&rdquo;</button></div>
+<div class="fb" id="fb-react"></div>
+</section>
+<section class="slide top" data-stage="Apply" data-stagetone="apply">
+<h2 class="hd">🎭 Act it out &mdash; twice</h2>
+<div class="list"><div class="li"><div class="n">1</div><div>Open the book at p. 166. <strong>Leo is Mario</strong>, Dad is Pablo. Read it straight through.</div></div><div class="li"><div class="n bl">2</div><div><strong>Swap.</strong> Now Leo is Pablo &mdash; so Leo gets <em>Do you?</em> and <em>Wow. That&rsquo;s so cool!</em></div></div><div class="li"><div class="n gn">3</div><div>Change the sport. Same six lines, <strong>Leo&rsquo;s own answers</strong>.</div></div></div>
+<div class="frame mt">The second and third times are the practice. The first time is only reading.</div>
+</section>
+<section class="slide top" data-stage="Activity 3" data-stagetone="present">
+<h3 class="sub">🎧 Listen and read &nbsp;<span class="jp">TR 9.13</span></h3>
+<div class="dlg">
+ <div class="dl"><div class="who">Antoni</div><div>Hey, Martina, <b>what does this word mean?</b></div></div>
+ <div class="dl"><div class="who">Martina</div><div><b>I don&rsquo;t know.</b> I think it&rsquo;s a kind of invention.</div></div>
+ <div class="dl"><div class="who">Antoni</div><div><b>Um, I don&rsquo;t think so.</b></div></div>
+ <div class="dl"><div class="who">Martina</div><div><b>Why don&rsquo;t you ask the teacher?</b></div></div>
+ <div class="dl"><div class="who">Antoni</div><div><b>That&rsquo;s a good idea</b> &hellip; <b>Excuse me, Ms. Biga.</b> What does this word mean?</div></div>
+</div>
+<p class="lead mt">Nobody knew the answer &mdash; and the whole thing still worked. 👏</p>
+</section>
+<section class="slide top" data-stage="Practice" data-stagetone="practice">
+<h2 class="hd">Three questions about words</h2>
+<div class="grid3">
+ <div class="card bl"><div class="card-lbl">You see it, you don&rsquo;t know it</div><h3 class="sub">🔤 What does <em>___</em> mean?</h3><p class="jp">「どういう意味？」</p></div>
+ <div class="card gn"><div class="card-lbl">You know it, you need the letters</div><h3 class="sub">✏️ How do you spell <em>___</em>?</h3><p class="jp">「どう書くの？」</p></div>
+ <div class="card pu"><div class="card-lbl">You know it in Japanese</div><h3 class="sub">🗣️ How do you say <em>___</em> in English?</h3><p class="jp">「英語で何て言うの？」</p></div>
+</div>
+<p class="lead mt" style="margin-bottom:20px">You want to write <strong>creativity</strong>, but you don&rsquo;t know the letters. Which one?</p>
+<div class="grid3" id="q-ask"><button class="opt center" data-act="opt" data-g="ask" data-c="0" data-fb="You already know what it means &mdash; you need the letters.">What does creativity mean?</button><button class="opt center" data-act="opt" data-g="ask" data-c="1" data-fb="Correct &mdash; and that is exactly what Sayeed is asked in Activity 4.">How do you spell creativity?</button><button class="opt center" data-act="opt" data-g="ask" data-c="0" data-fb="You already have the English word. You need to write it.">How do you say creativity in English?</button></div>
+<div class="fb" id="fb-ask"></div>
+</section>
+<section class="slide top" data-stage="Practice" data-stagetone="practice">
+<h3 class="sub">🤷 &ldquo;I don&rsquo;t know&rdquo; &mdash; and one that disagrees</h3>
+<div class="grid2" style="gap:20px">
+ <div class="card"><div class="card-lbl">When you don&rsquo;t know</div><div class="chips" style="justify-content:flex-start"><span class="chip">I don&rsquo;t know.</span><span class="chip">I&rsquo;m not sure.</span><span class="chip">No idea.</span></div><p class="lead mt"><em>No idea</em> is the casual one &mdash; fine with a friend, not with a teacher.</p></div>
+ <div class="card acc"><div class="card-lbl">When you disagree</div><div class="chips" style="justify-content:flex-start"><span class="chip">Um, I don&rsquo;t think so.</span></div><p class="lead mt">That little <strong>Um</strong> is not an accident. It softens the whole sentence.</p></div>
+</div>
+<p class="lead" style="margin:22px 0 16px">Martina says <em>&ldquo;I think it&rsquo;s a kind of invention.&rdquo;</em> Antoni does not agree. What does he say?</p>
+<div class="grid3" id="q-sure"><button class="opt center" data-act="opt" data-g="sure" data-c="0" data-fb="That says you have no answer. He does have an opinion &mdash; a different one.">&ldquo;No idea.&rdquo;</button><button class="opt center" data-act="opt" data-g="sure" data-c="1" data-fb="Yes &mdash; disagreeing, but gently. Nobody gets upset.">&ldquo;Um, I don&rsquo;t think so.&rdquo;</button><button class="opt center" data-act="opt" data-g="sure" data-c="0" data-fb="Too strong. In English that sounds rude to a friend.">&ldquo;No! You are wrong.&rdquo;</button></div>
+<div class="fb" id="fb-sure"></div>
+</section>
+<section class="slide top" data-stage="Practice" data-stagetone="practice">
+<h2 class="hd">💡 &ldquo;Why don&rsquo;t you&hellip;?&rdquo; is not a question</h2>
+<p class="lead" style="margin-bottom:22px">It looks like a question. It means <strong>&ldquo;here is an idea.&rdquo;</strong> Tap each situation.</p>
+<div class="grid3">
+ <div class="tile" data-act="tap" data-count="sugg" data-a="Why don&rsquo;t you ask the teacher?"><div class="t-emo">🙋</div><div class="t-q">Leo doesn&rsquo;t know. Dad might.</div></div>
+ <div class="tile" data-act="tap" data-count="sugg" data-a="Why don&rsquo;t we ask the teacher?"><div class="t-emo">🤷🤷</div><div class="t-q">Neither of them knows.</div></div>
+ <div class="tile" data-act="tap" data-count="sugg" data-a="That&rsquo;s a good idea."><div class="t-emo">👍</div><div class="t-q">Someone suggests it. You agree.</div></div>
+</div>
+<div class="frame mt hide" id="suggReveal">🔑 <strong>you</strong> = you do it &nbsp;·&nbsp; <strong>we</strong> = we do it together. One word, completely different plan.</div>
+</section>
+<section class="slide top" data-stage="Activity 4" data-stagetone="apply">
+<h3 class="sub">🎧 Two discussions &nbsp;<span class="jp">TR 9.14</span></h3>
+<div class="grid2">
+ <div class="card bl"><div class="card-lbl">Discussion 1</div>
+  <div class="dl"><div class="who">A</div><div>Sayeed, <b>how do you spell</b> creativity?</div></div>
+  <div class="dl"><div class="who">B</div><div><b>No idea.</b> <b>You should ask the teacher.</b></div></div>
+  <div class="dl"><div class="who">A</div><div>OK &hellip; <b>Excuse me, Mr. Haddad.</b> How do you spell creativity?</div></div></div>
+ <div class="card gn"><div class="card-lbl">Discussion 2</div>
+  <div class="dl"><div class="who">A</div><div>Hey, Aisha, <b>how do you say</b> <em>halaw&agrave;</em> <b>in English?</b></div></div>
+  <div class="dl"><div class="who">B</div><div>I think it&rsquo;s dessert, but <b>I&rsquo;m not sure.</b></div></div>
+  <div class="dl"><div class="who">A</div><div><b>Um, I don&rsquo;t think so.</b></div></div>
+  <div class="dl"><div class="who">B</div><div><b>Why don&rsquo;t we ask the teacher?</b></div></div>
+  <div class="dl"><div class="who">A</div><div>OK &hellip; <b>Excuse me, Mr. Gonzalez.</b> What does <em>halaw&agrave;</em> mean in English?</div></div></div>
+</div>
+<p class="lead mt" style="margin-bottom:18px">Discussion 1 &mdash; what does the first student actually need?</p>
+<div class="grid3" id="q-a4"><button class="opt center" data-act="opt" data-g="a4" data-c="0" data-fb="He already knows what it means &mdash; listen again to his question.">the meaning</button><button class="opt center" data-act="opt" data-g="a4" data-c="1" data-fb="Right &mdash; &lsquo;How do you spell&hellip;?&rsquo; asks for the letters.">the spelling</button><button class="opt center" data-act="opt" data-g="a4" data-c="0" data-fb="Nobody asks for Japanese here &mdash; they stay in English the whole way.">the Japanese</button></div>
+<div class="fb" id="fb-a4"></div>
+</section>
+<section class="slide top" data-stage="Apply" data-stagetone="apply">
+<h2 class="hd">🏠 The house rule, starting today</h2>
+<p class="lead" style="margin-bottom:26px">From now on, when Leo meets a word he doesn&rsquo;t know &mdash; in <em>any</em> lesson &mdash; he asks in English.</p>
+<div class="frame" style="font-size:44px;text-align:center">&ldquo;Excuse me, Dad. What does <em>___</em> mean?&rdquo;</div>
+<div class="grid2 mt">
+ <div class="tick" data-act="tick"><div class="bx"></div><div>I asked in English at least once today.</div></div>
+ <div class="tick" data-act="tick"><div class="bx"></div><div>I used &ldquo;How do you spell&hellip;?&rdquo; once.</div></div>
+ <div class="tick" data-act="tick"><div class="bx"></div><div>I used &ldquo;How do you say&hellip; in English?&rdquo; once.</div></div>
+ <div class="tick" data-act="tick"><div class="bx"></div><div>I showed interest with an echo question once.</div></div>
+</div>
+<div class="dad mt hide" id="editDone">✅ All four. That is the lesson done properly &mdash; not on paper, out loud.</div>
+</section>
+<section class="slide top" data-stage="Formative Assessment" data-stagetone="recap">
+<h2 class="hd">✔️ Can Leo&hellip;</h2>
+<div class="list"><div class="li"><div class="n gn">✓</div><div>&hellip;answer a statement with the right echo question? <span class="jp">(I love soccer. &rarr; Do you?)</span></div></div><div class="li"><div class="n gn">✓</div><div>&hellip;react to good news without saying &ldquo;OK&rdquo;? <span class="jp">(Wow. That&rsquo;s so cool!)</span></div></div><div class="li"><div class="n gn">✓</div><div>&hellip;ask about a word <strong>three</strong> ways? <span class="jp">(mean / spell / say in English)</span></div></div><div class="li"><div class="n gn">✓</div><div>&hellip;disagree politely and suggest what to do? <span class="jp">(Um, I don&rsquo;t think so. Why don&rsquo;t we ask&hellip;?)</span></div></div></div>
+<div class="card u9 mt"><div class="card-lbl">Quick check</div><p class="lead">&ldquo;Ask me three different questions about the word <em>invention</em>. Go.&rdquo;</p></div>
+</section>
+<section class="slide center" data-stage="Wrap Up" data-stagetone="wrapup">
+<div class="col center" style="gap:16px">
+ <div class="mid-emo">🗣️🎉</div>
+ <h2 class="hd" style="margin-bottom:0">Now he can ask for himself.</h2>
+ <p class="lead">Six lines of dialogue, and Leo is never stuck and silent again.</p>
+ <div class="chips"><span class="chip">Do you?</span><span class="chip">Wow. That&rsquo;s so cool!</span><span class="chip">What does it mean?</span><span class="chip">How do you spell&hellip;?</span></div>
+ <div class="frame" style="max-width:1200px">Review ✅ &nbsp;·&nbsp; Extra Reading ✅ &nbsp;·&nbsp; Let&rsquo;s Talk ✅ &nbsp;&rarr;&nbsp; next is the <strong>Test 7&ndash;9</strong>.</div>
+ <div class="done-row">
+  <button class="opt center" id="doneBtn" data-act="done">✅ Mark this lesson done</button>
+  <button class="opt center" id="redoBtn" data-act="redo">↺ Redo</button>
+ </div>
+ <p class="lead" id="doneMsg" style="margin-top:6px"></p>
+</div>
+</section>
+
+<div id="prog"><div id="progFill"></div></div>
+<button class="tn-btn" data-act="notes" title="Teacher notes (N)">📋</button>
+<button class="tn-btn fs-btn" data-act="full" title="Fullscreen (F)">⛶</button>
+<div class="tn-panel" id="tnPanel"></div>
+<div id="nav">
+  <button class="nb" data-act="nav" data-dir="-1">‹</button>
+  <div id="counter">1 / 17</div>
+  <button class="nb" data-act="nav" data-dir="1">›</button>
+</div>
+</div></div>
+<script>
+(function(){
+"use strict";
+
+/* ═══════ LEEA SAVE STANDARD ═══════ */
+var SAVE_PREFIX = '4-lt7-9-lets-talk-slides-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-lt7-9-lets-talk-slides';
+/* Must match the `id` in checkpoint-7-9/lessons/lets-talk.teacher.json — the teacher dashboard
+   reads leea.lessonProgress.v1 keyed by that lesson id. */
+var LESSON_ID = 'ow-l4-lt7-9-lets-talk';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+
+function lSave(key, val){
+  try{ localStorage.setItem('leea-' + key, JSON.stringify(val)); }catch(e){}
+  try{
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && LEEA_CLOUD.enabled){
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val);
+    }
+  }catch(e){}
+}
+function lLoad(key, fb){
+  try{ var v = localStorage.getItem('leea-' + key); return v !== null ? JSON.parse(v) : fb; }
+  catch(e){ return fb; }
+}
+function lRemove(key){
+  try{ localStorage.removeItem('leea-' + key); }catch(e){}
+}
+
+/* ═══════ MARK DONE ═══════ */
+function writeLessonProgress(){
+  try{
+    var store = {};
+    var raw = localStorage.getItem(PROGRESS_KEY);
+    if(raw){ store = JSON.parse(raw) || {}; }
+    var now = new Date().toISOString();
+    store[LESSON_ID] = {
+      lessonId: LESSON_ID,
+      teacherId: 'neritan',
+      studentId: 'leo',
+      status: 'done',
+      completedAt: now,
+      updatedAt: now
+    };
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+  }catch(e){ console.warn('writeLessonProgress', e); }
+}
+function clearLessonProgress(){
+  try{
+    var raw = localStorage.getItem(PROGRESS_KEY);
+    if(!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+  }catch(e){ console.warn('clearLessonProgress', e); }
+}
+function paintDone(saved){
+  var btn = document.getElementById('doneBtn');
+  if(!btn) return;
+  if(saved){ btn.classList.add('confirmed'); btn.style.pointerEvents = 'none'; btn.textContent = '✅ Saved!'; }
+  else { btn.classList.remove('confirmed'); btn.style.pointerEvents = 'auto'; btn.textContent = '✅ Mark this lesson done'; }
+}
+function markDone(){
+  try{
+    writeLessonProgress();
+    lSave(SAVE_PREFIX + 'done', true);
+    paintDone(true);
+    var msg = document.getElementById('doneMsg');
+    if(msg) msg.textContent = 'Saved. Now go and use it, Leo. 🗣️';
+  }catch(e){ console.warn('markDone', e); }
+}
+/* Two-tap so a stray tap on the last slide can't wipe the lesson record. */
+var redoArmed = false, redoTimer = null;
+function handleRedo(){
+  try{
+    var btn = document.getElementById('redoBtn');
+    var msg = document.getElementById('doneMsg');
+    if(!redoArmed){
+      redoArmed = true;
+      if(btn) btn.textContent = '↺ Tap again to clear';
+      if(msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+      if(redoTimer) clearTimeout(redoTimer);
+      redoTimer = setTimeout(function(){
+        redoArmed = false;
+        if(btn) btn.textContent = '↺ Redo';
+        if(msg) msg.textContent = '';
+      }, 4000);
+      return;
+    }
+    redoArmed = false;
+    if(redoTimer) clearTimeout(redoTimer);
+    clearLessonProgress();
+    lRemove(SAVE_PREFIX + 'done');
+    paintDone(false);
+    if(btn) btn.textContent = '↺ Redo';
+    if(msg) msg.textContent = 'Cleared. Ready to talk again.';
+  }catch(e){ console.warn('handleRedo', e); }
+}
+
+/* ═══════ <deck-stage> WEB COMPONENT ═══════ */
+class DeckStage extends HTMLElement{
+  connectedCallback(){
+    try{
+      var stage = this.getAttribute('stage') || '';
+      var tone  = this.getAttribute('tone')  || 'wrapup';
+      var sub   = this.getAttribute('sub')   || '';
+      this.innerHTML = '<span class="sb ' + tone + '">' + stage + '</span>' +
+                       (sub ? '<span class="sb-sub">' + sub + '</span>' : '');
+    }catch(e){ console.warn('deck-stage', e); }
+  }
+}
+try{ customElements.define('deck-stage', DeckStage); }catch(e){}
+
+/* ═══════ TEACHER NOTES (per slide) ═══════ */
+var NOTES = {
+0:{h:'Open the Let&rsquo;s Talk page',b:'<p>Open at pp. 166&ndash;167. This is the <strong>last back-of-book page</strong> of the Units 7&ndash;9 band &mdash; Review, Extended Reading, and now this.</p><p><span class=\'say\'>Say</span> <em>This page is not for the test. It is for talking &mdash; to me, today.</em></p><p><strong>Source note:</strong> the dialogues below are verbatim from the Student Book audio script (TR 9.12, 9.13, 9.14). There is no Student Book audio file in LEEA, so <strong>you read the parts aloud</strong> &mdash; which is better here anyway, because Leo answers a real person.</p>'},
+1:{h:'Warm Up &mdash; name the problem first',b:'<p>Ask it as a real question before tapping anything. Leo almost certainly does option 1 or 3 in real life.</p><p><span class=\'say\'>Say</span> <em>You are not bad at English when you don&rsquo;t know a word. You are only stuck &mdash; and being stuck has words of its own.</em></p>'},
+2:{h:'Objectives',b:'<p>Four objectives, two per dialogue. The first two come from TR 9.12, the second two from TR 9.13 and 9.14.</p><p>Objective 4 is the one Leo will actually use most often. Say so.</p>'},
+3:{h:'The two jobs',b:'<p>Worth 30 seconds before any dialogue: the page teaches two completely different skills and it helps to name them.</p><p>Job 1 is for when the conversation is <em>going fine</em>. Job 2 is for when it <em>breaks</em>. Both are conversation repair &mdash; one keeps it alive, the other restarts it.</p>'},
+4:{h:'Activity 1 &mdash; read it twice',b:'<p>TR 9.12, verbatim. Read Pablo yourself the first time so Leo hears the intonation on <em>Do you?</em> &mdash; it <strong>rises</strong>. A flat <em>Do you.</em> sounds bored and means the opposite.</p><p>Then read it again with Leo following in the book, finger on the line.</p>'},
+5:{h:'&ldquo;Do you?&rdquo; &mdash; what it really is',b:'<p>Japanese has this too &mdash; 「へえ、そうなんだ！」 does the same job. Say that out loud; it makes the whole idea land in one second.</p><p>The trap is thinking it is a real question. It is not. Nobody answers it with yes or no &mdash; Mario answers it with <em>Yeah!</em> and then keeps talking. That is the point.</p>'},
+6:{h:'The echo drill',b:'<p>Cover the tile, let Leo <strong>say</strong> the echo, then tap to check. Do not tap first.</p><p>The rule is simple enough that he can derive it: take the helping verb, switch the person, make it a question. If there is no helping verb, <em>do / does / did</em> appears &mdash; which is exactly the same move he already knows from making questions.</p><p>The last tile is deliberate: <em>used to</em> is Unit 7 grammar, and its echo is <strong>Did they?</strong>, not <em>Used they?</em></p>'},
+7:{h:'React &mdash; and the honest third option',b:'<p>Option 3 is not really wrong English, it is the wrong <em>verb</em>. If Leo picks it, that is a good mistake: <em>&ldquo;My dad is taking me&hellip;&rdquo;</em> &rarr; <strong>Is he?</strong></p><p>Do that correction out loud. It teaches more than the right answer would.</p>'},
+8:{h:'Act it out &mdash; the swap is the lesson',b:'<p>Reading it once proves nothing. On the swap, Leo has to <em>produce</em> the two target phrases instead of hearing them.</p><p>Round 3 (his own sport) is where it becomes his. Let him change everything except the six-line shape.</p><p>If he says <em>Do you?</em> flat, say the line back to him both ways and let him hear the difference.</p>'},
+9:{h:'Activity 3 &mdash; nobody knew the answer',b:'<p>TR 9.13, verbatim. Read Martina; give Antoni to Leo so he gets the three asking lines.</p><p>The thing to point out at the end: <strong>neither child knew the word</strong>, and the conversation still succeeded. That is the reassurance this page is really selling.</p><p>Nice link: Martina guesses <em>&ldquo;a kind of invention&rdquo;</em> &mdash; straight out of Unit 7.</p>'},
+10:{h:'Three questions &mdash; keep them separate',b:'<p>Leo will collapse all three into <em>&ldquo;What does it mean?&rdquo;</em> if you let him. Drill the difference with objects in the room.</p><p>Test each one on a real word right now: one he doesn&rsquo;t know (mean), one he can say but not write (spell), one he only has in Japanese (say in English).</p><p>The MCQ answer is <em>How do you spell creativity?</em> &mdash; the same question Sayeed is asked in Activity 4, so it comes back in two slides.</p>'},
+11:{h:'Not sure vs. disagree',b:'<p>Three ways to have no answer, one way to have a <em>different</em> answer. Leo needs to feel that gap.</p><p><em>No idea</em> is friend-level. Do not use it with a teacher &mdash; worth saying plainly.</p><p>The <em>Um</em> matters. In English, disagreeing with no softener sounds aggressive. <em>Um, I don&rsquo;t think so</em> is polite; <em>I don&rsquo;t think so.</em> alone already sounds firmer.</p>'},
+12:{h:'Why don&rsquo;t you&hellip;?',b:'<p>Form trap: it is negative and a question, but it means neither. 「〜したらどう？」 is the closest Japanese.</p><p><strong>you</strong> vs <strong>we</strong> is the real content here. In Discussion 2 of Activity 4 they say <em>we</em> because <em>both</em> of them are stuck &mdash; go back and check that after the next slide.</p><p><em>You should ask the teacher</em> is the third form, from Discussion 1. Same idea, more direct.</p>'},
+13:{h:'Activity 4 &mdash; and an honest gap',b:'<p>Both discussions are verbatim from TR 9.14.</p><p><strong>I do not have the two printed questions from p. 167</strong>, only the answer key: <strong>1&nbsp;b, 2&nbsp;a</strong>. So the question on this slide is <em>mine</em>, not the book&rsquo;s. Do the book&rsquo;s two questions from the printed page &mdash; the key above will tell you if Leo is right. I would rather leave the gap than invent the book&rsquo;s wording.</p><p>After the slide question, go back and count how many of today&rsquo;s phrases appear in these two short discussions. It is seven.</p>'},
+14:{h:'The house rule',b:'<p>This is the slide that makes the lesson worth building. Everything before it is preparation for this.</p><p>Tick the boxes <strong>during the week</strong>, not now &mdash; reopen the deck at the end of a later lesson and tick what actually happened.</p><p>Your part of the deal: when he asks in English, answer in English, and never answer a question he asked in Japanese until he has tried it in English.</p>'},
+15:{h:'Formative Assessment',b:'<p>All four out loud. No writing on this page &mdash; writing it down would be avoiding the whole point.</p><p>The quick check is the real test: three different questions about one word, from memory, in under ten seconds.</p>'},
+16:{h:'Wrap Up',b:'<p>The band is finished: Review, Extra Reading and Let&rsquo;s Talk are all done. Next is the Test 7&ndash;9.</p><p>Leave the nine chips visible for a moment. Nine phrases is a real haul for one short page.</p>'}
+};
+
+/* ═══════ DECK STATE ═══════ */
+var deck    = document.getElementById('deck');
+var slides  = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+var total   = slides.length;
+var idx     = 0;
+var notesOpen = false;
+
+/* Inject stage badges from data-stage / data-stagetone */
+try{
+  slides.forEach(function(s, i){
+    var st = s.getAttribute('data-stage');
+    if(!st) return;
+    var el = document.createElement('deck-stage');
+    el.setAttribute('stage', st);
+    el.setAttribute('tone', s.getAttribute('data-stagetone') || 'wrapup');
+    el.setAttribute('sub', (i + 1) + ' of ' + total);
+    s.insertBefore(el, s.firstChild);
+  });
+}catch(e){ console.warn('badge inject', e); }
+
+function render(){
+  try{
+    slides.forEach(function(s, i){ s.classList.toggle('on', i === idx); });
+    var c = document.getElementById('counter');
+    if(c) c.textContent = (idx + 1) + ' / ' + total;
+    var pf = document.getElementById('progFill');
+    if(pf) pf.style.width = ((idx + 1) / total * 100) + '%';
+    paintNotes();
+    lSave(SAVE_PREFIX + 'slide', idx);
+  }catch(e){ console.warn('render', e); }
+}
+
+function paintNotes(){
+  try{
+    var p = document.getElementById('tnPanel');
+    if(!p) return;
+    var n = NOTES[idx];
+    p.innerHTML = n ? ('<h4>' + n.h + '</h4>' + n.b)
+                    : '<h4>Teacher notes</h4><p>No notes for this slide.</p>';
+  }catch(e){ console.warn('paintNotes', e); }
+}
+
+function go(d){
+  var n = idx + d;
+  if(n < 0 || n >= total) return;
+  idx = n;
+  render();
+}
+
+/* ═══════ SCALING ═══════ */
+function fit(){
+  try{
+    var vw = window.innerWidth  || document.documentElement.clientWidth;
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var s  = Math.min(vw / 1920, vh / 1080);
+    var ox = Math.max(0, (vw - 1920 * s) / 2);
+    var oy = Math.max(0, (vh - 1080 * s) / 2);
+    deck.style.transform = 'translate(' + ox + 'px,' + oy + 'px) scale(' + s + ')';
+  }catch(e){ console.warn('fit', e); }
+}
+window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', function(){ setTimeout(fit, 120); });
+if(window.visualViewport){ window.visualViewport.addEventListener('resize', fit); }
+
+/* ═══════ SINGLE DELEGATED CLICK HANDLER ═══════ */
+document.addEventListener('click', function(ev){
+  try{
+    var t = ev.target.closest('[data-act]');
+    if(!t) return;
+    var act = t.getAttribute('data-act');
+
+    if(act === 'nav'){ go(parseInt(t.getAttribute('data-dir'), 10)); return; }
+    if(act === 'done'){ markDone(); return; }
+    if(act === 'redo'){ handleRedo(); return; }
+
+    if(act === 'notes'){
+      notesOpen = !notesOpen;
+      var p = document.getElementById('tnPanel');
+      if(p) p.classList.toggle('open', notesOpen);
+      t.classList.toggle('act', notesOpen);
+      return;
+    }
+
+    if(act === 'full'){ toggleFull(); return; }
+
+    if(act === 'tap'){
+      if(t.classList.contains('open')) return;
+      t.classList.add('open', 'reveal');
+      var ans = t.getAttribute('data-a') || '';
+      if(t.classList.contains('ce-cell')){
+        t.classList.remove('blank');
+        t.classList.add('fill');
+        t.textContent = ans;
+      } else {
+        var q = t.querySelector('.t-q');
+        var out = document.createElement('div');
+        out.className = 't-a';
+        out.innerHTML = ans;
+        if(q && q.parentNode === t) t.appendChild(out); else t.appendChild(out);
+      }
+      var ck = t.getAttribute('data-count');
+      if(ck) checkGroupDone(ck);
+      return;
+    }
+
+    if(act === 'count'){
+      var key = t.getAttribute('data-key');
+      var max = parseInt(t.getAttribute('data-max'), 10) || 3;
+      var cur = (parseInt(t.getAttribute('data-n'), 10) || 0) + 1;
+      if(cur > max) return;
+      t.setAttribute('data-n', cur);
+      var out2 = document.getElementById(key + 'Out');
+      if(out2) out2.textContent = cur;
+      var emo = document.getElementById(key + 'Emo');
+      if(emo){ emo.classList.remove('reveal'); void emo.offsetWidth; emo.classList.add('reveal'); }
+      if(cur >= max) t.classList.add('open');
+      return;
+    }
+
+    if(act === 'opt'){
+      var g = t.getAttribute('data-g');
+      var box = document.getElementById('q-' + g);
+      if(!box || box.getAttribute('data-locked') === '1') return;
+      box.setAttribute('data-locked', '1');
+      var ok = t.getAttribute('data-c') === '1';
+      Array.prototype.forEach.call(box.querySelectorAll('.opt'), function(o){
+        o.classList.add('locked');
+        if(o.getAttribute('data-c') === '1') o.classList.add('ok');
+      });
+      if(!ok) t.classList.add('bad');
+      var fb = document.getElementById('fb-' + g);
+      if(fb){
+        fb.className = 'fb show ' + (ok ? 'ok' : 'bad');
+        fb.innerHTML = (ok ? '✅ ' : '💡 ') + (t.getAttribute('data-fb') || '');
+      }
+      lSave(SAVE_PREFIX + 'q-' + g, { correct: ok, ts: new Date().toISOString() });
+      return;
+    }
+
+    if(act === 'tick'){
+      t.classList.toggle('on');
+      var bx = t.querySelector('.bx');
+      if(bx) bx.textContent = t.classList.contains('on') ? '✓' : '';
+      var all = Array.prototype.slice.call(document.querySelectorAll('[data-act="tick"]'));
+      var done = all.filter(function(x){ return x.classList.contains('on'); }).length;
+      var ed = document.getElementById('editDone');
+      if(ed) ed.classList.toggle('hide', done !== all.length);
+      lSave(SAVE_PREFIX + 'edit-checklist', done);
+      return;
+    }
+  }catch(e){ console.warn('click handler', e); }
+});
+
+function checkGroupDone(key){
+  try{
+    var all = Array.prototype.slice.call(document.querySelectorAll('[data-count="' + key + '"]'));
+    if(!all.length) return;
+    var open = all.filter(function(x){ return x.classList.contains('open'); }).length;
+    if(open === all.length){
+      var r = document.getElementById(key + 'Reveal');
+      if(r){ r.classList.remove('hide'); r.classList.add('reveal'); }
+    }
+  }catch(e){ console.warn('checkGroupDone', e); }
+}
+
+function toggleFull(){
+  try{
+    var el = document.documentElement;
+    if(!document.fullscreenElement){
+      if(el.requestFullscreen) el.requestFullscreen();
+      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } else {
+      if(document.exitFullscreen) document.exitFullscreen();
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+    setTimeout(fit, 150);
+  }catch(e){ console.warn('toggleFull', e); }
+}
+document.addEventListener('fullscreenchange', function(){ setTimeout(fit, 120); });
+
+/* ═══════ KEYBOARD ═══════ */
+document.addEventListener('keydown', function(e){
+  try{
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); go(1); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+    else if(e.key === 'f' || e.key === 'F'){ toggleFull(); }
+    else if(e.key === 'n' || e.key === 'N'){
+      var b = document.querySelector('[data-act="notes"]');
+      if(b) b.click();
+    }
+  }catch(err){ console.warn('key', err); }
+});
+
+/* ═══════ INIT ═══════ */
+function restore(){ paintDone(lLoad(SAVE_PREFIX + 'done', false) === true); }
+document.addEventListener('DOMContentLoaded', function(){ fit(); render(); restore(); });
+fit();
+render();
+restore();
+
+})();
+</script>
+</body>
+</html>

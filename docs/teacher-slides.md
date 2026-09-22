@@ -34,6 +34,29 @@ If a deck is drafted outside this repo (e.g. in a separate Claude conversation) 
   <script src="../../lib/leea-cloud-config.js"></script>
   <script src="../../lib/leea-cloud.js"></script>
   ```
+  **Keep `lib/` in the path.** Whatever the number of `../`, it must end in
+  `lib/leea-cloud-config.js` and `lib/leea-cloud.js` — `../` cannot climb above
+  the site root, so every depth resolves to `/lib/…` and the segment is the only
+  part that matters. One deck shipped with it missing and pointed at
+  `/leea-cloud.js` for months; `scripts/validate-content.mjs` now fails on any
+  lesson `<script src>` naming a file that is not under `public/`.
+
+  **What those two files do.** `public/lib/leea-cloud.js` defines
+  `window.LEEA_CLOUD` — the `saveProgress` / `fetchProgress` / `deleteProgress`
+  / `clearProgress` contract every call site is written against — backed by
+  localStorage, with `enabled: false` from `leea-cloud-config.js`. It is
+  deliberately not a cloud writer: no table stores a teacher deck's per-slide
+  state, and golden rule 11a says a write to a table that does not exist looks
+  exactly like sync working. A deck iframe is same-origin with the app, so its
+  localStorage already *is* the app's — which is why "Mark Done" reaches the
+  teacher dashboard with no cloud involved.
+
+  **It stands down if a bridge already exists.** Learner apps get a real,
+  Supabase-backed bridge injected by `injectLearnerCloudBridge` in
+  `src/components/LessonPage.tsx`, placed immediately after `<head>` — that is,
+  *before* these tags. `leea-cloud.js` returns early when it finds
+  `window.LEEA_CLOUD` already set, because assigning over it would silently cut
+  live cloud sync in the six learner apps that carry these tags.
 
 Everything else — registering the lesson so it appears on the teacher dashboard, pairing it with a learner app, adding any new vocabulary word the deck introduces to the content model — happens after handoff, not before it.
 

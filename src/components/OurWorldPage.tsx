@@ -50,7 +50,7 @@ type RowProgress = LearnerRollup & {
 };
 
 type SequenceItem = {
-  kind: "unit" | "review" | "reading" | "level-test";
+  kind: "unit" | "review" | "reading" | "talk" | "level-test";
   number?: number;
   title: string;
   subtitle: string;
@@ -134,7 +134,7 @@ function buildSequence(
       const band = `${unit - 2}–${unit}`;
       const bandLocked = level > cursor.level || (level === cursor.level && unit > cursor.unit);
       const checkpointItem = (
-        kind: "review" | "reading",
+        kind: "review" | "reading" | "talk",
         component: string,
         title: string,
         subtitle: string,
@@ -174,6 +174,20 @@ function buildSequence(
           0
         )
       );
+      // Let's Talk is a Levels 4-6 spread. Levels 1-3 have no functional-dialogue
+      // page, so their bands carry two checkpoint rows, not three — a planned row
+      // here would promise a page the book does not have.
+      if (level >= 4) {
+        items.push(
+          checkpointItem(
+            "talk",
+            "lets-talk",
+            `Let’s Talk · Units ${band}`,
+            "The band's speaking page — dialogue, not marking.",
+            0
+          )
+        );
+      }
     }
   }
 
@@ -435,9 +449,9 @@ function SequenceRow({ item, level }: { item: SequenceItem; level: number }) {
 
   const content = (
     <>
-      <span className="ow-sequence-icon">{item.kind === "unit" ? item.number : item.kind === "reading" ? "📖" : "▦"}</span>
+      <span className="ow-sequence-icon">{item.kind === "unit" ? item.number : item.kind === "reading" ? "📖" : item.kind === "talk" ? "🗣️" : "▦"}</span>
       <div className="ow-sequence-copy">
-        <small>{item.kind === "unit" ? `Unit ${item.number}` : item.kind === "reading" ? "Bonus" : "Checkpoint · Review"}</small>
+        <small>{item.kind === "unit" ? `Unit ${item.number}` : item.kind === "reading" ? "Bonus" : item.kind === "talk" ? "Checkpoint · Speaking" : "Checkpoint · Review"}</small>
         <h3>{item.title}</h3>
         <p>{item.subtitle}</p>
         {item.state === "active" && (

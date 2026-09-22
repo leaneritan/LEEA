@@ -118,6 +118,14 @@ Use the NatGeo planner activity sections as the slide flow:
 - Recycle vocabulary, academic language, grammar, reading/listening skills, and common errors from the full band
 - Include quick teacher checks before Leo gets the paired review app
 
+### lets-talk
+- Functional dialogue after Units 1-3, 4-6, or 7-9 — **Levels 4-6 only**
+- Name the page's two jobs before either dialogue (show interest / ask for help)
+- Each SB dialogue verbatim, with the target phrases marked in the line
+- One drill per function, and a pair-practice slide that swaps the roles — the swap is where the phrases get produced rather than heard
+- A "use it for real" slide with a tick checklist, because the point of the page is the week after the lesson
+- Where a printed activity's own questions are not legible in the source, print the answer key in the teacher notes and mark the slide's question as ours — do not invent the book's wording
+
 ### extra-reading
 - Extended checkpoint reading after Units 1-3, 4-6, or 7-9
 - Pre-read vocabulary/glossary support

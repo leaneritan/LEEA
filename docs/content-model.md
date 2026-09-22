@@ -205,21 +205,24 @@ Level 4
   - Unit 3
   - Review 1-3
   - Extra Reading 1-3
+  - Let's Talk 1-3
 - Units 4-6
   - Unit 4
   - Unit 5
   - Unit 6
   - Review 4-6
   - Extra Reading 4-6
+  - Let's Talk 4-6
 - Units 7-9
   - Unit 7
   - Unit 8
   - Unit 9
   - Review 7-9
   - Extra Reading 7-9
+  - Let's Talk 7-9
 ```
 
-Treat these as checkpoint lessons, not as sub-lessons of Unit 3, 6, or 9. They use normal teacher/learner lesson records so assignment, review, and future Supabase sync work the same way as unit lessons. Components are `review` / `review-app` and `extra-reading` / `extra-reading-app`. Source tags use band notation such as `OW4-R7-9` and `OW4-ER7-9`.
+Treat these as checkpoint lessons, not as sub-lessons of Unit 3, 6, or 9. They use normal teacher/learner lesson records so assignment, review, and future Supabase sync work the same way as unit lessons. Components are `review` / `review-app`, `extra-reading` / `extra-reading-app` and `lets-talk` / `lets-talk-app`. Source tags use band notation such as `OW4-R7-9`, `OW4-ER7-9` and `OW4-LT7-9`. Let's Talk is a Levels 4-6 page only — Levels 1-3 have no functional-dialogue spread, so those bands carry two checkpoint rows, not three.
 
 Their lesson records live beside the units, in `level-<n>/checkpoint-<start>-<end>/lessons/` — for example `content/subjects/english/courses/our-world/level-4/checkpoint-7-9/lessons/review.teacher.json`. Each record carries `unit: <band end>` (9 for the 7-9 band) purely so the teacher menu and course map can find it from the last unit of the band; both surfaces then split it back out with `isCheckpointComponent()` from `src/data/lessons.ts` so a checkpoint never counts as one of that unit's teaching components. A new checkpoint folder must also be listed in `lessonsDirs` in `scripts/validate-content.mjs`, or its records will silently skip validation.
 

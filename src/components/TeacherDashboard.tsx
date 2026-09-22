@@ -84,6 +84,11 @@ const checkpointComponents = [
     subtitle: "Extended comprehension & vocabulary practice."
   },
   {
+    component: "lets-talk",
+    title: "Let’s Talk",
+    subtitle: "Functional dialogue — showing interest and asking for help."
+  },
+  {
     component: "test",
     title: "Test",
     subtitle: "ExamView band test — answer key, rubric and speaking script."
@@ -448,7 +453,11 @@ export function TeacherDashboard() {
             {selectedUnit % 3 === 0 ? (
               <div className="teacher-checkpoint-rows">
                 <div className="teacher-checkpoint-label">Checkpoint after Units {selectedUnit - 2}–{selectedUnit}</div>
-                {checkpointComponents.map((checkpoint) => {
+                {checkpointComponents
+                  // Let's Talk is a Levels 4-6 spread. A planned row on Levels 1-3
+                  // would promise a page those books do not have.
+                  .filter((checkpoint) => checkpoint.component !== "lets-talk" || selectedLevel >= 4)
+                  .map((checkpoint) => {
                   const built = selectedCheckpointLessons.get(checkpoint.component);
                   if (built) {
                     const learnerCounterpart = selectedUnitGroup?.lessons.find(

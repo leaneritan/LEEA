@@ -125,6 +125,7 @@ import tgVerbTimeMachine from "../../content/subjects/english/courses/special-tr
 import level5Unit1Opener from "../../content/subjects/english/courses/our-world/level-5/unit-1/lessons/opener.teacher.json";
 import level5Unit1OpenerLearner from "../../content/subjects/english/courses/our-world/level-5/unit-1/lessons/opener-app.learner.json";
 import level5Unit1Vocab1 from "../../content/subjects/english/courses/our-world/level-5/unit-1/lessons/vocab1.teacher.json";
+import level5Unit1Vocab1Learner from "../../content/subjects/english/courses/our-world/level-5/unit-1/lessons/vocab1.learner.json";
 import type { Lesson } from "./types";
 
 // Canonical within-unit teaching order. Lessons are always sorted by this
@@ -277,6 +278,7 @@ export const lessons: Lesson[] = [
   level5Unit1Opener as Lesson,
   level5Unit1OpenerLearner as Lesson,
   level5Unit1Vocab1 as Lesson,
+  level5Unit1Vocab1Learner as Lesson,
   checkpoint79Test as Lesson,
   checkpoint79TestLearner as Lesson,
   checkpoint19Test as Lesson,

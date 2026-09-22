@@ -124,9 +124,15 @@ export function LessonPage({ lesson }: { lesson: Lesson }) {
   return (
     <section className={sectionClassName}>
       {isFullscreen ? (
-        <Link className="ghost-button deck-lesson-exit" href={`/lessons/${lesson.id}`}>
-          Exit Fullscreen
-        </Link>
+        // Its own strip, not a chip floating over the frame. Every learner app
+        // owns its top-right corner — "← Home" on the home screen, the ✕ that
+        // closes a modal — and a button floated there covered them and ate the
+        // tap. See .deck-lesson-page--fullscreen in globals.css.
+        <div className="deck-lesson-exitbar">
+          <Link className="ghost-button deck-lesson-exit" href={`/lessons/${lesson.id}`}>
+            Exit Fullscreen
+          </Link>
+        </div>
       ) : (
         <header className="deck-lesson-bar">
           <div>

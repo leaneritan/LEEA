@@ -205,17 +205,37 @@ export function getAcademicNav(currentId: string): PrevNext<AcademicEntry> {
 }
 
 /* Grammar prev/next within the SAME unit only (matches design: "Grammar 3 of 3 · Unit 8"). */
+/* Prev/Next walk the whole library in course → level → unit order, so Next
+   on the last point of a unit carries on into the next unit (and level).
+   index/total stay per unit, since the card reads "Grammar 2 of 2 · Unit 1". */
+const COURSE_ORDER: Record<GrammarEntry["course"], number> = {
+  "our-world": 0,
+  "joyful-work": 1,
+  "junior-high": 2
+};
+
+const grammarSequence: GrammarEntry[] = allGrammar
+  .map((entry, order) => ({ entry, order }))
+  .sort(
+    (a, b) =>
+      COURSE_ORDER[a.entry.course] - COURSE_ORDER[b.entry.course] ||
+      a.entry.level - b.entry.level ||
+      a.entry.unit - b.entry.unit ||
+      a.order - b.order
+  )
+  .map(({ entry }) => entry);
+
 export function getGrammarNav(currentId: string): PrevNext<GrammarEntry> {
   const current = getGrammarEntryById(currentId);
   if (!current) return { prev: null, next: null, index: 0, total: 0 };
-  const peers = allGrammar.filter(
+  const peers = grammarSequence.filter(
     (entry) => entry.course === current.course && entry.level === current.level && entry.unit === current.unit
   );
-  const i = peers.findIndex((entry) => entry.grammarId === currentId);
+  const i = grammarSequence.findIndex((entry) => entry.grammarId === currentId);
   return {
-    prev: i > 0 ? peers[i - 1] : null,
-    next: i < peers.length - 1 ? peers[i + 1] : null,
-    index: i + 1,
+    prev: i > 0 ? grammarSequence[i - 1] : null,
+    next: i < grammarSequence.length - 1 ? grammarSequence[i + 1] : null,
+    index: peers.findIndex((entry) => entry.grammarId === currentId) + 1,
     total: peers.length
   };
 }

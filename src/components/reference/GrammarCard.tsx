@@ -16,6 +16,11 @@ type TabKey = "chart" | "levelup" | "quiz" | "master";
 type QuizAnswer = { kind: "mcq"; pick: number } | { kind: "build"; order: string[]; checked: boolean };
 type QuestionWithKind = (GrammarQuizDisplay & { kind: "mcq" }) | GrammarMasterDisplay;
 
+/* Prev/Next can step into another unit or level — say which, so the jump is visible. */
+function crossesUnit(a: GrammarEntry, b: GrammarEntry) {
+  return a.course !== b.course || a.level !== b.level || a.unit !== b.unit;
+}
+
 export function GrammarCard({ entry }: { entry: GrammarEntry }) {
   const jp = useJapanesePreference();
   const [tab, setTab] = useState<TabKey>("chart");
@@ -116,6 +121,7 @@ export function GrammarCard({ entry }: { entry: GrammarEntry }) {
           <Link href={`/reference/grammar/${nav.prev.grammarId}`} className="rcardv2-prevnext-btn">
             <span className="rcardv2-prevnext-arrow">←</span>
             {nav.prev.title}
+            {crossesUnit(entry, nav.prev) && <span className="rcardv2-prevnext-tag">{nav.prev.tag}</span>}
           </Link>
         ) : (
           <button type="button" className="rcardv2-prevnext-btn is-disabled" disabled>
@@ -136,6 +142,7 @@ export function GrammarCard({ entry }: { entry: GrammarEntry }) {
 
         {nav.next ? (
           <Link href={`/reference/grammar/${nav.next.grammarId}`} className="rcardv2-prevnext-btn">
+            {crossesUnit(entry, nav.next) && <span className="rcardv2-prevnext-tag">{nav.next.tag}</span>}
             {nav.next.title}
             <span className="rcardv2-prevnext-arrow">→</span>
           </Link>

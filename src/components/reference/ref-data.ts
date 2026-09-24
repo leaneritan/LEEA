@@ -15,6 +15,7 @@ import {
   toWordEntry,
   type AcademicEntry,
   type GrammarEntry,
+  type RefSource,
   type WordEntry
 } from "@/data/reference-shapes";
 import { LEVEL_COLORS } from "@/data/reference-units";
@@ -26,15 +27,60 @@ export function getWordById(id: string): WordEntry | undefined {
   return allWords.find((entry) => entry.id === id);
 }
 
-export function getWordNav(currentId: string): PrevNext<WordEntry> {
-  const list = allWords.filter((entry) => entry.type !== "academic");
-  const i = list.findIndex((entry) => entry.id === currentId);
-  if (i < 0) return { prev: null, next: null, index: 0, total: list.length };
+/* Word prev/next walk the whole vocabulary in course → level → unit order,
+   so Next on the last word of a unit carries on into the next unit (and
+   level) — the same rule as getGrammarNav. A word's place is its first
+   source, the unit it was introduced in. index/total stay per unit, since
+   the card reads "Word 3 of 14 · Unit 1". */
+const WORD_COURSE_ORDER: Record<RefSource["course"], number> = {
+  "our-world": 0,
+  "joyful-work": 1,
+  "junior-high": 2
+};
+
+function wordHome(entry: WordEntry) {
+  const source = entry.sources[0];
   return {
-    prev: i > 0 ? list[i - 1] : null,
-    next: i < list.length - 1 ? list[i + 1] : null,
-    index: i + 1,
-    total: list.length
+    course: source?.course ?? "our-world",
+    level: source?.level ?? 0,
+    unit: source?.unit ?? 0,
+    tag: source?.tag ?? ""
+  };
+}
+
+const wordSequence: WordEntry[] = allWords
+  .filter((entry) => entry.type !== "academic")
+  .map((entry, order) => ({ entry, home: wordHome(entry), order }))
+  .sort(
+    (a, b) =>
+      WORD_COURSE_ORDER[a.home.course] - WORD_COURSE_ORDER[b.home.course] ||
+      a.home.level - b.home.level ||
+      a.home.unit - b.home.unit ||
+      a.order - b.order
+  )
+  .map(({ entry }) => entry);
+
+export function sameWordUnit(a: WordEntry, b: WordEntry) {
+  const x = wordHome(a);
+  const y = wordHome(b);
+  return x.course === y.course && x.level === y.level && x.unit === y.unit;
+}
+
+export function getWordSourceTag(entry: WordEntry) {
+  return wordHome(entry).tag;
+}
+
+export function getWordNav(currentId: string): PrevNext<WordEntry> & { unit: number | null } {
+  const i = wordSequence.findIndex((entry) => entry.id === currentId);
+  if (i < 0) return { prev: null, next: null, index: 0, total: 0, unit: null };
+  const current = wordSequence[i];
+  const peers = wordSequence.filter((entry) => sameWordUnit(entry, current));
+  return {
+    prev: i > 0 ? wordSequence[i - 1] : null,
+    next: i < wordSequence.length - 1 ? wordSequence[i + 1] : null,
+    index: peers.findIndex((entry) => entry.id === currentId) + 1,
+    total: peers.length,
+    unit: wordHome(current).unit || null
   };
 }
 
@@ -204,7 +250,6 @@ export function getAcademicNav(currentId: string): PrevNext<AcademicEntry> {
   };
 }
 
-/* Grammar prev/next within the SAME unit only (matches design: "Grammar 3 of 3 · Unit 8"). */
 /* Prev/Next walk the whole library in course → level → unit order, so Next
    on the last point of a unit carries on into the next unit (and level).
    index/total stay per unit, since the card reads "Grammar 2 of 2 · Unit 1". */

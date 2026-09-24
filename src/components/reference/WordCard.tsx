@@ -7,7 +7,7 @@ import { useKnownWordIds } from "@/components/useKnownWordIds";
 import type { WordEntry } from "@/data/reference-shapes";
 import { getVerbForms, type VerbForms } from "@/data/verbForms";
 import sanseidoIndex from "../../../content/subjects/english/junior-high/sanseido-index.json";
-import { allWords, getWordNav } from "./ref-data";
+import { allWords, getWordNav, getWordSourceTag, sameWordUnit } from "./ref-data";
 import { isMultiEmoji } from "./emoji-utils";
 
 type SanseidoEntry = { w: string; u: string };
@@ -30,11 +30,13 @@ const POS_LABEL: Record<string, string> = {
    should stay inside that list instead of jumping to whatever word happens to
    sit beside it globally. Both overrides default to the vocabulary behavior. */
 export type CardNav = {
-  prev: { href: string; label: string } | null;
-  next: { href: string; label: string } | null;
+  /* tag is set when the step leaves the current unit, so the jump is visible. */
+  prev: { href: string; label: string; tag?: string } | null;
+  next: { href: string; label: string; tag?: string } | null;
   index: number;
   total: number;
   noun: string;
+  unit?: number | null;
 };
 
 export function WordCard({
@@ -55,12 +57,21 @@ export function WordCard({
   const nav = useMemo<CardNav>(() => {
     if (navOverride) return navOverride;
     const wordNav = getWordNav(entry.id);
+    const step = (target: WordEntry | null) =>
+      target
+        ? {
+            href: `/reference/word/${target.id}`,
+            label: target.word,
+            tag: sameWordUnit(entry, target) ? undefined : getWordSourceTag(target) || undefined
+          }
+        : null;
     return {
-      prev: wordNav.prev ? { href: `/reference/word/${wordNav.prev.id}`, label: wordNav.prev.word } : null,
-      next: wordNav.next ? { href: `/reference/word/${wordNav.next.id}`, label: wordNav.next.word } : null,
+      prev: step(wordNav.prev),
+      next: step(wordNav.next),
       index: wordNav.index,
       total: wordNav.total,
-      noun: "Word"
+      noun: "Word",
+      unit: wordNav.unit
     };
   }, [entry.id, navOverride]);
   const family = useMemo(() => getWordFamily(entry), [entry]);
@@ -177,6 +188,7 @@ export function WordCard({
           <Link href={nav.prev.href} className="rcardv2-prevnext-btn">
             <span className="rcardv2-prevnext-arrow">←</span>
             {nav.prev.label}
+            {nav.prev.tag && <span className="rcardv2-prevnext-tag">{nav.prev.tag}</span>}
           </Link>
         ) : (
           <button type="button" className="rcardv2-prevnext-btn is-disabled" disabled>
@@ -187,11 +199,13 @@ export function WordCard({
         <div className="rcardv2-prevnext-pos">
           <div className="rcardv2-prevnext-count">
             {nav.noun} {nav.index} of {nav.total}
+            {nav.unit ? ` · Unit ${nav.unit}` : ""}
           </div>
         </div>
 
         {nav.next ? (
           <Link href={nav.next.href} className="rcardv2-prevnext-btn">
+            {nav.next.tag && <span className="rcardv2-prevnext-tag">{nav.next.tag}</span>}
             {nav.next.label}
             <span className="rcardv2-prevnext-arrow">→</span>
           </Link>

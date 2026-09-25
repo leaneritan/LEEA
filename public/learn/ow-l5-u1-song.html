@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Song · Bad Weather — Leo's App 🎵</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --song:#d94f7b;--song-d:#9d2450;--song-l:#fde7ef;
+  --storm:#1e3a5f;--storm-m:#2f5a8a;--storm-l:#e3edf8;
+  --green:#16A34A;--green-d:#14532D;--green-l:#DCFCE7;
+  --amber:#F59E0B;--amber-d:#7c5b06;--amber-l:#FEF3C7;
+  --red:#DC2626;--red-l:#fee2e2;
+  --ink:#16202c;--ink-2:#465466;--ink-3:#7a8797;--bg:#f4f7fb;--border:#dde4ec;
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;color:var(--ink);padding-bottom:40px}
+.ja{font-family:'Noto Sans JP','Outfit',sans-serif}
+
+/* header */
+.hdr{background:linear-gradient(135deg,var(--storm),var(--storm-m) 70%,var(--song));color:#fff;padding:20px 18px 22px;position:sticky;top:0;z-index:40;box-shadow:0 3px 14px rgba(0,0,0,.18)}
+.hdr h1{font-size:21px;font-weight:800;display:flex;align-items:center;gap:9px}
+.hdr p{font-size:13px;opacity:.9;margin-top:3px}
+.review-banner{background:var(--amber);color:#5a3d00;font-weight:700;text-align:center;padding:9px;font-size:14px}
+
+/* module grid */
+.wrap{max-width:680px;margin:0 auto;padding:18px 14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.card{background:#fff;border:2px solid var(--border);border-left:6px solid var(--song);border-radius:18px;padding:18px 16px;cursor:pointer;position:relative;transition:transform .12s,box-shadow .12s;min-height:128px;display:flex;flex-direction:column}
+.card:active{transform:scale(.97)}
+.card:hover{box-shadow:0 8px 22px rgba(30,58,95,.12)}
+.card .ci{font-size:40px;line-height:1}
+.card .ct{font-size:18px;font-weight:800;margin-top:10px}
+.card .cs{font-size:13px;color:var(--ink-3);margin-top:3px;line-height:1.3;flex:1}
+.card.wide{grid-column:1/-1;min-height:auto;flex-direction:row;align-items:center;gap:14px;border-left-color:var(--storm-m)}
+.card.wide .ci{font-size:34px}
+.card.wide .ct{margin-top:0}
+.badge{position:absolute;top:12px;right:12px;font-size:12px;font-weight:800;padding:4px 9px;border-radius:999px}
+.badge:empty{display:none}
+.badge.done{background:var(--green);color:#fff}
+.badge.score{background:var(--storm-m);color:#fff}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(15,25,40,.55);z-index:60;display:none;align-items:flex-end;justify-content:center}
+.modal.open{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:680px;max-height:94vh;border-radius:22px 22px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:up .25s ease}
+@keyframes up{from{transform:translateY(40px);opacity:.6}to{transform:translateY(0);opacity:1}}
+.sheet-hdr{background:#fff;padding:16px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sheet-hdr .si{font-size:26px}
+.sheet-hdr h2{font-size:18px;font-weight:800;flex:1}
+.x{background:var(--border);border:none;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;color:var(--ink-2);flex-shrink:0}
+.sheet-body{padding:18px;overflow-y:auto;flex:1}
+.sheet-ftr{padding:13px 16px;background:#fff;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0}
+.sheet-ftr:empty{display:none}
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:13px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit}
+.btn-complete:disabled{background:var(--border);color:var(--ink-3);cursor:not-allowed}
+.btn-complete.confirmed{background:var(--green-d)}
+.btn-redo{width:110px;background:#fff;color:var(--red);border:2px solid var(--red);border-radius:13px;padding:15px 0;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
+.btn-redo.armed{background:var(--red);color:#fff}
+
+/* word card */
+.fcard{background:#fff;border:2px solid var(--border);border-radius:16px;padding:16px;text-align:center;margin-bottom:14px}
+.fcard .fe{font-size:54px;line-height:1}
+.fcard .fw{font-size:28px;font-weight:800;margin-top:4px}
+.fcard .fi{font-size:14px;color:var(--ink-3);margin-top:2px}
+.fcard .ja-btn{margin-top:10px;background:var(--song-l);color:var(--song-d);border:none;border-radius:10px;padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.fcard .ja-reveal{display:none;margin-top:10px;font-size:17px;line-height:1.4}
+.fcard .ja-reveal.show{display:block}
+.fcard .ja-reveal .jp{font-weight:700}
+.fcard .ja-reveal .en{color:var(--ink-2);font-size:15px;margin-top:3px}
+
+/* games */
+.q{font-size:19px;font-weight:600;text-align:center;line-height:1.4;margin-bottom:14px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{background:#fff;border:2.5px solid var(--border);border-radius:13px;padding:15px;font-size:17px;font-weight:600;cursor:pointer;text-align:center;font-family:inherit;color:var(--ink)}
+.opt:active{transform:scale(.98)}
+.opt.correct{background:var(--green);border-color:var(--green);color:#fff}
+.opt.wrong{background:var(--red-l);border-color:var(--red);color:var(--red)}
+.lines{display:flex;flex-direction:column;gap:10px}
+.line{background:#fff;border:2.5px solid var(--border);border-radius:13px;padding:14px;font-size:16px;cursor:pointer;line-height:1.35;font-weight:500}
+.line.correct{background:var(--green);border-color:var(--green);color:#fff}
+.line.wrong{background:var(--red-l);border-color:var(--red)}
+.chips{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:6px}
+.chip{background:var(--storm-l);border:2px solid var(--storm-m);color:var(--storm);border-radius:11px;padding:11px 16px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
+.chip.used{opacity:.35;pointer-events:none}
+.chip.picked{background:var(--green);border-color:var(--green);color:#fff}
+.chip.shake{animation:shake .35s;background:var(--red-l);border-color:var(--red);color:var(--red)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.slotline{font-size:20px;font-weight:600;text-align:center;line-height:1.6;margin:8px 0}
+.slot{display:inline-block;min-width:110px;border-bottom:3px dashed var(--song);color:var(--song-d);font-weight:800;padding:0 8px}
+.slot.filled{border-bottom-style:solid;border-color:var(--green);color:var(--green-d)}
+.fb{text-align:center;font-size:16px;font-weight:700;min-height:24px;margin-top:12px}
+.fb.ok{color:var(--green-d)}.fb.no{color:var(--red)}
+.def{background:var(--green-l);border:2px solid var(--green);border-radius:13px;padding:0 16px;max-height:0;overflow:hidden;opacity:0;transition:all .4s;margin-top:14px}
+.def.show{max-height:220px;opacity:1;padding:14px 16px}
+.def .dt{font-size:16px;line-height:1.4}
+.def .dx{font-size:14px;color:var(--ink-2);margin-top:6px;font-style:italic}
+.next-btn{display:none;width:100%;background:var(--storm-m);color:#fff;border:none;border-radius:13px;padding:14px;font-size:16px;font-weight:800;margin-top:16px;cursor:pointer;font-family:inherit}
+.next-btn.show{display:block}
+.dots{display:flex;gap:6px;justify-content:center;margin-bottom:14px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.dot.on{background:var(--green)}
+.dot.cur{background:var(--song);transform:scale(1.5)}
+
+/* karaoke */
+.kw{display:inline-block;font-weight:700;border-radius:7px;padding:1px 7px;cursor:pointer;border:2px solid transparent}
+.kw.wx{color:#8a5a00;background:var(--amber-l)}
+.kw.sw{color:var(--song-d);background:var(--song-l)}
+.kw.tapped{background:var(--green);color:#fff}
+.kl{font-size:17px;line-height:1.9;padding:1px 0}
+.klabel{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--storm-m);margin:14px 0 4px}
+.klabel.cho{color:var(--song)}
+.kcount{background:#fff;border:2px solid var(--storm-m);border-radius:14px;padding:12px;text-align:center;font-size:14px;font-weight:600;color:var(--ink-2);margin-bottom:10px;position:sticky;top:0;z-index:2}
+.kcount .kbar{display:flex;gap:10px;justify-content:center;margin-bottom:6px}
+.kcount .kb{font-size:15px;font-weight:800;padding:4px 10px;border-radius:999px}
+.kcount .kb.wx{background:var(--amber-l);color:#8a5a00}
+.kcount .kb.sw{background:var(--song-l);color:var(--song-d)}
+.klegend{font-size:13px;color:var(--ink-3);text-align:center;margin-bottom:6px}
+
+/* rows */
+.mm-row{background:#fff;border:2px solid var(--border);border-radius:13px;padding:13px;margin-bottom:10px}
+.mm-row.done{border-color:var(--green)}
+.mm-word{font-size:30px;margin-bottom:9px;text-align:center}
+.mm-opts{display:flex;flex-direction:column;gap:8px}
+.mm-opt{background:var(--storm-l);border:2px solid var(--storm-m);color:var(--storm);border-radius:10px;padding:10px 13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.mm-opt.correct{background:var(--green);border-color:var(--green);color:#fff}
+.mm-opt.wrong{background:var(--red-l);border-color:var(--red);color:var(--red)}
+.mm-row.done .mm-opt:not(.correct){opacity:.4;pointer-events:none}
+.box{background:#fff;border:2px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px}
+.cho-line{font-size:17px;line-height:1.8;text-align:center}
+.inp{width:100%;border:2px solid var(--border);border-radius:11px;padding:11px 12px;font-size:16px;font-family:inherit;margin-top:6px}
+.inp:focus{outline:none;border-color:var(--song)}
+.frame{font-size:16px;font-weight:700;margin-top:12px}
+.frame .ja{font-weight:400;color:var(--ink-3);font-size:13px;margin-left:6px}
+
+/* progress + quiz */
+.prog-row{display:flex;align-items:center;gap:12px;background:#fff;border:2px solid var(--border);border-radius:13px;padding:13px 15px;margin-bottom:9px}
+.prog-row .pi{font-size:24px}
+.prog-row .pn{flex:1;font-weight:700;font-size:15px}
+.prog-row .ps{font-weight:800;font-size:14px;padding:4px 10px;border-radius:999px;background:var(--border);color:var(--ink-3)}
+.prog-row .ps.done{background:var(--green);color:#fff}
+.prog-row .ps.score{background:var(--storm-m);color:#fff}
+.wrong-item{background:#fff;border:2px solid var(--border);border-left:6px solid var(--red);border-radius:11px;padding:12px 14px;margin-bottom:8px;font-size:14px;line-height:1.4}
+.wrong-item .wp{font-weight:700}
+.wrong-item .wc{color:var(--red)}.wrong-item .wok{color:var(--green-d);font-weight:700}
+.quiz-result{text-align:center;padding:10px}
+.quiz-result .qbig{font-size:60px}
+.quiz-result .qpct{font-size:46px;font-weight:900;color:var(--storm-m)}
+.note{font-size:13px;color:var(--ink-3);text-align:center;margin-top:14px;line-height:1.4}
+.intro{font-size:14px;color:var(--ink-2);text-align:center;margin-bottom:14px;line-height:1.45}
+</style>
+</head>
+<body>
+<div id="reviewBanner"></div>
+<div class="hdr">
+  <h1>🎵🌊 Bad Weather</h1>
+  <p>Level 5 · Unit 1 · Song · Leo's practice · SB pp. 10–11</p>
+</div>
+
+<div class="wrap">
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="sheet-hdr"><span class="si" id="mIcon">🎵</span><h2 id="mTitle">Module</h2><button class="x" onclick="closeModal()">✕</button></div>
+    <div class="sheet-body" id="mBody"></div>
+    <div class="sheet-ftr" id="mFtr"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== SAVE LAYER (LEEA standard) ===================== */
+const SAVE_PREFIX = '5-1-song-';
+const HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-5-1-song';
+const isReview = new URLSearchParams(location.search).get('review') === '1';
+
+function lSave(key, val){
+  try{
+    if(val === null) localStorage.removeItem('leea-'+key);
+    else localStorage.setItem('leea-'+key, JSON.stringify(val));
+  }catch(e){}
+  try{ if(window.LEEA_CLOUD && window.LEEA_CLOUD.enabled) window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, key, val); }catch(e){}
+}
+function lLoad(key){
+  try{ const v=localStorage.getItem('leea-'+key); return v?JSON.parse(v):null; }catch(e){ return null; }
+}
+async function restoreProgressFromCloud(){
+  try{
+    if(!window.LEEA_CLOUD || !window.LEEA_CLOUD.enabled || !window.LEEA_CLOUD.fetchProgress) return;
+    const rows = await window.LEEA_CLOUD.fetchProgress(HOMEWORK_ID);
+    if(!rows) return;
+    rows.forEach(r=>{ try{ localStorage.setItem('leea-'+r.storage_key, JSON.stringify(r.value)); }catch(e){} });
+  }catch(e){}
+}
+function saveScore(id, score, total, extra){
+  const percent = total? Math.round(score/total*100):0;
+  lSave(SAVE_PREFIX+id+'-score', Object.assign({score,total,percent,done:true,timestamp:Date.now()}, extra||{}));
+}
+
+/* ===================== CONTENT =====================
+   Lyrics: TR 1.3 "Bad Weather", Student's Book audio script (SB p. 10).
+   Word lists: the LP Song page — Vocabulary 1 in the song (lightning, thunder,
+   a blizzard, an ice storm, a hurricane), Content Vocabulary (safe, grab, see,
+   howl, waves, rage), Related Vocabulary (lighthouse, crash, coast) and
+   Vocabulary 2 in the song (preview only). The LP prints no Academic Language
+   for the Song, so the "ma" slot carries the photo words instead of invented
+   academic ones. Grammar 2 stays out of this app (song previews Grammar 1 only).
+   ================================================================== */
+function wx(w,key){ return `<span class="kw wx" data-k="${key||w.toLowerCase()}">${w}</span>`; }
+function sw(w,key){ return `<span class="kw sw" data-k="${key||w.toLowerCase()}">${w}</span>`; }
+
+const WEATHER_KEYS = ['lightning','thunder','blizzard','ice storm','hurricane'];
+const SONG_KEYS    = ['safe','grab','see','howl','waves','rage'];
+
+const CHORUS = [
+  `Be prepared for emergencies.`,
+  `It's always good to be ${sw('safe')}. You'll ${sw('see')}!`,
+  `${sw('Grab','grab')} supplies and a flashlight, too.`,
+  `Seek shelter. It's the ${sw('safe')} thing to do!`
+];
+const SONG = [
+  {label:'Verse 1', lines:[
+    `There's bad weather on the way!`,
+    `There's bad weather on the way!`,
+    `Is it going to storm? Yes, it is!`,
+    `Is there going to be ${wx('lightning')}? Yes, there is!`,
+    `Is there going to be ${wx('thunder')}? Yes, there is!`,
+    `When there's going to be a storm, I hurry inside!`]},
+  {label:'Chorus', cho:true, lines:CHORUS},
+  {label:'Verse 2', lines:[
+    `Is there going to be a ${wx('blizzard')}? Yes, there is!`,
+    `Is there going to be an ${wx('ice storm')}? Yes, there is!`,
+    `Is it going to be cold? Oh, yes it is!`,
+    `If there's going to be a ${wx('blizzard')}, I hurry inside!`]},
+  {label:'Chorus', cho:true, lines:CHORUS},
+  {label:'Verse 3', lines:[
+    `Is there going to be a ${wx('hurricane')}? Yes, there is!`,
+    `Is the wind going to ${sw('howl')}? Yes, it is!`,
+    `Are the ${sw('waves')} going to ${sw('rage')}? Yes, they are!`,
+    `If there's going to be a ${wx('hurricane')}, we evacuate!`]},
+  {label:'Chorus', cho:true, lines:CHORUS.concat([`Seek shelter. It's the ${sw('safe')} thing to do!`])}
+];
+
+/* m2 — the six Content Vocabulary words */
+const SONGWORDS = [
+  { word:"safe", emoji:"🛡️🏡", ipa:"/seɪf/ · adjective", ja:"安全（あんぜん）な", jaen:"safe → safety 安全", def:"Safe = not in danger; away from anything that can hurt you.", ex:"🎵 “It's always good to be safe.”",
+    game:{type:"pick", q:"A big storm is here. Where are you <b>safe</b>?", opts:["under a tall tree in lightning","inside a strong building","swimming in big storm waves"], correct:1} },
+  { word:"grab", emoji:"✊🎒", ipa:"/ɡræb/ · verb", ja:"つかむ・急（いそ）いで取（と）る", jaen:"grab → grabbed (double the b)", def:"Grab = to take something quickly with your hand.", ex:"🎵 “Grab supplies and a flashlight, too.”",
+    game:{type:"scramble", q:"Build the chorus line.", pieces:["Grab","supplies","and a flashlight,","too."], a:"Grab supplies and a flashlight, too."} },
+  { word:"see", emoji:"👁️🔎", ipa:"/siː/ · verb", ja:"見（み）る・見（み）える", jaen:"see → saw → seen", def:"See = to notice something with your eyes.", ex:"🎵 “It's always good to be safe. You'll see!”",
+    game:{type:"pick", q:"Which storm thing do you <b>see</b> with your eyes?", opts:["thunder","the howling wind","lightning"], correct:2} },
+  { word:"howl", emoji:"🐺💨", ipa:"/haʊl/ · verb", ja:"遠吠（とおぼ）えする・うなる", jaen:"wolves and the wind both howl", def:"Howl = to make a long, loud crying sound, like a wolf.", ex:"🎵 “Is the wind going to howl? Yes, it is!”",
+    game:{type:"lyric", q:"Tap the line where the <b>wind makes a long, loud sound</b>.", lines:["Is it going to be cold? Oh, yes it is!","Is the wind going to howl? Yes, it is!","Seek shelter. It's the safe thing to do!"], correct:1} },
+  { word:"waves", emoji:"🌊🌊", ipa:"/weɪvz/ · noun, plural", ja:"波（なみ）", jaen:"津波 tsunami is an English word too!", def:"Waves = lines of water that move across the top of the sea.", ex:"🎵 “Are the waves going to rage?”",
+    game:{type:"gap", before:"Are the", after:"going to rage? Yes, they are!", chips:["clouds","waves","supplies"], a:"waves"} },
+  { word:"rage", emoji:"😡💨", ipa:"/reɪdʒ/ · verb", ja:"荒（あ）れ狂（くる）う", jaen:"used for people AND for storms", def:"Rage = to be very wild, angry and powerful.", ex:"🎵 “Are the waves going to rage? Yes, they are!”",
+    game:{type:"pick", q:"Which one is <b>raging</b>?", opts:["a quiet lake","a light breeze","waves smashing the lighthouse"], correct:2} }
+];
+
+/* ma — Related Vocabulary from the p. 11 photo */
+const PHOTOWORDS = [
+  { word:"a lighthouse", emoji:"🚨🗼", ipa:"/ˈlaɪtˌhaʊs/ · noun", ja:"灯台（とうだい）", jaen:"light + house = one word", def:"A lighthouse = a tall tower by the sea with a bright light that warns ships.", ex:"“The waves crash against the lighthouse.”",
+    game:{type:"pick", q:"What does a <b>lighthouse</b> do?", opts:["it warns ships to stay away","it catches fish","it keeps food cold"], correct:0} },
+  { word:"crash", emoji:"💥🌊", ipa:"/kræʃ/ · verb", ja:"ぶつかる・衝突（しょうとつ）する", jaen:"a wave's sound: ザブーン", def:"Crash = to hit something hard, with a loud noise.", ex:"“Waves crash against the coast.”",
+    game:{type:"order", q:"Put the wave's story in order. What happens <b>first</b>?", items:["A small wave rises far out at sea","It grows taller and taller","It races toward the rocks","CRASH! It smashes on the rocks"]} },
+  { word:"the coast", emoji:"🏖️🗺️", ipa:"/koʊst/ · noun", ja:"海岸（かいがん）・沿岸（えんがん）", jaen:"adjective: coastal", def:"The coast = the land that is next to the sea.", ex:"“The Netherlands is a small coastal country.”",
+    game:{type:"pick", q:"Which place is <b>on the coast</b>?", opts:["the top of a mountain","a harbour","the middle of a desert"], correct:1} }
+];
+
+/* m3 — Vocabulary 1 words that are in the song */
+const VOCAB1 = [
+  { word:"lightning", emoji:"⚡☁️", ipa:"/ˈlaɪtnɪŋ/ · noun", ja:"稲妻（いなずま）", jaen:"you SEE it", def:"Lightning = the bright flash of light in the sky in a storm.", ex:"🎵 “Is there going to be lightning? Yes, there is!”",
+    game:{type:"pick", q:"Which one do you <b>see</b>?", opts:["thunder","lightning","the wind"], correct:1} },
+  { word:"thunder", emoji:"🔊☁️", ipa:"/ˈθʌndər/ · noun", ja:"雷（かみなり）の音（おと）", jaen:"you HEAR it", def:"Thunder = the loud noise in the sky after lightning.", ex:"🎵 “Is there going to be thunder? Yes, there is!”",
+    game:{type:"lyric", q:"Tap the line with the storm sound you <b>hear</b>.", lines:["Is there going to be thunder? Yes, there is!","Is it going to be cold? Oh, yes it is!","There's bad weather on the way!"], correct:0} },
+  { word:"a blizzard", emoji:"🧍❄️", ipa:"/ˈblɪzərd/ · noun", ja:"吹雪（ふぶき）", jaen:"cold + wind + lots of snow", def:"A blizzard = a storm with strong, cold wind and lots of snow.", ex:"🎵 “Is there going to be a blizzard? Yes, there is!”",
+    game:{type:"gap", before:"Is there going to be a", after:"? Yes, there is! Is it going to be cold? Oh, yes it is!", chips:["heat wave","blizzard","drought"], a:"blizzard"} },
+  { word:"an ice storm", emoji:"🥶🌲", ipa:"/aɪs stɔːrm/ · noun", ja:"着氷性（ちゃくひょうせい）の嵐（あらし）", jaen:"two words: ice + storm", def:"An ice storm = a storm where rain freezes on everything.", ex:"🎵 “Is there going to be an ice storm? Yes, there is!”",
+    game:{type:"tf", s:"In an ice storm, rain freezes on everything.", a:true} },
+  { word:"a hurricane", emoji:"🌀🌊", ipa:"/ˈhɜːrəkeɪn/ · noun", ja:"ハリケーン（大（おお）きな台風（たいふう））", jaen:"winds faster than 119 km/h", def:"A hurricane = a very big storm with winds faster than 119 km/h.", ex:"🎵 “If there's going to be a hurricane, we evacuate!”",
+    game:{type:"scramble", q:"Build the question from the song.", pieces:["Is there","going to be","a hurricane?"], a:"Is there going to be a hurricane?"} }
+];
+
+/* m4 — Use It Again. Chorus catch: the LP's four answers, in the order sung. */
+const CATCH = ["emergencies","supplies","a flashlight","shelter"];
+const CATCH_CHIPS = ["shelter","emergencies","a flashlight","supplies"];
+/* Grammar 1 seed: the LP's own four answers to "What are you going to do?" */
+const GOING = [
+  {e:"⛺🏡", a:"I'm going to seek shelter."},
+  {e:"🧥",   a:"I'm going to put on a coat."},
+  {e:"🪟",   a:"I'm going to close the windows."},
+  {e:"🎒",   a:"I'm going to grab supplies."}
+];
+const GOING_OPTS = [
+  ["I'm going to put on a coat.","I'm going to seek shelter.","I'm going to grab supplies."],
+  ["I'm going to close the windows.","I'm going to grab supplies.","I'm going to put on a coat."],
+  ["I'm going to close the windows.","I'm going to seek shelter.","I'm going to put on a coat."],
+  ["I'm going to seek shelter.","I'm going to close the windows.","I'm going to grab supplies."]
+];
+
+/* m5 — End of unit weather report (LP) + Activity 2 frames (SB p. 10) */
+const FC_WEATHER = ["a blizzard","a tropical storm","a flood","a heat wave","a hurricane"];
+const FC_PLACE   = ["Hokkaido","Tokyo","Okinawa","my town"];
+const FRAMES = [
+  {k:"remember", before:"I remember a", ph:"typhoon last summer", ja:"覚えている嵐は…"},
+  {k:"prepare",  before:"To prepare, I", ph:"grabbed a flashlight", ja:"準備のために…"},
+  {k:"feel",     before:"The storm made me feel", ph:"nervous", ja:"嵐のとき、気持ちは…"}
+];
+
+/* m6 — Quiz (10) */
+const QUIZ = [
+  {p:"What is our song called?", opts:["Rainy Days","Bad Weather","Sunny Skies"], c:1},
+  {p:"The chorus says: “It's always good to be ___.”", opts:["safe","cold","late"], c:0},
+  {p:"“___ supplies and a flashlight, too.”", opts:["Howl","Rage","Grab"], c:2},
+  {p:"In the song, what is going to <b>howl</b>?", opts:["the waves","the wind","the lighthouse"], c:1},
+  {p:"“Are the waves going to ___? Yes, they are!”", opts:["rage","see","grab"], c:0},
+  {p:"You <b>see</b> lightning. What do you <b>hear</b>?", opts:["a blizzard","thunder","an ice storm"], c:1},
+  {p:"A tall tower by the sea with a bright light that warns ships is a ___.", opts:["shelter","coast","lighthouse"], c:2},
+  {p:"The land that is next to the sea is the ___.", opts:["coast","wave","storm"], c:0},
+  {p:"“If there's going to be a hurricane, we ___!”", opts:["hurry inside","evacuate","grab supplies"], c:1},
+  {p:"A storm is coming. Which sentence is a <b>plan</b>?", opts:["I'm going to close the windows.","I closed the windows yesterday.","I close the windows every day."], c:0}
+];
+
+/* ===================== MODULES ===================== */
+const MODULES = [
+  {id:"m1", icon:"🎵", title:"Listen & Sing", sub:"Tap the weather words and song words as you sing"},
+  {id:"m2", icon:"🛡️", title:"Song Words", sub:"safe · grab · see · howl · waves · rage"},
+  {id:"ma", icon:"🗼", title:"Photo Words", sub:"lighthouse · crash · coast (p. 11)"},
+  {id:"m3", icon:"⚡", title:"Word Review", sub:"The 5 Vocabulary 1 words in the song"},
+  {id:"m4", icon:"🔁", title:"Use It Again", sub:"Chorus catch + What are you going to do?"},
+  {id:"m5", icon:"✍️", title:"Write a Line", sub:"Be the forecaster + your own storm"},
+  {id:"m6", icon:"🧠", title:"Quiz", sub:"10 questions — show what you know", quiz:true},
+  {id:"m7", icon:"📊", title:"My Progress", sub:"See everything you finished", wide:true, dash:true}
+];
+</script>
+<script>
+/* ===================== UI BUILD ===================== */
+const $ = id=>document.getElementById(id);
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function isDone(id){ const c=lLoad(SAVE_PREFIX+id+'-complete'); return !!(c && c.timestamp); }
+
+function buildGrid(){
+  $('grid').innerHTML = MODULES.map(m=>`
+    <div class="card ${m.wide?'wide':''}" onclick="openModule('${m.id}')">
+      <span class="badge" id="badge-${m.id}"></span>
+      <div class="ci">${m.icon}</div>
+      <div><div class="ct">${m.title}</div><div class="cs">${m.sub}</div></div>
+    </div>`).join('');
+  MODULES.forEach(m=>updateBadge(m.id));
+}
+function updateBadge(id){
+  const b=$('badge-'+id); if(!b) return;
+  const m=MODULES.find(x=>x.id===id);
+  b.className='badge'; b.textContent='';
+  if(!m || m.dash) return;
+  if(m.quiz){
+    const sc=lLoad(SAVE_PREFIX+id+'-score');
+    if(sc && sc.done){ b.className='badge score'; b.textContent=sc.percent+'%'; }
+    return;
+  }
+  if(isDone(id)){ b.className='badge done'; b.textContent='✓ Done'; }
+}
+
+/* ===================== MODAL ===================== */
+let CUR=null;
+function openModule(id){
+  const m=MODULES.find(x=>x.id===id); if(!m) return; CUR=m;
+  $('mIcon').textContent=m.icon; $('mTitle').textContent=m.title;
+  $('mFtr').innerHTML=''; $('mBody').scrollTop=0;
+  if(m.dash) renderDash();
+  else if(m.quiz){
+    const sc=lLoad(SAVE_PREFIX+'m6-score');
+    if(isReview || (sc && sc.done)) renderQuizReview();
+    else renderQuiz();
+  }
+  else { renderFooter(m); renderModule(id); }
+  $('modal').classList.add('open');
+}
+function closeModal(){ $('modal').classList.remove('open'); CUR=null; }
+
+/* Footer: Mark complete (disabled until the module's own work is done) + two-tap Redo. */
+function renderFooter(m){
+  if(isReview){ $('mFtr').innerHTML=`<button class="btn-complete" onclick="closeModal()">Close</button>`; return; }
+  $('mFtr').innerHTML=`
+    <button class="btn-complete" id="cbtn" disabled onclick="closeModal()">Finish the activity first</button>
+    <button class="btn-redo" id="rbtn" onclick="armRedo('${m.id}',this)">↺ Redo</button>`;
+  if(isDone(m.id)) setFooterDone();
+}
+function setFooterDone(){
+  const b=$('cbtn'); if(!b) return;
+  b.disabled=false; b.classList.add('confirmed'); b.textContent='Leo complete ✓';
+}
+/* Called by each module the moment its own completion criteria are met:
+   the done-key saves itself (rule 1), the button becomes the confirmation. */
+function moduleFinished(id){
+  if(isReview) return;
+  if(!isDone(id)) lSave(SAVE_PREFIX+id+'-complete', {done:true, timestamp:Date.now()});
+  saveHomeworkFlag();
+  updateBadge(id);
+  if(CUR && CUR.id===id) setFooterDone();
+}
+/* The homework flag learnerProgress.ts reads: `leea-<homeworkId>-done`. */
+function saveHomeworkFlag(){
+  const ids = MODULES.filter(m=>!m.dash).map(m=>m.id);
+  if(!ids.every(isDone)) return;
+  const value = { complete:true, completedAt:new Date().toISOString() };
+  try{ localStorage.setItem('leea-'+HOMEWORK_ID+'-done', JSON.stringify(value)); }catch(e){}
+  try{ if(window.LEEA_CLOUD && window.LEEA_CLOUD.enabled)
+         window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, 'leea-'+HOMEWORK_ID+'-done', value); }catch(e){}
+}
+function clearHomeworkFlag(){
+  try{ localStorage.removeItem('leea-'+HOMEWORK_ID+'-done'); }catch(e){}
+  try{ if(window.LEEA_CLOUD && window.LEEA_CLOUD.enabled)
+         window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, 'leea-'+HOMEWORK_ID+'-done', null); }catch(e){}
+}
+function armRedo(id,btn){
+  if(btn.dataset.armed==='1'){ doRedo(id); return; }
+  btn.dataset.armed='1'; btn.classList.add('armed'); btn.textContent='Tap again ↺';
+  setTimeout(()=>{ if(btn && btn.isConnected){ btn.dataset.armed=''; btn.classList.remove('armed'); btn.textContent='↺ Redo'; } },2500);
+}
+function doRedo(id){
+  lSave(SAVE_PREFIX+id+'-complete', null);
+  lSave(SAVE_PREFIX+id+'-state', null);
+  if(id==='m6'){ lSave(SAVE_PREFIX+'m6-score', null); lSave(SAVE_PREFIX+'m6-wrong', null); }
+  clearHomeworkFlag();
+  updateBadge(id);
+  openModule(id);
+}
+
+/* ===================== MODULE RENDERERS ===================== */
+function renderModule(id){
+  if(id==='m1') renderKaraoke();
+  else if(id==='m2') startCarousel(SONGWORDS,'m2');
+  else if(id==='ma') startCarousel(PHOTOWORDS,'ma');
+  else if(id==='m3') startCarousel(VOCAB1,'m3');
+  else if(id==='m4') renderUseAgain();
+  else if(id==='m5') renderWrite();
+}
+
+/* ---- m1 Karaoke ---- */
+function renderKaraoke(){
+  const st = lLoad(SAVE_PREFIX+'m1-state') || {found:[]};
+  const found = new Set(isReview||isDone('m1') ? WEATHER_KEYS.concat(SONG_KEYS) : st.found);
+  const body=$('mBody');
+  body.innerHTML = `<div class="kcount"><div class="kbar"><span class="kb wx">🌩️ Weather <b id="kcw">0</b>/5</span><span class="kb sw">🎵 Song words <b id="kcs">0</b>/6</span></div>🙋 Hand up for every weather word — then tap it!</div>
+    <div class="klegend">Play TR 1.3 and follow the words. Sing along — badly is fine! 🎤</div>
+    ${SONG.map(b=>`<div class="klabel ${b.cho?'cho':''}">${b.label} ${b.cho?'🔁':'📜'}</div>`+b.lines.map(l=>`<div class="kl">${l}</div>`).join('')).join('')}
+    <div class="note">Find all 5 weather words and all 6 song words to finish.</div>`;
+  function paint(){
+    body.querySelectorAll('.kw').forEach(w=>w.classList.toggle('tapped', found.has(w.dataset.k)));
+    $('kcw').textContent = WEATHER_KEYS.filter(k=>found.has(k)).length;
+    $('kcs').textContent = SONG_KEYS.filter(k=>found.has(k)).length;
+  }
+  body.querySelectorAll('.kw').forEach(w=>w.onclick=()=>{
+    if(isReview || found.has(w.dataset.k)) return;
+    found.add(w.dataset.k); paint();
+    lSave(SAVE_PREFIX+'m1-state', {found:[...found]});
+    if(WEATHER_KEYS.concat(SONG_KEYS).every(k=>found.has(k))) moduleFinished('m1');
+  });
+  paint();
+}
+
+/* ---- m2 / ma / m3 word carousels ---- */
+function startCarousel(list, id){
+  const body=$('mBody');
+  const all = isReview || isDone(id);
+  const st = lLoad(SAVE_PREFIX+id+'-state') || {solved:[]};
+  const solved = new Set(all ? list.map((_,k)=>k) : st.solved);
+  let i = all ? 0 : Math.min(solved.size, list.length-1);
+  body.innerHTML = `<div id="carousel"></div>`;
+  function show(){
+    const v=list[i], c=$('carousel'), isSolved=solved.has(i);
+    c.innerHTML=`
+      <div class="dots">${list.map((_,k)=>`<span class="dot ${solved.has(k)?'on':''} ${k===i?'cur':''}"></span>`).join('')}</div>
+      <div class="fcard">
+        <div class="fe">${v.emoji}</div><div class="fw">${v.word}</div><div class="fi">${v.ipa}</div>
+        <button class="ja-btn" id="jab">🇯🇵 意味を見る (tap)</button>
+        <div class="ja-reveal" id="jar"><span class="jp ja">${v.ja}</span><div class="en">${v.jaen}</div></div>
+      </div>
+      <div id="gwrap"></div>
+      <div class="def" id="gdef"><div class="dt">${v.def}</div><div class="dx">${v.ex}</div></div>
+      <button class="next-btn" id="nextb">${i<list.length-1?'Next word →':'All done ✓'}</button>`;
+    $('jab').onclick=()=>$('jar').classList.add('show');
+    const onSolve=()=>{
+      $('gdef').classList.add('show'); $('nextb').classList.add('show');
+      if(!solved.has(i)){
+        solved.add(i);
+        if(!isReview) lSave(SAVE_PREFIX+id+'-state', {solved:[...solved]});
+        c.querySelectorAll('.dot')[i].classList.add('on');
+      }
+      if(solved.size===list.length) moduleFinished(id);
+    };
+    renderGame($('gwrap'), v.game, onSolve, isSolved);
+    if(isSolved) onSolve();
+    $('nextb').onclick=()=>{
+      if(i<list.length-1){ i++; show(); body.scrollTop=0; }
+      else { $('carousel').insertAdjacentHTML('beforeend',`<div class="note">🎉 All ${list.length} words done! Tap “Leo complete ✓” below.</div>`); $('nextb').remove(); }
+    };
+  }
+  show();
+}
+
+/* ---- Generic game engine ---- */
+function renderGame(wrap, g, onSolve, showSolved){
+  if(g.type==='pick'){
+    wrap.innerHTML=`<div class="q">${g.q}</div><div class="opts">${g.opts.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div>`;
+    const lock=()=>wrap.querySelectorAll('.opt').forEach(x=>x.style.pointerEvents='none');
+    wrap.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{
+      if(+o.dataset.i===g.correct){ o.classList.add('correct'); lock(); onSolve(); }
+      else{ o.classList.add('wrong'); setTimeout(()=>o.classList.remove('wrong'),500); }
+    });
+    if(showSolved){ wrap.querySelector(`.opt[data-i="${g.correct}"]`).classList.add('correct'); lock(); }
+  }
+  else if(g.type==='lyric'){
+    wrap.innerHTML=`<div class="q">${g.q}</div><div class="lines">${g.lines.map((l,i)=>`<div class="line" data-i="${i}">${l}</div>`).join('')}</div>`;
+    const lock=()=>wrap.querySelectorAll('.line').forEach(x=>x.style.pointerEvents='none');
+    wrap.querySelectorAll('.line').forEach(l=>l.onclick=()=>{
+      if(+l.dataset.i===g.correct){ l.classList.add('correct'); lock(); onSolve(); }
+      else{ l.classList.add('wrong'); setTimeout(()=>l.classList.remove('wrong'),500); }
+    });
+    if(showSolved){ wrap.querySelector(`.line[data-i="${g.correct}"]`).classList.add('correct'); lock(); }
+  }
+  else if(g.type==='tf'){
+    wrap.innerHTML=`<div class="q">${g.s}</div><div class="opts"><button class="opt" data-v="1">✓ True</button><button class="opt" data-v="0">✗ False</button></div><div class="fb" id="tffb"></div>`;
+    const lock=()=>wrap.querySelectorAll('.opt').forEach(x=>x.style.pointerEvents='none');
+    wrap.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{
+      const fb=wrap.querySelector('#tffb');
+      if((o.dataset.v==='1')===g.a){ o.classList.add('correct'); fb.className='fb ok'; fb.textContent='Yes! 🎉'; lock(); onSolve(); }
+      else{ o.classList.add('wrong'); fb.className='fb no'; fb.textContent='Try again!'; setTimeout(()=>o.classList.remove('wrong'),500); }
+    });
+    if(showSolved){ wrap.querySelector(`.opt[data-v="${g.a?1:0}"]`).classList.add('correct'); lock(); }
+  }
+  else if(g.type==='gap'){
+    wrap.innerHTML=`<div class="slotline">${g.before} <span class="slot" id="gs">______</span> ${g.after}</div><div class="chips">${g.chips.map(c=>`<button class="chip" data-c="${c}">${c}</button>`).join('')}</div><div class="fb" id="gpfb"></div>`;
+    const fill=()=>{ const s=wrap.querySelector('#gs'); s.textContent=g.a; s.classList.add('filled'); wrap.querySelectorAll('.chip').forEach(x=>x.classList.add('used')); };
+    wrap.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
+      const fb=wrap.querySelector('#gpfb');
+      if(c.dataset.c===g.a){ fill(); fb.className='fb ok'; fb.textContent='Perfect! 🎉'; onSolve(); }
+      else{ c.classList.add('shake'); fb.className='fb no'; fb.textContent='Not that one!'; setTimeout(()=>c.classList.remove('shake'),450); }
+    });
+    if(showSolved) fill();
+  }
+  else if(g.type==='scramble' || g.type==='order'){
+    const pieces = g.type==='order' ? g.items : g.pieces;
+    const answer = g.type==='order' ? g.items.join(' → ') : g.a;
+    const jc = g.type==='order' ? ' → ' : ' ';
+    const shuffled = shuffleNot(pieces);
+    let picked=[];
+    wrap.innerHTML=`<div class="q">${g.q}</div><div class="slotline"><span class="slot" id="ss" style="min-width:200px">______</span></div><div class="chips">${shuffled.map(p=>`<button class="chip" data-p="${esc(p)}">${p}</button>`).join('')}</div><div class="fb" id="scfb"></div>`;
+    const fill=()=>{ const s=wrap.querySelector('#ss'); s.textContent=answer; s.classList.add('filled'); wrap.querySelectorAll('.chip').forEach(x=>x.classList.add('used')); };
+    wrap.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
+      if(c.classList.contains('used')) return;
+      c.classList.add('used'); picked.push(c.dataset.p); wrap.querySelector('#ss').textContent=picked.join(jc);
+      const fb=wrap.querySelector('#scfb');
+      if(picked.length===pieces.length){
+        if(picked.join(jc)===answer){ fill(); fb.className='fb ok'; fb.textContent='You got it! 🎉'; onSolve(); }
+        else{ fb.className='fb no'; fb.textContent='Not quite — try again!'; picked=[];
+          setTimeout(()=>{ wrap.querySelectorAll('.chip').forEach(x=>x.classList.remove('used')); wrap.querySelector('#ss').textContent='______'; fb.textContent=''; },900); }
+      }
+    });
+    if(showSolved) fill();
+  }
+}
+/* A shuffle that never hands back the answer order. */
+function shuffleNot(arr){
+  let out=[...arr];
+  for(let t=0;t<10;t++){
+    out=[...arr].sort(()=>Math.random()-.5);
+    if(out.join('|')!==arr.join('|')) return out;
+  }
+  return [...arr].reverse();
+}
+
+/* ---- m4 Use It Again ---- */
+function renderUseAgain(){
+  const body=$('mBody');
+  const full = isReview || isDone('m4');
+  const st = lLoad(SAVE_PREFIX+'m4-state') || {caught:0, rows:[]};
+  let caught = full ? CATCH.length : (st.caught||0);
+  const rows = new Set(full ? GOING.map((_,k)=>k) : (st.rows||[]));
+  const blank = n=>`<span class="slot ${n<caught?'filled':''}" id="cb${n}">${n<caught?CATCH[n]:'______'}</span>`;
+  body.innerHTML = `
+    <div class="klabel cho">🎧 Chorus Catch — Vocabulary 2 preview</div>
+    <div class="intro">Play the chorus. Tap the 4 missing words <b>in the order you hear them</b>.</div>
+    <div class="box">
+      <div class="cho-line">Be prepared for ${blank(0)}.</div>
+      <div class="cho-line">It's always good to be safe. You'll see!</div>
+      <div class="cho-line">Grab ${blank(1)} and ${blank(2)}, too.</div>
+      <div class="cho-line">Seek ${blank(3)}. It's the safe thing to do!</div>
+    </div>
+    <div class="chips" id="catchChips">${CATCH_CHIPS.map(c=>`<button class="chip ${CATCH.indexOf(c)<caught?'used':''}" data-c="${c}">${c}</button>`).join('')}</div>
+    <div class="fb" id="catchFb"></div>
+    <div class="note">🔒 These are Vocabulary 2 words — next lesson each one gets its own game.</div>
+
+    <div class="klabel" style="margin-top:22px">📐 A storm is coming! What are you going to do?</div>
+    <div class="intro">The song asks “Is there going to be…?” Now you answer with <b>I'm going to…</b></div>
+    ${GOING.map((g,i)=>`<div class="mm-row ${rows.has(i)?'done':''}" data-row="${i}"><div class="mm-word">${g.e}</div><div class="mm-opts">${GOING_OPTS[i].map(o=>`<button class="mm-opt ${rows.has(i)&&o===g.a?'correct':''}" data-r="${i}" data-o="${esc(o)}">${o}</button>`).join('')}</div></div>`).join('')}`;
+  const save=()=>{ if(!isReview) lSave(SAVE_PREFIX+'m4-state', {caught, rows:[...rows]}); };
+  const check=()=>{ if(caught===CATCH.length && rows.size===GOING.length) moduleFinished('m4'); };
+  body.querySelectorAll('#catchChips .chip').forEach(c=>c.onclick=()=>{
+    if(isReview || caught>=CATCH.length) return;
+    const fb=$('catchFb');
+    if(c.dataset.c===CATCH[caught]){
+      const s=$('cb'+caught); s.textContent=CATCH[caught]; s.classList.add('filled');
+      c.classList.add('used'); caught++; save();
+      fb.className='fb ok'; fb.textContent = caught===CATCH.length ? 'The whole chorus! 🎉' : 'Yes! Next one…';
+      check();
+    } else {
+      c.classList.add('shake'); fb.className='fb no'; fb.textContent='Listen again — that one comes later.';
+      setTimeout(()=>c.classList.remove('shake'),450);
+    }
+  });
+  body.querySelectorAll('.mm-opt').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.r; if(isReview || rows.has(i)) return;
+    if(b.dataset.o===GOING[i].a){
+      b.classList.add('correct'); rows.add(i);
+      body.querySelector(`.mm-row[data-row="${i}"]`).classList.add('done');
+      save(); check();
+    } else { b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),500); }
+  });
+}
+
+/* ---- m5 Write a Line ---- */
+function renderWrite(){
+  const body=$('mBody');
+  const st = lLoad(SAVE_PREFIX+'m5-state') || {};
+  let wx = st.weather || null, pl = st.place || null;
+  const lines = Object.assign({}, st.lines||{});
+  body.innerHTML = `
+    <div class="klabel">📺 Be the TV forecaster</div>
+    <div class="intro">Every forecast uses <b>going to</b>. Pick the weather and the place.</div>
+    <div class="box">
+      <div class="slotline">There's going to be <span class="slot ${wx?'filled':''}" id="fw">${wx||'______'}</span></div>
+      <div class="chips" id="fwChips">${FC_WEATHER.map(w=>`<button class="chip ${w===wx?'picked':''}" data-w="${w}">${w}</button>`).join('')}</div>
+      <div class="slotline" style="margin-top:12px">in <span class="slot ${pl?'filled':''}" id="fp">${pl||'______'}</span>.</div>
+      <div class="chips" id="fpChips">${FC_PLACE.map(p=>`<button class="chip ${p===pl?'picked':''}" data-p="${p}">${p}</button>`).join('')}</div>
+      <div class="fb ok" id="fcFb"></div>
+    </div>
+
+    <div class="klabel" style="margin-top:20px">🌀 A storm I remember — Activity 2</div>
+    <div class="intro">Finish each sentence about a <b>real</b> storm. Use a feeling word!</div>
+    <div class="box">
+      ${FRAMES.map(f=>`<div class="frame">${f.before} …<span class="ja">${f.ja}</span></div>
+        <input class="inp" id="in-${f.k}" placeholder="${f.ph}" value="${esc(lines[f.k]||'')}" ${isReview?'readonly':''}>`).join('')}
+    </div>
+    <div class="note" id="wNote">Build the forecast and write all three sentences to finish.</div>`;
+  const save=()=>{ if(!isReview) lSave(SAVE_PREFIX+'m5-state', {weather:wx, place:pl, lines}); };
+  const check=()=>{
+    $('fcFb').textContent = (wx&&pl) ? `🎤 “There's going to be ${wx} in ${pl}.” Say it like a forecaster!` : '';
+    const ok = wx && pl && FRAMES.every(f=>(lines[f.k]||'').trim().length>=2);
+    if(ok){ $('wNote').textContent='🎉 Great report! Read your storm story to Dad.'; moduleFinished('m5'); }
+  };
+  body.querySelectorAll('#fwChips .chip').forEach(c=>c.onclick=()=>{
+    if(isReview) return; wx=c.dataset.w;
+    body.querySelectorAll('#fwChips .chip').forEach(x=>x.classList.toggle('picked',x===c));
+    const s=$('fw'); s.textContent=wx; s.classList.add('filled'); save(); check();
+  });
+  body.querySelectorAll('#fpChips .chip').forEach(c=>c.onclick=()=>{
+    if(isReview) return; pl=c.dataset.p;
+    body.querySelectorAll('#fpChips .chip').forEach(x=>x.classList.toggle('picked',x===c));
+    const s=$('fp'); s.textContent=pl; s.classList.add('filled'); save(); check();
+  });
+  FRAMES.forEach(f=>{ $('in-'+f.k).oninput=e=>{ lines[f.k]=e.target.value; save(); check(); }; });
+  check();
+}
+
+/* ---- m6 Quiz ---- */
+function renderQuiz(){
+  let i=0, score=0; const wrong=[];
+  const body=$('mBody');
+  $('mFtr').innerHTML='';
+  function show(){
+    if(i>=QUIZ.length){ finish(); return; }
+    const q=QUIZ[i];
+    body.innerHTML=`<div class="dots">${QUIZ.map((_,k)=>`<span class="dot ${k<i?'on':''} ${k===i?'cur':''}"></span>`).join('')}</div>
+      <div class="q" style="margin-top:6px">${i+1}. ${q.p}</div>
+      <div class="opts">${q.opts.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join('')}</div>
+      <div class="fb" id="qfb"></div>`;
+    body.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{
+      body.querySelectorAll('.opt').forEach(x=>x.style.pointerEvents='none');
+      const k=+o.dataset.k, fb=$('qfb');
+      if(k===q.c){ o.classList.add('correct'); score++; fb.className='fb ok'; fb.textContent='Correct! 🎉'; }
+      else{ o.classList.add('wrong'); body.querySelector(`.opt[data-k="${q.c}"]`).classList.add('correct'); fb.className='fb no'; fb.textContent='The answer is in green.';
+        wrong.push({question:'Q'+(i+1), prompt:q.p.replace(/<[^>]+>/g,''), chosen:q.opts[k], correct:q.opts[q.c]}); }
+      setTimeout(()=>{ i++; show(); }, 950);
+    });
+  }
+  function finish(){
+    const pct=Math.round(score/QUIZ.length*100);
+    saveScore('m6', score, QUIZ.length, {wrongQuestions:wrong});
+    lSave(SAVE_PREFIX+'m6-wrong', wrong);
+    moduleFinished('m6');
+    renderQuizReview();
+  }
+  show();
+}
+function renderQuizReview(){
+  const sc=lLoad(SAVE_PREFIX+'m6-score'); const wrong=lLoad(SAVE_PREFIX+'m6-wrong')||[];
+  const body=$('mBody');
+  if(!sc||!sc.done){ body.innerHTML=`<div class="note" style="font-size:16px">Quiz not done yet.</div>`; $('mFtr').innerHTML=`<button class="btn-complete" onclick="closeModal()">Close</button>`; return; }
+  const pct=sc.percent;
+  body.innerHTML=`<div class="quiz-result"><div class="qbig">${pct>=80?'🏆':pct>=50?'🎉':'💪'}</div>
+      <div class="qpct">${pct}%</div><div style="font-size:18px;font-weight:700;margin-top:4px">${sc.score} / ${sc.total} correct</div>
+      <div class="note">${pct>=80?'Storm expert, Leo! Be prepared — you are! 🌀':pct>=50?'Good job — sing it once more and try again!':'Let’s sing “Bad Weather” together, then try again. You’ve got this!'}</div></div>
+    ${wrong.length?`<div class="klabel">Words to practice</div>${wrong.map(w=>`<div class="wrong-item"><div class="wp">${w.prompt}</div>Leo chose: <span class="wc">${w.chosen}</span><br>Answer: <span class="wok">${w.correct}</span></div>`).join('')}`:`<div class="note">Perfect — no wrong answers! 🏆</div>`}`;
+  $('mFtr').innerHTML = isReview
+    ? `<button class="btn-complete" onclick="closeModal()">Close</button>`
+    : `<button class="btn-complete confirmed" onclick="closeModal()">Leo complete ✓</button><button class="btn-redo" onclick="armRedo('m6',this)">↺ Redo</button>`;
+}
+
+/* ---- m7 Progress ---- */
+function renderDash(){
+  const body=$('mBody'); $('mFtr').innerHTML=`<button class="btn-complete" onclick="closeModal()">Close</button>`;
+  const rows=MODULES.filter(m=>!m.dash).map(m=>{
+    if(m.quiz){ const sc=lLoad(SAVE_PREFIX+m.id+'-score'); return `<div class="prog-row"><span class="pi">${m.icon}</span><span class="pn">${m.title}</span><span class="ps ${sc&&sc.done?'score':''}">${sc&&sc.done?sc.percent+'%':'—'}</span></div>`; }
+    return `<div class="prog-row"><span class="pi">${m.icon}</span><span class="pn">${m.title}</span><span class="ps ${isDone(m.id)?'done':''}">${isDone(m.id)?'✓ Done':'—'}</span></div>`;
+  }).join('');
+  const w=lLoad(SAVE_PREFIX+'m5-state');
+  const story = w && w.lines ? FRAMES.filter(f=>(w.lines[f.k]||'').trim()).map(f=>`${f.before} ${esc(w.lines[f.k].trim())}`).join(' ') : '';
+  const forecast = w && w.weather && w.place ? `There's going to be ${w.weather} in ${w.place}.` : '';
+  const wrong=lLoad(SAVE_PREFIX+'m6-wrong')||[];
+  body.innerHTML=rows
+    + ((forecast||story)?`<div class="klabel">Leo's lines</div><div class="box">${forecast?`<div>📺 ${forecast}</div>`:''}${story?`<div style="margin-top:6px">🌀 ${story}</div>`:''}</div>`:'')
+    + (wrong.length?`<div class="klabel">Quiz words to practice</div>${wrong.map(x=>`<div class="wrong-item"><div class="wp">${x.prompt}</div>You chose: <span class="wc">${x.chosen}</span> · Answer: <span class="wok">${x.correct}</span></div>`).join('')}`:'')
+    + `<div class="note">Play “Bad Weather” in the car this week! 🎶</div>`;
+}
+
+/* ===================== INIT ===================== */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  await restoreProgressFromCloud();
+  if(isReview){ $('reviewBanner').innerHTML=`<div class="review-banner">👀 Review mode — Leo's results & answers</div>`; }
+  buildGrid();
+  saveHomeworkFlag();
+});
+</script>
+</body>
+</html>

@@ -184,7 +184,7 @@ Tab 8 (Match) pairs each word with its **verbatim transcript sentence** from the
 
 **Recap table — LOCKED via PR #113:**
 - Render on match completion AND on RESTORE if already done
-- **Exactly 3 columns: Word · Emoji · Sentence.** No IPA/Pronunciation column. Emoji column centered, 1-2 emojis per row matching the V1 visual density.
+- **Exactly 3 columns, in this order: Emoji · Vocab · Sentence** (Leaneritan, Sep 2026 — the order he copies the list out in). No IPA/Pronunciation column. Emoji column centered, 1-2 emojis per row matching the V1 visual density.
 - **Always in TR audio-script order — never in match-completion order.** Pre-render every row (hidden) in TR order at tab init time, then REVEAL each row at its fixed position when Leo matches its pair. Do NOT `appendChild` a new `<tr>` per match.
 - Match gameplay randomness stays: shuffle the right-column chips when building the match grid so the matching exercise still has to be a real challenge. Only the after-completion recap is fixed-order.
 - Same recap-table shape across every vocab component — consistent for Leo. Reference implementations: `public/learn/ow-l4-u8-vocab-1.html` (14 words, 2 rounds of 7) and `public/learn/ow-l4-u8-vocab-2.html` (5 words, 1 round).
@@ -303,7 +303,7 @@ Push to the current working branch. Do NOT create a PR — Leaneritan reviews + 
 - [ ] Leo app at `public/learn/<lesson-id>.html` (13 tabs, all 4 save/restore rules)
 - [ ] **Academic Tab 0 AND Flashcards Tab 3 have Practice + Quiz dual mode** — tab completes only when BOTH modes done (PR #77)
 - [ ] **Match Tab 8 uses verbatim TR transcript sentences** (`MATCH_PAIRS` pulled from `supporting/...audioscript_website.docx`); array order = TR audio script order, never alphabetical
-- [ ] **Match completion + RESTORE both render the `recap-table`** with exactly 3 columns **Word · Emoji · Sentence** (PR #113 — no IPA column)
+- [ ] **Match completion + RESTORE both render the `recap-table`** with exactly 3 columns **Emoji · Vocab · Sentence**, in that order (no IPA column)
 - [ ] **Recap rows pre-rendered hidden in TR order, revealed on match** — never `appendChild` per match (PR #113)
 - [ ] Teacher JSON registered with `component: "<vocab-1|vocab-2>"`, `mode: "teacher"`, `slideCount`
 - [ ] Learner JSON registered with `component: "<vocab-1|vocab-2>-app"`, `mode: "learner"`, full `source` block

@@ -128,6 +128,7 @@ import level5Unit1Vocab1 from "../../content/subjects/english/courses/our-world/
 import level5Unit1Vocab1Learner from "../../content/subjects/english/courses/our-world/level-5/unit-1/lessons/vocab1.learner.json";
 import level5Unit1Song from "../../content/subjects/english/courses/our-world/level-5/unit-1/lessons/song.teacher.json";
 import level5Unit1SongLearner from "../../content/subjects/english/courses/our-world/level-5/unit-1/lessons/song.learner.json";
+import level5Unit1Grammar1 from "../../content/subjects/english/courses/our-world/level-5/unit-1/lessons/grammar1.teacher.json";
 import type { Lesson } from "./types";
 
 // Canonical within-unit teaching order. Lessons are always sorted by this
@@ -283,6 +284,7 @@ export const lessons: Lesson[] = [
   level5Unit1Vocab1Learner as Lesson,
   level5Unit1Song as Lesson,
   level5Unit1SongLearner as Lesson,
+  level5Unit1Grammar1 as Lesson,
   checkpoint79Test as Lesson,
   checkpoint79TestLearner as Lesson,
   checkpoint19Test as Lesson,

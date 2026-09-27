@@ -448,6 +448,12 @@
     // rerender() itself will have cancelled this timer — see pendingRerender.
     pendingRerender[id] = setTimeout(function () {
       delete pendingRerender[id];
+      // Leo usually leaves one oval by tapping the next. Rerendering now
+      // would replace the oval he is typing into mid-word — the rest of the
+      // word went nowhere, or overwrote what he had typed. The rerender only
+      // refreshes fill colours, so it waits until focus leaves the web.
+      const active = document.activeElement;
+      if (active && active.classList && active.classList.contains('leea-web-text') && document.body.contains(wrap) && wrap.contains(active)) return;
       rerender(id);
     }, 0);
   }, true);

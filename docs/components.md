@@ -150,11 +150,13 @@ Note the non-numeric `ma` module and the non-default `scoreKey: m6-score`. Set `
 
 Reference: `public/learn/ow-l4-u9-grammar-1.html`, `public/learn/ow-l4-u8-grammar-1.html`, `public/learn/ow-l4-u7-grammar-1.html`.
 
+**The app is the companion to the teacher deck.** Leo does it alone after the lesson, so each tab replays the deck's own slides and sentences — Word Lab uses exactly the deck's word cards, and every other tab maps to named slides. The full slide → tab rule is in `.claude/commands/grammar-app.md` → *Leo app — the companion to the slides*; `public/learn/ow-l5-u1-grammar-1.html` is the reference build.
+
 12 tabs, numeric IDs, `moduleKeyFormat: tab-{i}-done`, `scoreKey: score` (Tab 10):
 
 | # | Tab | What Leo does |
 |---|---|---|
-| 0 | 🧪 Word Lab | Flashcards for the lesson's words — Practice + Quiz dual mode |
+| 0 | 🧪 Word Lab | Flashcards for the deck's word cards (exactly those words) — Practice + Quiz dual mode |
 | 1 | 🔥 Warm Up | 8 quick MCQ items on the target pattern |
 | 2 | 📐 The Rule | 6 checks on the form itself (affirmative / negative / question) |
 | 3 | 🕵️ Detective | 6 broken sentences — pick the fixed version |

@@ -2,7 +2,7 @@
 
 Build one **grammar component** (grammar-1 or grammar-2) **teacher slideshow** for a single unit, using all locked LEEA grammar patterns. Reads from the planner PDF + the unit's `grammar.json` + the Student Book + the Workbook Answer Key. Personalizes samples with Leo's interests (soccer + movies — see "Leo personalization" below).
 
-> **Scope note.** This skill builds the **teacher slideshow only**. The Leo learner app is a separate, later session — the grammar-app structure for the Leo side will be locked after grammar-2's Leo app is built (mirroring how vocab-app was locked only after vocab-2 proved the pattern).
+> **Scope note.** This skill builds the **teacher slideshow**, and — in a separate pass once that deck exists — **Leo's app** for the same grammar point. The app is a **companion to the slides**: Leo does it alone after the lesson, so it is built *from the deck*, never from a fresh plan. See **Leo app — the companion to the slides** below before building one.
 
 > **Naming note.** This single skill handles both grammar-1 and grammar-2 — choose with the third arg. Each grammar component teaches a different grammar point; only the architectural patterns (spine, no-leaps, mini-games for academic vocab, JS safety) are shared.
 
@@ -176,6 +176,39 @@ For specific decks, Leaneritan may direct: *"copy the activities and make them a
   node -e "$(awk '/<script>/{f=1;next}/<\/script>/{f=0}f' public/lessons/<lesson-id>.html)"
   ```
   Runtime `window is not defined` / `document is not defined` is the GREEN signal (the JS parsed; it just can't run DOM in Node). A `SyntaxError` is the red signal.
+
+## Leo app — the companion to the slides
+
+Leo's grammar app is what he does **on his own after Neritan teaches the deck**. It is not a second lesson with its own content plan: every tab replays part of the deck, so what Leo meets alone is what he just met with Dad. Build it only once the teacher deck exists, and build it **from the deck**.
+
+**Step A — read the deck first, slide by slide.** List every slide with its stage (`data-stage`), its game, and the answers it reveals (`data-a` attributes and the teacher `NOTES`). Write that list down before choosing any app content.
+
+**Step B — Word Lab words = the deck's words, exactly.** Tab 0 uses the words the slides present as cards: the academic / content word cards (e.g. L5 U1 Grammar 1's only card is *a prediction*, slide 3), plus any word set a slide explicitly works with (its eight weather note cards, slide 35). Never swap in other words because they would suit the grammar better. The first L5 U1 build used rain / snow / windy / cloudy / sunny — words from an activity, not the deck's cards — and had to be redone.
+
+**Step C — map every tab to its slides.** Keep the locked 12 tabs (see `docs/components.md` → grammar-1), but fill each from the slides that match it, using the slides' own sentences **verbatim first**, then extra items in the same shape:
+
+| Tab | Comes from |
+|---|---|
+| Word Lab | the deck's word cards (Step B) |
+| Warm Up | the Warm Up / Present slides (the frame, the timeline, the pattern-notice game) |
+| The Rule | each Rule slide's own game, one block per rule, same items |
+| Detective | the Japanese Corner / common-error slides |
+| Build It | the grammar box sentences + the deck's build/question slide + its chart |
+| Sort | the deck's correct-vs-broken slide (Error Hospital) — its items verbatim, then more |
+| Practice | the SB Practice activity slides (book answers verbatim) + the frame drill |
+| Survey | the Recap / Apply / Extend prompts, answered about himself |
+| Word Web | the Apply activity the deck builds a web or list around |
+| Guess End | the deck's clue → prediction / guessing slides (Extend, Wrap Up) |
+| Quiz | `grammar.json` `tab3_quiz` (the book's own practice items) |
+| Dribble! | a soccer round on the same rules |
+
+Where a slide makes a factual claim (a result, a stat), reuse the deck's claim — do not add new ones.
+
+**Step D — write the slide → tab map into the app's header comment** and into the PR, so a reviewer can check each tab against its slides.
+
+**Step E — save/restore** (the learner contract in `AGENTS.md`): save each answer as it is given; on reopen, restore answered items disabled **with the correct option marked**; keep Mark complete disabled until the tab's own work is done, and let the done-key save itself then; a finished sorter restores as the finished columns; Redo clears the tab's keys and the homework flag.
+
+Reference build: `public/learn/ow-l5-u1-grammar-1.html` (companion to `public/lessons/ow-l5-u1-grammar-1.html`).
 
 ## Leo personalization (mandatory in samples)
 

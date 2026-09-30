@@ -99,6 +99,17 @@ Add a CSS block `.mg-wrap / .mg-head / .mg-grid / .mg-btn / .mg-score / .mg-win 
 
 Verify before commit: open the deck, click through s_present_1 … s_present_N. Each must have a working game with a score going up and a win message firing. If any per-word slide is just a reveal + info box → it is not done.
 
+### Leo app = the companion to the slides (build it from the deck)
+
+Leo does the app **alone after Neritan teaches the deck**, so every tab replays part of the deck — the same rule as `.claude/commands/grammar-app.md` → *Leo app — the companion to the slides*. When the teacher deck already exists (Neritan often authors it), read it slide by slide first — stage, game, and the answers it holds (`data-a`, `data-ord`, `data-cat`, `data-want`, the `NOTES`) — and fill the 13 tabs from it:
+
+- **Academic (Tab 0)** = exactly the deck's Academic / Content word cards; **Flashcards (Tab 3)** = exactly the deck's target word cards, with the deck's definitions, examples and Japanese. No substitutes.
+- Every other tab maps to named slides, the slides' own items verbatim first (e.g. the deck's sorts in Sort, its read-and-write sentences in Reading, its per-word games in Practice, its listen-and-stick in Apply, its recap and wrap-up in Wrap Up).
+- Reuse the deck's football/movie claims; add none.
+- Write the slide → tab map into the app's header comment and the PR.
+
+Reference build: `public/learn/ow-l5-u1-vocab-2.html` (companion to `public/lessons/ow-l5-u1-vocab-2.html`).
+
 ### Leo learner app — 13 tabs (LOCKED via vocab-1)
 
 Reference: `public/learn/ow-l4-u8-vocab-1.html` (1596 lines, 13 tabs).
@@ -184,7 +195,7 @@ Tab 8 (Match) pairs each word with its **verbatim transcript sentence** from the
 
 **Recap table — LOCKED via PR #113:**
 - Render on match completion AND on RESTORE if already done
-- **Exactly 3 columns, in this order: Emoji · Vocab · Sentence** (Leaneritan, Sep 2026 — the order he copies the list out in). No IPA/Pronunciation column. Emoji column centered, 1-2 emojis per row matching the V1 visual density.
+- **Exactly 3 columns: Word · Emoji · Sentence.** No IPA/Pronunciation column. Emoji column centered, 1-2 emojis per row matching the V1 visual density.
 - **Always in TR audio-script order — never in match-completion order.** Pre-render every row (hidden) in TR order at tab init time, then REVEAL each row at its fixed position when Leo matches its pair. Do NOT `appendChild` a new `<tr>` per match.
 - Match gameplay randomness stays: shuffle the right-column chips when building the match grid so the matching exercise still has to be a real challenge. Only the after-completion recap is fixed-order.
 - Same recap-table shape across every vocab component — consistent for Leo. Reference implementations: `public/learn/ow-l4-u8-vocab-1.html` (14 words, 2 rounds of 7) and `public/learn/ow-l4-u8-vocab-2.html` (5 words, 1 round).
@@ -303,7 +314,7 @@ Push to the current working branch. Do NOT create a PR — Leaneritan reviews + 
 - [ ] Leo app at `public/learn/<lesson-id>.html` (13 tabs, all 4 save/restore rules)
 - [ ] **Academic Tab 0 AND Flashcards Tab 3 have Practice + Quiz dual mode** — tab completes only when BOTH modes done (PR #77)
 - [ ] **Match Tab 8 uses verbatim TR transcript sentences** (`MATCH_PAIRS` pulled from `supporting/...audioscript_website.docx`); array order = TR audio script order, never alphabetical
-- [ ] **Match completion + RESTORE both render the `recap-table`** with exactly 3 columns **Emoji · Vocab · Sentence**, in that order (no IPA column)
+- [ ] **Match completion + RESTORE both render the `recap-table`** with exactly 3 columns **Word · Emoji · Sentence** (PR #113 — no IPA column)
 - [ ] **Recap rows pre-rendered hidden in TR order, revealed on match** — never `appendChild` per match (PR #113)
 - [ ] Teacher JSON registered with `component: "<vocab-1|vocab-2>"`, `mode: "teacher"`, `slideCount`
 - [ ] Learner JSON registered with `component: "<vocab-1|vocab-2>-app"`, `mode: "learner"`, full `source` block

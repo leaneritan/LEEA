@@ -99,6 +99,17 @@ Add a CSS block `.mg-wrap / .mg-head / .mg-grid / .mg-btn / .mg-score / .mg-win 
 
 Verify before commit: open the deck, click through s_present_1 … s_present_N. Each must have a working game with a score going up and a win message firing. If any per-word slide is just a reveal + info box → it is not done.
 
+### Leo app = the companion to the slides (build it from the deck)
+
+Leo does the app **alone after Neritan teaches the deck**, so every tab replays part of the deck — the same rule as `.claude/commands/grammar-app.md` → *Leo app — the companion to the slides*. When the teacher deck already exists (Neritan often authors it), read it slide by slide first — stage, game, and the answers it holds (`data-a`, `data-ord`, `data-cat`, `data-want`, the `NOTES`) — and fill the 13 tabs from it:
+
+- **Academic (Tab 0)** = exactly the deck's Academic / Content word cards; **Flashcards (Tab 3)** = exactly the deck's target word cards, with the deck's definitions, examples and Japanese. No substitutes.
+- Every other tab maps to named slides, the slides' own items verbatim first (e.g. the deck's sorts in Sort, its read-and-write sentences in Reading, its per-word games in Practice, its listen-and-stick in Apply, its recap and wrap-up in Wrap Up).
+- Reuse the deck's football/movie claims; add none.
+- Write the slide → tab map into the app's header comment and the PR.
+
+Reference build: `public/learn/ow-l5-u1-vocab-2.html` (companion to `public/lessons/ow-l5-u1-vocab-2.html`).
+
 ### Leo learner app — 13 tabs (LOCKED via vocab-1)
 
 Reference: `public/learn/ow-l4-u8-vocab-1.html` (1596 lines, 13 tabs).

@@ -175,7 +175,12 @@ The teacher deck is hand-authored per unit around a unit-themed frame (Unit 9 "F
 
 ### grammar-2 (TO LOCK)
 
-Same shape as grammar-1. Different chart data and different theme. To be locked after the first grammar-2 Leo app is built.
+Same shape as grammar-1: 12 tabs, `tab-{i}-done`, `score` on Tab 10, and the same companion-to-the-slides rule. Tab labels may follow the deck (L5 U1 uses Write It and Card Game where its deck has a chart-writing activity and the SB card game). Reference build: `public/learn/ow-l5-u1-grammar-2.html`, which packs several activities into each tab and adds four reusable mechanics:
+
+- **Typed sentences with a live grammar checker** (`GC.check`) — fix / join / write items, two tries, then the model answer. Matching expands contractions, so `it's` = `it is`, but keeps the comma, so the comma rule still counts.
+- **Builders with a trap piece** — word- or chunk-level, two tries per sentence.
+- **Five sorts in one tab** — each finished sort restores as its finished columns.
+- **Dad's view** — a header button listing Leo's wrong first tries per tab, with the checker's flags.
 
 ### reading (LOCKED — Unit 8 Reading)
 

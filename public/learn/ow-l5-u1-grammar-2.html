@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leo · Unit 1 · Grammar 2 — Weather Rules</title>
+<script src="/components/charts.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --or:#EA580C;--or-d:#9A3412;--or-l:#FFF7ED;--or-b:#FED7AA;
+  --sky:#0369A1;--sky-d:#0C4A6E;--sky-l:#F0F9FF;--sky-b:#BAE6FD;
+  --red:#DC2626;--red-l:#FEF2F2;--red-b:#FECACA;
+  --amber:#F59E0B;--amber-l:#FFFBEB;--yellow:#FACC15;--yellow-b:#FDE68A;
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --ink:#111;--ink-2:#374151;--ink-3:#6B7280;--border:#E5E7EB;
+  --paper:#FFFDF8;--navy:#0f172a;
+}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink)}
+body{display:flex;flex-direction:column}
+.jp{font-family:'Noto Sans JP','Outfit',sans-serif}
+
+/* HEADER */
+.app-header{background:linear-gradient(120deg,var(--sky-d),var(--or));color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-header .logo{font-size:24px}
+.app-header .title{font-size:20px;font-weight:800;line-height:1.1}
+.app-header .subtitle{font-size:13px;opacity:.9;margin-top:2px}
+.app-header .badge-row{margin-left:auto;display:flex;gap:8px;align-items:center}
+.prog-pill{background:rgba(255,255,255,.22);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;white-space:nowrap}
+
+/* TAB NAV */
+.tab-nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:12px 14px;font-weight:700;font-family:'Outfit',sans-serif;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;min-width:74px}
+.tab-btn .tab-icon{font-size:18px}
+.tab-btn .tab-name{font-size:11px;letter-spacing:.3px}
+.tab-btn.active{color:var(--or);border-bottom-color:var(--or)}
+.tab-btn.done::after{content:'✓';position:absolute;top:4px;right:6px;color:var(--green);font-weight:900;font-size:12px}
+
+/* CONTENT */
+.tab-content{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.tab-content.active{display:flex}
+.tab-body{flex:1;padding:18px 20px;display:flex;flex-direction:column;gap:14px;max-width:900px;width:100%;margin:0 auto}
+.tab-footer{flex-shrink:0;border-top:2px solid var(--border);background:#fff;padding:10px 20px;display:flex;gap:10px}
+.section-title{font-size:21px;font-weight:900;color:var(--navy)}
+.section-sub{font-size:14px;color:var(--ink-3);font-weight:600;margin-top:2px}
+.dad-hint{background:var(--amber-l);border:2px solid var(--yellow-b);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:600;color:var(--ink-2);line-height:1.45}
+.rule-box{background:var(--sky-l);border:2px solid var(--sky-b);border-radius:12px;padding:10px 16px;font-size:15px;font-weight:700;color:var(--sky-d);text-align:center}
+.rule-box b{color:var(--or-d)}
+
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:12px 16px;font-size:15px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.btn-complete:disabled{background:var(--border);color:var(--ink-3);cursor:not-allowed}
+.btn-complete.confirmed{background:var(--green-d)}
+.btn-redo{width:110px;flex-shrink:0;background:#fff;color:var(--red);border:2px solid var(--red-b);border-radius:12px;padding:12px 8px;font-size:13px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.btn-redo.armed{background:var(--red-l);border-color:var(--red)}
+
+.done-banner{display:none;background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;color:var(--green-d);text-align:center}
+.done-banner.show{display:block;animation:pop .35s}
+@keyframes pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+/* OPTION BUTTONS */
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid var(--border);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;margin-top:8px}
+.opt:hover{border-color:var(--or)}
+.opt.good{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default}
+.opt:disabled:not(.good){opacity:.55}
+.qcard{background:#fff;border:3px solid var(--border);border-radius:14px;padding:16px 18px}
+.qcard.solved{border-color:var(--green-b)}
+.qcard .qtext{font-size:16px;font-weight:800;color:var(--navy);line-height:1.4}
+.qcard .qclue{font-size:14px;color:var(--ink-3);font-weight:700;margin-bottom:4px}
+.qcard .qwhy{display:none;margin-top:8px;font-size:14px;color:var(--green-d);font-weight:700}
+.qcard.solved .qwhy{display:block}
+.qcard .qjp{display:none;margin-top:4px;font-size:13px;color:var(--ink-3)}
+.qcard.solved .qjp{display:block}
+
+/* FLASHCARDS (tab 0) */
+.fc-modeswitch{display:flex;gap:8px}
+.fc-modebtn{flex:1;padding:9px;border-radius:10px;border:2px solid var(--border);background:#fff;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;color:var(--ink-3)}
+.fc-modebtn.active{background:var(--or);color:#fff;border-color:var(--or)}
+.fc-pane{display:none}
+.fc-pane.active{display:block}
+.flashcard-wrap{perspective:1000px;min-height:260px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:260px;position:relative;transform-style:preserve-3d;transition:transform .5s ease}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;gap:8px;text-align:center}
+.fc-front{background:linear-gradient(135deg,var(--sky-d),var(--or));color:#fff;border:4px solid var(--or-b)}
+.fc-back{background:linear-gradient(135deg,#fff,var(--or-l));border:4px solid var(--or);transform:rotateY(180deg)}
+.fc-face .fc-emoji{font-size:56px;line-height:1}
+.fc-face .fc-word{font-size:30px;font-weight:900}
+.fc-face .fc-pos{font-size:13px;font-weight:700;background:rgba(255,255,255,.22);border-radius:12px;padding:3px 12px}
+.fc-face .fc-def{font-size:16px;color:var(--ink-2);font-weight:700;line-height:1.35}
+.fc-tap{font-size:12px;font-weight:700;opacity:.8;letter-spacing:.06em}
+.fc-jp{font-size:14px;color:var(--ink-3);font-weight:700;display:none}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:none;border:1px dashed #D1D5DB;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;color:var(--ink-3);cursor:pointer;font-family:'Outfit',sans-serif}
+.fc-face .fc-sample{font-size:15px;background:var(--sky-l);border-radius:10px;padding:7px 12px;font-weight:700;color:var(--sky-d)}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.fc-nav button{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.fc-dots{display:flex;gap:6px}
+.fc-dot{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.fc-dot.seen{background:var(--or-b)}
+.fc-dot.on{background:var(--or)}
+
+/* CHIP BUILDER */
+.chip{display:inline-block;background:#fff;border:3px solid var(--or);border-radius:10px;padding:8px 14px;font-size:16px;font-weight:800;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;margin:3px}
+.chip:hover{background:var(--or-l)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.err{animation:shake .35s;border-color:var(--red)}
+.build-line{min-height:56px;background:#fff;border:3px dashed var(--border);border-radius:12px;padding:10px 14px;font-size:18px;font-weight:800;color:var(--navy);display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.build-line.done{border-style:solid;border-color:var(--green);background:var(--green-l)}
+.bpart{background:var(--or-l);border:2px solid var(--or-b);border-radius:8px;padding:3px 10px}
+.bld-prompt{font-size:14px;font-weight:700;color:var(--ink-3);margin-bottom:6px}
+
+/* SORT restore */
+.sort-static{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sort-static .col{border:2px solid var(--green-b);border-radius:12px;overflow:hidden;background:#fff}
+.sort-static .col h4{padding:8px 12px;color:#fff;font-size:15px}
+.sort-static .col div{padding:6px 12px;font-size:14px;font-weight:700;border-top:1px solid var(--border)}
+
+/* SURVEY */
+.svy-row{background:#fff;border:2px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.svy-row input{border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:15px;font-family:'Outfit',sans-serif;flex:1;min-width:160px}
+.svy-row input:focus{border-color:var(--or);outline:none}
+.svy-row.filled{border-color:var(--green);background:var(--green-l)}
+
+/* GUESS THE ENDING */
+.ge-round-tabs{display:flex;gap:8px}
+.ge-round-tab{flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:#fff;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;color:var(--ink-3);font-size:14px}
+.ge-round-tab.active{background:var(--or-l);border-color:var(--or);color:var(--or-d)}
+.ge-round-tab.won::after{content:' ✓';color:var(--green)}
+.ge-round{display:none}
+.ge-round.showround{display:block}
+.ge-clue-box{background:var(--sky-l);border:2px solid var(--sky-b);border-radius:12px;padding:14px 18px;font-size:17px;font-weight:800;color:var(--navy);margin:10px 0}
+.ge-clue-btn{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.ge-clue-btn:disabled{opacity:.4}
+.ge-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+.ge-tile{background:#fff;border:3px solid var(--border);border-radius:12px;padding:14px;font-weight:700;font-size:15px;cursor:pointer;text-align:center}
+.ge-tile.win{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.ge-tile.lose{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.ge-tile.locked{pointer-events:none}
+.ge-tile.locked:not(.win){opacity:.5}
+
+/* QUIZ */
+.quiz-progress{display:flex;gap:5px}
+.quiz-progress div{flex:1;height:8px;border-radius:4px;background:var(--border)}
+.quiz-progress div.answered{background:var(--or)}
+.quiz-result{text-align:center;padding:20px}
+.quiz-result .trophy{font-size:70px}
+.quiz-result .qscore{font-size:38px;font-weight:900;color:var(--navy);margin:8px 0}
+.wrong-review{background:var(--red-l);border:2px solid var(--red-b);border-radius:10px;padding:10px 14px;text-align:left;margin-top:8px;font-size:14px;line-height:1.5}
+.quiz-fb{margin-top:10px;font-weight:700;font-size:14px;min-height:20px}
+.quiz-fb.ok{color:var(--green-d)}.quiz-fb.no{color:var(--red)}
+
+/* DRIBBLE */
+.pitch{background:linear-gradient(180deg,#166534,#15803d);border-radius:16px;padding:16px;color:#fff;position:relative;overflow:hidden}
+.pitch::before{content:'';position:absolute;inset:8px;border:2px solid rgba(255,255,255,.3);border-radius:10px}
+.score-row{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;font-weight:800}
+.goal-tally{font-size:26px}
+.drib-q{background:#14532d;border-radius:12px;padding:12px 16px;color:#fff}
+.drib-opt{display:block;width:100%;text-align:left;background:rgba(255,255,255,.92);border:2px solid transparent;border-radius:10px;padding:10px 14px;margin-top:6px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;font-size:15px}
+.drib-opt.good{background:var(--yellow)}
+.drib-opt.bad{background:#fecaca;animation:shake .35s}
+
+.web-host,.sort-host{min-height:80px}
+#sort-host .dnd-tile{white-space:normal !important;font-size:15px !important;padding:8px 14px !important}
+@media (max-width:560px){#sort-host .dnd-zones{flex-direction:column}}
+@media (max-width:560px){.sort-static{grid-template-columns:1fr}.tab-body{padding:14px}}
+/* VOCAB 2 extras */
+.klabel{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sky);margin-top:4px}
+.read-box{background:#fff;border:2px solid var(--border);border-radius:14px;padding:14px 18px;font-size:17px;line-height:1.9;font-weight:600}
+.read-box p{margin:4px 0}
+.read-box.report{font-size:15px;line-height:1.7;font-weight:500;color:var(--ink-2);max-height:260px;overflow-y:auto}
+.read-blank{display:inline-block;min-width:90px;text-align:center;border-bottom:3px dashed var(--border);color:var(--ink-3);font-weight:800;padding:0 6px}
+.read-blank.next{border-color:var(--amber);background:var(--amber-l)}
+.read-blank.filled{border-bottom-style:solid;border-color:var(--green);color:var(--green-d)}
+.chips-row{text-align:center}
+.chip.letter{min-width:44px;text-align:center;font-size:20px}
+.type-row{display:flex;gap:8px;margin-top:10px}
+.type-in{flex:1;border:3px solid var(--border);border-radius:12px;padding:12px 14px;font-size:18px;font-family:'Outfit',sans-serif;font-weight:700}
+.type-in:focus{outline:none;border-color:var(--or)}
+.type-in.shake{animation:shake .35s;border-color:var(--red)}
+.type-go{background:var(--or);color:#fff;border:none;border-radius:12px;padding:0 20px;font-size:20px;font-weight:900;cursor:pointer}
+.match-grid{display:grid;grid-template-columns:1fr 1.6fr;gap:12px}
+.mcol{display:flex;flex-direction:column;gap:8px}
+.mbtn{background:#fff;border:3px solid var(--border);border-radius:12px;padding:10px 12px;font-size:15px;font-weight:700;font-family:'Outfit',sans-serif;text-align:left;cursor:pointer;color:var(--ink)}
+.mbtn.sel{border-color:var(--amber);background:var(--amber-l)}
+.mbtn.matched{border-color:var(--green-b);background:var(--green-l);color:var(--green-d);opacity:.75}
+.mbtn.err{animation:shake .35s;border-color:var(--red)}
+.recap-table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;border:2px solid var(--border)}
+.recap-table th{background:var(--green);color:#fff;padding:10px;text-align:left;font-size:13px}
+.recap-table td{padding:9px 10px;border-top:1px solid var(--border);font-size:15px}
+.stk-slots{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.stk-slot{background:#fff;border:3px dashed var(--border);border-radius:12px;padding:10px 6px;text-align:center;font-size:14px;font-weight:700;min-height:62px}
+.stk-slot b{display:block;font-size:18px;color:var(--ink-3)}
+.stk-slot.next{border-color:var(--amber);background:var(--amber-l)}
+.stk-slot.filled{border-style:solid;border-color:var(--green);background:var(--green-l);color:var(--green-d)}
+@media (max-width:560px){.match-grid{grid-template-columns:1fr}.stk-slots{grid-template-columns:repeat(3,1fr)}.sort-static{grid-template-columns:1fr !important}}
+
+/* GRAMMAR 2 extras */
+.dad-btn{background:rgba(255,255,255,.18);color:#fff;border:2px solid rgba(255,255,255,.5);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;white-space:nowrap}
+.dad-ov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:80;display:none;align-items:flex-end;justify-content:center}
+.dad-ov.open{display:flex}
+.dad-modal{background:var(--paper);width:100%;max-width:760px;max-height:90vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden}
+.dad-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#fff;border-bottom:2px solid var(--border);font-size:17px}
+.dad-x{background:var(--border);border:none;border-radius:10px;padding:8px 12px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.dad-body{padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.dad-sec{background:#fff;border:2px solid var(--border);border-radius:12px;padding:10px 14px;font-size:14px;line-height:1.5}
+.dad-sec h4{font-size:15px;color:var(--navy);margin-bottom:4px}
+.dad-row{color:var(--red);border-top:1px solid var(--border);padding:4px 0}
+.dad-row i{color:var(--ink-2)}
+.dad-flag{color:var(--sky-d);font-size:12px}
+.opt2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt2 .opt{margin-top:8px;text-align:center}
+.qcard.missed{border-color:var(--amber)}
+.type-row{align-items:center;flex-wrap:wrap}
+.type-row .pre{font-size:17px;font-weight:800;color:var(--navy)}
+.type-row .type-in{min-width:180px;font-size:17px}
+.live{font-size:13px;font-weight:700;color:var(--sky-d);margin-top:6px;min-height:0}
+.live.ok{color:var(--green-d)}
+.quiz-fb.show{color:#92400E}
+.ghost-btn{background:#fff;border:2px solid var(--border);border-radius:12px;padding:0 16px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;color:var(--ink-2)}
+.bld-btns{display:flex;gap:8px;justify-content:center;margin-top:10px;min-height:44px}
+.build-line.shake{animation:shake .35s;border-color:var(--red)}
+.fixline{font-size:12px;color:var(--green-d);font-weight:700}
+.cards-row{display:flex;align-items:center;justify-content:center;gap:12px}
+.wcard,.acard{border-radius:14px;padding:10px;text-align:center;min-width:120px;font-family:'Outfit',sans-serif}
+.wcard{background:#FEE2E2;border:3px solid #DC2626}
+.acard{background:#DCFCE7;border:3px solid #16A34A}
+.acard.q{background:#fff;border-style:dashed}
+.ctag{font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--ink-3)}
+.cemo{font-size:34px;line-height:1.2}
+.ctext{font-size:15px;font-weight:800}
+.cplus{font-size:28px;font-weight:900;color:var(--ink-3)}
+.action-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.acard.pick{cursor:pointer;min-width:0}
+.acard.pick.good{background:var(--green);color:#fff}
+.acard.pick.bad{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.made{background:#fff;border:2px solid var(--green-b);border-radius:10px;padding:8px 12px;font-weight:700;margin-top:6px}
+@media (max-width:560px){.action-grid{grid-template-columns:repeat(2,1fr)}.badge-row{flex-direction:column;align-items:flex-end}}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo">🌦️🧠</div>
+  <div>
+    <div class="title">Unit 1 · Grammar 2 — Weather Rules</div>
+    <div class="subtitle">zero conditional · If + present, present · SB p. 15</div>
+  </div>
+  <div class="badge-row"><button class="dad-btn" onclick="openDad()">👨 Dad’s view</button><div class="prog-pill" id="prog-pill">0 / 12 done</div></div>
+</div>
+
+<div class="tab-nav" id="tab-nav">
+  <button class="tab-btn active" onclick="showTab(0)" id="tb0"><span class="tab-icon">🧪</span><span class="tab-name">Word Lab</span></button>
+  <button class="tab-btn" onclick="showTab(1)" id="tb1"><span class="tab-icon">🔥</span><span class="tab-name">Warm Up</span></button>
+  <button class="tab-btn" onclick="showTab(2)" id="tb2"><span class="tab-icon">📐</span><span class="tab-name">The Rule</span></button>
+  <button class="tab-btn" onclick="showTab(3)" id="tb3"><span class="tab-icon">🕵️</span><span class="tab-name">Detective</span></button>
+  <button class="tab-btn" onclick="showTab(4)" id="tb4"><span class="tab-icon">🔧</span><span class="tab-name">Build It</span></button>
+  <button class="tab-btn" onclick="showTab(5)" id="tb5"><span class="tab-icon">🗂️</span><span class="tab-name">Sort</span></button>
+  <button class="tab-btn" onclick="showTab(6)" id="tb6"><span class="tab-icon">✏️</span><span class="tab-name">Practice</span></button>
+  <button class="tab-btn" onclick="showTab(7)" id="tb7"><span class="tab-icon">📋</span><span class="tab-name">Write It</span></button>
+  <button class="tab-btn" onclick="showTab(8)" id="tb8"><span class="tab-icon">🃏</span><span class="tab-name">Card Game</span></button>
+  <button class="tab-btn" onclick="showTab(9)" id="tb9"><span class="tab-icon">🎯</span><span class="tab-name">Guess End</span></button>
+  <button class="tab-btn" onclick="showTab(10)" id="tb10"><span class="tab-icon">📝</span><span class="tab-name">Quiz</span></button>
+  <button class="tab-btn" onclick="showTab(11)" id="tb11"><span class="tab-icon">⚽</span><span class="tab-name">Dribble!</span></button>
+</div>
+
+<!-- TAB 0 — WORD LAB (slides 3-5) -->
+<div class="tab-content active" id="tc0">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🧪 Word Lab — logical · condition · depend</div>
+      <div class="section-sub">Slides 3–5. Flip all 3 cards, then play the three word games again.</div>
+    </div>
+    <div class="fc-wrap-host" id="fc-host"></div>
+    <div id="list-0" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="done-0">🎉 Word Lab done — three academic words, three games!</div>
+  </div>
+  <div class="tab-footer"><button class="btn-redo" id="redo-0" onclick="doRedo(0)">↺ Redo</button><button class="btn-complete" id="complete-0" onclick="markComplete(0)" disabled>Finish the activity first</button></div>
+</div>
+
+<!-- TAB 1 — WARM UP (slides 6-8) -->
+<div class="tab-content" id="tc1">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🔥 Warm Up — Dad’s weather rules</div>
+      <div class="section-sub">Slides 6–8: Dad checks the weather before he leaves. What does he do? Then everyday rules.</div>
+    </div>
+    <div class="dad-hint">👂 Every rule has two parts: <b>If it’s cold</b> … <b>I take a coat.</b> Say each one out loud when you get it.</div>
+    <div id="list-1" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="done-1">🎉 20 rules — you know Dad’s mornings!</div>
+  </div>
+  <div class="tab-footer"><button class="btn-redo" id="redo-1" onclick="doRedo(1)">↺ Redo</button><button class="btn-complete" id="complete-1" onclick="markComplete(1)" disabled>Finish the activity first</button></div>
+</div>
+
+<!-- TAB 2 — THE RULE (slides 16-19, 23-26, 31, 33) -->
+<div class="tab-content" id="tc2">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📐 The Rule — the zero conditional</div>
+      <div class="section-sub">Slides 16–33: the pattern, its name, the grammar box, and the rule games.</div>
+    </div>
+    <div class="rule-box"><b>If</b> + condition (present) <b>,</b> result (present)</div>
+    <div id="list-2" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="done-2">🎉 Six rules unlocked — again, on your own!</div>
+  </div>
+  <div class="tab-footer"><button class="btn-redo" id="redo-2" onclick="doRedo(2)">↺ Redo</button><button class="btn-complete" id="complete-2" onclick="markComplete(2)" disabled>Finish the activity first</button></div>
+</div>
+
+<!-- TAB 3 — DETECTIVE (typed fixes) -->
+<div class="tab-content" id="tc3">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🕵️ Detective — type the fixed sentence</div>
+      <div class="section-sub">The broken sentences from the slides. Fix each one and type it. Two tries, then you see the answer.</div>
+    </div>
+    <div class="dad-hint">🔎 Check: one <b>if</b> · a <b>subject</b> in both halves · <b>present</b> in both halves · <b>-s</b> for he / she / it · the <b>comma</b> when If comes first.</div>
+    <div id="list-3" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="done-3">🎉 Case closed — every sentence fixed!</div>
+  </div>
+  <div class="tab-footer"><button class="btn-redo" id="redo-3" onclick="doRedo(3)">↺ Redo</button><button class="btn-complete" id="complete-3" onclick="markComplete(3)" disabled>Finish the activity first</button></div>
+</div>
+
+<!-- TAB 4 — BUILD IT (slides 32, 47) -->
+<div class="tab-content" id="tc4">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🔧 Build It — the Sentence Builder Lab</div>
+      <div class="section-sub">Slides 32 and 47, then new ones. Tap the pieces in order. One piece is a trap!</div>
+    </div>
+    <div id="list-4"></div>
+    <div class="done-banner" id="done-4">🎉 Every sentence built!</div>
+  </div>
+  <div class="tab-footer"><button class="btn-redo" id="redo-4" onclick="doRedo(4)">↺ Redo</button><button class="btn-complete" id="complete-4" onclick="markComplete(4)" disabled>Finish the activity first</button></div>
+</div>
+
+<!-- TAB 5 — SORT (slides 28, 30, 34, 38, 40) -->
+<div class="tab-content" id="tc5">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🗂️ Sort — five sorts from the slides</div>
+      <div class="section-sub">Logical? · Comma? · -s in both halves? · the Error Hospital · If it’s ___ or If it ___s?</div>
+    </div>
+    <div id="sorts-5" style="display:flex;flex-direction:column;gap:18px"></div>
+    <div class="done-banner" id="done-5">🎉 All five sorts done!</div>
+  </div>
+  <div class="tab-footer"><button class="btn-redo" id="redo-5" onclick="doRedo(5)">↺ Redo</button><button class="btn-complete" id="complete-5" onclick="markComplete(5)" disabled>Finish the activity first</button></div>
+</div>
+
+<!-- TAB 6 — PRACTICE (slides 39, 12-15) -->
+<div class="tab-content" id="tc6">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">✏️ Practice — Activity 1 and the safety sentences</div>
+      <div class="section-sub">SB p. 15 Activity 1, TR 1.7, slides 13–14, then type the whole sentence (slide 15).</div>
+    </div>
+    <div id="list-6" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="klabel">🖼️ Slide 15 · Look, think, type the whole sentence</div>
+    <div id="type-6" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="done-6">🎉 All the practice done!</div>
+  </div>
+  <div class="tab-footer"><button class="btn-redo" id="redo-6" onclick="doRedo(6)">↺ Redo</button><button class="btn-complete" id="complete-6" onclick="markComplete(6)" disabled>Finish the activity first</button></div>
+</div>
+
+<!-- TAB 7 — WRITE IT (slides 20-22, 43) -->
+<div class="tab-content" id="tc7">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📋 Write It — my own rules</div>
+      <div class="section-sub">Slides 20–22: finish the chart with YOUR ideas. Slide 43: a problem → what I do, then what he / she does.</div>
+    </div>
+    <div class="dad-hint">🧠 Any answer is fine if it is <b>logical</b> and the grammar is right. The checker helps while you type.</div>
+    <div id="type-7" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="done-banner" id="done-7">🎉 Your own rules — read them to Dad!</div>
+  </div>
+  <div class="tab-footer"><button class="btn-redo" id="redo-7" onclick="doRedo(7)">↺ Redo</button><button class="btn-complete" id="complete-7" onclick="markComplete(7)" disabled>Finish the activity first</button></div>
+</div>
+
+<!-- TAB 8 — CARD GAME (slide 41) -->
+<div class="tab-content" id="tc8">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🃏 Card Game — Activity 2 (SB p. 169)</div>
+      <div class="section-sub">Slide 41: a weather card is drawn. Tap the action card that matches — is it logical? Then say the sentence.</div>
+    </div>
+    <div id="card-game"></div>
+    <div class="done-banner" id="done-8">🎉 All 8 weather cards matched!</div>
+  </div>
+  <div class="tab-footer"><button class="btn-redo" id="redo-8" onclick="doRedo(8)">↺ Redo</button><button class="btn-complete" id="complete-8" onclick="markComplete(8)" disabled>Finish the activity first</button></div>
+</div>
+
+<!-- TAB 9 — GUESS THE ENDING (slides 18, 11, 42-43) -->
+<div class="tab-content" id="tc9">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">🎯 Guess the Ending · 3 rounds</div>
+      <div class="section-sub">Get the first half. Tap the ending that is logical. Facts (slide 18) · House rules (slide 11) · Recap and trip (slides 42–43).</div>
+    </div>
+    <div class="ge-round-tabs">
+      <button class="ge-round-tab active" id="ge-rt-0" onclick="geSwitch(0)">🔬 Facts</button>
+      <button class="ge-round-tab" id="ge-rt-1" onclick="geSwitch(1)">🏠 House rules</button>
+      <button class="ge-round-tab" id="ge-rt-2" onclick="geSwitch(2)">🎙️ Recap &amp; trip</button>
+    </div>
+    <div id="ge-rounds"></div>
+    <div class="done-banner" id="done-9">🏆 All 3 rounds won!</div>
+  </div>
+  <div class="tab-footer"><button class="btn-redo" id="redo-9" onclick="doRedo(9)">↺ Redo</button><button class="btn-complete" id="complete-9" onclick="markComplete(9)" disabled>Finish the activity first</button></div>
+</div>
+
+<!-- TAB 10 — QUIZ -->
+<div class="tab-content" id="tc10">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">📝 Quiz — 10 questions</div>
+      <div class="section-sub">One try each. Score 8/10 or better and the weather rules are yours!</div>
+    </div>
+    <div id="quiz-active"><div class="quiz-progress" id="quiz-progress"></div><div class="qcard" style="margin-top:14px" id="quiz-qcard"></div></div>
+    <div id="quiz-result" style="display:none"></div>
+  </div>
+  <div class="tab-footer"><button class="btn-redo" id="redo-10" onclick="doRedo(10)">↺ Redo</button><button class="btn-complete" id="complete-10" onclick="markComplete(10)" disabled>Finish all 10 questions first</button></div>
+</div>
+
+<!-- TAB 11 — DRIBBLE! (slides 44, 47) -->
+<div class="tab-content" id="tc11">
+  <div class="tab-body">
+    <div>
+      <div class="section-title">⚽ Dribble! — soccer rules are all “if” sentences</div>
+      <div class="section-sub">Slide 44 and more. Answer right, score a goal. 8 shots.</div>
+    </div>
+    <div class="pitch"><div class="score-row"><div>⚽ Goals: <span class="goal-tally" id="drib-goals">0</span> / 8</div><div id="drib-defenders">🛡️🛡️🛡️🛡️🛡️🛡️🛡️🛡️</div></div></div>
+    <div id="drib-list"></div>
+    <div class="done-banner" id="done-11">⚽ Full time! Match complete.</div>
+  </div>
+  <div class="tab-footer"><button class="btn-redo" id="redo-11" onclick="doRedo(11)">↺ Redo</button><button class="btn-complete" id="complete-11" onclick="markComplete(11)" disabled>Finish the activity first</button></div>
+</div>
+
+<!-- DAD'S VIEW -->
+<div class="dad-ov" id="dad-ov"><div class="dad-modal">
+  <div class="dad-head"><b>👨 Dad’s view — Leo’s first attempts</b><button class="dad-x" onclick="closeDad()">✕ Close</button></div>
+  <div class="dad-body" id="dad-body"></div>
+</div></div>
+
+<script>
+/* ═════════════════════════════════════════════════════════════════════
+   LEVEL 5 UNIT 1 GRAMMAR 2 — LEO APP (zero conditional)
+   SAVE_PREFIX: leea-5-1-grammar-2- · HOMEWORK_ID: leo-5-1-grammar-2
+   moduleCount: 12 (tabs 0-11) · moduleKeyFormat: tab-{i}-done · scoreKey: score (Tab 10)
+
+   A COMPANION TO THE TEACHER DECK (public/lessons/ow-l5-u1-grammar-2.html).
+   Leo does this alone after the lesson: every tab replays the slides it
+   comes from, with the slides' own sentences and answers first.
+     Word Lab   <- slides 3-5 (logical · condition · depend)
+     Warm Up    <- slides 6, 7, 8
+     The Rule   <- slides 16, 17, 19, 23-26, 31, 33
+     Detective  <- broken sentences from slides 26, 31, 34, 36, 37, 38 (typed)
+     Build It   <- slide 32, slide 47 (Sentence Builder Lab), then new builds
+     Sort       <- slides 28, 30, 34, 38, 40
+     Practice   <- slide 39 (SB Activity 1), 12 (TR 1.7), 13, 14, 15 (typed)
+     Write It   <- slides 20, 21, 22, 43 (his own endings; me, then he/she)
+     Card Game  <- slide 41 (SB p. 169 weather + action cards)
+     Guess End  <- slides 18, 11, 42, 43
+     Quiz       <- grammar.json tab3_quiz (the book's practice items)
+     Dribble!   <- slides 44, 47 + soccer rules
+   Mechanics borrowed from Leaneritan's draft app (ow-l5-u1-grammar-2-app):
+   the live grammar checker, typed fix / join / write items with two tries
+   then the model, trap pieces in the builders, and Dad's view of the first
+   attempts. Scope: the zero conditional only.
+═════════════════════════════════════════════════════════════════════ */
+const SAVE_PREFIX = 'leea-5-1-grammar-2-';
+const HOMEWORK_ID = 'leo-5-1-grammar-2';
+const TAB_COUNT = 12;
+const TAB_NAMES = ['Word Lab','Warm Up','The Rule','Detective','Build It','Sort','Practice','Write It','Card Game','Guess End','Quiz','Dribble!'];
+const TAB_INIT = {}, TAB_RESET = {}, TAB_RESTORE = {};
+
+function lSave(k,v){ try{ localStorage.setItem(SAVE_PREFIX+k, JSON.stringify(v)); }catch(e){} }
+function lLoad(k){ try{ const r = localStorage.getItem(SAVE_PREFIX+k); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
+function lDel(k){ try{ localStorage.removeItem(SAVE_PREFIX+k); }catch(e){} }
+const $ = id => document.getElementById(id);
+function shuffle(a){ const b = a.slice(); for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]]; } return b; }
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ── GRAMMAR CHECKER (zero conditional) — from Leaneritan's draft app ── */
+const GC = (function(){
+  const BASE = 'go take wear eat stay play drink come turn get make use help close buy call walk study sleep run open put wash cook read watch ride stop start melt freeze boil feel see ask give need want like love leave bring grow rain snow work live catch throw sit hide rest charge answer check clean write say tell wait change hold fly move shout listen borrow lose miss celebrate'.split(' ');
+  const S3 = 'goes takes wears eats stays plays drinks comes turns gets makes uses helps closes buys calls walks studies sleeps runs opens puts washes cooks reads watches rides stops starts melts freezes boils feels sees asks gives needs wants likes loves leaves brings grows rains snows works lives catches throws sits hides rests charges answers checks cleans writes says tells waits changes holds flies moves shouts listens borrows loses misses celebrates'.split(' ');
+  const PAST = 'went took wore ate drank came got made had did was were stayed played called walked bought stopped saw said ran'.split(' ');
+  const IT_GUARD = ['make','makes','let','lets','help','helps','see','sees','watch','watches','hear','feel','feels','charge','answer','do','throws','throw'];
+  const MSG = {
+    short:'Write a full sentence with two halves: the condition and the result.',
+    noif:'I can’t find the word “if”. Start with If, or put if in the middle.',
+    twoif:'Only ONE “if” in the sentence.',
+    will:'Use the present, not “will”: If it rains, I take my umbrella.',
+    goingto:'No “going to” here. Use the simple present in both halves.',
+    comma_missing:'If comes first? Then put a comma after the if-half.',
+    comma_extra:'Result first? Then there is NO comma before “if”.',
+    s_missing:'he / she / it needs -s on the verb (he plays, it rains).',
+    s_extra:'I / you / we / they: no -s on the verb (I play, they play).',
+    be_agree:'Check the be word: he / she / it → is · I → am · you / we / they → are.',
+    past:'Use the present tense in both halves, not the past.',
+    subj:'Don’t leave out the subject: If it is raining… (English needs “it”).',
+    adjverb:'Rain and snow are verbs here: If it rains… / If it is rainy…'
+  };
+  function norm(raw){
+    let t = ' ' + String(raw).replace(/[’‘]/g, "'").toLowerCase() + ' ';
+    t = t.replace(/\bi'm\b/g,'i am').replace(/\bit's\b/g,'it is').replace(/\bhe's\b/g,'he is').replace(/\bshe's\b/g,'she is')
+         .replace(/\bthat's\b/g,'that is').replace(/\bthere's\b/g,'there is').replace(/\bwe're\b/g,'we are').replace(/\byou're\b/g,'you are').replace(/\bthey're\b/g,'they are')
+         .replace(/\bisn't\b/g,'is not').replace(/\baren't\b/g,'are not').replace(/\bdon't\b/g,'do not').replace(/\bdoesn't\b/g,'does not')
+         .replace(/\bcan't\b/g,'can not').replace(/\bwon't\b/g,'will not').replace(/\bi'll\b/g,'i will').replace(/\b(he|she|it|you|we|they)'ll\b/g,'$1 will');
+    return t.replace(/,/g,' , ').replace(/[^a-z, ]/g,' ').replace(/\s+/g,' ').trim();
+  }
+  function check(raw){
+    const out = [], add = id => { if(!out.some(o => o.id === id)) out.push({ id:id, msg:MSG[id] }); };
+    const t = norm(raw), toks = t.split(' ').filter(Boolean), words = toks.filter(x => x !== ',');
+    if(words.length < 4){ add('short'); return out; }
+    const ifs = (t.match(/\bif\b/g) || []).length;
+    if(ifs === 0) add('noif');
+    if(ifs > 1) add('twoif');
+    if(/\bwill\b/.test(t)) add('will');
+    if(/\bgoing to\b/.test(t)) add('goingto');
+    const startsIf = /^if\b/.test(t);
+    if(ifs >= 1){
+      if(startsIf && toks.indexOf(',') === -1) add('comma_missing');
+      if(!startsIf && /,\s*if\b/.test(t)) add('comma_extra');
+    }
+    for(let i = 0; i < toks.length - 1; i++){
+      const w = toks[i], nx = toks[i+1], pv = toks[i-1] || '';
+      if(pv === 'and' || pv === 'or') continue;
+      if((w === 'he' || w === 'she' || w === 'it') && BASE.indexOf(nx) > -1){ if(w === 'it' && IT_GUARD.indexOf(pv) > -1) continue; add('s_missing'); }
+      if((w === 'he' || w === 'she' || w === 'it') && (nx === 'are' || nx === 'am' || nx === 'do' || nx === 'have')) add('be_agree');
+      if(w === 'i' && (nx === 'is' || nx === 'are')) add('be_agree');
+      if((w === 'you' || w === 'we' || w === 'they') && (nx === 'is' || nx === 'am')) add('be_agree');
+      if((w === 'i' || w === 'we' || w === 'they' || w === 'you') && S3.indexOf(nx) > -1) add('s_extra');
+    }
+    if(toks.some(w => PAST.indexOf(w) > -1)) add('past');
+    if(/\bif (is|are|am)\b/.test(t) || /\bif (rains|snows|rain|snow)\b/.test(t) ||
+       /\bif (raining|snowing|windy|hot|cold|sunny|rainy|snowy|cloudy|foggy|stormy|dark|late)\b/.test(t)) add('subj');
+    if(/\bit is (rain|snow|rains|snows)\b/.test(t)) add('adjverb');
+    return out;
+  }
+  return { check, norm, MSG };
+})();
+/* Two sentences are the same answer if they match after contractions are
+   expanded (it’s = it is). Commas are kept, so the comma rule still counts. */
+function same(a, b){ const f = x => GC.norm(x).replace(/\bits\b/g,'it is'); return f(a) === f(b); }
+/* "If X, Y." → also accept "Y if X." (Rule 4: no comma when result is first). */
+function withFlip(model){
+  const m = /^If (.+?), (.+?)\.?$/.exec(model.replace(/’/g,'\''));
+  if(!m) return [model];
+  return [model, m[2].charAt(0).toUpperCase() + m[2].slice(1) + ' if ' + m[1] + '.'];
+}
+
+/* Homework flag: learnerProgress.ts reads `leea-<homeworkId>-done` exactly. */
+function clearHomeworkFlag(){
+  try{ localStorage.removeItem('leea-' + HOMEWORK_ID + '-done'); }catch(e){}
+  try{ if(window.LEEA_CLOUD && typeof window.LEEA_CLOUD.saveProgress === 'function') window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, 'leea-' + HOMEWORK_ID + '-done', null); }catch(e){}
+}
+function saveHomeworkFlag(value){
+  try{ localStorage.setItem('leea-' + HOMEWORK_ID + '-done', JSON.stringify(value)); }catch(e){}
+  try{ if(window.LEEA_CLOUD && typeof window.LEEA_CLOUD.saveProgress === 'function') window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, 'leea-' + HOMEWORK_ID + '-done', value); }catch(e){}
+}
+function isDone(n){ return !!lLoad('tab-' + n + '-done'); }
+function refreshProgress(){
+  try{
+    let done = 0;
+    for(let i=0;i<TAB_COUNT;i++){ const d = isDone(i); if(d) done++; const tb = $('tb'+i); if(tb) tb.classList.toggle('done', d); }
+    $('prog-pill').textContent = done + ' / ' + TAB_COUNT + ' done';
+    if(done >= TAB_COUNT){ if(!localStorage.getItem('leea-' + HOMEWORK_ID + '-done')) saveHomeworkFlag({ complete:true, completedAt:new Date().toISOString() }); }
+    else if(localStorage.getItem('leea-' + HOMEWORK_ID + '-done')) clearHomeworkFlag();
+  }catch(e){}
+}
+function paintFooter(n){
+  const cb = $('complete-' + n); if(!cb) return;
+  if(isDone(n)){ cb.disabled = false; cb.classList.add('confirmed'); cb.textContent = '✓ ' + TAB_NAMES[n] + ' done'; }
+  else { cb.disabled = true; cb.classList.remove('confirmed'); cb.textContent = n === 10 ? 'Finish all 10 questions first' : 'Finish the activity first'; }
+}
+function finishTab(n){
+  try{
+    const b = $('done-' + n); if(b) b.classList.add('show');
+    if(!isDone(n)) lSave('tab-' + n + '-done', { done:true, completedAt:new Date().toISOString() });
+    paintFooter(n); refreshProgress();
+  }catch(e){}
+}
+function markComplete(n){ if(isDone(n)) paintFooter(n); }
+function doRedo(n){
+  try{
+    const btn = $('redo-' + n);
+    if(!btn.classList.contains('armed')){ btn.classList.add('armed'); btn.textContent = 'Tap again ↺'; setTimeout(()=>{ btn.classList.remove('armed'); btn.textContent = '↺ Redo'; }, 3000); return; }
+    btn.classList.remove('armed'); btn.textContent = '↺ Redo';
+    Object.keys(localStorage).filter(k => k.startsWith(SAVE_PREFIX + 'tab-' + n + '-')).forEach(k => localStorage.removeItem(k));
+    if(n === 10) lDel('score');
+    const b = $('done-' + n); if(b) b.classList.remove('show');
+    if(TAB_RESET[n]) TAB_RESET[n]();
+    paintFooter(n); refreshProgress();
+  }catch(e){}
+}
+function showTab(n){
+  try{
+    document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', i===n));
+    document.querySelectorAll('.tab-content').forEach((c,i)=>c.classList.toggle('active', i===n));
+    if(TAB_INIT[n] && !TAB_INIT[n]._initialized){ TAB_INIT[n](); TAB_INIT[n]._initialized = true; if(TAB_RESTORE[n]) TAB_RESTORE[n](); }
+    paintFooter(n);
+  }catch(e){}
+}
+function reinit(n){ TAB_INIT[n]._initialized = false; TAB_INIT[n](); TAB_INIT[n]._initialized = true; if(TAB_RESTORE[n]) TAB_RESTORE[n](); }
+function stdRestore(n){ return function(){ if(isDone(n)) $('done-'+n).classList.add('show'); }; }
+
+/* ── First-attempt log for Dad's view (cleared with the tab's Redo) ── */
+function logAtt(n, rec){ const a = lLoad('tab-' + n + '-att') || []; a.push(rec); lSave('tab-' + n + '-att', a); }
+function openDad(){
+  let h = '<div class="dad-hint">Leo’s <b>wrong first tries</b>, exactly as he tapped or typed them. They show which rule tripped him.</div>';
+  let any = false;
+  TAB_NAMES.forEach((name, n)=>{
+    const a = (lLoad('tab-' + n + '-att') || []).filter(r => !r.ok);
+    if(!a.length) return; any = true;
+    h += '<div class="dad-sec"><h4>' + esc(name) + (isDone(n) ? ' ✓' : '') + ' — ' + a.length + '</h4>' +
+      a.map(r => '<div class="dad-row">✖ ' + (r.q ? '<i>' + esc(r.q) + '</i> → ' : '') + '<b>' + esc(r.a) + '</b>' + (r.flags && r.flags.length ? ' <span class="dad-flag">🔎 ' + esc(r.flags.join(', ')) + '</span>' : '') + '</div>').join('') + '</div>';
+  });
+  if(!any) h += '<div class="dad-sec">No wrong first tries yet. 🎉</div>';
+  $('dad-body').innerHTML = h; $('dad-ov').classList.add('open');
+}
+function closeDad(){ $('dad-ov').classList.remove('open'); }
+
+/* ═════════════════════════════════════════════════════════════════════
+   MCQ BLOCK — { clue?, q, opts, ok, why? }. Retry until right; the first
+   wrong pick is logged for Dad. Right answers save as they are given.
+═════════════════════════════════════════════════════════════════════ */
+const MCQ = {};
+function strip(h){ return String(h).replace(/<[^>]+>/g,''); }
+function mcqBlock(hostId, key, items, tab, onAll){
+  MCQ[hostId] = { key, items, tab, onAll };
+  $(hostId).innerHTML = items.map((it,i)=>{
+    const opts = shuffle(it.opts.map((o,oi)=>({text:o, ok:oi===it.ok})));
+    return '<div class="qcard" data-idx="'+i+'">' + (it.clue ? '<div class="qclue">'+it.clue+'</div>' : '') +
+      '<div class="qtext">'+(i+1)+'. '+it.q+'</div>' +
+      '<div class="'+(it.two ? 'opt2' : '')+'">' + opts.map(o=>'<button class="opt" data-ok="'+(o.ok?1:0)+'" onclick="mcqPick(this,\''+hostId+'\','+i+')">'+o.text+'</button>').join('') + '</div>' +
+      (it.why ? '<div class="qwhy">💡 '+it.why+'</div>' : '') + '</div>';
+  }).join('');
+  (lLoad(key) || []).forEach(i=>{ const c = document.querySelector('#'+hostId+' [data-idx="'+i+'"]'); if(c) mcqSolve(c); });
+}
+function mcqSolve(card){ card.classList.add('solved'); card.querySelectorAll('.opt').forEach(o=>{ o.disabled = true; if(o.dataset.ok === '1') o.classList.add('good'); }); }
+function mcqPick(btn, hostId, i){
+  const card = btn.closest('.qcard'); if(!card || card.classList.contains('solved')) return;
+  const m = MCQ[hostId], right = btn.dataset.ok === '1';
+  if(!card.dataset.tried){ card.dataset.tried = '1'; if(!right) logAtt(m.tab, { q: strip(m.items[i].q), a: strip(btn.innerHTML), ok:false }); }
+  if(right){
+    mcqSolve(card);
+    const s = new Set(lLoad(m.key) || []); s.add(i); lSave(m.key, Array.from(s));
+    if(s.size >= m.items.length && m.onAll) m.onAll();
+  } else { btn.classList.add('bad'); setTimeout(()=>btn.classList.remove('bad'), 380); }
+}
+function mcqAllDone(key, items){ return (lLoad(key) || []).length >= items.length; }
+function mcqTab(n, items){
+  TAB_INIT[n] = ()=>mcqBlock('list-'+n, 'tab-'+n+'-solved', items, n, ()=>finishTab(n));
+  TAB_RESTORE[n] = stdRestore(n);
+  TAB_RESET[n] = ()=>reinit(n);
+}
+/* Finish-the-sentence items where the endings come from the same slide. */
+function endings(clue, starts, ends, prefix){
+  return starts.map((s,i)=>({ clue, q:(prefix||'')+s, opts:[ends[i]].concat(shuffle(ends.filter((e,k)=>k!==i)).slice(0,2)), ok:0 }));
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TYPED BLOCK — fix / join / write. Two tries, then the model answer.
+   item: { p (prompt), pre? (fixed start), seed? (prefilled), accept? [..],
+           free? (any logical answer the checker passes), model, clue? }
+═════════════════════════════════════════════════════════════════════ */
+const TY = {};
+function typedBlock(hostId, key, items, tab, onAll, live){
+  TY[hostId] = { key, items, tab, onAll, live };
+  const st = lLoad(key) || {};
+  $(hostId).innerHTML = items.map((it,i)=>{
+    const s = st[i] || { tries:[] };
+    return '<div class="qcard" id="'+hostId+'-c'+i+'">' + (it.clue0 ? '<div class="qclue">'+it.clue0+'</div>' : '') +
+      '<div class="qtext">'+(i+1)+'. '+it.p+'</div>' +
+      '<div class="type-row">' + (it.pre ? '<span class="pre">'+esc(it.pre)+'</span>' : '') +
+      '<input class="type-in" id="'+hostId+'-in'+i+'" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="'+(it.pre ? 'your idea…' : 'type the sentence…')+'" value="'+esc(s.last != null ? s.last : (it.seed || ''))+'" oninput="tyLive(\''+hostId+'\','+i+')" onkeydown="if(event.key===\'Enter\')tyCheck(\''+hostId+'\','+i+')">' +
+      '<button class="type-go" onclick="tyCheck(\''+hostId+'\','+i+')">✓</button></div>' +
+      '<div class="live" id="'+hostId+'-lv'+i+'"></div><div class="quiz-fb" id="'+hostId+'-fb'+i+'"></div></div>';
+  }).join('');
+  items.forEach((it,i)=>{ const s = st[i]; if(s && s.done) tyPaintDone(hostId, i, s); else if(s && s.tries && s.tries.length === 1) tyHint(hostId, i, s.tries[0]); });
+}
+function tyFull(it, text){ return (it.pre || '') + text; }
+function tyEval(it, text){
+  const full = tyFull(it, text), issues = GC.check(full);
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  if(it.accept) return { ok: it.accept.some(a => same(full, a)), issues, full };
+  return { ok: issues.length === 0 && words >= (it.min || 2) && (!it.must || new RegExp(it.must, 'i').test(full)), issues, full };
+}
+function tyLive(hostId, i){
+  const m = TY[hostId], it = m.items[i], lv = $(hostId+'-lv'+i);
+  if(!m.live || it.noLive){ lv.textContent = ''; return; }
+  const text = $(hostId+'-in'+i).value;
+  if(text.trim().split(/\s+/).filter(Boolean).length < 2){ lv.className = 'live'; lv.textContent = ''; return; }
+  const iss = GC.check(tyFull(it, text));
+  lv.className = 'live' + (iss.length ? '' : ' ok');
+  lv.textContent = iss.length ? '🔎 ' + iss.map(x=>x.msg).join(' · ') : '👍 Looks good — press ✓.';
+}
+function tyHint(hostId, i, text){
+  const it = TY[hostId].items[i], ev = tyEval(it, text), fb = $(hostId+'-fb'+i);
+  fb.className = 'quiz-fb no';
+  fb.textContent = '💡 ' + (ev.issues.length ? ev.issues.map(x=>x.msg).join(' ') : (it.clue || 'Check the sentence again.')) + '  (one more try)';
+}
+function tyPaintDone(hostId, i, s){
+  const it = TY[hostId].items[i], inp = $(hostId+'-in'+i), fb = $(hostId+'-fb'+i), card = $(hostId+'-c'+i);
+  inp.disabled = true; card.querySelector('.type-go').disabled = true; $(hostId+'-lv'+i).textContent = '';
+  if(s.shown){ card.classList.add('missed'); fb.className = 'quiz-fb show'; fb.textContent = '👀 ' + (it.free ? 'Dad’s answer: ' : 'The answer: ') + it.model + ' — read it aloud.'; }
+  else { card.classList.add('solved'); fb.className = 'quiz-fb ok'; fb.textContent = '✅ ' + tyFull(it, s.last).trim() + (it.free && it.model ? '   (Dad’s: ' + it.model + ')' : '') + ' — read it aloud!'; }
+}
+function tyCheck(hostId, i){
+  const m = TY[hostId], it = m.items[i], st = lLoad(m.key) || {}, s = st[i] || (st[i] = { tries:[] });
+  if(s.done) return;
+  const text = $(hostId+'-in'+i).value.trim(); if(!text) return;
+  const ev = tyEval(it, text);
+  s.tries.push(text); s.last = text;
+  if(!ev.ok) logAtt(m.tab, { q: strip(it.p), a: ev.full, flags: ev.issues.map(x=>x.id), ok:false });
+  if(ev.ok) s.done = true; else if(s.tries.length >= 2){ s.done = true; s.shown = true; }
+  lSave(m.key, st);
+  if(s.done) tyPaintDone(hostId, i, s); else tyHint(hostId, i, text);
+  if(m.items.every((x,k)=>st[k] && st[k].done) && m.onAll) m.onAll();
+}
+function tyAllDone(key, items){ const st = lLoad(key) || {}; return items.every((x,k)=>st[k] && st[k].done); }
+
+/* ═════════════════════════════════════════════════════════════════════
+   BUILDER — tap pieces in order; one trap piece; two tries per sentence.
+   round: { p, a:[pieces in order], t:[bank incl. the trap], h }
+═════════════════════════════════════════════════════════════════════ */
+let BLD = null;
+function joinPieces(a){ return a.join(' ').replace(/\s+([,.?!])/g, '$1').replace(/\s+/g, ' ').trim(); }
+function buildBlock(hostId, key, rounds, tab, onAll){
+  const st = lLoad(key) || { r: rounds.map(()=>({ tries:[] })) };
+  let i = st.r.findIndex(x => !x.done); if(i < 0) i = rounds.length - 1;
+  BLD = { hostId, key, rounds, tab, onAll, st, i, placed:[] };
+  buildPaint();
+}
+function buildPaint(){
+  const B = BLD, rd = B.rounds[B.i], s = B.st.r[B.i];
+  B.placed = [];
+  $(B.hostId).innerHTML =
+    '<div class="fc-dots" style="justify-content:center;margin-bottom:8px">' + B.rounds.map((_,k)=>'<div class="fc-dot'+(B.st.r[k].done?' seen':'')+(k===B.i?' on':'')+'" onclick="buildGo('+k+')" style="cursor:pointer"></div>').join('') + '</div>' +
+    '<div class="qcard'+(s.done ? (s.shown?' missed':' solved') : '')+'"><div class="qclue">'+(rd.src||'')+' · Sentence '+(B.i+1)+' / '+B.rounds.length+'</div><div class="qtext">'+rd.p+'</div>' +
+    '<div class="build-line" id="bl"></div><div id="bk" style="text-align:center;margin-top:8px"></div>' +
+    '<div class="bld-btns"><button class="type-go" id="bc" onclick="buildCheck()">✓ Check</button><button class="ghost-btn" id="bx" onclick="buildPaint()">↺ Clear</button><button class="type-go" id="bn" onclick="buildGo('+(B.i+1)+')" style="display:none">Next ▶</button></div>' +
+    '<div class="quiz-fb" id="bf"></div></div>';
+  if(s.done){ buildDone(); return; }
+  $('bk').innerHTML = shuffle(rd.t.map((w,k)=>({w,k}))).map(x=>'<span class="chip" data-k="'+x.k+'" onclick="buildTap(this)">'+esc(x.w)+'</span>').join('');
+  if(s.tries.length === 1){ $('bf').className = 'quiz-fb no'; $('bf').textContent = '💡 ' + rd.h + '  (one more try)'; }
+}
+function buildGo(k){ if(k >= 0 && k < BLD.rounds.length){ BLD.i = k; buildPaint(); } }
+function buildTap(chip){
+  const B = BLD; if(B.st.r[B.i].done || chip.classList.contains('used')) return;
+  chip.classList.add('used'); B.placed.push(chip);
+  const span = document.createElement('span'); span.className = 'bpart'; span.textContent = chip.textContent;
+  span.onclick = ()=>{ chip.classList.remove('used'); B.placed.splice(B.placed.indexOf(chip),1); span.remove(); };
+  $('bl').appendChild(span);
+}
+function buildCheck(){
+  const B = BLD, rd = B.rounds[B.i], s = B.st.r[B.i];
+  if(!B.placed.length){ $('bf').className = 'quiz-fb no'; $('bf').textContent = 'Tap the pieces first.'; return; }
+  const got = joinPieces(B.placed.map(c=>c.textContent)), ok = got === joinPieces(rd.a);
+  s.tries.push(got);
+  if(!ok) logAtt(B.tab, { q: strip(rd.p), a: got, ok:false });
+  if(ok) s.done = true; else if(s.tries.length >= 2){ s.done = true; s.shown = true; }
+  lSave(B.key, B.st);
+  if(s.done){ buildDone(); if(B.st.r.every(x=>x.done) && B.onAll) B.onAll(); }
+  else { $('bf').className = 'quiz-fb no'; $('bf').textContent = '💡 ' + rd.h + '  (one more try)'; const bl = $('bl'); bl.classList.remove('shake'); void bl.offsetWidth; bl.classList.add('shake'); }
+}
+function buildDone(){
+  const B = BLD, rd = B.rounds[B.i], s = B.st.r[B.i];
+  $('bl').innerHTML = '<span>' + esc(joinPieces(rd.a)) + '</span>'; $('bl').classList.add('done'); $('bk').innerHTML = '';
+  $('bc').style.display = 'none'; $('bx').style.display = 'none';
+  if(B.i < B.rounds.length - 1) $('bn').style.display = '';
+  $('bf').className = 'quiz-fb ' + (s.shown ? 'show' : 'ok');
+  $('bf').textContent = (s.shown ? '👀 That is the sentence — ' : '✅ ') + (rd.say || 'read it aloud!');
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   SORTERS (pickChart 'classification sort'); a finished sort restores
+   as its finished columns, never as an empty board.
+═════════════════════════════════════════════════════════════════════ */
+function sortTab(n, SORTS){
+  TAB_INIT[n] = function(){
+    const done = new Set(lLoad('tab-'+n+'-sorted') || []);
+    $('sorts-'+n).innerHTML = SORTS.map(s=>'<div><div class="klabel">'+s.title+'</div><div class="dad-hint" style="margin:6px 0 8px">'+s.hint+'</div><div class="sort-host" id="host-'+s.id+'"></div></div>').join('');
+    SORTS.forEach(s=>{
+      if(done.has(s.id) || typeof window.pickChart !== 'function'){ sortStatic(s); return; }
+      $('host-'+s.id).innerHTML = window.pickChart('classification sort', { id:s.id, tiles:shuffle(s.tiles), zones:s.zones,
+        onComplete: function(){
+          const d = new Set(lLoad('tab-'+n+'-sorted') || []); d.add(s.id); lSave('tab-'+n+'-sorted', Array.from(d));
+          setTimeout(()=>sortStatic(s), 900);
+          if(d.size >= SORTS.length) finishTab(n);
+        } });
+    });
+  };
+  TAB_RESTORE[n] = stdRestore(n); TAB_RESET[n] = ()=>reinit(n);
+}
+function sortStatic(s){
+  $('host-'+s.id).innerHTML = '<div class="sort-static" style="grid-template-columns:repeat('+s.zones.length+',1fr)">' + s.zones.map(z=>
+    '<div class="col"><h4 style="background:'+z.color+'">'+z.label+'</h4>' + s.tiles.filter(t=>t.answer===z.key).map(t=>'<div>'+t.text+(t.fix ? '<div class="fixline">→ '+t.fix+'</div>' : '')+'</div>').join('') + '</div>').join('') + '</div>' +
+    (s.win ? '<div class="dad-hint" style="margin-top:8px">✅ '+s.win+'</div>' : '');
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 0 — WORD LAB (slides 3-5: the deck's three cards and their games)
+═════════════════════════════════════════════════════════════════════ */
+const WORDS = [
+  { word:'logical', emoji:'🧠🔍', pos:'adjective · academic', def:'Makes sense; the idea follows in a clear, sensible way.', sample:'“If it’s cold, I wear a coat.” → That’s <b>logical</b>.', jp:'論理的（ろんりてき）な・筋（すじ）が通（とお）った　opposite: illogical' },
+  { word:'condition', emoji:'🌧️🌡️', pos:'noun · academic', def:'The situation or state of something, such as the weather, that affects what happens.', sample:'“We play outside only in good weather <b>conditions</b>.”', jp:'条件（じょうけん）・状態（じょうたい）　weather conditions = 気象条件' },
+  { word:'depend (on)', emoji:'🔗🐕', pos:'verb · academic', def:'To change because of something; to need someone or something.', sample:'“What I do <b>depends on</b> the weather.”', jp:'〜次第（しだい）だ・〜による　It depends! = 場合（ばあい）による' }
+];
+let wIdx = 0;
+function wRender(){
+  const w = WORDS[wIdx], seen = new Set(lLoad('tab-0-seen') || []);
+  $('fc-card').classList.remove('flipped');
+  $('fc-emoji').textContent = w.emoji; $('fc-word').textContent = w.word; $('fc-pos').textContent = w.pos;
+  $('fc-def').textContent = w.def; $('fc-sample').innerHTML = w.sample;
+  $('fc-jp').textContent = '🇯🇵 ' + w.jp; $('fc-jp').classList.remove('revealed'); $('fc-jp-btn').textContent = '🇯🇵 日本語';
+  $('fc-dots').innerHTML = WORDS.map((x,i)=>'<div class="fc-dot'+(seen.has(i)?' seen':'')+(i===wIdx?' on':'')+'"></div>').join('');
+}
+function wFlip(){ if($('fc-card').classList.toggle('flipped')){ const s = new Set(lLoad('tab-0-seen') || []); s.add(wIdx); lSave('tab-0-seen', Array.from(s)); const d = $('fc-dots').children[wIdx]; if(d) d.classList.add('seen'); wCheck(); } }
+function wStep(d){ wIdx = (wIdx + d + WORDS.length) % WORDS.length; wRender(); }
+function wJp(e){ e.stopPropagation(); const on = $('fc-jp').classList.toggle('revealed'); $('fc-jp-btn').textContent = on ? '🇯🇵 隠す' : '🇯🇵 日本語'; }
+function wCheck(){ if((lLoad('tab-0-seen')||[]).length >= WORDS.length && mcqAllDone('tab-0-solved', WORD_Q)) finishTab(0); }
+const MAKES = ['✅ makes sense','🤪 doesn’t make sense'];
+const WORD_Q = [
+  { clue:'Slide 3 · 🧠🔍 Does it make sense?', q:'It’s dark, so I turn on the light.', opts:MAKES, ok:0, two:true },
+  { clue:'Slide 3 · 🧠🔍 Does it make sense?', q:'It’s hot, so I wear three sweaters.', opts:MAKES, ok:1, two:true, why:'Three sweaters in the heat? That doesn’t make sense!' },
+  { clue:'Slide 3 · 🧠🔍 Does it make sense?', q:'I’m thirsty, so I drink some water.', opts:MAKES, ok:0, two:true },
+  { clue:'Slide 3 · 🧠🔍 Does it make sense?', q:'The floor is wet, so I run fast.', opts:MAKES, ok:1, two:true, why:'Running on a wet floor? Not smart — you slip!' },
+  { clue:'Slide 3 · 🧠🔍 Does it make sense?', q:'A tornado is coming, so I go to a shelter.', opts:MAKES, ok:0, two:true },
+  { clue:'Slide 3 · 🧠🔍 Does it make sense?', q:'It’s snowing, so I go swimming in the sea.', opts:MAKES, ok:1, two:true, why:'Swimming in the snow? That doesn’t make sense — it isn’t logical!' },
+  { clue:'Slide 4 · 🌡️ Set the conditions for a soccer match', q:'It’s 2 °C. The pitch is frozen. The conditions are…', opts:['too cold','perfect to play','too hot'], ok:0 },
+  { clue:'Slide 4 · 🌡️ Set the conditions for a soccer match', q:'It’s 18 °C. The conditions are…', opts:['too cold','perfect to play','too hot'], ok:1 },
+  { clue:'Slide 4 · 🌡️ Set the conditions for a soccer match', q:'It’s 34 °C. Players need a heat break. The conditions are…', opts:['too cold','perfect to play','too hot'], ok:2, why:'The weather, the temperature, the pitch — these are the CONDITIONS 🌧️🌡️.' },
+  { clue:'Slide 5 · 🔗 What does it depend on?', q:'What I wear depends on…', opts:['the weather.','its owner.','how much I study.'], ok:0 },
+  { clue:'Slide 5 · 🔗 What does it depend on?', q:'Plants depend on…', opts:['its owner.','water and sunlight.','the weather report.'], ok:1 },
+  { clue:'Slide 5 · 🔗 What does it depend on?', q:'My test score depends on…', opts:['water and sunlight.','its owner.','how much I study.'], ok:2 },
+  { clue:'Slide 5 · 🔗 What does it depend on?', q:'A puppy depends on…', opts:['its owner.','how much I study.','the weather.'], ok:0 },
+  { clue:'🔗 depend + on', q:'My plan depends ___ the weather.', opts:['to','on','at'], ok:1, why:'We say depend ON.' },
+  { clue:'🔗 depend + -s', q:'What I wear ___ on the weather.', opts:['depend','depends','depending'], ok:1, why:'What I wear = it → depends (with -s).' }
+];
+TAB_INIT[0] = function(){
+  wIdx = 0;
+  $('fc-host').innerHTML = '<div class="flashcard-wrap" onclick="wFlip()"><div class="flashcard" id="fc-card">' +
+    '<div class="fc-face fc-front"><div class="fc-emoji" id="fc-emoji"></div><div class="fc-word" id="fc-word"></div><div class="fc-pos" id="fc-pos"></div><div class="fc-tap">TAP TO FLIP 👆</div></div>' +
+    '<div class="fc-face fc-back"><div class="fc-def" id="fc-def"></div><div class="fc-sample" id="fc-sample"></div><div class="fc-jp jp" id="fc-jp"></div><button class="fc-jp-btn" id="fc-jp-btn" onclick="wJp(event)">🇯🇵 日本語</button></div></div></div>' +
+    '<div class="fc-nav"><button onclick="wStep(-1)">◀ Prev</button><div class="fc-dots" id="fc-dots"></div><button onclick="wStep(1)">Next ▶</button></div>';
+  wRender();
+  mcqBlock('list-0', 'tab-0-solved', WORD_Q, 0, wCheck);
+};
+TAB_RESTORE[0] = stdRestore(0); TAB_RESET[0] = ()=>reinit(0);
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 1 — WARM UP (slides 6, 7, 8 — Dad's answers verbatim)
+═════════════════════════════════════════════════════════════════════ */
+mcqTab(1, [].concat(
+  endings('Slide 6 · 🚪 Dad checks the weather before he leaves', ['🥶 If it’s cold, …','☀️ If it’s warm, …','🌧️ If it’s rainy, …','💦 If it’s humid, …','🌅 If it’s early, …','❄️ If it’s snowy, …'],
+    ['I take a coat. 🧥','I wear shorts. 🩳','I take my umbrella. ☂️','I turn on the fan. 🌀','I eat breakfast. 🍳','I take my boots and gloves. 🧤']),
+  endings('Slide 7 · 🌦️ More mornings — what does Dad do?', ['🌬️ If it’s windy, …','🌫️ If it’s foggy, …','😎 If it’s very sunny, …','🧊 If it’s icy, …','🥵 If it’s very hot, …','⛈️ If it’s stormy, …','🌤️ If it’s cloudy, …','🌞🧴 If the sun is strong, …','🌫️🏜️ If it’s dusty, …'],
+    ['I hold on to my hat. 🧢','I turn on my bike light. 🚲','I wear sunglasses. 🕶️','I walk carefully. 🚶','I drink cold water. 🥤','I stay at home. 🏠','I take a light jacket. 🧥','I put on sunscreen. 🧴','I wear a mask. 😷']),
+  endings('Slide 8 · 🌍 Everyday life — join the halves', ['If I’m sleepy, …','If I’m thirsty, …','If I’m bored, …','If I miss the bus, …','If I’m hot, …'],
+    ['I go to bed early. 🛌','I drink some water. 🥤','I read a comic. 📖','I walk to school. 🚶','I open a window. 🪟'])
+));
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 2 — THE RULE (slides 16-19, 23-26, 31, 33 — the deck's own items)
+═════════════════════════════════════════════════════════════════════ */
+const CR = ['🌧️🌡️ CONDITION (if…)','🎬 RESULT'];
+mcqTab(2, [
+  { clue:'Slide 16 · 🕵️ Pattern Detective', q:'If it’s dark, I turn on the light. · If I see lightning, I go inside. · If a sandstorm comes, I close all the windows.<br>Which two things are in EVERY sentence?', opts:['If + a comma','going to + will','the + yesterday'], ok:0 },
+  { clue:'Slide 16 · 🤔 Look at the verbs', q:'is · turn · see · go · comes · close — what time are they?', opts:['past','simple PRESENT','future'], ok:1, why:'Both verbs are simple PRESENT. Things that are ALWAYS true.' },
+  { clue:'Slide 17 · 🏷️ The zero conditional', q:'Why is it called “zero”?', opts:['It’s the simplest kind: nothing changes. Present + present.','It is about the number 0.','It has no verbs.'], ok:0 },
+  { clue:'Slide 17 · 🏷️ The zero conditional', q:'When do we use it?', opts:['For things that happened yesterday.','For facts and things that are generally true — every time.','For plans for tomorrow.'], ok:1 },
+  { clue:'Slide 17 · 🏷️ The zero conditional', q:'What does it show?', opts:['Cause and effect: this happens → that happens.','A question.','Something that is not true.'], ok:0 },
+  { clue:'Slide 19 · 📖 Grammar box (p. 15)', q:'“I put on my winter coat if the weather is cold.” Where is <b>if</b>?', opts:['At the start, with a comma.','In the MIDDLE — the result comes first, and no comma.','There is no if.'], ok:1 },
+  { clue:'Slide 19 · 📖 Grammar box (p. 15)', q:'“If I see lightning, I go inside.” The two verbs are…', opts:['see · go — both present','saw · went — both past','see · will go'], ok:0 },
+  { clue:'Slide 19 · 📖 Grammar box (p. 15)', q:'“If a sandstorm comes, …” Why “comes” with -s?', opts:['Because it is past.','a sandstorm = it → comes.','Because of the comma.'], ok:1 },
+  { clue:'Slide 24 · 🔗 Rule 1 — condition or result?', q:'🌙 it gets dark', opts:CR, ok:0, two:true },
+  { clue:'Slide 24 · 🔗 Rule 1 — condition or result?', q:'💡 the streetlights turn on', opts:CR, ok:1, two:true },
+  { clue:'Slide 24 · 🔗 Rule 1 — condition or result?', q:'☀️ the sun comes out', opts:CR, ok:0, two:true },
+  { clue:'Slide 24 · 🔗 Rule 1 — condition or result?', q:'🧊 the ice melts', opts:CR, ok:1, two:true },
+  { clue:'Slide 24 · 🔗 Rule 1 — condition or result?', q:'🔦 the electricity goes out', opts:CR, ok:0, two:true },
+  { clue:'Slide 24 · 🔗 Rule 1 — condition or result?', q:'🔍 we use a flashlight', opts:CR, ok:1, two:true, why:'Condition = the cause. Result = what happens because of it. 🔗' },
+  { clue:'Slide 26 · ⏱️ Rule 2 — only ONE is right', q:'⚡☁️ Check both verbs. Which one is correct?', opts:['If Dad will see lightning, he goes inside.','If Dad saw lightning, he goes inside.','If Dad sees lightning, he going inside.','If Dad sees lightning, he goes inside.','If Dad see lightning, he goes inside.','If Dad sees lightning, he go inside.'], ok:3, why:'Present in both halves, with -s for Dad (he): sees · goes.' },
+  { clue:'Slide 31 · ☝️ Rule 5 — only ONE if', q:'Which one is right?', opts:['If it rains, then if I use an umbrella.','If it rains, I use an umbrella.','If it rains, if I use an umbrella.'], ok:1, why:'if belongs to the condition only.' },
+  { clue:'Slide 33 · 🧑 Rule 6 — he / she / it', q:'If it’s hot, my dog ___ a lot.', opts:['drink','drinks','drinking'], ok:1, why:'my dog = it → drinks.' },
+  { clue:'Slide 33 · 🧑 Rule 6 — I / you / we / they', q:'If it’s hot, we ___ swimming.', opts:['go','goes','going'], ok:0, why:'we → no -s: we go.' }
+]);
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 3 — DETECTIVE (typed fixes; broken sentences from the deck first)
+═════════════════════════════════════════════════════════════════════ */
+const FIX = [
+  { clue0:'Slide 26', p:'If Dad will see lightning, he goes inside.', seed:'If Dad will see lightning, he goes inside.', accept:['If Dad sees lightning, he goes inside.'], model:'If Dad sees lightning, he goes inside.', clue:'No “will” in the if half. Present only.' },
+  { clue0:'Slide 26', p:'If Dad sees lightning, he go inside.', seed:'If Dad sees lightning, he go inside.', accept:['If Dad sees lightning, he goes inside.'], model:'If Dad sees lightning, he goes inside.', clue:'he → goes, with -es.' },
+  { clue0:'Slide 38 · Error Hospital', p:'If rains, I stay inside.', seed:'If rains, I stay inside.', accept:['If it rains, I stay inside.'], model:'If it rains, I stay inside.', clue:'English needs a subject: If IT rains.' },
+  { clue0:'Slide 38 · Error Hospital', p:'If it’s cold, wear my coat.', seed:'If it’s cold, wear my coat.', accept:['If it’s cold, I wear my coat.'], model:'If it’s cold, I wear my coat.', clue:'Who wears the coat? The result half needs a subject too.' },
+  { clue0:'Slide 38 · Error Hospital', p:'If it will snow, I wear boots.', seed:'If it will snow, I wear boots.', accept:['If it snows, I wear boots.'], model:'If it snows, I wear boots.', clue:'No future in the if half: If it snows.' },
+  { clue0:'Slide 34', p:'If my brother miss the bus, he walks.', seed:'If my brother miss the bus, he walks.', accept:['If my brother misses the bus, he walks.'], model:'If my brother misses the bus, he walks.', clue:'my brother = he → misses.' },
+  { clue0:'Slide 34', p:'If the baby is hungry, she cry.', seed:'If the baby is hungry, she cry.', accept:['If the baby is hungry, she cries.'], model:'If the baby is hungry, she cries.', clue:'she → cries (y → ies).' },
+  { clue0:'Slide 34', p:'If Mom work late, we cook dinner.', seed:'If Mom work late, we cook dinner.', accept:['If Mom works late, we cook dinner.'], model:'If Mom works late, we cook dinner.', clue:'Mom = she → works. (we cook ✅)' },
+  { clue0:'Slide 31 · Rule 5', p:'If a tornado comes, if we evacuate.', seed:'If a tornado comes, if we evacuate.', accept:['If a tornado comes, we evacuate.'], model:'If a tornado comes, we evacuate.', clue:'Only ONE if.' },
+  { clue0:'Slide 36 · Corner 2', p:'It snows if, school closes.', seed:'It snows if, school closes.', accept:['If it snows, school closes.','School closes if it snows.'], model:'If it snows, school closes.  (or: School closes if it snows.)', clue:'If goes FIRST in its half.' },
+  { clue0:'Slide 25 · Rule 2', p:'If it snows, school is going to close.', seed:'If it snows, school is going to close.', accept:['If it snows, school closes.'], model:'If it snows, school closes.', clue:'It’s a fact — no going to. Present: school closes.' },
+  { clue0:'Slide 30 · Rule 4', p:'If it’s foggy the plane is late.', seed:'If it’s foggy the plane is late.', accept:['If it’s foggy, the plane is late.'], model:'If it’s foggy, the plane is late.', clue:'If comes first → comma after the if-half.' },
+  { clue0:'New', p:'I feel sick, if I eat too much.', seed:'I feel sick, if I eat too much.', accept:['I feel sick if I eat too much.'], model:'I feel sick if I eat too much.', clue:'Result first → NO comma before if.' },
+  { clue0:'New', p:'If is snowing, we make a snowman.', seed:'If is snowing, we make a snowman.', accept:['If it is snowing, we make a snowman.','If it snows, we make a snowman.'], model:'If it is snowing, we make a snowman.', clue:'English needs “it”.' }
+].map(x=>Object.assign(x, { noLive:true }));
+TAB_INIT[3] = ()=>typedBlock('list-3', 'tab-3-state', FIX, 3, ()=>finishTab(3), false);
+TAB_RESTORE[3] = stdRestore(3); TAB_RESET[3] = ()=>reinit(3);
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 4 — BUILD IT (slide 32, slide 47's eight rounds verbatim, then new)
+═════════════════════════════════════════════════════════════════════ */
+const BUILD = [
+  { src:'Slide 32', p:'🥵☀️ Make a weather rule about a heat wave.', a:['If','there’s','a heat wave,','we','stay inside.'], t:['we','there’s','stay inside.','If','a heat wave,'], h:'Start with If. The comma comes after the condition.' },
+  { src:'Slide 32', p:'🔄 Now flip it — result first, no comma!', a:['We stay inside','if','there’s','a heat wave.'], t:['if','We stay inside','a heat wave.','there’s',','], h:'Result first = no comma before if.' },
+  { src:'Slide 47', p:'🌧️ rain → ☂️ take my umbrella', a:['If','it rains',',','I take','my umbrella','.'], t:['.','will rain','my umbrella','If','I take','it rains',','], h:'Start with “If”, put the comma after the condition, and keep both verbs in the present.' },
+  { src:'Slide 47', p:'🥶 cold → 🧥 wear a coat (start with the result!)', a:['I wear a coat','if','it’s cold','.'], t:['if','.',',','I wear a coat','it’s cold'], h:'When the result comes first, there is no comma before “if”.' },
+  { src:'Slide 47', p:'🌫️ foggy → 🚗 drivers go slowly', a:['If','it’s foggy',',','drivers','go slowly','.'], t:['it’s foggy',',','.','go slowly','drivers','will go slowly','If'], h:'Condition first, then a comma, then the result. Both parts are present.' },
+  { src:'Slide 47', p:'🤒 my brother is sick → 🛌 he stays in bed', a:['If','my brother','is sick',',','he stays','in bed','.'], t:['he stay','is sick','in bed','.','If',',','he stays','my brother'], h:'he / she / it → the verb needs -s in the result: he stays.' },
+  { src:'Slide 47', p:'🔥🧊 you heat ice → it melts (start with the result!)', a:['Ice melts','if','you heat it','.'], t:['if','you heat it','Ice melts','.',','], h:'Result first = no comma.' },
+  { src:'Slide 47', p:'🔘💡 you press the switch → the light comes on', a:['If','you press','the switch',',','the light','comes on','.'], t:['comes on','.','will come on',',','the switch','you press','the light','If'], h:'Use the present in both halves: “the light comes on” (it → -s).' },
+  { src:'Slide 47', p:'⚽🥅 the ball goes out → the other team throws it in', a:['If','the ball','goes out',',','the other team','throws it in','.'], t:['.',',','goes out','If','the ball','throws it in','throw it in','the other team'], h:'“The other team” = it → throws (with -s).' },
+  { src:'Slide 47', p:'📚 I have homework → I do it after school (start with the result!)', a:['I do it after school','if','I have homework','.'], t:['if','.',',','I do it after school','I have homework'], h:'Result first = no comma before “if”.' },
+  { src:'New', p:'🌊🏠 the river rises → people evacuate', a:['If','the river rises',',','people','evacuate','.'], t:['people','.','evacuates','If',',','the river rises','evacuate'], h:'people = they → evacuate (no -s).' },
+  { src:'New', p:'🔊☁️ I hear thunder → I go inside (start with the result!)', a:['I go inside','if','I hear thunder','.'], t:['I hear thunder','.',',','if','I go inside'], h:'Result first = no comma.' },
+  { src:'New', p:'🐱⚡ my cat sees lightning → it hides', a:['If','my cat','sees lightning',',','it hides','.'], t:['it hide','sees lightning',',','If','.','my cat','it hides'], h:'my cat = it → hides (with -s).' },
+  { src:'New', p:'🧍❄️ there’s a blizzard → there’s no school', a:['If','there’s a blizzard',',','there’s','no school','.'], t:['no school','if','If','there’s',',','.','there’s a blizzard'], h:'Only ONE if — and English needs “there’s” in both halves.' }
+];
+TAB_INIT[4] = ()=>buildBlock('list-4', 'tab-4-state', BUILD, 4, ()=>finishTab(4));
+TAB_RESTORE[4] = stdRestore(4); TAB_RESET[4] = ()=>reinit(4);
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 5 — SORT (slides 28, 30, 34, 38, 40 — tiles and answers verbatim)
+═════════════════════════════════════════════════════════════════════ */
+sortTab(5, [
+  { id:'leo-g2-logic', title:'🧠🔍 Slide 28 · Logical or not?', hint:'Ask each time: does that make sense?', win:'Good grammar AND good sense. 🧠🔍',
+    zones:[{ key:'A', label:'✅ LOGICAL', color:'#16A34A' },{ key:'B', label:'🤪 NOT LOGICAL', color:'#DC2626' }],
+    tiles:[{ text:'🪁 If it’s windy, I fly my kite.', answer:'A' },{ text:'🍦 If it’s windy, I sleep on the roof.', answer:'B' },{ text:'😴 If I’m tired, I go to bed early.', answer:'A' },{ text:'🏃 If I’m tired, I run a marathon.', answer:'B' },{ text:'🔦 If the power goes out, I use a flashlight.', answer:'A' },{ text:'📺 If the power goes out, I watch TV.', answer:'B' }] },
+  { id:'leo-g2-comma', title:'✏️ Slide 30 · Comma or no comma? (the commas are missing!)', hint:'Look at where IF is: at the start, or in the middle?', win:'If first → comma. If in the middle → no comma. ✏️',
+    zones:[{ key:'A', label:'✏️ NEEDS A COMMA', color:'#0369A1' },{ key:'B', label:'🚫 NO COMMA', color:'#6B7280' }],
+    tiles:[{ text:'🌫️ If it’s foggy the plane is late.', answer:'A', fix:'If it’s foggy, the plane is late.' },{ text:'✈️ The plane is late if it’s foggy.', answer:'B' },{ text:'🤢 If I eat too much I feel sick.', answer:'A', fix:'If I eat too much, I feel sick.' },{ text:'🍰 I feel sick if I eat too much.', answer:'B' },{ text:'🌊 If the river rises people evacuate.', answer:'A', fix:'If the river rises, people evacuate.' },{ text:'🏃 People evacuate if the river rises.', answer:'B' }] },
+  { id:'leo-g2-s', title:'🧑 Slide 34 · -s right in BOTH halves?', hint:'Check every verb. he / she / it → verb + s.', win:'Three perfect, three missing an -s. 🧑',
+    zones:[{ key:'A', label:'✅ -s RIGHT', color:'#16A34A' },{ key:'B', label:'❌ -s MISSING', color:'#DC2626' }],
+    tiles:[{ text:'If my brother miss the bus, he walks.', answer:'B', fix:'my brother → misses' },{ text:'If my sister sees a spider, she screams.', answer:'A' },{ text:'If the baby is hungry, she cry.', answer:'B', fix:'she → cries' },{ text:'If the dog hears thunder, it hides.', answer:'A' },{ text:'If Mom work late, we cook dinner.', answer:'B', fix:'Mom → works' },{ text:'If Leo scores, he celebrates.', answer:'A' }] },
+  { id:'leo-g2-hosp', title:'🏥 Slide 38 · Error Hospital — six patients', hint:'For every broken one, say the repaired sentence aloud.', win:'Missing it · missing I · a future in the if half. 🏥',
+    zones:[{ key:'A', label:'✅ CORRECT', color:'#16A34A' },{ key:'B', label:'🤕 BROKEN', color:'#DC2626' }],
+    tiles:[{ text:'🌊 If there’s a flood, people evacuate.', answer:'A' },{ text:'🌧️ If rains, I stay inside.', answer:'B', fix:'If it rains, I stay inside.' },{ text:'🌪️ We go to a shelter if a tornado comes.', answer:'A' },{ text:'🥶 If it’s cold, wear my coat.', answer:'B', fix:'If it’s cold, I wear my coat.' },{ text:'🐱 If my cat sees lightning, it hides.', answer:'A' },{ text:'❄️ If it will snow, I wear boots.', answer:'B', fix:'If it snows, I wear boots.' }] },
+  { id:'leo-g2-trap', title:'⚠️ Slide 40 · “If it’s ___” or “If it ___s”?', hint:'Is it a describing word (hot, windy) or an action word (rain, snow)?', win:'Describing words need IS: If it’s hot. Action words don’t: If it rains. ⚠️',
+    zones:[{ key:'A', label:'If it’s ___ ,', color:'#EA580C' },{ key:'B', label:'If it ___s ,', color:'#7C3AED' }],
+    tiles:[{ text:'🥵 hot', answer:'A' },{ text:'🌧️ rain', answer:'B' },{ text:'💨 windy', answer:'A' },{ text:'❄️ snow', answer:'B' },{ text:'☁️ cloudy', answer:'A' },{ text:'🌊 flood', answer:'B' }] }
+]);
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 6 — PRACTICE (SB p. 15 Activity 1, TR 1.7, slides 13-15)
+═════════════════════════════════════════════════════════════════════ */
+const PRAC = [].concat(
+  endings('Slide 39 · ✏️ Activity 1 (p. 15) — make a logical sentence', ['If I see lightning when I’m swimming, …','If it rains, …','If a storm comes, …','If the temperature rises, …','If a flood comes, …','If it snows, …'],
+    ['I get out of the water.','I use an umbrella.','I go inside the house.','I try to stay cool.','I look for a boat.','I wear gloves and boots.']),
+  endings('Slide 12 · 🔗 TR 1.7 — join the halves', ['If the weather is cold, …','If I see lightning, …','If a sandstorm comes, …'],
+    ['I put on my winter coat. 🧥','I go inside. 🏠','I close all the windows. 🪟']),
+  [['If it’s foggy, I walk slowly.','is · walk'],['If there’s a flood, we move to higher ground.','is · move'],['If the ground shakes, I hide under a table.','shakes · hide'],['If it’s very windy, I stay away from trees.','is · stay'],['If a river rises, people leave the area.','rises · leave'],['If the heat is extreme, I rest in the shade.','is · rest']]
+    .map((r,i,all)=>({ clue:'Slide 13 · 🎧 Which two verbs?', q:r[0], opts:[r[1]].concat(shuffle(all.filter((x,k)=>k!==i && x[1]!==r[1]).map(x=>x[1])).slice(0,1)).concat(['will · go']), ok:0 })),
+  endings('Slide 14 · 🔗 More safety sentences', ['If I smell smoke, …','If the lights go out, …','If I cut my finger, …','If a stranger calls, …','If I feel dizzy, …'],
+    ['I leave the building. 🚪','I use a flashlight. 🔦','I put on a bandage. 🩹','I tell an adult. 🧑','I sit down. 🪑'])
+);
+const LOOK = [['🌫️🚲 foggy → turn on my bike light','If it’s foggy, I turn on my bike light.'],['⛈️🏠 stormy → stay at home','If it’s stormy, I stay at home.'],['🌬️🧢 windy → hold my hat','If it’s windy, I hold my hat.'],['🌨️🧤 snowing → wear gloves','If it’s snowing, I wear gloves.'],['🌊🚫 the sea is rough → don’t swim','If the sea is rough, I don’t swim.'],['🌡️🥤 hot → drink cold water','If it’s hot, I drink cold water.'],['🌞🧴 sunny → put on sunscreen','If it’s sunny, I put on sunscreen.'],['🌧️🥾 muddy → wear boots','If it’s muddy, I wear boots.'],['🏜️🥤 the air is dry → drink more water','If the air is dry, I drink more water.']]
+  .map(x=>({ p:x[0], accept:withFlip(x[1]), model:x[1], clue:'Use If + the weather, a comma, then what you do. Both verbs present.' }));
+function pracCheck(){ if(mcqAllDone('tab-6-solved', PRAC) && tyAllDone('tab-6-typed', LOOK)) finishTab(6); }
+TAB_INIT[6] = function(){ mcqBlock('list-6', 'tab-6-solved', PRAC, 6, pracCheck); typedBlock('type-6', 'tab-6-typed', LOOK, 6, pracCheck, true); };
+TAB_RESTORE[6] = stdRestore(6); TAB_RESET[6] = ()=>reinit(6);
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 7 — WRITE IT (slides 20-22 his own endings; slide 43 me → he/she)
+═════════════════════════════════════════════════════════════════════ */
+const WRITE = [
+  { clue0:'Slide 20 · 📊 The chart', p:'Finish it with your own idea.', pre:'If it is raining, ', free:true, model:'I use an umbrella.' },
+  { clue0:'Slide 20 · 📊 The chart', p:'Finish it with your own idea.', pre:'If I go to bed late, ', free:true, model:'I am tired the next day.' },
+  { clue0:'Slide 21 · 📊 Your turn', p:'Finish it with your own idea.', pre:'If it’s a holiday, ', free:true, model:'we don’t go to school.' },
+  { clue0:'Slide 21 · 📊 Your turn', p:'Finish it with your own idea.', pre:'If the bus is late, ', free:true, model:'I walk.' },
+  { clue0:'Slide 21 · 📊 Your turn', p:'Finish it with your own idea.', pre:'If I skip breakfast, ', free:true, model:'I feel hungry.' },
+  { clue0:'Slide 22 · 🙋 Dad’s Saturday rules', p:'Make a Saturday rule for your family — the whole sentence.', free:true, model:'If it’s hot, we go swimming.' },
+  { clue0:'Slide 43 · 🧳 Problem → solution (me)', p:'Problem: I miss my plane.', pre:'If I miss my plane, I ', free:true, model:'wait for the next one.' },
+  { clue0:'Slide 43 · 👦 Now the same problem for my brother (he)', p:'he → the verb needs -s!', pre:'If my brother misses his plane, he ', free:true, must:'\\bhe [a-z]+s\\b', model:'waits for the next one.' },
+  { clue0:'Slide 43 · 🧳 Problem → solution (me)', p:'Problem: I get lost.', pre:'If I get lost, I ', free:true, model:'ask a police officer.' },
+  { clue0:'Slide 43 · 👧 Now the same problem for my sister (she)', p:'she → the verb needs -s!', pre:'If my sister gets lost, she ', free:true, must:'\\bshe [a-z]+s\\b', model:'asks a police officer.' },
+  { clue0:'Slide 43 · 🧳 Problem → solution (me)', p:'Problem: my phone battery dies.', pre:'If my phone battery dies, I ', free:true, model:'borrow a charger.' },
+  { clue0:'Slide 43 · 🧑 Now the same problem for my friend (he)', p:'he → the verb needs -s!', pre:'If his phone battery dies, he ', free:true, must:'\\bhe [a-z]+s\\b', model:'borrows a charger.' }
+].map(x=>Object.assign(x, { clue:'Keep the grammar of the first half, and make it logical. For he / she, add -s.' }));
+TAB_INIT[7] = ()=>typedBlock('type-7', 'tab-7-state', WRITE, 7, ()=>finishTab(7), true);
+TAB_RESTORE[7] = stdRestore(7); TAB_RESET[7] = ()=>reinit(7);
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 8 — CARD GAME (slide 41: the deck's weather and action cards)
+═════════════════════════════════════════════════════════════════════ */
+const WEATHER = [['🌧️','it rains'],['❄️','it snows'],['🥵☀️','it’s very hot'],['⚡☁️','I see lightning'],['🌪️🏡','a tornado comes'],['💨','it’s windy'],['🌊🏠','a flood comes'],['🥶','it’s cold']];
+const ACTION  = [['☂️','I use an umbrella'],['🧤','I wear gloves'],['🏊','I go swimming'],['🏠','I go inside'],['⛺🏡','I go to a shelter'],['🪁','I fly my kite'],['🏃🚪','I evacuate'],['🧥','I put on my coat']];
+function cardState(){ return lLoad('tab-8-state') || { k:0 }; }
+TAB_INIT[8] = function(){ cardPaint(); };
+function cardPaint(){
+  const s = cardState(), host = $('card-game');
+  const made = WEATHER.slice(0, s.k).map((w,i)=>'<div class="made">'+w[0]+ACTION[i][0]+' If '+w[1]+', '+ACTION[i][1]+'.</div>').join('');
+  if(s.k >= WEATHER.length){ host.innerHTML = '<div class="klabel">✅ Your sentences — read them aloud</div>' + made; return; }
+  const w = WEATHER[s.k];
+  host.innerHTML = '<div class="cards-row"><div class="wcard"><div class="ctag">WEATHER 🟥</div><div class="cemo">'+w[0]+'</div><div class="ctext">'+w[1]+'</div></div><div class="cplus">+</div><div class="acard q"><div class="ctag">ACTION 🟩</div><div class="cemo">❔</div><div class="ctext">which one?</div></div></div>' +
+    '<div class="qclue" style="text-align:center;margin:8px 0">Card '+(s.k+1)+' of '+WEATHER.length+' · Tap the logical action card</div>' +
+    '<div class="action-grid">' + shuffle(ACTION.map((a,i)=>({a,i}))).map(x=>'<button class="acard pick" data-i="'+x.i+'" onclick="cardPick(this)"><div class="cemo">'+x.a[0]+'</div><div class="ctext">'+x.a[1]+'</div></button>').join('') + '</div>' +
+    '<div class="quiz-fb" id="card-fb"></div>' + (made ? '<div class="klabel" style="margin-top:12px">✅ Kept cards</div>' + made : '');
+}
+function cardPick(btn){
+  const s = cardState(), w = WEATHER[s.k], i = +btn.dataset.i, fb = $('card-fb');
+  if(i === s.k){
+    btn.classList.add('good');
+    fb.className = 'quiz-fb ok'; fb.textContent = '✅ They match! “If ' + w[1] + ', ' + ACTION[i][1] + '.” Say it and keep the cards!';
+    document.querySelectorAll('.acard.pick').forEach(b=>b.disabled = true);
+    s.k++; lSave('tab-8-state', s);
+    setTimeout(()=>{ cardPaint(); if(s.k >= WEATHER.length) finishTab(8); }, 1300);
+  } else {
+    if(!btn.dataset.missed){ btn.dataset.missed = '1'; logAtt(8, { q:'If ' + w[1] + ', …', a:ACTION[i][1], ok:false }); }
+    btn.classList.add('bad'); setTimeout(()=>btn.classList.remove('bad'), 400);
+    fb.className = 'quiz-fb no'; fb.textContent = '🤪 “If ' + w[1] + ', ' + ACTION[i][1] + '.” — is that logical? Try another card.';
+  }
+}
+TAB_RESTORE[8] = stdRestore(8); TAB_RESET[8] = ()=>reinit(8);
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 9 — GUESS THE ENDING (slides 18, 11, 42-43 — the deck's endings)
+═════════════════════════════════════════════════════════════════════ */
+function geRound(name, starts, ends){ return { name, clues: starts.map((s,i)=>({ clue:s, tiles:[ends[i]].concat(shuffle(ends.filter((e,k)=>k!==i)).slice(0,2)), ok:0 })) }; }
+const GE_ROUNDS = [
+  geRound('Facts', ['🧊🔥 If you heat ice, …','💧🥶 If water gets very cold, …','🔴🔵 If you mix red and blue, …','🌱🚫💧 If a plant doesn’t get water, …','🔘💡 If you press the switch, …','⚽🦵 If you kick a ball, …','🍳🥚 If you heat an egg, …','🧂💧 If you put salt in water, …','🔌📺 If you unplug the TV, …'],
+    ['it melts.','it freezes.','you get purple.','it dies.','the light comes on.','it moves.','it gets hard.','it disappears.','it turns off.']),
+  geRound('House rules', ['📚✅ If you finish your homework, …','🕗 If you’re going to be late, …','🦷 If you eat sweets, …','🔋 If your tablet is low, …','🚪 If you leave the house, …','🌙 If it’s bedtime, …','🍽️ If dinner is ready, …','🎒 If you have school tomorrow, …','🐶 If the dog is hungry, …'],
+    ['you can play a game. 🎮','you call me. 📞','you brush your teeth. 🪥','you charge it. 🔌','you take your keys. 🔑','you turn off the light. 💡','you wash your hands. 🧼','you pack your bag. 🎒','you give him food. 🦴']),
+  geRound('Recap & trip', ['🧍❄️ If there’s a blizzard, …','🥵☀️ If there’s a heat wave, …','🏜️🌪️ If a sandstorm comes, …','🌀🌊 If a hurricane comes, …','🔊☁️ If I hear thunder, …','🚨🚑 If there’s an emergency, …','✈️ If I miss my plane, …','🗺️ If I get lost, …'],
+    ['I stay inside.','I drink a lot of water.','I close all the windows.','we evacuate.','I go inside.','we follow our plan.','I wait for the next one.','I ask a police officer.'])
+];
+let geActive = 0;
+function geState(){ return lLoad('tab-9-won') || [0,0,0]; }
+TAB_INIT[9] = function(){
+  $('ge-rounds').innerHTML = GE_ROUNDS.map((r,i)=>'<div id="ge-round-'+i+'" class="ge-round'+(i===geActive?' showround':'')+'">' +
+    '<div class="ge-clue-box" id="ge-clue-'+i+'">Tap "Get a clue" to start the '+r.name+' round.</div>' +
+    '<button class="ge-clue-btn" id="ge-btn-'+i+'" onclick="geClue('+i+')">🔍 Get a clue</button>' +
+    '<span style="margin-left:12px;font-size:13px;color:var(--ink-3);font-weight:700" id="ge-cnt-'+i+'">Clue 0 of '+r.clues.length+'</span><div class="ge-grid" id="ge-grid-'+i+'"></div></div>').join('');
+};
+TAB_RESTORE[9] = function(){
+  geState().forEach((w,r)=>{
+    const L = GE_ROUNDS[r].clues.length;
+    $('ge-cnt-'+r).textContent = 'Won ' + w + ' of ' + L; $('ge-rt-'+r).classList.toggle('won', w >= L);
+    if(w >= L){ $('ge-clue-'+r).textContent = '🏆 Round won!'; $('ge-btn-'+r).disabled = true; }
+  });
+  if(isDone(9)) $('done-9').classList.add('show');
+};
+TAB_RESET[9] = ()=>reinit(9);
+function geSwitch(r){ geActive = r; [0,1,2].forEach(i=>{ $('ge-rt-'+i).classList.toggle('active', i===r); const el = $('ge-round-'+i); if(el) el.classList.toggle('showround', i===r); }); }
+function geClue(r){
+  const w = geState()[r], L = GE_ROUNDS[r].clues.length; if(w >= L) return;
+  const item = GE_ROUNDS[r].clues[w];
+  $('ge-clue-'+r).textContent = item.clue; $('ge-cnt-'+r).textContent = 'Clue ' + (w+1) + ' of ' + L; $('ge-btn-'+r).disabled = true;
+  $('ge-grid-'+r).innerHTML = shuffle(item.tiles.map((t,ti)=>({text:t, ok:ti===item.ok}))).map(t=>'<div class="ge-tile" data-ok="'+(t.ok?1:0)+'" onclick="gePick(this,'+r+')">'+t.text+'</div>').join('');
+}
+function gePick(tile, r){
+  if(tile.classList.contains('locked')) return;
+  const grid = $('ge-grid-'+r), L = GE_ROUNDS[r].clues.length;
+  if(tile.dataset.ok === '1'){
+    tile.classList.add('win'); grid.querySelectorAll('.ge-tile').forEach(t=>t.classList.add('locked'));
+    const won = geState(); won[r]++; lSave('tab-9-won', won);
+    $('ge-cnt-'+r).textContent = 'Won ' + won[r] + ' of ' + L;
+    if(won[r] < L) setTimeout(()=>geClue(r), 800);
+    else { $('ge-rt-'+r).classList.add('won'); setTimeout(()=>{ $('ge-clue-'+r).textContent = '🏆 Round won!'; grid.innerHTML = ''; }, 900); if(won.every((x,k)=>x>=GE_ROUNDS[k].clues.length)) finishTab(9); }
+  } else {
+    if(!grid.dataset.missed){ grid.dataset.missed = '1'; logAtt(9, { q:$('ge-clue-'+r).textContent, a:tile.textContent, ok:false }); }
+    tile.classList.add('lose'); setTimeout(()=>tile.classList.remove('lose'), 380);
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 10 — QUIZ (grammar.json tab3_quiz; one try each; writes `score`)
+═════════════════════════════════════════════════════════════════════ */
+const QUIZ_ITEMS = [
+  { q:'If it ___, school starts late.', opts:['snows','snowing','snowed','will snow'], ok:0, jp:'雪が降ったら学校は遅く始まります。' },
+  { q:'If I see lightning, I ___ inside.', opts:['go','going','went','will go'], ok:0, jp:'雷を見たら中に入ります。' },
+  { q:'If a sandstorm ___, I close all the windows.', opts:['comes','come','coming','will come'], ok:0, jp:'砂嵐が来たら窓を全部閉めます。' },
+  { q:'If Jon knows it’s going to be cold, he ___ his coat and gloves.', opts:['wears','wear','wearing','wore'], ok:0, jp:'ジョンは寒くなるとわかったら、コートと手袋を身につけます。' },
+  { q:'___ it’s hot, we go swimming.', opts:['If','Is','When is','Does'], ok:0, jp:'暑いときは泳ぎに行きます。' },
+  { q:'If there’s a blizzard, we ___ have school.', opts:['don’t','doesn’t','not','isn’t'], ok:0, jp:'吹雪になったら学校は休みです。' },
+  { q:'If the electricity goes out, we ___ a flashlight.', opts:['use','used','using','will use'], ok:0, jp:'停電したら懐中電灯を使います。' },
+  { q:'School starts late ___ it snows.', opts:['if','if,','then if','because of'], ok:0, jp:'雪が降ったら学校は遅く始まります。' },
+  { q:'If there’s a flood in my town, people ___.', opts:['evacuate','evacuates','evacuating','will evacuate'], ok:0, jp:'私の町で洪水が起きたら、人々は避難します。' },
+  { q:'If I ___ a lion, I run.', opts:['see','seeing','saw','will see'], ok:0, jp:'ライオンを見たら、私は逃げます。' }
+];
+let quizIdx = 0, quizScore = 0, quizWrong = [];
+TAB_INIT[10] = function(){
+  const saved = lLoad('score');
+  if(saved && saved.done){ quizShowResult(saved); return; }
+  const prog = lLoad('tab-10-progress');
+  quizIdx = prog ? prog.idx : 0; quizScore = prog ? prog.score : 0; quizWrong = prog ? prog.wrong : [];
+  $('quiz-active').style.display = 'block'; $('quiz-result').style.display = 'none';
+  quizRender();
+};
+TAB_RESET[10] = ()=>reinit(10);
+function quizRender(){
+  $('quiz-progress').innerHTML = QUIZ_ITEMS.map((x,i)=>'<div class="'+(i<quizIdx?'answered':'')+'"></div>').join('');
+  if(quizIdx >= QUIZ_ITEMS.length){ quizFinish(); return; }
+  const it = QUIZ_ITEMS[quizIdx], card = $('quiz-qcard'); card.classList.remove('solved');
+  card.innerHTML = '<div class="qtext">Q'+(quizIdx+1)+'. '+it.q+'</div>' + shuffle(it.opts.map((o,oi)=>({text:o, ok:oi===it.ok}))).map(o=>'<button class="opt" data-ok="'+(o.ok?1:0)+'" onclick="quizPick(this)">'+o.text+'</button>').join('') +
+    '<div class="quiz-fb" id="quiz-fb"></div><div class="qjp jp">🇯🇵 '+it.jp+'</div>';
+}
+function quizPick(btn){
+  const card = $('quiz-qcard'); if(card.classList.contains('solved')) return;
+  const it = QUIZ_ITEMS[quizIdx], right = btn.dataset.ok === '1';
+  mcqSolve(card);
+  if(right){ quizScore++; $('quiz-fb').className = 'quiz-fb ok'; $('quiz-fb').textContent = 'Correct! 🎉'; }
+  else { btn.classList.add('bad'); $('quiz-fb').className = 'quiz-fb no'; $('quiz-fb').textContent = 'The right answer is in green.'; quizWrong.push({ q:it.q, chose:btn.textContent, answer:it.opts[it.ok] }); logAtt(10, { q:it.q, a:btn.textContent, ok:false }); }
+  quizIdx++; lSave('tab-10-progress', { idx:quizIdx, score:quizScore, wrong:quizWrong });
+  setTimeout(quizRender, 1400);
+}
+function quizFinish(){
+  const total = QUIZ_ITEMS.length, percent = Math.round(quizScore/total*100);
+  const data = { score:quizScore, total, percent, done:true, timestamp:new Date().toISOString(),
+    trophy: percent >= 80 ? '🏆' : percent >= 50 ? '🥈' : '💪',
+    text: percent >= 80 ? 'The weather rules are yours!' : percent >= 50 ? 'Great effort!' : 'Keep practicing — If you practice, you get better!',
+    wrongQuestions: quizWrong.map(w=>w.q), wrong: quizWrong };
+  lSave('score', data); lDel('tab-10-progress'); quizShowResult(data); finishTab(10);
+}
+function quizShowResult(d){
+  $('quiz-active').style.display = 'none';
+  const rz = $('quiz-result'); rz.style.display = 'block'; const wrong = d.wrong || [];
+  rz.innerHTML = '<div class="quiz-result"><div class="trophy">'+d.trophy+'</div><div class="qscore">'+d.score+' / '+d.total+'</div><div style="font-weight:800;font-size:18px">'+d.text+'</div>' +
+    (wrong.length ? '<div class="wrong-review"><b>Go over these:</b><br>' + wrong.map(w=>'• '+w.q+'<br>&nbsp;&nbsp;You chose: <b style="color:var(--red)">'+w.chose+'</b> · Answer: <b style="color:var(--green-d)">'+w.answer+'</b>').join('<br>') + '</div>' : '<div class="dad-hint" style="margin-top:10px">Perfect — no mistakes! 🏆</div>') + '</div>';
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB 11 — DRIBBLE! (slide 44's soccer rules + slide 47 + more)
+═════════════════════════════════════════════════════════════════════ */
+const DRIB_ITEMS = [
+  { q:'🦁 Premier League: If a team wins a match, it ___ three points.', opts:['gets','get','will get'], ok:0 },
+  { q:'🟨🟨 If a player gets two yellow cards, he ___ a red card.', opts:['get','gets','got'], ok:1 },
+  { q:'🏆 Champions League: If the score is still tied after extra time, …', opts:['there’s a penalty shootout.','there will a penalty shootout.','there was a penalty shootout.'], ok:0 },
+  { q:'🇩🇪 Bundesliga: If a team finishes 16th, it ___ a relegation play-off.', opts:['play','plays','playing'], ok:1 },
+  { q:'⚽🥅 If the ball goes out, the other team ___ it in.', opts:['throws','throw','threw'], ok:0, },
+  { q:'Which rule is right?', opts:['If the referee blows the whistle, the game stops.','If the referee will blow the whistle, the game stops.','If the referee blow the whistle, the game stop.'], ok:0 },
+  { q:'🥶 The pitch is frozen. Which one is logical?', opts:['If the pitch is frozen, we play in shorts.','If the pitch is frozen, the match stops.','If the pitch is frozen, the ball melts.'], ok:1 },
+  { q:'🗣️ Your team rule: “If someone is late to practice, …”', opts:['he runs an extra lap.','he run an extra lap.','he will running an extra lap.'], ok:0 }
+];
+function dribState(){ return lLoad('tab-11-goals') || { goals:0, idx:0 }; }
+function dribPaint(){ const s = dribState(); $('drib-goals').textContent = s.goals; $('drib-defenders').textContent = '🛡️'.repeat(Math.max(0, DRIB_ITEMS.length - s.idx)) || '🥅'; }
+TAB_INIT[11] = function(){ dribPaint(); dribRender(); };
+TAB_RESTORE[11] = stdRestore(11); TAB_RESET[11] = ()=>reinit(11);
+function dribRender(){
+  const s = dribState(), host = $('drib-list');
+  if(s.idx >= DRIB_ITEMS.length){ host.innerHTML = '<div class="dad-hint">⚽ Final score: <b>'+s.goals+' / '+DRIB_ITEMS.length+'</b> goals.</div>'; finishTab(11); return; }
+  const it = DRIB_ITEMS[s.idx];
+  host.innerHTML = '<div class="drib-q"><div style="font-weight:800;margin-bottom:6px">'+(s.idx+1)+'. '+it.q+'</div>' + shuffle(it.opts.map((o,oi)=>({text:o, ok:oi===it.ok}))).map(o=>'<button class="drib-opt" data-ok="'+(o.ok?1:0)+'" onclick="dribPick(this)">'+o.text+'</button>').join('') + '</div>';
+}
+function dribPick(btn){
+  const group = btn.parentElement; if(group.dataset.solved) return; group.dataset.solved = '1';
+  const s = dribState(), right = btn.dataset.ok === '1';
+  group.querySelectorAll('.drib-opt').forEach(o=>{ o.disabled = true; if(o.dataset.ok === '1') o.classList.add('good'); });
+  if(!right){ btn.classList.add('bad'); logAtt(11, { q:strip(DRIB_ITEMS[s.idx].q), a:btn.textContent, ok:false }); }
+  s.goals += right ? 1 : 0; s.idx++; lSave('tab-11-goals', s); dribPaint();
+  setTimeout(dribRender, 1100);
+}
+
+document.addEventListener('DOMContentLoaded', function(){ try{ showTab(0); refreshProgress(); }catch(e){} });
+</script>
+</body>
+</html>

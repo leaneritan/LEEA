@@ -210,6 +210,8 @@ Where a slide makes a factual claim (a result, a stat), reuse the deck's claim â
 
 Reference build: `public/learn/ow-l5-u1-grammar-1.html` (companion to `public/lessons/ow-l5-u1-grammar-1.html`).
 
+**More exercises, not fewer.** Leaneritan wants as many exercises as the deck supports: put several activities in one tab rather than one activity per tab. `public/learn/ow-l5-u1-grammar-2.html` is the fuller reference â€” the slides' items first, then typed sentences with a live grammar checker (two tries, then the model), builders with a trap piece, several sorts per tab, and a Dad's view of Leo's wrong first tries. Test the checker against every model answer before shipping: a right answer it rejects is worse than no checker.
+
 ## Leo personalization (mandatory in samples)
 
 Same rule as `/vocab-app`:

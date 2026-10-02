@@ -55,10 +55,12 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
 /* ── frame ─────────────────────────────────────────────────────────── */
 .app{height:100%;display:flex;flex-direction:column;max-width:1240px;margin:0 auto;
      background:var(--paper)}
-/* The right end of this row is left empty on purpose: the page that embeds the
-   test floats its own "Exit Fullscreen" button over that corner, and anything
-   put there is covered by it and cannot be tapped. */
-.bar{flex:0 0 auto;border-bottom:1px solid var(--hair);padding:7px 176px 0 14px}
+/* This row used to reserve 176px of dead space on its right, because the page
+   that embeds the test floated an "Exit Fullscreen" button over that corner and
+   anything underneath could not be tapped. That button now sits in its own
+   strip above the frame (.deck-lesson-page--fullscreen in globals.css), so the
+   bar gets its full width back. */
+.bar{flex:0 0 auto;border-bottom:1px solid var(--hair);padding:7px 14px 0 14px}
 .bar-row{display:flex;align-items:center;font-size:.78rem;
          font-weight:700;color:var(--ink3);padding-bottom:6px}
 .bar-row b{color:var(--ink)}
@@ -66,11 +68,10 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
 .saved.on{opacity:1}
 .bar-left{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
 .bar-left>b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* The host's Exit Fullscreen button already eats the right end of this row, so
-   on a phone the title drops its course prefix rather than wrapping the clock
-   onto a second line and spending height the questions need. */
-@media(max-width:620px){.bar-course{display:none}.bar{padding-right:150px}
-  .bar-prog{margin-right:-150px}}
+/* On a phone the title still drops its course prefix — not to dodge anything
+   now, but so the clock does not wrap onto a second line and spend height the
+   questions need. */
+@media(max-width:620px){.bar-course{display:none}}
 .clock{font-family:var(--fn);font-size:.82rem;font-weight:700;color:var(--ink);background:none;
        border:1.5px solid var(--hair);border-radius:3px;padding:3px 9px;cursor:pointer;
        font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -78,7 +79,7 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);font-size:16
 .clock.over{color:#B91C1C;border-color:#B91C1C}
 /* Stopped, because the result is open — a record of the sitting, not a timer. */
 .clock.done{color:var(--ink3);border-style:solid;cursor:default}
-.bar-prog{height:3px;background:#F4F4F5;margin:0 -176px 0 -14px}
+.bar-prog{height:3px;background:#F4F4F5;margin:0 -14px}
 .bar-prog i{display:block;height:100%;background:var(--ink);width:0;transition:width .35s}
 
 .stage{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
@@ -364,7 +365,7 @@ var TEST_CHROME = `
  * a fix that never landed. Bump this whenever the engine's behaviour changes,
  * so a screenshot says which one is running.
  */
-var ENGINE_REV = 'r3-grid';
+var ENGINE_REV = 'r4-fullbar';
 
 var TEST;                       /* the test's own data, loaded by boot() */
 var SP;                         /* its localStorage prefix                */

@@ -813,6 +813,42 @@ for (const dir of ["public/lessons", "public/learn"]) {
   }
 }
 
+// A lesson's cloud-sync <script> tags must point at files that actually exist.
+//
+// `public/lib/leea-cloud.js` and `leea-cloud-config.js` are a handoff hook:
+// docs/teacher-slides.md tells anyone dropping in an externally-drafted deck to
+// keep the three-tag cloud block "present, unchanged". For a long time the two
+// files it names were never in the repo at all, so 14 decks and 6 learner apps
+// 404ed twice on every open — silently, because every call site is guarded by
+// `typeof LEEA_CLOUD !== 'undefined'` and an absent global just falls through.
+// A 15th deck pointed at `../../leea-cloud.js`, missing the `lib/` segment, and
+// that typo was invisible for exactly the same reason.
+//
+// Nothing here can tell you a guarded feature never switched on, so the paths
+// are checked instead: a script tag naming a file that does not exist is a
+// broken reference whether or not the page survives it.
+for (const dir of ["public/lessons", "public/learn"]) {
+  const dirPath = path.join(root, dir);
+  if (!fs.existsSync(dirPath)) continue;
+  for (const file of fs.readdirSync(dirPath)) {
+    if (!file.endsWith(".html")) continue;
+    const html = fs.readFileSync(path.join(dirPath, file), "utf8");
+    for (const match of html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["']/gi)) {
+      const src = match[1];
+      if (/^(?:https?:)?\/\//.test(src)) continue; // a CDN is not ours to check
+      // Teacher decks resolve against /lessons/; learner apps run from srcdoc
+      // under an injected <base href="/">. Either way `../` cannot climb above
+      // the site root, so the tail is the served path under public/.
+      const served = src.replace(/^(?:\.\.\/)+/, "").replace(/^\//, "").split("?")[0];
+      if (!fs.existsSync(path.join(root, "public", served))) {
+        fail(
+          `${dir}/${file} loads <script src="${src}">, which resolves to /${served} — no such file under public/. It will 404 on every open, and a guarded feature behind it will simply never switch on.`
+        );
+      }
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // 特訓レッスン: the registry and the section links must agree.
 //

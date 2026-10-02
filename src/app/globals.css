@@ -3852,24 +3852,69 @@ h3 {
   background: #f5efe0;
 }
 
+/* Fullscreen is a host strip plus the frame, in that order — a grid with a
+   fixed first row rather than a floating button over a full-height iframe.
+
+   Floating it was a real bug, not a cosmetic one. Every learner app puts
+   something in its own top-right corner: the "← Home" button on the home
+   screen, the ✕ that closes a module modal. The host's Exit Fullscreen chip
+   sat 10px from that corner at z-index 101 and swallowed the tap, so in
+   fullscreen a module could be opened and not closed. It had already forced a
+   workaround into the test engine — `.bar` reserved 176px of dead space on the
+   right so the clock and title would not end up underneath it — and any app
+   built without knowing that inherits the bug silently.
+
+   Reserving the row costs ~34px of height and ends the whole class of it: no
+   app has to know the chip exists, and there is no corner left to guess wrong.
+   Measured against learner apps at phone and desktop widths, every floating
+   position clashed with something (top-right 9/16 states, bottom-centre 11/16,
+   the corners 6/16); the only ones that did not were already taken by the test
+   engine's own bar. */
 .deck-lesson-page--fullscreen {
   position: fixed;
   inset: 0;
   z-index: 100;
+  display: grid;
+  grid-template-rows: auto 1fr;
   gap: 0;
   background: #111;
 }
 
-.deck-lesson-exit {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 101;
+.deck-lesson-exitbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 4px 10px;
+  background: #111;
 }
 
-.deck-lesson-frame--fullscreen {
-  width: 100vw;
-  height: 100vh;
+.deck-lesson-exit {
+  /* Compact: this strip is host chrome, and every pixel it takes is one the
+     lesson does not get. */
+  padding: 5px 12px;
+  font-size: 12px;
+  border-color: #3f3f46;
+  background: #1c1c1f;
+  color: #e4e4e7;
+}
+
+.deck-lesson-exit:hover {
+  border-color: #71717a;
+  background: #27272a;
+  color: #fff;
+}
+
+/* Scoped to the fullscreen page on purpose, not left as a bare
+   .deck-lesson-frame--fullscreen. The phone breakpoint further down this file
+   sets `.deck-lesson-frame { height: calc(100vh - 210px) }`, which is a single
+   class like this one but comes later in source order — so it won, and a
+   learner app opened fullscreen on a phone rendered 210px short with a black
+   band under it. (That predates the strip: the old rule said `height: 100vh`
+   and lost the same way.) Two classes beat one, at any source position. */
+.deck-lesson-page--fullscreen .deck-lesson-frame--fullscreen {
+  width: 100%;
+  /* The grid row, not the viewport: 100vh here would push the strip off screen. */
+  height: 100%;
   min-height: 0;
   border: none;
 }

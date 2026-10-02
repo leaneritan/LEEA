@@ -822,9 +822,17 @@ take the top of the range and put it in the test's `assessment` block, where the
 validator checks it. The clock starts on Leo's first answer (so opening the test
 does not drain it), pauses when the test is closed, and at zero says so and keeps
 counting in red without locking anything — a half-written sentence is never
-thrown away, and whether to stop is Neritan's call. Keep it clear of the frame's
-top-right corner: the host page floats its own "Exit Fullscreen" button there and
-swallows every tap underneath.
+thrown away, and whether to stop is Neritan's call.
+
+**The frame's corners belong to the lesson.** In fullscreen the host used to
+float its "Exit Fullscreen" button over the top-right one, where it swallowed
+every tap underneath — the test bar reserved 176px of dead space to dodge it,
+and learner apps, which put "← Home" and a modal's ✕ in exactly that corner,
+lost the ability to close a module at all. The button now has its own strip
+above the frame (`.deck-lesson-page--fullscreen` in `globals.css`), so no
+lesson has to know it exists. Do not float host chrome over the frame again:
+measured across learner apps at phone and desktop widths, every floating
+position collided with something.
 
 **The clock belongs to the sitting.** It runs from Leo's first answer and stops
 when the result is opened — the sitting is over at that point, so the pill

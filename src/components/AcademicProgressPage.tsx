@@ -51,6 +51,31 @@ interface TestRecord {
   // 教科別の学年順位（成績表の「総合順位」行）。点数はテストの難易度で
   // 上下するが、順位は相対的な実力を示すので、テスト間の比較はこちらが公平。
   subjectRanks?: Partial<Record<SubjectId, number>>;
+  // 実力テスト（業者テスト）の平均点は県内受検者全体のもので、学校平均ではない。
+  // 未設定は学校平均（定期テスト）。ラベルを取り違えると「学校平均より上」と
+  // 誤って読めてしまうので、表示はすべて avgLabel() を通す。
+  averageScope?: "school" | "prefecture";
+  // 成績表の「男女別」順位。
+  genderRanks?: { total5?: number; total3?: number; subjects?: Partial<Record<CoreSubjectId, number>> };
+  // 成績表の「領域ごとの得点とデータ」。rate＝Leoの正答率、overall＝全体の正答率（%）。
+  domains?: Partial<Record<CoreSubjectId, DomainResult[]>>;
+  // 成績表の「今回の正誤と全体の正答率」。返却された教科の分だけ。
+  questions?: Partial<Record<CoreSubjectId, QuestionResult[]>>;
+}
+
+interface DomainResult {
+  name: string;
+  score: number;
+  max: number;
+  rate: number;
+  overall: number;
+}
+
+interface QuestionResult {
+  no: string;
+  ok: boolean;
+  rate: number;
+  topic: string;
 }
 
 interface AcademicGoals {
@@ -79,6 +104,90 @@ const firstTermFinalExam: TestRecord = {
   subjectRanks: { japanese: 120, social: 5, math: 47, science: 67, english: 10, music: 92, health: 113, techHome: 85, art: 96 }
 };
 
+// 2026年度 1年第1回 実力テスト（県内一斉の業者テスト）。成績表の日付欄は
+// 20260918。平均と正答率は県内受検者全体、順位は校内順位。
+// 正誤表は国語・数学の2教科分だけ返却されている。
+const q = (no: string, ok: boolean, rate: number, topic: string): QuestionResult => ({ no, ok, rate, topic });
+const firstJitsuryokuTest: TestRecord = {
+  date: "2026-09-18",
+  name: "第1回 実力テスト",
+  scores: { japanese: 46, social: 68, math: 66, science: 74, english: 94 },
+  rank: 54,
+  rank3: 44,
+  average: { japanese: 47.1, social: 51.8, math: 56.4, science: 70.0, english: 65.1 },
+  averageScope: "prefecture",
+  subjectRanks: { japanese: 76, social: 34, math: 60, science: 95, english: 6 },
+  genderRanks: { total5: 23, total3: 19, subjects: { japanese: 35, social: 16, math: 31, science: 45, english: 3 } },
+  domains: {
+    japanese: [
+      { name: "説明的文章の読解", score: 9, max: 24, rate: 38, overall: 42 },
+      { name: "文学的文章の読解", score: 15, max: 24, rate: 63, overall: 44 },
+      { name: "詩の鑑賞", score: 6, max: 12, rate: 50, overall: 52 },
+      { name: "漢字と語句", score: 16, max: 30, rate: 53, overall: 52 },
+      { name: "作文", score: 0, max: 10, rate: 0, overall: 42 }
+    ],
+    math: [
+      { name: "正の数・負の数の計算", score: 29, max: 34, rate: 85, overall: 66 },
+      { name: "正の数・負の数", score: 11, max: 17, rate: 65, overall: 54 },
+      { name: "正の数・負の数の利用（大問3）", score: 12, max: 16, rate: 75, overall: 51 },
+      { name: "正の数・負の数の利用（大問4）", score: 8, max: 12, rate: 67, overall: 59 },
+      { name: "文字を使った式", score: 6, max: 21, rate: 29, overall: 45 }
+    ],
+    social: [
+      { name: "世界の姿", score: 18, max: 30, rate: 60, overall: 58 },
+      { name: "日本の姿", score: 16, max: 20, rate: 80, overall: 47 },
+      { name: "人類の出現と古代文明", score: 16, max: 20, rate: 80, overall: 51 },
+      { name: "文明と宗教のおこり", score: 18, max: 30, rate: 60, overall: 49 }
+    ],
+    science: [
+      { name: "身近な生物の観察", score: 8, max: 10, rate: 80, overall: 78 },
+      { name: "花のつくりの観察", score: 18, max: 30, rate: 60, overall: 67 },
+      { name: "イヌワラビの観察", score: 9, max: 15, rate: 60, overall: 62 },
+      { name: "植物の分類", score: 15, max: 15, rate: 100, overall: 70 },
+      { name: "動物のからだのつくり", score: 9, max: 15, rate: 60, overall: 77 },
+      { name: "動物の分類", score: 15, max: 15, rate: 100, overall: 71 }
+    ],
+    english: [
+      { name: "聞き取りの問題（1〜8）", score: 35, max: 37, rate: 95, overall: 86 },
+      { name: "アルファベットと単語（9）", score: 14, max: 18, rate: 78, overall: 61 },
+      { name: "語いと文法①（10〜13）", score: 24, max: 24, rate: 100, overall: 64 },
+      { name: "語いと文法②（14）", score: 12, max: 12, rate: 100, overall: 19 },
+      { name: "対話文の読解（15）", score: 9, max: 9, rate: 100, overall: 61 }
+    ]
+  },
+  questions: {
+    japanese: [
+      q("一(一)①", false, 38, "内容把握"), q("一(一)②", false, 22, "内容把握"), q("一(二)", true, 77, "適語選択"),
+      q("一(三)", false, 16, "内容把握・記述"), q("一(四)", true, 71, "適語選択・接続語"), q("一(五)", false, 21, "内容把握・記述"),
+      q("一(六)", true, 44, "内容把握"), q("一(七)", false, 49, "内容真偽"),
+      q("二(一)①", true, 39, "内容把握・記述"), q("二(一)②", false, 11, "内容把握"), q("二(二)", false, 26, "内容把握・記述"),
+      q("二(三)", true, 59, "内容把握"), q("二(四)", true, 71, "適語選択"), q("二(五)", true, 57, "内容把握"),
+      q("二(六)①", false, 36, "内容把握"), q("二(六)②", true, 52, "内容把握"),
+      q("三(一)", false, 52, "内容把握"), q("三(二)①", true, 40, "内容把握"), q("三(二)②", false, 52, "内容把握・記述"), q("三(二)③", true, 66, "内容把握"),
+      q("四(一)①", false, 31, "漢字の書き取り"), q("四(一)②", false, 54, "漢字の書き取り"), q("四(一)③", false, 58, "漢字の書き取り"), q("四(一)④", true, 33, "漢字の書き取り"),
+      q("四(二)①", false, 59, "漢字の読み取り"), q("四(二)②", true, 74, "漢字の読み取り"), q("四(二)③", true, 50, "漢字の読み取り"), q("四(二)④", true, 42, "漢字の読み取り"),
+      q("四(三)①", true, 77, "漢字の知識・総画数"), q("四(三)②", true, 78, "漢字の知識・総画数"),
+      q("四(四)①", true, 55, "漢字の知識"), q("四(四)②", false, 19, "漢字の知識"),
+      q("四(五)①", false, 68, "漢字の知識"), q("四(五)②", true, 60, "漢字の知識"), q("四(五)③", false, 29, "漢字の知識"),
+      q("五", false, 42, "作文")
+    ],
+    math: [
+      q("1(1)", true, 89, "正負の数の加法"), q("1(2)", true, 76, "正負の数の減法"), q("1(3)", true, 80, "正負の数の加法"),
+      q("1(4)", true, 69, "正負の数の減法"), q("1(5)", true, 71, "正負の数の減法"), q("1(6)", true, 59, "正負の数の加法・減法"),
+      q("1(7)", true, 88, "正負の数の乗法"), q("1(8)", true, 76, "正負の数の除法"), q("1(9)", false, 76, "正負の数の乗法"),
+      q("1(10)", true, 63, "正負の数の乗法"), q("1(11)", true, 75, "正負の数の除法"), q("1(12)", true, 59, "正負の数の除法・乗法"),
+      q("1(13)", true, 62, "正負の数の乗法・加法"), q("1(14)", true, 53, "正負の数の減法・除法"), q("1(15)", false, 41, "正負の数の乗法・加法"),
+      q("1(16)", true, 44, "正負の数の四則の計算"),
+      q("2(1)", false, 24, "素数"), q("2(2)①", true, 91, "数の大小"), q("2(2)②", true, 88, "絶対値"),
+      q("2(3)", false, 31, "反対の性質をもつ数量"), q("2(4)", true, 56, "逆数"), q("2(5)", true, 57, "数の範囲"),
+      q("3(1)", true, 55, "クラスの平均"), q("3(2)", false, 56, "記録の差"), q("3(3)", true, 54, "記録が最も高い生徒"), q("3(4)", true, 39, "記録の平均"),
+      q("4(1)", true, 87, "合計点"), q("4(2)", false, 46, "得点の比較"), q("4(3)", true, 44, "それぞれの玉の個数"),
+      q("5(1)", false, 39, "文字式の表し方"), q("5(2)", false, 54, "×、÷を使った表し方"), q("5(3)", false, 46, "文字式"),
+      q("5(4)", false, 38, "文字式"), q("5(5)", false, 40, "文字式"), q("5(6)", true, 50, "式の値"), q("5(7)", true, 49, "式の値")
+    ]
+  }
+};
+
 const starterTests: TestRecord[] = [
   {
     date: "2026-05-17",
@@ -89,16 +198,29 @@ const starterTests: TestRecord[] = [
     average: { japanese: 74.2, social: 56.3, math: 67.2, science: 67.6, english: 82.7 },
     subjectRanks: { japanese: 98, social: 40, math: 58, science: 60, english: 60 }
   },
-  firstTermFinalExam
+  firstTermFinalExam,
+  firstJitsuryokuTest
 ];
 
-// Existing users already have savedTests in localStorage from before the
-// 期末 exam was recorded, so the starterTests fallback above never runs for
-// them. Merge the real exam result in once, keyed by name+date so this is a
-// no-op on every later load.
-function withFirstTermFinalExam(tests: TestRecord[]): TestRecord[] {
-  const alreadyPresent = tests.some((t) => t.name === firstTermFinalExam.name && t.date === firstTermFinalExam.date);
-  return alreadyPresent ? tests : [...tests, firstTermFinalExam];
+// Real results recorded after the first release. Existing users already have
+// savedTests in localStorage, so the starterTests fallback never runs for
+// them: each of these is merged in once, keyed by date+name.
+const seededTests: TestRecord[] = [firstTermFinalExam, firstJitsuryokuTest];
+// Which seeded tests this browser has already been given. Seeding is not
+// owning — without this memory a seeded test Neritan deleted would come
+// straight back on the next load.
+const SEEDED_STORAGE_KEY = "leeaTestsJPDashboardSeededV1";
+const recordKey = (t: TestRecord) => `${t.date}__${t.name}`;
+
+function withSeededTests(tests: TestRecord[], seeded: Set<string>): TestRecord[] {
+  const out = [...tests];
+  for (const seed of seededTests) {
+    const key = recordKey(seed);
+    if (seeded.has(key)) continue;
+    seeded.add(key);
+    if (!out.some((t) => recordKey(t) === key)) out.push(seed);
+  }
+  return out;
 }
 
 // Tests saved to localStorage before subjectRanks/rank3 existed won't have
@@ -119,6 +241,15 @@ function withKnownSubjectRanks(tests: TestRecord[]): TestRecord[] {
     }
     return patched;
   });
+}
+
+// 中間・期末・実力 are different papers with different difficulty, so a raw
+// score change is only meaningful between two tests of the same kind.
+function testTypeOf(t: TestRecord): "中間" | "期末" | "実力" | "その他" {
+  if (t.name.includes("中間")) return "中間";
+  if (t.name.includes("期末")) return "期末";
+  if (t.name.includes("実力") || t.name.includes("模試")) return "実力";
+  return "その他";
 }
 
 const defaultGoals: AcademicGoals = {
@@ -176,6 +307,7 @@ export function AcademicProgressPage() {
     rank_health: "" as string | number,
     rank_techHome: "" as string | number,
     rank_art: "" as string | number,
+    averageScope: "school" as "school" | "prefecture",
   });
 
   // Identify the selected "compare" tests by a stable key (date+name), not
@@ -187,6 +319,8 @@ export function AcademicProgressPage() {
   const [compareFromKey, setCompareFromKey] = useState<string>("");
   const [compareToKey, setCompareToKey] = useState<string>("");
   const [radarCompareKey, setRadarCompareKey] = useState<string>("");
+  // Which test the 領域別 breakdown shows (only tests with report-sheet detail).
+  const [detailKey, setDetailKey] = useState<string>("");
 
   const [showDeleteModal, setShowDeleteModal] = useState<number | null>(null);
   const [toastMsg, setToastMsg] = useState("");
@@ -206,16 +340,26 @@ export function AcademicProgressPage() {
     const savedTests = localStorage.getItem("leeaTestsJPDashboardV2");
     const savedGoals = localStorage.getItem("leeaGoalsJPDashboardV2");
 
+    let seeded = new Set<string>();
+    try {
+      const raw = localStorage.getItem(SEEDED_STORAGE_KEY);
+      if (raw) seeded = new Set(JSON.parse(raw));
+    } catch (e) { /* treat as nothing seeded yet */ }
+
     if (savedTests) {
       try {
         const parsed = JSON.parse(savedTests);
-        setTests(withKnownSubjectRanks(withFirstTermFinalExam(parsed)));
+        setTests(withKnownSubjectRanks(withSeededTests(parsed, seeded)));
       } catch (e) {
         setTests(starterTests);
       }
     } else {
       setTests(starterTests);
     }
+    // starterTests already holds every seeded test, so either way they are
+    // all now this browser's to keep or delete.
+    seededTests.forEach((t) => seeded.add(recordKey(t)));
+    localStorage.setItem(SEEDED_STORAGE_KEY, JSON.stringify([...seeded]));
 
     if (savedGoals) {
       try {
@@ -301,6 +445,7 @@ export function AcademicProgressPage() {
       rank_health: "",
       rank_techHome: "",
       rank_art: "",
+      averageScope: "school",
     });
     if (show) showToast("入力欄をクリアしました");
   }, [showToast]);
@@ -349,8 +494,17 @@ export function AcademicProgressPage() {
         techHome: Number(form.avg_techHome || 0),
         art: Number(form.avg_art || 0),
       },
-      subjectRanks: Object.keys(subjectRanks).length ? subjectRanks : undefined
+      subjectRanks: Object.keys(subjectRanks).length ? subjectRanks : undefined,
+      averageScope: form.averageScope === "prefecture" ? "prefecture" : undefined
     };
+    // The form has no fields for the report sheet's breakdown (男女別順位,
+    // 領域, 正誤), so editing a score must carry them over, not drop them.
+    if (form.editIndex !== null) {
+      const prev = tests[form.editIndex];
+      if (prev?.genderRanks) t.genderRanks = prev.genderRanks;
+      if (prev?.domains) t.domains = prev.domains;
+      if (prev?.questions) t.questions = prev.questions;
+    }
 
     for (const s of allSubjects) {
       const score = t.scores[s] ?? 0;
@@ -412,6 +566,7 @@ export function AcademicProgressPage() {
       rank_health: t.subjectRanks?.health ?? "",
       rank_techHome: t.subjectRanks?.techHome ?? "",
       rank_art: t.subjectRanks?.art ?? "",
+      averageScope: t.averageScope === "prefecture" ? "prefecture" : "school",
     });
     setActiveTab("input");
     showToast("編集モードです");
@@ -471,15 +626,20 @@ export function AcademicProgressPage() {
   const summary = useMemo(() => {
     if (!sortedTests.length) return null;
     const latest = sortedTests[sortedTests.length - 1];
+    // Score change is only fair against the last test of the same kind — the
+    // 実力テスト is a different paper from the 期末, so "-30" against it would
+    // read as a drop that never happened. Rank is within the same grade
+    // either way, so it compares against the previous test of any kind.
+    const previousSame = [...sortedTests.slice(0, -1)].reverse().find(t => testTypeOf(t) === testTypeOf(latest));
     const previous = sortedTests[sortedTests.length - 2];
 
     const curTotal = totalScore(latest);
-    const prevTotal = previous ? totalScore(previous) : null;
+    const prevTotal = previousSame ? totalScore(previousSame) : null;
     const totalDiff = prevTotal !== null ? curTotal - prevTotal : null;
 
     const curRank = latest.rank;
     const prevRank = previous ? previous.rank : null;
-    const rankDiff = (curRank !== null && prevRank !== null) ? curRank - prevRank : null;
+    const rankDiff = (curRank != null && prevRank != null) ? curRank - prevRank : null;
 
     const diffRows = subjects.map(s => ({
       s,
@@ -491,6 +651,10 @@ export function AcademicProgressPage() {
     const weak = diffRows.reduce((a, b) => a.gap > b.gap ? a : b).s;
 
     return {
+      latest,
+      latestType: testTypeOf(latest),
+      previousSame,
+      previous,
       curTotal,
       totalDiff,
       curRank,
@@ -503,9 +667,17 @@ export function AcademicProgressPage() {
 
   const esc = (s: any) => String(s ?? "").replace(/[&<>\"]/g, m => (({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" } as any)[m]));
   const testKey = (t: TestRecord | undefined) => (t ? `${t.date}__${t.name}` : "");
+  // X-axis test name. The first and last labels anchor inward so they are not
+  // clipped at the chart edges (the right-most one used to lose half its text).
+  const axisLabel = (cx: number, cy: number, i: number, n: number, name: string) => {
+    const anchor = n === 1 ? "middle" : i === 0 ? "start" : i === n - 1 ? "end" : "middle";
+    const dx = anchor === "start" ? -8 : anchor === "end" ? 8 : 0;
+    return `<text x="${cx + dx}" y="${cy}" text-anchor="${anchor}" font-size="11" fill="#667085">${esc(name).slice(0, 9)}</text>`;
+  };
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
-  const testType = (t: TestRecord) => (t.name.includes("中間") ? "中間" : t.name.includes("期末") ? "期末" : "その他");
+  const testType = testTypeOf;
+  const avgLabel = (t: TestRecord | undefined) => (t?.averageScope === "prefecture" ? "県平均" : "学校平均");
   // Default comparison partner: the latest earlier test of the SAME type
   // (中間↔中間, 期末↔期末). 期末 covers 9 subjects and has different
   // difficulty from 中間, so raw comparisons across types mislead. Falls
@@ -548,7 +720,7 @@ export function AcademicProgressPage() {
     if (segment.length) { html += `<polyline points="${segment.join(" ")}" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`; }
     totals.forEach((v, i) => { html += `<circle cx="${x(i)}" cy="${y(v)}" r="6" fill="#fff" stroke="#2563eb" stroke-width="4"/><text x="${x(i) - 15}" y="${y(v) - 13}" font-size="13" fill="#172033" font-weight="1000">${v}</text>`; });
     avgs.forEach((v, i) => { if (v !== null) html += `<circle cx="${x(i)}" cy="${y(v)}" r="5" fill="#fff" stroke="#64748b" stroke-width="3"/><text x="${x(i) - 18}" y="${y(v) + 22}" font-size="12" fill="#64748b" font-weight="900">平均${v}</text>`; });
-    sortedTests.forEach((t, i) => html += `<text x="${x(i) - 30}" y="${H - 18}" font-size="11" fill="#667085">${esc(t.name).slice(0, 9)}</text>`);
+    sortedTests.forEach((t, i) => html += axisLabel(x(i), H - 18, i, sortedTests.length, t.name));
     svg.innerHTML = html;
   }, [sortedTests, goals.total, esc]);
 
@@ -610,15 +782,20 @@ export function AcademicProgressPage() {
     if (!svg || !sortedTests.length) return;
     const W = 700, H = 330, L = 46, R = 22, T = 26, B = 50;
     let html = "";
-    for (let v = 50; v <= 100; v += 10) { const y = T + (100 - v) / 50 * (H - T - B); html += `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#e5eaf3"/><text x="12" y="${y + 4}" font-size="11" fill="#667085">${v}</text>`; }
+    // The floor follows the lowest score shown instead of a fixed 50 — a fixed
+    // floor drew 国語 46 and 37 on the same line as 50.
+    const shownScores = sortedTests.flatMap(t => subjects.filter(s => visibleSubjects[s]).map(s => Number(t.scores[s])));
+    const lo = Math.min(50, Math.floor(Math.min(...shownScores, 100) / 10) * 10);
+    const span = 100 - lo;
+    for (let v = lo; v <= 100; v += 10) { const y = T + (100 - v) / span * (H - T - B); html += `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#e5eaf3"/><text x="12" y="${y + 4}" font-size="11" fill="#667085">${v}</text>`; }
     const x = (i: number) => L + (W - L - R) * (sortedTests.length === 1 ? 0.5 : i / (sortedTests.length - 1));
-    const y = (v: number) => T + (100 - clamp(v, 50, 100)) / 50 * (H - T - B);
+    const y = (v: number) => T + (100 - clamp(v, lo, 100)) / span * (H - T - B);
     subjects.filter(s => visibleSubjects[s]).forEach(s => {
       const pts = sortedTests.map((t, i) => `${x(i)},${y(t.scores[s])}`).join(" ");
       html += `<polyline points="${pts}" fill="none" stroke="${colors[s]}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
       sortedTests.forEach((t, i) => html += `<circle cx="${x(i)}" cy="${y(t.scores[s])}" r="4" fill="#fff" stroke="${colors[s]}" stroke-width="2"/>`);
     });
-    sortedTests.forEach((t, i) => html += `<text x="${x(i) - 30}" y="${H - 18}" font-size="11" fill="#667085">${esc(t.name).slice(0, 9)}</text>`);
+    sortedTests.forEach((t, i) => html += axisLabel(x(i), H - 18, i, sortedTests.length, t.name));
     svg.innerHTML = html;
   }, [sortedTests, clamp, esc, visibleSubjects]);
 
@@ -642,7 +819,7 @@ export function AcademicProgressPage() {
     const pts = values.map((v, i) => `${x(i)},${y(v)}`).join(" ");
     if (area && values.length > 1) { html += `<polygon points="${L},${H - B} ${pts} ${W - R},${H - B}" fill="url(#grad_rank)"/>`; }
     html += `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
-    values.forEach((v, i) => { html += `<circle cx="${x(i)}" cy="${y(v)}" r="6" fill="#fff" stroke="${color}" stroke-width="4"/><text x="${x(i) - 14}" y="${y(v) - 12}" font-size="13" fill="#172033" font-weight="1000">${v}</text><text x="${x(i) - 30}" y="${H - 18}" font-size="11" fill="#667085">${esc(names[i]).slice(0, 9)}</text>`; });
+    values.forEach((v, i) => { html += `<circle cx="${x(i)}" cy="${y(v)}" r="6" fill="#fff" stroke="${color}" stroke-width="4"/><text x="${x(i) - 14}" y="${y(v) - 12}" font-size="13" fill="#172033" font-weight="1000">${v}</text>${axisLabel(x(i), H - 18, i, values.length, names[i])}`; });
     svg.innerHTML = html;
   }, [sortedTests, goals.students, goals.rank, esc]);
 
@@ -684,7 +861,7 @@ export function AcademicProgressPage() {
         html += `<text x="${x(lastIdx) + 9}" y="${y(v) + 4}" font-size="11.5" fill="${colors[s]}" font-weight="1000">${labels[s]} ${v >= 0 ? "+" : ""}${v}</text>`;
       }
     });
-    sortedTests.forEach((t, i) => html += `<text x="${x(i) - 30}" y="${H - 18}" font-size="11" fill="#667085">${esc(t.name).slice(0, 9)}</text>`);
+    sortedTests.forEach((t, i) => html += axisLabel(x(i), H - 18, i, sortedTests.length, t.name));
     svg.innerHTML = html;
   }, [sortedTests, esc, visibleSubjects]);
 
@@ -723,7 +900,7 @@ export function AcademicProgressPage() {
         html += `<text x="${x(lastIdx) + 9}" y="${y(v) + 4}" font-size="11.5" fill="${colors[s]}" font-weight="1000">${labels[s]} ${v}位</text>`;
       }
     });
-    sortedTests.forEach((t, i) => html += `<text x="${x(i) - 30}" y="${H - 18}" font-size="11" fill="#667085">${esc(t.name).slice(0, 9)}</text>`);
+    sortedTests.forEach((t, i) => html += axisLabel(x(i), H - 18, i, sortedTests.length, t.name));
     svg.innerHTML = html;
   }, [sortedTests, goals.students, esc, visibleSubjects]);
 
@@ -1015,6 +1192,21 @@ export function AcademicProgressPage() {
         .academic-progress-container .dash-sample { width: 22px; height: 0; border-top: 4px dashed #000; border-radius: 999px }
 
         .academic-progress-container .note { background: #fffbeb; border: 1px solid #fde68a; border-radius: 16px; padding: 12px 14px; color: #92400e; line-height: 1.65 }
+        .academic-progress-container .latest-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 18px }
+        .academic-progress-container .type-tag { display: inline-block; border-radius: 999px; padding: 2px 9px; font-size: 11px; font-weight: 1000; background: #f1f5f9; color: #475569; vertical-align: middle }
+        .academic-progress-container .type-中間 { background: #e0f2fe; color: #0369a1 }
+        .academic-progress-container .type-期末 { background: #ede9fe; color: #6d28d9 }
+        .academic-progress-container .type-実力 { background: #fef3c7; color: #b45309 }
+        .academic-progress-container .domain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px }
+        .academic-progress-container .domain-subject { border: 1px solid var(--tracker-line); border-top: 4px solid; border-radius: 16px; padding: 12px 14px; background: #fff }
+        .academic-progress-container .domain-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; font-size: 14px }
+        .academic-progress-container .domain-row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 36px; gap: 8px; align-items: center; margin: 7px 0; font-size: 12.5px }
+        .academic-progress-container .domain-name { line-height: 1.3 }
+        .academic-progress-container .domain-bar { position: relative; height: 12px; background: #e5eaf3; border-radius: 999px }
+        .academic-progress-container .domain-bar .fill { position: absolute; left: 0; top: 0 }
+        .academic-progress-container .domain-mark { position: absolute; top: 50%; transform: translate(-50%, -50%); font-size: 13px; line-height: 1; color: #172033; text-shadow: 0 0 2px #fff, 0 0 2px #fff }
+        .academic-progress-container .domain-gap { text-align: right; font-weight: 1000 }
+        .academic-progress-container .tight-list { margin: 6px 0 0; padding-left: 20px; line-height: 1.6; font-size: 13px }
         .academic-progress-container .soft { background: #f8fafc; border: 1px solid var(--tracker-line); border-radius: 16px; padding: 12px 14px; line-height: 1.6 }
         .academic-progress-container .analysis p { line-height: 1.75; margin: 0 0 10px }
 
@@ -1052,8 +1244,8 @@ export function AcademicProgressPage() {
           <section className="hero">
             <div>
               <div className="kicker">LEEA Academic Dashboard</div>
-              <h1>定期テスト成績トラッカー</h1>
-              <p>テストを追加すると、合計点・学校平均・順位・教科別推移・レーダー・目標達成率が自動更新されます。右のタブで「概要・推移・比較・目標・入力」を切り替えられます。点数だけでなく、平均との差と順位で本当の実力の動きが見えます。</p>
+              <h1>テスト成績トラッカー</h1>
+              <p>定期テスト（中間・期末）と実力テストを記録できます。テストを追加すると、合計点・平均・順位・教科別推移・レーダー・目標達成率が自動更新されます。右のタブで「概要・推移・比較・目標・入力」を切り替えられます。点数だけでなく、平均との差と順位で本当の実力の動きが見えます。</p>
             </div>
             <nav className="nav">
               <button className={activeTab === "overview" ? "tabbtn active" : "tabbtn"} onClick={() => setActiveTab("overview")}>📋 概要</button>
@@ -1067,19 +1259,32 @@ export function AcademicProgressPage() {
         <main>
           <section className="grid">
             {activeTab === "overview" && (<>
+            {summary && (
+            <div className="card span-12 latest-strip">
+              <span className={`type-tag type-${summary.latestType}`}>{summary.latestType}</span>
+              <b>最新：{summary.latest.name}</b>
+              <span className="small">{summary.latest.date} ／ 平均点は{avgLabel(summary.latest)}{summary.latest.averageScope === "prefecture" ? "（県内受検者全体）・順位は校内順位" : ""}</span>
+            </div>
+            )}
             <div className="card span-3">
-              <div className="eyebrow">最新合計</div>
+              <div className="eyebrow">最新合計（5教科）</div>
               <div className="big">{summary?.curTotal ?? "—"}</div>
               <div className={`pill ${summary && summary.totalDiff !== null ? (summary.totalDiff >= 0 ? 'good' : 'bad') : 'neutral'}`}>
-                {summary && summary.totalDiff !== null ? `${summary.totalDiff >= 0 ? '+' : ''}${summary.totalDiff}` : '—'}
+                {summary && summary.totalDiff !== null && summary.previousSame
+                  ? `前回の${summary.latestType}比 ${summary.totalDiff >= 0 ? '+' : ''}${summary.totalDiff}`
+                  : summary ? `初めての${summary.latestType}テスト` : '—'}
               </div>
+              {summary && hasAvgData(summary.latest) && (
+                <div className="small" style={{ marginTop: 6 }}>{avgLabel(summary.latest)} {avgTotalScore(summary.latest)}点 ／ 差 <b className={summary.curTotal - avgTotalScore(summary.latest) >= 0 ? "goodtxt" : "badtxt"}>{summary.curTotal - avgTotalScore(summary.latest) >= 0 ? "+" : ""}{Math.round((summary.curTotal - avgTotalScore(summary.latest)) * 10) / 10}</b></div>
+              )}
             </div>
             <div className="card span-3">
-              <div className="eyebrow">学年順位</div>
+              <div className="eyebrow">学年順位（5教科）</div>
               <div className="big">{summary?.curRank ?? "—"}</div>
               <div className={`pill ${summary && summary.rankDiff !== null ? (summary.rankDiff <= 0 ? 'good' : 'bad') : 'neutral'}`}>
-                {summary && summary.rankDiff !== null ? `${summary.rankDiff <= 0 ? '' : '+'}${summary.rankDiff}位` : '順位は小さいほど良い'}
+                {summary && summary.rankDiff !== null ? `${summary.previous?.name}比 ${summary.rankDiff <= 0 ? '↑' : '↓'}${Math.abs(summary.rankDiff)}位` : '順位は小さいほど良い'}
               </div>
+              {summary?.latest.genderRanks?.total5 ? <div className="small" style={{ marginTop: 6 }}>男女別 {summary.latest.genderRanks.total5}位</div> : null}
             </div>
             <div className="card span-3">
               <div className="eyebrow">一番強い教科</div>
@@ -1093,9 +1298,9 @@ export function AcademicProgressPage() {
             </div>
 
             <div className="card span-8">
-              <div className="card-head"><h2>5教科合計の推移</h2><div className="legend"><span className="legend-item"><span className="line-sample" style={{ borderColor: "#2563eb" }}></span>Leo</span><span className="legend-item"><span className="line-sample" style={{ borderColor: "#64748b" }}></span>学校平均</span><span className="legend-item"><span className="dash-sample" style={{ borderColor: "#dc2626" }}></span>合計目標</span></div></div>
+              <div className="card-head"><h2>5教科合計の推移</h2><div className="legend"><span className="legend-item"><span className="line-sample" style={{ borderColor: "#2563eb" }}></span>Leo</span><span className="legend-item"><span className="line-sample" style={{ borderColor: "#64748b" }}></span>平均（学校／県）</span><span className="legend-item"><span className="dash-sample" style={{ borderColor: "#dc2626" }}></span>合計目標</span></div></div>
               <svg ref={totalChartRef} className="chart" viewBox="0 0 760 320" preserveAspectRatio="none"></svg>
-              <div className="small">学校平均線は、各教科の平均点を合計して表示しています。平均点を入力すると自動で更新されます。</div>
+              <div className="small">平均線は、各教科の平均点を合計して表示しています。定期テストは学校平均、実力テストは県内受検者全体の平均です。</div>
             </div>
             <div className="card span-4">
               <h2>最新テスト：教科別スコア</h2>
@@ -1112,7 +1317,7 @@ export function AcademicProgressPage() {
                         <b>{latest.scores[s]}</b>
                       </div>
                       <div className="small" style={{ margin: "-6px 0 8px 68px" }}>
-                        平均との差：<span className={latest.scores[s] - (latest.average?.[s] || 0) >= 0 ? 'goodtxt' : 'badtxt'}>
+                        {avgLabel(latest)}との差：<span className={latest.scores[s] - (latest.average?.[s] || 0) >= 0 ? 'goodtxt' : 'badtxt'}>
                           {latest.scores[s] - (latest.average?.[s] || 0) >= 0 ? '+' : ''}{Math.round((latest.scores[s] - (latest.average?.[s] || 0)) * 10) / 10}
                         </span>{latest.subjectRanks?.[s] ? <> ／ 順位：<b>{latest.subjectRanks[s]}位</b>{topPct(latest.subjectRanks[s]) !== null ? `（上位${topPct(latest.subjectRanks[s])}%）` : ""}</> : null} ／ 目標まで：{Math.max(0, (goals[s] || 100) - latest.scores[s])}点
                       </div>
@@ -1133,10 +1338,107 @@ export function AcademicProgressPage() {
               })()}
             </div>
 
+            {(() => {
+              // 領域別の分析 — the report sheet's breakdown, which says far more
+              // than the five totals: which part of each subject cost the
+              // marks, and how that compares with everyone who sat it.
+              const detailTests = sortedTests.filter(t => t.domains && Object.keys(t.domains).length);
+              if (!detailTests.length) return null;
+              const t = detailTests.find(d => testKey(d) === detailKey) || detailTests[detailTests.length - 1];
+              const scope = t.averageScope === "prefecture" ? "県内全体" : "学校全体";
+              const allDomains = subjects.flatMap(s => (t.domains?.[s] || []).map(d => ({ s, ...d, gap: d.rate - d.overall })));
+              const focus = allDomains.filter(d => d.gap <= -5).sort((a, b) => (a.gap * a.max) - (b.gap * b.max)).slice(0, 4);
+              const shine = allDomains.filter(d => d.gap >= 15).sort((a, b) => b.gap - a.gap).slice(0, 4);
+              const qs = subjects.flatMap(s => (t.questions?.[s] || []).map(qq => ({ s, ...qq })));
+              // 落とした問題のうち、全体の半分以上が正解しているもの — 一番取り返しやすい点。
+              const slips = qs.filter(qq => !qq.ok && qq.rate >= 50).sort((a, b) => b.rate - a.rate);
+              // 全体の正答率が45%未満なのに正解できた問題 — 自信につなげる。
+              const wins = qs.filter(qq => qq.ok && qq.rate < 45).sort((a, b) => a.rate - b.rate);
+              return (
+                <div className="card span-12">
+                  <div className="card-head">
+                    <h2>領域別の分析</h2>
+                    {detailTests.length > 1 ? (
+                      <select style={{ width: "auto" }} value={testKey(t)} onChange={e => setDetailKey(e.target.value)}>
+                        {detailTests.map(d => <option key={testKey(d)} value={testKey(d)}>{d.name}（{d.date}）</option>)}
+                      </select>
+                    ) : <span className="small">{t.name}（{t.date}）</span>}
+                  </div>
+                  <div className="small" style={{ marginBottom: 10 }}>バー＝Leoの正答率、◆＝{scope}の正答率。◆より右に伸びていれば、みんなより取れています。</div>
+                  <div className="twocol" style={{ marginBottom: 14 }}>
+                    <div className="soft">
+                      <b>次に伸ばす領域</b>
+                      {focus.length ? (
+                        <ol className="tight-list">
+                          {focus.map(d => <li key={d.s + d.name}><b style={{ color: colors[d.s] }}>{labels[d.s]}</b> {d.name}：{d.score}/{d.max}点（Leo {d.rate}% ／ 全体 {d.overall}%）</li>)}
+                        </ol>
+                      ) : <div>全体の正答率を大きく下回った領域はありません。</div>}
+                    </div>
+                    <div className="soft">
+                      <b>みんなより取れた領域</b>
+                      {shine.length ? (
+                        <ol className="tight-list">
+                          {shine.map(d => <li key={d.s + d.name}><b style={{ color: colors[d.s] }}>{labels[d.s]}</b> {d.name}：Leo {d.rate}% ／ 全体 {d.overall}%（<span className="goodtxt">+{d.gap}</span>）</li>)}
+                        </ol>
+                      ) : <div>—</div>}
+                    </div>
+                  </div>
+                  <div className="domain-grid">
+                    {subjects.filter(s => t.domains?.[s]?.length).map(s => (
+                      <div key={s} className="domain-subject" style={{ borderTopColor: colors[s] }}>
+                        <div className="domain-head">
+                          <b style={{ color: colors[s] }}>{labels[s]}</b>
+                          <span><b>{t.scores[s]}</b>点{t.subjectRanks?.[s] ? ` ・ ${t.subjectRanks[s]}位` : ""}{t.genderRanks?.subjects?.[s] ? `（男女別${t.genderRanks.subjects[s]}位）` : ""}</span>
+                        </div>
+                        {(t.domains?.[s] || []).map(d => {
+                          const gap = d.rate - d.overall;
+                          return (
+                            <div key={d.name} className="domain-row">
+                              <div className="domain-name">{d.name}<span className="small"> {d.score}/{d.max}</span></div>
+                              <div className="domain-bar">
+                                <div className="fill" style={{ width: `${d.rate}%`, background: colors[s] }}></div>
+                                <span className="domain-mark" style={{ left: `${d.overall}%` }} title={`${scope} ${d.overall}%`}>◆</span>
+                              </div>
+                              <div className={`domain-gap ${gap >= 0 ? "goodtxt" : "badtxt"}`}>{gap >= 0 ? "+" : ""}{gap}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                  {qs.length > 0 && (
+                    <div className="twocol" style={{ marginTop: 14 }}>
+                      <div className="soft">
+                        <b>取り返しやすい問題</b> <span className="small">×だったが、全体の50%以上が正解</span>
+                        {slips.length ? (
+                          <ul className="tight-list">
+                            {slips.map(qq => <li key={qq.s + qq.no}><b style={{ color: colors[qq.s] }}>{labels[qq.s]}</b> {qq.no} {qq.topic}（全体 {qq.rate}%）</li>)}
+                          </ul>
+                        ) : <div>ありません。</div>}
+                      </div>
+                      <div className="soft">
+                        <b>難問を正解した問題</b> <span className="small">全体の正答率45%未満で○</span>
+                        {wins.length ? (
+                          <ul className="tight-list">
+                            {wins.map(qq => <li key={qq.s + qq.no}><b style={{ color: colors[qq.s] }}>{labels[qq.s]}</b> {qq.no} {qq.topic}（全体 {qq.rate}%）</li>)}
+                          </ul>
+                        ) : <div>—</div>}
+                      </div>
+                    </div>
+                  )}
+                  {qs.length > 0 && <div className="small" style={{ marginTop: 8 }}>問題ごとの正誤は、成績表で返却された教科（{subjects.filter(s => t.questions?.[s]?.length).map(s => labels[s]).join("・")}）のみです。</div>}
+                </div>
+              );
+            })()}
+
             <div className="card span-12">
-              <div className="card-head"><h2>新教科（音楽・保体・技家・美術）</h2><span className="small">期末テストのみ実施</span></div>
-              {sortedTests.length > 0 && hasExtraData(sortedTests[sortedTests.length - 1]) ? (() => {
-                const latest = sortedTests[sortedTests.length - 1];
+              {/* Only 期末 carries these four, so show the latest test that has
+                  them — not the latest test, which may be a 中間 or 実力. */}
+              {(() => { const t = [...sortedTests].reverse().find(hasExtraData); return (
+              <div className="card-head"><h2>新教科（音楽・保体・技家・美術）</h2><span className="small">{t ? `${t.name}（${t.date}）` : "期末テストのみ実施"}</span></div>
+              ); })()}
+              {sortedTests.some(hasExtraData) ? (() => {
+                const latest = [...sortedTests].reverse().find(hasExtraData)!;
                 return (
                   <>
                     {extraSubjects.map(s => (
@@ -1337,7 +1639,7 @@ export function AcademicProgressPage() {
               {trendView === "rank" && <svg ref={subjectRankChartRef} className="chart" viewBox="0 0 700 330" preserveAspectRatio="none"></svg>}
               <div className="small">
                 {trendView === "score" && "各教科の点数の動き。教科ボタンをタップすると表示を絞れます。"}
-                {trendView === "avgdiff" && "0より上＝学校平均より上。テストの難易度に左右されない「本当の実力」の動きです。点数が下がっても、この線が上がっていれば実力は伸びています。"}
+                {trendView === "avgdiff" && "0より上＝平均より上（定期テストは学校平均、実力テストは県平均）。テストの難易度に左右されない「本当の実力」の動きです。点数が下がっても、この線が上がっていれば実力は伸びています。"}
                 {trendView === "rank" && "上に行くほど良い順位。成績表の「総合順位」行の数字で、テストの難しさに関係なく比べられます。"}
               </div>
             </div>
@@ -1357,6 +1659,7 @@ export function AcademicProgressPage() {
                 <div><label htmlFor="rank">学年順位（5科目）</label><input id="rank" type="number" min="1" value={form.rank} onChange={e => setForm({ ...form, rank: e.target.value })} /></div>
                 <div><label htmlFor="rank9">学年順位（9科目・期末のみ）</label><input id="rank9" type="number" min="1" value={form.rank9} onChange={e => setForm({ ...form, rank9: e.target.value })} /></div>
                 <div><label htmlFor="rank3">学年順位（国数英3科目）</label><input id="rank3" type="number" min="1" value={form.rank3} onChange={e => setForm({ ...form, rank3: e.target.value })} /></div>
+                <div><label htmlFor="averageScope">平均点の種類</label><select id="averageScope" value={form.averageScope} onChange={e => setForm({ ...form, averageScope: e.target.value === "prefecture" ? "prefecture" : "school" })}><option value="school">学校平均（定期テスト）</option><option value="prefecture">県平均（実力テスト・模試）</option></select></div>
                 {allSubjects.map(s => (
                   <div key={s}><label htmlFor={s}>{labels[s]}</label><input id={s} type="number" min="0" max="100" value={form[s]} onChange={e => setForm({ ...form, [s]: e.target.value })} /></div>
                 ))}
@@ -1385,7 +1688,7 @@ export function AcademicProgressPage() {
                       <th>テスト</th>
                       <th>日付</th>
                       <th className="right">合計</th>
-                      <th className="right">前年差</th>
+                      <th className="right">前回差</th>
                       <th className="right">平均合計</th>
                       <th className="right">平均との差</th>
                       <th className="right">順位</th>
@@ -1407,11 +1710,11 @@ export function AcademicProgressPage() {
                       const rankPct = (t.rank && goals.students) ? Math.round((t.rank / goals.students * 100) * 10) / 10 : null;
                       return (
                         <tr key={i}>
-                          <td><b>{t.name}</b></td>
+                          <td><b>{t.name}</b> <span className={`type-tag type-${testType(t)}`}>{testType(t)}</span></td>
                           <td className="nowrap">{t.date}</td>
                           <td className="right"><b>{curTotal}</b></td>
                           <td className={`right ${td === null ? '' : td >= 0 ? 'goodtxt' : 'badtxt'}`}>{td === null ? '—' : (td >= 0 ? '+' : '') + td}</td>
-                          <td className="right">{curAvgTotal === null ? "—" : curAvgTotal}</td>
+                          <td className="right">{curAvgTotal === null ? "—" : <>{curAvgTotal}{t.averageScope === "prefecture" ? <span className="small">（県）</span> : null}</>}</td>
                           <td className={`right ${avgDiff === null ? '' : avgDiff >= 0 ? 'goodtxt' : 'badtxt'}`}>{avgDiff === null ? '—' : (avgDiff >= 0 ? '+' : '') + avgDiff}</td>
                           <td className="right">{t.rank ? t.rank + '位' : '—'}</td>
                           <td className="right">{rankPct ? rankPct + '%' : '—'}</td>
@@ -1419,7 +1722,7 @@ export function AcademicProgressPage() {
                           {extraSubjects.map(s => <td key={s} className="right">{hasExtraData(t) ? (t.scores[s] || 0) : '—'}</td>)}
                           <td className="right">{hasExtraData(t) ? nineSubjectTotal(t) : '—'}</td>
                           <td className="right">{t.rank9 ? t.rank9 + '位' : '—'}</td>
-                          <td className="center nowrap"><button className="secondary" onClick={() => editTest(i)}>編集</button> <button className="danger" onClick={() => askDelete(i)}>削除</button></td>
+                          <td className="center nowrap"><button className="secondary" onClick={() => editTest(tests.indexOf(t))}>編集</button> <button className="danger" onClick={() => askDelete(tests.indexOf(t))}>削除</button></td>
                         </tr>
                       );
                     })}
@@ -1456,13 +1759,13 @@ export function AcademicProgressPage() {
 
                   return (
                     <>
-                      <p><b>率直に言うと：</b> 最新の合計は <b>{curTotal}点</b>。{curAvgTotal === null ? '学校平均データは未入力です。' : <>学校平均合計は <b>{curAvgTotal}点</b> なので、平均との差は <b className={curTotal - curAvgTotal >= 0 ? 'goodtxt' : 'badtxt'}>{curTotal - curAvgTotal >= 0 ? '+' : ''}{Math.round((curTotal - curAvgTotal) * 10) / 10}点</b> です。</>} 合計目標の <b>{goals.total}点</b> までは <b className={gap === 0 ? 'goodtxt' : 'warntxt'}>{gap === 0 ? '達成' : `あと${gap}点`}</b> です。</p>
+                      <p><b>率直に言うと：</b> 最新の合計は <b>{curTotal}点</b>。{curAvgTotal === null ? `${avgLabel(latest)}データは未入力です。` : <>{avgLabel(latest)}の合計は <b>{curAvgTotal}点</b> なので、平均との差は <b className={curTotal - curAvgTotal >= 0 ? 'goodtxt' : 'badtxt'}>{curTotal - curAvgTotal >= 0 ? '+' : ''}{Math.round((curTotal - curAvgTotal) * 10) / 10}点</b> です。</>} 合計目標の <b>{goals.total}点</b> までは <b className={gap === 0 ? 'goodtxt' : 'warntxt'}>{gap === 0 ? '達成' : `あと${gap}点`}</b> です。</p>
                       <p><b>順位：</b> {latest.rank ? `${latest.rank}位 / ${goals.students || 150}人。上位${rankPct}%・前に${rankAhead}人・後ろに${rankBehind}人。` : '順位データなし'} 目標の{goals.rank}位以内に入るには、順位だけで見るとあと <b>{latest.rank ? Math.max(0, latest.rank - goals.rank) : '—'}人</b> 抜く必要があります。</p>
                       <p>一番強い教科は <b>{labels[strong]}</b>。今いちばん点数を取りに行くべき教科は <b>{labels[weak]}</b> です。英語が強いなら、英語だけに時間を使いすぎず、国語・数学・理科の底上げで合計点を上げる方が効率的です。</p>
                       <table>
                         <thead>
                           <tr>
-                            <th>教科</th><th className="right">点数</th><th className="right">順位</th><th className="right">目標</th><th className="right">目標まで</th><th className="right">平均との差</th><th className="right">目安</th>
+                            <th>教科</th><th className="right">点数</th><th className="right">順位</th><th className="right">目標</th><th className="right">目標まで</th><th className="right">{avgLabel(latest)}との差</th><th className="right">目安</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1490,8 +1793,8 @@ export function AcademicProgressPage() {
         <div className={`modal ${showDeleteModal !== null ? "open" : ""}`} id="confirmModal">
           <div className="modal-card">
             <h2 id="modalTitle">確認</h2>
-            <p id="modalText">{showDeleteModal !== null && sortedTests[showDeleteModal] && (
-              <><b>{sortedTests[showDeleteModal].name}</b> を削除します。入力ミスなら「編集」の方が安全です。</>
+            <p id="modalText">{showDeleteModal !== null && tests[showDeleteModal] && (
+              <><b>{tests[showDeleteModal].name}</b> を削除します。入力ミスなら「編集」の方が安全です。</>
             )}</p>
             <div className="actions">
               <button className="danger" onClick={confirmDelete} id="modalYes">削除する</button>

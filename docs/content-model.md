@@ -66,6 +66,8 @@ The actual `TestRecord` shape (defined inline in `AcademicProgressPage.tsx`):
 }
 ```
 
+Optional fields carry what a report sheet adds beyond the totals: `rank3`/`rank9`, `subjectRanks`, `averageScope` (`"prefecture"` for a 実力テスト, whose averages are 県内受検者全体 — every label reads it through `avgLabel()`, never a hardcoded 学校平均), `genderRanks` (男女別), `domains` (領域ごとの得点: `{ name, score, max, rate, overall }`) and `questions` (正誤 and 全体の正答率, only for the subjects the sheet returned). Editing a test keeps `genderRanks`/`domains`/`questions`, since the form has no fields for them. Real results are seeded from `seededTests` once per browser; `leeaTestsJPDashboardSeededV1` remembers which, so a seeded test Neritan deletes stays deleted.
+
 `average` fields default to `0` when left blank in the form — they are not optional/nullable at the type level, so any code reading them must check "did the user actually enter this" separately from "is the value 0" (see `hasAvgData()` in the component). Treating a blank average as a real value of 0 produced a real bug once (misleading "school average is 0点" text) — don't reintroduce that assumption.
 
 Keep school subjects flexible enough for future subjects, but the first tracker uses Japanese, Social Studies, Math, Science, and English. This is different from LEEA lesson progress: test results are real school outcomes, not lesson completion records.

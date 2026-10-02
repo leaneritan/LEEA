@@ -51,6 +51,32 @@ interface TestRecord {
   // 教科別の学年順位（成績表の「総合順位」行）。点数はテストの難易度で
   // 上下するが、順位は相対的な実力を示すので、テスト間の比較はこちらが公平。
   subjectRanks?: Partial<Record<SubjectId, number>>;
+  // 模試 only: averages are 県内受験者 averages, not the school's, and the
+  // sheet also gives 男女別 ranks plus a 分野別 breakdown and per-question results.
+  kind?: "定期テスト" | "模試";
+  averageLabel?: string;
+  // The sheet's official average total, used instead of summing subject averages.
+  averageTotal?: number;
+  genderRank?: number | null;
+  genderRank3?: number | null;
+  topics?: Partial<Record<CoreSubjectId, TopicResult[]>>;
+  review?: ReviewItem[];
+}
+
+interface TopicResult {
+  name: string;
+  score: number;
+  max: number;
+  overallRate: number;
+}
+
+// A missed question worth re-doing, ranked by how many test-takers got it right.
+interface ReviewItem {
+  subject: CoreSubjectId;
+  question: string;
+  topic: string;
+  overallRate: number;
+  note?: string;
 }
 
 interface AcademicGoals {
@@ -79,6 +105,69 @@ const firstTermFinalExam: TestRecord = {
   subjectRanks: { japanese: 120, social: 5, math: 47, science: 67, english: 10, music: 92, health: 113, techHome: 85, art: 96 }
 };
 
+const firstMockExam: TestRecord = {
+  date: "2026-09-18",
+  name: "1年 第1回 模試",
+  kind: "模試",
+  scores: { japanese: 46, social: 68, math: 66, science: 74, english: 94 },
+  rank: 54,
+  rank3: 44,
+  genderRank: 23,
+  genderRank3: 19,
+  average: { japanese: 47.1, social: 51.8, math: 56.4, science: 70.0, english: 65.1 },
+  averageLabel: "県平均",
+  averageTotal: 289.8,
+  subjectRanks: { japanese: 76, social: 34, math: 60, science: 95, english: 6 },
+  topics: {
+    japanese: [
+      { name: "説明的文章の読解", score: 9, max: 24, overallRate: 42 },
+      { name: "文学的文章の読解", score: 15, max: 24, overallRate: 44 },
+      { name: "詩の鑑賞", score: 6, max: 12, overallRate: 52 },
+      { name: "漢字と語句", score: 16, max: 30, overallRate: 52 },
+      { name: "作文", score: 0, max: 10, overallRate: 42 }
+    ],
+    social: [
+      { name: "世界の姿", score: 18, max: 30, overallRate: 58 },
+      { name: "日本の姿", score: 16, max: 20, overallRate: 47 },
+      { name: "人類の出現と古代文明", score: 16, max: 20, overallRate: 51 },
+      { name: "文明と宗教のおこり", score: 18, max: 30, overallRate: 49 }
+    ],
+    math: [
+      { name: "正の数・負の数の計算", score: 29, max: 34, overallRate: 66 },
+      { name: "正の数・負の数", score: 11, max: 17, overallRate: 54 },
+      { name: "正の数・負の数の利用（記録）", score: 12, max: 16, overallRate: 51 },
+      { name: "正の数・負の数の利用（得点）", score: 8, max: 12, overallRate: 59 },
+      { name: "文字を使った式", score: 6, max: 21, overallRate: 45 }
+    ],
+    science: [
+      { name: "身近な生物の観察", score: 8, max: 10, overallRate: 78 },
+      { name: "花のつくりの観察", score: 18, max: 30, overallRate: 67 },
+      { name: "イヌワラビの観察", score: 9, max: 15, overallRate: 62 },
+      { name: "植物の分類", score: 15, max: 15, overallRate: 70 },
+      { name: "動物のからだのつくり", score: 9, max: 15, overallRate: 77 },
+      { name: "動物の分類", score: 15, max: 15, overallRate: 71 }
+    ],
+    english: [
+      { name: "聞き取りの問題", score: 35, max: 37, overallRate: 86 },
+      { name: "アルファベットと単語", score: 14, max: 18, overallRate: 61 },
+      { name: "語いと文法①", score: 24, max: 24, overallRate: 64 },
+      { name: "語いと文法②", score: 12, max: 12, overallRate: 19 },
+      { name: "対話文の読解", score: 9, max: 9, overallRate: 61 }
+    ]
+  },
+  review: [
+    { subject: "math", question: "1(9)", topic: "正負の数の乗法", overallRate: 76, note: "正答率70%以上で不正解" },
+    { subject: "math", question: "3(2)", topic: "記録の差", overallRate: 56 },
+    { subject: "math", question: "5(2)", topic: "×・÷を使った文字式の表し方", overallRate: 54 },
+    { subject: "math", question: "5(1)(3)〜(5)", topic: "文字式の表し方", overallRate: 41, note: "大問5は7問中2問正解" },
+    { subject: "japanese", question: "四(五)①", topic: "漢字の知識", overallRate: 68 },
+    { subject: "japanese", question: "四(二)①", topic: "漢字の読み取り", overallRate: 59 },
+    { subject: "japanese", question: "四(一)②③", topic: "漢字の書き取り", overallRate: 56 },
+    { subject: "japanese", question: "三(一)・三(二)②", topic: "詩の鑑賞・内容把握", overallRate: 52 },
+    { subject: "japanese", question: "五", topic: "作文", overallRate: 42, note: "0/10点 — 条件どおりに書く練習を" }
+  ]
+};
+
 const starterTests: TestRecord[] = [
   {
     date: "2026-05-17",
@@ -89,7 +178,8 @@ const starterTests: TestRecord[] = [
     average: { japanese: 74.2, social: 56.3, math: 67.2, science: 67.6, english: 82.7 },
     subjectRanks: { japanese: 98, social: 40, math: 58, science: 60, english: 60 }
   },
-  firstTermFinalExam
+  firstTermFinalExam,
+  firstMockExam
 ];
 
 // Existing users already have savedTests in localStorage from before the
@@ -99,6 +189,12 @@ const starterTests: TestRecord[] = [
 function withFirstTermFinalExam(tests: TestRecord[]): TestRecord[] {
   const alreadyPresent = tests.some((t) => t.name === firstTermFinalExam.name && t.date === firstTermFinalExam.date);
   return alreadyPresent ? tests : [...tests, firstTermFinalExam];
+}
+
+// Same one-time merge for the first 模試, for users whose saved data predates it.
+function withFirstMockExam(tests: TestRecord[]): TestRecord[] {
+  const alreadyPresent = tests.some((t) => t.name === firstMockExam.name && t.date === firstMockExam.date);
+  return alreadyPresent ? tests : [...tests, firstMockExam];
 }
 
 // Tests saved to localStorage before subjectRanks/rank3 existed won't have
@@ -193,7 +289,7 @@ export function AcademicProgressPage() {
 
   // Tab navigation: one section visible at a time keeps the page short,
   // especially on the phone.
-  const [activeTab, setActiveTab] = useState<"overview" | "trend" | "compare" | "goals" | "input">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "topics" | "trend" | "compare" | "goals" | "input">("overview");
   // Which lens the combined trend chart uses. 点数 is the familiar view;
   // 平均との差 and 順位 are the difficulty-adjusted ones.
   const [trendView, setTrendView] = useState<"score" | "avgdiff" | "rank">("score");
@@ -209,7 +305,7 @@ export function AcademicProgressPage() {
     if (savedTests) {
       try {
         const parsed = JSON.parse(savedTests);
-        setTests(withKnownSubjectRanks(withFirstTermFinalExam(parsed)));
+        setTests(withKnownSubjectRanks(withFirstMockExam(withFirstTermFinalExam(parsed))));
       } catch (e) {
         setTests(starterTests);
       }
@@ -246,7 +342,9 @@ export function AcademicProgressPage() {
   }, []);
 
   const totalScore = (t: TestRecord) => subjects.reduce((sum, s) => sum + Number(t.scores[s] || 0), 0);
-  const avgTotalScore = (t: TestRecord) => Math.round(subjects.reduce((sum, s) => sum + Number(t.average?.[s] || 0), 0) * 10) / 10;
+  const avgTotalScore = (t: TestRecord) => t.averageTotal ?? Math.round(subjects.reduce((sum, s) => sum + Number(t.average?.[s] || 0), 0) * 10) / 10;
+  // 定期テスト averages are the school's; 模試 averages are 県内受験者 averages.
+  const avgLabel = (t?: TestRecord) => t?.averageLabel || "学校平均";
   // Average fields are optional and default to 0 when left blank, so
   // avgTotalScore(t) === 0 is ambiguous between "no data entered" and "the
   // school average really is 0". This checks the real intent — was any
@@ -366,7 +464,11 @@ export function AcademicProgressPage() {
 
     if (form.editIndex !== null) {
       const nextTests = [...tests];
-      nextTests[form.editIndex] = t;
+      const prev = nextTests[form.editIndex];
+      const averagesChanged = allSubjects.some(s => Number(prev.average?.[s] || 0) !== Number(t.average[s] || 0));
+      // The form has no fields for 模試 detail (分野別, review list, 男女別順位),
+      // so carry it over instead of dropping it on save.
+      nextTests[form.editIndex] = { ...prev, ...t, averageTotal: averagesChanged ? undefined : prev.averageTotal };
       setTests(nextTests);
       showToast("テストデータを修正しました");
     } else {
@@ -376,10 +478,12 @@ export function AcademicProgressPage() {
     clearForm(false);
   };
 
+  // i is a row index in the history table, which lists sortedTests; edits and
+  // deletes must hit the same record in the unsorted tests array.
   const editTest = (i: number) => {
-    const t = tests[i];
+    const t = sortedTests[i];
     setForm({
-      editIndex: i,
+      editIndex: tests.indexOf(t),
       name: t.name,
       date: t.date,
       rank: t.rank ?? "",
@@ -423,7 +527,8 @@ export function AcademicProgressPage() {
 
   const confirmDelete = () => {
     if (showDeleteModal === null) return;
-    const nextTests = tests.filter((_, i) => i !== showDeleteModal);
+    const target = sortedTests[showDeleteModal];
+    const nextTests = tests.filter(t => t !== target);
     setTests(nextTests.length ? nextTests : starterTests);
     setShowDeleteModal(null);
     showToast("削除しました");
@@ -468,6 +573,9 @@ export function AcademicProgressPage() {
     return [...tests].sort((a, b) => String(a.date).localeCompare(String(b.date)));
   }, [tests]);
 
+  // Most recent test with a 分野別 breakdown (only 模試 sheets have one).
+  const latestDetail = useMemo(() => [...sortedTests].reverse().find(t => t.topics), [sortedTests]);
+
   const summary = useMemo(() => {
     if (!sortedTests.length) return null;
     const latest = sortedTests[sortedTests.length - 1];
@@ -505,7 +613,7 @@ export function AcademicProgressPage() {
   const testKey = (t: TestRecord | undefined) => (t ? `${t.date}__${t.name}` : "");
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
-  const testType = (t: TestRecord) => (t.name.includes("中間") ? "中間" : t.name.includes("期末") ? "期末" : "その他");
+  const testType = (t: TestRecord) => (t.kind === "模試" || t.name.includes("模試") ? "模試" : t.name.includes("中間") ? "中間" : t.name.includes("期末") ? "期末" : "その他");
   // Default comparison partner: the latest earlier test of the SAME type
   // (中間↔中間, 期末↔期末). 期末 covers 9 subjects and has different
   // difficulty from 中間, so raw comparisons across types mislead. Falls
@@ -610,9 +718,13 @@ export function AcademicProgressPage() {
     if (!svg || !sortedTests.length) return;
     const W = 700, H = 330, L = 46, R = 22, T = 26, B = 50;
     let html = "";
-    for (let v = 50; v <= 100; v += 10) { const y = T + (100 - v) / 50 * (H - T - B); html += `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#e5eaf3"/><text x="12" y="${y + 4}" font-size="11" fill="#667085">${v}</text>`; }
+    // A fixed 50 floor drew e.g. 国語 37 or 46 as 50; start below the lowest score instead.
+    const lowest = Math.min(...sortedTests.flatMap(t => subjects.map(s => Number(t.scores[s] || 0))));
+    const vmin = clamp(Math.floor((lowest - 5) / 10) * 10, 0, 50);
+    const span = 100 - vmin;
+    for (let v = vmin; v <= 100; v += 10) { const y = T + (100 - v) / span * (H - T - B); html += `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#e5eaf3"/><text x="12" y="${y + 4}" font-size="11" fill="#667085">${v}</text>`; }
     const x = (i: number) => L + (W - L - R) * (sortedTests.length === 1 ? 0.5 : i / (sortedTests.length - 1));
-    const y = (v: number) => T + (100 - clamp(v, 50, 100)) / 50 * (H - T - B);
+    const y = (v: number) => T + (100 - clamp(v, vmin, 100)) / span * (H - T - B);
     subjects.filter(s => visibleSubjects[s]).forEach(s => {
       const pts = sortedTests.map((t, i) => `${x(i)},${y(t.scores[s])}`).join(" ");
       html += `<polyline points="${pts}" fill="none" stroke="${colors[s]}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -1028,6 +1140,18 @@ export function AcademicProgressPage() {
         .academic-progress-container .badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 6px 9px; background: #f1f5f9; font-weight: 1000; font-size: 12px; margin: 2px }
         .academic-progress-container .subject-table-wrap { overflow: auto }
 
+        .academic-progress-container .rank-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 14px }
+        .academic-progress-container .rank-chip { background: #f8fafc; border: 1px solid var(--tracker-line); border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px }
+        .academic-progress-container .rank-chip b { font-size: 20px }
+        .academic-progress-container .topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px }
+        .academic-progress-container .topic-card { background: #f8fafc; border: 1px solid var(--tracker-line); border-radius: 16px; padding: 12px 14px }
+        .academic-progress-container .topic-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px }
+        .academic-progress-container .topic-row { display: grid; grid-template-columns: 1fr 110px 74px; gap: 10px; align-items: center; margin: 8px 0; font-size: 13px }
+        .academic-progress-container .topic-bar { position: relative; height: 12px; background: #e5eaf3; border-radius: 999px }
+        .academic-progress-container .topic-bar .fill { height: 100%; border-radius: 999px }
+        .academic-progress-container .topic-marker { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1px; background: #172033; border-radius: 2px }
+        .academic-progress-container .topic-diff { text-align: right; font-weight: 1000 }
+
         @media(max-width:1050px) {
           .academic-progress-container .hero { grid-template-columns: 1fr }
           .academic-progress-container .nav { justify-content: flex-start }
@@ -1035,11 +1159,15 @@ export function AcademicProgressPage() {
           .academic-progress-container .formgrid { grid-template-columns: repeat(3, 1fr) }
           .academic-progress-container .goalgrid { grid-template-columns: repeat(4, 1fr) }
           .academic-progress-container .goal-status { grid-template-columns: repeat(3, 1fr) }
+          .academic-progress-container .rank-strip { grid-template-columns: repeat(4, 1fr) }
         }
         @media(max-width:660px) {
           .academic-progress-container header, .academic-progress-container main { padding-left: 12px; padding-right: 12px }
           .academic-progress-container .hero { padding: 20px }
           .academic-progress-container .formgrid, .academic-progress-container .goalgrid, .academic-progress-container .goal-status, .academic-progress-container .twocol { grid-template-columns: 1fr }
+          .academic-progress-container .rank-strip { grid-template-columns: repeat(2, 1fr) }
+          .academic-progress-container .topic-grid { grid-template-columns: 1fr }
+          .academic-progress-container .topic-row { grid-template-columns: 1fr 80px 66px }
           .academic-progress-container .big { font-size: 31px }
           .academic-progress-container .chart { height: 280px }
           .academic-progress-container table { font-size: 12px }
@@ -1053,10 +1181,11 @@ export function AcademicProgressPage() {
             <div>
               <div className="kicker">LEEA Academic Dashboard</div>
               <h1>定期テスト成績トラッカー</h1>
-              <p>テストを追加すると、合計点・学校平均・順位・教科別推移・レーダー・目標達成率が自動更新されます。右のタブで「概要・推移・比較・目標・入力」を切り替えられます。点数だけでなく、平均との差と順位で本当の実力の動きが見えます。</p>
+              <p>テストを追加すると、合計点・学校平均・順位・教科別推移・レーダー・目標達成率が自動更新されます。右のタブで「概要・分野別・推移・比較・目標・入力」を切り替えられます。点数だけでなく、平均との差と順位で本当の実力の動きが見えます。</p>
             </div>
             <nav className="nav">
               <button className={activeTab === "overview" ? "tabbtn active" : "tabbtn"} onClick={() => setActiveTab("overview")}>📋 概要</button>
+              <button className={activeTab === "topics" ? "tabbtn active" : "tabbtn"} onClick={() => setActiveTab("topics")}>🔍 分野別</button>
               <button className={activeTab === "trend" ? "tabbtn active" : "tabbtn"} onClick={() => setActiveTab("trend")}>📈 推移</button>
               <button className={activeTab === "compare" ? "tabbtn active" : "tabbtn"} onClick={() => setActiveTab("compare")}>📊 比較</button>
               <button className={activeTab === "goals" ? "tabbtn active" : "tabbtn"} onClick={() => setActiveTab("goals")}>🎯 目標</button>
@@ -1093,9 +1222,9 @@ export function AcademicProgressPage() {
             </div>
 
             <div className="card span-8">
-              <div className="card-head"><h2>5教科合計の推移</h2><div className="legend"><span className="legend-item"><span className="line-sample" style={{ borderColor: "#2563eb" }}></span>Leo</span><span className="legend-item"><span className="line-sample" style={{ borderColor: "#64748b" }}></span>学校平均</span><span className="legend-item"><span className="dash-sample" style={{ borderColor: "#dc2626" }}></span>合計目標</span></div></div>
+              <div className="card-head"><h2>5教科合計の推移</h2><div className="legend"><span className="legend-item"><span className="line-sample" style={{ borderColor: "#2563eb" }}></span>Leo</span><span className="legend-item"><span className="line-sample" style={{ borderColor: "#64748b" }}></span>平均</span><span className="legend-item"><span className="dash-sample" style={{ borderColor: "#dc2626" }}></span>合計目標</span></div></div>
               <svg ref={totalChartRef} className="chart" viewBox="0 0 760 320" preserveAspectRatio="none"></svg>
-              <div className="small">学校平均線は、各教科の平均点を合計して表示しています。平均点を入力すると自動で更新されます。</div>
+              <div className="small">平均線は各テストの平均合計です（定期テスト＝学校平均、模試＝県平均）。平均点を入力すると自動で更新されます。</div>
             </div>
             <div className="card span-4">
               <h2>最新テスト：教科別スコア</h2>
@@ -1126,7 +1255,7 @@ export function AcademicProgressPage() {
                 return (
                   <div className="goal-card" style={{ marginTop: 10 }}>
                     <div className="goal-title">国数英計（3科目合計）</div>
-                    <div className="goal-value">{threeSubjectTotal(latest)}点{latest.rank3 ? ` ・ ${latest.rank3}位` : ""}</div>
+                    <div className="goal-value">{threeSubjectTotal(latest)}点{latest.rank3 ? ` ・ ${latest.rank3}位` : ""}{latest.genderRank3 ? `（男子${latest.genderRank3}位）` : ""}</div>
                     <div className="small">{latest.rank3 && pct !== null ? `上位${pct}%。入試で重視される組み合わせです。` : "順位（国数英計）は未入力です。"}</div>
                   </div>
                 );
@@ -1135,10 +1264,11 @@ export function AcademicProgressPage() {
 
             <div className="card span-12">
               <div className="card-head"><h2>新教科（音楽・保体・技家・美術）</h2><span className="small">期末テストのみ実施</span></div>
-              {sortedTests.length > 0 && hasExtraData(sortedTests[sortedTests.length - 1]) ? (() => {
-                const latest = sortedTests[sortedTests.length - 1];
+              {sortedTests.some(hasExtraData) ? (() => {
+                const latest = [...sortedTests].reverse().find(hasExtraData)!;
                 return (
                   <>
+                    <div className="small" style={{ marginBottom: 6 }}>{latest.name}（{latest.date}）の結果</div>
                     {extraSubjects.map(s => (
                       <div key={s}>
                         <div className="bar-row">
@@ -1170,6 +1300,70 @@ export function AcademicProgressPage() {
                 );
               })() : <div className="soft">まだ音楽・保体・技家・美術のデータがありません。期末テストの結果を追加すると表示されます。</div>}
             </div>
+            </>)}
+
+            {activeTab === "topics" && (<>
+            {latestDetail ? (
+              <div className="card span-12">
+                <div className="card-head">
+                  <h2>分野別の正答率：{latestDetail.name}</h2>
+                  <span className="badge">{avgLabel(latestDetail)}・受験者全体と比較</span>
+                </div>
+                <div className="rank-strip">
+                  <div className="rank-chip"><span className="small">5科目</span><b>{totalScore(latestDetail)}点</b><span className="small">校内{latestDetail.rank ?? "—"}位{latestDetail.genderRank ? `・男子${latestDetail.genderRank}位` : ""}</span></div>
+                  <div className="rank-chip"><span className="small">3科目（国数英）</span><b>{threeSubjectTotal(latestDetail)}点</b><span className="small">校内{latestDetail.rank3 ?? "—"}位{latestDetail.genderRank3 ? `・男子${latestDetail.genderRank3}位` : ""}</span></div>
+                  {subjects.map(s => (
+                    <div className="rank-chip" key={s}><span className="small" style={{ color: colors[s] }}>{labels[s]}</span><b>{latestDetail.scores[s]}点</b><span className="small">校内{latestDetail.subjectRanks?.[s] ?? "—"}位</span></div>
+                  ))}
+                </div>
+                <div className="topic-grid">
+                  {subjects.filter(s => latestDetail.topics?.[s]?.length).map(s => (
+                    <div className="topic-card" key={s}>
+                      <div className="topic-head"><b style={{ color: colors[s] }}>{labels[s]}</b><span className="small">バー＝自分 ／ 縦線＝全体</span></div>
+                      {latestDetail.topics![s]!.map(tp => {
+                        const rate = Math.round(tp.score / tp.max * 100);
+                        const d = rate - tp.overallRate;
+                        return (
+                          <div className="topic-row" key={tp.name}>
+                            <div>{tp.name}<span className="small"> {tp.score}/{tp.max}</span></div>
+                            <div className="topic-bar">
+                              <div className="fill" style={{ width: `${rate}%`, background: colors[s] }}></div>
+                              <div className="topic-marker" style={{ left: `${tp.overallRate}%` }}></div>
+                            </div>
+                            <div className={`topic-diff ${d >= 10 ? "goodtxt" : d <= -10 ? "badtxt" : ""}`}>{rate}%<span className="small"> ({d >= 0 ? "+" : ""}{d})</span></div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+                <div className="small" style={{ marginTop: 10 }}>緑＝全体より10ポイント以上高い、赤＝10ポイント以上低い分野。縦線は受験者全体の正答率です。</div>
+              </div>
+            ) : (
+              <div className="card span-12"><div className="soft">分野別のデータがあるテストはまだありません。模試の結果を追加すると表示されます。</div></div>
+            )}
+
+            {latestDetail?.review?.length ? (
+              <div className="card span-12">
+                <div className="card-head"><h2>📝 復習リスト</h2><span className="small">全体の正答率が高いのに不正解だった問題＝次に一番点が伸びる所</span></div>
+                <div className="subject-table-wrap">
+                  <table>
+                    <thead><tr><th>教科</th><th>問題</th><th>内容</th><th className="right">全体正答率</th><th>メモ</th></tr></thead>
+                    <tbody>
+                      {[...latestDetail.review].sort((a, b) => b.overallRate - a.overallRate).map(r => (
+                        <tr key={r.subject + r.question}>
+                          <td><b style={{ color: colors[r.subject] }}>{labels[r.subject]}</b></td>
+                          <td className="nowrap">{r.question}</td>
+                          <td>{r.topic}</td>
+                          <td className={`right ${r.overallRate >= 70 ? "badtxt" : r.overallRate >= 50 ? "warntxt" : ""}`}>{r.overallRate}%</td>
+                          <td className="small">{r.note || ""}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : null}
             </>)}
 
             {activeTab === "goals" && (
@@ -1385,7 +1579,7 @@ export function AcademicProgressPage() {
                       <th>テスト</th>
                       <th>日付</th>
                       <th className="right">合計</th>
-                      <th className="right">前年差</th>
+                      <th className="right">前回差</th>
                       <th className="right">平均合計</th>
                       <th className="right">平均との差</th>
                       <th className="right">順位</th>
@@ -1407,7 +1601,7 @@ export function AcademicProgressPage() {
                       const rankPct = (t.rank && goals.students) ? Math.round((t.rank / goals.students * 100) * 10) / 10 : null;
                       return (
                         <tr key={i}>
-                          <td><b>{t.name}</b></td>
+                          <td><b>{t.name}</b>{t.kind === "模試" && <span className="badge">模試</span>}</td>
                           <td className="nowrap">{t.date}</td>
                           <td className="right"><b>{curTotal}</b></td>
                           <td className={`right ${td === null ? '' : td >= 0 ? 'goodtxt' : 'badtxt'}`}>{td === null ? '—' : (td >= 0 ? '+' : '') + td}</td>
@@ -1456,7 +1650,7 @@ export function AcademicProgressPage() {
 
                   return (
                     <>
-                      <p><b>率直に言うと：</b> 最新の合計は <b>{curTotal}点</b>。{curAvgTotal === null ? '学校平均データは未入力です。' : <>学校平均合計は <b>{curAvgTotal}点</b> なので、平均との差は <b className={curTotal - curAvgTotal >= 0 ? 'goodtxt' : 'badtxt'}>{curTotal - curAvgTotal >= 0 ? '+' : ''}{Math.round((curTotal - curAvgTotal) * 10) / 10}点</b> です。</>} 合計目標の <b>{goals.total}点</b> までは <b className={gap === 0 ? 'goodtxt' : 'warntxt'}>{gap === 0 ? '達成' : `あと${gap}点`}</b> です。</p>
+                      <p><b>率直に言うと：</b> 最新の合計は <b>{curTotal}点</b>。{curAvgTotal === null ? '平均点データは未入力です。' : <>{avgLabel(latest)}の合計は <b>{curAvgTotal}点</b> なので、平均との差は <b className={curTotal - curAvgTotal >= 0 ? 'goodtxt' : 'badtxt'}>{curTotal - curAvgTotal >= 0 ? '+' : ''}{Math.round((curTotal - curAvgTotal) * 10) / 10}点</b> です。</>} 合計目標の <b>{goals.total}点</b> までは <b className={gap === 0 ? 'goodtxt' : 'warntxt'}>{gap === 0 ? '達成' : `あと${gap}点`}</b> です。</p>
                       <p><b>順位：</b> {latest.rank ? `${latest.rank}位 / ${goals.students || 150}人。上位${rankPct}%・前に${rankAhead}人・後ろに${rankBehind}人。` : '順位データなし'} 目標の{goals.rank}位以内に入るには、順位だけで見るとあと <b>{latest.rank ? Math.max(0, latest.rank - goals.rank) : '—'}人</b> 抜く必要があります。</p>
                       <p>一番強い教科は <b>{labels[strong]}</b>。今いちばん点数を取りに行くべき教科は <b>{labels[weak]}</b> です。英語が強いなら、英語だけに時間を使いすぎず、国語・数学・理科の底上げで合計点を上げる方が効率的です。</p>
                       <table>

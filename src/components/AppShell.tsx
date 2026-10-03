@@ -26,7 +26,9 @@ const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNod
   { key: "progress", label: "Progress", href: "/teacher/progress", icon: <BarChart3 size={20} strokeWidth={2} /> }
 ];
 
-const mobileNavItems = [navItems[0], navItems[1], navItems[2], { key: "english" as const, label: "English", href: "/english", icon: <BookOpen size={20} /> }, navItems[3]];
+// The sidebar is hidden on phones, so anything missing from this bar has no
+// way in at all — Progress was only reachable by typing its URL.
+const mobileNavItems = [navItems[0], navItems[1], navItems[2], navItems[5], { key: "english" as const, label: "English", href: "/english", icon: <BookOpen size={20} /> }, navItems[3]];
 
 const JapanesePreferenceContext = createContext(false);
 

@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leo · Unit 1 · Reading — Tornado Trouble</title>
+<script src="/components/charts.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --or:#EA580C;--or-d:#9A3412;--or-l:#FFF7ED;--or-b:#FED7AA;
+  --sky:#0369A1;--sky-d:#0C4A6E;--sky-l:#F0F9FF;--sky-b:#BAE6FD;
+  --pur:#7C3AED;--pur-l:#F5F3FF;--pur-b:#DDD6FE;
+  --red:#DC2626;--red-l:#FEF2F2;--red-b:#FECACA;
+  --amber:#F59E0B;--amber-l:#FFFBEB;--yellow:#FACC15;--yellow-b:#FDE68A;
+  --green:#16A34A;--green-d:#15803D;--green-l:#F0FDF4;--green-b:#BBF7D0;
+  --ink:#111;--ink-2:#374151;--ink-3:#6B7280;--border:#E5E7EB;
+  --paper:#FFFDF8;--navy:#0f172a;--storm:#334155;
+}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--paper);color:var(--ink)}
+body{display:flex;flex-direction:column}
+.jp{font-family:'Noto Sans JP','Outfit',sans-serif}
+
+.app-header{background:linear-gradient(120deg,var(--storm),var(--sky));color:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-header .logo{font-size:24px}
+.app-header .title{font-size:19px;font-weight:800;line-height:1.1}
+.app-header .subtitle{font-size:13px;opacity:.9;margin-top:2px}
+.app-header .badge-row{margin-left:auto;display:flex;gap:8px;align-items:center}
+.prog-pill{background:rgba(255,255,255,.22);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;white-space:nowrap}
+.dad-btn{background:rgba(255,255,255,.18);color:#fff;border:2px solid rgba(255,255,255,.5);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;white-space:nowrap}
+
+/* LANDING */
+.landing-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:30px 16px;gap:20px;background:linear-gradient(135deg,#F1F5F9,#E0F2FE);overflow-y:auto;flex-wrap:wrap}
+.mode-card{background:#fff;border:3px solid var(--border);border-radius:18px;padding:30px 24px;font-family:'Outfit',sans-serif;cursor:pointer;min-width:260px;max-width:360px;flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.mode-card:hover{transform:translateY(-3px)}
+.mode-card.sb{border-color:var(--sky)}
+.mode-card.wb{border-color:var(--or)}
+.mc-icon{font-size:66px;line-height:1}
+.mc-title{font-size:24px;font-weight:900}
+.mode-card.sb .mc-title{color:var(--sky-d)}
+.mode-card.wb .mc-title{color:var(--or-d)}
+.mc-sub{font-size:14px;color:var(--ink-3);line-height:1.5}
+.mc-prog{background:#F3F4F6;color:var(--ink-2);padding:6px 14px;border-radius:99px;font-size:12px;font-weight:800;margin-top:6px}
+.mode-card.sb .mc-prog.has-prog{background:var(--sky);color:#fff}
+.mode-card.wb .mc-prog.has-prog{background:var(--or);color:#fff}
+.mode-pane{flex:1;display:none;flex-direction:column;overflow:hidden}
+.mode-back-bar{background:#fff;border-bottom:1px solid var(--border);padding:5px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.mode-back-bar button{background:none;border:2px solid var(--border);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--ink-2);cursor:pointer;font-family:'Outfit',sans-serif}
+.mode-label{font-size:13px;font-weight:800}
+
+/* TAB NAV */
+.tab-nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:10px 12px;font-weight:700;font-family:'Outfit',sans-serif;border:none;background:none;cursor:pointer;color:var(--ink-3);border-bottom:3px solid transparent;margin-bottom:-2px;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;min-width:76px}
+.tab-btn .tab-icon{font-size:18px}
+.tab-btn .tab-name{font-size:11px;letter-spacing:.3px}
+.tab-btn.active{color:var(--sky);border-bottom-color:var(--sky)}
+#wb-mode .tab-btn.active{color:var(--or);border-bottom-color:var(--or)}
+.tab-btn.done::after{content:'✓';position:absolute;top:4px;right:6px;color:var(--green);font-weight:900;font-size:12px}
+
+.tab-content{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.tab-content.active{display:flex}
+.tab-body{flex:1;padding:18px 20px;display:flex;flex-direction:column;gap:14px;max-width:900px;width:100%;margin:0 auto}
+.tab-footer{flex-shrink:0;border-top:2px solid var(--border);background:#fff;padding:10px 20px;display:flex;gap:10px}
+.section-title{font-size:21px;font-weight:900;color:var(--navy)}
+.section-sub{font-size:14px;color:var(--ink-3);font-weight:600;margin-top:2px}
+.dad-hint{background:var(--amber-l);border:2px solid var(--yellow-b);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:600;color:var(--ink-2);line-height:1.45}
+.klabel{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sky);margin-top:10px;display:flex;align-items:center;gap:8px}
+.klabel .kdone{display:none;color:var(--green);letter-spacing:0;text-transform:none}
+.klabel.ok .kdone{display:inline}
+.blk{display:flex;flex-direction:column;gap:12px}
+
+.btn-complete{flex:1;background:var(--green);color:#fff;border:none;border-radius:12px;padding:12px 16px;font-size:15px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.btn-complete:disabled{background:var(--border);color:var(--ink-3);cursor:not-allowed}
+.btn-complete.confirmed{background:var(--green-d)}
+.btn-redo{width:110px;flex-shrink:0;background:#fff;color:var(--red);border:2px solid var(--red-b);border-radius:12px;padding:12px 8px;font-size:13px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.btn-redo.armed{background:var(--red-l);border-color:var(--red)}
+.done-banner{display:none;background:var(--green-l);border:2px solid var(--green-b);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;color:var(--green-d);text-align:center}
+.done-banner.show{display:block;animation:pop .35s}
+@keyframes pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.shake{animation:shake .35s}
+
+/* MCQ */
+.opt{display:block;width:100%;text-align:left;background:#fff;border:3px solid var(--border);border-radius:12px;padding:11px 16px;font-size:16px;font-weight:700;color:var(--ink);cursor:pointer;font-family:'Outfit',sans-serif;margin-top:8px}
+.opt:hover{border-color:var(--sky)}
+.opt.good{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.opt.bad{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default}
+.opt:disabled:not(.good){opacity:.55}
+.opt2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt2 .opt{text-align:center}
+.qcard{background:#fff;border:3px solid var(--border);border-radius:14px;padding:14px 18px}
+.qcard.solved{border-color:var(--green-b)}
+.qcard.missed{border-color:var(--amber)}
+.qtext{font-size:16px;font-weight:800;color:var(--navy);line-height:1.4}
+.qclue{font-size:13px;color:var(--ink-3);font-weight:700;margin-bottom:4px}
+.qwhy{display:none;margin-top:8px;font-size:14px;color:var(--green-d);font-weight:700}
+.qcard.solved .qwhy{display:block}
+.qjp{display:none;margin-top:4px;font-size:13px;color:var(--ink-3)}
+.qcard.solved .qjp{display:block}
+.quiz-fb{margin-top:8px;font-weight:700;font-size:14px;min-height:0}
+.quiz-fb.ok{color:var(--green-d)}.quiz-fb.no{color:var(--red)}.quiz-fb.show{color:#92400E}
+
+/* FLASHCARDS */
+.flashcard-wrap{perspective:1000px;min-height:270px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:270px;position:relative;transform-style:preserve-3d;transition:transform .5s ease}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:8px;text-align:center}
+.fc-front{background:linear-gradient(135deg,var(--storm),var(--sky));color:#fff;border:4px solid var(--sky-b)}
+#wb-mode .fc-front{background:linear-gradient(135deg,var(--or-d),var(--or));border-color:var(--or-b)}
+.fc-back{background:linear-gradient(135deg,#fff,var(--sky-l));border:4px solid var(--sky);transform:rotateY(180deg)}
+.fc-emoji{font-size:54px;line-height:1}
+.fc-word{font-size:30px;font-weight:900}
+.fc-pos{font-size:13px;font-weight:700;background:rgba(255,255,255,.22);border-radius:12px;padding:3px 12px}
+.fc-def{font-size:16px;color:var(--ink-2);font-weight:700;line-height:1.35}
+.fc-tap{font-size:12px;font-weight:700;opacity:.8;letter-spacing:.06em}
+.fc-sample{font-size:15px;background:#fff;border:2px solid var(--sky-b);border-radius:10px;padding:7px 12px;font-weight:700;color:var(--sky-d)}
+.fc-jp{font-size:14px;color:var(--ink-3);font-weight:700;display:none}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:none;border:1px dashed #D1D5DB;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;color:var(--ink-3);cursor:pointer;font-family:'Outfit',sans-serif}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:12px;max-width:560px;width:100%;margin-left:auto;margin-right:auto}
+.fc-nav button{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.fc-dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.fc-dot{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.fc-dot.seen{background:var(--sky-b)}
+.fc-dot.on{background:var(--sky)}
+
+/* MATCH */
+.match-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}
+.mcol{display:flex;flex-direction:column;gap:8px}
+.mbtn{background:#fff;border:3px solid var(--border);border-radius:12px;padding:10px 12px;font-size:15px;font-weight:700;font-family:'Outfit',sans-serif;text-align:left;cursor:pointer;color:var(--ink)}
+.mbtn.sel{border-color:var(--amber);background:var(--amber-l)}
+.mbtn.matched{border-color:var(--green-b);background:var(--green-l);color:var(--green-d);opacity:.8;cursor:default}
+.mbtn.err{animation:shake .35s;border-color:var(--red)}
+
+/* TYPED */
+.type-row{display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap}
+.type-row .pre{font-size:17px;font-weight:800;color:var(--navy)}
+.type-in{flex:1;min-width:160px;border:3px solid var(--border);border-radius:12px;padding:11px 14px;font-size:17px;font-family:'Outfit',sans-serif;font-weight:700}
+.type-in:focus{outline:none;border-color:var(--sky)}
+.type-go{background:var(--sky);color:#fff;border:none;border-radius:12px;padding:10px 18px;font-size:18px;font-weight:900;cursor:pointer;font-family:'Outfit',sans-serif}
+.type-go:disabled{opacity:.4}
+.long-in{width:100%;min-height:150px;border:3px solid var(--border);border-radius:12px;padding:12px 14px;font-size:16px;font-family:'Outfit',sans-serif;line-height:1.6;resize:vertical}
+.long-in:focus{outline:none;border-color:var(--sky)}
+.counter{font-size:13px;font-weight:800;color:var(--ink-3);margin-top:6px}
+.counter b.ok{color:var(--green-d)}
+
+/* SORT restore */
+.sort-static{display:grid;gap:12px}
+.sort-static .col{border:2px solid var(--green-b);border-radius:12px;overflow:hidden;background:#fff}
+.sort-static .col h4{padding:8px 12px;color:#fff;font-size:15px}
+.sort-static .col div{padding:6px 12px;font-size:14px;font-weight:700;border-top:1px solid var(--border)}
+.sort-host .dnd-tile{white-space:normal !important;font-size:15px !important;padding:8px 14px !important}
+
+/* ORDER + FIND */
+.ord-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.ord-done{background:var(--green-l);border:2px solid var(--green-b);border-radius:10px;padding:8px 12px;font-weight:700;color:var(--green-d);font-size:15px}
+.ord-done b{display:inline-block;min-width:26px}
+.ord-bank{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tile{background:#fff;border:3px solid var(--sky-b);border-radius:12px;padding:9px 14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--ink);text-align:left}
+.tile:hover{border-color:var(--sky)}
+.tile.found{background:var(--green-l);border-color:var(--green);color:var(--green-d);cursor:default}
+.tile.nope{background:var(--red-l);border-color:var(--red);animation:shake .35s}
+.tile.nope-done{opacity:.45;border-style:dashed;cursor:default}
+.find-count{font-size:13px;font-weight:800;color:var(--sky-d);margin-top:6px}
+
+/* PASSAGE */
+.passage-block{background:#fff;border:3px solid var(--sky-b);border-radius:14px;padding:16px 20px;font-size:18px;line-height:1.85}
+.passage-block .pnum{font-size:12px;font-weight:900;letter-spacing:.12em;color:var(--sky);display:block;margin-bottom:4px}
+.passage-block .tag{background:#DBEAFE;border-bottom:2px solid var(--sky);padding:0 4px;border-radius:4px;font-weight:800;cursor:pointer}
+.passage-block .sig{background:#FEF3C7;border-bottom:2px solid var(--amber);padding:0 4px;border-radius:4px;font-weight:800;cursor:pointer}
+.passage-block b.kw{color:var(--or-d)}
+.gloss{display:none;margin-top:8px;background:var(--sky-l);border-radius:10px;padding:8px 12px;font-size:15px;font-weight:700;color:var(--sky-d)}
+.gloss.show{display:block}
+.para{display:flex;flex-direction:column;gap:10px}
+.para.locked{opacity:.35;pointer-events:none;filter:grayscale(1)}
+.para .lock-note{display:none;font-size:13px;font-weight:800;color:var(--ink-3)}
+.para.locked .lock-note{display:block}
+.fact-box{background:var(--pur-l);border:2px solid var(--pur-b);border-radius:14px;padding:12px 16px;font-size:16px;font-weight:700;color:#4C1D95}
+
+/* CHART */
+.cmp-table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;border:2px solid var(--border)}
+.cmp-table th{background:var(--storm);color:#fff;padding:10px;text-align:left;font-size:14px}
+.cmp-table td{padding:9px 10px;border-top:1px solid var(--border);font-size:15px;font-weight:700}
+.cmp-table td.q{color:var(--ink-3)}
+.cmp-table td.a{color:var(--green-d);background:var(--green-l)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:#fff;border:2px solid var(--sky-b);border-radius:20px;padding:5px 12px;font-size:14px;font-weight:700}
+.web-host{min-height:80px}
+
+/* QUIZ */
+.quiz-progress{display:flex;gap:5px}
+.quiz-progress div{flex:1;height:8px;border-radius:4px;background:var(--border)}
+.quiz-progress div.answered{background:var(--sky)}
+.quiz-result{text-align:center;padding:16px}
+.quiz-result .trophy{font-size:66px}
+.quiz-result .qscore{font-size:36px;font-weight:900;color:var(--navy);margin:8px 0}
+.wrong-review{background:var(--red-l);border:2px solid var(--red-b);border-radius:10px;padding:10px 14px;text-align:left;margin-top:8px;font-size:14px;line-height:1.5}
+
+/* DAD */
+.dad-ov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:80;display:none;align-items:flex-end;justify-content:center}
+.dad-ov.open{display:flex}
+.dad-modal{background:var(--paper);width:100%;max-width:760px;max-height:90vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden}
+.dad-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#fff;border-bottom:2px solid var(--border);font-size:17px}
+.dad-x{background:var(--border);border:none;border-radius:10px;padding:8px 12px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer}
+.dad-body{padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.dad-sec{background:#fff;border:2px solid var(--border);border-radius:12px;padding:10px 14px;font-size:14px;line-height:1.5}
+.dad-sec h4{font-size:15px;color:var(--navy);margin-bottom:4px}
+.dad-row{color:var(--red);border-top:1px solid var(--border);padding:4px 0}
+.dad-row i{color:var(--ink-2)}
+@media (max-width:620px){
+  .match-grid{grid-template-columns:1fr}.sort-static{grid-template-columns:1fr !important}
+  .tab-body{padding:14px 16px}.app-header .subtitle{display:none}
+  .sort-host .dnd-zones{flex-direction:column}
+  .badge-row{flex-direction:column;align-items:flex-end}
+}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo">🌪️</div>
+  <div>
+    <div class="title">Unit 1 · Reading — Tornado Trouble</div>
+    <div class="subtitle">Extreme Weather · SB pp. 16–17 · TR 1.8 · WB pp. 8–9</div>
+  </div>
+  <div class="badge-row"><button class="dad-btn" onclick="openDad()">👨 Dad’s view</button><div class="prog-pill" id="prog-pill">0 / 13 done</div></div>
+</div>
+
+<div class="landing-screen" id="landing">
+  <button class="mode-card sb" onclick="enterMode('sb')">
+    <div class="mc-icon">📘</div>
+    <div class="mc-title">Student Book</div>
+    <div class="mc-sub">Tornado Trouble — storm chasing with Josh Wurman · the slides, again on your own · 8 tabs</div>
+    <div class="mc-prog" id="mc-prog-sb">0 / 8 done</div>
+  </button>
+  <button class="mode-card wb" onclick="enterMode('wb')">
+    <div class="mc-icon">📒</div>
+    <div class="mc-title">Workbook</div>
+    <div class="mc-sub">Weather Change — WB pp. 8–9 · TR 1.3 · 5 tabs</div>
+    <div class="mc-prog" id="mc-prog-wb">0 / 5 done</div>
+  </button>
+</div>
+
+<div class="mode-pane" id="sb-mode">
+  <div class="mode-back-bar"><button onclick="backToLanding()">◀ Back to menu</button><span class="mode-label">📘 Student Book — Tornado Trouble</span></div>
+  <div class="tab-nav" id="nav-sb"></div>
+  <div id="panes-sb" style="flex:1;display:flex;flex-direction:column;overflow:hidden"></div>
+</div>
+
+<div class="mode-pane" id="wb-mode">
+  <div class="mode-back-bar"><button onclick="backToLanding()">◀ Back to menu</button><span class="mode-label">📒 Workbook — Weather Change</span></div>
+  <div class="tab-nav" id="nav-wb"></div>
+  <div id="panes-wb" style="flex:1;display:flex;flex-direction:column;overflow:hidden"></div>
+</div>
+
+<div class="dad-ov" id="dad-ov"><div class="dad-modal">
+  <div class="dad-head"><b>👨 Dad’s view — Leo’s wrong first tries</b><button class="dad-x" onclick="closeDad()">✕ Close</button></div>
+  <div class="dad-body" id="dad-body"></div>
+</div></div>
+<script>
+/* ═════════════════════════════════════════════════════════════════════
+   LEVEL 5 UNIT 1 READING — LEO APP (Tornado Trouble + Weather Change)
+   SAVE_PREFIX: leea-5-1-reading- · HOMEWORK_ID: leo-5-1-reading
+   moduleCount 13 = 📘 SB 8 (tab-{i}-done, i 0-7) + 📒 WB 5 (wb-tab-{i}-done, i 0-4)
+   Quiz scores: score (SB tab 4) · wb-score (WB tab 4) · last-mode / last-tab / wb-last-tab
+
+   A COMPANION TO THE TEACHER DECK (public/lessons/ow-l5-u1-reading.html).
+   Leo does this alone after the lesson; every SB tab replays the slides it
+   comes from, with the slides' own words, sentences and answers first.
+     Vocab        <- slides 1, 7, 9-16 (the deck's eight word cards) + 13, 17
+     Word Games   <- slides 7, 8, 9-12, 14, 15, 16, 17, 18
+     Strategy     <- slides 4, 5, 19, 36 (Visualize · detail words · think aloud)
+     Read         <- slides 22-24 (before), 25-33 (P1-P3 + checks), 24 (facts)
+     Questions    <- slides 35, 38-46, 62 (Activity 2, Activity 3, the orders)
+     Compare      <- slides 47-50 (Activity 4 chart, Venn, compare sentences)
+     My Storm     <- slides 52-61 (word web, tell your storm, role-play, soccer)
+     Quiz         <- 10 questions over the whole reading
+   WB tabs use WB pp. 8-9: the 7 WB-only words (OW5-U1-RD-WB), Weather Change
+   (TR 1.3), Activity 2 (Circle the best answer: c, b, a) and Activity 3 (KWL).
+
+   Every tab is a list of blocks; each block saves as Leo answers, restores
+   its own DOM, and the tab's done-key saves itself when every block is done.
+═════════════════════════════════════════════════════════════════════ */
+const SAVE_PREFIX = 'leea-5-1-reading-';
+const HOMEWORK_ID = 'leo-5-1-reading';
+const SB_TABS = 8, WB_TABS = 5;
+function lSave(k,v){ try{ localStorage.setItem(SAVE_PREFIX+k, JSON.stringify(v)); }catch(e){} }
+function lLoad(k){ try{ const r = localStorage.getItem(SAVE_PREFIX+k); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
+function lDel(k){ try{ localStorage.removeItem(SAVE_PREFIX+k); }catch(e){} }
+const $ = id => document.getElementById(id);
+function shuffle(a){ const b = a.slice(); for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]]; } return b; }
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function strip(h){ return String(h).replace(/<[^>]+>/g,''); }
+function norm(s){ return String(s).toLowerCase().replace(/[’‘`]/g,"'").replace(/[.,!?;:"“”]/g,' ').replace(/\s+/g,' ').trim(); }
+
+/* Homework flag: learnerProgress.ts reads `leea-<homeworkId>-done` exactly. */
+function clearHomeworkFlag(){
+  try{ localStorage.removeItem('leea-' + HOMEWORK_ID + '-done'); }catch(e){}
+  try{ if(window.LEEA_CLOUD && typeof window.LEEA_CLOUD.saveProgress === 'function') window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, 'leea-' + HOMEWORK_ID + '-done', null); }catch(e){}
+}
+function saveHomeworkFlag(value){
+  try{ localStorage.setItem('leea-' + HOMEWORK_ID + '-done', JSON.stringify(value)); }catch(e){}
+  try{ if(window.LEEA_CLOUD && typeof window.LEEA_CLOUD.saveProgress === 'function') window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, 'leea-' + HOMEWORK_ID + '-done', value); }catch(e){}
+}
+
+/* ═══ TAB MACHINERY — a tab key K is 'tab-N' (SB) or 'wb-tab-N' (WB) ═══ */
+const TABS = {};            // K -> tab config (filled by defineTab)
+const TAB_INIT = {};        // K -> init(); TAB_INIT[K]._init once rendered
+function isDone(K){ return !!lLoad(K + '-done'); }
+function modeOf(K){ return K.indexOf('wb-') === 0 ? 'wb' : 'sb'; }
+function blocksDone(K){ const t = TABS[K]; return t.blocks.filter(b => BLOCK_DONE[b.type] && BLOCK_DONE[b.type](K + '-' + b.id, b)).length; }
+function blocksTotal(K){ return TABS[K].blocks.filter(b => BLOCK_DONE[b.type]).length; }
+function refreshProg(){
+  try{
+    let sb = 0, wb = 0;
+    Object.keys(TABS).forEach(K=>{ const d = isDone(K); if(d){ if(modeOf(K)==='wb') wb++; else sb++; } const b = $('tb-'+K); if(b) b.classList.toggle('done', d); });
+    const a = $('mc-prog-sb'); a.textContent = sb + ' / ' + SB_TABS + ' done'; a.classList.toggle('has-prog', sb > 0);
+    const c = $('mc-prog-wb'); c.textContent = wb + ' / ' + WB_TABS + ' done'; c.classList.toggle('has-prog', wb > 0);
+    $('prog-pill').textContent = (sb + wb) + ' / ' + (SB_TABS + WB_TABS) + ' done';
+    if(sb + wb >= SB_TABS + WB_TABS){ if(!localStorage.getItem('leea-' + HOMEWORK_ID + '-done')) saveHomeworkFlag({ complete:true, completedAt:new Date().toISOString() }); }
+    else if(localStorage.getItem('leea-' + HOMEWORK_ID + '-done')) clearHomeworkFlag();
+  }catch(e){}
+}
+function paintFooter(K){
+  const cb = $('complete-' + K); if(!cb) return;
+  if(isDone(K)){ cb.disabled = false; cb.classList.add('confirmed'); cb.textContent = '✓ ' + TABS[K].name + ' done'; }
+  else { cb.disabled = true; cb.classList.remove('confirmed'); cb.textContent = 'Finish the activities first (' + blocksDone(K) + ' / ' + blocksTotal(K) + ')'; }
+  TABS[K].blocks.forEach(b=>{ const l = $('kl-' + K + '-' + b.id); if(l && BLOCK_DONE[b.type]) l.classList.toggle('ok', !!BLOCK_DONE[b.type](K + '-' + b.id, b)); });
+}
+function finishTab(K){
+  try{
+    $('done-' + K).classList.add('show');
+    if(!isDone(K)) lSave(K + '-done', { done:true, completedAt:new Date().toISOString() });
+    paintFooter(K); refreshProg();
+  }catch(e){}
+}
+/* Called by every block after progress: the done-key saves itself. */
+function checkTab(K){ if(blocksDone(K) >= blocksTotal(K)) finishTab(K); else paintFooter(K); }
+function completeTab(K){ checkTab(K); }
+function redoTab(K){
+  try{
+    const btn = $('redo-' + K);
+    if(!btn.classList.contains('armed')){ btn.classList.add('armed'); btn.textContent = 'Tap again ↺'; setTimeout(()=>{ btn.classList.remove('armed'); btn.textContent = '↺ Redo'; }, 3000); return; }
+    btn.classList.remove('armed'); btn.textContent = '↺ Redo';
+    Object.keys(localStorage).filter(k => k.indexOf(SAVE_PREFIX + K + '-') === 0).forEach(k => localStorage.removeItem(k));
+    if(K === 'tab-4') lDel('score');
+    if(K === 'wb-tab-4') lDel('wb-score');
+    $('done-' + K).classList.remove('show');
+    renderTab(K); paintFooter(K); refreshProg();
+  }catch(e){}
+}
+function openTab(K){
+  try{
+    const m = modeOf(K);
+    document.querySelectorAll('#nav-' + m + ' .tab-btn').forEach(b => b.classList.toggle('active', b.id === 'tb-' + K));
+    document.querySelectorAll('#panes-' + m + ' .tab-content').forEach(c => c.classList.toggle('active', c.id === 'tc-' + K));
+    if(!TAB_INIT[K]._init) renderTab(K);
+    paintFooter(K);
+    lSave(m === 'wb' ? 'wb-last-tab' : 'last-tab', K);
+  }catch(e){}
+}
+/* Locked-pattern entry points (SB / WB parallel names). */
+function showTab(n){ openTab('tab-' + n); }
+function wbShowTab(n){ openTab('wb-tab-' + n); }
+function markComplete(n){ completeTab('tab-' + n); }
+function wbMarkComplete(n){ completeTab('wb-tab-' + n); }
+function doRedo(n){ redoTab('tab-' + n); }
+function wbDoRedo(n){ redoTab('wb-tab-' + n); }
+
+function renderTab(K){
+  const t = TABS[K];
+  $('blocks-' + K).innerHTML = t.blocks.map(b =>
+    (b.label ? '<div class="klabel" id="kl-' + K + '-' + b.id + '">' + b.label + ' <span class="kdone">✓ done</span></div>' : '') +
+    (b.hint ? '<div class="dad-hint">' + b.hint + '</div>' : '') +
+    '<div class="blk" id="' + K + '-' + b.id + '"></div>').join('');
+  t.blocks.forEach(b => { try{ BLOCK_RENDER[b.type](K + '-' + b.id, K + '-' + b.id, b, K); }catch(e){ console.error(b.type, e); } });
+  TAB_INIT[K]._init = true;
+  if(isDone(K)) $('done-' + K).classList.add('show');
+}
+function defineTab(K, cfg){
+  cfg.k = K; TABS[K] = cfg; TAB_INIT[K] = function(){ renderTab(K); };
+}
+function buildShell(){
+  ['sb','wb'].forEach(m=>{
+    const order = m === 'sb' ? SB_NAV : WB_NAV;
+    $('nav-' + m).innerHTML = order.map(K => '<button class="tab-btn" id="tb-' + K + '" onclick="openTab(\'' + K + '\')"><span class="tab-icon">' + TABS[K].icon + '</span><span class="tab-name">' + TABS[K].name + '</span></button>').join('');
+    $('panes-' + m).innerHTML = order.map(K => { const t = TABS[K]; return '<div class="tab-content" id="tc-' + K + '"><div class="tab-body">' +
+      '<div><div class="section-title">' + t.title + '</div><div class="section-sub">' + t.sub + '</div></div>' +
+      (t.hint ? '<div class="dad-hint">' + t.hint + '</div>' : '') +
+      '<div id="blocks-' + K + '" style="display:flex;flex-direction:column;gap:12px"></div>' +
+      '<div class="done-banner" id="done-' + K + '">' + t.done + '</div></div>' +
+      '<div class="tab-footer"><button class="btn-redo" id="redo-' + K + '" onclick="redoTab(\'' + K + '\')">↺ Redo</button><button class="btn-complete" id="complete-' + K + '" onclick="completeTab(\'' + K + '\')" disabled>Finish the activities first</button></div></div>'; }).join('');
+  });
+}
+function enterMode(m){
+  lSave('last-mode', m);
+  $('landing').style.display = 'none';
+  $('sb-mode').style.display = m === 'sb' ? 'flex' : 'none';
+  $('wb-mode').style.display = m === 'wb' ? 'flex' : 'none';
+  const last = lLoad(m === 'wb' ? 'wb-last-tab' : 'last-tab');
+  openTab(last && TABS[last] && modeOf(last) === m ? last : (m === 'wb' ? WB_NAV[0] : SB_NAV[0]));
+}
+function backToLanding(){
+  lSave('last-mode', 'landing');
+  $('landing').style.display = 'flex'; $('sb-mode').style.display = 'none'; $('wb-mode').style.display = 'none';
+  refreshProg();
+}
+
+/* ── Wrong first tries, for Dad (cleared with the tab's Redo) ── */
+function logAtt(K, rec){ const a = lLoad(K + '-att') || []; a.push(rec); lSave(K + '-att', a); }
+function openDad(){
+  let h = '<div class="dad-hint">Leo’s <b>wrong first tries</b>, exactly as he tapped or typed them.</div>', any = false;
+  SB_NAV.concat(WB_NAV).forEach(K=>{
+    const a = lLoad(K + '-att') || []; if(!a.length) return; any = true;
+    h += '<div class="dad-sec"><h4>' + (modeOf(K)==='wb' ? '📒 ' : '📘 ') + esc(TABS[K].name) + (isDone(K) ? ' ✓' : '') + ' — ' + a.length + '</h4>' +
+      a.map(r => '<div class="dad-row">✖ ' + (r.q ? '<i>' + esc(r.q) + '</i> → ' : '') + '<b>' + esc(r.a) + '</b></div>').join('') + '</div>';
+  });
+  if(!any) h += '<div class="dad-sec">No wrong first tries yet. 🎉</div>';
+  $('dad-body').innerHTML = h; $('dad-ov').classList.add('open');
+}
+function closeDad(){ $('dad-ov').classList.remove('open'); }
+
+/* ═════════════════════════════════════════════════════════════════════
+   BLOCKS. Each: render(host, key, cfg, K) + done(key, cfg).
+═════════════════════════════════════════════════════════════════════ */
+const BLOCK_RENDER = {}, BLOCK_DONE = {}, BS = {};
+
+/* note — static html, no progress */
+BLOCK_RENDER.note = (host, key, b) => { $(host).innerHTML = b.html; };
+
+/* flash — the deck's word cards; every card flipped = done */
+BLOCK_RENDER.flash = function(host, key, b, K){
+  BS[host] = { key, b, K, i:0 };
+  $(host).innerHTML = '<div class="flashcard-wrap" onclick="fcFlip(\'' + host + '\')"><div class="flashcard" id="' + host + '-card">' +
+    '<div class="fc-face fc-front"><div class="fc-emoji" id="' + host + '-em"></div><div class="fc-word" id="' + host + '-w"></div><div class="fc-pos" id="' + host + '-pos"></div><div class="fc-tap">TAP TO FLIP</div></div>' +
+    '<div class="fc-face fc-back"><div class="fc-def" id="' + host + '-def"></div><div class="fc-sample" id="' + host + '-s"></div><button class="fc-jp-btn" id="' + host + '-jb" onclick="fcJp(event,\'' + host + '\')">🇯🇵 日本語</button><div class="fc-jp jp" id="' + host + '-jp"></div></div></div></div>' +
+    '<div class="fc-nav"><button onclick="fcStep(\'' + host + '\',-1)">◀ Back</button><div class="fc-dots" id="' + host + '-dots"></div><button onclick="fcStep(\'' + host + '\',1)">Next ▶</button></div>';
+  fcPaint(host);
+};
+BLOCK_DONE.flash = (key, b) => (lLoad(key) || []).length >= b.words.length;
+function fcPaint(host){
+  const s = BS[host], w = s.b.words[s.i], seen = new Set(lLoad(s.key) || []);
+  $(host + '-card').classList.remove('flipped');
+  $(host + '-em').textContent = w.emoji; $(host + '-w').textContent = w.word; $(host + '-pos').textContent = w.pos;
+  $(host + '-def').textContent = w.def; $(host + '-s').innerHTML = w.sample;
+  $(host + '-jp').textContent = '🇯🇵 ' + w.jp; $(host + '-jp').classList.remove('revealed'); $(host + '-jb').textContent = '🇯🇵 日本語';
+  $(host + '-dots').innerHTML = s.b.words.map((x,i)=>'<div class="fc-dot' + (seen.has(i) ? ' seen' : '') + (i === s.i ? ' on' : '') + '"></div>').join('');
+}
+function fcFlip(host){
+  const s = BS[host];
+  if($(host + '-card').classList.toggle('flipped')){
+    const seen = new Set(lLoad(s.key) || []); seen.add(s.i); lSave(s.key, Array.from(seen));
+    const d = $(host + '-dots').children[s.i]; if(d) d.classList.add('seen');
+    checkTab(s.K);
+  }
+}
+function fcStep(host, d){ const s = BS[host]; s.i = (s.i + d + s.b.words.length) % s.b.words.length; fcPaint(host); }
+function fcJp(e, host){ e.stopPropagation(); const on = $(host + '-jp').classList.toggle('revealed'); $(host + '-jb').textContent = on ? '🇯🇵 隠す' : '🇯🇵 日本語'; }
+
+/* mcq — { clue?, q, opts, ok, why?, jp? }. Retry until right; saved as solved. */
+BLOCK_RENDER.mcq = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  $(host).innerHTML = b.items.map((it,i)=>{
+    const opts = (b.keep || it.keep) ? it.opts.map((o,oi)=>({ text:o, ok:oi===it.ok })) : shuffle(it.opts.map((o,oi)=>({ text:o, ok:oi===it.ok })));
+    return '<div class="qcard" data-idx="' + i + '">' + (it.clue ? '<div class="qclue">' + it.clue + '</div>' : '') +
+      '<div class="qtext">' + (b.nonum ? '' : (i+1) + '. ') + it.q + '</div><div class="' + (it.two || b.two ? 'opt2' : '') + '">' +
+      opts.map(o=>'<button class="opt" data-ok="' + (o.ok ? 1 : 0) + '" onclick="mcqPick(this,\'' + host + '\',' + i + ')">' + o.text + '</button>').join('') + '</div>' +
+      (it.why ? '<div class="qwhy">💡 ' + it.why + '</div>' : '') + (it.jp ? '<div class="qjp jp">🇯🇵 ' + it.jp + '</div>' : '') + '</div>';
+  }).join('');
+  (lLoad(key) || []).forEach(i=>{ const c = $(host).querySelector('[data-idx="' + i + '"]'); if(c) mcqSolve(c); });
+};
+BLOCK_DONE.mcq = (key, b) => (lLoad(key) || []).length >= b.items.length;
+function mcqSolve(card){ card.classList.add('solved'); card.querySelectorAll('.opt').forEach(o=>{ o.disabled = true; if(o.dataset.ok === '1') o.classList.add('good'); }); }
+function mcqPick(btn, host, i){
+  const card = btn.closest('.qcard'); if(!card || card.classList.contains('solved')) return;
+  const s = BS[host], right = btn.dataset.ok === '1';
+  if(!card.dataset.tried){ card.dataset.tried = '1'; if(!right) logAtt(s.K, { q:strip(s.b.items[i].q), a:strip(btn.innerHTML) }); }
+  if(right){
+    mcqSolve(card);
+    const set = new Set(lLoad(s.key) || []); set.add(i); lSave(s.key, Array.from(set));
+    if(s.b.after) s.b.after(host);
+    checkTab(s.K);
+  } else { btn.classList.add('bad'); setTimeout(()=>btn.classList.remove('bad'), 380); }
+}
+
+/* match — tap a clue, then its answer. pairs: [{ l, r }] */
+BLOCK_RENDER.match = function(host, key, b, K){
+  BS[host] = { key, b, K, sel:null };
+  const right = shuffle(b.pairs.map((p,i)=>({ t:p.r, i })));
+  $(host).innerHTML = '<div class="match-grid"><div class="mcol">' +
+    b.pairs.map((p,i)=>'<button class="mbtn" id="' + host + '-l' + i + '" onclick="mtL(\'' + host + '\',' + i + ')">' + p.l + '</button>').join('') +
+    '</div><div class="mcol">' + right.map((x,k)=>'<button class="mbtn" id="' + host + '-r' + k + '" data-t="' + esc(x.t) + '" onclick="mtR(\'' + host + '\',' + k + ')">' + x.t + '</button>').join('') + '</div></div>' +
+    '<div class="quiz-fb" id="' + host + '-fb"></div>';
+  (lLoad(key) || []).forEach(i=>mtPaint(host, i));
+};
+BLOCK_DONE.match = (key, b) => (lLoad(key) || []).length >= b.pairs.length;
+function mtPaint(host, i){
+  const s = BS[host], t = s.b.pairs[i].r;
+  $(host + '-l' + i).classList.add('matched'); $(host + '-l' + i).disabled = true;
+  const r = Array.from($(host).querySelectorAll('.mcol:last-child .mbtn')).find(x => x.dataset.t === esc(t) && !x.classList.contains('matched'));
+  if(r){ r.classList.add('matched'); r.disabled = true; }
+}
+function mtL(host, i){ const s = BS[host]; $(host).querySelectorAll('.mbtn.sel').forEach(x=>x.classList.remove('sel')); s.sel = i; $(host + '-l' + i).classList.add('sel'); }
+function mtR(host, k){
+  const s = BS[host], btn = $(host + '-r' + k), fb = $(host + '-fb');
+  if(s.sel === null){ fb.className = 'quiz-fb no'; fb.textContent = 'Tap a clue on the left first.'; return; }
+  const p = s.b.pairs[s.sel];
+  if(btn.dataset.t === esc(p.r)){
+    const m = new Set(lLoad(s.key) || []); m.add(s.sel); lSave(s.key, Array.from(m));
+    $(host + '-l' + s.sel).classList.remove('sel'); mtPaint(host, s.sel); s.sel = null;
+    fb.className = 'quiz-fb ok'; fb.textContent = '✅ Match! ' + (m.size >= s.b.pairs.length ? 'All matched.' : '');
+    checkTab(s.K);
+  } else {
+    logAtt(s.K, { q:strip(p.l), a:strip(btn.innerHTML) });
+    btn.classList.add('err'); setTimeout(()=>btn.classList.remove('err'), 380);
+    fb.className = 'quiz-fb no'; fb.textContent = 'Not that one — read the clue again.';
+  }
+}
+
+/* typed — { p, pre?, post?, ans?[..] | free (min words), model }. Two tries, then the answer. */
+BLOCK_RENDER.typed = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  const st = lLoad(key) || {};
+  $(host).innerHTML = b.items.map((it,i)=>{
+    const s = st[i] || {};
+    return '<div class="qcard" id="' + host + '-c' + i + '"><div class="qtext">' + (i+1) + '. ' + it.p + '</div><div class="type-row">' +
+      (it.pre ? '<span class="pre">' + esc(it.pre) + '</span>' : '') +
+      '<input class="type-in" id="' + host + '-in' + i + '" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="' + (it.ph || 'type here…') + '" value="' + esc(s.last || '') + '" onkeydown="if(event.key===\'Enter\')tyCheck(\'' + host + '\',' + i + ')">' +
+      (it.post ? '<span class="pre">' + esc(it.post) + '</span>' : '') +
+      '<button class="type-go" onclick="tyCheck(\'' + host + '\',' + i + ')">✓</button></div><div class="quiz-fb" id="' + host + '-fb' + i + '"></div></div>';
+  }).join('');
+  b.items.forEach((it,i)=>{ const s = st[i]; if(s && s.done) tyDone(host, i, s); });
+};
+BLOCK_DONE.typed = (key, b) => { const st = lLoad(key) || {}; return b.items.every((x,i)=>st[i] && st[i].done); };
+function tyDone(host, i, s){
+  const it = BS[host].b.items[i], fb = $(host + '-fb' + i), card = $(host + '-c' + i);
+  $(host + '-in' + i).disabled = true; card.querySelector('.type-go').disabled = true;
+  const full = (it.pre || '') + (s.last || '') + (it.post || '');
+  if(s.shown){ card.classList.add('missed'); fb.className = 'quiz-fb show'; fb.textContent = '👀 The answer: ' + it.model + ' — say it aloud.'; }
+  else { card.classList.add('solved'); fb.className = 'quiz-fb ok'; fb.textContent = '✅ ' + full + (it.free && it.model ? '   (Dad’s idea: ' + it.model + ')' : '') + (it.say ? ' — ' + it.say : ' — read it aloud!'); }
+}
+function tyCheck(host, i){
+  const S = BS[host], it = S.b.items[i], st = lLoad(S.key) || {}, s = st[i] || (st[i] = { tries:0 });
+  if(s.done) return;
+  const text = $(host + '-in' + i).value.trim(); if(!text) return;
+  const words = norm(text).split(' ').filter(Boolean).length;
+  const ok = it.free ? words >= (it.min || 1) : it.ans.some(a => norm(a) === norm(text));
+  s.tries++; s.last = text;
+  if(!ok) logAtt(S.K, { q:strip(it.p), a:text });
+  if(ok) s.done = true; else if(!it.free && s.tries >= 2){ s.done = true; s.shown = true; }
+  lSave(S.key, st);
+  if(s.done){ tyDone(host, i, s); checkTab(S.K); }
+  else { const fb = $(host + '-fb' + i); fb.className = 'quiz-fb no'; fb.textContent = '💡 ' + (it.free ? 'Write at least ' + (it.min || 1) + ' words.' : (it.clue || 'Check the spelling.') + '  (one more try)'); const inp = $(host + '-in' + i); inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake'); }
+}
+
+/* sort — pickChart('classification sort'); a finished sort restores as its columns. */
+BLOCK_RENDER.sort = function(host, key, b, K){
+  const done = new Set(lLoad(key) || []);
+  $(host).innerHTML = b.sorts.map(s=>(s.intro ? '<div class="dad-hint">' + s.intro + '</div>' : '') + '<div class="sort-host" id="host-' + s.id + '"></div>').join('');
+  b.sorts.forEach(s=>{
+    if(done.has(s.id) || typeof window.pickChart !== 'function'){ sortStatic(s); return; }
+    $('host-' + s.id).innerHTML = window.pickChart('classification sort', { id:s.id, tiles:shuffle(s.tiles), zones:s.zones,
+      onComplete: function(){ const d = new Set(lLoad(key) || []); d.add(s.id); lSave(key, Array.from(d)); setTimeout(()=>sortStatic(s), 900); checkTab(K); } });
+  });
+};
+BLOCK_DONE.sort = (key, b) => (lLoad(key) || []).length >= b.sorts.length;
+function sortStatic(s){
+  $('host-' + s.id).innerHTML = '<div class="sort-static" style="grid-template-columns:repeat(' + s.zones.length + ',1fr)">' + s.zones.map(z=>
+    '<div class="col"><h4 style="background:' + z.color + '">' + z.label + '</h4>' + s.tiles.filter(t=>t.answer === z.key).map(t=>'<div>' + t.text + '</div>').join('') + '</div>').join('') + '</div>' +
+    (s.win ? '<div class="dad-hint" style="margin-top:8px">✅ ' + s.win + '</div>' : '');
+}
+
+/* order — tap the steps in order. sets: [{ title, steps:[in order], end? }] */
+BLOCK_RENDER.order = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  $(host).innerHTML = b.sets.map((s,si)=>'<div class="qcard" id="' + host + '-s' + si + '"><div class="qtext">' + s.title + '</div><div class="ord-list" id="' + host + '-l' + si + '"></div><div class="ord-bank" id="' + host + '-b' + si + '"></div><div class="quiz-fb" id="' + host + '-f' + si + '"></div></div>').join('');
+  b.sets.forEach((s,si)=>ordPaint(host, si));
+};
+BLOCK_DONE.order = (key, b) => { const st = lLoad(key) || {}; return b.sets.every((s,si)=>(st[si] || 0) >= s.steps.length); };
+function ordPaint(host, si){
+  const S = BS[host], set = S.b.sets[si], n = (lLoad(S.key) || {})[si] || 0;
+  $(host + '-l' + si).innerHTML = set.steps.slice(0, n).map((t,k)=>'<div class="ord-done"><b>' + (set.labels ? set.labels[k] : (k+1) + '.') + '</b> ' + t + '</div>').join('');
+  const left = set.steps.map((t,k)=>({ t, k })).filter(x=>x.k >= n);
+  $(host + '-b' + si).innerHTML = shuffle(left).map(x=>'<button class="tile" onclick="ordTap(\'' + host + '\',' + si + ',' + x.k + ',this)">' + x.t + '</button>').join('');
+  if(n >= set.steps.length){ $(host + '-s' + si).classList.add('solved'); const f = $(host + '-f' + si); f.className = 'quiz-fb ok'; f.textContent = '✅ ' + (set.end || 'In order! Read them aloud.'); }
+}
+function ordTap(host, si, k, btn){
+  const S = BS[host], st = lLoad(S.key) || {}, n = st[si] || 0, f = $(host + '-f' + si);
+  if(k === n){ st[si] = n + 1; lSave(S.key, st); f.textContent = ''; ordPaint(host, si); checkTab(S.K); }
+  else { logAtt(S.K, { q:strip(S.b.sets[si].title) + ' (step ' + (n+1) + ')', a:strip(btn.innerHTML) }); btn.classList.add('nope'); setTimeout(()=>btn.classList.remove('nope'), 380); f.className = 'quiz-fb no'; f.textContent = 'Not yet — what happens ' + (n === 0 ? 'first' : 'next') + '?'; }
+}
+
+/* find — find every right tile. sets: [{ q, tiles:[{ t, ok, why? }] }] */
+BLOCK_RENDER.find = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  $(host).innerHTML = b.sets.map((s,si)=>'<div class="qcard" id="' + host + '-s' + si + '"><div class="qtext">' + s.q + '</div><div class="ord-bank">' +
+    s.tiles.map((t,ti)=>'<button class="tile" id="' + host + '-t' + si + '-' + ti + '" onclick="fdTap(\'' + host + '\',' + si + ',' + ti + ')">' + t.t + '</button>').join('') +
+    '</div><div class="find-count" id="' + host + '-c' + si + '"></div><div class="quiz-fb" id="' + host + '-f' + si + '"></div></div>').join('');
+  b.sets.forEach((s,si)=>fdPaint(host, si));
+};
+BLOCK_DONE.find = (key, b) => { const st = lLoad(key) || {}; return b.sets.every((s,si)=>(st[si] || []).length >= s.tiles.filter(t=>t.ok).length); };
+function fdPaint(host, si){
+  const S = BS[host], set = S.b.sets[si], found = (lLoad(S.key) || {})[si] || [], need = set.tiles.filter(t=>t.ok).length;
+  found.forEach(ti=>{ const el = $(host + '-t' + si + '-' + ti); el.classList.add('found'); el.disabled = true; });
+  $(host + '-c' + si).textContent = 'Found: ' + found.length + ' / ' + need;
+  if(found.length >= need){
+    $(host + '-s' + si).classList.add('solved');
+    set.tiles.forEach((t,ti)=>{ if(!t.ok){ const el = $(host + '-t' + si + '-' + ti); el.classList.add('nope-done'); el.disabled = true; } });
+    const f = $(host + '-f' + si); f.className = 'quiz-fb ok'; f.textContent = '✅ ' + (set.end || 'You found them all!');
+  }
+}
+function fdTap(host, si, ti){
+  const S = BS[host], t = S.b.sets[si].tiles[ti], st = lLoad(S.key) || {}, f = $(host + '-f' + si);
+  if(t.ok){ const a = st[si] || []; if(a.indexOf(ti) < 0) a.push(ti); st[si] = a; lSave(S.key, st); f.className = 'quiz-fb ok'; f.textContent = t.why ? '✅ ' + t.why : '✅ Yes!'; fdPaint(host, si); checkTab(S.K); }
+  else { logAtt(S.K, { q:strip(S.b.sets[si].q), a:strip(t.t) }); const el = $(host + '-t' + si + '-' + ti); el.classList.add('nope'); setTimeout(()=>el.classList.remove('nope'), 380); f.className = 'quiz-fb no'; f.textContent = '✖ ' + (t.why || 'Not this one.'); }
+}
+
+/* read — paragraphs; the next one unlocks when this one's checks are solved.
+   text markup: [[words|gloss]] blue word · {{words|gloss}} signal word · **bold** */
+function markup(text, host, pi){
+  let g = 0;
+  return text.replace(/\*\*(.+?)\*\*/g, '<b class="kw">$1</b>')
+    .replace(/\[\[(.+?)\|(.+?)\]\]|\{\{(.+?)\|(.+?)\}\}/g, (m, a, ag, s, sg) => '<span class="' + (a ? 'tag' : 'sig') + '" data-g="' + esc((a || s) + ' — ' + (ag || sg)) + '" onclick="glossShow(this,\'' + host + '-g' + pi + '\')">' + (a || s) + '</span>');
+}
+function glossShow(el, id){ const g = $(id); g.textContent = '🔎 ' + el.dataset.g; g.classList.add('show'); }
+BLOCK_RENDER.read = function(host, key, b, K){
+  $(host).innerHTML = b.paras.map((p,pi)=>'<div class="para" id="' + host + '-p' + pi + '"><div class="lock-note">🔒 Answer the checks above to unlock this paragraph.</div>' +
+    '<div class="passage-block"><span class="pnum">' + p.label + '</span>' + markup(p.text, host, pi) + '<div class="gloss" id="' + host + '-g' + pi + '"></div></div>' +
+    (p.items && p.items.length ? '<div class="klabel">🤔 Think about it</div><div class="blk" id="' + host + '-q' + pi + '"></div>' : '') + '</div>').join('');
+  b.paras.forEach((p,pi)=>{ if(p.items && p.items.length) BLOCK_RENDER.mcq(host + '-q' + pi, key + '-p' + pi, { items:p.items, after:()=>readLock(host, key, b) }, K); });
+  readLock(host, key, b);
+};
+function readLock(host, key, b){
+  let open = true;
+  b.paras.forEach((p,pi)=>{ $(host + '-p' + pi).classList.toggle('locked', !open); if(p.items && p.items.length && (lLoad(key + '-p' + pi) || []).length < p.items.length) open = false; });
+}
+BLOCK_DONE.read = (key, b) => b.paras.every((p,pi)=>!p.items || !p.items.length || (lLoad(key + '-p' + pi) || []).length >= p.items.length);
+
+/* chart — a table whose cells fill as Leo answers the cell questions. */
+BLOCK_RENDER.chart = function(host, key, b, K){
+  const items = [];
+  b.rows.forEach((r,ri)=>r.cells.forEach((c,ci)=>items.push({ clue:r.label + ' · ' + b.head[ci+1], q:c.q, opts:c.opts, ok:0, two:true, cell:[ri,ci] })));
+  $(host).innerHTML = '<table class="cmp-table" id="' + host + '-t"></table><div class="blk" id="' + host + '-q"></div>';
+  const paint = ()=>{
+    const solved = new Set(lLoad(key) || []); let n = 0;
+    $(host + '-t').innerHTML = '<tr>' + b.head.map(h=>'<th>' + h + '</th>').join('') + '</tr>' + b.rows.map(r=>'<tr><td><b>' + r.label + '</b></td>' + r.cells.map(c=>{ const k = n++; return solved.has(k) ? '<td class="a">' + c.opts[0] + '</td>' : '<td class="q">❓</td>'; }).join('') + '</tr>').join('');
+  };
+  BLOCK_RENDER.mcq(host + '-q', key, { items, after:paint }, K);
+  paint();
+};
+BLOCK_DONE.chart = (key, b) => (lLoad(key) || []).length >= b.rows.reduce((n,r)=>n + r.cells.length, 0);
+
+/* web — Leo’s own word web (pickChart 'word web'); done at b.min filled ovals. */
+BLOCK_RENDER.web = function(host, key, b, K){
+  if(typeof window.pickChart !== 'function'){ $(host).innerHTML = '<div class="dad-hint">The word web could not load — make it on paper today.</div>'; return; }
+  $(host).innerHTML = '<div class="web-host">' + window.pickChart('word web', { id:'web-' + host, center:b.center, nodes:[], addable:true, removable:true, editable:true, maxNodes:8, sentenceBuilder:false,
+    storageKey: SAVE_PREFIX + key + '-nodes',
+    onChange: function(nodes){ const f = nodes.filter(x => x.text && x.text.trim()).length; lSave(key + '-count', f); const c = $(host + '-cnt'); if(c) c.innerHTML = 'Ovals filled: <b class="' + (f >= b.min ? 'ok' : '') + '">' + f + ' / ' + b.min + '</b>'; checkTab(K); } }) + '</div>' +
+    '<div class="counter" id="' + host + '-cnt">Ovals filled: <b class="' + ((lLoad(key + '-count') || 0) >= b.min ? 'ok' : '') + '">' + (lLoad(key + '-count') || 0) + ' / ' + b.min + '</b></div>';
+};
+BLOCK_DONE.web = (key, b) => (lLoad(key + '-count') || 0) >= b.min;
+
+/* write — a longer piece; saves as he types; done when it meets the targets. */
+BLOCK_RENDER.write = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  const s = lLoad(key) || {};
+  $(host).innerHTML = '<div class="qcard"><div class="qtext">' + b.p + '</div><textarea class="long-in" id="' + host + '-ta" placeholder="' + (b.ph || 'Write here…') + '" oninput="wrInput(\'' + host + '\')">' + esc(s.text || '') + '</textarea><div class="counter" id="' + host + '-cn"></div>' +
+    '<div class="type-row"><button class="type-go" id="' + host + '-go" onclick="wrCheck(\'' + host + '\')">✓ I’m finished</button></div><div class="quiz-fb" id="' + host + '-fb"></div></div>';
+  wrCount(host);
+  if(s.done){ $(host + '-fb').className = 'quiz-fb ok'; $(host + '-fb').textContent = '✅ Saved — read it to Dad!'; $(host).querySelector('.qcard').classList.add('solved'); }
+};
+BLOCK_DONE.write = key => !!(lLoad(key) || {}).done;
+function wrStats(host){
+  const b = BS[host].b, text = $(host + '-ta').value, low = text.toLowerCase();
+  const used = (b.targets || []).filter(t => new RegExp('\\b' + t.re, 'i').test(low)).map(t => t.w);
+  const sentences = (text.match(/[^.!?]+[.!?]+/g) || []).filter(x => x.trim().split(/\s+/).length >= 3).length;
+  return { used, sentences };
+}
+function wrCount(host){
+  const b = BS[host].b, st = wrStats(host);
+  $(host + '-cn').innerHTML = 'Sentences: <b class="' + (st.sentences >= b.sentences ? 'ok' : '') + '">' + st.sentences + ' / ' + b.sentences + '</b>' +
+    (b.targets ? ' · Target words: <b class="' + (st.used.length >= b.need ? 'ok' : '') + '">' + st.used.length + ' / ' + b.need + '</b>' + (st.used.length ? ' (' + st.used.join(', ') + ')' : '') : '');
+}
+function wrInput(host){ const S = BS[host], s = lLoad(S.key) || {}; s.text = $(host + '-ta').value; lSave(S.key, s); wrCount(host); }
+function wrCheck(host){
+  const S = BS[host], b = S.b, st = wrStats(host), s = lLoad(S.key) || {}, fb = $(host + '-fb');
+  s.text = $(host + '-ta').value;
+  if(st.sentences >= b.sentences && (!b.targets || st.used.length >= b.need)){ s.done = true; lSave(S.key, s); fb.className = 'quiz-fb ok'; fb.textContent = '✅ Saved — read it to Dad!'; $(host).querySelector('.qcard').classList.add('solved'); checkTab(S.K); }
+  else { lSave(S.key, s); fb.className = 'quiz-fb no'; fb.textContent = '💡 You need ' + b.sentences + ' sentences' + (b.targets ? ' and ' + b.need + ' target words' : '') + '. End each sentence with a period.'; }
+}
+
+/* quiz — one try each, scored; progress saves after every answer. */
+BLOCK_RENDER.quiz = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  $(host).innerHTML = '<div id="' + host + '-act"><div class="quiz-progress" id="' + host + '-pr"></div><div class="qcard" style="margin-top:12px" id="' + host + '-qc"></div></div><div id="' + host + '-res" style="display:none"></div>';
+  const saved = lLoad(b.scoreKey);
+  if(saved && saved.done){ qzResult(host, saved); return; }
+  qzRender(host);
+};
+BLOCK_DONE.quiz = (key, b) => !!(lLoad(b.scoreKey) || {}).done;
+function qzState(host){ return lLoad(BS[host].key + '-progress') || { idx:0, score:0, wrong:[] }; }
+function qzRender(host){
+  const S = BS[host], items = S.b.items, p = qzState(host);
+  $(host + '-pr').innerHTML = items.map((x,i)=>'<div class="' + (i < p.idx ? 'answered' : '') + '"></div>').join('');
+  if(p.idx >= items.length){ qzFinish(host); return; }
+  const it = items[p.idx], card = $(host + '-qc'); card.classList.remove('solved');
+  card.innerHTML = '<div class="qtext">Q' + (p.idx+1) + '. ' + it.q + '</div>' + shuffle(it.opts.map((o,oi)=>({ text:o, ok:oi===it.ok }))).map(o=>'<button class="opt" data-ok="' + (o.ok ? 1 : 0) + '" onclick="qzPick(\'' + host + '\',this)">' + o.text + '</button>').join('') +
+    '<div class="quiz-fb" id="' + host + '-fb"></div>' + (it.jp ? '<div class="qjp jp">🇯🇵 ' + it.jp + '</div>' : '');
+}
+function qzPick(host, btn){
+  const S = BS[host], card = $(host + '-qc'); if(card.classList.contains('solved')) return;
+  const p = qzState(host), it = S.b.items[p.idx], right = btn.dataset.ok === '1', fb = $(host + '-fb');
+  mcqSolve(card);
+  if(right){ p.score++; fb.className = 'quiz-fb ok'; fb.textContent = 'Correct! 🎉'; }
+  else { btn.classList.add('bad'); fb.className = 'quiz-fb no'; fb.textContent = 'The right answer is in green.'; p.wrong.push({ q:strip(it.q), chose:strip(btn.innerHTML), answer:strip(it.opts[it.ok]) }); logAtt(S.K, { q:strip(it.q), a:strip(btn.innerHTML) }); }
+  p.idx++; lSave(S.key + '-progress', p);
+  setTimeout(()=>qzRender(host), 1400);
+}
+function qzFinish(host){
+  const S = BS[host], p = qzState(host), total = S.b.items.length, percent = Math.round(p.score / total * 100);
+  const d = { score:p.score, total, percent, done:true, timestamp:new Date().toISOString(),
+    trophy: percent >= 80 ? '🏆' : percent >= 50 ? '🥈' : '💪',
+    text: percent >= 80 ? S.b.win : percent >= 50 ? 'Great effort!' : 'Keep practicing — read it again and try once more!',
+    wrongQuestions: p.wrong.map(w=>w.q), wrong: p.wrong };
+  lSave(S.b.scoreKey, d); lDel(S.key + '-progress'); qzResult(host, d); checkTab(S.K);
+}
+function qzResult(host, d){
+  $(host + '-act').style.display = 'none';
+  const rz = $(host + '-res'); rz.style.display = 'block'; const wrong = d.wrong || [];
+  rz.innerHTML = '<div class="quiz-result"><div class="trophy">' + d.trophy + '</div><div class="qscore">' + d.score + ' / ' + d.total + '</div><div style="font-weight:800;font-size:18px">' + d.text + '</div>' +
+    (wrong.length ? '<div class="wrong-review"><b>Go over these:</b><br>' + wrong.map(w=>'• ' + esc(w.q) + '<br>&nbsp;&nbsp;You chose: <b style="color:var(--red)">' + esc(w.chose) + '</b> · Answer: <b style="color:var(--green-d)">' + esc(w.answer) + '</b>').join('<br>') + '</div>' : '<div class="dad-hint" style="margin-top:10px">Perfect — no mistakes! 🏆</div>') + '</div>';
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   📘 STUDENT BOOK — the deck's own words first
+═════════════════════════════════════════════════════════════════════ */
+const SB_NAV = ['tab-5','tab-6','tab-1','tab-0','tab-2','tab-3','tab-7','tab-4'];
+const WB_NAV = ['wb-tab-0','wb-tab-1','wb-tab-2','wb-tab-3','wb-tab-4'];
+const YN = ['✅ Yes','❌ No'];
+
+/* Slides 7, 9-12, 14-16: the eight word cards */
+const SB_WORDS = [
+  { word:'compare', emoji:'⚖️', pos:'verb · academic · com-PARE', def:'To look at two things and say how they are the same and how they are different.', sample:'“A tornado is <b>smaller</b> than a hurricane, but <b>both</b> are storms.”', jp:'比（くら）べる　compare A with B' },
+  { word:'instruments', emoji:'🌡️', pos:'noun · plural · IN-stru-ments', def:'Tools that measure things, like wind speed, rain and temperature.', sample:'“The team dropped special <b>instruments</b> close to the storm.”', jp:'計器（けいき）・機器（きき）　(also: 楽器 musical instruments)' },
+  { word:'twisted', emoji:'🌀', pos:'verb (past) / adjective · TWIS-ted', def:'Turned around and around, like a rope.', sample:'“The winds <b>twisted</b> the storm tighter and tighter.”', jp:'ねじれた（捻れた）' },
+  { word:'funnel', emoji:'🔻', pos:'noun · FUN-nel', def:'A shape that is wide at the top and narrow at the bottom.', sample:'“…into the shape of a <b>funnel</b>.”', jp:'漏斗（ろうと）・じょうご' },
+  { word:'warn', emoji:'🚨', pos:'verb · /wɔrn/', def:'To tell people about danger before it happens.', sample:'“…so that they can <b>warn</b> people and save lives.”', jp:'警告（けいこく）する・知（し）らせる' },
+  { word:'field', emoji:'🌾', pos:'noun · /fiːld/', def:'An open area outside. Scientists work in the field when they study things in the real world, not in a lab.', sample:'“The team worked in the <b>field</b> in Tornado Alley.”', jp:'野外（やがい）・現場（げんば）' },
+  { word:'record', emoji:'🔴', pos:'verb re-CORD · noun REC-ord', def:'Verb: to write down or save information. Noun: the best result ever.', sample:'“The scientists <b>record</b> the wind speed.”', jp:'記録（きろく）する（動詞）／記録（名詞）' },
+  { word:'research', emoji:'🔬', pos:'noun (no plural) · verb · re-SEARCH', def:'Careful study to find out new information.', sample:'“Wurman does <b>research</b> on tornadoes.”', jp:'研究（けんきゅう）　a lot of research（researches ✖）' }
+];
+
+defineTab('tab-5', { icon:'📚', name:'Vocab', title:'📚 Vocab — the eight words from the slides',
+  sub:'Slides 1, 7, 9–17: compare · instruments · twisted · funnel · warn · field · record · research.',
+  done:'🎉 All eight storm words caught!',
+  blocks:[
+    { type:'flash', id:'cards', label:'🃏 Flip every card', words:SB_WORDS },
+    { type:'match', id:'match', label:'🔗 Slide 13 + 17 · Match each clue to its word', pairs:[
+      { l:'📏 Tools that measure wind, rain and temperature.', r:'🌡️ instruments' },
+      { l:'🪢 Turned around and around, like a rope.', r:'🌀 twisted' },
+      { l:'🔺 A shape: wide at the top, narrow at the bottom.', r:'🔻 funnel' },
+      { l:'📣 To tell people about danger before it happens.', r:'🚨 warn' },
+      { l:'🟰↔️ To say how two things are the same and different.', r:'⚖️ compare' },
+      { l:'🌳 An open area outside, not a lab.', r:'🌾 field' },
+      { l:'📝 To write down or save information.', r:'🔴 record' },
+      { l:'📚 Careful study to find out new information.', r:'🔬 research' } ] },
+    { type:'typed', id:'spell', label:'⌨️ Type the word', hint:'Read the clue, then type the word. Two tries, then you see it.', items:[
+      { p:'🔻 A tornado has the shape of a ______.', ans:['funnel'], model:'funnel' },
+      { p:'🌀 The winds ______ the storm tighter and tighter.', ans:['twisted'], model:'twisted' },
+      { p:'🌡️ They dropped special ______ close to the storm.', ans:['instruments'], model:'instruments' },
+      { p:'🚨 They can ______ people and save lives.', ans:['warn'], model:'warn' },
+      { p:'⚖️ ______ tornadoes and hurricanes. (Activity 4)', ans:['compare'], model:'Compare' },
+      { p:'🌾 Storm chasers work in the ______, near the storm.', ans:['field'], model:'field' },
+      { p:'🔴 The instruments ______ the wind speed.', ans:['record'], model:'record' },
+      { p:'🔬 Scientists do a lot of ______ about tornadoes.', ans:['research'], model:'research' } ] }
+  ] });
+
+defineTab('tab-6', { icon:'🎮', name:'Word Games', title:'🎮 Word Games — the Word Lab, again',
+  sub:'Slides 7–18: the games you played with Dad, now on your own.',
+  done:'🎉 Word Lab cleared — every game won!',
+  blocks:[
+    { type:'mcq', id:'compare', label:'⚖️ Slides 7–8 · Compare sentences', items:[
+      { clue:'① Slide 8', q:'A tornado lasts ten minutes. A hurricane lasts a week. Which sentence compares them?', opts:['A tornado is shorter than a hurricane.','A tornado is bigger than a hurricane.'], ok:0 },
+      { clue:'② Slide 8', q:'“Tornadoes are fast. Hurricanes are fast, too. ____ are storms.”', opts:['Both','But'], ok:0, two:true },
+      { clue:'③ Slide 8', q:'“A tornado forms over land, ____ a hurricane forms over water.”', opts:['but','and'], ok:0, two:true },
+      { clue:'📏 Slide 7 · Size', q:'A tornado is about a quarter of a mile wide. A hurricane is hundreds of miles wide. So…', opts:['A tornado is smaller than a hurricane.','A tornado is bigger than a hurricane.'], ok:0 },
+      { clue:'🌍 Slide 7 · Place', q:'“Tornadoes form over land, but hurricanes form over water.” This sentence says they are…', opts:['different','the same'], ok:0, two:true },
+      { clue:'🟰 Slide 8', q:'“Both have strong winds.” This sentence says they are…', opts:['the same','different'], ok:0, two:true },
+      { clue:'🗣️ Slide 8', q:'Which one is a compare question?', opts:['Which lasts longer?','What time is it?','Where is my bag?'], ok:0 },
+      { clue:'🐯 Slide 7', q:'“Let’s compare a cat and a tiger. A tiger is bigger, but ____ are cats.”', opts:['both','but'], ok:0, two:true }
+    ] },
+    { type:'order', id:'funnel', label:'🔻 Slide 11 · Build the funnel', sets:[
+      { title:'Build the funnel from the top. Tap the widest part first, then down to the tip.', steps:['▬▬▬▬▬ the widest part','▬▬▬▬ still wide','▬▬▬ getting narrow','▬ the tip'], end:'A funnel is wide at the top and narrow at the bottom.' } ] },
+    { type:'mcq', id:'words', label:'🌡️🌀🚨 Slides 9–12 · instruments · twisted · funnel · warn', items:[
+      { clue:'🌡️ Slide 9', q:'“These instruments showed wind speed, temperature, and how much ____ was falling.”', opts:['rain','snow','sand'], ok:0 },
+      { clue:'🌡️ Slide 9', q:'A thermometer is an ____.', opts:['instrument','storm','field'], ok:0 },
+      { clue:'🎸 Slide 9', q:'“A guitar is a musical instrument.” Here instrument means…', opts:['楽器 (a thing that makes music)','計器 (a thing that measures)'], ok:0 },
+      { clue:'🌀 Slide 10', q:'Is a straight rope twisted?', opts:['No, it is not twisted.','Yes, it is twisted.'], ok:0 },
+      { clue:'🌀 Slide 10', q:'“The winds twisted the storm tighter and ____.”', opts:['tighter','slower','colder'], ok:0 },
+      { clue:'🔻 Slide 11', q:'Where is a funnel wide?', opts:['at the top','at the bottom'], ok:0, two:true },
+      { clue:'🔻 Slide 11', q:'We use a funnel to pour juice into a small ____.', opts:['bottle','field','truck'], ok:0 },
+      { clue:'🚨 Slide 12', q:'When do we warn people?', opts:['before the danger comes','after the danger is over'], ok:0 },
+      { clue:'🚨 Slide 12', q:'Who warns people about a storm?', opts:['a siren and a phone alert','a pizza and a movie'], ok:0 },
+      { clue:'🚨 Slide 12', q:'“Be careful!” she ____ her little brother.', opts:['warned','twisted','compared'], ok:0 }
+    ] },
+    { type:'sort', id:'field', label:'🌾 Slide 14 · Lab or field?', sorts:[
+      { id:'rd-field', intro:'Is it done in the Lab 🧪 (inside) or in the Field 🌾 (outside, a real place)? Drag each card to its box.', win:'Today Wurman works in the field — near the storm!',
+        zones:[{ key:'lab', label:'🧪 Lab (inside)', color:'#7C3AED' },{ key:'field', label:'🌾 Field (outside)', color:'#16A34A' }],
+        tiles:[{ text:'🌪️ Chase a tornado in a truck', answer:'field' },{ text:'🌡️ Drop instruments near the storm', answer:'field' },{ text:'🌾 Visit Tornado Alley', answer:'field' },
+               { text:'🔬 Look at data on a computer', answer:'lab' },{ text:'⚗️ Test samples in a room', answer:'lab' },{ text:'📊 Draw charts after the storm', answer:'lab' }] } ] },
+    { type:'mcq', id:'record', label:'🔴 Slide 15 · record: re-CORD or REC-ord?', items:[
+      { q:'“The scientists record the wind speed.” Here record is…', opts:['a verb · re-CORD (write it down)','a noun · REC-ord (the best ever)'], ok:0 },
+      { q:'“That tornado set a record for wind speed.” Here record is…', opts:['a noun · REC-ord (the best ever)','a verb · re-CORD (write it down)'], ok:0 },
+      { q:'Wind speeds: 120 · 150 · 180 · 140 km/h. Which number is the record?', opts:['180 km/h','120 km/h','140 km/h'], ok:0, why:'The record is the highest — the best result ever.' },
+      { q:'What do the instruments record?', opts:['wind speed, temperature and rain','songs and videos'], ok:0 }
+    ] },
+    { type:'find', id:'research', label:'🔬 Slide 16 · Find the four research jobs', sets:[
+      { q:'Which of these are research? Find the four research jobs.', end:'Research = careful study to find out new information.', tiles:[
+        { t:'📚 Read books about tornadoes', ok:true },{ t:'🎮 Play a video game', ok:false, why:'A game is fun, but you don’t find new information.' },
+        { t:'🌡️ Measure wind with instruments', ok:true },{ t:'🍿 Watch a funny movie', ok:false, why:'A funny movie is not careful study.' },
+        { t:'🗣️ Ask an expert a question', ok:true },{ t:'📓 Write down what you find', ok:true } ] } ] },
+    { type:'mcq', id:'which', label:'❓ Slide 17 · field · record · research — which one?', items:[
+      { q:'Scientists study tornadoes outside, near the storm. They work in the ____.', opts:['field','record','research'], ok:0 },
+      { q:'Instruments ____ the wind speed. They write it down.', opts:['record','research','field'], ok:0 },
+      { q:'Wurman reads, asks questions and measures. He does ____ about tornadoes.', opts:['research','field','record'], ok:0 },
+      { q:'⚠️ Which sentence is right?', opts:['Scientists do a lot of research.','Scientists do a lot of researches.','Scientists do a research.'], ok:0, why:'research has no plural: some research, a lot of research.' }
+    ] },
+    { type:'find', id:'wind', label:'💨 Slide 18 · Unit 1 words — find the wind words', sets:[
+      { q:'Find the five WIND storms and wind words.', end:'tornado · hurricane · tropical storm · sandstorm · speed', tiles:[
+        { t:'🌪️ tornado', ok:true, why:'A column of wind that rotates very fast.' },{ t:'🌀 hurricane', ok:true, why:'A huge storm with very strong winds.' },
+        { t:'🌊 tropical storm', ok:true, why:'Strong winds — a hurricane is even faster.' },{ t:'🏜️ sandstorm', ok:true, why:'Strong wind carries the sand.' },
+        { t:'☀️ heat wave', ok:false, why:'A heat wave is about heat, not wind.' },{ t:'🌵 drought', ok:false, why:'A drought is no rain for a long time.' },
+        { t:'💧 flood', ok:false, why:'A flood is about water.' },{ t:'⚡ lightning', ok:false, why:'Lightning is light in the sky, not wind.' },
+        { t:'💨 speed', ok:true, why:'Wind speed — how fast the wind moves.' } ] } ] }
+  ] });
+
+defineTab('tab-1', { icon:'🎬', name:'Strategy', title:'🎬 Strategy — Visualize',
+  sub:'Slides 4–6, 19, 36: make a movie in your head — color, shape, mood and movement.',
+  hint:'🎬 <b>Visualize</b> = make a picture in your mind (頭の中で映像を作る). Good readers see, hear and feel the story.',
+  done:'🎉 Strategy Bay done — you can see the story!',
+  blocks:[
+    { type:'mcq', id:'kinds', label:'🎨📐😮🌀 Slide 4 · What do you see?', items:[
+      { q:'Visualize means…', opts:['make a movie in your head','read very fast','count the words'], ok:0 },
+      { q:'“The blue sky turned black.” This detail is a…', opts:['🎨 Color','📐 Shape','😮 Mood','🌀 Movement'], ok:0, two:true },
+      { q:'“…into the shape of a funnel.” This detail is a…', opts:['📐 Shape','🎨 Color','😮 Mood','🌀 Movement'], ok:0, two:true },
+      { q:'“Scary and loud. Quiet before the storm.” This detail is a…', opts:['😮 Mood','🎨 Color','📐 Shape','🌀 Movement'], ok:0, two:true },
+      { q:'“It moved one way, then another way.” This detail is a…', opts:['🌀 Movement','🎨 Color','📐 Shape','😮 Mood'], ok:0, two:true },
+      { q:'“Gray clouds, yellow lightning, a white blizzard.” These details are…', opts:['🎨 Colors','🌀 Movements'], ok:0, two:true }
+    ] },
+    { type:'sort', id:'detail', label:'🔎 Slide 5 · Find the detail words', sorts:[
+      { id:'rd-detail', intro:'<b>A tall wave rushes toward the beach. The water is gray and loud. A tiny boat drops and rises. The sailors are nervous.</b><br>Can you see it, feel it, or watch it move? Drag each word to its box.',
+        zones:[{ key:'c', label:'🎨 Color', color:'#64748B' },{ key:'s', label:'📐 Shape / size', color:'#0369A1' },{ key:'f', label:'😮 Feeling / sound', color:'#EA580C' },{ key:'m', label:'🌀 Movement', color:'#16A34A' }],
+        tiles:[{ text:'gray', answer:'c' },{ text:'black', answer:'c' },{ text:'tall', answer:'s' },{ text:'tiny', answer:'s' },{ text:'nervous', answer:'f' },{ text:'loud', answer:'f' },{ text:'rushes', answer:'m' },{ text:'drops', answer:'m' }] } ] },
+    { type:'find', id:'draw', label:'✏️ Slide 19 · Listen, draw, check', hint:'📖 Read it aloud (or ask Dad to read it). Draw the weather with your colored pencils. Then find the six things that are in your picture.<br><br><b>“The sky looks dark. It’s full of gray clouds, and it is very rainy. The sky lights up with flashes of bright yellow lightning. The wind is strong and trees are falling over.”</b>', sets:[
+      { q:'Which six things are in the picture?', end:'Six layers — does your drawing have them all?', tiles:[
+        { t:'🌑 dark sky', ok:true, why:'“The sky looks dark.”' },{ t:'☀️ sunny sky', ok:false, why:'The sky is dark, not sunny.' },
+        { t:'☁️ gray clouds', ok:true, why:'“It’s full of gray clouds.”' },{ t:'🌧️ rain', ok:true, why:'“It is very rainy.”' },
+        { t:'❄️ white snow', ok:false, why:'There is rain, not snow.' },{ t:'⚡ yellow lightning', ok:true, why:'“flashes of bright yellow lightning”' },
+        { t:'💨 strong wind', ok:true, why:'“The wind is strong.”' },{ t:'🌳 falling trees', ok:true, why:'“trees are falling over”' },{ t:'🌈 a rainbow', ok:false, why:'No rainbow in this storm.' } ] } ] },
+    { type:'order', id:'think', label:'🤔 Slide 36 · Think aloud: guess from context', sets:[
+      { title:'I’m not sure what <b>funnel</b> means. Put the four steps in order.', labels:['1️⃣','2️⃣','3️⃣','4️⃣'], steps:['Stop at the new word.','Read the sentence: “the shape of a funnel” — so a funnel is a shape.','Look for clues: “a giant gray elephant’s trunk” and the picture.','Make a guess: round, bigger on top and smaller at the bottom.'], end:'Did the guess make sense in the sentence? Then it is a good guess!' } ] },
+    { type:'mcq', id:'try', label:'🌀 Your turn! Try twisted', items:[
+      { q:'“The winds <b>twisted</b> the storm tighter and tighter.” What do you think twisted means?', opts:['turned around and around','stopped','very cold'], ok:0 },
+      { q:'Which clue helped you?', opts:['“tighter and tighter” — like a rope','“the blue sky”'], ok:0 }
+    ] }
+  ] });
+
+defineTab('tab-0', { icon:'📖', name:'Read', title:'📖 Read — Tornado Trouble',
+  sub:'SB pp. 16–17 · TR 1.8. Slides 22–33. Answer each paragraph’s checks to unlock the next one.',
+  hint:'🔵 Tap a <span style="background:#DBEAFE;padding:0 4px;border-radius:4px;font-weight:800">blue word</span> or a <span style="background:#FDE68A;padding:0 4px;border-radius:4px;font-weight:800">signal word</span> to see what it means. Make a picture for every sentence!',
+  done:'🎉 You read Tornado Trouble — all three paragraphs!',
+  blocks:[
+    { type:'mcq', id:'before', label:'🗺️ Slides 22–23 · Before you read', items:[
+      { clue:'📍 Slide 22', q:'Where is Kansas?', opts:['in the midwestern United States — in the heart of Tornado Alley','in Japan, near Tokyo','in the middle of the ocean'], ok:0 },
+      { clue:'📊 Slide 22', q:'Why is Tornado Alley famous?', opts:['More tornadoes occur there than in any other part of the United States.','It never has any storms.'], ok:0 },
+      { clue:'🎧 Slide 23 · Predict', q:'Josh Wurman studies extreme weather. I think he is a …', opts:['🔬 scientist','🧑‍🍳 chef','⚽ soccer coach'], ok:0 },
+      { clue:'🎧 Slide 23 · Predict', q:'I predict the team is going to …', opts:['🚚 chase a tornado','🏖️ go to the beach','🎬 make a movie'], ok:0 }
+    ] },
+    { type:'read', id:'passage', label:'🌪️ Tornado Trouble · TR 1.8', paras:[
+      { label:'PARAGRAPH 1', text:'Tornadoes happen [[all over the world|everywhere on Earth]]. There’s even a place called [[Tornado Alley|a region in the midwestern U.S. — more tornadoes happen there than anywhere else in the U.S.]]. Josh Wurman studies [[extreme weather|very strong, dangerous weather]]. He joined a team of other scientists to study tornadoes in Tornado Alley. {{One day|signal: the story changes!}}, the blue sky [[turned black|the color changed: blue → black]]. A giant cloud came toward the team. The cloud had winds that [[moved in a circle|went around and around]]. Inside his truck, Wurman watched the storm through his window and on his [[instruments|🌡️ tools that measure wind speed, rain and temperature]]. Colors on the [[computer screen|💻 the colors showed the rain and the strongest wind]] showed where the rain fell and where the wind was the strongest.',
+        items:[
+          { q:'👨‍🔬 What does Josh Wurman do?', opts:['He studies extreme weather.','He drives a school bus.','He sells umbrellas.'], ok:0, why:'He joined a team of scientists to study tornadoes in Tornado Alley.' },
+          { q:'🌤️ How does the weather change?', opts:['The blue sky turned black.','The black sky turned blue.','It started to snow.'], ok:0, why:'A giant cloud came toward the team. The wind moved in a circle.' },
+          { q:'How did the team see the rain and the wind inside the truck?', opts:['They looked at colors on a computer screen.','They listened to the radio.','They called a friend.'], ok:0 } ] },
+      { label:'PARAGRAPH 2', text:'The winds [[twisted|🌀 turned around and around, like a rope]] the storm [[tighter and tighter|more and more]] into the shape of a [[funnel|🔻 wide at the top, narrow at the bottom]]. {{When|signal: the next step}} the funnel touched the ground, it became a tornado! The tornado looked like a giant, gray [[elephant’s trunk|🐘 an elephant’s long nose — a long shape, wide then narrow]]. It moved [[one way, then another way|↔️ it changed direction]]. {{As|signal: at the same time}} the tornado moved across the ground, the team came [[dangerously close|so close that it is dangerous]]. They dropped [[special instruments|🌡️ tools that measure the storm]] close to the storm. These instruments showed wind speed, temperature, and how much rain was falling.',
+        items:[
+          { q:'🔻 What shape is the tornado?', opts:['It is the shape of a funnel.','It is the shape of a box.','It is the shape of a star.'], ok:0 },
+          { q:'🐘 What does it look like?', opts:['a giant, gray elephant’s trunk','a soft, white cloud','a blue bird'], ok:0 },
+          { q:'🚚 What do Wurman and his team do?', opts:['They get dangerously close and drop special instruments near the storm.','They go home and watch TV.'], ok:0 },
+          { q:'What do the instruments show?', opts:['Wind speed, temperature and rain','Only the color of the sky'], ok:0 } ] },
+      { label:'PARAGRAPH 3', text:'The tornado twisted and moved for [[half an hour|⏱️ 30 minutes]]. The team watched the storm and their instruments [[the whole time|all the time, from start to end]]. {{Then|signal: next}} the tornado [[leaned over|bent to one side]] slowly like a [[soft rope|🪢 a rope that bends and falls]]. [[Poof!|💨 a sound word — it is gone very fast]] It was gone. The excitement was over. {{But|signal: the story turns — the work is not over}} Wurman and his team have a lot more work to do. The [[information|📊 the facts from the instruments]] from their instruments will help them [[predict|🔮 say what will happen before it happens]] other tornadoes {{so that|signal: tells WHY — the purpose}} they can [[warn|🚨 tell people about danger before it happens]] people and [[save lives|❤️ keep people alive]].',
+        items:[
+          { q:'⏱️ How long does this tornado last?', opts:['It lasts half an hour.','It lasts ten hours.','It lasts a week.'], ok:0 },
+          { q:'❤️ How does Wurman’s work help people?', opts:['It helps scientists predict other tornadoes, so they can warn people and save lives.','It makes the tornadoes stop.','It makes the sky blue.'], ok:0 },
+          { q:'Which sentence is TRUE?', opts:['The tornado leaned over slowly and was gone.','The tornado lasted ten hours.','The team stayed home.'], ok:0 } ] }
+    ] },
+    { type:'find', id:'facts', label:'💡 Slide 24 · What new information did you learn?', sets:[
+      { q:'Find the six true facts about tornadoes.', end:'Tell Dad one in a full sentence: “I learned that tornadoes…”', tiles:[
+        { t:'🌍 They happen all over the world.', ok:true },{ t:'🔻 They have a funnel shape.', ok:true },
+        { t:'🗾 They only happen in Japan.', ok:false, why:'They happen all over the world.' },{ t:'☁️ They come from giant clouds.', ok:true },
+        { t:'🌧️ They have wind and rain.', ok:true },{ t:'📅 They last for a whole year.', ok:false, why:'This one lasted half an hour. They can quickly disappear.' },
+        { t:'↔️ They touch the ground and move in different directions.', ok:true },{ t:'💨 They can quickly disappear.', ok:true } ] } ] }
+  ] });
+
+defineTab('tab-2', { icon:'❓', name:'Questions', title:'❓ Questions — Activities 2 and 3',
+  sub:'SB p. 17 · Slides 35–46 and 62: answer, match the diagrams, and put the steps in order.',
+  done:'🎉 Every question answered — you know how a tornado forms!',
+  blocks:[
+    { type:'mcq', id:'act2', label:'📝 Activity 2 · Answer the questions (slides 38–40)', items:[
+      { clue:'Q1 · Slide 38', q:'What is the shape of a tornado?', opts:['It is the shape of a funnel.','It is the shape of a box.','It is the shape of a star.'], ok:0 },
+      { clue:'Q2 · Slide 39', q:'When does a funnel become a tornado?', opts:['When it touches the ground.','When it stays in the sky.','When it turns blue.'], ok:0 },
+      { clue:'Q4 · Slide 42', q:'What do scientists use to get information about tornadoes?', opts:['They use special instruments.','They use a pizza oven.','They use a video game.'], ok:0 }
+    ] },
+    { type:'find', id:'why', label:'🔬 Activity 2 · Q3 · Why do scientists study tornadoes? (slide 41)', sets:[
+      { q:'Find the three reasons.', end:'They study tornadoes to predict other tornadoes.', tiles:[
+        { t:'🔮 to predict other tornadoes', ok:true },{ t:'🍕 to make pizza', ok:false, why:'Not in the reading!' },
+        { t:'🚨 to warn people', ok:true },{ t:'🏖️ to go to the beach', ok:false, why:'They work in the field, not at the beach.' },
+        { t:'❤️ to save lives', ok:true },{ t:'🎵 to write a song', ok:false, why:'Not in the reading!' } ] } ] },
+    { type:'match', id:'instr', label:'🌡️ Activity 2 · Q4 · Which instrument measures what? (slide 42)', pairs:[
+      { l:'🌬️ anemometer', r:'💨 wind speed' },{ l:'🌡️ thermometer', r:'🔥❄️ temperature' },{ l:'🧪 rain gauge', r:'🌧️ how much rain' } ] },
+    { type:'mcq', id:'colors', label:'🖍️ Slide 45 · Draw it with red and blue', hint:'Draw three pictures in a row: 1 🔴🔵 warm + cold meet · 2 ⬆️⬇️ the air stands up · 3 🔻 twist into a funnel.', items:[
+      { q:'Which color is warm air?', opts:['🔴 red','🔵 blue'], ok:0, two:true },
+      { q:'Which color is cold air?', opts:['🔵 blue','🔴 red'], ok:0, two:true },
+      { q:'In picture 2, which way does the warm air move?', opts:['⬆️ up','⬇️ down'], ok:0, two:true, why:'Warm air moves up. Cold air moves down.' }
+    ] },
+    { type:'match', id:'act3', label:'📐 Activity 3 · Match the sentences to the pictures (slide 44)', hint:'The book’s answers: <b>1 b · 2 c · 3 a</b>. Tap a sentence, then its picture.', pairs:[
+      { l:'<b>b</b> · Warm air and cold air come together. They make a twisting wind of air that moves in circles.', r:'1 🔴🔵 warm + cold air meet' },
+      { l:'<b>c</b> · The twisting air stands up. Warm air moves up. Cold air moves down.', r:'2 ⬆️⬇️ the air stands up' },
+      { l:'<b>a</b> · Warm and cold air currents twist winds into a funnel. Then the funnel touches the ground.', r:'3 🔻 funnel touches the ground' } ] },
+    { type:'order', id:'orders', label:'🔢 Put them in order (slides 46, 62, 35)', sets:[
+      { title:'🌀 Slide 46 · How does a tornado form? First, Next, Then.', labels:['First,','Next,','Next,','Then'], steps:['warm and cold air come together.','the wind twists in circles.','the twisting air stands up.','the funnel touches the ground and becomes a tornado.'] },
+      { title:'⏱️ Slide 62 · Put the tornado phrases in order.', steps:['sky turns black','wind moves in a circle','wind twists into a funnel','funnel touches the ground','tornado leans over and disappears'], end:'Now read them with First, Next, Then, Finally!' },
+      { title:'🐸 Slide 35 · It once rained frogs! (Serbia, June 2005)', steps:['🌪️ A tornado sucks up water from a pond. Frogs are in the water.','🐸 The frogs travel inside the tornado with the water.','🌧️ The frogs are dropped miles away — it rains frogs!'], end:'In 2010 it rained fish over a small town in Australia! 🐟' } ] }
+  ] });
+
+defineTab('tab-3', { icon:'⚖️', name:'Compare', title:'⚖️ Compare — tornadoes and hurricanes',
+  sub:'SB p. 17 Activity 4 · Slides 47–50: the chart, the Venn sort, then your own compare sentences.',
+  done:'🎉 Storm report: tornado vs hurricane — compared!',
+  blocks:[
+    { type:'mcq', id:'words', label:'🌱 Slide 47 · Words for the chart', items:[
+      { q:'What does <b>origin</b> mean?', opts:['how something forms (where it starts)','how big something is','how long something lasts'], ok:0 },
+      { q:'<b>Duration</b> means…', opts:['how long it lasts','how big it is'], ok:0, two:true },
+      { q:'<b>Size</b> means…', opts:['how big it is','how long it lasts'], ok:0, two:true },
+      { q:'What is the origin of a tornado? How does it form?', opts:['Warm and cold air twist into a funnel.','Snow falls on a mountain.'], ok:0 }
+    ] },
+    { type:'chart', id:'chart', label:'📋 Activity 4 · Fill the chart (slide 48)', head:['','🌪️ Tornado','🌀 Hurricane'], rows:[
+      { label:'🌱 Origin', cells:[{ q:'🌪️ Where does a tornado form?', opts:['over land','over water'] },{ q:'🌀 Where does a hurricane form?', opts:['over water','over land'] }] },
+      { label:'⏱️ Duration', cells:[{ q:'🌪️ How long does a tornado last?', opts:['about 10 minutes','about a week'] },{ q:'🌀 How long does a hurricane last?', opts:['about a week','about 10 minutes'] }] },
+      { label:'📏 Size', cells:[{ q:'🌪️ How big is a tornado?', opts:['about a quarter of a mile wide','hundreds of miles wide'] },{ q:'🌀 How big is a hurricane?', opts:['hundreds of miles wide','about a quarter of a mile wide'] }] } ] },
+    { type:'sort', id:'venn', label:'⭕ Slide 49 · Tornado, hurricane or both?', sorts:[
+      { id:'rd-venn', intro:'Drag each fact: only the tornado, only the hurricane, or both?', win:'Both: strong winds · dangerous · winds move in a circle.',
+        zones:[{ key:'t', label:'🌪️ Tornado', color:'#334155' },{ key:'b', label:'🟰 Both', color:'#7C3AED' },{ key:'h', label:'🌀 Hurricane', color:'#0369A1' }],
+        tiles:[{ text:'forms over land', answer:'t' },{ text:'lasts about 10 minutes', answer:'t' },{ text:'about a quarter mile wide', answer:'t' },{ text:'has a funnel shape', answer:'t' },
+               { text:'forms over water', answer:'h' },{ text:'lasts about a week', answer:'h' },{ text:'hundreds of miles wide', answer:'h' },
+               { text:'strong winds', answer:'b' },{ text:'dangerous', answer:'b' },{ text:'winds move in a circle', answer:'b' }] } ] },
+    { type:'mcq', id:'more', label:'➕ Slide 50 · More ways to compare', items:[
+      { clue:'💨 Wind speed', q:'Both storms have very ____ winds.', opts:['strong','soft','warm'], ok:0 },
+      { clue:'🔻 Shape', q:'A tornado is a funnel. A hurricane is…', opts:['a huge circle of clouds','a small square'], ok:0 },
+      { clue:'⚠️ Danger', q:'Both are dangerous. People need…', opts:['a plan and a shelter','a kite and a ball'], ok:0 },
+      { clue:'📍 Location · 🇯🇵', q:'Hurricanes form over warm oceans. In Japan we say…', opts:['typhoon (台風)','tornado (竜巻)'], ok:0, two:true }
+    ] },
+    { type:'typed', id:'say', label:'✏️ Slide 50 · Your compare sentences', hint:'Use the frames. Any true answer from the chart works.', items:[
+      { p:'Use the chart: smaller? shorter?', pre:'A tornado is ', post:' than a hurricane.', ans:['smaller','shorter','narrower'], model:'A tornado is smaller (or shorter) than a hurricane.' },
+      { p:'Which lasts longer?', pre:'A hurricane lasts ', post:' than a tornado.', ans:['longer'], model:'A hurricane lasts longer than a tornado.' },
+      { p:'Which is bigger?', pre:'A hurricane is ', post:' than a tornado.', ans:['bigger','larger','wider'], model:'A hurricane is bigger than a tornado.' },
+      { p:'Origin: land or water?', pre:'Tornadoes form over land, but hurricanes form over ', post:'.', ans:['water','the water','warm oceans','oceans','the ocean','warm water'], model:'…but hurricanes form over water.' },
+      { p:'How are they the same? (are storms · have strong winds · are dangerous)', pre:'Both tornadoes and hurricanes ', free:true, min:2, model:'Both tornadoes and hurricanes have strong winds.' }
+    ] }
+  ] });
+
+defineTab('tab-7', { icon:'🕸️', name:'My Storm', title:'🕸️ My Storm — tell a good story',
+  sub:'Slides 52–61: build a word web, tell your storm, role-play Josh Wurman, and the soccer transfer.',
+  hint:'🎬 Good storytellers help you <b>see</b> and <b>feel</b> the story. Choose a storm you remember — a typhoon (台風), the rainy season, a thunderstorm or a snowstorm.',
+  done:'🎉 Your storm story is ready — tell it to Dad and let him draw it!',
+  blocks:[
+    { type:'order', id:'steps', label:'✏️ Slide 52 · Make a word web in 5 steps', sets:[
+      { title:'Build a word web in the right order.', labels:['First,','Next,','Then,','After that,','Finally,'], steps:['choose ONE type of storm. Think of a storm you remember.','write the type of storm in a circle in the middle of your paper.','draw 3–4 lines out from the middle. Write a big idea on each: I saw · I heard · I felt.','add detail WORDS to each idea: colors, sounds, feelings, movement.','read your web. Use it to tell your story.'], end:'Now you are ready to talk or write!' } ] },
+    { type:'note', id:'model', label:'❄️ Slide 53 · Dad’s model web — a blizzard', html:'<div class="qcard"><div class="qtext">❄️ blizzard</div><div class="chips" style="margin-top:8px"><span class="chip">dark</span><span class="chip">high wind speed</span><span class="chip">cold</span><span class="chip">white</span><span class="chip">snow</span><span class="chip">icy streets</span><span class="chip">trees covered in snow</span></div></div>' },
+    { type:'find', id:'good', label:'✔ Slide 54 · Which are good web words?', sets:[
+      { q:'Which ideas belong in a word web about a THUNDERSTORM? Find the five good web words.', end:'A good web word is short and about the topic.', tiles:[
+        { t:'☁️ dark clouds', ok:true },{ t:'🔊 loud thunder', ok:true },
+        { t:'📝 The storm was very big and it came at night.', ok:false, why:'That is a whole sentence. Make it shorter: big storm.' },
+        { t:'🌧️ heavy rain', ok:true },{ t:'🍕 I like pizza.', ok:false, why:'Not about the storm!' },{ t:'😨 scared', ok:true },
+        { t:'💨 strong wind', ok:true },{ t:'📅 Yesterday my dad went to work.', ok:false, why:'Not about the storm — and it is a sentence.' } ] } ] },
+    { type:'sort', id:'shf', label:'👀👂🤲 Slide 56 · I saw, I heard or I felt?', sorts:[
+      { id:'rd-shf', intro:'Sort the storm words. Drag each one to its box.',
+        zones:[{ key:'s', label:'👀 I saw', color:'#334155' },{ key:'h', label:'👂 I heard', color:'#EA580C' },{ key:'f', label:'🤲 I felt', color:'#0369A1' }],
+        tiles:[{ text:'dark clouds', answer:'s' },{ text:'heavy rain', answer:'s' },{ text:'bright lightning', answer:'s' },{ text:'thunder', answer:'h' },{ text:'howling', answer:'h' },{ text:'loud crash', answer:'h' },{ text:'strong wind', answer:'f' },{ text:'wet and cold', answer:'f' }] } ] },
+    { type:'web', id:'web', label:'🕸️ Slide 55 · My word web', hint:'Tap the middle oval and type your storm. Then tap <b>+</b> and add at least 4 words: colors, sounds, feelings, movement.', center:{ text:'storm', emoji:'🌧️' }, min:4 },
+    { type:'typed', id:'frames', label:'🗣️ Slide 57 · Tell your storm', hint:'Use your web. Then Dad draws what you say — does his picture match your idea?', items:[
+      { p:'What kind of storm?', pre:'It was a ', post:' storm.', free:true, min:1, model:'It was a big typhoon storm.' },
+      { p:'Color!', pre:'The sky was ', free:true, min:1, model:'The sky was dark gray.' },
+      { p:'Sound!', pre:'I heard ', free:true, min:1, model:'I heard loud thunder.' },
+      { p:'Feeling!', pre:'I felt ', free:true, min:1, model:'I felt scared.' },
+      { p:'Movement — what happened next?', pre:'Then ', free:true, min:2, model:'Then the trees fell over.' }
+    ] },
+    { type:'mcq', id:'role', label:'🎭 Slide 61 · Role-play: Josh Wurman and his team', hint:'Pick what Wurman says. Then act it with Dad — make it dramatic! Then switch roles.', items:[
+      { clue:'🧑‍🔬 Team', q:'“What do you see?”', opts:['I see a giant, black cloud. The wind is moving in a circle!','I see a sunny beach and a blue sea.'], ok:0 },
+      { clue:'🧑‍🔬 Team', q:'“How do you feel?”', opts:['I feel excited, but I am a little nervous. The funnel is close!','I feel sleepy. Let’s go home.'], ok:0 },
+      { clue:'🧑‍🔬 Team', q:'“What do you need to do?”', opts:['We need to drop the instruments and record the wind speed. Then we must warn the town!','We need to eat lunch and watch a movie.'], ok:0 },
+      { clue:'✏️ Slide 60 · Recap', q:'My tornado is the shape of a ____. The winds move in a circle.', opts:['funnel','box','star'], ok:0 }
+    ] },
+    { type:'mcq', id:'soccer', label:'⚽ Slide 58 · Our words go to the soccer field (stats as of 21 Sept 2026)', items:[
+      { clue:'⚖️ compare', q:'Raphinha has 12 goals. Haaland has 5. Compare them!', opts:['Raphinha has more goals than Haaland.','Haaland has more goals than Raphinha.'], ok:0 },
+      { clue:'⚖️ compare', q:'Who scored more — Raphinha (12) or Malen (6)?', opts:['Raphinha','Malen'], ok:0, two:true },
+      { clue:'🔴 record', q:'The stats team ____ every goal.', opts:['records','warns','twists'], ok:0 },
+      { clue:'🔬 research', q:'Scouts do ____ before a club buys a player — they watch videos and read the stats.', opts:['research','field','funnel'], ok:0 },
+      { clue:'🌾 field', q:'Players run on the soccer ____.', opts:['field','record','instrument'], ok:0 },
+      { clue:'🚨 warn', q:'A referee ____ a player with a yellow card.', opts:['warns','records','compares'], ok:0 },
+      { clue:'🌀 twisted', q:'“Ouch! He ____ his ankle.”', opts:['twisted','warned','researched'], ok:0 },
+      { clue:'🌡️ instruments', q:'GPS vests measure speed. They are ____.', opts:['instruments','fields','funnels'], ok:0 }
+    ] },
+    { type:'write', id:'report', label:'📝 Slide 59 · Task A · Write a Storm Report', p:'Write 5 sentences about a storm. Use at least 3 target words: compare · instruments · twisted · funnel · warn · field · record · research.', ph:'The sky turned black. A funnel touched the ground…', sentences:5, need:3,
+      targets:[{ w:'compare', re:'compar' },{ w:'instruments', re:'instrument' },{ w:'twisted', re:'twist' },{ w:'funnel', re:'funnel' },{ w:'warn', re:'warn' },{ w:'field', re:'field' },{ w:'record', re:'record' },{ w:'research', re:'research' }] }
+  ] });
+
+defineTab('tab-4', { icon:'✅', name:'Quiz', title:'✅ Quiz — 10 questions',
+  sub:'One try each. Score 8/10 or better and you are a real storm chaser!',
+  done:'🏆 Quiz finished!',
+  blocks:[
+    { type:'quiz', id:'quiz', scoreKey:'score', win:'You are a real storm chaser! 🌪️', items:[
+      { q:'Where is Tornado Alley?', opts:['in the midwestern United States','in Antarctica','in Australia'], ok:0, jp:'トルネード・アレーはアメリカ中西部にあります。' },
+      { q:'Josh Wurman ____ extreme weather.', opts:['studies','cooks','sells'], ok:0, jp:'ジョシュ・ワーマンは極端な気象を研究しています。' },
+      { q:'“The winds ____ the storm tighter and tighter.”', opts:['twisted','warned','recorded'], ok:0, jp:'風が嵐をどんどんきつくねじりました。' },
+      { q:'What is the shape of a tornado?', opts:['a funnel','a box','a circle of clouds'], ok:0, jp:'竜巻はじょうごの形をしています。' },
+      { q:'When does the funnel become a tornado?', opts:['when it touches the ground','when it turns blue','when it stops'], ok:0, jp:'じょうごが地面に着くと竜巻になります。' },
+      { q:'What did the special instruments show?', opts:['wind speed, temperature, and how much rain was falling','the color of the sky','the time'], ok:0, jp:'特別な計器は風速・気温・雨の量を示しました。' },
+      { q:'How long did this tornado twist and move?', opts:['for half an hour','for a week','for ten hours'], ok:0, jp:'この竜巻は30分間ねじれながら動きました。' },
+      { q:'Why do scientists study tornadoes?', opts:['to predict other tornadoes and warn people','to make tornadoes bigger','to go on vacation'], ok:0, jp:'他の竜巻を予測して人々に警告するためです。' },
+      { q:'Which sentence compares a tornado and a hurricane?', opts:['A hurricane is bigger than a tornado.','A tornado is a storm.','I like hurricanes.'], ok:0, jp:'ハリケーンは竜巻より大きいです。' },
+      { q:'How does a tornado form? What happens FIRST?', opts:['Warm air and cold air come together.','The funnel touches the ground.','The tornado leans over.'], ok:0, jp:'まず、暖かい空気と冷たい空気が出会います。' }
+    ] }
+  ] });
+
+/* ═════════════════════════════════════════════════════════════════════
+   📒 WORKBOOK — WB pp. 8–9 · Weather Change (TR 1.3)
+   Words from vocabulary.json, source tag OW5-U1-RD-WB.
+═════════════════════════════════════════════════════════════════════ */
+const WB_WORDS = [
+  { word:'coal', emoji:'🪨🔥', pos:'noun', def:'A hard black rock from the ground that people burn to make heat and power.', sample:'“…when people started to burn <b>coal</b>, oil, and gas.”', jp:'石炭（せきたん）' },
+  { word:'average', emoji:'📊', pos:'adjective', def:'Usual or normal; the middle amount when you add things up and share them out.', sample:'“The <b>average</b> temperature on Earth is rising.”', jp:'平均（へいきん）の' },
+  { word:'melt', emoji:'🧊💧', pos:'verb', def:'To change from ice or something solid into water or liquid because it gets warm.', sample:'“More of the ice on mountains <b>melts</b> faster.”', jp:'とける' },
+  { word:'sea level', emoji:'🌊📏', pos:'noun phrase', def:'The height of the top of the sea.', sample:'“If this water goes to the sea, the <b>sea level</b> rises.”', jp:'海面（かいめん）' },
+  { word:'efficient', emoji:'⚡✅', pos:'adjective', def:'Working well without wasting energy, time, or money.', sample:'“We can make factories and cars more <b>efficient</b>.”', jp:'効率的（こうりつてき）な' },
+  { word:'energy', emoji:'🔋⚡', pos:'noun', def:'The power that makes machines, lights, and cars work.', sample:'“We can use less <b>energy</b>.”', jp:'エネルギー' },
+  { word:'practical', emoji:'🛠️👍', pos:'adjective', def:'Useful and easy to do in real life.', sample:'“There are also some <b>practical</b> things that everyone can do…”', jp:'実用的（じつようてき）な' }
+];
+const WB7 = ['coal','average','melts','sea level','efficient','energy','practical'];
+function wbFill(q, ans){ return { q, opts:[ans].concat(shuffle(WB7.filter(w => w !== ans)).slice(0,2)), ok:0 }; }
+
+defineTab('wb-tab-0', { icon:'📚', name:'Vocab', title:'📚 Vocab — seven Workbook words',
+  sub:'WB pp. 8–9 · Weather Change. Learn these first, then read.',
+  done:'🎉 Seven new words — ready to read!',
+  blocks:[
+    { type:'flash', id:'cards', label:'🃏 Flip every card', words:WB_WORDS },
+    { type:'match', id:'match', label:'🔗 Match each meaning to its word', pairs:WB_WORDS.map(w=>({ l:w.def, r:w.emoji + ' ' + w.word })) },
+    { type:'mcq', id:'fill', label:'✏️ Sentences from the reading', items:[
+      wbFill('People started to burn ____, oil, and gas.', 'coal'),
+      wbFill('The ____ temperature on Earth is rising.', 'average'),
+      wbFill('More of the ice on mountains ____ faster.', 'melts'),
+      wbFill('If this water goes to the sea, the ____ rises.', 'sea level'),
+      wbFill('We can make factories and cars more ____.', 'efficient'),
+      wbFill('We can use less ____.', 'energy'),
+      wbFill('There are also some ____ things that everyone can do.', 'practical')
+    ] }
+  ] });
+
+defineTab('wb-tab-1', { icon:'📖', name:'Read', title:'📖 Read — Weather Change',
+  sub:'WB p. 8 · TR 1.3. Answer each paragraph’s checks to unlock the next one.',
+  hint:'🔵 Tap a <span style="background:#DBEAFE;padding:0 4px;border-radius:4px;font-weight:800">blue word</span> to see what it means. The orange words are your seven Vocab words.',
+  done:'🎉 You read Weather Change — all five paragraphs!',
+  blocks:[
+    { type:'read', id:'passage', label:'🌡️ Weather Change · TR 1.3', paras:[
+      { label:'PARAGRAPH 1', text:'We’ve always had [[extreme weather|very strong, dangerous weather]]. Do you know that there is more extreme weather now than in the past? [[According to|this is what … say]] many scientists, this change started when people started to burn **coal**, oil, and gas.',
+        items:[
+          { q:'Is there more extreme weather now than in the past?', opts:['Yes, there is.','No, there isn’t.'], ok:0, two:true },
+          { q:'When did this change start?', opts:['when people started to burn coal, oil, and gas','when people built houses near the sea','when it snowed in Antarctica'], ok:0 } ] },
+      { label:'PARAGRAPH 2', text:'The **average** temperature on Earth is [[rising|going up]]. Some [[droughts|🌵 long times with no rain]] are longer and hotter. More of the ice on mountains **melts** faster. If this water goes to the sea, the **sea level** rises.',
+        items:[
+          { q:'What is happening to the average temperature on Earth?', opts:['It is rising.','It is going down.','It is the same.'], ok:0 },
+          { q:'Ice melts and the water goes to the sea. What happens?', opts:['The sea level rises.','The sea level goes down.'], ok:0 } ] },
+      { label:'PARAGRAPH 3', text:'Different places have different changes in the weather. Some places have less rain. Other places have more rain and [[floods|💧 a lot of water covers the land]]. In most places, there are more storms. Storms are stronger, too. The warmer sea temperatures make [[hurricanes|🌀 huge storms with very strong winds]] stronger.',
+        items:[
+          { q:'In most places, there are ____ storms.', opts:['more','fewer'], ok:0, two:true },
+          { q:'Why are hurricanes stronger?', opts:['The warmer sea temperatures make them stronger.','The colder sea temperatures make them stronger.'], ok:0 } ] },
+      { label:'PARAGRAPH 4', text:'Weather change is a [[fact|something that is true]]. But we can do something. For example, we can make [[factories|🏭 big buildings where people make things]] and cars more **efficient**. That way, we can burn less coal, oil, and gas. We can also build stronger houses in [[safer areas|places with less danger]]. We can use less **energy**.',
+        items:[
+          { q:'How can we burn less coal, oil, and gas?', opts:['We can make factories and cars more efficient.','We can build more factories.'], ok:0 },
+          { q:'Where can we build stronger houses?', opts:['in safer areas','near rivers that flood'], ok:0, two:true } ] },
+      { label:'PARAGRAPH 5', text:'There are also some **practical** things that everyone can do to be [[prepared|ready]] for more extreme weather. People should have a plan and [[supplies|🔦💧 things you need: water, food, a flashlight]] for [[emergencies|🚨 sudden, dangerous times]]. People who live in areas that can flood or in hurricane areas should [[evacuate|🏃 leave a dangerous place and go somewhere safe]] in an emergency.',
+        items:[
+          { q:'What should people have for emergencies?', opts:['a plan and supplies','a party and games'], ok:0, two:true },
+          { q:'What should people in hurricane areas do in an emergency?', opts:['evacuate','go to the beach'], ok:0, two:true } ] }
+    ] },
+    { type:'note', id:'factbox', label:'🧊 Fact box', html:'<div class="fact-box">🥶 The coldest temperature ever recorded on Earth was −97.7ºC (−144°F) on an ice sheet deep in the middle of Antarctica.</div>' },
+    { type:'mcq', id:'fact', items:[
+      { q:'Where was the coldest temperature ever recorded?', opts:['on an ice sheet deep in the middle of Antarctica','on a mountain in Japan','in Tornado Alley'], ok:0 },
+      { q:'How cold was it?', opts:['−97.7ºC','−9.7ºC','0ºC'], ok:0 }
+    ] }
+  ] });
+
+const TF = ['✅ True','❌ False'];
+defineTab('wb-tab-2', { icon:'⭕', name:'Circle', title:'⭕ Circle the best answer — Activity 2',
+  sub:'WB p. 9 Activity 2, then True or False about Weather Change.',
+  done:'🎉 Activity 2 done — and every true/false right!',
+  blocks:[
+    { type:'mcq', id:'act2', label:'⭕ WB Activity 2 · Circle the best answer', items:[
+      { q:'When the weather gets warmer,', opts:['a. ice on mountains melts faster.','b. the seas rise.','c. both a and b.'], ok:2, keep:true, why:'Ice melts faster AND the water goes to the sea, so the sea level rises.' },
+      { q:'To slow weather change, we can', opts:['a. build stronger houses.','b. burn less coal, oil, and gas.','c. both a and b.'], ok:1, keep:true, why:'Stronger houses keep people safe, but burning less coal, oil, and gas slows the change.' },
+      { q:'Hurricanes are stronger because', opts:['a. the sea water is warmer.','b. droughts are longer and hotter.','c. people don’t evacuate.'], ok:0, keep:true, why:'“The warmer sea temperatures make hurricanes stronger.”' }
+    ] },
+    { type:'mcq', id:'tf', label:'✅❌ True or false?', two:true, items:[
+      { q:'There is more extreme weather now than in the past.', opts:TF, ok:0 },
+      { q:'The average temperature on Earth is going down.', opts:TF, ok:1, why:'It is rising.' },
+      { q:'Some droughts are longer and hotter.', opts:TF, ok:0 },
+      { q:'Every place has the same changes in the weather.', opts:TF, ok:1, why:'Different places have different changes.' },
+      { q:'Some places have less rain. Other places have more rain and floods.', opts:TF, ok:0 },
+      { q:'Storms are weaker now.', opts:TF, ok:1, why:'Storms are stronger, too.' },
+      { q:'We can use less energy.', opts:TF, ok:0 },
+      { q:'People in flood areas should stay at home in an emergency.', opts:TF, ok:1, why:'They should evacuate.' }
+    ] }
+  ] });
+
+defineTab('wb-tab-3', { icon:'🧠', name:'Think', title:'🧠 Think — causes, actions and Activity 3',
+  sub:'What happens, what we can do, then WB Activity 3: What did you know? learn? want to know?',
+  done:'🎉 Great thinking — read your answers to Dad!',
+  blocks:[
+    { type:'match', id:'cause', label:'🔗 What happens next? Cause → effect', pairs:[
+      { l:'🧊 Ice on mountains melts faster…', r:'🌊 the sea level rises.' },
+      { l:'🌡️ The sea is warmer…', r:'🌀 hurricanes are stronger.' },
+      { l:'🏭 People started to burn coal, oil, and gas…', r:'⛈️ there is more extreme weather.' },
+      { l:'🚗 Factories and cars are more efficient…', r:'🔥 we burn less coal, oil, and gas.' } ] },
+    { type:'sort', id:'sort', label:'🗂️ The problem or what we can do?', sorts:[
+      { id:'rd-wbsort', intro:'Drag each sentence: is it a change in the weather, or something we can do?', win:'Weather change is a fact. But we can do something!',
+        zones:[{ key:'p', label:'⚠️ The weather is changing', color:'#DC2626' },{ key:'d', label:'🛠️ What we can do', color:'#16A34A' }],
+        tiles:[{ text:'The average temperature is rising.', answer:'p' },{ text:'Some droughts are longer and hotter.', answer:'p' },{ text:'The sea level rises.', answer:'p' },{ text:'Storms are stronger.', answer:'p' },
+               { text:'Make cars more efficient.', answer:'d' },{ text:'Use less energy.', answer:'d' },{ text:'Build stronger houses in safer areas.', answer:'d' },{ text:'Have a plan and supplies.', answer:'d' }] } ] },
+    { type:'typed', id:'kwl', label:'✏️ WB Activity 3 · Answer the questions', hint:'Answers will vary. Write a full idea for each one (3 words or more).', items:[
+      { p:'What did you know about extreme weather?', pre:'I knew that ', free:true, min:3, model:'I knew that tornadoes are dangerous.' },
+      { p:'What did you learn?', pre:'I learned that ', free:true, min:3, model:'I learned that the sea level rises when ice melts.' },
+      { p:'What do you want to know?', pre:'I want to know ', free:true, min:3, model:'I want to know why Antarctica is so cold.' }
+    ] }
+  ] });
+
+defineTab('wb-tab-4', { icon:'🏆', name:'Quiz', title:'🏆 Quiz — 6 questions',
+  sub:'One try each. Words + Weather Change.',
+  done:'🏆 Workbook quiz finished!',
+  blocks:[
+    { type:'quiz', id:'quiz', scoreKey:'wb-score', win:'Weather expert! 🌍', items:[
+      { q:'The average temperature on Earth is ____.', opts:['rising','going down','the same'], ok:0, jp:'地球の平均気温は上がっています。' },
+      { q:'If the ice on mountains melts, the ____ rises.', opts:['sea level','coal','energy'], ok:0, jp:'山の氷がとけると、海面が上がります。' },
+      { q:'To slow weather change, we can burn less ____, oil, and gas.', opts:['coal','water','ice'], ok:0, jp:'気候の変化をおさえるために、石炭・石油・ガスを燃やす量を減らせます。' },
+      { q:'Why are hurricanes stronger?', opts:['The sea water is warmer.','Droughts are longer.','People use less energy.'], ok:0, jp:'海水が暖かくなっているからです。' },
+      { q:'An efficient car uses ____ energy.', opts:['less','more','no'], ok:0, jp:'効率的な車はエネルギーを少ししか使いません。' },
+      { q:'People who live in hurricane areas should ____ in an emergency.', opts:['evacuate','swim','melt'], ok:0, jp:'ハリケーン地域に住む人は、緊急時に避難すべきです。' }
+    ] }
+  ] });
+
+/* ═══ boot ═══ */
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    buildShell(); refreshProg();
+    const last = lLoad('last-mode');
+    if(last === 'sb' || last === 'wb') enterMode(last);
+  }catch(e){ console.error(e); }
+});
+</script>
+</body>
+</html>

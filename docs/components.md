@@ -217,6 +217,8 @@ homeworkId:      leo-<l>-<u>-reading
 
 **Reference rule:** if the workbook reading uses words Leo hasn't met yet, they get added to `vocabulary.json` + the global `vocabulary-index.json` BEFORE the WB tabs are built — tagged with source `OW<level>-U<unit>-RD-WB`. (See Unit 8 Reading where arcade / console / portable / virtual reality / headset were added for the Video Games WB reading.)
 
+**Companion build (L5 U1 Reading):** `public/learn/ow-l5-u1-reading.html` keeps the landing → SB / WB shell and storage names, but follows the companion-to-the-slides rule, so the SB side has more tabs than the six above: Vocab · Word Games · Strategy · Read · Questions · Compare · My Storm · Quiz (8) + WB Vocab · Read · Circle · Think · Quiz (5) = 13 modules, listed in nav order in the learner JSON's explicit `moduleKeys`. Each tab is a list of blocks (flash, match, typed, mcq, sort, order, find, read, chart, web, write, quiz); every block saves as Leo answers and restores its own DOM, and the tab's done-key saves itself when all its blocks are done — the footer shows how many are left.
+
 ### writing (LOCKED — Unit 8 Writing)
 
 Reference: `public/learn/ow-l4-u8-writing.html` (13 modules, `m1`–`m13`).

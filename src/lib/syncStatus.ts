@@ -17,7 +17,8 @@ export type CloudSyncSource =
   | "geography"
   | "science"
   | "reference"
-  | "test-attempts";
+  | "test-attempts"
+  | "school-tests";
 
 export const cloudSyncSourceLabels: Record<CloudSyncSource, string> = {
   assignments: "Assignments",
@@ -28,7 +29,8 @@ export const cloudSyncSourceLabels: Record<CloudSyncSource, string> = {
   geography: "Geography",
   science: "Science",
   reference: "Reference words",
-  "test-attempts": "Test results"
+  "test-attempts": "Test results",
+  "school-tests": "School test review"
 };
 
 export type CloudSyncFailure = {

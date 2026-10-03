@@ -181,6 +181,8 @@ For specific decks, Leaneritan may direct: *"copy the activities and make them a
 
 Leo's grammar app is what he does **on his own after Neritan teaches the deck**. It is not a second lesson with its own content plan: every tab replays part of the deck, so what Leo meets alone is what he just met with Dad. Build it only once the teacher deck exists, and build it **from the deck**.
 
+**Reference check at upload (AGENTS.md rule 5a).** Every word card the deck presents — academic, content, related, and any words the deck chose where the planner prints none — must be in Reference with this lesson's source tag. Add a full card for a missing word; add the tag to an existing card's `sources`; list them all in the teacher JSON's `referenceLinks`. Check the deck against `docs/teacher-slides.md` → *Level 5 deck anatomy* too.
+
 **Step A — read the deck first, slide by slide.** List every slide with its stage (`data-stage`), its game, and the answers it reveals (`data-a` attributes and the teacher `NOTES`). Write that list down before choosing any app content.
 
 **Step B — Word Lab words = the deck's words, exactly.** Tab 0 uses the words the slides present as cards: the academic / content word cards (e.g. L5 U1 Grammar 1's only card is *a prediction*, slide 3), plus any word set a slide explicitly works with (its eight weather note cards, slide 35). Never swap in other words because they would suit the grammar better. The first L5 U1 build used rain / snow / windy / cloudy / sunny — words from an activity, not the deck's cards — and had to be redone.

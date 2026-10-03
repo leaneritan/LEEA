@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 1 · Writing — Safe not Sorry!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"></noscript>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../lib/leea-cloud-config.js"></script>
+<script src="../../lib/leea-cloud.js"></script>
+<style>
+:root{
+  --red:#6366F1;
+  --red-hi:#A5B4FC;
+  --red-lo:#312E81;
+  --yellow:#FACC15;
+  --yellow-hi:#312E81;
+  --ink:#070B16;
+  --panel:#0F172A;
+  --panel-2:#16213A;
+  --line:rgba(250,204,21,.22);
+  --line-soft:rgba(255,255,255,.10);
+  --text:#0F172A;
+  --muted:#9AA7C7;
+  --good:#2ED573;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;background:var(--ink);font-family:'Outfit',system-ui,sans-serif;color:var(--text);overflow:hidden}
+
+/* ---------- STAGE ---------- */
+deck-stage{position:fixed;inset:0;display:block;overflow:hidden;background:
+  radial-gradient(1200px 700px at 20% 0%,rgba(99,102,241,.20),transparent 60%),
+  radial-gradient(900px 600px at 85% 100%,rgba(250,204,21,.12),transparent 62%),
+  var(--ink)}
+.scaler{position:absolute;top:50%;left:50%;width:1920px;height:1080px;transform-origin:center center}
+
+/* ---------- SLIDE ---------- */
+.slide{position:absolute;inset:0;display:none;padding:70px 92px 96px;opacity:0;transition:opacity .28s ease}
+.slide.active{display:flex;flex-direction:column;justify-content:center;opacity:1}
+.slide.center{align-items:center;text-align:center}
+.wrap{width:100%}
+
+/* ---------- TYPE ---------- */
+.eyebrow{display:inline-flex;align-items:center;gap:12px;font-family:var(--mono);font-size:20px;letter-spacing:.20em;
+  text-transform:uppercase;color:var(--yellow);border:1.5px solid var(--line);border-radius:999px;
+  padding:9px 22px;margin-bottom:26px;background:rgba(250,204,21,.06)}
+.h1{font-size:96px;font-weight:900;line-height:.98;letter-spacing:-.025em;margin:0 0 22px}
+.h2{font-size:62px;font-weight:800;line-height:1.04;letter-spacing:-.02em;margin:0 0 22px}
+.h3{font-size:42px;font-weight:800;line-height:1.1;margin:0 0 16px}
+.lead{font-size:34px;line-height:1.45;color:#1E293B;font-weight:400;margin:0 0 18px;max-width:1560px}
+.small{font-size:26px;color:var(--muted);line-height:1.5}
+.hot{color:var(--yellow)}
+.hotr{color:var(--red-hi)}
+.mono{font-family:var(--mono)}
+
+/* ---------- LAYOUT ---------- */
+.row{display:flex;gap:26px;align-items:stretch}
+.col{display:flex;flex-direction:column;justify-content:center;gap:20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:20px}
+
+/* ---------- CARDS ---------- */
+.card{background:linear-gradient(160deg,var(--panel-2),var(--panel));border:1.5px solid var(--line-soft);
+  border-radius:26px;padding:30px 32px}
+.card.y{border-color:var(--line);box-shadow:0 0 0 1px rgba(250,204,21,.06) inset}
+.card.r{border-color:rgba(99,102,241,.45)}
+
+/* ---------- TAPPABLE ---------- */
+.tap{cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .2s ease}
+.tap:hover{transform:translateY(-4px);border-color:var(--yellow)}
+.tap:active{transform:translateY(-1px)}
+.tap:focus-visible{outline:3px solid var(--yellow);outline-offset:4px}
+
+/* ---------- HIDDEN / REVEAL ---------- */
+.hide{display:none}
+.rv{max-height:0;opacity:0;overflow:hidden;transition:max-height .42s ease,opacity .3s ease,margin .3s ease}
+.rv.show{max-height:640px;opacity:1;margin-top:20px}
+span.rv{display:inline-block;vertical-align:bottom;max-height:none;width:0}
+span.rv.show{margin-top:0;width:auto}
+.card.dim{opacity:.3;transition:opacity .35s ease}
+.cvbar{transition:border-color .3s ease}
+
+/* ---------- CHIPS & BUTTONS ---------- */
+.chip{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);
+  border:1.5px solid var(--line-soft);border-radius:999px;padding:12px 24px;font-size:28px;font-weight:600}
+.chip.y{background:rgba(250,204,21,.12);border-color:var(--line);color:var(--yellow-hi)}
+.chip.r{background:rgba(99,102,241,.16);border-color:rgba(99,102,241,.5);color:#312E81}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;border:none;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:30px;font-weight:800;border-radius:18px;padding:18px 38px;
+  background:var(--yellow);color:#151500;transition:transform .15s ease,filter .15s ease}
+.btn:hover{transform:translateY(-3px);filter:brightness(1.06)}
+.btn.ghost{background:transparent;color:var(--yellow);border:2px solid var(--line)}
+.btn.green{background:var(--good);color:#04240F}
+
+/* ---------- QUIZ ---------- */
+.opt{background:var(--panel-2);border:2px solid var(--line-soft);border-radius:20px;padding:24px 26px;
+  font-size:30px;font-weight:600;cursor:pointer;text-align:left;transition:all .18s ease;color:var(--text);
+  font-family:'Outfit',sans-serif;width:100%}
+.opt:hover{border-color:var(--yellow);transform:translateY(-3px)}
+.opt.ok{border-color:var(--good);background:rgba(46,213,115,.16)}
+.opt.no{border-color:var(--red);background:rgba(99,102,241,.14);opacity:.75}
+.fb{font-size:28px;font-weight:600;color:var(--yellow-hi);margin-top:18px;min-height:38px}
+
+/* ---------- READING TEXT ---------- */
+.read{font-size:40px;line-height:1.52;font-weight:400;color:#0F172A;letter-spacing:-.005em}
+.read.sm{font-size:30px;line-height:1.5}
+.cv{color:var(--yellow);font-weight:700;cursor:pointer;border-bottom:3px dotted rgba(250,204,21,.5);padding-bottom:2px}
+.cv:hover{background:rgba(250,204,21,.14);border-radius:6px}
+.sig{color:var(--red-hi);font-weight:800}
+.para-no{font-family:var(--mono);font-size:100px;font-weight:700;color:rgba(250,204,21,.16);line-height:1}
+
+/* ---------- SIGNATURE: RIDE RAIL ---------- */
+.rail{position:absolute;left:92px;right:92px;bottom:34px;height:88px;pointer-events:none}
+.rail svg{width:100%;height:100%;overflow:visible}
+.rail .lbl{font-family:var(--mono);font-size:15px;fill:var(--muted);letter-spacing:.12em}
+
+/* ---------- GAUGE ---------- */
+.gauge{width:220px;height:130px}
+.needle{transform-origin:110px 110px;transition:transform .7s cubic-bezier(.34,1.4,.5,1)}
+
+/* ---------- LP STAGE TAG ---------- */
+.stage-tag{position:absolute;top:26px;left:92px;z-index:35;display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--mono);font-size:17px;font-weight:700;letter-spacing:.20em;text-transform:uppercase;
+  border-radius:11px;padding:10px 20px;background:var(--yellow);color:#151500;
+  box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.stage-tag.rd{background:var(--red);color:#fff}
+.stage-tag.gr{background:var(--good);color:#04240F}
+.stage-tag .n{opacity:.55;font-weight:600}
+
+/* ---------- TEACHER NOTES ---------- */
+.tn-btn{position:absolute;top:26px;right:30px;z-index:40;background:rgba(250,204,21,.14);border:1.5px solid var(--line);
+  color:var(--yellow);font-family:var(--mono);font-size:17px;letter-spacing:.14em;padding:11px 20px;border-radius:12px;
+  cursor:pointer;text-transform:uppercase}
+.tn-btn:hover{background:rgba(250,204,21,.26)}
+.tn-panel{position:absolute;top:86px;right:30px;width:660px;max-height:820px;overflow:auto;z-index:39;
+  background:#101018;border:2px solid var(--line);border-radius:20px;padding:26px 30px;display:none;
+  font-size:23px;line-height:1.5;color:#0F172A;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.tn-panel.open{display:block}
+.tn-panel b{color:var(--yellow)}
+.tn-panel ul{margin:10px 0 0;padding-left:24px}
+.tn-panel li{margin-bottom:9px}
+
+/* ---------- NAV + PROGRESS ---------- */
+#nav{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:14px;
+  background:rgba(10,10,17,.86);border:1.5px solid var(--line-soft);border-radius:999px;padding:9px 16px;backdrop-filter:blur(8px)}
+#nav button{background:rgba(255,255,255,.08);border:none;color:var(--text);width:44px;height:44px;border-radius:50%;
+  font-size:22px;cursor:pointer;font-family:'Outfit',sans-serif}
+#nav button:hover{background:var(--yellow);color:#151500}
+#counter{font-family:var(--mono);font-size:17px;color:var(--muted);min-width:82px;text-align:center}
+#progBar{position:fixed;top:0;left:0;right:0;height:5px;background:rgba(255,255,255,.07);z-index:61}
+#progFill{height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--yellow));transition:width .3s ease}
+
+/* ---------- MISC ANIMATION ---------- */
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+.pulse{animation:pulse 1.9s ease-in-out infinite}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+.shake{animation:shake .42s ease}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ══ READING ADDITIONS ══ */
+.slide{padding:84px 92px 120px}
+.slide.rail-on{padding-bottom:128px}
+.wrap{max-width:1736px;margin:0 auto}
+.eyebrow{font-size:18px;padding:7px 18px;margin-bottom:18px}
+.h2{font-size:56px;margin:0 0 16px}
+.h3{font-size:36px;margin:0 0 10px}
+.lead{font-size:31px;line-height:1.4}
+.small{font-size:24px}
+.cvbar{min-height:76px;background:rgba(250,204,21,.07);border:1.5px dashed var(--line);border-radius:18px;padding:14px 22px;margin-top:16px;font-size:26px;color:var(--yellow-hi)}
+.cvbar p{font-size:27px!important;line-height:1.35}
+.read{font-size:36px;line-height:1.5}
+.read.two{column-count:2;column-gap:56px;font-size:25.5px;line-height:1.46}
+.read.two p{margin:0 0 14px;break-inside:avoid}
+.read p{margin:0 0 6px}
+.pnum{font-family:var(--mono);font-size:19px;letter-spacing:.2em;color:var(--yellow);margin-bottom:10px}
+.sig{border-bottom:3px solid rgba(165,180,252,.6);cursor:pointer}
+.row{gap:22px}
+.g{flex:1.15;min-width:0}.c{flex:1;min-width:0}
+.gbox{background:linear-gradient(160deg,#16213A,#0F172A);border:1.5px solid var(--line);border-radius:26px;padding:22px 26px}
+.game-hint{font-size:23px;color:var(--yellow-hi);margin-bottom:12px;font-weight:600}
+.gi{display:inline-flex;align-items:center;gap:10px;background:#16213A;border:2px solid var(--line-soft);border-radius:16px;padding:10px 16px;font-size:25px;font-weight:600;cursor:pointer;transition:all .16s ease;color:var(--text);line-height:1.2;user-select:none}
+.gi:hover{border-color:var(--yellow);transform:translateY(-2px)}
+.gi.sel{border-color:var(--yellow);background:rgba(250,204,21,.16)}
+.gi.ok{border-color:var(--good);background:rgba(46,213,115,.16);pointer-events:none}
+.gi.no{border-color:#F97316;background:rgba(249,115,22,.14)}
+.gi .ge{font-size:32px}
+.gi .ord{background:var(--yellow);color:#151500;border-radius:50%;width:34px;height:34px;display:none;align-items:center;justify-content:center;font-weight:900;font-size:22px}
+.gi.ok .ord{display:inline-flex}
+.hgrid{display:grid;gap:12px}
+.pool{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+.bins{display:grid;gap:14px}
+.bin{border:2.5px dashed var(--line);border-radius:20px;padding:10px 14px;min-height:150px;cursor:pointer;background:rgba(255,255,255,.03)}
+.bin-hd{font-size:23px;font-weight:800;color:var(--yellow);margin-bottom:8px}
+.bin-body{display:flex;flex-wrap:wrap;gap:8px}
+.bin-body .gi{font-size:21px;padding:6px 12px;pointer-events:none}
+.mcols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mcol{display:flex;flex-direction:column;gap:10px}
+.mcol .gi{display:flex;font-size:23px}
+.gcount{font-family:var(--mono);font-size:19px;color:var(--muted);margin-top:10px}
+.fb{font-size:25px;font-weight:600;color:var(--yellow-hi);margin-top:12px;min-height:34px}
+.lockcard{border:2.5px dashed var(--line);border-radius:26px;padding:34px;text-align:center;font-size:28px;color:var(--muted);font-weight:600;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.lockcard .big{font-size:80px}
+.wcard{background:linear-gradient(160deg,#1E2A52,#0F172A);border:2px solid var(--yellow);border-radius:26px;padding:22px 28px;box-shadow:0 0 40px rgba(250,204,21,.12)}
+.wcard.hide{display:none}
+.wc-top{display:flex;gap:18px;align-items:center;margin-bottom:8px}
+.wc-emo{font-size:76px;line-height:1}
+.wc-w{font-size:58px;font-weight:900;color:var(--yellow);line-height:1}
+.wc-pos{font-family:var(--mono);font-size:19px;color:var(--muted);letter-spacing:.14em}
+.wc-def{font-size:28px;font-weight:600;line-height:1.35;margin:6px 0 8px}
+.wc-ex{font-size:25px;line-height:1.4;color:#1E293B;margin:0 0 6px}
+.wc-ex b{color:var(--yellow)}
+.pers{display:flex;gap:10px;font-size:24px;line-height:1.35;margin-top:6px}
+.pers b{color:var(--yellow);white-space:nowrap}
+.jpb{margin-top:10px;background:rgba(99,102,241,.14);border:1.5px solid rgba(99,102,241,.5);border-radius:16px;padding:10px 16px;font-size:22px;line-height:1.45;color:#1E1B4B}
+.jpb b{color:#312E81}
+.win-reveal.hide{display:none}
+.win-hide.hide{display:none}
+.tbl{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:26px}
+.tbl th{font-family:var(--mono);font-size:18px;letter-spacing:.14em;color:var(--yellow);text-align:left;padding:6px 14px}
+.tbl td{background:#16213A;padding:12px 16px;border-top:1.5px solid var(--line-soft);border-bottom:1.5px solid var(--line-soft)}
+.tbl td:first-child{border-left:1.5px solid var(--line-soft);border-radius:14px 0 0 14px;font-weight:800;color:var(--yellow-hi)}
+.tbl td:last-child{border-right:1.5px solid var(--line-soft);border-radius:0 14px 14px 0}
+.tbl .cell{cursor:pointer}
+.tbl .cell .hint{color:var(--muted);font-style:italic}
+.tbl .cell .ans{display:none;color:#fff;font-weight:600}
+.tbl .cell.show .ans{display:inline}.tbl .cell.show .hint{display:none}
+.frame{background:rgba(250,204,21,.08);border-left:6px solid var(--yellow);border-radius:0 16px 16px 0;padding:12px 20px;font-size:26px;line-height:1.4;margin:8px 0}
+.dad{background:rgba(99,102,241,.14);border-left:6px solid #818CF8;border-radius:0 16px 16px 0;padding:12px 20px;font-size:26px;line-height:1.4;margin:8px 0}
+.dad b,.frame b{color:var(--yellow)}
+.pills{display:flex;flex-wrap:wrap;gap:10px}
+.pill{background:rgba(255,255,255,.07);border:1.5px solid var(--line-soft);border-radius:999px;padding:8px 18px;font-size:24px;font-weight:600}
+.pill.y{background:rgba(250,204,21,.14);border-color:var(--line);color:var(--yellow-hi)}
+.sbar{height:34px;border-radius:12px;background:rgba(255,255,255,.07);overflow:hidden;position:relative;margin:6px 0 10px}
+.sbar i{position:absolute;left:0;top:0;bottom:0;width:4%;background:linear-gradient(90deg,#6366F1,#38BDF8);transition:width .7s cubic-bezier(.3,1.2,.5,1);border-radius:12px}
+.sbar.h i{background:linear-gradient(90deg,#FACC15,#F97316)}
+.sbar span{position:absolute;right:12px;top:3px;font-size:21px;font-weight:700;z-index:2}
+.cbtn{font-family:'Outfit',sans-serif}
+.cmpout{font-size:26px;font-weight:600;color:var(--yellow-hi);min-height:70px;margin-top:10px}
+.gauges{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.gcard{background:#16213A;border:2px solid var(--line-soft);border-radius:20px;padding:12px;text-align:center;cursor:pointer;transition:all .2s}
+.gcard:hover{border-color:var(--yellow)}
+.gcard.ok{border-color:var(--good);background:rgba(46,213,115,.10);pointer-events:none}
+.gcard svg{width:100%;height:120px}
+.gcard .nd{transform-origin:100px 100px;transition:transform .9s cubic-bezier(.3,1.3,.5,1)}
+.gcard .gl{font-size:22px;font-weight:700}
+.gcard .gv{font-family:var(--mono);font-size:20px;color:var(--yellow-hi);min-height:28px}
+.twbox{text-align:center}
+.twbox svg{width:100%;height:230px}
+.twbox path{transition:d .6s ease}
+.btn{font-size:26px;padding:14px 30px}
+.warnbox{position:relative}
+.radar{position:relative;height:210px;border-radius:20px;background:linear-gradient(180deg,#0B1226,#16213A);border:2px solid var(--line-soft);overflow:hidden}
+.radar .storm{position:absolute;top:26px;font-size:88px;transition:left .15s linear}
+.radar .town{position:absolute;right:22px;bottom:14px;font-size:60px}
+.radar .siren{position:absolute;right:26px;top:10px;font-size:50px;opacity:.15}
+.radar.alarm .siren{opacity:1;animation:pulse .6s ease-in-out infinite}
+.radar .dist{position:absolute;left:14px;bottom:10px;font-family:var(--mono);font-size:19px;color:var(--muted)}
+.warnbox input[type=range]{width:100%;margin:14px 0 6px;accent-color:#FACC15;height:34px}
+.btn[disabled]{opacity:.35;cursor:not-allowed}
+.logger td{font-family:var(--mono);font-size:23px}
+.recdot{display:inline-block;width:20px;height:20px;border-radius:50%;background:#EF4444;margin-right:8px;vertical-align:middle}
+.lay{opacity:0;transition:opacity .5s ease}.lay.show{opacity:1}
+.arrowdraw path{stroke-dasharray:420;stroke-dashoffset:420;transition:stroke-dashoffset 1s ease}
+.arrowdraw.show path{stroke-dashoffset:0}
+.ph{border-radius:26px;overflow:hidden;border:2px solid var(--line-soft);background:#0B1226}
+.chk{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{font-size:26px;padding:16px 20px}
+.qtxt{font-size:34px;font-weight:700;line-height:1.3;margin-bottom:14px}
+.donebtn{font-size:34px;padding:22px 52px}
+.btn.confirmed{background:var(--good);color:#04240F}
+.big-emo{font-size:96px;line-height:1}
+.tn-panel{font-size:22px}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.dense .lead{font-size:28px}.dense .card{padding:18px 22px}.dense .gi{font-size:23px}
+.wcard.sm .wc-def{font-size:25px}.wcard.sm .wc-ex{font-size:23px}
+.card .h3 .hot{color:var(--yellow)}
+
+.te{font-size:54px;line-height:1.1}
+.dense .te{font-size:34px;float:left;margin-right:14px}
+.dense .card .h3{font-size:31px}
+.dense .rv.show{margin-top:10px}
+.dense .opt{padding:10px 16px;font-size:23px}.dense .qtxt{font-size:27px;margin-bottom:8px}
+.dense .dad,.dense .frame{padding:8px 16px;font-size:23px}
+.dense .eyebrow{margin-bottom:10px}.dense .h2{font-size:48px;margin-bottom:10px}
+.slide.dense .small{font-size:22px}
+
+/* ══ SIZE BUMP (v2) ══ */
+.eyebrow{font-size:20px}
+.small{font-size:28px}
+.h3{font-size:40px}
+.lead{font-size:34px}
+.gi{font-size:28px;padding:12px 18px}
+.gi .ge{font-size:36px}
+.pill{font-size:28px;padding:9px 20px}
+.frame,.dad{font-size:29px;padding:14px 22px}
+.opt{font-size:30px;padding:18px 22px}
+.qtxt{font-size:38px}
+.game-hint{font-size:26px}
+.fb{font-size:28px}
+.gcount{font-size:21px}
+.wc-def{font-size:31px}.wc-ex{font-size:27px}.pers{font-size:27px}.jpb{font-size:24px}.wc-w{font-size:64px}
+.tbl{font-size:30px}
+.read{font-size:44px;line-height:1.5}
+.read.two{font-size:30px;line-height:1.45}
+.cvbar{font-size:28px}.cvbar p{font-size:30px!important}
+.tn-panel{font-size:24px}
+.bin-hd{font-size:26px}.bin-body .gi{font-size:23px}
+.mcol .gi{font-size:26px}
+.rail{bottom:80px;height:66px}
+.slide.rail-on{padding-bottom:158px}
+.te{font-size:60px}
+.chip{font-size:30px}
+.lockcard{font-size:30px}
+.dense .small{font-size:24px}.dense .gi{font-size:25px}.dense .frame,.dense .dad{font-size:25px;padding:9px 16px}.dense .pill{font-size:25px}.dense .opt{font-size:25px;padding:11px 16px}.dense .qtxt{font-size:30px}
+.dense .wc-def{font-size:27px}.dense .wc-ex{font-size:23px}.dense .pers{font-size:23px}.dense .jpb{font-size:21px}.dense .wc-w{font-size:54px}
+.whole .read.two{font-size:27.5px;line-height:1.42}.whole .cvbar{min-height:60px;padding:8px 18px}
+
+/* ══ LIGHT THEME ══ */
+:root{--ink:#F8FAFC;--panel:#FFFFFF;--panel-2:#F1F5F9;--text:#0F172A;--muted:#64748B;--yellow:#4338CA;--yellow-hi:#312E81;--red:#4338CA;--red-hi:#4338CA;
+ --line:rgba(67,56,202,.35);--line-soft:rgba(15,23,42,.14)}
+html,body{background:#F8FAFC;color:#0F172A}
+deck-stage{background:radial-gradient(1200px 700px at 15% 0%,rgba(99,102,241,.14),transparent 60%),radial-gradient(900px 600px at 90% 100%,rgba(250,204,21,.16),transparent 62%),#F8FAFC}
+.card{background:#fff;border-color:rgba(15,23,42,.14);box-shadow:0 2px 10px rgba(15,23,42,.06)}
+.card.y{border-color:rgba(67,56,202,.35)}
+.tap:hover{border-color:#4338CA}
+.hot{color:#4338CA}.hotr{color:#4338CA}
+.small,.muted{color:#475569}
+.lead{color:#1E293B}
+.read{color:#0F172A}
+.cv{color:#4338CA;border-bottom-color:rgba(67,56,202,.55)}.cv:hover{background:rgba(67,56,202,.10)}
+.sig{color:#B45309;border-bottom-color:rgba(180,83,9,.5)}
+.eyebrow{color:#4338CA;background:#EEF2FF;border-color:rgba(67,56,202,.3)}
+.pnum{color:#4338CA}
+.chip{background:#fff;color:#0F172A}.chip.y{background:#EEF2FF;color:#312E81;border-color:rgba(67,56,202,.35)}
+.btn{background:#4338CA;color:#fff}.btn.ghost{background:#fff;color:#4338CA;border-color:rgba(67,56,202,.45)}
+.btn.confirmed{background:#16A34A;color:#fff}
+.opt{background:#fff;color:#0F172A;border-color:rgba(15,23,42,.18)}
+.opt:hover{border-color:#4338CA}
+.opt.ok{border-color:#16A34A;background:#DCFCE7}.opt.no{border-color:#EA580C;background:#FFEDD5;opacity:1}
+.fb{color:#312E81}
+.stage-tag{background:#4338CA;color:#fff}.stage-tag.rd{background:#0E7490;color:#fff}.stage-tag.gr{background:#16A34A;color:#fff}
+.tn-btn{background:#EEF2FF;color:#312E81;border-color:rgba(67,56,202,.35)}.tn-btn:hover{background:#E0E7FF}
+.tn-panel{background:#fff;color:#0F172A;border-color:rgba(67,56,202,.4);box-shadow:0 30px 80px rgba(15,23,42,.25)}
+.tn-panel b{color:#4338CA}
+#nav{background:rgba(255,255,255,.92);border-color:rgba(15,23,42,.15)}
+#nav button{background:#EEF2FF;color:#0F172A}#nav button:hover{background:#4338CA;color:#fff}
+#counter{color:#475569}
+#progBar{background:rgba(15,23,42,.08)}#progFill{background:linear-gradient(90deg,#4338CA,#FACC15)}
+.cvbar{background:#FEF9C3;border-color:rgba(161,98,7,.35);color:#312E81}.cvbar p{color:#1E293B}
+.gbox{background:#fff;border:2px solid rgba(67,56,202,.28);box-shadow:0 2px 12px rgba(15,23,42,.06)}
+.game-hint{color:#312E81}
+.gi{background:#F1F5F9;color:#0F172A;border-color:rgba(15,23,42,.16)}
+.gi:hover{border-color:#4338CA}.gi.sel{background:#E0E7FF;border-color:#4338CA}
+.gi.ok{background:#DCFCE7;border-color:#16A34A}.gi.no{background:#FFEDD5;border-color:#EA580C}
+.gi .ord{background:#4338CA;color:#fff}
+.bin{background:#F8FAFC;border-color:rgba(67,56,202,.4)}.bin-hd{color:#312E81}
+.pill{background:#F1F5F9;color:#0F172A;border-color:rgba(15,23,42,.14)}.pill.y{background:#EEF2FF;color:#312E81;border-color:rgba(67,56,202,.35)}
+.frame{background:#FEF9C3;border-left-color:#CA8A04;color:#0F172A}.frame b,.dad b{color:#4338CA}
+.dad{background:#EEF2FF;border-left-color:#4338CA;color:#0F172A}
+.lockcard{border-color:rgba(67,56,202,.35);color:#475569;background:#F8FAFC}
+.wcard{background:linear-gradient(160deg,#FFFBEB,#FFFFFF);border-color:#CA8A04;box-shadow:0 6px 28px rgba(202,138,4,.18)}
+.wc-w{color:#4338CA}.wc-pos{color:#64748B}.wc-ex{color:#1E293B}.wc-ex b{color:#4338CA}.pers b{color:#4338CA}
+.jpb{background:#EEF2FF;border-color:rgba(67,56,202,.35);color:#1E1B4B}.jpb b{color:#312E81}
+.tbl th{color:#4338CA}.tbl td{background:#fff;border-color:rgba(15,23,42,.14)}.tbl td:first-child{color:#312E81}
+.tbl .cell .hint{color:#64748B}.tbl .cell .ans{color:#0F172A}
+.sbar{background:rgba(15,23,42,.10)}
+.cmpout{color:#312E81}
+.gcard{background:#F1F5F9;border-color:rgba(15,23,42,.16)}.gcard.ok{background:#DCFCE7;border-color:#16A34A}
+.gcard .gv{color:#312E81}
+.radar{background:linear-gradient(180deg,#DBEAFE,#E0E7FF);border-color:rgba(67,56,202,.3)}
+.radar .dist{color:#334155}
+.logger td{color:#0F172A}
+.ph{background:#fff}
+.gcount{color:#475569}
+.mono.hot{color:#4338CA}
+.rail .lbl{fill:#64748B}
+/* ══ NOTES DOCK + FULLSCREEN ══ */
+.tn-btn{top:auto;right:auto;left:26px;bottom:22px;width:62px;height:62px;border-radius:50%;padding:0;font-size:30px;letter-spacing:0;display:flex;align-items:center;justify-content:center;background:#fff;border:3px solid rgba(67,56,202,.45);z-index:45}
+.tn-btn::before{content:"📋"}
+.tn-btn{font-size:0}.tn-btn::before{font-size:30px}
+.tn-btn.act{background:#4338CA;border-color:#312E81}
+.tn-panel{top:auto;right:0;left:0;bottom:0;width:auto;max-height:430px;border-radius:0;border:none;border-top:6px solid #4338CA;padding:30px 120px 112px;font-size:27px;line-height:1.5;box-shadow:0 -12px 40px rgba(15,23,42,.22);z-index:40}
+.tn-panel ul{padding-left:30px}
+#nav #fsBtn{font-size:20px}
+
+/* ══ NOTES DOCK v2 (persistent, side, scrollable) ══ */
+.tn-btn,.tn-panel{display:none!important}
+#nav #notesBtn{font-size:20px}
+#nav #notesBtn.act,#nav #fsBtn.act{background:#4338CA;color:#fff}
+#notesDock{position:fixed;top:0;right:0;bottom:0;width:clamp(300px,26vw,480px);z-index:50;background:#fff;border-left:4px solid #4338CA;box-shadow:-10px 0 40px rgba(15,23,42,.18);display:none;flex-direction:column;font-family:'Outfit',system-ui,sans-serif}
+#notesDock.open{display:flex}
+#notesDock .nd-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px 12px 20px;background:#EEF2FF;border-bottom:2px solid rgba(67,56,202,.25);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#312E81;font-weight:700}
+#notesDock .nd-hd button{background:#fff;border:2px solid rgba(67,56,202,.4);color:#312E81;border-radius:10px;width:38px;height:38px;font-size:18px;cursor:pointer}
+#ndBody{flex:1;overflow-y:auto;padding:18px 22px 110px;font-size:20px;line-height:1.5;color:#0F172A}
+#ndBody b{color:#4338CA}
+#ndBody ul{margin:0;padding-left:22px}#ndBody li{margin-bottom:12px}
+body.notes-on deck-stage{right:clamp(300px,26vw,480px)}
+body.notes-on #nav{left:calc(50% - clamp(150px,13vw,240px))}
+body.notes-on #progBar{right:clamp(300px,26vw,480px)}
+.stage-tag.warmup,.stage-tag.present,.stage-tag.vocab{background:#4338CA;color:#fff}
+.stage-tag.practice,.stage-tag.expert{background:#0E7490;color:#fff}
+.stage-tag.apply{background:#B45309;color:#fff}
+.stage-tag.recap,.stage-tag.wrapup{background:#16A34A;color:#fff}
+</style>
+</head>
+<body>
+<div id="progBar"><div id="progFill"></div></div>
+<deck-stage id="stage">
+<section class="slide center" data-stage="Writing" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Writing</b><ul><li>Say <b>Today we are reporters at the Storm Gazette. We write true stories about storms.</b> Our story is called a <b>personal narrative</b>.</li><li>Point at the pencil and the lightning. Ask <b>What do you think we will write about?</b> (a storm, something that happened to me)</li><li>Tell Leo the model today is <b>“Safe not Sorry!”</b> — Student Book p. 18. Words hiding in the lesson: <b>senses · emotions · experience · forecaster · heavy</b> and the five senses.</li></ul></div>
+  <div class="wrap"><div class="center-wrap" style="text-align:center"><div class="eyebrow">Unit 1 · Extreme Weather · Writing</div><h1 class="h1">Safe not <span class="hot">Sorry!</span></h1><p class="lead" style="margin:0 auto 8px">Storm Gazette · Story Desk — Leo writes a <b>personal narrative</b> ✍️⛈️</p><div style="font-size:150px;line-height:1.1;margin:6px 0">📝⛈️</div><div class="row" style="justify-content:center"><span class="chip y">📖 Student Book p. 18</span><span class="chip">📓 Workbook pp. 10–11</span><span class="chip">✍️ Personal Narrative</span><span class="chip">🎯 5 senses + time words</span></div></div></div>
+  
+</section>
+<section class="slide " data-stage="Objectives" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Objectives</b><ul><li>LP objectives: analyze a writing model; describe an experience using details related to the five senses; use sequencing words to signal order of events; evaluate classmates’ writing.</li><li>Read each goal aloud, then tap the card.</li><li>Say <b>By the end, you will write a true storm story and share it with me.</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Story Desk · Today’s Goals</div><h2 class="h2">Today Leo will…</h2><div class="cols4"><div class="card y tap" data-reveal="#o1"><div class="te">🔍</div><div class="h3"><span class="hot">analyze</span> a writing model.</div><div class="rv" id="o1"><p class="small" style="margin:0">Read “Safe not Sorry!” and find <b class="hot">how the writer</b> tells the story.</p></div></div><div class="card y tap" data-reveal="#o2"><div class="te">👁️</div><div class="h3"><span class="hot">describe</span> an experience.</div><div class="rv" id="o2"><p class="small" style="margin:0">Use details from the <b class="hot">five senses</b>: sight, sound, touch, taste, smell.</p></div></div><div class="card y tap" data-reveal="#o3"><div class="te">➡️</div><div class="h3"><span class="hot">sequence</span> events.</div><div class="rv" id="o3"><p class="small" style="margin:0">Use time words: <b class="hot">first, next, then, after, before, soon</b>.</p></div></div><div class="card y tap" data-reveal="#o4"><div class="te">🗣️</div><div class="h3"><span class="hot">evaluate</span> writing.</div><div class="rv" id="o4"><p class="small" style="margin:0">Listen to a partner’s story and say what you <b class="hot">liked</b>. Then use a <b class="hot">checklist</b>.</p></div></div></div><p class="small" style="margin-top:22px">Tap a card. 🔓 &nbsp;·&nbsp; Words today: 👁️ sight · 👂 sound · ✋ touch · 👅 taste · 👃 smell · 🧠 senses · 😮 emotions · 🎞️ experience · 🌦️ forecaster · 🪵 heavy</p></div>
+  
+</section>
+<section class="slide  rail-on" data-stage="Lesson Map" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Lesson Map</b><ul><li>Show Leo the whole route before you start. Tap each stop.</li><li>Say <b>This is our day at the Story Desk. We learn words, we read, we plan, we write, and we share.</b></li><li>Point at the dot on the line at the bottom: it moves as the story moves.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">The Route · Story Desk</div><h2 class="h2">Six stops at the <span class="hot">Story Desk</span></h2><div class="cols3"><div class="card y tap" data-reveal="#m0"><div class="te">📚</div><div class="h3">Word Desk</div><div class="rv" id="m0"><p class="small" style="margin:0">Ten words, ten little games.</p></div></div><div class="card y tap" data-reveal="#m1"><div class="te">🔥</div><div class="h3">Warm-Up Wall</div><div class="rv" id="m1"><p class="small" style="margin:0">Weather words for each sense.</p></div></div><div class="card y tap" data-reveal="#m2"><div class="te">🔍</div><div class="h3">Model Lab</div><div class="rv" id="m2"><p class="small" style="margin:0">Read “Safe not Sorry!” three times.</p></div></div><div class="card y tap" data-reveal="#m3"><div class="te">🗺️</div><div class="h3">Plan Room</div><div class="rv" id="m3"><p class="small" style="margin:0">Fill the two-column chart.</p></div></div><div class="card y tap" data-reveal="#m4"><div class="te">🏷️</div><div class="h3">Expert Corner</div><div class="rv" id="m4"><p class="small" style="margin:0">Irregular past tense verbs.</p></div></div><div class="card y tap" data-reveal="#m5"><div class="te">✍️</div><div class="h3">Writing Desk</div><div class="rv" id="m5"><p class="small" style="margin:0">Write, edit, share your story.</p></div></div></div></div>
+  <div class="rail" data-rail="0" data-raillbl="STORY LINE"></div>
+</section>
+<section class="slide " data-stage="Related Vocabulary" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Related Vocabulary</b><ul><li><b>Teacher flag:</b> the Lesson Planner prints no Related Vocabulary for Writing. These five come from the SB p. 18 intro text and the WB p. 10 chart headings (See · Hear · Touch · Taste · Smell). Change if you prefer.</li><li>Say <b>Today we use five sense words. Each one is a game.</b></li><li>Tap the pills to say them. Say each word twice, Leo repeats.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Related Vocabulary · Word Desk</div><h2 class="h2">Five words for the <span class="hot">five senses</span></h2><p class="lead">These words are in the Student Book intro and the Workbook chart. We use them to describe a storm. (The Lesson Planner prints no Related Vocabulary for Writing — these five come from the Plan stage.)</p><div class="pills" style="gap:16px;margin-top:18px"><span class="pill y" style="font-size:34px;padding:16px 26px">👁️ sight</span><span class="pill y" style="font-size:34px;padding:16px 26px">👂 sound</span><span class="pill y" style="font-size:34px;padding:16px 26px">✋ touch</span><span class="pill y" style="font-size:34px;padding:16px 26px">👅 taste</span><span class="pill y" style="font-size:34px;padding:16px 26px">👃 smell</span></div><div class="dad"><b>Dad 💬</b> Say each word with me. Tap the one you know best!</div></div>
+  
+</section>
+<section class="slide dense rail-on" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Related Vocabulary</b><ul><li>Say <b>sight</b>: <b>/saɪt/</b>. Silent <b>gh</b>. Rhymes with <b>light</b>, <b>night</b>.</li><li>LP link: SB p. 18 intro — “descriptive language that uses the senses — sight, sound, taste, smell, and touch.”</li><li>Tap the 3 things you can see. Ask <b>What do you see in a storm?</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Related Vocabulary · 1 of 5</div><h2 class="h2">sight 👁️</h2><div class="row "><div class="g"><div class="gbox" data-hunt data-need="3" data-win="Eagle eyes! 👁️"><div class="game-hint">Spot it! Tap what you can <b>SEE</b> out of the window in a storm. Find 3.</div><div class="hgrid" style="grid-template-columns:repeat(3,1fr)"><div class="gi" data-hu data-good="1" data-why="Yes! You see it. 👁️"><span class="ge">⚡</span>a flash of lightning</div><div class="gi" data-hu data-good="1" data-why="Yes! Sight."><span class="ge">🌳</span>a tree falling</div><div class="gi" data-hu data-good="1" data-why="You see dark clouds!"><span class="ge">⛈️</span>black clouds</div><div class="gi" data-hu data-good="0" data-why="That is touch ✋ — you feel it."><span class="ge">🥶</span>a cold wind on your face</div><div class="gi" data-hu data-good="0" data-why="That is sound 👂."><span class="ge">📢</span>a loud thunder</div><div class="gi" data-hu data-good="0" data-why="That is smell 👃."><span class="ge">👃</span>wet earth</div></div><div class="gcount">Found: 0 / 3</div><div class="fb"></div></div></div><div class="c"><div class="lockcard win-hide"><div class="big">🔒</div>Win the game to unlock the word card</div><div class="wcard win-reveal hide "><div class="wc-top"><div class="wc-emo">👁️</div><div><div class="wc-w">sight</div><div class="wc-pos">NOUN</div></div></div><div class="wc-def">one of the five senses. You use your <b>eyes</b> to see.</div><div class="wc-ex">• I saw a huge tree on the ground. <i>(sight)</i></div><div class="wc-ex">• What was the <b>sight</b> after the storm?</div><div class="wc-ex">• The sun is a beautiful <b>sight</b>.</div><div class="pers"><b>Dad 💬</b><span>What is a sight you remember from a storm?</span></div><div class="pers"><b>Leo 💬</b><span>I remember the black clouds.</span></div><div class="jpb">🇯🇵 <b>Japanese bridge</b> — 視覚(しかく)・光景(こうけい) <i>shikaku / kōkei</i>. Careful: <b>サイト</b> (<i>saito</i>) = website, but <b>sight</b> is /saɪt/ — the word for <b>seeing</b>.</div></div></div></div></div>
+  <div class="rail" data-rail="8" data-raillbl="SIGHT"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Related Vocabulary</b><ul><li>Say <b>sound</b>: <b>/saʊnd/</b> (like “around”).</li><li>Sort six sounds. Make the sound with your voice! (BOOM / whoosh / shhh)</li><li>Ask <b>What sounds do you hear in a hurricane?</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Related Vocabulary · 2 of 5</div><h2 class="h2">sound 👂</h2><div class="row "><div class="g"><div class="gbox" data-sort data-win="Good ears! 👂"><div class="game-hint">Is it <b>LOUD</b> 🔊 or <b>QUIET</b> 🤫? Tap a card, then a box.</div><div class="pool"><div class="gi" data-sp data-cat="l" data-why="Loud!"><span class="ge">⛈️</span>thunder</div><div class="gi" data-sp data-cat="l" data-why="Loud!"><span class="ge">🚨</span>a siren</div><div class="gi" data-sp data-cat="l" data-why="Loud!"><span class="ge">🌬️</span>wind howling</div><div class="gi" data-sp data-cat="q" data-why="Quiet."><span class="ge">❄️</span>snow falling</div><div class="gi" data-sp data-cat="q" data-why="Quiet."><span class="ge">🌫️</span>a light fog</div><div class="gi" data-sp data-cat="q" data-why="Soon, it was quiet!"><span class="ge">🏠</span>after the storm</div></div><div class="bins" style="grid-template-columns:repeat(2,1fr)"><div class="bin" data-bin="l"><div class="bin-hd">🔊 LOUD</div><div class="bin-body"></div></div><div class="bin" data-bin="q"><div class="bin-hd">🤫 QUIET</div><div class="bin-body"></div></div></div><div class="fb"></div></div></div><div class="c"><div class="lockcard win-hide"><div class="big">🔒</div>Win the game to unlock the word card</div><div class="wcard win-reveal hide "><div class="wc-top"><div class="wc-emo">👂</div><div><div class="wc-w">sound</div><div class="wc-pos">NOUN</div></div></div><div class="wc-def">what you <b>hear</b> with your ears.</div><div class="wc-ex">• There was a loud <b>sound</b> — a crash!</div><div class="wc-ex">• What a strange <b>sound</b>!</div><div class="wc-ex">• I heard the <b>sound</b> of rain on the roof.</div><div class="pers"><b>Dad 💬</b><span>What sound do you hear in a storm?</span></div><div class="pers"><b>Leo 💬</b><span>I hear thunder and rain.</span></div><div class="jpb">🇯🇵 <b>Japanese bridge</b> — 音(おと) <i>oto</i>. <b>サウンド</b> (<i>saundo</i>) is used in music. In English, <b>sound</b> can also be a verb: “It <b>sounds</b> scary.”</div></div></div></div></div>
+  <div class="rail" data-rail="14" data-raillbl="SOUND"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Related Vocabulary</b><ul><li>Say <b>touch</b>: <b>/tʌtʃ/</b> — “ou” sounds like “u” in “cup”.</li><li>LP Writing Support uses <b>touch / touched</b> as the regular past example. Good place to introduce it.</li><li>Play the touch box. Say <b>I touched the ice. It was cold.</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Related Vocabulary · 3 of 5</div><h2 class="h2">touch ✋</h2><div class="row "><div class="g"><div data-quiz data-yes="Cold and wet — ice! ✋" data-no="Not hot! Cold and wet…" data-win><div class="qtxt">Touch box 📦 — you put your hand in and feel: <b>cold and wet</b>. What is it?</div><div class=""><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">❄️ ice</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">🔥 fire</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">🪨 a hot stone</button></div><div class="fb"></div></div></div><div class="c"><div class="lockcard win-hide"><div class="big">🔒</div>Win the game to unlock the word card</div><div class="wcard win-reveal hide "><div class="wc-top"><div class="wc-emo">✋</div><div><div class="wc-w">touch</div><div class="wc-pos">VERB / NOUN</div></div></div><div class="wc-def">to feel something with your <b>hands</b> or skin.</div><div class="wc-ex">• The ice felt cold when I <b>touched</b> it.</div><div class="wc-ex">• Don’t <b>touch</b> the lightning rod!</div><div class="wc-ex">• Wood is rough to the <b>touch</b>.</div><div class="pers"><b>Dad 💬</b><span>What do you touch when you put wood on a window?</span></div><div class="pers"><b>Leo 💬</b><span>I touch heavy wood.</span></div><div class="jpb">🇯🇵 <b>Japanese bridge</b> — 触(さわ)る <i>sawaru</i>. <b>タッチ</b> (<i>taccchi</i>) is “touch”: touchscreen = タッチパネル (<i>tacchi paneru</i>). Also a regular past verb: touch → <b>touched</b>.</div></div></div></div></div>
+  <div class="rail" data-rail="20" data-raillbl="TOUCH"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Related Vocabulary</b><ul><li>Say <b>taste</b>: <b>/teɪst/</b>.</li><li>Tell Leo: the writer in the model does not use taste — <b>“You can write about all or only some senses”</b> (WB p. 10).</li><li>Match the flavors. Ask <b>What does the ocean air taste like?</b> (salty)</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Related Vocabulary · 4 of 5</div><h2 class="h2">taste 👅</h2><div class="row "><div class="g"><div class="gbox" data-match data-win="Yum! 👅"><div class="game-hint">Taste test! Match the word to the food.</div><div class="mcols"><div class="mcol"><div class="pill y">TASTE WORD</div><div class="gi" data-ml="a">🍬 sweet</div><div class="gi" data-ml="b">🧂 salty</div><div class="gi" data-ml="c">🍋 sour</div><div class="gi" data-ml="d">🌶️ spicy</div></div><div class="mcol"><div class="pill y">FOOD</div><div class="gi" data-mr="d">hot pepper</div><div class="gi" data-mr="b">sea water</div><div class="gi" data-mr="a">candy</div><div class="gi" data-mr="c">lemon</div></div></div><div class="fb"></div></div></div><div class="c"><div class="lockcard win-hide"><div class="big">🔒</div>Win the game to unlock the word card</div><div class="wcard win-reveal hide "><div class="wc-top"><div class="wc-emo">👅</div><div><div class="wc-w">taste</div><div class="wc-pos">VERB / NOUN</div></div></div><div class="wc-def">to know a food by your <b>tongue</b>. Also: the <b>flavor</b> of the food.</div><div class="wc-ex">• The rain tasted <b>salty</b> near the sea.</div><div class="wc-ex">• Hot chocolate <b>tastes</b> great after a storm!</div><div class="wc-ex">• I like the <b>taste</b> of lemon.</div><div class="pers"><b>Dad 💬</b><span>What does lemon taste like?</span></div><div class="pers"><b>Leo 💬</b><span>It tastes sour.</span></div><div class="jpb">🇯🇵 <b>Japanese bridge</b> — 味(あじ)・味(あじ)がする <i>aji / aji ga suru</i>. <b>テイスト</b> (<i>teisuto</i>) = “taste” (style). Say <b>/teɪst/</b>, not “ta-su-to”.</div></div></div></div></div>
+  <div class="rail" data-rail="26" data-raillbl="TASTE"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Related Vocabulary" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Related Vocabulary</b><ul><li>Say <b>smell</b>: <b>/smɛl/</b>. The “sm-” cluster is quick.</li><li>Sort six smells. Make a face (nice / yucky).</li><li>Ask <b>What does a storm smell like?</b> (wet earth, rain)</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Related Vocabulary · 5 of 5</div><h2 class="h2">smell 👃</h2><div class="row "><div class="g"><div class="gbox" data-sort data-win="Great nose! 👃"><div class="game-hint">Is the smell <b>NICE</b> 😊 or <b>YUCKY</b> 🤢? Tap a card, then a box.</div><div class="pool"><div class="gi" data-sp data-cat="n" data-why="Nice! A fresh smell."><span class="ge">🌱</span>wet earth after rain</div><div class="gi" data-sp data-cat="n" data-why="Nice!"><span class="ge">🌸</span>flowers</div><div class="gi" data-sp data-cat="n" data-why="Nice!"><span class="ge">🍞</span>fresh bread</div><div class="gi" data-sp data-cat="y" data-why="Yucky — smoke!"><span class="ge">🔥</span>smoke</div><div class="gi" data-sp data-cat="y" data-why="Yucky!"><span class="ge">🗑️</span>old garbage</div><div class="gi" data-sp data-cat="y" data-why="Yucky!"><span class="ge">🐟</span>a dead fish</div></div><div class="bins" style="grid-template-columns:repeat(2,1fr)"><div class="bin" data-bin="n"><div class="bin-hd">😊 NICE</div><div class="bin-body"></div></div><div class="bin" data-bin="y"><div class="bin-hd">🤢 YUCKY</div><div class="bin-body"></div></div></div><div class="fb"></div></div></div><div class="c"><div class="lockcard win-hide"><div class="big">🔒</div>Win the game to unlock the word card</div><div class="wcard win-reveal hide "><div class="wc-top"><div class="wc-emo">👃</div><div><div class="wc-w">smell</div><div class="wc-pos">VERB / NOUN</div></div></div><div class="wc-def">to know something with your <b>nose</b>. Also: the <b>odor</b>.</div><div class="wc-ex">• I can <b>smell</b> the rain coming.</div><div class="wc-ex">• The kitchen <b>smells</b> like bread.</div><div class="wc-ex">• Smoke has a strong <b>smell</b>.</div><div class="pers"><b>Dad 💬</b><span>What can you smell after a storm?</span></div><div class="pers"><b>Leo 💬</b><span>I can smell wet earth.</span></div><div class="jpb">🇯🇵 <b>Japanese bridge</b> — 匂(にお)い・においがする <i>nioi / nioi ga suru</i>. <b>スメル</b> (<i>sumeru</i>) is not used much — say <b>にお</b>い for “smell”. Say <b>/smɛl/</b>.</div></div></div></div></div>
+  <div class="rail" data-rail="32" data-raillbl="SMELL"></div>
+</section>
+<section class="slide " data-stage="Related Vocabulary" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Related Vocabulary</b><ul><li>Consolidation for the senses. Ask Leo to say a full sentence for each card: <b>I see / I hear / I feel…</b></li><li>Taste and smell appear in Warm Up and Plan too.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Related Vocabulary · Check</div><h2 class="h2">Sort the <span class="hot">senses</span></h2><div class="gbox" data-sort data-win="Five senses sorted! ✋"><div class="game-hint">Which sense is it? Tap a card, then a box.</div><div class="pool"><div class="gi" data-sp data-cat="s" data-why="Sight 👁️"><span class="ge">⚡</span>lightning flash</div><div class="gi" data-sp data-cat="h" data-why="Sound 👂"><span class="ge">🔊</span>thunder</div><div class="gi" data-sp data-cat="t" data-why="Touch ✋"><span class="ge">🥶</span>cold rain</div><div class="gi" data-sp data-cat="s" data-why="Sight 👁️"><span class="ge">🌳</span>a falling tree</div><div class="gi" data-sp data-cat="h" data-why="Sound 👂"><span class="ge">🌬️</span>strong wind noise</div><div class="gi" data-sp data-cat="t" data-why="Touch ✋"><span class="ge">🪵</span>heavy wood</div></div><div class="bins" style="grid-template-columns:repeat(3,1fr)"><div class="bin" data-bin="s"><div class="bin-hd">👁️ SIGHT</div><div class="bin-body"></div></div><div class="bin" data-bin="h"><div class="bin-hd">👂 SOUND</div><div class="bin-body"></div></div><div class="bin" data-bin="t"><div class="bin-hd">✋ TOUCH</div><div class="bin-body"></div></div></div><div class="fb"></div></div><div class="pills" style="margin-top:14px"><span class="pill y">👁️ sight</span><span class="pill y">👂 sound</span><span class="pill y">✋ touch</span><span class="pill y">👅 taste</span><span class="pill y">👃 smell</span></div><div class="frame">Make a sentence: “I <b>see</b> ______.” &nbsp;“I <b>hear</b> ______.” &nbsp;“I <b>feel</b> ______.”</div></div>
+  
+</section>
+<section class="slide " data-stage="Academic Language" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Academic Language</b><ul><li>LP Academic Language: <b>senses, emotions, experience</b>.</li><li>Say <b>These are writer words. We use them in the checklist and the rubric.</b></li><li>Tap to hear each one twice.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Academic Language · Word Desk</div><h2 class="h2">Three <span class="hot">big words</span> for writers</h2><p class="lead">LP Academic Language: <b>senses · emotions · experience</b>. We use them to talk about writing.</p><div class="pills" style="gap:16px;margin-top:18px"><span class="pill y" style="font-size:34px;padding:16px 26px">🧠 senses</span><span class="pill y" style="font-size:34px;padding:16px 26px">😮 emotions</span><span class="pill y" style="font-size:34px;padding:16px 26px">🎞️ experience</span></div><div class="dad"><b>Dad 💬</b> Say each word with me. Tap the one you know best!</div></div>
+  
+</section>
+<section class="slide dense rail-on" data-stage="Academic Language" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Academic Language</b><ul><li>LP Academic Language word 1 of 3.</li><li>Say <b>senses: /ˈsɛn-sɪz/</b>. Plural of <b>sense</b>.</li><li>Match the five body parts. Ask <b>Which sense is easiest to write about?</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Academic Language · 1 of 3</div><h2 class="h2">senses 🧠</h2><div class="row "><div class="g"><div class="gbox" data-match data-win="All five senses! 🧠"><div class="game-hint">Match the body part to the sense it uses.</div><div class="mcols"><div class="mcol"><div class="pill y">BODY PART</div><div class="gi" data-ml="a">👁️ eyes</div><div class="gi" data-ml="b">👂 ears</div><div class="gi" data-ml="c">👃 nose</div><div class="gi" data-ml="d">👅 tongue</div><div class="gi" data-ml="e">🖐️ fingers</div></div><div class="mcol"><div class="pill y">SENSE</div><div class="gi" data-mr="e">touch</div><div class="gi" data-mr="a">sight</div><div class="gi" data-mr="d">taste</div><div class="gi" data-mr="b">sound</div><div class="gi" data-mr="c">smell</div></div></div><div class="fb"></div></div></div><div class="c"><div class="lockcard win-hide"><div class="big">🔒</div>Win the game to unlock the word card</div><div class="wcard win-reveal hide "><div class="wc-top"><div class="wc-emo">🧠</div><div><div class="wc-w">senses</div><div class="wc-pos">NOUN (plural)</div></div></div><div class="wc-def">the five ways we know the world: <b>sight, sound, touch, taste, smell</b>.</div><div class="wc-ex">• Use your <b>senses</b> to describe a storm.</div><div class="wc-ex">• The writer uses the <b>senses</b> in her story.</div><div class="wc-ex">• Which <b>senses</b> do you use?</div><div class="pers"><b>Dad 💬</b><span>Which sense helps you most in a storm?</span></div><div class="pers"><b>Leo 💬</b><span>I use my ears and my eyes.</span></div><div class="jpb">🇯🇵 <b>Japanese bridge</b> — 感覚(かんかく) <i>kankaku</i>. Do not mix up with <b>センス</b> (<i>sensu</i>, “fashion sense”)! <b>Senses</b> = /ˈsɛnsɪz/ — the five.</div></div></div></div></div>
+  <div class="rail" data-rail="40" data-raillbl="SENSES"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Academic Language" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Academic Language</b><ul><li>LP Academic Language word 2 of 3.</li><li>Say <b>emotions: /ɪˈmoʊʃənz/</b>.</li><li>Ask <b>How did the writer feel?</b> (scared, worried, happy)</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Academic Language · 2 of 3</div><h2 class="h2">emotions 😮</h2><div class="row "><div class="g"><div class="gbox" data-hunt data-need="4" data-win="Emotion expert! 😮"><div class="game-hint">Which are <b>EMOTIONS</b> 😮? Tap the 4 feelings.</div><div class="hgrid" style="grid-template-columns:repeat(3,1fr)"><div class="gi" data-hu data-good="1" data-why="Yes — a feeling!"><span class="ge">😨</span>scared</div><div class="gi" data-hu data-good="1" data-why="Yes — a feeling!"><span class="ge">😟</span>worried</div><div class="gi" data-hu data-good="1" data-why="Yes — a feeling!"><span class="ge">😊</span>happy</div><div class="gi" data-hu data-good="1" data-why="Yes — a feeling!"><span class="ge">🤩</span>excited</div><div class="gi" data-hu data-good="0" data-why="Heavy is about weight, not a feeling."><span class="ge">🪵</span>heavy</div><div class="gi" data-hu data-good="0" data-why="Windy is weather, not a feeling."><span class="ge">🌬️</span>windy</div></div><div class="gcount">Found: 0 / 4</div><div class="fb"></div></div></div><div class="c"><div class="lockcard win-hide"><div class="big">🔒</div>Win the game to unlock the word card</div><div class="wcard win-reveal hide "><div class="wc-top"><div class="wc-emo">😮</div><div><div class="wc-w">emotions</div><div class="wc-pos">NOUN (plural)</div></div></div><div class="wc-def">strong <b>feelings</b> like happy, scared, or worried.</div><div class="wc-ex">• Her <b>emotions</b>: scared, worried, then happy.</div><div class="wc-ex">• Show your <b>emotions</b> with words.</div><div class="wc-ex">• Everyone was worried — a strong <b>emotion</b>.</div><div class="pers"><b>Dad 💬</b><span>How did you feel in a storm?</span></div><div class="pers"><b>Leo 💬</b><span>I felt scared, but a little excited.</span></div><div class="jpb">🇯🇵 <b>Japanese bridge</b> — 感情(かんじょう) <i>kanjō</i>. <b>エモい</b> (<i>emoi</i>) is slang. <b>Emotions</b> = /ɪˈmoʊʃənz/ — stress the 2nd part: i-<b>MO</b>-shuns.</div></div></div></div></div>
+  <div class="rail" data-rail="46" data-raillbl="EMOTIONS"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Academic Language" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Academic Language</b><ul><li>LP Academic Language word 3 of 3. SB Act 2: <b>Write about an extreme weather experience.</b></li><li>Say <b>/ɪkˈspɪriəns/</b>.</li><li>Sort six sentences: true (experience) or imagined. A personal narrative is <b>true</b>.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Academic Language · 3 of 3</div><h2 class="h2">experience 🎞️</h2><div class="row "><div class="g"><div class="gbox" data-sort data-win="True stories only! 🎞️"><div class="game-hint">Is it an <b>EXPERIENCE</b> 🎞️ (it happened to me) or <b>IMAGINED</b> 💭? Tap a card, then a box.</div><div class="pool"><div class="gi" data-sp data-cat="e" data-why="It happened to you — experience!"><span class="ge">🌪️</span>I saw a tornado last year.</div><div class="gi" data-sp data-cat="e" data-why="Experience!"><span class="ge">🏠</span>We put wood on the windows.</div><div class="gi" data-sp data-cat="i" data-why="Imagined — a story."><span class="ge">🧙</span>A wizard stopped the storm.</div><div class="gi" data-sp data-cat="i" data-why="Imagined."><span class="ge">🐉</span>A dragon made the thunder.</div><div class="gi" data-sp data-cat="e" data-why="Experience!"><span class="ge">🌧️</span>I got wet in the rain.</div><div class="gi" data-sp data-cat="i" data-why="Imagined."><span class="ge">🚀</span>I flew to the moon.</div></div><div class="bins" style="grid-template-columns:repeat(2,1fr)"><div class="bin" data-bin="e"><div class="bin-hd">🎞️ EXPERIENCE (true, happened to me)</div><div class="bin-body"></div></div><div class="bin" data-bin="i"><div class="bin-hd">💭 IMAGINED (not true)</div><div class="bin-body"></div></div></div><div class="fb"></div></div></div><div class="c"><div class="lockcard win-hide"><div class="big">🔒</div>Win the game to unlock the word card</div><div class="wcard win-reveal hide "><div class="wc-top"><div class="wc-emo">🎞️</div><div><div class="wc-w">experience</div><div class="wc-pos">NOUN</div></div></div><div class="wc-def">something that <b>happened</b> to you. In a personal narrative, you write about a real <b>experience</b>.</div><div class="wc-ex">• Write about an extreme weather <b>experience</b>.</div><div class="wc-ex">• My <b>experience</b> with a typhoon was scary.</div><div class="wc-ex">• What was your <b>experience</b>?</div><div class="pers"><b>Dad 💬</b><span>Tell me about an experience with weather.</span></div><div class="pers"><b>Leo 💬</b><span>My experience was a typhoon in Japan.</span></div><div class="jpb">🇯🇵 <b>Japanese bridge</b> — 経験(けいけん) <i>keiken</i>. <b>エクスペリエンス</b> (<i>ekusuperiensu</i>) is long — say <b>/ɪkˈspɪriəns/</b>: ik-<b>SPEER</b>-ee-uns.</div></div></div></div></div>
+  <div class="rail" data-rail="52" data-raillbl="EXPERIENCE"></div>
+</section>
+<section class="slide " data-stage="Academic Language" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Academic Language</b><ul><li>Check the three academic words. Ask Leo to say one sentence for each.</li><li>Say <b>I use my ______ to ______.</b> / <b>I felt ______.</b> / <b>My experience was ______.</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Academic Language · Check</div><h2 class="h2">Writer words · <span class="hot">quick check</span></h2><div class="cols3"><div data-quiz data-yes="Yes! 🎉" data-no="Not quite. Try again."><div class="qtxt">Which word means <b>strong feelings</b> like scared, worried, happy?</div><div class=""><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">🧠 senses</button><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">😮 emotions</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">🎞️ experience</button></div><div class="fb"></div></div><div data-quiz data-yes="Yes! 🎉" data-no="Not quite. Try again."><div class="qtxt">Which word means <b>something that happened to you</b>?</div><div class=""><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">🎞️ experience</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">🧠 senses</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">😮 emotions</button></div><div class="fb"></div></div><div data-quiz data-yes="Yes! 🎉" data-no="Not quite. Try again." data-win><div class="qtxt"><b>Sight, sound, touch, taste, smell</b> are the five …</div><div class=""><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">🧠 senses</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">😮 emotions</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">🎞️ experience</button></div><div class="fb"></div></div></div><div class="frame"><b>Leo 💬</b> My ______ was a storm. I used my ______. I felt ______.</div></div>
+  
+</section>
+<section class="slide " data-stage="Content Vocabulary" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Content Vocabulary</b><ul><li>LP Content Vocabulary: <b>forecaster, heavy</b>.</li><li>Say <b>Both words are in our model text. Find them later!</b></li><li>Say each one twice.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Content Vocabulary · Word Desk</div><h2 class="h2">Two <span class="hot">storm words</span> from the model</h2><p class="lead">LP Content Vocabulary: <b>forecaster · heavy</b>. Both are in “Safe not Sorry!”.</p><div class="pills" style="gap:16px;margin-top:18px"><span class="pill y" style="font-size:34px;padding:16px 26px">🌦️ forecaster</span><span class="pill y" style="font-size:34px;padding:16px 26px">🪵 heavy</span></div><div class="dad"><b>Dad 💬</b> Say each word with me. Tap the one you know best!</div></div>
+  
+</section>
+<section class="slide dense rail-on" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Content Vocabulary</b><ul><li>LP Content Vocabulary word 1 of 2. In the model: “the weather forecaster told us that a hurricane was coming.”</li><li>Say <b>forecaster /ˈfɔrkæstər/</b>. Split: <b>fore + cast + er</b>.</li><li>Tap three forecaster sentences. Ask <b>Who tells us about the weather tomorrow?</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Content Vocabulary · 1 of 2</div><h2 class="h2">forecaster 🌦️</h2><div class="row "><div class="g"><div class="gbox" data-hunt data-need="3" data-win="Forecast ready! 🌦️"><div class="game-hint">A <b>forecaster</b> says… Tap the 3 things a weather forecaster would say.</div><div class="hgrid" style="grid-template-columns:repeat(3,1fr)"><div class="gi" data-hu data-good="1" data-why="Yes — a forecast!"><span class="ge">🌧️</span>“It will rain tomorrow.”</div><div class="gi" data-hu data-good="1" data-why="Yes — a warning!"><span class="ge">🌀</span>“A hurricane is coming.”</div><div class="gi" data-hu data-good="1" data-why="Yes — a forecast!"><span class="ge">🌡️</span>“It will be 30 degrees.”</div><div class="gi" data-hu data-good="0" data-why="That is a soccer announcer."><span class="ge">⚽</span>“Goal! He scored!”</div><div class="gi" data-hu data-good="0" data-why="That is a cook."><span class="ge">🍕</span>“Dinner is ready.”</div><div class="gi" data-hu data-good="0" data-why="That is a teacher."><span class="ge">📚</span>“Open your books.”</div></div><div class="gcount">Found: 0 / 3</div><div class="fb"></div></div></div><div class="c"><div class="lockcard win-hide"><div class="big">🔒</div>Win the game to unlock the word card</div><div class="wcard win-reveal hide "><div class="wc-top"><div class="wc-emo">🌦️</div><div><div class="wc-w">forecaster</div><div class="wc-pos">NOUN</div></div></div><div class="wc-def">a person who <b>says what the weather will be</b>. Also: weather forecaster.</div><div class="wc-ex">• The weather <b>forecaster</b> told us a hurricane was coming. <i>(model)</i></div><div class="wc-ex">• My dad listens to the <b>forecaster</b> on the radio.</div><div class="wc-ex">• A <b>forecaster</b> says: “Rain tomorrow.”</div><div class="pers"><b>Dad 💬</b><span>What does a weather forecaster do?</span></div><div class="pers"><b>Leo 💬</b><span>A forecaster says what the weather will be.</span></div><div class="jpb">🇯🇵 <b>Japanese bridge</b> — 予報士(よほうし) <i>yohōshi</i> / 天気予報(てんきよほう) <i>tenki yohō</i> = weather forecast. Say <b>FOR-kas-ter</b> (<i>fōkasutā</i>) — stress the first part.</div></div></div></div></div>
+  <div class="rail" data-rail="58" data-raillbl="FORECASTER"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Content Vocabulary" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Content Vocabulary</b><ul><li>LP Content Vocabulary word 2 of 2. In the model: “heavy wood over the windows.”</li><li>Say <b>heavy /ˈhɛvi/</b> — short “e”, like “red”.</li><li>Say <b>heavy rain, heavy wood, a heavy bag.</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Content Vocabulary · 2 of 2</div><h2 class="h2">heavy 🪵</h2><div class="row "><div class="g"><div class="gbox" data-sort data-win="Strong arms! 🪵"><div class="game-hint">Is it <b>HEAVY</b> 🪵 or <b>LIGHT</b> 🪶? Tap a card, then a box.</div><div class="pool"><div class="gi" data-sp data-cat="h" data-why="Heavy!"><span class="ge">🪵</span>wood for the windows</div><div class="gi" data-sp data-cat="h" data-why="Heavy!"><span class="ge">🪨</span>a big stone</div><div class="gi" data-sp data-cat="h" data-why="Heavy!"><span class="ge">🧱</span>a pile of bricks</div><div class="gi" data-sp data-cat="l" data-why="Light."><span class="ge">🪶</span>a feather</div><div class="gi" data-sp data-cat="l" data-why="Light."><span class="ge">🎈</span>a balloon</div><div class="gi" data-sp data-cat="l" data-why="Light!"><span class="ge">☁️</span>a cloud</div></div><div class="bins" style="grid-template-columns:repeat(2,1fr)"><div class="bin" data-bin="h"><div class="bin-hd">🪵 HEAVY</div><div class="bin-body"></div></div><div class="bin" data-bin="l"><div class="bin-hd">🪶 LIGHT</div><div class="bin-body"></div></div></div><div class="fb"></div></div></div><div class="c"><div class="lockcard win-hide"><div class="big">🔒</div>Win the game to unlock the word card</div><div class="wcard win-reveal hide "><div class="wc-top"><div class="wc-emo">🪵</div><div><div class="wc-w">heavy</div><div class="wc-pos">ADJECTIVE</div></div></div><div class="wc-def">weighs <b>a lot</b>; hard to lift. Also: <b>heavy rain</b> = a lot of rain.</div><div class="wc-ex">• I helped my dad put <b>heavy</b> wood over the windows. <i>(model)</i></div><div class="wc-ex">• It was <b>heavy</b> rain all night.</div><div class="wc-ex">• The bag is <b>heavy</b>.</div><div class="pers"><b>Dad 💬</b><span>What is heavy in your house?</span></div><div class="pers"><b>Leo 💬</b><span>The fridge is heavy.</span></div><div class="jpb">🇯🇵 <b>Japanese bridge</b> — 重(おも)い <i>omoi</i> / ヘビー <i>hebī</i>. Opposite: 軽(かる)い <i>karui</i> = <b>light</b>. “Heavy rain” = 大雨(おおあめ) <i>ōame</i>. Say <b>/ˈhɛvi/</b>.</div></div></div></div></div>
+  <div class="rail" data-rail="64" data-raillbl="HEAVY"></div>
+</section>
+<section class="slide " data-stage="Content Vocabulary" data-stagetone="vocab">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Content Vocabulary</b><ul><li>Consolidation for forecaster and heavy.</li><li>Ask Leo to say each sentence with the word.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Content Vocabulary · Check</div><h2 class="h2">Storm words · <span class="hot">use them</span></h2><div class="cols2"><div data-quiz data-yes="Yes! 🎉" data-no="Not quite. Try again."><div class="qtxt">A <b>weather ______</b> says what tomorrow’s weather will be.</div><div class=""><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">🌦️ forecaster</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">📻 radio</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">🏠 shelter</button></div><div class="fb"></div></div><div data-quiz data-yes="Yes! 🎉" data-no="Not quite. Try again." data-win><div class="qtxt">We put ______ wood on the windows. It was hard work.</div><div class=""><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">🪶 light</button><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">🪵 heavy</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">🌧️ wet</button></div><div class="fb"></div></div></div><div class="frame">Make a sentence: “The <b>forecaster</b> said ______.” &nbsp;“It was <b>heavy</b> ______.”</div></div>
+  
+</section>
+<section class="slide  rail-on" data-stage="Warm Up" data-stagetone="warmup">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Warm Up</b><ul><li>LP Warm Up · Activate prior knowledge: <b>Write the word sight on the board. Point to your eyes. Write smell, point to your nose. Sound — ears. Taste — tongue. Touch — fingers.</b></li><li>Say <b>We have five senses. Which part of your body do you use?</b> Leo taps each card and points to his body.</li><li>Say <b>We use our senses to write about a storm.</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Warm Up · Pre-teach · Five senses</div><h2 class="h2">Point to it! <span class="hot">Five senses</span> 🧍</h2><div class="cols3"><div class="card y tap" data-reveal="#w1"><div class="te">👁️</div><div class="h3"><span class="hot">sight</span> — point to your eyes</div><div class="rv" id="w1"><p class="small" style="margin:0">I <b class="hot">see</b> dark clouds. I see lightning.</p></div></div><div class="card y tap" data-reveal="#w2"><div class="te">👂</div><div class="h3"><span class="hot">sound</span> — point to your ears</div><div class="rv" id="w2"><p class="small" style="margin:0">I <b class="hot">hear</b> thunder. I hear the wind.</p></div></div><div class="card y tap" data-reveal="#w3"><div class="te">🖐️</div><div class="h3"><span class="hot">touch</span> — point to your fingers</div><div class="rv" id="w3"><p class="small" style="margin:0">I <b class="hot">feel</b> cold rain on my hands.</p></div></div><div class="card y tap" data-reveal="#w4"><div class="te">👅</div><div class="h3"><span class="hot">taste</span> — point to your tongue</div><div class="rv" id="w4"><p class="small" style="margin:0">I <b class="hot">taste</b> salty rain from the sea.</p></div></div><div class="card y tap" data-reveal="#w5"><div class="te">👃</div><div class="h3"><span class="hot">smell</span> — point to your nose</div><div class="rv" id="w5"><p class="small" style="margin:0">I <b class="hot">smell</b> wet earth after the rain.</p></div></div><div class="card"><div class="h3">🪧 Teacher board</div><p class="small" style="margin:0">Write the five words. Point at each body part.</p></div></div><div class="dad"><b>Dad 💬</b> Close your eyes. What do you <b>hear</b> right now? Open them. What do you <b>see</b>?</div></div>
+  <div class="rail" data-rail="70" data-raillbl="WARM-UP"></div>
+</section>
+<section class="slide  rail-on" data-stage="Warm Up" data-stagetone="warmup">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Warm Up</b><ul><li>LP Warm Up · Brainstorm: <b>Draw a chart on the board: Sight / Sound / Touch. Write sun under Sight, thunder under Sound, cold under Touch as examples.</b></li><li>Ask <b>What are some words that tell what weather feels like on our bodies?</b> (cold, wet, hot) <b>What types of weather can we hear?</b> (rain, thunder, wind blowing) <b>What weather words are things that we can see?</b> (sun, clouds, rain, lightning, snow)</li><li>Leo sorts the nine cards. If he wants to add more words, write them on the board.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Warm Up · Brainstorm chart</div><h2 class="h2">Weather words by <span class="hot">sense</span></h2><div class="gbox" data-sort data-win="Chart complete! 📊"><div class="game-hint">Brainstorm! Put each weather word on the right chart: <b>sight, sound, or touch</b>.</div><div class="pool"><div class="gi" data-sp data-cat="s" data-why="You see the sun. Sight."><span class="ge">☀️</span>sun</div><div class="gi" data-sp data-cat="s" data-why="Sight."><span class="ge">☁️</span>clouds</div><div class="gi" data-sp data-cat="s" data-why="Sight — a bright flash."><span class="ge">⚡</span>lightning</div><div class="gi" data-sp data-cat="h" data-why="Sound!"><span class="ge">🌩️</span>thunder</div><div class="gi" data-sp data-cat="h" data-why="Sound — you can hear it."><span class="ge">🌬️</span>wind blowing</div><div class="gi" data-sp data-cat="h" data-why="Sound!"><span class="ge">🌧️</span>rain on the roof</div><div class="gi" data-sp data-cat="t" data-why="Touch — it feels cold."><span class="ge">🥶</span>cold</div><div class="gi" data-sp data-cat="t" data-why="Touch — it feels wet."><span class="ge">💧</span>wet</div><div class="gi" data-sp data-cat="t" data-why="Touch — it feels hot."><span class="ge">🥵</span>hot</div></div><div class="bins" style="grid-template-columns:repeat(3,1fr)"><div class="bin" data-bin="s"><div class="bin-hd">👁️ SIGHT</div><div class="bin-body"></div></div><div class="bin" data-bin="h"><div class="bin-hd">👂 SOUND</div><div class="bin-body"></div></div><div class="bin" data-bin="t"><div class="bin-hd">✋ TOUCH</div><div class="bin-body"></div></div></div><div class="fb"></div></div></div>
+  <div class="rail" data-rail="76" data-raillbl="BRAINSTORM"></div>
+</section>
+<section class="slide  rail-on" data-stage="Warm Up" data-stagetone="warmup">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Warm Up</b><ul><li>LP Warm Up: <b>The same words can be used for more than one sense.</b></li><li>Tap each card. Ask <b>Can you see rain? Can you hear rain? Can you feel rain?</b> (yes, yes, yes)</li><li>Say <b>That is good! One word, many senses. That makes our writing richer.</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Warm Up · One word, many senses</div><h2 class="h2">Same word, <span class="hot">more senses</span> 🌧️</h2><div class="cols4"><div class="card y tap" data-reveal="#x1"><div class="te">🌧️</div><div class="h3"><span class="hot">rain</span></div><div class="rv" id="x1"><p class="small" style="margin:0">👁️ I <b>see</b> rain.<br>👂 I <b>hear</b> rain on the roof.<br>✋ I <b>feel</b> cold rain.</p></div></div><div class="card y tap" data-reveal="#x2"><div class="te">🌬️</div><div class="h3"><span class="hot">wind</span></div><div class="rv" id="x2"><p class="small" style="margin:0">👂 I <b>hear</b> strong winds.<br>✋ I <b>feel</b> wind on my face.<br>👁️ I <b>see</b> trees move.</p></div></div><div class="card y tap" data-reveal="#x3"><div class="te">❄️</div><div class="h3"><span class="hot">snow</span></div><div class="rv" id="x3"><p class="small" style="margin:0">👁️ I <b>see</b> white snow.<br>✋ I <b>feel</b> cold snow.<br>👅 I <b>taste</b> a snowflake!</p></div></div><div class="card y tap" data-reveal="#x4"><div class="te">⛈️</div><div class="h3"><span class="hot">thunder</span></div><div class="rv" id="x4"><p class="small" style="margin:0">👂 I <b>hear</b> a loud BOOM.<br>✋ I <b>feel</b> the ground shake.</p></div></div></div><div class="dad"><b>Dad 💬</b> Pick one weather word. Tell me <b>two</b> senses for it!</div><div class="frame"><b>Leo 💬</b> I can ______ the ______. I can ______ the ______, too.</div></div>
+  <div class="rail" data-rail="82" data-raillbl="MORE SENSES"></div>
+</section>
+<section class="slide  rail-on" data-stage="Present" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Present</b><ul><li>LP Present: <b>Today you will write a personal narrative about a storm that you experienced. A personal narrative tells a story about what happened to you.</b></li><li>Read the SB p. 18 box together: <b>When you write a personal narrative, you tell a story. You want the reader to feel like he or she is there. To do this you can use descriptive language that uses the senses — sight, sound, taste, smell, and touch. To express the sequence of events, you can use time expressions such as after, before, next, and then.</b></li><li>Tap each card as you read.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Present · What is a personal narrative?</div><h2 class="h2">A <span class="hot">personal narrative</span> 📖</h2><div class="cols3"><div class="card y tap" data-reveal="#p1"><div class="te">📖</div><div class="h3">You <span class="hot">tell a story</span>.</div><div class="rv" id="p1"><p class="small" style="margin:0">It is a <b class="hot">true</b> story. It <b class="hot">happened to you</b>. That is your <b>experience</b>.</p></div></div><div class="card y tap" data-reveal="#p2"><div class="te">🧍</div><div class="h3">The reader <span class="hot">feels</span> like he or she is <span class="hot">there</span>.</div><div class="rv" id="p2"><p class="small" style="margin:0">Use the <b class="hot">senses</b>: sight, sound, taste, smell, touch. Tell what you saw, heard, and felt.</p></div></div><div class="card y tap" data-reveal="#p3"><div class="te">➡️</div><div class="h3">Put events in <span class="hot">order</span>.</div><div class="rv" id="p3"><p class="small" style="margin:0">Use time words: <b class="hot">after, before, next, then</b>.</p></div></div></div><div class="frame" style="margin-top:20px">📘 <b>Student Book p. 18:</b> “When you write a personal narrative, you tell a story. You want the reader to feel like he or she is there.”</div><div class="dad"><b>Dad 💬</b> A <b>narrative</b> is a <b>story</b>. A <b>personal</b> narrative is <b>your</b> story. What is your story about today?</div></div>
+  <div class="rail" data-rail="0" data-raillbl="STORY LINE"></div>
+</section>
+<section class="slide  rail-on" data-stage="Present" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Present</b><ul><li>LP Present: <b>Have students imagine they are in a sandstorm. Write sentence frames on the board: I saw ___. I felt ___. I heard ___.</b></li><li>Say <b>Imagine you are in a sandstorm. Close your eyes. What do you see? What do you feel? What do you hear?</b></li><li>LP: three groups, each assigned a sense. With Leo, Dad models all three; Leo does one then two then all three.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Present · Imagine a sandstorm 🏜️</div><h2 class="h2">I <span class="hot">saw</span> · I <span class="hot">felt</span> · I <span class="hot">heard</span></h2><div class="cols3"><div class="card y tap" data-reveal="#q1"><div class="te">👁️</div><div class="h3">I <span class="hot">saw</span> ___.</div><div class="rv" id="q1"><p class="small" style="margin:0">I saw a <b>huge orange cloud</b>.<br>I saw <b>sand</b> in the air.</p></div></div><div class="card y tap" data-reveal="#q2"><div class="te">🖐️</div><div class="h3">I <span class="hot">felt</span> ___.</div><div class="rv" id="q2"><p class="small" style="margin:0">I felt <b>hot sand</b> on my face.<br>I felt <b>scared</b>.</p></div></div><div class="card y tap" data-reveal="#q3"><div class="te">👂</div><div class="h3">I <span class="hot">heard</span> ___.</div><div class="rv" id="q3"><p class="small" style="margin:0">I heard a <b>loud wind</b>.<br>I heard people <b>shout</b>.</p></div></div></div><div class="dad"><b>Dad 💬</b> Be a reporter in a sandstorm. <b>Tell me one thing for each sense.</b> Then tell the sandstorm story in order!</div><div class="frame"><b>Leo 💬</b> I saw ______. I felt ______. I heard ______.</div></div>
+  <div class="rail" data-rail="6" data-raillbl="SANDSTORM"></div>
+</section>
+<section class="slide  rail-on" data-stage="Present" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Present</b><ul><li>Leo sorts six sandstorm sentences. Read each one aloud after he sorts it.</li><li>Point out <b>saw, heard, felt</b> — these are <b>irregular past tense verbs</b>. We study them in Be the Expert.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Present · Sandstorm sentences</div><h2 class="h2">Which sense? <span class="hot">saw · heard · felt</span></h2><div class="gbox" data-sort data-win="Sandstorm reporter! 🏜️"><div class="game-hint">Sandstorm sentences! Tap one, then <b>SAW</b>, <b>FELT</b> or <b>HEARD</b>.</div><div class="pool"><div class="gi" data-sp data-cat="s" data-why="saw → sight"><span class="ge">🏜️</span>I saw a yellow cloud.</div><div class="gi" data-sp data-cat="h" data-why="heard → sound"><span class="ge">🌬️</span>I heard the wind.</div><div class="gi" data-sp data-cat="f" data-why="felt → touch"><span class="ge">🔥</span>I felt hot sand.</div><div class="gi" data-sp data-cat="s" data-why="saw → sight"><span class="ge">🚗</span>I saw cars stop.</div><div class="gi" data-sp data-cat="h" data-why="heard → sound"><span class="ge">📢</span>I heard people shout.</div><div class="gi" data-sp data-cat="f" data-why="felt → emotion/touch"><span class="ge">😨</span>I felt scared.</div></div><div class="bins" style="grid-template-columns:repeat(3,1fr)"><div class="bin" data-bin="s"><div class="bin-hd">👁️ I SAW</div><div class="bin-body"></div></div><div class="bin" data-bin="h"><div class="bin-hd">👂 I HEARD</div><div class="bin-body"></div></div><div class="bin" data-bin="f"><div class="bin-hd">🖐️ I FELT</div><div class="bin-body"></div></div></div><div class="fb"></div></div><div class="frame"><b>Leo 💬</b> In the sandstorm, I ______, I ______, and I ______.</div></div>
+  <div class="rail" data-rail="12" data-raillbl="SANDSTORM"></div>
+</section>
+<section class="slide  rail-on" data-stage="Present" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Present</b><ul><li>Time words show <b>the order of events</b>: <b>first, next, then, after that, soon</b>.</li><li>Say <b>First, I woke up. Next, I ate. Then, I went to school.</b> Mime the actions.</li><li>LP: SB p. 18 — <b>after, before, next, then</b>. Write them on the board.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Present · Time words</div><h2 class="h2">First · Next · <span class="hot">Then</span> ➡️</h2><div class="row dense"><div class="g"><div class="gbox" data-seq data-step="1" data-win="Perfect order! First → Next → Then → Soon. ➡️" data-hint="Not yet. What happens first?"><div class="game-hint">Put the storm in order. Tap 1 → 4!</div><div class="seqrow" style="display:flex;flex-direction:column;gap:12px;align-items:center"><div class="gi" data-ord="3" style=""><span class="ord"></span><b>Then</b>, the hurricane came.</div><div class="gi" data-ord="1" style=""><span class="ord"></span><b>First</b>, we put wood on the windows.</div><div class="gi" data-ord="4" style=""><span class="ord"></span><b>Soon</b>, it was quiet.</div><div class="gi" data-ord="2" style=""><span class="ord"></span><b>Next</b>, we turned on the radio.</div></div><div class="fb"></div></div></div><div class="c"><div class="lockcard win-hide"><div class="big">🔒</div>Win the game to unlock the word card</div><div class="wcard win-reveal hide "><div class="wc-top"><div class="wc-emo">➡️</div><div><div class="wc-w">next</div><div class="wc-pos">TIME WORD</div></div></div><div class="wc-def">tells what happens <b>after</b> the first thing. Other time words: <b>first, then, after that, soon, finally</b>.</div><div class="wc-ex">• <b>First</b>, I helped my dad. <b>Next</b>, we went inside. <i>(model)</i></div><div class="wc-ex">• <b>Then</b>, suddenly, there was a loud crash. <i>(model)</i></div><div class="wc-ex">• <b>Soon</b>, it was quiet. <i>(model)</i></div><div class="pers"><b>Dad 💬</b><span>What did you do first this morning?</span></div><div class="pers"><b>Leo 💬</b><span>First, I woke up. Next, I ate breakfast.</span></div><div class="jpb">🇯🇵 <b>Japanese bridge</b> — まず・次(つぎ)に・それから・やがて <i>mazu / tsugi ni / sorekara / yagate</i>. English puts the time word <b>at the start</b> and a <b>comma</b> after it: <b>Next, we …</b></div></div></div></div></div>
+  <div class="rail" data-rail="18" data-raillbl="TIME WORDS"></div>
+</section>
+<section class="slide  rail-on" data-stage="Present" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Present</b><ul><li>LP SB p. 18 mentions <b>after</b> and <b>before</b>. Leo reads both and picks the right one.</li><li>Say <b>Before the storm, we put wood on the windows. After the storm, we went outside.</b> Show with two fingers.</li><li>Ask <b>What did you do before breakfast?</b> (I woke up.) <b>After breakfast?</b> (I went to school.)</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Present · Before and after</div><h2 class="h2">Before ◀ · <span class="hot">After</span> ▶</h2><div class="cols3"><div data-quiz data-yes="Yes! 🎉" data-no="Not quite. Try again."><div class="qtxt">We put wood on the windows ______ the hurricane came.</div><div class=""><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">before</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">after</button></div><div class="fb"></div></div><div data-quiz data-yes="Yes! 🎉" data-no="Not quite. Try again."><div class="qtxt">We went outside ______ the storm was over.</div><div class=""><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">before</button><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">after</button></div><div class="fb"></div></div><div data-quiz data-yes="Yes! 🎉" data-no="Not quite. Try again." data-win><div class="qtxt">I turned on the radio ______ I listened for news.</div><div class=""><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">before</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">after</button></div><div class="fb"></div></div></div><div class="dad"><b>Dad 💬</b> Use <b>before</b> or <b>after</b> to tell me about your morning.</div></div>
+  <div class="rail" data-rail="24" data-raillbl="BEFORE · AFTER"></div>
+</section>
+<section class="slide  rail-on" data-stage="Read the Model" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Read the Model</b><ul><li>LP Read the model: <b>Have students open their books to p. 18. Read the model aloud three times.</b> First, the story. Second, words about the senses and feelings. Third, words that show time.</li><li>Say <b>We read three times, and each time we look for something new.</b> Tap the cards.</li><li>Show the title <b>“Safe not Sorry!”</b> Ask <b>What does it mean?</b> (be careful and ready; better safe than sorry).</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Read the Model · SB p. 18</div><h2 class="h2">Read it <span class="hot">three</span> times 📖</h2><div class="cols3"><div class="card y tap" data-reveal="#rm1"><div class="te">1️⃣</div><div class="h3">Read 1 · <span class="hot">The story</span></div><div class="rv" id="rm1"><p class="small" style="margin:0">What happens? Who is in the story? <b>How does the writer describe the hurricane?</b></p></div></div><div class="card y tap" data-reveal="#rm2"><div class="te">2️⃣</div><div class="h3">Read 2 · <span class="hot">Senses and feelings</span></div><div class="rv" id="rm2"><p class="small" style="margin:0">Find words about <b>sight, sound, touch</b> and <b>emotions</b>. Circle them.</p></div></div><div class="card y tap" data-reveal="#rm3"><div class="te">3️⃣</div><div class="h3">Read 3 · <span class="hot">Time words</span></div><div class="rv" id="rm3"><p class="small" style="margin:0">Find words like <b>First, Next, Then, Soon</b>. Underline them.</p></div></div></div><div class="dad"><b>Dad 💬</b> The title is <b>Safe not Sorry</b>. In Japanese we say <b>用心(ようじん)しておけば安心(あんしん)</b> <i>yōjin shite okeba anshin</i>. Why does the family have a <b>plan</b>?</div></div>
+  <div class="rail" data-rail="30" data-raillbl="READ THE MODEL"></div>
+</section>
+<section class="slide  rail-on" data-stage="Read the Model" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Read the Model</b><ul><li>Read 1 — the story. Read slowly and point to the words. <span class="say">How does the writer describe the hurricane?</span></li><li>Say <b>What is the family plan?</b> (put wood on windows, listen to the radio).</li><li>Tap any blue word if Leo needs help.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Read the Model · Read 1 · Paragraphs 1 and 2 (a)</div><h2 class="h2" style="font-size:44px;margin-bottom:8px">Safe not <span class="hot">Sorry!</span></h2><div class="pnum">PARAGRAPH 1</div><div class="read">If a hurricane comes, we know what to do. We have a family plan.</div><div class="pnum">PARAGRAPH 2</div><div class="read">Last year, the weather forecaster told us that a hurricane was coming.  First, I helped my dad put heavy wood over the windows.  It was hard work.  Next, we went inside the house and turned on the radio to listen for news about the hurricane. </div><div class="cvbar"><p class="lead" style="margin:0;color:#475569">Read it like a reporter. Tap a word if you need help.</p></div></div>
+  <div class="rail" data-rail="36" data-raillbl="READ 1"></div>
+</section>
+<section class="slide  rail-on" data-stage="Read the Model" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Read the Model</b><ul><li>Read 1 — middle of the story. Ask <b>What happened first? Next? Then?</b></li><li>Point to <b>When the hurricane came</b> — the story gets exciting!</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Read the Model · Read 1 · Paragraph 2 (b)</div><div class="pnum">PARAGRAPH 2</div><div class="read">When the hurricane came, we could hear the strong winds outside.  It was scary.  The rain came down hard on the roof too.  Then, suddenly, there was a loud crash.  The whole house shook! </div><div class="cvbar"><p class="lead" style="margin:0;color:#475569">What do you hear? What do you see?</p></div></div>
+  <div class="rail" data-rail="42" data-raillbl="READ 1"></div>
+</section>
+<section class="slide  rail-on" data-stage="Read the Model" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Read the Model</b><ul><li>Read 1 — the ending. Ask <b>How does she feel at the end?</b> (happy)</li><li>Ask <b>What does “Hopefully” mean?</b> (I hope).</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Read the Model · Read 1 · Paragraphs 2 (c) and 3</div><div class="pnum">PARAGRAPH 2</div><div class="read">Everyone was worried.  What was it?  Soon, it was quiet and we could go outside.  We saw a huge tree on the ground.  Part of the tree hit the wood on the window.</div><div class="pnum">PARAGRAPH 3</div><div class="read">I am so happy we had a family plan! Hopefully, there isn’t going to be a hurricane for a while.</div><div class="cvbar"><p class="lead" style="margin:0;color:#475569">The whole story is a <span class="hot">personal narrative</span>.</p></div></div>
+  <div class="rail" data-rail="48" data-raillbl="READ 1"></div>
+</section>
+<section class="slide  rail-on" data-stage="Read the Model" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Read the Model</b><ul><li>LP SB Act 1: <span class="say">How does the writer describe the hurricane? How does the writer describe what she hears and sees? How does she feel?</span></li><li>Tap each card. Let Leo answer first before you open it.</li><li>Keep the answers short: <b>strong winds, rain, a loud crash; a huge tree; scary, worried, happy.</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Read the Model · Questions · SB Activity 1</div><h2 class="h2">Check the <span class="hot">model</span> 🔍</h2><div class="cols3"><div class="card y tap" data-reveal="#rq1"><div class="te">🌀</div><div class="h3">How does she describe the <span class="hot">hurricane</span>?</div><div class="rv" id="rq1"><p class="small" style="margin:0"><b>Strong winds</b>, <b>hard</b> rain, <b>heavy</b> wood, a <b>loud</b> crash. The whole house <b>shook</b>.</p></div></div><div class="card y tap" data-reveal="#rq2"><div class="te">👀</div><div class="h3">What does she <span class="hot">hear and see</span>?</div><div class="rv" id="rq2"><p class="small" style="margin:0">She <b>hears</b> the strong winds and a loud crash. She <b>sees</b> a huge tree on the ground.</p></div></div><div class="card y tap" data-reveal="#rq3"><div class="te">😟</div><div class="h3">How does she <span class="hot">feel</span>?</div><div class="rv" id="rq3"><p class="small" style="margin:0"><b>Scary</b> → <b>worried</b> → <b>happy</b>. Her feelings change!</p></div></div></div><div class="dad"><b>Dad 💬</b> <b>Everyone was worried.</b> What was it? What do you think the loud crash was?</div></div>
+  <div class="rail" data-rail="54" data-raillbl="QUESTIONS"></div>
+</section>
+<section class="slide whole rail-on" data-stage="Read the Model" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Read the Model</b><ul><li>Read 2 — circle the words about the senses and emotions (SB Act 1). Tap each <span class="say">blue</span> word to see which sense or emotion it is.</li><li>Ask Leo to say the sense for each: <b>loud crash — what sense?</b> (sound). <b>scary — sense or emotion?</b> (emotion).</li><li>Teacher tip: Leo circles these in the book while you tap here.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Read the Model · Read 2 · Circle senses and emotions</div><h2 class="h2" style="font-size:44px;margin-bottom:6px">Safe not Sorry! <span class="hot">(senses)</span></h2><div class="read two"><p>If a hurricane comes, we know what to do. We have a family plan.</p><p>Last year, the weather forecaster told us that a hurricane was coming. First, I helped my dad put <span class="cv" data-cvdef="TOUCH ✋ — heavy wood. You feel the weight.">heavy wood</span> over the windows. It was hard work. Next, we went inside the house and turned on the radio to listen for news about the hurricane. When the hurricane came, we could hear the <span class="cv" data-cvdef="SOUND 👂 — strong winds. You hear them.">strong winds</span> outside. It was <span class="cv" data-cvdef="EMOTION 😨 — scary. How she feels.">scary</span>. The rain <span class="cv" data-cvdef="SOUND 👂 / TOUCH ✋ — rain that comes down hard.">came down hard</span> on the roof too. Then, suddenly, there was a <span class="cv" data-cvdef="SOUND 👂 — a loud crash!">loud crash</span>. The whole house <span class="cv" data-cvdef="TOUCH ✋ — the house shook. You feel it.">shook</span>! Everyone was <span class="cv" data-cvdef="EMOTION 😟 — worried. How everyone feels.">worried</span>. What was it? Soon, it was <span class="cv" data-cvdef="SOUND 👂 — quiet. No noise now.">quiet</span> and we could go outside. We saw a <span class="cv" data-cvdef="SIGHT 👁️ — a huge tree. You see it.">huge tree</span> on the ground. <span class="cv" data-cvdef="SIGHT 👁️ — part of a tree. You see it.">Part of the tree</span> hit the <span class="cv" data-cvdef="SIGHT 👁️ — wood on the window. You see it.">wood on the window</span>.</p><p>I am so <span class="cv" data-cvdef="EMOTION 😊 — happy. How she feels at the end.">happy</span> we had a family plan! Hopefully, there isn’t going to be a hurricane for a while.</p></div><div class="cvbar"><p class="lead" style="margin:0;color:#475569">Tap a <span class="hot">blue</span> word to see which sense or emotion it shows.</p></div></div>
+  <div class="rail" data-rail="60" data-raillbl="READ 2"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Read the Model" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Read the Model</b><ul><li>WB p. 10 planning artefact — the chart of sense words from the model: <b>See</b>: part of a tree, wood on the window. <b>Hear</b>: weather forecaster, strong winds, hard rain, loud crash. <b>Touch</b>: heavy wood. Feelings: It was scary, but a little exciting, too. / Everyone was worried. / I am so happy we had a family plan.</li><li>WB note: <b>The writer didn’t write about all her senses. You can write about all or only some senses.</b> Taste and smell are empty in the model.</li><li>Note: the WB lists <b>weather forecaster</b> under Hear (the forecaster told us).</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Read the Model · WB p. 10 · Sense chart</div><h2 class="h2">The writer’s <span class="hot">sense words</span></h2><div class="gbox" data-sort data-win="Sense chart done! 📊"><div class="game-hint">WB chart! Put each phrase in the right box: <b>See · Hear · Touch · Emotions</b>.</div><div class="pool"><div class="gi" data-sp data-cat="s" data-why="See 👁️ — part of a tree."><span class="ge">🌳</span>part of a tree</div><div class="gi" data-sp data-cat="s" data-why="See 👁️"><span class="ge">🪟</span>wood on the window</div><div class="gi" data-sp data-cat="h" data-why="Hear 👂"><span class="ge">🌬️</span>strong winds</div><div class="gi" data-sp data-cat="h" data-why="Hear 👂"><span class="ge">🌧️</span>hard rain</div><div class="gi" data-sp data-cat="h" data-why="Hear 👂"><span class="ge">💥</span>a loud crash</div><div class="gi" data-sp data-cat="t" data-why="Touch ✋"><span class="ge">🪵</span>heavy wood</div><div class="gi" data-sp data-cat="e" data-why="Emotion 😨"><span class="ge">😨</span>it was scary</div><div class="gi" data-sp data-cat="e" data-why="Emotion 😟"><span class="ge">😟</span>everyone was worried</div><div class="gi" data-sp data-cat="e" data-why="Emotion 😊"><span class="ge">😊</span>I am so happy</div></div><div class="bins" style="grid-template-columns:repeat(4,1fr)"><div class="bin" data-bin="s"><div class="bin-hd">👁️ SEE</div><div class="bin-body"></div></div><div class="bin" data-bin="h"><div class="bin-hd">👂 HEAR</div><div class="bin-body"></div></div><div class="bin" data-bin="t"><div class="bin-hd">✋ TOUCH</div><div class="bin-body"></div></div><div class="bin" data-bin="e"><div class="bin-hd">😮 EMOTIONS</div><div class="bin-body"></div></div></div><div class="fb"></div></div><div class="frame">📓 <b>WB p. 10:</b> “The writer didn’t write about all her senses. You can write about all or only some senses.” (She did not use taste or smell.)</div></div>
+  <div class="rail" data-rail="66" data-raillbl="WB CHART"></div>
+</section>
+<section class="slide whole rail-on" data-stage="Read the Model" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Read the Model</b><ul><li>Read 3 — underline the words and expressions that show the sequence of events (SB Act 1). Tap each <span class="say">orange</span> word.</li><li>LP board example: <b>Then, suddenly, there was a loud crash.</b> Ask <b>Which words show the order?</b> (Then, suddenly).</li><li>Ask Leo to say the order: <b>First → Next → When → Then → Soon</b>.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Read the Model · Read 3 · Underline time words</div><h2 class="h2" style="font-size:44px;margin-bottom:6px">Safe not Sorry! <span class="hotr">(time words)</span></h2><div class="read two"><p>If a hurricane comes, we know what to do. We have a family plan.</p><p><span class="sig" data-cvdef="Last year, = when it happened. Time at the start.">Last year,</span> the weather forecaster told us that a hurricane was coming. <span class="sig" data-cvdef="First, = the first event.">First,</span> I helped my dad put heavy wood over the windows. It was hard work. <span class="sig" data-cvdef="Next, = the second event.">Next,</span> we went inside the house and turned on the radio to listen for news about the hurricane. <span class="sig" data-cvdef="When = at that time.">When</span> the hurricane came, we could hear the strong winds outside. It was scary. The rain came down hard on the roof too. <span class="sig" data-cvdef="Then, = the next event.">Then,</span> <span class="sig" data-cvdef="suddenly = very fast, a surprise!">suddenly,</span> there was a loud crash. The whole house shook! Everyone was worried. What was it? <span class="sig" data-cvdef="Soon, = a short time later.">Soon,</span> it was quiet and we could go outside. We saw a huge tree on the ground. Part of the tree hit the wood on the window.</p><p>I am so happy we had a family plan! Hopefully, there isn’t going to be a hurricane for a while.</p></div><div class="cvbar"><p class="lead" style="margin:0;color:#475569">Tap an <span style="color:#B45309;font-weight:800">orange</span> word to see how it shows time.</p></div></div>
+  <div class="rail" data-rail="72" data-raillbl="READ 3"></div>
+</section>
+<section class="slide  rail-on" data-stage="Read the Model" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Read the Model</b><ul><li>LP board: <b>Then, suddenly, there was a loud crash.</b> Circle <b>loud crash</b> (senses) and underline <b>Then</b> (sequence). Do it live with a marker.</li><li>Leo orders the six events of the story. Then he says the story using <b>First, Next, When, Then, Soon</b>.</li><li>WB p. 10 step 2: <b>The writer wrote things that happened in the order they happened.</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Read the Model · Board example + order</div><h2 class="h2">Circle ◯ and <span class="hot">underline</span> ▁</h2><div class="row"><div class="g"><div class="gbox" data-seq data-step="1" data-win="Perfect! Forecaster → wood → radio → hurricane → crash → tree. 🌀" data-hint="Not yet. What happens first?"><div class="game-hint">Put the story in order. Tap 1 → 6!</div><div class="seqrow" style="display:flex;flex-direction:column;gap:12px;align-items:center"><div class="gi" data-ord="3" style="justify-content:center"><span class="ord"></span>we turned on the radio</div><div class="gi" data-ord="1" style="justify-content:center"><span class="ord"></span>the forecaster told us</div><div class="gi" data-ord="6" style="justify-content:center"><span class="ord"></span>we saw a huge tree</div><div class="gi" data-ord="2" style="justify-content:center"><span class="ord"></span>I helped my dad put wood on the windows</div><div class="gi" data-ord="5" style="justify-content:center"><span class="ord"></span>there was a loud crash</div><div class="gi" data-ord="4" style="justify-content:center"><span class="ord"></span>the hurricane came</div></div><div class="fb"></div></div></div><div class="c"><div class="card y tap" data-reveal="#bx1"><div class="h3" style="margin:0">Then, suddenly, there was a <span class="hot" style="border:3px solid #4338CA;border-radius:30px;padding:2px 12px">loud crash</span>.</div><div class="rv" id="bx1"><p class="small" style="margin:0"><b>Circle</b> = sense word (sound 👂).</p></div></div><div class="card y tap" data-reveal="#bx2" style="margin-top:12px"><div class="h3" style="margin:0"><span class="hot" style="text-decoration:underline;text-decoration-thickness:4px">Then, suddenly,</span> there was a loud crash.</div><div class="rv" id="bx2"><p class="small" style="margin:0"><b>Underline</b> = time words (order of events ➡️).</p></div></div><div class="dad"><b>Dad 💬</b> Tell me the story with <b>First, Next, When, Then, Soon</b>.</div></div></div></div>
+  <div class="rail" data-rail="78" data-raillbl="ORDER"></div>
+</section>
+<section class="slide  rail-on" data-stage="Read the Model" data-stagetone="present">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Read the Model</b><ul><li>Count slide: the model has <b>12</b> sense and emotion expressions and <b>7</b> time words/phrases (as marked in this deck).</li><li>Ask Leo <b>Which is easier to find — senses or time words?</b></li><li>Tap the cards to see the lists.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Read the Model · Count</div><h2 class="h2">What the writer <span class="hot">used</span></h2><div class="cols2"><div class="card y tap" data-reveal="#rc1"><div class="te">👁️</div><div class="h3"><span class="hot">12</span> sense and emotion words</div><div class="rv" id="rc1"><p class="small" style="margin:0">heavy wood · strong winds · came down hard · loud crash · shook · quiet · huge tree · part of the tree · wood on the window · scary · worried · happy</p></div></div><div class="card y tap" data-reveal="#rc2"><div class="te">➡️</div><div class="h3"><span class="hot">7</span> time words</div><div class="rv" id="rc2"><p class="small" style="margin:0">Last year, · First, · Next, · When · Then, · suddenly, · Soon,</p></div></div></div><div class="dad"><b>Dad 💬</b> The writer uses <b>both</b>: senses make us <b>feel</b> it; time words keep the story in <b>order</b>.</div></div>
+  <div class="rail" data-rail="84" data-raillbl="COUNT"></div>
+</section>
+<section class="slide  rail-on" data-stage="Plan" data-stagetone="practice">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Plan</b><ul><li>LP Plan: <b>Have students think of a time they experienced extreme weather.</b> <span class="say">What type of weather was it? How did you feel?</span></li><li>Leo thinks first. If he has no experience, use the photographs on pp. 6–11 (Teaching Tip).</li><li>WB p. 10 steps: the writer first <b>chose something that happened</b>.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Plan · Choose your storm</div><h2 class="h2">Think of an <span class="hot">experience</span> 🌪️</h2><div class="cols3"><div class="card y tap" data-reveal="#pl1"><div class="te">🌦️</div><div class="h3">What type of <span class="hot">weather</span> was it?</div><div class="rv" id="pl1"><p class="small" style="margin:0">A <b>typhoon</b>? A <b>thunderstorm</b>? A <b>heavy snow</b>? A <b>heat wave</b>? Pick <b>one</b>.</p></div></div><div class="card y tap" data-reveal="#pl2"><div class="te">😮</div><div class="h3">How did you <span class="hot">feel</span>?</div><div class="rv" id="pl2"><p class="small" style="margin:0"><b>Scared? Worried? Excited? Happy?</b> Pick two feelings.</p></div></div><div class="card y tap" data-reveal="#pl3"><div class="te">📸</div><div class="h3">No storm? <span class="hot">Use a photo</span>.</div><div class="rv" id="pl3"><p class="small" style="margin:0">Look at the photos on <b>pp. 6–11</b>. Imagine you are <b>there</b>.</p></div></div></div><div class="dad"><b>Dad 💬</b> Think of a day with <b>strong weather</b>. Where were you? Who was with you?</div><div class="frame"><b>Leo 💬</b> I want to write about a ______. I felt ______ and ______.</div></div>
+  <div class="rail" data-rail="6" data-raillbl="PLAN"></div>
+</section>
+<section class="slide  rail-on" data-stage="Plan" data-stagetone="practice">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Plan</b><ul><li>LP Plan: <b>Give each student a two-column chart. Have them write words relating to the senses and emotions.</b> Model: <span class="say">I saw a tornado once. I was afraid and worried, but it was also a little exciting.</span></li><li>Chart rows from the LP: <b>Sight</b> — trees blowing, funnel; <b>Sound</b> — loud noise, wind; <b>Touch</b> — wet, wind; <b>Emotions</b> — afraid, worried, excited.</li><li>Tap the cells after Leo guesses. Read the model sentence aloud.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Plan · Two-column chart · Dad’s tornado</div><h2 class="h2">The chart: <span class="hot">senses</span> and <span class="hot">emotions</span> 🗺️</h2><table class="tbl"><thead><tr><th>SENSE</th><th>WORDS</th><th>MORE WORDS</th></tr></thead><tbody><tr><td>👁️ Sight</td><td class="cell" id="pa0" data-reveal="#pa0"><span class="hint">tap</span><span class="ans">trees blowing</span></td><td class="cell" id="pb0" data-reveal="#pb0"><span class="hint">tap</span><span class="ans">funnel</span></td></tr><tr><td>👂 Sound</td><td class="cell" id="pa1" data-reveal="#pa1"><span class="hint">tap</span><span class="ans">loud noise</span></td><td class="cell" id="pb1" data-reveal="#pb1"><span class="hint">tap</span><span class="ans">wind</span></td></tr><tr><td>🖐️ Touch</td><td class="cell" id="pa2" data-reveal="#pa2"><span class="hint">tap</span><span class="ans">wet</span></td><td class="cell" id="pb2" data-reveal="#pb2"><span class="hint">tap</span><span class="ans">wind</span></td></tr><tr><td>😮 Emotions</td><td class="cell" id="pa3" data-reveal="#pa3"><span class="hint">tap</span><span class="ans">afraid</span></td><td class="cell" id="pb3" data-reveal="#pb3"><span class="hint">tap</span><span class="ans">worried, excited</span></td></tr></tbody></table><div class="frame">🌪️ <b>Dad’s model:</b> “I saw a tornado once. I was afraid and worried, but it was also a little exciting.”</div></div>
+  <div class="rail" data-rail="14" data-raillbl="CHART"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Plan" data-stagetone="practice">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Plan</b><ul><li>Leo sorts nine words into the chart. Then he adds <b>two of his own</b> words for his storm.</li><li>Say <b>Now your chart. Which words match your storm?</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Plan · Build your chart</div><h2 class="h2">Fill <span class="hot">your</span> chart 🗺️</h2><div class="gbox" data-sort data-win="Chart ready! 🗺️"><div class="game-hint">Build the chart! Put each word under the right heading.</div><div class="pool"><div class="gi" data-sp data-cat="s" data-why="Sight 👁️"><span class="ge">🌀</span>a funnel cloud</div><div class="gi" data-sp data-cat="s" data-why="Sight 👁️"><span class="ge">🌳</span>trees blowing</div><div class="gi" data-sp data-cat="h" data-why="Sound 👂"><span class="ge">📢</span>loud noise</div><div class="gi" data-sp data-cat="h" data-why="Sound 👂"><span class="ge">🌬️</span>howling wind</div><div class="gi" data-sp data-cat="t" data-why="Touch ✋"><span class="ge">💧</span>wet</div><div class="gi" data-sp data-cat="t" data-why="Touch ✋"><span class="ge">🥶</span>cold</div><div class="gi" data-sp data-cat="e" data-why="Emotion 😮"><span class="ge">😨</span>afraid</div><div class="gi" data-sp data-cat="e" data-why="Emotion 😮"><span class="ge">😟</span>worried</div><div class="gi" data-sp data-cat="e" data-why="Emotion 😮"><span class="ge">🤩</span>excited</div></div><div class="bins" style="grid-template-columns:repeat(4,1fr)"><div class="bin" data-bin="s"><div class="bin-hd">👁️ SIGHT</div><div class="bin-body"></div></div><div class="bin" data-bin="h"><div class="bin-hd">👂 SOUND</div><div class="bin-body"></div></div><div class="bin" data-bin="t"><div class="bin-hd">✋ TOUCH</div><div class="bin-body"></div></div><div class="bin" data-bin="e"><div class="bin-hd">😮 EMOTIONS</div><div class="bin-body"></div></div></div><div class="fb"></div></div><div class="dad"><b>Dad 💬</b> Add two words for <b>your</b> storm to each column in the notebook.</div></div>
+  <div class="rail" data-rail="20" data-raillbl="CHART"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Plan" data-stagetone="practice">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Plan</b><ul><li>WB p. 10 Act 1 steps: 1) The writer chose something that happened. 2) Next, the writer wrote things that happened in the order they happened. 3) Then the writer wrote about her feelings about the things that happened. 4) Next, the writer added descriptions of how she lived the experience through her senses. 5) Next, the writer wrote a first sentence to say what the narrative was about: <b>If a hurricane comes, we know what to do.</b> 6) Then the writer wrote what happened in order. 7) Finally, the writer wrote a sentence to close the narrative: <b>Hopefully there isn’t going to be a hurricane for a while.</b></li><li>Note: WB steps 2 and 6 both mention the order of events (the book lists them twice). Accept either order for these two.</li><li>Tap the numbers in order. Read each step aloud.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Plan · WB p. 10 · How did the writer plan?</div><h2 class="h2">Plan <span class="hot">steps</span> 📋</h2><div class="row"><div class="g"><div class="gbox" data-seq data-step="1" data-win="Planned like a pro! ✍️" data-hint="Not yet — think about the WB steps 1–7."><div class="game-hint">Plan like the writer! Put WB steps 1–7 in order. Tap 1 → 7.</div><div class="seqrow" style="display:flex;flex-direction:column;gap:12px;align-items:center"><div class="gi" data-ord="4" style="justify-content:center"><span class="ord"></span>Add descriptions of senses.</div><div class="gi" data-ord="1" style="justify-content:center"><span class="ord"></span>Choose something that happened.</div><div class="gi" data-ord="6" style="justify-content:center"><span class="ord"></span>Write what happened in order.</div><div class="gi" data-ord="3" style="justify-content:center"><span class="ord"></span>Write about your feelings.</div><div class="gi" data-ord="7" style="justify-content:center"><span class="ord"></span>Write a closing sentence.</div><div class="gi" data-ord="2" style="justify-content:center"><span class="ord"></span>Write the events in order.</div><div class="gi" data-ord="5" style="justify-content:center"><span class="ord"></span>Write a first sentence.</div></div><div class="fb"></div></div></div><div class="c"><div class="card y"><div class="h3" style="margin:0 0 8px">First sentence 🎬</div><p class="small" style="margin:0">“If a hurricane comes, we know what to do.”</p></div><div class="card y" style="margin-top:12px"><div class="h3" style="margin:0 0 8px">Closing sentence 🏁</div><p class="small" style="margin:0">“Hopefully, there isn’t going to be a hurricane for a while.”</p></div><div class="dad"><b>Dad 💬</b> Write your <b>first sentence</b> and your <b>closing sentence</b> now.</div></div></div></div>
+  <div class="rail" data-rail="26" data-raillbl="PLAN STEPS"></div>
+</section>
+<section class="slide  rail-on" data-stage="Be the Expert" data-stagetone="expert">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Be the Expert</b><ul><li>LP Be the Expert · <b>Teaching Tip:</b> <b>Students without firsthand experience of extreme weather may use the photographs on pp. 6–11 as the setting for their writing.</b></li><li>Say <b>No storm story? No problem. Pick a photo and imagine you were there.</b></li><li>LP prints no Our World in Context block for this lesson — do not add one.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Be the Expert · Teaching Tip</div><h2 class="h2">No storm story? <span class="hot">Use a photo</span> 📸</h2><div class="cols3"><div class="card y tap" data-reveal="#tt1"><div class="te">📖</div><div class="h3">Open <span class="hot">pp. 6–11</span></div><div class="rv" id="tt1"><p class="small" style="margin:0">Look at the <b>photographs</b> of extreme weather in Unit 1.</p></div></div><div class="card y tap" data-reveal="#tt2"><div class="te">🧍</div><div class="h3">Imagine you are <span class="hot">there</span></div><div class="rv" id="tt2"><p class="small" style="margin:0">What do you <b>see</b>? What do you <b>hear</b>? What do you <b>feel</b>?</p></div></div><div class="card y tap" data-reveal="#tt3"><div class="te">📝</div><div class="h3">Write it as <span class="hot">your story</span></div><div class="rv" id="tt3"><p class="small" style="margin:0">Use the <b>photo as the setting</b>. Add senses and emotions.</p></div></div></div><div class="dad"><b>Dad 💬</b> Choose one photo. <b>Where</b> are you? <b>What</b> happens first?</div></div>
+  <div class="rail" data-rail="32" data-raillbl="EXPERT"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Be the Expert" data-stagetone="expert">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Be the Expert</b><ul><li>LP Writing Support · Usage: <b>Irregular Past Tense Verbs.</b> Use <b>past tense</b> to write about events that happened in the past.</li><li>Regular verbs add <b>-ed</b> (touch → touched). Irregular verbs change: <b>tell → told, hear → heard, see → saw</b>.</li><li>Review the list of irregular verbs on <b>SB p. 168</b>. Say <b>The writer saw a huge tree. She heard a loud crash.</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Be the Expert · Writing Support · Usage</div><h2 class="h2">Irregular <span class="hot">past tense</span> verbs ⏪</h2><div class="cols2"><div class="card y tap" data-reveal="#ew1"><div class="te">📅</div><div class="h3">Past event → <span class="hot">past tense</span></div><div class="rv" id="ew1"><p class="small" style="margin:0">I <b>helped</b> my dad. We <b>went</b> inside. It <b>was</b> scary.</p></div></div><div class="card y tap" data-reveal="#ew2"><div class="te">➕</div><div class="h3">Regular: add <span class="hot">-ed</span></div><div class="rv" id="ew2"><p class="small" style="margin:0">touch → <b>touched</b><br>help → <b>helped</b><br>turn → <b>turned</b></p></div></div><div class="card y tap" data-reveal="#ew3"><div class="te">🔀</div><div class="h3">Irregular: the word <span class="hot">changes</span></div><div class="rv" id="ew3"><p class="small" style="margin:0">tell → <b>told</b><br>hear → <b>heard</b><br>see → <b>saw</b><br>go → <b>went</b><br>come → <b>came</b></p></div></div><div class="card y tap" data-reveal="#ew4"><div class="te">📘</div><div class="h3"><span class="hot">SB p. 168</span> list</div><div class="rv" id="ew4"><p class="small" style="margin:0">Find the <b>Irregular Verbs</b> list. Check <b>see / saw / seen</b>.</p></div></div></div></div>
+  <div class="rail" data-rail="38" data-raillbl="PAST TENSE"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Be the Expert" data-stagetone="expert">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Be the Expert</b><ul><li>Japanese bridge. Japanese makes the past with <b>-た</b> <i>-ta</i> every time: 見る → 見た <i>miru → mita</i>. English has the same idea, but many verbs <b>change shape</b>: see → <b>saw</b>, go → <b>went</b>.</li><li>Common error: <b>I goed outside / I seed a tree</b> (adding -ed to everything). Say <b>-ed is for regular verbs only. Irregular verbs must be learned.</b></li><li>Tap the answers after Leo guesses.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Be the Expert · Japanese bridge · Past tense</div><h2 class="h2">Japanese <span class="hot">-た</span> vs English ⏪</h2><table class="tbl"><thead><tr><th>JAPANESE</th><th>PAST (-た)</th><th>ENGLISH</th><th>PAST</th></tr></thead><tbody><tr><td>見る <i style="font-weight:400">miru</i></td><td>見た <i style="font-weight:400">mita</i></td><td>see</td><td class="cell" id="jb0" data-reveal="#jb0"><span class="hint">tap</span><span class="ans">saw</span></td></tr><tr><td>行く <i style="font-weight:400">iku</i></td><td>行った <i style="font-weight:400">itta</i></td><td>go</td><td class="cell" id="jb1" data-reveal="#jb1"><span class="hint">tap</span><span class="ans">went</span></td></tr><tr><td>聞く <i style="font-weight:400">kiku</i></td><td>聞いた <i style="font-weight:400">kiita</i></td><td>hear</td><td class="cell" id="jb2" data-reveal="#jb2"><span class="hint">tap</span><span class="ans">heard</span></td></tr><tr><td>言う <i style="font-weight:400">iu</i></td><td>言った <i style="font-weight:400">itta</i></td><td>say / tell</td><td class="cell" id="jb3" data-reveal="#jb3"><span class="hint">tap</span><span class="ans">said / told</span></td></tr></tbody></table><div class="cols2" style="margin-top:12px"><div class="frame">🇯🇵 In Japanese the past is always <b>-た</b> <i>-ta</i>.</div><div class="frame">🇬🇧 In English, <b>regular</b> = -ed, <b>irregular</b> = a new word. ✖ “I <s>goed</s>.” ✔ “I <b>went</b>.”</div></div></div>
+  <div class="rail" data-rail="44" data-raillbl="BRIDGE"></div>
+</section>
+<section class="slide  rail-on" data-stage="Be the Expert" data-stagetone="expert">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Be the Expert</b><ul><li>Six irregular verbs from the model: told, saw, went, came, heard, shook.</li><li>After each match, Leo says a sentence: <b>The forecaster told us. I saw a tree.</b></li><li>Point out: <b>put</b> and <b>hit</b> do not change (put → put, hit → hit) — see SB p. 168.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Be the Expert · Match the verbs</div><h2 class="h2">Now → <span class="hot">Before</span> ⏪</h2><div class="gbox" data-match data-win="Past tense pro! ⏪"><div class="game-hint">Match the present verb to its past form.</div><div class="mcols"><div class="mcol"><div class="pill y">NOW</div><div class="gi" data-ml="a">tell</div><div class="gi" data-ml="b">see</div><div class="gi" data-ml="c">go</div><div class="gi" data-ml="d">come</div><div class="gi" data-ml="e">hear</div><div class="gi" data-ml="f">shake</div></div><div class="mcol"><div class="pill y">BEFORE</div><div class="gi" data-mr="e">heard</div><div class="gi" data-mr="a">told</div><div class="gi" data-mr="f">shook</div><div class="gi" data-mr="d">came</div><div class="gi" data-mr="b">saw</div><div class="gi" data-mr="c">went</div></div></div><div class="fb"></div></div><div class="frame"><b>Leo 💬</b> Last year, I ______ (see) ______. I ______ (hear) ______.</div></div>
+  <div class="rail" data-rail="50" data-raillbl="MATCH"></div>
+</section>
+<section class="slide  rail-on" data-stage="Be the Expert" data-stagetone="expert">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Be the Expert</b><ul><li>Sort six past verbs from the model. Ask <b>How do you know it is irregular?</b> (there is no -ed).</li><li>Say <b>When in doubt, check SB p. 168.</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Be the Expert · Sort the verbs</div><h2 class="h2">Regular or <span class="hot">irregular</span>? 🔀</h2><div class="gbox" data-sort data-win="Verb sorter! 🔀"><div class="game-hint">Regular (<b>-ed</b>) or irregular (<b>changes</b>)? Tap a card, then a box.</div><div class="pool"><div class="gi" data-sp data-cat="r" data-why="helped = help + ed. Regular."><span class="ge">🤝</span>helped</div><div class="gi" data-sp data-cat="r" data-why="turned = turn + ed. Regular."><span class="ge">🔄</span>turned</div><div class="gi" data-sp data-cat="r" data-why="touched = touch + ed. Regular."><span class="ge">✋</span>touched</div><div class="gi" data-sp data-cat="i" data-why="saw — irregular (see)."><span class="ge">👀</span>saw</div><div class="gi" data-sp data-cat="i" data-why="told — irregular (tell)."><span class="ge">🗣️</span>told</div><div class="gi" data-sp data-cat="i" data-why="went — irregular (go)."><span class="ge">🏠</span>went</div></div><div class="bins" style="grid-template-columns:repeat(2,1fr)"><div class="bin" data-bin="r"><div class="bin-hd">➕ REGULAR (-ed)</div><div class="bin-body"></div></div><div class="bin" data-bin="i"><div class="bin-hd">🔀 IRREGULAR (changes)</div><div class="bin-body"></div></div></div><div class="fb"></div></div></div>
+  <div class="rail" data-rail="56" data-raillbl="SORT"></div>
+</section>
+<section class="slide  rail-on" data-stage="Be the Expert" data-stagetone="expert">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Be the Expert</b><ul><li>Check activity: choose the correct past tense verb.</li><li>If Leo says <b>goed</b> or <b>seed</b>, recall the Japanese bridge: <b>-ed is not for every verb</b>.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Be the Expert · Check · Past tense</div><h2 class="h2">Which one is <span class="hot">right</span>? ✅</h2><div class="cols3"><div data-quiz data-yes="Yes! 🎉" data-no="Not quite. Try again."><div class="qtxt">Last year, the forecaster ______ us a hurricane was coming.</div><div class="chk"><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">tell</button><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">told</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">telled</button></div><div class="fb"></div></div><div data-quiz data-yes="Yes! 🎉" data-no="Not quite. Try again."><div class="qtxt">I ______ a huge tree on the ground.</div><div class="chk"><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">saw</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">seed</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">see</button></div><div class="fb"></div></div><div data-quiz data-yes="Yes! 🎉" data-no="Not quite. Try again." data-win><div class="qtxt">We ______ inside the house.</div><div class="chk"><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">goed</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">go</button><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">went</button></div><div class="fb"></div></div></div></div>
+  <div class="rail" data-rail="62" data-raillbl="CHECK"></div>
+</section>
+<section class="slide  rail-on" data-stage="Write" data-stagetone="apply">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Write</b><ul><li>LP Write: <b>Have students use their chart and the words on the board to write their personal narrative.</b> Remind them to use sequencing words and details about senses and emotions.</li><li>WB p. 11 Act 3: <b>Follow the steps in Activity 1. In your notebook, write your narrative about an extreme weather experience.</b></li><li>Leo writes in three parts: first sentence, events, closing.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Write · Your narrative</div><h2 class="h2">Write your <span class="hot">story</span> ✍️</h2><div class="cols3"><div class="card y tap" data-reveal="#wr1"><div class="te">1️⃣</div><div class="h3">First <span class="hot">sentence</span></div><div class="rv" id="wr1"><p class="small" style="margin:0">Say what the story is about.<br>“If a ______ comes, we know what to do.”</p></div></div><div class="card y tap" data-reveal="#wr2"><div class="te">2️⃣</div><div class="h3">Events in <span class="hot">order</span></div><div class="rv" id="wr2"><p class="small" style="margin:0">Use <b>First, Next, When, Then, Soon</b>. Add <b>sight, sound, touch</b> and <b>emotions</b>.</p></div></div><div class="card y tap" data-reveal="#wr3"><div class="te">3️⃣</div><div class="h3">Closing <span class="hot">sentence</span></div><div class="rv" id="wr3"><p class="small" style="margin:0">How do you feel now?<br>“I am so happy ______.” “Hopefully, ______.”</p></div></div></div><div class="frame" style="margin-top:20px"><b>Leo 💬</b> Last ______, ______. First, ______. Next, ______. Then, suddenly, ______. Soon, ______. I am so ______!</div><div class="dad"><b>Dad 💬</b> Use your <b>chart</b> and the words on the <b>board</b>. Take your time. 📝</div></div>
+  <div class="rail" data-rail="68" data-raillbl="WRITE"></div>
+</section>
+<section class="slide  rail-on" data-stage="Write" data-stagetone="apply">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Write</b><ul><li>Show don’t tell: a weak sentence tells; a strong one uses a sense.</li><li>Leo picks the better sentence each time and says why.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Write · Make it come alive</div><h2 class="h2">Which sentence makes you <span class="hot">feel</span> it? 💡</h2><div class="cols3"><div data-quiz data-yes="Yes! Sound details help the reader." data-no="That one only tells. Add a sense!"><div class="qtxt">Which is better?</div><div class=""><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">The storm was bad.</button><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">The strong wind roared and the rain hit the roof hard.</button></div><div class="fb"></div></div><div data-quiz data-yes="Touch + emotion — great!" data-no="Add a sense!"><div class="qtxt">Which is better?</div><div class=""><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">I was scared.</button><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">My hands were cold and I was scared.</button></div><div class="fb"></div></div><div data-quiz data-yes="Time word + sound = exciting!" data-no="Add a time word and a sound." data-win><div class="qtxt">Which is better?</div><div class=""><button class="opt" data-opt data-ok="1" style="margin-bottom:10px">Then, suddenly, there was a loud crash!</button><button class="opt" data-opt data-ok="0" style="margin-bottom:10px">There was a crash.</button></div><div class="fb"></div></div></div><div class="dad"><b>Dad 💬</b> Take <b>one</b> sentence from your story and make it stronger with <b>one sense</b>.</div></div>
+  <div class="rail" data-rail="74" data-raillbl="WRITE"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Write" data-stagetone="apply">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Write</b><ul><li>Teacher model 1. Read it aloud. Leo taps each blue (sense/emotion) and orange (time) word.</li><li>Point out the first sentence, the events in order, and the closing sentence. All verbs are in past tense (irregular: <b>put, came, heard, hit, went, saw</b>).</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Write · Dad’s model · Typhoon night 🌀</div><h2 class="h2" style="font-size:44px;margin-bottom:6px">Typhoon <span class="hot">Night</span></h2><div class="read" style="font-size:36px"><p>If a typhoon comes, we know what to do. Last summer, a typhoon came to our city. <span class="sig" data-cvdef="First, = the first event.">First,</span> we put <span class="cv" data-cvdef="TOUCH ✋ — heavy boxes. You feel the weight.">heavy</span> boxes by the door. <span class="sig" data-cvdef="Next, = the second event.">Next,</span> we turned on the TV and listened to the <span class="cv" data-cvdef="The weather forecaster — the person who says what the weather will be.">forecaster</span>. <span class="sig" data-cvdef="When = at that time.">When</span> the typhoon came, I heard the <span class="cv" data-cvdef="SOUND 👂 — strong wind.">strong wind</span>. It was <span class="cv" data-cvdef="EMOTION 😨 — scary.">scary</span>. The rain hit the windows hard. <span class="sig" data-cvdef="Then, suddenly, = the next event, very fast!">Then, suddenly,</span> the lights went out! Everyone was <span class="cv" data-cvdef="EMOTION 😟 — worried.">worried</span>. <span class="sig" data-cvdef="Soon, = a short time later.">Soon,</span> it was <span class="cv" data-cvdef="SOUND 👂 — quiet.">quiet</span>. I saw <span class="cv" data-cvdef="SIGHT 👁️ — broken branches.">broken branches</span> on the street. I am so glad we were ready!</p></div><div class="cvbar"><p class="lead" style="margin:0;color:#475569">Tap a blue or orange word.</p></div></div>
+  <div class="rail" data-rail="80" data-raillbl="MODEL 1"></div>
+</section>
+<section class="slide dense rail-on" data-stage="Write" data-stagetone="apply">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Write</b><ul><li>Teacher model 2 (different weather). Leo reads it with Dad: Dad reads the odd sentences, Leo the even ones.</li><li>Ask <b>Which senses does the writer use?</b> (sight, touch, sound) <b>What is the closing sentence?</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Write · Dad’s model · Snow day ❄️</div><h2 class="h2" style="font-size:44px;margin-bottom:6px">The <span class="hot">Snow</span> Day</h2><div class="read" style="font-size:36px"><p>Last winter, a blizzard came to our town. <span class="sig" data-cvdef="First, = the first event.">First,</span> I looked out the window. I saw <span class="cv" data-cvdef="SIGHT 👁️ — white snow everywhere.">white snow everywhere</span>. <span class="sig" data-cvdef="Next, = the second event.">Next,</span> I put on my coat and went outside. The snow felt <span class="cv" data-cvdef="TOUCH ✋ — cold on my face.">cold on my face</span>. <span class="sig" data-cvdef="Then, = the next event.">Then,</span> I heard a <span class="cv" data-cvdef="SOUND 👂 — a loud noise.">loud noise</span>. It was a snowplow! I was <span class="cv" data-cvdef="EMOTION 🤩 — excited.">excited</span>. <span class="sig" data-cvdef="After that, = the next event.">After that,</span> my dad made hot chocolate. It tasted <span class="cv" data-cvdef="TASTE 👅 — sweet.">sweet</span>. I was so <span class="cv" data-cvdef="EMOTION 😊 — happy.">happy</span>! Hopefully, we will have another snow day soon.</p></div><div class="cvbar"><p class="lead" style="margin:0;color:#475569">Tap a blue or orange word.</p></div></div>
+  <div class="rail" data-rail="86" data-raillbl="MODEL 2"></div>
+</section>
+<section class="slide  rail-on" data-stage="Edit" data-stagetone="apply">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Edit</b><ul><li>LP Edit: <b>Have students check their writing using the checklist.</b> Then they revise. <b>Review irregular past tense verbs and check usage.</b></li><li>Tap each card after Leo checks that item in his writing.</li><li>Say <b>Read your story out loud. Does it sound right? Fix one thing.</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Edit · Checklist</div><h2 class="h2">Check your <span class="hot">writing</span> ✅</h2><div class="cols2"><div class="card y tap" data-reveal="#ed1"><div class="te">✔</div><div class="h3">Does it clearly describe an experience about a storm?</div><div class="rv" id="ed1"><p class="small" style="margin:0">Say <b>what</b> storm and <b>when</b> it happened.</p></div></div><div class="card y tap" data-reveal="#ed2"><div class="te">👁️</div><div class="h3">Does it include details related to the five senses?</div><div class="rv" id="ed2"><p class="small" style="margin:0">Find <b>sight, sound, touch</b> — maybe taste or smell.</p></div></div><div class="card y tap" data-reveal="#ed3"><div class="te">😮</div><div class="h3">Does it describe the writer’s emotions?</div><div class="rv" id="ed3"><p class="small" style="margin:0">Find words like <b>scared, worried, excited, happy</b>.</p></div></div><div class="card y tap" data-reveal="#ed4"><div class="te">➡️</div><div class="h3">Does it include words to signal sequence?</div><div class="rv" id="ed4"><p class="small" style="margin:0">Find <b>after, before, next, then</b> (also first, soon).</p></div></div></div><div class="dad"><b>Dad 💬</b> Also check: are your <b>irregular past tense verbs</b> right? <b>saw, told, heard, went</b>…</div></div>
+  <div class="rail" data-rail="92" data-raillbl="EDIT"></div>
+</section>
+<section class="slide  rail-on" data-stage="Edit" data-stagetone="apply">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Edit</b><ul><li>Edit game: three sentences have wrong irregular past verbs. Leo taps them, then says the correct form.</li><li>Then he finds the same kind of mistake in his own story.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Edit · Be the editor</div><h2 class="h2">Find the <span class="hot">mistakes</span> 🔎</h2><div class="gbox" data-hunt data-need="3" data-win="Editor’s eyes! 🔎"><div class="game-hint">Find the <b>mistakes</b>! Tap the 3 sentences with wrong past tense verbs.</div><div class="hgrid" style="grid-template-columns:repeat(2,1fr)"><div class="gi" data-hu data-good="1" data-why="seen → saw (irregular)."><span class="ge">❌</span>Yesterday I seen a flash of lightning.</div><div class="gi" data-hu data-good="1" data-why="goed → went (irregular)."><span class="ge">❌</span>Then I goed outside.</div><div class="gi" data-hu data-good="1" data-why="telled → told."><span class="ge">❌</span>The forecaster telled us about the storm.</div><div class="gi" data-hu data-good="0" data-why="Correct! heard."><span class="ge">✅</span>We heard a loud crash.</div><div class="gi" data-hu data-good="0" data-why="Correct! went."><span class="ge">✅</span>Then, suddenly, the lights went out.</div><div class="gi" data-hu data-good="0" data-why="Correct! helped (regular)."><span class="ge">✅</span>I helped my dad.</div></div><div class="gcount">Found: 0 / 3</div><div class="fb"></div></div><div class="dad"><b>Dad 💬</b> Read your story. Circle every <b>past tense verb</b>. Are they all right?</div></div>
+  <div class="rail" data-rail="96" data-raillbl="EDIT"></div>
+</section>
+<section class="slide dense" data-stage="Share" data-stagetone="apply">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Share</b><ul><li>LP Share: <b>Students share their writing in small groups. Listeners take notes.</b> With Leo: Leo reads, Dad takes notes.</li><li>LP frames: <span class="say">One thing that was interesting was . . . / Why did you . . . ? / How did you feel when . . . ? / I really like how you described . . .</span></li><li>After sharing, the writer uses the notes to revise.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Share · Listen and take notes</div><h2 class="h2">Share with a <span class="hot">partner</span> 🗣️</h2><div class="cols2"><div class="card y tap" data-reveal="#sh1"><div class="te">💡</div><div class="h3">One thing that was <span class="hot">interesting</span> was…</div><div class="rv" id="sh1"><p class="small" style="margin:0">“One thing that was interesting was <b>the loud crash</b>.”</p></div></div><div class="card y tap" data-reveal="#sh2"><div class="te">❓</div><div class="h3"><span class="hot">Why</span> did you…?</div><div class="rv" id="sh2"><p class="small" style="margin:0">“Why did you <b>put wood on the windows</b>?”</p></div></div><div class="card y tap" data-reveal="#sh3"><div class="te">😮</div><div class="h3">How did you <span class="hot">feel</span> when…?</div><div class="rv" id="sh3"><p class="small" style="margin:0">“How did you feel when <b>the house shook</b>?”</p></div></div><div class="card y tap" data-reveal="#sh4"><div class="te">🌟</div><div class="h3">I really <span class="hot">like</span> how you described…</div><div class="rv" id="sh4"><p class="small" style="margin:0">“I really like how you described <b>the strong winds</b>.”</p></div></div></div></div>
+  
+</section>
+<section class="slide " data-stage="Share" data-stagetone="apply">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Share</b><ul><li>Leo reads his story aloud. Dad takes notes using the table, then asks two questions.</li><li>Evaluate: tick the four checklist items. Leo then <b>revises</b> using the notes.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Share · Note-taking sheet</div><h2 class="h2">Listen and <span class="hot">take notes</span> 📝</h2><div class="cols2"><div class="card y"><div class="h3">👂 Dad’s notes</div><p class="small" style="margin:0">One thing that was interesting: ______<br>My question: ______<br>I really like how you described: ______</p></div><div class="card y"><div class="h3">✍️ Leo’s revision</div><p class="small" style="margin:0">I will add a <b>sense</b>: ______<br>I will fix a <b>verb</b>: ______<br>I will add a <b>time word</b>: ______</p></div></div><div class="dad"><b>Dad 💬</b> Ask <b>one</b> question about the story. Then tell Leo one thing you <b>liked</b>.</div><div class="frame"><b>Leo 💬</b> Thank you! I will change ______ because ______.</div></div>
+  
+</section>
+<section class="slide dense" data-stage="Share" data-stagetone="apply">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Share</b><ul><li>Soccer transfer (mandatory). Stats checked online on 21 September 2026 (Planet Football top goalscorers in Europe’s major leagues; NBC Sports for the Premier League). They change every week — update if you like.</li><li>Competitions: <b>La Liga</b> (Raphinha 12, Mbappé 7), <b>Serie A</b> (Malen 6), <b>Premier League</b> (Haaland 5).</li><li>Leo writes a match story: First, Next, Then, suddenly… using senses: <b>I heard the crowd. I saw the ball. I felt excited.</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Extend · Soccer transfer · Season 2026–27</div><h2 class="h2">A match story with <span class="hot">senses</span> ⚽</h2><div class="cols3"><div class="card y tap" data-reveal="#sc1"><div class="te">🇪🇸</div><div class="h3">La Liga · Raphinha (Barcelona)</div><div class="rv" id="sc1"><p class="small" style="margin:0"><b>12 goals</b> — top in Europe’s major leagues. “First, Barcelona attacked. Then, suddenly, Raphinha <b>scored</b>! I <b>heard</b> the crowd. I felt <b>excited</b>.”</p></div></div><div class="card y tap" data-reveal="#sc2"><div class="te">🇮🇹</div><div class="h3">Serie A · Donyell Malen (Roma)</div><div class="rv" id="sc2"><p class="small" style="margin:0"><b>6 goals</b>. “Last Saturday, Malen scored. <b>Next</b>, the fans <b>sang</b>. It was <b>loud</b>!”</p></div></div><div class="card y tap" data-reveal="#sc3"><div class="te">🏴</div><div class="h3">Premier League · Erling Haaland (Man City)</div><div class="rv" id="sc3"><p class="small" style="margin:0"><b>5 goals</b>. “It rained <b>heavy</b>, but Haaland <b>scored</b>. I <b>saw</b> the ball hit the net.”</p></div></div></div><div class="frame" style="margin-top:14px">⚽ <b>Sports story frame:</b> Last ______, I watched ______. <b>First</b>, ______. <b>Next</b>, ______. <b>Then, suddenly</b>, ______ <b>scored</b>! I <b>heard</b> ______. I felt ______.</div><div class="dad"><b>Dad 💬</b> Which player scored <b>more</b>: Raphinha or Malen? <i>Stats as of 21 Sept 2026.</i> Tell a short match story with 2 senses!</div></div>
+  
+</section>
+<section class="slide  rail-on" data-stage="Recap" data-stagetone="recap">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Recap</b><ul><li>Recap before Wrap Up. Leo taps each card and says the rule in his own words.</li><li>Ask <b>What makes a good personal narrative?</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Recap · The Story Desk recipe</div><h2 class="h2">What makes a good <span class="hot">narrative</span>? 🧾</h2><div class="cols4"><div class="card y tap" data-reveal="#rp1"><div class="te">📖</div><div class="h3">True <span class="hot">story</span></div><div class="rv" id="rp1"><p class="small" style="margin:0">Your <b>own experience</b>. First sentence + events + closing.</p></div></div><div class="card y tap" data-reveal="#rp2"><div class="te">👁️</div><div class="h3"><span class="hot">Five senses</span></div><div class="rv" id="rp2"><p class="small" style="margin:0"><b>Sight, sound, touch, taste, smell.</b> You can use all or some.</p></div></div><div class="card y tap" data-reveal="#rp3"><div class="te">😮</div><div class="h3"><span class="hot">Emotions</span></div><div class="rv" id="rp3"><p class="small" style="margin:0">How you felt: <b>scared, worried, excited, happy</b>.</p></div></div><div class="card y tap" data-reveal="#rp4"><div class="te">➡️</div><div class="h3"><span class="hot">Order</span></div><div class="rv" id="rp4"><p class="small" style="margin:0"><b>First, next, then, after, before, soon</b>. Use <b>past tense</b>: saw, told, heard, went.</p></div></div></div><div class="dad"><b>Dad 💬</b> Which one is <b>hardest</b> for you? Which one is <b>easiest</b>?</div></div>
+  <div class="rail" data-rail="100" data-raillbl="RECAP"></div>
+</section>
+<section class="slide  rail-on" data-stage="Recap" data-stagetone="recap">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Recap</b><ul><li>Match five writing tools to examples from the model.</li><li>Ask Leo to give his own example for each.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">Recap · Match it</div><h2 class="h2">Tools for <span class="hot">writers</span> 🧰</h2><div class="gbox" data-match data-win="Recap champion! 🧾"><div class="game-hint">Match the writing tool to its example.</div><div class="mcols"><div class="mcol"><div class="pill y">TOOL</div><div class="gi" data-ml="a">👁️ sight</div><div class="gi" data-ml="b">👂 sound</div><div class="gi" data-ml="c">😮 emotion</div><div class="gi" data-ml="d">➡️ time word</div><div class="gi" data-ml="e">⏪ irregular verb</div></div><div class="mcol"><div class="pill y">EXAMPLE</div><div class="gi" data-mr="e">We went inside.</div><div class="gi" data-mr="a">I saw a huge tree.</div><div class="gi" data-mr="d">Then, suddenly, …</div><div class="gi" data-mr="b">There was a loud crash.</div><div class="gi" data-mr="c">Everyone was worried.</div></div></div><div class="fb"></div></div></div>
+  <div class="rail" data-rail="100" data-raillbl="RECAP"></div>
+</section>
+<section class="slide dense" data-stage="✔ Formative Assessment" data-stagetone="recap">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>✔ Formative Assessment</b><ul><li>LP objectives as Can-do questions. Tap a card when Leo has done it.</li><li><b>analyze a writing model?</b> Ask him to point to the first sentence, the events, the closing sentence, and one sense word.</li><li><b>describe an experience using the five senses?</b> Check his writing for sight, sound, touch (and maybe taste or smell).</li><li><b>use sequencing words?</b> Count: after, before, next, then, first, soon. <b>evaluate classmates’ writing?</b> He listens and uses a sentence frame.</li></ul></div>
+  <div class="wrap"><div class="eyebrow">✔ Formative Assessment · Can Leo…</div><h2 class="h2">Can Leo…?</h2><div class="cols2"><div class="card y tap" data-reveal="#fa1"><div class="te">🔍</div><div class="h3">✔ <span class="hot">analyze</span> a writing model?</div><div class="rv" id="fa1"><p class="small" style="margin:0">He can point to the <b>first sentence</b>, the <b>events</b>, the <b>closing</b>, and one <b>sense word</b>.</p></div></div><div class="card y tap" data-reveal="#fa2"><div class="te">👁️</div><div class="h3">✔ describe an experience with the <span class="hot">five senses</span>?</div><div class="rv" id="fa2"><p class="small" style="margin:0">His writing has <b>sight, sound, touch</b> details — and emotions.</p></div></div><div class="card y tap" data-reveal="#fa3"><div class="te">➡️</div><div class="h3">✔ use <span class="hot">sequencing</span> words?</div><div class="rv" id="fa3"><p class="small" style="margin:0">He uses <b>first, next, then, after, before, soon</b> to order the events.</p></div></div><div class="card y tap" data-reveal="#fa4"><div class="te">🗣️</div><div class="h3">✔ <span class="hot">evaluate</span> writing?</div><div class="rv" id="fa4"><p class="small" style="margin:0">He listens, takes notes, and uses a frame: <b>“I really like how you described…”</b></p></div></div></div><div class="pills" style="margin-top:16px"><span class="pill y">🧠 senses</span><span class="pill y">😮 emotions</span><span class="pill y">🎞️ experience</span><span class="pill y">🌦️ forecaster</span><span class="pill y">🪵 heavy</span></div></div>
+  
+</section>
+<section class="slide dense" data-stage="✔ Formative Assessment" data-stagetone="recap">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>✔ Formative Assessment</b><ul><li>LP rubric (4–1): Organization · Grammar · Vocabulary · Writing type · Usage.</li><li>Tap a criterion to see the 4 → 1 scale. Score Leo’s story together; keep it positive: <b>“Here is one thing to fix next time.”</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">✔ Formative Assessment · Rubric</div><h2 class="h2">Score the <span class="hot">story</span> 🏅</h2><div class="cols3"><div class="card y tap" data-reveal="#ru0"><div class="te">📚</div><div class="h3"><span class="hot">Organization</span></div><div class="rv" id="ru0"><p class="small" style="margin:0">4: first sentence, events in order, closing sentence. 3: one part is weak. 2: the order is unclear. 1: no order.</p></div></div><div class="card y tap" data-reveal="#ru1"><div class="te">✏️</div><div class="h3"><span class="hot">Grammar</span></div><div class="rv" id="ru1"><p class="small" style="margin:0">4: almost no mistakes. 3: a few. 2: many. 1: hard to understand.</p></div></div><div class="card y tap" data-reveal="#ru2"><div class="te">🔤</div><div class="h3"><span class="hot">Vocabulary</span></div><div class="rv" id="ru2"><p class="small" style="margin:0">4: variety, including unit words (heavy, forecaster…). 3: some variety. 2: simple words. 1: very few words.</p></div></div><div class="card y tap" data-reveal="#ru3"><div class="te">👁️</div><div class="h3"><span class="hot">Writing type</span></div><div class="rv" id="ru3"><p class="small" style="margin:0">4: five-sense details + after, before, next, then. 3: some details. 2: few. 1: none.</p></div></div><div class="card y tap" data-reveal="#ru4"><div class="te">⏪</div><div class="h3"><span class="hot">Usage</span></div><div class="rv" id="ru4"><p class="small" style="margin:0">4: irregular past tense verbs always right. 3: mostly right. 2: some right. 1: rarely right.</p></div></div><div class="card"><div class="h3">🌟 Score guide</div><p class="small" style="margin:0"><b>4</b> excellent · <b>3</b> good · <b>2</b> getting there · <b>1</b> try again</p></div></div></div>
+  
+</section>
+<section class="slide  rail-on" data-stage="Wrap Up" data-stagetone="wrapup">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Wrap Up</b><ul><li>Dad-made sentence builder (not LP): rebuild the board sentence <b>Then, suddenly, there was a loud crash.</b></li><li>After, ask Leo to build his <b>own</b> sentence with a time word, a sense, and a past verb.</li><li>Say <b>Great story reporting today!</b></li></ul></div>
+  <div class="wrap"><div class="eyebrow">Wrap Up · Sentence builder</div><h2 class="h2">Build the <span class="hot">sentence</span> 🧩</h2><div class="row"><div class="g"><div class="gbox" data-seq data-step="1" data-win="Then, suddenly, there was a loud crash! 💥" data-hint="Not yet — what comes first?"><div class="game-hint">Sentence builder! Put the chunks in order. Tap 1 → 4.</div><div class="seqrow" style="display:flex;flex-wrap:wrap;gap:12px;"><div class="gi" data-ord="3" style="justify-content:center"><span class="ord"></span>there was</div><div class="gi" data-ord="1" style="justify-content:center"><span class="ord"></span>Then,</div><div class="gi" data-ord="4" style="justify-content:center"><span class="ord"></span>a loud crash!</div><div class="gi" data-ord="2" style="justify-content:center"><span class="ord"></span>suddenly,</div></div><div class="fb"></div></div></div><div class="c"><div class="lockcard win-hide"><div class="big">🔒</div>Win the game to see the sentence</div><div class="card y win-reveal hide"><div class="h3" style="margin:0 0 8px">Read it 🗣️</div><p class="lead" style="margin:0"><b>Then, suddenly, there was a loud crash!</b></p></div><div class="dad"><b>Dad 💬</b> Now build <b>your own</b>: <b>time word + sense + past verb</b>.</div><div class="frame"><b>Leo 💬</b> Next, ______ (heard / saw / felt) ______.</div></div></div></div>
+  <div class="rail" data-rail="100" data-raillbl="WRAP UP"></div>
+</section>
+<section class="slide center" data-stage="Finish" data-stagetone="wrapup">
+  <button class="tn-btn" data-note>Notes</button>
+  <div class="tn-panel"><b>Finish</b><ul><li>Homework: <b>Workbook pp. 10–11</b> and <b>Online Practice</b>.</li><li>Tap “Mark this lesson done” to save. Redo needs two taps (it clears progress).</li><li>Say <b>Great reporting today, Leo!</b></li></ul></div>
+  <div class="wrap"><div style="text-align:center"><div class="eyebrow">Finish · Story Desk closed</div><h1 class="h1" style="font-size:80px">Great writing, <span class="hot">Leo!</span> ✍️</h1><p class="lead" style="margin:0 auto 20px">Today you analyzed a model, used your senses, ordered events, and shared your story.</p><div class="cols3" style="max-width:1300px;margin:0 auto 20px"><div class="card"><div class="h3">📓 Homework</div><p class="small" style="margin:0">Workbook pp. 10–11</p></div><div class="card"><div class="h3">💻 Online</div><p class="small" style="margin:0">Online Practice · Writing</p></div><div class="card"><div class="h3">🔤 Review</div><p class="small" style="margin:0">senses · emotions · experience · forecaster · heavy · sight · sound · touch · taste · smell</p></div></div><div class="row" style="justify-content:center"><button class="btn donebtn" id="doneBtn">Mark this lesson done</button><button class="btn ghost donebtn" id="redoBtn">↺ Redo</button></div><p class="small" id="doneMsg" style="margin-top:14px;min-height:34px"></p></div></div>
+  
+</section>
+</deck-stage>
+
+<div id="nav">
+  <button id="prevBtn" aria-label="Previous slide">‹</button>
+  <span id="counter">1 / 62</span>
+  <button id="nextBtn" aria-label="Next slide">›</button>
+  <button id="notesBtn" aria-label="Teacher notes" title="Teacher notes (N)">📋</button>
+  <button id="fsBtn" aria-label="Fullscreen" title="Fullscreen (F)">⛶</button>
+</div>
+
+<div id="notesDock" aria-label="Teacher notes"><div class="nd-hd"><span id="ndTitle">Teacher notes</span><button id="ndClose" aria-label="Close notes">✕</button></div><div id="ndBody"></div></div>
+
+<script>
+/* =========================================================
+   LEEA · Level 5 · Unit 1 · Writing — Safe not Sorry!
+   Style A deck · 1920x1080 · Outfit · deck-stage
+   ========================================================= */
+var SAVE_PREFIX = 'leea.l5.u1.writing';
+var HOMEWORK_ID = 'l-5-1-writing';
+/* Must match the `id` in lessons/reading.teacher.json */
+var LESSON_ID = 'ow-l5-u1-writing';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+var LESSON_NAME = 'Unit 1 · Writing — Safe not Sorry!';
+var isReview = false;
+try { isReview = new URLSearchParams(window.location.search).get('review') === '1'; } catch (e) { isReview = false; }
+
+/* ---------- STORAGE ---------- */
+function lSave(key, value) {
+  try {
+    var k = SAVE_PREFIX + '.' + key;
+    window.localStorage.setItem(k, JSON.stringify(value));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, value);
+    }
+  } catch (e) { console.warn('lSave failed', e); }
+}
+function lLoad(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(SAVE_PREFIX + '.' + key);
+    if (raw === null || raw === undefined) return fallback;
+    return JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function lRemove(key) {
+  try { window.localStorage.removeItem(SAVE_PREFIX + '.' + key); } catch (e) {}
+}
+
+/* ---------- DECK STAGE ---------- */
+try {
+  class DeckStage extends HTMLElement {
+    connectedCallback() {
+      try {
+        if (this._ready) return;
+        this._ready = true;
+        var scaler = document.createElement('div');
+        scaler.className = 'scaler';
+        while (this.firstChild) { scaler.appendChild(this.firstChild); }
+        this.appendChild(scaler);
+        this._scaler = scaler;
+        var self = this;
+        this._fit = function () {
+          try {
+            var s = Math.min(self.clientWidth / 1920, self.clientHeight / 1080);
+            if (!isFinite(s) || s <= 0) { s = 1; }
+            scaler.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+          } catch (e) {}
+        };
+        this._fit();
+        window.addEventListener('resize', this._fit);
+      } catch (e) { console.warn('deck-stage init failed', e); }
+    }
+  }
+  if (!window.customElements.get('deck-stage')) { window.customElements.define('deck-stage', DeckStage); }
+} catch (e) { console.warn('custom element failed', e); }
+
+/* ---------- SLIDE ENGINE ---------- */
+var slides = [];
+var idx = 0;
+
+function updateBadge() {
+  try {
+    var progFill = document.getElementById('progFill');
+    if (progFill && slides.length > 0) {
+      progFill.style.width = (((idx + 1) / slides.length) * 100) + '%';
+    }
+    var counter = document.getElementById('counter');
+    if (counter) { counter.textContent = (idx + 1) + ' / ' + slides.length; }
+  } catch (e) { console.warn('updateBadge failed', e); }
+}
+function go(n) {
+  try {
+    if (!slides.length) return;
+    if (n < 0) n = 0;
+    if (n > slides.length - 1) n = slides.length - 1;
+    slides[idx].classList.remove('active');
+    idx = n;
+    slides[idx].classList.add('active');
+    if (notesOpen) { refreshNotes(); }
+    updateBadge();
+    lSave('slide', idx);
+  } catch (e) { console.warn('go failed', e); }
+}
+function nextSlide() { try { go(idx + 1); } catch (e) {} }
+function prevSlide() { try { go(idx - 1); } catch (e) {} }
+var notesOpen = false;
+function refreshNotes() {
+  try {
+    var body = document.getElementById('ndBody');
+    var title = document.getElementById('ndTitle');
+    var s = slides[idx];
+    var src = s ? s.querySelector('.tn-panel') : null;
+    if (body) { body.innerHTML = src ? src.innerHTML : ''; body.scrollTop = 0; }
+    if (title && s) { title.textContent = 'Teacher notes · ' + (idx + 1) + ' / ' + slides.length; }
+  } catch (e) { console.warn('refreshNotes failed', e); }
+}
+function setNotes(on) {
+  try {
+    notesOpen = !!on;
+    var dock = document.getElementById('notesDock');
+    var btn = document.getElementById('notesBtn');
+    if (dock) { dock.classList.toggle('open', notesOpen); }
+    if (btn) { btn.classList.toggle('act', notesOpen); }
+    if (document.body) { document.body.classList.toggle('notes-on', notesOpen); }
+    if (notesOpen) { refreshNotes(); }
+    window.dispatchEvent(new Event('resize'));
+  } catch (e) { console.warn('setNotes failed', e); }
+}
+function closeAllNotes() { try { setNotes(false); } catch (e) {} }
+
+/* ---------- STORM-CHASE RAIL (signature element) ---------- */
+var RAIL_PTS = [[0,70],[100,70]];
+function railY(pct) {
+  try {
+    for (var i = 1; i < RAIL_PTS.length; i++) {
+      var a = RAIL_PTS[i - 1], b = RAIL_PTS[i];
+      if (pct <= b[0]) {
+        var span = b[0] - a[0];
+        var t = span > 0 ? (pct - a[0]) / span : 0;
+        return a[1] + (b[1] - a[1]) * t;
+      }
+    }
+    return RAIL_PTS[RAIL_PTS.length - 1][1];
+  } catch (e) { return 62; }
+}
+function renderRails() {
+  try {
+    var rails = document.querySelectorAll('.rail');
+    var pts = '';
+    for (var p = 0; p < RAIL_PTS.length; p++) { pts += (10 + 980 * RAIL_PTS[p][0] / 100) + ',' + RAIL_PTS[p][1] + ' '; }
+    for (var i = 0; i < rails.length; i++) {
+      var el = rails[i];
+      var pct = parseFloat(el.getAttribute('data-rail') || '0');
+      var lbl = el.getAttribute('data-raillbl') || '';
+      var x = 10 + (980 * (pct / 100));
+      var y = railY(pct);
+      el.innerHTML =
+        '<svg viewBox="0 0 1000 100" preserveAspectRatio="none">' +
+        '<polyline points="' + pts + '" fill="none" stroke="#94A3B8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<circle cx="' + x + '" cy="' + y + '" r="11" fill="#FACC15"/>' +
+        '<circle cx="' + x + '" cy="' + y + '" r="20" fill="none" stroke="#6366F1" stroke-width="3" opacity=".8"/>' +
+        '</svg>' +
+        '<div class="mono" style="position:absolute;right:0;top:-8px;font-size:17px;letter-spacing:.18em;color:#475569">' + lbl + '</div>';
+    }
+  } catch (e) { console.warn('renderRails failed', e); }
+}
+
+/* ---------- LP STAGE TAGS ---------- */
+function renderStageTags() {
+  try {
+    var all = document.querySelectorAll('.slide');
+    for (var i = 0; i < all.length; i++) {
+      var s = all[i];
+      if (s.querySelector('.stage-tag')) continue;
+      var name = s.getAttribute('data-stage');
+      if (!name) continue;
+      var tone = s.getAttribute('data-stagetone') || 'yl';
+      var tag = document.createElement('div');
+      tag.className = 'stage-tag' + (tone === 'yl' ? '' : ' ' + tone);
+      tag.innerHTML = name + ' <span class="n">' + (i + 1) + '</span>';
+      s.appendChild(tag);
+    }
+  } catch (e) { console.warn('renderStageTags failed', e); }
+}
+
+/* ---------- SHARED HELPERS ---------- */
+function shake(el) {
+  try {
+    if (!el) return;
+    el.classList.remove('shake');
+    void el.offsetWidth;
+    el.classList.add('shake');
+  } catch (e) {}
+}
+function say(box, msg) {
+  try {
+    var f = box.querySelector('.fb');
+    if (f) { f.textContent = msg; }
+  } catch (e) {}
+}
+function winGame(box) {
+  try {
+    if (!box || box.getAttribute('data-won') === '1') return;
+    box.setAttribute('data-won', '1');
+    var slide = box.closest('.slide');
+    if (!slide) return;
+    var rv = slide.querySelectorAll('.win-reveal');
+    for (var i = 0; i < rv.length; i++) { rv[i].classList.remove('hide'); }
+    var hd = slide.querySelectorAll('.win-hide');
+    for (var j = 0; j < hd.length; j++) { hd[j].classList.add('hide'); }
+    var msg = box.getAttribute('data-win') || 'Unlocked! 🔓';
+    say(box, msg);
+  } catch (e) { console.warn('winGame failed', e); }
+}
+
+/* ---------- REVEAL ---------- */
+function doReveal(sel) {
+  try {
+    var list = document.querySelectorAll(sel);
+    for (var i = 0; i < list.length; i++) {
+      list[i].classList.add('show');
+      var card = list[i].closest ? list[i].closest('.card') : null;
+      if (card) {
+        var ps = card.querySelectorAll('p.small');
+        for (var k = 0; k < ps.length; k++) {
+          if ((ps[k].textContent || '').trim().toLowerCase() === 'tap') { ps[k].style.display = 'none'; }
+        }
+      }
+    }
+  } catch (e) { console.warn('doReveal failed', e); }
+}
+
+/* ---------- QUIZ ---------- */
+function handleQuiz(btn) {
+  try {
+    var box = btn.closest('[data-quiz]');
+    if (!box) return;
+    var ok = btn.getAttribute('data-ok') === '1';
+    var fb = box.querySelector('.fb');
+    btn.classList.remove('ok', 'no', 'shake');
+    if (ok) {
+      btn.classList.add('ok');
+      if (fb) { fb.textContent = btn.getAttribute('data-fb') || box.getAttribute('data-yes') || 'Yes! 🎉'; }
+      var all = box.querySelectorAll('[data-opt]');
+      for (var i = 0; i < all.length; i++) { all[i].disabled = true; }
+      if (box.getAttribute('data-win') !== null) { winGame(box); }
+    } else {
+      btn.classList.add('no');
+      shake(btn);
+      if (fb) { fb.textContent = btn.getAttribute('data-fb') || box.getAttribute('data-no') || 'Not quite. Try again.'; }
+    }
+  } catch (e) { console.warn('handleQuiz failed', e); }
+}
+
+/* ---------- HUNT (find the good ones) ---------- */
+function runHunt(item) {
+  try {
+    var box = item.closest('[data-hunt]');
+    if (!box || item.classList.contains('ok') || item.classList.contains('no')) return;
+    var need = parseInt(box.getAttribute('data-need') || '0', 10);
+    var good = item.getAttribute('data-good') === '1';
+    var why = item.getAttribute('data-why') || '';
+    if (good) {
+      item.classList.add('ok');
+      var n = box.querySelectorAll('.gi.ok').length;
+      var c = box.querySelector('.gcount');
+      if (c) { c.textContent = 'Found: ' + n + ' / ' + need; }
+      say(box, why);
+      if (n >= need) { winGame(box); }
+    } else {
+      item.classList.add('no');
+      shake(item);
+      say(box, why);
+    }
+  } catch (e) { console.warn('runHunt failed', e); }
+}
+
+/* ---------- SORT ---------- */
+function runSortPick(item) {
+  try {
+    var box = item.closest('[data-sort]');
+    if (!box || item.classList.contains('ok')) return;
+    var all = box.querySelectorAll('.pool .gi');
+    for (var i = 0; i < all.length; i++) { all[i].classList.remove('sel'); }
+    item.classList.add('sel');
+    say(box, 'Now tap the right box.');
+  } catch (e) { console.warn('runSortPick failed', e); }
+}
+function runSortBin(bin) {
+  try {
+    var box = bin.closest('[data-sort]');
+    if (!box) return;
+    var sel = box.querySelector('.pool .gi.sel');
+    if (!sel) { say(box, 'First tap a card, then tap a box.'); return; }
+    if (sel.getAttribute('data-cat') === bin.getAttribute('data-bin')) {
+      sel.classList.remove('sel');
+      sel.classList.add('ok');
+      var body = bin.querySelector('.bin-body');
+      if (body) { body.appendChild(sel); }
+      say(box, sel.getAttribute('data-why') || 'Yes!');
+      var left = box.querySelectorAll('.pool .gi').length;
+      if (left === 0) { winGame(box); }
+    } else {
+      shake(sel);
+      say(box, sel.getAttribute('data-no') || 'Not that box. Think again.');
+    }
+  } catch (e) { console.warn('runSortBin failed', e); }
+}
+
+/* ---------- SEQ (tap in order) ---------- */
+function runSeq(item) {
+  try {
+    var box = item.closest('[data-seq]');
+    if (!box || item.classList.contains('ok')) return;
+    var step = parseInt(box.getAttribute('data-step') || '1', 10);
+    var total = box.querySelectorAll('[data-ord]').length;
+    var o = parseInt(item.getAttribute('data-ord') || '0', 10);
+    if (o === step) {
+      item.classList.add('ok');
+      var ordEl = item.querySelector('.ord');
+      if (ordEl) { ordEl.textContent = String(o); }
+      box.setAttribute('data-step', String(step + 1));
+      say(box, item.getAttribute('data-why') || 'Yes!');
+      if (step >= total) { winGame(box); }
+    } else {
+      shake(item);
+      say(box, box.getAttribute('data-hint') || 'Not yet — what comes first?');
+    }
+  } catch (e) { console.warn('runSeq failed', e); }
+}
+
+/* ---------- MATCH ---------- */
+function runMatch(item, side) {
+  try {
+    var box = item.closest('[data-match]');
+    if (!box || item.classList.contains('ok')) return;
+    if (side === 'l') {
+      var ls = box.querySelectorAll('[data-ml]');
+      for (var i = 0; i < ls.length; i++) { ls[i].classList.remove('sel'); }
+      item.classList.add('sel');
+      say(box, 'Now tap its partner on the right.');
+      return;
+    }
+    var cur = box.querySelector('[data-ml].sel');
+    if (!cur) { say(box, 'Tap a card on the left first.'); return; }
+    if (cur.getAttribute('data-ml') === item.getAttribute('data-mr')) {
+      cur.classList.remove('sel'); cur.classList.add('ok'); item.classList.add('ok');
+      say(box, 'Match! ✔');
+      var total = box.querySelectorAll('[data-ml]').length;
+      if (box.querySelectorAll('[data-ml].ok').length >= total) { winGame(box); }
+    } else {
+      shake(item);
+      say(box, 'Not a pair. Look at the clue again.');
+    }
+  } catch (e) { console.warn('runMatch failed', e); }
+}
+
+/* ---------- COMPARE BARS (Academic: compare) ---------- */
+function runCmp(btn) {
+  try {
+    var box = btn.closest('[data-cmp]');
+    if (!box) return;
+    var bt = box.querySelector('.sbar.t i'), bh = box.querySelector('.sbar.h i');
+    var tt = box.querySelector('.sbar.t span'), th = box.querySelector('.sbar.h span');
+    if (bt) { bt.style.width = btn.getAttribute('data-bt') + '%'; }
+    if (bh) { bh.style.width = btn.getAttribute('data-bh') + '%'; }
+    if (tt) { tt.textContent = btn.getAttribute('data-tl') || ''; }
+    if (th) { th.textContent = btn.getAttribute('data-hl') || ''; }
+    var out = box.querySelector('.cmpout');
+    if (out) { out.innerHTML = btn.getAttribute('data-line') || ''; }
+    btn.classList.add('ok');
+    if (box.querySelectorAll('.gi.ok').length >= box.querySelectorAll('.gi[data-bt]').length) { winGame(box); }
+  } catch (e) { console.warn('runCmp failed', e); }
+}
+
+/* ---------- INSTRUMENTS (needles) ---------- */
+function runGauge(card) {
+  try {
+    var box = card.closest('[data-instr]');
+    if (!box || card.classList.contains('ok')) return;
+    var nd = card.querySelector('.nd');
+    if (nd) { nd.style.transform = 'rotate(' + (card.getAttribute('data-deg') || '0') + 'deg)'; }
+    var gv = card.querySelector('.gv');
+    if (gv) { gv.textContent = card.getAttribute('data-read') || ''; }
+    card.classList.add('ok');
+    var n = box.querySelectorAll('.gcard.ok').length;
+    say(box, n + ' of 3 instruments dropped near the storm.');
+    if (n >= 3) { winGame(box); }
+  } catch (e) { console.warn('runGauge failed', e); }
+}
+
+/* ---------- TWIST (rope twists tighter) ---------- */
+var TW_STATES = [
+  'M20,115 L380,115',
+  'M20,115 C90,60 140,170 200,115 C260,60 310,170 380,115',
+  'M20,115 C60,30 110,200 160,115 C200,40 240,190 280,115 C320,50 350,180 380,115',
+  'M20,115 C40,10 70,220 100,115 C125,20 150,210 180,115 C205,25 230,205 255,115 C280,30 305,200 330,115 C350,50 365,170 380,115'
+];
+var TW_TEXT = [
+  'A straight rope. Nothing is twisted yet.',
+  'Twist 1 — the rope is a little twisted.',
+  'Twist 2 — twisted tighter and tighter!',
+  'Twist 3 — very twisted! Winds do this inside a storm.'
+];
+function runTwist(btn) {
+  try {
+    var box = btn.closest('[data-twist]');
+    if (!box) return;
+    var lv = parseInt(box.getAttribute('data-lv') || '0', 10);
+    if (lv >= 3) return;
+    lv = lv + 1;
+    box.setAttribute('data-lv', String(lv));
+    var path = box.querySelector('path.tw');
+    if (path) { path.setAttribute('d', TW_STATES[lv]); path.setAttribute('stroke-width', String(10 + lv * 3)); }
+    say(box, TW_TEXT[lv]);
+    var c = box.querySelector('.gcount');
+    if (c) { c.textContent = 'Twists: ' + lv + ' / 3'; }
+    if (lv >= 3) { winGame(box); }
+  } catch (e) { console.warn('runTwist failed', e); }
+}
+
+/* ---------- WARN (radar slider) ---------- */
+function runWarnSlide(inp) {
+  try {
+    var box = inp.closest('[data-warn]');
+    if (!box || box.getAttribute('data-won') === '1') return;
+    var v = parseInt(inp.value || '100', 10);
+    var radar = box.querySelector('.radar');
+    var storm = box.querySelector('.storm');
+    var dist = box.querySelector('.dist');
+    var btn = box.querySelector('.wbtn');
+    if (storm) { storm.style.left = (10 + (100 - v) * 0.62) + '%'; }
+    if (dist) { dist.textContent = 'Storm is ' + v + ' km from town'; }
+    var warned = box.getAttribute('data-warned') === '1';
+    if (v <= 60 && !warned) {
+      if (radar) { radar.classList.add('alarm'); }
+      if (btn) { btn.disabled = false; }
+      say(box, 'The storm is coming! Tap WARN now.');
+    } else if (v > 60 && !warned) {
+      if (radar) { radar.classList.remove('alarm'); }
+      if (btn) { btn.disabled = true; }
+      say(box, 'Slide the storm closer. Watch the radar.');
+    }
+    if (v <= 15 && !warned) {
+      inp.value = '100';
+      if (storm) { storm.style.left = '10%'; }
+      if (radar) { radar.classList.remove('alarm'); }
+      if (btn) { btn.disabled = true; }
+      if (dist) { dist.textContent = 'Storm is 100 km from town'; }
+      say(box, 'Oh no! You forgot to warn the town. Try again — warn early!');
+    }
+  } catch (e) { console.warn('runWarnSlide failed', e); }
+}
+function runWarnBtn(btn) {
+  try {
+    var box = btn.closest('[data-warn]');
+    if (!box || btn.disabled) return;
+    box.setAttribute('data-warned', '1');
+    var town = box.querySelector('.town');
+    if (town) { town.textContent = '🏫'; }
+    btn.disabled = true;
+    box.setAttribute('data-win', 'WARNED! Everyone ran to the shelter. 🏃‍♂️🏃‍♀️ Lives saved!');
+    winGame(box);
+  } catch (e) { console.warn('runWarnBtn failed', e); }
+}
+
+/* ---------- LOGGER (record) ---------- */
+var LOG_ROWS = [['10:00', '40 km/h', '19 °C'], ['10:10', '95 km/h', '17 °C'], ['10:20', '180 km/h', '14 °C'], ['10:30', '120 km/h', '15 °C']];
+function runRec(btn) {
+  try {
+    var box = btn.closest('[data-log]');
+    if (!box) return;
+    var n = parseInt(box.getAttribute('data-n') || '0', 10);
+    if (n >= LOG_ROWS.length) return;
+    var body = box.querySelector('tbody');
+    if (body) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + LOG_ROWS[n][0] + '</td><td>' + LOG_ROWS[n][1] + '</td><td>' + LOG_ROWS[n][2] + '</td>';
+      body.appendChild(tr);
+    }
+    n = n + 1;
+    box.setAttribute('data-n', String(n));
+    var c = box.querySelector('.gcount');
+    if (c) { c.textContent = 'Records saved: ' + n + ' / 4'; }
+    say(box, n < 4 ? 'Recorded! Wait… tap REC again.' : 'The highest number is the record: 180 km/h! 🏆');
+    if (n >= 4) { winGame(box); }
+  } catch (e) { console.warn('runRec failed', e); }
+}
+
+/* ---------- CV DEFINITION BAR ---------- */
+function showCvDef(el) {
+  try {
+    var def = el.getAttribute('data-cvdef') || '';
+    var slide = el.closest('.slide');
+    var bar = slide ? slide.querySelector('.cvbar') : null;
+    if (bar) { bar.innerHTML = '<p class="lead" style="margin:0">' + def + '</p>'; }
+  } catch (e) { console.warn('showCvDef failed', e); }
+}
+
+/* ---------- MARK DONE ---------- */
+function writeLessonProgress() {
+  try {
+    var store = {};
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (raw) { store = JSON.parse(raw) || {}; }
+    var now = new Date().toISOString();
+    store[LESSON_ID] = {
+      lessonId: LESSON_ID, id: HOMEWORK_ID, level: 5, unit: 1, lesson: 'writing', name: LESSON_NAME,
+      teacherId: 'neritan', studentId: 'leo', status: 'done', done: true,
+      completedAt: now, updatedAt: now, timestamp: now
+    };
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) { console.warn('writeLessonProgress failed', e); }
+}
+function clearLessonProgress() {
+  try {
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) { console.warn('clearLessonProgress failed', e); }
+}
+function markDone() {
+  try {
+    writeLessonProgress();
+    lSave('complete', { name: LESSON_NAME, timestamp: new Date().toISOString(), done: true });
+    lSave('done', true);
+    var btn = document.getElementById('doneBtn');
+    if (btn) { btn.classList.add('confirmed'); btn.style.pointerEvents = 'none'; btn.textContent = 'Saved! ✔'; }
+    var msg = document.getElementById('doneMsg');
+    if (msg) { msg.innerHTML = 'Saved. Great storm chasing today, Leo. 🌪️'; }
+  } catch (e) { console.warn('markDone failed', e); }
+}
+var redoArmed = false;
+var redoTimer = null;
+function handleRedo() {
+  try {
+    var btn = document.getElementById('redoBtn');
+    var msg = document.getElementById('doneMsg');
+    if (!redoArmed) {
+      redoArmed = true;
+      if (btn) { btn.textContent = '↺ Tap again to clear'; }
+      if (msg) { msg.textContent = 'This will clear the saved progress for this lesson.'; }
+      if (redoTimer) { window.clearTimeout(redoTimer); }
+      redoTimer = window.setTimeout(function () {
+        try {
+          redoArmed = false;
+          if (btn) { btn.textContent = '↺ Redo'; }
+          if (msg) { msg.textContent = ''; }
+        } catch (e) {}
+      }, 4000);
+      return;
+    }
+    redoArmed = false;
+    if (redoTimer) { window.clearTimeout(redoTimer); }
+    clearLessonProgress();
+    lRemove('complete');
+    lRemove('done');
+    var done = document.getElementById('doneBtn');
+    if (done) { done.classList.remove('confirmed'); done.style.pointerEvents = 'auto'; done.textContent = 'Mark this lesson done'; }
+    if (btn) { btn.textContent = '↺ Redo'; }
+    if (msg) { msg.textContent = 'Cleared. Ready to chase again.'; }
+  } catch (e) { console.warn('handleRedo failed', e); }
+}
+
+/* ---------- DELEGATED CLICKS ---------- */
+function onClick(ev) {
+  try {
+    var t = ev.target;
+    if (!t || !t.closest) return;
+
+    if (t.closest('#notesBtn')) { setNotes(!notesOpen); return; }
+    if (t.closest('#ndClose')) { setNotes(false); return; }
+    if (t.closest('#notesDock')) { return; }
+    if (t.closest('.tn-panel')) return;
+
+    if (t.closest('#doneBtn')) { markDone(); return; }
+    if (t.closest('#redoBtn')) { handleRedo(); return; }
+    if (t.closest('#nextBtn')) { nextSlide(); return; }
+    if (t.closest('#prevBtn')) { prevSlide(); return; }
+    if (t.closest('#fsBtn')) { toggleFull(); return; }
+
+    var cv = t.closest('[data-cvdef]');
+    if (cv) { showCvDef(cv); return; }
+
+    var opt = t.closest('[data-opt]');
+    if (opt) { handleQuiz(opt); return; }
+
+    var hu = t.closest('[data-hu]');
+    if (hu) { runHunt(hu); return; }
+    var sp = t.closest('[data-sp]');
+    if (sp) { runSortPick(sp); return; }
+    var sb = t.closest('[data-bin]');
+    if (sb) { runSortBin(sb); return; }
+    var sq = t.closest('[data-ord]');
+    if (sq) { runSeq(sq); return; }
+    var ml = t.closest('[data-ml]');
+    if (ml) { runMatch(ml, 'l'); return; }
+    var mr = t.closest('[data-mr]');
+    if (mr) { runMatch(mr, 'r'); return; }
+
+    var cm = t.closest('[data-bt]');
+    if (cm) { runCmp(cm); return; }
+    var gg = t.closest('[data-deg]');
+    if (gg) { runGauge(gg); return; }
+    var tw = t.closest('[data-twbtn]');
+    if (tw) { runTwist(tw); return; }
+    var wb = t.closest('[data-wbtn]');
+    if (wb) { runWarnBtn(wb); return; }
+    var rc = t.closest('[data-rec]');
+    if (rc) { runRec(rc); return; }
+
+    var rv = t.closest('[data-reveal]');
+    if (rv) { doReveal(rv.getAttribute('data-reveal')); return; }
+  } catch (e) { console.warn('onClick failed', e); }
+}
+function onInput(ev) {
+  try {
+    var t = ev.target;
+    if (t && t.matches && t.matches('[data-wslide]')) { runWarnSlide(t); }
+  } catch (e) { console.warn('onInput failed', e); }
+}
+
+/* ---------- FULLSCREEN + NOTES ---------- */
+function toggleFull() {
+  try {
+    var el = document.documentElement;
+    if (!document.fullscreenElement) {
+      if (el.requestFullscreen) { el.requestFullscreen(); }
+      else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+    } else {
+      if (document.exitFullscreen) { document.exitFullscreen(); }
+      else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+    }
+  } catch (e) { console.warn('toggleFull failed', e); }
+}
+function toggleActiveNotes() { try { setNotes(!notesOpen); } catch (e) { console.warn('toggleActiveNotes failed', e); } }
+
+/* ---------- KEYBOARD ---------- */
+function onKey(ev) {
+  try {
+    if (ev.key === 'ArrowRight' || ev.key === 'PageDown') { ev.preventDefault(); nextSlide(); }
+    else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); prevSlide(); }
+    else if (ev.key === 'Home') { ev.preventDefault(); go(0); }
+    else if (ev.key === 'End') { ev.preventDefault(); go(slides.length - 1); }
+    else if (ev.key === 'Escape') { closeAllNotes(); }
+    else if (ev.key === 'f' || ev.key === 'F') { toggleFull(); }
+    else if (ev.key === 'n' || ev.key === 'N') { toggleActiveNotes(); }
+  } catch (e) { console.warn('onKey failed', e); }
+}
+
+/* ---------- BOOT ---------- */
+document.addEventListener('DOMContentLoaded', async function () {
+  try {
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.fetchProgress === 'function') {
+      try {
+        var rows = await LEEA_CLOUD.fetchProgress();
+        if (rows && rows.length) {
+          for (var i = 0; i < rows.length; i++) {
+            var r = rows[i];
+            if (r && r.storage_key) { window.localStorage.setItem(r.storage_key, typeof r.value === 'string' ? r.value : JSON.stringify(r.value)); }
+          }
+        }
+      } catch (e) { console.warn('cloud restore skipped', e); }
+    }
+    slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    if (slides.length) { slides[0].classList.add('active'); }
+    renderRails();
+    renderStageTags();
+    updateBadge();
+    document.addEventListener('click', onClick);
+    document.addEventListener('input', onInput);
+    document.addEventListener('keydown', onKey);
+    if (lLoad('done', false) === true) {
+      var db = document.getElementById('doneBtn');
+      if (db) { db.classList.add('confirmed'); db.style.pointerEvents = 'none'; db.textContent = 'Saved! ✔'; }
+      var dm = document.getElementById('doneMsg');
+      if (dm) { dm.textContent = 'This lesson is already marked done.'; }
+    }
+    if (isReview) { go(slides.length - 1); }
+  } catch (e) { console.warn('boot failed', e); }
+});
+</script>
+</body>
+</html>

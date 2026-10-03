@@ -45,6 +45,14 @@ Examples:
 
 Component keys: `reading` (teacher) ↔ `reading-app` (learner).
 
+## Leo app — the companion to the slides
+
+Leo does the app **alone after Neritan teaches the deck**, so it is built *from the deck*, not from a fresh plan — the same rule as `grammar-app.md` → *Leo app — the companion to the slides*. Read the deck slide by slide first (dump every `.slide`'s text, its games and the answers in its markup and notes), then check it against **`docs/teacher-slides.md` → Level 5 deck anatomy**, which maps each deck feature to what the app does: the title slide's word list (same words, same emojis) becomes the word tab, each word's mini-game is replayed, Dad 💬 / Leo 💬 frames become typed items, the soccer transfer slide becomes a soccer block with the deck's own dated claims, and the Can-do / formative slide shapes the final quiz. The deck's items go in verbatim first, then more of the same shape — several activities per tab. Write the slide → tab map into the app's header comment and the PR.
+
+**Reference check at upload (AGENTS.md rule 5a).** Every word card the deck presents — academic, content, related, and any words the deck chose where the planner prints none — must be in Reference with this lesson's source tag. Add a full card for a missing word; add the tag to an existing card's `sources`; list them all in the teacher JSON's `referenceLinks`.
+
+**Reading specifics.** Reference build: `public/learn/ow-l5-u1-reading.html` (companion to `public/lessons/ow-l5-u1-reading.html`). Its SB side grew past the six locked tabs because the deck had more to replay: Vocab · Word Games · Strategy · Read · Questions · Compare · My Storm · Quiz, plus the five WB tabs — 13 modules, declared with explicit `moduleKeys` in nav order. Every tab is a list of blocks (flash, match, typed, mcq, sort, order, find, read, chart, web, write, quiz) that save as Leo answers and restore their own DOM; reuse that engine rather than starting over.
+
 ## Locked patterns the skill must follow
 
 ### Teacher slideshow shell

@@ -103,6 +103,8 @@ Verify before commit: open the deck, click through s_present_1 … s_present_N. 
 
 Leo does the app **alone after Neritan teaches the deck**, so every tab replays part of the deck — the same rule as `.claude/commands/grammar-app.md` → *Leo app — the companion to the slides*. When the teacher deck already exists (Neritan often authors it), read it slide by slide first — stage, game, and the answers it holds (`data-a`, `data-ord`, `data-cat`, `data-want`, the `NOTES`) — and fill the 13 tabs from it:
 
+**Reference check at upload (AGENTS.md rule 5a).** Every word card the deck presents — academic, content, related, and any words the deck chose where the planner prints none — must be in Reference with this lesson's source tag. Add a full card for a missing word; add the tag to an existing card's `sources`; list them all in the teacher JSON's `referenceLinks`. Check the deck against `docs/teacher-slides.md` → *Level 5 deck anatomy* too.
+
 - **Academic (Tab 0)** = exactly the deck's Academic / Content word cards; **Flashcards (Tab 3)** = exactly the deck's target word cards, with the deck's definitions, examples and Japanese. No substitutes.
 - Every other tab maps to named slides, the slides' own items verbatim first (e.g. the deck's sorts in Sort, its read-and-write sentences in Reading, its per-word games in Practice, its listen-and-stick in Apply, its recap and wrap-up in Wrap Up).
 - Reuse the deck's football/movie claims; add none.

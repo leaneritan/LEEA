@@ -58,7 +58,7 @@ If a deck is drafted outside this repo (e.g. in a separate Claude conversation) 
   `window.LEEA_CLOUD` already set, because assigning over it would silently cut
   live cloud sync in the six learner apps that carry these tags.
 
-Everything else — registering the lesson so it appears on the teacher dashboard, pairing it with a learner app, adding any new vocabulary word the deck introduces to the content model — happens after handoff, not before it.
+Everything else — registering the lesson so it appears on the teacher dashboard, pairing it with a learner app, adding any new vocabulary word the deck introduces to the content model — happens after handoff, not before it. **The Reference check is not optional:** every word card the deck presents (academic, content, related — including words the deck chose where the planner printed none) must exist in Reference with this lesson's source tag before the upload PR ships. See AGENTS.md rule 5a.
 
 ## Why custom, not templated
 
@@ -182,6 +182,26 @@ Where each part of a slide comes from:
 Do not duplicate vocab or grammar content inside a teacher HTML when it lives in `vocabulary.json` or `grammar.json`. Slides should read from data or, if static-baked for performance, the source of truth is still the JSON — change the JSON and the slide updates next render.
 
 This is why emojis stay consistent across Reference, Leo apps, and teacher slides — every surface reads the same `displayEmoji` from `vocabulary.json`.
+
+## Level 5 deck anatomy — and how Leo's app mirrors it
+
+The Level 5 Unit 1 decks Neritan authored (opener → writing) settled into one anatomy. The later ones (reading, writing) carry all of it. Read a new deck against this list before building its app, and expect the next decks to follow it.
+
+| Deck feature | What it looks like | Leo's app does |
+|---|---|---|
+| **Title slide word list** | "Words hiding in the lesson: …", one emoji per word, reused on every slide the word appears | The app's word tab uses **exactly these words, with the same emojis** |
+| **Objectives + Lesson Map** | tap-to-open goal cards; a "route" of stops; a rail dot that moves with the story | Tab order follows the stops; the header comment lists slide → tab |
+| **Word Desk / Word Lab** | one slide per word: a mini-game, then "🔒 Win the game to unlock the word card" (part of speech, definition, 3 examples, Dad 💬 / Leo 💬, 🇯🇵 Japanese bridge with a katakana / pronunciation trap); a check slide after each group | Flashcards carry the card's definition, example and Japanese bridge; **each word's mini-game is replayed** (find-N, sort, match, order); the check slide becomes a match or quiz |
+| **Teacher flag** | "The Lesson Planner prints no … — these come from …" | Treat the deck's chosen words as the lesson's words: they go into Reference too (AGENTS.md rule 5a) |
+| **LP beats labelled** | "LP Warm Up", "LP Present", "Be the Expert", "Think Aloud", "Teaching Tip" | One block per beat; LP answers are kept verbatim |
+| **Games with answers in the markup** | `data-a`, `data-cat`, `data-ord`, `data-want`, "Found: 0 / 4", "Tap a card, then a box" | The same items, same answers: find → find block, box sort → sorter, tap-in-order → order block |
+| **Dad 💬 / Leo 💬 frames** | sentence frames with ______ blanks | Typed items with the frame as `pre`/`post` (free answers where the deck accepts any) |
+| **Source text verbatim** | the passage / model paragraph by paragraph with checks | Paragraph-gated reading, the deck's checks as the questions |
+| **Soccer transfer (mandatory Extend)** | target words used on real players, stats dated ("checked … 21 Sept 2026") | A soccer block reusing the deck's claims and date — never new stats |
+| **Recap before Wrap Up · Formative "Can Leo…?" · rubric** | Can-do cards, the 4–1 rubric | The final quiz tests the Can-do points; writing apps keep the rubric's criteria |
+| **Finish slide** | homework (WB pages, Online Practice) and Mark Done | The WB pages named here are the app's WB content |
+
+**More exercises, not fewer.** Several activities per tab is normal (the L5 U1 reading app has up to eight blocks in a tab); the deck's items come first, then more of the same shape.
 
 ## What stays consistent across all teacher slideshows
 

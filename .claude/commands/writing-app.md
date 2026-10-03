@@ -52,6 +52,25 @@ Component keys: `writing` (teacher) ↔ `writing-app` (learner).
 
 ---
 
+## Leo app — the companion to the slides
+
+Leo does the app **alone after Neritan teaches the deck**, so it is built *from the deck*, not from a fresh plan — the same rule as `grammar-app.md` → *Leo app — the companion to the slides*. Read the deck slide by slide first (dump every `.slide`'s text, its games and the answers in its markup and notes), then check it against **`docs/teacher-slides.md` → Level 5 deck anatomy**, which maps each deck feature to what the app does: the title slide's word list (same words, same emojis) becomes the word tab, each word's mini-game is replayed, Dad 💬 / Leo 💬 frames become typed items, the soccer transfer slide becomes a soccer block with the deck's own dated claims, and the Can-do / formative slide shapes the final quiz. The deck's items go in verbatim first, then more of the same shape — several activities per tab. Write the slide → tab map into the app's header comment and the PR.
+
+**Reference check at upload (AGENTS.md rule 5a).** Every word card the deck presents — academic, content, related, and any words the deck chose where the planner prints none — must be in Reference with this lesson's source tag. Add a full card for a missing word; add the tag to an existing card's `sources`; list them all in the teacher JSON's `referenceLinks`.
+
+**Writing specifics — fill the locked modules from the deck.** Keep the modal home grid and storage names, but every module's content comes from the deck's slides. In the L5 U1 Writing deck (`public/lessons/ow-l5-u1-writing.html`, "Safe not Sorry!") that means:
+
+| Deck stage | Slides | App content |
+|---|---|---|
+| Word Desk | related words (the five senses), academic (senses · emotions · experience), content (forecaster · heavy), each with its game and a check slide | the vocab modules: these words only, their games replayed |
+| Warm Up | point-to-it five senses; brainstorm chart (sight / sound / touch); same word, different senses | sense sorts |
+| Present | the sandstorm sentences; time words (first, next, then, after, before, soon) | sort + order the events |
+| Read the Model | read 3 times: the story, circle sense and emotion words, underline time words, count them | paragraph reading + find blocks |
+| Plan | two-column chart; sort nine words; WB p. 10 steps | the planning chart Leo fills |
+| Be the Expert | irregular past (told, saw, went, came, heard, shook): match, sort, choose | match + mcq |
+| Write · Edit | show don't tell; two teacher models; fix the wrong past verbs | typed rewrite + fix |
+| Share · Recap · Formative | soccer transfer; match writing tools to the model; Can-do and the 4–1 rubric | soccer block, match, final quiz |
+
 ## Locked patterns the skill must follow
 
 ### Always-on Vocab Foundations rule (from `docs/design-decisions.md`)

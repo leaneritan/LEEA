@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { BarChart3, BookOpen, CheckSquare, ChevronLeft, ChevronRight, ClipboardList, Dumbbell, GraduationCap, History, Home, Library, Search } from "lucide-react";
+import { BarChart3, BookOpen, CheckSquare, ChevronLeft, ChevronRight, ClipboardList, Dumbbell, GraduationCap, History, Home, Library, MoreHorizontal, Search, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { CSSProperties, ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -30,6 +30,16 @@ const navItems: Array<{ key: NavKey; label: string; href: string; icon: ReactNod
 // way in at all — Progress was only reachable by typing its URL.
 const mobileNavItems = [navItems[0], navItems[1], navItems[2], navItems[5], { key: "english" as const, label: "English", href: "/english", icon: <BookOpen size={20} /> }, navItems[3]];
 
+// Everything the sidebar offers that does not fit in the bottom bar. On a phone
+// the sidebar is hidden, so without this panel these pages have no way in.
+const mobileMoreItems: Array<{ key: NavKey; label: string; href: string; dot?: string; icon?: ReactNode }> = [
+  { key: "tests", label: "Tests", href: "/tests", icon: <ClipboardList size={18} strokeWidth={2} /> },
+  { key: "math", label: "Math", href: "/math", dot: "dot-math" },
+  { key: "geography", label: "Geography", href: "/geography", dot: "dot-geography" },
+  { key: "history", label: "History", href: "/history", dot: "dot-history" },
+  { key: "science", label: "Science", href: "/science", dot: "dot-science" }
+];
+
 const JapanesePreferenceContext = createContext(false);
 
 export function useJapanesePreference() {
@@ -50,6 +60,15 @@ export function AppShell({
   const [assignmentsLeft, setAssignmentsLeft] = useState<number | null>(null);
   const [streakDays, setStreakDays] = useState(0);
   const pathname = usePathname();
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreActive = mobileMoreItems.some((item) => item.key === active);
+  useEffect(() => setMoreOpen(false), [pathname]);
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setMoreOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [moreOpen]);
   const { knownWordSet } = useKnownWordIds();
   const isReferenceContext = active === "reference" || active === "search" || active === "practice" || active === "irregular-verbs";
   const knownWordCount = knownWordSet.size;
@@ -244,6 +263,23 @@ export function AppShell({
           <div className="content">{children}</div>
         </main>
 
+        {moreOpen && (
+          <div className="mobile-more" onClick={() => setMoreOpen(false)}>
+            <div aria-label="More pages" className="mobile-more-sheet" id="mobile-more-sheet" onClick={(event) => event.stopPropagation()} role="dialog">
+              <header>
+                <strong>More</strong>
+                <button aria-label="Close" onClick={() => setMoreOpen(false)} type="button"><X size={18} /></button>
+              </header>
+              {mobileMoreItems.map((item) => (
+                <Link className={active === item.key ? "active" : ""} href={item.href} key={item.key} onClick={() => setMoreOpen(false)}>
+                  {item.icon ?? <i className={item.dot} />}
+                  <span>{item.label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         <nav className="mobile-nav" aria-label="Mobile navigation">
           {mobileNavItems.map((item) => (
             <Link className={active === item.key ? "active" : ""} href={item.href} key={item.key}>
@@ -251,6 +287,16 @@ export function AppShell({
               <span>{item.label}</span>
             </Link>
           ))}
+          <button
+            aria-controls="mobile-more-sheet"
+            aria-expanded={moreOpen}
+            className={moreOpen || moreActive ? "active" : ""}
+            onClick={() => setMoreOpen((open) => !open)}
+            type="button"
+          >
+            <MoreHorizontal size={20} />
+            <span>More</span>
+          </button>
         </nav>
       </div>
     </JapanesePreferenceContext.Provider>

@@ -217,6 +217,7 @@ export const stxCss = `
 .stx-print-sheet th{background:#f1f5f9}
 .stx-print-sheet td{white-space:nowrap}
 .stx-print-sheet td.l{text-align:left;white-space:normal}
+@media screen and (max-width:680px){.stx-print-sheet{overflow-x:auto;padding:16px}}
 .stx-print-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
 .stx-box{display:inline-block;width:12px;height:12px;border:1.5px solid #334155;border-radius:2px;vertical-align:-2px}
 .stx-lines{border-bottom:1px solid #94a3b8;height:26px}

@@ -127,6 +127,14 @@ export function LeoDashboard() {
         </div>
       </section>
 
+      <Link className="leo-note-card leo-note-card-link" href="/leo/tests-review">
+        <span className="leo-note-avatar">🃏</span>
+        <div>
+          <small>School tests</small>
+          <p>テストの復習 — まちがえた問題をカードにして、1枚ずつ取り戻そう。 →</p>
+        </div>
+      </Link>
+
       <article className="leo-note-card">
         <span className="leo-note-avatar">N</span>
         <div>

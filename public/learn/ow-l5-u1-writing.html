@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 1 · Writing — Safe not Sorry!</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@600;700&display=swap"></noscript>
+<script src="/components/charts.js"></script>
+<script src="/components/chart-picker.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --or:#F97316;--ord:#EA580C;--orl:#FFF7ED;
+  --bl:#3B82F6;--bld:#1D4ED8;--bll:#EFF6FF;
+  --ye:#FDE047;--yed:#EAB308;
+  --gn:#16A34A;--gnd:#15803D;--gnl:#F0FDF4;--gnb:#BBF7D0;
+  --rd:#DC2626;--rdl:#FEE2E2;--rdb:#FECACA;
+  --am:#D97706;--aml:#FFFBEB;
+  --pu:#7C3AED;--pul:#F5F3FF;
+  --ink:#111111;--ink2:#374151;--ink3:#6B7280;
+  --paper:#FAFAF7;--surf:#FFFFFF;--bdr:#E5E7EB;
+  --fn:'Nunito',sans-serif;--fnh:'Oswald',sans-serif;
+}
+body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+.jp{font-family:'Hiragino Sans','Yu Gothic','Noto Sans JP',sans-serif}
+
+/* HEADER + HERO */
+.app-hdr{background:var(--ink);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.hdr-badge{background:var(--ye);color:var(--ink);font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:2px;padding:2px 7px;border-radius:2px}
+.hdr-title{font-family:var(--fnh);font-size:.85rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hdr-unit{font-size:.7rem;font-weight:700;color:var(--or)}
+.hdr-btns{display:flex;gap:6px}
+.mbk{background:rgba(255,255,255,.15);border:none;color:#fff;font-family:var(--fn);font-size:.72rem;font-weight:800;padding:5px 11px;border-radius:20px;cursor:pointer;flex-shrink:0}
+.hero{background:linear-gradient(135deg,var(--or),var(--ord));padding:20px 16px 16px;text-align:center}
+.hero-kick{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.75);margin-bottom:6px}
+.hero-title{font-family:var(--fnh);font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:1px}
+.hero-title span{color:var(--ye)}
+.hero-sub{font-size:.8rem;color:rgba(255,255,255,.9);font-weight:700;margin-top:4px}
+.hero-em{font-size:1.3rem;margin-top:8px}
+.hero-pill{display:inline-block;margin-top:8px;background:rgba(0,0,0,.18);color:#fff;font-weight:800;font-size:.75rem;padding:3px 12px;border-radius:20px}
+.prog-wrap{background:rgba(0,0,0,.15);height:4px}
+.prog-fill{height:100%;background:var(--ye);transition:width .5s;width:0%}
+.hw-banner{background:var(--bll);border-bottom:2px solid var(--bl);padding:8px 16px;font-size:.8rem;font-weight:700;color:var(--bld);display:none;align-items:center;gap:8px}
+
+/* HOME GRID */
+.home{max-width:680px;margin:0 auto;padding:16px 14px 80px}
+.sec-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--ink3);margin-bottom:10px;margin-top:20px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mod-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:13px 13px 11px;cursor:pointer;transition:all .2s;position:relative;text-align:left;font-family:var(--fn)}
+.mod-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.1)}
+.mod-card.ow:hover{border-color:var(--or)}
+.mod-card.wb:hover{border-color:var(--bl)}
+.mod-card.quiz:hover{border-color:var(--yed)}
+.mod-card.always{border-color:#D8B4FE;background:linear-gradient(180deg,#fff,#FAF5FF)}
+.mod-card.always:hover{border-color:var(--pu)}
+.mod-card.wide{grid-column:1/-1}
+.mod-icon{font-size:1.5rem;margin-bottom:5px}
+.mod-name{font-weight:800;font-size:.82rem;color:var(--ink);margin-bottom:2px}
+.mod-desc{font-size:.7rem;color:var(--ink3);font-weight:600;line-height:1.4}
+.mod-badge{font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;margin-top:7px;display:inline-block}
+.badge-new{background:var(--paper);color:var(--ink3);border:1px solid var(--bdr)}
+.badge-done{background:#D1FAE5;color:var(--gn)}
+.badge-prog{background:var(--orl);color:var(--ord)}
+.mod-tag{position:absolute;top:6px;right:6px;font-family:var(--fnh);font-size:.5rem;font-weight:700;letter-spacing:1px;color:var(--pu);background:var(--pul);padding:2px 6px;border-radius:2px}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;overflow-y:auto}
+.modal.open{display:block}
+.mbox{background:var(--surf);min-height:100vh;display:flex;flex-direction:column;max-width:680px;margin:0 auto}
+.mhd{padding:13px 14px;display:flex;align-items:center;gap:10px;color:#fff;position:sticky;top:0;z-index:10;flex-shrink:0}
+.mhd.or{background:var(--or)}.mhd.bl{background:var(--bl)}.mhd.ye{background:var(--yed)}.mhd.pu{background:var(--pu)}
+.mhd-title{font-weight:900;font-size:1rem;flex:1;letter-spacing:.3px;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.mhd-num{font-family:var(--fnh);font-size:.6rem;font-weight:700;letter-spacing:1px;opacity:.8}
+.mhd-close{background:rgba(255,255,255,.18);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mbody{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
+.mod-footer{display:flex;gap:8px;margin-top:10px;position:sticky;bottom:0;background:var(--paper);padding:8px 0}
+.mark-btn{flex:1;background:var(--gn);color:#fff;border:none;border-radius:4px;padding:11px 14px;font-family:var(--fn);font-size:.82rem;font-weight:800;cursor:pointer}
+.mark-btn:disabled{background:var(--ink3);cursor:not-allowed;opacity:.6}
+.mark-btn.confirmed{background:var(--gnd)}
+.redo-btn{background:var(--rd);color:#fff;border:none;border-radius:4px;padding:11px 14px;font-family:var(--fn);font-size:.78rem;font-weight:800;cursor:pointer;min-width:96px}
+.redo-btn.armed{background:#7F1D1D}
+.done-banner{display:none;background:#D1FAE5;border:2px solid #6EE7B7;border-radius:4px;padding:11px 13px;font-size:.88rem;font-weight:800;color:#065F46;text-align:center}
+.done-banner.show{display:block;animation:pop .35s}
+@keyframes pop{0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.shake{animation:shake .35s}
+
+/* SHARED CARDS */
+.dad-card{background:#D1FAE5;border:2px solid #A7F3D0;border-radius:4px;padding:11px 13px;font-size:.82rem;font-weight:700;color:#065F46;line-height:1.5}
+.info-card{background:var(--bll);border:2px solid #BFDBFE;border-radius:4px;padding:10px 12px;font-size:.8rem;font-weight:700;color:var(--bld);line-height:1.55}
+.section-h{font-family:var(--fnh);font-size:.75rem;font-weight:700;letter-spacing:2px;color:var(--ink);margin-top:8px;display:flex;align-items:center;gap:6px}
+.section-h::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.section-h .kdone{display:none;color:var(--gn);letter-spacing:0;font-family:var(--fn);font-size:.72rem}
+.section-h.ok .kdone{display:inline}
+.blk{display:flex;flex-direction:column;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#fff;border:1px solid #FDBA74;border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:700;color:var(--ord)}
+.passage{background:var(--aml);border:2px solid #FCD34D;border-left:4px solid var(--am);border-radius:0 4px 4px 0;padding:11px 14px;font-size:.92rem;font-weight:600;line-height:1.75;color:var(--ink)}
+.passage .ptitle{font-family:var(--fnh);font-weight:700;font-size:.8rem;color:var(--am);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase}
+.passage .tag{background:#DBEAFE;border-bottom:2px solid var(--bl);padding:0 3px;border-radius:3px;font-weight:800;cursor:pointer}
+.passage .sig{background:#FED7AA;border-bottom:2px solid var(--or);padding:0 3px;border-radius:3px;font-weight:800;cursor:pointer}
+.gloss{display:none;margin-top:8px;background:var(--bll);border-radius:4px;padding:7px 11px;font-size:.82rem;font-weight:700;color:var(--bld)}
+.gloss.show{display:block}
+.para{display:flex;flex-direction:column;gap:9px}
+.para.locked{opacity:.35;pointer-events:none;filter:grayscale(1)}
+.para .lock-note{display:none;font-size:.75rem;font-weight:800;color:var(--ink3)}
+.para.locked .lock-note{display:block}
+
+/* MCQ */
+.qcard{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:11px 13px}
+.qcard.solved{border-color:#6EE7B7}
+.qcard.missed{border-color:#FCD34D}
+.qtext{font-size:.9rem;font-weight:800;color:var(--ink);line-height:1.45}
+.qclue{font-size:.7rem;color:var(--ink3);font-weight:800;margin-bottom:3px;letter-spacing:.3px}
+.opt{display:block;width:100%;text-align:left;background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-family:var(--fn);font-size:.86rem;font-weight:700;color:var(--ink);cursor:pointer;margin-top:7px}
+.opt:hover:not(:disabled){background:var(--paper);border-color:var(--or)}
+.opt.good{background:#D1FAE5;border-color:var(--gn);color:var(--gnd)}
+.opt.bad{background:var(--rdl);border-color:var(--rd);color:var(--rd);animation:shake .3s}
+.opt:disabled{cursor:default}
+.opt:disabled:not(.good){opacity:.5}
+.opt2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.opt2 .opt{text-align:center}
+.qwhy{display:none;margin-top:7px;font-size:.8rem;color:var(--gnd);font-weight:700}
+.qcard.solved .qwhy{display:block}
+.qjp{display:none;margin-top:4px;font-size:.78rem;color:var(--ink3)}
+.qcard.solved .qjp{display:block}
+.fb{margin-top:7px;font-weight:800;font-size:.8rem;min-height:0}
+.fb.ok{color:var(--gnd)}.fb.no{color:var(--rd)}.fb.show{color:#92400E}
+
+/* FLASHCARD (canonical) */
+.flashcard-wrap{perspective:1000px;min-height:250px;cursor:pointer;max-width:560px;width:100%;margin:0 auto}
+.flashcard{width:100%;min-height:250px;position:relative;transform-style:preserve-3d;transition:transform .5s ease}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;width:100%;min-height:250px;backface-visibility:hidden;border-radius:6px;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;border:2px solid var(--bdr);background:var(--surf)}
+.fc-back{transform:rotateY(180deg);border-color:var(--pu);background:var(--pul)}
+.fc-emoji{font-size:2.5rem;line-height:1}
+.fc-word{font-family:var(--fnh);font-size:1.5rem;font-weight:700;color:var(--ink);letter-spacing:.5px}
+.fc-pos{font-size:.7rem;font-weight:700;color:var(--ink3);letter-spacing:1px;text-transform:uppercase}
+.fc-tap{font-size:.65rem;color:var(--ink3);font-weight:600;font-style:italic;margin-top:4px}
+.fc-def{font-size:.95rem;font-weight:700;color:var(--ink);line-height:1.4}
+.fc-sample{font-size:.84rem;font-weight:600;color:var(--ink2);line-height:1.55;font-style:italic}
+.fc-sample b{color:var(--pu);font-style:normal}
+.fc-jp{font-size:.82rem;color:var(--pu);font-weight:700;display:none;line-height:1.5}
+.fc-jp.revealed{display:block}
+.fc-jp-btn{background:none;border:1px dashed #d1d5db;border-radius:20px;padding:3px 12px;font-size:.68rem;font-weight:700;color:var(--ink3);cursor:pointer;font-family:var(--fn);margin-top:2px}
+.fc-nav{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px;max-width:560px;width:100%;margin-left:auto;margin-right:auto}
+.fc-nav button{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:7px 14px;font-family:var(--fn);font-size:.78rem;font-weight:700;color:var(--ink2);cursor:pointer}
+.fc-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.fc-dot{width:9px;height:9px;border-radius:50%;background:var(--bdr)}
+.fc-dot.seen{background:#C4B5FD}
+.fc-dot.on{background:var(--pu)}
+
+/* MATCH / TILES / ORDER */
+.match-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
+.mcol{display:flex;flex-direction:column;gap:7px}
+.mbtn{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px 11px;font-size:.84rem;font-weight:700;font-family:var(--fn);text-align:left;cursor:pointer;color:var(--ink)}
+.mbtn.sel{border-color:var(--am);background:var(--aml)}
+.mbtn.matched{border-color:#6EE7B7;background:#D1FAE5;color:var(--gnd);opacity:.85;cursor:default}
+.mbtn.err{animation:shake .35s;border-color:var(--rd)}
+.ord-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.ord-done{background:#D1FAE5;border:2px solid #A7F3D0;border-radius:4px;padding:7px 11px;font-weight:700;color:var(--gnd);font-size:.85rem}
+.ord-done b{display:inline-block;min-width:24px}
+.ord-bank{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.tile{background:var(--surf);border:2px solid #FDBA74;border-radius:4px;padding:8px 12px;font-size:.84rem;font-weight:700;cursor:pointer;font-family:var(--fn);color:var(--ink);text-align:left}
+.tile:hover{border-color:var(--or)}
+.tile.found{background:#D1FAE5;border-color:var(--gn);color:var(--gnd);cursor:default}
+.tile.nope{background:var(--rdl);border-color:var(--rd);animation:shake .35s}
+.tile.nope-done{opacity:.45;border-style:dashed;cursor:default}
+.find-count{font-size:.75rem;font-weight:800;color:var(--bld);margin-top:6px}
+
+/* SORT (static restore) */
+.sort-static{display:grid;gap:10px}
+.sort-static .col{border:2px solid #6EE7B7;border-radius:4px;overflow:hidden;background:#fff}
+.sort-static .col h4{padding:7px 10px;color:#fff;font-size:.82rem}
+.sort-static .col div{padding:5px 10px;font-size:.8rem;font-weight:700;border-top:1px solid var(--bdr)}
+.sort-host .dnd-tile{white-space:normal !important;font-size:.86rem !important;padding:7px 12px !important}
+
+/* TYPED + WRITE */
+.type-row{display:flex;gap:7px;margin-top:8px;align-items:center;flex-wrap:wrap}
+.type-row .pre{font-size:.92rem;font-weight:800;color:var(--ink)}
+.type-in{flex:1;min-width:150px;border:2px solid var(--bdr);border-radius:4px;padding:9px 11px;font-size:.92rem;font-family:var(--fn);font-weight:700}
+.type-in:focus{outline:none;border-color:var(--or)}
+.type-go{background:var(--or);color:#fff;border:none;border-radius:4px;padding:9px 16px;font-size:.95rem;font-weight:900;cursor:pointer;font-family:var(--fn)}
+.type-go:disabled{opacity:.4}
+.ghost{background:#fff;color:var(--ink2);border:2px solid var(--bdr);border-radius:4px;padding:8px 12px;font-size:.8rem;font-weight:800;cursor:pointer;font-family:var(--fn)}
+.text-ta{width:100%;border:2px solid var(--bdr);border-radius:4px;padding:10px 12px;font-family:var(--fn);font-size:.92rem;font-weight:600;color:var(--ink);background:var(--surf);outline:none;resize:vertical;min-height:220px;line-height:1.65}
+.text-ta:focus{border-color:var(--or)}
+.meter{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin-top:6px}
+.meter div{background:#fff;border:2px solid var(--bdr);border-radius:4px;padding:6px 9px;font-size:.74rem;font-weight:800;color:var(--ink3)}
+.meter div b{display:block;font-size:1rem;color:var(--ink2)}
+.meter div.ok{border-color:#6EE7B7;background:#F0FDF4;color:var(--gnd)}
+.meter div.ok b{color:var(--gnd)}
+.flags{font-size:.8rem;font-weight:800;color:var(--rd);margin-top:6px;line-height:1.5}
+.found-words{font-size:.75rem;font-weight:700;color:var(--ink3);margin-top:4px;line-height:1.5}
+
+/* TAP-THE-WORDS passage */
+.tapbox{background:#fff;border:2px solid var(--bdr);border-radius:4px;padding:12px 14px;font-size:.95rem;line-height:2;font-weight:600}
+.tapbox .w{cursor:pointer;border-radius:3px}
+.tapbox .w.miss{background:var(--rdl);color:var(--rd)}
+.tapbox .t{cursor:pointer;border-radius:3px}
+.tapbox .t.hit{font-weight:900}
+.tapbox .t.hit.c-sense{background:#DBEAFE;border-bottom:3px solid var(--bl);color:var(--bld)}
+.tapbox .t.hit.c-emo{background:#FCE7F3;border-bottom:3px solid #DB2777;color:#9D174D}
+.tapbox .t.hit.c-time{background:#FED7AA;border-bottom:3px solid var(--or);color:var(--ord)}
+.tap-log{font-size:.78rem;font-weight:700;color:var(--ink2);margin-top:6px;line-height:1.6}
+
+/* PLAN CHART */
+.plan-tbl{width:100%;border-collapse:collapse;background:#fff;border:2px solid var(--bdr);border-radius:4px;overflow:hidden}
+.plan-tbl th{background:var(--bl);color:#fff;padding:8px 10px;text-align:left;font-size:.78rem;font-family:var(--fnh);letter-spacing:1px}
+.plan-tbl td{border-top:1px solid var(--bdr);padding:6px 8px;font-size:.84rem;font-weight:800;vertical-align:top}
+.plan-tbl td:first-child{width:34%;white-space:nowrap}
+.plan-tbl textarea{width:100%;border:none;background:#FFFBEB;font-family:var(--fn);font-size:.86rem;font-weight:600;resize:vertical;min-height:44px;padding:7px 9px;border-radius:3px;outline:none}
+.plan-tbl textarea:focus{background:#FFF7ED}
+.plan-tbl td.model{font-weight:600;color:var(--ink2)}
+.counter{font-size:.75rem;font-weight:800;color:var(--ink3);margin-top:5px}
+.counter b.ok{color:var(--gnd)}
+.chk-item{display:flex;align-items:center;gap:9px;background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:9px 11px;cursor:pointer;font-size:.84rem;font-weight:700;color:var(--ink2);font-family:var(--fn);text-align:left;width:100%}
+.chk-item.checked{background:#D1FAE5;border-color:var(--gn);color:#065F46}
+.chk-box{width:20px;height:20px;border:2px solid var(--bdr);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.85rem;background:#fff}
+.chk-item.checked .chk-box{background:var(--gn);border-color:var(--gn);color:#fff}
+.chk-item small{display:block;font-weight:600;color:var(--ink3);font-size:.74rem}
+.choice-row{display:flex;gap:8px;flex-wrap:wrap}
+.choice{flex:1;min-width:120px;background:#fff;border:2px solid var(--bdr);border-radius:4px;padding:12px 8px;font-family:var(--fn);font-size:.9rem;font-weight:800;cursor:pointer;text-align:center}
+.choice.on{background:var(--bll);border-color:var(--bl);color:var(--bld)}
+.draft-view{background:#fff;border:2px dashed var(--bdr);border-radius:4px;padding:10px 12px;font-size:.88rem;font-weight:600;line-height:1.65;white-space:pre-wrap;color:var(--ink2)}
+
+/* QUIZ */
+.qz-bar{background:var(--bdr);height:5px;border-radius:3px;overflow:hidden}
+.qz-bar-fill{background:var(--or);height:5px;width:0;transition:width .4s}
+.qz-head{display:flex;justify-content:space-between;font-family:var(--fnh);font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--ink3);margin-bottom:6px}
+.qz-tag{display:inline-block;font-family:var(--fnh);font-size:.55rem;font-weight:700;letter-spacing:1.5px;padding:2px 7px;border-radius:2px;margin-bottom:6px;background:var(--orl);color:var(--ord)}
+.qz-res{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:16px;text-align:center}
+.qz-trophy{font-size:3rem;line-height:1;margin-bottom:6px}
+.qz-score-big{font-family:var(--fnh);font-size:1.8rem;font-weight:700;color:var(--ink)}
+.qz-msg{font-size:.88rem;font-weight:800;color:var(--ink2);margin-top:6px;line-height:1.5}
+.wrong-review{background:var(--rdl);border:2px solid var(--rdb);border-radius:4px;padding:9px 12px;text-align:left;margin-top:9px;font-size:.8rem;line-height:1.55}
+
+/* DAD VIEW + REVIEW */
+.dad-ov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:400;display:none;align-items:flex-end;justify-content:center}
+.dad-ov.open{display:flex}
+.dad-modal{background:var(--paper);width:100%;max-width:680px;max-height:90vh;border-radius:12px 12px 0 0;display:flex;flex-direction:column;overflow:hidden}
+.dad-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#fff;border-bottom:2px solid var(--bdr)}
+.dad-body{padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:9px}
+.dad-sec{background:#fff;border:2px solid var(--bdr);border-radius:4px;padding:9px 12px;font-size:.8rem;line-height:1.5}
+.dad-row{color:var(--rd);border-top:1px solid var(--bdr);padding:3px 0}
+.dad-row i{color:var(--ink2)}
+.rv-screen{display:none;max-width:680px;margin:0 auto;padding:18px 14px 80px}
+.rv-screen.show{display:block}
+.rv-card{background:var(--surf);border:2px solid var(--bdr);border-radius:4px;padding:12px;margin-bottom:10px}
+.rv-lbl{font-family:var(--fnh);font-size:.62rem;font-weight:700;letter-spacing:2px;color:var(--ink3);margin-bottom:4px}
+.rv-text{font-size:.86rem;font-weight:600;color:var(--ink2);line-height:1.6;white-space:pre-wrap}
+.rv-not-started{background:var(--paper);border:2px dashed var(--bdr);border-radius:4px;padding:24px;text-align:center;font-weight:700;color:var(--ink3)}
+@media (max-width:480px){
+  .mod-grid{grid-template-columns:1fr}
+  .match-grid{grid-template-columns:1fr}
+  .sort-static{grid-template-columns:1fr !important}
+  .sort-host .dnd-zones{flex-direction:column}
+  .plan-tbl td:first-child{white-space:normal}
+}
+</style>
+</head>
+<body>
+
+<header class="app-hdr">
+  <div class="hdr-left"><span class="hdr-badge">LEEA</span><span class="hdr-title">LEO</span><span class="hdr-unit">· L5 U1 WRITING</span></div>
+  <div class="hdr-btns"><button class="mbk" onclick="openDad()">👨 Dad’s view</button><button class="mbk" onclick="location.href='/'">← Home</button></div>
+</header>
+
+<div id="appRoot">
+<div class="hero">
+  <div class="hero-kick">OUR WORLD · LEVEL 5 · UNIT 1 · STORY DESK</div>
+  <div class="hero-title">✍️ Writing: <span>Safe not Sorry!</span></div>
+  <div class="hero-sub">Personal narrative — your true storm story with the five senses</div>
+  <div class="hero-em">👁️ 👂 ✋ 👅 👃 ⛈️</div>
+  <div class="hero-pill" id="progPill">0 / 13 done</div>
+</div>
+<div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
+<div id="hwBanner" class="hw-banner"></div>
+<div class="home" id="home"></div>
+</div>
+
+<div id="modals"></div>
+
+<div id="reviewScreen" class="rv-screen">
+  <div class="rv-card" style="background:var(--ink);color:#fff"><b>REVIEW · NERITAN</b> — Leo’s saved work, read-only.</div>
+  <div id="reviewBody"></div>
+</div>
+
+<div class="dad-ov" id="dad-ov"><div class="dad-modal">
+  <div class="dad-head"><b>👨 Dad’s view — Leo’s wrong first tries</b><button class="ghost" onclick="closeDad()">✕ Close</button></div>
+  <div class="dad-body" id="dad-body"></div>
+</div></div>
+<script>
+/* ═════════════════════════════════════════════════════════════════════
+   LEVEL 5 UNIT 1 WRITING — LEO APP · "Safe not Sorry!" (personal narrative)
+   Storage: localStorage 'leea-5-1-writing-<key>' · HOMEWORK_ID leo-5-1-writing
+   MODULE_COUNT 13 · done-keys m{n}-done · final quiz score: score (m13)
+
+   Locked writing shell (modal home grid, Vocab Foundations first, SB 5 +
+   WB 5 + final quiz). Every module is filled from the teacher deck
+   (public/lessons/ow-l5-u1-writing.html), its own items verbatim first:
+     m1  Academic Language   <- slides 11-15 (senses · emotions · experience)
+     m2  Related Vocab       <- slides 4-10, 16-22 (5 senses · forecaster · heavy)
+     m3  Personal Narrative  <- slides 23, 28-33, 36 (what it is + Read 1)
+     m4  Key Expressions     <- slides 24-27, 43-47, 49 (saw/heard/felt,
+                                time words, before/after, irregular past)
+     m5  Plan My Chart       <- slides 37-41 (Read 2/3 tap hunts, chart, steps)
+     m6  Write!              <- slides 48, 50, 51 (frame, Dad's two models)
+     m7  Edit & Share        <- slides 52-56 (checklist, find mistakes, share)
+     m8  WB Act 1 · 7 Steps  <- WB p. 10 Act 1 + sense chart (slides 34, 41)
+     m9  WB Act 2 · My Plan  <- WB p. 11 Act 2
+     m10 WB Act 4 · Express  <- WB p. 11 Act 4 (happy / scary / beautiful)
+     m11 WB Act 5 · In Order <- WB p. 11 Act 5
+     m12 WB Act 6 · Story 2  <- WB p. 11 Act 6
+     m13 Can Leo Score?      <- slides 57-61 (recap, builder) + 10Q quiz
+   (WB Act 3 — "write your narrative" — is the SB story in m6.)
+   Each module is a list of blocks; every block saves as Leo answers and
+   restores its own DOM; the module's done-key saves itself when all its
+   blocks are done, which is also what enables Mark complete.
+═════════════════════════════════════════════════════════════════════ */
+const SAVE_PREFIX = 'leea-5-1-writing-';
+const HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-5-1-writing';
+const REVIEW = new URLSearchParams(location.search).get('review') === '1';
+const MODULE_COUNT = 13;
+function lSave(k,v){ try{ localStorage.setItem(SAVE_PREFIX+k, JSON.stringify(v)); }catch(e){} }
+function lLoad(k){ try{ const r = localStorage.getItem(SAVE_PREFIX+k); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
+function lDel(k){ try{ localStorage.removeItem(SAVE_PREFIX+k); }catch(e){} }
+const $ = id => document.getElementById(id);
+function shuffle(a){ const b = a.slice(); for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]]; } return b; }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function strip(h){ return String(h).replace(/<[^>]+>/g,''); }
+function norm(s){ return String(s).toLowerCase().replace(/[’‘`]/g,"'").replace(/[.,!?;:"“”]/g,' ').replace(/\s+/g,' ').trim(); }
+
+/* Homework flag: learnerProgress.ts reads `leea-<homeworkId>-done` exactly. */
+function hwFlag(value){
+  try{ if(value) localStorage.setItem('leea-' + HOMEWORK_ID + '-done', JSON.stringify(value)); else localStorage.removeItem('leea-' + HOMEWORK_ID + '-done'); }catch(e){}
+  try{ if(window.LEEA_CLOUD && typeof window.LEEA_CLOUD.saveProgress === 'function') window.LEEA_CLOUD.saveProgress(HOMEWORK_ID, 'leea-' + HOMEWORK_ID + '-done', value || null); }catch(e){}
+}
+
+/* ═══ MODULE MACHINERY — K is 'm1' … 'm13' ═══ */
+const MODS = {}, ORDER = [];
+const INIT = {};
+function defineMod(K, cfg){ cfg.k = K; MODS[K] = cfg; ORDER.push(K); }
+function isDone(K){ return !!lLoad(K + '-done'); }
+function blocksDone(K){ return MODS[K].blocks.filter(b => BLOCK_DONE[b.type] && BLOCK_DONE[b.type](K + '-' + b.id, b)).length; }
+function blocksTotal(K){ return MODS[K].blocks.filter(b => BLOCK_DONE[b.type]).length; }
+function started(K){ try{ return Object.keys(localStorage).some(k => k.indexOf(SAVE_PREFIX + K + '-') === 0 && k.slice(-4) !== '-att'); }catch(e){ return false; } }
+function paintBadge(K){
+  const b = $('badge-' + K); if(!b) return;
+  const m = MODS[K];
+  if(isDone(K)){ b.className = 'mod-badge badge-done'; b.textContent = '✓ DONE'; }
+  else if(started(K)){ b.className = 'mod-badge badge-prog'; b.textContent = 'IN PROGRESS'; }
+  else { b.className = 'mod-badge badge-new'; b.textContent = m.badge || 'NOT STARTED'; }
+}
+function refreshProg(){
+  try{
+    let n = 0; ORDER.forEach(K=>{ if(isDone(K)) n++; paintBadge(K); });
+    $('progFill').style.width = Math.round(n / MODULE_COUNT * 100) + '%';
+    $('progPill').textContent = n + ' / ' + MODULE_COUNT + ' done';
+    const has = !!localStorage.getItem('leea-' + HOMEWORK_ID + '-done');
+    if(n >= MODULE_COUNT){ if(!has) hwFlag({ complete:true, completedAt:new Date().toISOString() }); }
+    else if(has) hwFlag(null);
+  }catch(e){}
+}
+function paintFooter(K){
+  const cb = $('mark-' + K); if(!cb) return;
+  if(isDone(K)){ cb.disabled = false; cb.classList.add('confirmed'); cb.textContent = '✓ ' + MODS[K].name + ' complete'; }
+  else { cb.disabled = true; cb.classList.remove('confirmed'); cb.textContent = 'Mark ' + MODS[K].name + ' complete ✓  (' + blocksDone(K) + ' / ' + blocksTotal(K) + ')'; }
+  MODS[K].blocks.forEach(b=>{ const l = $('kl-' + K + '-' + b.id); if(l && BLOCK_DONE[b.type]) l.classList.toggle('ok', !!BLOCK_DONE[b.type](K + '-' + b.id, b)); });
+}
+function finishMod(K){
+  try{
+    $('done-' + K).classList.add('show');
+    if(!isDone(K)) lSave(K + '-done', { done:true, completedAt:new Date().toISOString() });
+    paintFooter(K); refreshProg();
+  }catch(e){}
+}
+/* Called by every block after progress: the done-key saves itself. */
+function checkMod(K){ if(blocksDone(K) >= blocksTotal(K)) finishMod(K); else { paintFooter(K); paintBadge(K); } }
+function markComplete(K){ checkMod(K); }
+function redoMod(K){
+  try{
+    const btn = $('redo-' + K);
+    if(!btn.classList.contains('armed')){ btn.classList.add('armed'); btn.textContent = 'Tap again ↺'; setTimeout(()=>{ btn.classList.remove('armed'); btn.textContent = '↺ Redo'; }, 3000); return; }
+    btn.classList.remove('armed'); btn.textContent = '↺ Redo';
+    Object.keys(localStorage).filter(k => k.indexOf(SAVE_PREFIX + K + '-') === 0).forEach(k => localStorage.removeItem(k));
+    if(K === 'm13') lDel('score');
+    $('done-' + K).classList.remove('show');
+    renderMod(K); paintFooter(K); refreshProg();
+  }catch(e){}
+}
+function openModal(K){
+  try{
+    $(K).classList.add('open'); document.body.style.overflow = 'hidden';
+    if(!INIT[K]) renderMod(K);
+    paintFooter(K);
+  }catch(e){ console.error(e); }
+}
+function closeModal(K){ $(K).classList.remove('open'); document.body.style.overflow = ''; refreshProg(); }
+function renderMod(K){
+  const m = MODS[K];
+  $('blocks-' + K).innerHTML = m.blocks.map(b =>
+    (b.label ? '<div class="section-h" id="kl-' + K + '-' + b.id + '">' + b.label + ' <span class="kdone">✓ done</span></div>' : '') +
+    (b.hint ? '<div class="info-card">' + b.hint + '</div>' : '') +
+    '<div class="blk" id="' + K + '-' + b.id + '"></div>').join('');
+  m.blocks.forEach(b => { try{ BLOCK_RENDER[b.type](K + '-' + b.id, K + '-' + b.id, b, K); }catch(e){ console.error(K, b.type, e); } });
+  INIT[K] = true;
+  if(isDone(K)) $('done-' + K).classList.add('show');
+}
+function buildShell(){
+  let h = '';
+  SECTIONS.forEach(sec=>{
+    h += '<div class="sec-lbl">' + sec.label + '</div><div class="mod-grid">';
+    sec.mods.forEach(K=>{ const m = MODS[K];
+      h += '<button class="mod-card ' + sec.cls + (m.wide ? ' wide' : '') + '" onclick="openModal(\'' + K + '\')">' + (sec.cls === 'always' ? '<div class="mod-tag">ALWAYS</div>' : '') +
+        '<div class="mod-icon">' + m.icon + '</div><div class="mod-name">' + m.name + '</div><div class="mod-desc">' + m.desc + '</div><div class="mod-badge badge-new" id="badge-' + K + '">' + (m.badge || 'NOT STARTED') + '</div></button>';
+    });
+    h += '</div>';
+  });
+  $('home').innerHTML = h;
+  $('modals').innerHTML = ORDER.map((K,i)=>{ const m = MODS[K];
+    return '<div class="modal" id="' + K + '"><div class="mbox"><div class="mhd ' + m.color + '"><div class="mhd-title">' + m.icon + ' ' + m.title + '</div><div class="mhd-num">' + (i+1) + ' / ' + MODULE_COUNT + '</div><button class="mhd-close" onclick="closeModal(\'' + K + '\')">✕</button></div>' +
+      '<div class="mbody">' + (m.dad ? '<div class="dad-card">💬 ' + m.dad + '</div>' : '') +
+      '<div id="blocks-' + K + '" style="display:flex;flex-direction:column;gap:12px"></div>' +
+      '<div class="done-banner" id="done-' + K + '">' + m.done + '</div>' +
+      '<div class="mod-footer"><button class="mark-btn" id="mark-' + K + '" onclick="markComplete(\'' + K + '\')" disabled>Mark complete ✓</button><button class="redo-btn" id="redo-' + K + '" onclick="redoMod(\'' + K + '\')">↺ Redo</button></div></div></div></div>';
+  }).join('');
+}
+
+/* ── Wrong first tries, for Dad (cleared with that module's Redo) ── */
+function logAtt(K, rec){ const a = lLoad(K + '-att') || []; a.push(rec); lSave(K + '-att', a); }
+function openDad(){
+  let h = '<div class="dad-sec">Leo’s <b>wrong first tries</b>, exactly as he tapped or typed them.</div>', any = false;
+  ORDER.forEach(K=>{
+    const a = lLoad(K + '-att') || []; if(!a.length) return; any = true;
+    h += '<div class="dad-sec"><b>' + MODS[K].icon + ' ' + esc(MODS[K].name) + (isDone(K) ? ' ✓' : '') + ' — ' + a.length + '</b>' +
+      a.map(r => '<div class="dad-row">✖ ' + (r.q ? '<i>' + esc(r.q) + '</i> → ' : '') + '<b>' + esc(r.a) + '</b></div>').join('') + '</div>';
+  });
+  if(!any) h += '<div class="dad-sec">No wrong first tries yet. 🎉</div>';
+  $('dad-body').innerHTML = h; $('dad-ov').classList.add('open');
+}
+function closeDad(){ $('dad-ov').classList.remove('open'); }
+
+/* ═════════════════════════════════════════════════════════════════════
+   BLOCKS. Each: render(host, key, cfg, K) + done(key, cfg).
+═════════════════════════════════════════════════════════════════════ */
+const BLOCK_RENDER = {}, BLOCK_DONE = {}, BS = {};
+
+BLOCK_RENDER.note = (host, key, b) => { $(host).innerHTML = b.html; };
+
+/* flash — the deck's word cards; done when every card is flipped */
+BLOCK_RENDER.flash = function(host, key, b, K){
+  BS[host] = { key, b, K, i:0 };
+  $(host).innerHTML = '<div class="flashcard-wrap" onclick="fcFlip(\'' + host + '\')"><div class="flashcard" id="' + host + '-card">' +
+    '<div class="fc-face fc-front"><div class="fc-emoji" id="' + host + '-em"></div><div class="fc-word" id="' + host + '-w"></div><div class="fc-pos" id="' + host + '-pos"></div><div class="fc-tap">tap to flip</div></div>' +
+    '<div class="fc-face fc-back"><div class="fc-def" id="' + host + '-def"></div><div class="fc-sample" id="' + host + '-s"></div><button class="fc-jp-btn" id="' + host + '-jb" onclick="fcJp(event,\'' + host + '\')">🇯🇵 日本語</button><div class="fc-jp jp" id="' + host + '-jp"></div></div></div></div>' +
+    '<div class="fc-nav"><button onclick="fcStep(\'' + host + '\',-1)">◀ Prev</button><div class="fc-dots" id="' + host + '-dots"></div><button onclick="fcStep(\'' + host + '\',1)">Next ▶</button></div>';
+  fcPaint(host);
+};
+BLOCK_DONE.flash = (key, b) => (lLoad(key) || []).length >= b.words.length;
+function fcPaint(host){
+  const s = BS[host], w = s.b.words[s.i], seen = new Set(lLoad(s.key) || []);
+  $(host + '-card').classList.remove('flipped');
+  $(host + '-em').textContent = w.emoji; $(host + '-w').textContent = w.word; $(host + '-pos').textContent = w.pos;
+  $(host + '-def').textContent = w.def; $(host + '-s').innerHTML = w.sample;
+  $(host + '-jp').textContent = '🇯🇵 ' + w.jp; $(host + '-jp').classList.remove('revealed'); $(host + '-jb').textContent = '🇯🇵 日本語';
+  $(host + '-dots').innerHTML = s.b.words.map((x,i)=>'<div class="fc-dot' + (seen.has(i) ? ' seen' : '') + (i === s.i ? ' on' : '') + '"></div>').join('');
+}
+function fcFlip(host){
+  const s = BS[host];
+  if($(host + '-card').classList.toggle('flipped')){
+    const seen = new Set(lLoad(s.key) || []); seen.add(s.i); lSave(s.key, Array.from(seen));
+    const d = $(host + '-dots').children[s.i]; if(d) d.classList.add('seen');
+    checkMod(s.K);
+  }
+}
+function fcStep(host, d){ const s = BS[host]; s.i = (s.i + d + s.b.words.length) % s.b.words.length; fcPaint(host); }
+function fcJp(e, host){ e.stopPropagation(); const on = $(host + '-jp').classList.toggle('revealed'); $(host + '-jb').textContent = on ? '🇯🇵 隠す' : '🇯🇵 日本語'; }
+
+/* mcq — { clue?, q, opts, ok, why?, jp? }. Retry until right; solved items save. */
+BLOCK_RENDER.mcq = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  $(host).innerHTML = b.items.map((it,i)=>{
+    const raw = it.opts.map((o,oi)=>({ text:o, ok:oi===it.ok }));
+    const opts = (b.keep || it.keep) ? raw : shuffle(raw);
+    return '<div class="qcard" data-idx="' + i + '">' + (it.clue ? '<div class="qclue">' + it.clue + '</div>' : '') +
+      '<div class="qtext">' + (b.nonum ? '' : (i+1) + '. ') + it.q + '</div><div class="' + (it.two || b.two ? 'opt2' : '') + '">' +
+      opts.map(o=>'<button class="opt" data-ok="' + (o.ok ? 1 : 0) + '" onclick="mcqPick(this,\'' + host + '\',' + i + ')">' + o.text + '</button>').join('') + '</div>' +
+      (it.why ? '<div class="qwhy">💡 ' + it.why + '</div>' : '') + (it.jp ? '<div class="qjp jp">🇯🇵 ' + it.jp + '</div>' : '') + '</div>';
+  }).join('');
+  (lLoad(key) || []).forEach(i=>{ const c = $(host).querySelector('[data-idx="' + i + '"]'); if(c) mcqSolve(c); });
+};
+BLOCK_DONE.mcq = (key, b) => (lLoad(key) || []).length >= b.items.length;
+function mcqSolve(card){ card.classList.add('solved'); card.querySelectorAll('.opt').forEach(o=>{ o.disabled = true; if(o.dataset.ok === '1') o.classList.add('good'); }); }
+function mcqPick(btn, host, i){
+  const card = btn.closest('.qcard'); if(!card || card.classList.contains('solved')) return;
+  const s = BS[host], right = btn.dataset.ok === '1';
+  if(!card.dataset.tried){ card.dataset.tried = '1'; if(!right) logAtt(s.K, { q:strip(s.b.items[i].q), a:strip(btn.innerHTML) }); }
+  if(right){
+    mcqSolve(card);
+    const set = new Set(lLoad(s.key) || []); set.add(i); lSave(s.key, Array.from(set));
+    if(s.b.after) s.b.after(host);
+    checkMod(s.K);
+  } else { btn.classList.add('bad'); setTimeout(()=>btn.classList.remove('bad'), 380); }
+}
+
+/* match — tap a left card, then its partner. pairs: [{ l, r }] */
+BLOCK_RENDER.match = function(host, key, b, K){
+  BS[host] = { key, b, K, sel:null };
+  const right = shuffle(b.pairs.map((p,i)=>({ t:p.r, i })));
+  $(host).innerHTML = (b.heads ? '<div class="match-grid"><div class="qclue">' + b.heads[0] + '</div><div class="qclue">' + b.heads[1] + '</div></div>' : '') + '<div class="match-grid"><div class="mcol">' +
+    b.pairs.map((p,i)=>'<button class="mbtn" id="' + host + '-l' + i + '" onclick="mtL(\'' + host + '\',' + i + ')">' + p.l + '</button>').join('') +
+    '</div><div class="mcol">' + right.map((x,k)=>'<button class="mbtn" id="' + host + '-r' + k + '" data-t="' + esc(x.t) + '" onclick="mtR(\'' + host + '\',' + k + ')">' + x.t + '</button>').join('') + '</div></div>' +
+    '<div class="fb" id="' + host + '-fb"></div>';
+  (lLoad(key) || []).forEach(i=>mtPaint(host, i));
+};
+BLOCK_DONE.match = (key, b) => (lLoad(key) || []).length >= b.pairs.length;
+function mtPaint(host, i){
+  const s = BS[host], t = s.b.pairs[i].r;
+  $(host + '-l' + i).classList.add('matched'); $(host + '-l' + i).disabled = true;
+  const r = Array.from($(host).querySelectorAll('.mcol:last-child .mbtn')).find(x => x.dataset.t === esc(t) && !x.classList.contains('matched'));
+  if(r){ r.classList.add('matched'); r.disabled = true; }
+}
+function mtL(host, i){ const s = BS[host]; $(host).querySelectorAll('.mbtn.sel').forEach(x=>x.classList.remove('sel')); s.sel = i; $(host + '-l' + i).classList.add('sel'); }
+function mtR(host, k){
+  const s = BS[host], btn = $(host + '-r' + k), fb = $(host + '-fb');
+  if(s.sel === null){ fb.className = 'fb no'; fb.textContent = 'Tap a card on the left first.'; return; }
+  const p = s.b.pairs[s.sel];
+  if(btn.dataset.t === esc(p.r)){
+    const m = new Set(lLoad(s.key) || []); m.add(s.sel); lSave(s.key, Array.from(m));
+    $(host + '-l' + s.sel).classList.remove('sel'); mtPaint(host, s.sel); s.sel = null;
+    fb.className = 'fb ok'; fb.textContent = '✅ Match! ' + (m.size >= s.b.pairs.length ? 'All matched.' : '');
+    checkMod(s.K);
+  } else {
+    logAtt(s.K, { q:strip(p.l), a:strip(btn.innerHTML) });
+    btn.classList.add('err'); setTimeout(()=>btn.classList.remove('err'), 380);
+    fb.className = 'fb no'; fb.textContent = 'Not that one — try again.';
+  }
+}
+
+/* typed — { p, pre?, post?, ans?[..] | free+min, model }. Two tries, then the answer. */
+BLOCK_RENDER.typed = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  const st = lLoad(key) || {};
+  $(host).innerHTML = b.items.map((it,i)=>{
+    const s = st[i] || {};
+    return '<div class="qcard" id="' + host + '-c' + i + '"><div class="qtext">' + (b.nonum ? '' : (i+1) + '. ') + it.p + '</div><div class="type-row">' +
+      (it.pre ? '<span class="pre">' + esc(it.pre) + '</span>' : '') +
+      '<input class="type-in" id="' + host + '-in' + i + '" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="' + (it.ph || 'type here…') + '" value="' + esc(s.last || '') + '" onkeydown="if(event.key===\'Enter\')tyCheck(\'' + host + '\',' + i + ')">' +
+      (it.post ? '<span class="pre">' + esc(it.post) + '</span>' : '') +
+      '<button class="type-go" onclick="tyCheck(\'' + host + '\',' + i + ')">✓</button></div><div class="fb" id="' + host + '-fb' + i + '"></div></div>';
+  }).join('');
+  b.items.forEach((it,i)=>{ const s = st[i]; if(s && s.done) tyDone(host, i, s); });
+};
+BLOCK_DONE.typed = (key, b) => { const st = lLoad(key) || {}; return b.items.every((x,i)=>st[i] && st[i].done); };
+function tyDone(host, i, s){
+  const it = BS[host].b.items[i], fb = $(host + '-fb' + i), card = $(host + '-c' + i);
+  $(host + '-in' + i).disabled = true; card.querySelector('.type-go').disabled = true;
+  const full = (it.pre || '') + (s.last || '') + (it.post || '');
+  if(s.shown){ card.classList.add('missed'); fb.className = 'fb show'; fb.textContent = '👀 The answer: ' + it.model + ' — say it aloud.'; }
+  else { card.classList.add('solved'); fb.className = 'fb ok'; fb.textContent = '✅ ' + full + (it.free && it.model ? '   (Dad’s idea: ' + it.model + ')' : '') + ' — read it aloud!'; }
+}
+function tyCheck(host, i){
+  const S = BS[host], it = S.b.items[i], st = lLoad(S.key) || {}, s = st[i] || (st[i] = { tries:0 });
+  if(s.done) return;
+  const text = $(host + '-in' + i).value.trim(); if(!text) return;
+  const words = norm(text).split(' ').filter(Boolean).length;
+  const bad = it.free ? wrongPast(text) : [];
+  const ok = it.free ? (words >= (it.min || 1) && !bad.length && text.indexOf('__') < 0) : it.ans.some(a => norm(a) === norm(text));
+  s.tries++; s.last = text;
+  if(!ok) logAtt(S.K, { q:strip(it.p), a:text });
+  if(ok) s.done = true; else if(!it.free && s.tries >= 2){ s.done = true; s.shown = true; }
+  lSave(S.key, st);
+  if(s.done){ tyDone(host, i, s); checkMod(S.K); }
+  else {
+    const fb = $(host + '-fb' + i); fb.className = 'fb no';
+    fb.textContent = '💡 ' + (it.free ? (bad.length ? 'Check the past tense: ' + bad.map(x=>x.w + ' → ' + x.fix).join(', ') : 'Write at least ' + (it.min || 1) + ' word' + ((it.min || 1) > 1 ? 's' : '') + '.') : (it.clue || 'Check the spelling.') + '  (one more try)');
+    const inp = $(host + '-in' + i); inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake');
+  }
+}
+
+/* sort — pickChart('classification sort'); a finished sort restores as columns. */
+BLOCK_RENDER.sort = function(host, key, b, K){
+  const done = new Set(lLoad(key) || []);
+  $(host).innerHTML = b.sorts.map(s=>(s.intro ? '<div class="qtext" style="font-size:.85rem">' + s.intro + '</div>' : '') + '<div class="sort-host" id="host-' + s.id + '"></div>').join('');
+  b.sorts.forEach(s=>{
+    if(done.has(s.id) || typeof window.pickChart !== 'function'){ sortStatic(s); return; }
+    $('host-' + s.id).innerHTML = window.pickChart('classification sort', { id:s.id, tiles:shuffle(s.tiles), zones:s.zones,
+      onComplete: function(){ const d = new Set(lLoad(key) || []); d.add(s.id); lSave(key, Array.from(d)); setTimeout(()=>sortStatic(s), 900); checkMod(K); } });
+  });
+};
+BLOCK_DONE.sort = (key, b) => (lLoad(key) || []).length >= b.sorts.length;
+function sortStatic(s){
+  $('host-' + s.id).innerHTML = '<div class="sort-static" style="grid-template-columns:repeat(' + Math.min(s.zones.length, 3) + ',1fr)">' + s.zones.map(z=>
+    '<div class="col"><h4 style="background:' + z.color + '">' + z.label + '</h4>' + s.tiles.filter(t=>t.answer === z.key).map(t=>'<div>' + t.text + '</div>').join('') + '</div>').join('') + '</div>' +
+    (s.win ? '<div class="dad-card" style="margin-top:8px">✅ ' + s.win + '</div>' : '');
+}
+
+/* order — tap the steps in order. sets: [{ title, steps:[in order], labels?, end? }] */
+BLOCK_RENDER.order = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  $(host).innerHTML = b.sets.map((s,si)=>'<div class="qcard" id="' + host + '-s' + si + '"><div class="qtext">' + s.title + '</div><div class="ord-list" id="' + host + '-l' + si + '"></div><div class="ord-bank" id="' + host + '-b' + si + '"></div><div class="fb" id="' + host + '-f' + si + '"></div></div>').join('');
+  b.sets.forEach((s,si)=>ordPaint(host, si));
+};
+BLOCK_DONE.order = (key, b) => { const st = lLoad(key) || {}; return b.sets.every((s,si)=>(st[si] || 0) >= s.steps.length); };
+function ordPaint(host, si){
+  const S = BS[host], set = S.b.sets[si], n = (lLoad(S.key) || {})[si] || 0;
+  $(host + '-l' + si).innerHTML = set.steps.slice(0, n).map((t,k)=>'<div class="ord-done"><b>' + (set.labels ? set.labels[k] : (k+1) + '.') + '</b> ' + t + '</div>').join('');
+  const left = set.steps.map((t,k)=>({ t, k })).filter(x=>x.k >= n);
+  $(host + '-b' + si).innerHTML = shuffle(left).map(x=>'<button class="tile" onclick="ordTap(\'' + host + '\',' + si + ',' + x.k + ',this)">' + x.t + '</button>').join('');
+  if(n >= set.steps.length){ $(host + '-s' + si).classList.add('solved'); const f = $(host + '-f' + si); f.className = 'fb ok'; f.textContent = '✅ ' + (set.end || 'In order! Read them aloud.'); }
+}
+function ordTap(host, si, k, btn){
+  const S = BS[host], st = lLoad(S.key) || {}, n = st[si] || 0, f = $(host + '-f' + si), set = S.b.sets[si];
+  const same = set.same && set.same.some(g => g.indexOf(k) >= 0 && g.indexOf(n) >= 0);
+  if(k === n || same){
+    if(same && k !== n){ const t = set.steps[n]; set.steps[n] = set.steps[k]; set.steps[k] = t; }
+    st[si] = n + 1; lSave(S.key, st); f.textContent = ''; ordPaint(host, si); checkMod(S.K);
+  }
+  else { logAtt(S.K, { q:strip(set.title) + ' (step ' + (n+1) + ')', a:strip(btn.innerHTML) }); btn.classList.add('nope'); setTimeout(()=>btn.classList.remove('nope'), 380); f.className = 'fb no'; f.textContent = 'Not yet — what comes ' + (n === 0 ? 'first' : 'next') + '?'; }
+}
+
+/* find — find every right tile. sets: [{ q, tiles:[{ t, ok, why? }] }] */
+BLOCK_RENDER.find = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  $(host).innerHTML = b.sets.map((s,si)=>'<div class="qcard" id="' + host + '-s' + si + '"><div class="qtext">' + s.q + '</div><div class="ord-bank">' +
+    s.tiles.map((t,ti)=>'<button class="tile" id="' + host + '-t' + si + '-' + ti + '" onclick="fdTap(\'' + host + '\',' + si + ',' + ti + ')">' + t.t + '</button>').join('') +
+    '</div><div class="find-count" id="' + host + '-c' + si + '"></div><div class="fb" id="' + host + '-f' + si + '"></div></div>').join('');
+  b.sets.forEach((s,si)=>fdPaint(host, si));
+};
+BLOCK_DONE.find = (key, b) => { const st = lLoad(key) || {}; return b.sets.every((s,si)=>(st[si] || []).length >= s.tiles.filter(t=>t.ok).length); };
+function fdPaint(host, si){
+  const S = BS[host], set = S.b.sets[si], found = (lLoad(S.key) || {})[si] || [], need = set.tiles.filter(t=>t.ok).length;
+  found.forEach(ti=>{ const el = $(host + '-t' + si + '-' + ti); el.classList.add('found'); el.disabled = true; });
+  $(host + '-c' + si).textContent = 'Found: ' + found.length + ' / ' + need;
+  if(found.length >= need){
+    $(host + '-s' + si).classList.add('solved');
+    set.tiles.forEach((t,ti)=>{ if(!t.ok){ const el = $(host + '-t' + si + '-' + ti); el.classList.add('nope-done'); el.disabled = true; } });
+    const f = $(host + '-f' + si); f.className = 'fb ok'; f.textContent = '✅ ' + (set.end || 'You found them all!');
+  }
+}
+function fdTap(host, si, ti){
+  const S = BS[host], t = S.b.sets[si].tiles[ti], st = lLoad(S.key) || {}, f = $(host + '-f' + si);
+  if(t.ok){ const a = st[si] || []; if(a.indexOf(ti) < 0) a.push(ti); st[si] = a; lSave(S.key, st); f.className = 'fb ok'; f.textContent = t.why ? '✅ ' + t.why : '✅ Yes!'; fdPaint(host, si); checkMod(S.K); }
+  else { logAtt(S.K, { q:strip(S.b.sets[si].q), a:strip(t.t) }); const el = $(host + '-t' + si + '-' + ti); el.classList.add('nope'); setTimeout(()=>el.classList.remove('nope'), 380); f.className = 'fb no'; f.textContent = '✖ ' + (t.why || 'Not this one.'); }
+}
+
+/* read — paragraphs; the next unlocks when this one's checks are solved.
+   markup: [[words|gloss]] blue word · {{words|gloss}} time word */
+function markup(text, host, pi){
+  return text.replace(/\[\[(.+?)\|(.+?)\]\]|\{\{(.+?)\|(.+?)\}\}/g, (m, a, ag, s, sg) => '<span class="' + (a ? 'tag' : 'sig') + '" data-g="' + esc((a || s) + ' — ' + (ag || sg)) + '" onclick="glossShow(this,\'' + host + '-g' + pi + '\')">' + (a || s) + '</span>');
+}
+function glossShow(el, id){ const g = $(id); g.textContent = '🔎 ' + el.dataset.g; g.classList.add('show'); }
+BLOCK_RENDER.read = function(host, key, b, K){
+  $(host).innerHTML = b.paras.map((p,pi)=>'<div class="para" id="' + host + '-p' + pi + '"><div class="lock-note">🔒 Answer the questions above to unlock this part.</div>' +
+    '<div class="passage">' + (p.label ? '<div class="ptitle">' + p.label + '</div>' : '') + markup(p.text, host, pi) + '<div class="gloss" id="' + host + '-g' + pi + '"></div></div>' +
+    (p.items && p.items.length ? '<div class="blk" id="' + host + '-q' + pi + '"></div>' : '') + '</div>').join('');
+  b.paras.forEach((p,pi)=>{ if(p.items && p.items.length) BLOCK_RENDER.mcq(host + '-q' + pi, key + '-p' + pi, { items:p.items, after:()=>readLock(host, key, b) }, K); });
+  readLock(host, key, b);
+};
+function readLock(host, key, b){
+  let open = true;
+  b.paras.forEach((p,pi)=>{ $(host + '-p' + pi).classList.toggle('locked', !open); if(p.items && p.items.length && (lLoad(key + '-p' + pi) || []).length < p.items.length) open = false; });
+}
+BLOCK_DONE.read = (key, b) => b.paras.every((p,pi)=>!p.items || !p.items.length || (lLoad(key + '-p' + pi) || []).length >= p.items.length);
+
+/* tap — tap every target phrase in a passage (circle / underline hunts).
+   segs: strings and [phrase, label, cls] targets. Wrong words flash red. */
+BLOCK_RENDER.tap = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  let ti = 0;
+  const html = b.segs.map((sg,si)=>{
+    const sp = si > 0 && !/^[.,!?]/.test(typeof sg === 'string' ? sg : sg[0]) ? ' ' : '';
+    if(typeof sg === 'string') return sp + sg.split(/(\s+)/).map(w => /\S/.test(w) ? '<span class="w" onclick="tapMiss(this,\'' + host + '\')">' + esc(w) + '</span>' : w).join('');
+    const i = ti++; return sp + '<span class="t" data-i="' + i + '" data-c="' + sg[2] + '" onclick="tapHit(\'' + host + '\',' + i + ')">' + esc(sg[0]) + '</span>';
+  }).join('');
+  BS[host].targets = b.segs.filter(sg => typeof sg !== 'string');
+  $(host).innerHTML = '<div class="tapbox">' + html + '</div><div class="find-count" id="' + host + '-c"></div><div class="tap-log" id="' + host + '-log"></div><div class="fb" id="' + host + '-fb"></div>';
+  tapPaint(host);
+};
+BLOCK_DONE.tap = (key, b) => (lLoad(key) || []).length >= b.segs.filter(sg => typeof sg !== 'string').length;
+function tapPaint(host){
+  const S = BS[host], hit = lLoad(S.key) || [];
+  $(host).querySelectorAll('.t').forEach(el=>{ const i = +el.dataset.i; if(hit.indexOf(i) >= 0) el.classList.add('hit', 'c-' + el.dataset.c); });
+  $(host + '-c').textContent = 'Found: ' + hit.length + ' / ' + S.targets.length;
+  $(host + '-log').innerHTML = hit.slice().sort((a,b)=>a-b).map(i => '<b>' + esc(S.targets[i][0]) + '</b> → ' + S.targets[i][1]).join(' · ');
+  if(hit.length >= S.targets.length){ const f = $(host + '-fb'); f.className = 'fb ok'; f.textContent = '✅ ' + (S.b.end || 'You found them all!'); }
+}
+function tapHit(host, i){ const S = BS[host], hit = lLoad(S.key) || []; if(hit.indexOf(i) < 0){ hit.push(i); lSave(S.key, hit); } tapPaint(host); checkMod(S.K); }
+function tapMiss(el, host){
+  const S = BS[host], f = $(host + '-fb');
+  if((lLoad(S.key) || []).length >= S.targets.length) return;
+  el.classList.add('miss'); setTimeout(()=>el.classList.remove('miss'), 500);
+  logAtt(S.K, { q:S.b.what || 'tap hunt', a:el.textContent });
+  f.className = 'fb no'; f.textContent = '✖ “' + el.textContent + '” is not ' + (S.b.what || 'one of them') + '.';
+}
+
+/* plan — Leo’s own chart: one row per heading, saved as he types. */
+BLOCK_RENDER.plan = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  const st = lLoad(key) || {};
+  $(host).innerHTML = '<table class="plan-tbl"><tr><th>' + b.cols[0] + '</th><th>' + b.cols[1] + '</th></tr>' +
+    b.rows.map((r,i)=>'<tr><td>' + r + '</td><td><textarea id="' + host + '-r' + i + '" placeholder="' + esc(b.ph && b.ph[i] || 'your words…') + '" oninput="planIn(\'' + host + '\')">' + esc(st[i] || '') + '</textarea></td></tr>').join('') + '</table>' +
+    '<div class="counter" id="' + host + '-cnt"></div>';
+  planCount(host);
+};
+BLOCK_DONE.plan = (key, b) => { const st = lLoad(key) || {}; return b.rows.filter((r,i)=>st[i] && st[i].trim()).length >= b.min; };
+function planIn(host){ const S = BS[host], st = {}; S.b.rows.forEach((r,i)=>{ st[i] = $(host + '-r' + i).value; }); lSave(S.key, st); planCount(host); checkMod(S.K); }
+function planCount(host){ const S = BS[host], st = lLoad(S.key) || {}, n = S.b.rows.filter((r,i)=>st[i] && st[i].trim()).length; $(host + '-cnt').innerHTML = 'Rows filled: <b class="' + (n >= S.b.min ? 'ok' : '') + '">' + n + ' / ' + S.b.min + '</b>' + (S.b.note ? ' · ' + S.b.note : ''); }
+
+/* choice — pick one option (saved). */
+BLOCK_RENDER.choice = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  const v = lLoad(key);
+  $(host).innerHTML = '<div class="choice-row">' + b.opts.map((o,i)=>'<button class="choice' + (v === i ? ' on' : '') + '" onclick="choicePick(\'' + host + '\',' + i + ')">' + o + '</button>').join('') + '</div>';
+};
+BLOCK_DONE.choice = key => lLoad(key) !== null;
+function choicePick(host, i){ const S = BS[host]; lSave(S.key, i); BLOCK_RENDER.choice(host, S.key, S.b, S.K); checkMod(S.K); }
+
+/* check — a checklist Leo ticks himself (with hints from his draft). */
+BLOCK_RENDER.check = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  const st = lLoad(key) || {};
+  $(host).innerHTML = b.items.map((it,i)=>'<button class="chk-item' + (st[i] ? ' checked' : '') + '" onclick="chkTog(\'' + host + '\',' + i + ')"><span class="chk-box">' + (st[i] ? '✓' : '') + '</span><span>' + it.t + (it.hint ? '<small>' + it.hint() + '</small>' : '') + '</span></button>').join('');
+};
+BLOCK_DONE.check = (key, b) => { const st = lLoad(key) || {}; return b.items.every((x,i)=>st[i]); };
+function chkTog(host, i){ const S = BS[host], st = lLoad(S.key) || {}; st[i] = !st[i]; lSave(S.key, st); BLOCK_RENDER.check(host, S.key, S.b, S.K); checkMod(S.K); }
+
+/* view — show Leo’s own saved work from another module. */
+BLOCK_RENDER.view = (host, key, b) => { const t = b.get(); $(host).innerHTML = '<div class="draft-view">' + (t ? esc(t) : (b.empty || 'Nothing here yet.')) + '</div>'; };
+
+/* narrative — the story, with a live meter for the four checklist points. */
+const TIME_WORDS = ['last year','last summer','last winter','last spring','last fall','last week','last night','last saturday','last sunday','yesterday','first','next','then','after that','after','before','soon','suddenly','finally','when','later','at last'];
+const SENSE_WORDS = ['saw','see','looked','heard','hear','felt','feel','touched','touch','smelled','smelt','smell','tasted','taste','loud','quiet','noise','sound','crash','boom','roar','roared','howling','dark','bright','black','gray','grey','white','yellow','orange','cold','wet','hot','warm','heavy','strong','hard','soft','salty','sweet','shook','shake','flash','lightning','thunder'];
+const EMO_WORDS = ['scared','scary','worried','happy','excited','exciting','afraid','nervous','sad','glad','surprised','angry','calm','relieved','frightened','tired','bored','safe','brave','proud','lucky'];
+const BAD_PAST = { goed:'went', seed:'saw', telled:'told', comed:'came', heared:'heard', shaked:'shook', feeled:'felt', putted:'put', hitted:'hit', maked:'made', runned:'ran', eated:'ate', drinked:'drank', thinked:'thought', buyed:'bought', catched:'caught', taked:'took', gived:'gave', falled:'fell', blowed:'blew', knowed:'knew', sayed:'said', haved:'had', doed:'did', getted:'got', winned:'won', leaved:'left', sitted:'sat', standed:'stood', bringed:'brought', breaked:'broke', writed:'wrote' };
+function wrongPast(text){
+  const out = [], low = ' ' + norm(text) + ' ';
+  Object.keys(BAD_PAST).forEach(w => { if(low.indexOf(' ' + w + ' ') >= 0) out.push({ w, fix:BAD_PAST[w] }); });
+  if(/ (i|we|he|she|they|you) seen /.test(low)) out.push({ w:'I seen', fix:'I saw' });
+  return out;
+}
+function findIn(text, list){ const low = ' ' + norm(text) + ' '; return list.filter(w => low.indexOf(' ' + w + ' ') >= 0); }
+function storyStats(text){
+  const sentences = (text.match(/[^.!?]+[.!?]+/g) || []).filter(x => x.trim().split(/\s+/).length >= 3).length;
+  return { sentences, time:findIn(text, TIME_WORDS), sense:findIn(text, SENSE_WORDS), emo:findIn(text, EMO_WORDS), bad:wrongPast(text), blanks:text.indexOf('__') >= 0 };
+}
+BLOCK_RENDER.narrative = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  const s = lLoad(key) || {};
+  $(host).innerHTML = '<div class="qcard"><div class="qtext">' + b.p + '</div>' +
+    (b.starter ? '<div class="type-row"><button class="ghost" onclick="narStarter(\'' + host + '\')">📝 Use the story frame</button></div>' : '') +
+    '<textarea class="text-ta" id="' + host + '-ta" placeholder="' + esc(b.ph || 'Write your story here…') + '" oninput="narIn(\'' + host + '\')">' + esc(s.text || '') + '</textarea>' +
+    '<div class="meter" id="' + host + '-m"></div><div class="flags" id="' + host + '-fl"></div><div class="found-words" id="' + host + '-fw"></div>' +
+    '<div class="type-row"><button class="type-go" onclick="narCheck(\'' + host + '\')">✓ I’m finished</button></div><div class="fb" id="' + host + '-fb"></div></div>';
+  narMeter(host);
+  if(s.done){ $(host + '-fb').className = 'fb ok'; $(host + '-fb').textContent = '✅ Saved — read it aloud to Dad!'; $(host).querySelector('.qcard').classList.add('solved'); }
+};
+BLOCK_DONE.narrative = key => !!(lLoad(key) || {}).done;
+function narGoal(b){ return { sentences:b.sentences || 6, time:b.time || 3, sense:b.sense || 3, emo:b.emo || 1 }; }
+function narMeter(host){
+  const b = BS[host].b, g = narGoal(b), st = storyStats($(host + '-ta').value);
+  const cell = (ok, n, goal, lbl) => '<div class="' + (ok ? 'ok' : '') + '"><b>' + n + ' / ' + goal + '</b>' + lbl + '</div>';
+  $(host + '-m').innerHTML = cell(st.sentences >= g.sentences, st.sentences, g.sentences, '📝 sentences') + cell(st.time.length >= g.time, st.time.length, g.time, '➡️ time words') +
+    cell(st.sense.length >= g.sense, st.sense.length, g.sense, '👁️👂✋ sense words') + cell(st.emo.length >= g.emo, st.emo.length, g.emo, '😮 feelings');
+  $(host + '-fl').innerHTML = (st.bad.length ? '⏪ Past tense: ' + st.bad.map(x => '<b>' + esc(x.w) + '</b> → ' + esc(x.fix)).join(' · ') + '<br>' : '') + (st.blanks ? '✏️ Fill every ______ in the frame.' : '');
+  $(host + '-fw').textContent = (st.time.length ? '➡️ ' + st.time.join(', ') + '   ' : '') + (st.sense.length ? '👁️ ' + st.sense.join(', ') + '   ' : '') + (st.emo.length ? '😮 ' + st.emo.join(', ') : '');
+  return st;
+}
+function narIn(host){ const S = BS[host], s = lLoad(S.key) || {}; s.text = $(host + '-ta').value; lSave(S.key, s); narMeter(host); }
+function narStarter(host){
+  const ta = $(host + '-ta'); if(ta.value.trim() && !confirmArm(host)) return;
+  ta.value = BS[host].b.starter; narIn(host); ta.focus();
+}
+const ARM = {};
+function confirmArm(host){ if(ARM[host]){ ARM[host] = false; return true; } ARM[host] = true; const f = $(host + '-fb'); f.className = 'fb no'; f.textContent = 'Your story is not empty — tap the frame button again to replace it.'; setTimeout(()=>{ ARM[host] = false; }, 3000); return false; }
+function narCheck(host){
+  const S = BS[host], b = S.b, g = narGoal(b), st = narMeter(host), s = lLoad(S.key) || {}, fb = $(host + '-fb');
+  s.text = $(host + '-ta').value;
+  const miss = [];
+  if(st.sentences < g.sentences) miss.push(g.sentences + ' sentences');
+  if(st.time.length < g.time) miss.push(g.time + ' time words');
+  if(st.sense.length < g.sense) miss.push(g.sense + ' sense words');
+  if(st.emo.length < g.emo) miss.push('a feeling');
+  if(st.bad.length) miss.push('the past tense fixed');
+  if(st.blanks) miss.push('every ______ filled');
+  if(!miss.length){ s.done = true; lSave(S.key, s); fb.className = 'fb ok'; fb.textContent = '✅ Saved — read it aloud to Dad!'; $(host).querySelector('.qcard').classList.add('solved'); checkMod(S.K); }
+  else { lSave(S.key, s); fb.className = 'fb no'; fb.textContent = '💡 Not yet — you need ' + miss.join(', ') + '. Your story is saved.'; }
+}
+
+/* quiz — one try per question, scored; saves after every answer; pass gate. */
+BLOCK_RENDER.quiz = function(host, key, b, K){
+  BS[host] = { key, b, K };
+  $(host).innerHTML = '<div id="' + host + '-act"><div class="qz-head"><span id="' + host + '-num"></span><span id="' + host + '-sc"></span></div><div class="qz-bar"><div class="qz-bar-fill" id="' + host + '-bar"></div></div><div class="qcard" style="margin-top:10px" id="' + host + '-qc"></div></div><div id="' + host + '-res" style="display:none"></div>';
+  const saved = lLoad(b.scoreKey);
+  if(saved && saved.finished){ qzResult(host, saved); return; }
+  qzRender(host);
+};
+BLOCK_DONE.quiz = (key, b) => !!(lLoad(b.scoreKey) || {}).passed;
+function qzState(host){ return lLoad(BS[host].key + '-progress') || { idx:0, score:0, wrong:[] }; }
+function qzRender(host){
+  const S = BS[host], items = S.b.items, p = qzState(host);
+  $(host + '-act').style.display = ''; $(host + '-res').style.display = 'none';
+  if(p.idx >= items.length){ qzFinish(host); return; }
+  $(host + '-num').textContent = 'QUESTION ' + (p.idx+1) + ' OF ' + items.length; $(host + '-sc').textContent = 'SCORE: ' + p.score;
+  $(host + '-bar').style.width = Math.round(p.idx / items.length * 100) + '%';
+  const it = items[p.idx], card = $(host + '-qc'); card.classList.remove('solved');
+  card.innerHTML = (it.tag ? '<div class="qz-tag">' + it.tag + '</div>' : '') + '<div class="qtext">' + it.q + '</div><div class="' + (it.opts.length === 2 ? 'opt2' : '') + '">' + (it.keep ? it.opts.map((o,oi)=>({ text:o, ok:oi===it.ok })) : shuffle(it.opts.map((o,oi)=>({ text:o, ok:oi===it.ok })))).map(o=>'<button class="opt" data-ok="' + (o.ok ? 1 : 0) + '" onclick="qzPick(\'' + host + '\',this)">' + o.text + '</button>').join('') + '</div>' +
+    '<div class="fb" id="' + host + '-fb"></div>' + (it.jp ? '<div class="qjp jp">🇯🇵 ' + it.jp + '</div>' : '');
+}
+function qzPick(host, btn){
+  const S = BS[host], card = $(host + '-qc'); if(card.classList.contains('solved')) return;
+  const p = qzState(host), it = S.b.items[p.idx], right = btn.dataset.ok === '1', fb = $(host + '-fb');
+  mcqSolve(card);
+  if(right){ p.score++; fb.className = 'fb ok'; fb.textContent = 'Correct! 🎉'; }
+  else { btn.classList.add('bad'); fb.className = 'fb no'; fb.textContent = 'The right answer is in green.'; p.wrong.push({ q:strip(it.q), chose:strip(btn.innerHTML), answer:strip(it.opts[it.ok]) }); logAtt(S.K, { q:strip(it.q), a:strip(btn.innerHTML) }); }
+  p.idx++; lSave(S.key + '-progress', p);
+  setTimeout(()=>qzRender(host), 1300);
+}
+function qzFinish(host){
+  const S = BS[host], p = qzState(host), total = S.b.items.length, percent = Math.round(p.score / total * 100), passed = percent >= S.b.pass * 100;
+  const prev = lLoad(S.b.scoreKey) || {};
+  const d = { score:p.score, total, percent, pct:percent, finished:true, passed: passed || !!prev.passed, done: passed || !!prev.passed, best: Math.max(p.score, prev.best || 0),
+    timestamp:new Date().toISOString(), wrongQuestions:p.wrong.map(w=>w.q), wrong:p.wrong };
+  lSave(S.b.scoreKey, d); lDel(S.key + '-progress'); qzResult(host, d); checkMod(S.K);
+}
+function qzResult(host, d){
+  const S = BS[host];
+  $(host + '-act').style.display = 'none';
+  const rz = $(host + '-res'); rz.style.display = 'block'; const wrong = d.wrong || [], need = Math.ceil(S.b.pass * d.total), ok = d.score >= need;
+  rz.innerHTML = '<div class="qz-res"><div class="qz-trophy">' + (ok ? '🏆' : '💪') + '</div><div class="qz-score-big">' + d.score + ' / ' + d.total + '</div>' +
+    '<div class="qz-msg">' + (ok ? S.b.win : 'You need ' + need + ' / ' + d.total + '. Read the cards again and try once more!') + (d.passed && !ok ? '<br>(You already passed — best ' + d.best + ' / ' + d.total + '.)' : '') + '</div>' +
+    (wrong.length ? '<div class="wrong-review"><b>Go over these:</b><br>' + wrong.map(w=>'• ' + esc(w.q) + '<br>&nbsp;&nbsp;You chose: <b style="color:var(--rd)">' + esc(w.chose) + '</b> · Answer: <b style="color:var(--gnd)">' + esc(w.answer) + '</b>').join('<br>') + '</div>' : '<div class="dad-card" style="margin-top:9px">Perfect — no mistakes! 🏆</div>') +
+    '<button class="type-go" style="margin-top:12px" onclick="qzRetry(\'' + host + '\')">↺ Try the quiz again</button></div>';
+}
+function qzRetry(host){ const S = BS[host], d = lLoad(S.b.scoreKey) || {}; d.finished = false; lSave(S.b.scoreKey, d); lDel(S.key + '-progress'); qzRender(host); }
+
+/* ═════════════════════════════════════════════════════════════════════
+   CONTENT — the deck's own words, sentences and answers first
+═════════════════════════════════════════════════════════════════════ */
+const SECTIONS = [
+  { label:'🎴 VOCAB FOUNDATIONS', cls:'always', mods:['m1','m2'] },
+  { label:'📘 STUDENT BOOK p. 18', cls:'ow', mods:['m3','m4','m5','m6','m7'] },
+  { label:'📓 WORKBOOK pp. 10–11', cls:'wb', mods:['m8','m9','m10','m11','m12'] },
+  { label:'⚽ FINAL', cls:'quiz', mods:['m13'] }
+];
+const YN = ['✅ Yes','❌ No'];
+
+/* The model, SB p. 18 — verbatim (deck slides 29–31, 33). */
+const MODEL_P1 = 'If a hurricane comes, we know what to do. We have a family plan.';
+const MODEL_P2 = 'Last year, the weather forecaster told us that a hurricane was coming. First, I helped my dad put heavy wood over the windows. It was hard work. Next, we went inside the house and turned on the radio to listen for news about the hurricane. When the hurricane came, we could hear the strong winds outside. It was scary. The rain came down hard on the roof too. Then, suddenly, there was a loud crash. The whole house shook! Everyone was worried. What was it? Soon, it was quiet and we could go outside. We saw a huge tree on the ground. Part of the tree hit the wood on the window.';
+const MODEL_P3 = 'I am so happy we had a family plan! Hopefully, there isn’t going to be a hurricane for a while.';
+
+/* ── m1 · Academic Language (slides 11–15) ── */
+defineMod('m1', { icon:'🎓', name:'Academic Language', title:'Academic Language', color:'pu', badge:'START HERE',
+  desc:'senses · emotions · experience — 3 cards, 3 games + quiz',
+  dad:'These three are writer words. We use them in the checklist and the rubric. Flip each card, play the slide games again, then pass the quiz (70%).',
+  done:'🎉 Writer words caught — senses, emotions, experience!',
+  blocks:[
+    { type:'flash', id:'cards', label:'🎴 Flip all 3 cards', words:[
+      { word:'senses', emoji:'🧠', pos:'noun (plural) · SEN-sez', def:'The five ways we know the world: sight, sound, touch, taste, smell.', sample:'“Use your <b>senses</b> to describe a storm.”', jp:'感覚（かんかく）— not センス (fashion sense)!' },
+      { word:'emotions', emoji:'😮', pos:'noun (plural) · i-MO-shuns', def:'Strong feelings like happy, scared, or worried.', sample:'“Her <b>emotions</b>: scared, worried, then happy.”', jp:'感情（かんじょう）' },
+      { word:'experience', emoji:'🎞️', pos:'noun · ik-SPEER-ee-uns', def:'Something that happened to you. In a personal narrative, you write about a real experience.', sample:'“My <b>experience</b> with a typhoon was scary.”', jp:'経験（けいけん）' } ] },
+    { type:'match', id:'body', label:'🧠 Slide 12 · senses — match the body part to its sense', heads:['BODY PART','SENSE'], pairs:[
+      { l:'👁️ eyes', r:'sight' },{ l:'👂 ears', r:'sound' },{ l:'👃 nose', r:'smell' },{ l:'👅 tongue', r:'taste' },{ l:'🖐️ fingers', r:'touch' } ] },
+    { type:'find', id:'emo', label:'😮 Slide 13 · emotions — tap the 4 feelings', sets:[
+      { q:'Which are EMOTIONS?', end:'scared · worried · happy · excited — strong feelings.', tiles:[
+        { t:'😨 scared', ok:true },{ t:'😟 worried', ok:true },{ t:'😊 happy', ok:true },{ t:'🤩 excited', ok:true },
+        { t:'🪵 heavy', ok:false, why:'heavy tells how much something weighs — not a feeling.' },{ t:'🌬️ windy', ok:false, why:'windy is weather, not a feeling.' } ] } ] },
+    { type:'sort', id:'exp', label:'🎞️ Slide 14 · experience or imagined?', sorts:[
+      { id:'wr-exp', intro:'A personal narrative is TRUE. Drag each sentence to its box.', win:'A personal narrative is a real experience — it happened to you.',
+        zones:[{ key:'e', label:'🎞️ EXPERIENCE (true)', color:'#16A34A' },{ key:'i', label:'💭 IMAGINED (not true)', color:'#7C3AED' }],
+        tiles:[{ text:'🌪️ I saw a tornado last year.', answer:'e' },{ text:'🏠 We put wood on the windows.', answer:'e' },{ text:'🌧️ I got wet in the rain.', answer:'e' },
+               { text:'🧙 A wizard stopped the storm.', answer:'i' },{ text:'🐉 A dragon made the thunder.', answer:'i' },{ text:'🚀 I flew to the moon.', answer:'i' }] } ] },
+    { type:'quiz', id:'quiz', label:'📝 Quiz — need 70%', scoreKey:'m1-quiz-score', pass:0.7, win:'Writer words — yours! 🎓', items:[
+      { tag:'SLIDE 15', q:'Which word means strong feelings like scared, worried, happy?', opts:['emotions','senses','experience'], ok:0, jp:'怖い・心配・うれしいなどの強い気持ち＝emotions' },
+      { tag:'SLIDE 15', q:'Which word means something that happened to you?', opts:['experience','senses','emotions'], ok:0, jp:'自分に起きたこと＝experience' },
+      { tag:'SLIDE 15', q:'Sight, sound, touch, taste, smell are the five …', opts:['senses','emotions','experiences'], ok:0, jp:'五感＝the five senses' },
+      { tag:'EXPERIENCE', q:'“My ______ with a typhoon was scary.”', opts:['experience','sense','emotion'], ok:0 },
+      { tag:'SENSES', q:'“Use your ______ to describe a storm.”', opts:['senses','experiences','emotions'], ok:0 },
+      { tag:'EMOTIONS', q:'“I felt scared, but a little excited.” These words show my …', opts:['emotions','senses','experience'], ok:0 }
+    ] }
+  ] });
+
+/* ── m2 · Related Vocab: the five senses + forecaster + heavy (slides 4–10, 16–22) ── */
+defineMod('m2', { icon:'🌟', name:'Related Vocab', title:'Related Vocab', color:'pu', badge:'START HERE',
+  desc:'sight · sound · touch · taste · smell · forecaster · heavy',
+  dad:'Seven storm words from the Word Desk. Flip the cards, play every game from the slides, then pass the 14-question quiz (75%).',
+  done:'🎉 Five senses + forecaster + heavy — all yours!',
+  blocks:[
+    { type:'flash', id:'cards', label:'🎴 Flip all 7 cards', words:[
+      { word:'sight', emoji:'👁️', pos:'noun · /saɪt/', def:'One of the five senses. You use your eyes to see.', sample:'“I <b>saw</b> a huge tree on the ground.” (sight)', jp:'視覚（しかく）・光景（こうけい）— not サイト (website)!' },
+      { word:'sound', emoji:'👂', pos:'noun · /saʊnd/', def:'What you hear with your ears.', sample:'“There was a loud <b>sound</b> — a crash!”', jp:'音（おと）' },
+      { word:'touch', emoji:'✋', pos:'verb / noun · /tʌtʃ/', def:'To feel something with your hands or skin.', sample:'“The ice felt cold when I <b>touched</b> it.”', jp:'触（さわ）る　touch → touched' },
+      { word:'taste', emoji:'👅', pos:'verb / noun · /teɪst/', def:'To know a food by your tongue. Also: the flavor of the food.', sample:'“The rain <b>tasted</b> salty near the sea.”', jp:'味（あじ）・味がする' },
+      { word:'smell', emoji:'👃', pos:'verb / noun · /smɛl/', def:'To know something with your nose. Also: the odor.', sample:'“I can <b>smell</b> the rain coming.”', jp:'匂（にお）い・においがする' },
+      { word:'forecaster', emoji:'🌦️', pos:'noun · FOR-kas-ter', def:'A person who says what the weather will be. Also: weather forecaster.', sample:'“The weather <b>forecaster</b> told us a hurricane was coming.” (model)', jp:'予報士（よほうし）・天気予報（てんきよほう）' },
+      { word:'heavy', emoji:'🪵', pos:'adjective · /ˈhɛvi/', def:'Weighs a lot; hard to lift. Also: heavy rain = a lot of rain.', sample:'“I helped my dad put <b>heavy</b> wood over the windows.” (model)', jp:'重（おも）い　↔ 軽（かる）い light　heavy rain = 大雨（おおあめ）' } ] },
+    { type:'find', id:'sight', label:'👁️ Slide 5 · sight — what can you SEE in a storm?', sets:[
+      { q:'Tap what you can SEE out of the window in a storm. Find 3.', end:'You see with your eyes.', tiles:[
+        { t:'⚡ a flash of lightning', ok:true },{ t:'🌳 a tree falling', ok:true },{ t:'⛈️ black clouds', ok:true },
+        { t:'🥶 a cold wind on your face', ok:false, why:'You FEEL that — touch.' },{ t:'📢 a loud thunder', ok:false, why:'You HEAR that — sound.' },{ t:'👃 wet earth', ok:false, why:'You SMELL that.' } ] } ] },
+    { type:'sort', id:'sound', label:'👂 Slide 6 · sound — loud or quiet?', sorts:[
+      { id:'wr-sound', intro:'Is it LOUD 🔊 or QUIET 🤫? (Make the sound with your voice!)',
+        zones:[{ key:'l', label:'🔊 LOUD', color:'#DC2626' },{ key:'q', label:'🤫 QUIET', color:'#3B82F6' }],
+        tiles:[{ text:'⛈️ thunder', answer:'l' },{ text:'🚨 a siren', answer:'l' },{ text:'🌬️ wind howling', answer:'l' },{ text:'❄️ snow falling', answer:'q' },{ text:'🌫️ a light fog', answer:'q' },{ text:'🏠 after the storm', answer:'q' }] } ] },
+    { type:'mcq', id:'touch', label:'✋ Slide 7 · touch — the touch box', items:[
+      { q:'📦 You put your hand in the touch box and feel: cold and wet. What is it?', opts:['❄️ ice','🔥 fire','🪨 a hot stone'], ok:0, why:'“I touched the ice. It was cold.”' },
+      { q:'touch is a regular verb. Its past is …', opts:['touched','tought','toucht'], ok:0, two:false }
+    ] },
+    { type:'match', id:'taste', label:'👅 Slide 8 · taste — match the taste word to the food', heads:['TASTE WORD','FOOD'], pairs:[
+      { l:'🍬 sweet', r:'candy' },{ l:'🧂 salty', r:'sea water' },{ l:'🍋 sour', r:'lemon' },{ l:'🌶️ spicy', r:'hot pepper' } ] },
+    { type:'sort', id:'smell', label:'👃 Slide 9 · smell — nice or yucky?', sorts:[
+      { id:'wr-smell', intro:'Is the smell NICE 😊 or YUCKY 🤢?',
+        zones:[{ key:'n', label:'😊 NICE', color:'#16A34A' },{ key:'y', label:'🤢 YUCKY', color:'#D97706' }],
+        tiles:[{ text:'🌱 wet earth after rain', answer:'n' },{ text:'🌸 flowers', answer:'n' },{ text:'🍞 fresh bread', answer:'n' },{ text:'🔥 smoke', answer:'y' },{ text:'🗑️ old garbage', answer:'y' },{ text:'🐟 a dead fish', answer:'y' }] } ] },
+    { type:'sort', id:'which', label:'🧠 Slides 10 + 21 · which sense is it?', sorts:[
+      { id:'wr-sense10', intro:'Slide 10: Which sense is it?',
+        zones:[{ key:'s', label:'👁️ SIGHT', color:'#334155' },{ key:'h', label:'👂 SOUND', color:'#EA580C' },{ key:'t', label:'✋ TOUCH', color:'#3B82F6' }],
+        tiles:[{ text:'⚡ lightning flash', answer:'s' },{ text:'🌳 a falling tree', answer:'s' },{ text:'🔊 thunder', answer:'h' },{ text:'🌬️ strong wind noise', answer:'h' },{ text:'🥶 cold rain', answer:'t' },{ text:'🪵 heavy wood', answer:'t' }] },
+      { id:'wr-sense21', intro:'Slide 21 · Brainstorm! Put each weather word on the right chart.',
+        zones:[{ key:'s', label:'👁️ SIGHT', color:'#334155' },{ key:'h', label:'👂 SOUND', color:'#EA580C' },{ key:'t', label:'✋ TOUCH', color:'#3B82F6' }],
+        tiles:[{ text:'☀️ sun', answer:'s' },{ text:'☁️ clouds', answer:'s' },{ text:'⚡ lightning', answer:'s' },{ text:'🌩️ thunder', answer:'h' },{ text:'🌬️ wind blowing', answer:'h' },{ text:'🌧️ rain on the roof', answer:'h' },{ text:'🥶 cold', answer:'t' },{ text:'💧 wet', answer:'t' },{ text:'🥵 hot', answer:'t' }] } ] },
+    { type:'mcq', id:'more', label:'🌧️ Slide 22 · one word, many senses', two:true, items:[
+      { q:'“I hear rain on the roof.” Which sense?', opts:['👂 sound','👁️ sight'], ok:0 },
+      { q:'“I feel wind on my face.” Which sense?', opts:['✋ touch','👂 sound'], ok:0 },
+      { q:'“I taste a snowflake!” Which sense?', opts:['👅 taste','👃 smell'], ok:0 },
+      { q:'“I feel the ground shake.” Which sense?', opts:['✋ touch','👁️ sight'], ok:0 },
+      { q:'“I see trees move.” Which sense?', opts:['👁️ sight','✋ touch'], ok:0 },
+      { q:'Can you see, hear AND feel rain?', opts:YN, ok:0, why:'Yes! One word, many senses — that makes our writing richer.' }
+    ] },
+    { type:'find', id:'fore', label:'🌦️ Slide 17 · forecaster — what would a forecaster say?', sets:[
+      { q:'Tap the 3 things a weather forecaster would say.', end:'A forecaster says what the weather will be.', tiles:[
+        { t:'🌧️ “It will rain tomorrow.”', ok:true },{ t:'🌀 “A hurricane is coming.”', ok:true },{ t:'🌡️ “It will be 30 degrees.”', ok:true },
+        { t:'⚽ “Goal! He scored!”', ok:false, why:'That is a soccer commentator.' },{ t:'🍕 “Dinner is ready.”', ok:false, why:'That is Mom or Dad!' },{ t:'📚 “Open your books.”', ok:false, why:'That is a teacher.' } ] } ] },
+    { type:'sort', id:'heavy', label:'🪵 Slide 18 · heavy or light?', sorts:[
+      { id:'wr-heavy', intro:'Is it HEAVY 🪵 or LIGHT 🪶?',
+        zones:[{ key:'h', label:'🪵 HEAVY', color:'#92400E' },{ key:'l', label:'🪶 LIGHT', color:'#0EA5E9' }],
+        tiles:[{ text:'🪵 wood for the windows', answer:'h' },{ text:'🪨 a big stone', answer:'h' },{ text:'🧱 a pile of bricks', answer:'h' },{ text:'🪶 a feather', answer:'l' },{ text:'🎈 a balloon', answer:'l' },{ text:'☁️ a cloud', answer:'l' }] } ] },
+    { type:'mcq', id:'use', label:'✅ Slide 19 · storm words — use them', items:[
+      { q:'A weather ______ says what tomorrow’s weather will be.', opts:['🌦️ forecaster','📻 radio','🏠 shelter'], ok:0 },
+      { q:'We put ______ wood on the windows. It was hard work.', opts:['🪵 heavy','🪶 light','🌧️ wet'], ok:0 },
+      { q:'“It was ______ rain all night.” (a lot of rain)', opts:['heavy','light','quiet'], ok:0 }
+    ] },
+    { type:'quiz', id:'quiz', label:'📝 Quiz — 14 questions, need 75%', scoreKey:'m2-quiz-score', pass:0.75, win:'Seven storm words — mastered! 🌟', items:[
+      { tag:'SIGHT', q:'You use your eyes for …', opts:['sight','sound','smell'], ok:0 },
+      { tag:'SIGHT', q:'“The sun is a beautiful ______.”', opts:['sight','taste','touch'], ok:0 },
+      { tag:'SOUND', q:'You hear a ______ with your ears.', opts:['sound','sight','taste'], ok:0 },
+      { tag:'SOUND', q:'“I heard the ______ of rain on the roof.”', opts:['sound','smell','sight'], ok:0 },
+      { tag:'TOUCH', q:'“The ice felt cold when I ______ it.”', opts:['touched','tasted','smelled'], ok:0 },
+      { tag:'TOUCH', q:'Which sense tells you the wood is heavy and rough?', opts:['touch','taste','sight'], ok:0 },
+      { tag:'TASTE', q:'You ______ food with your tongue.', opts:['taste','smell','touch'], ok:0 },
+      { tag:'TASTE', q:'“What does lemon taste like?” “It tastes ______.”', opts:['sour','loud','heavy'], ok:0 },
+      { tag:'SMELL', q:'You ______ with your nose.', opts:['smell','taste','hear'], ok:0 },
+      { tag:'SMELL', q:'“After a storm, I can smell ______.”', opts:['wet earth','loud thunder','a flash'], ok:0 },
+      { tag:'FORECASTER', q:'Who tells us about the weather tomorrow?', opts:['a weather forecaster','a soccer player','a chef'], ok:0 },
+      { tag:'FORECASTER', q:'“The weather forecaster ______ us that a hurricane was coming.”', opts:['told','telled','tell'], ok:0 },
+      { tag:'HEAVY', q:'Which one is heavy?', opts:['a pile of bricks','a feather','a balloon'], ok:0 },
+      { tag:'HEAVY', q:'“Heavy rain” means …', opts:['a lot of rain','a little rain','no rain'], ok:0 }
+    ] }
+  ] });
+
+/* ── m3 · What is a Personal Narrative? (slides 23, 28–32, 36) ── */
+defineMod('m3', { icon:'📖', name:'Personal Narrative', title:'What is a Personal Narrative?', color:'or',
+  desc:'What it is + read “Safe not Sorry!”', done:'🎉 You read the model like a reporter!',
+  dad:'A narrative is a story. A personal narrative is YOUR story — it really happened to you. Read the model one part at a time; answer the questions to unlock the next part.',
+  blocks:[
+    { type:'note', id:'box', label:'📘 SB p. 18 · the writing box', html:'<div class="passage"><div class="ptitle">Personal narrative</div>When you write a personal narrative, you tell a story. You want the reader to feel like he or she is there. To do this you can use descriptive language that uses the senses — sight, sound, taste, smell, and touch. To express the sequence of events, you can use time expressions such as after, before, next, and then.</div>' },
+    { type:'mcq', id:'what', label:'📖 Slide 23 · What is a personal narrative?', items:[
+      { q:'A personal narrative is …', opts:['a true story. It happened to you.','a story about a dragon.','a list of weather words.'], ok:0 },
+      { q:'What do you want the reader to feel?', opts:['like he or she is there','sleepy','angry with you'], ok:0 },
+      { q:'How do you help the reader feel there?', opts:['Use the senses: sight, sound, taste, smell, touch.','Write very short.','Use only numbers.'], ok:0 },
+      { q:'How do you put the events in order?', opts:['Use time words: after, before, next, then.','Use big letters.','Write the end first.'], ok:0 },
+      { q:'“A personal narrative is your ______.”', opts:['experience','forecast','dictionary'], ok:0, why:'It is your story — your experience.' }
+    ] },
+    { type:'mcq', id:'title', label:'🛡️ Slide 28 · the title', items:[
+      { q:'The title is “Safe not Sorry!” What does it mean?', opts:['Be careful and ready — better safe than sorry.','Say sorry to your friends.','Storms are always safe.'], ok:0, why:'用心しておけば安心 — that is why the family has a plan.' }
+    ] },
+    { type:'read', id:'read1', label:'📖 Read 1 · the story (SB p. 18, slides 29–31)', paras:[
+      { label:'Safe not Sorry! · Paragraph 1', text:'If a hurricane comes, we know what to do. We have a [[family plan|📋 what the family will do when a storm comes]].',
+        items:[{ q:'What does the family have?', opts:['a family plan','a new car','a big boat'], ok:0 }] },
+      { label:'Paragraph 2 (a)', text:'{{Last year|time words — when the story happened}}, the weather [[forecaster|🌦️ a person who says what the weather will be]] told us that a hurricane was coming. {{First|time word — the first thing}}, I helped my dad put [[heavy|🪵 weighs a lot; hard to lift]] wood over the windows. It was hard work. {{Next|time word — the thing after}}, we went inside the house and turned on the radio to listen for news about the hurricane.',
+        items:[
+          { q:'Who told them a hurricane was coming?', opts:['the weather forecaster','her teacher','a friend'], ok:0 },
+          { q:'What did she do first?', opts:['She helped her dad put heavy wood over the windows.','She went to the beach.','She turned on the TV.'], ok:0 },
+          { q:'What did they do next?', opts:['They went inside and turned on the radio.','They went outside to play.'], ok:0 } ] },
+      { label:'Paragraph 2 (b)', text:'{{When|time word — at that time}} the hurricane came, we could hear the [[strong winds|🌬️ very fast, powerful wind]] outside. It was [[scary|😨 it made her afraid — an emotion]]. The rain came down hard on the roof too. {{Then|time word — after that}}, {{suddenly|time word — very quickly, with no warning}}, there was a [[loud crash|💥 a big, sudden noise]]. The whole house [[shook|past of shake — moved quickly from side to side]]!',
+        items:[
+          { q:'👂 What could they hear outside?', opts:['the strong winds','birds singing','music'], ok:0 },
+          { q:'What happened then, suddenly?', opts:['There was a loud crash. The whole house shook!','The sun came out.','The radio stopped.'], ok:0 } ] },
+      { label:'Paragraph 2 (c)', text:'Everyone was [[worried|😟 thinking something bad may happen — an emotion]]. What was it? {{Soon|time word — after a short time}}, it was [[quiet|🤫 no noise]] and we could go outside. We saw a [[huge|very, very big]] tree on the ground. Part of the tree hit the wood on the window.',
+        items:[
+          { q:'👁️ What did they see outside?', opts:['a huge tree on the ground','a big boat','a rainbow'], ok:0 },
+          { q:'What do you think the loud crash was?', opts:['the tree hitting the wood on the window','thunder in the radio','Dad’s car'], ok:0, why:'Part of the tree hit the wood on the window — the heavy wood kept them safe!' } ] },
+      { label:'Paragraph 3', text:'I am so [[happy|😊 an emotion]] we had a family plan! [[Hopefully|I hope]], there isn’t going to be a hurricane for a while.',
+        items:[
+          { q:'😊 How does she feel at the end?', opts:['happy','angry','bored'], ok:0 },
+          { q:'What does “Hopefully” mean?', opts:['I hope','I know','I forgot'], ok:0 } ] }
+    ] },
+    { type:'mcq', id:'act1', label:'🔍 Slide 32 · SB Activity 1 · check the model', items:[
+      { q:'🌀 How does the writer describe the hurricane?', opts:['Strong winds, hard rain, a loud crash. The whole house shook.','Sunny and warm.','Quiet and boring.'], ok:0 },
+      { q:'👀 What does she hear and see?', opts:['She hears the strong winds and a loud crash. She sees a huge tree on the ground.','She hears music. She sees a rainbow.'], ok:0 },
+      { q:'😟 How does she feel?', opts:['Scary → worried → happy. Her feelings change!','Happy the whole time.','Angry the whole time.'], ok:0 }
+    ] },
+    { type:'order', id:'events', label:'🔢 Slide 36 · put the story in order', sets:[
+      { title:'Tap the six events 1 → 6. Then tell the story with First, Next, When, Then, Soon.', steps:['the forecaster told us','I helped my dad put wood on the windows','we turned on the radio','the hurricane came','there was a loud crash','we saw a huge tree'], end:'That is the order the writer used!' } ] }
+  ] });
+
+/* ── m4 · Key Expressions (slides 24–27, 43–47, 49) ── */
+defineMod('m4', { icon:'💬', name:'Key Expressions', title:'Key Expressions', color:'or',
+  desc:'I saw · I heard · I felt · time words · past tense', done:'🎉 Senses, time words and past verbs — ready to write!',
+  dad:'Three writer tools: sense sentences (I saw / I heard / I felt), time words (First, Next, Then, Soon, before, after) and irregular past verbs (told, saw, went, came, heard, shook).',
+  blocks:[
+    { type:'sort', id:'sand', label:'🏜️ Slides 24–25 · sandstorm sentences', sorts:[
+      { id:'wr-sand', intro:'Imagine you are in a sandstorm. Which sense? Drag each sentence to SAW, HEARD or FELT.', win:'saw · heard · felt are irregular past verbs!',
+        zones:[{ key:'s', label:'👁️ I SAW', color:'#334155' },{ key:'h', label:'👂 I HEARD', color:'#EA580C' },{ key:'f', label:'🖐️ I FELT', color:'#3B82F6' }],
+        tiles:[{ text:'🏜️ I saw a yellow cloud.', answer:'s' },{ text:'🚗 I saw cars stop.', answer:'s' },{ text:'🌬️ I heard the wind.', answer:'h' },{ text:'📢 I heard people shout.', answer:'h' },{ text:'🔥 I felt hot sand.', answer:'f' },{ text:'😨 I felt scared.', answer:'f' }] } ] },
+    { type:'typed', id:'reporter', label:'🎙️ Slide 24 · be a reporter in a sandstorm', hint:'Tell one thing for each sense. Any true idea is fine.', items:[
+      { p:'👁️ What did you see?', pre:'I saw ', free:true, min:2, model:'I saw a huge orange cloud.' },
+      { p:'🖐️ What did you feel?', pre:'I felt ', free:true, min:1, model:'I felt hot sand on my face.' },
+      { p:'👂 What did you hear?', pre:'I heard ', free:true, min:2, model:'I heard a loud wind.' } ] },
+    { type:'order', id:'time', label:'➡️ Slide 26 · time words — put the storm in order', sets:[
+      { title:'Tap 1 → 4!', steps:['First, we put wood on the windows.','Next, we turned on the radio.','Then, the hurricane came.','Soon, it was quiet.'], end:'English puts the time word first, with a comma: “Next, we …”' } ] },
+    { type:'mcq', id:'ba', label:'◀▶ Slide 27 · before or after?', two:true, items:[
+      { q:'We put wood on the windows ______ the hurricane came.', opts:['before','after'], ok:0 },
+      { q:'We went outside ______ the storm was over.', opts:['after','before'], ok:0 },
+      { q:'I turned on the radio ______ I listened for news.', opts:['before','after'], ok:0 },
+      { q:'I eat breakfast ______ I go to school.', opts:['before','after'], ok:0 }
+    ] },
+    { type:'match', id:'past', label:'⏪ Slide 45 · now → before (irregular past)', heads:['NOW','BEFORE'], pairs:[
+      { l:'tell', r:'told' },{ l:'see', r:'saw' },{ l:'go', r:'went' },{ l:'come', r:'came' },{ l:'hear', r:'heard' },{ l:'shake', r:'shook' } ] },
+    { type:'sort', id:'reg', label:'🔀 Slide 46 · regular or irregular?', sorts:[
+      { id:'wr-reg', intro:'Regular (-ed) or irregular (the word changes)?', win:'No -ed? Then it is irregular — check SB p. 168.',
+        zones:[{ key:'r', label:'➕ REGULAR (-ed)', color:'#16A34A' },{ key:'i', label:'🔀 IRREGULAR', color:'#EA580C' }],
+        tiles:[{ text:'🤝 helped', answer:'r' },{ text:'🔄 turned', answer:'r' },{ text:'✋ touched', answer:'r' },{ text:'👀 saw', answer:'i' },{ text:'🗣️ told', answer:'i' },{ text:'🏠 went', answer:'i' }] } ] },
+    { type:'mcq', id:'check', label:'✅ Slides 44, 47 · which one is right?', items:[
+      { q:'Last year, the forecaster ______ us a hurricane was coming.', opts:['told','tell','telled'], ok:0 },
+      { q:'I ______ a huge tree on the ground.', opts:['saw','seed','see'], ok:0 },
+      { q:'We ______ inside the house.', opts:['went','goed','go'], ok:0 },
+      { q:'🇯🇵 Japanese always adds -た. In English …', opts:['regular verbs add -ed, irregular verbs change: go → went','every verb adds -ed: go → goed'], ok:0 },
+      { q:'Which one is wrong?', opts:['I goed outside.','I went outside.','I helped my dad.'], ok:0, why:'✖ I goed → ✔ I went.' },
+      { q:'Part of the tree ______ the wood on the window. (hit → ?)', opts:['hit','hitted','hat'], ok:0, why:'put → put, hit → hit: they do not change.' }
+    ] },
+    { type:'typed', id:'forms', label:'⌨️ Type the past form', hint:'Two tries, then you see it.', items:[
+      { p:'see →', ans:['saw'], model:'saw' },{ p:'hear →', ans:['heard'], model:'heard' },{ p:'go →', ans:['went'], model:'went' },
+      { p:'come →', ans:['came'], model:'came' },{ p:'tell →', ans:['told'], model:'told' },{ p:'shake →', ans:['shook'], model:'shook' },
+      { p:'feel →', ans:['felt'], model:'felt' },{ p:'put →', ans:['put'], model:'put' },{ p:'help →', ans:['helped'], model:'helped' },{ p:'turn →', ans:['turned'], model:'turned' } ] },
+    { type:'mcq', id:'alive', label:'💡 Slide 49 · which sentence makes you feel it?', items:[
+      { q:'Which is better?', opts:['The strong wind roared and the rain hit the roof hard.','The storm was bad.'], ok:0, why:'It uses sound and touch — you can hear it!' },
+      { q:'Which is better?', opts:['My hands were cold and I was scared.','I was scared.'], ok:0, why:'A sense (cold hands) + an emotion.' },
+      { q:'Which is better?', opts:['Then, suddenly, there was a loud crash!','There was a crash.'], ok:0, why:'Time words + a sound word.' }
+    ] }
+  ] });
+
+/* ── m5 · Plan My Chart (slides 33–35, 37–41) ── */
+const TAP_SENSES = ['If a hurricane comes, we know what to do. We have a family plan. Last year, the weather forecaster told us that a hurricane was coming. First, I helped my dad put', ['heavy wood','touch ✋','c-sense'], 'over the windows. It was hard work. Next, we went inside the house and turned on the radio to listen for news about the hurricane. When the hurricane came, we could hear the', ['strong winds','sound 👂','c-sense'], 'outside. It was', ['scary','emotion 😮','c-emo'], '. The rain', ['came down hard','sound 👂','c-sense'], 'on the roof too. Then, suddenly, there was a', ['loud crash','sound 👂','c-sense'], '. The whole house', ['shook','touch ✋','c-sense'], '! Everyone was', ['worried','emotion 😮','c-emo'], '. What was it? Soon, it was', ['quiet','sound 👂','c-sense'], 'and we could go outside. We saw a', ['huge tree','sight 👁️','c-sense'], 'on the ground.', ['Part of the tree','sight 👁️','c-sense'], 'hit the', ['wood on the window','sight 👁️','c-sense'], '. I am so', ['happy','emotion 😮','c-emo'], 'we had a family plan! Hopefully, there isn’t going to be a hurricane for a while.'];
+const TAP_TIME = ['If a hurricane comes, we know what to do. We have a family plan.', ['Last year,','when it happened','c-time'], 'the weather forecaster told us that a hurricane was coming.', ['First,','the first event','c-time'], 'I helped my dad put heavy wood over the windows. It was hard work.', ['Next,','the event after','c-time'], 'we went inside the house and turned on the radio to listen for news about the hurricane.', ['When','at that time','c-time'], 'the hurricane came, we could hear the strong winds outside. It was scary. The rain came down hard on the roof too.', ['Then,','after that','c-time'], ['suddenly,','very quickly — no warning','c-time'], 'there was a loud crash. The whole house shook! Everyone was worried. What was it?', ['Soon,','after a short time','c-time'], 'it was quiet and we could go outside. We saw a huge tree on the ground. Part of the tree hit the wood on the window. I am so happy we had a family plan! Hopefully, there isn’t going to be a hurricane for a while.'];
+defineMod('m5', { icon:'🗺️', name:'Plan My Chart', title:'Plan My Chart', color:'or',
+  desc:'Find the writer’s words · fill YOUR senses chart', done:'🎉 Your plan is ready — now write!',
+  dad:'First find the writer’s tools in the model (circle the senses and feelings, underline the time words). Then plan YOUR storm.',
+  blocks:[
+    { type:'tap', id:'circle', label:'◯ Read 2 · circle the sense and emotion words (slides 33, 37)', hint:'Tap the 12 sense and emotion words and phrases. 👁️ sight · 👂 sound · ✋ touch · 😮 emotion', what:'a sense or emotion word', segs:TAP_SENSES, end:'12 sense and emotion words — they make us feel it!' },
+    { type:'tap', id:'underline', label:'▁ Read 3 · underline the time words (slides 35, 37)', hint:'Tap the 7 time words and phrases that show the order of events.', what:'a time word', segs:TAP_TIME, end:'7 time words — they keep the story in order!' },
+    { type:'mcq', id:'easier', label:'🔍 Slide 37 · what the writer used', items:[
+      { q:'Senses and emotions make us …', opts:['feel the story','skip the story'], ok:0, two:true },
+      { q:'Time words keep the story …', opts:['in order','very short'], ok:0, two:true },
+      { q:'Which senses did the writer NOT use?', opts:['taste and smell','sight and sound','touch and sight'], ok:0, why:'“You can write about all or only some senses.” (WB p. 10)' }
+    ] },
+    { type:'typed', id:'choose', label:'🌪️ Slide 38 · choose your storm', hint:'A typhoon? A thunderstorm? A heavy snow? A heat wave? No storm? Use a photo from SB pp. 6–11.', items:[
+      { p:'What type of weather was it?', pre:'I want to write about a ', free:true, min:1, model:'I want to write about a typhoon.' },
+      { p:'How did you feel? Pick two feelings.', pre:'I felt ', free:true, min:3, model:'I felt scared and worried.' } ] },
+    { type:'note', id:'dadmodel', label:'🌪️ Slide 39 · Dad’s chart', html:'<table class="plan-tbl"><tr><th>SENSE</th><th>WORDS</th></tr><tr><td>👁️ Sight</td><td class="model">trees blowing · funnel</td></tr><tr><td>👂 Sound</td><td class="model">loud noise · wind</td></tr><tr><td>🖐️ Touch</td><td class="model">wet · wind</td></tr><tr><td>😮 Emotions</td><td class="model">afraid · worried, excited</td></tr></table><div class="dad-card" style="margin-top:8px">🌪️ Dad’s model: “I saw a tornado once. I was afraid and worried, but it was also a little exciting.”</div>' },
+    { type:'sort', id:'build', label:'🗂️ Slide 40 · build the chart', sorts:[
+      { id:'wr-build', intro:'Put each word under the right heading.',
+        zones:[{ key:'s', label:'👁️ SIGHT', color:'#334155' },{ key:'h', label:'👂 SOUND', color:'#EA580C' },{ key:'t', label:'✋ TOUCH', color:'#3B82F6' },{ key:'e', label:'😮 EMOTIONS', color:'#DB2777' }],
+        tiles:[{ text:'🌀 a funnel cloud', answer:'s' },{ text:'🌳 trees blowing', answer:'s' },{ text:'📢 loud noise', answer:'h' },{ text:'🌬️ howling wind', answer:'h' },{ text:'💧 wet', answer:'t' },{ text:'🥶 cold', answer:'t' },{ text:'😨 afraid', answer:'e' },{ text:'😟 worried', answer:'e' },{ text:'🤩 excited', answer:'e' }] } ] },
+    { type:'plan', id:'chart', label:'✍️ My chart — senses and emotions', hint:'Write words for YOUR storm. Add at least two words in a row. Fill 4 rows or more (Emotions too!).', cols:['SENSE','MY WORDS'], rows:['👁️ Sight','👂 Sound','🖐️ Touch','👅 Taste','👃 Smell','😮 Emotions'], ph:['dark clouds, lightning…','thunder, wind…','cold rain, wet…','salty rain… (if any)','wet earth… (if any)','scared, worried, excited…'], min:4, note:'taste and smell are optional' },
+    { type:'order', id:'steps', label:'📋 Slide 41 · plan like the writer (WB p. 10 steps)', sets:[
+      { title:'Put the writer’s 7 steps in order. Tap 1 → 7.', steps:['Choose something that happened.','Write the events in order.','Write about your feelings.','Add descriptions of senses.','Write a first sentence.','Write what happened in order.','Write a closing sentence.'], same:[[1,5]], end:'Steps 2 and 6 both put the events in order — the book lists it twice.' } ] },
+    { type:'typed', id:'ends', label:'🎬🏁 Slide 41 · your first and closing sentences', hint:'The writer’s: “If a hurricane comes, we know what to do.” · “Hopefully, there isn’t going to be a hurricane for a while.”', items:[
+      { p:'🎬 First sentence — say what the story is about.', pre:'If a ', post:' comes, we know what to do.', free:true, min:1, model:'If a typhoon comes, we know what to do.' },
+      { p:'🏁 Closing sentence — how do you feel now?', pre:'Hopefully, ', free:true, min:3, model:'Hopefully, there isn’t going to be a typhoon for a while.' } ] }
+  ] });
+
+/* ── m6 · Write! (slides 48, 50, 51; WB Act 3) ── */
+function planText(key, rows){ const st = lLoad(key) || {}; return rows.map((r,i)=>st[i] && st[i].trim() ? r + ': ' + st[i].trim() : '').filter(Boolean).join('\n'); }
+function typedText(key, items){ const st = lLoad(key) || {}; return items.map((it,i)=>st[i] && st[i].last ? (it.pre || '') + st[i].last + (it.post || '') : '').filter(Boolean).join('\n'); }
+const M5_ROWS = ['👁️ Sight','👂 Sound','🖐️ Touch','👅 Taste','👃 Smell','😮 Emotions'];
+const TAP_DAD1 = ['If a typhoon comes, we know what to do.', ['Last summer,','when it happened','c-time'], 'a typhoon came to our city.', ['First,','the first event','c-time'], 'we put heavy boxes by the door.', ['Next,','the event after','c-time'], 'we turned on the TV and listened to the forecaster.', ['When','at that time','c-time'], 'the typhoon came, I heard the strong wind. It was scary. The rain hit the windows hard.', ['Then,','after that','c-time'], ['suddenly,','no warning','c-time'], 'the lights went out! Everyone was worried.', ['Soon,','after a short time','c-time'], 'it was quiet. I saw broken branches on the street. I am so glad we were ready!'];
+defineMod('m6', { icon:'✏️', name:'Write!', title:'Write! — my storm story', color:'or',
+  desc:'Dad’s two models, then YOUR personal narrative', done:'🎉 Your storm story is written — read it to Dad!',
+  dad:'Write in three parts: a first sentence, the events in order (with senses and feelings), and a closing sentence. This is WB p. 11 Activity 3 too — write it here.',
+  blocks:[
+    { type:'tap', id:'model1', label:'🌀 Slide 50 · Dad’s model 1 — Typhoon Night', hint:'Read it aloud. Tap the 7 orange time words.', what:'a time word', segs:TAP_DAD1, end:'First sentence → events in order → closing sentence. All verbs are past: put, came, heard, hit, went, saw.' },
+    { type:'note', id:'model2', label:'❄️ Slide 51 · Dad’s model 2 — The Snow Day', html:'<div class="passage"><div class="ptitle">The Snow Day</div>Last winter, a blizzard came to our town. First, I looked out the window. I saw white snow everywhere. Next, I put on my coat and went outside. The snow felt cold on my face. Then, I heard a loud noise. It was a snowplow! I was excited. After that, my dad made hot chocolate. It tasted sweet. I was so happy! Hopefully, we will have another snow day soon.</div>' },
+    { type:'find', id:'senses2', label:'🔎 The Snow Day · find the four sense sentences', sets:[
+      { q:'Which sentences use a sense? Find 4.', end:'sight · touch · sound · taste — the writer used four senses!', tiles:[
+        { t:'I saw white snow everywhere.', ok:true, why:'👁️ sight' },{ t:'The snow felt cold on my face.', ok:true, why:'✋ touch' },
+        { t:'Then, I heard a loud noise.', ok:true, why:'👂 sound' },{ t:'It tasted sweet.', ok:true, why:'👅 taste' },
+        { t:'Last winter, a blizzard came to our town.', ok:false, why:'That tells WHEN and WHAT — no sense word.' },
+        { t:'After that, my dad made hot chocolate.', ok:false, why:'That is an event — the next sentence has the taste.' },
+        { t:'Hopefully, we will have another snow day soon.', ok:false, why:'That is the closing sentence.' } ] } ] },
+    { type:'mcq', id:'parts', label:'🧩 The three parts', items:[
+      { q:'Typhoon Night — what is the first sentence?', opts:['If a typhoon comes, we know what to do.','Soon, it was quiet.','I am so glad we were ready!'], ok:0 },
+      { q:'The Snow Day — what is the closing sentence?', opts:['Hopefully, we will have another snow day soon.','Last winter, a blizzard came to our town.','It was a snowplow!'], ok:0 },
+      { q:'Which feeling words are in The Snow Day?', opts:['excited, happy','scared, worried','angry, bored'], ok:0 }
+    ] },
+    { type:'view', id:'myplan', label:'🗺️ Your chart from Plan My Chart', get:()=>planText('m5-chart', M5_ROWS), empty:'Fill your chart in 🗺️ Plan My Chart first — or start writing now.' },
+    { type:'narrative', id:'story', label:'✍️ Write your personal narrative', p:'Write about YOUR storm. Use your chart. Use First, Next, When, Then, Soon. Add sight, sound, touch — and your feelings. Write in the past tense.',
+      starter:'If a ______ comes, we know what to do. Last ______, ______. First, ______. Next, ______. Then, suddenly, ______. Soon, ______. I am so ______!',
+      ph:'If a typhoon comes, we know what to do. Last summer, …', sentences:6, time:3, sense:3, emo:1 }
+  ] });
+
+/* ── m7 · Edit & Share (slides 52–56) ── */
+function m6Stats(){ return storyStats(((lLoad('m6-story') || {}).text) || ''); }
+defineMod('m7', { icon:'✅', name:'Edit & Share', title:'Edit Checklist + Share', color:'or', wide:true,
+  desc:'Check your story · be the editor · share frames · soccer story', done:'🎉 Edited and shared — a real Story Desk reporter!',
+  dad:'Read your story out loud. Does it sound right? Check each point, fix one thing, then share it.',
+  blocks:[
+    { type:'view', id:'draft', label:'📄 Your story', get:()=> (lLoad('m6-story') || {}).text, empty:'Write your story in ✏️ Write! first.' },
+    { type:'check', id:'list', label:'✅ Slide 52 · check your writing', items:[
+      { t:'Does it clearly describe an experience about a storm?', hint:()=>'Say what storm and when it happened.' },
+      { t:'Does it include details related to the five senses?', hint:()=>{ const s = m6Stats(); return s.sense.length ? 'Found: ' + s.sense.join(', ') : 'Find sight, sound, touch — maybe taste or smell.'; } },
+      { t:'Does it describe the writer’s emotions?', hint:()=>{ const s = m6Stats(); return s.emo.length ? 'Found: ' + s.emo.join(', ') : 'Find words like scared, worried, excited, happy.'; } },
+      { t:'Does it include words to signal sequence?', hint:()=>{ const s = m6Stats(); return s.time.length ? 'Found: ' + s.time.join(', ') : 'Find after, before, next, then (also first, soon).'; } },
+      { t:'Are your irregular past tense verbs right?', hint:()=>{ const s = m6Stats(); return s.bad.length ? '⚠️ Fix: ' + s.bad.map(x=>x.w + ' → ' + x.fix).join(', ') : 'saw, told, heard, went… — read them again.'; } } ] },
+    { type:'find', id:'editor', label:'🔎 Slide 53 · be the editor — find the mistakes', sets:[
+      { q:'Tap the 3 sentences with wrong past tense verbs.', end:'seen → saw · goed → went · telled → told', tiles:[
+        { t:'Yesterday I seen a flash of lightning.', ok:true, why:'seen → saw' },{ t:'Then I goed outside.', ok:true, why:'goed → went' },{ t:'The forecaster telled us about the storm.', ok:true, why:'telled → told' },
+        { t:'We heard a loud crash.', ok:false, why:'heard is right.' },{ t:'Then, suddenly, the lights went out.', ok:false, why:'went is right.' },{ t:'I helped my dad.', ok:false, why:'helped is right (regular -ed).' } ] } ] },
+    { type:'typed', id:'fix', label:'✏️ Type the fixed sentence', hint:'Two tries, then you see it.', items:[
+      { p:'Yesterday I seen a flash of lightning.', ans:['Yesterday I saw a flash of lightning.','Yesterday, I saw a flash of lightning.'], model:'Yesterday I saw a flash of lightning.', clue:'see → saw' },
+      { p:'Then I goed outside.', ans:['Then I went outside.','Then, I went outside.'], model:'Then I went outside.', clue:'go → went' },
+      { p:'The forecaster telled us about the storm.', ans:['The forecaster told us about the storm.'], model:'The forecaster told us about the storm.', clue:'tell → told' } ] },
+    { type:'match', id:'frames', label:'🗣️ Slide 54 · share frames', heads:['FRAME','EXAMPLE'], pairs:[
+      { l:'💡 One thing that was interesting was…', r:'“…the loud crash.”' },
+      { l:'❓ Why did you…?', r:'“…put wood on the windows?”' },
+      { l:'😮 How did you feel when…?', r:'“…the house shook?”' },
+      { l:'🌟 I really like how you described…', r:'“…the strong winds.”' } ] },
+    { type:'typed', id:'revise', label:'✍️ Slide 55 · Leo’s revision', hint:'Read your story to Dad. Listen to his notes. Then plan your changes.', items:[
+      { p:'Add a sense', pre:'I will add a sense: ', free:true, min:2, model:'I will add a sense: I heard loud thunder.' },
+      { p:'Fix a verb', pre:'I will fix a verb: ', free:true, min:1, model:'I will fix a verb: go → went.' },
+      { p:'Add a time word', pre:'I will add a time word: ', free:true, min:1, model:'I will add a time word: Soon,' },
+      { p:'Thank Dad', pre:'Thank you! I will change ', free:true, min:4, model:'Thank you! I will change my first sentence because it is too short.' } ] },
+    { type:'mcq', id:'soccer', label:'⚽ Slide 56 · a match story with senses (stats as of 21 Sept 2026)', items:[
+      { q:'Which player scored more: Raphinha (Barcelona, 12 goals) or Malen (Roma, 6 goals)?', opts:['Raphinha','Malen'], ok:0, two:true },
+      { q:'“First, Barcelona attacked. Then, suddenly, Raphinha scored! I heard the crowd. I felt excited.” Which sentence uses the sense of sound?', opts:['I heard the crowd.','First, Barcelona attacked.','I felt excited.'], ok:0 },
+      { q:'“Last Saturday, Malen scored. Next, the fans sang. It was loud!” Which words show the order?', opts:['Last Saturday, … Next,','Malen … the fans','It was loud!'], ok:0 },
+      { q:'“I saw the ball hit the net.” Which sense?', opts:['👁️ sight','👅 taste'], ok:0, two:true },
+      { q:'Haaland (Man City) has 5 goals, Raphinha has 12. Who has fewer?', opts:['Haaland','Raphinha'], ok:0, two:true }
+    ] },
+    { type:'typed', id:'match', label:'⚽ Your match story (2 senses!)', items:[
+      { p:'When and who?', pre:'Last ', free:true, min:3, model:'Last Saturday, I watched Barcelona.' },
+      { p:'What happened?', pre:'Then, suddenly, ', post:' scored!', free:true, min:1, model:'Then, suddenly, Raphinha scored!' },
+      { p:'👂 Sound', pre:'I heard ', free:true, min:2, model:'I heard the crowd.' },
+      { p:'😮 Feeling', pre:'I felt ', free:true, min:1, model:'I felt excited.' } ] }
+  ] });
+
+/* ── m8 · WB p. 10 Activity 1 — How did the writer plan? ── */
+defineMod('m8', { icon:'📋', name:'7 Steps', title:'WB Act 1 · How did the writer plan?', color:'bl', badge:'WB ACT 1',
+  desc:'The writer’s 7 steps + her sense chart', done:'🎉 You know how the writer planned!',
+  dad:'Read “Safe not Sorry!” again. How did the writer plan her writing? Put her steps in order, then fill her sense chart.',
+  blocks:[
+    { type:'order', id:'steps', label:'📋 WB p. 10 · the writer’s 7 steps', sets:[
+      { title:'Tap the steps in order, 1 → 7.', steps:[
+        'The writer chose something that happened.',
+        'Next, the writer wrote things that happened in the order they happened.',
+        'Then the writer wrote about her feelings about the things that happened.',
+        'Next, the writer added descriptions of how she lived the experience through her senses.',
+        'Next, the writer wrote a first sentence to say what the narrative was about.',
+        'Then the writer wrote what happened in order. She included information about what she saw, what she heard, and how she felt.',
+        'Finally, the writer wrote a sentence to close the narrative.'], end:'Choose → order → feelings → senses → first sentence → write it in order → close.' } ] },
+    { type:'sort', id:'chart', label:'🗂️ WB p. 10 · the writer’s sense words', sorts:[
+      { id:'wr-wbchart', intro:'Put each phrase in the writer’s chart: See · Hear · Touch · Feelings.', win:'Taste and Smell stay empty — the writer didn’t write about all her senses.',
+        zones:[{ key:'s', label:'👁️ SEE', color:'#334155' },{ key:'h', label:'👂 HEAR', color:'#EA580C' },{ key:'t', label:'✋ TOUCH', color:'#3B82F6' },{ key:'f', label:'😮 FEELINGS', color:'#DB2777' }],
+        tiles:[{ text:'part of a tree', answer:'s' },{ text:'wood on the window', answer:'s' },{ text:'weather forecaster', answer:'h' },{ text:'strong winds', answer:'h' },{ text:'hard rain', answer:'h' },{ text:'loud crash', answer:'h' },{ text:'heavy wood', answer:'t' },
+               { text:'It was scary, but a little exciting, too.', answer:'f' },{ text:'Everyone was worried.', answer:'f' },{ text:'I am so happy we had a family plan.', answer:'f' }] } ] },
+    { type:'mcq', id:'q', label:'🔍 Check the plan', items:[
+      { q:'Why is “weather forecaster” under HEAR?', opts:['The forecaster told us — she heard the news.','She saw the forecaster on the roof.'], ok:0 },
+      { q:'Taste and Smell are empty. Why?', opts:['The writer didn’t write about all her senses. You can write about all or only some senses.','The writer forgot to finish.'], ok:0 },
+      { q:'Which is the writer’s first sentence?', opts:['If a hurricane comes, we know what to do.','Hopefully there isn’t going to be a hurricane for a while.'], ok:0 },
+      { q:'Which is the writer’s closing sentence?', opts:['Hopefully there isn’t going to be a hurricane for a while.','We have a family plan.'], ok:0 }
+    ] }
+  ] });
+
+/* ── m9 · WB p. 11 Activity 2 — plan your experience ── */
+const M9_ROWS = ['👁️ See','👂 Hear','✋ Touch','👅 Taste','👃 Smell'];
+defineMod('m9', { icon:'🗺️', name:'My Plan', title:'WB Act 2 · Plan your experience', color:'bl', badge:'WB ACT 2',
+  desc:'Answer the questions · complete the chart', done:'🎉 Workbook plan done!',
+  dad:'Plan to write about your extreme weather experience. Answer the questions and complete the chart.',
+  blocks:[
+    { type:'typed', id:'qs', label:'❓ WB p. 11 · answer the questions', items:[
+      { p:'1. What extreme weather experience will you write about?', pre:'I will write about ', free:true, min:2, model:'I will write about the typhoon last summer.' },
+      { p:'2. What feelings will you write about?', pre:'I will write about feeling ', free:true, min:2, model:'I will write about feeling scared and then happy.' } ] },
+    { type:'plan', id:'chart', label:'🗺️ WB p. 11 · complete the chart', hint:'Words, not sentences. You can use all or only some senses — fill at least 3.', cols:['SENSE','MY WORDS'], rows:M9_ROWS, ph:['dark sky, lightning…','thunder, wind…','cold rain…','salty rain…','wet earth…'], min:3 }
+  ] });
+
+/* ── m10 · WB p. 11 Activity 4 — Express yourself ── */
+const M10_ROWS = ['What experience will you describe?','What words will you use to describe your senses?','What words will you use to describe your feelings?'];
+defineMod('m10', { icon:'🌈', name:'Express Yourself', title:'WB Act 4 · Express yourself', color:'bl', badge:'WB ACT 4',
+  desc:'A happy, scary or beautiful thing', done:'🎉 Your second story is planned!',
+  dad:'Plan to write about something that happened to you — not a storm this time. Choose one, then complete the table.',
+  blocks:[
+    { type:'choice', id:'pick', label:'🎯 WB p. 11 · choose one', opts:['😊 a happy thing','😨 a scary thing','🌸 a beautiful thing'] },
+    { type:'plan', id:'table', label:'📋 Complete the table', cols:['QUESTION','MY ANSWER'], rows:M10_ROWS, ph:['My first soccer goal…','I heard the crowd, I saw the ball…','excited, proud, happy…'], min:3 }
+  ] });
+
+/* ── m11 · WB p. 11 Activity 5 — events in order ── */
+const M11_ITEMS = [
+  { p:'1. What happened first?', pre:'First, ', free:true, min:3, model:'First, I ran with the ball.' },
+  { p:'2. What happened next?', pre:'Next, ', free:true, min:3, model:'Next, I kicked it very hard.' },
+  { p:'3. What happened then?', pre:'Then, ', free:true, min:3, model:'Then, the ball hit the net!' } ];
+defineMod('m11', { icon:'🔢', name:'Events in Order', title:'WB Act 5 · Put the events in order', color:'bl', badge:'WB ACT 5',
+  desc:'Write each thing that happened, 1 → 3', done:'🎉 Three events, in order!',
+  dad:'Write each thing that happened. Put the events in order. Use the past tense.',
+  blocks:[
+    { type:'view', id:'plan', label:'🌈 Your plan from Express Yourself', get:()=>planText('m10-table', M10_ROWS), empty:'Fill the table in 🌈 Express Yourself first.' },
+    { type:'typed', id:'events', label:'🔢 WB p. 11 · write the events', items:M11_ITEMS },
+    { type:'mcq', id:'order', label:'➡️ Check your time words', items:[
+      { q:'Which time word can come after Then?', opts:['Soon, / Finally,','First,'], ok:0, two:true },
+      { q:'Which sentence is in the past tense?', opts:['Next, I kicked the ball.','Next, I kick the ball.','Next, I will kick the ball.'], ok:0 }
+    ] }
+  ] });
+
+/* ── m12 · WB p. 11 Activity 6 — write the personal narrative ── */
+defineMod('m12', { icon:'📝', name:'My Second Story', title:'WB Act 6 · Write your personal narrative', color:'bl', badge:'WB ACT 6', wide:true,
+  desc:'Your happy, scary or beautiful thing — told with the senses', done:'🎉 Two true stories — you are a real writer!',
+  dad:'Write your personal narrative about the thing you chose. Use your table and your three events. Same tools: senses, feelings, time words, past tense.',
+  blocks:[
+    { type:'view', id:'plan', label:'📋 Your table + events', get:()=>[planText('m10-table', M10_ROWS), typedText('m11-events', M11_ITEMS)].filter(Boolean).join('\n\n'), empty:'Plan it in 🌈 Express Yourself and 🔢 Events in Order first.' },
+    { type:'narrative', id:'story', label:'✍️ Write it', p:'Write your second personal narrative. Start with what it is about, tell the events in order with senses and feelings, then close it.',
+      starter:'Last ______, ______. First, ______. Next, ______. Then, ______. I felt ______. I am so ______!', ph:'Last spring, I scored my first goal…', sentences:5, time:3, sense:2, emo:1 }
+  ] });
+
+/* ── m13 · Can Leo Score? (slides 57–61 + quiz) ── */
+defineMod('m13', { icon:'⚽', name:'Can Leo Score?', title:'Can Leo Score?', color:'ye', badge:'FINAL QUIZ', wide:true,
+  desc:'Recap · sentence builder · 10 questions — need 8/10', done:'⚽ GOAL! The Story Desk is closed — great reporting, Leo!',
+  dad:'Recap first: match the writer’s tools and build the board sentence. Then the final quiz — you need 8 / 10.',
+  blocks:[
+    { type:'note', id:'recipe', label:'🧾 Slide 57 · what makes a good narrative?', html:'<div class="chips"><span class="chip">📖 True story — first sentence + events + closing</span><span class="chip">👁️ Five senses — all or some</span><span class="chip">😮 Emotions</span><span class="chip">➡️ Order: first, next, then, after, before, soon</span><span class="chip">⏪ Past tense: saw, told, heard, went</span></div>' },
+    { type:'match', id:'tools', label:'🧰 Slide 58 · tools for writers', heads:['TOOL','EXAMPLE'], pairs:[
+      { l:'👁️ sight', r:'I saw a huge tree.' },{ l:'👂 sound', r:'There was a loud crash.' },{ l:'😮 emotion', r:'Everyone was worried.' },{ l:'➡️ time word', r:'Then, suddenly, …' },{ l:'⏪ irregular verb', r:'We went inside.' } ] },
+    { type:'order', id:'build', label:'🧩 Slide 61 · sentence builder', sets:[
+      { title:'Put the chunks in order. Tap 1 → 4!', steps:['Then,','suddenly,','there was','a loud crash!'], end:'Then, suddenly, there was a loud crash!' } ] },
+    { type:'quiz', id:'quiz', label:'📝 Final quiz — need 8 / 10', scoreKey:'score', pass:0.8, win:'⚽ GOAL! 8 or more — you scored!', items:[
+      { tag:'ACADEMIC', q:'A personal narrative is about your own …', opts:['experience','forecast','dictionary'], ok:0 },
+      { tag:'ACADEMIC', q:'Sight, sound, touch, taste and smell are the five …', opts:['senses','emotions','time words'], ok:0 },
+      { tag:'ACADEMIC', q:'scared · worried · happy are …', opts:['emotions','senses','time words'], ok:0 },
+      { tag:'MODEL', q:'In “Safe not Sorry!”, who told them a hurricane was coming?', opts:['the weather forecaster','her teacher','her friend'], ok:0 },
+      { tag:'TIME WORDS', q:'“First, I helped my dad. ______, we went inside the house.”', opts:['Next','Hopefully','Before'], ok:0 },
+      { tag:'TIME WORDS', q:'We put wood on the windows ______ the hurricane came.', opts:['before','after'], ok:0 },
+      { tag:'PAST TENSE', q:'“I ______ a loud crash.”', opts:['heard','heared','hear'], ok:0 },
+      { tag:'PAST TENSE', q:'“The whole house ______!”', opts:['shook','shaked','shake'], ok:0 },
+      { tag:'SENSES', q:'“The snow felt cold on my face.” Which sense?', opts:['touch','taste','smell'], ok:0 },
+      { tag:'STRUCTURE', q:'Which is a closing sentence?', opts:['Hopefully, there isn’t going to be a hurricane for a while.','Last year, the weather forecaster told us that a hurricane was coming.','Then, suddenly, there was a loud crash.'], ok:0 }
+    ] }
+  ] });
+
+/* ═══ REVIEW MODE (?review=1) — Leo’s saved work for Neritan ═══ */
+function initReviewMode(){
+  $('appRoot').style.display = 'none'; $('reviewScreen').classList.add('show');
+  const card = (lbl, txt) => txt ? '<div class="rv-card"><div class="rv-lbl">' + lbl + '</div><div class="rv-text">' + esc(txt) + '</div></div>' : '';
+  const sc = (k, lbl) => { const d = lLoad(k); return d && d.finished !== undefined ? card(lbl, d.score + ' / ' + d.total + ' · ' + d.percent + '%' + (d.passed ? ' ✅ passed' : ' — not passed yet') + (d.best ? ' · best ' + d.best : '')) : ''; };
+  const done = ORDER.filter(isDone).map(K => MODS[K].name);
+  const choice = lLoad('m10-pick');
+  let h = card('MODULES DONE', done.length + ' / ' + MODULE_COUNT + (done.length ? '\n' + done.join(' · ') : '')) +
+    sc('score', 'FINAL QUIZ') + sc('m1-quiz-score', 'ACADEMIC QUIZ') + sc('m2-quiz-score', 'RELATED VOCAB QUIZ') +
+    card('STORM CHOICE (m5)', typedText('m5-choose', [{ pre:'I want to write about a ' },{ pre:'I felt ' }])) +
+    card('MY CHART (m5)', planText('m5-chart', M5_ROWS)) +
+    card('FIRST + CLOSING SENTENCES (m5)', typedText('m5-ends', [{ pre:'If a ', post:' comes, we know what to do.' },{ pre:'Hopefully, ' }])) +
+    card('SB STORY (m6)', (lLoad('m6-story') || {}).text) +
+    card('REVISION PLAN (m7)', typedText('m7-revise', [{ pre:'I will add a sense: ' },{ pre:'I will fix a verb: ' },{ pre:'I will add a time word: ' },{ pre:'Thank you! I will change ' }])) +
+    card('MATCH STORY (m7)', typedText('m7-match', [{ pre:'Last ' },{ pre:'Then, suddenly, ', post:' scored!' },{ pre:'I heard ' },{ pre:'I felt ' }])) +
+    card('WB ACT 2 (m9)', [typedText('m9-qs', [{ pre:'I will write about ' },{ pre:'I will write about feeling ' }]), planText('m9-chart', M9_ROWS)].filter(Boolean).join('\n')) +
+    card('WB ACT 4 (m10)', [choice !== null ? 'Chose: ' + ['a happy thing','a scary thing','a beautiful thing'][choice] : '', planText('m10-table', M10_ROWS)].filter(Boolean).join('\n')) +
+    card('WB ACT 5 (m11)', typedText('m11-events', M11_ITEMS)) +
+    card('WB ACT 6 STORY (m12)', (lLoad('m12-story') || {}).text);
+  const att = ORDER.map(K => (lLoad(K + '-att') || []).length ? MODS[K].name + ': ' + (lLoad(K + '-att') || []).map(r => r.a).join(' · ') : '').filter(Boolean).join('\n');
+  h += card('WRONG FIRST TRIES', att);
+  $('reviewBody').innerHTML = done.length || h.indexOf('rv-card') >= 0 ? h : '<div class="rv-not-started">📋 Work not started yet.</div>';
+}
+
+/* ═══ BOOT ═══ */
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    buildShell();
+    if(REVIEW){ initReviewMode(); return; }
+    if(new URLSearchParams(location.search).get('hw')){ const b = $('hwBanner'); b.style.display = 'flex'; b.textContent = '🎯 Homework mode — your progress will be saved to Neritan.'; }
+    refreshProg();
+  }catch(e){ console.error(e); }
+});
+</script>
+</body>
+</html>

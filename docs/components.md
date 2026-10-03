@@ -223,6 +223,8 @@ homeworkId:      leo-<l>-<u>-reading
 
 Reference: `public/learn/ow-l4-u8-writing.html` (13 modules, `m1`–`m13`).
 
+**Companion build (L5 U1 Writing):** `public/learn/ow-l5-u1-writing.html` keeps the 13-module home grid, the `m{n}-done` keys and `score`, but fills every module from the teacher deck (slide → module map in its header comment and in `.claude/commands/writing-app.md`). Each module is a list of blocks that save as Leo answers; two blocks are new for writing — `tap` (circle / underline hunts on the model) and `narrative` (the story textarea with a live meter for sentences, time words, sense words and feelings, which flags wrong irregular past forms such as *goed* → *went*). The vocab and final quizzes keep their pass gates (70% / 75% / 80%) and offer a retry; a pass is never taken back.
+
 13 modules, all sequential, covering both the Student Book and Workbook writing tasks for the unit:
 
 | ID | Title | Type | Done criteria |

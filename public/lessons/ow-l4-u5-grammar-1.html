@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 5 · Grammar 1 · My Favorites</title>
+<script src="/components/charts.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../lib/leea-cloud-config.js"></script>
+<script src="../../lib/leea-cloud.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+
+/* HEADER */
+.slide-header{height:64px;background:#A21CAF;display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.65);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.2);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.ac{background:rgba(14,165,233,.4)}
+
+/* TWO-COLUMN VOCAB LAYOUT */
+.vocab-body{flex:1;display:flex;min-height:0}
+.word-panel{width:40%;padding:30px 34px;display:flex;flex-direction:column;border-right:2px solid #e5e7eb;background:#fff}
+.game-panel{width:60%;padding:22px 32px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;overflow:hidden}
+
+/* TAGS */
+.vtag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;width:fit-content}
+.vtag.v1{background:#FAE8FF;color:#701A75}
+.vtag.ac{background:#FEF3C7;color:#B45309}
+.vtag.rel{background:#f3f4f6;color:#6b7280}
+
+/* WORD PANEL */
+.word-emoji{font-size:130px;line-height:1;margin-bottom:12px;cursor:pointer;transition:transform .25s}
+.word-emoji:active{transform:scale(1.15)}
+.word-main{font-size:70px;font-weight:800;color:#111;line-height:1.05;margin-bottom:8px}
+.word-ipa{font-size:21px;color:#6b7280}
+.word-syl{font-size:18px;color:#9ca3af;letter-spacing:1px}
+.word-pos{font-size:19px;color:#A21CAF;font-weight:700;margin-bottom:14px}
+.word-def{font-size:21px;color:#374151;line-height:1.45;margin-bottom:8px}
+.word-jp{font-size:18px;color:#6b7280;line-height:1.45}
+.dad-say{background:#FDF4FF;border-left:4px solid #A21CAF;padding:13px 16px;border-radius:0 12px 12px 0;font-size:18px;color:#374151;line-height:1.5;margin-top:auto}
+.dad-say b{color:#701A75}
+.how-box{background:#fff;border:2px dashed #F5D0FE;border-radius:12px;padding:10px 16px;font-size:16px;color:#4b5563;line-height:1.5;width:100%}
+.how-box b{color:#701A75}
+.how-box li{margin-left:18px}
+
+/* MINI-GAME SHELL (shared class names across LEEA vocab decks) */
+.mg-wrap{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;flex:1;min-height:0}
+.mg-head{font-size:20px;font-weight:700;color:#374151;text-align:center;background:#f9fafb;border:2px solid #e5e7eb;border-radius:12px;padding:10px 20px;width:100%;flex-shrink:0}
+.mg-head b{color:#701A75}
+.mg-stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0;overflow:hidden}
+.mg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;width:100%}
+.mg-grid.c4{grid-template-columns:repeat(4,1fr)}
+.mg-grid.c3{grid-template-columns:repeat(3,1fr)}
+.mg-tile{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 6px;font-size:38px;cursor:pointer;transition:all .15s;text-align:center}
+.mg-tile:hover{transform:translateY(-3px);border-color:#A21CAF}
+.mg-tile .mg-label{display:block;font-size:14px;font-weight:700;color:#4b5563;margin-top:4px;min-height:18px}
+.mg-tile.hit{background:#FDF4FF;border-color:#A21CAF;cursor:default}
+.mg-tile.miss{background:#fef2f2;border-color:#ef4444;animation:mgShake .3s ease}
+@keyframes mgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.mg-btn{background:#A21CAF;color:#fff;border:none;border-radius:12px;padding:13px 30px;font-size:20px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.mg-btn:hover{background:#701A75;transform:scale(1.04)}
+.mg-btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+.mg-opt{padding:12px 22px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:19px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left}
+.mg-opt:hover{border-color:#A21CAF}
+.mg-opt.ok{background:#FDF4FF;border-color:#A21CAF;color:#701A75;pointer-events:none}
+.mg-opt.no{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+.mg-score{font-size:20px;font-weight:800;color:#701A75;background:#FAE8FF;border-radius:20px;padding:6px 22px}
+.mg-miss{font-size:17px;font-weight:700;color:#ef4444;min-height:22px}
+.mg-win{background:#A21CAF;color:#fff;border-radius:14px;padding:12px 24px;font-size:20px;font-weight:800;text-align:center;opacity:0;transform:translateY(10px);transition:all .35s;width:100%}
+.mg-win.show{opacity:1;transform:translateY(0)}
+.mg-source{font-size:14px;color:#9ca3af;font-weight:600;letter-spacing:.4px}
+.mg-bar{width:100%;height:22px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.mg-bar > div{height:100%;background:linear-gradient(90deg,#E879F9,#A21CAF);width:0%;transition:width .2s;border-radius:99px}
+.mg-track{position:relative;width:100%;height:96px;background:linear-gradient(180deg,#FAE8FF,#FDF4FF);border-radius:16px;overflow:hidden;border:2px solid #F5D0FE}
+.mg-runner{position:absolute;bottom:16px;font-size:46px;transition:left .25s}
+.mg-flag{position:absolute;bottom:14px;right:2%;font-size:40px}
+.mg-spin{display:inline-block;transition:transform .3s ease}
+.mg-flip{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.mg-flip:hover{border-color:#A21CAF;transform:translateY(-3px)}
+.mg-flip.open{background:#FDF4FF;border-color:#A21CAF;cursor:default}
+.mg-flip .mf-front{font-size:40px}
+.mg-flip .mf-back{display:none;font-size:15px;font-weight:700;color:#701A75;line-height:1.35}
+.mg-flip.open .mf-back{display:block}
+.mg-pair{display:flex;gap:26px;width:100%;justify-content:center}
+.mg-col{display:flex;flex-direction:column;gap:10px;flex:1;max-width:340px}
+.mg-pbtn{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:17px;font-weight:700;color:#374151;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left;line-height:1.3}
+.mg-pbtn:hover{border-color:#A21CAF}
+.mg-pbtn.sel{border-color:#A21CAF;background:#FDF4FF}
+.mg-pbtn.done{border-color:#10b981;background:#ecfdf5;color:#047857;pointer-events:none}
+.mg-pbtn.bad{border-color:#ef4444;background:#fef2f2;animation:mgShake .3s}
+.mg-battery{width:220px;height:110px;border:6px solid #374151;border-radius:14px;position:relative;display:flex;align-items:center;padding:8px}
+.mg-battery::after{content:'';position:absolute;right:-20px;top:32px;width:16px;height:40px;background:#374151;border-radius:0 6px 6px 0}
+.mg-battery > div{height:100%;background:linear-gradient(90deg,#a3e635,#16a34a);border-radius:6px;width:0%;transition:width .2s}
+.mg-lamp{font-size:44px;filter:grayscale(1);opacity:.4;transition:all .25s}
+.mg-lamp.on{filter:none;opacity:1;transform:scale(1.1)}
+
+/* NAV BAR */
+#nav-bar{position:fixed;bottom:0;left:0;right:0;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px;transition:background .2s}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn.active,#fs-btn.active{background:rgba(124,58,237,.35)!important;color:#F0ABFC!important}
+#unit-label{color:#F0ABFC;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+
+/* TEACHER NOTES PANEL */
+#tn-panel{position:fixed;right:-460px;top:0;bottom:52px;width:440px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#F0ABFC;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-panel ul{padding-left:18px;margin-bottom:8px}
+#tn-panel .tn-lbl{color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+
+/* CONTENT SLIDES */
+.content-body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:18px;min-height:0;overflow:hidden}
+.slide-h1{font-size:40px;font-weight:800;color:#111}
+.slide-h2{font-size:25px;font-weight:600;color:#374151}
+.src-pill{display:inline-block;background:#f3f4f6;color:#6b7280;border-radius:20px;padding:6px 18px;font-size:15px;font-weight:700;letter-spacing:.4px;width:fit-content}
+
+/* READING */
+.reading-block{background:#fff;border-radius:16px;padding:26px 36px;font-size:23px;line-height:1.7;color:#1f2937;box-shadow:0 4px 16px rgba(0,0,0,.05);border-left:6px solid #A21CAF}
+.reading-block b{color:#701A75;font-weight:700}
+.tap-word{background:#FAE8FF;color:#701A75;border:none;border-radius:6px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.tap-word.done{background:#A21CAF;color:#fff}
+
+/* OBJECTIVES */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:10px}
+.obj-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;display:flex;align-items:flex-start;gap:16px}
+.obj-icon{font-size:34px;flex-shrink:0}
+.obj-text{font-size:19px;color:#374151;line-height:1.4;font-weight:500}
+.obj-text b{color:#A21CAF}
+
+/* FORMATIVE ASSESSMENT */
+.assess-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px}
+.assess-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;cursor:pointer;transition:all .2s}
+.assess-card:hover{border-color:#A21CAF}
+.assess-card.yes{border-color:#A21CAF;background:#FDF4FF}
+.assess-q{font-size:19px;color:#374151;font-weight:600;margin-bottom:10px}
+
+/* BE THE EXPERT */
+.bte-header{background:#A21CAF;color:#fff;border-radius:12px 12px 0 0;padding:13px 26px;font-size:19px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bte-body{background:#fff;border:2px solid #A21CAF;border-radius:0 0 16px 16px;padding:24px;font-size:19px;color:#374151;line-height:1.6}
+.bte-body b{color:#701A75}
+
+/* CHIPS / TASK CARDS */
+.chips-row{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:#FAE8FF;color:#701A75;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.chip.used{background:#A21CAF;color:#fff}
+.task-card{background:#fff;border-radius:16px;padding:20px 28px;border:2px solid #e5e7eb;font-size:21px;color:#374151;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card b{color:#A21CAF}
+.q-item{background:#fff;border-radius:12px;padding:16px 22px;border:2px solid #e5e7eb;font-size:19px;color:#374151;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .2s}
+.q-item:hover{border-color:#A21CAF}
+.q-item.done{border-color:#10b981;background:#ecfdf5}
+.q-num{background:#A21CAF;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;margin-top:2px}
+.q-ans{max-height:0;overflow:hidden;transition:max-height .3s ease;color:#701A75;font-weight:700}
+.q-item.done .q-ans{max-height:120px;margin-top:6px}
+
+/* DIALOGUE */
+.chat-row{display:flex;align-items:flex-end;gap:14px}
+.chat-row.right{flex-direction:row-reverse}
+.chat-ava{font-size:50px;line-height:1}
+.bub{max-width:62%;padding:18px 28px;border-radius:26px;font-size:26px;font-weight:600;line-height:1.35}
+.bub.q{background:#fff;border:2px solid #e5e7eb;border-bottom-left-radius:6px;color:#374151}
+.bub.a{background:#A21CAF;color:#fff;border-bottom-right-radius:6px}
+
+/* LISTEN HERO */
+.listen-hero{background:linear-gradient(135deg,#4A044E,#A21CAF);border-radius:20px;padding:24px 36px;display:flex;align-items:center;gap:28px;color:#fff}
+.listen-hero .lh-emoji{font-size:64px;line-height:1;animation:lhPulse 1.6s ease-in-out infinite}
+@keyframes lhPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.listen-hero .lh-text{font-size:25px;font-weight:700;flex:1}
+.listen-hero .lh-tr{background:rgba(255,255,255,.2);border-radius:20px;padding:9px 22px;font-size:21px;font-weight:800;white-space:nowrap}
+
+/* TITLE / GREAT JOB */
+.title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#4A044E 0%,#A21CAF 50%,#E879F9 100%);color:#fff;gap:22px;padding:40px}
+.great-job-slide{background:linear-gradient(135deg,#4A044E,#A21CAF,#E879F9);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:18px;height:100%;padding:40px}
+
+/* MARK DONE */
+.done-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+.btn-done{background:#16A34A;color:#fff;border:none;border-radius:14px;padding:18px 46px;font-size:26px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-done:hover{background:#15803d}
+.btn-done.confirmed{background:#9ca3af;pointer-events:none}
+.btn-clear{background:#fff;color:#ef4444;border:2px solid #ef4444;border-radius:14px;padding:14px 30px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+#doneMsg{font-size:20px;color:#4b5563;font-weight:600;min-height:28px}
+
+/* VOCAB REVIEW */
+.vr-tabs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;flex-shrink:0}
+.vr-tab{padding:7px 14px;border:2px solid #e5e7eb;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s;white-space:nowrap}
+.vr-tab:hover{border-color:#A21CAF;color:#A21CAF}
+.vr-tab.active{background:#A21CAF;color:#fff;border-color:#A21CAF}
+.vr-tab.done{background:#FAE8FF;border-color:#A21CAF;color:#701A75}
+.vr-tab.done.active{background:#A21CAF;color:#fff}
+.vr-body{flex:1;display:flex;min-height:0}
+.vr-left{width:26%;padding:18px;border-right:2px solid #e5e7eb;display:flex;flex-direction:column;gap:8px;background:#fafaf7}
+.vr-right{flex:1;padding:18px 24px;display:flex;flex-direction:column;gap:12px}
+.vr-emoji{font-size:80px;line-height:1}
+.vr-word{font-size:42px;font-weight:800;color:#111;line-height:1.1}
+.vr-ipa{font-size:16px;color:#6b7280}
+.vr-pos{font-size:15px;color:#A21CAF;font-weight:700}
+.vr-mark{background:#A21CAF;color:#fff;border:none;border-radius:10px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;margin-top:auto;transition:all .2s}
+.vr-mark.done{background:#9ca3af;cursor:not-allowed}
+
+/* OPENER */
+.oz-band{padding:16px 22px;color:#fff;font-weight:700;font-size:20px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:all .18s;border:none;font-family:Outfit,sans-serif;text-align:left;flex:1;justify-content:center}
+.oz-band small{font-weight:600;opacity:0;font-size:17px;transition:opacity .25s}
+.oz-band .oz-note{font-size:18px;font-weight:500;opacity:0;line-height:1.45;transition:opacity .25s}
+.oz-strip{width:100%;border-radius:16px;overflow:hidden;border:2px solid #F5D0FE;display:flex;flex-direction:column;flex:1;min-height:0}
+.oz-band.sunlit{background:linear-gradient(90deg,#F0ABFC,#0EA5E9)}
+.oz-band.twilight{background:linear-gradient(90deg,#A21CAF,#701A75)}
+.oz-band.midnight{background:linear-gradient(90deg,#4A044E,#020617)}
+.photo-card{background:#fff;border:3px solid #e5e7eb;border-radius:18px;padding:20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .18s;min-height:250px;justify-content:center}
+.photo-card:hover{border-color:#A21CAF;transform:translateY(-3px)}
+.photo-card.open{border-color:#A21CAF;background:#FDF4FF}
+.pc-emoji{font-size:66px;line-height:1}
+.pc-word{font-size:28px;font-weight:800;color:#111}
+.pc-def{font-size:17px;color:#4b5563;line-height:1.45;text-align:center;display:none}
+.pc-ex{font-size:16px;color:#701A75;font-style:italic;text-align:center;display:none}
+.photo-card.open .pc-def,.photo-card.open .pc-ex{display:block}
+.tf-row{display:flex;align-items:center;gap:20px;background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:18px 24px}
+.tf-num{background:#A21CAF;color:#fff;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex-shrink:0}
+.tf-text{flex:1;font-size:23px;color:#374151;font-weight:600}
+.tf-key{font-size:30px;font-weight:900;padding:8px 26px;border-radius:12px;opacity:0;transition:opacity .25s}
+.tf-key.t{background:#DCFCE7;color:#15803D}
+.tf-key.f{background:#FEE2E2;color:#B91C1C}
+/* UNIT 5 WIDGETS */
+:root{--p:#A21CAF;--pd:#701A75;--pl:#FDF4FF;--pb:#F5D0FE}
+.ts-bank{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:52px}
+.ts-tile.sel{background:var(--p);color:#fff;transform:translateY(-3px)}
+.ts-zones{display:flex;gap:16px;width:100%;flex:1;min-height:0}
+.ts-zone{flex:1;border:3px solid #e5e7eb;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;background:#fff;min-height:170px}
+.ts-zone.miss{animation:mgShake .3s ease;border-color:#ef4444}
+.ts-zh{color:#fff;font-weight:800;font-size:20px;padding:10px;text-align:center}
+.ts-zb{flex:1;display:flex;flex-wrap:wrap;gap:8px;padding:12px;align-content:flex-start}
+.ts-in{background:var(--pl);border:2px solid var(--pb);border-radius:14px;padding:6px 14px;font-size:17px;font-weight:700;color:var(--pd)}
+.chip.miss{animation:mgShake .3s ease;background:#FEE2E2;color:#B91C1C}
+.ord-out{display:flex;flex-direction:column;gap:8px;width:100%}
+.ord-row{background:#ECFDF5;border:2px solid #A7F3D0;border-radius:12px;padding:10px 18px;font-size:21px;font-weight:700;color:#047857}
+.ord-row b{display:inline-block;min-width:34px}
+.bd-line{width:100%;min-height:74px;background:#fff;border:3px dashed var(--pb);border-radius:16px;padding:16px 24px;font-size:32px;font-weight:800;color:#111;text-align:center}
+.bd-line.ok{border-style:solid;border-color:#10b981;background:#ECFDF5;color:#047857}
+.star-band{display:flex;gap:16px;width:100%}
+.big-quote{background:#fff;border-left:8px solid var(--p);border-radius:0 18px 18px 0;padding:22px 30px;font-size:27px;line-height:1.5;color:#1f2937;font-style:italic}
+.lyric{background:#fff;border-radius:16px;padding:18px 26px;font-size:24px;line-height:1.6;color:#1f2937;border-left:6px solid var(--p);box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.lyric .vw{background:var(--pb);color:var(--pd);border-radius:6px;padding:0 6px;font-weight:800}
+.lyric .gw{background:#DBEAFE;color:#1E3A8A;border-radius:6px;padding:0 6px;font-weight:800}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;min-height:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rule-box{background:#fff;border:3px solid var(--p);border-radius:18px;overflow:hidden}
+.rule-box .rh{background:var(--p);color:#fff;font-size:22px;font-weight:800;padding:10px 22px}
+.rule-box table{width:100%;border-collapse:collapse;font-size:23px}
+.rule-box td,.rule-box th{padding:10px 18px;border-top:1px solid #f3e8ff;text-align:left}
+.rule-box th{background:var(--pl);color:var(--pd);font-size:18px;letter-spacing:.5px}
+.rule-box td b{color:var(--pd)}
+.say-row{display:flex;gap:14px;align-items:flex-start}
+.say{flex:1;border-radius:16px;padding:16px 22px;font-size:21px;line-height:1.45}
+.say.dad{background:#EFF6FF;border:2px solid #BFDBFE}
+.say.leo{background:#FEF3C7;border:2px solid #FDE68A}
+.mini-note{font-size:16px;color:#6b7280}
+.st-row{display:flex;align-items:center;gap:20px;background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:12px 18px;width:100%}
+.st-box{min-width:360px;font-size:34px;font-weight:900;color:#111;text-align:center;background:var(--pl);border:3px dashed var(--pb);border-radius:14px;padding:8px 18px}
+.st-box.pop{animation:stPop .35s}
+.st-box.ok{border-style:solid;border-color:#10b981;background:#ECFDF5;color:#047857}
+@keyframes stPop{0%{transform:scale(.85)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+.st-btns{display:flex;gap:10px;flex-wrap:wrap}
+.st-btn{font-size:18px;padding:10px 18px}
+.st-box s{color:#ef4444}
+.st-box u{color:var(--p);text-decoration:none;background:#FAE8FF;border-radius:6px;padding:0 4px}
+.award-wall{background:linear-gradient(135deg,#4A044E,#A21CAF);border-radius:16px;padding:10px 18px;color:#fff;width:100%}
+.aw-head{font-size:18px;font-weight:800;letter-spacing:.5px;margin-bottom:6px}
+.aw-row{display:flex;flex-wrap:wrap;gap:8px}
+.aw{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:4px 14px;font-size:16px;font-weight:700}
+.aw.empty{opacity:.75;font-weight:600}
+.award-wall.big .aw{font-size:22px;padding:8px 18px}
+#toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-120px);background:#4A044E;color:#fff;font-family:Outfit,sans-serif;font-weight:800;font-size:20px;padding:12px 26px;border-radius:30px;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#toast.show{animation:toastIn 2.6s ease}
+@keyframes toastIn{0%{transform:translateX(-50%) translateY(-120px)}12%,80%{transform:translateX(-50%) translateY(0)}100%{transform:translateX(-50%) translateY(-120px)}}
+
+</style>
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<!-- SLIDE 1 -->
+<div class="slide active" id="s1">
+<div class="title-bg">
+    <div style="font-size:22px;font-weight:700;letter-spacing:3px;opacity:.75;text-transform:uppercase">Our World · Level 4 · Unit 5 · My Favorites</div>
+    <div style="font-size:84px;font-weight:900;text-align:center;line-height:1.05">Grammar 1 · LEEA Awards Night 🏆</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;font-size:30px;font-weight:700">Superlatives with -est and most · TR 5.4</div>
+    <div style="font-size:24px;opacity:.92;text-align:center;max-width:1400px">Words hiding in the lesson: ⚖️ compare · 💭 opinion · 🌍 world</div>
+    <div style="font-size:20px;opacity:.8">Student Book pp. 82–83 · Workbook p. 57 · Grammar Workbook pp. 20–21</div>
+  </div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" id="s2">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Objectives + The Awards Night</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 Students will…</div>
+    <div class="obj-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="obj-card"><div class="obj-icon">📐</div><div class="obj-text">use superlatives with <b>-est</b> and <b>most</b>.</div></div>
+      <div class="obj-card"><div class="obj-icon">📸</div><div class="obj-text">use comparatives and superlatives to compare photos of people and things.</div></div>
+      <div class="obj-card"><div class="obj-icon">💭</div><div class="obj-text">compare opinions.</div></div>
+    </div>
+    <div class="task-card">🏆 <b>Tonight Leo is the host of the LEEA Awards.</b> Every award needs a name like <b>“The Funniest Movie”</b>. Make the right superlative and the trophy goes on the wall.</div>
+    <div class="award-wall" data-title="LEEA Awards Night" data-total="25" data-max="12"></div>
+    <div><button class="btn-clear" onclick="clearAwards()">↺ Empty the trophy wall (new night)</button></div>
+    <span class="src-pill">Lesson Planner p. 172 · Objectives (verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide" id="s3">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Academic Language</span><span class="hd-chip ac">LP p. 172</span></div>
+  <div class="vocab-body"><div class="word-panel"><span class="vtag ac">Academic Language</span><div class="word-emoji">⚖️</div><div class="word-main">compare</div><div class="word-ipa">/kəmˈper/ <span class="word-syl">com-pare</span></div><div class="word-pos">verb</div><div class="word-def">to look at two or more things and say how they are the same or different</div><div class="word-jp">🇯🇵 比較する</div><div class="dad-say">💬 <b>Example:</b> Compare the two stories and choose the better title.</div></div>
+    <div class="game-panel"><div class="mg-wrap">
+      <div class="mg-head">⚖️ <b>Compare</b> them! Look at all three, then choose.</div>
+      <div id="cmp" style="width:100%;display:flex;flex-direction:column;gap:10px"></div>
+      <div class="mg-win" id="cmp-win">⚖️ To compare, you look at two or more things side by side.</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide" id="s4">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Content Vocabulary</span><span class="hd-chip">LP p. 172</span></div>
+  <div class="vocab-body"><div class="word-panel"><span class="vtag v1">Content Vocabulary</span><div class="word-emoji">💬</div><div class="word-main">opinion</div><div class="word-ipa">/əˈpɪn-yən/ <span class="word-syl">o-pin-ion</span></div><div class="word-pos">noun</div><div class="word-def">what someone thinks or believes</div><div class="word-jp">🇯🇵 意見</div><div class="dad-say">💬 <b>Example:</b> Which sentence shows an opinion?</div></div>
+    <div class="game-panel"><div class="mg-wrap">
+      <div class="mg-head">💭 “Your opinion is what you think. It isn’t a fact.” Fact or opinion?</div>
+      <div id="fo" style="width:100%;display:flex;flex-direction:column;gap:12px;flex:1"></div>
+      <div class="mg-win" id="fo-win">💭 Different people may have different opinions!</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide" id="s5">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Content Vocabulary</span><span class="hd-chip">LP p. 172</span></div>
+  <div class="vocab-body"><div class="word-panel"><span class="vtag v1">Content Vocabulary</span><div class="word-emoji">🌍</div><div class="word-main">world</div><div class="word-ipa">/wɜːrld/ <span class="word-syl">world</span></div><div class="word-pos">noun</div><div class="word-def">the earth and all its people and places</div><div class="word-jp">🇯🇵 世界</div><div class="dad-say">💬 <b>Example:</b> Who is the most amazing singer in the world?</div></div>
+    <div class="game-panel"><div class="mg-wrap">
+      <div class="mg-head">🌍 After a superlative, we often say the group: <b>in the world</b>, <b>ever</b>, <b>of all</b>. Tap the group phrases. Found: <b id="gp-n">0 / 5</b></div>
+      <div class="mg-grid c4" id="gp"></div>
+      <div class="mg-win" id="gp-win">🌍 He’s the greatest basketball player <b>in the world</b>. It’s the funniest movie <b>ever</b> / <b>of all</b> (time).</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide" id="s6">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Recycle</span><span class="hd-chip">Lesson Planner pp. 172–175</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🍕 Our favorite foods. Everyone taps the foods on his or her list.</div>
+    <div class="slide-h2">The foods with the most check marks win: <b>“In our opinion, these foods are great.”</b></div>
+    <div class="mg-grid" id="food" style="grid-template-columns:repeat(4,1fr)"></div>
+    <div class="mg-win" id="food-win"></div>
+    <span class="src-pill">Lesson Planner p. 172 · Warm Up: Recycle (favorite foods + check marks)</span>
+  </div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide" id="s7">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Build Background — Better Than Any Other</span><span class="hd-chip">Lesson Planner pp. 172–175</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🐶 “I think the coolest pet is a dog. No other animal is as smart!”</div>
+    <div class="slide-h2">Complete the frames with your opinion. Does the other person agree? If not, say your choice!</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="frames"></div>
+    <span class="src-pill">Lesson Planner p. 172 · Build background (the six sentence frames verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide" id="s8">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">The Grammar Box</span><span class="hd-chip">TR 5.4</span></div>
+  <div class="content-body" style="gap:12px">
+    <div class="listen-hero" style="padding:14px 30px"><div class="lh-emoji">🎧</div><div class="lh-text">Superlatives with -est and most. Listen and read.</div><div class="lh-tr">TR 5.4</div></div>
+    <div class="big-quote" style="font-size:26px;padding:14px 26px">I think Beauty and the Beast is the greatest fairy tale ever.</div><div class="big-quote" style="font-size:26px;padding:14px 26px">J.K. Rowling is the most talented writer I know.</div><div class="big-quote" style="font-size:26px;padding:14px 26px">In your opinion, what's the funniest movie of all?</div><div class="rule-box"><div class="rh">📐 Superlatives with -est and most</div><table><tr><th>Form</th><th>Pattern</th><th>Example</th></tr><tr><td><b>One syllable</b></td><td>the + adjective-est</td><td>He's the greatest basketball player in the world.</td></tr><tr><td><b>Two syllables ending in y</b></td><td>the + adjective-ies + t</td><td>She's the funniest person in our class.</td></tr><tr><td><b>Two or more syllables</b></td><td>the most + adjective</td><td>It's the most popular show on TV.</td></tr></table></div><div class="how-box"><b>Rule:</b> Use superlatives to compare one person or thing with all the others. Use phrases such as in the world, ever, and of all to show the comparison group.</div>
+    <span class="src-pill">Student Book p. 82 · TR 5.4 · chart from unit-5/grammar.json · Grammar Workbook p. 20</span>
+  </div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide" id="s9">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Present — great → the greatest</span><span class="hd-chip">Lesson Planner pp. 172–175</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🏆 Award 1: “Many fairy tales are great, but I think Beauty and the Beast is the greatest fairy tale ever!”</div>
+    <div class="slide-h2">Watch it happen. Press the steps in order.</div>
+    <div id="st1" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="award-wall" data-title="LEEA Awards Night" data-total="" data-max="12"></div>
+    <span class="src-pill">Lesson Planner p. 173 · Present: great → greatest (underline -est)</span>
+  </div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide" id="s10">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Present — talented → the most talented</span><span class="hd-chip">Lesson Planner pp. 172–175</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🏆 Award 2: “I think J.K. Rowling is the most talented writer around today!”</div>
+    <div class="slide-h2">Wrong first: watch what happens if we add -est to <b>talented</b>…</div>
+    <div id="st2" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="award-wall" data-title="LEEA Awards Night" data-total="" data-max="12"></div>
+    <span class="src-pill">Lesson Planner p. 173 · Present: “For some words we don’t add -est. Instead, we add the word most.”</span>
+  </div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide" id="s11">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Present — The Board List</span><span class="hd-chip">Lesson Planner pp. 172–175</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📋 -est or most? Drag each word to its column.</div>
+    <div id="board" style="flex:1;min-height:0"></div>
+    <div class="mg-win" id="board-win">✅ -est: funniest, bravest, coolest, prettiest, greatest · most: wonderful, handsome, talented, famous, amazing, popular</div>
+    <span class="src-pill">Lesson Planner p. 173 · the list to keep on the board all lesson</span>
+  </div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide" id="s12">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Grammar in Depth — Short Words + y → i</span><span class="hd-chip">Lesson Planner pp. 172–175</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📏 One syllable (tall, great) → <b>the …est</b>. Two syllables ending in y (funny, pretty) → <b>y → i + est</b>.</div>
+    <div id="st3" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="mg-win" id="st3-win">✅ With funny, note the change from y to i.</div>
+    <div class="award-wall" data-title="LEEA Awards Night" data-total="" data-max="12"></div>
+    <span class="src-pill">Lesson Planner p. 173 · Grammar in Depth · Grammar Workbook p. 20</span>
+  </div>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="slide" id="s13">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Grammar in Depth — Long Words Take most</span><span class="hd-chip">Lesson Planner pp. 172–175</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔝 Two syllables ending in -ous or -ful, and ALL words with three or more syllables → <b>the most …</b></div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="long"></div>
+    <div class="award-wall" data-title="LEEA Awards Night" data-total="" data-max="12"></div>
+    <span class="src-pill">Lesson Planner p. 173 · Grammar in Depth: She’s the most famous singer in the world. It’s the most popular show on TV.</span>
+  </div>
+</div>
+
+<!-- SLIDE 14 -->
+<div class="slide" id="s14">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Superlative Detective 🕵️</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🕵️ Every sentence has ONE mistake. Pick the fixed version.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="det"></div>
+    <div class="how-box">🇯🇵 <b>Japanese bridge:</b> 一番〜 = <b>the</b> + -est / <b>the most</b> + word. Never both: <s>the most funniest</s>. Don’t forget <b>the</b>: <s>He is tallest</s> → He is <b>the</b> tallest.</div>
+    <span class="src-pill">grammar.json note: do not use both most and -est together</span>
+  </div>
+</div>
+
+<!-- SLIDE 15 -->
+<div class="slide" id="s15">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Practice — Activity 1</span><span class="hd-chip">SB p. 82</span></div>
+  <div class="content-body" style="gap:10px">
+    <div class="slide-h1" style="font-size:34px">🏆 Read. Complete the questions. Each right answer is an award!</div>
+    <div class="slide-h2" style="font-size:21px">Model: “I see the words amazing and singer. I know that I have to add the words the most before amazing. So I’ll write <b>the most amazing singer</b>.”</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="a1"></div>
+    <div class="award-wall" data-title="LEEA Awards Night" data-total="25" data-max="12"></div>
+    <span class="src-pill">Student Book p. 82 · Activity 1 · answer key verbatim</span>
+  </div>
+</div>
+
+<!-- SLIDE 16 -->
+<div class="slide" id="s16">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Practice — Activity 2</span><span class="hd-chip">SB p. 82</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📸 Look at the pictures. Write sentences.</div>
+    <div class="slide-h2">“Which car is bigger, the red car or the green car? (the red car) Which of the three cars is the biggest? (the blue car)”</div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="a2"></div>
+    <div class="award-wall" data-title="LEEA Awards Night" data-total="" data-max="12"></div>
+    <span class="src-pill">Student Book p. 82 · Activity 2 · model sentences from the answer key</span>
+  </div>
+</div>
+
+<!-- SLIDE 17 -->
+<div class="slide" id="s17">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Apply — Activity 3: Ask and Answer</span><span class="hd-chip">SB p. 83</span></div>
+  <div class="content-body" style="gap:10px">
+    <div class="slide-h1" style="font-size:34px">❓ Make the question. Then ask your partner and write the answer.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="a3"></div>
+    <span class="src-pill">Student Book p. 83 · Activity 3 · Answers will vary · model: Who is the coolest TV star?</span>
+  </div>
+</div>
+
+<!-- SLIDE 18 -->
+<div class="slide" id="s18">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Apply — Activity 3: Our Answers</span><span class="hd-chip">SB p. 83</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📝 Me · My partner — type both answers.</div>
+    <div style="display:flex;flex-direction:column;gap:8px" id="a3t"></div>
+    <span class="src-pill">Student Book p. 83 · Activity 3 chart</span>
+  </div>
+</div>
+
+<!-- SLIDE 19 -->
+<div class="slide" id="s19">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Apply — Activity 4: Compare Opinions</span><span class="hd-chip">SB p. 83</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💬 Compare your opinions. Decide who or what is the group’s favorite.</div>
+    <div class="chat-row"><div class="chat-ava">👨</div><div class="bub q">Who is the most talented singer?</div></div>
+    <div class="chat-row right"><div class="chat-ava">👦</div><div class="bub a">Pavarotti.</div></div>
+    <div class="chat-row"><div class="chat-ava">👩</div><div class="bub q">Who’s he?</div></div>
+    <div class="chat-row right"><div class="chat-ava">👦</div><div class="bub a">Are you kidding? He’s the greatest opera singer ever!</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px" id="a4"></div>
+    <span class="src-pill">Student Book p. 83 · Activity 4 (model dialogue verbatim) · Teaching Tip: there are no right or wrong answers</span>
+  </div>
+</div>
+
+<!-- SLIDE 20 -->
+<div class="slide" id="s20">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Recap — Baby, Teenager, Grandmother</span><span class="hd-chip">Lesson Planner pp. 172–175</span></div>
+  <div class="content-body">
+    <div class="slide-h1">👶 🧑 👵 Who is the youngest? Who is the oldest?</div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="rec"></div>
+    <div style="display:flex;flex-direction:column;gap:8px" id="rect"></div>
+    <span class="src-pill">Lesson Planner p. 175 · Recap (answers verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 21 -->
+<div class="slide" id="s21">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Extend — Write the Superlative</span><span class="hd-chip">Lesson Planner pp. 172–175</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✏️ One person writes the superlative, the other answers. Then switch.</div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="ext"></div>
+    <div style="display:flex;flex-direction:column;gap:8px" id="extt"></div>
+    <span class="src-pill">Lesson Planner p. 175 · Extend (questions verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 22 -->
+<div class="slide" id="s22">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — Photos of People</span><span class="hd-chip">Lesson Planner pp. 172–175</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📸 What’s your opinion? Answer in complete sentences.</div>
+    <div class="slide-h2">Hold up photos (a phone works): three female actors, then three male singers.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="wu"></div>
+    <span class="src-pill">Lesson Planner p. 174 · Wrap Up (questions verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 23 -->
+<div class="slide" id="s23">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Soccer Awards ⚽</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⚽ Name the soccer awards. Which form is right?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="soc"></div>
+    <div class="award-wall" data-title="LEEA Awards Night" data-total="" data-max="12"></div>
+  </div>
+</div>
+
+<!-- SLIDE 24 -->
+<div class="slide" id="s24">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">The Awards Wall 🏆</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🏆 Look at the wall! Every trophy is a superlative you made.</div>
+    <div class="award-wall big" data-title="LEEA Awards Night — the full wall" data-total="25"></div>
+    <div class="slide-h2">🎤 Leo’s host speech: present three awards. “And the award for <b>the funniest movie</b> goes to…”</div>
+    <div style="display:flex;flex-direction:column;gap:8px" id="speech"></div>
+  </div>
+</div>
+
+<!-- SLIDE 25 -->
+<div class="slide" id="s25">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✔️ Can Leo…</div>
+    <div class="assess-grid" id="assess"></div>
+    <div class="task-card">📓 <b>Homework:</b> Workbook p. 57 · Grammar Workbook pp. 20–21 · Leo’s Grammar 1 app (12 tabs).</div>
+  </div>
+</div>
+
+<!-- SLIDE 26 -->
+<div class="slide" id="s26">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Finish the Lesson</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:22px">
+    <div style="font-size:90px">🏆</div>
+    <div class="slide-h1" style="text-align:center">Unit 5 · Grammar 1 — taught</div>
+    <div class="slide-h2" style="text-align:center;max-width:1100px">Next lesson: Vocabulary 2 — a hobby, a school subject, a sport, a TV show, a writer (TR 5.5).</div>
+    <div class="done-wrap">
+      <button class="btn-done" id="doneBtn" onclick="markDone()">✅ Mark this lesson done</button>
+      <button class="btn-clear" id="redoBtn" onclick="handleRedo()">↺ Clear saved progress</button>
+      <div id="doneMsg"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
+
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 26</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="fs-btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+  <span id="unit-label">Unit 5 · Grammar 1</span>
+</div>
+
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+<script>
+/* =========================================================
+   LEEA · Our World Level 4 · Unit 5 · Grammar 1 — Superlatives with -est and most
+   Spine: LEEA Awards Night — every superlative Leo builds becomes a trophy on the wall.
+   SB pp. 82–83 · TR 5.4 · LP pp. 172–175 · WB p. 57 · GWB pp. 20–21 · chart from unit-5/grammar.json
+   Scope: superlatives (-est / y→iest / most) only; comparatives appear only where SB Activity 2 uses them.
+   ========================================================= */
+
+var SAVE_PREFIX = '4-5-grammar-1-slides-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-5-grammar-1-slides';
+/* Must match the `id` in the teacher lesson JSON — the dashboard reads leea.lessonProgress.v1 by it. */
+var LESSON_ID = 'ow-l4-u5-grammar-1';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+var LESSON_NAME = 'Unit 5 · Grammar 1 — My Favorites';
+function lSave(key, value) {
+  try {
+    var k = SAVE_PREFIX + key;
+    window.localStorage.setItem(k, JSON.stringify(value));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, value);
+    }
+  } catch (e) {}
+}
+function lLoad(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(SAVE_PREFIX + key);
+    return raw === null || raw === undefined ? fallback : JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function writeLessonProgress() {
+  try {
+    var store = {};
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (raw) store = JSON.parse(raw) || {};
+    var now = new Date().toISOString();
+    store[LESSON_ID] = { lessonId: LESSON_ID, teacherId: 'neritan', studentId: 'leo',
+                         status: 'done', completedAt: now, updatedAt: now };
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function clearLessonProgress() {
+  try {
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function markDone() {
+  writeLessonProgress();
+  lSave('complete', { name: LESSON_NAME, timestamp: new Date().toISOString(), done: true });
+  lSave('done', true);
+  var btn = document.getElementById('doneBtn');
+  if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+  var msg = document.getElementById('doneMsg');
+  if (msg) msg.textContent = 'Saved on the teacher dashboard. ⭐';
+}
+var redoArmed = false, redoTimer = null;
+function handleRedo() {
+  var btn = document.getElementById('redoBtn');
+  var msg = document.getElementById('doneMsg');
+  if (!redoArmed) {
+    redoArmed = true;
+    btn.textContent = '↺ Tap again to clear';
+    if (msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+    if (redoTimer) window.clearTimeout(redoTimer);
+    redoTimer = window.setTimeout(function () {
+      redoArmed = false;
+      btn.textContent = '↺ Clear saved progress';
+      if (msg) msg.textContent = '';
+    }, 3000);
+    return;
+  }
+  redoArmed = false;
+  if (redoTimer) window.clearTimeout(redoTimer);
+  btn.textContent = '↺ Clear saved progress';
+  clearLessonProgress();
+  lSave('complete', null);
+  lSave('done', null);
+  var d = document.getElementById('doneBtn');
+  if (d) { d.classList.remove('confirmed'); d.textContent = '✅ Mark this lesson done'; }
+  if (msg) msg.textContent = 'Cleared.';
+}
+function restoreDoneState() {
+  var c = lLoad('complete', null);
+  if (c && c.done) {
+    var btn = document.getElementById('doneBtn');
+    if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+    var msg = document.getElementById('doneMsg');
+    if (msg) msg.textContent = 'Already marked done.';
+  }
+}
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+var cur = 1;
+function goTo(n) {
+  n = Math.max(1, Math.min(TOTAL, n));
+  var old = document.getElementById('s' + cur);
+  if (old) old.classList.remove('active');
+  cur = n;
+  var next = document.getElementById('s' + cur);
+  if (next) next.classList.add('active');
+  document.getElementById('slide-counter').textContent = cur + ' / ' + TOTAL;
+  document.getElementById('tn-content').innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
+  if (SLIDE_INIT[cur]) SLIDE_INIT[cur]();
+}
+document.addEventListener('keydown', function (e) {
+  if (e.target && (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+var notesOpen = false;
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('notes-btn').classList.toggle('active', notesOpen);
+  scale();
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange', function () {
+  var btn = document.getElementById('fs-btn');
+  var active = !!document.fullscreenElement;
+  btn.textContent = active ? '⛶ Exit Full (F)' : '⛶ Fullscreen (F)';
+  btn.classList.toggle('active', active);
+  scale();
+});
+function scale() {
+  var s = document.getElementById('scaler');
+  var availW = window.innerWidth - (notesOpen ? 440 : 0);
+  var availH = window.innerHeight - 52;
+  var r = Math.min(availW / 1920, availH / 1080);
+  s.style.transform = 'scale(' + r + ')';
+  s.style.left = ((availW - 1920 * r) / 2) + 'px';
+  s.style.top = ((availH - 1080 * r) / 2) + 'px';
+  s.style.position = 'fixed';
+}
+window.addEventListener('resize', scale);
+
+// ─── WIDGETS (shared by every Unit 5 deck) ─────────────────────
+function $id(i){ return document.getElementById(i); }
+function once(el){ if(!el || el.dataset.built) return false; el.dataset.built = '1'; return true; }
+function mix(a){ var b = a.slice(); for(var i=b.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=b[i]; b[i]=b[j]; b[j]=t; } return b; }
+function shake(el){ el.classList.remove('miss'); void el.offsetWidth; el.classList.add('miss'); setTimeout(function(){ el.classList.remove('miss'); }, 400); }
+function win(id, text){ var w = $id(id); if(w){ if(text) w.innerHTML = text; w.classList.add('show'); } }
+
+/* reveal: question cards, tap to show the answer. items [[q,a]] */
+function wReveal(id, items, countId){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  items.forEach(function(d, i){
+    var it = document.createElement('div'); it.className = 'q-item';
+    it.innerHTML = '<div class="q-num">' + (d[2] || (i + 1)) + '</div><div><div>' + d[0] + '</div><div class="q-ans">→ ' + d[1] + '</div></div>';
+    it.onclick = function(){ if(it.classList.contains('done')) return; it.classList.add('done'); n++; if(countId) $id(countId).textContent = n + ' / ' + items.length; };
+    g.appendChild(it);
+  });
+}
+/* flip: recap cards. cards [{e, w, b}] */
+function wFlip(id, cards, countId){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  cards.forEach(function(c){
+    var el = document.createElement('div'); el.className = 'mg-flip';
+    el.innerHTML = '<div class="mf-front">' + c.e + '</div><div style="font-size:20px;font-weight:800;color:#111">' + c.w + '</div><div class="mf-back">' + c.b + '</div>';
+    el.onclick = function(){ if(el.classList.contains('open')) return; el.classList.add('open'); n++; if(countId) $id(countId).textContent = n + ' / ' + cards.length; };
+    g.appendChild(el);
+  });
+}
+/* check: multiple choice, wrong shakes, right locks. items [{q, opts, ok, why}] */
+function wCheck(id, items, winId){
+  var g = $id(id); if(!once(g)) return; var solved = 0;
+  items.forEach(function(it, qi){
+    var box = document.createElement('div'); box.className = 'task-card'; box.style.cssText = 'padding:14px 22px;font-size:20px';
+    var opts = it.keep ? it.opts.map(function(o, i){ return [o, i]; }) : mix(it.opts.map(function(o, i){ return [o, i]; }));
+    box.innerHTML = '<div style="font-weight:700;margin-bottom:8px">' + (items.length > 1 ? (qi + 1) + '. ' : '') + it.q + '</div><div style="display:flex;flex-wrap:wrap;gap:10px"></div><div class="mg-miss" style="color:#047857"></div>';
+    var row = box.children[1], why = box.children[2];
+    opts.forEach(function(o){
+      var b = document.createElement('button'); b.className = 'mg-opt'; b.innerHTML = o[0];
+      b.onclick = function(){
+        if(box.dataset.done) return;
+        if(o[1] === it.ok){ b.classList.add('ok'); box.dataset.done = '1'; if(it.award) addAward(it.award); why.textContent = it.why ? '✓ ' + it.why : '✓ Yes!'; solved++; if(solved === items.length && winId) win(winId); }
+        else { b.classList.add('no'); setTimeout(function(){ b.classList.remove('no'); }, 600); }
+      };
+      row.appendChild(b);
+    });
+    g.appendChild(box);
+  });
+}
+/* find: tap every tile that fits. tiles [{t, ok, why}] */
+function wFind(id, tiles, countId, winId){
+  var g = $id(id); if(!once(g)) return; var need = tiles.filter(function(t){ return t.ok; }).length, got = 0;
+  mix(tiles).forEach(function(t){
+    var el = document.createElement('div'); el.className = 'mg-tile';
+    el.innerHTML = t.t + '<span class="mg-label">' + (t.l || '') + '</span>';
+    el.onclick = function(){
+      if(el.classList.contains('hit')) return;
+      if(t.ok){ el.classList.add('hit'); if(t.why) el.querySelector('.mg-label').textContent = t.why; got++; if(countId) $id(countId).textContent = got + ' / ' + need; if(got === need && winId) win(winId); }
+      else { shake(el); if(t.why) el.querySelector('.mg-label').textContent = t.why; }
+    };
+    g.appendChild(el);
+  });
+}
+/* tapsort: tap a tile, then tap its box. zones [{k, label, color}], tiles [{t, k}] */
+function wTapSort(id, zones, tiles, winId){
+  var g = $id(id); if(!once(g)) return; var sel = null, left = tiles.length;
+  g.innerHTML = '<div class="ts-bank"></div><div class="ts-zones"></div><div class="mg-miss"></div>';
+  var bank = g.children[0], zs = g.children[1], miss = g.children[2];
+  mix(tiles).forEach(function(t){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = t.t; b.dataset.k = t.k;
+    b.onclick = function(){ if(b.classList.contains('used')) return; bank.querySelectorAll('.ts-tile').forEach(function(x){ x.classList.remove('sel'); }); b.classList.add('sel'); sel = b; miss.textContent = ''; };
+    bank.appendChild(b);
+  });
+  zones.forEach(function(z){
+    var c = document.createElement('div'); c.className = 'ts-zone';
+    c.innerHTML = '<div class="ts-zh" style="background:' + z.color + '">' + z.label + '</div><div class="ts-zb"></div>';
+    c.onclick = function(){
+      if(!sel){ miss.textContent = 'Tap a card first, then its box.'; return; }
+      if(sel.dataset.k === z.k){ var t = document.createElement('div'); t.className = 'ts-in'; t.innerHTML = sel.innerHTML; c.children[1].appendChild(t); sel.classList.add('used'); sel.classList.remove('sel'); sel.style.visibility = 'hidden'; sel = null; left--; miss.textContent = ''; if(!left && winId) win(winId); }
+      else { shake(c); miss.textContent = 'Not that box — think again.'; }
+    };
+    zs.appendChild(c);
+  });
+}
+/* order: tap the items in order (rank, sequence). steps in the right order */
+function wOrder(id, steps, winId, prompt){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  g.innerHTML = '<div class="ord-out"></div><div class="ts-bank"></div><div class="mg-miss"></div>';
+  var out = g.children[0], bank = g.children[1], miss = g.children[2];
+  mix(steps.map(function(s, i){ return [s, i]; })).forEach(function(s){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = s[0];
+    b.onclick = function(){
+      if(s[1] === n){ var d = document.createElement('div'); d.className = 'ord-row'; d.innerHTML = '<b>' + (n + 1) + '</b> ' + s[0]; out.appendChild(d); b.style.visibility = 'hidden'; n++; miss.textContent = ''; if(n === steps.length && winId) win(winId); }
+      else { shake(b); miss.textContent = prompt || ('Not yet — what comes ' + (n ? 'next' : 'first') + '?'); }
+    };
+    bank.appendChild(b);
+  });
+}
+/* build: tap the chips in order to build the sentence. chips = right order; extra = traps */
+function wBuild(id, chips, extra, winId){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  g.innerHTML = '<div class="bd-line">&nbsp;</div><div class="ts-bank"></div><div class="mg-miss"></div>';
+  var line = g.children[0], bank = g.children[1], miss = g.children[2], built = [];
+  mix(chips.map(function(c, i){ return [c, i]; }).concat((extra || []).map(function(c){ return [c, -1]; }))).forEach(function(c){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = c[0];
+    b.onclick = function(){
+      if(c[1] === n){ built.push(c[0]); line.innerHTML = built.join(' '); b.style.visibility = 'hidden'; n++; miss.textContent = ''; if(n === chips.length){ line.classList.add('ok'); if(winId) win(winId); } }
+      else { shake(b); miss.textContent = c[1] < 0 ? 'That piece does not belong in this sentence.' : 'Not that word yet.'; }
+    };
+    bank.appendChild(b);
+  });
+}
+/* hold: press and hold to fill a meter; release early and it drains. */
+function wHold(id, cfg){
+  var g = $id(id); if(!once(g)) return;
+  g.innerHTML = '<div class="mg-bar" style="height:34px"><div></div></div><div style="font-size:72px;line-height:1;text-align:center">' + cfg.e0 + '</div><button class="mg-btn" style="font-size:24px;padding:18px 40px">' + cfg.btn + '</button><div class="mg-miss" style="color:#374151"></div>';
+  var bar = g.children[0].firstChild, face = g.children[1], btn = g.children[2], msg = g.children[3], v = 0, t = null, done = false;
+  function tick(){ v = Math.min(100, v + 2.2); bar.style.width = v + '%'; if(v >= 100){ stop(); done = true; face.innerHTML = cfg.e1; msg.innerHTML = cfg.win; btn.disabled = true; if(cfg.winId) win(cfg.winId); } }
+  function drain(){ if(done) return; v = Math.max(0, v - 4); bar.style.width = v + '%'; if(v > 0) t = setTimeout(drain, 40); }
+  function start(e){ if(done) return; e.preventDefault(); clearTimeout(t); msg.innerHTML = cfg.during || 'Keep going…'; t = setInterval(tick, 40); }
+  function stop(){ clearInterval(t); clearTimeout(t); if(!done){ msg.innerHTML = cfg.early || 'Don’t stop! Hold it longer.'; drain(); } }
+  btn.addEventListener('pointerdown', start); btn.addEventListener('pointerup', stop); btn.addEventListener('pointerleave', stop);
+}
+/* typed: Dad 💬 / Leo 💬 frames, saved as typed. rows [[label, placeholder]] */
+function wTyped(id, rows, key){
+  var g = $id(id); if(!once(g)) return; var saved = lLoad(key, {}) || {};
+  rows.forEach(function(r, i){
+    var row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:16px';
+    row.innerHTML = '<span style="font-size:21px;font-weight:800;color:var(--pd);min-width:300px">' + r[0] + '</span>';
+    var inp = document.createElement('input'); inp.placeholder = r[1]; inp.value = saved[i] || '';
+    inp.style.cssText = 'flex:1;font-family:Outfit,sans-serif;font-size:21px;padding:11px 16px;border:2px solid var(--pb);border-radius:12px';
+    inp.oninput = function(){ saved[i] = inp.value; lSave(key, saved); };
+    row.appendChild(inp); g.appendChild(row);
+  });
+}
+/* assess: Can Leo…? cards */
+function wAssess(id, items){
+  var g = $id(id); if(!once(g)) return;
+  items.forEach(function(t){
+    var c = document.createElement('div'); c.className = 'assess-card';
+    c.innerHTML = '<div class="assess-q">' + t[0] + '</div><div style="font-size:16px;color:#6b7280">' + (t[1] || 'Tap when Leo can do it.') + '</div>';
+    c.onclick = function(){ c.classList.toggle('yes'); };
+    g.appendChild(c);
+  });
+}
+/* sort with the shared drag-and-drop sorter (pickChart) */
+function wSort(id, zones, tiles, winId){
+  if(typeof window.pickChart !== 'function'){ wTapSort(id, zones, tiles, winId); return; }
+  var g = $id(id); if(!once(g)) return;
+  g.innerHTML = window.pickChart('classification sort', { id: id + '-dnd', tiles: tiles.map(function(t){ return { text: t.t, answer: t.k }; }),
+    zones: zones.map(function(z){ return { key: z.k, label: z.label, color: z.color }; }), onComplete: function(){ if(winId) win(winId); } });
+}
+/* pair: tap one on the left, then its partner on the right. pairs [[l, r]] */
+function wPair(id, pairs, countId, winId){
+  var g = $id(id); if(!once(g)) return; var sel = null, got = 0;
+  g.innerHTML = '<div class="mg-pair"><div class="mg-col"></div><div class="mg-col"></div></div>';
+  var L = g.querySelectorAll('.mg-col')[0], R = g.querySelectorAll('.mg-col')[1];
+  pairs.forEach(function(p, i){
+    var b = document.createElement('button'); b.className = 'mg-pbtn'; b.innerHTML = p[0];
+    b.onclick = function(){ if(b.classList.contains('done')) return; L.querySelectorAll('.mg-pbtn').forEach(function(x){ x.classList.remove('sel'); }); b.classList.add('sel'); sel = [i, b]; };
+    L.appendChild(b);
+  });
+  mix(pairs.map(function(p, i){ return [p[1], i]; })).forEach(function(p){
+    var b = document.createElement('button'); b.className = 'mg-pbtn'; b.innerHTML = p[0];
+    b.onclick = function(){
+      if(!sel || b.classList.contains('done')) return;
+      if(p[1] === sel[0]){ b.classList.add('done'); sel[1].classList.add('done'); sel[1].classList.remove('sel'); sel = null; got++; if(countId) $id(countId).textContent = got + ' / ' + pairs.length; if(got === pairs.length && winId) win(winId); }
+      else { b.classList.add('bad'); setTimeout(function(){ b.classList.remove('bad'); }, 400); }
+    };
+    R.appendChild(b);
+  });
+}
+/* rank: tap in YOUR order — favorite first. No wrong answers. */
+function wRank(id, items, winId, first, last){
+  var g = $id(id); if(!once(g)) return; var n = 0, order = [];
+  g.innerHTML = '<div class="ord-out"></div><div class="ts-bank"></div>';
+  var out = g.children[0], bank = g.children[1];
+  items.forEach(function(t){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = t;
+    b.onclick = function(){ order.push(t); var d = document.createElement('div'); d.className = 'ord-row'; d.innerHTML = '<b>' + (++n) + '</b> ' + t; out.appendChild(d); b.style.visibility = 'hidden';
+      if(n === items.length && winId) win(winId, '🗣️ “' + (first || 'I put {x} first.').replace('{x}', order[0].replace(/<[^>]+>/g, '')) + '” · “' + (last || 'I put {x} last.').replace('{x}', order[n - 1].replace(/<[^>]+>/g, '')) + '”'); };
+    bank.appendChild(b);
+  });
+}
+/* steps: watch a word change, one button per step — no leaps.
+   rows [{start, steps:[[buttonLabel, resultHTML]], award?}] */
+function wSteps(id, rows, winId){
+  var g = $id(id); if(!once(g)) return; var done = 0;
+  rows.forEach(function(r){
+    var row = document.createElement('div'); row.className = 'st-row';
+    row.innerHTML = '<div class="st-box">' + r.start + '</div><div class="st-btns"></div>';
+    var box = row.children[0], btns = row.children[1], k = 0;
+    r.steps.forEach(function(s, i){
+      var b = document.createElement('button'); b.className = 'mg-btn st-btn'; b.innerHTML = (i + 1) + '. ' + s[0]; b.disabled = i > 0;
+      b.onclick = function(){ if(i !== k) return; box.innerHTML = s[1]; box.classList.remove('pop'); void box.offsetWidth; box.classList.add('pop'); b.disabled = true; k++;
+        if(btns.children[k]) btns.children[k].disabled = false;
+        if(k === r.steps.length){ box.classList.add('ok'); done++; if(r.award) addAward(r.award); if(done === rows.length && winId) win(winId); } };
+      btns.appendChild(b);
+    });
+    g.appendChild(row);
+  });
+}
+/* tally: tap to add a check mark; the most checks wins. */
+function wTally(id, items, key, winId, frame){
+  var g = $id(id); if(!once(g)) return; var t = lLoad(key, {}) || {};
+  function paint(){ var best = 0, who = []; items.forEach(function(a, i){ var n = t[i] || 0; if(n > best){ best = n; who = [a]; } else if(n && n === best) who.push(a); });
+    if(best && winId) win(winId, (frame || 'In our opinion, {x} is great!').replace('{x}', '<b>' + who.join(' / ') + '</b>') + ' (' + best + ' ✔)'); }
+  items.forEach(function(a, i){
+    var c = document.createElement('div'); c.className = 'mg-tile'; c.style.fontSize = '26px';
+    c.innerHTML = a + '<span class="mg-label" style="font-size:24px;color:var(--p)">' + '✔'.repeat(t[i] || 0) + '</span>';
+    c.onclick = function(){ t[i] = (t[i] || 0) + 1; lSave(key, t); c.querySelector('.mg-label').textContent = '✔'.repeat(t[i]); paint(); };
+    g.appendChild(c);
+  });
+  paint();
+}
+/* AWARDS — the spine's trophy wall. Every .award-wall on any slide repaints. */
+var WIN_HOOK = {};
+var _win0 = win;
+win = function(id, text){ _win0(id, text); if(WIN_HOOK[id]) [].concat(WIN_HOOK[id]).forEach(addAward); };
+function getAwards(){ return lLoad('awards', []) || []; }
+function addAward(name){ var a = getAwards(); if(a.indexOf(name) < 0){ a.push(name); lSave('awards', a); toast('🏆 New award: ' + name); } paintAwards(); }
+function paintAwards(){
+  var a = getAwards();
+  document.querySelectorAll('.award-wall').forEach(function(w){
+    var max = +(w.dataset.max || 99);
+    w.innerHTML = '<div class="aw-head">🏆 ' + (w.dataset.title || 'Trophy wall') + ' · ' + a.length + (w.dataset.total ? ' / ' + w.dataset.total : '') + '</div><div class="aw-row">' +
+      (a.length ? a.slice(-max).map(function(x){ return '<span class="aw">🏆 ' + x + '</span>'; }).join('') : '<span class="aw empty">No trophies yet — every right superlative wins one!</span>') + '</div>';
+  });
+}
+function toast(t){ var el = $id('toast'); if(!el){ el = document.createElement('div'); el.id = 'toast'; document.body.appendChild(el); } el.textContent = t; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); }
+function clearAwards(){ lSave('awards', []); paintAwards(); }
+
+
+// ─── TEACHER NOTES ─────────────────────────────────────────────
+var NOTES = {
+ "1": "<p class=\"tn-lbl\">The spine</p><p>Tonight Leo hosts the LEEA Awards. Every award has a superlative name — the funniest movie, the most talented writer. He can only create an award by building the superlative, and every award goes up on the trophy wall. The wall fills across the deck; the payoff is Leo’s host speech in front of the full wall.</p>",
+ "2": "<p class=\"tn-lbl\">Objectives</p><p>Verbatim, LP p. 172. Empty the wall only if you are re-teaching the lesson.</p>",
+ "3": "<p class=\"tn-lbl\">compare</p><p>Academic Language, LP p. 172. Before any rule: comparing three things and picking “the most” one is the whole idea of a superlative.</p>",
+ "4": "<p class=\"tn-lbl\">opinion</p><p>LP p. 172 Warm Up: “Your opinion is what you think. It isn’t a fact. For example, I think Beauty and the Beast is a great movie. That’s my opinion. Does everyone think the same thing? (no)”</p>",
+ "5": "<p class=\"tn-lbl\">world</p><p>Grammar in Depth (LP p. 173): with the superlative we often use in the world, ever and of all (time). Ever and of all (time) both mean “since the beginning of time until now.”</p>",
+ "6": "<p class=\"tn-lbl\">Warm Up</p><p>LP: four favorite foods each, compare lists, a check mark for each person who chose it.</p>",
+ "7": "<p class=\"tn-lbl\">Build background</p><p>LP p. 172: use the frames to share opinions; if Leo disagrees, he completes the sentence with his own choice.</p>",
+ "8": "<p class=\"tn-lbl\">Grammar box — the one reveal</p><p>Play TR 5.4. Point out that <b>the</b> comes before <b>most</b>, and the two words that end with <b>-est</b> (greatest, funniest).</p>",
+ "9": "<p class=\"tn-lbl\">Present — -est</p><p>LP p. 173: “When we think someone or something is so great that nothing else is as great, we add the letters -est to the end of great.”</p>",
+ "10": "<p class=\"tn-lbl\">Present — most</p><p>LP p. 173: circle <b>most</b>. The wrong-first step shows why long words can’t take -est.</p>",
+ "11": "<p class=\"tn-lbl\">The board list</p><p>LP p. 173: keep this list on the board throughout the lesson. Then Leo adds -est or most to make sentences.</p>",
+ "12": "<p class=\"tn-lbl\">Grammar in Depth 1</p><p>LP p. 173: “She’s the funniest person in our class.” Big → biggest doubles the g (SB Activity 2) — mention it when you reach that item.</p>",
+ "13": "<p class=\"tn-lbl\">Grammar in Depth 2</p><p>LP p. 173, verbatim examples.</p>",
+ "14": "<p class=\"tn-lbl\">Detective</p><p>The three most common errors: both most and -est; -est on a long word; forgetting <b>the</b>.</p>",
+ "15": "<p class=\"tn-lbl\">Activity 1</p><p>Key: 1 the most amazing singer · 2 the coolest athlete · 3 the prettiest flower · 4 the most interesting TV show · 5 the funniest movie · 6 the most talented TV star. Then ask: “What sport is more amazing than any other sport?” — answer in a complete sentence.</p>",
+ "16": "<p class=\"tn-lbl\">Activity 2</p><p>Comparative (-er / more) for two; superlative for the one above all three. big → bigger → biggest doubles the g. “That is my opinion. What is your opinion?”</p>",
+ "17": "<p class=\"tn-lbl\">Activity 3</p><p>LP p. 175: “Do we add -est or the word most to talented? Right, we add the word most. The question would be Who is the most talented singer?” Write Leo’s answers on paper in the My partner column.</p>",
+ "18": "<p class=\"tn-lbl\">Activity 3 chart</p><p>Answers vary.</p>",
+ "19": "<p class=\"tn-lbl\">Activity 4</p><p>Teaching Tip (LP p. 175): no right or wrong answers; support opinions with reasons; be respectful of other people’s choices.</p>",
+ "20": "<p class=\"tn-lbl\">Recap</p><p>LP p. 175. Then other sentences with words from the board, e.g. The baby is the most amazing.</p>",
+ "21": "<p class=\"tn-lbl\">Extend</p><p>LP p. 175, items verbatim.</p>",
+ "22": "<p class=\"tn-lbl\">Wrap Up</p><p>LP p. 174 photos + LP p. 175 pair wrap up (“Who is your funniest friend? My funniest friend is (Miguel).”)</p>",
+ "23": "<p class=\"tn-lbl\">Soccer awards</p><p>Award names only — no stats, so nothing goes out of date. Ask Leo to name a player for each award and say why.</p>",
+ "24": "<p class=\"tn-lbl\">Payoff</p><p>The wall shows every award Leo created. He reads three out like a real host.</p>",
+ "25": "<p class=\"tn-lbl\">Formative Assessment</p><p>Verbatim from LP p. 175.</p>",
+ "26": "<p class=\"tn-lbl\">Mark Done</p><p>Records this lesson on the teacher dashboard (leea.lessonProgress.v1). Leo's app tracks his own tabs separately.</p>"
+};
+
+// ─── SLIDE INIT MAP ───────────────────────────────────────────
+var TOTAL = 26;
+var SLIDE_INIT = {
+  2: function(){ paintAwards(); },
+  3: function(){ wCheck("cmp", [
+ {
+  "q": "🐭 🐱 🐘 — Which animal is the biggest?",
+  "opts": [
+   "🐘",
+   "🐭",
+   "🐱"
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "🐌 🐢 🐆 — Which animal is the fastest?",
+  "opts": [
+   "🐆",
+   "🐌",
+   "🐢"
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "👶 🧒 👵 — Who is the oldest?",
+  "opts": [
+   "👵",
+   "👶",
+   "🧒"
+  ],
+  "ok": 0,
+  "keep": true
+ }
+], "cmp-win"); },
+  4: function(){ wTapSort("fo", [
+ {
+  "k": "f",
+  "label": "📏 a fact",
+  "color": "#0EA5E9"
+ },
+ {
+  "k": "o",
+  "label": "💭 an opinion",
+  "color": "#A21CAF"
+ }
+], [
+ {
+  "t": "Beauty and the Beast is a great movie.",
+  "k": "o"
+ },
+ {
+  "t": "I think the coolest pet is a dog.",
+  "k": "o"
+ },
+ {
+  "t": "Soccer is the best sport.",
+  "k": "o"
+ },
+ {
+  "t": "A week has seven days.",
+  "k": "f"
+ },
+ {
+  "t": "The Grimm brothers wrote fairy tales.",
+  "k": "f"
+ },
+ {
+  "t": "A soccer team has eleven players.",
+  "k": "f"
+ }
+], "fo-win"); },
+  5: function(){ wFind("gp", [
+ {
+  "t": "🌍",
+  "l": "in the world",
+  "ok": true
+ },
+ {
+  "t": "⏳",
+  "l": "ever",
+  "ok": true
+ },
+ {
+  "t": "♾️",
+  "l": "of all (time)",
+  "ok": true
+ },
+ {
+  "t": "🏫",
+  "l": "in our class",
+  "ok": true
+ },
+ {
+  "t": "👪",
+  "l": "in my family",
+  "ok": true
+ },
+ {
+  "t": "🏃",
+  "l": "quickly",
+  "ok": false,
+  "why": "not a group"
+ },
+ {
+  "t": "📅",
+  "l": "yesterday",
+  "ok": false,
+  "why": "not a group"
+ },
+ {
+  "t": "🍎",
+  "l": "an apple",
+  "ok": false,
+  "why": "not a group"
+ }
+], "gp-n", "gp-win"); },
+  6: function(){ wTally("food", [
+ "🍕 pizza",
+ "🍣 sushi",
+ "🍛 curry",
+ "🍜 ramen",
+ "🍔 burgers",
+ "🍓 strawberries",
+ "🍫 chocolate",
+ "🥗 salad"
+], "foods", "food-win", "In our opinion, {x} is great!"); },
+  7: function(){ wTyped("frames", [
+ [
+  "😂 The funniest movie is",
+  ""
+ ],
+ [
+  "🐶 The coolest pet is",
+  "a dog"
+ ],
+ [
+  "⚽ The most amazing soccer player is",
+  ""
+ ],
+ [
+  "🎤 The greatest singer is",
+  ""
+ ],
+ [
+  "🎸 The prettiest rock star is",
+  ""
+ ],
+ [
+  "🎭 The most handsome actor is",
+  ""
+ ]
+], "bgframes"); },
+  9: function(){ paintAwards(); wSteps("st1", [
+ {
+  "start": "great",
+  "steps": [
+   [
+    "add -est",
+    "great<u>est</u>"
+   ],
+   [
+    "add the",
+    "<u>the</u> greatest"
+   ],
+   [
+    "add the group",
+    "the greatest fairy tale <u>ever</u>"
+   ]
+  ],
+  "award": "The Greatest Fairy Tale"
+ }
+]); },
+  10: function(){ paintAwards(); wSteps("st2", [
+ {
+  "start": "talented",
+  "steps": [
+   [
+    "try -est 😬",
+    "talented<s>est</s> ❌ too long!"
+   ],
+   [
+    "use most",
+    "<u>most</u> talented"
+   ],
+   [
+    "add the",
+    "<u>the</u> most talented"
+   ],
+   [
+    "add the noun",
+    "the most talented <u>writer</u>"
+   ]
+  ],
+  "award": "The Most Talented Writer"
+ }
+]); },
+  11: function(){ WIN_HOOK["board-win"] = "The Best Sorter"; wSort("board", [
+ {
+  "k": "e",
+  "label": "➕ -est (the …est)",
+  "color": "#A21CAF"
+ },
+ {
+  "k": "m",
+  "label": "🔝 the most …",
+  "color": "#0EA5E9"
+ }
+], [
+ {
+  "t": "funny",
+  "k": "e"
+ },
+ {
+  "t": "wonderful",
+  "k": "m"
+ },
+ {
+  "t": "brave",
+  "k": "e"
+ },
+ {
+  "t": "handsome",
+  "k": "m"
+ },
+ {
+  "t": "cool",
+  "k": "e"
+ },
+ {
+  "t": "talented",
+  "k": "m"
+ },
+ {
+  "t": "pretty",
+  "k": "e"
+ },
+ {
+  "t": "famous",
+  "k": "m"
+ },
+ {
+  "t": "great",
+  "k": "e"
+ },
+ {
+  "t": "amazing",
+  "k": "m"
+ },
+ {
+  "t": "popular",
+  "k": "m"
+ }
+], "board-win"); },
+  12: function(){ paintAwards(); wSteps("st3", [
+ {
+  "start": "tall",
+  "steps": [
+   [
+    "add -est",
+    "tall<u>est</u>"
+   ],
+   [
+    "add the",
+    "<u>the</u> tallest"
+   ]
+  ]
+ },
+ {
+  "start": "funny",
+  "steps": [
+   [
+    "drop y",
+    "funn<s>y</s>"
+   ],
+   [
+    "add i",
+    "funn<u>i</u>"
+   ],
+   [
+    "add -est",
+    "funni<u>est</u>"
+   ],
+   [
+    "add the",
+    "<u>the</u> funniest"
+   ]
+  ],
+  "award": "The Funniest Person in Our Class"
+ },
+ {
+  "start": "pretty",
+  "steps": [
+   [
+    "drop y",
+    "prett<s>y</s>"
+   ],
+   [
+    "add i",
+    "prett<u>i</u>"
+   ],
+   [
+    "add -est",
+    "pretti<u>est</u>"
+   ],
+   [
+    "add the",
+    "<u>the</u> prettiest"
+   ]
+  ]
+ }
+], "st3-win"); },
+  13: function(){ paintAwards(); wCheck("long", [
+ {
+  "q": "famous (-ous) → ?",
+  "opts": [
+   "the most famous",
+   "the famousest"
+  ],
+  "ok": 0,
+  "keep": true,
+  "award": "The Most Famous Singer in the World"
+ },
+ {
+  "q": "wonderful (-ful) → ?",
+  "opts": [
+   "the most wonderful",
+   "the wonderfulest"
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "popular (pop-u-lar, 3 syllables) → ?",
+  "opts": [
+   "the most popular",
+   "the popularest"
+  ],
+  "ok": 0,
+  "keep": true,
+  "award": "The Most Popular Show on TV"
+ },
+ {
+  "q": "interesting (4 syllables) → ?",
+  "opts": [
+   "the most interesting",
+   "the interestingest"
+  ],
+  "ok": 0,
+  "keep": true
+ }
+]); },
+  14: function(){ wCheck("det", [
+ {
+  "q": "❌ She’s the most funniest girl in our class.",
+  "opts": [
+   "She’s the funniest girl in our class.",
+   "She’s the most funny girl in our class."
+  ],
+  "ok": 0
+ },
+ {
+  "q": "❌ It’s the beautifulest flower.",
+  "opts": [
+   "It’s the most beautiful flower.",
+   "It’s the beautifuller flower."
+  ],
+  "ok": 0
+ },
+ {
+  "q": "❌ He is greatest player in the world.",
+  "opts": [
+   "He is the greatest player in the world.",
+   "He is most greatest player in the world."
+  ],
+  "ok": 0
+ },
+ {
+  "q": "❌ This is the funnyest movie ever.",
+  "opts": [
+   "This is the funniest movie ever.",
+   "This is the most funnyest movie ever."
+  ],
+  "ok": 0
+ },
+ {
+  "q": "❌ J.K. Rowling is the talentedest writer.",
+  "opts": [
+   "J.K. Rowling is the most talented writer.",
+   "J.K. Rowling is the more talented writer."
+  ],
+  "ok": 0
+ },
+ {
+  "q": "❌ Who is the most cool athlete?",
+  "opts": [
+   "Who is the coolest athlete?",
+   "Who is the cooler athlete?"
+  ],
+  "ok": 0
+ }
+]); },
+  15: function(){ paintAwards(); wCheck("a1", [
+ {
+  "q": "1. Who is ____ in the world? (amazing / singer)",
+  "opts": [
+   "the most amazing singer",
+   "the amazingest singer",
+   "the more amazing singer"
+  ],
+  "ok": 0,
+  "award": "The Most Amazing Singer"
+ },
+ {
+  "q": "2. In your opinion, who is ____? (cool / athlete)",
+  "opts": [
+   "the coolest athlete",
+   "the most cool athlete",
+   "the cooler athlete"
+  ],
+  "ok": 0,
+  "award": "The Coolest Athlete"
+ },
+ {
+  "q": "3. In your opinion, what is ____? (pretty / flower)",
+  "opts": [
+   "the prettiest flower",
+   "the most pretty flower",
+   "the prettyest flower"
+  ],
+  "ok": 0,
+  "award": "The Prettiest Flower"
+ },
+ {
+  "q": "4. What is ____ you watch? (interesting / TV show)",
+  "opts": [
+   "the most interesting TV show",
+   "the interestingest TV show",
+   "the more interesting TV show"
+  ],
+  "ok": 0,
+  "award": "The Most Interesting TV Show"
+ },
+ {
+  "q": "5. What is ____ of all? (funny / movie)",
+  "opts": [
+   "the funniest movie",
+   "the most funny movie",
+   "the funnyest movie"
+  ],
+  "ok": 0,
+  "award": "The Funniest Movie"
+ },
+ {
+  "q": "6. In your opinion, who is ____? (talented / TV star)",
+  "opts": [
+   "the most talented TV star",
+   "the talentedest TV star",
+   "the most talentedest TV star"
+  ],
+  "ok": 0,
+  "award": "The Most Talented TV Star"
+ }
+]); },
+  16: function(){ paintAwards(); wCheck("a2", [
+ {
+  "q": "🚗 big: red car / green car / blue car",
+  "opts": [
+   "The red car is bigger than the green car, but the blue car is the biggest!",
+   "The red car is the biggest than the green car, but the blue car is bigger!"
+  ],
+  "ok": 0,
+  "award": "The Biggest Car"
+ },
+ {
+  "q": "🌸 beautiful: red flower / blue flower / yellow flower",
+  "opts": [
+   "The red flower is more beautiful than the blue flower, but the yellow flower is the most beautiful.",
+   "The red flower is beautifuler than the blue flower, but the yellow flower is the beautifulest."
+  ],
+  "ok": 0,
+  "award": "The Most Beautiful Flower"
+ },
+ {
+  "q": "👕 cool: blue T-shirt / white T-shirt / orange T-shirt",
+  "opts": [
+   "The blue T-shirt is cooler than the white T-shirt, but the orange T-shirt is the coolest!",
+   "The blue T-shirt is more cool than the white T-shirt, but the orange T-shirt is the most cool!"
+  ],
+  "ok": 0,
+  "award": "The Coolest T-Shirt"
+ }
+]); },
+  17: function(){ wCheck("a3", [
+ {
+  "q": "who / talented / singer",
+  "opts": [
+   "Who is the most talented singer?",
+   "Who is the talentedest singer?"
+  ],
+  "ok": 0,
+  "award": null
+ },
+ {
+  "q": "who / cool / TV star",
+  "opts": [
+   "Who is the coolest TV star?",
+   "Who is the most cool TV star?"
+  ],
+  "ok": 0,
+  "award": null
+ },
+ {
+  "q": "what / interesting / video game",
+  "opts": [
+   "What is the most interesting video game?",
+   "What is the interestingest video game?"
+  ],
+  "ok": 0,
+  "award": null
+ },
+ {
+  "q": "who / amazing / actor",
+  "opts": [
+   "Who is the most amazing actor?",
+   "Who is the amazingest actor?"
+  ],
+  "ok": 0,
+  "award": null
+ },
+ {
+  "q": "what / funny / movie",
+  "opts": [
+   "What is the funniest movie?",
+   "What is the most funny movie?"
+  ],
+  "ok": 0,
+  "award": null
+ },
+ {
+  "q": "who / great / athlete",
+  "opts": [
+   "Who is the greatest athlete?",
+   "Who is the most great athlete?"
+  ],
+  "ok": 0,
+  "award": "Question Master"
+ }
+]); },
+  18: function(){ wTyped("a3t", [
+ [
+  "Who is the most talented singer?",
+  "Me: … / My partner: …"
+ ],
+ [
+  "Who is the coolest TV star?",
+  "Me: … / My partner: …"
+ ],
+ [
+  "What is the most interesting video game?",
+  "Me: … / My partner: …"
+ ],
+ [
+  "Who is the most amazing actor?",
+  "Me: … / My partner: …"
+ ],
+ [
+  "What is the funniest movie?",
+  "Me: … / My partner: …"
+ ],
+ [
+  "Who is the greatest athlete?",
+  "Me: … / My partner: …"
+ ]
+], "act3"); },
+  19: function(){ wTyped("a4", [
+ [
+  "🏆 Our family’s favorite singer",
+  "Our favorite is… because…"
+ ],
+ [
+  "🏆 Our family’s favorite movie",
+  "…"
+ ]
+], "act4"); },
+  20: function(){ wCheck("rec", [
+ {
+  "q": "Who is the youngest?",
+  "opts": [
+   "The baby is the youngest.",
+   "The grandmother is the youngest."
+  ],
+  "ok": 0,
+  "award": "The Youngest"
+ },
+ {
+  "q": "Who is the oldest?",
+  "opts": [
+   "The grandmother is the oldest.",
+   "The baby is the oldest."
+  ],
+  "ok": 0,
+  "award": "The Oldest"
+ }
+]); wTyped("rect", [
+ [
+  "✍️ Another sentence",
+  "The baby is the most amazing."
+ ]
+], "recap"); },
+  21: function(){ wCheck("ext", [
+ {
+  "q": "What is the (wonderful) place you have visited?",
+  "opts": [
+   "the most wonderful",
+   "the wonderfulest"
+  ],
+  "ok": 0,
+  "keep": true,
+  "award": "The Most Wonderful Place"
+ },
+ {
+  "q": "Who do you think is the (brave) superhero?",
+  "opts": [
+   "the bravest",
+   "the most brave"
+  ],
+  "ok": 0,
+  "keep": true,
+  "award": "The Bravest Superhero"
+ },
+ {
+  "q": "What is the (famous) place in our city/country?",
+  "opts": [
+   "the most famous",
+   "the famousest"
+  ],
+  "ok": 0,
+  "keep": true,
+  "award": "The Most Famous Place"
+ }
+]); wTyped("extt", [
+ [
+  "🗺️ Leo’s answer 1",
+  "The most wonderful place I have visited is…"
+ ],
+ [
+  "🦸 Leo’s answer 2",
+  "The bravest superhero is…"
+ ],
+ [
+  "🏯 Leo’s answer 3",
+  "The most famous place in our city is…"
+ ]
+], "extend"); },
+  22: function(){ wTyped("wu", [
+ [
+  "🎭 Which female actor is the most talented?",
+  "… is the most talented."
+ ],
+ [
+  "🌸 Which one is the prettiest?",
+  "…"
+ ],
+ [
+  "🎤 Which singer is the most talented?",
+  "…"
+ ],
+ [
+  "🤵 Which one is the most handsome?",
+  "…"
+ ],
+ [
+  "😂 Who is your funniest friend?",
+  "My funniest friend is…"
+ ],
+ [
+  "⭐ Who is your most talented friend?",
+  "…"
+ ]
+], "wrapup"); },
+  23: function(){ paintAwards(); wCheck("soc", [
+ {
+  "q": "The player who scores the most goals: ___ striker",
+  "opts": [
+   "the greatest",
+   "the most great"
+  ],
+  "ok": 0,
+  "award": "The Greatest Striker"
+ },
+ {
+  "q": "The keeper who jumps in front of every shot: ___ keeper",
+  "opts": [
+   "the bravest",
+   "the most brave"
+  ],
+  "ok": 0,
+  "award": "The Bravest Keeper"
+ },
+ {
+  "q": "The goal everyone watches again and again: ___ goal",
+  "opts": [
+   "the most amazing",
+   "the amazingest"
+  ],
+  "ok": 0,
+  "award": "The Most Amazing Goal"
+ },
+ {
+  "q": "The team with the most fans: ___ team",
+  "opts": [
+   "the most popular",
+   "the popularest"
+  ],
+  "ok": 0,
+  "award": "The Most Popular Team"
+ }
+]); },
+  24: function(){ paintAwards(); wTyped("speech", [
+ [
+  "🏆 Award 1",
+  "And the award for the funniest movie goes to…"
+ ],
+ [
+  "🏆 Award 2",
+  "And the award for the most talented writer goes to…"
+ ],
+ [
+  "🏆 Award 3",
+  "And the award for the greatest athlete goes to…"
+ ]
+], "speech"); },
+  25: function(){ wAssess("assess", [
+ [
+  "…use superlatives with -est and most?",
+  "Give brave, pretty, wonderful, interesting — Leo says sentences using most or -est."
+ ],
+ [
+  "…use comparatives and superlatives to compare photos of people?",
+  "Photos of three actors and three singers: talented, pretty, handsome…"
+ ],
+ [
+  "…compare opinions?",
+  "Which writer has more talent than anyone else? Which video game is cooler than all the others? — then ask each other why."
+ ]
+]); },
+  26: function(){ restoreDoneState(); }
+};
+
+scale();
+goTo(1);
+restoreDoneState();
+</script>
+</body>
+</html>

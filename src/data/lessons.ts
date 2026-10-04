@@ -1,3 +1,23 @@
+import unit5Opener from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/opener.teacher.json";
+import unit5OpenerLearner from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/opener.learner.json";
+import unit5Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/vocab1.teacher.json";
+import unit5Vocab1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/vocab1.learner.json";
+import unit5Song from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/song.teacher.json";
+import unit5SongLearner from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/song.learner.json";
+import unit5Grammar1 from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/grammar1.teacher.json";
+import unit5Grammar1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/grammar1.learner.json";
+import unit5Vocab2 from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/vocab2.teacher.json";
+import unit5Vocab2Learner from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/vocab2.learner.json";
+import unit5Grammar2 from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/grammar2.teacher.json";
+import unit5Grammar2Learner from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/grammar2.learner.json";
+import unit5Reading from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/reading.teacher.json";
+import unit5ReadingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/reading.learner.json";
+import unit5Writing from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/writing.teacher.json";
+import unit5WritingLearner from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/writing.learner.json";
+import unit5Mission from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/mission.teacher.json";
+import unit5MissionLearner from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/mission.learner.json";
+import unit5Project from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/project.teacher.json";
+import unit5ProjectLearner from "../../content/subjects/english/courses/our-world/level-4/unit-5/lessons/project.learner.json";
 import unit6Vocab1 from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/vocab1.teacher.json";
 import unit6Vocab1Learner from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/vocab1.learner.json";
 import unit6Song from "../../content/subjects/english/courses/our-world/level-4/unit-6/lessons/song.teacher.json";
@@ -184,6 +204,26 @@ function compareLessonOrder(a: Lesson, b: Lesson) {
 }
 
 export const lessons: Lesson[] = [
+  unit5Opener as Lesson,
+  unit5OpenerLearner as Lesson,
+  unit5Vocab1 as Lesson,
+  unit5Vocab1Learner as Lesson,
+  unit5Song as Lesson,
+  unit5SongLearner as Lesson,
+  unit5Grammar1 as Lesson,
+  unit5Grammar1Learner as Lesson,
+  unit5Vocab2 as Lesson,
+  unit5Vocab2Learner as Lesson,
+  unit5Grammar2 as Lesson,
+  unit5Grammar2Learner as Lesson,
+  unit5Reading as Lesson,
+  unit5ReadingLearner as Lesson,
+  unit5Writing as Lesson,
+  unit5WritingLearner as Lesson,
+  unit5Mission as Lesson,
+  unit5MissionLearner as Lesson,
+  unit5Project as Lesson,
+  unit5ProjectLearner as Lesson,
   unit6Opener as Lesson,
   unit6OpenerLearner as Lesson,
   unit6Vocab1 as Lesson,

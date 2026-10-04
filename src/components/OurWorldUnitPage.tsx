@@ -44,6 +44,11 @@ const lessonCopy: Record<string, { title: string; subtitle: string }> = {
 };
 
 const unitMeta: Record<number, { title: string; subtitle: string; chips: string[] }> = {
+  5: {
+    title: "My Favorites",
+    subtitle: "Favorite people & things, fairy tales & amazing acrobats.",
+    chips: ["⭐ Favorites", "🏆 The Best", "🤸 Acrobats"]
+  },
   6: {
     title: "Wonders of the Sea",
     subtitle: "Ocean layers, sea creatures & a California kelp forest.",

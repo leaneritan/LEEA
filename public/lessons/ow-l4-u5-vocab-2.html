@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 5 · Vocabulary 2 · My Favorites</title>
+<script src="/components/charts.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../lib/leea-cloud-config.js"></script>
+<script src="../../lib/leea-cloud.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+
+/* HEADER */
+.slide-header{height:64px;background:#A21CAF;display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.65);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.2);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.ac{background:rgba(14,165,233,.4)}
+
+/* TWO-COLUMN VOCAB LAYOUT */
+.vocab-body{flex:1;display:flex;min-height:0}
+.word-panel{width:40%;padding:30px 34px;display:flex;flex-direction:column;border-right:2px solid #e5e7eb;background:#fff}
+.game-panel{width:60%;padding:22px 32px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;overflow:hidden}
+
+/* TAGS */
+.vtag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;width:fit-content}
+.vtag.v1{background:#FAE8FF;color:#701A75}
+.vtag.ac{background:#FEF3C7;color:#B45309}
+.vtag.rel{background:#f3f4f6;color:#6b7280}
+
+/* WORD PANEL */
+.word-emoji{font-size:130px;line-height:1;margin-bottom:12px;cursor:pointer;transition:transform .25s}
+.word-emoji:active{transform:scale(1.15)}
+.word-main{font-size:70px;font-weight:800;color:#111;line-height:1.05;margin-bottom:8px}
+.word-ipa{font-size:21px;color:#6b7280}
+.word-syl{font-size:18px;color:#9ca3af;letter-spacing:1px}
+.word-pos{font-size:19px;color:#A21CAF;font-weight:700;margin-bottom:14px}
+.word-def{font-size:21px;color:#374151;line-height:1.45;margin-bottom:8px}
+.word-jp{font-size:18px;color:#6b7280;line-height:1.45}
+.dad-say{background:#FDF4FF;border-left:4px solid #A21CAF;padding:13px 16px;border-radius:0 12px 12px 0;font-size:18px;color:#374151;line-height:1.5;margin-top:auto}
+.dad-say b{color:#701A75}
+.how-box{background:#fff;border:2px dashed #F5D0FE;border-radius:12px;padding:10px 16px;font-size:16px;color:#4b5563;line-height:1.5;width:100%}
+.how-box b{color:#701A75}
+.how-box li{margin-left:18px}
+
+/* MINI-GAME SHELL (shared class names across LEEA vocab decks) */
+.mg-wrap{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;flex:1;min-height:0}
+.mg-head{font-size:20px;font-weight:700;color:#374151;text-align:center;background:#f9fafb;border:2px solid #e5e7eb;border-radius:12px;padding:10px 20px;width:100%;flex-shrink:0}
+.mg-head b{color:#701A75}
+.mg-stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0;overflow:hidden}
+.mg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;width:100%}
+.mg-grid.c4{grid-template-columns:repeat(4,1fr)}
+.mg-grid.c3{grid-template-columns:repeat(3,1fr)}
+.mg-tile{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 6px;font-size:38px;cursor:pointer;transition:all .15s;text-align:center}
+.mg-tile:hover{transform:translateY(-3px);border-color:#A21CAF}
+.mg-tile .mg-label{display:block;font-size:14px;font-weight:700;color:#4b5563;margin-top:4px;min-height:18px}
+.mg-tile.hit{background:#FDF4FF;border-color:#A21CAF;cursor:default}
+.mg-tile.miss{background:#fef2f2;border-color:#ef4444;animation:mgShake .3s ease}
+@keyframes mgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.mg-btn{background:#A21CAF;color:#fff;border:none;border-radius:12px;padding:13px 30px;font-size:20px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.mg-btn:hover{background:#701A75;transform:scale(1.04)}
+.mg-btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+.mg-opt{padding:12px 22px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:19px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left}
+.mg-opt:hover{border-color:#A21CAF}
+.mg-opt.ok{background:#FDF4FF;border-color:#A21CAF;color:#701A75;pointer-events:none}
+.mg-opt.no{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+.mg-score{font-size:20px;font-weight:800;color:#701A75;background:#FAE8FF;border-radius:20px;padding:6px 22px}
+.mg-miss{font-size:17px;font-weight:700;color:#ef4444;min-height:22px}
+.mg-win{background:#A21CAF;color:#fff;border-radius:14px;padding:12px 24px;font-size:20px;font-weight:800;text-align:center;opacity:0;transform:translateY(10px);transition:all .35s;width:100%}
+.mg-win.show{opacity:1;transform:translateY(0)}
+.mg-source{font-size:14px;color:#9ca3af;font-weight:600;letter-spacing:.4px}
+.mg-bar{width:100%;height:22px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.mg-bar > div{height:100%;background:linear-gradient(90deg,#E879F9,#A21CAF);width:0%;transition:width .2s;border-radius:99px}
+.mg-track{position:relative;width:100%;height:96px;background:linear-gradient(180deg,#FAE8FF,#FDF4FF);border-radius:16px;overflow:hidden;border:2px solid #F5D0FE}
+.mg-runner{position:absolute;bottom:16px;font-size:46px;transition:left .25s}
+.mg-flag{position:absolute;bottom:14px;right:2%;font-size:40px}
+.mg-spin{display:inline-block;transition:transform .3s ease}
+.mg-flip{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.mg-flip:hover{border-color:#A21CAF;transform:translateY(-3px)}
+.mg-flip.open{background:#FDF4FF;border-color:#A21CAF;cursor:default}
+.mg-flip .mf-front{font-size:40px}
+.mg-flip .mf-back{display:none;font-size:15px;font-weight:700;color:#701A75;line-height:1.35}
+.mg-flip.open .mf-back{display:block}
+.mg-pair{display:flex;gap:26px;width:100%;justify-content:center}
+.mg-col{display:flex;flex-direction:column;gap:10px;flex:1;max-width:340px}
+.mg-pbtn{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:17px;font-weight:700;color:#374151;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left;line-height:1.3}
+.mg-pbtn:hover{border-color:#A21CAF}
+.mg-pbtn.sel{border-color:#A21CAF;background:#FDF4FF}
+.mg-pbtn.done{border-color:#10b981;background:#ecfdf5;color:#047857;pointer-events:none}
+.mg-pbtn.bad{border-color:#ef4444;background:#fef2f2;animation:mgShake .3s}
+.mg-battery{width:220px;height:110px;border:6px solid #374151;border-radius:14px;position:relative;display:flex;align-items:center;padding:8px}
+.mg-battery::after{content:'';position:absolute;right:-20px;top:32px;width:16px;height:40px;background:#374151;border-radius:0 6px 6px 0}
+.mg-battery > div{height:100%;background:linear-gradient(90deg,#a3e635,#16a34a);border-radius:6px;width:0%;transition:width .2s}
+.mg-lamp{font-size:44px;filter:grayscale(1);opacity:.4;transition:all .25s}
+.mg-lamp.on{filter:none;opacity:1;transform:scale(1.1)}
+
+/* NAV BAR */
+#nav-bar{position:fixed;bottom:0;left:0;right:0;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px;transition:background .2s}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn.active,#fs-btn.active{background:rgba(124,58,237,.35)!important;color:#F0ABFC!important}
+#unit-label{color:#F0ABFC;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+
+/* TEACHER NOTES PANEL */
+#tn-panel{position:fixed;right:-460px;top:0;bottom:52px;width:440px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#F0ABFC;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-panel ul{padding-left:18px;margin-bottom:8px}
+#tn-panel .tn-lbl{color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+
+/* CONTENT SLIDES */
+.content-body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:18px;min-height:0;overflow:hidden}
+.slide-h1{font-size:40px;font-weight:800;color:#111}
+.slide-h2{font-size:25px;font-weight:600;color:#374151}
+.src-pill{display:inline-block;background:#f3f4f6;color:#6b7280;border-radius:20px;padding:6px 18px;font-size:15px;font-weight:700;letter-spacing:.4px;width:fit-content}
+
+/* READING */
+.reading-block{background:#fff;border-radius:16px;padding:26px 36px;font-size:23px;line-height:1.7;color:#1f2937;box-shadow:0 4px 16px rgba(0,0,0,.05);border-left:6px solid #A21CAF}
+.reading-block b{color:#701A75;font-weight:700}
+.tap-word{background:#FAE8FF;color:#701A75;border:none;border-radius:6px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.tap-word.done{background:#A21CAF;color:#fff}
+
+/* OBJECTIVES */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:10px}
+.obj-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;display:flex;align-items:flex-start;gap:16px}
+.obj-icon{font-size:34px;flex-shrink:0}
+.obj-text{font-size:19px;color:#374151;line-height:1.4;font-weight:500}
+.obj-text b{color:#A21CAF}
+
+/* FORMATIVE ASSESSMENT */
+.assess-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px}
+.assess-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;cursor:pointer;transition:all .2s}
+.assess-card:hover{border-color:#A21CAF}
+.assess-card.yes{border-color:#A21CAF;background:#FDF4FF}
+.assess-q{font-size:19px;color:#374151;font-weight:600;margin-bottom:10px}
+
+/* BE THE EXPERT */
+.bte-header{background:#A21CAF;color:#fff;border-radius:12px 12px 0 0;padding:13px 26px;font-size:19px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bte-body{background:#fff;border:2px solid #A21CAF;border-radius:0 0 16px 16px;padding:24px;font-size:19px;color:#374151;line-height:1.6}
+.bte-body b{color:#701A75}
+
+/* CHIPS / TASK CARDS */
+.chips-row{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:#FAE8FF;color:#701A75;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.chip.used{background:#A21CAF;color:#fff}
+.task-card{background:#fff;border-radius:16px;padding:20px 28px;border:2px solid #e5e7eb;font-size:21px;color:#374151;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card b{color:#A21CAF}
+.q-item{background:#fff;border-radius:12px;padding:16px 22px;border:2px solid #e5e7eb;font-size:19px;color:#374151;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .2s}
+.q-item:hover{border-color:#A21CAF}
+.q-item.done{border-color:#10b981;background:#ecfdf5}
+.q-num{background:#A21CAF;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;margin-top:2px}
+.q-ans{max-height:0;overflow:hidden;transition:max-height .3s ease;color:#701A75;font-weight:700}
+.q-item.done .q-ans{max-height:120px;margin-top:6px}
+
+/* DIALOGUE */
+.chat-row{display:flex;align-items:flex-end;gap:14px}
+.chat-row.right{flex-direction:row-reverse}
+.chat-ava{font-size:50px;line-height:1}
+.bub{max-width:62%;padding:18px 28px;border-radius:26px;font-size:26px;font-weight:600;line-height:1.35}
+.bub.q{background:#fff;border:2px solid #e5e7eb;border-bottom-left-radius:6px;color:#374151}
+.bub.a{background:#A21CAF;color:#fff;border-bottom-right-radius:6px}
+
+/* LISTEN HERO */
+.listen-hero{background:linear-gradient(135deg,#4A044E,#A21CAF);border-radius:20px;padding:24px 36px;display:flex;align-items:center;gap:28px;color:#fff}
+.listen-hero .lh-emoji{font-size:64px;line-height:1;animation:lhPulse 1.6s ease-in-out infinite}
+@keyframes lhPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.listen-hero .lh-text{font-size:25px;font-weight:700;flex:1}
+.listen-hero .lh-tr{background:rgba(255,255,255,.2);border-radius:20px;padding:9px 22px;font-size:21px;font-weight:800;white-space:nowrap}
+
+/* TITLE / GREAT JOB */
+.title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#4A044E 0%,#A21CAF 50%,#E879F9 100%);color:#fff;gap:22px;padding:40px}
+.great-job-slide{background:linear-gradient(135deg,#4A044E,#A21CAF,#E879F9);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:18px;height:100%;padding:40px}
+
+/* MARK DONE */
+.done-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+.btn-done{background:#16A34A;color:#fff;border:none;border-radius:14px;padding:18px 46px;font-size:26px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-done:hover{background:#15803d}
+.btn-done.confirmed{background:#9ca3af;pointer-events:none}
+.btn-clear{background:#fff;color:#ef4444;border:2px solid #ef4444;border-radius:14px;padding:14px 30px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+#doneMsg{font-size:20px;color:#4b5563;font-weight:600;min-height:28px}
+
+/* VOCAB REVIEW */
+.vr-tabs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;flex-shrink:0}
+.vr-tab{padding:7px 14px;border:2px solid #e5e7eb;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s;white-space:nowrap}
+.vr-tab:hover{border-color:#A21CAF;color:#A21CAF}
+.vr-tab.active{background:#A21CAF;color:#fff;border-color:#A21CAF}
+.vr-tab.done{background:#FAE8FF;border-color:#A21CAF;color:#701A75}
+.vr-tab.done.active{background:#A21CAF;color:#fff}
+.vr-body{flex:1;display:flex;min-height:0}
+.vr-left{width:26%;padding:18px;border-right:2px solid #e5e7eb;display:flex;flex-direction:column;gap:8px;background:#fafaf7}
+.vr-right{flex:1;padding:18px 24px;display:flex;flex-direction:column;gap:12px}
+.vr-emoji{font-size:80px;line-height:1}
+.vr-word{font-size:42px;font-weight:800;color:#111;line-height:1.1}
+.vr-ipa{font-size:16px;color:#6b7280}
+.vr-pos{font-size:15px;color:#A21CAF;font-weight:700}
+.vr-mark{background:#A21CAF;color:#fff;border:none;border-radius:10px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;margin-top:auto;transition:all .2s}
+.vr-mark.done{background:#9ca3af;cursor:not-allowed}
+
+/* OPENER */
+.oz-band{padding:16px 22px;color:#fff;font-weight:700;font-size:20px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:all .18s;border:none;font-family:Outfit,sans-serif;text-align:left;flex:1;justify-content:center}
+.oz-band small{font-weight:600;opacity:0;font-size:17px;transition:opacity .25s}
+.oz-band .oz-note{font-size:18px;font-weight:500;opacity:0;line-height:1.45;transition:opacity .25s}
+.oz-strip{width:100%;border-radius:16px;overflow:hidden;border:2px solid #F5D0FE;display:flex;flex-direction:column;flex:1;min-height:0}
+.oz-band.sunlit{background:linear-gradient(90deg,#F0ABFC,#0EA5E9)}
+.oz-band.twilight{background:linear-gradient(90deg,#A21CAF,#701A75)}
+.oz-band.midnight{background:linear-gradient(90deg,#4A044E,#020617)}
+.photo-card{background:#fff;border:3px solid #e5e7eb;border-radius:18px;padding:20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .18s;min-height:250px;justify-content:center}
+.photo-card:hover{border-color:#A21CAF;transform:translateY(-3px)}
+.photo-card.open{border-color:#A21CAF;background:#FDF4FF}
+.pc-emoji{font-size:66px;line-height:1}
+.pc-word{font-size:28px;font-weight:800;color:#111}
+.pc-def{font-size:17px;color:#4b5563;line-height:1.45;text-align:center;display:none}
+.pc-ex{font-size:16px;color:#701A75;font-style:italic;text-align:center;display:none}
+.photo-card.open .pc-def,.photo-card.open .pc-ex{display:block}
+.tf-row{display:flex;align-items:center;gap:20px;background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:18px 24px}
+.tf-num{background:#A21CAF;color:#fff;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex-shrink:0}
+.tf-text{flex:1;font-size:23px;color:#374151;font-weight:600}
+.tf-key{font-size:30px;font-weight:900;padding:8px 26px;border-radius:12px;opacity:0;transition:opacity .25s}
+.tf-key.t{background:#DCFCE7;color:#15803D}
+.tf-key.f{background:#FEE2E2;color:#B91C1C}
+/* UNIT 5 WIDGETS */
+:root{--p:#A21CAF;--pd:#701A75;--pl:#FDF4FF;--pb:#F5D0FE}
+.ts-bank{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:52px}
+.ts-tile.sel{background:var(--p);color:#fff;transform:translateY(-3px)}
+.ts-zones{display:flex;gap:16px;width:100%;flex:1;min-height:0}
+.ts-zone{flex:1;border:3px solid #e5e7eb;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;background:#fff;min-height:170px}
+.ts-zone.miss{animation:mgShake .3s ease;border-color:#ef4444}
+.ts-zh{color:#fff;font-weight:800;font-size:20px;padding:10px;text-align:center}
+.ts-zb{flex:1;display:flex;flex-wrap:wrap;gap:8px;padding:12px;align-content:flex-start}
+.ts-in{background:var(--pl);border:2px solid var(--pb);border-radius:14px;padding:6px 14px;font-size:17px;font-weight:700;color:var(--pd)}
+.chip.miss{animation:mgShake .3s ease;background:#FEE2E2;color:#B91C1C}
+.ord-out{display:flex;flex-direction:column;gap:8px;width:100%}
+.ord-row{background:#ECFDF5;border:2px solid #A7F3D0;border-radius:12px;padding:10px 18px;font-size:21px;font-weight:700;color:#047857}
+.ord-row b{display:inline-block;min-width:34px}
+.bd-line{width:100%;min-height:74px;background:#fff;border:3px dashed var(--pb);border-radius:16px;padding:16px 24px;font-size:32px;font-weight:800;color:#111;text-align:center}
+.bd-line.ok{border-style:solid;border-color:#10b981;background:#ECFDF5;color:#047857}
+.star-band{display:flex;gap:16px;width:100%}
+.big-quote{background:#fff;border-left:8px solid var(--p);border-radius:0 18px 18px 0;padding:22px 30px;font-size:27px;line-height:1.5;color:#1f2937;font-style:italic}
+.lyric{background:#fff;border-radius:16px;padding:18px 26px;font-size:24px;line-height:1.6;color:#1f2937;border-left:6px solid var(--p);box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.lyric .vw{background:var(--pb);color:var(--pd);border-radius:6px;padding:0 6px;font-weight:800}
+.lyric .gw{background:#DBEAFE;color:#1E3A8A;border-radius:6px;padding:0 6px;font-weight:800}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;min-height:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rule-box{background:#fff;border:3px solid var(--p);border-radius:18px;overflow:hidden}
+.rule-box .rh{background:var(--p);color:#fff;font-size:22px;font-weight:800;padding:10px 22px}
+.rule-box table{width:100%;border-collapse:collapse;font-size:23px}
+.rule-box td,.rule-box th{padding:10px 18px;border-top:1px solid #f3e8ff;text-align:left}
+.rule-box th{background:var(--pl);color:var(--pd);font-size:18px;letter-spacing:.5px}
+.rule-box td b{color:var(--pd)}
+.say-row{display:flex;gap:14px;align-items:flex-start}
+.say{flex:1;border-radius:16px;padding:16px 22px;font-size:21px;line-height:1.45}
+.say.dad{background:#EFF6FF;border:2px solid #BFDBFE}
+.say.leo{background:#FEF3C7;border:2px solid #FDE68A}
+.mini-note{font-size:16px;color:#6b7280}
+
+</style>
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<!-- SLIDE 1 -->
+<div class="slide active" id="s1">
+<div class="title-bg">
+    <div style="font-size:22px;font-weight:700;letter-spacing:3px;opacity:.75;text-transform:uppercase">Our World · Level 4 · Unit 5 · My Favorites</div>
+    <div style="font-size:92px;font-weight:900;text-align:center;line-height:1.05">Vocabulary 2</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;font-size:30px;font-weight:700">🏆 Put your favorites in order</div>
+    <div style="font-size:26px;opacity:.92;text-align:center;max-width:1400px">Words hiding in the lesson: 📺 a TV show · 🎲 a hobby · 📚 a school subject · ⚽ a sport · ✍️ a writer · ⚖️ compare · 🥱 boring · 💛 favorite</div>
+    <div style="font-size:20px;opacity:.8">Student Book p. 84 · TR 5.5 · Workbook p. 58</div>
+  </div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" id="s2">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Objectives</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 Students will…</div>
+    <div class="obj-grid">
+      <div class="obj-card"><div class="obj-icon">🎨</div><div class="obj-text">identify and use words related to <b>favorite activities</b>.</div></div>
+      <div class="obj-card"><div class="obj-icon">🏆</div><div class="obj-text">put activities in <b>order of preference</b>.</div></div>
+    </div>
+    <div class="slide-h2">The route: Warm Up → Present → Practice → Extend (stickers) → Apply → Wrap Up</div>
+    <span class="src-pill">Lesson Planner p. 176 · Objectives (verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide" id="s3">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Brainstorm</span><span class="hd-chip">Lesson Planner pp. 176–177</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🕸️ Things we like to do after school</div>
+    <div class="slide-h2">Ask: <b>What do you like to do after school?</b> Type every answer into an oval. Then circle Leo’s favorite three.</div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="after"></div>
+    <span class="src-pill">Lesson Planner p. 176 · Warm Up: word web</span>
+  </div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide" id="s4">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Present — The Photos</span><span class="hd-chip">SB p. 84</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📸 Look at the photos and captions. Tap for what Dad says.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px" id="photos"></div>
+    <span class="src-pill">Lesson Planner p. 176 · Present (teacher talk verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide" id="s5">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Listen and Repeat</span><span class="hd-chip">TR 5.5</span></div>
+  <div class="content-body">
+    <div class="listen-hero"><div class="lh-emoji">🎧</div><div class="lh-text">1 Listen and repeat. Then read and match.</div><div class="lh-tr">TR 5.5</div></div>
+    <div style="display:flex;flex-direction:column;gap:12px"><div class="tf-row"><div class="tf-num">📺</div><div class="tf-text"><b>a TV show</b> — What’s your favorite TV show?</div></div><div class="tf-row"><div class="tf-num">🎲</div><div class="tf-text"><b>a hobby</b> — I love to read books. It’s my favorite hobby.</div></div><div class="tf-row"><div class="tf-num">📚</div><div class="tf-text"><b>a school subject</b> — English is the best school subject.</div></div><div class="tf-row"><div class="tf-num">⚽</div><div class="tf-text"><b>a sport</b> — Tennis is a wonderful sport. I play every day.</div></div><div class="tf-row"><div class="tf-num">✍️</div><div class="tf-text"><b>a writer</b> — J. K. Rowling is a wonderful writer.</div></div></div>
+    <span class="src-pill">Student Book p. 84 · TR 5.5 (audio script, in order)</span>
+  </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide" id="s6">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 1 of 5</span><span class="hd-chip">TR 5.5</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 2</span><div class="word-emoji">📺</div><div class="word-main">a TV show</div><div class="word-ipa">/ˈtiːˈviː ʃoʊ/ <span class="word-syl">TV show</span></div><div class="word-pos">noun phrase</div><div class="word-def">a program you watch on television or online</div><div class="word-jp">🇯🇵 テレビ番組（ばんぐみ）</div><div class="dad-say">💬 🎧 <b>TR 5.5:</b> What’s your favorite TV show?</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">📺 Channel surfing! Tap only the <b>TV shows</b>. Found: <b id="g-tv-n">0 / 4</b></div><div class="mg-grid c4" id="g-tv"></div><div class="mg-win" id="g-tv_show-win">📺 Four TV shows found!</div><div class="how-box"><b>How do we use it?</b> a TV show = a program you watch on TV: a game show, a quiz show, a comedy.</div><span class="mg-source">Student Book p. 84 · TR 5.5 · Workbook p. 58</span></div></div></div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide" id="s7">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 2 of 5</span><span class="hd-chip">TR 5.5</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 2</span><div class="word-emoji">🎲</div><div class="word-main">a hobby</div><div class="word-ipa">/ˈhɑː-bi/ <span class="word-syl">hob-by</span></div><div class="word-pos">noun</div><div class="word-def">an activity you enjoy doing in your free time</div><div class="word-jp">🇯🇵 趣味（しゅみ）</div><div class="dad-say">💬 🎧 <b>TR 5.5:</b> I love to read books. It’s my favorite hobby.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">🎨 Hobby or chore? A hobby is something you <b>like</b> to do. Tap a card, then its box.</div><div id="g-hobby" style="width:100%;display:flex;flex-direction:column;gap:12px;flex:1"></div><div class="mg-win" id="g-hobby-win">🎨 Hobbies are fun — chores are not!</div><div class="how-box"><b>How do we use it?</b> a hobby = something you like to do in your free time. One of my hobbies is…</div><span class="mg-source">Student Book p. 84 · TR 5.5 · Workbook p. 58</span></div></div></div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide" id="s8">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 3 of 5</span><span class="hd-chip">TR 5.5</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 2</span><div class="word-emoji">📚</div><div class="word-main">a school subject</div><div class="word-ipa">/ˈskuːl ˌsʌb-dʒekt/ <span class="word-syl">school sub-ject</span></div><div class="word-pos">noun phrase</div><div class="word-def">a class you study at school</div><div class="word-jp">🇯🇵 教科（きょうか）</div><div class="dad-say">💬 🎧 <b>TR 5.5:</b> English is the best school subject.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">📐 Build Leo’s timetable! Tap the <b>school subjects</b>. Found: <b id="g-ss-n">0 / 5</b></div><div class="mg-grid c4" id="g-ss"></div><div class="mg-win" id="g-school_subject-win">📐 Your timetable is ready.</div><div class="how-box"><b>How do we use it?</b> a school subject = something you study at school. English is the best school subject!</div><span class="mg-source">Student Book p. 84 · TR 5.5 · Workbook p. 58</span></div></div></div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide" id="s9">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 4 of 5</span><span class="hd-chip">TR 5.5</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 2</span><div class="word-emoji">⚽</div><div class="word-main">a sport</div><div class="word-ipa">/spɔːrt/ <span class="word-syl">sport</span></div><div class="word-pos">noun</div><div class="word-def">a physical game or activity with rules</div><div class="word-jp">🇯🇵 スポーツ</div><div class="dad-say">💬 🎧 <b>TR 5.5:</b> Tennis is a wonderful sport. I play every day.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">⚽ What sport does this photo show? Three rounds.</div><div id="g-sport" style="width:100%;display:flex;flex-direction:column;gap:10px"></div><div class="mg-win" id="g-sport-win">⚽ Three sports named!</div><div class="how-box"><b>How do we use it?</b> a sport = a game or activity with rules, like soccer or tennis. Tennis is a wonderful sport.</div><span class="mg-source">Student Book p. 84 · TR 5.5 · Workbook p. 58</span></div></div></div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide" id="s10">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 5 of 5</span><span class="hd-chip">TR 5.5</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 2</span><div class="word-emoji">✍️</div><div class="word-main">a writer</div><div class="word-ipa">/ˈraɪ-tər/ <span class="word-syl">writ-er</span></div><div class="word-pos">noun</div><div class="word-def">a person who writes books, stories, or articles</div><div class="word-jp">🇯🇵 作家（さっか）／書く人</div><div class="dad-say">💬 🎧 <b>TR 5.5:</b> J. K. Rowling is a wonderful writer.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">✍️ Match the <b>writer</b> to the book. Matched: <b id="g-wr-n">0 / 3</b></div><div id="g-wr" style="width:100%"></div><div class="mg-win" id="g-writer-win">✍️ Every writer has a book.</div><div class="how-box"><b>How do we use it?</b> a writer = a person who writes books or stories. Book writers are also called authors.</div><span class="mg-source">Student Book p. 84 · TR 5.5 · Workbook p. 58</span></div></div></div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide" id="s11">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Academic Language + Content Words</span><span class="hd-chip ac">LP p. 176</span></div>
+  <div class="vocab-body"><div class="word-panel"><span class="vtag ac">Academic Language</span><div class="word-emoji">⚖️</div><div class="word-main">compare</div><div class="word-ipa">/kəmˈper/ <span class="word-syl">com-pare</span></div><div class="word-pos">verb</div><div class="word-def">to look at two or more things and say how they are the same or different</div><div class="word-jp">🇯🇵 比較する</div><div class="dad-say">💬 <b>Example:</b> Compare the two stories and choose the better title.</div></div>
+    <div class="game-panel"><div class="mg-wrap">
+      <div class="mg-head">⚖️ <b>Compare</b> soccer and tennis. Is each fact the <b>same</b> for both, or <b>different</b>?</div>
+      <div id="cmp" style="width:100%;display:flex;flex-direction:column;gap:12px;flex:1"></div>
+      <div class="mg-win" id="cmp-win">⚖️ You compared them: two things the same, three things different.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%" id="bf"></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide" id="s12">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Present — The Class Chart</span><span class="hd-chip">Lesson Planner pp. 176–177</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🗂️ Give examples of each word. Drag each one to its column.</div>
+    <div id="chart" style="flex:1;min-height:0"></div>
+    <div class="mg-win" id="chart-win">✅ Every example is in its column — these are the Workbook p. 58 lists.</div>
+    <span class="src-pill">Lesson Planner p. 176 · board chart · examples from Workbook p. 58, Activity 1</span>
+  </div>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="slide" id="s13">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Practice — Read and Match</span><span class="hd-chip">SB p. 84 · Activity 1</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔗 Find the answer that goes with each line.</div>
+    <div class="slide-h2">Model: “Item 1 asks about a favorite sport. Find an item that tells about a favorite sport. Right, it’s Item b.” Matched: <b id="a1-n" style="color:var(--pd)">0 / 5</b></div>
+    <div id="a1" style="width:100%"></div>
+    <div class="mg-win" id="a1-win">✅ 1 b · 2 e · 3 d · 4 a · 5 c</div>
+    <span class="src-pill">Student Book p. 84 · Activity 1 · answer key 1 b, 2 e, 3 d, 4 a, 5 c</span>
+  </div>
+</div>
+
+<!-- SLIDE 14 -->
+<div class="slide" id="s14">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Practice — Ranking Preferences</span><span class="hd-chip">Vocabulary Strategy</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🏆 Rank these from 1 (you enjoy it the most) to 5 (you enjoy it the least).</div>
+    <div class="slide-h2">There are no wrong answers. Tap them in your order. Then Dad does it too — compare!</div>
+    <div class="cols2"><div id="rk1"></div><div id="rk2"></div></div>
+    <div class="mg-win" id="rk1-win"></div><div class="mg-win" id="rk2-win"></div>
+    <span class="src-pill">Lesson Planner p. 177 · Vocabulary Strategy: Ranking Preferences</span>
+  </div>
+</div>
+
+<!-- SLIDE 15 -->
+<div class="slide" id="s15">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Extend — Stick and Talk</span><span class="hd-chip">SB p. 84 · Activity 2</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🏷️ Put the stickers in the order of how much you like them.</div>
+    <div class="slide-h2">Your favorite thing on number 1. The thing you don’t like at all, or like only a little, on number 5.</div>
+    <div id="stick"></div>
+    <div class="mg-win" id="stick-win"></div>
+    <div class="chat-row"><div class="chat-ava">👦</div><div class="bub q">I put sports first. I love soccer!</div></div>
+    <div class="chat-row right"><div class="chat-ava">👨</div><div class="bub a">I put sports last! I don’t like them.</div></div>
+    <span class="src-pill">Student Book p. 84 · Activity 2 (model dialogue verbatim) · stickers at the back of the book</span>
+  </div>
+</div>
+
+<!-- SLIDE 16 -->
+<div class="slide" id="s16">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — Make Questions</span><span class="hd-chip">Lesson Planner pp. 176–177</span></div>
+  <div class="content-body">
+    <div class="slide-h1">❓ Use the words to make questions. Then ask and answer.</div>
+    <div id="q1" style="display:flex;flex-direction:column;align-items:center;gap:10px"></div>
+    <div class="mg-win" id="q1-win">✅ What’s your favorite sport?</div>
+    <div id="q2" style="display:flex;flex-direction:column;align-items:center;gap:10px"></div>
+    <div class="mg-win" id="q2-win">✅ Is math your favorite school subject?</div>
+    <span class="src-pill">Lesson Planner p. 177 · Wrap Up (model questions verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 17 -->
+<div class="slide" id="s17">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Workbook Preview — Marco’s Answers</span><span class="hd-chip">WB p. 58 · TR 5.4</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎧 Listen to Marco. Ask each question first, then tap for his answer.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px" id="marco"></div>
+    <span class="src-pill">Workbook p. 58 · Activity 2 · Workbook Audio TR 5.4 (audio script verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 18 -->
+<div class="slide" id="s18">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Soccer Corner ⚽</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⚽ Favorite things, soccer style. Choose the right word.</div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="soc"></div>
+  </div>
+</div>
+
+<!-- SLIDE 19 -->
+<div class="slide" id="s19">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✔️ Can Leo…</div>
+    <div class="assess-grid" id="assess"></div>
+    <div class="task-card">📓 <b>Homework:</b> Workbook p. 58 (Workbook Audio TR 5.4) · Activity Worksheet 5.2 · Leo’s Vocabulary 2 app (13 tabs).</div>
+  </div>
+</div>
+
+<!-- SLIDE 20 -->
+<div class="slide" id="s20">
+<div class="slide-header"><span class="hd-unit">Unit 5</span><span class="hd-sep">·</span><span class="hd-section">Finish the Lesson</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:22px">
+    <div style="font-size:90px">🏆</div>
+    <div class="slide-h1" style="text-align:center">Unit 5 · Vocabulary 2 — taught</div>
+    <div class="slide-h2" style="text-align:center;max-width:1100px">Next lesson: Grammar 2 — better, the best, worse, the worst (TR 5.6).</div>
+    <div class="done-wrap">
+      <button class="btn-done" id="doneBtn" onclick="markDone()">✅ Mark this lesson done</button>
+      <button class="btn-clear" id="redoBtn" onclick="handleRedo()">↺ Clear saved progress</button>
+      <div id="doneMsg"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
+
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 20</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="fs-btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+  <span id="unit-label">Unit 5 · Vocabulary 2</span>
+</div>
+
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+<script>
+/* =========================================================
+   LEEA · Our World Level 4 · Unit 5 · Vocabulary 2 — favorite activities
+   SB p. 84 · TR 5.5 (audio-script order) · LP pp. 176–177 · WB p. 58 (TR 5.4 WB)
+   Activity 1 key: 1 b · 2 e · 3 d · 4 a · 5 c (SB answer key).
+   ========================================================= */
+
+var SAVE_PREFIX = '4-5-vocab-2-slides-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-5-vocab-2-slides';
+/* Must match the `id` in the teacher lesson JSON — the dashboard reads leea.lessonProgress.v1 by it. */
+var LESSON_ID = 'ow-l4-u5-vocab-2';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+var LESSON_NAME = 'Unit 5 · Vocabulary 2 — My Favorites';
+function lSave(key, value) {
+  try {
+    var k = SAVE_PREFIX + key;
+    window.localStorage.setItem(k, JSON.stringify(value));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, value);
+    }
+  } catch (e) {}
+}
+function lLoad(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(SAVE_PREFIX + key);
+    return raw === null || raw === undefined ? fallback : JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function writeLessonProgress() {
+  try {
+    var store = {};
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (raw) store = JSON.parse(raw) || {};
+    var now = new Date().toISOString();
+    store[LESSON_ID] = { lessonId: LESSON_ID, teacherId: 'neritan', studentId: 'leo',
+                         status: 'done', completedAt: now, updatedAt: now };
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function clearLessonProgress() {
+  try {
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function markDone() {
+  writeLessonProgress();
+  lSave('complete', { name: LESSON_NAME, timestamp: new Date().toISOString(), done: true });
+  lSave('done', true);
+  var btn = document.getElementById('doneBtn');
+  if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+  var msg = document.getElementById('doneMsg');
+  if (msg) msg.textContent = 'Saved on the teacher dashboard. ⭐';
+}
+var redoArmed = false, redoTimer = null;
+function handleRedo() {
+  var btn = document.getElementById('redoBtn');
+  var msg = document.getElementById('doneMsg');
+  if (!redoArmed) {
+    redoArmed = true;
+    btn.textContent = '↺ Tap again to clear';
+    if (msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+    if (redoTimer) window.clearTimeout(redoTimer);
+    redoTimer = window.setTimeout(function () {
+      redoArmed = false;
+      btn.textContent = '↺ Clear saved progress';
+      if (msg) msg.textContent = '';
+    }, 3000);
+    return;
+  }
+  redoArmed = false;
+  if (redoTimer) window.clearTimeout(redoTimer);
+  btn.textContent = '↺ Clear saved progress';
+  clearLessonProgress();
+  lSave('complete', null);
+  lSave('done', null);
+  var d = document.getElementById('doneBtn');
+  if (d) { d.classList.remove('confirmed'); d.textContent = '✅ Mark this lesson done'; }
+  if (msg) msg.textContent = 'Cleared.';
+}
+function restoreDoneState() {
+  var c = lLoad('complete', null);
+  if (c && c.done) {
+    var btn = document.getElementById('doneBtn');
+    if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+    var msg = document.getElementById('doneMsg');
+    if (msg) msg.textContent = 'Already marked done.';
+  }
+}
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+var cur = 1;
+function goTo(n) {
+  n = Math.max(1, Math.min(TOTAL, n));
+  var old = document.getElementById('s' + cur);
+  if (old) old.classList.remove('active');
+  cur = n;
+  var next = document.getElementById('s' + cur);
+  if (next) next.classList.add('active');
+  document.getElementById('slide-counter').textContent = cur + ' / ' + TOTAL;
+  document.getElementById('tn-content').innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
+  if (SLIDE_INIT[cur]) SLIDE_INIT[cur]();
+}
+document.addEventListener('keydown', function (e) {
+  if (e.target && (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+var notesOpen = false;
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('notes-btn').classList.toggle('active', notesOpen);
+  scale();
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange', function () {
+  var btn = document.getElementById('fs-btn');
+  var active = !!document.fullscreenElement;
+  btn.textContent = active ? '⛶ Exit Full (F)' : '⛶ Fullscreen (F)';
+  btn.classList.toggle('active', active);
+  scale();
+});
+function scale() {
+  var s = document.getElementById('scaler');
+  var availW = window.innerWidth - (notesOpen ? 440 : 0);
+  var availH = window.innerHeight - 52;
+  var r = Math.min(availW / 1920, availH / 1080);
+  s.style.transform = 'scale(' + r + ')';
+  s.style.left = ((availW - 1920 * r) / 2) + 'px';
+  s.style.top = ((availH - 1080 * r) / 2) + 'px';
+  s.style.position = 'fixed';
+}
+window.addEventListener('resize', scale);
+
+// ─── WIDGETS (shared by every Unit 5 deck) ─────────────────────
+function $id(i){ return document.getElementById(i); }
+function once(el){ if(!el || el.dataset.built) return false; el.dataset.built = '1'; return true; }
+function mix(a){ var b = a.slice(); for(var i=b.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=b[i]; b[i]=b[j]; b[j]=t; } return b; }
+function shake(el){ el.classList.remove('miss'); void el.offsetWidth; el.classList.add('miss'); setTimeout(function(){ el.classList.remove('miss'); }, 400); }
+function win(id, text){ var w = $id(id); if(w){ if(text) w.innerHTML = text; w.classList.add('show'); } }
+
+/* reveal: question cards, tap to show the answer. items [[q,a]] */
+function wReveal(id, items, countId){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  items.forEach(function(d, i){
+    var it = document.createElement('div'); it.className = 'q-item';
+    it.innerHTML = '<div class="q-num">' + (d[2] || (i + 1)) + '</div><div><div>' + d[0] + '</div><div class="q-ans">→ ' + d[1] + '</div></div>';
+    it.onclick = function(){ if(it.classList.contains('done')) return; it.classList.add('done'); n++; if(countId) $id(countId).textContent = n + ' / ' + items.length; };
+    g.appendChild(it);
+  });
+}
+/* flip: recap cards. cards [{e, w, b}] */
+function wFlip(id, cards, countId){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  cards.forEach(function(c){
+    var el = document.createElement('div'); el.className = 'mg-flip';
+    el.innerHTML = '<div class="mf-front">' + c.e + '</div><div style="font-size:20px;font-weight:800;color:#111">' + c.w + '</div><div class="mf-back">' + c.b + '</div>';
+    el.onclick = function(){ if(el.classList.contains('open')) return; el.classList.add('open'); n++; if(countId) $id(countId).textContent = n + ' / ' + cards.length; };
+    g.appendChild(el);
+  });
+}
+/* check: multiple choice, wrong shakes, right locks. items [{q, opts, ok, why}] */
+function wCheck(id, items, winId){
+  var g = $id(id); if(!once(g)) return; var solved = 0;
+  items.forEach(function(it, qi){
+    var box = document.createElement('div'); box.className = 'task-card'; box.style.cssText = 'padding:14px 22px;font-size:20px';
+    var opts = it.keep ? it.opts.map(function(o, i){ return [o, i]; }) : mix(it.opts.map(function(o, i){ return [o, i]; }));
+    box.innerHTML = '<div style="font-weight:700;margin-bottom:8px">' + (items.length > 1 ? (qi + 1) + '. ' : '') + it.q + '</div><div style="display:flex;flex-wrap:wrap;gap:10px"></div><div class="mg-miss" style="color:#047857"></div>';
+    var row = box.children[1], why = box.children[2];
+    opts.forEach(function(o){
+      var b = document.createElement('button'); b.className = 'mg-opt'; b.innerHTML = o[0];
+      b.onclick = function(){
+        if(box.dataset.done) return;
+        if(o[1] === it.ok){ b.classList.add('ok'); box.dataset.done = '1'; why.textContent = it.why ? '✓ ' + it.why : '✓ Yes!'; solved++; if(solved === items.length && winId) win(winId); }
+        else { b.classList.add('no'); setTimeout(function(){ b.classList.remove('no'); }, 600); }
+      };
+      row.appendChild(b);
+    });
+    g.appendChild(box);
+  });
+}
+/* find: tap every tile that fits. tiles [{t, ok, why}] */
+function wFind(id, tiles, countId, winId){
+  var g = $id(id); if(!once(g)) return; var need = tiles.filter(function(t){ return t.ok; }).length, got = 0;
+  mix(tiles).forEach(function(t){
+    var el = document.createElement('div'); el.className = 'mg-tile';
+    el.innerHTML = t.t + '<span class="mg-label">' + (t.l || '') + '</span>';
+    el.onclick = function(){
+      if(el.classList.contains('hit')) return;
+      if(t.ok){ el.classList.add('hit'); if(t.why) el.querySelector('.mg-label').textContent = t.why; got++; if(countId) $id(countId).textContent = got + ' / ' + need; if(got === need && winId) win(winId); }
+      else { shake(el); if(t.why) el.querySelector('.mg-label').textContent = t.why; }
+    };
+    g.appendChild(el);
+  });
+}
+/* tapsort: tap a tile, then tap its box. zones [{k, label, color}], tiles [{t, k}] */
+function wTapSort(id, zones, tiles, winId){
+  var g = $id(id); if(!once(g)) return; var sel = null, left = tiles.length;
+  g.innerHTML = '<div class="ts-bank"></div><div class="ts-zones"></div><div class="mg-miss"></div>';
+  var bank = g.children[0], zs = g.children[1], miss = g.children[2];
+  mix(tiles).forEach(function(t){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = t.t; b.dataset.k = t.k;
+    b.onclick = function(){ if(b.classList.contains('used')) return; bank.querySelectorAll('.ts-tile').forEach(function(x){ x.classList.remove('sel'); }); b.classList.add('sel'); sel = b; miss.textContent = ''; };
+    bank.appendChild(b);
+  });
+  zones.forEach(function(z){
+    var c = document.createElement('div'); c.className = 'ts-zone';
+    c.innerHTML = '<div class="ts-zh" style="background:' + z.color + '">' + z.label + '</div><div class="ts-zb"></div>';
+    c.onclick = function(){
+      if(!sel){ miss.textContent = 'Tap a card first, then its box.'; return; }
+      if(sel.dataset.k === z.k){ var t = document.createElement('div'); t.className = 'ts-in'; t.innerHTML = sel.innerHTML; c.children[1].appendChild(t); sel.classList.add('used'); sel.classList.remove('sel'); sel.style.visibility = 'hidden'; sel = null; left--; miss.textContent = ''; if(!left && winId) win(winId); }
+      else { shake(c); miss.textContent = 'Not that box — think again.'; }
+    };
+    zs.appendChild(c);
+  });
+}
+/* order: tap the items in order (rank, sequence). steps in the right order */
+function wOrder(id, steps, winId, prompt){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  g.innerHTML = '<div class="ord-out"></div><div class="ts-bank"></div><div class="mg-miss"></div>';
+  var out = g.children[0], bank = g.children[1], miss = g.children[2];
+  mix(steps.map(function(s, i){ return [s, i]; })).forEach(function(s){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = s[0];
+    b.onclick = function(){
+      if(s[1] === n){ var d = document.createElement('div'); d.className = 'ord-row'; d.innerHTML = '<b>' + (n + 1) + '</b> ' + s[0]; out.appendChild(d); b.style.visibility = 'hidden'; n++; miss.textContent = ''; if(n === steps.length && winId) win(winId); }
+      else { shake(b); miss.textContent = prompt || ('Not yet — what comes ' + (n ? 'next' : 'first') + '?'); }
+    };
+    bank.appendChild(b);
+  });
+}
+/* build: tap the chips in order to build the sentence. chips = right order; extra = traps */
+function wBuild(id, chips, extra, winId){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  g.innerHTML = '<div class="bd-line">&nbsp;</div><div class="ts-bank"></div><div class="mg-miss"></div>';
+  var line = g.children[0], bank = g.children[1], miss = g.children[2], built = [];
+  mix(chips.map(function(c, i){ return [c, i]; }).concat((extra || []).map(function(c){ return [c, -1]; }))).forEach(function(c){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = c[0];
+    b.onclick = function(){
+      if(c[1] === n){ built.push(c[0]); line.innerHTML = built.join(' '); b.style.visibility = 'hidden'; n++; miss.textContent = ''; if(n === chips.length){ line.classList.add('ok'); if(winId) win(winId); } }
+      else { shake(b); miss.textContent = c[1] < 0 ? 'That piece does not belong in this sentence.' : 'Not that word yet.'; }
+    };
+    bank.appendChild(b);
+  });
+}
+/* hold: press and hold to fill a meter; release early and it drains. */
+function wHold(id, cfg){
+  var g = $id(id); if(!once(g)) return;
+  g.innerHTML = '<div class="mg-bar" style="height:34px"><div></div></div><div style="font-size:72px;line-height:1;text-align:center">' + cfg.e0 + '</div><button class="mg-btn" style="font-size:24px;padding:18px 40px">' + cfg.btn + '</button><div class="mg-miss" style="color:#374151"></div>';
+  var bar = g.children[0].firstChild, face = g.children[1], btn = g.children[2], msg = g.children[3], v = 0, t = null, done = false;
+  function tick(){ v = Math.min(100, v + 2.2); bar.style.width = v + '%'; if(v >= 100){ stop(); done = true; face.innerHTML = cfg.e1; msg.innerHTML = cfg.win; btn.disabled = true; if(cfg.winId) win(cfg.winId); } }
+  function drain(){ if(done) return; v = Math.max(0, v - 4); bar.style.width = v + '%'; if(v > 0) t = setTimeout(drain, 40); }
+  function start(e){ if(done) return; e.preventDefault(); clearTimeout(t); msg.innerHTML = cfg.during || 'Keep going…'; t = setInterval(tick, 40); }
+  function stop(){ clearInterval(t); clearTimeout(t); if(!done){ msg.innerHTML = cfg.early || 'Don’t stop! Hold it longer.'; drain(); } }
+  btn.addEventListener('pointerdown', start); btn.addEventListener('pointerup', stop); btn.addEventListener('pointerleave', stop);
+}
+/* typed: Dad 💬 / Leo 💬 frames, saved as typed. rows [[label, placeholder]] */
+function wTyped(id, rows, key){
+  var g = $id(id); if(!once(g)) return; var saved = lLoad(key, {}) || {};
+  rows.forEach(function(r, i){
+    var row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:16px';
+    row.innerHTML = '<span style="font-size:21px;font-weight:800;color:var(--pd);min-width:300px">' + r[0] + '</span>';
+    var inp = document.createElement('input'); inp.placeholder = r[1]; inp.value = saved[i] || '';
+    inp.style.cssText = 'flex:1;font-family:Outfit,sans-serif;font-size:21px;padding:11px 16px;border:2px solid var(--pb);border-radius:12px';
+    inp.oninput = function(){ saved[i] = inp.value; lSave(key, saved); };
+    row.appendChild(inp); g.appendChild(row);
+  });
+}
+/* assess: Can Leo…? cards */
+function wAssess(id, items){
+  var g = $id(id); if(!once(g)) return;
+  items.forEach(function(t){
+    var c = document.createElement('div'); c.className = 'assess-card';
+    c.innerHTML = '<div class="assess-q">' + t[0] + '</div><div style="font-size:16px;color:#6b7280">' + (t[1] || 'Tap when Leo can do it.') + '</div>';
+    c.onclick = function(){ c.classList.toggle('yes'); };
+    g.appendChild(c);
+  });
+}
+/* sort with the shared drag-and-drop sorter (pickChart) */
+function wSort(id, zones, tiles, winId){
+  if(typeof window.pickChart !== 'function'){ wTapSort(id, zones, tiles, winId); return; }
+  var g = $id(id); if(!once(g)) return;
+  g.innerHTML = window.pickChart('classification sort', { id: id + '-dnd', tiles: tiles.map(function(t){ return { text: t.t, answer: t.k }; }),
+    zones: zones.map(function(z){ return { key: z.k, label: z.label, color: z.color }; }), onComplete: function(){ if(winId) win(winId); } });
+}
+/* pair: tap one on the left, then its partner on the right. pairs [[l, r]] */
+function wPair(id, pairs, countId, winId){
+  var g = $id(id); if(!once(g)) return; var sel = null, got = 0;
+  g.innerHTML = '<div class="mg-pair"><div class="mg-col"></div><div class="mg-col"></div></div>';
+  var L = g.querySelectorAll('.mg-col')[0], R = g.querySelectorAll('.mg-col')[1];
+  pairs.forEach(function(p, i){
+    var b = document.createElement('button'); b.className = 'mg-pbtn'; b.innerHTML = p[0];
+    b.onclick = function(){ if(b.classList.contains('done')) return; L.querySelectorAll('.mg-pbtn').forEach(function(x){ x.classList.remove('sel'); }); b.classList.add('sel'); sel = [i, b]; };
+    L.appendChild(b);
+  });
+  mix(pairs.map(function(p, i){ return [p[1], i]; })).forEach(function(p){
+    var b = document.createElement('button'); b.className = 'mg-pbtn'; b.innerHTML = p[0];
+    b.onclick = function(){
+      if(!sel || b.classList.contains('done')) return;
+      if(p[1] === sel[0]){ b.classList.add('done'); sel[1].classList.add('done'); sel[1].classList.remove('sel'); sel = null; got++; if(countId) $id(countId).textContent = got + ' / ' + pairs.length; if(got === pairs.length && winId) win(winId); }
+      else { b.classList.add('bad'); setTimeout(function(){ b.classList.remove('bad'); }, 400); }
+    };
+    R.appendChild(b);
+  });
+}
+/* rank: tap in YOUR order — favorite first. No wrong answers. */
+function wRank(id, items, winId, first, last){
+  var g = $id(id); if(!once(g)) return; var n = 0, order = [];
+  g.innerHTML = '<div class="ord-out"></div><div class="ts-bank"></div>';
+  var out = g.children[0], bank = g.children[1];
+  items.forEach(function(t){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = t;
+    b.onclick = function(){ order.push(t); var d = document.createElement('div'); d.className = 'ord-row'; d.innerHTML = '<b>' + (++n) + '</b> ' + t; out.appendChild(d); b.style.visibility = 'hidden';
+      if(n === items.length && winId) win(winId, '🗣️ “' + (first || 'I put {x} first.').replace('{x}', order[0].replace(/<[^>]+>/g, '')) + '” · “' + (last || 'I put {x} last.').replace('{x}', order[n - 1].replace(/<[^>]+>/g, '')) + '”'); };
+    bank.appendChild(b);
+  });
+}
+
+
+// ─── TEACHER NOTES ─────────────────────────────────────────────
+var NOTES = {
+ "1": "<p class=\"tn-lbl\">Title</p><p>Five words for favorite activities, plus compare, boring and favorite.</p>",
+ "2": "<p class=\"tn-lbl\">Objectives</p><p>Verbatim, LP p. 176. Vocab 2 has no Recap phase.</p>",
+ "3": "<p class=\"tn-lbl\">Warm Up</p><p>LP p. 176: a word web with “Things we like to do after school” in the center. Leo makes his own web with his favorite three.</p>",
+ "4": "<p class=\"tn-lbl\">Present</p><p>LP p. 176. Then pairs tell each other about one of their hobbies: “What do you like about (golf)?”</p>",
+ "5": "<p class=\"tn-lbl\">Listen and repeat — the one reveal</p><p>Play TR 5.5. Leo repeats each word and sentence.</p>",
+ "6": "<p class=\"tn-lbl\">a TV show</p><p>TR 5.5: <i>What’s your favorite TV show?</i> Leo repeats it, plays the game, then gives his own example.</p>",
+ "7": "<p class=\"tn-lbl\">a hobby</p><p>TR 5.5: <i>I love to read books. It’s my favorite hobby.</i> Leo repeats it, plays the game, then gives his own example.</p>",
+ "8": "<p class=\"tn-lbl\">a school subject</p><p>TR 5.5: <i>English is the best school subject.</i> Leo repeats it, plays the game, then gives his own example.</p>",
+ "9": "<p class=\"tn-lbl\">a sport</p><p>TR 5.5: <i>Tennis is a wonderful sport. I play every day.</i> Leo repeats it, plays the game, then gives his own example.</p>",
+ "10": "<p class=\"tn-lbl\">a writer</p><p>TR 5.5: <i>J. K. Rowling is a wonderful writer.</i> Leo repeats it, plays the game, then gives his own example.</p>",
+ "11": "<p class=\"tn-lbl\">compare · boring · favorite</p><p>Academic Language (compare) and Content Vocabulary (boring, favorite) from LP p. 176.</p>",
+ "12": "<p class=\"tn-lbl\">Board chart</p><p>LP: draw a chart with the five words and ask for examples (“What TV shows do you watch?”). The tiles are the Workbook p. 58 lists.</p>",
+ "13": "<p class=\"tn-lbl\">Read and match</p><p>LP p. 177. If Leo disagrees with the key, he must explain why he chose his answer.</p>",
+ "14": "<p class=\"tn-lbl\">Ranking</p><p>LP p. 177: first to fifth, first = enjoy the most. The class-survey version (“Class Favorites”) becomes a family survey here: ask Mom too and tally.</p>",
+ "15": "<p class=\"tn-lbl\">Stick and talk</p><p>LP p. 177. Use the real stickers if you have them; the slide records the order. Then compare your orders.</p>",
+ "16": "<p class=\"tn-lbl\">Wrap Up</p><p>LP p. 177. After building each, Leo asks Dad and Dad answers, then swap.</p>",
+ "17": "<p class=\"tn-lbl\">Workbook preview</p><p>The questions already use Grammar 1 (the most difficult, the coolest) — a nice bridge. Answers from the WB answer key.</p>",
+ "18": "<p class=\"tn-lbl\">Soccer transfer</p><p>No stats — only the five words in Leo’s world.</p>",
+ "19": "<p class=\"tn-lbl\">Formative Assessment</p><p>Both checks and their questions verbatim from LP p. 177.</p>",
+ "20": "<p class=\"tn-lbl\">Mark Done</p><p>Records this lesson on the teacher dashboard (leea.lessonProgress.v1). Leo's app tracks his own tabs separately.</p>"
+};
+
+// ─── SLIDE INIT MAP ───────────────────────────────────────────
+var TOTAL = 20;
+var SLIDE_INIT = {
+  3: function(){ wTyped("after", [
+ [
+  "🟣 oval 1",
+  "play soccer"
+ ],
+ [
+  "🟣 oval 2",
+  "watch TV"
+ ],
+ [
+  "🟣 oval 3",
+  "read comics"
+ ],
+ [
+  "🟣 oval 4",
+  "play video games"
+ ],
+ [
+  "⭐ Leo’s favorite three",
+  "soccer, comics, video games"
+ ]
+], "after"); },
+  4: function(){ wReveal("photos", [
+ [
+  "🎨 a hobby",
+  "A hobby is something you like to do. One of my hobbies is (painting).",
+  "1"
+ ],
+ [
+  "📷 the hobby photo",
+  "This person is taking photos. This is a hobby called photography.",
+  "2"
+ ],
+ [
+  "⚽ a sport",
+  "My favorite sport is (basketball). What sport does this photo show? — soccer",
+  "3"
+ ],
+ [
+  "📐 a school subject · 📺 a TV show · ✍️ a writer",
+  "Point to each photo and read its caption together.",
+  "4"
+ ]
+]); },
+  6: function(){ wFind("g-tv", [
+ {
+  "t": "🧸",
+  "l": "Sesame Street",
+  "ok": true
+ },
+ {
+  "t": "❓",
+  "l": "a quiz show",
+  "ok": true
+ },
+ {
+  "t": "🎲",
+  "l": "a game show",
+  "ok": true
+ },
+ {
+  "t": "😂",
+  "l": "a comedy",
+  "ok": true
+ },
+ {
+  "t": "📖",
+  "l": "a book",
+  "ok": false,
+  "why": "you read it"
+ },
+ {
+  "t": "⚽",
+  "l": "a ball",
+  "ok": false,
+  "why": "not on TV"
+ },
+ {
+  "t": "🎹",
+  "l": "a piano",
+  "ok": false,
+  "why": "you play it"
+ },
+ {
+  "t": "🍕",
+  "l": "pizza",
+  "ok": false,
+  "why": "you eat it!"
+ }
+], "g-tv-n", "g-tv_show-win"); },
+  7: function(){ wTapSort("g-hobby", [
+ {
+  "k": "h",
+  "label": "🎨 a hobby",
+  "color": "#A21CAF"
+ },
+ {
+  "k": "c",
+  "label": "🧹 a chore / must do",
+  "color": "#6B7280"
+ }
+], [
+ {
+  "t": "🥁 play the drums",
+  "k": "h"
+ },
+ {
+  "t": "✍️ write stories",
+  "k": "h"
+ },
+ {
+  "t": "📚 read books",
+  "k": "h"
+ },
+ {
+  "t": "📷 take photos",
+  "k": "h"
+ },
+ {
+  "t": "🧽 wash the dishes",
+  "k": "c"
+ },
+ {
+  "t": "🦷 go to the dentist",
+  "k": "c"
+ },
+ {
+  "t": "🧺 do the laundry",
+  "k": "c"
+ }
+], "g-hobby-win"); },
+  8: function(){ wFind("g-ss", [
+ {
+  "t": "➗",
+  "l": "math",
+  "ok": true
+ },
+ {
+  "t": "🔬",
+  "l": "science",
+  "ok": true
+ },
+ {
+  "t": "🔤",
+  "l": "English",
+  "ok": true
+ },
+ {
+  "t": "🎵",
+  "l": "music",
+  "ok": true
+ },
+ {
+  "t": "🎨",
+  "l": "art",
+  "ok": true
+ },
+ {
+  "t": "🍔",
+  "l": "lunch",
+  "ok": false,
+  "why": "not a subject!"
+ },
+ {
+  "t": "🚌",
+  "l": "the bus",
+  "ok": false,
+  "why": "not a subject"
+ },
+ {
+  "t": "🛌",
+  "l": "a nap",
+  "ok": false,
+  "why": "no way!"
+ }
+], "g-ss-n", "g-school_subject-win"); },
+  9: function(){ wCheck("g-sport", [
+ {
+  "q": "🏐 A ball over a high net, hit with the hands…",
+  "opts": [
+   "volleyball",
+   "tennis",
+   "soccer"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "🎾 A racket and a small yellow ball…",
+  "opts": [
+   "tennis",
+   "basketball",
+   "volleyball"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "🏀 Bounce the ball and shoot it through a hoop…",
+  "opts": [
+   "basketball",
+   "soccer",
+   "tennis"
+  ],
+  "ok": 0
+ }
+], "g-sport-win"); },
+  10: function(){ wPair("g-wr", [
+ [
+  "J.K. Rowling",
+  "⚡ Harry Potter"
+ ],
+ [
+  "Jacqueline Wilson",
+  "🧗 Cliffhanger"
+ ],
+ [
+  "J. R. R. Tolkien",
+  "💍 The Lord of the Rings"
+ ]
+], "g-wr-n", "g-writer-win"); },
+  11: function(){ wTapSort("cmp", [
+ {
+  "k": "s",
+  "label": "🤝 the same",
+  "color": "#16A34A"
+ },
+ {
+  "k": "d",
+  "label": "↔️ different",
+  "color": "#A21CAF"
+ }
+], [
+ {
+  "t": "both are sports",
+  "k": "s"
+ },
+ {
+  "t": "both use a ball",
+  "k": "s"
+ },
+ {
+  "t": "tennis uses a racket",
+  "k": "d"
+ },
+ {
+  "t": "soccer has 11 players a team",
+  "k": "d"
+ },
+ {
+  "t": "soccer uses your feet",
+  "k": "d"
+ }
+], "cmp-win"); wCheck("bf", [
+ {
+  "q": "My parents watch a lot of <b>____</b> TV shows! (not interesting)",
+  "opts": [
+   "boring",
+   "favorite"
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "What’s your <b>____</b> sport? (the one you like best)",
+  "opts": [
+   "favorite",
+   "boring"
+  ],
+  "ok": 0,
+  "keep": true
+ }
+]); },
+  12: function(){ wSort("chart", [
+ {
+  "k": "tv_show",
+  "label": "📺 a TV show",
+  "color": "#A21CAF"
+ },
+ {
+  "k": "hobby",
+  "label": "🎲 a hobby",
+  "color": "#0EA5E9"
+ },
+ {
+  "k": "school_subject",
+  "label": "📚 a school subject",
+  "color": "#16A34A"
+ },
+ {
+  "k": "sport",
+  "label": "⚽ a sport",
+  "color": "#EA580C"
+ },
+ {
+  "k": "writer",
+  "label": "✍️ a writer",
+  "color": "#7C3AED"
+ }
+], [
+ {
+  "t": "game show",
+  "k": "tv_show"
+ },
+ {
+  "t": "quiz show",
+  "k": "tv_show"
+ },
+ {
+  "t": "comedy",
+  "k": "tv_show"
+ },
+ {
+  "t": "play the drums",
+  "k": "hobby"
+ },
+ {
+  "t": "write stories",
+  "k": "hobby"
+ },
+ {
+  "t": "read books",
+  "k": "hobby"
+ },
+ {
+  "t": "math",
+  "k": "school_subject"
+ },
+ {
+  "t": "science",
+  "k": "school_subject"
+ },
+ {
+  "t": "English",
+  "k": "school_subject"
+ },
+ {
+  "t": "music",
+  "k": "school_subject"
+ },
+ {
+  "t": "basketball",
+  "k": "sport"
+ },
+ {
+  "t": "tennis",
+  "k": "sport"
+ },
+ {
+  "t": "soccer",
+  "k": "sport"
+ },
+ {
+  "t": "volleyball",
+  "k": "sport"
+ },
+ {
+  "t": "J.K. Rowling",
+  "k": "writer"
+ },
+ {
+  "t": "Jacqueline Wilson",
+  "k": "writer"
+ },
+ {
+  "t": "J. R. R. Tolkien",
+  "k": "writer"
+ }
+], "chart-win"); },
+  13: function(){ wPair("a1", [
+ [
+  "1. What’s your favorite sport?",
+  "b. Well, I like tennis. But I think soccer is the best."
+ ],
+ [
+  "2. My parents watch a lot of boring TV shows!",
+  "e. My parents do, too!"
+ ],
+ [
+  "3. Which country is that writer from?",
+  "d. She’s from India. She’s very talented."
+ ],
+ [
+  "4. What are your favorite hobbies?",
+  "a. I like playing sports and going out with my friends."
+ ],
+ [
+  "5. What’s your favorite school subject?",
+  "c. I don’t have one. I like all my school subjects."
+ ]
+], "a1-n", "a1-win"); },
+  14: function(){ wRank("rk1", [
+ "⚽ playing soccer",
+ "🏊 swimming",
+ "📚 reading",
+ "🎮 video games",
+ "🎨 drawing"
+], "rk1-win", "Leo: I like {x} the most.", "Leo: I like {x} the least."); wRank("rk2", [
+ "⚽ playing soccer",
+ "🏊 swimming",
+ "📚 reading",
+ "🎮 video games",
+ "🎨 drawing"
+], "rk2-win", "Dad: I like {x} the most.", "Dad: I like {x} the least."); },
+  15: function(){ wRank("stick", [
+ "📺 a TV show",
+ "⚽ a sport",
+ "🎨 a hobby",
+ "✍️ a writer",
+ "📐 a school subject"
+], "stick-win", "I put {x} first.", "I put {x} last."); },
+  16: function(){ wBuild("q1", ["What’s", "your", "favorite", "sport?"], ["boring"], "q1-win"); wBuild("q2", ["Is", "math", "your", "favorite", "school", "subject?"], ["writer"], "q2-win"); },
+  17: function(){ wReveal("marco", [
+ [
+  "What’s your favorite school subject?",
+  "math"
+ ],
+ [
+  "What is the most difficult school subject?",
+  "art"
+ ],
+ [
+  "What’s the name of a funny TV show?",
+  "Sesame Street"
+ ],
+ [
+  "What’s the coolest sport in the world?",
+  "soccer"
+ ],
+ [
+  "What are two hobbies that you enjoy?",
+  "write stories / play the drums"
+ ],
+ [
+  "Who’s the most interesting writer of all?",
+  "Tolkien"
+ ]
+]); },
+  18: function(){ wCheck("soc", [
+ {
+  "q": "Soccer is Leo’s favorite…",
+  "opts": [
+   "sport",
+   "school subject",
+   "writer"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "Collecting soccer cards is a…",
+  "opts": [
+   "hobby",
+   "TV show",
+   "sport"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "A weekly program with all the goals of the weekend is a…",
+  "opts": [
+   "TV show",
+   "hobby",
+   "writer"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "A person who writes a book about a soccer star is a…",
+  "opts": [
+   "writer",
+   "sport",
+   "school subject"
+  ],
+  "ok": 0
+ }
+]); },
+  19: function(){ wAssess("assess", [
+ [
+  "…identify and use words related to favorite activities?",
+  "What TV shows does your family like to watch? What are some of your friends’ favorite hobbies?"
+ ],
+ [
+  "…put activities in order of preference?",
+  "Which do you like better, reading or playing sports? Do you prefer playing soccer or swimming?"
+ ]
+]); },
+  20: function(){ restoreDoneState(); }
+};
+
+scale();
+goTo(1);
+restoreDoneState();
+</script>
+</body>
+</html>

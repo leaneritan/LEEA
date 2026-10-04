@@ -396,6 +396,7 @@ function openModal(K){
   try{
     $(K).classList.add('open'); document.body.style.overflow = 'hidden';
     if(!INIT[K]) renderMod(K);
+    else MODS[K].blocks.forEach(b => { if(b.type === 'view') BLOCK_RENDER.view(K + '-' + b.id, K + '-' + b.id, b, K); });  /* show the latest work from other modules */
     paintFooter(K);
   }catch(e){ console.error(e); }
 }
@@ -1230,7 +1231,7 @@ defineMod('m12', { icon:'📝', name:'My Second Story', title:'WB Act 6 · Write
   desc:'Your happy, scary or beautiful thing — told with the senses', done:'🎉 Two true stories — you are a real writer!',
   dad:'Write your personal narrative about the thing you chose. Use your table and your three events. Same tools: senses, feelings, time words, past tense.',
   blocks:[
-    { type:'view', id:'plan', label:'📋 Your table + events', get:()=>[planText('m10-table', M10_ROWS), typedText('m11-events', M11_ITEMS)].filter(Boolean).join('\n\n'), empty:'Plan it in 🌈 Express Yourself and 🔢 Events in Order first.' },
+    { type:'view', id:'plan', label:'📋 Your table + events', get:()=>{ const c = lLoad('m10-pick'); return [c !== null ? 'I chose: ' + ['a happy thing 😊','a scary thing 😨','a beautiful thing 🌸'][c] : '', planText('m10-table', M10_ROWS), typedText('m11-events', M11_ITEMS)].filter(Boolean).join('\n\n'); }, empty:'Plan it in 🌈 Express Yourself and 🔢 Events in Order first.' },
     { type:'narrative', id:'story', label:'✍️ Write it', p:'Write your second personal narrative. Start with what it is about, tell the events in order with senses and feelings, then close it.',
       starter:'Last ______, ______. First, ______. Next, ______. Then, ______. I felt ______. I am so ______!', ph:'Last spring, I scored my first goal…', sentences:5, time:3, sense:2, emo:1 }
   ] });

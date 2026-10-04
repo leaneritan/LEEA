@@ -34,7 +34,7 @@ Examples:
 6. **Generates the Leo learner app** at `public/learn/<lesson-id>.html` (landing screen → SB + WB modes, ~11 modules total, all save/restore rules per mode).
 7. **Registers both lessons** + updates `src/data/lessons.ts`.
 8. **Validates** (`npm run validate:content` + `npx tsc --noEmit` + `node -e` script-parse-check on both HTML files).
-9. **Commits and pushes** — does NOT auto-create a PR.
+9. **Commits and pushes** — then **creates a PR** (AGENTS.md golden rule 0 — every push gets a PR; never reuse a merged one). Leaneritan reviews + merges.
 
 ## Lesson ID convention
 
@@ -257,7 +257,7 @@ All four must pass.
 
 ### Step 7 — Commit and push
 
-Push to the working branch. Do NOT auto-create a PR — Leaneritan reviews + merges.
+Push to the working branch. Then create a PR (AGENTS.md golden rule 0 — every push gets a PR; never reuse a merged one). Leaneritan reviews + merges.
 
 ## Output checklist
 
@@ -273,7 +273,7 @@ Push to the working branch. Do NOT auto-create a PR — Leaneritan reviews + mer
 - [ ] `npx tsc --noEmit` ✅
 - [ ] `node -e` parse-check on BOTH HTML files ✅
 - [ ] Learner `component` ends in `-app` and matches the teacher lesson's `component` once stripped — the parent's "Mark Done" checklist only auto-updates when Leo finishes his app if this matches (see `docs/supabase.md`)
-- [ ] Commit pushed; no auto-PR
+- [ ] Commit pushed and PR created
 
 ## Important constraints
 

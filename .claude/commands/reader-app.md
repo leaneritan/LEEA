@@ -35,7 +35,7 @@ Examples:
    - `content/.../<unit>/lessons/reader-app.learner.json` (learner)
    - Updates `src/data/lessons.ts` to import + add to the `lessons[]` array
 6. **Validates**: `npm run validate:content`
-7. **Commits and pushes** — does NOT auto-create a PR.
+7. **Commits and pushes** — then **creates a PR** (AGENTS.md golden rule 0 — every push gets a PR; never reuse a merged one). Leaneritan reviews + merges.
 
 ## Lesson ID convention
 
@@ -267,7 +267,7 @@ npm run validate:content
 
 ### Step 6 — Commit and push
 
-Push to the current working branch. Do NOT create a PR.
+Push to the current working branch. Then create a PR (AGENTS.md golden rule 0 — every push gets a PR; never reuse a merged one). Leaneritan reviews + merges.
 
 ## Output checklist
 
@@ -285,7 +285,7 @@ Push to the current working branch. Do NOT create a PR.
 - [ ] `src/data/lessons.ts` updated
 - [ ] `npm run validate:content` ✅
 - [ ] Learner `component` ends in `-app` and matches the teacher lesson's `component` once that suffix is stripped — confirm the teacher/learner `Mark Done` link actually works (see `docs/supabase.md`), don't just assume it
-- [ ] Commit pushed; no auto-PR
+- [ ] Commit pushed and PR created
 
 ## Important constraints
 

@@ -40,7 +40,7 @@ Examples:
    - `npm run validate:content` (teacher/learner pairing rule enforced)
    - `npx tsc --noEmit`
    - `node` syntax-check on the inlined `<script>` (catches `\\'` escape errors and similar before they ship)
-6. **Commits** with a clear message and **pushes** to the working branch. Does NOT auto-create a PR — Leaneritan reviews + merges.
+6. **Commits** with a clear message and **pushes** to the working branch. Then creates a PR (AGENTS.md golden rule 0 — every push gets a PR; never reuse a merged one). Leaneritan reviews + merges.
 
 ## Lesson ID convention
 
@@ -307,7 +307,7 @@ Validation: validate:content + tsc + node script-check all pass.
 https://claude.ai/code/session_<id>
 ```
 
-Push to the current working branch. Do NOT create a PR — Leaneritan reviews + merges.
+Push to the current working branch. Then create a PR (AGENTS.md golden rule 0 — every push gets a PR; never reuse a merged one). Leaneritan reviews + merges.
 
 ## Output checklist
 
@@ -327,7 +327,7 @@ Push to the current working branch. Do NOT create a PR — Leaneritan reviews + 
 - [ ] `npx tsc --noEmit` ✅
 - [ ] `node -e "$(awk '<script> extract)"` ✅ (catches `\\'` escape bugs before shipping)
 - [ ] The `<vocab-1|vocab-2>` / `<vocab-1|vocab-2>-app` component pair actually matches once `-app` is stripped — the parent's "Mark Done" checklist only auto-updates when Leo finishes his app if this matches exactly (see `docs/supabase.md`)
-- [ ] Commit pushed; no auto-PR
+- [ ] Commit pushed and PR created
 
 ## Important constraints
 

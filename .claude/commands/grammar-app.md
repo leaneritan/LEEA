@@ -41,7 +41,7 @@ Examples:
    - `npm run validate:content` (teacher/learner pairing rule enforced — fine if the Leo app already exists from an earlier draft)
    - `npx tsc --noEmit`
    - `node` syntax-check on the inlined `<script>` (catches `\\'` escape errors before they ship — broke Grammar 1 once)
-6. **Commits** with a clear message and **pushes** to the working branch. Does NOT auto-create a PR — Leaneritan reviews + merges.
+6. **Commits** with a clear message and **pushes** to the working branch. Then creates a PR (AGENTS.md golden rule 0 — every push gets a PR; never reuse a merged one). Leaneritan reviews + merges.
 
 ## Lesson ID convention
 
@@ -302,7 +302,7 @@ Validation: validate:content + tsc + node script-check all pass.
 https://claude.ai/code/session_<id>
 ```
 
-Push to the current working branch. Do NOT create a PR — Leaneritan reviews + merges.
+Push to the current working branch. Then create a PR (AGENTS.md golden rule 0 — every push gets a PR; never reuse a merged one). Leaneritan reviews + merges.
 
 ## Output checklist
 
@@ -318,7 +318,7 @@ Push to the current working branch. Do NOT create a PR — Leaneritan reviews + 
 - [ ] `npm run validate:content` ✅
 - [ ] `npx tsc --noEmit` ✅
 - [ ] `node -e "$(awk '<script> extract)"` ✅ (catches `\\'` escape bugs)
-- [ ] Commit pushed; no auto-PR
+- [ ] Commit pushed and PR created
 
 ## Important constraints
 

@@ -28,7 +28,7 @@ Examples:
 5. **Updates `src/data/lessons.ts`** to import and register both manifests
 6. **Wires the unit into the dashboard** if not already done (see Dashboard wiring section below)
 7. **Validates**: `npm run validate:content` + `npx tsc --noEmit`
-8. **Commits and pushes** to the working branch. Does NOT auto-create a PR.
+8. **Commits and pushes** to the working branch. Then creates a PR (AGENTS.md golden rule 0). Leaneritan reviews + merges.
 
 ## Lesson ID convention
 
@@ -320,7 +320,7 @@ Report what was generated:
 - [ ] `OurWorldUnitPage.tsx` — `unitMeta` has entry for this unit
 - [ ] `npm run validate:content` passes
 - [ ] `npx tsc --noEmit` passes
-- [ ] Committed and pushed (no PR created — Leaneritan reviews + merges)
+- [ ] Committed, pushed and PR created (Leaneritan reviews + merges)
 
 ## Important constraints
 

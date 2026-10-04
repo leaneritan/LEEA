@@ -38,7 +38,7 @@ Examples:
    - `npm run validate:content`
    - `node` parse check on both inline `<script>` blocks
    - `npm run build`
-7. **Commits and pushes** — does NOT auto-create a PR. Leaneritan reviews + merges.
+7. **Commits and pushes** — then **creates a PR** (AGENTS.md golden rule 0 — every push gets a PR; never reuse a merged one). Leaneritan reviews + merges.
 8. **NEVER creates a `writing.design.md`** per the standing rule in `docs/design-decisions.md` ("No doc unless something reads it"). The skill IS the design.
 
 ## Lesson ID convention
@@ -70,6 +70,15 @@ Leo does the app **alone after Neritan teaches the deck**, so it is built *from 
 | Be the Expert | irregular past (told, saw, went, came, heard, shook): match, sort, choose | match + mcq |
 | Write · Edit | show don't tell; two teacher models; fix the wrong past verbs | typed rewrite + fix |
 | Share · Recap · Formative | soccer transfer; match writing tools to the model; Can-do and the 4–1 rubric | soccer block, match, final quiz |
+
+**Reference build:** `public/learn/ow-l5-u1-writing.html` (companion to `public/lessons/ow-l5-u1-writing.html`). Start from it, not from a blank file. Its header comment holds the slide → module map. Every module is a list of blocks (flash, mcq, match, typed, sort, order, find, read, tap, plan, choice, check, view, narrative, quiz) that save as Leo answers and restore their own DOM. A module's `m{n}-done` saves itself when all its blocks are done, and that same check enables Mark complete. Lessons from that build:
+
+- **WB "write your narrative in your notebook" is the SB story.** In L5 U1 that is WB Act 3: it became the story in m6, so m8–m12 hold the WB's *other* activities (Acts 1, 2, 4, 5, 6). Map each WB activity to exactly one module, and say in the header comment where any activity went.
+- **The story box is a `narrative` block with a live meter** for the deck's own Edit checklist: sentences, time words, sense words and feelings. It also flags wrong irregular past forms (goed → went, seed → saw, telled → told, "I seen" → I saw). "I'm finished" counts only when every target is met. The draft saves as he types. **Run the deck's model stories and the SB model through the meter before shipping** — every one must pass, and the deck's mistake sentences must be flagged.
+- **Read 2 / Read 3 hunts are `tap` blocks.** The deck's "circle the sense words" and "underline the time words" become tap-the-phrase passages. Their targets are the exact lists the deck counts (L5 U1: 12 sense and emotion phrases, 7 time words).
+- **Plans travel forward.** A module that writes from an earlier plan shows it in a `view` block (m6 shows the m5 chart; m12 shows the m10 choice and table plus the m11 events). **Views redraw every time the module opens**: the first build drew them once per page load, so a plan filled after opening the story module stayed blank until reload (PR #524).
+- **Quizzes keep their gates and allow a retry.** 70% for m1, 75% for m2, 80% for m13. A pass is never taken back by a lower retry, and m13 writes `score` with `done: true` only on a pass.
+- **Do not copy a slide's mistake into the app.** The deck's soccer slide had "It rained heavy". The app reused the slide's stats but not that sentence, and the PR said so.
 
 ## Locked patterns the skill must follow
 
@@ -269,7 +278,7 @@ git commit -m "Unit <unit> Writing: build via /writing-app (modal home-grid + Vo
 git push -u origin claude/u<level>-u<unit>-writing
 ```
 
-Do NOT auto-create a PR. Leaneritan reviews + merges.
+Then create a PR (AGENTS.md golden rule 0 — every push gets a PR; never reuse a merged one). Leaneritan reviews + merges.
 
 ---
 

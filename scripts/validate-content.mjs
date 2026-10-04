@@ -464,6 +464,7 @@ for (const [index, entry] of (sanseido ?? []).entries()) {
 
 // Lesson registration + teacher/learner pairing check
 const lessonsDirs = [
+  "content/subjects/english/courses/our-world/level-4/unit-5/lessons",
   "content/subjects/english/courses/our-world/level-4/unit-6/lessons",
   "content/subjects/english/courses/our-world/level-4/unit-7/lessons",
   "content/subjects/english/courses/our-world/level-4/unit-8/lessons",

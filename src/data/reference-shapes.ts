@@ -62,6 +62,7 @@ export type RefSource = {
   tag: string;
   level?: number;
   unit?: number;
+  component?: string;
   lessonId?: string;
   lessonStatus: "live" | "draft";
 };
@@ -77,6 +78,7 @@ function normalizeSources(raw: VocabularyItem["sources"]): RefSource[] {
     tag: source.tag,
     level: source.level,
     unit: source.unit,
+    component: source.component,
     lessonId: source.lessonId,
     lessonStatus: source.lessonStatus === "live" ? "live" : "draft"
   }));

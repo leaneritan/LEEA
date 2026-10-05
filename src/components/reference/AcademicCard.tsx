@@ -18,6 +18,7 @@ import type { AcademicEntry } from "@/data/reference-shapes";
 import sanseidoIndex from "../../../content/subjects/english/junior-high/sanseido-index.json";
 import { posPillClass } from "./pos-pill";
 import { getAcademicNav } from "./ref-data";
+import { findFirstSourceLessons, findSourceLessons } from "@/data/lessonLinks";
 import { isMultiEmoji } from "./emoji-utils";
 
 type SanseidoEntry = { w: string; u: string };
@@ -38,6 +39,7 @@ const POS_LABEL: Record<string, string> = {
 type QuizState = Record<number, number>;
 
 export function AcademicCard({ entry }: { entry: AcademicEntry }) {
+  const lessonLinks = findFirstSourceLessons(entry.sources);
   const jp = useJapanesePreference();
   const { knownWordSet, setWordKnown } = useKnownWordIds();
   const known = knownWordSet.has(entry.id);
@@ -329,8 +331,10 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
           <section className="rcardv2-section rcardv2-section--rail">
             <div className="rcardv2-eyebrow">Appears in</div>
             <div className="rcardv2-sources">
-              {entry.sources.map((source, idx) => (
-                <div key={`${source.tag}-${idx}`} className="rcardv2-source-row">
+              {entry.sources.map((source, idx) => {
+                const found = findSourceLessons(source);
+                const href = found.teacher?.href ?? found.app?.href ?? null;
+                const body = (<>
                   <span className={`rcardv2-source-tile rcardv2-source-tile--${source.course}`} aria-hidden>
                     {source.course === "our-world" ? <span className="rcardv2-tile-ow-mark" /> : source.course === "joyful-work" ? "J" : "JH"}
                   </span>
@@ -341,9 +345,17 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
                     </div>
                     <div className="rcardv2-source-tag">{source.tag}</div>
                   </div>
-                  <span className="rcardv2-source-arrow">→</span>
-                </div>
-              ))}
+                  <span className="rcardv2-source-arrow">{href ? "↗" : "→"}</span>
+</>);
+                return href ? (
+                  <div key={`${source.tag}-${idx}`} className="rcardv2-source-wrap">
+                    <Link href={href} className="rcardv2-source-row">{body}</Link>
+                    {found.teacher && found.app ? <Link href={found.app.href} className="rcardv2-source-app">🎮 Leo’s app</Link> : null}
+                  </div>
+                ) : (
+                  <div key={`${source.tag}-${idx}`} className="rcardv2-source-row">{body}</div>
+                );
+              })}
               {sanseidoUrl && (
                 <a
                   href={sanseidoUrl}
@@ -366,13 +378,28 @@ export function AcademicCard({ entry }: { entry: AcademicEntry }) {
             </div>
           </section>
 
-          <button type="button" className="rcardv2-locked" disabled title="Lesson not published yet">
-            <span className="rcardv2-locked-icon" aria-hidden>🔒</span>
-            <span className="rcardv2-locked-text">
-              Open related lesson
-              <span>Academic Language · available when live</span>
-            </span>
-          </button>
+          {lessonLinks.teacher || lessonLinks.app ? (
+            <div className="rcardv2-related-row">
+              {lessonLinks.teacher ? (
+                <Link className="rcardv2-related-live" href={lessonLinks.teacher.href} title={lessonLinks.teacher.title}>
+                  Open related lesson →
+                </Link>
+              ) : null}
+              {lessonLinks.app ? (
+                <Link className="rcardv2-related-live rcardv2-related-app" href={lessonLinks.app.href} title={lessonLinks.app.title}>
+                  🎮 Leo’s app →
+                </Link>
+              ) : null}
+            </div>
+          ) : (
+            <button type="button" className="rcardv2-locked" disabled title="Lesson not built yet">
+              <span className="rcardv2-locked-icon" aria-hidden>🔒</span>
+              <span className="rcardv2-locked-text">
+                Open related lesson
+                <span>Academic Language · not built yet</span>
+              </span>
+            </button>
+          )}
         </div>
       </div>
     </div>

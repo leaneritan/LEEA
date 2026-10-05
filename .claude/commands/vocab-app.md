@@ -110,6 +110,8 @@ Leo does the app **alone after Neritan teaches the deck**, so every tab replays 
 - Reuse the deck's football/movie claims; add none.
 - Write the slide → tab map into the app's header comment and the PR.
 
+**No dead ends (AGENTS.md learner contract rule 7).** Hand-pick every wrong option — never random, never one that also fits. Accept every logical answer and wording. Give sorts, order games and tap hunts a two-tap 👀 Show the answers. Check answer keys against the book's answer key, not only the deck.
+
 Reference build: `public/learn/ow-l5-u1-vocab-2.html` (companion to `public/lessons/ow-l5-u1-vocab-2.html`).
 
 ### Leo learner app — 13 tabs (LOCKED via vocab-1)

@@ -426,6 +426,13 @@ onclick="lSave('score', null); initQuiz()"
 
 **6. Restoring per-question answered state means restoring the DOM, not just the data object.** A module that tracks per-question answers in a JS object (e.g. `const M3_ANS = {}`, saved/loaded via `lSave`/`lLoad`) and guards its answer handler with `if (M3_ANS[qk]) return;` must also re-apply the disabled/"correct" look to those buttons in its `restore_mX()` function. Restoring only the data object leaves the buttons rendered fresh and clickable; tapping one then silently does nothing (the guard blocks it) with zero feedback, which reads as broken. `restoreAnsweredButtons(groupPrefix, answeredObj, btnClass)` in `ow-l4-u8-writing.html` is the reusable pattern — re-disables every button in an answered question's group and marks the objectively-correct one, regardless of which option the learner originally picked.
 
+**7. No dead ends — Leo must never be stuck behind a mistake.** He works alone, so a wrong key in the app stops him with nobody to ask. Two parts:
+
+- **Wrong options are chosen by hand, never at random.** A random distractor from the same slide can also be right ("If I'm hot, … I drink some water"; "If it's cold, … I wear gloves"), and then a correct answer is marked wrong. Every wrong option must be clearly wrong. Where several answers are logical (a card game, open endings), accept every logical one. A typed answer accepts every correct wording, including the result-first form of an *if* sentence — but only when it reads naturally ("I wear my coat if it's cold", never "He goes inside if Dad sees lightning").
+- **Every activity has a way through.** Typed items and builders show the answer after two tries. Sorts, order games and tap hunts carry a two-tap **👀 Show the answers** button that completes them, and Dad's view records that it was used. Multiple-choice items let Leo retry until he is right.
+
+Check answer keys against the book (the SB / WB answer key), not only the deck. The L5 U1 apps were audited this way after Neritan found the Writing app's Read 2/3 hunts following the deck's counts instead of the book's.
+
 Home current-focus progress counts unit components, not every route. If a teacher lesson and Leo learner app cover the same component, such as `opener` and `opener-app`, they count as one lesson/component in the Home progress total.
 
 Before Supabase is connected, Neritan assignment/review uses local storage with Supabase-shaped records. The assignment loop is: Neritan assigns a learner app, Leo completes it, Neritan reviews saved module/score/caption progress, then marks it reviewed or needs redo.

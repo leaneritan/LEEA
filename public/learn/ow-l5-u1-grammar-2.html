@@ -551,6 +551,8 @@ function same(a, b){ const f = x => GC.norm(x).replace(/\bits\b/g,'it is'); retu
 function withFlip(model){
   const m = /^If (.+?), (.+?)\.?$/.exec(model.replace(/’/g,'\''));
   if(!m) return [model];
+  /* "He goes inside if Dad sees lightning" names nobody before "he" — only flip when the result has its own subject. */
+  if(/^(he|she|it|they)\b/i.test(m[2])) return [model];
   return [model, m[2].charAt(0).toUpperCase() + m[2].slice(1) + ' if ' + m[1] + '.'];
 }
 
@@ -660,8 +662,21 @@ function mcqTab(n, items){
   TAB_RESET[n] = ()=>reinit(n);
 }
 /* Finish-the-sentence items where the endings come from the same slide. */
-function endings(clue, starts, ends, prefix){
-  return starts.map((s,i)=>({ clue, q:(prefix||'')+s, opts:[ends[i]].concat(shuffle(ends.filter((e,k)=>k!==i)).slice(0,2)), ok:0 }));
+/* Wrong endings are chosen by hand, never at random: a random ending from
+   the same slide can also be logical ("If I’m hot, … I drink some water"),
+   and then a right answer is marked wrong. A number = another ending from
+   the slide, a string = a clearly illogical extra. */
+const ENDING_BAD = {
+  'Slide 6':  [[1,3],[0,5],[3,'I go to the beach. 🏖️'],[0,5],['I eat dinner. 🍽️','I go to bed. 🛌'],[1,3]],
+  'Slide 7':  [[4,7],[2,7],[1,6],[4,7],[1,6],[2,7],[2,7],[1,6],[7,'I go swimming. 🏊']],
+  'Slide 8':  [[3,'I run a marathon. 🏃'],[0,2],[1,3],[0,1],[0,2]],
+  'Slide 39': [[3,5],[3,4],[3,'I go to the beach.'],[1,5],[3,'I wear sunglasses.'],[3,4]],
+  'Slide 12': [['I wear shorts. 🩳','I go swimming. 🏊'],['I fly my kite. 🪁','I go swimming. 🏊'],['I open all the windows. 🪟','I have a picnic. 🧺']],
+  'Slide 14': [[2,4],[2,'I go swimming. 🏊'],[0,1],[1,2],[1,2]]
+};
+function endings(clue, starts, ends){
+  const bad = ENDING_BAD[clue.split(' · ')[0]];
+  return starts.map((s,i)=>({ clue, q:s, opts:[ends[i]].concat(bad[i].map(x => typeof x === 'number' ? ends[x] : x)), ok:0 }));
 }
 
 /* ═════════════════════════════════════════════════════════════════════
@@ -785,18 +800,31 @@ function buildDone(){
 function sortTab(n, SORTS){
   TAB_INIT[n] = function(){
     const done = new Set(lLoad('tab-'+n+'-sorted') || []);
-    $('sorts-'+n).innerHTML = SORTS.map(s=>'<div><div class="klabel">'+s.title+'</div><div class="dad-hint" style="margin:6px 0 8px">'+s.hint+'</div><div class="sort-host" id="host-'+s.id+'"></div></div>').join('');
+    $('sorts-'+n).innerHTML = SORTS.map(s=>'<div><div class="klabel">'+s.title+'</div><div class="dad-hint" style="margin:6px 0 8px">'+s.hint+'</div><div class="sort-host" id="host-'+s.id+'"></div>' +
+      '<div style="margin-top:6px"><button class="ghost-btn" style="padding:8px 14px" id="show-'+s.id+'" onclick="sortShow('+n+',\''+s.id+'\')">👀 Show the answers</button></div></div>').join('');
     SORTS.forEach(s=>{
-      if(done.has(s.id) || typeof window.pickChart !== 'function'){ sortStatic(s); return; }
+      if(done.has(s.id) || typeof window.pickChart !== 'function'){ sortStatic(s); $('show-'+s.id).style.display = 'none'; return; }
       $('host-'+s.id).innerHTML = window.pickChart('classification sort', { id:s.id, tiles:shuffle(s.tiles), zones:s.zones,
-        onComplete: function(){
-          const d = new Set(lLoad('tab-'+n+'-sorted') || []); d.add(s.id); lSave('tab-'+n+'-sorted', Array.from(d));
-          setTimeout(()=>sortStatic(s), 900);
-          if(d.size >= SORTS.length) finishTab(n);
-        } });
+        onComplete: function(){ sortDone(n, s); } });
     });
   };
   TAB_RESTORE[n] = stdRestore(n); TAB_RESET[n] = ()=>reinit(n);
+  SORT_SETS[n] = SORTS;
+}
+const SORT_SETS = {}, SORT_ARM = {};
+function sortDone(n, s){
+  const d = new Set(lLoad('tab-'+n+'-sorted') || []); d.add(s.id); lSave('tab-'+n+'-sorted', Array.from(d));
+  const b = $('show-'+s.id); if(b) b.style.display = 'none';
+  setTimeout(()=>sortStatic(s), 900);
+  if(d.size >= SORT_SETS[n].length) finishTab(n);
+}
+/* Two taps: never let a sort trap Leo. The columns appear; Dad’s view records it. */
+function sortShow(n, id){
+  const b = $('show-'+id), s = SORT_SETS[n].find(x => x.id === id);
+  if(!SORT_ARM[id]){ SORT_ARM[id] = true; b.textContent = '👀 Tap again to show the answers'; setTimeout(()=>{ SORT_ARM[id] = false; b.textContent = '👀 Show the answers'; }, 3000); return; }
+  SORT_ARM[id] = false;
+  logAtt(n, { q:strip(s.title) + ' — showed the answers', a:'(shown)', ok:false });
+  sortDone(n, s); sortStatic(s);
 }
 function sortStatic(s){
   $('host-'+s.id).innerHTML = '<div class="sort-static" style="grid-template-columns:repeat('+s.zones.length+',1fr)">' + s.zones.map(z=>
@@ -909,7 +937,7 @@ const FIX = [
   { clue0:'Slide 30 · Rule 4', p:'If it’s foggy the plane is late.', seed:'If it’s foggy the plane is late.', accept:['If it’s foggy, the plane is late.'], model:'If it’s foggy, the plane is late.', clue:'If comes first → comma after the if-half.' },
   { clue0:'New', p:'I feel sick, if I eat too much.', seed:'I feel sick, if I eat too much.', accept:['I feel sick if I eat too much.'], model:'I feel sick if I eat too much.', clue:'Result first → NO comma before if.' },
   { clue0:'New', p:'If is snowing, we make a snowman.', seed:'If is snowing, we make a snowman.', accept:['If it is snowing, we make a snowman.','If it snows, we make a snowman.'], model:'If it is snowing, we make a snowman.', clue:'English needs “it”.' }
-].map(x=>Object.assign(x, { noLive:true }));
+].map(x=>Object.assign(x, { noLive:true, accept: Array.from(new Set([].concat.apply([], x.accept.map(withFlip)))) }));  /* the result-first form is right too */
 TAB_INIT[3] = ()=>typedBlock('list-3', 'tab-3-state', FIX, 3, ()=>finishTab(3), false);
 TAB_RESTORE[3] = stdRestore(3); TAB_RESET[3] = ()=>reinit(3);
 
@@ -986,11 +1014,11 @@ const WRITE = [
   { clue0:'Slide 21 · 📊 Your turn', p:'Finish it with your own idea.', pre:'If I skip breakfast, ', free:true, model:'I feel hungry.' },
   { clue0:'Slide 22 · 🙋 Dad’s Saturday rules', p:'Make a Saturday rule for your family — the whole sentence.', free:true, model:'If it’s hot, we go swimming.' },
   { clue0:'Slide 43 · 🧳 Problem → solution (me)', p:'Problem: I miss my plane.', pre:'If I miss my plane, I ', free:true, model:'wait for the next one.' },
-  { clue0:'Slide 43 · 👦 Now the same problem for my brother (he)', p:'he → the verb needs -s!', pre:'If my brother misses his plane, he ', free:true, must:'\\bhe [a-z]+s\\b', model:'waits for the next one.' },
+  { clue0:'Slide 43 · 👦 Now the same problem for my brother (he)', p:'he → the verb needs -s!', pre:'If my brother misses his plane, he ', free:true, must:'\\bhe ([a-z]+s|can|must|should)\\b', model:'waits for the next one.' },
   { clue0:'Slide 43 · 🧳 Problem → solution (me)', p:'Problem: I get lost.', pre:'If I get lost, I ', free:true, model:'ask a police officer.' },
-  { clue0:'Slide 43 · 👧 Now the same problem for my sister (she)', p:'she → the verb needs -s!', pre:'If my sister gets lost, she ', free:true, must:'\\bshe [a-z]+s\\b', model:'asks a police officer.' },
+  { clue0:'Slide 43 · 👧 Now the same problem for my sister (she)', p:'she → the verb needs -s!', pre:'If my sister gets lost, she ', free:true, must:'\\bshe ([a-z]+s|can|must|should)\\b', model:'asks a police officer.' },
   { clue0:'Slide 43 · 🧳 Problem → solution (me)', p:'Problem: my phone battery dies.', pre:'If my phone battery dies, I ', free:true, model:'borrow a charger.' },
-  { clue0:'Slide 43 · 🧑 Now the same problem for my friend (he)', p:'he → the verb needs -s!', pre:'If his phone battery dies, he ', free:true, must:'\\bhe [a-z]+s\\b', model:'borrows a charger.' }
+  { clue0:'Slide 43 · 🧑 Now the same problem for my friend (he)', p:'he → the verb needs -s!', pre:'If his phone battery dies, he ', free:true, must:'\\bhe ([a-z]+s|can|must|should)\\b', model:'borrows a charger.' }
 ].map(x=>Object.assign(x, { clue:'Keep the grammar of the first half, and make it logical. For he / she, add -s.' }));
 TAB_INIT[7] = ()=>typedBlock('type-7', 'tab-7-state', WRITE, 7, ()=>finishTab(7), true);
 TAB_RESTORE[7] = stdRestore(7); TAB_RESET[7] = ()=>reinit(7);
@@ -1000,11 +1028,13 @@ TAB_RESTORE[7] = stdRestore(7); TAB_RESET[7] = ()=>reinit(7);
 ═════════════════════════════════════════════════════════════════════ */
 const WEATHER = [['🌧️','it rains'],['❄️','it snows'],['🥵☀️','it’s very hot'],['⚡☁️','I see lightning'],['🌪️🏡','a tornado comes'],['💨','it’s windy'],['🌊🏠','a flood comes'],['🥶','it’s cold']];
 const ACTION  = [['☂️','I use an umbrella'],['🧤','I wear gloves'],['🏊','I go swimming'],['🏠','I go inside'],['⛺🏡','I go to a shelter'],['🪁','I fly my kite'],['🏃🚪','I evacuate'],['🧥','I put on my coat']];
-function cardState(){ return lLoad('tab-8-state') || { k:0 }; }
+/* Every logical action card counts — "If it’s cold, I wear gloves" is as right as the coat. */
+const CARD_OK = [[0,3],[1,7,3],[2,3],[3,4],[4,3,6],[5,7,3],[6,4],[7,1,3]];
+function cardState(){ const s = lLoad('tab-8-state') || { k:0 }; if(!s.pick) s.pick = []; return s; }
 TAB_INIT[8] = function(){ cardPaint(); };
 function cardPaint(){
   const s = cardState(), host = $('card-game');
-  const made = WEATHER.slice(0, s.k).map((w,i)=>'<div class="made">'+w[0]+ACTION[i][0]+' If '+w[1]+', '+ACTION[i][1]+'.</div>').join('');
+  const made = WEATHER.slice(0, s.k).map((w,i)=>{ const a = ACTION[s.pick[i] != null ? s.pick[i] : i]; return '<div class="made">'+w[0]+a[0]+' If '+w[1]+', '+a[1]+'.</div>'; }).join('');
   if(s.k >= WEATHER.length){ host.innerHTML = '<div class="klabel">✅ Your sentences — read them aloud</div>' + made; return; }
   const w = WEATHER[s.k];
   host.innerHTML = '<div class="cards-row"><div class="wcard"><div class="ctag">WEATHER 🟥</div><div class="cemo">'+w[0]+'</div><div class="ctext">'+w[1]+'</div></div><div class="cplus">+</div><div class="acard q"><div class="ctag">ACTION 🟩</div><div class="cemo">❔</div><div class="ctext">which one?</div></div></div>' +
@@ -1014,11 +1044,11 @@ function cardPaint(){
 }
 function cardPick(btn){
   const s = cardState(), w = WEATHER[s.k], i = +btn.dataset.i, fb = $('card-fb');
-  if(i === s.k){
+  if(CARD_OK[s.k].indexOf(i) >= 0){
     btn.classList.add('good');
     fb.className = 'quiz-fb ok'; fb.textContent = '✅ They match! “If ' + w[1] + ', ' + ACTION[i][1] + '.” Say it and keep the cards!';
     document.querySelectorAll('.acard.pick').forEach(b=>b.disabled = true);
-    s.k++; lSave('tab-8-state', s);
+    s.pick[s.k] = i; s.k++; lSave('tab-8-state', s);
     setTimeout(()=>{ cardPaint(); if(s.k >= WEATHER.length) finishTab(8); }, 1300);
   } else {
     if(!btn.dataset.missed){ btn.dataset.missed = '1'; logAtt(8, { q:'If ' + w[1] + ', …', a:ACTION[i][1], ok:false }); }
@@ -1031,14 +1061,18 @@ TAB_RESTORE[8] = stdRestore(8); TAB_RESET[8] = ()=>reinit(8);
 /* ═════════════════════════════════════════════════════════════════════
    TAB 9 — GUESS THE ENDING (slides 18, 11, 42-43 — the deck's endings)
 ═════════════════════════════════════════════════════════════════════ */
-function geRound(name, starts, ends){ return { name, clues: starts.map((s,i)=>({ clue:s, tiles:[ends[i]].concat(shuffle(ends.filter((e,k)=>k!==i)).slice(0,2)), ok:0 })) }; }
+/* Wrong tiles are chosen by hand (see ENDING_BAD): "If water gets very cold, … it gets hard" is true, so it can never be a wrong tile. */
+function geRound(name, starts, ends, bad){ return { name, clues: starts.map((s,i)=>({ clue:s, tiles:[ends[i]].concat(bad[i].map(x => typeof x === 'number' ? ends[x] : x)), ok:0 })) }; }
 const GE_ROUNDS = [
   geRound('Facts', ['🧊🔥 If you heat ice, …','💧🥶 If water gets very cold, …','🔴🔵 If you mix red and blue, …','🌱🚫💧 If a plant doesn’t get water, …','🔘💡 If you press the switch, …','⚽🦵 If you kick a ball, …','🍳🥚 If you heat an egg, …','🧂💧 If you put salt in water, …','🔌📺 If you unplug the TV, …'],
-    ['it melts.','it freezes.','you get purple.','it dies.','the light comes on.','it moves.','it gets hard.','it disappears.','it turns off.']),
+    ['it melts.','it freezes.','you get purple.','it dies.','the light comes on.','it moves.','it gets hard.','it disappears.','it turns off.'],
+    [[1,2],[2,3],[0,5],[2,4],[0,1],[1,2],[1,2],[2,4],[4,1]]),
   geRound('House rules', ['📚✅ If you finish your homework, …','🕗 If you’re going to be late, …','🦷 If you eat sweets, …','🔋 If your tablet is low, …','🚪 If you leave the house, …','🌙 If it’s bedtime, …','🍽️ If dinner is ready, …','🎒 If you have school tomorrow, …','🐶 If the dog is hungry, …'],
-    ['you can play a game. 🎮','you call me. 📞','you brush your teeth. 🪥','you charge it. 🔌','you take your keys. 🔑','you turn off the light. 💡','you wash your hands. 🧼','you pack your bag. 🎒','you give him food. 🦴']),
+    ['you can play a game. 🎮','you call me. 📞','you brush your teeth. 🪥','you charge it. 🔌','you take your keys. 🔑','you turn off the light. 💡','you wash your hands. 🧼','you pack your bag. 🎒','you give him food. 🦴'],
+    [[3,8],[2,3],[3,4],[2,8],[3,8],[4,8],[3,4],[8,3],[2,7]]),
   geRound('Recap & trip', ['🧍❄️ If there’s a blizzard, …','🥵☀️ If there’s a heat wave, …','🏜️🌪️ If a sandstorm comes, …','🌀🌊 If a hurricane comes, …','🔊☁️ If I hear thunder, …','🚨🚑 If there’s an emergency, …','✈️ If I miss my plane, …','🗺️ If I get lost, …'],
-    ['I stay inside.','I drink a lot of water.','I close all the windows.','we evacuate.','I go inside.','we follow our plan.','I wait for the next one.','I ask a police officer.'])
+    ['I stay inside.','I drink a lot of water.','I close all the windows.','we evacuate.','I go inside.','we follow our plan.','I wait for the next one.','I ask a police officer.'],
+    [[6,7],[6,7],[6,7],[6,7],[6,7],[6,1],[0,2],[0,2]])
 ];
 let geActive = 0;
 function geState(){ return lLoad('tab-9-won') || [0,0,0]; }

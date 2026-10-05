@@ -158,6 +158,7 @@ body{display:flex;flex-direction:column}
 .sort-host .dnd-tile{white-space:normal !important;font-size:15px !important;padding:8px 14px !important}
 
 /* ORDER + FIND */
+.ghost-btn{background:#fff;border:2px solid var(--border);border-radius:10px;padding:7px 14px;margin-top:6px;font-size:13px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;color:var(--ink-2)}
 .ord-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .ord-done{background:var(--green-l);border:2px solid var(--green-b);border-radius:10px;padding:8px 12px;font-weight:700;color:var(--green-d);font-size:15px}
 .ord-done b{display:inline-block;min-width:26px}
@@ -562,14 +563,26 @@ function tyCheck(host, i){
 /* sort — pickChart('classification sort'); a finished sort restores as its columns. */
 BLOCK_RENDER.sort = function(host, key, b, K){
   const done = new Set(lLoad(key) || []);
-  $(host).innerHTML = b.sorts.map(s=>(s.intro ? '<div class="dad-hint">' + s.intro + '</div>' : '') + '<div class="sort-host" id="host-' + s.id + '"></div>').join('');
+  BS[host] = { key, b, K };
+  $(host).innerHTML = b.sorts.map(s=>(s.intro ? '<div class="dad-hint">' + s.intro + '</div>' : '') + '<div class="sort-host" id="host-' + s.id + '"></div>' +
+    '<div><button class="ghost-btn" id="show-' + s.id + '" onclick="sortShow(\'' + host + '\',\'' + s.id + '\')">👀 Show the answers</button></div>').join('');
   b.sorts.forEach(s=>{
-    if(done.has(s.id) || typeof window.pickChart !== 'function'){ sortStatic(s); return; }
+    if(done.has(s.id) || typeof window.pickChart !== 'function'){ sortStatic(s); $('show-' + s.id).style.display = 'none'; return; }
     $('host-' + s.id).innerHTML = window.pickChart('classification sort', { id:s.id, tiles:shuffle(s.tiles), zones:s.zones,
-      onComplete: function(){ const d = new Set(lLoad(key) || []); d.add(s.id); lSave(key, Array.from(d)); setTimeout(()=>sortStatic(s), 900); checkTab(K); } });
+      onComplete: function(){ sortDone(host, s); setTimeout(()=>sortStatic(s), 900); } });
   });
 };
 BLOCK_DONE.sort = (key, b) => (lLoad(key) || []).length >= b.sorts.length;
+function sortDone(host, s){ const S = BS[host], d = new Set(lLoad(S.key) || []); d.add(s.id); lSave(S.key, Array.from(d)); const bt = $('show-' + s.id); if(bt) bt.style.display = 'none'; checkTab(S.K); }
+/* Two taps — a sort or an order game must never trap Leo. Dad’s view records it. */
+const ARMED = {};
+function arm(id, btn, label){ if(ARMED[id]) { ARMED[id] = false; return true; } ARMED[id] = true; btn.textContent = '👀 Tap again to show the answers'; setTimeout(()=>{ ARMED[id] = false; btn.textContent = label; }, 3000); return false; }
+function sortShow(host, id){
+  const S = BS[host], s = S.b.sorts.find(x => x.id === id);
+  if(!arm(id, $('show-' + id), '👀 Show the answers')) return;
+  logAtt(S.K, { q:'Sort — showed the answers', a:s.zones.map(z => strip(z.label)).join(' / ') });
+  sortDone(host, s); sortStatic(s);
+}
 function sortStatic(s){
   $('host-' + s.id).innerHTML = '<div class="sort-static" style="grid-template-columns:repeat(' + s.zones.length + ',1fr)">' + s.zones.map(z=>
     '<div class="col"><h4 style="background:' + z.color + '">' + z.label + '</h4>' + s.tiles.filter(t=>t.answer === z.key).map(t=>'<div>' + t.text + '</div>').join('') + '</div>').join('') + '</div>' +
@@ -579,7 +592,8 @@ function sortStatic(s){
 /* order — tap the steps in order. sets: [{ title, steps:[in order], end? }] */
 BLOCK_RENDER.order = function(host, key, b, K){
   BS[host] = { key, b, K };
-  $(host).innerHTML = b.sets.map((s,si)=>'<div class="qcard" id="' + host + '-s' + si + '"><div class="qtext">' + s.title + '</div><div class="ord-list" id="' + host + '-l' + si + '"></div><div class="ord-bank" id="' + host + '-b' + si + '"></div><div class="quiz-fb" id="' + host + '-f' + si + '"></div></div>').join('');
+  $(host).innerHTML = b.sets.map((s,si)=>'<div class="qcard" id="' + host + '-s' + si + '"><div class="qtext">' + s.title + '</div><div class="ord-list" id="' + host + '-l' + si + '"></div><div class="ord-bank" id="' + host + '-b' + si + '"></div><div class="quiz-fb" id="' + host + '-f' + si + '"></div>' +
+    '<div><button class="ghost-btn" id="' + host + '-sh' + si + '" onclick="ordShow(\'' + host + '\',' + si + ')">👀 Show the answers</button></div></div>').join('');
   b.sets.forEach((s,si)=>ordPaint(host, si));
 };
 BLOCK_DONE.order = (key, b) => { const st = lLoad(key) || {}; return b.sets.every((s,si)=>(st[si] || 0) >= s.steps.length); };
@@ -588,7 +602,14 @@ function ordPaint(host, si){
   $(host + '-l' + si).innerHTML = set.steps.slice(0, n).map((t,k)=>'<div class="ord-done"><b>' + (set.labels ? set.labels[k] : (k+1) + '.') + '</b> ' + t + '</div>').join('');
   const left = set.steps.map((t,k)=>({ t, k })).filter(x=>x.k >= n);
   $(host + '-b' + si).innerHTML = shuffle(left).map(x=>'<button class="tile" onclick="ordTap(\'' + host + '\',' + si + ',' + x.k + ',this)">' + x.t + '</button>').join('');
+  const shb = $(host + '-sh' + si); if(shb) shb.style.display = n >= set.steps.length ? 'none' : '';
   if(n >= set.steps.length){ $(host + '-s' + si).classList.add('solved'); const f = $(host + '-f' + si); f.className = 'quiz-fb ok'; f.textContent = '✅ ' + (set.end || 'In order! Read them aloud.'); }
+}
+function ordShow(host, si){
+  const S = BS[host], st = lLoad(S.key) || {};
+  if(!arm(host + '-o' + si, $(host + '-sh' + si), '👀 Show the answers')) return;
+  logAtt(S.K, { q:strip(S.b.sets[si].title) + ' — showed the answers', a:'(shown)' });
+  st[si] = S.b.sets[si].steps.length; lSave(S.key, st); ordPaint(host, si); checkTab(S.K);
 }
 function ordTap(host, si, k, btn){
   const S = BS[host], st = lLoad(S.key) || {}, n = st[si] || 0, f = $(host + '-f' + si);
@@ -1052,7 +1073,8 @@ const WB_WORDS = [
   { word:'practical', emoji:'🛠️👍', pos:'adjective', def:'Useful and easy to do in real life.', sample:'“There are also some <b>practical</b> things that everyone can do…”', jp:'実用的（じつようてき）な' }
 ];
 const WB7 = ['coal','average','melts','sea level','efficient','energy','practical'];
-function wbFill(q, ans){ return { q, opts:[ans].concat(shuffle(WB7.filter(w => w !== ans)).slice(0,2)), ok:0 }; }
+/* Wrong words are picked by hand: a random one can fit too ("We can use less coal"). */
+function wbFill(q, ans, bad){ return { q, opts:[ans].concat(bad), ok:0 }; }
 
 defineTab('wb-tab-0', { icon:'📚', name:'Vocab', title:'📚 Vocab — seven Workbook words',
   sub:'WB pp. 8–9 · Weather Change. Learn these first, then read.',
@@ -1061,13 +1083,13 @@ defineTab('wb-tab-0', { icon:'📚', name:'Vocab', title:'📚 Vocab — seven W
     { type:'flash', id:'cards', label:'🃏 Flip every card', words:WB_WORDS },
     { type:'match', id:'match', label:'🔗 Match each meaning to its word', pairs:WB_WORDS.map(w=>({ l:w.def, r:w.emoji + ' ' + w.word })) },
     { type:'mcq', id:'fill', label:'✏️ Sentences from the reading', items:[
-      wbFill('People started to burn ____, oil, and gas.', 'coal'),
-      wbFill('The ____ temperature on Earth is rising.', 'average'),
-      wbFill('More of the ice on mountains ____ faster.', 'melts'),
-      wbFill('If this water goes to the sea, the ____ rises.', 'sea level'),
-      wbFill('We can make factories and cars more ____.', 'efficient'),
-      wbFill('We can use less ____.', 'energy'),
-      wbFill('There are also some ____ things that everyone can do.', 'practical')
+      wbFill('People started to burn ____, oil, and gas.', 'coal', ['average','practical']),
+      wbFill('The ____ temperature on Earth is rising.', 'average', ['coal','melts']),
+      wbFill('More of the ice on mountains ____ faster.', 'melts', ['coal','average']),
+      wbFill('If this water goes to the sea, the ____ rises.', 'sea level', ['practical','efficient']),
+      wbFill('We can make factories and cars more ____.', 'efficient', ['coal','sea level']),
+      wbFill('We can use less ____.', 'energy', ['average','melts']),
+      wbFill('There are also some ____ things that everyone can do.', 'practical', ['coal','sea level'])
     ] }
   ] });
 

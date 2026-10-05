@@ -51,6 +51,8 @@ Leo does the app **alone after Neritan teaches the deck**, so it is built *from 
 
 **Reference check at upload (AGENTS.md rule 5a).** Every word card the deck presents — academic, content, related, and any words the deck chose where the planner prints none — must be in Reference with this lesson's source tag. Add a full card for a missing word; add the tag to an existing card's `sources`; list them all in the teacher JSON's `referenceLinks`.
 
+**No dead ends (AGENTS.md learner contract rule 7).** Hand-pick every wrong option — never random, never one that also fits. Accept every logical answer and wording. Give sorts, order games and tap hunts a two-tap 👀 Show the answers. Check answer keys against the book's answer key, not only the deck.
+
 **Reading specifics.** Reference build: `public/learn/ow-l5-u1-reading.html` (companion to `public/lessons/ow-l5-u1-reading.html`). Its SB side grew past the six locked tabs because the deck had more to replay: Vocab · Word Games · Strategy · Read · Questions · Compare · My Storm · Quiz, plus the five WB tabs — 13 modules, declared with explicit `moduleKeys` in nav order. Every tab is a list of blocks (flash, match, typed, mcq, sort, order, find, read, chart, web, write, quiz) that save as Leo answers and restore their own DOM; reuse that engine rather than starting over.
 
 ## Locked patterns the skill must follow

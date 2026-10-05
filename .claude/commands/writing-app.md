@@ -71,6 +71,8 @@ Leo does the app **alone after Neritan teaches the deck**, so it is built *from 
 | Write · Edit | show don't tell; two teacher models; fix the wrong past verbs | typed rewrite + fix |
 | Share · Recap · Formative | soccer transfer; match writing tools to the model; Can-do and the 4–1 rubric | soccer block, match, final quiz |
 
+**No dead ends (AGENTS.md learner contract rule 7).** Hand-pick every wrong option — never random, never one that also fits. Accept every logical answer and wording. Give sorts, order games and tap hunts a two-tap 👀 Show the answers. Check answer keys against the book's answer key, not only the deck.
+
 **Reference build:** `public/learn/ow-l5-u1-writing.html` (companion to `public/lessons/ow-l5-u1-writing.html`). Start from it, not from a blank file. Its header comment holds the slide → module map. Every module is a list of blocks (flash, mcq, match, typed, sort, order, find, read, tap, plan, choice, check, view, narrative, quiz) that save as Leo answers and restore their own DOM. A module's `m{n}-done` saves itself when all its blocks are done, and that same check enables Mark complete. Lessons from that build:
 
 - **WB "write your narrative in your notebook" is the SB story.** In L5 U1 that is WB Act 3: it became the story in m6, so m8–m12 hold the WB's *other* activities (Acts 1, 2, 4, 5, 6). Map each WB activity to exactly one module, and say in the header comment where any activity went.

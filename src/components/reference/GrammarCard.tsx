@@ -11,6 +11,7 @@ import {
   type GrammarSampleDisplay
 } from "@/data/reference-shapes";
 import { getGrammarNav } from "./ref-data";
+import { findSourceLessons } from "@/data/lessonLinks";
 
 type TabKey = "chart" | "levelup" | "quiz" | "master";
 type QuizAnswer = { kind: "mcq"; pick: number } | { kind: "build"; order: string[]; checked: boolean };
@@ -22,6 +23,7 @@ function crossesUnit(a: GrammarEntry, b: GrammarEntry) {
 }
 
 export function GrammarCard({ entry }: { entry: GrammarEntry }) {
+  const grammarLinks = findSourceLessons({ lessonId: entry.relatedLessonId });
   const jp = useJapanesePreference();
   const [tab, setTab] = useState<TabKey>("chart");
   const [quizAnswers, setQuizAnswers] = useState<Record<string, QuizAnswer>>({});
@@ -100,17 +102,26 @@ export function GrammarCard({ entry }: { entry: GrammarEntry }) {
           )}
         </div>
 
-        {entry.relatedLessonId && entry.lessonStatus === "live" ? (
-          <Link className="rcardv2-related-live" href={`/lessons/${entry.relatedLessonId}`}>
-            Open lesson →
-          </Link>
+        {grammarLinks.teacher || grammarLinks.app ? (
+          <div className="rcardv2-related-row">
+            {grammarLinks.teacher ? (
+              <Link className="rcardv2-related-live" href={grammarLinks.teacher.href} title={grammarLinks.teacher.title}>
+                Open lesson →
+              </Link>
+            ) : null}
+            {grammarLinks.app ? (
+              <Link className="rcardv2-related-live rcardv2-related-app" href={grammarLinks.app.href} title={grammarLinks.app.title}>
+                🎮 Leo’s app →
+              </Link>
+            ) : null}
+          </div>
         ) : (
           <button type="button" className="rcardv2-locked" disabled title="Lesson not published yet">
             <span className="rcardv2-locked-icon" aria-hidden>
               🔒
             </span>
             <span className="rcardv2-locked-text">
-              Open lesson<span>Available when live</span>
+              Open lesson<span>Not built yet</span>
             </span>
           </button>
         )}

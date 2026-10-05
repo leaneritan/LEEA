@@ -9,6 +9,7 @@ import { getVerbForms, type VerbForms } from "@/data/verbForms";
 import sanseidoIndex from "../../../content/subjects/english/junior-high/sanseido-index.json";
 import { allWords, getWordNav, getWordSourceTag, sameWordUnit } from "./ref-data";
 import { isMultiEmoji } from "./emoji-utils";
+import { findSourceLessons } from "@/data/lessonLinks";
 
 type SanseidoEntry = { w: string; u: string };
 const sanseidoByWord = new Map(
@@ -345,8 +346,8 @@ export function WordCard({
 }
 
 function SourceRow({ source }: { source: WordEntry["sources"][number] }) {
-  const liveLessonHref =
-    source.lessonId && source.lessonStatus === "live" ? `/lessons/${source.lessonId}` : null;
+  const found = findSourceLessons(source);
+  const liveLessonHref = found.teacher?.href ?? found.app?.href ?? null;
   const content = (
     <>
       <span className={`rcardv2-source-tile rcardv2-source-tile--${source.course}`} aria-hidden>
@@ -364,9 +365,14 @@ function SourceRow({ source }: { source: WordEntry["sources"][number] }) {
 
   if (liveLessonHref) {
     return (
-      <Link href={liveLessonHref} className="rcardv2-source-row">
-        {content}
-      </Link>
+      <div className="rcardv2-source-wrap">
+        <Link href={liveLessonHref} className="rcardv2-source-row" title={`Open lesson: ${(found.teacher ?? found.app)?.title ?? ""}`}>
+          {content}
+        </Link>
+        {found.teacher && found.app ? (
+          <Link href={found.app.href} className="rcardv2-source-app">🎮 Leo’s app</Link>
+        ) : null}
+      </div>
     );
   }
 

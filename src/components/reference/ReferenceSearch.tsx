@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { findSourceLessons } from "@/data/lessonLinks";
 import { useSearchParams } from "next/navigation";
 import { Search as SearchIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -273,7 +274,8 @@ function WordResultCard({
       <div className="refv2-open-in">
         <span className="refv2-open-in-label">Open in</span>
         {word.sources.map((source, index) => {
-          const liveLessonHref = source.lessonId && source.lessonStatus === "live" ? `/lessons/${source.lessonId}` : null;
+          const found = findSourceLessons(source);
+          const liveLessonHref = found.teacher?.href ?? found.app?.href ?? null;
           return (
             <Link key={`${source.tag}-${index}`} href={liveLessonHref ?? route} className="refv2-source-chip">
               <span className="refv2-course-dot" style={{ background: courseColor(source.course) }} />

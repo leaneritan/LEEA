@@ -205,6 +205,8 @@ body{font-family:var(--fn);background:var(--paper);color:var(--ink);min-height:1
 .tapbox .t.hit.c-sense{background:#DBEAFE;border-bottom:3px solid var(--bl);color:var(--bld)}
 .tapbox .t.hit.c-emo{background:#FCE7F3;border-bottom:3px solid #DB2777;color:#9D174D}
 .tapbox .t.hit.c-time{background:#FED7AA;border-bottom:3px solid var(--or);color:var(--ord)}
+.tapbox .t.shown{outline:2px dashed var(--am);outline-offset:1px}
+.tapbox .w.xtra.xshow{background:var(--aml);color:var(--am);border-radius:3px}
 .tap-log{font-size:.78rem;font-weight:700;color:var(--ink2);margin-top:6px;line-height:1.6}
 
 /* PLAN CHART */
@@ -669,34 +671,61 @@ function readLock(host, key, b){
 BLOCK_DONE.read = (key, b) => b.paras.every((p,pi)=>!p.items || !p.items.length || (lLoad(key + '-p' + pi) || []).length >= p.items.length);
 
 /* tap — tap every target phrase in a passage (circle / underline hunts).
-   segs: strings and [phrase, label, cls] targets. Wrong words flash red. */
+   segs: strings, [phrase, label, cls] targets, and [phrase, note, 'x'] extras —
+   words that fit but that the book does not mark: tapping one explains, never
+   counts as wrong. Wrong words flash red. "Show the answers" (two taps) marks
+   what is left as shown, so Leo is never stuck; Dad's view records it. */
 BLOCK_RENDER.tap = function(host, key, b, K){
   BS[host] = { key, b, K };
-  let ti = 0;
+  let ti = 0, xi = 0;
   const html = b.segs.map((sg,si)=>{
     const sp = si > 0 && !/^[.,!?]/.test(typeof sg === 'string' ? sg : sg[0]) ? ' ' : '';
     if(typeof sg === 'string') return sp + sg.split(/(\s+)/).map(w => /\S/.test(w) ? '<span class="w" onclick="tapMiss(this,\'' + host + '\')">' + esc(w) + '</span>' : w).join('');
+    if(sg[2] === 'x'){ const j = xi++; return sp + '<span class="w xtra" onclick="tapExtra(\'' + host + '\',' + j + ',this)">' + esc(sg[0]) + '</span>'; }
     const i = ti++; return sp + '<span class="t" data-i="' + i + '" data-c="' + sg[2] + '" onclick="tapHit(\'' + host + '\',' + i + ')">' + esc(sg[0]) + '</span>';
   }).join('');
-  BS[host].targets = b.segs.filter(sg => typeof sg !== 'string');
-  $(host).innerHTML = '<div class="tapbox">' + html + '</div><div class="find-count" id="' + host + '-c"></div><div class="tap-log" id="' + host + '-log"></div><div class="fb" id="' + host + '-fb"></div>';
+  BS[host].targets = b.segs.filter(sg => typeof sg !== 'string' && sg[2] !== 'x');
+  BS[host].extras = b.segs.filter(sg => typeof sg !== 'string' && sg[2] === 'x');
+  $(host).innerHTML = '<div class="tapbox">' + html + '</div><div class="find-count" id="' + host + '-c"></div><div class="tap-log" id="' + host + '-log"></div><div class="fb" id="' + host + '-fb"></div>' +
+    '<div class="type-row"><button class="ghost" id="' + host + '-show" onclick="tapShow(\'' + host + '\')">👀 Show the answers</button></div>';
   tapPaint(host);
 };
-BLOCK_DONE.tap = (key, b) => (lLoad(key) || []).length >= b.segs.filter(sg => typeof sg !== 'string').length;
+function tapTargets(b){ return b.segs.filter(sg => typeof sg !== 'string' && sg[2] !== 'x').length; }
+BLOCK_DONE.tap = (key, b) => new Set((lLoad(key) || []).concat(lLoad(key + '-shown') || [])).size >= tapTargets(b);
 function tapPaint(host){
-  const S = BS[host], hit = lLoad(S.key) || [];
-  $(host).querySelectorAll('.t').forEach(el=>{ const i = +el.dataset.i; if(hit.indexOf(i) >= 0) el.classList.add('hit', 'c-' + el.dataset.c); });
-  $(host + '-c').textContent = 'Found: ' + hit.length + ' / ' + S.targets.length;
-  $(host + '-log').innerHTML = hit.slice().sort((a,b)=>a-b).map(i => '<b>' + esc(S.targets[i][0]) + '</b> → ' + S.targets[i][1]).join(' · ');
-  if(hit.length >= S.targets.length){ const f = $(host + '-fb'); f.className = 'fb ok'; f.textContent = '✅ ' + (S.b.end || 'You found them all!'); }
+  const S = BS[host], hit = lLoad(S.key) || [], shown = lLoad(S.key + '-shown') || [];
+  $(host).querySelectorAll('.t').forEach(el=>{ const i = +el.dataset.i;
+    if(hit.indexOf(i) >= 0) el.classList.add('hit', el.dataset.c);
+    else if(shown.indexOf(i) >= 0) el.classList.add('hit', 'shown', el.dataset.c); });
+  const all = hit.concat(shown.filter(i => hit.indexOf(i) < 0));
+  $(host + '-c').textContent = 'Found: ' + hit.length + ' / ' + S.targets.length + (all.length > hit.length ? '  ·  shown: ' + (all.length - hit.length) : '');
+  $(host + '-log').innerHTML = all.slice().sort((a,b)=>a-b).map(i => '<b>' + esc(S.targets[i][0]) + '</b> → ' + S.targets[i][1] + (hit.indexOf(i) < 0 ? ' (shown)' : '')).join(' · ');
+  const done = all.length >= S.targets.length, btn = $(host + '-show');
+  if(btn) btn.style.display = done ? 'none' : '';
+  if(done){ const f = $(host + '-fb'); f.className = 'fb ' + (all.length > hit.length ? 'show' : 'ok'); f.textContent = (all.length > hit.length ? '👀 Here they are — read each one aloud. ' : '✅ ') + (S.b.end || 'You found them all!'); }
 }
 function tapHit(host, i){ const S = BS[host], hit = lLoad(S.key) || []; if(hit.indexOf(i) < 0){ hit.push(i); lSave(S.key, hit); } tapPaint(host); checkMod(S.K); }
+function tapExtra(host, j, el){
+  const S = BS[host], f = $(host + '-fb'), x = S.extras[j];
+  el.classList.add('xshow'); setTimeout(()=>el.classList.remove('xshow'), 900);
+  f.className = 'fb show'; f.textContent = '💡 “' + x[0] + '” — ' + x[1];
+}
 function tapMiss(el, host){
   const S = BS[host], f = $(host + '-fb');
-  if((lLoad(S.key) || []).length >= S.targets.length) return;
+  if(BLOCK_DONE.tap(S.key, S.b)) return;
   el.classList.add('miss'); setTimeout(()=>el.classList.remove('miss'), 500);
   logAtt(S.K, { q:S.b.what || 'tap hunt', a:el.textContent });
   f.className = 'fb no'; f.textContent = '✖ “' + el.textContent + '” is not ' + (S.b.what || 'one of them') + '.';
+}
+const SHOW_ARM = {};
+function tapShow(host){
+  const S = BS[host], btn = $(host + '-show');
+  if(!SHOW_ARM[host]){ SHOW_ARM[host] = true; btn.textContent = '👀 Tap again to show the answers'; setTimeout(()=>{ SHOW_ARM[host] = false; if(btn) btn.textContent = '👀 Show the answers'; }, 3000); return; }
+  SHOW_ARM[host] = false;
+  const hit = lLoad(S.key) || [], left = S.targets.map((t,i)=>i).filter(i => hit.indexOf(i) < 0);
+  lSave(S.key + '-shown', left);
+  logAtt(S.K, { q:(S.b.what || 'tap hunt') + ' — showed the answers', a:left.map(i => S.targets[i][0]).join(', ') });
+  tapPaint(host); checkMod(S.K);
 }
 
 /* plan — Leo’s own chart: one row per heading, saved as he types. */
@@ -852,7 +881,7 @@ const YN = ['✅ Yes','❌ No'];
 
 /* The model, SB p. 18 — verbatim (deck slides 29–31, 33). */
 const MODEL_P1 = 'If a hurricane comes, we know what to do. We have a family plan.';
-const MODEL_P2 = 'Last year, the weather forecaster told us that a hurricane was coming. First, I helped my dad put heavy wood over the windows. It was hard work. Next, we went inside the house and turned on the radio to listen for news about the hurricane. When the hurricane came, we could hear the strong winds outside. It was scary. The rain came down hard on the roof too. Then, suddenly, there was a loud crash. The whole house shook! Everyone was worried. What was it? Soon, it was quiet and we could go outside. We saw a huge tree on the ground. Part of the tree hit the wood on the window.';
+const MODEL_P2 = 'Last year, the weather forecaster told us that a hurricane was coming. First, I helped my dad put heavy wood over the windows. It was hard work. Next, we went inside the house and turned on the radio to listen for news about the hurricane. When the hurricane came, we could hear the strong winds outside. It was scary. The rain came down hard on the roof, too. Then suddenly, there was a loud crash. The whole house shook! Everyone was worried. What was it? Soon, it was quiet and we could go outside. We saw a huge tree on the ground. Part of the tree hit the wood on the window.';
 const MODEL_P3 = 'I am so happy we had a family plan! Hopefully, there isn’t going to be a hurricane for a while.';
 
 /* ── m1 · Academic Language (slides 11–15) ── */
@@ -988,7 +1017,7 @@ defineMod('m3', { icon:'📖', name:'Personal Narrative', title:'What is a Perso
           { q:'Who told them a hurricane was coming?', opts:['the weather forecaster','her teacher','a friend'], ok:0 },
           { q:'What did she do first?', opts:['She helped her dad put heavy wood over the windows.','She went to the beach.','She turned on the TV.'], ok:0 },
           { q:'What did they do next?', opts:['They went inside and turned on the radio.','They went outside to play.'], ok:0 } ] },
-      { label:'Paragraph 2 (b)', text:'{{When|time word — at that time}} the hurricane came, we could hear the [[strong winds|🌬️ very fast, powerful wind]] outside. It was [[scary|😨 it made her afraid — an emotion]]. The rain came down hard on the roof too. {{Then|time word — after that}}, {{suddenly|time word — very quickly, with no warning}}, there was a [[loud crash|💥 a big, sudden noise]]. The whole house [[shook|past of shake — moved quickly from side to side]]!',
+      { label:'Paragraph 2 (b)', text:'{{When|time word — at that time}} the hurricane came, we could hear the [[strong winds|🌬️ very fast, powerful wind]] outside. It was [[scary|😨 it made her afraid — an emotion]]. The rain came down hard on the roof, too. {{Then|time word — after that}} {{suddenly|very quickly, with no warning}}, there was a [[loud crash|💥 a big, sudden noise]]. The whole house [[shook|past of shake — moved quickly from side to side]]!',
         items:[
           { q:'👂 What could they hear outside?', opts:['the strong winds','birds singing','music'], ok:0 },
           { q:'What happened then, suddenly?', opts:['There was a loud crash. The whole house shook!','The sun came out.','The radio stopped.'], ok:0 } ] },
@@ -1057,14 +1086,17 @@ defineMod('m4', { icon:'💬', name:'Key Expressions', title:'Key Expressions', 
   ] });
 
 /* ── m5 · Plan My Chart (slides 33–35, 37–41) ── */
-const TAP_SENSES = ['If a hurricane comes, we know what to do. We have a family plan. Last year, the weather forecaster told us that a hurricane was coming. First, I helped my dad put', ['heavy wood','touch ✋','c-sense'], 'over the windows. It was hard work. Next, we went inside the house and turned on the radio to listen for news about the hurricane. When the hurricane came, we could hear the', ['strong winds','sound 👂','c-sense'], 'outside. It was', ['scary','emotion 😮','c-emo'], '. The rain', ['came down hard','sound 👂','c-sense'], 'on the roof too. Then, suddenly, there was a', ['loud crash','sound 👂','c-sense'], '. The whole house', ['shook','touch ✋','c-sense'], '! Everyone was', ['worried','emotion 😮','c-emo'], '. What was it? Soon, it was', ['quiet','sound 👂','c-sense'], 'and we could go outside. We saw a', ['huge tree','sight 👁️','c-sense'], 'on the ground.', ['Part of the tree','sight 👁️','c-sense'], 'hit the', ['wood on the window','sight 👁️','c-sense'], '. I am so', ['happy','emotion 😮','c-emo'], 'we had a family plan! Hopefully, there isn’t going to be a hurricane for a while.'];
-const TAP_TIME = ['If a hurricane comes, we know what to do. We have a family plan.', ['Last year,','when it happened','c-time'], 'the weather forecaster told us that a hurricane was coming.', ['First,','the first event','c-time'], 'I helped my dad put heavy wood over the windows. It was hard work.', ['Next,','the event after','c-time'], 'we went inside the house and turned on the radio to listen for news about the hurricane.', ['When','at that time','c-time'], 'the hurricane came, we could hear the strong winds outside. It was scary. The rain came down hard on the roof too.', ['Then,','after that','c-time'], ['suddenly,','very quickly — no warning','c-time'], 'there was a loud crash. The whole house shook! Everyone was worried. What was it?', ['Soon,','after a short time','c-time'], 'it was quiet and we could go outside. We saw a huge tree on the ground. Part of the tree hit the wood on the window. I am so happy we had a family plan! Hopefully, there isn’t going to be a hurricane for a while.'];
+/* Read 2 / Read 3 — the book's own marks (SB p. 18 answer key): 8 circled
+   sense and emotion words, 5 underlined time words. Words the deck also
+   points at but the book does not mark are extras: tapping one explains. */
+const TAP_SENSES = ['If a hurricane comes, we know what to do. We have a family plan. Last year, the weather forecaster told us that a hurricane was coming. First, I helped my dad put', ['heavy wood','a touch word too — but the book does not circle it','x'], 'over the windows. It was hard work. Next, we went inside the house and', ['turned on the radio to listen','sound 👂','c-sense'], 'for news about the hurricane. When the hurricane came,', ['we could hear the strong winds','sound 👂','c-sense'], 'outside. It was', ['scary','emotion 😮','c-emo'], '. The rain came down hard on the roof, too. Then suddenly, there was a', ['loud','it describes the crash — the book circles the noise itself','x'], ['crash','sound 👂','c-sense'], '. The whole house', ['shook','touch ✋','c-sense'], '!', ['Everyone was worried','a feeling too — but the book does not circle it','x'], '. What was it? Soon, it was', ['quiet','sound 👂','c-sense'], 'and we could go outside. We', ['saw','sight 👁️','c-sense'], 'a', ['huge tree','what she saw — the book circles the verb saw','x'], 'on the ground. Part of the tree hit the wood on the window. I am so', ['happy','emotion 😮','c-emo'], 'we had a family plan! Hopefully, there isn’t going to be a hurricane for a while.'];
+const TAP_TIME = ['If a hurricane comes, we know what to do. We have a family plan.', ['Last year','when it happened','c-time'], ', the weather forecaster told us that a hurricane was coming.', ['First','the first event','c-time'], ', I helped my dad put heavy wood over the windows. It was hard work.', ['Next','the event after','c-time'], ', we went inside the house and turned on the radio to listen for news about the hurricane.', ['When','it tells the time, but the book underlines only Last year, First, Next, Then and Soon','x'], 'the hurricane came, we could hear the strong winds outside. It was scary. The rain came down hard on the roof, too.', ['Then','after that','c-time'], ['suddenly','it tells HOW it happened (very fast) — the book underlines only Then','x'], ', there was a loud crash. The whole house shook! Everyone was worried. What was it?', ['Soon','after a short time','c-time'], ', it was quiet and we could go outside. We saw a huge tree on the ground. Part of the tree hit the wood on the window. I am so happy we had a family plan! Hopefully, there isn’t going to be a hurricane for a while.'];
 defineMod('m5', { icon:'🗺️', name:'Plan My Chart', title:'Plan My Chart', color:'or',
   desc:'Find the writer’s words · fill YOUR senses chart', done:'🎉 Your plan is ready — now write!',
   dad:'First find the writer’s tools in the model (circle the senses and feelings, underline the time words). Then plan YOUR storm.',
   blocks:[
-    { type:'tap', id:'circle', label:'◯ Read 2 · circle the sense and emotion words (slides 33, 37)', hint:'Tap the 12 sense and emotion words and phrases. 👁️ sight · 👂 sound · ✋ touch · 😮 emotion', what:'a sense or emotion word', segs:TAP_SENSES, end:'12 sense and emotion words — they make us feel it!' },
-    { type:'tap', id:'underline', label:'▁ Read 3 · underline the time words (slides 35, 37)', hint:'Tap the 7 time words and phrases that show the order of events.', what:'a time word', segs:TAP_TIME, end:'7 time words — they keep the story in order!' },
+    { type:'tap', id:'circle', label:'◯ Read 2 · circle the sense and emotion words (SB p. 18)', hint:'Tap the 8 words and phrases the book circles. 👁️ sight · 👂 sound · ✋ touch · 😮 emotion. Stuck? “Show the answers” is at the bottom.', what:'a sense or emotion word', segs:TAP_SENSES, end:'The book circles 8: turned on the radio to listen · we could hear the strong winds · scary · crash · shook · quiet · saw · happy.' },
+    { type:'tap', id:'underline', label:'▁ Read 3 · underline the time words (SB p. 18)', hint:'Tap the 5 time words the book underlines. They show the order of events.', what:'a time word', segs:TAP_TIME, end:'The book underlines 5: Last year · First · Next · Then · Soon.' },
     { type:'mcq', id:'easier', label:'🔍 Slide 37 · what the writer used', items:[
       { q:'Senses and emotions make us …', opts:['feel the story','skip the story'], ok:0, two:true },
       { q:'Time words keep the story …', opts:['in order','very short'], ok:0, two:true },
@@ -1243,9 +1275,9 @@ defineMod('m13', { icon:'⚽', name:'Can Leo Score?', title:'Can Leo Score?', co
   blocks:[
     { type:'note', id:'recipe', label:'🧾 Slide 57 · what makes a good narrative?', html:'<div class="chips"><span class="chip">📖 True story — first sentence + events + closing</span><span class="chip">👁️ Five senses — all or some</span><span class="chip">😮 Emotions</span><span class="chip">➡️ Order: first, next, then, after, before, soon</span><span class="chip">⏪ Past tense: saw, told, heard, went</span></div>' },
     { type:'match', id:'tools', label:'🧰 Slide 58 · tools for writers', heads:['TOOL','EXAMPLE'], pairs:[
-      { l:'👁️ sight', r:'I saw a huge tree.' },{ l:'👂 sound', r:'There was a loud crash.' },{ l:'😮 emotion', r:'Everyone was worried.' },{ l:'➡️ time word', r:'Then, suddenly, …' },{ l:'⏪ irregular verb', r:'We went inside.' } ] },
+      { l:'👁️ sight', r:'I saw a huge tree.' },{ l:'👂 sound', r:'There was a loud crash.' },{ l:'😮 emotion', r:'Everyone was worried.' },{ l:'➡️ time word', r:'Then suddenly, …' },{ l:'⏪ irregular verb', r:'We went inside.' } ] },
     { type:'order', id:'build', label:'🧩 Slide 61 · sentence builder', sets:[
-      { title:'Put the chunks in order. Tap 1 → 4!', steps:['Then,','suddenly,','there was','a loud crash!'], end:'Then, suddenly, there was a loud crash!' } ] },
+      { title:'Put the chunks in order. Tap 1 → 4!', steps:['Then','suddenly,','there was','a loud crash.'], end:'Then suddenly, there was a loud crash. (SB p. 18)' } ] },
     { type:'quiz', id:'quiz', label:'📝 Final quiz — need 8 / 10', scoreKey:'score', pass:0.8, win:'⚽ GOAL! 8 or more — you scored!', items:[
       { tag:'ACADEMIC', q:'A personal narrative is about your own …', opts:['experience','forecast','dictionary'], ok:0 },
       { tag:'ACADEMIC', q:'Sight, sound, touch, taste and smell are the five …', opts:['senses','emotions','time words'], ok:0 },

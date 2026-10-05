@@ -44,6 +44,11 @@ const lessonCopy: Record<string, { title: string; subtitle: string }> = {
 };
 
 const unitMeta: Record<number, { title: string; subtitle: string; chips: string[] }> = {
+  4: {
+    title: "Get Well Soon!",
+    subtitle: "Illnesses, injuries & how to treat them — and why we sneeze.",
+    chips: ["🤒 Illness", "🩹 Injuries", "⛑️ First Aid"]
+  },
   5: {
     title: "My Favorites",
     subtitle: "Favorite people & things, fairy tales & amazing acrobats.",

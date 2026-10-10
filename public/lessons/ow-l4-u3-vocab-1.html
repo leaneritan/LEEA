@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 3 · Vocabulary 1 · Long Ago and Today</title>
+<script src="/components/charts.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../lib/leea-cloud-config.js"></script>
+<script src="../../lib/leea-cloud.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+
+/* HEADER */
+.slide-header{height:64px;background:#B45309;display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.65);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.2);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.ac{background:rgba(14,165,233,.4)}
+
+/* TWO-COLUMN VOCAB LAYOUT */
+.vocab-body{flex:1;display:flex;min-height:0}
+.word-panel{width:40%;padding:30px 34px;display:flex;flex-direction:column;border-right:2px solid #e5e7eb;background:#fff}
+.game-panel{width:60%;padding:22px 32px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;overflow:hidden}
+
+/* TAGS */
+.vtag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;width:fit-content}
+.vtag.v1{background:#FEF3C7;color:#92400E}
+.vtag.ac{background:#FEF3C7;color:#B45309}
+.vtag.rel{background:#f3f4f6;color:#6b7280}
+
+/* WORD PANEL */
+.word-emoji{font-size:130px;line-height:1;margin-bottom:12px;cursor:pointer;transition:transform .25s}
+.word-emoji:active{transform:scale(1.15)}
+.word-main{font-size:70px;font-weight:800;color:#111;line-height:1.05;margin-bottom:8px}
+.word-ipa{font-size:21px;color:#6b7280}
+.word-syl{font-size:18px;color:#9ca3af;letter-spacing:1px}
+.word-pos{font-size:19px;color:#B45309;font-weight:700;margin-bottom:14px}
+.word-def{font-size:21px;color:#374151;line-height:1.45;margin-bottom:8px}
+.word-jp{font-size:18px;color:#6b7280;line-height:1.45}
+.dad-say{background:#FFFBEB;border-left:4px solid #B45309;padding:13px 16px;border-radius:0 12px 12px 0;font-size:18px;color:#374151;line-height:1.5;margin-top:auto}
+.dad-say b{color:#92400E}
+.how-box{background:#fff;border:2px dashed #FDE68A;border-radius:12px;padding:10px 16px;font-size:16px;color:#4b5563;line-height:1.5;width:100%}
+.how-box b{color:#92400E}
+.how-box li{margin-left:18px}
+
+/* MINI-GAME SHELL (shared class names across LEEA vocab decks) */
+.mg-wrap{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;flex:1;min-height:0}
+.mg-head{font-size:20px;font-weight:700;color:#374151;text-align:center;background:#f9fafb;border:2px solid #e5e7eb;border-radius:12px;padding:10px 20px;width:100%;flex-shrink:0}
+.mg-head b{color:#92400E}
+.mg-stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0;overflow:hidden}
+.mg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;width:100%}
+.mg-grid.c4{grid-template-columns:repeat(4,1fr)}
+.mg-grid.c3{grid-template-columns:repeat(3,1fr)}
+.mg-tile{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 6px;font-size:38px;cursor:pointer;transition:all .15s;text-align:center}
+.mg-tile:hover{transform:translateY(-3px);border-color:#B45309}
+.mg-tile .mg-label{display:block;font-size:14px;font-weight:700;color:#4b5563;margin-top:4px;min-height:18px}
+.mg-tile.hit{background:#FFFBEB;border-color:#B45309;cursor:default}
+.mg-tile.miss{background:#fef2f2;border-color:#ef4444;animation:mgShake .3s ease}
+@keyframes mgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.mg-btn{background:#B45309;color:#fff;border:none;border-radius:12px;padding:13px 30px;font-size:20px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.mg-btn:hover{background:#92400E;transform:scale(1.04)}
+.mg-btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+.mg-opt{padding:12px 22px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:19px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left}
+.mg-opt:hover{border-color:#B45309}
+.mg-opt.ok{background:#FFFBEB;border-color:#B45309;color:#92400E;pointer-events:none}
+.mg-opt.no{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+.mg-score{font-size:20px;font-weight:800;color:#92400E;background:#FEF3C7;border-radius:20px;padding:6px 22px}
+.mg-miss{font-size:17px;font-weight:700;color:#ef4444;min-height:22px}
+.mg-win{background:#B45309;color:#fff;border-radius:14px;padding:12px 24px;font-size:20px;font-weight:800;text-align:center;opacity:0;transform:translateY(10px);transition:all .35s;width:100%}
+.mg-win.show{opacity:1;transform:translateY(0)}
+.mg-source{font-size:14px;color:#9ca3af;font-weight:600;letter-spacing:.4px}
+.mg-bar{width:100%;height:22px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.mg-bar > div{height:100%;background:linear-gradient(90deg,#F59E0B,#B45309);width:0%;transition:width .2s;border-radius:99px}
+.mg-track{position:relative;width:100%;height:96px;background:linear-gradient(180deg,#FEF3C7,#FFFBEB);border-radius:16px;overflow:hidden;border:2px solid #FDE68A}
+.mg-runner{position:absolute;bottom:16px;font-size:46px;transition:left .25s}
+.mg-flag{position:absolute;bottom:14px;right:2%;font-size:40px}
+.mg-spin{display:inline-block;transition:transform .3s ease}
+.mg-flip{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.mg-flip:hover{border-color:#B45309;transform:translateY(-3px)}
+.mg-flip.open{background:#FFFBEB;border-color:#B45309;cursor:default}
+.mg-flip .mf-front{font-size:40px}
+.mg-flip .mf-back{display:none;font-size:15px;font-weight:700;color:#92400E;line-height:1.35}
+.mg-flip.open .mf-back{display:block}
+.mg-pair{display:flex;gap:26px;width:100%;justify-content:center}
+.mg-col{display:flex;flex-direction:column;gap:10px;flex:1;max-width:340px}
+.mg-pbtn{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:17px;font-weight:700;color:#374151;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left;line-height:1.3}
+.mg-pbtn:hover{border-color:#B45309}
+.mg-pbtn.sel{border-color:#B45309;background:#FFFBEB}
+.mg-pbtn.done{border-color:#10b981;background:#ecfdf5;color:#047857;pointer-events:none}
+.mg-pbtn.bad{border-color:#ef4444;background:#fef2f2;animation:mgShake .3s}
+.mg-battery{width:220px;height:110px;border:6px solid #374151;border-radius:14px;position:relative;display:flex;align-items:center;padding:8px}
+.mg-battery::after{content:'';position:absolute;right:-20px;top:32px;width:16px;height:40px;background:#374151;border-radius:0 6px 6px 0}
+.mg-battery > div{height:100%;background:linear-gradient(90deg,#a3e635,#16a34a);border-radius:6px;width:0%;transition:width .2s}
+.mg-lamp{font-size:44px;filter:grayscale(1);opacity:.4;transition:all .25s}
+.mg-lamp.on{filter:none;opacity:1;transform:scale(1.1)}
+
+/* NAV BAR */
+#nav-bar{position:fixed;bottom:0;left:0;right:0;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px;transition:background .2s}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn.active,#fs-btn.active{background:rgba(124,58,237,.35)!important;color:#FCD34D!important}
+#unit-label{color:#FCD34D;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+
+/* TEACHER NOTES PANEL */
+#tn-panel{position:fixed;right:-460px;top:0;bottom:52px;width:440px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#FCD34D;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-panel ul{padding-left:18px;margin-bottom:8px}
+#tn-panel .tn-lbl{color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+
+/* CONTENT SLIDES */
+.content-body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:18px;min-height:0;overflow:hidden}
+.slide-h1{font-size:40px;font-weight:800;color:#111}
+.slide-h2{font-size:25px;font-weight:600;color:#374151}
+.src-pill{display:inline-block;background:#f3f4f6;color:#6b7280;border-radius:20px;padding:6px 18px;font-size:15px;font-weight:700;letter-spacing:.4px;width:fit-content}
+
+/* READING */
+.reading-block{background:#fff;border-radius:16px;padding:26px 36px;font-size:23px;line-height:1.7;color:#1f2937;box-shadow:0 4px 16px rgba(0,0,0,.05);border-left:6px solid #B45309}
+.reading-block b{color:#92400E;font-weight:700}
+.tap-word{background:#FEF3C7;color:#92400E;border:none;border-radius:6px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.tap-word.done{background:#B45309;color:#fff}
+
+/* OBJECTIVES */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:10px}
+.obj-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;display:flex;align-items:flex-start;gap:16px}
+.obj-icon{font-size:34px;flex-shrink:0}
+.obj-text{font-size:19px;color:#374151;line-height:1.4;font-weight:500}
+.obj-text b{color:#B45309}
+
+/* FORMATIVE ASSESSMENT */
+.assess-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px}
+.assess-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;cursor:pointer;transition:all .2s}
+.assess-card:hover{border-color:#B45309}
+.assess-card.yes{border-color:#B45309;background:#FFFBEB}
+.assess-q{font-size:19px;color:#374151;font-weight:600;margin-bottom:10px}
+
+/* BE THE EXPERT */
+.bte-header{background:#B45309;color:#fff;border-radius:12px 12px 0 0;padding:13px 26px;font-size:19px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bte-body{background:#fff;border:2px solid #B45309;border-radius:0 0 16px 16px;padding:24px;font-size:19px;color:#374151;line-height:1.6}
+.bte-body b{color:#92400E}
+
+/* CHIPS / TASK CARDS */
+.chips-row{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:#FEF3C7;color:#92400E;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.chip.used{background:#B45309;color:#fff}
+.task-card{background:#fff;border-radius:16px;padding:20px 28px;border:2px solid #e5e7eb;font-size:21px;color:#374151;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card b{color:#B45309}
+.q-item{background:#fff;border-radius:12px;padding:16px 22px;border:2px solid #e5e7eb;font-size:19px;color:#374151;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .2s}
+.q-item:hover{border-color:#B45309}
+.q-item.done{border-color:#10b981;background:#ecfdf5}
+.q-num{background:#B45309;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;margin-top:2px}
+.q-ans{max-height:0;overflow:hidden;transition:max-height .3s ease;color:#92400E;font-weight:700}
+.q-item.done .q-ans{max-height:120px;margin-top:6px}
+
+/* DIALOGUE */
+.chat-row{display:flex;align-items:flex-end;gap:14px}
+.chat-row.right{flex-direction:row-reverse}
+.chat-ava{font-size:50px;line-height:1}
+.bub{max-width:62%;padding:18px 28px;border-radius:26px;font-size:26px;font-weight:600;line-height:1.35}
+.bub.q{background:#fff;border:2px solid #e5e7eb;border-bottom-left-radius:6px;color:#374151}
+.bub.a{background:#B45309;color:#fff;border-bottom-right-radius:6px}
+
+/* LISTEN HERO */
+.listen-hero{background:linear-gradient(135deg,#78350F,#B45309);border-radius:20px;padding:24px 36px;display:flex;align-items:center;gap:28px;color:#fff}
+.listen-hero .lh-emoji{font-size:64px;line-height:1;animation:lhPulse 1.6s ease-in-out infinite}
+@keyframes lhPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.listen-hero .lh-text{font-size:25px;font-weight:700;flex:1}
+.listen-hero .lh-tr{background:rgba(255,255,255,.2);border-radius:20px;padding:9px 22px;font-size:21px;font-weight:800;white-space:nowrap}
+
+/* TITLE / GREAT JOB */
+.title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#78350F 0%,#B45309 50%,#F59E0B 100%);color:#fff;gap:22px;padding:40px}
+.great-job-slide{background:linear-gradient(135deg,#78350F,#B45309,#F59E0B);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:18px;height:100%;padding:40px}
+
+/* MARK DONE */
+.done-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+.btn-done{background:#16A34A;color:#fff;border:none;border-radius:14px;padding:18px 46px;font-size:26px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-done:hover{background:#15803d}
+.btn-done.confirmed{background:#9ca3af;pointer-events:none}
+.btn-clear{background:#fff;color:#ef4444;border:2px solid #ef4444;border-radius:14px;padding:14px 30px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+#doneMsg{font-size:20px;color:#4b5563;font-weight:600;min-height:28px}
+
+/* VOCAB REVIEW */
+.vr-tabs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;flex-shrink:0}
+.vr-tab{padding:7px 14px;border:2px solid #e5e7eb;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s;white-space:nowrap}
+.vr-tab:hover{border-color:#B45309;color:#B45309}
+.vr-tab.active{background:#B45309;color:#fff;border-color:#B45309}
+.vr-tab.done{background:#FEF3C7;border-color:#B45309;color:#92400E}
+.vr-tab.done.active{background:#B45309;color:#fff}
+.vr-body{flex:1;display:flex;min-height:0}
+.vr-left{width:26%;padding:18px;border-right:2px solid #e5e7eb;display:flex;flex-direction:column;gap:8px;background:#fafaf7}
+.vr-right{flex:1;padding:18px 24px;display:flex;flex-direction:column;gap:12px}
+.vr-emoji{font-size:80px;line-height:1}
+.vr-word{font-size:42px;font-weight:800;color:#111;line-height:1.1}
+.vr-ipa{font-size:16px;color:#6b7280}
+.vr-pos{font-size:15px;color:#B45309;font-weight:700}
+.vr-mark{background:#B45309;color:#fff;border:none;border-radius:10px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;margin-top:auto;transition:all .2s}
+.vr-mark.done{background:#9ca3af;cursor:not-allowed}
+
+/* OPENER */
+.oz-band{padding:16px 22px;color:#fff;font-weight:700;font-size:20px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:all .18s;border:none;font-family:Outfit,sans-serif;text-align:left;flex:1;justify-content:center}
+.oz-band small{font-weight:600;opacity:0;font-size:17px;transition:opacity .25s}
+.oz-band .oz-note{font-size:18px;font-weight:500;opacity:0;line-height:1.45;transition:opacity .25s}
+.oz-strip{width:100%;border-radius:16px;overflow:hidden;border:2px solid #FDE68A;display:flex;flex-direction:column;flex:1;min-height:0}
+.oz-band.sunlit{background:linear-gradient(90deg,#FCD34D,#0EA5E9)}
+.oz-band.twilight{background:linear-gradient(90deg,#B45309,#92400E)}
+.oz-band.midnight{background:linear-gradient(90deg,#78350F,#020617)}
+.photo-card{background:#fff;border:3px solid #e5e7eb;border-radius:18px;padding:20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .18s;min-height:250px;justify-content:center}
+.photo-card:hover{border-color:#B45309;transform:translateY(-3px)}
+.photo-card.open{border-color:#B45309;background:#FFFBEB}
+.pc-emoji{font-size:66px;line-height:1}
+.pc-word{font-size:28px;font-weight:800;color:#111}
+.pc-def{font-size:17px;color:#4b5563;line-height:1.45;text-align:center;display:none}
+.pc-ex{font-size:16px;color:#92400E;font-style:italic;text-align:center;display:none}
+.photo-card.open .pc-def,.photo-card.open .pc-ex{display:block}
+.tf-row{display:flex;align-items:center;gap:20px;background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:18px 24px}
+.tf-num{background:#B45309;color:#fff;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex-shrink:0}
+.tf-text{flex:1;font-size:23px;color:#374151;font-weight:600}
+.tf-key{font-size:30px;font-weight:900;padding:8px 26px;border-radius:12px;opacity:0;transition:opacity .25s}
+.tf-key.t{background:#DCFCE7;color:#15803D}
+.tf-key.f{background:#FEE2E2;color:#B91C1C}
+/* UNIT 5 WIDGETS */
+:root{--p:#B45309;--pd:#92400E;--pl:#FFFBEB;--pb:#FDE68A}
+.ts-bank{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:52px}
+.ts-tile.sel{background:var(--p);color:#fff;transform:translateY(-3px)}
+.ts-zones{display:flex;gap:16px;width:100%;flex:1;min-height:0}
+.ts-zone{flex:1;border:3px solid #e5e7eb;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;background:#fff;min-height:170px}
+.ts-zone.miss{animation:mgShake .3s ease;border-color:#ef4444}
+.ts-zh{color:#fff;font-weight:800;font-size:20px;padding:10px;text-align:center}
+.ts-zb{flex:1;display:flex;flex-wrap:wrap;gap:8px;padding:12px;align-content:flex-start}
+.ts-in{background:var(--pl);border:2px solid var(--pb);border-radius:14px;padding:6px 14px;font-size:17px;font-weight:700;color:var(--pd)}
+.chip.miss{animation:mgShake .3s ease;background:#FEE2E2;color:#B91C1C}
+.ord-out{display:flex;flex-direction:column;gap:8px;width:100%}
+.ord-row{background:#ECFDF5;border:2px solid #A7F3D0;border-radius:12px;padding:10px 18px;font-size:21px;font-weight:700;color:#047857}
+.ord-row b{display:inline-block;min-width:34px}
+.bd-line{width:100%;min-height:74px;background:#fff;border:3px dashed var(--pb);border-radius:16px;padding:16px 24px;font-size:32px;font-weight:800;color:#111;text-align:center}
+.bd-line.ok{border-style:solid;border-color:#10b981;background:#ECFDF5;color:#047857}
+.star-band{display:flex;gap:16px;width:100%}
+.big-quote{background:#fff;border-left:8px solid var(--p);border-radius:0 18px 18px 0;padding:22px 30px;font-size:27px;line-height:1.5;color:#1f2937;font-style:italic}
+.lyric{background:#fff;border-radius:16px;padding:18px 26px;font-size:24px;line-height:1.6;color:#1f2937;border-left:6px solid var(--p);box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.lyric .vw{background:var(--pb);color:var(--pd);border-radius:6px;padding:0 6px;font-weight:800}
+.lyric .gw{background:#DBEAFE;color:#1E3A8A;border-radius:6px;padding:0 6px;font-weight:800}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;min-height:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rule-box{background:#fff;border:3px solid var(--p);border-radius:18px;overflow:hidden}
+.rule-box .rh{background:var(--p);color:#fff;font-size:22px;font-weight:800;padding:10px 22px}
+.rule-box table{width:100%;border-collapse:collapse;font-size:23px}
+.rule-box td,.rule-box th{padding:10px 18px;border-top:1px solid #f3e8ff;text-align:left}
+.rule-box th{background:var(--pl);color:var(--pd);font-size:18px;letter-spacing:.5px}
+.rule-box td b{color:var(--pd)}
+.say-row{display:flex;gap:14px;align-items:flex-start}
+.say{flex:1;border-radius:16px;padding:16px 22px;font-size:21px;line-height:1.45}
+.say.dad{background:#EFF6FF;border:2px solid #BFDBFE}
+.say.leo{background:#FEF3C7;border:2px solid #FDE68A}
+.mini-note{font-size:16px;color:#6b7280}
+.st-row{display:flex;align-items:center;gap:20px;background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:12px 18px;width:100%}
+.st-box{min-width:360px;font-size:34px;font-weight:900;color:#111;text-align:center;background:var(--pl);border:3px dashed var(--pb);border-radius:14px;padding:8px 18px}
+.st-box.pop{animation:stPop .35s}
+.st-box.ok{border-style:solid;border-color:#10b981;background:#ECFDF5;color:#047857}
+@keyframes stPop{0%{transform:scale(.85)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+.st-btns{display:flex;gap:10px;flex-wrap:wrap}
+.st-btn{font-size:18px;padding:10px 18px}
+.st-box s{color:#ef4444}
+.st-box u{color:var(--p);text-decoration:none;background:#FEF3C7;border-radius:6px;padding:0 4px}
+.award-wall{background:linear-gradient(135deg,#78350F,#B45309);border-radius:16px;padding:10px 18px;color:#fff;width:100%}
+.aw-head{font-size:18px;font-weight:800;letter-spacing:.5px;margin-bottom:6px}
+.aw-row{display:flex;flex-wrap:wrap;gap:8px}
+.aw{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:4px 14px;font-size:16px;font-weight:700}
+.aw.empty{opacity:.75;font-weight:600}
+.award-wall.big .aw{font-size:22px;padding:8px 18px}
+#toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-120px);background:#78350F;color:#fff;font-family:Outfit,sans-serif;font-weight:800;font-size:20px;padding:12px 26px;border-radius:30px;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#toast.show{animation:toastIn 2.6s ease}
+@keyframes toastIn{0%{transform:translateX(-50%) translateY(-120px)}12%,80%{transform:translateX(-50%) translateY(0)}100%{transform:translateX(-50%) translateY(-120px)}}
+.mw{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%}
+.mw-c{background:var(--p);color:#fff;border-radius:40px;padding:12px 30px;font-size:22px;font-weight:800;text-align:center}
+.mw-d{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.mw-o{border:3px dashed var(--pb);border-radius:30px;padding:8px 14px;font-size:16px;font-weight:700;color:#9ca3af;text-align:center;background:#fff}
+.mw-o.on{border-style:solid;border-color:#10b981;color:#047857;background:#ECFDF5}
+
+</style>
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<!-- SLIDE 1 -->
+<div class="slide active" id="s1">
+<div class="title-bg">
+    <div style="font-size:22px;font-weight:700;letter-spacing:3px;opacity:.75;text-transform:uppercase">Our World · Level 4 · Unit 3 · Long Ago and Today</div>
+    <div style="font-size:92px;font-weight:900;text-align:center;line-height:1.05">Vocabulary 1</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;font-size:30px;font-weight:700">🕯️ Then and now — how did people spend time?</div>
+    <div style="font-size:24px;opacity:.92;text-align:center;max-width:1500px">⏳ spend time · 🌱 life · 🌅 begin · 💡 electric lights · 🧹 chores · 🛠️ make · 🧼 wash · 🪡 sew · 📦 things · 🏘️ town · 📘 learn · 🔥 fire · 📱 cell phone · 🎮 video game · 🗣️ tell</div>
+    <div style="font-size:20px;opacity:.8">Student Book pp. 40–41 · TR 3.1 · TR 3.2 · Workbook pp. 26–27</div>
+  </div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" id="s2">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Objectives + Lesson Map</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 Students will identify and use words related to the past and to the present.</div>
+    <div class="slide-h2">The route today — tap each stop as we reach it. <b id="map-n" style="color:var(--pd)">0 / 8</b></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px" id="map"></div>
+    <span class="src-pill">Lesson Planner p. 100 · Objectives</span>
+  </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide" id="s3">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Set the Stage</span><span class="hd-chip">Lesson Planner pp. 100–103</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🕯️ Turn off the lights. “Imagine it is long ago. It is the past.”</div>
+    <div class="slide-h2">Dad sits by the “fire” and holds up the candle. Then: “Now imagine it is the present.” Long ago or now?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="stage"></div>
+    <div class="mg-win" id="stage-win">✅ Long ago: fire and candles, and we make the things we need. Now: electric light, clothes from a store, cell phones.</div>
+    <span class="src-pill">Lesson Planner p. 100 · Warm Up: Set the stage (Dad’s lines verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide" id="s4">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Things and Actions</span><span class="hd-chip">SB pp. 40–41</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📊 “Remember, an <b>action</b> is something we do.” Is it a <b>thing</b> or an <b>action</b>?</div>
+    <div class="slide-h2">Look at the pictures on pp. 40–41. Tap a word, then its column.</div>
+    <div id="ta" style="display:flex;flex-direction:column;gap:12px;flex:1"></div>
+    <div class="mg-win" id="ta-win">✅ Things: fire, video game, electric light, cell phone. Actions: wash, make, sew, tell, learn.</div>
+    <span class="src-pill">Lesson Planner p. 100 · Warm Up T-chart (headings, words and answers from the planner)</span>
+  </div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide" id="s5">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Academic Language</span><span class="hd-chip ac">Present</span></div>
+  <div class="vocab-body"><div class="word-panel"><span class="vtag ac">Academic Language</span><div class="word-emoji">🏃</div><div class="word-main">action</div><div class="word-ipa">/ˈæk-ʃən/ <span class="word-syl">ac-tion</span></div><div class="word-pos">noun</div><div class="word-def">something that someone does</div><div class="word-jp">🇯🇵 動作</div><div class="dad-say">💬 <b>Example:</b> Wash is an action people did long ago and still do today.</div></div>
+    <div class="game-panel"><div class="mg-wrap">
+      <div class="mg-head">🏃 An <b>action word</b> tells what someone does. Tap the action words in the sentence. Found: <b id="aw-n">0 / 3</b></div>
+      <div class="slide-h2" style="text-align:center">“Mothers taught their daughters to cook, wash the dishes, and sew clothes.”</div>
+      <div class="mg-grid c3" id="aw"></div>
+      <div class="mg-win" id="aw-win">🏃 cook · wash · sew — they are actions. Some actions are called <b>chores</b>.</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide" id="s6">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Content Vocabulary</span><span class="hd-chip">Present</span></div>
+  <div class="vocab-body"><div class="word-panel"><span class="vtag rel">Content Vocabulary</span><div class="word-emoji">🕯️</div><div class="word-main">candles</div><div class="word-ipa">/ˈkæn-dəlz/ <span class="word-syl">can-dles</span></div><div class="word-pos">noun</div><div class="word-def">wax sticks that burn to give light</div><div class="word-jp">🇯🇵 ろうそく</div><div class="dad-say">💬 <b>Example:</b> Candles gave light at night.</div></div>
+    <div class="game-panel"><div class="mg-wrap">
+      <div class="mg-head">🧰 <b>useful</b> = it helps you do something. Was it useful long ago? Found: <b id="us-n">0 / 4</b></div>
+      <div class="mg-grid c3" id="us"></div>
+      <div class="mg-win" id="us-win">🕯️ Candles, fire, a needle and thread, soap — all useful long ago! Fathers made useful things for the house or garden.</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide" id="s7">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Listen and Read</span><span class="hd-chip">TR 3.1</span></div>
+  <div class="content-body" style="gap:10px">
+    <div class="listen-hero"><div class="lh-emoji">🎧</div><div class="lh-text">1 Listen and read. Read the paragraphs on pages 40 and 41 and the words on both pages as you listen.</div><div class="lh-tr">TR 3.1</div></div>
+    <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:8px"><div class="reading-block" style="font-size:19px;padding:12px 18px;line-height:1.5">How did people <b>spend time</b> long ago? Their <b>life</b> was different from ours.</div><div class="reading-block" style="font-size:19px;padding:12px 18px;line-height:1.5">Long ago, most people had to <b>begin</b> their day when the sun came up. There were no <b>electric lights</b>, so they had to do their <b>chores</b> during the daylight. Many children didn’t go to school. They stayed at home to <b>learn</b> with their parents. Mothers taught their daughters to cook, <b>wash</b> the dishes, <b>make</b> soap, and <b>sew</b> clothes. Fathers taught their sons to make useful <b>things</b> for the house or garden, or to sell at the market in <b>town</b>.</div><div class="reading-block" style="font-size:19px;padding:12px 18px;line-height:1.5">Long ago, families used candles or sat by the <b>fire</b> in the evening. They liked to play games, sing songs, or <b>tell</b> stories. Some children had dolls or other toys to play with.</div></div>
+      <div class="reading-block" style="font-size:19px;padding:12px 18px;line-height:1.5;background:#E0F2FE">📱 <b>Now</b><br>Now children still play with dolls and other toys. But instead of sitting by the fire to play with their toys, children and their families can do many different things. They can watch TV, use their <b>cell phones</b>, and play <b>video games</b>. There are a lot of other free-time activities to choose from, too.</div>
+    </div>
+    <span class="src-pill">Student Book pp. 40–41 · TR 3.1 — verbatim. The target words are in bold.</span>
+  </div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide" id="s8">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Talk About the Past</span><span class="hd-chip">Lesson Planner pp. 100–103</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💬 “Let’s talk about the past.” Ask first, then tap for the planner’s answer.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="disc"></div>
+    <span class="src-pill">Lesson Planner p. 101 · Practice (questions and answers verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide" id="s9">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 1 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">⏳</div><div class="word-main">spend time</div><div class="word-ipa">/spend taɪm/ <span class="word-syl">spend time</span></div><div class="word-pos">verb phrase</div><div class="word-def">to use time doing something or being with someone</div><div class="word-jp">🇯🇵 時間を過ごす</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> I like to spend time with my grandparents on weekends.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">⏳ How did people <b>spend time</b>? Long ago or today? Tap a card, then its box.</div><div id="g-spend_time" style="width:100%;display:flex;flex-direction:column;gap:12px;flex:1"></div><div class="mg-win" id="g-spend_time-win">⏳ Then and now — different ways to spend time!</div><div class="how-box"><b>How do we use it?</b> spend time = use your time doing something, or be with someone. Who do you like to spend time with on Saturdays? (LP p. 101)</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide" id="s10">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 2 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">🌱</div><div class="word-main">life</div><div class="word-ipa">/laɪf/ <span class="word-syl">life</span></div><div class="word-pos">noun</div><div class="word-def">the way people live</div><div class="word-jp">🇯🇵 生活</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> Long ago, life was very different.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">🌱 <b>Life</b> long ago — read and choose.</div><div id="g-life" style="width:100%;display:flex;flex-direction:column;gap:10px"></div><div class="mg-win" id="g-life-win">🌱 Life was very different.</div><div class="how-box"><b>How do we use it?</b> life = the way people live. One life → two lives.</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide" id="s11">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 3 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">🌅</div><div class="word-main">begin</div><div class="word-ipa">/bɪˈɡɪn/ <span class="word-syl">be-gin</span></div><div class="word-pos">verb</div><div class="word-def">to start</div><div class="word-jp">🇯🇵 始める</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> It’s time to begin your homework.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">🌅 A day long ago. Put it in order — when did the day <b>begin</b>?</div><div id="g-begin" style="width:100%;display:flex;flex-direction:column;gap:10px"></div><div class="mg-win" id="g-begin-win">🌅 The day began when the sun came up.</div><div class="how-box"><b>How do we use it?</b> begin = start. Past: began. “It’s time to begin your homework.”</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide" id="s12">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 4 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">💡</div><div class="word-main">electric lights</div><div class="word-ipa">/ɪˈlek-trɪk laɪts/ <span class="word-syl">e-lec-tric lights</span></div><div class="word-pos">noun</div><div class="word-def">lights that work using electricity</div><div class="word-jp">🇯🇵 電灯</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> Electric lights make the day longer.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">💡 Hold the button to switch on the <b>electric lights</b>…</div><div id="g-electric_lights" style="width:80%;display:flex;flex-direction:column;align-items:center;gap:14px"></div><div class="mg-win" id="g-electric_lights-win">💡 Click — light!</div><div class="how-box"><b>How do we use it?</b> electric lights = lights that work with electricity. Thomas Edison invented the electric light bulb in the 1870s. (Be the Expert, LP p. 101)</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="slide" id="s13">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 5 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">🧹</div><div class="word-main">chores</div><div class="word-ipa">/tʃɔrz/ <span class="word-syl">chores</span></div><div class="word-pos">noun</div><div class="word-def">small jobs that you do at home</div><div class="word-jp">🇯🇵 家の手伝い</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> I do my chores in the morning.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">🧹 Tap the <b>chores</b> — jobs we do to help at home. Found: <b id="g-chores-n">0 / 4</b></div><div class="mg-grid c3" id="g-chores"></div><div class="mg-win" id="g-chores-win">🧹 Four chores!</div><div class="how-box"><b>How do we use it?</b> chores = small jobs at home. We say <b>do</b> chores: “I do my chores in the morning.”</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 14 -->
+<div class="slide" id="s14">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 6 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">🛠️</div><div class="word-main">make</div><div class="word-ipa">/meɪk/ <span class="word-syl">make</span></div><div class="word-pos">verb</div><div class="word-def">to create or produce something</div><div class="word-jp">🇯🇵 作る</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> I make my bed in the morning.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">🛠️ <b>make</b>, <b>do</b>, <b>tell</b> or <b>spend</b>? Match each verb to what goes with it. Matched: <b id="g-make-n">0 / 4</b></div><div id="g-make" style="width:100%"></div><div class="mg-win" id="g-make-win">🛠️ make · do · tell · spend!</div><div class="how-box"><b>How do we use it?</b> make = create something. Past: made. “I make my bed in the morning.” (Workbook p. 27, Activity 6)</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 15 -->
+<div class="slide" id="s15">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 7 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">🧼</div><div class="word-main">wash</div><div class="word-ipa">/wɑʃ/ <span class="word-syl">wash</span></div><div class="word-pos">verb</div><div class="word-def">to clean something with water</div><div class="word-jp">🇯🇵 洗う</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> My brother washes the dishes three times a week.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">🧼 <b>Wash</b> it — long ago or today? Tap a card, then its box.</div><div id="g-wash" style="width:100%;display:flex;flex-direction:column;gap:12px;flex:1"></div><div class="mg-win" id="g-wash-win">🧼 Washing then and now.</div><div class="how-box"><b>How do we use it?</b> wash = clean with water. He/She wash<b>es</b>: “My brother washes the dishes three times a week.”</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 16 -->
+<div class="slide" id="s16">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 8 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">🪡</div><div class="word-main">sew</div><div class="word-ipa">/soʊ/ <span class="word-syl">sew</span></div><div class="word-pos">verb</div><div class="word-def">to join cloth with a needle and thread</div><div class="word-jp">🇯🇵 縫う</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> My grandmother is teaching me how to sew.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">🪡 How do you <b>sew</b> on a button? Put the steps in order.</div><div id="g-sew" style="width:100%;display:flex;flex-direction:column;gap:10px"></div><div class="mg-win" id="g-sew-win">🪡 Button sewn on!</div><div class="how-box"><b>How do we use it?</b> sew = join cloth with a needle and thread. Past: sewed. <b>sew</b> sounds like <b>so</b> — a homophone!</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 17 -->
+<div class="slide" id="s17">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 9 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">📦</div><div class="word-main">things</div><div class="word-ipa">/θɪŋz/ <span class="word-syl">things</span></div><div class="word-pos">noun</div><div class="word-def">objects, ideas, or activities</div><div class="word-jp">🇯🇵 ものごと</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> Put your things away, please.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">📦 <b>Things</b> or actions? Tap only the things. Found: <b id="g-things-n">0 / 4</b></div><div class="mg-grid c3" id="g-things"></div><div class="mg-win" id="g-things-win">📦 Four things!</div><div class="how-box"><b>How do we use it?</b> things = objects. “Put your things away, please.” Fathers made useful things for the house.</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 18 -->
+<div class="slide" id="s18">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 10 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">🏘️</div><div class="word-main">town</div><div class="word-ipa">/taʊn/ <span class="word-syl">town</span></div><div class="word-pos">noun</div><div class="word-def">a place where people live, smaller than a city</div><div class="word-jp">🇯🇵 町</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> My grandparents live in a small town.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">🏘️ A <b>town</b> — read and choose.</div><div id="g-town" style="width:100%;display:flex;flex-direction:column;gap:10px"></div><div class="mg-win" id="g-town-win">🏘️ A town is smaller than a city.</div><div class="how-box"><b>How do we use it?</b> a town = a place where people live, smaller than a city.</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 19 -->
+<div class="slide" id="s19">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 11 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">📘</div><div class="word-main">learn</div><div class="word-ipa">/lɝn/ <span class="word-syl">learn</span></div><div class="word-pos">verb</div><div class="word-def">to get knowledge or a skill</div><div class="word-jp">🇯🇵 学ぶ</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> Do you want to learn how to play chess?</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">📘 What did children <b>learn</b> at home long ago? Found: <b id="g-learn-n">0 / 4</b></div><div class="mg-grid c3" id="g-learn"></div><div class="mg-win" id="g-learn-win">📘 They learned at home.</div><div class="how-box"><b>How do we use it?</b> learn = get to know something. Past: learned. “They stayed at home to learn with their parents.”</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 20 -->
+<div class="slide" id="s20">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 12 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">🔥</div><div class="word-main">fire</div><div class="word-ipa">/faɪr/ <span class="word-syl">fire</span></div><div class="word-pos">noun</div><div class="word-def">heat and light from burning things</div><div class="word-jp">🇯🇵 火</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> Long ago, people cooked their food over fire.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">🔥 What did families do by the <b>fire</b> in the evening? Found: <b id="g-fire-n">0 / 4</b></div><div class="mg-grid c3" id="g-fire"></div><div class="mg-win" id="g-fire-win">🔥 Evenings by the fire!</div><div class="how-box"><b>How do we use it?</b> fire = heat and light from burning wood. “Long ago, people cooked their food over fire.” We <b>make</b> a fire.</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 21 -->
+<div class="slide" id="s21">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 13 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">📱</div><div class="word-main">cell phone</div><div class="word-ipa">/ˈsel foʊn/ <span class="word-syl">cell phone</span></div><div class="word-pos">noun</div><div class="word-def">a phone you can carry and use without wires</div><div class="word-jp">🇯🇵 携帯電話</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> Cell phones make communication easier.</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">📱 What can you do with a <b>cell phone</b>? Found: <b id="g-cell_phone-n">0 / 4</b></div><div class="mg-grid c3" id="g-cell_phone"></div><div class="mg-win" id="g-cell_phone-win">📱 So many things with one phone!</div><div class="how-box"><b>How do we use it?</b> a cell phone = a phone you carry with you. “Cell phones make communication easier.” Long ago? No cell phones!</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 22 -->
+<div class="slide" id="s22">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 14 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">🎮</div><div class="word-main">video game</div><div class="word-ipa">/ˈvɪd-i-oʊ ɡeɪm/ <span class="word-syl">vid-e-o game</span></div><div class="word-pos">noun</div><div class="word-def">a game played on a screen</div><div class="word-jp">🇯🇵 テレビゲーム</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> Can I see your new video game?</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">🎮 Fun 👍 or a chore 🙅? Tap a card, then its box.</div><div id="g-video_game" style="width:100%;display:flex;flex-direction:column;gap:12px;flex:1"></div><div class="mg-win" id="g-video_game-win">🎮 Thumbs up for fun!</div><div class="how-box"><b>How do we use it?</b> a video game = a game on a screen. “Can I see your new video game?” (Sentences from the LP p. 102 Wrap Up.)</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 23 -->
+<div class="slide" id="s23">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present · Word 15 of 15</span><span class="hd-chip">TR 3.2</span></div><div class="vocab-body"><div class="word-panel"><span class="vtag v1">Vocabulary 1</span><div class="word-emoji">🗣️</div><div class="word-main">tell</div><div class="word-ipa">/tel/ <span class="word-syl">tell</span></div><div class="word-pos">verb</div><div class="word-def">to say something to someone</div><div class="word-jp">🇯🇵 話す／伝える</div><div class="dad-say">💬 🎧 <b>TR 3.2:</b> Grandpa, tell me a story!</div></div><div class="game-panel"><div class="mg-wrap"><div class="mg-head">🗣️ What can you <b>tell</b>? Only two fit! Found: <b id="g-tell-n">0 / 2</b></div><div class="mg-grid c4" id="g-tell"></div><div class="mg-win" id="g-tell-win">🗣️ tell a story, tell the time!</div><div class="how-box"><b>How do we use it?</b> tell = say something to someone. Past: told. “Grandpa, tell me a story!” (Workbook p. 27, Activity 6)</div><span class="mg-source">Student Book pp. 40–41 · TR 3.2 · Workbook pp. 26–27</span></div></div></div>
+</div>
+
+<!-- SLIDE 24 -->
+<div class="slide" id="s24">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Missing Word</span><span class="hd-chip">Lesson Planner pp. 100–103</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎧 Dad says the sentence and stops. Leo says the missing word.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px" id="miss"></div>
+    <div class="mg-win" id="miss-win">✅ Every missing word found!</div>
+    <span class="src-pill">Lesson Planner p. 101 · Practice: say the TR 3.2 sentences, leaving out the new word</span>
+  </div>
+</div>
+
+<!-- SLIDE 25 -->
+<div class="slide" id="s25">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Word Recap — All 15</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🃏 Tap a card. Say the word and its TR 3.2 sentence.</div>
+    <div class="slide-h2">Opened: <b id="all-n" style="color:var(--pd)">0 / 15</b></div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px" id="all"></div>
+  </div>
+</div>
+
+<!-- SLIDE 26 -->
+<div class="slide" id="s26">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Vocabulary Strategy — Homophones</span><span class="hd-chip">Be the Expert</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🧩 <b>Homophones</b> sound alike but have different meanings and spellings.</div>
+    <div class="slide-h2"><b>sew</b> is an action — something people do. <b>so</b> means “very”. Choose the right spelling.</div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="hom"></div>
+    <div class="mg-win" id="hom-win">🧩 sew / so · four / for · write / right — same sound, different words!</div>
+    <span class="src-pill">Lesson Planner p. 101 · Vocabulary Strategy: Homophones (the planner’s sentences)</span>
+  </div>
+</div>
+
+<!-- SLIDE 27 -->
+<div class="slide" id="s27">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Related Vocabulary</span><span class="hd-chip">Then → Now</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🏠 Long ago, people did it by hand. What do we use today?</div>
+    <div class="slide-h2">Match each <b>then</b> to its <b>now</b>. Matched: <b id="rel-n" style="color:var(--pd)">0 / 4</b></div>
+    <div id="rel" style="width:100%"></div>
+    <div class="mg-win" id="rel-win">🏠 dishwasher · toaster · refrigerator · lamp — the Related Vocabulary on p. 41.</div>
+    <span class="src-pill">Lesson Planner p. 101 · Related Vocabulary: dishwasher, toaster, refrigerator, lamp</span>
+  </div>
+</div>
+
+<!-- SLIDE 28 -->
+<div class="slide" id="s28">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Apply — Ask and Answer</span><span class="hd-chip">SB p. 41 · Activity 3</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💬 What did you learn? Ask about the reading.</div>
+    <div class="chat-row"><div class="chat-ava">👨</div><div class="bub q">Why did people get up with the sun?</div></div>
+    <div class="chat-row right"><div class="chat-ava">👦</div><div class="bub a">They wanted to do their chores in the daytime. They didn’t have electric lights.</div></div>
+    <div class="slide-h2">Build Dad’s model question and answer:</div>
+    <div id="bd" style="display:flex;flex-direction:column;gap:10px;align-items:center"></div>
+    <div class="mg-win" id="bd-win">🗣️ Now write your own: a yes/no question, and questions with why, how and when.</div>
+    <span class="src-pill">Student Book p. 41 · Activity 3 (model dialogue verbatim) · LP p. 102 Apply model</span>
+  </div>
+</div>
+
+<!-- SLIDE 29 -->
+<div class="slide" id="s29">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Yes/No Questions</span><span class="hd-chip">Lesson Planner pp. 100–103</span></div>
+  <div class="content-body">
+    <div class="slide-h1">❓ Did people have it long ago? Answer with a full sentence.</div>
+    <div class="slide-h2">Model: “Did people have electric lights long ago?” → “No, they didn’t have electric lights.”</div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="yn"></div>
+    <div class="mg-win" id="yn-win">✅ Did they? / They didn’t…</div>
+    <span class="src-pill">Lesson Planner p. 102 · yes/no questions (model verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 30 -->
+<div class="slide" id="s30">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — Fun or Chores?</span><span class="hd-chip">Lesson Planner pp. 100–103</span></div>
+  <div class="content-body">
+    <div class="slide-h1">👍 Sounds like fun? Thumbs up! 🙅 Sounds like work? Cross your arms!</div>
+    <div class="slide-h2">Dad says the sentence. Leo does the gesture, then taps the box.</div>
+    <div id="fc" style="display:flex;flex-direction:column;gap:12px;flex:1"></div>
+    <div class="mg-win" id="fc-win">👍 Fun and 🙅 chores — sorted!</div>
+    <span class="src-pill">Lesson Planner p. 102 · Wrap Up (first three sentences verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 31 -->
+<div class="slide" id="s31">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Recap — The Time Line</span><span class="hd-chip">Lesson Planner pp. 100–103</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⏳ Past ⟵ ⟶ Present. Fun things and chores, then and now.</div>
+    <div class="slide-h2">Drag each one onto the time line. Then talk with Dad: what does the time line show?</div>
+    <div id="tl" style="flex:1;min-height:0"></div>
+    <div class="mg-win" id="tl-win">⏳ Some things changed. Some things — like dolls and toys — are on both sides!</div>
+    <span class="src-pill">Lesson Planner p. 102 · Recap: time line (Past on the left, Present on the right)</span>
+  </div>
+</div>
+
+<!-- SLIDE 32 -->
+<div class="slide" id="s32">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Extend — Two Stars</span><span class="hd-chip">Lesson Planner pp. 100–103</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⭐ Write five ways you spend time <b>today</b> — then five things people did <b>long ago</b>.</div>
+    <div class="slide-h2">Then play: say one action. Dad guesses — Today star or Long ago star? Check each right guess.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div><div class="slide-h2" style="color:#0EA5E9">⭐ Today</div><div style="display:flex;flex-direction:column;gap:8px" id="st1"></div></div>
+      <div><div class="slide-h2" style="color:#92400E">⭐ Long ago</div><div style="display:flex;flex-direction:column;gap:8px" id="st2"></div></div>
+    </div>
+    <span class="src-pill">Lesson Planner p. 103 · Extend: the five-pointed stars and the guessing game</span>
+  </div>
+</div>
+
+<!-- SLIDE 33 -->
+<div class="slide" id="s33">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Be the Expert — Our World in Context</span><span class="hd-chip">Edison · Soap</span></div>
+  <div class="content-body">
+    <div class="slide-h1">💎 Two true stories from the past. Guess first, then tap.</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px" id="bte"></div>
+    <span class="src-pill">Lesson Planner pp. 101 and 103 · Our World in Context</span>
+  </div>
+</div>
+
+<!-- SLIDE 34 -->
+<div class="slide" id="s34">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — Our Favorite Ways to Spend Time</span><span class="hd-chip">Lesson Planner pp. 100–103</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🏆 Our favorite ways to spend time. Did people do this long ago? Why or why not?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="fav"></div>
+    <div class="mg-win" id="fav-win">✅ Some fun is new. Some fun is very old!</div>
+    <span class="src-pill">Lesson Planner p. 103 · Wrap Up (the planner’s list of favorite activities)</span>
+  </div>
+</div>
+
+<!-- SLIDE 35 -->
+<div class="slide" id="s35">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Soccer Corner ⚽</span><span class="hd-chip">Extend</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⚽ Soccer long ago and today</div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="soc"></div>
+  </div>
+</div>
+
+<!-- SLIDE 36 -->
+<div class="slide" id="s36">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✔️ “In the past, it was common to ______, but today we ______ instead.”</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start"><div style="display:flex;flex-direction:column;gap:8px" id="frame"></div>
+    <div class="assess-grid" id="assess" style="grid-template-columns:1fr"></div></div>
+    <div class="task-card">📓 <b>Homework:</b> Workbook pp. 26–27 (Workbook Audio TR 3.1) · Activity Worksheet 3.1 · Leo’s Vocabulary 1 app (13 tabs).</div>
+  </div>
+</div>
+
+<!-- SLIDE 37 -->
+<div class="slide" id="s37">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Finish the Lesson</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:22px">
+    <div style="font-size:90px">🕯️</div>
+    <div class="slide-h1" style="text-align:center">Unit 3 · Vocabulary 1 — taught</div>
+    <div class="slide-h2" style="text-align:center;max-width:1100px">Next lesson: the Song — “Yesterday and Today” (TR 3.3).</div>
+    <div class="done-wrap">
+      <button class="btn-done" id="doneBtn" onclick="markDone()">✅ Mark this lesson done</button>
+      <button class="btn-clear" id="redoBtn" onclick="handleRedo()">↺ Clear saved progress</button>
+      <div id="doneMsg"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
+
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 37</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="fs-btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+  <span id="unit-label">Unit 3 · Vocabulary 1</span>
+</div>
+
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+<script>
+/* =========================================================
+   LEEA · Our World Level 4 · Unit 3 · Vocabulary 1 — then and now
+   SB pp. 40–41 · TR 3.1 (reading, verbatim) · TR 3.2 (sentences, SB audioscript) · LP pp. 100–103 · WB pp. 26–27
+   One Present slide per word, each with its own game. Word cards baked from vocabulary.json.
+   ========================================================= */
+
+var SAVE_PREFIX = '4-3-vocab-1-slides-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-3-vocab-1-slides';
+/* Must match the `id` in the teacher lesson JSON — the dashboard reads leea.lessonProgress.v1 by it. */
+var LESSON_ID = 'ow-l4-u3-vocab-1';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+var LESSON_NAME = 'Unit 3 · Vocabulary 1 — Long Ago and Today';
+function lSave(key, value) {
+  try {
+    var k = SAVE_PREFIX + key;
+    window.localStorage.setItem(k, JSON.stringify(value));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, value);
+    }
+  } catch (e) {}
+}
+function lLoad(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(SAVE_PREFIX + key);
+    return raw === null || raw === undefined ? fallback : JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function writeLessonProgress() {
+  try {
+    var store = {};
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (raw) store = JSON.parse(raw) || {};
+    var now = new Date().toISOString();
+    store[LESSON_ID] = { lessonId: LESSON_ID, teacherId: 'neritan', studentId: 'leo',
+                         status: 'done', completedAt: now, updatedAt: now };
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function clearLessonProgress() {
+  try {
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function markDone() {
+  writeLessonProgress();
+  lSave('complete', { name: LESSON_NAME, timestamp: new Date().toISOString(), done: true });
+  lSave('done', true);
+  var btn = document.getElementById('doneBtn');
+  if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+  var msg = document.getElementById('doneMsg');
+  if (msg) msg.textContent = 'Saved on the teacher dashboard. ⭐';
+}
+var redoArmed = false, redoTimer = null;
+function handleRedo() {
+  var btn = document.getElementById('redoBtn');
+  var msg = document.getElementById('doneMsg');
+  if (!redoArmed) {
+    redoArmed = true;
+    btn.textContent = '↺ Tap again to clear';
+    if (msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+    if (redoTimer) window.clearTimeout(redoTimer);
+    redoTimer = window.setTimeout(function () {
+      redoArmed = false;
+      btn.textContent = '↺ Clear saved progress';
+      if (msg) msg.textContent = '';
+    }, 3000);
+    return;
+  }
+  redoArmed = false;
+  if (redoTimer) window.clearTimeout(redoTimer);
+  btn.textContent = '↺ Clear saved progress';
+  clearLessonProgress();
+  lSave('complete', null);
+  lSave('done', null);
+  var d = document.getElementById('doneBtn');
+  if (d) { d.classList.remove('confirmed'); d.textContent = '✅ Mark this lesson done'; }
+  if (msg) msg.textContent = 'Cleared.';
+}
+function restoreDoneState() {
+  var c = lLoad('complete', null);
+  if (c && c.done) {
+    var btn = document.getElementById('doneBtn');
+    if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+    var msg = document.getElementById('doneMsg');
+    if (msg) msg.textContent = 'Already marked done.';
+  }
+}
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+var cur = 1;
+function goTo(n) {
+  n = Math.max(1, Math.min(TOTAL, n));
+  var old = document.getElementById('s' + cur);
+  if (old) old.classList.remove('active');
+  cur = n;
+  var next = document.getElementById('s' + cur);
+  if (next) next.classList.add('active');
+  document.getElementById('slide-counter').textContent = cur + ' / ' + TOTAL;
+  document.getElementById('tn-content').innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
+  if (SLIDE_INIT[cur]) SLIDE_INIT[cur]();
+}
+document.addEventListener('keydown', function (e) {
+  if (e.target && (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+var notesOpen = false;
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('notes-btn').classList.toggle('active', notesOpen);
+  scale();
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange', function () {
+  var btn = document.getElementById('fs-btn');
+  var active = !!document.fullscreenElement;
+  btn.textContent = active ? '⛶ Exit Full (F)' : '⛶ Fullscreen (F)';
+  btn.classList.toggle('active', active);
+  scale();
+});
+function scale() {
+  var s = document.getElementById('scaler');
+  var availW = window.innerWidth - (notesOpen ? 440 : 0);
+  var availH = window.innerHeight - 52;
+  var r = Math.min(availW / 1920, availH / 1080);
+  s.style.transform = 'scale(' + r + ')';
+  s.style.left = ((availW - 1920 * r) / 2) + 'px';
+  s.style.top = ((availH - 1080 * r) / 2) + 'px';
+  s.style.position = 'fixed';
+}
+window.addEventListener('resize', scale);
+
+// ─── WIDGETS (shared by every Unit 5 deck) ─────────────────────
+function $id(i){ return document.getElementById(i); }
+function once(el){ if(!el || el.dataset.built) return false; el.dataset.built = '1'; return true; }
+function mix(a){ var b = a.slice(); for(var i=b.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=b[i]; b[i]=b[j]; b[j]=t; } return b; }
+function shake(el){ el.classList.remove('miss'); void el.offsetWidth; el.classList.add('miss'); setTimeout(function(){ el.classList.remove('miss'); }, 400); }
+function win(id, text){ var w = $id(id); if(w){ if(text) w.innerHTML = text; w.classList.add('show'); } }
+
+/* reveal: question cards, tap to show the answer. items [[q,a]] */
+function wReveal(id, items, countId){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  items.forEach(function(d, i){
+    var it = document.createElement('div'); it.className = 'q-item';
+    it.innerHTML = '<div class="q-num">' + (d[2] || (i + 1)) + '</div><div><div>' + d[0] + '</div><div class="q-ans">→ ' + d[1] + '</div></div>';
+    it.onclick = function(){ if(it.classList.contains('done')) return; it.classList.add('done'); n++; if(countId) $id(countId).textContent = n + ' / ' + items.length; };
+    g.appendChild(it);
+  });
+}
+/* flip: recap cards. cards [{e, w, b}] */
+function wFlip(id, cards, countId){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  cards.forEach(function(c){
+    var el = document.createElement('div'); el.className = 'mg-flip';
+    el.innerHTML = '<div class="mf-front">' + c.e + '</div><div style="font-size:20px;font-weight:800;color:#111">' + c.w + '</div><div class="mf-back">' + c.b + '</div>';
+    el.onclick = function(){ if(el.classList.contains('open')) return; el.classList.add('open'); n++; if(countId) $id(countId).textContent = n + ' / ' + cards.length; };
+    g.appendChild(el);
+  });
+}
+/* check: multiple choice, wrong shakes, right locks. items [{q, opts, ok, why}] */
+function wCheck(id, items, winId){
+  var g = $id(id); if(!once(g)) return; var solved = 0;
+  items.forEach(function(it, qi){
+    var box = document.createElement('div'); box.className = 'task-card'; box.style.cssText = 'padding:14px 22px;font-size:20px';
+    var opts = it.keep ? it.opts.map(function(o, i){ return [o, i]; }) : mix(it.opts.map(function(o, i){ return [o, i]; }));
+    box.innerHTML = '<div style="font-weight:700;margin-bottom:8px">' + (items.length > 1 ? (qi + 1) + '. ' : '') + it.q + '</div><div style="display:flex;flex-wrap:wrap;gap:10px"></div><div class="mg-miss" style="color:#047857"></div>';
+    var row = box.children[1], why = box.children[2];
+    opts.forEach(function(o){
+      var b = document.createElement('button'); b.className = 'mg-opt'; b.innerHTML = o[0];
+      b.onclick = function(){
+        if(box.dataset.done) return;
+        if(o[1] === it.ok){ b.classList.add('ok'); box.dataset.done = '1'; if(it.award) addAward(it.award); if(it.webi !== undefined) webAdd(it.webi); why.textContent = it.why ? '✓ ' + it.why : '✓ Yes!'; solved++; if(solved === items.length && winId) win(winId); }
+        else { b.classList.add('no'); setTimeout(function(){ b.classList.remove('no'); }, 600); }
+      };
+      row.appendChild(b);
+    });
+    g.appendChild(box);
+  });
+}
+/* find: tap every tile that fits. tiles [{t, ok, why}] */
+function wFind(id, tiles, countId, winId){
+  var g = $id(id); if(!once(g)) return; var need = tiles.filter(function(t){ return t.ok; }).length, got = 0;
+  mix(tiles).forEach(function(t){
+    var el = document.createElement('div'); el.className = 'mg-tile';
+    el.innerHTML = t.t + '<span class="mg-label">' + (t.l || '') + '</span>';
+    el.onclick = function(){
+      if(el.classList.contains('hit')) return;
+      if(t.ok){ el.classList.add('hit'); if(t.why) el.querySelector('.mg-label').textContent = t.why; got++; if(countId) $id(countId).textContent = got + ' / ' + need; if(got === need && winId) win(winId); }
+      else { shake(el); if(t.why) el.querySelector('.mg-label').textContent = t.why; }
+    };
+    g.appendChild(el);
+  });
+}
+/* tapsort: tap a tile, then tap its box. zones [{k, label, color}], tiles [{t, k}] */
+function wTapSort(id, zones, tiles, winId){
+  var g = $id(id); if(!once(g)) return; var sel = null, left = tiles.length;
+  g.innerHTML = '<div class="ts-bank"></div><div class="ts-zones"></div><div class="mg-miss"></div>';
+  var bank = g.children[0], zs = g.children[1], miss = g.children[2];
+  mix(tiles).forEach(function(t){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = t.t; b.dataset.k = t.k;
+    b.onclick = function(){ if(b.classList.contains('used')) return; bank.querySelectorAll('.ts-tile').forEach(function(x){ x.classList.remove('sel'); }); b.classList.add('sel'); sel = b; miss.textContent = ''; };
+    bank.appendChild(b);
+  });
+  zones.forEach(function(z){
+    var c = document.createElement('div'); c.className = 'ts-zone';
+    c.innerHTML = '<div class="ts-zh" style="background:' + z.color + '">' + z.label + '</div><div class="ts-zb"></div>';
+    c.onclick = function(){
+      if(!sel){ miss.textContent = 'Tap a card first, then its box.'; return; }
+      if(sel.dataset.k === z.k){ var t = document.createElement('div'); t.className = 'ts-in'; t.innerHTML = sel.innerHTML; c.children[1].appendChild(t); sel.classList.add('used'); sel.classList.remove('sel'); sel.style.visibility = 'hidden'; sel = null; left--; miss.textContent = ''; if(!left && winId) win(winId); }
+      else { shake(c); miss.textContent = 'Not that box — think again.'; }
+    };
+    zs.appendChild(c);
+  });
+}
+/* order: tap the items in order (rank, sequence). steps in the right order */
+function wOrder(id, steps, winId, prompt){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  g.innerHTML = '<div class="ord-out"></div><div class="ts-bank"></div><div class="mg-miss"></div>';
+  var out = g.children[0], bank = g.children[1], miss = g.children[2];
+  mix(steps.map(function(s, i){ return [s, i]; })).forEach(function(s){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = s[0];
+    b.onclick = function(){
+      if(s[1] === n){ var d = document.createElement('div'); d.className = 'ord-row'; d.innerHTML = '<b>' + (n + 1) + '</b> ' + s[0]; out.appendChild(d); b.style.visibility = 'hidden'; n++; miss.textContent = ''; if(n === steps.length && winId) win(winId); }
+      else { shake(b); miss.textContent = prompt || ('Not yet — what comes ' + (n ? 'next' : 'first') + '?'); }
+    };
+    bank.appendChild(b);
+  });
+}
+/* build: tap the chips in order to build the sentence. chips = right order; extra = traps */
+function wBuild(id, chips, extra, winId){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  g.innerHTML = '<div class="bd-line">&nbsp;</div><div class="ts-bank"></div><div class="mg-miss"></div>';
+  var line = g.children[0], bank = g.children[1], miss = g.children[2], built = [];
+  mix(chips.map(function(c, i){ return [c, i]; }).concat((extra || []).map(function(c){ return [c, -1]; }))).forEach(function(c){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = c[0];
+    b.onclick = function(){
+      if(c[1] === n){ built.push(c[0]); line.innerHTML = built.join(' '); b.style.visibility = 'hidden'; n++; miss.textContent = ''; if(n === chips.length){ line.classList.add('ok'); if(winId) win(winId); } }
+      else { shake(b); miss.textContent = c[1] < 0 ? 'That piece does not belong in this sentence.' : 'Not that word yet.'; }
+    };
+    bank.appendChild(b);
+  });
+}
+/* hold: press and hold to fill a meter; release early and it drains. */
+function wHold(id, cfg){
+  var g = $id(id); if(!once(g)) return;
+  g.innerHTML = '<div class="mg-bar" style="height:34px"><div></div></div><div style="font-size:72px;line-height:1;text-align:center">' + cfg.e0 + '</div><button class="mg-btn" style="font-size:24px;padding:18px 40px">' + cfg.btn + '</button><div class="mg-miss" style="color:#374151"></div>';
+  var bar = g.children[0].firstChild, face = g.children[1], btn = g.children[2], msg = g.children[3], v = 0, t = null, done = false;
+  function tick(){ v = Math.min(100, v + 2.2); bar.style.width = v + '%'; if(v >= 100){ stop(); done = true; face.innerHTML = cfg.e1; msg.innerHTML = cfg.win; btn.disabled = true; if(cfg.winId) win(cfg.winId); } }
+  function drain(){ if(done) return; v = Math.max(0, v - 4); bar.style.width = v + '%'; if(v > 0) t = setTimeout(drain, 40); }
+  function start(e){ if(done) return; e.preventDefault(); clearTimeout(t); msg.innerHTML = cfg.during || 'Keep going…'; t = setInterval(tick, 40); }
+  function stop(){ clearInterval(t); clearTimeout(t); if(!done){ msg.innerHTML = cfg.early || 'Don’t stop! Hold it longer.'; drain(); } }
+  btn.addEventListener('pointerdown', start); btn.addEventListener('pointerup', stop); btn.addEventListener('pointerleave', stop);
+}
+/* typed: Dad 💬 / Leo 💬 frames, saved as typed. rows [[label, placeholder]] */
+function wTyped(id, rows, key){
+  var g = $id(id); if(!once(g)) return; var saved = lLoad(key, {}) || {};
+  rows.forEach(function(r, i){
+    var row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:16px';
+    row.innerHTML = '<span style="font-size:21px;font-weight:800;color:var(--pd);min-width:300px">' + r[0] + '</span>';
+    var inp = document.createElement('input'); inp.placeholder = r[1]; inp.value = saved[i] || '';
+    inp.style.cssText = 'flex:1;font-family:Outfit,sans-serif;font-size:21px;padding:11px 16px;border:2px solid var(--pb);border-radius:12px';
+    inp.oninput = function(){ saved[i] = inp.value; lSave(key, saved); };
+    row.appendChild(inp); g.appendChild(row);
+  });
+}
+/* assess: Can Leo…? cards */
+function wAssess(id, items){
+  var g = $id(id); if(!once(g)) return;
+  items.forEach(function(t){
+    var c = document.createElement('div'); c.className = 'assess-card';
+    c.innerHTML = '<div class="assess-q">' + t[0] + '</div><div style="font-size:16px;color:#6b7280">' + (t[1] || 'Tap when Leo can do it.') + '</div>';
+    c.onclick = function(){ c.classList.toggle('yes'); };
+    g.appendChild(c);
+  });
+}
+/* sort with the shared drag-and-drop sorter (pickChart) */
+function wSort(id, zones, tiles, winId){
+  if(typeof window.pickChart !== 'function'){ wTapSort(id, zones, tiles, winId); return; }
+  var g = $id(id); if(!once(g)) return;
+  g.innerHTML = window.pickChart('classification sort', { id: id + '-dnd', tiles: tiles.map(function(t){ return { text: t.t, answer: t.k }; }),
+    zones: zones.map(function(z){ return { key: z.k, label: z.label, color: z.color }; }), onComplete: function(){ if(winId) win(winId); } });
+}
+/* pair: tap one on the left, then its partner on the right. pairs [[l, r]] */
+function wPair(id, pairs, countId, winId){
+  var g = $id(id); if(!once(g)) return; var sel = null, got = 0;
+  g.innerHTML = '<div class="mg-pair"><div class="mg-col"></div><div class="mg-col"></div></div>';
+  var L = g.querySelectorAll('.mg-col')[0], R = g.querySelectorAll('.mg-col')[1];
+  pairs.forEach(function(p, i){
+    var b = document.createElement('button'); b.className = 'mg-pbtn'; b.innerHTML = p[0];
+    b.onclick = function(){ if(b.classList.contains('done')) return; L.querySelectorAll('.mg-pbtn').forEach(function(x){ x.classList.remove('sel'); }); b.classList.add('sel'); sel = [i, b]; };
+    L.appendChild(b);
+  });
+  mix(pairs.map(function(p, i){ return [p[1], i]; })).forEach(function(p){
+    var b = document.createElement('button'); b.className = 'mg-pbtn'; b.innerHTML = p[0];
+    b.onclick = function(){
+      if(!sel || b.classList.contains('done')) return;
+      if(p[1] === sel[0]){ b.classList.add('done'); sel[1].classList.add('done'); sel[1].classList.remove('sel'); sel = null; got++; if(countId) $id(countId).textContent = got + ' / ' + pairs.length; if(got === pairs.length && winId) win(winId); }
+      else { b.classList.add('bad'); setTimeout(function(){ b.classList.remove('bad'); }, 400); }
+    };
+    R.appendChild(b);
+  });
+}
+/* rank: tap in YOUR order — favorite first. No wrong answers. */
+function wRank(id, items, winId, first, last){
+  var g = $id(id); if(!once(g)) return; var n = 0, order = [];
+  g.innerHTML = '<div class="ord-out"></div><div class="ts-bank"></div>';
+  var out = g.children[0], bank = g.children[1];
+  items.forEach(function(t){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = t;
+    b.onclick = function(){ order.push(t); var d = document.createElement('div'); d.className = 'ord-row'; d.innerHTML = '<b>' + (++n) + '</b> ' + t; out.appendChild(d); b.style.visibility = 'hidden';
+      if(n === items.length && winId) win(winId, '🗣️ “' + (first || 'I put {x} first.').replace('{x}', order[0].replace(/<[^>]+>/g, '')) + '” · “' + (last || 'I put {x} last.').replace('{x}', order[n - 1].replace(/<[^>]+>/g, '')) + '”'); };
+    bank.appendChild(b);
+  });
+}
+/* steps: watch a word change, one button per step — no leaps.
+   rows [{start, steps:[[buttonLabel, resultHTML]], award?}] */
+function wSteps(id, rows, winId){
+  var g = $id(id); if(!once(g)) return; var done = 0;
+  rows.forEach(function(r){
+    var row = document.createElement('div'); row.className = 'st-row';
+    row.innerHTML = '<div class="st-box">' + r.start + '</div><div class="st-btns"></div>';
+    var box = row.children[0], btns = row.children[1], k = 0;
+    r.steps.forEach(function(s, i){
+      var b = document.createElement('button'); b.className = 'mg-btn st-btn'; b.innerHTML = (i + 1) + '. ' + s[0]; b.disabled = i > 0;
+      b.onclick = function(){ if(i !== k) return; box.innerHTML = s[1]; box.classList.remove('pop'); void box.offsetWidth; box.classList.add('pop'); b.disabled = true; k++;
+        if(btns.children[k]) btns.children[k].disabled = false;
+        if(k === r.steps.length){ box.classList.add('ok'); done++; if(r.award) addAward(r.award); if(done === rows.length && winId) win(winId); } };
+      btns.appendChild(b);
+    });
+    g.appendChild(row);
+  });
+}
+/* tally: tap to add a check mark; the most checks wins. */
+function wTally(id, items, key, winId, frame){
+  var g = $id(id); if(!once(g)) return; var t = lLoad(key, {}) || {};
+  function paint(){ var best = 0, who = []; items.forEach(function(a, i){ var n = t[i] || 0; if(n > best){ best = n; who = [a]; } else if(n && n === best) who.push(a); });
+    if(best && winId) win(winId, (frame || 'In our opinion, {x} is great!').replace('{x}', '<b>' + who.join(' / ') + '</b>') + ' (' + best + ' ✔)'); }
+  items.forEach(function(a, i){
+    var c = document.createElement('div'); c.className = 'mg-tile'; c.style.fontSize = '26px';
+    c.innerHTML = a + '<span class="mg-label" style="font-size:24px;color:var(--p)">' + '✔'.repeat(t[i] || 0) + '</span>';
+    c.onclick = function(){ t[i] = (t[i] || 0) + 1; lSave(key, t); c.querySelector('.mg-label').textContent = '✔'.repeat(t[i]); paint(); };
+    g.appendChild(c);
+  });
+  paint();
+}
+/* AWARDS — the spine's trophy wall. Every .award-wall on any slide repaints. */
+var WIN_HOOK = {};
+var _win0 = win;
+win = function(id, text){ _win0(id, text); if(WIN_HOOK[id]) [].concat(WIN_HOOK[id]).forEach(addAward); };
+function getAwards(){ return lLoad('awards', []) || []; }
+function addAward(name){ var a = getAwards(); if(a.indexOf(name) < 0){ a.push(name); lSave('awards', a); toast('🏆 New award: ' + name); } paintAwards(); }
+function paintAwards(){
+  var a = getAwards();
+  document.querySelectorAll('.award-wall').forEach(function(w){
+    var max = +(w.dataset.max || 99);
+    w.innerHTML = '<div class="aw-head">🏆 ' + (w.dataset.title || 'Trophy wall') + ' · ' + a.length + (w.dataset.total ? ' / ' + w.dataset.total : '') + '</div><div class="aw-row">' +
+      (a.length ? a.slice(-max).map(function(x){ return '<span class="aw">🏆 ' + x + '</span>'; }).join('') : '<span class="aw empty">' + (w.dataset.empty || 'No trophies yet — every right answer wins one!') + '</span>') + '</div>';
+  });
+}
+function toast(t){ var el = $id('toast'); if(!el){ el = document.createElement('div'); el.id = 'toast'; document.body.appendChild(el); } el.textContent = t; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); }
+function clearAwards(){ lSave('awards', []); paintAwards(); }
+/* choose: opinion rows — any answer, saved. items [{q, opts, frame}] */
+function wChoose(id, items, key){
+  var g = $id(id); if(!once(g)) return; var st = lLoad(key, {}) || {};
+  items.forEach(function(it, i){
+    var box = document.createElement('div'); box.className = 'task-card'; box.style.cssText = 'padding:12px 20px;font-size:20px';
+    box.innerHTML = '<div style="font-weight:800;margin-bottom:8px">' + it.q + '</div><div style="display:flex;flex-wrap:wrap;gap:8px"></div><div class="mg-miss" style="color:var(--pd)"></div>';
+    var row = box.children[1], say = box.children[2];
+    function paint(){ row.querySelectorAll('.mg-opt').forEach(function(b, k){ b.classList.toggle('ok', st[i] === k); }); if(st[i] !== undefined) say.innerHTML = '🗣️ ' + (it.frame || '{x}').replace('{x}', it.opts[st[i]]); }
+    it.opts.forEach(function(o, k){ var b = document.createElement('button'); b.className = 'mg-opt'; b.style.pointerEvents = 'auto'; b.innerHTML = o; b.onclick = function(){ st[i] = k; lSave(key, st); paint(); }; row.appendChild(b); });
+    paint(); g.appendChild(box);
+  });
+}
+/* web: the shared main-idea web (WEB = {c, d}); every .mw-host repaints; details unlock as checks are solved. */
+function paintWeb(){
+  if(typeof WEB === 'undefined') return; var got = lLoad('mainweb', []) || [];
+  document.querySelectorAll('.mw-host').forEach(function(g){
+    g.innerHTML = '<div class="mw"><div class="mw-c">' + WEB.c + '</div><div class="mw-d">' + WEB.d.map(function(d, i){ return '<div class="mw-o' + (got.indexOf(i) >= 0 ? ' on' : '') + '">' + (got.indexOf(i) >= 0 ? d : (WEB.ph ? WEB.ph[i] : '❓ detail ' + (i + 1))) + '</div>'; }).join('') + '</div></div>';
+  });
+}
+function webAdd(i){ var got = lLoad('mainweb', []) || []; if(got.indexOf(i) < 0){ got.push(i); lSave('mainweb', got); toast(typeof WEB !== 'undefined' && WEB.toast ? WEB.toast : '🕸️ New detail on the web!'); } paintWeb(); }
+
+
+// ─── TEACHER NOTES ─────────────────────────────────────────────
+var NOTES = {
+ "1": "<p class=\"tn-lbl\">Title</p><p>15 words to talk about long ago and today. Materials (LP p. 100): a candle, a piece of cloth, a needle and thread, a bar of soap, a cell phone.</p>",
+ "2": "<p class=\"tn-lbl\">Objectives</p><p>Verbatim from LP p. 100.</p>",
+ "3": "<p class=\"tn-lbl\">Set the stage</p><p>LP p. 100: hold your arms around yourself to show you are cold. “I make many of the things I need to live.”</p>",
+ "4": "<p class=\"tn-lbl\">Things and Actions</p><p>LP p. 100: point to the fire on p. 41 — “Is fire a thing or an action?” (a thing). Point to the woman hanging the clothes on p. 40 — “Is wash a thing or an action?” (an action). Act out washing clothes and dishes.</p>",
+ "5": "<p class=\"tn-lbl\">action · action word</p><p>Academic Language for this lesson (LP p. 100): typical, action, action word. “We do chores to help at home. My chore at home is washing the clothes. What chores do you do at home?”</p>",
+ "6": "<p class=\"tn-lbl\">Content Vocabulary: useful, candles</p><p>Hold up the real candle, cloth, needle and thread, and soap from the materials list.</p>",
+ "7": "<p class=\"tn-lbl\">Listen and Read</p><p>Play TR 3.1. Photo: Seventeenth-century reenactment, Plimoth Plantation, Massachusetts, USA.</p>",
+ "8": "<p class=\"tn-lbl\">Discuss</p><p>LP p. 101. Then ask: “What can children do today that they couldn’t do in the past?” Then play TR 3.2 — Leo repeats each word and sentence.</p>",
+ "9": "<p class=\"tn-lbl\">spend time</p><p>Play the TR 3.2 line: <i>I like to spend time with my grandparents on weekends.</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "10": "<p class=\"tn-lbl\">life</p><p>Play the TR 3.2 line: <i>Long ago, life was very different.</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "11": "<p class=\"tn-lbl\">begin</p><p>Play the TR 3.2 line: <i>It’s time to begin your homework.</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "12": "<p class=\"tn-lbl\">electric lights</p><p>Play the TR 3.2 line: <i>Electric lights make the day longer.</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "13": "<p class=\"tn-lbl\">chores</p><p>Play the TR 3.2 line: <i>I do my chores in the morning.</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "14": "<p class=\"tn-lbl\">make</p><p>Play the TR 3.2 line: <i>I make my bed in the morning.</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "15": "<p class=\"tn-lbl\">wash</p><p>Play the TR 3.2 line: <i>My brother washes the dishes three times a week.</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "16": "<p class=\"tn-lbl\">sew</p><p>Play the TR 3.2 line: <i>My grandmother is teaching me how to sew.</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "17": "<p class=\"tn-lbl\">things</p><p>Play the TR 3.2 line: <i>Put your things away, please.</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "18": "<p class=\"tn-lbl\">town</p><p>Play the TR 3.2 line: <i>My grandparents live in a small town.</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "19": "<p class=\"tn-lbl\">learn</p><p>Play the TR 3.2 line: <i>Do you want to learn how to play chess?</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "20": "<p class=\"tn-lbl\">fire</p><p>Play the TR 3.2 line: <i>Long ago, people cooked their food over fire.</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "21": "<p class=\"tn-lbl\">cell phone</p><p>Play the TR 3.2 line: <i>Cell phones make communication easier.</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "22": "<p class=\"tn-lbl\">video game</p><p>Play the TR 3.2 line: <i>Can I see your new video game?</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "23": "<p class=\"tn-lbl\">tell</p><p>Play the TR 3.2 line: <i>Grandpa, tell me a story!</i> Leo repeats it, plays the game, then makes his own sentence.</p>",
+ "24": "<p class=\"tn-lbl\">Missing word</p><p>LP p. 101: pause to signal the missing word, then follow up — “Who do you like to spend time with on Saturdays?” Repeat for each word.</p>",
+ "25": "<p class=\"tn-lbl\">Recap</p><p>Leo says each word before flipping.</p>",
+ "26": "<p class=\"tn-lbl\">Homophones</p><p>All four sentences are from LP p. 101.</p>",
+ "27": "<p class=\"tn-lbl\">Related Vocabulary</p><p>Use the four related words to talk about how chores changed.</p>",
+ "28": "<p class=\"tn-lbl\">Apply</p><p>LP p. 102: model the dialogue, then the question “What did people make long ago?” — “They made their own clothes.” Leo writes his own questions with why, how and when, then you take turns.</p>",
+ "29": "<p class=\"tn-lbl\">Yes/no</p><p>LP p. 102: repeat for each of the words.</p>",
+ "30": "<p class=\"tn-lbl\">Fun or chores</p><p>LP p. 102: thumbs-up for fun, cross arms for work. The first three sentences are the planner’s.</p>",
+ "31": "<p class=\"tn-lbl\">Time line</p><p>LP p. 102: ask “What are some fun things and some chores that people did in the past?” then the same for the present. Leo discusses what the time line shows.</p>",
+ "32": "<p class=\"tn-lbl\">Two stars</p><p>LP p. 103: answers may include lesson vocabulary (play video games) and recycled words (read books, learn math, talk with friends, grow food). The player with the most correct guesses wins.</p>",
+ "33": "<p class=\"tn-lbl\">Be the Expert</p><p>LP p. 101 (electric lights) and p. 103 (soap).</p>",
+ "34": "<p class=\"tn-lbl\">Wrap Up</p><p>LP p. 103: the planner’s five favorite activities. Accept any answer Leo can explain.</p>",
+ "35": "<p class=\"tn-lbl\">Soccer transfer</p><p>Leo uses the new words about soccer then and now.</p>",
+ "36": "<p class=\"tn-lbl\">Formative Assessment</p><p>Sentence frame verbatim from LP p. 103.</p>",
+ "37": "<p class=\"tn-lbl\">Mark Done</p><p>Records this lesson on the teacher dashboard (leea.lessonProgress.v1). Leo's app tracks his own tabs separately.</p>"
+};
+
+// ─── SLIDE INIT MAP ───────────────────────────────────────────
+var TOTAL = 37;
+var SLIDE_INIT = {
+  2: function(){ wReveal("map", [
+ [
+  "Warm Up",
+  "Things and Actions",
+  "🔥"
+ ],
+ [
+  "Set the stage",
+  "long ago or now?",
+  "🕯️"
+ ],
+ [
+  "Listen",
+  "TR 3.1 + TR 3.2",
+  "🎧"
+ ],
+ [
+  "15 words",
+  "one game each",
+  "🎮"
+ ],
+ [
+  "Strategy",
+  "homophones",
+  "🧩"
+ ],
+ [
+  "Apply",
+  "ask and answer",
+  "💬"
+ ],
+ [
+  "Extend",
+  "the two stars",
+  "⭐"
+ ],
+ [
+  "Wrap Up",
+  "fun or chores?",
+  "👍"
+ ]
+], "map-n"); },
+  3: function(){ wCheck("stage", [
+ {
+  "q": "🔥 “I sit by the fire to get warm.”",
+  "opts": [
+   "long ago",
+   "now"
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "🕯️ “I get light from a candle.”",
+  "opts": [
+   "long ago",
+   "now"
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "💡 How do we get light? “Turn on the light switch.”",
+  "opts": [
+   "long ago",
+   "now"
+  ],
+  "ok": 1,
+  "keep": true,
+  "why": "Today, we use electric light."
+ },
+ {
+  "q": "👕 “Today, we buy clothes at a store.”",
+  "opts": [
+   "long ago",
+   "now"
+  ],
+  "ok": 1,
+  "keep": true
+ },
+ {
+  "q": "📱 “Today, we use cell phones.”",
+  "opts": [
+   "long ago",
+   "now"
+  ],
+  "ok": 1,
+  "keep": true
+ }
+], "stage-win"); },
+  4: function(){ wTapSort("ta", [
+ {
+  "k": "t",
+  "label": "📦 Things",
+  "color": "#B45309"
+ },
+ {
+  "k": "a",
+  "label": "🏃 Actions",
+  "color": "#0EA5E9"
+ }
+], [
+ {
+  "t": "🔥 fire",
+  "k": "t"
+ },
+ {
+  "t": "🎮 video game",
+  "k": "t"
+ },
+ {
+  "t": "💡 electric light",
+  "k": "t"
+ },
+ {
+  "t": "📱 cell phone",
+  "k": "t"
+ },
+ {
+  "t": "🧼 wash",
+  "k": "a"
+ },
+ {
+  "t": "🛠️ make",
+  "k": "a"
+ },
+ {
+  "t": "🪡 sew",
+  "k": "a"
+ },
+ {
+  "t": "🗣️ tell (stories)",
+  "k": "a"
+ },
+ {
+  "t": "📘 learn",
+  "k": "a"
+ }
+], "ta-win"); },
+  5: function(){ wFind("aw", [
+ {
+  "t": "🍳",
+  "l": "cook",
+  "ok": true
+ },
+ {
+  "t": "🧼",
+  "l": "wash",
+  "ok": true
+ },
+ {
+  "t": "🪡",
+  "l": "sew",
+  "ok": true
+ },
+ {
+  "t": "👩",
+  "l": "Mothers",
+  "ok": false,
+  "why": "a person, not an action"
+ },
+ {
+  "t": "🍽️",
+  "l": "the dishes",
+  "ok": false,
+  "why": "a thing"
+ },
+ {
+  "t": "👗",
+  "l": "clothes",
+  "ok": false,
+  "why": "a thing"
+ }
+], "aw-n", "aw-win"); },
+  6: function(){ wFind("us", [
+ {
+  "t": "🕯️",
+  "l": "candles",
+  "ok": true
+ },
+ {
+  "t": "🔥",
+  "l": "a fire",
+  "ok": true
+ },
+ {
+  "t": "🪡",
+  "l": "a needle and thread",
+  "ok": true
+ },
+ {
+  "t": "🧼",
+  "l": "a bar of soap",
+  "ok": true
+ },
+ {
+  "t": "📱",
+  "l": "a cell phone",
+  "ok": false,
+  "why": "no cell phones long ago"
+ },
+ {
+  "t": "🎮",
+  "l": "a video game",
+  "ok": false,
+  "why": "no video games long ago"
+ }
+], "us-n", "us-win"); },
+  8: function(){ wReveal("disc", [
+ [
+  "When did the day begin?",
+  "when the sun came up"
+ ],
+ [
+  "What chores did people do?",
+  "make soap, cook, wash dishes, sew"
+ ],
+ [
+  "How did people spend their free time?",
+  "playing games, singing songs, telling stories"
+ ],
+ [
+  "Did people have cell phones?",
+  "no"
+ ],
+ [
+  "Why did people use candles at night?",
+  "because they didn’t have electric lights"
+ ],
+ [
+  "Did children in the past have dolls and other toys? Do children today?",
+  "yes · yes"
+ ]
+]); },
+  9: function(){ wTapSort("g-spend_time", [
+ {
+  "k": "p",
+  "label": "🕯️ long ago",
+  "color": "#92400E"
+ },
+ {
+  "k": "n",
+  "label": "📱 today",
+  "color": "#0EA5E9"
+ }
+], [
+ {
+  "t": "sitting by the fire",
+  "k": "p"
+ },
+ {
+  "t": "telling stories by candlelight",
+  "k": "p"
+ },
+ {
+  "t": "sewing clothes at home",
+  "k": "p"
+ },
+ {
+  "t": "playing video games",
+  "k": "n"
+ },
+ {
+  "t": "watching TV",
+  "k": "n"
+ },
+ {
+  "t": "using a cell phone",
+  "k": "n"
+ }
+], "g-spend_time-win"); },
+  10: function(){ wCheck("g-life", [
+ {
+  "q": "Long ago, life was very ____.",
+  "opts": [
+   "different",
+   "the same"
+  ],
+  "ok": 0,
+  "keep": true,
+  "why": "TR 3.2."
+ },
+ {
+  "q": "Their life was different from ____.",
+  "opts": [
+   "ours",
+   "today"
+  ],
+  "ok": 0,
+  "keep": true,
+  "why": "TR 3.1: different from ours."
+ },
+ {
+  "q": "Long ago, many children didn’t go to ____.",
+  "opts": [
+   "school",
+   "the fire"
+  ],
+  "ok": 0,
+  "keep": true,
+  "why": "They learned at home with their parents."
+ }
+], "g-life-win"); },
+  11: function(){ wOrder("g-begin", ["🌅 The sun comes up.", "🚶 People begin their day.", "🧹 They do their chores in the daylight.", "🌙 It gets dark.", "🔥 Families sit by the fire."], "g-begin-win"); },
+  12: function(){ wHold("g-electric_lights", {e0:"🕯️ dark room…", e1:"💡💡💡 bright!", btn:"💡 Hold to switch on", during:"Click… the bulb gets warm…", early:"Too soon! Keep holding.", win:"Electric lights make the day longer!", winId:"g-electric_lights-win"}); },
+  13: function(){ wFind("g-chores", [
+ {
+  "t": "🍽️",
+  "l": "wash the dishes",
+  "ok": true
+ },
+ {
+  "t": "🛏️",
+  "l": "make the bed",
+  "ok": true
+ },
+ {
+  "t": "🪡",
+  "l": "sew clothes",
+  "ok": true
+ },
+ {
+  "t": "🧼",
+  "l": "make soap",
+  "ok": true
+ },
+ {
+  "t": "🎮",
+  "l": "play video games",
+  "ok": false,
+  "why": "that’s fun, not a chore"
+ },
+ {
+  "t": "📖",
+  "l": "tell stories",
+  "ok": false,
+  "why": "that’s fun, not a chore"
+ }
+], "g-chores-n", "g-chores-win"); },
+  14: function(){ wPair("g-make", [
+ [
+  "🛠️ make",
+  "a fire, your bed"
+ ],
+ [
+  "🧹 do",
+  "chores, homework"
+ ],
+ [
+  "🗣️ tell",
+  "a story, the time"
+ ],
+ [
+  "⏳ spend",
+  "time, money"
+ ]
+], "g-make-n", "g-make-win"); },
+  15: function(){ wTapSort("g-wash", [
+ {
+  "k": "p",
+  "label": "🕯️ long ago",
+  "color": "#92400E"
+ },
+ {
+  "k": "n",
+  "label": "💡 today",
+  "color": "#0EA5E9"
+ }
+], [
+ {
+  "t": "wash clothes by hand",
+  "k": "p"
+ },
+ {
+  "t": "wash clothes in the river",
+  "k": "p"
+ },
+ {
+  "t": "make soap at home",
+  "k": "p"
+ },
+ {
+  "t": "wash clothes in a washing machine",
+  "k": "n"
+ },
+ {
+  "t": "wash dishes in a dishwasher",
+  "k": "n"
+ },
+ {
+  "t": "buy soap at a store",
+  "k": "n"
+ }
+], "g-wash-win"); },
+  16: function(){ wOrder("g-sew", ["🧵 Put the thread through the needle.", "🔘 Hold the button on the cloth.", "🪡 Push the needle through the cloth and the button.", "🔁 Do it again and again.", "✂️ Tie a knot and cut the thread."], "g-sew-win"); },
+  17: function(){ wFind("g-things", [
+ {
+  "t": "🪆",
+  "l": "a doll",
+  "ok": true
+ },
+ {
+  "t": "🕯️",
+  "l": "a candle",
+  "ok": true
+ },
+ {
+  "t": "📱",
+  "l": "a cell phone",
+  "ok": true
+ },
+ {
+  "t": "🧼",
+  "l": "soap",
+  "ok": true
+ },
+ {
+  "t": "🪡",
+  "l": "sew",
+  "ok": false,
+  "why": "an action"
+ },
+ {
+  "t": "🗣️",
+  "l": "tell",
+  "ok": false,
+  "why": "an action"
+ }
+], "g-things-n", "g-things-win"); },
+  18: function(){ wCheck("g-town", [
+ {
+  "q": "A town is ____ than a city.",
+  "opts": [
+   "smaller",
+   "bigger"
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "Long ago, fathers made things to sell at the market in ____.",
+  "opts": [
+   "town",
+   "school"
+  ],
+  "ok": 0,
+  "keep": true,
+  "why": "TR 3.1."
+ },
+ {
+  "q": "My grandparents live in a small ____.",
+  "opts": [
+   "town",
+   "chore"
+  ],
+  "ok": 0,
+  "keep": true,
+  "why": "TR 3.2."
+ }
+], "g-town-win"); },
+  19: function(){ wFind("g-learn", [
+ {
+  "t": "🍳",
+  "l": "to cook",
+  "ok": true
+ },
+ {
+  "t": "🍽️",
+  "l": "to wash the dishes",
+  "ok": true
+ },
+ {
+  "t": "🧼",
+  "l": "to make soap",
+  "ok": true
+ },
+ {
+  "t": "🪡",
+  "l": "to sew clothes",
+  "ok": true
+ },
+ {
+  "t": "🎮",
+  "l": "to play video games",
+  "ok": false,
+  "why": "no video games long ago"
+ },
+ {
+  "t": "📱",
+  "l": "to use a cell phone",
+  "ok": false,
+  "why": "no cell phones long ago"
+ }
+], "g-learn-n", "g-learn-win"); },
+  20: function(){ wFind("g-fire", [
+ {
+  "t": "🎲",
+  "l": "play games",
+  "ok": true
+ },
+ {
+  "t": "🎵",
+  "l": "sing songs",
+  "ok": true
+ },
+ {
+  "t": "📖",
+  "l": "tell stories",
+  "ok": true
+ },
+ {
+  "t": "🥶",
+  "l": "get warm",
+  "ok": true
+ },
+ {
+  "t": "📺",
+  "l": "watch TV",
+  "ok": false,
+  "why": "no TV long ago"
+ },
+ {
+  "t": "🎮",
+  "l": "play video games",
+  "ok": false,
+  "why": "that’s today"
+ }
+], "g-fire-n", "g-fire-win"); },
+  21: function(){ wFind("g-cell_phone", [
+ {
+  "t": "📞",
+  "l": "call a friend",
+  "ok": true
+ },
+ {
+  "t": "💬",
+  "l": "send a message",
+  "ok": true
+ },
+ {
+  "t": "📷",
+  "l": "take a photo",
+  "ok": true
+ },
+ {
+  "t": "🎮",
+  "l": "play video games",
+  "ok": true
+ },
+ {
+  "t": "🧼",
+  "l": "wash the dishes",
+  "ok": false,
+  "why": "a phone can’t wash!"
+ },
+ {
+  "t": "🔥",
+  "l": "make a fire",
+  "ok": false,
+  "why": "no!"
+ }
+], "g-cell_phone-n", "g-cell_phone-win"); },
+  22: function(){ wTapSort("g-video_game", [
+ {
+  "k": "f",
+  "label": "👍 fun!",
+  "color": "#16A34A"
+ },
+ {
+  "k": "c",
+  "label": "🙅 a chore",
+  "color": "#92400E"
+ }
+], [
+ {
+  "t": "We play video games.",
+  "k": "f"
+ },
+ {
+  "t": "They spend time by the fire, telling stories.",
+  "k": "f"
+ },
+ {
+  "t": "We sing songs.",
+  "k": "f"
+ },
+ {
+  "t": "We wash the dishes.",
+  "k": "c"
+ },
+ {
+  "t": "I make my bed.",
+  "k": "c"
+ },
+ {
+  "t": "She sews clothes.",
+  "k": "c"
+ }
+], "g-video_game-win"); },
+  23: function(){ wFind("g-tell", [
+ {
+  "t": "📖",
+  "l": "a story",
+  "ok": true
+ },
+ {
+  "t": "🕐",
+  "l": "the time",
+  "ok": true
+ },
+ {
+  "t": "🔥",
+  "l": "a fire",
+  "ok": false,
+  "why": "we make a fire"
+ },
+ {
+  "t": "🧹",
+  "l": "chores",
+  "ok": false,
+  "why": "we do chores"
+ }
+], "g-tell-n", "g-tell-win"); },
+  24: function(){ wCheck("miss", [
+ {
+  "q": "I like to ____ with my grandparents on weekends.",
+  "opts": [
+   "spend time",
+   "sew",
+   "begin"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "It’s time to ____ your homework.",
+  "opts": [
+   "begin",
+   "tell",
+   "wash"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "____ make the day longer.",
+  "opts": [
+   "Electric lights",
+   "Chores",
+   "Things"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "Put your ____ away, please.",
+  "opts": [
+   "things",
+   "town",
+   "life"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "Do you want to ____ how to play chess?",
+  "opts": [
+   "learn",
+   "wash",
+   "sew"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "Grandpa, ____ me a story!",
+  "opts": [
+   "tell",
+   "make",
+   "spend"
+  ],
+  "ok": 0
+ }
+], "miss-win"); },
+  25: function(){ wFlip("all", [
+ {
+  "e": "⏳",
+  "w": "spend time",
+  "b": "I like to spend time with my grandparents on weekends."
+ },
+ {
+  "e": "🌱",
+  "w": "life",
+  "b": "Long ago, life was very different."
+ },
+ {
+  "e": "🌅",
+  "w": "begin",
+  "b": "It’s time to begin your homework."
+ },
+ {
+  "e": "💡",
+  "w": "electric lights",
+  "b": "Electric lights make the day longer."
+ },
+ {
+  "e": "🧹",
+  "w": "chores",
+  "b": "I do my chores in the morning."
+ },
+ {
+  "e": "🛠️",
+  "w": "make",
+  "b": "I make my bed in the morning."
+ },
+ {
+  "e": "🧼",
+  "w": "wash",
+  "b": "My brother washes the dishes three times a week."
+ },
+ {
+  "e": "🪡",
+  "w": "sew",
+  "b": "My grandmother is teaching me how to sew."
+ },
+ {
+  "e": "📦",
+  "w": "things",
+  "b": "Put your things away, please."
+ },
+ {
+  "e": "🏘️",
+  "w": "town",
+  "b": "My grandparents live in a small town."
+ },
+ {
+  "e": "📘",
+  "w": "learn",
+  "b": "Do you want to learn how to play chess?"
+ },
+ {
+  "e": "🔥",
+  "w": "fire",
+  "b": "Long ago, people cooked their food over fire."
+ },
+ {
+  "e": "📱",
+  "w": "cell phone",
+  "b": "Cell phones make communication easier."
+ },
+ {
+  "e": "🎮",
+  "w": "video game",
+  "b": "Can I see your new video game?"
+ },
+ {
+  "e": "🗣️",
+  "w": "tell",
+  "b": "Grandpa, tell me a story!"
+ }
+], "all-n"); },
+  26: function(){ wCheck("hom", [
+ {
+  "q": "I am ____ excited.",
+  "opts": [
+   "so",
+   "sew"
+  ],
+  "ok": 0,
+  "keep": true,
+  "why": "so = very."
+ },
+ {
+  "q": "I ____ my own clothes.",
+  "opts": [
+   "sew",
+   "so"
+  ],
+  "ok": 0,
+  "keep": true,
+  "why": "sew = an action."
+ },
+ {
+  "q": "Get ____ cookies ____ your sisters.",
+  "opts": [
+   "four … for",
+   "for … four"
+  ],
+  "ok": 0,
+  "keep": true,
+  "why": "four = 4; for = to give to."
+ },
+ {
+  "q": "____ the ____ answer in your notebook.",
+  "opts": [
+   "Write … right",
+   "Right … write"
+  ],
+  "ok": 0,
+  "keep": true,
+  "why": "write = an action; right = correct."
+ }
+], "hom-win"); },
+  27: function(){ wPair("rel", [
+ [
+  "🍽️ washing the dishes by hand",
+  "🫧 a dishwasher"
+ ],
+ [
+  "🔥 toasting bread over the fire",
+  "🍞 a toaster"
+ ],
+ [
+  "🧊 keeping food in a cold cellar",
+  "❄️ a refrigerator"
+ ],
+ [
+  "🕯️ reading by a candle",
+  "💡 a lamp"
+ ]
+], "rel-n", "rel-win"); },
+  28: function(){ wBuild("bd", ["What", "did", "people", "make", "long", "ago?", "They", "made", "their", "own", "clothes."], ["sewed", "tell"], "bd-win"); },
+  29: function(){ wCheck("yn", [
+ {
+  "q": "Did people have electric lights long ago?",
+  "opts": [
+   "No, they didn’t have electric lights.",
+   "Yes, they did."
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "Did people have cell phones long ago?",
+  "opts": [
+   "No, they didn’t have cell phones.",
+   "Yes, they did."
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "Did people sew clothes long ago?",
+  "opts": [
+   "Yes, they did.",
+   "No, they didn’t sew clothes."
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "Did people tell stories by the fire?",
+  "opts": [
+   "Yes, they did.",
+   "No, they didn’t tell stories."
+  ],
+  "ok": 0,
+  "keep": true
+ }
+], "yn-win"); },
+  30: function(){ wTapSort("fc", [
+ {
+  "k": "f",
+  "label": "👍 fun",
+  "color": "#16A34A"
+ },
+ {
+  "k": "c",
+  "label": "🙅 work / chores",
+  "color": "#92400E"
+ }
+], [
+ {
+  "t": "They spend time by the fire, telling stories.",
+  "k": "f"
+ },
+ {
+  "t": "We play video games.",
+  "k": "f"
+ },
+ {
+  "t": "Children play with dolls and other toys.",
+  "k": "f"
+ },
+ {
+  "t": "We wash the dishes.",
+  "k": "c"
+ },
+ {
+  "t": "Mothers sew clothes.",
+  "k": "c"
+ },
+ {
+  "t": "People make soap.",
+  "k": "c"
+ }
+], "fc-win"); },
+  31: function(){ wSort("tl", [
+ {
+  "k": "p",
+  "label": "⬅️ Past",
+  "color": "#92400E"
+ },
+ {
+  "k": "n",
+  "label": "Present ➡️",
+  "color": "#0EA5E9"
+ }
+], [
+ {
+  "t": "make soap",
+  "k": "p"
+ },
+ {
+  "t": "sew clothes",
+  "k": "p"
+ },
+ {
+  "t": "read by candlelight",
+  "k": "p"
+ },
+ {
+  "t": "begin the day when the sun comes up",
+  "k": "p"
+ },
+ {
+  "t": "play video games",
+  "k": "n"
+ },
+ {
+  "t": "use cell phones",
+  "k": "n"
+ },
+ {
+  "t": "watch TV",
+  "k": "n"
+ },
+ {
+  "t": "turn on electric lights",
+  "k": "n"
+ }
+], "tl-win"); },
+  32: function(){ wTyped("st1", [
+ [
+  "1",
+  "play video games"
+ ],
+ [
+  "2",
+  "read books"
+ ],
+ [
+  "3",
+  "learn math"
+ ],
+ [
+  "4",
+  "talk with friends"
+ ],
+ [
+  "5",
+  "…"
+ ]
+], "startoday"); wTyped("st2", [
+ [
+  "1",
+  "grow food"
+ ],
+ [
+  "2",
+  "sew clothes"
+ ],
+ [
+  "3",
+  "tell stories by the fire"
+ ],
+ [
+  "4",
+  "make soap"
+ ],
+ [
+  "5",
+  "…"
+ ]
+], "starlongago"); },
+  33: function(){ wReveal("bte", [
+ [
+  "💡 When did electric lights become popular in homes?",
+  "In the 1870s, when Thomas Edison invented the electric light bulb. It made electric lamps easier and less expensive."
+ ],
+ [
+  "🧼 How long have people been making soap?",
+  "For over 2000 years!"
+ ],
+ [
+  "🩺 What was soap used for at first?",
+  "As a medicine — not to clean things."
+ ],
+ [
+  "🔥 What was soap made with?",
+  "Water, ashes from plants, and fat from animals. The mixture was boiled."
+ ]
+]); },
+  34: function(){ wCheck("fav", [
+ {
+  "q": "🎮 playing video games",
+  "opts": [
+   "not long ago",
+   "long ago, too"
+  ],
+  "ok": 0,
+  "keep": true,
+  "why": "No electricity, no screens."
+ },
+ {
+  "q": "⚽ playing soccer",
+  "opts": [
+   "not long ago",
+   "long ago, too"
+  ],
+  "ok": 1,
+  "keep": true,
+  "why": "People played ball games long ago."
+ },
+ {
+  "q": "📞 talking on the phone",
+  "opts": [
+   "not long ago",
+   "long ago, too"
+  ],
+  "ok": 0,
+  "keep": true,
+  "why": "They talked face-to-face."
+ },
+ {
+  "q": "🃏 playing cards or guessing games",
+  "opts": [
+   "not long ago",
+   "long ago, too"
+  ],
+  "ok": 1,
+  "keep": true,
+  "why": "They liked to play games."
+ },
+ {
+  "q": "📖 reading stories",
+  "opts": [
+   "not long ago",
+   "long ago, too"
+  ],
+  "ok": 1,
+  "keep": true,
+  "why": "They told stories by the fire."
+ }
+], "fav-win"); },
+  35: function(){ wCheck("soc", [
+ {
+  "q": "Long ago, players ____ their own soccer balls from leather.",
+  "opts": [
+   "made",
+   "told",
+   "spent"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "Today, fans watch the game on their ____.",
+  "opts": [
+   "cell phones",
+   "chores",
+   "towns"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "After the game, Leo has to ____ his dirty socks!",
+  "opts": [
+   "wash",
+   "tell",
+   "begin"
+  ],
+  "ok": 0
+ },
+ {
+  "q": "Big games at night need bright ____.",
+  "opts": [
+   "electric lights",
+   "candles",
+   "fires"
+  ],
+  "ok": 0
+ }
+]); },
+  36: function(){ wTyped("frame", [
+ [
+  "🕯️ In the past, it was common to…",
+  "read by candlelight, but today we use electric lights instead."
+ ],
+ [
+  "🔥 In the past, it was common to…",
+  "tell stories by the fire, but today we…"
+ ]
+], "v1frame"); wAssess("assess", [
+ [
+  "…identify and use words related to the past and present?",
+  "Use the sentence frame to tell about differences."
+ ],
+ [
+  "…say all 15 words with their TR 3.2 sentences?"
+ ],
+ [
+  "…sort things and actions?"
+ ]
+]); },
+  37: function(){ restoreDoneState(); }
+};
+
+scale();
+goTo(1);
+restoreDoneState();
+</script>
+</body>
+</html>

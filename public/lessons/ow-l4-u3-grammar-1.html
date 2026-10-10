@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 3 · Grammar 1 · Long Ago and Today</title>
+<script src="/components/charts.js"></script>
+<script src="/components/wordweb.js"></script>
+<script src="/components/chart-picker.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../lib/leea-cloud-config.js"></script>
+<script src="../../lib/leea-cloud.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&display=swap"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background:#0f172a}
+#scaler{width:1920px;height:1080px;transform-origin:top left;position:relative}
+#deck{width:1920px;height:1080px;position:absolute;top:0;left:0}
+.slide{width:1920px;height:1028px;position:absolute;top:0;left:0;display:none;flex-direction:column;background:#FAFAF7;overflow:hidden}
+.slide.active{display:flex}
+
+/* HEADER */
+.slide-header{height:64px;background:#B45309;display:flex;align-items:center;padding:0 40px;gap:16px;flex-shrink:0}
+.hd-unit{color:rgba(255,255,255,.65);font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.hd-sep{color:rgba(255,255,255,.4);font-size:20px}
+.hd-section{color:#fff;font-size:22px;font-weight:700}
+.hd-chip{background:rgba(255,255,255,.2);color:#fff;padding:4px 18px;border-radius:20px;font-size:17px;font-weight:700;margin-left:auto}
+.hd-chip.ac{background:rgba(14,165,233,.4)}
+
+/* TWO-COLUMN VOCAB LAYOUT */
+.vocab-body{flex:1;display:flex;min-height:0}
+.word-panel{width:40%;padding:30px 34px;display:flex;flex-direction:column;border-right:2px solid #e5e7eb;background:#fff}
+.game-panel{width:60%;padding:22px 32px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;overflow:hidden}
+
+/* TAGS */
+.vtag{display:inline-block;padding:5px 16px;border-radius:20px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;width:fit-content}
+.vtag.v1{background:#FEF3C7;color:#92400E}
+.vtag.ac{background:#FEF3C7;color:#B45309}
+.vtag.rel{background:#f3f4f6;color:#6b7280}
+
+/* WORD PANEL */
+.word-emoji{font-size:130px;line-height:1;margin-bottom:12px;cursor:pointer;transition:transform .25s}
+.word-emoji:active{transform:scale(1.15)}
+.word-main{font-size:70px;font-weight:800;color:#111;line-height:1.05;margin-bottom:8px}
+.word-ipa{font-size:21px;color:#6b7280}
+.word-syl{font-size:18px;color:#9ca3af;letter-spacing:1px}
+.word-pos{font-size:19px;color:#B45309;font-weight:700;margin-bottom:14px}
+.word-def{font-size:21px;color:#374151;line-height:1.45;margin-bottom:8px}
+.word-jp{font-size:18px;color:#6b7280;line-height:1.45}
+.dad-say{background:#FFFBEB;border-left:4px solid #B45309;padding:13px 16px;border-radius:0 12px 12px 0;font-size:18px;color:#374151;line-height:1.5;margin-top:auto}
+.dad-say b{color:#92400E}
+.how-box{background:#fff;border:2px dashed #FDE68A;border-radius:12px;padding:10px 16px;font-size:16px;color:#4b5563;line-height:1.5;width:100%}
+.how-box b{color:#92400E}
+.how-box li{margin-left:18px}
+
+/* MINI-GAME SHELL (shared class names across LEEA vocab decks) */
+.mg-wrap{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;flex:1;min-height:0}
+.mg-head{font-size:20px;font-weight:700;color:#374151;text-align:center;background:#f9fafb;border:2px solid #e5e7eb;border-radius:12px;padding:10px 20px;width:100%;flex-shrink:0}
+.mg-head b{color:#92400E}
+.mg-stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0;overflow:hidden}
+.mg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;width:100%}
+.mg-grid.c4{grid-template-columns:repeat(4,1fr)}
+.mg-grid.c3{grid-template-columns:repeat(3,1fr)}
+.mg-tile{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 6px;font-size:38px;cursor:pointer;transition:all .15s;text-align:center}
+.mg-tile:hover{transform:translateY(-3px);border-color:#B45309}
+.mg-tile .mg-label{display:block;font-size:14px;font-weight:700;color:#4b5563;margin-top:4px;min-height:18px}
+.mg-tile.hit{background:#FFFBEB;border-color:#B45309;cursor:default}
+.mg-tile.miss{background:#fef2f2;border-color:#ef4444;animation:mgShake .3s ease}
+@keyframes mgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.mg-btn{background:#B45309;color:#fff;border:none;border-radius:12px;padding:13px 30px;font-size:20px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s}
+.mg-btn:hover{background:#92400E;transform:scale(1.04)}
+.mg-btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+.mg-opt{padding:12px 22px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:19px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left}
+.mg-opt:hover{border-color:#B45309}
+.mg-opt.ok{background:#FFFBEB;border-color:#B45309;color:#92400E;pointer-events:none}
+.mg-opt.no{background:#fef2f2;border-color:#ef4444;pointer-events:none}
+.mg-score{font-size:20px;font-weight:800;color:#92400E;background:#FEF3C7;border-radius:20px;padding:6px 22px}
+.mg-miss{font-size:17px;font-weight:700;color:#ef4444;min-height:22px}
+.mg-win{background:#B45309;color:#fff;border-radius:14px;padding:12px 24px;font-size:20px;font-weight:800;text-align:center;opacity:0;transform:translateY(10px);transition:all .35s;width:100%}
+.mg-win.show{opacity:1;transform:translateY(0)}
+.mg-source{font-size:14px;color:#9ca3af;font-weight:600;letter-spacing:.4px}
+.mg-bar{width:100%;height:22px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.mg-bar > div{height:100%;background:linear-gradient(90deg,#F59E0B,#B45309);width:0%;transition:width .2s;border-radius:99px}
+.mg-track{position:relative;width:100%;height:96px;background:linear-gradient(180deg,#FEF3C7,#FFFBEB);border-radius:16px;overflow:hidden;border:2px solid #FDE68A}
+.mg-runner{position:absolute;bottom:16px;font-size:46px;transition:left .25s}
+.mg-flag{position:absolute;bottom:14px;right:2%;font-size:40px}
+.mg-spin{display:inline-block;transition:transform .3s ease}
+.mg-flip{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.mg-flip:hover{border-color:#B45309;transform:translateY(-3px)}
+.mg-flip.open{background:#FFFBEB;border-color:#B45309;cursor:default}
+.mg-flip .mf-front{font-size:40px}
+.mg-flip .mf-back{display:none;font-size:15px;font-weight:700;color:#92400E;line-height:1.35}
+.mg-flip.open .mf-back{display:block}
+.mg-pair{display:flex;gap:26px;width:100%;justify-content:center}
+.mg-col{display:flex;flex-direction:column;gap:10px;flex:1;max-width:340px}
+.mg-pbtn{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:17px;font-weight:700;color:#374151;cursor:pointer;font-family:Outfit,sans-serif;transition:all .15s;text-align:left;line-height:1.3}
+.mg-pbtn:hover{border-color:#B45309}
+.mg-pbtn.sel{border-color:#B45309;background:#FFFBEB}
+.mg-pbtn.done{border-color:#10b981;background:#ecfdf5;color:#047857;pointer-events:none}
+.mg-pbtn.bad{border-color:#ef4444;background:#fef2f2;animation:mgShake .3s}
+.mg-battery{width:220px;height:110px;border:6px solid #374151;border-radius:14px;position:relative;display:flex;align-items:center;padding:8px}
+.mg-battery::after{content:'';position:absolute;right:-20px;top:32px;width:16px;height:40px;background:#374151;border-radius:0 6px 6px 0}
+.mg-battery > div{height:100%;background:linear-gradient(90deg,#a3e635,#16a34a);border-radius:6px;width:0%;transition:width .2s}
+.mg-lamp{font-size:44px;filter:grayscale(1);opacity:.4;transition:all .25s}
+.mg-lamp.on{filter:none;opacity:1;transform:scale(1.1)}
+
+/* NAV BAR */
+#nav-bar{position:fixed;bottom:0;left:0;right:0;height:52px;background:#111827;display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000}
+#nav-bar button{background:none;border:none;color:#fff;font-size:17px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;padding:7px 18px;border-radius:8px;transition:background .2s}
+#nav-bar button:hover{background:rgba(255,255,255,.12)}
+#slide-counter{color:#9ca3af;font-size:16px;font-weight:600;min-width:80px;text-align:center}
+#notes-btn.active,#fs-btn.active{background:rgba(124,58,237,.35)!important;color:#FCD34D!important}
+#unit-label{color:#FCD34D;font-size:15px;font-weight:700;letter-spacing:1px;margin-left:20px}
+
+/* TEACHER NOTES PANEL */
+#tn-panel{position:fixed;right:-460px;top:0;bottom:52px;width:440px;background:#1f2937;overflow-y:auto;transition:right .3s ease;z-index:999;padding:24px}
+#tn-panel.open{right:0}
+#tn-panel h3{color:#FCD34D;font-size:17px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #374151;padding-bottom:8px}
+#tn-panel p,#tn-panel li{color:#d1d5db;font-size:14px;line-height:1.6;margin-bottom:6px}
+#tn-panel ul{padding-left:18px;margin-bottom:8px}
+#tn-panel .tn-lbl{color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:12px;margin-bottom:4px}
+#tn-close{position:absolute;top:14px;right:14px;background:none;border:none;color:#9ca3af;font-size:20px;cursor:pointer}
+
+/* CONTENT SLIDES */
+.content-body{flex:1;padding:32px 56px;display:flex;flex-direction:column;gap:18px;min-height:0;overflow:hidden}
+.slide-h1{font-size:40px;font-weight:800;color:#111}
+.slide-h2{font-size:25px;font-weight:600;color:#374151}
+.src-pill{display:inline-block;background:#f3f4f6;color:#6b7280;border-radius:20px;padding:6px 18px;font-size:15px;font-weight:700;letter-spacing:.4px;width:fit-content}
+
+/* READING */
+.reading-block{background:#fff;border-radius:16px;padding:26px 36px;font-size:23px;line-height:1.7;color:#1f2937;box-shadow:0 4px 16px rgba(0,0,0,.05);border-left:6px solid #B45309}
+.reading-block b{color:#92400E;font-weight:700}
+.tap-word{background:#FEF3C7;color:#92400E;border:none;border-radius:6px;padding:2px 10px;font-size:inherit;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+.tap-word.done{background:#B45309;color:#fff}
+
+/* OBJECTIVES */
+.obj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:10px}
+.obj-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;display:flex;align-items:flex-start;gap:16px}
+.obj-icon{font-size:34px;flex-shrink:0}
+.obj-text{font-size:19px;color:#374151;line-height:1.4;font-weight:500}
+.obj-text b{color:#B45309}
+
+/* FORMATIVE ASSESSMENT */
+.assess-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px}
+.assess-card{background:#fff;border-radius:16px;padding:22px 26px;border:2px solid #e5e7eb;cursor:pointer;transition:all .2s}
+.assess-card:hover{border-color:#B45309}
+.assess-card.yes{border-color:#B45309;background:#FFFBEB}
+.assess-q{font-size:19px;color:#374151;font-weight:600;margin-bottom:10px}
+
+/* BE THE EXPERT */
+.bte-header{background:#B45309;color:#fff;border-radius:12px 12px 0 0;padding:13px 26px;font-size:19px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bte-body{background:#fff;border:2px solid #B45309;border-radius:0 0 16px 16px;padding:24px;font-size:19px;color:#374151;line-height:1.6}
+.bte-body b{color:#92400E}
+
+/* CHIPS / TASK CARDS */
+.chips-row{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:#FEF3C7;color:#92400E;border-radius:20px;padding:8px 18px;font-size:18px;font-weight:700;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+.chip.used{background:#B45309;color:#fff}
+.task-card{background:#fff;border-radius:16px;padding:20px 28px;border:2px solid #e5e7eb;font-size:21px;color:#374151;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.task-card b{color:#B45309}
+.q-item{background:#fff;border-radius:12px;padding:16px 22px;border:2px solid #e5e7eb;font-size:19px;color:#374151;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .2s}
+.q-item:hover{border-color:#B45309}
+.q-item.done{border-color:#10b981;background:#ecfdf5}
+.q-num{background:#B45309;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;margin-top:2px}
+.q-ans{max-height:0;overflow:hidden;transition:max-height .3s ease;color:#92400E;font-weight:700}
+.q-item.done .q-ans{max-height:120px;margin-top:6px}
+
+/* DIALOGUE */
+.chat-row{display:flex;align-items:flex-end;gap:14px}
+.chat-row.right{flex-direction:row-reverse}
+.chat-ava{font-size:50px;line-height:1}
+.bub{max-width:62%;padding:18px 28px;border-radius:26px;font-size:26px;font-weight:600;line-height:1.35}
+.bub.q{background:#fff;border:2px solid #e5e7eb;border-bottom-left-radius:6px;color:#374151}
+.bub.a{background:#B45309;color:#fff;border-bottom-right-radius:6px}
+
+/* LISTEN HERO */
+.listen-hero{background:linear-gradient(135deg,#78350F,#B45309);border-radius:20px;padding:24px 36px;display:flex;align-items:center;gap:28px;color:#fff}
+.listen-hero .lh-emoji{font-size:64px;line-height:1;animation:lhPulse 1.6s ease-in-out infinite}
+@keyframes lhPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.listen-hero .lh-text{font-size:25px;font-weight:700;flex:1}
+.listen-hero .lh-tr{background:rgba(255,255,255,.2);border-radius:20px;padding:9px 22px;font-size:21px;font-weight:800;white-space:nowrap}
+
+/* TITLE / GREAT JOB */
+.title-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#78350F 0%,#B45309 50%,#F59E0B 100%);color:#fff;gap:22px;padding:40px}
+.great-job-slide{background:linear-gradient(135deg,#78350F,#B45309,#F59E0B);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:18px;height:100%;padding:40px}
+
+/* MARK DONE */
+.done-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+.btn-done{background:#16A34A;color:#fff;border:none;border-radius:14px;padding:18px 46px;font-size:26px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+.btn-done:hover{background:#15803d}
+.btn-done.confirmed{background:#9ca3af;pointer-events:none}
+.btn-clear{background:#fff;color:#ef4444;border:2px solid #ef4444;border-radius:14px;padding:14px 30px;font-size:19px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
+#doneMsg{font-size:20px;color:#4b5563;font-weight:600;min-height:28px}
+
+/* VOCAB REVIEW */
+.vr-tabs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;flex-shrink:0}
+.vr-tab{padding:7px 14px;border:2px solid #e5e7eb;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;background:#fff;transition:all .2s;white-space:nowrap}
+.vr-tab:hover{border-color:#B45309;color:#B45309}
+.vr-tab.active{background:#B45309;color:#fff;border-color:#B45309}
+.vr-tab.done{background:#FEF3C7;border-color:#B45309;color:#92400E}
+.vr-tab.done.active{background:#B45309;color:#fff}
+.vr-body{flex:1;display:flex;min-height:0}
+.vr-left{width:26%;padding:18px;border-right:2px solid #e5e7eb;display:flex;flex-direction:column;gap:8px;background:#fafaf7}
+.vr-right{flex:1;padding:18px 24px;display:flex;flex-direction:column;gap:12px}
+.vr-emoji{font-size:80px;line-height:1}
+.vr-word{font-size:42px;font-weight:800;color:#111;line-height:1.1}
+.vr-ipa{font-size:16px;color:#6b7280}
+.vr-pos{font-size:15px;color:#B45309;font-weight:700}
+.vr-mark{background:#B45309;color:#fff;border:none;border-radius:10px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;margin-top:auto;transition:all .2s}
+.vr-mark.done{background:#9ca3af;cursor:not-allowed}
+
+/* OPENER */
+.oz-band{padding:16px 22px;color:#fff;font-weight:700;font-size:20px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:all .18s;border:none;font-family:Outfit,sans-serif;text-align:left;flex:1;justify-content:center}
+.oz-band small{font-weight:600;opacity:0;font-size:17px;transition:opacity .25s}
+.oz-band .oz-note{font-size:18px;font-weight:500;opacity:0;line-height:1.45;transition:opacity .25s}
+.oz-strip{width:100%;border-radius:16px;overflow:hidden;border:2px solid #FDE68A;display:flex;flex-direction:column;flex:1;min-height:0}
+.oz-band.sunlit{background:linear-gradient(90deg,#FCD34D,#0EA5E9)}
+.oz-band.twilight{background:linear-gradient(90deg,#B45309,#92400E)}
+.oz-band.midnight{background:linear-gradient(90deg,#78350F,#020617)}
+.photo-card{background:#fff;border:3px solid #e5e7eb;border-radius:18px;padding:20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .18s;min-height:250px;justify-content:center}
+.photo-card:hover{border-color:#B45309;transform:translateY(-3px)}
+.photo-card.open{border-color:#B45309;background:#FFFBEB}
+.pc-emoji{font-size:66px;line-height:1}
+.pc-word{font-size:28px;font-weight:800;color:#111}
+.pc-def{font-size:17px;color:#4b5563;line-height:1.45;text-align:center;display:none}
+.pc-ex{font-size:16px;color:#92400E;font-style:italic;text-align:center;display:none}
+.photo-card.open .pc-def,.photo-card.open .pc-ex{display:block}
+.tf-row{display:flex;align-items:center;gap:20px;background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:18px 24px}
+.tf-num{background:#B45309;color:#fff;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex-shrink:0}
+.tf-text{flex:1;font-size:23px;color:#374151;font-weight:600}
+.tf-key{font-size:30px;font-weight:900;padding:8px 26px;border-radius:12px;opacity:0;transition:opacity .25s}
+.tf-key.t{background:#DCFCE7;color:#15803D}
+.tf-key.f{background:#FEE2E2;color:#B91C1C}
+/* UNIT 5 WIDGETS */
+:root{--p:#B45309;--pd:#92400E;--pl:#FFFBEB;--pb:#FDE68A}
+.ts-bank{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:52px}
+.ts-tile.sel{background:var(--p);color:#fff;transform:translateY(-3px)}
+.ts-zones{display:flex;gap:16px;width:100%;flex:1;min-height:0}
+.ts-zone{flex:1;border:3px solid #e5e7eb;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;background:#fff;min-height:170px}
+.ts-zone.miss{animation:mgShake .3s ease;border-color:#ef4444}
+.ts-zh{color:#fff;font-weight:800;font-size:20px;padding:10px;text-align:center}
+.ts-zb{flex:1;display:flex;flex-wrap:wrap;gap:8px;padding:12px;align-content:flex-start}
+.ts-in{background:var(--pl);border:2px solid var(--pb);border-radius:14px;padding:6px 14px;font-size:17px;font-weight:700;color:var(--pd)}
+.chip.miss{animation:mgShake .3s ease;background:#FEE2E2;color:#B91C1C}
+.ord-out{display:flex;flex-direction:column;gap:8px;width:100%}
+.ord-row{background:#ECFDF5;border:2px solid #A7F3D0;border-radius:12px;padding:10px 18px;font-size:21px;font-weight:700;color:#047857}
+.ord-row b{display:inline-block;min-width:34px}
+.bd-line{width:100%;min-height:74px;background:#fff;border:3px dashed var(--pb);border-radius:16px;padding:16px 24px;font-size:32px;font-weight:800;color:#111;text-align:center}
+.bd-line.ok{border-style:solid;border-color:#10b981;background:#ECFDF5;color:#047857}
+.star-band{display:flex;gap:16px;width:100%}
+.big-quote{background:#fff;border-left:8px solid var(--p);border-radius:0 18px 18px 0;padding:22px 30px;font-size:27px;line-height:1.5;color:#1f2937;font-style:italic}
+.lyric{background:#fff;border-radius:16px;padding:18px 26px;font-size:24px;line-height:1.6;color:#1f2937;border-left:6px solid var(--p);box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.lyric .vw{background:var(--pb);color:var(--pd);border-radius:6px;padding:0 6px;font-weight:800}
+.lyric .gw{background:#DBEAFE;color:#1E3A8A;border-radius:6px;padding:0 6px;font-weight:800}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;min-height:0}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rule-box{background:#fff;border:3px solid var(--p);border-radius:18px;overflow:hidden}
+.rule-box .rh{background:var(--p);color:#fff;font-size:22px;font-weight:800;padding:10px 22px}
+.rule-box table{width:100%;border-collapse:collapse;font-size:23px}
+.rule-box td,.rule-box th{padding:10px 18px;border-top:1px solid #f3e8ff;text-align:left}
+.rule-box th{background:var(--pl);color:var(--pd);font-size:18px;letter-spacing:.5px}
+.rule-box td b{color:var(--pd)}
+.say-row{display:flex;gap:14px;align-items:flex-start}
+.say{flex:1;border-radius:16px;padding:16px 22px;font-size:21px;line-height:1.45}
+.say.dad{background:#EFF6FF;border:2px solid #BFDBFE}
+.say.leo{background:#FEF3C7;border:2px solid #FDE68A}
+.mini-note{font-size:16px;color:#6b7280}
+.st-row{display:flex;align-items:center;gap:20px;background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:12px 18px;width:100%}
+.st-box{min-width:360px;font-size:34px;font-weight:900;color:#111;text-align:center;background:var(--pl);border:3px dashed var(--pb);border-radius:14px;padding:8px 18px}
+.st-box.pop{animation:stPop .35s}
+.st-box.ok{border-style:solid;border-color:#10b981;background:#ECFDF5;color:#047857}
+@keyframes stPop{0%{transform:scale(.85)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+.st-btns{display:flex;gap:10px;flex-wrap:wrap}
+.st-btn{font-size:18px;padding:10px 18px}
+.st-box s{color:#ef4444}
+.st-box u{color:var(--p);text-decoration:none;background:#FEF3C7;border-radius:6px;padding:0 4px}
+.award-wall{background:linear-gradient(135deg,#78350F,#B45309);border-radius:16px;padding:10px 18px;color:#fff;width:100%}
+.aw-head{font-size:18px;font-weight:800;letter-spacing:.5px;margin-bottom:6px}
+.aw-row{display:flex;flex-wrap:wrap;gap:8px}
+.aw{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:4px 14px;font-size:16px;font-weight:700}
+.aw.empty{opacity:.75;font-weight:600}
+.award-wall.big .aw{font-size:22px;padding:8px 18px}
+#toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-120px);background:#78350F;color:#fff;font-family:Outfit,sans-serif;font-weight:800;font-size:20px;padding:12px 26px;border-radius:30px;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#toast.show{animation:toastIn 2.6s ease}
+@keyframes toastIn{0%{transform:translateX(-50%) translateY(-120px)}12%,80%{transform:translateX(-50%) translateY(0)}100%{transform:translateX(-50%) translateY(-120px)}}
+.mw{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%}
+.mw-c{background:var(--p);color:#fff;border-radius:40px;padding:12px 30px;font-size:22px;font-weight:800;text-align:center}
+.mw-d{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.mw-o{border:3px dashed var(--pb);border-radius:30px;padding:8px 14px;font-size:16px;font-weight:700;color:#9ca3af;text-align:center;background:#fff}
+.mw-o.on{border-style:solid;border-color:#10b981;color:#047857;background:#ECFDF5}
+
+</style>
+</head>
+<body>
+<div id="scaler">
+<div id="deck">
+
+<!-- SLIDE 1 -->
+<div class="slide active" id="s1">
+<div class="title-bg">
+    <div style="font-size:22px;font-weight:700;letter-spacing:3px;opacity:.75;text-transform:uppercase">Our World · Level 4 · Unit 3 · Long Ago and Today</div>
+    <div style="font-size:80px;font-weight:900;text-align:center;line-height:1.05">Grammar 1 · The Then &amp; Now Museum 🏛️</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;font-size:30px;font-weight:700">Contrast with but and instead · TR 3.4</div>
+    <div style="font-size:24px;opacity:.92;text-align:center;max-width:1400px">Words hiding in the lesson: ⚖️ contrast · 🕯️ candlelight · 🔥 fireplace · ♟️ board game · 🧼 soap</div>
+    <div style="font-size:20px;opacity:.8">Student Book pp. 44–45 · Workbook p. 29 · Grammar Workbook pp. 10–11</div>
+  </div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" id="s2">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Objective + The Museum</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🎯 Students will contrast actions now with actions in the past using <b>but</b> and <b>instead</b>.</div>
+    <div class="task-card">🏛️ <b>Today Leo is the museum curator.</b> Each exhibit shows something from long ago and what we do today. Join them with <b>but</b> or <b>instead</b> — and the exhibit goes up on the wall.</div>
+    <div class="award-wall" data-title="The Then & Now Museum — exhibits" data-total="22" data-max="12" data-empty="The museum is empty — every right contrast adds an exhibit!"></div>
+    <div><button class="btn-clear" onclick="clearAwards()">↺ Empty the museum (new day)</button></div>
+    <span class="src-pill">Lesson Planner p. 106 · Objective (verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide" id="s3">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Academic Language</span><span class="hd-chip ac">LP p. 106</span></div>
+  <div class="vocab-body"><div class="word-panel"><span class="vtag ac">Academic Language</span><div class="word-emoji">↔️</div><div class="word-main">contrast</div><div class="word-ipa">/ˈkɑn-træst/ <span class="word-syl">con-trast</span></div><div class="word-pos">noun/verb</div><div class="word-def">a difference between two things; to show differences</div><div class="word-jp">🇯🇵 対比</div><div class="dad-say">💬 <b>Example:</b> But helps contrast life long ago with life today.</div></div>
+    <div class="game-panel"><div class="mg-wrap">
+      <div class="mg-head">⚖️ To <b>contrast</b> is to show how two things are different. Same or different?</div>
+      <div id="ct" style="width:100%;display:flex;flex-direction:column;gap:10px"></div>
+      <div class="mg-win" id="ct-win">⚖️ Different → we contrast them with but or instead. Same → we use too.</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide" id="s4">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — Revisit but, Teach instead</span><span class="hd-chip">Lesson Planner pp. 106–109</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔥 “Deng has curly hair, <b>but</b> Jade has straight hair.” · “I choose green beans. She chooses eggplant <b>instead</b>.”</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="wu"></div>
+    <div class="mg-win" id="wu-win">✅ but joins two different ideas. instead says “in place of that”.</div>
+    <span class="src-pill">Lesson Planner p. 106 · Warm Up: Revisit (examples verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide" id="s5">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Warm Up — What Do You Like for Lunch?</span><span class="hd-chip">Lesson Planner pp. 106–109</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🥪 Dad: “I like sandwiches for lunch.” Leo answers with <b>but</b> or <b>instead</b>.</div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="lu"></div>
+    <span class="src-pill">Lesson Planner p. 106 · Warm Up pairs (sentence frames verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide" id="s6">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">The Grammar Box</span><span class="hd-chip">TR 3.4</span></div>
+  <div class="content-body" style="gap:12px">
+    <div class="listen-hero" style="padding:14px 30px"><div class="lh-emoji">🎧</div><div class="lh-text">Contrast with but and instead. Listen, then read along.</div><div class="lh-tr">TR 3.4</div></div>
+    <div class="big-quote" style="font-size:26px;padding:14px 26px">Long ago, children walked to school, but today many children ride their bikes.</div><div class="big-quote" style="font-size:26px;padding:14px 26px">Many years ago, people didn't have TV. They told stories instead.</div><div class="rule-box"><div class="rh">📐 Contrast with but and instead</div><table><tr><th>Form</th><th>Pattern</th><th>Example</th></tr><tr><td><b>but</b></td><td>past idea + , but + present idea</td><td>Long ago, children walked to school, but today many children ride their bikes.</td></tr><tr><td><b>instead</b></td><td>past idea. present/different idea + instead</td><td>Many years ago, people didn't have TV. They told stories instead.</td></tr><tr><td><b>too</b></td><td>same idea + too</td><td>Long ago, people had fireplaces. Today some people have fireplaces, too.</td></tr></table></div><div class="how-box"><b>Rule:</b> Use but for contrast inside one sentence. Use instead at the end of the second sentence. Use a comma before but. Use a period before the second sentence with instead.</div>
+    <span class="src-pill">Student Book p. 44 · TR 3.4 · chart from unit-3/grammar.json · Grammar Workbook p. 10</span>
+  </div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide" id="s7">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present — The Time Line + but</span><span class="hd-chip">Lesson Planner pp. 106–109</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⏳ then · long ago · the past · many years ago ⟵ <b style="border:3px solid var(--pd);border-radius:50%;padding:2px 12px">but</b> ⟶ now · today · the present</div>
+    <div class="slide-h2">Move your hand from left to right along the time line as you say it.</div>
+    <div id="st1" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="award-wall" data-title="The Then & Now Museum — exhibits" data-total="" data-max="12" data-empty="The museum is empty — every right contrast adds an exhibit!"></div>
+    <span class="src-pill">Lesson Planner pp. 106–107 · Present + Grammar in Depth (time line and examples verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide" id="s8">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Present — instead</span><span class="hd-chip">Lesson Planner pp. 106–109</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⏳ Now add <b style="border:3px solid var(--pd);border-radius:50%;padding:2px 12px">instead</b> — on the right of the time line, at the END of the sentence.</div>
+    <div id="st2" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="award-wall" data-title="The Then & Now Museum — exhibits" data-total="" data-max="12" data-empty="The museum is empty — every right contrast adds an exhibit!"></div>
+    <span class="src-pill">Lesson Planner p. 107 · Grammar in Depth (examples verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide" id="s9">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Grammar in Depth — Where Does It Go?</span><span class="hd-chip">Lesson Planner pp. 106–109</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📍 <b>but</b> is in the middle, after a comma. <b>instead</b> is at the end of the second sentence.</div>
+    <div id="cr" style="display:flex;flex-direction:column;gap:12px;flex:1"></div>
+    <div class="mg-win" id="cr-win">📍 , but … in the middle · … instead. at the end · … , too. when things are the same</div>
+    <span class="src-pill">Lesson Planner pp. 107–108 · Grammar in Depth · grammar.json rule</span>
+  </div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide" id="s10">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Museum Detective 🕵️</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🕵️ Every museum label has ONE mistake. Pick the fixed version.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="det"></div>
+    <div class="how-box">🇯🇵 <b>Japanese bridge:</b> 〜だが、… = <b>, but</b>（文の真ん中）. 〜のかわりに… = 2つ目の文の最後に <b>instead</b>. 同じとき（〜も）= <b>too</b>.</div>
+    <span class="src-pill">grammar.json note: comma before but · period before the sentence with instead</span>
+  </div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide" id="s11">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Practice — Activity 1</span><span class="hd-chip">SB p. 44</span></div>
+  <div class="content-body" style="gap:10px">
+    <div class="slide-h1" style="font-size:34px">✍️ Complete the sentences. Read it with <b>but</b>, then with <b>instead</b> — which sounds best?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="a1"></div>
+    <div class="award-wall" data-title="The Then & Now Museum — exhibits" data-total="" data-max="12" data-empty="The museum is empty — every right contrast adds an exhibit!"></div>
+    <span class="src-pill">Student Book p. 44 · Activity 1 · answer key: 1 instead · 2 but · 3 instead · 4 but</span>
+  </div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide" id="s12">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Practice — Activity 2: Ella and Grandma</span><span class="hd-chip">SB p. 44</span></div>
+  <div class="content-body" style="gap:10px">
+    <div class="slide-h1" style="font-size:34px">👵👧 Read and write. Complete the dialogue. The prompt tells you: <b>but</b> or <b>instead</b>?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="a2"></div>
+    <div class="award-wall" data-title="The Then & Now Museum — exhibits" data-total="" data-max="12" data-empty="The museum is empty — every right contrast adds an exhibit!"></div>
+    <span class="src-pill">Student Book p. 44 · Activity 2 · answer key verbatim</span>
+  </div>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="slide" id="s13">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Apply — Activity 3: Too or Instead?</span><span class="hd-chip">SB p. 45</span></div>
+  <div class="content-body">
+    <div class="slide-h1">📊 Write what is true today. Same → <b>too</b>. Different → <b>instead</b>.</div>
+    <div class="slide-h2">Think aloud: “Long ago, people had fireplaces. Do people have fireplaces now? Yes, that’s the same. We have fireplaces, too.”</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="a3"></div>
+    <div class="award-wall" data-title="The Then & Now Museum — exhibits" data-total="" data-max="12" data-empty="The museum is empty — every right contrast adds an exhibit!"></div>
+    <span class="src-pill">Student Book p. 45 · Activity 3 (model verbatim) · answer key · LP p. 109 too vs instead</span>
+  </div>
+</div>
+
+<!-- SLIDE 14 -->
+<div class="slide" id="s14">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Apply — Activity 4: Your Life and an Older Family Member’s</span><span class="hd-chip">SB p. 45</span></div>
+  <div class="content-body">
+    <div class="slide-h1">👵 Talk about your life and an older family member’s life. How are they different?</div>
+    <div class="chat-row"><div class="chat-ava">👦</div><div class="bub a">My grandmother washed clothes by hand, but I use a washing machine instead!</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px" id="a4"></div>
+    <span class="src-pill">Student Book p. 45 · Activity 4 (model verbatim) · LP p. 109</span>
+  </div>
+</div>
+
+<!-- SLIDE 15 -->
+<div class="slide" id="s15">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Recap — Soap and a Candle</span><span class="hd-chip">Lesson Planner pp. 106–109</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🧼 Dad holds up the soap. 🕯️ Then the candle. Say it again with the other word.</div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="rec"></div>
+    <div class="award-wall" data-title="The Then & Now Museum — exhibits" data-total="" data-max="12" data-empty="The museum is empty — every right contrast adds an exhibit!"></div>
+    <span class="src-pill">Lesson Planner p. 108 · Recap (sentences verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 16 -->
+<div class="slide" id="s16">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Extend — True or False?</span><span class="hd-chip">Lesson Planner pp. 106–109</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🔄 Dad changed some sentences: <b>too</b> ↔ <b>instead</b>. True or false?</div>
+    <div class="slide-h2">Model: “Today, we have to make our own soap, too.” — False! Today we can buy soap in a store instead.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="ext"></div>
+    <span class="src-pill">Lesson Planner p. 109 · Extend (model verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 17 -->
+<div class="slide" id="s17">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — Hold Up Your Card!</span><span class="hd-chip">Lesson Planner pp. 106–109</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🪧 Cards: <b>now</b> · <b>long ago</b> · <b>but</b> · <b>instead</b>. Hold yours up when you hear it!</div>
+    <div class="slide-h2">Then build Dad’s two sentences from the planner.</div>
+    <div id="b1" style="display:flex;flex-direction:column;gap:10px;align-items:center"></div>
+    <div class="mg-win" id="b1-win">🪧 Long ago… but… today — now the second one!</div>
+    <div id="b2" style="display:flex;flex-direction:column;gap:10px;align-items:center"></div>
+    <div class="mg-win" id="b2-win">🪧 Now… instead — great listening!</div>
+    <span class="src-pill">Lesson Planner p. 109 · Wrap Up (sentences verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 18 -->
+<div class="slide" id="s18">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Wrap Up — My Name Is…</span><span class="hd-chip">Lesson Planner pp. 106–109</span></div>
+  <div class="content-body">
+    <div class="slide-h1">👦👨 My name is ___. My partner’s name is ___. I like ___. My partner likes ___.</div>
+    <div class="slide-h2">Say the first pair with <b>but</b> and the second pair with <b>instead</b>. Model: “My name is Jon, but her name is Mae. I like TV. She likes video games instead.”</div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="nm"></div>
+    <span class="src-pill">Lesson Planner p. 108 · Wrap Up (frames and model verbatim)</span>
+  </div>
+</div>
+
+<!-- SLIDE 19 -->
+<div class="slide" id="s19">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Soccer Museum ⚽</span></div>
+  <div class="content-body">
+    <div class="slide-h1">⚽ Soccer long ago and today. but, instead or too?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="soc"></div>
+    <div class="award-wall" data-title="The Then & Now Museum — exhibits" data-total="" data-max="12" data-empty="The museum is empty — every right contrast adds an exhibit!"></div>
+  </div>
+</div>
+
+<!-- SLIDE 20 -->
+<div class="slide" id="s20">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">The Museum Wall 🏛️</span></div>
+  <div class="content-body">
+    <div class="slide-h1">🏛️ Look at the museum! Every exhibit is one you joined correctly.</div>
+    <div class="award-wall big" data-title="The Then & Now Museum — every exhibit" data-total="22" data-empty="The museum is empty — every right contrast adds an exhibit!"></div>
+    <div class="slide-h2">📝 Curator Leo writes three exhibit labels: one with <b>but</b>, one with <b>instead</b>, one with <b>too</b>.</div>
+    <div style="display:flex;flex-direction:column;gap:8px" id="lab"></div>
+  </div>
+</div>
+
+<!-- SLIDE 21 -->
+<div class="slide" id="s21">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">✔ Formative Assessment</span></div>
+  <div class="content-body">
+    <div class="slide-h1">✔️ Can Leo…</div>
+    <div class="assess-grid" id="assess"></div>
+    <div class="task-card">📓 <b>Homework:</b> Workbook p. 29 · Grammar Workbook pp. 10–11 · Leo’s Grammar 1 app (12 tabs).</div>
+  </div>
+</div>
+
+<!-- SLIDE 22 -->
+<div class="slide" id="s22">
+<div class="slide-header"><span class="hd-unit">Unit 3</span><span class="hd-sep">·</span><span class="hd-section">Finish the Lesson</span></div>
+  <div class="content-body" style="align-items:center;justify-content:center;gap:22px">
+    <div style="font-size:90px">🏛️</div>
+    <div class="slide-h1" style="text-align:center">Unit 3 · Grammar 1 — taught</div>
+    <div class="slide-h2" style="text-align:center;max-width:1100px">Next lesson: Vocabulary 2 — modern, difficult, expensive, old-fashioned, important (TR 3.5).</div>
+    <div class="done-wrap">
+      <button class="btn-done" id="doneBtn" onclick="markDone()">✅ Mark this lesson done</button>
+      <button class="btn-clear" id="redoBtn" onclick="handleRedo()">↺ Clear saved progress</button>
+      <div id="doneMsg"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /scaler -->
+
+<div id="nav-bar">
+  <button onclick="goTo(cur-1)">◀ Prev</button>
+  <span id="slide-counter">1 / 22</span>
+  <button onclick="goTo(cur+1)">Next ▶</button>
+  <button id="fs-btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+  <button id="notes-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+  <span id="unit-label">Unit 3 · Grammar 1</span>
+</div>
+
+<div id="tn-panel">
+  <button id="tn-close" onclick="toggleNotes()">✕</button>
+  <h3>📝 Teacher Notes</h3>
+  <div id="tn-content"></div>
+</div>
+
+<script>
+/* =========================================================
+   LEEA · Our World Level 4 · Unit 3 · Grammar 1 — Contrast with but and instead
+   Spine: The Then & Now Museum — every right contrast adds an exhibit to the museum wall.
+   SB pp. 44–45 · TR 3.4 · LP pp. 106–109 · WB p. 29 · GWB pp. 10–11 · chart from unit-3/grammar.json
+   Scope: , but (middle) · instead (end of the second sentence) · too (the same).
+   ========================================================= */
+
+var SAVE_PREFIX = '4-3-grammar-1-slides-';
+var HOMEWORK_ID = new URLSearchParams(location.search).get('hw') || 'leo-4-3-grammar-1-slides';
+/* Must match the `id` in the teacher lesson JSON — the dashboard reads leea.lessonProgress.v1 by it. */
+var LESSON_ID = 'ow-l4-u3-grammar-1';
+var PROGRESS_KEY = 'leea.lessonProgress.v1';
+var LESSON_NAME = 'Unit 3 · Grammar 1 — Long Ago and Today';
+function lSave(key, value) {
+  try {
+    var k = SAVE_PREFIX + key;
+    window.localStorage.setItem(k, JSON.stringify(value));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, k, value);
+    }
+  } catch (e) {}
+}
+function lLoad(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(SAVE_PREFIX + key);
+    return raw === null || raw === undefined ? fallback : JSON.parse(raw);
+  } catch (e) { return fallback; }
+}
+function writeLessonProgress() {
+  try {
+    var store = {};
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (raw) store = JSON.parse(raw) || {};
+    var now = new Date().toISOString();
+    store[LESSON_ID] = { lessonId: LESSON_ID, teacherId: 'neritan', studentId: 'leo',
+                         status: 'done', completedAt: now, updatedAt: now };
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function clearLessonProgress() {
+  try {
+    var raw = window.localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return;
+    var store = JSON.parse(raw) || {};
+    delete store[LESSON_ID];
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(store));
+    if (typeof LEEA_CLOUD !== 'undefined' && LEEA_CLOUD && typeof LEEA_CLOUD.saveProgress === 'function') {
+      LEEA_CLOUD.saveProgress(HOMEWORK_ID, PROGRESS_KEY, store);
+    }
+  } catch (e) {}
+}
+function markDone() {
+  writeLessonProgress();
+  lSave('complete', { name: LESSON_NAME, timestamp: new Date().toISOString(), done: true });
+  lSave('done', true);
+  var btn = document.getElementById('doneBtn');
+  if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+  var msg = document.getElementById('doneMsg');
+  if (msg) msg.textContent = 'Saved on the teacher dashboard. ⭐';
+}
+var redoArmed = false, redoTimer = null;
+function handleRedo() {
+  var btn = document.getElementById('redoBtn');
+  var msg = document.getElementById('doneMsg');
+  if (!redoArmed) {
+    redoArmed = true;
+    btn.textContent = '↺ Tap again to clear';
+    if (msg) msg.textContent = 'This will clear the saved progress for this lesson.';
+    if (redoTimer) window.clearTimeout(redoTimer);
+    redoTimer = window.setTimeout(function () {
+      redoArmed = false;
+      btn.textContent = '↺ Clear saved progress';
+      if (msg) msg.textContent = '';
+    }, 3000);
+    return;
+  }
+  redoArmed = false;
+  if (redoTimer) window.clearTimeout(redoTimer);
+  btn.textContent = '↺ Clear saved progress';
+  clearLessonProgress();
+  lSave('complete', null);
+  lSave('done', null);
+  var d = document.getElementById('doneBtn');
+  if (d) { d.classList.remove('confirmed'); d.textContent = '✅ Mark this lesson done'; }
+  if (msg) msg.textContent = 'Cleared.';
+}
+function restoreDoneState() {
+  var c = lLoad('complete', null);
+  if (c && c.done) {
+    var btn = document.getElementById('doneBtn');
+    if (btn) { btn.classList.add('confirmed'); btn.textContent = '✅ Saved!'; }
+    var msg = document.getElementById('doneMsg');
+    if (msg) msg.textContent = 'Already marked done.';
+  }
+}
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+var cur = 1;
+function goTo(n) {
+  n = Math.max(1, Math.min(TOTAL, n));
+  var old = document.getElementById('s' + cur);
+  if (old) old.classList.remove('active');
+  cur = n;
+  var next = document.getElementById('s' + cur);
+  if (next) next.classList.add('active');
+  document.getElementById('slide-counter').textContent = cur + ' / ' + TOTAL;
+  document.getElementById('tn-content').innerHTML = NOTES[cur] || '<p style="color:#6b7280;font-style:italic">No notes for this slide.</p>';
+  if (SLIDE_INIT[cur]) SLIDE_INIT[cur]();
+}
+document.addEventListener('keydown', function (e) {
+  if (e.target && (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+  if (e.key === 'n' || e.key === 'N') toggleNotes();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+var notesOpen = false;
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('tn-panel').classList.toggle('open', notesOpen);
+  document.getElementById('notes-btn').classList.toggle('active', notesOpen);
+  scale();
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange', function () {
+  var btn = document.getElementById('fs-btn');
+  var active = !!document.fullscreenElement;
+  btn.textContent = active ? '⛶ Exit Full (F)' : '⛶ Fullscreen (F)';
+  btn.classList.toggle('active', active);
+  scale();
+});
+function scale() {
+  var s = document.getElementById('scaler');
+  var availW = window.innerWidth - (notesOpen ? 440 : 0);
+  var availH = window.innerHeight - 52;
+  var r = Math.min(availW / 1920, availH / 1080);
+  s.style.transform = 'scale(' + r + ')';
+  s.style.left = ((availW - 1920 * r) / 2) + 'px';
+  s.style.top = ((availH - 1080 * r) / 2) + 'px';
+  s.style.position = 'fixed';
+}
+window.addEventListener('resize', scale);
+
+// ─── WIDGETS (shared by every Unit 5 deck) ─────────────────────
+function $id(i){ return document.getElementById(i); }
+function once(el){ if(!el || el.dataset.built) return false; el.dataset.built = '1'; return true; }
+function mix(a){ var b = a.slice(); for(var i=b.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=b[i]; b[i]=b[j]; b[j]=t; } return b; }
+function shake(el){ el.classList.remove('miss'); void el.offsetWidth; el.classList.add('miss'); setTimeout(function(){ el.classList.remove('miss'); }, 400); }
+function win(id, text){ var w = $id(id); if(w){ if(text) w.innerHTML = text; w.classList.add('show'); } }
+
+/* reveal: question cards, tap to show the answer. items [[q,a]] */
+function wReveal(id, items, countId){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  items.forEach(function(d, i){
+    var it = document.createElement('div'); it.className = 'q-item';
+    it.innerHTML = '<div class="q-num">' + (d[2] || (i + 1)) + '</div><div><div>' + d[0] + '</div><div class="q-ans">→ ' + d[1] + '</div></div>';
+    it.onclick = function(){ if(it.classList.contains('done')) return; it.classList.add('done'); n++; if(countId) $id(countId).textContent = n + ' / ' + items.length; };
+    g.appendChild(it);
+  });
+}
+/* flip: recap cards. cards [{e, w, b}] */
+function wFlip(id, cards, countId){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  cards.forEach(function(c){
+    var el = document.createElement('div'); el.className = 'mg-flip';
+    el.innerHTML = '<div class="mf-front">' + c.e + '</div><div style="font-size:20px;font-weight:800;color:#111">' + c.w + '</div><div class="mf-back">' + c.b + '</div>';
+    el.onclick = function(){ if(el.classList.contains('open')) return; el.classList.add('open'); n++; if(countId) $id(countId).textContent = n + ' / ' + cards.length; };
+    g.appendChild(el);
+  });
+}
+/* check: multiple choice, wrong shakes, right locks. items [{q, opts, ok, why}] */
+function wCheck(id, items, winId){
+  var g = $id(id); if(!once(g)) return; var solved = 0;
+  items.forEach(function(it, qi){
+    var box = document.createElement('div'); box.className = 'task-card'; box.style.cssText = 'padding:14px 22px;font-size:20px';
+    var opts = it.keep ? it.opts.map(function(o, i){ return [o, i]; }) : mix(it.opts.map(function(o, i){ return [o, i]; }));
+    box.innerHTML = '<div style="font-weight:700;margin-bottom:8px">' + (items.length > 1 ? (qi + 1) + '. ' : '') + it.q + '</div><div style="display:flex;flex-wrap:wrap;gap:10px"></div><div class="mg-miss" style="color:#047857"></div>';
+    var row = box.children[1], why = box.children[2];
+    opts.forEach(function(o){
+      var b = document.createElement('button'); b.className = 'mg-opt'; b.innerHTML = o[0];
+      b.onclick = function(){
+        if(box.dataset.done) return;
+        if(o[1] === it.ok){ b.classList.add('ok'); box.dataset.done = '1'; if(it.award) addAward(it.award); if(it.webi !== undefined) webAdd(it.webi); why.textContent = it.why ? '✓ ' + it.why : '✓ Yes!'; solved++; if(solved === items.length && winId) win(winId); }
+        else { b.classList.add('no'); setTimeout(function(){ b.classList.remove('no'); }, 600); }
+      };
+      row.appendChild(b);
+    });
+    g.appendChild(box);
+  });
+}
+/* find: tap every tile that fits. tiles [{t, ok, why}] */
+function wFind(id, tiles, countId, winId){
+  var g = $id(id); if(!once(g)) return; var need = tiles.filter(function(t){ return t.ok; }).length, got = 0;
+  mix(tiles).forEach(function(t){
+    var el = document.createElement('div'); el.className = 'mg-tile';
+    el.innerHTML = t.t + '<span class="mg-label">' + (t.l || '') + '</span>';
+    el.onclick = function(){
+      if(el.classList.contains('hit')) return;
+      if(t.ok){ el.classList.add('hit'); if(t.why) el.querySelector('.mg-label').textContent = t.why; got++; if(countId) $id(countId).textContent = got + ' / ' + need; if(got === need && winId) win(winId); }
+      else { shake(el); if(t.why) el.querySelector('.mg-label').textContent = t.why; }
+    };
+    g.appendChild(el);
+  });
+}
+/* tapsort: tap a tile, then tap its box. zones [{k, label, color}], tiles [{t, k}] */
+function wTapSort(id, zones, tiles, winId){
+  var g = $id(id); if(!once(g)) return; var sel = null, left = tiles.length;
+  g.innerHTML = '<div class="ts-bank"></div><div class="ts-zones"></div><div class="mg-miss"></div>';
+  var bank = g.children[0], zs = g.children[1], miss = g.children[2];
+  mix(tiles).forEach(function(t){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = t.t; b.dataset.k = t.k;
+    b.onclick = function(){ if(b.classList.contains('used')) return; bank.querySelectorAll('.ts-tile').forEach(function(x){ x.classList.remove('sel'); }); b.classList.add('sel'); sel = b; miss.textContent = ''; };
+    bank.appendChild(b);
+  });
+  zones.forEach(function(z){
+    var c = document.createElement('div'); c.className = 'ts-zone';
+    c.innerHTML = '<div class="ts-zh" style="background:' + z.color + '">' + z.label + '</div><div class="ts-zb"></div>';
+    c.onclick = function(){
+      if(!sel){ miss.textContent = 'Tap a card first, then its box.'; return; }
+      if(sel.dataset.k === z.k){ var t = document.createElement('div'); t.className = 'ts-in'; t.innerHTML = sel.innerHTML; c.children[1].appendChild(t); sel.classList.add('used'); sel.classList.remove('sel'); sel.style.visibility = 'hidden'; sel = null; left--; miss.textContent = ''; if(!left && winId) win(winId); }
+      else { shake(c); miss.textContent = 'Not that box — think again.'; }
+    };
+    zs.appendChild(c);
+  });
+}
+/* order: tap the items in order (rank, sequence). steps in the right order */
+function wOrder(id, steps, winId, prompt){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  g.innerHTML = '<div class="ord-out"></div><div class="ts-bank"></div><div class="mg-miss"></div>';
+  var out = g.children[0], bank = g.children[1], miss = g.children[2];
+  mix(steps.map(function(s, i){ return [s, i]; })).forEach(function(s){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = s[0];
+    b.onclick = function(){
+      if(s[1] === n){ var d = document.createElement('div'); d.className = 'ord-row'; d.innerHTML = '<b>' + (n + 1) + '</b> ' + s[0]; out.appendChild(d); b.style.visibility = 'hidden'; n++; miss.textContent = ''; if(n === steps.length && winId) win(winId); }
+      else { shake(b); miss.textContent = prompt || ('Not yet — what comes ' + (n ? 'next' : 'first') + '?'); }
+    };
+    bank.appendChild(b);
+  });
+}
+/* build: tap the chips in order to build the sentence. chips = right order; extra = traps */
+function wBuild(id, chips, extra, winId){
+  var g = $id(id); if(!once(g)) return; var n = 0;
+  g.innerHTML = '<div class="bd-line">&nbsp;</div><div class="ts-bank"></div><div class="mg-miss"></div>';
+  var line = g.children[0], bank = g.children[1], miss = g.children[2], built = [];
+  mix(chips.map(function(c, i){ return [c, i]; }).concat((extra || []).map(function(c){ return [c, -1]; }))).forEach(function(c){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = c[0];
+    b.onclick = function(){
+      if(c[1] === n){ built.push(c[0]); line.innerHTML = built.join(' '); b.style.visibility = 'hidden'; n++; miss.textContent = ''; if(n === chips.length){ line.classList.add('ok'); if(winId) win(winId); } }
+      else { shake(b); miss.textContent = c[1] < 0 ? 'That piece does not belong in this sentence.' : 'Not that word yet.'; }
+    };
+    bank.appendChild(b);
+  });
+}
+/* hold: press and hold to fill a meter; release early and it drains. */
+function wHold(id, cfg){
+  var g = $id(id); if(!once(g)) return;
+  g.innerHTML = '<div class="mg-bar" style="height:34px"><div></div></div><div style="font-size:72px;line-height:1;text-align:center">' + cfg.e0 + '</div><button class="mg-btn" style="font-size:24px;padding:18px 40px">' + cfg.btn + '</button><div class="mg-miss" style="color:#374151"></div>';
+  var bar = g.children[0].firstChild, face = g.children[1], btn = g.children[2], msg = g.children[3], v = 0, t = null, done = false;
+  function tick(){ v = Math.min(100, v + 2.2); bar.style.width = v + '%'; if(v >= 100){ stop(); done = true; face.innerHTML = cfg.e1; msg.innerHTML = cfg.win; btn.disabled = true; if(cfg.winId) win(cfg.winId); } }
+  function drain(){ if(done) return; v = Math.max(0, v - 4); bar.style.width = v + '%'; if(v > 0) t = setTimeout(drain, 40); }
+  function start(e){ if(done) return; e.preventDefault(); clearTimeout(t); msg.innerHTML = cfg.during || 'Keep going…'; t = setInterval(tick, 40); }
+  function stop(){ clearInterval(t); clearTimeout(t); if(!done){ msg.innerHTML = cfg.early || 'Don’t stop! Hold it longer.'; drain(); } }
+  btn.addEventListener('pointerdown', start); btn.addEventListener('pointerup', stop); btn.addEventListener('pointerleave', stop);
+}
+/* typed: Dad 💬 / Leo 💬 frames, saved as typed. rows [[label, placeholder]] */
+function wTyped(id, rows, key){
+  var g = $id(id); if(!once(g)) return; var saved = lLoad(key, {}) || {};
+  rows.forEach(function(r, i){
+    var row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:16px';
+    row.innerHTML = '<span style="font-size:21px;font-weight:800;color:var(--pd);min-width:300px">' + r[0] + '</span>';
+    var inp = document.createElement('input'); inp.placeholder = r[1]; inp.value = saved[i] || '';
+    inp.style.cssText = 'flex:1;font-family:Outfit,sans-serif;font-size:21px;padding:11px 16px;border:2px solid var(--pb);border-radius:12px';
+    inp.oninput = function(){ saved[i] = inp.value; lSave(key, saved); };
+    row.appendChild(inp); g.appendChild(row);
+  });
+}
+/* assess: Can Leo…? cards */
+function wAssess(id, items){
+  var g = $id(id); if(!once(g)) return;
+  items.forEach(function(t){
+    var c = document.createElement('div'); c.className = 'assess-card';
+    c.innerHTML = '<div class="assess-q">' + t[0] + '</div><div style="font-size:16px;color:#6b7280">' + (t[1] || 'Tap when Leo can do it.') + '</div>';
+    c.onclick = function(){ c.classList.toggle('yes'); };
+    g.appendChild(c);
+  });
+}
+/* sort with the shared drag-and-drop sorter (pickChart) */
+function wSort(id, zones, tiles, winId){
+  if(typeof window.pickChart !== 'function'){ wTapSort(id, zones, tiles, winId); return; }
+  var g = $id(id); if(!once(g)) return;
+  g.innerHTML = window.pickChart('classification sort', { id: id + '-dnd', tiles: tiles.map(function(t){ return { text: t.t, answer: t.k }; }),
+    zones: zones.map(function(z){ return { key: z.k, label: z.label, color: z.color }; }), onComplete: function(){ if(winId) win(winId); } });
+}
+/* pair: tap one on the left, then its partner on the right. pairs [[l, r]] */
+function wPair(id, pairs, countId, winId){
+  var g = $id(id); if(!once(g)) return; var sel = null, got = 0;
+  g.innerHTML = '<div class="mg-pair"><div class="mg-col"></div><div class="mg-col"></div></div>';
+  var L = g.querySelectorAll('.mg-col')[0], R = g.querySelectorAll('.mg-col')[1];
+  pairs.forEach(function(p, i){
+    var b = document.createElement('button'); b.className = 'mg-pbtn'; b.innerHTML = p[0];
+    b.onclick = function(){ if(b.classList.contains('done')) return; L.querySelectorAll('.mg-pbtn').forEach(function(x){ x.classList.remove('sel'); }); b.classList.add('sel'); sel = [i, b]; };
+    L.appendChild(b);
+  });
+  mix(pairs.map(function(p, i){ return [p[1], i]; })).forEach(function(p){
+    var b = document.createElement('button'); b.className = 'mg-pbtn'; b.innerHTML = p[0];
+    b.onclick = function(){
+      if(!sel || b.classList.contains('done')) return;
+      if(p[1] === sel[0]){ b.classList.add('done'); sel[1].classList.add('done'); sel[1].classList.remove('sel'); sel = null; got++; if(countId) $id(countId).textContent = got + ' / ' + pairs.length; if(got === pairs.length && winId) win(winId); }
+      else { b.classList.add('bad'); setTimeout(function(){ b.classList.remove('bad'); }, 400); }
+    };
+    R.appendChild(b);
+  });
+}
+/* rank: tap in YOUR order — favorite first. No wrong answers. */
+function wRank(id, items, winId, first, last){
+  var g = $id(id); if(!once(g)) return; var n = 0, order = [];
+  g.innerHTML = '<div class="ord-out"></div><div class="ts-bank"></div>';
+  var out = g.children[0], bank = g.children[1];
+  items.forEach(function(t){
+    var b = document.createElement('button'); b.className = 'chip ts-tile'; b.innerHTML = t;
+    b.onclick = function(){ order.push(t); var d = document.createElement('div'); d.className = 'ord-row'; d.innerHTML = '<b>' + (++n) + '</b> ' + t; out.appendChild(d); b.style.visibility = 'hidden';
+      if(n === items.length && winId) win(winId, '🗣️ “' + (first || 'I put {x} first.').replace('{x}', order[0].replace(/<[^>]+>/g, '')) + '” · “' + (last || 'I put {x} last.').replace('{x}', order[n - 1].replace(/<[^>]+>/g, '')) + '”'); };
+    bank.appendChild(b);
+  });
+}
+/* steps: watch a word change, one button per step — no leaps.
+   rows [{start, steps:[[buttonLabel, resultHTML]], award?}] */
+function wSteps(id, rows, winId){
+  var g = $id(id); if(!once(g)) return; var done = 0;
+  rows.forEach(function(r){
+    var row = document.createElement('div'); row.className = 'st-row';
+    row.innerHTML = '<div class="st-box">' + r.start + '</div><div class="st-btns"></div>';
+    var box = row.children[0], btns = row.children[1], k = 0;
+    r.steps.forEach(function(s, i){
+      var b = document.createElement('button'); b.className = 'mg-btn st-btn'; b.innerHTML = (i + 1) + '. ' + s[0]; b.disabled = i > 0;
+      b.onclick = function(){ if(i !== k) return; box.innerHTML = s[1]; box.classList.remove('pop'); void box.offsetWidth; box.classList.add('pop'); b.disabled = true; k++;
+        if(btns.children[k]) btns.children[k].disabled = false;
+        if(k === r.steps.length){ box.classList.add('ok'); done++; if(r.award) addAward(r.award); if(done === rows.length && winId) win(winId); } };
+      btns.appendChild(b);
+    });
+    g.appendChild(row);
+  });
+}
+/* tally: tap to add a check mark; the most checks wins. */
+function wTally(id, items, key, winId, frame){
+  var g = $id(id); if(!once(g)) return; var t = lLoad(key, {}) || {};
+  function paint(){ var best = 0, who = []; items.forEach(function(a, i){ var n = t[i] || 0; if(n > best){ best = n; who = [a]; } else if(n && n === best) who.push(a); });
+    if(best && winId) win(winId, (frame || 'In our opinion, {x} is great!').replace('{x}', '<b>' + who.join(' / ') + '</b>') + ' (' + best + ' ✔)'); }
+  items.forEach(function(a, i){
+    var c = document.createElement('div'); c.className = 'mg-tile'; c.style.fontSize = '26px';
+    c.innerHTML = a + '<span class="mg-label" style="font-size:24px;color:var(--p)">' + '✔'.repeat(t[i] || 0) + '</span>';
+    c.onclick = function(){ t[i] = (t[i] || 0) + 1; lSave(key, t); c.querySelector('.mg-label').textContent = '✔'.repeat(t[i]); paint(); };
+    g.appendChild(c);
+  });
+  paint();
+}
+/* AWARDS — the spine's trophy wall. Every .award-wall on any slide repaints. */
+var WIN_HOOK = {};
+var _win0 = win;
+win = function(id, text){ _win0(id, text); if(WIN_HOOK[id]) [].concat(WIN_HOOK[id]).forEach(addAward); };
+function getAwards(){ return lLoad('awards', []) || []; }
+function addAward(name){ var a = getAwards(); if(a.indexOf(name) < 0){ a.push(name); lSave('awards', a); toast('🏆 New award: ' + name); } paintAwards(); }
+function paintAwards(){
+  var a = getAwards();
+  document.querySelectorAll('.award-wall').forEach(function(w){
+    var max = +(w.dataset.max || 99);
+    w.innerHTML = '<div class="aw-head">🏆 ' + (w.dataset.title || 'Trophy wall') + ' · ' + a.length + (w.dataset.total ? ' / ' + w.dataset.total : '') + '</div><div class="aw-row">' +
+      (a.length ? a.slice(-max).map(function(x){ return '<span class="aw">🏆 ' + x + '</span>'; }).join('') : '<span class="aw empty">' + (w.dataset.empty || 'No trophies yet — every right answer wins one!') + '</span>') + '</div>';
+  });
+}
+function toast(t){ var el = $id('toast'); if(!el){ el = document.createElement('div'); el.id = 'toast'; document.body.appendChild(el); } el.textContent = t; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); }
+function clearAwards(){ lSave('awards', []); paintAwards(); }
+/* choose: opinion rows — any answer, saved. items [{q, opts, frame}] */
+function wChoose(id, items, key){
+  var g = $id(id); if(!once(g)) return; var st = lLoad(key, {}) || {};
+  items.forEach(function(it, i){
+    var box = document.createElement('div'); box.className = 'task-card'; box.style.cssText = 'padding:12px 20px;font-size:20px';
+    box.innerHTML = '<div style="font-weight:800;margin-bottom:8px">' + it.q + '</div><div style="display:flex;flex-wrap:wrap;gap:8px"></div><div class="mg-miss" style="color:var(--pd)"></div>';
+    var row = box.children[1], say = box.children[2];
+    function paint(){ row.querySelectorAll('.mg-opt').forEach(function(b, k){ b.classList.toggle('ok', st[i] === k); }); if(st[i] !== undefined) say.innerHTML = '🗣️ ' + (it.frame || '{x}').replace('{x}', it.opts[st[i]]); }
+    it.opts.forEach(function(o, k){ var b = document.createElement('button'); b.className = 'mg-opt'; b.style.pointerEvents = 'auto'; b.innerHTML = o; b.onclick = function(){ st[i] = k; lSave(key, st); paint(); }; row.appendChild(b); });
+    paint(); g.appendChild(box);
+  });
+}
+/* web: the shared main-idea web (WEB = {c, d}); every .mw-host repaints; details unlock as checks are solved. */
+function paintWeb(){
+  if(typeof WEB === 'undefined') return; var got = lLoad('mainweb', []) || [];
+  document.querySelectorAll('.mw-host').forEach(function(g){
+    g.innerHTML = '<div class="mw"><div class="mw-c">' + WEB.c + '</div><div class="mw-d">' + WEB.d.map(function(d, i){ return '<div class="mw-o' + (got.indexOf(i) >= 0 ? ' on' : '') + '">' + (got.indexOf(i) >= 0 ? d : (WEB.ph ? WEB.ph[i] : '❓ detail ' + (i + 1))) + '</div>'; }).join('') + '</div></div>';
+  });
+}
+function webAdd(i){ var got = lLoad('mainweb', []) || []; if(got.indexOf(i) < 0){ got.push(i); lSave('mainweb', got); toast(typeof WEB !== 'undefined' && WEB.toast ? WEB.toast : '🕸️ New detail on the web!'); } paintWeb(); }
+
+
+// ─── TEACHER NOTES ─────────────────────────────────────────────
+var NOTES = {
+ "1": "<p class=\"tn-lbl\">The spine</p><p>Today Leo is the curator of the Then &amp; Now Museum. Every time he joins long ago and today correctly with <b>but</b> or <b>instead</b>, a new exhibit goes up on the museum wall. The payoff is Leo writing the museum labels in front of the full wall.</p>",
+ "2": "<p class=\"tn-lbl\">Objective</p><p>Verbatim, LP p. 106. Empty the wall only if you are re-teaching the lesson. Materials (LP p. 106): a bar of soap, a candle.</p>",
+ "3": "<p class=\"tn-lbl\">contrast</p><p>Academic Language, LP p. 106.</p>",
+ "4": "<p class=\"tn-lbl\">Revisit</p><p>LP p. 106: point to Leo, then yourself. Then pairs: “I like (sandwiches) for lunch.” — “I like salad instead.” Frames: I like ___ instead. / You like ___, but I like ___.</p>",
+ "5": "<p class=\"tn-lbl\">Lunch</p><p>Swap roles.</p>",
+ "6": "<p class=\"tn-lbl\">Grammar box — the one reveal</p><p>LP p. 108: “Notice that but is in the middle of the sentence, but instead is at the end.”</p>",
+ "7": "<p class=\"tn-lbl\">Present — but</p><p>LP p. 107 Teaching Tip: but connects two sentences; in writing a comma usually goes before but.</p>",
+ "8": "<p class=\"tn-lbl\">Present — instead</p><p>LP p. 107 Teaching Tip: instead comes at the end of the second sentence, and there is a period at the end of the first sentence.</p>",
+ "9": "<p class=\"tn-lbl\">Where does it go?</p><p>Leo says why each broken sentence is broken.</p>",
+ "10": "<p class=\"tn-lbl\">Detective</p><p>The three common errors: the comma after but, instead twice, instead used like but — and instead where things are the same.</p>",
+ "11": "<p class=\"tn-lbl\">Activity 1</p><p>LP p. 108: help with item 1 — read it aloud and motion to Leo to say <i>instead</i>. The SB also prints the words to write: 1 buy clothes in stores, 3 letters.</p>",
+ "12": "<p class=\"tn-lbl\">Activity 2</p><p>LP p. 108: Ella is talking to her grandmother. Point out when to use but and when to use instead (it is in the prompt). Then read the dialogue aloud together — Dad is Grandma.</p>",
+ "13": "<p class=\"tn-lbl\">Activity 3</p><p>LP p. 109: there can be more than one right answer — some people today still play board games, sew, or make soap. “When things are the same, we use too. When things are different, we use instead.”</p>",
+ "14": "<p class=\"tn-lbl\">Activity 4</p><p>LP p. 109: one side says what grandparents did in the past, the other what they do now. Then swap.</p>",
+ "15": "<p class=\"tn-lbl\">Recap</p><p>LP p. 108.</p>",
+ "16": "<p class=\"tn-lbl\">Extend</p><p>LP p. 109: then Leo changes three sentences and Dad says true or false.</p>",
+ "17": "<p class=\"tn-lbl\">Wrap Up</p><p>LP p. 109: read the sentences slowly; Leo holds up the right card. Then Leo writes his own pair and Dad holds up the cards.</p>",
+ "18": "<p class=\"tn-lbl\">Wrap Up</p><p>LP p. 108.</p>",
+ "19": "<p class=\"tn-lbl\">Soccer museum</p><p>Ask Leo for one more soccer then-and-now sentence.</p>",
+ "20": "<p class=\"tn-lbl\">Payoff</p><p>The wall shows every exhibit Leo earned. His three labels use all three words from the chart.</p>",
+ "21": "<p class=\"tn-lbl\">Formative Assessment</p><p>First card verbatim from LP p. 109. Model answer: “My grandparents talked face-to-face, but I use my cell phone.”</p>",
+ "22": "<p class=\"tn-lbl\">Mark Done</p><p>Records this lesson on the teacher dashboard (leea.lessonProgress.v1). Leo's app tracks his own tabs separately.</p>"
+};
+
+// ─── SLIDE INIT MAP ───────────────────────────────────────────
+var TOTAL = 22;
+var SLIDE_INIT = {
+  2: function(){ paintAwards(); },
+  3: function(){ wCheck("ct", [
+ {
+  "q": "🕯️ candles long ago · 💡 electric lights today",
+  "opts": [
+   "different",
+   "the same"
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "🔥 fireplaces long ago · 🔥 fireplaces today",
+  "opts": [
+   "different",
+   "the same"
+  ],
+  "ok": 1,
+  "keep": true
+ },
+ {
+  "q": "🚶 walked to school long ago · 🚲 ride bikes today",
+  "opts": [
+   "different",
+   "the same"
+  ],
+  "ok": 0,
+  "keep": true
+ }
+], "ct-win"); },
+  4: function(){ wCheck("wu", [
+ {
+  "q": "He has straight hair, ____ she has curly hair.",
+  "opts": [
+   "but",
+   "instead"
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "I choose green beans with my lunch. She chooses eggplant ____.",
+  "opts": [
+   "instead",
+   "but"
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "I eat tacos for lunch. He eats pizza ____.",
+  "opts": [
+   "instead",
+   "but"
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "Dad likes coffee, ____ Leo likes juice.",
+  "opts": [
+   "but",
+   "instead"
+  ],
+  "ok": 0,
+  "keep": true
+ }
+], "wu-win"); },
+  5: function(){ wTyped("lu", [
+ [
+  "🥗 I like ___ instead.",
+  "I like salad instead."
+ ],
+ [
+  "🍕 You like ___, but I like ___.",
+  "You like sandwiches, but I like pizza."
+ ],
+ [
+  "🍙 Leo’s turn: “I like ___ for lunch.”",
+  "Dad: I like ___ instead."
+ ]
+], "lunch"); },
+  7: function(){ paintAwards(); wSteps("st1", [
+ {
+  "start": "Then people used fires for light.",
+  "steps": [
+   [
+    "add the present",
+    "Then people used fires for light. Now we use electric lights."
+   ],
+   [
+    "join with but",
+    "Then people used fires for light<u>, but</u> now we use electric lights."
+   ]
+  ],
+  "award": "🔥 → 💡 Fire and electric lights"
+ },
+ {
+  "start": "Long ago, children walked to school.",
+  "steps": [
+   [
+    "add the present",
+    "Long ago, children walked to school. Today many children ride their bikes."
+   ],
+   [
+    "join with but",
+    "Long ago, children walked to school<u>, but</u> today many children ride their bikes."
+   ]
+  ],
+  "award": "🚶 → 🚲 The walk to school"
+ }
+]); },
+  8: function(){ paintAwards(); wSteps("st2", [
+ {
+  "start": "Many years ago, people didn’t have TV.",
+  "steps": [
+   [
+    "add the second sentence",
+    "Many years ago, people didn’t have TV. They told stories."
+   ],
+   [
+    "add instead at the end",
+    "Many years ago, people didn’t have TV. They told stories <u>instead</u>."
+   ]
+  ],
+  "award": "📺 → 📖 Stories, not TV"
+ },
+ {
+  "start": "In the past, we walked to school.",
+  "steps": [
+   [
+    "add the second sentence",
+    "In the past, we walked to school. Today we ride a bus."
+   ],
+   [
+    "add instead at the end",
+    "In the past, we walked to school. Today we ride a bus <u>instead</u>."
+   ]
+  ],
+  "award": "🚌 The school bus"
+ }
+]); },
+  9: function(){ WIN_HOOK["cr-win"] = "📍 The punctuation check"; wTapSort("cr", [
+ {
+  "k": "y",
+  "label": "✅ correct",
+  "color": "#16A34A"
+ },
+ {
+  "k": "n",
+  "label": "❌ broken",
+  "color": "#DC2626"
+ }
+], [
+ {
+  "t": "Long ago, children walked to school, but today they ride bikes.",
+  "k": "y"
+ },
+ {
+  "t": "People didn’t have TV. They told stories instead.",
+  "k": "y"
+ },
+ {
+  "t": "Long ago, people had fireplaces. Today we have fireplaces, too.",
+  "k": "y"
+ },
+ {
+  "t": "Long ago, children walked to school but, today they ride bikes.",
+  "k": "n"
+ },
+ {
+  "t": "People didn’t have TV. Instead they told stories instead.",
+  "k": "n"
+ },
+ {
+  "t": "Long ago, people made soap, instead today we buy it.",
+  "k": "n"
+ }
+], "cr-win"); },
+  10: function(){ wCheck("det", [
+ {
+  "q": "❌ Long ago, people used candles but, today we use lamps.",
+  "opts": [
+   "Long ago, people used candles, but today we use lamps.",
+   "Long ago, people used candles, today but we use lamps."
+  ],
+  "ok": 0
+ },
+ {
+  "q": "❌ People didn’t have TV. Instead they told stories instead.",
+  "opts": [
+   "People didn’t have TV. They told stories instead.",
+   "People didn’t have TV, instead they told stories."
+  ],
+  "ok": 0
+ },
+ {
+  "q": "❌ Long ago, people sewed clothes, instead today we buy them.",
+  "opts": [
+   "Long ago, people sewed clothes. Today we buy them instead.",
+   "Long ago, people sewed clothes instead, today we buy them."
+  ],
+  "ok": 0
+ },
+ {
+  "q": "❌ Long ago, people had fireplaces. Today we have fireplaces, instead.",
+  "opts": [
+   "Long ago, people had fireplaces. Today we have fireplaces, too.",
+   "Long ago, people had fireplaces, too today."
+  ],
+  "ok": 0,
+  "why": "The same → too."
+ }
+]); },
+  11: function(){ paintAwards(); wCheck("a1", [
+ {
+  "q": "1. Long ago, mothers and daughters sewed clothes at home. Today we buy clothes in stores ____.",
+  "opts": [
+   "but",
+   "instead"
+  ],
+  "ok": 1,
+  "keep": true,
+  "award": "🪡 → 🛍️ Clothes"
+ },
+ {
+  "q": "2. Many years ago, people couldn’t play video games, ____ they played some fun board games.",
+  "opts": [
+   "but",
+   "instead"
+  ],
+  "ok": 0,
+  "keep": true,
+  "award": "🎲 Board games"
+ },
+ {
+  "q": "3. Long ago, people didn’t have computers. They wrote letters ____.",
+  "opts": [
+   "but",
+   "instead"
+  ],
+  "ok": 1,
+  "keep": true,
+  "award": "✉️ Letters"
+ },
+ {
+  "q": "4. Many years ago, people didn’t have cars, ____ some people had horses.",
+  "opts": [
+   "but",
+   "instead"
+  ],
+  "ok": 0,
+  "keep": true,
+  "award": "🐎 → 🚗 Horses and cars"
+ }
+]); },
+  12: function(){ paintAwards(); wCheck("a2", [
+ {
+  "q": "Grandma: Years ago, we didn’t have cell phones, ____. (but / a big red telephone)",
+  "opts": [
+   "but we had a big red telephone",
+   "we had a big red telephone instead but"
+  ],
+  "ok": 0,
+  "award": "☎️ The big red telephone"
+ },
+ {
+  "q": "Ella: That’s cool. Did you play video games? Grandma: No. We ____. (play with toys / instead) I liked to play with my dolls.",
+  "opts": [
+   "played with toys instead",
+   "instead played with toys"
+  ],
+  "ok": 0,
+  "award": "🪆 Grandma’s dolls"
+ },
+ {
+  "q": "Ella: I don’t have any dolls, ____. (but / a lot of puppets)",
+  "opts": [
+   "but I have a lot of puppets",
+   "I have a lot of puppets but"
+  ],
+  "ok": 0,
+  "award": "🎭 Ella’s puppets"
+ },
+ {
+  "q": "Ella: Do you want to see my puppet theater? Or do you want to ____? (play a board game / instead)",
+  "opts": [
+   "play a board game instead",
+   "instead play a board game"
+  ],
+  "ok": 0,
+  "award": "♟️ A board game"
+ }
+]); },
+  13: function(){ paintAwards(); wCheck("a3", [
+ {
+  "q": "🕰️ People had fireplaces.",
+  "opts": [
+   "We have fireplaces, too.",
+   "We have fireplaces instead."
+  ],
+  "ok": 0,
+  "award": "🔥 Fireplaces"
+ },
+ {
+  "q": "🕰️ People made their own soap.",
+  "opts": [
+   "We buy soap in a store instead.",
+   "We buy soap in a store, too."
+  ],
+  "ok": 0,
+  "award": null
+ },
+ {
+  "q": "🕰️ People walked everywhere.",
+  "opts": [
+   "We go by car instead.",
+   "We go by car, too."
+  ],
+  "ok": 0,
+  "award": null
+ },
+ {
+  "q": "🕰️ People played board games.",
+  "opts": [
+   "We play video games instead.",
+   "We play video games, too."
+  ],
+  "ok": 0,
+  "award": null
+ },
+ {
+  "q": "🕰️ People read by candlelight.",
+  "opts": [
+   "We have electric lights instead.",
+   "We have electric lights, too."
+  ],
+  "ok": 0,
+  "award": null
+ },
+ {
+  "q": "🕰️ People sewed their own clothes.",
+  "opts": [
+   "We buy clothes in a store instead.",
+   "We buy clothes in a store, too."
+  ],
+  "ok": 0,
+  "award": null
+ }
+]); },
+  14: function(){ wTyped("a4", [
+ [
+  "👴 Grandpa / Grandma…",
+  "My grandpa walked to school, but I ride my bike."
+ ],
+ [
+  "👨 Dad, when he was a boy…",
+  "Dad played outside. I play video games instead."
+ ],
+ [
+  "👦 Leo’s own",
+  "…"
+ ]
+], "act4"); },
+  15: function(){ paintAwards(); wCheck("rec", [
+ {
+  "q": "🧼 “Long ago, people made their own soap, but today we can buy soap at the store.” Say it with <b>instead</b>.",
+  "opts": [
+   "Long ago, people made their own soap. Today we buy soap at the store instead.",
+   "Long ago, people made their own soap instead, today we buy it."
+  ],
+  "ok": 0,
+  "award": "🧼 Homemade soap"
+ },
+ {
+  "q": "🕯️ “People used candles for light. Today we use electric lights.” Join them with <b>but</b>.",
+  "opts": [
+   "People used candles for light, but today we use electric lights.",
+   "People used candles for light but, today we use electric lights."
+  ],
+  "ok": 0,
+  "award": "🕯️ The candle"
+ },
+ {
+  "q": "🕯️ Now with <b>instead</b>.",
+  "opts": [
+   "People used candles for light. Today we use electric lights instead.",
+   "Instead people used candles. Today electric lights."
+  ],
+  "ok": 0
+ }
+]); },
+  16: function(){ wCheck("ext", [
+ {
+  "q": "People made their own soap. Today, we have to make our own soap, too.",
+  "opts": [
+   "true",
+   "false"
+  ],
+  "ok": 1,
+  "keep": true,
+  "why": "Today we can buy soap in a store instead."
+ },
+ {
+  "q": "People had fireplaces. Today we have fireplaces, too.",
+  "opts": [
+   "true",
+   "false"
+  ],
+  "ok": 0,
+  "keep": true
+ },
+ {
+  "q": "People read by candlelight. Today we read by candlelight, too.",
+  "opts": [
+   "true",
+   "false"
+  ],
+  "ok": 1,
+  "keep": true,
+  "why": "We have electric lights instead."
+ },
+ {
+  "q": "People walked everywhere. Today we go by car instead.",
+  "opts": [
+   "true",
+   "false"
+  ],
+  "ok": 0,
+  "keep": true
+ }
+]); },
+  17: function(){ wBuild("b1", ["Long ago,", "we", "told", "stories", "by", "the", "fire,", "but", "today", "we", "watch", "TV."], ["instead"], "b1-win"); wBuild("b2", ["Long ago,", "we", "made", "our", "clothes.", "Now,", "we", "buy", "them", "instead."], ["but"], "b2-win"); },
+  18: function(){ wTyped("nm", [
+ [
+  "👦 with but",
+  "My name is Leo, but my dad’s name is…"
+ ],
+ [
+  "🎮 with instead",
+  "I like soccer. Dad likes … instead."
+ ]
+], "names"); },
+  19: function(){ paintAwards(); wCheck("soc", [
+ {
+  "q": "Long ago, balls were made of heavy leather, ____ today they are light and modern.",
+  "opts": [
+   "but",
+   "instead",
+   "too"
+  ],
+  "ok": 0,
+  "keep": true,
+  "award": "⚽ The leather ball"
+ },
+ {
+  "q": "Long ago, fans listened to games on the radio. Today they watch on TV ____.",
+  "opts": [
+   "instead",
+   "but",
+   "too"
+  ],
+  "ok": 0,
+  "keep": true,
+  "award": "📻 → 📺 The radio match"
+ },
+ {
+  "q": "Long ago, people loved soccer. Today people love soccer, ____.",
+  "opts": [
+   "too",
+   "instead",
+   "but"
+  ],
+  "ok": 0,
+  "keep": true,
+  "award": "❤️ Love of the game"
+ },
+ {
+  "q": "Long ago, players wore heavy boots, ____ today they wear light boots.",
+  "opts": [
+   "but",
+   "instead",
+   "too"
+  ],
+  "ok": 0,
+  "keep": true,
+  "award": "👟 Old boots"
+ }
+]); },
+  20: function(){ paintAwards(); wTyped("lab", [
+ [
+  "🏷️ with but",
+  "Long ago, people used candles, but today we use electric lights."
+ ],
+ [
+  "🏷️ with instead",
+  "Long ago, people wrote letters. Today we send e-mails instead."
+ ],
+ [
+  "🏷️ with too",
+  "Long ago, children played with dolls. Today children play with dolls, too."
+ ]
+], "labels"); },
+  21: function(){ wAssess("assess", [
+ [
+  "…contrast actions and ideas in the past and present using but and instead?",
+  "Give the phrases I use my cell phone and My grandparents talked face-to-face. Leo makes one or two sentences with but or instead."
+ ],
+ [
+  "…put a comma before but and instead at the end?"
+ ],
+ [
+  "…use too when things are the same?"
+ ]
+]); },
+  22: function(){ restoreDoneState(); }
+};
+
+scale();
+goTo(1);
+restoreDoneState();
+</script>
+</body>
+</html>

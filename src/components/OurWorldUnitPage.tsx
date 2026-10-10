@@ -44,6 +44,11 @@ const lessonCopy: Record<string, { title: string; subtitle: string }> = {
 };
 
 const unitMeta: Record<number, { title: string; subtitle: string; chips: string[] }> = {
+  3: {
+    title: "Long Ago and Today",
+    subtitle: "Life long ago & life today, how phones changed, and appreciating the past.",
+    chips: ["🕯️ Long Ago", "📱 Today", "🗿 The Past"]
+  },
   4: {
     title: "Get Well Soon!",
     subtitle: "Illnesses, injuries & how to treat them — and why we sneeze.",
